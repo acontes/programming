@@ -1,4 +1,3 @@
-
 package com.amazonaws.ec2.model;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -30,9 +29,7 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-    "keyPair"
-})
+@XmlType(name = "", propOrder = { "keyPair" })
 @XmlRootElement(name = "CreateKeyPairResult")
 public class CreateKeyPairResult {
 
@@ -80,7 +77,7 @@ public class CreateKeyPairResult {
     }
 
     public boolean isSetKeyPair() {
-        return (this.keyPair!= null);
+        return (this.keyPair != null);
     }
 
     /**
@@ -94,7 +91,6 @@ public class CreateKeyPairResult {
         setKeyPair(value);
         return this;
     }
-    
 
     /**
      * 
@@ -107,11 +103,11 @@ public class CreateKeyPairResult {
     protected String toXMLFragment() {
         StringBuffer xml = new StringBuffer();
         if (isSetKeyPair()) {
-            KeyPair  keyPair = getKeyPair();
+            KeyPair keyPair = getKeyPair();
             xml.append("<KeyPair>");
             xml.append(keyPair.toXMLFragment());
             xml.append("</KeyPair>");
-        } 
+        }
         return xml.toString();
     }
 
@@ -125,29 +121,27 @@ public class CreateKeyPairResult {
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             switch (c) {
-            case '&':
-                sb.append("&amp;");
-                break;
-            case '<':
-                sb.append("&lt;");
-                break;
-            case '>':
-                sb.append("&gt;");
-                break;
-            case '\'':
-                sb.append("&#039;");
-                break;
-            case '"':
-                sb.append("&quot;");
-                break;
-            default:
-                sb.append(c);
+                case '&':
+                    sb.append("&amp;");
+                    break;
+                case '<':
+                    sb.append("&lt;");
+                    break;
+                case '>':
+                    sb.append("&gt;");
+                    break;
+                case '\'':
+                    sb.append("&#039;");
+                    break;
+                case '"':
+                    sb.append("&quot;");
+                    break;
+                default:
+                    sb.append(c);
             }
         }
         return sb.toString();
     }
-
-
 
     /**
      *
@@ -162,10 +156,10 @@ public class CreateKeyPairResult {
         StringBuffer json = new StringBuffer();
         boolean first = true;
         if (isSetKeyPair()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append("\"KeyPair\" : {");
-            KeyPair  keyPair = getKeyPair();
-
+            KeyPair keyPair = getKeyPair();
 
             json.append(keyPair.toJSONFragment());
             json.append("}");
@@ -185,41 +179,40 @@ public class CreateKeyPairResult {
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             switch (c) {
-            case '"':
-                sb.append("\\\"");
-                break;
-            case '\\':
-                sb.append("\\\\");
-                break;
-            case '/':
-                sb.append("\\/");
-                break;
-            case '\b':
-                sb.append("\\b");
-                break;
-            case '\f':
-                sb.append("\\f");
-                break;
-            case '\n':
-                sb.append("\\n");
-                break;
-            case '\r':
-                sb.append("\\r");
-                break;
-            case '\t':
-                sb.append("\\t");
-                break;
-            default:
-                if (c <  ' ') {
-                    sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
-                } else {
-                sb.append(c);
+                case '"':
+                    sb.append("\\\"");
+                    break;
+                case '\\':
+                    sb.append("\\\\");
+                    break;
+                case '/':
+                    sb.append("\\/");
+                    break;
+                case '\b':
+                    sb.append("\\b");
+                    break;
+                case '\f':
+                    sb.append("\\f");
+                    break;
+                case '\n':
+                    sb.append("\\n");
+                    break;
+                case '\r':
+                    sb.append("\\r");
+                    break;
+                case '\t':
+                    sb.append("\\t");
+                    break;
+                default:
+                    if (c < ' ') {
+                        sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
+                    } else {
+                        sb.append(c);
+                    }
             }
-        }
         }
         sb.append("\"");
         return sb.toString();
     }
-
 
 }

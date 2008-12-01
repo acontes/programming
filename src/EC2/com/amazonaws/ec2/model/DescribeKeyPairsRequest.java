@@ -1,4 +1,3 @@
-
 package com.amazonaws.ec2.model;
 
 import java.util.ArrayList;
@@ -32,9 +31,7 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-    "keyName"
-})
+@XmlType(name = "", propOrder = { "keyName" })
 @XmlRootElement(name = "DescribeKeyPairsRequest")
 public class DescribeKeyPairsRequest {
 
@@ -87,7 +84,7 @@ public class DescribeKeyPairsRequest {
     }
 
     public boolean isSetKeyName() {
-        return ((this.keyName!= null)&&(!this.keyName.isEmpty()));
+        return ((this.keyName != null) && (!this.keyName.isEmpty()));
     }
 
     public void unsetKeyName() {
@@ -102,7 +99,7 @@ public class DescribeKeyPairsRequest {
      *     this instance
      */
     public DescribeKeyPairsRequest withKeyName(String... values) {
-        for (String value: values) {
+        for (String value : values) {
             getKeyName().add(value);
         }
         return this;
@@ -119,8 +116,6 @@ public class DescribeKeyPairsRequest {
     public void setKeyName(List<String> keyName) {
         this.keyName = keyName;
     }
-    
-
 
     /**
      *
@@ -135,12 +130,14 @@ public class DescribeKeyPairsRequest {
         StringBuffer json = new StringBuffer();
         boolean first = true;
         if (isSetKeyName()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append("\"KeyName\" : [");
-            java.util.List<String> keyNameList  =  getKeyName();
+            java.util.List<String> keyNameList = getKeyName();
             for (String keyName : keyNameList) {
-                if (keyNameList.indexOf(keyName) > 0) json.append(", ");
-                    json.append(quoteJSON(keyName));
+                if (keyNameList.indexOf(keyName) > 0)
+                    json.append(", ");
+                json.append(quoteJSON(keyName));
             }
             json.append("]");
             first = false;
@@ -159,41 +156,40 @@ public class DescribeKeyPairsRequest {
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             switch (c) {
-            case '"':
-                sb.append("\\\"");
-                break;
-            case '\\':
-                sb.append("\\\\");
-                break;
-            case '/':
-                sb.append("\\/");
-                break;
-            case '\b':
-                sb.append("\\b");
-                break;
-            case '\f':
-                sb.append("\\f");
-                break;
-            case '\n':
-                sb.append("\\n");
-                break;
-            case '\r':
-                sb.append("\\r");
-                break;
-            case '\t':
-                sb.append("\\t");
-                break;
-            default:
-                if (c <  ' ') {
-                    sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
-                } else {
-                sb.append(c);
+                case '"':
+                    sb.append("\\\"");
+                    break;
+                case '\\':
+                    sb.append("\\\\");
+                    break;
+                case '/':
+                    sb.append("\\/");
+                    break;
+                case '\b':
+                    sb.append("\\b");
+                    break;
+                case '\f':
+                    sb.append("\\f");
+                    break;
+                case '\n':
+                    sb.append("\\n");
+                    break;
+                case '\r':
+                    sb.append("\\r");
+                    break;
+                case '\t':
+                    sb.append("\\t");
+                    break;
+                default:
+                    if (c < ' ') {
+                        sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
+                    } else {
+                        sb.append(c);
+                    }
             }
-        }
         }
         sb.append("\"");
         return sb.toString();
     }
-
 
 }

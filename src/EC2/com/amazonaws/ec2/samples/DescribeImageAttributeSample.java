@@ -19,8 +19,6 @@
  * 
  */
 
-
-
 package com.amazonaws.ec2.samples;
 
 import java.util.List;
@@ -28,6 +26,7 @@ import java.util.ArrayList;
 import com.amazonaws.ec2.*;
 import com.amazonaws.ec2.model.*;
 import com.amazonaws.ec2.mock.AmazonEC2Mock;
+
 
 /**
  *
@@ -44,7 +43,7 @@ public class DescribeImageAttributeSample {
      * @param args unused
      */
     public static void main(String... args) {
-        
+
         /************************************************************************
          * Access Key ID and Secret Acess Key ID, obtained from:
          * http://aws.amazon.com
@@ -56,7 +55,7 @@ public class DescribeImageAttributeSample {
          * Instantiate Http Client Implementation of Amazon EC2 
          ***********************************************************************/
         AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey);
-        
+
         /************************************************************************
          * Uncomment to try advanced configuration options. Available options are:
          *
@@ -69,7 +68,6 @@ public class DescribeImageAttributeSample {
         // AmazonEC2Config config = new AmazonEC2Config();
         // config.setSignatureVersion("0");
         // AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey, config);
- 
         /************************************************************************
          * Uncomment to try out Mock Service that simulates Amazon EC2 
          * responses without calling Amazon EC2  service.
@@ -81,21 +79,18 @@ public class DescribeImageAttributeSample {
          *
          ***********************************************************************/
         // AmazonEC2 service = new AmazonEC2Mock();
-
         /************************************************************************
          * Setup request parameters and uncomment invoke to try out 
          * sample for Describe Image Attribute 
          ***********************************************************************/
-         DescribeImageAttributeRequest request = new DescribeImageAttributeRequest();
-        
-         // @TODO: set request parameters here
+        DescribeImageAttributeRequest request = new DescribeImageAttributeRequest();
 
-         // invokeDescribeImageAttribute(service, request);
+        // @TODO: set request parameters here
+
+        // invokeDescribeImageAttribute(service, request);
 
     }
 
-
-                                                                                        
     /**
      * Describe Image Attribute  request sample
      * The DescribeImageAttribute operation returns information about an attribute of
@@ -106,32 +101,34 @@ public class DescribeImageAttributeSample {
      */
     public static void invokeDescribeImageAttribute(AmazonEC2 service, DescribeImageAttributeRequest request) {
         try {
-            
+
             DescribeImageAttributeResponse response = service.describeImageAttribute(request);
 
-            
-            System.out.println ("DescribeImageAttribute Action Response");
-            System.out.println ("=============================================================================");
-            System.out.println ();
+            System.out.println("DescribeImageAttribute Action Response");
+            System.out
+                    .println("=============================================================================");
+            System.out.println();
 
             System.out.print("    DescribeImageAttributeResponse");
             System.out.println();
             if (response.isSetResponseMetadata()) {
                 System.out.print("        ResponseMetadata");
                 System.out.println();
-                ResponseMetadata  responseMetadata = response.getResponseMetadata();
+                ResponseMetadata responseMetadata = response.getResponseMetadata();
                 if (responseMetadata.isSetRequestId()) {
                     System.out.print("            RequestId");
                     System.out.println();
                     System.out.print("                " + responseMetadata.getRequestId());
                     System.out.println();
                 }
-            } 
+            }
             if (response.isSetDescribeImageAttributeResult()) {
                 System.out.print("        DescribeImageAttributeResult");
                 System.out.println();
-                DescribeImageAttributeResult  describeImageAttributeResult = response.getDescribeImageAttributeResult();
-                java.util.List<ImageAttribute> imageAttributeList = describeImageAttributeResult.getImageAttribute();
+                DescribeImageAttributeResult describeImageAttributeResult = response
+                        .getDescribeImageAttributeResult();
+                java.util.List<ImageAttribute> imageAttributeList = describeImageAttributeResult
+                        .getImageAttribute();
                 for (ImageAttribute imageAttribute : imageAttributeList) {
                     System.out.print("            ImageAttribute");
                     System.out.println();
@@ -144,7 +141,7 @@ public class DescribeImageAttributeSample {
                     if (imageAttribute.isSetLaunchPermission()) {
                         System.out.print("                LaunchPermission");
                         System.out.println();
-                        LaunchPermission  launchPermission = imageAttribute.getLaunchPermission();
+                        LaunchPermission launchPermission = imageAttribute.getLaunchPermission();
                         if (launchPermission.isSetUserId()) {
                             System.out.print("                    UserId");
                             System.out.println();
@@ -157,13 +154,13 @@ public class DescribeImageAttributeSample {
                             System.out.print("                        " + launchPermission.getGroupName());
                             System.out.println();
                         }
-                    } 
-                    java.util.List<String> productCodeList  =  imageAttribute.getProductCode();
-                    for (String productCode : productCodeList) { 
+                    }
+                    java.util.List<String> productCodeList = imageAttribute.getProductCode();
+                    for (String productCode : productCodeList) {
                         System.out.print("                ProductCode");
-                            System.out.println();
+                        System.out.println();
                         System.out.print("                    " + productCode);
-                    }	
+                    }
                     if (imageAttribute.isSetKernelId()) {
                         System.out.print("                KernelId");
                         System.out.println();
@@ -179,11 +176,12 @@ public class DescribeImageAttributeSample {
                     if (imageAttribute.isSetBlockDeviceMapping()) {
                         System.out.print("                BlockDeviceMapping");
                         System.out.println();
-                        BlockDeviceMapping  blockDeviceMapping = imageAttribute.getBlockDeviceMapping();
+                        BlockDeviceMapping blockDeviceMapping = imageAttribute.getBlockDeviceMapping();
                         if (blockDeviceMapping.isSetVirtualName()) {
                             System.out.print("                    VirtualName");
                             System.out.println();
-                            System.out.print("                        " + blockDeviceMapping.getVirtualName());
+                            System.out
+                                    .print("                        " + blockDeviceMapping.getVirtualName());
                             System.out.println();
                         }
                         if (blockDeviceMapping.isSetDeviceName()) {
@@ -192,14 +190,13 @@ public class DescribeImageAttributeSample {
                             System.out.print("                        " + blockDeviceMapping.getDeviceName());
                             System.out.println();
                         }
-                    } 
+                    }
                 }
-            } 
+            }
             System.out.println();
 
-           
         } catch (AmazonEC2Exception ex) {
-            
+
             System.out.println("Caught Exception: " + ex.getMessage());
             System.out.println("Response Status Code: " + ex.getStatusCode());
             System.out.println("Error Code: " + ex.getErrorCode());
@@ -208,5 +205,5 @@ public class DescribeImageAttributeSample {
             System.out.print("XML: " + ex.getXML());
         }
     }
-                                                                        
+
 }

@@ -19,8 +19,6 @@
  * 
  */
 
-
-
 package com.amazonaws.ec2.samples;
 
 import java.util.List;
@@ -28,6 +26,7 @@ import java.util.ArrayList;
 import com.amazonaws.ec2.*;
 import com.amazonaws.ec2.model.*;
 import java.util.concurrent.Future;
+
 
 /**
  *
@@ -44,13 +43,13 @@ public class TerminateInstancesAsyncSample {
      * @param args unused
      */
     public static void main(String... args) {
-        
+
         /************************************************************************
          * Access Key ID and Secret Acess Key ID, obtained from:
          * http://aws.amazon.com
          ***********************************************************************/
-         String accessKeyId = "<Your Access Key ID>";
-         String secretAccessKey = "<Your Secret Access Key>";
+        String accessKeyId = "<Your Access Key ID>";
+        String secretAccessKey = "<Your Secret Access Key>";
 
         /************************************************************************
          * Instantiate Http Client Implementation of Amazon EC2 
@@ -58,29 +57,27 @@ public class TerminateInstancesAsyncSample {
          * spawn for processing.
          *
          ***********************************************************************/
-         AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey, 35);
+        AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey, 35);
 
         /************************************************************************
          * Setup requests parameters and invoke parallel processing. Of course
          * in real world application, there will be much more than a couple of
          * requests to process.
          ***********************************************************************/
-         TerminateInstancesRequest requestOne = new TerminateInstancesRequest();
-         // @TODO: set request parameters here
+        TerminateInstancesRequest requestOne = new TerminateInstancesRequest();
+        // @TODO: set request parameters here
 
-         TerminateInstancesRequest requestTwo = new TerminateInstancesRequest();
-         // @TODO: set second request parameters here
+        TerminateInstancesRequest requestTwo = new TerminateInstancesRequest();
+        // @TODO: set second request parameters here
 
-         List<TerminateInstancesRequest> requests = new ArrayList<TerminateInstancesRequest>();
-         requests.add(requestOne);
-         requests.add(requestTwo);
+        List<TerminateInstancesRequest> requests = new ArrayList<TerminateInstancesRequest>();
+        requests.add(requestOne);
+        requests.add(requestTwo);
 
-         // invokeTerminateInstances(service, requests);
+        // invokeTerminateInstances(service, requests);
 
     }
 
-
-                                                                                                                                                            
     /**
      * Terminate Instances request sample
      * The TerminateInstances operation shuts down one or more instances. This
@@ -121,5 +118,5 @@ public class TerminateInstancesAsyncSample {
             }
         }
     }
-    
+
 }

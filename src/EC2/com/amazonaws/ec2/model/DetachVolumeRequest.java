@@ -1,4 +1,3 @@
-
 package com.amazonaws.ec2.model;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -33,12 +32,7 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-    "volumeId",
-    "instanceId",
-    "device",
-    "force"
-})
+@XmlType(name = "", propOrder = { "volumeId", "instanceId", "device", "force" })
 @XmlRootElement(name = "DetachVolumeRequest")
 public class DetachVolumeRequest {
 
@@ -63,7 +57,8 @@ public class DetachVolumeRequest {
      * Value constructor
      * 
      */
-    public DetachVolumeRequest(final String volumeId, final String instanceId, final String device, final Boolean force) {
+    public DetachVolumeRequest(final String volumeId, final String instanceId, final String device,
+            final Boolean force) {
         this.volumeId = volumeId;
         this.instanceId = instanceId;
         this.device = device;
@@ -95,7 +90,7 @@ public class DetachVolumeRequest {
     }
 
     public boolean isSetVolumeId() {
-        return (this.volumeId!= null);
+        return (this.volumeId != null);
     }
 
     /**
@@ -123,7 +118,7 @@ public class DetachVolumeRequest {
     }
 
     public boolean isSetInstanceId() {
-        return (this.instanceId!= null);
+        return (this.instanceId != null);
     }
 
     /**
@@ -151,7 +146,7 @@ public class DetachVolumeRequest {
     }
 
     public boolean isSetDevice() {
-        return (this.device!= null);
+        return (this.device != null);
     }
 
     /**
@@ -179,7 +174,7 @@ public class DetachVolumeRequest {
     }
 
     public boolean isSetForce() {
-        return (this.force!= null);
+        return (this.force != null);
     }
 
     /**
@@ -229,8 +224,6 @@ public class DetachVolumeRequest {
         setForce(value);
         return this;
     }
-    
-
 
     /**
      *
@@ -245,28 +238,32 @@ public class DetachVolumeRequest {
         StringBuffer json = new StringBuffer();
         boolean first = true;
         if (isSetVolumeId()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("VolumeId"));
             json.append(" : ");
             json.append(quoteJSON(getVolumeId()));
             first = false;
         }
         if (isSetInstanceId()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("InstanceId"));
             json.append(" : ");
             json.append(quoteJSON(getInstanceId()));
             first = false;
         }
         if (isSetDevice()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("Device"));
             json.append(" : ");
             json.append(quoteJSON(getDevice()));
             first = false;
         }
         if (isSetForce()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("Force"));
             json.append(" : ");
             json.append(quoteJSON(isForce() + ""));
@@ -286,41 +283,40 @@ public class DetachVolumeRequest {
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             switch (c) {
-            case '"':
-                sb.append("\\\"");
-                break;
-            case '\\':
-                sb.append("\\\\");
-                break;
-            case '/':
-                sb.append("\\/");
-                break;
-            case '\b':
-                sb.append("\\b");
-                break;
-            case '\f':
-                sb.append("\\f");
-                break;
-            case '\n':
-                sb.append("\\n");
-                break;
-            case '\r':
-                sb.append("\\r");
-                break;
-            case '\t':
-                sb.append("\\t");
-                break;
-            default:
-                if (c <  ' ') {
-                    sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
-                } else {
-                sb.append(c);
+                case '"':
+                    sb.append("\\\"");
+                    break;
+                case '\\':
+                    sb.append("\\\\");
+                    break;
+                case '/':
+                    sb.append("\\/");
+                    break;
+                case '\b':
+                    sb.append("\\b");
+                    break;
+                case '\f':
+                    sb.append("\\f");
+                    break;
+                case '\n':
+                    sb.append("\\n");
+                    break;
+                case '\r':
+                    sb.append("\\r");
+                    break;
+                case '\t':
+                    sb.append("\\t");
+                    break;
+                default:
+                    if (c < ' ') {
+                        sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
+                    } else {
+                        sb.append(c);
+                    }
             }
-        }
         }
         sb.append("\"");
         return sb.toString();
     }
-
 
 }

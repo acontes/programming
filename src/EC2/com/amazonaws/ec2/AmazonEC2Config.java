@@ -19,17 +19,13 @@
  * 
  */
 
-
-
-
-
 package com.amazonaws.ec2;
 
 /**
  * Configuration for accessing Amazon EC2  service
  */
 public class AmazonEC2Config {
-    
+
     private String serviceVersion = "2008-05-05";
     private String serviceURL = "http://ec2.amazonaws.com";
     private String userAgent = "Amazon EC2 Java Library";
@@ -41,8 +37,7 @@ public class AmazonEC2Config {
     private int maxErrorRetry = 3;
     private int maxAsyncThreads = 30;
     private int maxAsyncQueueSize = maxAsyncThreads * 10;
-    
-  
+
     /**
      * Gets Version of the API
      *
@@ -52,7 +47,6 @@ public class AmazonEC2Config {
         return serviceVersion;
     }
 
- 
     /**
      * Gets SignatureVersion property
      *
@@ -61,7 +55,7 @@ public class AmazonEC2Config {
     public String getSignatureVersion() {
         return signatureVersion;
     }
-    
+
     /**
      * Sets SignatureVersion property
      *
@@ -70,7 +64,7 @@ public class AmazonEC2Config {
     public void setSignatureVersion(String signatureVersion) {
         this.signatureVersion = signatureVersion;
     }
-    
+
     /**
      * Sets SignatureVersion property and returns current AmazonEC2Config
      *
@@ -82,7 +76,7 @@ public class AmazonEC2Config {
         setSignatureVersion(signatureVersion);
         return this;
     }
-    
+
     /**
      * Checks if SignatureVersion property is set
      *
@@ -91,7 +85,7 @@ public class AmazonEC2Config {
     public boolean isSetSignatureVersion() {
         return true;
     }
-    
+
     /**
      * Gets UserAgent property
      *
@@ -100,7 +94,7 @@ public class AmazonEC2Config {
     public String getUserAgent() {
         return userAgent;
     }
-    
+
     /**
      * Sets UserAgent property
      *
@@ -110,7 +104,7 @@ public class AmazonEC2Config {
     public void setUserAgent(String userAgent) {
         this.userAgent = userAgent;
     }
-    
+
     /**
      * Sets UserAgent property and returns current AmazonEC2Config
      *
@@ -122,7 +116,7 @@ public class AmazonEC2Config {
         setUserAgent(userAgent);
         return this;
     }
-    
+
     /**
      * Checks if UserAgent property is set
      *
@@ -131,7 +125,7 @@ public class AmazonEC2Config {
     public boolean isSetUserAgent() {
         return this.userAgent != null;
     }
-    
+
     /**
      * Gets ServiceURL property
      *
@@ -140,7 +134,7 @@ public class AmazonEC2Config {
     public String getServiceURL() {
         return serviceURL;
     }
-    
+
     /**
      * Sets ServiceURL property
      *
@@ -150,7 +144,7 @@ public class AmazonEC2Config {
     public void setServiceURL(String serviceURL) {
         this.serviceURL = serviceURL;
     }
-    
+
     /**
      * Sets ServiceURL property and returns current AmazonEC2Config
      *
@@ -162,7 +156,7 @@ public class AmazonEC2Config {
         setServiceURL(serviceURL);
         return this;
     }
-    
+
     /**
      * Checks if ServiceURL property is set
      *
@@ -171,7 +165,7 @@ public class AmazonEC2Config {
     public boolean isSetServiceURL() {
         return this.serviceURL != null;
     }
-    
+
     /**
      * Gets ProxyHost property
      *
@@ -180,7 +174,7 @@ public class AmazonEC2Config {
     public String getProxyHost() {
         return proxyHost;
     }
-    
+
     /**
      * Sets ProxyHost property
      *
@@ -190,7 +184,7 @@ public class AmazonEC2Config {
     public void setProxyHost(String proxyHost) {
         this.proxyHost = proxyHost;
     }
-    
+
     /**
      * Sets ProxyHost property and returns current AmazonEC2Config
      *
@@ -202,7 +196,7 @@ public class AmazonEC2Config {
         setProxyHost(proxyHost);
         return this;
     }
-    
+
     /**
      * Checks if ProxyHost property is set
      *
@@ -211,7 +205,7 @@ public class AmazonEC2Config {
     public boolean isSetProxyHost() {
         return this.proxyHost != null;
     }
-    
+
     /**
      * Gets ProxyPort property
      *
@@ -220,7 +214,7 @@ public class AmazonEC2Config {
     public int getProxyPort() {
         return proxyPort;
     }
-    
+
     /**
      * Sets ProxyPort property
      *
@@ -230,7 +224,7 @@ public class AmazonEC2Config {
     public void setProxyPort(int proxyPort) {
         this.proxyPort = proxyPort;
     }
-    
+
     /**
      * Sets ProxyPort property and returns current AmazonEC2Config
      *
@@ -242,7 +236,7 @@ public class AmazonEC2Config {
         setProxyPort(proxyPort);
         return this;
     }
-    
+
     /**
      * Checks if ProxyPort property is set
      *
@@ -371,6 +365,7 @@ public class AmazonEC2Config {
     public boolean isSetMaxErrorRetry() {
         return this.maxErrorRetry > 0;
     }
+
     /**
      * Gets MaxAsyncThreads property
      *
@@ -482,5 +477,5 @@ public class AmazonEC2Config {
         setMaxAsyncQueueSize(maxAsyncQueueSize);
         return this;
     }
-    
+
 }

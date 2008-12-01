@@ -19,8 +19,6 @@
  * 
  */
 
-
-
 package com.amazonaws.ec2.samples;
 
 import java.util.List;
@@ -28,6 +26,7 @@ import java.util.ArrayList;
 import com.amazonaws.ec2.*;
 import com.amazonaws.ec2.model.*;
 import com.amazonaws.ec2.mock.AmazonEC2Mock;
+
 
 /**
  *
@@ -44,7 +43,7 @@ public class DescribeSnapshotsSample {
      * @param args unused
      */
     public static void main(String... args) {
-        
+
         /************************************************************************
          * Access Key ID and Secret Acess Key ID, obtained from:
          * http://aws.amazon.com
@@ -56,7 +55,7 @@ public class DescribeSnapshotsSample {
          * Instantiate Http Client Implementation of Amazon EC2 
          ***********************************************************************/
         AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey);
-        
+
         /************************************************************************
          * Uncomment to try advanced configuration options. Available options are:
          *
@@ -69,7 +68,6 @@ public class DescribeSnapshotsSample {
         // AmazonEC2Config config = new AmazonEC2Config();
         // config.setSignatureVersion("0");
         // AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey, config);
- 
         /************************************************************************
          * Uncomment to try out Mock Service that simulates Amazon EC2 
          * responses without calling Amazon EC2  service.
@@ -81,21 +79,18 @@ public class DescribeSnapshotsSample {
          *
          ***********************************************************************/
         // AmazonEC2 service = new AmazonEC2Mock();
-
         /************************************************************************
          * Setup request parameters and uncomment invoke to try out 
          * sample for Describe Snapshots 
          ***********************************************************************/
-         DescribeSnapshotsRequest request = new DescribeSnapshotsRequest();
-        
-         // @TODO: set request parameters here
+        DescribeSnapshotsRequest request = new DescribeSnapshotsRequest();
 
-         // invokeDescribeSnapshots(service, request);
+        // @TODO: set request parameters here
+
+        // invokeDescribeSnapshots(service, request);
 
     }
 
-
-                                                                                                            
     /**
      * Describe Snapshots  request sample
      * Describes the indicated snapshots, or in lieu of that, all snapshots owned by the caller.
@@ -105,20 +100,20 @@ public class DescribeSnapshotsSample {
      */
     public static void invokeDescribeSnapshots(AmazonEC2 service, DescribeSnapshotsRequest request) {
         try {
-            
+
             DescribeSnapshotsResponse response = service.describeSnapshots(request);
 
-            
-            System.out.println ("DescribeSnapshots Action Response");
-            System.out.println ("=============================================================================");
-            System.out.println ();
+            System.out.println("DescribeSnapshots Action Response");
+            System.out
+                    .println("=============================================================================");
+            System.out.println();
 
             System.out.print("    DescribeSnapshotsResponse");
             System.out.println();
             if (response.isSetDescribeSnapshotsResult()) {
                 System.out.print("        DescribeSnapshotsResult");
                 System.out.println();
-                DescribeSnapshotsResult  describeSnapshotsResult = response.getDescribeSnapshotsResult();
+                DescribeSnapshotsResult describeSnapshotsResult = response.getDescribeSnapshotsResult();
                 java.util.List<Snapshot> snapshotList = describeSnapshotsResult.getSnapshot();
                 for (Snapshot snapshot : snapshotList) {
                     System.out.print("            Snapshot");
@@ -154,23 +149,22 @@ public class DescribeSnapshotsSample {
                         System.out.println();
                     }
                 }
-            } 
+            }
             if (response.isSetResponseMetadata()) {
                 System.out.print("        ResponseMetadata");
                 System.out.println();
-                ResponseMetadata  responseMetadata = response.getResponseMetadata();
+                ResponseMetadata responseMetadata = response.getResponseMetadata();
                 if (responseMetadata.isSetRequestId()) {
                     System.out.print("            RequestId");
                     System.out.println();
                     System.out.print("                " + responseMetadata.getRequestId());
                     System.out.println();
                 }
-            } 
+            }
             System.out.println();
 
-           
         } catch (AmazonEC2Exception ex) {
-            
+
             System.out.println("Caught Exception: " + ex.getMessage());
             System.out.println("Response Status Code: " + ex.getStatusCode());
             System.out.println("Error Code: " + ex.getErrorCode());
@@ -179,5 +173,5 @@ public class DescribeSnapshotsSample {
             System.out.print("XML: " + ex.getXML());
         }
     }
-                                                    
+
 }

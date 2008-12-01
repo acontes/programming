@@ -1,4 +1,3 @@
-
 package com.amazonaws.ec2.model;
 
 import java.util.ArrayList;
@@ -54,12 +53,7 @@ import org.w3c.dom.Element;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-    "type",
-    "code",
-    "message",
-    "detail"
-})
+@XmlType(name = "", propOrder = { "type", "code", "message", "detail" })
 @XmlRootElement(name = "Error")
 public class Error {
 
@@ -116,7 +110,7 @@ public class Error {
     }
 
     public boolean isSetType() {
-        return (this.type!= null);
+        return (this.type != null);
     }
 
     /**
@@ -144,7 +138,7 @@ public class Error {
     }
 
     public boolean isSetCode() {
-        return (this.code!= null);
+        return (this.code != null);
     }
 
     /**
@@ -172,7 +166,7 @@ public class Error {
     }
 
     public boolean isSetMessage() {
-        return (this.message!= null);
+        return (this.message != null);
     }
 
     /**
@@ -200,7 +194,7 @@ public class Error {
     }
 
     public boolean isSetDetail() {
-        return (this.detail!= null);
+        return (this.detail != null);
     }
 
     /**
@@ -251,7 +245,6 @@ public class Error {
         return this;
     }
 
-
     /**
      * <p>Java class for anonymous complex type.
      * 
@@ -274,9 +267,7 @@ public class Error {
      * 
      */
     @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "", propOrder = {
-        "any"
-    })
+    @XmlType(name = "", propOrder = { "any" })
     public static class Detail {
 
         @XmlAnyElement(lax = true)
@@ -329,7 +320,7 @@ public class Error {
         }
 
         public boolean isSetAny() {
-            return ((this.any!= null)&&(!this.any.isEmpty()));
+            return ((this.any != null) && (!this.any.isEmpty()));
         }
 
         public void unsetAny() {
@@ -344,7 +335,7 @@ public class Error {
          *     this instance
          */
         public Error.Detail withAny(Object... values) {
-            for (Object value: values) {
+            for (Object value : values) {
                 getAny().add(value);
             }
             return this;
@@ -364,7 +355,6 @@ public class Error {
         }
 
     }
-    
 
     /**
      * 
@@ -392,12 +382,12 @@ public class Error {
             xml.append("</Message>");
         }
         if (isSetDetail()) {
-            Error.Detail  detail = getDetail();
+            Error.Detail detail = getDetail();
             xml.append("<Detail>");
             xml.append(detail.toString());
 
             xml.append("</Detail>");
-        } 
+        }
         return xml.toString();
     }
 
@@ -411,29 +401,27 @@ public class Error {
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             switch (c) {
-            case '&':
-                sb.append("&amp;");
-                break;
-            case '<':
-                sb.append("&lt;");
-                break;
-            case '>':
-                sb.append("&gt;");
-                break;
-            case '\'':
-                sb.append("&#039;");
-                break;
-            case '"':
-                sb.append("&quot;");
-                break;
-            default:
-                sb.append(c);
+                case '&':
+                    sb.append("&amp;");
+                    break;
+                case '<':
+                    sb.append("&lt;");
+                    break;
+                case '>':
+                    sb.append("&gt;");
+                    break;
+                case '\'':
+                    sb.append("&#039;");
+                    break;
+                case '"':
+                    sb.append("&quot;");
+                    break;
+                default:
+                    sb.append(c);
             }
         }
         return sb.toString();
     }
-
-
 
     /**
      *
@@ -448,31 +436,34 @@ public class Error {
         StringBuffer json = new StringBuffer();
         boolean first = true;
         if (isSetType()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("Type"));
             json.append(" : ");
             json.append(quoteJSON(getType() + ""));
             first = false;
         }
         if (isSetCode()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("Code"));
             json.append(" : ");
             json.append(quoteJSON(getCode()));
             first = false;
         }
         if (isSetMessage()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("Message"));
             json.append(" : ");
             json.append(quoteJSON(getMessage()));
             first = false;
         }
         if (isSetDetail()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append("\"Detail\" : {");
-            Error.Detail  detail = getDetail();
-
+            Error.Detail detail = getDetail();
 
             json.append(detail.toString());
 
@@ -493,41 +484,40 @@ public class Error {
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             switch (c) {
-            case '"':
-                sb.append("\\\"");
-                break;
-            case '\\':
-                sb.append("\\\\");
-                break;
-            case '/':
-                sb.append("\\/");
-                break;
-            case '\b':
-                sb.append("\\b");
-                break;
-            case '\f':
-                sb.append("\\f");
-                break;
-            case '\n':
-                sb.append("\\n");
-                break;
-            case '\r':
-                sb.append("\\r");
-                break;
-            case '\t':
-                sb.append("\\t");
-                break;
-            default:
-                if (c <  ' ') {
-                    sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
-                } else {
-                sb.append(c);
+                case '"':
+                    sb.append("\\\"");
+                    break;
+                case '\\':
+                    sb.append("\\\\");
+                    break;
+                case '/':
+                    sb.append("\\/");
+                    break;
+                case '\b':
+                    sb.append("\\b");
+                    break;
+                case '\f':
+                    sb.append("\\f");
+                    break;
+                case '\n':
+                    sb.append("\\n");
+                    break;
+                case '\r':
+                    sb.append("\\r");
+                    break;
+                case '\t':
+                    sb.append("\\t");
+                    break;
+                default:
+                    if (c < ' ') {
+                        sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
+                    } else {
+                        sb.append(c);
+                    }
             }
-        }
         }
         sb.append("\"");
         return sb.toString();
     }
-
 
 }

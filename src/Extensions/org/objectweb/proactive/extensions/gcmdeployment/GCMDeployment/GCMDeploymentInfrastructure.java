@@ -69,7 +69,7 @@ public class GCMDeploymentInfrastructure {
     public Map<String, JavaGroup> getJavaGroups() {
         return javaGroups;
     }
-    
+
     public Map<String, Bridge> getBridges() {
         return bridges;
     }

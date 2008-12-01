@@ -1,4 +1,3 @@
-
 package com.amazonaws.ec2.model;
 
 import java.util.ArrayList;
@@ -42,19 +41,8 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-    "imageId",
-    "minCount",
-    "maxCount",
-    "keyName",
-    "securityGroup",
-    "userData",
-    "instanceType",
-    "placement",
-    "kernelId",
-    "ramdiskId",
-    "blockDeviceMapping"
-})
+@XmlType(name = "", propOrder = { "imageId", "minCount", "maxCount", "keyName", "securityGroup", "userData",
+        "instanceType", "placement", "kernelId", "ramdiskId", "blockDeviceMapping" })
 @XmlRootElement(name = "RunInstancesRequest")
 public class RunInstancesRequest {
 
@@ -93,7 +81,10 @@ public class RunInstancesRequest {
      * Value constructor
      * 
      */
-    public RunInstancesRequest(final String imageId, final int minCount, final int maxCount, final String keyName, final List<String> securityGroup, final String userData, final String instanceType, final Placement placement, final String kernelId, final String ramdiskId, final List<BlockDeviceMapping> blockDeviceMapping) {
+    public RunInstancesRequest(final String imageId, final int minCount, final int maxCount,
+            final String keyName, final List<String> securityGroup, final String userData,
+            final String instanceType, final Placement placement, final String kernelId,
+            final String ramdiskId, final List<BlockDeviceMapping> blockDeviceMapping) {
         this.imageId = imageId;
         this.minCount = minCount;
         this.maxCount = maxCount;
@@ -132,7 +123,7 @@ public class RunInstancesRequest {
     }
 
     public boolean isSetImageId() {
-        return (this.imageId!= null);
+        return (this.imageId != null);
     }
 
     /**
@@ -200,7 +191,7 @@ public class RunInstancesRequest {
     }
 
     public boolean isSetKeyName() {
-        return (this.keyName!= null);
+        return (this.keyName != null);
     }
 
     /**
@@ -233,7 +224,7 @@ public class RunInstancesRequest {
     }
 
     public boolean isSetSecurityGroup() {
-        return ((this.securityGroup!= null)&&(!this.securityGroup.isEmpty()));
+        return ((this.securityGroup != null) && (!this.securityGroup.isEmpty()));
     }
 
     public void unsetSecurityGroup() {
@@ -265,7 +256,7 @@ public class RunInstancesRequest {
     }
 
     public boolean isSetUserData() {
-        return (this.userData!= null);
+        return (this.userData != null);
     }
 
     /**
@@ -293,7 +284,7 @@ public class RunInstancesRequest {
     }
 
     public boolean isSetInstanceType() {
-        return (this.instanceType!= null);
+        return (this.instanceType != null);
     }
 
     /**
@@ -321,7 +312,7 @@ public class RunInstancesRequest {
     }
 
     public boolean isSetPlacement() {
-        return (this.placement!= null);
+        return (this.placement != null);
     }
 
     /**
@@ -349,7 +340,7 @@ public class RunInstancesRequest {
     }
 
     public boolean isSetKernelId() {
-        return (this.kernelId!= null);
+        return (this.kernelId != null);
     }
 
     /**
@@ -377,7 +368,7 @@ public class RunInstancesRequest {
     }
 
     public boolean isSetRamdiskId() {
-        return (this.ramdiskId!= null);
+        return (this.ramdiskId != null);
     }
 
     /**
@@ -410,7 +401,7 @@ public class RunInstancesRequest {
     }
 
     public boolean isSetBlockDeviceMapping() {
-        return ((this.blockDeviceMapping!= null)&&(!this.blockDeviceMapping.isEmpty()));
+        return ((this.blockDeviceMapping != null) && (!this.blockDeviceMapping.isEmpty()));
     }
 
     public void unsetBlockDeviceMapping() {
@@ -473,7 +464,7 @@ public class RunInstancesRequest {
      *     this instance
      */
     public RunInstancesRequest withSecurityGroup(String... values) {
-        for (String value: values) {
+        for (String value : values) {
             getSecurityGroup().add(value);
         }
         return this;
@@ -547,7 +538,7 @@ public class RunInstancesRequest {
      *     this instance
      */
     public RunInstancesRequest withBlockDeviceMapping(BlockDeviceMapping... values) {
-        for (BlockDeviceMapping value: values) {
+        for (BlockDeviceMapping value : values) {
             getBlockDeviceMapping().add(value);
         }
         return this;
@@ -576,8 +567,6 @@ public class RunInstancesRequest {
     public void setBlockDeviceMapping(List<BlockDeviceMapping> blockDeviceMapping) {
         this.blockDeviceMapping = blockDeviceMapping;
     }
-    
-
 
     /**
      *
@@ -592,88 +581,100 @@ public class RunInstancesRequest {
         StringBuffer json = new StringBuffer();
         boolean first = true;
         if (isSetImageId()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("ImageId"));
             json.append(" : ");
             json.append(quoteJSON(getImageId()));
             first = false;
         }
         if (isSetMinCount()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("MinCount"));
             json.append(" : ");
             json.append(quoteJSON(getMinCount() + ""));
             first = false;
         }
         if (isSetMaxCount()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("MaxCount"));
             json.append(" : ");
             json.append(quoteJSON(getMaxCount() + ""));
             first = false;
         }
         if (isSetKeyName()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("KeyName"));
             json.append(" : ");
             json.append(quoteJSON(getKeyName()));
             first = false;
         }
         if (isSetSecurityGroup()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append("\"SecurityGroup\" : [");
-            java.util.List<String> securityGroupList  =  getSecurityGroup();
+            java.util.List<String> securityGroupList = getSecurityGroup();
             for (String securityGroup : securityGroupList) {
-                if (securityGroupList.indexOf(securityGroup) > 0) json.append(", ");
-                    json.append(quoteJSON(securityGroup));
+                if (securityGroupList.indexOf(securityGroup) > 0)
+                    json.append(", ");
+                json.append(quoteJSON(securityGroup));
             }
             json.append("]");
             first = false;
         }
         if (isSetUserData()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("UserData"));
             json.append(" : ");
             json.append(quoteJSON(getUserData()));
             first = false;
         }
         if (isSetInstanceType()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("InstanceType"));
             json.append(" : ");
             json.append(quoteJSON(getInstanceType()));
             first = false;
         }
         if (isSetPlacement()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append("\"Placement\" : {");
-            Placement  placement = getPlacement();
-
+            Placement placement = getPlacement();
 
             json.append(placement.toJSONFragment());
             json.append("}");
             first = false;
         }
         if (isSetKernelId()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("KernelId"));
             json.append(" : ");
             json.append(quoteJSON(getKernelId()));
             first = false;
         }
         if (isSetRamdiskId()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("RamdiskId"));
             json.append(" : ");
             json.append(quoteJSON(getRamdiskId()));
             first = false;
         }
         if (isSetBlockDeviceMapping()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append("\"BlockDeviceMapping\" : [");
             java.util.List<BlockDeviceMapping> blockDeviceMappingList = getBlockDeviceMapping();
             for (BlockDeviceMapping blockDeviceMapping : blockDeviceMappingList) {
-                if (blockDeviceMappingList.indexOf(blockDeviceMapping) > 0) json.append(", ");
+                if (blockDeviceMappingList.indexOf(blockDeviceMapping) > 0)
+                    json.append(", ");
                 json.append("{");
                 json.append("");
                 json.append(blockDeviceMapping.toJSONFragment());
@@ -696,41 +697,40 @@ public class RunInstancesRequest {
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             switch (c) {
-            case '"':
-                sb.append("\\\"");
-                break;
-            case '\\':
-                sb.append("\\\\");
-                break;
-            case '/':
-                sb.append("\\/");
-                break;
-            case '\b':
-                sb.append("\\b");
-                break;
-            case '\f':
-                sb.append("\\f");
-                break;
-            case '\n':
-                sb.append("\\n");
-                break;
-            case '\r':
-                sb.append("\\r");
-                break;
-            case '\t':
-                sb.append("\\t");
-                break;
-            default:
-                if (c <  ' ') {
-                    sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
-                } else {
-                sb.append(c);
+                case '"':
+                    sb.append("\\\"");
+                    break;
+                case '\\':
+                    sb.append("\\\\");
+                    break;
+                case '/':
+                    sb.append("\\/");
+                    break;
+                case '\b':
+                    sb.append("\\b");
+                    break;
+                case '\f':
+                    sb.append("\\f");
+                    break;
+                case '\n':
+                    sb.append("\\n");
+                    break;
+                case '\r':
+                    sb.append("\\r");
+                    break;
+                case '\t':
+                    sb.append("\\t");
+                    break;
+                default:
+                    if (c < ' ') {
+                        sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
+                    } else {
+                        sb.append(c);
+                    }
             }
-        }
         }
         sb.append("\"");
         return sb.toString();
     }
-
 
 }

@@ -19,13 +19,10 @@
  * 
  */
 
-
-
 package com.amazonaws.ec2;
 
 import com.amazonaws.ec2.model.*;
 import java.util.concurrent.Future;
-
 
 
 /**
@@ -53,10 +50,8 @@ import java.util.concurrent.Future;
  * 
  * 
  */
-public interface  AmazonEC2 {
-    
+public interface AmazonEC2 {
 
-            
     /**
      * Allocate Address 
      *
@@ -120,8 +115,6 @@ public interface  AmazonEC2 {
      */
     public Future<AllocateAddressResponse> allocateAddressAsync(AllocateAddressRequest request);
 
-
-            
     /**
      * Associate Address 
      *
@@ -138,7 +131,8 @@ public interface  AmazonEC2 {
      *
      * @throws AmazonEC2Exception
      */
-    public AssociateAddressResponse associateAddress(AssociateAddressRequest request) throws AmazonEC2Exception;
+    public AssociateAddressResponse associateAddress(AssociateAddressRequest request)
+            throws AmazonEC2Exception;
 
     /**
      * Non-blocking Associate Address 
@@ -188,8 +182,6 @@ public interface  AmazonEC2 {
      */
     public Future<AssociateAddressResponse> associateAddressAsync(AssociateAddressRequest request);
 
-
-            
     /**
      * Attach Volume 
      *
@@ -252,8 +244,6 @@ public interface  AmazonEC2 {
      */
     public Future<AttachVolumeResponse> attachVolumeAsync(AttachVolumeRequest request);
 
-
-            
     /**
      * Authorize Security Group Ingress 
      *
@@ -279,7 +269,8 @@ public interface  AmazonEC2 {
      *
      * @throws AmazonEC2Exception
      */
-    public AuthorizeSecurityGroupIngressResponse authorizeSecurityGroupIngress(AuthorizeSecurityGroupIngressRequest request) throws AmazonEC2Exception;
+    public AuthorizeSecurityGroupIngressResponse authorizeSecurityGroupIngress(
+            AuthorizeSecurityGroupIngressRequest request) throws AmazonEC2Exception;
 
     /**
      * Non-blocking Authorize Security Group Ingress 
@@ -327,10 +318,9 @@ public interface  AmazonEC2 {
      * @return Future&lt;AuthorizeSecurityGroupIngressResponse&gt; future pointer to AuthorizeSecurityGroupIngressResponse
      * 
      */
-    public Future<AuthorizeSecurityGroupIngressResponse> authorizeSecurityGroupIngressAsync(AuthorizeSecurityGroupIngressRequest request);
+    public Future<AuthorizeSecurityGroupIngressResponse> authorizeSecurityGroupIngressAsync(
+            AuthorizeSecurityGroupIngressRequest request);
 
-
-            
     /**
      * Confirm Product Instance 
      *
@@ -348,7 +338,8 @@ public interface  AmazonEC2 {
      *
      * @throws AmazonEC2Exception
      */
-    public ConfirmProductInstanceResponse confirmProductInstance(ConfirmProductInstanceRequest request) throws AmazonEC2Exception;
+    public ConfirmProductInstanceResponse confirmProductInstance(ConfirmProductInstanceRequest request)
+            throws AmazonEC2Exception;
 
     /**
      * Non-blocking Confirm Product Instance 
@@ -396,10 +387,9 @@ public interface  AmazonEC2 {
      * @return Future&lt;ConfirmProductInstanceResponse&gt; future pointer to ConfirmProductInstanceResponse
      * 
      */
-    public Future<ConfirmProductInstanceResponse> confirmProductInstanceAsync(ConfirmProductInstanceRequest request);
+    public Future<ConfirmProductInstanceResponse> confirmProductInstanceAsync(
+            ConfirmProductInstanceRequest request);
 
-
-            
     /**
      * Create Key Pair 
      *
@@ -464,8 +454,6 @@ public interface  AmazonEC2 {
      */
     public Future<CreateKeyPairResponse> createKeyPairAsync(CreateKeyPairRequest request);
 
-
-            
     /**
      * Create Security Group 
      *
@@ -485,7 +473,8 @@ public interface  AmazonEC2 {
      *
      * @throws AmazonEC2Exception
      */
-    public CreateSecurityGroupResponse createSecurityGroup(CreateSecurityGroupRequest request) throws AmazonEC2Exception;
+    public CreateSecurityGroupResponse createSecurityGroup(CreateSecurityGroupRequest request)
+            throws AmazonEC2Exception;
 
     /**
      * Non-blocking Create Security Group 
@@ -535,8 +524,6 @@ public interface  AmazonEC2 {
      */
     public Future<CreateSecurityGroupResponse> createSecurityGroupAsync(CreateSecurityGroupRequest request);
 
-
-            
     /**
      * Create Snapshot 
      *
@@ -607,8 +594,6 @@ public interface  AmazonEC2 {
      */
     public Future<CreateSnapshotResponse> createSnapshotAsync(CreateSnapshotRequest request);
 
-
-            
     /**
      * Create Volume 
      *
@@ -671,8 +656,6 @@ public interface  AmazonEC2 {
      */
     public Future<CreateVolumeResponse> createVolumeAsync(CreateVolumeRequest request);
 
-
-            
     /**
      * Delete Key Pair 
      *
@@ -735,8 +718,6 @@ public interface  AmazonEC2 {
      */
     public Future<DeleteKeyPairResponse> deleteKeyPairAsync(DeleteKeyPairRequest request);
 
-
-            
     /**
      * Delete Security Group 
      *
@@ -756,7 +737,8 @@ public interface  AmazonEC2 {
      *
      * @throws AmazonEC2Exception
      */
-    public DeleteSecurityGroupResponse deleteSecurityGroup(DeleteSecurityGroupRequest request) throws AmazonEC2Exception;
+    public DeleteSecurityGroupResponse deleteSecurityGroup(DeleteSecurityGroupRequest request)
+            throws AmazonEC2Exception;
 
     /**
      * Non-blocking Delete Security Group 
@@ -806,8 +788,6 @@ public interface  AmazonEC2 {
      */
     public Future<DeleteSecurityGroupResponse> deleteSecurityGroupAsync(DeleteSecurityGroupRequest request);
 
-
-            
     /**
      * Delete Snapshot 
      *
@@ -870,8 +850,6 @@ public interface  AmazonEC2 {
      */
     public Future<DeleteSnapshotResponse> deleteSnapshotAsync(DeleteSnapshotRequest request);
 
-
-            
     /**
      * Delete Volume 
      *
@@ -934,8 +912,6 @@ public interface  AmazonEC2 {
      */
     public Future<DeleteVolumeResponse> deleteVolumeAsync(DeleteVolumeRequest request);
 
-
-            
     /**
      * Deregister Image 
      *
@@ -999,8 +975,6 @@ public interface  AmazonEC2 {
      */
     public Future<DeregisterImageResponse> deregisterImageAsync(DeregisterImageRequest request);
 
-
-            
     /**
      * Describe Addresses 
      *
@@ -1014,7 +988,8 @@ public interface  AmazonEC2 {
      *
      * @throws AmazonEC2Exception
      */
-    public DescribeAddressesResponse describeAddresses(DescribeAddressesRequest request) throws AmazonEC2Exception;
+    public DescribeAddressesResponse describeAddresses(DescribeAddressesRequest request)
+            throws AmazonEC2Exception;
 
     /**
      * Non-blocking Describe Addresses 
@@ -1064,8 +1039,6 @@ public interface  AmazonEC2 {
      */
     public Future<DescribeAddressesResponse> describeAddressesAsync(DescribeAddressesRequest request);
 
-
-            
     /**
      * Describe Availability Zones 
      *
@@ -1082,7 +1055,8 @@ public interface  AmazonEC2 {
      *
      * @throws AmazonEC2Exception
      */
-    public DescribeAvailabilityZonesResponse describeAvailabilityZones(DescribeAvailabilityZonesRequest request) throws AmazonEC2Exception;
+    public DescribeAvailabilityZonesResponse describeAvailabilityZones(
+            DescribeAvailabilityZonesRequest request) throws AmazonEC2Exception;
 
     /**
      * Non-blocking Describe Availability Zones 
@@ -1130,10 +1104,9 @@ public interface  AmazonEC2 {
      * @return Future&lt;DescribeAvailabilityZonesResponse&gt; future pointer to DescribeAvailabilityZonesResponse
      * 
      */
-    public Future<DescribeAvailabilityZonesResponse> describeAvailabilityZonesAsync(DescribeAvailabilityZonesRequest request);
+    public Future<DescribeAvailabilityZonesResponse> describeAvailabilityZonesAsync(
+            DescribeAvailabilityZonesRequest request);
 
-
-            
     /**
      * Describe Image Attribute 
      *
@@ -1147,7 +1120,8 @@ public interface  AmazonEC2 {
      *
      * @throws AmazonEC2Exception
      */
-    public DescribeImageAttributeResponse describeImageAttribute(DescribeImageAttributeRequest request) throws AmazonEC2Exception;
+    public DescribeImageAttributeResponse describeImageAttribute(DescribeImageAttributeRequest request)
+            throws AmazonEC2Exception;
 
     /**
      * Non-blocking Describe Image Attribute 
@@ -1195,10 +1169,9 @@ public interface  AmazonEC2 {
      * @return Future&lt;DescribeImageAttributeResponse&gt; future pointer to DescribeImageAttributeResponse
      * 
      */
-    public Future<DescribeImageAttributeResponse> describeImageAttributeAsync(DescribeImageAttributeRequest request);
+    public Future<DescribeImageAttributeResponse> describeImageAttributeAsync(
+            DescribeImageAttributeRequest request);
 
-
-            
     /**
      * Describe Images 
      *
@@ -1292,8 +1265,6 @@ public interface  AmazonEC2 {
      */
     public Future<DescribeImagesResponse> describeImagesAsync(DescribeImagesRequest request);
 
-
-            
     /**
      * Describe Instances 
      *
@@ -1314,7 +1285,8 @@ public interface  AmazonEC2 {
      *
      * @throws AmazonEC2Exception
      */
-    public DescribeInstancesResponse describeInstances(DescribeInstancesRequest request) throws AmazonEC2Exception;
+    public DescribeInstancesResponse describeInstances(DescribeInstancesRequest request)
+            throws AmazonEC2Exception;
 
     /**
      * Non-blocking Describe Instances 
@@ -1364,8 +1336,6 @@ public interface  AmazonEC2 {
      */
     public Future<DescribeInstancesResponse> describeInstancesAsync(DescribeInstancesRequest request);
 
-
-            
     /**
      * Describe Key Pairs 
      *
@@ -1380,7 +1350,8 @@ public interface  AmazonEC2 {
      *
      * @throws AmazonEC2Exception
      */
-    public DescribeKeyPairsResponse describeKeyPairs(DescribeKeyPairsRequest request) throws AmazonEC2Exception;
+    public DescribeKeyPairsResponse describeKeyPairs(DescribeKeyPairsRequest request)
+            throws AmazonEC2Exception;
 
     /**
      * Non-blocking Describe Key Pairs 
@@ -1430,8 +1401,6 @@ public interface  AmazonEC2 {
      */
     public Future<DescribeKeyPairsResponse> describeKeyPairsAsync(DescribeKeyPairsRequest request);
 
-
-            
     /**
      * Describe Security Groups 
      *
@@ -1448,7 +1417,8 @@ public interface  AmazonEC2 {
      *
      * @throws AmazonEC2Exception
      */
-    public DescribeSecurityGroupsResponse describeSecurityGroups(DescribeSecurityGroupsRequest request) throws AmazonEC2Exception;
+    public DescribeSecurityGroupsResponse describeSecurityGroups(DescribeSecurityGroupsRequest request)
+            throws AmazonEC2Exception;
 
     /**
      * Non-blocking Describe Security Groups 
@@ -1496,10 +1466,9 @@ public interface  AmazonEC2 {
      * @return Future&lt;DescribeSecurityGroupsResponse&gt; future pointer to DescribeSecurityGroupsResponse
      * 
      */
-    public Future<DescribeSecurityGroupsResponse> describeSecurityGroupsAsync(DescribeSecurityGroupsRequest request);
+    public Future<DescribeSecurityGroupsResponse> describeSecurityGroupsAsync(
+            DescribeSecurityGroupsRequest request);
 
-
-            
     /**
      * Describe Snapshots 
      *
@@ -1512,7 +1481,8 @@ public interface  AmazonEC2 {
      *
      * @throws AmazonEC2Exception
      */
-    public DescribeSnapshotsResponse describeSnapshots(DescribeSnapshotsRequest request) throws AmazonEC2Exception;
+    public DescribeSnapshotsResponse describeSnapshots(DescribeSnapshotsRequest request)
+            throws AmazonEC2Exception;
 
     /**
      * Non-blocking Describe Snapshots 
@@ -1562,8 +1532,6 @@ public interface  AmazonEC2 {
      */
     public Future<DescribeSnapshotsResponse> describeSnapshotsAsync(DescribeSnapshotsRequest request);
 
-
-            
     /**
      * Describe Volumes 
      *
@@ -1626,8 +1594,6 @@ public interface  AmazonEC2 {
      */
     public Future<DescribeVolumesResponse> describeVolumesAsync(DescribeVolumesRequest request);
 
-
-            
     /**
      * Detach Volume 
      *
@@ -1690,8 +1656,6 @@ public interface  AmazonEC2 {
      */
     public Future<DetachVolumeResponse> detachVolumeAsync(DetachVolumeRequest request);
 
-
-            
     /**
      * Disassociate Address 
      *
@@ -1706,7 +1670,8 @@ public interface  AmazonEC2 {
      *
      * @throws AmazonEC2Exception
      */
-    public DisassociateAddressResponse disassociateAddress(DisassociateAddressRequest request) throws AmazonEC2Exception;
+    public DisassociateAddressResponse disassociateAddress(DisassociateAddressRequest request)
+            throws AmazonEC2Exception;
 
     /**
      * Non-blocking Disassociate Address 
@@ -1756,8 +1721,6 @@ public interface  AmazonEC2 {
      */
     public Future<DisassociateAddressResponse> disassociateAddressAsync(DisassociateAddressRequest request);
 
-
-            
     /**
      * Get Console Output 
      *
@@ -1774,7 +1737,8 @@ public interface  AmazonEC2 {
      *
      * @throws AmazonEC2Exception
      */
-    public GetConsoleOutputResponse getConsoleOutput(GetConsoleOutputRequest request) throws AmazonEC2Exception;
+    public GetConsoleOutputResponse getConsoleOutput(GetConsoleOutputRequest request)
+            throws AmazonEC2Exception;
 
     /**
      * Non-blocking Get Console Output 
@@ -1824,8 +1788,6 @@ public interface  AmazonEC2 {
      */
     public Future<GetConsoleOutputResponse> getConsoleOutputAsync(GetConsoleOutputRequest request);
 
-
-            
     /**
      * Modify Image Attribute 
      *
@@ -1838,7 +1800,8 @@ public interface  AmazonEC2 {
      *
      * @throws AmazonEC2Exception
      */
-    public ModifyImageAttributeResponse modifyImageAttribute(ModifyImageAttributeRequest request) throws AmazonEC2Exception;
+    public ModifyImageAttributeResponse modifyImageAttribute(ModifyImageAttributeRequest request)
+            throws AmazonEC2Exception;
 
     /**
      * Non-blocking Modify Image Attribute 
@@ -1888,8 +1851,6 @@ public interface  AmazonEC2 {
      */
     public Future<ModifyImageAttributeResponse> modifyImageAttributeAsync(ModifyImageAttributeRequest request);
 
-
-            
     /**
      * Reboot Instances 
      *
@@ -1955,8 +1916,6 @@ public interface  AmazonEC2 {
      */
     public Future<RebootInstancesResponse> rebootInstancesAsync(RebootInstancesRequest request);
 
-
-            
     /**
      * Register Image 
      *
@@ -2028,8 +1987,6 @@ public interface  AmazonEC2 {
      */
     public Future<RegisterImageResponse> registerImageAsync(RegisterImageRequest request);
 
-
-            
     /**
      * Release Address 
      *
@@ -2103,8 +2060,6 @@ public interface  AmazonEC2 {
      */
     public Future<ReleaseAddressResponse> releaseAddressAsync(ReleaseAddressRequest request);
 
-
-            
     /**
      * Reset Image Attribute 
      *
@@ -2120,7 +2075,8 @@ public interface  AmazonEC2 {
      *
      * @throws AmazonEC2Exception
      */
-    public ResetImageAttributeResponse resetImageAttribute(ResetImageAttributeRequest request) throws AmazonEC2Exception;
+    public ResetImageAttributeResponse resetImageAttribute(ResetImageAttributeRequest request)
+            throws AmazonEC2Exception;
 
     /**
      * Non-blocking Reset Image Attribute 
@@ -2170,8 +2126,6 @@ public interface  AmazonEC2 {
      */
     public Future<ResetImageAttributeResponse> resetImageAttributeAsync(ResetImageAttributeRequest request);
 
-
-            
     /**
      * Revoke Security Group Ingress 
      *
@@ -2197,7 +2151,8 @@ public interface  AmazonEC2 {
      *
      * @throws AmazonEC2Exception
      */
-    public RevokeSecurityGroupIngressResponse revokeSecurityGroupIngress(RevokeSecurityGroupIngressRequest request) throws AmazonEC2Exception;
+    public RevokeSecurityGroupIngressResponse revokeSecurityGroupIngress(
+            RevokeSecurityGroupIngressRequest request) throws AmazonEC2Exception;
 
     /**
      * Non-blocking Revoke Security Group Ingress 
@@ -2245,10 +2200,9 @@ public interface  AmazonEC2 {
      * @return Future&lt;RevokeSecurityGroupIngressResponse&gt; future pointer to RevokeSecurityGroupIngressResponse
      * 
      */
-    public Future<RevokeSecurityGroupIngressResponse> revokeSecurityGroupIngressAsync(RevokeSecurityGroupIngressRequest request);
+    public Future<RevokeSecurityGroupIngressResponse> revokeSecurityGroupIngressAsync(
+            RevokeSecurityGroupIngressRequest request);
 
-
-            
     /**
      * Run Instances 
      *
@@ -2346,8 +2300,6 @@ public interface  AmazonEC2 {
      */
     public Future<RunInstancesResponse> runInstancesAsync(RunInstancesRequest request);
 
-
-            
     /**
      * Terminate Instances 
      *
@@ -2364,7 +2316,8 @@ public interface  AmazonEC2 {
      *
      * @throws AmazonEC2Exception
      */
-    public TerminateInstancesResponse terminateInstances(TerminateInstancesRequest request) throws AmazonEC2Exception;
+    public TerminateInstancesResponse terminateInstances(TerminateInstancesRequest request)
+            throws AmazonEC2Exception;
 
     /**
      * Non-blocking Terminate Instances 

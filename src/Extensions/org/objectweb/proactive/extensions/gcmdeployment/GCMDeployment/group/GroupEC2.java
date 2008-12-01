@@ -63,7 +63,7 @@ public class GroupEC2 extends AbstractJavaGroup {
 
         public EC2InstanceRunner(String accessKeyId, String secretAccessKey, RunInstancesRequest request) {
             service = new AmazonEC2Client(accessKeyId, secretAccessKey);
-//            service = new AmazonEC2Mock();
+            //            service = new AmazonEC2Mock();
             this.request = request;
             this.response = null;
         }
@@ -107,7 +107,7 @@ public class GroupEC2 extends AbstractJavaGroup {
 
         request.setImageId(imageId);
         int hostCapacity = getHostInfo().getHostCapacity();
-        
+
         // request for the number of instances equal to host capacity
         //
         request.setMinCount(hostCapacity);

@@ -19,8 +19,6 @@
  * 
  */
 
-
-
 package com.amazonaws.ec2.samples;
 
 import java.util.List;
@@ -28,6 +26,7 @@ import java.util.ArrayList;
 import com.amazonaws.ec2.*;
 import com.amazonaws.ec2.model.*;
 import com.amazonaws.ec2.mock.AmazonEC2Mock;
+
 
 /**
  *
@@ -44,7 +43,7 @@ public class DescribeImagesSample {
      * @param args unused
      */
     public static void main(String... args) {
-        
+
         /************************************************************************
          * Access Key ID and Secret Acess Key ID, obtained from:
          * http://aws.amazon.com
@@ -56,7 +55,7 @@ public class DescribeImagesSample {
          * Instantiate Http Client Implementation of Amazon EC2 
          ***********************************************************************/
         AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey);
-        
+
         /************************************************************************
          * Uncomment to try advanced configuration options. Available options are:
          *
@@ -69,7 +68,6 @@ public class DescribeImagesSample {
         // AmazonEC2Config config = new AmazonEC2Config();
         // config.setSignatureVersion("0");
         // AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey, config);
- 
         /************************************************************************
          * Uncomment to try out Mock Service that simulates Amazon EC2 
          * responses without calling Amazon EC2  service.
@@ -81,21 +79,18 @@ public class DescribeImagesSample {
          *
          ***********************************************************************/
         // AmazonEC2 service = new AmazonEC2Mock();
-
         /************************************************************************
          * Setup request parameters and uncomment invoke to try out 
          * sample for Describe Images 
          ***********************************************************************/
-         DescribeImagesRequest request = new DescribeImagesRequest();
-        
-         // @TODO: set request parameters here
+        DescribeImagesRequest request = new DescribeImagesRequest();
 
-         // invokeDescribeImages(service, request);
+        // @TODO: set request parameters here
+
+        // invokeDescribeImages(service, request);
 
     }
 
-
-                                                                                            
     /**
      * Describe Images  request sample
      * The DescribeImages operation returns information about AMIs, AKIs, and ARIs
@@ -136,31 +131,31 @@ public class DescribeImagesSample {
      */
     public static void invokeDescribeImages(AmazonEC2 service, DescribeImagesRequest request) {
         try {
-            
+
             DescribeImagesResponse response = service.describeImages(request);
 
-            
-            System.out.println ("DescribeImages Action Response");
-            System.out.println ("=============================================================================");
-            System.out.println ();
+            System.out.println("DescribeImages Action Response");
+            System.out
+                    .println("=============================================================================");
+            System.out.println();
 
             System.out.print("    DescribeImagesResponse");
             System.out.println();
             if (response.isSetResponseMetadata()) {
                 System.out.print("        ResponseMetadata");
                 System.out.println();
-                ResponseMetadata  responseMetadata = response.getResponseMetadata();
+                ResponseMetadata responseMetadata = response.getResponseMetadata();
                 if (responseMetadata.isSetRequestId()) {
                     System.out.print("            RequestId");
                     System.out.println();
                     System.out.print("                " + responseMetadata.getRequestId());
                     System.out.println();
                 }
-            } 
+            }
             if (response.isSetDescribeImagesResult()) {
                 System.out.print("        DescribeImagesResult");
                 System.out.println();
-                DescribeImagesResult  describeImagesResult = response.getDescribeImagesResult();
+                DescribeImagesResult describeImagesResult = response.getDescribeImagesResult();
                 java.util.List<Image> imageList = describeImagesResult.getImage();
                 for (Image image : imageList) {
                     System.out.print("            Image");
@@ -195,12 +190,12 @@ public class DescribeImagesSample {
                         System.out.print("                    " + image.getVisibility());
                         System.out.println();
                     }
-                    java.util.List<String> productCodeList  =  image.getProductCode();
-                    for (String productCode : productCodeList) { 
+                    java.util.List<String> productCodeList = image.getProductCode();
+                    for (String productCode : productCodeList) {
                         System.out.print("                ProductCode");
-                            System.out.println();
+                        System.out.println();
                         System.out.print("                    " + productCode);
-                    }	
+                    }
                     if (image.isSetArchitecture()) {
                         System.out.print("                Architecture");
                         System.out.println();
@@ -226,12 +221,11 @@ public class DescribeImagesSample {
                         System.out.println();
                     }
                 }
-            } 
+            }
             System.out.println();
 
-           
         } catch (AmazonEC2Exception ex) {
-            
+
             System.out.println("Caught Exception: " + ex.getMessage());
             System.out.println("Response Status Code: " + ex.getStatusCode());
             System.out.println("Error Code: " + ex.getErrorCode());
@@ -240,5 +234,5 @@ public class DescribeImagesSample {
             System.out.print("XML: " + ex.getXML());
         }
     }
-                                                                    
+
 }

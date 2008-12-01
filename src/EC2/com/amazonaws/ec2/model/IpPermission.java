@@ -1,4 +1,3 @@
-
 package com.amazonaws.ec2.model;
 
 import java.util.ArrayList;
@@ -35,13 +34,8 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "IpPermission", propOrder = {
-    "ipProtocol",
-    "fromPort",
-    "toPort",
-    "userIdGroupPair",
-    "ipRange"
-})
+@XmlType(name = "IpPermission", propOrder = { "ipProtocol", "fromPort", "toPort", "userIdGroupPair",
+        "ipRange" })
 public class IpPermission {
 
     @XmlElement(name = "IpProtocol", required = true)
@@ -67,7 +61,8 @@ public class IpPermission {
      * Value constructor
      * 
      */
-    public IpPermission(final String ipProtocol, final int fromPort, final int toPort, final List<UserIdGroupPair> userIdGroupPair, final List<String> ipRange) {
+    public IpPermission(final String ipProtocol, final int fromPort, final int toPort,
+            final List<UserIdGroupPair> userIdGroupPair, final List<String> ipRange) {
         this.ipProtocol = ipProtocol;
         this.fromPort = fromPort;
         this.toPort = toPort;
@@ -100,7 +95,7 @@ public class IpPermission {
     }
 
     public boolean isSetIpProtocol() {
-        return (this.ipProtocol!= null);
+        return (this.ipProtocol != null);
     }
 
     /**
@@ -173,7 +168,7 @@ public class IpPermission {
     }
 
     public boolean isSetUserIdGroupPair() {
-        return ((this.userIdGroupPair!= null)&&(!this.userIdGroupPair.isEmpty()));
+        return ((this.userIdGroupPair != null) && (!this.userIdGroupPair.isEmpty()));
     }
 
     public void unsetUserIdGroupPair() {
@@ -210,7 +205,7 @@ public class IpPermission {
     }
 
     public boolean isSetIpRange() {
-        return ((this.ipRange!= null)&&(!this.ipRange.isEmpty()));
+        return ((this.ipRange != null) && (!this.ipRange.isEmpty()));
     }
 
     public void unsetIpRange() {
@@ -261,7 +256,7 @@ public class IpPermission {
      *     this instance
      */
     public IpPermission withUserIdGroupPair(UserIdGroupPair... values) {
-        for (UserIdGroupPair value: values) {
+        for (UserIdGroupPair value : values) {
             getUserIdGroupPair().add(value);
         }
         return this;
@@ -275,7 +270,7 @@ public class IpPermission {
      *     this instance
      */
     public IpPermission withIpRange(String... values) {
-        for (String value: values) {
+        for (String value : values) {
             getIpRange().add(value);
         }
         return this;
@@ -304,7 +299,6 @@ public class IpPermission {
     public void setIpRange(List<String> ipRange) {
         this.ipRange = ipRange;
     }
-    
 
     /**
      * 
@@ -337,12 +331,12 @@ public class IpPermission {
             xml.append(userIdGroupPair.toXMLFragment());
             xml.append("</UserIdGroupPair>");
         }
-        java.util.List<String> ipRangeList  =  getIpRange();
-        for (String ipRange : ipRangeList) { 
+        java.util.List<String> ipRangeList = getIpRange();
+        for (String ipRange : ipRangeList) {
             xml.append("<IpRange>");
             xml.append(escapeXML(ipRange));
             xml.append("</IpRange>");
-        }	
+        }
         return xml.toString();
     }
 
@@ -356,29 +350,27 @@ public class IpPermission {
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             switch (c) {
-            case '&':
-                sb.append("&amp;");
-                break;
-            case '<':
-                sb.append("&lt;");
-                break;
-            case '>':
-                sb.append("&gt;");
-                break;
-            case '\'':
-                sb.append("&#039;");
-                break;
-            case '"':
-                sb.append("&quot;");
-                break;
-            default:
-                sb.append(c);
+                case '&':
+                    sb.append("&amp;");
+                    break;
+                case '<':
+                    sb.append("&lt;");
+                    break;
+                case '>':
+                    sb.append("&gt;");
+                    break;
+                case '\'':
+                    sb.append("&#039;");
+                    break;
+                case '"':
+                    sb.append("&quot;");
+                    break;
+                default:
+                    sb.append(c);
             }
         }
         return sb.toString();
     }
-
-
 
     /**
      *
@@ -393,32 +385,37 @@ public class IpPermission {
         StringBuffer json = new StringBuffer();
         boolean first = true;
         if (isSetIpProtocol()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("IpProtocol"));
             json.append(" : ");
             json.append(quoteJSON(getIpProtocol()));
             first = false;
         }
         if (isSetFromPort()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("FromPort"));
             json.append(" : ");
             json.append(quoteJSON(getFromPort() + ""));
             first = false;
         }
         if (isSetToPort()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("ToPort"));
             json.append(" : ");
             json.append(quoteJSON(getToPort() + ""));
             first = false;
         }
         if (isSetUserIdGroupPair()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append("\"UserIdGroupPair\" : [");
             java.util.List<UserIdGroupPair> userIdGroupPairList = getUserIdGroupPair();
             for (UserIdGroupPair userIdGroupPair : userIdGroupPairList) {
-                if (userIdGroupPairList.indexOf(userIdGroupPair) > 0) json.append(", ");
+                if (userIdGroupPairList.indexOf(userIdGroupPair) > 0)
+                    json.append(", ");
                 json.append("{");
                 json.append("");
                 json.append(userIdGroupPair.toJSONFragment());
@@ -428,12 +425,14 @@ public class IpPermission {
             json.append("]");
         }
         if (isSetIpRange()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append("\"IpRange\" : [");
-            java.util.List<String> ipRangeList  =  getIpRange();
+            java.util.List<String> ipRangeList = getIpRange();
             for (String ipRange : ipRangeList) {
-                if (ipRangeList.indexOf(ipRange) > 0) json.append(", ");
-                    json.append(quoteJSON(ipRange));
+                if (ipRangeList.indexOf(ipRange) > 0)
+                    json.append(", ");
+                json.append(quoteJSON(ipRange));
             }
             json.append("]");
             first = false;
@@ -452,41 +451,40 @@ public class IpPermission {
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             switch (c) {
-            case '"':
-                sb.append("\\\"");
-                break;
-            case '\\':
-                sb.append("\\\\");
-                break;
-            case '/':
-                sb.append("\\/");
-                break;
-            case '\b':
-                sb.append("\\b");
-                break;
-            case '\f':
-                sb.append("\\f");
-                break;
-            case '\n':
-                sb.append("\\n");
-                break;
-            case '\r':
-                sb.append("\\r");
-                break;
-            case '\t':
-                sb.append("\\t");
-                break;
-            default:
-                if (c <  ' ') {
-                    sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
-                } else {
-                sb.append(c);
+                case '"':
+                    sb.append("\\\"");
+                    break;
+                case '\\':
+                    sb.append("\\\\");
+                    break;
+                case '/':
+                    sb.append("\\/");
+                    break;
+                case '\b':
+                    sb.append("\\b");
+                    break;
+                case '\f':
+                    sb.append("\\f");
+                    break;
+                case '\n':
+                    sb.append("\\n");
+                    break;
+                case '\r':
+                    sb.append("\\r");
+                    break;
+                case '\t':
+                    sb.append("\\t");
+                    break;
+                default:
+                    if (c < ' ') {
+                        sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
+                    } else {
+                        sb.append(c);
+                    }
             }
-        }
         }
         sb.append("\"");
         return sb.toString();
     }
-
 
 }

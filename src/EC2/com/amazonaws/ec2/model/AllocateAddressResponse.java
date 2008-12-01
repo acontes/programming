@@ -1,4 +1,3 @@
-
 package com.amazonaws.ec2.model;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -31,10 +30,7 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-    "responseMetadata",
-    "allocateAddressResult"
-})
+@XmlType(name = "", propOrder = { "responseMetadata", "allocateAddressResult" })
 @XmlRootElement(name = "AllocateAddressResponse")
 public class AllocateAddressResponse {
 
@@ -55,7 +51,8 @@ public class AllocateAddressResponse {
      * Value constructor
      * 
      */
-    public AllocateAddressResponse(final ResponseMetadata responseMetadata, final AllocateAddressResult allocateAddressResult) {
+    public AllocateAddressResponse(final ResponseMetadata responseMetadata,
+            final AllocateAddressResult allocateAddressResult) {
         this.responseMetadata = responseMetadata;
         this.allocateAddressResult = allocateAddressResult;
     }
@@ -85,7 +82,7 @@ public class AllocateAddressResponse {
     }
 
     public boolean isSetResponseMetadata() {
-        return (this.responseMetadata!= null);
+        return (this.responseMetadata != null);
     }
 
     /**
@@ -113,7 +110,7 @@ public class AllocateAddressResponse {
     }
 
     public boolean isSetAllocateAddressResult() {
-        return (this.allocateAddressResult!= null);
+        return (this.allocateAddressResult != null);
     }
 
     /**
@@ -139,7 +136,6 @@ public class AllocateAddressResponse {
         setAllocateAddressResult(value);
         return this;
     }
-    
 
     /**
      * 
@@ -151,17 +147,17 @@ public class AllocateAddressResponse {
         StringBuffer xml = new StringBuffer();
         xml.append("<AllocateAddressResponse xmlns=\"http://ec2.amazonaws.com/doc/2008-05-05/\">");
         if (isSetResponseMetadata()) {
-            ResponseMetadata  responseMetadata = getResponseMetadata();
+            ResponseMetadata responseMetadata = getResponseMetadata();
             xml.append("<ResponseMetadata>");
             xml.append(responseMetadata.toXMLFragment());
             xml.append("</ResponseMetadata>");
-        } 
+        }
         if (isSetAllocateAddressResult()) {
-            AllocateAddressResult  allocateAddressResult = getAllocateAddressResult();
+            AllocateAddressResult allocateAddressResult = getAllocateAddressResult();
             xml.append("<AllocateAddressResult>");
             xml.append(allocateAddressResult.toXMLFragment());
             xml.append("</AllocateAddressResult>");
-        } 
+        }
         xml.append("</AllocateAddressResponse>");
         return xml.toString();
     }
@@ -176,29 +172,27 @@ public class AllocateAddressResponse {
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             switch (c) {
-            case '&':
-                sb.append("&amp;");
-                break;
-            case '<':
-                sb.append("&lt;");
-                break;
-            case '>':
-                sb.append("&gt;");
-                break;
-            case '\'':
-                sb.append("&#039;");
-                break;
-            case '"':
-                sb.append("&quot;");
-                break;
-            default:
-                sb.append(c);
+                case '&':
+                    sb.append("&amp;");
+                    break;
+                case '<':
+                    sb.append("&lt;");
+                    break;
+                case '>':
+                    sb.append("&gt;");
+                    break;
+                case '\'':
+                    sb.append("&#039;");
+                    break;
+                case '"':
+                    sb.append("&quot;");
+                    break;
+                default:
+                    sb.append(c);
             }
         }
         return sb.toString();
     }
-
-
 
     /**
      * 
@@ -215,23 +209,25 @@ public class AllocateAddressResponse {
         boolean first = true;
         json.append(", ");
         if (isSetResponseMetadata()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append("\"ResponseMetadata\" : {");
-            ResponseMetadata  responseMetadata = getResponseMetadata();
+            ResponseMetadata responseMetadata = getResponseMetadata();
 
             json.append(responseMetadata.toJSONFragment());
             json.append("}");
             first = false;
-        } 
+        }
         if (isSetAllocateAddressResult()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append("\"AllocateAddressResult\" : {");
-            AllocateAddressResult  allocateAddressResult = getAllocateAddressResult();
+            AllocateAddressResult allocateAddressResult = getAllocateAddressResult();
 
             json.append(allocateAddressResult.toJSONFragment());
             json.append("}");
             first = false;
-        } 
+        }
         json.append("}");
         json.append("}");
         return json.toString();
@@ -248,41 +244,40 @@ public class AllocateAddressResponse {
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             switch (c) {
-            case '"':
-                sb.append("\\\"");
-                break;
-            case '\\':
-                sb.append("\\\\");
-                break;
-            case '/':
-                sb.append("\\/");
-                break;
-            case '\b':
-                sb.append("\\b");
-                break;
-            case '\f':
-                sb.append("\\f");
-                break;
-            case '\n':
-                sb.append("\\n");
-                break;
-            case '\r':
-                sb.append("\\r");
-                break;
-            case '\t':
-                sb.append("\\t");
-                break;
-            default:
-                if (c <  ' ') {
-                    sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
-                } else {
-                sb.append(c);
-                }
+                case '"':
+                    sb.append("\\\"");
+                    break;
+                case '\\':
+                    sb.append("\\\\");
+                    break;
+                case '/':
+                    sb.append("\\/");
+                    break;
+                case '\b':
+                    sb.append("\\b");
+                    break;
+                case '\f':
+                    sb.append("\\f");
+                    break;
+                case '\n':
+                    sb.append("\\n");
+                    break;
+                case '\r':
+                    sb.append("\\r");
+                    break;
+                case '\t':
+                    sb.append("\\t");
+                    break;
+                default:
+                    if (c < ' ') {
+                        sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
+                    } else {
+                        sb.append(c);
+                    }
             }
         }
         sb.append("\"");
         return sb.toString();
     }
-
 
 }

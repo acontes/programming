@@ -19,8 +19,6 @@
  * 
  */
 
-
-
 package com.amazonaws.ec2.samples;
 
 import java.util.List;
@@ -28,6 +26,7 @@ import java.util.ArrayList;
 import com.amazonaws.ec2.*;
 import com.amazonaws.ec2.model.*;
 import com.amazonaws.ec2.mock.AmazonEC2Mock;
+
 
 /**
  *
@@ -44,7 +43,7 @@ public class DescribeAvailabilityZonesSample {
      * @param args unused
      */
     public static void main(String... args) {
-        
+
         /************************************************************************
          * Access Key ID and Secret Acess Key ID, obtained from:
          * http://aws.amazon.com
@@ -56,7 +55,7 @@ public class DescribeAvailabilityZonesSample {
          * Instantiate Http Client Implementation of Amazon EC2 
          ***********************************************************************/
         AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey);
-        
+
         /************************************************************************
          * Uncomment to try advanced configuration options. Available options are:
          *
@@ -69,7 +68,6 @@ public class DescribeAvailabilityZonesSample {
         // AmazonEC2Config config = new AmazonEC2Config();
         // config.setSignatureVersion("0");
         // AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey, config);
- 
         /************************************************************************
          * Uncomment to try out Mock Service that simulates Amazon EC2 
          * responses without calling Amazon EC2  service.
@@ -81,21 +79,18 @@ public class DescribeAvailabilityZonesSample {
          *
          ***********************************************************************/
         // AmazonEC2 service = new AmazonEC2Mock();
-
         /************************************************************************
          * Setup request parameters and uncomment invoke to try out 
          * sample for Describe Availability Zones 
          ***********************************************************************/
-         DescribeAvailabilityZonesRequest request = new DescribeAvailabilityZonesRequest();
-        
-         // @TODO: set request parameters here
+        DescribeAvailabilityZonesRequest request = new DescribeAvailabilityZonesRequest();
 
-         // invokeDescribeAvailabilityZones(service, request);
+        // @TODO: set request parameters here
+
+        // invokeDescribeAvailabilityZones(service, request);
 
     }
 
-
-                                                                                    
     /**
      * Describe Availability Zones  request sample
      * The DescribeAvailabilityZones operation describes availability zones that are
@@ -107,34 +102,37 @@ public class DescribeAvailabilityZonesSample {
      * @param service instance of AmazonEC2 service
      * @param request Action to invoke
      */
-    public static void invokeDescribeAvailabilityZones(AmazonEC2 service, DescribeAvailabilityZonesRequest request) {
+    public static void invokeDescribeAvailabilityZones(AmazonEC2 service,
+            DescribeAvailabilityZonesRequest request) {
         try {
-            
+
             DescribeAvailabilityZonesResponse response = service.describeAvailabilityZones(request);
 
-            
-            System.out.println ("DescribeAvailabilityZones Action Response");
-            System.out.println ("=============================================================================");
-            System.out.println ();
+            System.out.println("DescribeAvailabilityZones Action Response");
+            System.out
+                    .println("=============================================================================");
+            System.out.println();
 
             System.out.print("    DescribeAvailabilityZonesResponse");
             System.out.println();
             if (response.isSetResponseMetadata()) {
                 System.out.print("        ResponseMetadata");
                 System.out.println();
-                ResponseMetadata  responseMetadata = response.getResponseMetadata();
+                ResponseMetadata responseMetadata = response.getResponseMetadata();
                 if (responseMetadata.isSetRequestId()) {
                     System.out.print("            RequestId");
                     System.out.println();
                     System.out.print("                " + responseMetadata.getRequestId());
                     System.out.println();
                 }
-            } 
+            }
             if (response.isSetDescribeAvailabilityZonesResult()) {
                 System.out.print("        DescribeAvailabilityZonesResult");
                 System.out.println();
-                DescribeAvailabilityZonesResult  describeAvailabilityZonesResult = response.getDescribeAvailabilityZonesResult();
-                java.util.List<AvailabilityZone> availabilityZoneList = describeAvailabilityZonesResult.getAvailabilityZone();
+                DescribeAvailabilityZonesResult describeAvailabilityZonesResult = response
+                        .getDescribeAvailabilityZonesResult();
+                java.util.List<AvailabilityZone> availabilityZoneList = describeAvailabilityZonesResult
+                        .getAvailabilityZone();
                 for (AvailabilityZone availabilityZone : availabilityZoneList) {
                     System.out.print("            AvailabilityZone");
                     System.out.println();
@@ -151,12 +149,11 @@ public class DescribeAvailabilityZonesSample {
                         System.out.println();
                     }
                 }
-            } 
+            }
             System.out.println();
 
-           
         } catch (AmazonEC2Exception ex) {
-            
+
             System.out.println("Caught Exception: " + ex.getMessage());
             System.out.println("Response Status Code: " + ex.getStatusCode());
             System.out.println("Error Code: " + ex.getErrorCode());
@@ -165,5 +162,5 @@ public class DescribeAvailabilityZonesSample {
             System.out.print("XML: " + ex.getXML());
         }
     }
-                                                                            
+
 }

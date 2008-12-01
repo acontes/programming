@@ -1,4 +1,3 @@
-
 package com.amazonaws.ec2.model;
 
 import java.util.ArrayList;
@@ -36,14 +35,8 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ImageAttribute", propOrder = {
-    "imageId",
-    "launchPermission",
-    "productCode",
-    "kernelId",
-    "ramdiskId",
-    "blockDeviceMapping"
-})
+@XmlType(name = "ImageAttribute", propOrder = { "imageId", "launchPermission", "productCode", "kernelId",
+        "ramdiskId", "blockDeviceMapping" })
 public class ImageAttribute {
 
     @XmlElement(name = "ImageId", required = true)
@@ -71,7 +64,9 @@ public class ImageAttribute {
      * Value constructor
      * 
      */
-    public ImageAttribute(final String imageId, final LaunchPermission launchPermission, final List<String> productCode, final String kernelId, final String ramdiskId, final BlockDeviceMapping blockDeviceMapping) {
+    public ImageAttribute(final String imageId, final LaunchPermission launchPermission,
+            final List<String> productCode, final String kernelId, final String ramdiskId,
+            final BlockDeviceMapping blockDeviceMapping) {
         this.imageId = imageId;
         this.launchPermission = launchPermission;
         this.productCode = productCode;
@@ -105,7 +100,7 @@ public class ImageAttribute {
     }
 
     public boolean isSetImageId() {
-        return (this.imageId!= null);
+        return (this.imageId != null);
     }
 
     /**
@@ -133,7 +128,7 @@ public class ImageAttribute {
     }
 
     public boolean isSetLaunchPermission() {
-        return (this.launchPermission!= null);
+        return (this.launchPermission != null);
     }
 
     /**
@@ -166,7 +161,7 @@ public class ImageAttribute {
     }
 
     public boolean isSetProductCode() {
-        return ((this.productCode!= null)&&(!this.productCode.isEmpty()));
+        return ((this.productCode != null) && (!this.productCode.isEmpty()));
     }
 
     public void unsetProductCode() {
@@ -198,7 +193,7 @@ public class ImageAttribute {
     }
 
     public boolean isSetKernelId() {
-        return (this.kernelId!= null);
+        return (this.kernelId != null);
     }
 
     /**
@@ -226,7 +221,7 @@ public class ImageAttribute {
     }
 
     public boolean isSetRamdiskId() {
-        return (this.ramdiskId!= null);
+        return (this.ramdiskId != null);
     }
 
     /**
@@ -254,7 +249,7 @@ public class ImageAttribute {
     }
 
     public boolean isSetBlockDeviceMapping() {
-        return (this.blockDeviceMapping!= null);
+        return (this.blockDeviceMapping != null);
     }
 
     /**
@@ -289,7 +284,7 @@ public class ImageAttribute {
      *     this instance
      */
     public ImageAttribute withProductCode(String... values) {
-        for (String value: values) {
+        for (String value : values) {
             getProductCode().add(value);
         }
         return this;
@@ -342,7 +337,6 @@ public class ImageAttribute {
     public void setProductCode(List<String> productCode) {
         this.productCode = productCode;
     }
-    
 
     /**
      * 
@@ -360,17 +354,17 @@ public class ImageAttribute {
             xml.append("</ImageId>");
         }
         if (isSetLaunchPermission()) {
-            LaunchPermission  launchPermission = getLaunchPermission();
+            LaunchPermission launchPermission = getLaunchPermission();
             xml.append("<LaunchPermission>");
             xml.append(launchPermission.toXMLFragment());
             xml.append("</LaunchPermission>");
-        } 
-        java.util.List<String> productCodeList  =  getProductCode();
-        for (String productCode : productCodeList) { 
+        }
+        java.util.List<String> productCodeList = getProductCode();
+        for (String productCode : productCodeList) {
             xml.append("<ProductCode>");
             xml.append(escapeXML(productCode));
             xml.append("</ProductCode>");
-        }	
+        }
         if (isSetKernelId()) {
             xml.append("<KernelId>");
             xml.append(escapeXML(getKernelId()));
@@ -382,11 +376,11 @@ public class ImageAttribute {
             xml.append("</RamdiskId>");
         }
         if (isSetBlockDeviceMapping()) {
-            BlockDeviceMapping  blockDeviceMapping = getBlockDeviceMapping();
+            BlockDeviceMapping blockDeviceMapping = getBlockDeviceMapping();
             xml.append("<BlockDeviceMapping>");
             xml.append(blockDeviceMapping.toXMLFragment());
             xml.append("</BlockDeviceMapping>");
-        } 
+        }
         return xml.toString();
     }
 
@@ -400,29 +394,27 @@ public class ImageAttribute {
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             switch (c) {
-            case '&':
-                sb.append("&amp;");
-                break;
-            case '<':
-                sb.append("&lt;");
-                break;
-            case '>':
-                sb.append("&gt;");
-                break;
-            case '\'':
-                sb.append("&#039;");
-                break;
-            case '"':
-                sb.append("&quot;");
-                break;
-            default:
-                sb.append(c);
+                case '&':
+                    sb.append("&amp;");
+                    break;
+                case '<':
+                    sb.append("&lt;");
+                    break;
+                case '>':
+                    sb.append("&gt;");
+                    break;
+                case '\'':
+                    sb.append("&#039;");
+                    break;
+                case '"':
+                    sb.append("&quot;");
+                    break;
+                default:
+                    sb.append(c);
             }
         }
         return sb.toString();
     }
-
-
 
     /**
      *
@@ -437,52 +429,57 @@ public class ImageAttribute {
         StringBuffer json = new StringBuffer();
         boolean first = true;
         if (isSetImageId()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("ImageId"));
             json.append(" : ");
             json.append(quoteJSON(getImageId()));
             first = false;
         }
         if (isSetLaunchPermission()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append("\"LaunchPermission\" : {");
-            LaunchPermission  launchPermission = getLaunchPermission();
-
+            LaunchPermission launchPermission = getLaunchPermission();
 
             json.append(launchPermission.toJSONFragment());
             json.append("}");
             first = false;
         }
         if (isSetProductCode()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append("\"ProductCode\" : [");
-            java.util.List<String> productCodeList  =  getProductCode();
+            java.util.List<String> productCodeList = getProductCode();
             for (String productCode : productCodeList) {
-                if (productCodeList.indexOf(productCode) > 0) json.append(", ");
-                    json.append(quoteJSON(productCode));
+                if (productCodeList.indexOf(productCode) > 0)
+                    json.append(", ");
+                json.append(quoteJSON(productCode));
             }
             json.append("]");
             first = false;
         }
         if (isSetKernelId()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("KernelId"));
             json.append(" : ");
             json.append(quoteJSON(getKernelId()));
             first = false;
         }
         if (isSetRamdiskId()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("RamdiskId"));
             json.append(" : ");
             json.append(quoteJSON(getRamdiskId()));
             first = false;
         }
         if (isSetBlockDeviceMapping()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append("\"BlockDeviceMapping\" : {");
-            BlockDeviceMapping  blockDeviceMapping = getBlockDeviceMapping();
-
+            BlockDeviceMapping blockDeviceMapping = getBlockDeviceMapping();
 
             json.append(blockDeviceMapping.toJSONFragment());
             json.append("}");
@@ -502,41 +499,40 @@ public class ImageAttribute {
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             switch (c) {
-            case '"':
-                sb.append("\\\"");
-                break;
-            case '\\':
-                sb.append("\\\\");
-                break;
-            case '/':
-                sb.append("\\/");
-                break;
-            case '\b':
-                sb.append("\\b");
-                break;
-            case '\f':
-                sb.append("\\f");
-                break;
-            case '\n':
-                sb.append("\\n");
-                break;
-            case '\r':
-                sb.append("\\r");
-                break;
-            case '\t':
-                sb.append("\\t");
-                break;
-            default:
-                if (c <  ' ') {
-                    sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
-                } else {
-                sb.append(c);
+                case '"':
+                    sb.append("\\\"");
+                    break;
+                case '\\':
+                    sb.append("\\\\");
+                    break;
+                case '/':
+                    sb.append("\\/");
+                    break;
+                case '\b':
+                    sb.append("\\b");
+                    break;
+                case '\f':
+                    sb.append("\\f");
+                    break;
+                case '\n':
+                    sb.append("\\n");
+                    break;
+                case '\r':
+                    sb.append("\\r");
+                    break;
+                case '\t':
+                    sb.append("\\t");
+                    break;
+                default:
+                    if (c < ' ') {
+                        sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
+                    } else {
+                        sb.append(c);
+                    }
             }
-        }
         }
         sb.append("\"");
         return sb.toString();
     }
-
 
 }

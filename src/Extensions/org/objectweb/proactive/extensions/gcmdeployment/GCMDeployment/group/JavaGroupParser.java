@@ -36,6 +36,7 @@ import javax.xml.xpath.XPath;
 
 import org.w3c.dom.Node;
 
+
 public interface JavaGroupParser {
     public AbstractJavaGroup parseGroupNode(Node groupNode, XPath xpath);
 

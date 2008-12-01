@@ -1,4 +1,3 @@
-
 package com.amazonaws.ec2.model;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -30,10 +29,7 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "BlockDeviceMapping", propOrder = {
-    "virtualName",
-    "deviceName"
-})
+@XmlType(name = "BlockDeviceMapping", propOrder = { "virtualName", "deviceName" })
 public class BlockDeviceMapping {
 
     @XmlElement(name = "VirtualName", required = true)
@@ -83,7 +79,7 @@ public class BlockDeviceMapping {
     }
 
     public boolean isSetVirtualName() {
-        return (this.virtualName!= null);
+        return (this.virtualName != null);
     }
 
     /**
@@ -111,7 +107,7 @@ public class BlockDeviceMapping {
     }
 
     public boolean isSetDeviceName() {
-        return (this.deviceName!= null);
+        return (this.deviceName != null);
     }
 
     /**
@@ -137,7 +133,6 @@ public class BlockDeviceMapping {
         setDeviceName(value);
         return this;
     }
-    
 
     /**
      * 
@@ -172,29 +167,27 @@ public class BlockDeviceMapping {
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             switch (c) {
-            case '&':
-                sb.append("&amp;");
-                break;
-            case '<':
-                sb.append("&lt;");
-                break;
-            case '>':
-                sb.append("&gt;");
-                break;
-            case '\'':
-                sb.append("&#039;");
-                break;
-            case '"':
-                sb.append("&quot;");
-                break;
-            default:
-                sb.append(c);
+                case '&':
+                    sb.append("&amp;");
+                    break;
+                case '<':
+                    sb.append("&lt;");
+                    break;
+                case '>':
+                    sb.append("&gt;");
+                    break;
+                case '\'':
+                    sb.append("&#039;");
+                    break;
+                case '"':
+                    sb.append("&quot;");
+                    break;
+                default:
+                    sb.append(c);
             }
         }
         return sb.toString();
     }
-
-
 
     /**
      *
@@ -209,14 +202,16 @@ public class BlockDeviceMapping {
         StringBuffer json = new StringBuffer();
         boolean first = true;
         if (isSetVirtualName()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("VirtualName"));
             json.append(" : ");
             json.append(quoteJSON(getVirtualName()));
             first = false;
         }
         if (isSetDeviceName()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("DeviceName"));
             json.append(" : ");
             json.append(quoteJSON(getDeviceName()));
@@ -236,41 +231,40 @@ public class BlockDeviceMapping {
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             switch (c) {
-            case '"':
-                sb.append("\\\"");
-                break;
-            case '\\':
-                sb.append("\\\\");
-                break;
-            case '/':
-                sb.append("\\/");
-                break;
-            case '\b':
-                sb.append("\\b");
-                break;
-            case '\f':
-                sb.append("\\f");
-                break;
-            case '\n':
-                sb.append("\\n");
-                break;
-            case '\r':
-                sb.append("\\r");
-                break;
-            case '\t':
-                sb.append("\\t");
-                break;
-            default:
-                if (c <  ' ') {
-                    sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
-                } else {
-                sb.append(c);
+                case '"':
+                    sb.append("\\\"");
+                    break;
+                case '\\':
+                    sb.append("\\\\");
+                    break;
+                case '/':
+                    sb.append("\\/");
+                    break;
+                case '\b':
+                    sb.append("\\b");
+                    break;
+                case '\f':
+                    sb.append("\\f");
+                    break;
+                case '\n':
+                    sb.append("\\n");
+                    break;
+                case '\r':
+                    sb.append("\\r");
+                    break;
+                case '\t':
+                    sb.append("\\t");
+                    break;
+                default:
+                    if (c < ' ') {
+                        sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
+                    } else {
+                        sb.append(c);
+                    }
             }
-        }
         }
         sb.append("\"");
         return sb.toString();
     }
-
 
 }

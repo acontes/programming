@@ -19,8 +19,6 @@
  * 
  */
 
-
-
 package com.amazonaws.ec2.mock;
 
 import com.amazonaws.ec2.model.*;
@@ -38,6 +36,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
+
 /**
  *
  * AmazonEC2Mock is the implementation of AmazonEC2 based
@@ -49,29 +48,29 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Note, current Mock Service implementation does not valiadate requests
  *
  */
-public  class AmazonEC2Mock implements AmazonEC2 {
-    
-    private final Log log = LogFactory.getLog(AmazonEC2Mock.class);
-    private static JAXBContext  jaxbContext;
-    private static ThreadLocal<Unmarshaller> unmarshaller;
-    private ExecutorService asyncExecutor = Executors.newCachedThreadPool(
-            new ThreadFactory() {
-                private final AtomicInteger threadNumber = new AtomicInteger(1);
-                public Thread newThread(Runnable task) {
-                    Thread thread = new Thread(task, "AmazonEC2Mock-Thread-" + threadNumber.getAndIncrement());
-                    thread.setDaemon(Boolean.TRUE);
-                    if (thread.getPriority() != Thread.NORM_PRIORITY) {
-                        thread.setPriority(Thread.NORM_PRIORITY);
-                    }
-                    return thread;
-                }
-                });
+public class AmazonEC2Mock implements AmazonEC2 {
 
-    
+    private final Log log = LogFactory.getLog(AmazonEC2Mock.class);
+    private static JAXBContext jaxbContext;
+    private static ThreadLocal<Unmarshaller> unmarshaller;
+    private ExecutorService asyncExecutor = Executors.newCachedThreadPool(new ThreadFactory() {
+        private final AtomicInteger threadNumber = new AtomicInteger(1);
+
+        public Thread newThread(Runnable task) {
+            Thread thread = new Thread(task, "AmazonEC2Mock-Thread-" + threadNumber.getAndIncrement());
+            thread.setDaemon(Boolean.TRUE);
+            if (thread.getPriority() != Thread.NORM_PRIORITY) {
+                thread.setPriority(Thread.NORM_PRIORITY);
+            }
+            return thread;
+        }
+    });
+
     /** Initialize JAXBContext and  Unmarshaller **/
     static {
         try {
-            jaxbContext = JAXBContext.newInstance("com.amazonaws.ec2.model", AmazonEC2.class.getClassLoader());
+            jaxbContext = JAXBContext
+                    .newInstance("com.amazonaws.ec2.model", AmazonEC2.class.getClassLoader());
         } catch (JAXBException ex) {
             throw new ExceptionInInitializerError(ex);
         }
@@ -79,7 +78,7 @@ public  class AmazonEC2Mock implements AmazonEC2 {
             protected synchronized Unmarshaller initialValue() {
                 try {
                     return jaxbContext.createUnmarshaller();
-                } catch(JAXBException e) {
+                } catch (JAXBException e) {
                     throw new ExceptionInInitializerError(e);
                 }
             }
@@ -87,8 +86,7 @@ public  class AmazonEC2Mock implements AmazonEC2 {
     }
 
     // Public API ------------------------------------------------------------//
-    
-        
+
     /**
      * Allocate Address 
      *
@@ -102,32 +100,31 @@ public  class AmazonEC2Mock implements AmazonEC2 {
      *
      * @throws AmazonEC2Exception
      */
-    public AllocateAddressResponse allocateAddress(AllocateAddressRequest request)
-        throws AmazonEC2Exception {
+    public AllocateAddressResponse allocateAddress(AllocateAddressRequest request) throws AmazonEC2Exception {
         AllocateAddressResponse response;
         try {
-            response = (AllocateAddressResponse)getUnmarshaller().unmarshal
-                    (new InputSource(this.getClass().getResourceAsStream("AllocateAddressResponse.xml")));
+            response = (AllocateAddressResponse) getUnmarshaller().unmarshal(
+                    new InputSource(this.getClass().getResourceAsStream("AllocateAddressResponse.xml")));
 
             log.debug("Response from Mock Service: " + response.toXML());
-            
+
         } catch (JAXBException jbe) {
             throw new AmazonEC2Exception("Unable to process mock response", jbe);
         }
         return response;
     }
 
-    public Future<AllocateAddressResponse> allocateAddressAsync(final
-AllocateAddressRequest request) {
-        Future<AllocateAddressResponse> response = asyncExecutor.submit(new Callable<AllocateAddressResponse>() {
+    public Future<AllocateAddressResponse> allocateAddressAsync(final AllocateAddressRequest request) {
+        Future<AllocateAddressResponse> response = asyncExecutor
+                .submit(new Callable<AllocateAddressResponse>() {
 
-            public AllocateAddressResponse call() throws AmazonEC2Exception {
-                return allocateAddress(request);
-            }
-            });
+                    public AllocateAddressResponse call() throws AmazonEC2Exception {
+                        return allocateAddress(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Associate Address 
      *
@@ -145,31 +142,31 @@ AllocateAddressRequest request) {
      * @throws AmazonEC2Exception
      */
     public AssociateAddressResponse associateAddress(AssociateAddressRequest request)
-        throws AmazonEC2Exception {
+            throws AmazonEC2Exception {
         AssociateAddressResponse response;
         try {
-            response = (AssociateAddressResponse)getUnmarshaller().unmarshal
-                    (new InputSource(this.getClass().getResourceAsStream("AssociateAddressResponse.xml")));
+            response = (AssociateAddressResponse) getUnmarshaller().unmarshal(
+                    new InputSource(this.getClass().getResourceAsStream("AssociateAddressResponse.xml")));
 
             log.debug("Response from Mock Service: " + response.toXML());
-            
+
         } catch (JAXBException jbe) {
             throw new AmazonEC2Exception("Unable to process mock response", jbe);
         }
         return response;
     }
 
-    public Future<AssociateAddressResponse> associateAddressAsync(final
-AssociateAddressRequest request) {
-        Future<AssociateAddressResponse> response = asyncExecutor.submit(new Callable<AssociateAddressResponse>() {
+    public Future<AssociateAddressResponse> associateAddressAsync(final AssociateAddressRequest request) {
+        Future<AssociateAddressResponse> response = asyncExecutor
+                .submit(new Callable<AssociateAddressResponse>() {
 
-            public AssociateAddressResponse call() throws AmazonEC2Exception {
-                return associateAddress(request);
-            }
-            });
+                    public AssociateAddressResponse call() throws AmazonEC2Exception {
+                        return associateAddress(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Attach Volume 
      *
@@ -182,32 +179,30 @@ AssociateAddressRequest request) {
      *
      * @throws AmazonEC2Exception
      */
-    public AttachVolumeResponse attachVolume(AttachVolumeRequest request)
-        throws AmazonEC2Exception {
+    public AttachVolumeResponse attachVolume(AttachVolumeRequest request) throws AmazonEC2Exception {
         AttachVolumeResponse response;
         try {
-            response = (AttachVolumeResponse)getUnmarshaller().unmarshal
-                    (new InputSource(this.getClass().getResourceAsStream("AttachVolumeResponse.xml")));
+            response = (AttachVolumeResponse) getUnmarshaller().unmarshal(
+                    new InputSource(this.getClass().getResourceAsStream("AttachVolumeResponse.xml")));
 
             log.debug("Response from Mock Service: " + response.toXML());
-            
+
         } catch (JAXBException jbe) {
             throw new AmazonEC2Exception("Unable to process mock response", jbe);
         }
         return response;
     }
 
-    public Future<AttachVolumeResponse> attachVolumeAsync(final
-AttachVolumeRequest request) {
+    public Future<AttachVolumeResponse> attachVolumeAsync(final AttachVolumeRequest request) {
         Future<AttachVolumeResponse> response = asyncExecutor.submit(new Callable<AttachVolumeResponse>() {
 
             public AttachVolumeResponse call() throws AmazonEC2Exception {
                 return attachVolume(request);
             }
-            });
+        });
         return response;
     }
-        
+
     /**
      * Authorize Security Group Ingress 
      *
@@ -233,32 +228,34 @@ AttachVolumeRequest request) {
      *
      * @throws AmazonEC2Exception
      */
-    public AuthorizeSecurityGroupIngressResponse authorizeSecurityGroupIngress(AuthorizeSecurityGroupIngressRequest request)
-        throws AmazonEC2Exception {
+    public AuthorizeSecurityGroupIngressResponse authorizeSecurityGroupIngress(
+            AuthorizeSecurityGroupIngressRequest request) throws AmazonEC2Exception {
         AuthorizeSecurityGroupIngressResponse response;
         try {
-            response = (AuthorizeSecurityGroupIngressResponse)getUnmarshaller().unmarshal
-                    (new InputSource(this.getClass().getResourceAsStream("AuthorizeSecurityGroupIngressResponse.xml")));
+            response = (AuthorizeSecurityGroupIngressResponse) getUnmarshaller().unmarshal(
+                    new InputSource(this.getClass().getResourceAsStream(
+                            "AuthorizeSecurityGroupIngressResponse.xml")));
 
             log.debug("Response from Mock Service: " + response.toXML());
-            
+
         } catch (JAXBException jbe) {
             throw new AmazonEC2Exception("Unable to process mock response", jbe);
         }
         return response;
     }
 
-    public Future<AuthorizeSecurityGroupIngressResponse> authorizeSecurityGroupIngressAsync(final
-AuthorizeSecurityGroupIngressRequest request) {
-        Future<AuthorizeSecurityGroupIngressResponse> response = asyncExecutor.submit(new Callable<AuthorizeSecurityGroupIngressResponse>() {
+    public Future<AuthorizeSecurityGroupIngressResponse> authorizeSecurityGroupIngressAsync(
+            final AuthorizeSecurityGroupIngressRequest request) {
+        Future<AuthorizeSecurityGroupIngressResponse> response = asyncExecutor
+                .submit(new Callable<AuthorizeSecurityGroupIngressResponse>() {
 
-            public AuthorizeSecurityGroupIngressResponse call() throws AmazonEC2Exception {
-                return authorizeSecurityGroupIngress(request);
-            }
-            });
+                    public AuthorizeSecurityGroupIngressResponse call() throws AmazonEC2Exception {
+                        return authorizeSecurityGroupIngress(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Confirm Product Instance 
      *
@@ -277,31 +274,34 @@ AuthorizeSecurityGroupIngressRequest request) {
      * @throws AmazonEC2Exception
      */
     public ConfirmProductInstanceResponse confirmProductInstance(ConfirmProductInstanceRequest request)
-        throws AmazonEC2Exception {
+            throws AmazonEC2Exception {
         ConfirmProductInstanceResponse response;
         try {
-            response = (ConfirmProductInstanceResponse)getUnmarshaller().unmarshal
-                    (new InputSource(this.getClass().getResourceAsStream("ConfirmProductInstanceResponse.xml")));
+            response = (ConfirmProductInstanceResponse) getUnmarshaller()
+                    .unmarshal(
+                            new InputSource(this.getClass().getResourceAsStream(
+                                    "ConfirmProductInstanceResponse.xml")));
 
             log.debug("Response from Mock Service: " + response.toXML());
-            
+
         } catch (JAXBException jbe) {
             throw new AmazonEC2Exception("Unable to process mock response", jbe);
         }
         return response;
     }
 
-    public Future<ConfirmProductInstanceResponse> confirmProductInstanceAsync(final
-ConfirmProductInstanceRequest request) {
-        Future<ConfirmProductInstanceResponse> response = asyncExecutor.submit(new Callable<ConfirmProductInstanceResponse>() {
+    public Future<ConfirmProductInstanceResponse> confirmProductInstanceAsync(
+            final ConfirmProductInstanceRequest request) {
+        Future<ConfirmProductInstanceResponse> response = asyncExecutor
+                .submit(new Callable<ConfirmProductInstanceResponse>() {
 
-            public ConfirmProductInstanceResponse call() throws AmazonEC2Exception {
-                return confirmProductInstance(request);
-            }
-            });
+                    public ConfirmProductInstanceResponse call() throws AmazonEC2Exception {
+                        return confirmProductInstance(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Create Key Pair 
      *
@@ -316,32 +316,30 @@ ConfirmProductInstanceRequest request) {
      *
      * @throws AmazonEC2Exception
      */
-    public CreateKeyPairResponse createKeyPair(CreateKeyPairRequest request)
-        throws AmazonEC2Exception {
+    public CreateKeyPairResponse createKeyPair(CreateKeyPairRequest request) throws AmazonEC2Exception {
         CreateKeyPairResponse response;
         try {
-            response = (CreateKeyPairResponse)getUnmarshaller().unmarshal
-                    (new InputSource(this.getClass().getResourceAsStream("CreateKeyPairResponse.xml")));
+            response = (CreateKeyPairResponse) getUnmarshaller().unmarshal(
+                    new InputSource(this.getClass().getResourceAsStream("CreateKeyPairResponse.xml")));
 
             log.debug("Response from Mock Service: " + response.toXML());
-            
+
         } catch (JAXBException jbe) {
             throw new AmazonEC2Exception("Unable to process mock response", jbe);
         }
         return response;
     }
 
-    public Future<CreateKeyPairResponse> createKeyPairAsync(final
-CreateKeyPairRequest request) {
+    public Future<CreateKeyPairResponse> createKeyPairAsync(final CreateKeyPairRequest request) {
         Future<CreateKeyPairResponse> response = asyncExecutor.submit(new Callable<CreateKeyPairResponse>() {
 
             public CreateKeyPairResponse call() throws AmazonEC2Exception {
                 return createKeyPair(request);
             }
-            });
+        });
         return response;
     }
-        
+
     /**
      * Create Security Group 
      *
@@ -362,31 +360,32 @@ CreateKeyPairRequest request) {
      * @throws AmazonEC2Exception
      */
     public CreateSecurityGroupResponse createSecurityGroup(CreateSecurityGroupRequest request)
-        throws AmazonEC2Exception {
+            throws AmazonEC2Exception {
         CreateSecurityGroupResponse response;
         try {
-            response = (CreateSecurityGroupResponse)getUnmarshaller().unmarshal
-                    (new InputSource(this.getClass().getResourceAsStream("CreateSecurityGroupResponse.xml")));
+            response = (CreateSecurityGroupResponse) getUnmarshaller().unmarshal(
+                    new InputSource(this.getClass().getResourceAsStream("CreateSecurityGroupResponse.xml")));
 
             log.debug("Response from Mock Service: " + response.toXML());
-            
+
         } catch (JAXBException jbe) {
             throw new AmazonEC2Exception("Unable to process mock response", jbe);
         }
         return response;
     }
 
-    public Future<CreateSecurityGroupResponse> createSecurityGroupAsync(final
-CreateSecurityGroupRequest request) {
-        Future<CreateSecurityGroupResponse> response = asyncExecutor.submit(new Callable<CreateSecurityGroupResponse>() {
+    public Future<CreateSecurityGroupResponse> createSecurityGroupAsync(
+            final CreateSecurityGroupRequest request) {
+        Future<CreateSecurityGroupResponse> response = asyncExecutor
+                .submit(new Callable<CreateSecurityGroupResponse>() {
 
-            public CreateSecurityGroupResponse call() throws AmazonEC2Exception {
-                return createSecurityGroup(request);
-            }
-            });
+                    public CreateSecurityGroupResponse call() throws AmazonEC2Exception {
+                        return createSecurityGroup(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Create Snapshot 
      *
@@ -407,32 +406,31 @@ CreateSecurityGroupRequest request) {
      *
      * @throws AmazonEC2Exception
      */
-    public CreateSnapshotResponse createSnapshot(CreateSnapshotRequest request)
-        throws AmazonEC2Exception {
+    public CreateSnapshotResponse createSnapshot(CreateSnapshotRequest request) throws AmazonEC2Exception {
         CreateSnapshotResponse response;
         try {
-            response = (CreateSnapshotResponse)getUnmarshaller().unmarshal
-                    (new InputSource(this.getClass().getResourceAsStream("CreateSnapshotResponse.xml")));
+            response = (CreateSnapshotResponse) getUnmarshaller().unmarshal(
+                    new InputSource(this.getClass().getResourceAsStream("CreateSnapshotResponse.xml")));
 
             log.debug("Response from Mock Service: " + response.toXML());
-            
+
         } catch (JAXBException jbe) {
             throw new AmazonEC2Exception("Unable to process mock response", jbe);
         }
         return response;
     }
 
-    public Future<CreateSnapshotResponse> createSnapshotAsync(final
-CreateSnapshotRequest request) {
-        Future<CreateSnapshotResponse> response = asyncExecutor.submit(new Callable<CreateSnapshotResponse>() {
+    public Future<CreateSnapshotResponse> createSnapshotAsync(final CreateSnapshotRequest request) {
+        Future<CreateSnapshotResponse> response = asyncExecutor
+                .submit(new Callable<CreateSnapshotResponse>() {
 
-            public CreateSnapshotResponse call() throws AmazonEC2Exception {
-                return createSnapshot(request);
-            }
-            });
+                    public CreateSnapshotResponse call() throws AmazonEC2Exception {
+                        return createSnapshot(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Create Volume 
      *
@@ -445,32 +443,30 @@ CreateSnapshotRequest request) {
      *
      * @throws AmazonEC2Exception
      */
-    public CreateVolumeResponse createVolume(CreateVolumeRequest request)
-        throws AmazonEC2Exception {
+    public CreateVolumeResponse createVolume(CreateVolumeRequest request) throws AmazonEC2Exception {
         CreateVolumeResponse response;
         try {
-            response = (CreateVolumeResponse)getUnmarshaller().unmarshal
-                    (new InputSource(this.getClass().getResourceAsStream("CreateVolumeResponse.xml")));
+            response = (CreateVolumeResponse) getUnmarshaller().unmarshal(
+                    new InputSource(this.getClass().getResourceAsStream("CreateVolumeResponse.xml")));
 
             log.debug("Response from Mock Service: " + response.toXML());
-            
+
         } catch (JAXBException jbe) {
             throw new AmazonEC2Exception("Unable to process mock response", jbe);
         }
         return response;
     }
 
-    public Future<CreateVolumeResponse> createVolumeAsync(final
-CreateVolumeRequest request) {
+    public Future<CreateVolumeResponse> createVolumeAsync(final CreateVolumeRequest request) {
         Future<CreateVolumeResponse> response = asyncExecutor.submit(new Callable<CreateVolumeResponse>() {
 
             public CreateVolumeResponse call() throws AmazonEC2Exception {
                 return createVolume(request);
             }
-            });
+        });
         return response;
     }
-        
+
     /**
      * Delete Key Pair 
      *
@@ -483,32 +479,30 @@ CreateVolumeRequest request) {
      *
      * @throws AmazonEC2Exception
      */
-    public DeleteKeyPairResponse deleteKeyPair(DeleteKeyPairRequest request)
-        throws AmazonEC2Exception {
+    public DeleteKeyPairResponse deleteKeyPair(DeleteKeyPairRequest request) throws AmazonEC2Exception {
         DeleteKeyPairResponse response;
         try {
-            response = (DeleteKeyPairResponse)getUnmarshaller().unmarshal
-                    (new InputSource(this.getClass().getResourceAsStream("DeleteKeyPairResponse.xml")));
+            response = (DeleteKeyPairResponse) getUnmarshaller().unmarshal(
+                    new InputSource(this.getClass().getResourceAsStream("DeleteKeyPairResponse.xml")));
 
             log.debug("Response from Mock Service: " + response.toXML());
-            
+
         } catch (JAXBException jbe) {
             throw new AmazonEC2Exception("Unable to process mock response", jbe);
         }
         return response;
     }
 
-    public Future<DeleteKeyPairResponse> deleteKeyPairAsync(final
-DeleteKeyPairRequest request) {
+    public Future<DeleteKeyPairResponse> deleteKeyPairAsync(final DeleteKeyPairRequest request) {
         Future<DeleteKeyPairResponse> response = asyncExecutor.submit(new Callable<DeleteKeyPairResponse>() {
 
             public DeleteKeyPairResponse call() throws AmazonEC2Exception {
                 return deleteKeyPair(request);
             }
-            });
+        });
         return response;
     }
-        
+
     /**
      * Delete Security Group 
      *
@@ -529,31 +523,32 @@ DeleteKeyPairRequest request) {
      * @throws AmazonEC2Exception
      */
     public DeleteSecurityGroupResponse deleteSecurityGroup(DeleteSecurityGroupRequest request)
-        throws AmazonEC2Exception {
+            throws AmazonEC2Exception {
         DeleteSecurityGroupResponse response;
         try {
-            response = (DeleteSecurityGroupResponse)getUnmarshaller().unmarshal
-                    (new InputSource(this.getClass().getResourceAsStream("DeleteSecurityGroupResponse.xml")));
+            response = (DeleteSecurityGroupResponse) getUnmarshaller().unmarshal(
+                    new InputSource(this.getClass().getResourceAsStream("DeleteSecurityGroupResponse.xml")));
 
             log.debug("Response from Mock Service: " + response.toXML());
-            
+
         } catch (JAXBException jbe) {
             throw new AmazonEC2Exception("Unable to process mock response", jbe);
         }
         return response;
     }
 
-    public Future<DeleteSecurityGroupResponse> deleteSecurityGroupAsync(final
-DeleteSecurityGroupRequest request) {
-        Future<DeleteSecurityGroupResponse> response = asyncExecutor.submit(new Callable<DeleteSecurityGroupResponse>() {
+    public Future<DeleteSecurityGroupResponse> deleteSecurityGroupAsync(
+            final DeleteSecurityGroupRequest request) {
+        Future<DeleteSecurityGroupResponse> response = asyncExecutor
+                .submit(new Callable<DeleteSecurityGroupResponse>() {
 
-            public DeleteSecurityGroupResponse call() throws AmazonEC2Exception {
-                return deleteSecurityGroup(request);
-            }
-            });
+                    public DeleteSecurityGroupResponse call() throws AmazonEC2Exception {
+                        return deleteSecurityGroup(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Delete Snapshot 
      *
@@ -566,32 +561,31 @@ DeleteSecurityGroupRequest request) {
      *
      * @throws AmazonEC2Exception
      */
-    public DeleteSnapshotResponse deleteSnapshot(DeleteSnapshotRequest request)
-        throws AmazonEC2Exception {
+    public DeleteSnapshotResponse deleteSnapshot(DeleteSnapshotRequest request) throws AmazonEC2Exception {
         DeleteSnapshotResponse response;
         try {
-            response = (DeleteSnapshotResponse)getUnmarshaller().unmarshal
-                    (new InputSource(this.getClass().getResourceAsStream("DeleteSnapshotResponse.xml")));
+            response = (DeleteSnapshotResponse) getUnmarshaller().unmarshal(
+                    new InputSource(this.getClass().getResourceAsStream("DeleteSnapshotResponse.xml")));
 
             log.debug("Response from Mock Service: " + response.toXML());
-            
+
         } catch (JAXBException jbe) {
             throw new AmazonEC2Exception("Unable to process mock response", jbe);
         }
         return response;
     }
 
-    public Future<DeleteSnapshotResponse> deleteSnapshotAsync(final
-DeleteSnapshotRequest request) {
-        Future<DeleteSnapshotResponse> response = asyncExecutor.submit(new Callable<DeleteSnapshotResponse>() {
+    public Future<DeleteSnapshotResponse> deleteSnapshotAsync(final DeleteSnapshotRequest request) {
+        Future<DeleteSnapshotResponse> response = asyncExecutor
+                .submit(new Callable<DeleteSnapshotResponse>() {
 
-            public DeleteSnapshotResponse call() throws AmazonEC2Exception {
-                return deleteSnapshot(request);
-            }
-            });
+                    public DeleteSnapshotResponse call() throws AmazonEC2Exception {
+                        return deleteSnapshot(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Delete Volume 
      *
@@ -604,32 +598,30 @@ DeleteSnapshotRequest request) {
      *
      * @throws AmazonEC2Exception
      */
-    public DeleteVolumeResponse deleteVolume(DeleteVolumeRequest request)
-        throws AmazonEC2Exception {
+    public DeleteVolumeResponse deleteVolume(DeleteVolumeRequest request) throws AmazonEC2Exception {
         DeleteVolumeResponse response;
         try {
-            response = (DeleteVolumeResponse)getUnmarshaller().unmarshal
-                    (new InputSource(this.getClass().getResourceAsStream("DeleteVolumeResponse.xml")));
+            response = (DeleteVolumeResponse) getUnmarshaller().unmarshal(
+                    new InputSource(this.getClass().getResourceAsStream("DeleteVolumeResponse.xml")));
 
             log.debug("Response from Mock Service: " + response.toXML());
-            
+
         } catch (JAXBException jbe) {
             throw new AmazonEC2Exception("Unable to process mock response", jbe);
         }
         return response;
     }
 
-    public Future<DeleteVolumeResponse> deleteVolumeAsync(final
-DeleteVolumeRequest request) {
+    public Future<DeleteVolumeResponse> deleteVolumeAsync(final DeleteVolumeRequest request) {
         Future<DeleteVolumeResponse> response = asyncExecutor.submit(new Callable<DeleteVolumeResponse>() {
 
             public DeleteVolumeResponse call() throws AmazonEC2Exception {
                 return deleteVolume(request);
             }
-            });
+        });
         return response;
     }
-        
+
     /**
      * Deregister Image 
      *
@@ -643,32 +635,31 @@ DeleteVolumeRequest request) {
      *
      * @throws AmazonEC2Exception
      */
-    public DeregisterImageResponse deregisterImage(DeregisterImageRequest request)
-        throws AmazonEC2Exception {
+    public DeregisterImageResponse deregisterImage(DeregisterImageRequest request) throws AmazonEC2Exception {
         DeregisterImageResponse response;
         try {
-            response = (DeregisterImageResponse)getUnmarshaller().unmarshal
-                    (new InputSource(this.getClass().getResourceAsStream("DeregisterImageResponse.xml")));
+            response = (DeregisterImageResponse) getUnmarshaller().unmarshal(
+                    new InputSource(this.getClass().getResourceAsStream("DeregisterImageResponse.xml")));
 
             log.debug("Response from Mock Service: " + response.toXML());
-            
+
         } catch (JAXBException jbe) {
             throw new AmazonEC2Exception("Unable to process mock response", jbe);
         }
         return response;
     }
 
-    public Future<DeregisterImageResponse> deregisterImageAsync(final
-DeregisterImageRequest request) {
-        Future<DeregisterImageResponse> response = asyncExecutor.submit(new Callable<DeregisterImageResponse>() {
+    public Future<DeregisterImageResponse> deregisterImageAsync(final DeregisterImageRequest request) {
+        Future<DeregisterImageResponse> response = asyncExecutor
+                .submit(new Callable<DeregisterImageResponse>() {
 
-            public DeregisterImageResponse call() throws AmazonEC2Exception {
-                return deregisterImage(request);
-            }
-            });
+                    public DeregisterImageResponse call() throws AmazonEC2Exception {
+                        return deregisterImage(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Describe Addresses 
      *
@@ -683,31 +674,31 @@ DeregisterImageRequest request) {
      * @throws AmazonEC2Exception
      */
     public DescribeAddressesResponse describeAddresses(DescribeAddressesRequest request)
-        throws AmazonEC2Exception {
+            throws AmazonEC2Exception {
         DescribeAddressesResponse response;
         try {
-            response = (DescribeAddressesResponse)getUnmarshaller().unmarshal
-                    (new InputSource(this.getClass().getResourceAsStream("DescribeAddressesResponse.xml")));
+            response = (DescribeAddressesResponse) getUnmarshaller().unmarshal(
+                    new InputSource(this.getClass().getResourceAsStream("DescribeAddressesResponse.xml")));
 
             log.debug("Response from Mock Service: " + response.toXML());
-            
+
         } catch (JAXBException jbe) {
             throw new AmazonEC2Exception("Unable to process mock response", jbe);
         }
         return response;
     }
 
-    public Future<DescribeAddressesResponse> describeAddressesAsync(final
-DescribeAddressesRequest request) {
-        Future<DescribeAddressesResponse> response = asyncExecutor.submit(new Callable<DescribeAddressesResponse>() {
+    public Future<DescribeAddressesResponse> describeAddressesAsync(final DescribeAddressesRequest request) {
+        Future<DescribeAddressesResponse> response = asyncExecutor
+                .submit(new Callable<DescribeAddressesResponse>() {
 
-            public DescribeAddressesResponse call() throws AmazonEC2Exception {
-                return describeAddresses(request);
-            }
-            });
+                    public DescribeAddressesResponse call() throws AmazonEC2Exception {
+                        return describeAddresses(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Describe Availability Zones 
      *
@@ -724,32 +715,34 @@ DescribeAddressesRequest request) {
      *
      * @throws AmazonEC2Exception
      */
-    public DescribeAvailabilityZonesResponse describeAvailabilityZones(DescribeAvailabilityZonesRequest request)
-        throws AmazonEC2Exception {
+    public DescribeAvailabilityZonesResponse describeAvailabilityZones(
+            DescribeAvailabilityZonesRequest request) throws AmazonEC2Exception {
         DescribeAvailabilityZonesResponse response;
         try {
-            response = (DescribeAvailabilityZonesResponse)getUnmarshaller().unmarshal
-                    (new InputSource(this.getClass().getResourceAsStream("DescribeAvailabilityZonesResponse.xml")));
+            response = (DescribeAvailabilityZonesResponse) getUnmarshaller().unmarshal(
+                    new InputSource(this.getClass().getResourceAsStream(
+                            "DescribeAvailabilityZonesResponse.xml")));
 
             log.debug("Response from Mock Service: " + response.toXML());
-            
+
         } catch (JAXBException jbe) {
             throw new AmazonEC2Exception("Unable to process mock response", jbe);
         }
         return response;
     }
 
-    public Future<DescribeAvailabilityZonesResponse> describeAvailabilityZonesAsync(final
-DescribeAvailabilityZonesRequest request) {
-        Future<DescribeAvailabilityZonesResponse> response = asyncExecutor.submit(new Callable<DescribeAvailabilityZonesResponse>() {
+    public Future<DescribeAvailabilityZonesResponse> describeAvailabilityZonesAsync(
+            final DescribeAvailabilityZonesRequest request) {
+        Future<DescribeAvailabilityZonesResponse> response = asyncExecutor
+                .submit(new Callable<DescribeAvailabilityZonesResponse>() {
 
-            public DescribeAvailabilityZonesResponse call() throws AmazonEC2Exception {
-                return describeAvailabilityZones(request);
-            }
-            });
+                    public DescribeAvailabilityZonesResponse call() throws AmazonEC2Exception {
+                        return describeAvailabilityZones(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Describe Image Attribute 
      *
@@ -764,31 +757,34 @@ DescribeAvailabilityZonesRequest request) {
      * @throws AmazonEC2Exception
      */
     public DescribeImageAttributeResponse describeImageAttribute(DescribeImageAttributeRequest request)
-        throws AmazonEC2Exception {
+            throws AmazonEC2Exception {
         DescribeImageAttributeResponse response;
         try {
-            response = (DescribeImageAttributeResponse)getUnmarshaller().unmarshal
-                    (new InputSource(this.getClass().getResourceAsStream("DescribeImageAttributeResponse.xml")));
+            response = (DescribeImageAttributeResponse) getUnmarshaller()
+                    .unmarshal(
+                            new InputSource(this.getClass().getResourceAsStream(
+                                    "DescribeImageAttributeResponse.xml")));
 
             log.debug("Response from Mock Service: " + response.toXML());
-            
+
         } catch (JAXBException jbe) {
             throw new AmazonEC2Exception("Unable to process mock response", jbe);
         }
         return response;
     }
 
-    public Future<DescribeImageAttributeResponse> describeImageAttributeAsync(final
-DescribeImageAttributeRequest request) {
-        Future<DescribeImageAttributeResponse> response = asyncExecutor.submit(new Callable<DescribeImageAttributeResponse>() {
+    public Future<DescribeImageAttributeResponse> describeImageAttributeAsync(
+            final DescribeImageAttributeRequest request) {
+        Future<DescribeImageAttributeResponse> response = asyncExecutor
+                .submit(new Callable<DescribeImageAttributeResponse>() {
 
-            public DescribeImageAttributeResponse call() throws AmazonEC2Exception {
-                return describeImageAttribute(request);
-            }
-            });
+                    public DescribeImageAttributeResponse call() throws AmazonEC2Exception {
+                        return describeImageAttribute(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Describe Images 
      *
@@ -832,32 +828,31 @@ DescribeImageAttributeRequest request) {
      *
      * @throws AmazonEC2Exception
      */
-    public DescribeImagesResponse describeImages(DescribeImagesRequest request)
-        throws AmazonEC2Exception {
+    public DescribeImagesResponse describeImages(DescribeImagesRequest request) throws AmazonEC2Exception {
         DescribeImagesResponse response;
         try {
-            response = (DescribeImagesResponse)getUnmarshaller().unmarshal
-                    (new InputSource(this.getClass().getResourceAsStream("DescribeImagesResponse.xml")));
+            response = (DescribeImagesResponse) getUnmarshaller().unmarshal(
+                    new InputSource(this.getClass().getResourceAsStream("DescribeImagesResponse.xml")));
 
             log.debug("Response from Mock Service: " + response.toXML());
-            
+
         } catch (JAXBException jbe) {
             throw new AmazonEC2Exception("Unable to process mock response", jbe);
         }
         return response;
     }
 
-    public Future<DescribeImagesResponse> describeImagesAsync(final
-DescribeImagesRequest request) {
-        Future<DescribeImagesResponse> response = asyncExecutor.submit(new Callable<DescribeImagesResponse>() {
+    public Future<DescribeImagesResponse> describeImagesAsync(final DescribeImagesRequest request) {
+        Future<DescribeImagesResponse> response = asyncExecutor
+                .submit(new Callable<DescribeImagesResponse>() {
 
-            public DescribeImagesResponse call() throws AmazonEC2Exception {
-                return describeImages(request);
-            }
-            });
+                    public DescribeImagesResponse call() throws AmazonEC2Exception {
+                        return describeImages(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Describe Instances 
      *
@@ -879,31 +874,31 @@ DescribeImagesRequest request) {
      * @throws AmazonEC2Exception
      */
     public DescribeInstancesResponse describeInstances(DescribeInstancesRequest request)
-        throws AmazonEC2Exception {
+            throws AmazonEC2Exception {
         DescribeInstancesResponse response;
         try {
-            response = (DescribeInstancesResponse)getUnmarshaller().unmarshal
-                    (new InputSource(this.getClass().getResourceAsStream("DescribeInstancesResponse.xml")));
+            response = (DescribeInstancesResponse) getUnmarshaller().unmarshal(
+                    new InputSource(this.getClass().getResourceAsStream("DescribeInstancesResponse.xml")));
 
             log.debug("Response from Mock Service: " + response.toXML());
-            
+
         } catch (JAXBException jbe) {
             throw new AmazonEC2Exception("Unable to process mock response", jbe);
         }
         return response;
     }
 
-    public Future<DescribeInstancesResponse> describeInstancesAsync(final
-DescribeInstancesRequest request) {
-        Future<DescribeInstancesResponse> response = asyncExecutor.submit(new Callable<DescribeInstancesResponse>() {
+    public Future<DescribeInstancesResponse> describeInstancesAsync(final DescribeInstancesRequest request) {
+        Future<DescribeInstancesResponse> response = asyncExecutor
+                .submit(new Callable<DescribeInstancesResponse>() {
 
-            public DescribeInstancesResponse call() throws AmazonEC2Exception {
-                return describeInstances(request);
-            }
-            });
+                    public DescribeInstancesResponse call() throws AmazonEC2Exception {
+                        return describeInstances(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Describe Key Pairs 
      *
@@ -919,31 +914,31 @@ DescribeInstancesRequest request) {
      * @throws AmazonEC2Exception
      */
     public DescribeKeyPairsResponse describeKeyPairs(DescribeKeyPairsRequest request)
-        throws AmazonEC2Exception {
+            throws AmazonEC2Exception {
         DescribeKeyPairsResponse response;
         try {
-            response = (DescribeKeyPairsResponse)getUnmarshaller().unmarshal
-                    (new InputSource(this.getClass().getResourceAsStream("DescribeKeyPairsResponse.xml")));
+            response = (DescribeKeyPairsResponse) getUnmarshaller().unmarshal(
+                    new InputSource(this.getClass().getResourceAsStream("DescribeKeyPairsResponse.xml")));
 
             log.debug("Response from Mock Service: " + response.toXML());
-            
+
         } catch (JAXBException jbe) {
             throw new AmazonEC2Exception("Unable to process mock response", jbe);
         }
         return response;
     }
 
-    public Future<DescribeKeyPairsResponse> describeKeyPairsAsync(final
-DescribeKeyPairsRequest request) {
-        Future<DescribeKeyPairsResponse> response = asyncExecutor.submit(new Callable<DescribeKeyPairsResponse>() {
+    public Future<DescribeKeyPairsResponse> describeKeyPairsAsync(final DescribeKeyPairsRequest request) {
+        Future<DescribeKeyPairsResponse> response = asyncExecutor
+                .submit(new Callable<DescribeKeyPairsResponse>() {
 
-            public DescribeKeyPairsResponse call() throws AmazonEC2Exception {
-                return describeKeyPairs(request);
-            }
-            });
+                    public DescribeKeyPairsResponse call() throws AmazonEC2Exception {
+                        return describeKeyPairs(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Describe Security Groups 
      *
@@ -961,31 +956,34 @@ DescribeKeyPairsRequest request) {
      * @throws AmazonEC2Exception
      */
     public DescribeSecurityGroupsResponse describeSecurityGroups(DescribeSecurityGroupsRequest request)
-        throws AmazonEC2Exception {
+            throws AmazonEC2Exception {
         DescribeSecurityGroupsResponse response;
         try {
-            response = (DescribeSecurityGroupsResponse)getUnmarshaller().unmarshal
-                    (new InputSource(this.getClass().getResourceAsStream("DescribeSecurityGroupsResponse.xml")));
+            response = (DescribeSecurityGroupsResponse) getUnmarshaller()
+                    .unmarshal(
+                            new InputSource(this.getClass().getResourceAsStream(
+                                    "DescribeSecurityGroupsResponse.xml")));
 
             log.debug("Response from Mock Service: " + response.toXML());
-            
+
         } catch (JAXBException jbe) {
             throw new AmazonEC2Exception("Unable to process mock response", jbe);
         }
         return response;
     }
 
-    public Future<DescribeSecurityGroupsResponse> describeSecurityGroupsAsync(final
-DescribeSecurityGroupsRequest request) {
-        Future<DescribeSecurityGroupsResponse> response = asyncExecutor.submit(new Callable<DescribeSecurityGroupsResponse>() {
+    public Future<DescribeSecurityGroupsResponse> describeSecurityGroupsAsync(
+            final DescribeSecurityGroupsRequest request) {
+        Future<DescribeSecurityGroupsResponse> response = asyncExecutor
+                .submit(new Callable<DescribeSecurityGroupsResponse>() {
 
-            public DescribeSecurityGroupsResponse call() throws AmazonEC2Exception {
-                return describeSecurityGroups(request);
-            }
-            });
+                    public DescribeSecurityGroupsResponse call() throws AmazonEC2Exception {
+                        return describeSecurityGroups(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Describe Snapshots 
      *
@@ -999,31 +997,31 @@ DescribeSecurityGroupsRequest request) {
      * @throws AmazonEC2Exception
      */
     public DescribeSnapshotsResponse describeSnapshots(DescribeSnapshotsRequest request)
-        throws AmazonEC2Exception {
+            throws AmazonEC2Exception {
         DescribeSnapshotsResponse response;
         try {
-            response = (DescribeSnapshotsResponse)getUnmarshaller().unmarshal
-                    (new InputSource(this.getClass().getResourceAsStream("DescribeSnapshotsResponse.xml")));
+            response = (DescribeSnapshotsResponse) getUnmarshaller().unmarshal(
+                    new InputSource(this.getClass().getResourceAsStream("DescribeSnapshotsResponse.xml")));
 
             log.debug("Response from Mock Service: " + response.toXML());
-            
+
         } catch (JAXBException jbe) {
             throw new AmazonEC2Exception("Unable to process mock response", jbe);
         }
         return response;
     }
 
-    public Future<DescribeSnapshotsResponse> describeSnapshotsAsync(final
-DescribeSnapshotsRequest request) {
-        Future<DescribeSnapshotsResponse> response = asyncExecutor.submit(new Callable<DescribeSnapshotsResponse>() {
+    public Future<DescribeSnapshotsResponse> describeSnapshotsAsync(final DescribeSnapshotsRequest request) {
+        Future<DescribeSnapshotsResponse> response = asyncExecutor
+                .submit(new Callable<DescribeSnapshotsResponse>() {
 
-            public DescribeSnapshotsResponse call() throws AmazonEC2Exception {
-                return describeSnapshots(request);
-            }
-            });
+                    public DescribeSnapshotsResponse call() throws AmazonEC2Exception {
+                        return describeSnapshots(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Describe Volumes 
      *
@@ -1036,32 +1034,31 @@ DescribeSnapshotsRequest request) {
      *
      * @throws AmazonEC2Exception
      */
-    public DescribeVolumesResponse describeVolumes(DescribeVolumesRequest request)
-        throws AmazonEC2Exception {
+    public DescribeVolumesResponse describeVolumes(DescribeVolumesRequest request) throws AmazonEC2Exception {
         DescribeVolumesResponse response;
         try {
-            response = (DescribeVolumesResponse)getUnmarshaller().unmarshal
-                    (new InputSource(this.getClass().getResourceAsStream("DescribeVolumesResponse.xml")));
+            response = (DescribeVolumesResponse) getUnmarshaller().unmarshal(
+                    new InputSource(this.getClass().getResourceAsStream("DescribeVolumesResponse.xml")));
 
             log.debug("Response from Mock Service: " + response.toXML());
-            
+
         } catch (JAXBException jbe) {
             throw new AmazonEC2Exception("Unable to process mock response", jbe);
         }
         return response;
     }
 
-    public Future<DescribeVolumesResponse> describeVolumesAsync(final
-DescribeVolumesRequest request) {
-        Future<DescribeVolumesResponse> response = asyncExecutor.submit(new Callable<DescribeVolumesResponse>() {
+    public Future<DescribeVolumesResponse> describeVolumesAsync(final DescribeVolumesRequest request) {
+        Future<DescribeVolumesResponse> response = asyncExecutor
+                .submit(new Callable<DescribeVolumesResponse>() {
 
-            public DescribeVolumesResponse call() throws AmazonEC2Exception {
-                return describeVolumes(request);
-            }
-            });
+                    public DescribeVolumesResponse call() throws AmazonEC2Exception {
+                        return describeVolumes(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Detach Volume 
      *
@@ -1074,32 +1071,30 @@ DescribeVolumesRequest request) {
      *
      * @throws AmazonEC2Exception
      */
-    public DetachVolumeResponse detachVolume(DetachVolumeRequest request)
-        throws AmazonEC2Exception {
+    public DetachVolumeResponse detachVolume(DetachVolumeRequest request) throws AmazonEC2Exception {
         DetachVolumeResponse response;
         try {
-            response = (DetachVolumeResponse)getUnmarshaller().unmarshal
-                    (new InputSource(this.getClass().getResourceAsStream("DetachVolumeResponse.xml")));
+            response = (DetachVolumeResponse) getUnmarshaller().unmarshal(
+                    new InputSource(this.getClass().getResourceAsStream("DetachVolumeResponse.xml")));
 
             log.debug("Response from Mock Service: " + response.toXML());
-            
+
         } catch (JAXBException jbe) {
             throw new AmazonEC2Exception("Unable to process mock response", jbe);
         }
         return response;
     }
 
-    public Future<DetachVolumeResponse> detachVolumeAsync(final
-DetachVolumeRequest request) {
+    public Future<DetachVolumeResponse> detachVolumeAsync(final DetachVolumeRequest request) {
         Future<DetachVolumeResponse> response = asyncExecutor.submit(new Callable<DetachVolumeResponse>() {
 
             public DetachVolumeResponse call() throws AmazonEC2Exception {
                 return detachVolume(request);
             }
-            });
+        });
         return response;
     }
-        
+
     /**
      * Disassociate Address 
      *
@@ -1115,31 +1110,32 @@ DetachVolumeRequest request) {
      * @throws AmazonEC2Exception
      */
     public DisassociateAddressResponse disassociateAddress(DisassociateAddressRequest request)
-        throws AmazonEC2Exception {
+            throws AmazonEC2Exception {
         DisassociateAddressResponse response;
         try {
-            response = (DisassociateAddressResponse)getUnmarshaller().unmarshal
-                    (new InputSource(this.getClass().getResourceAsStream("DisassociateAddressResponse.xml")));
+            response = (DisassociateAddressResponse) getUnmarshaller().unmarshal(
+                    new InputSource(this.getClass().getResourceAsStream("DisassociateAddressResponse.xml")));
 
             log.debug("Response from Mock Service: " + response.toXML());
-            
+
         } catch (JAXBException jbe) {
             throw new AmazonEC2Exception("Unable to process mock response", jbe);
         }
         return response;
     }
 
-    public Future<DisassociateAddressResponse> disassociateAddressAsync(final
-DisassociateAddressRequest request) {
-        Future<DisassociateAddressResponse> response = asyncExecutor.submit(new Callable<DisassociateAddressResponse>() {
+    public Future<DisassociateAddressResponse> disassociateAddressAsync(
+            final DisassociateAddressRequest request) {
+        Future<DisassociateAddressResponse> response = asyncExecutor
+                .submit(new Callable<DisassociateAddressResponse>() {
 
-            public DisassociateAddressResponse call() throws AmazonEC2Exception {
-                return disassociateAddress(request);
-            }
-            });
+                    public DisassociateAddressResponse call() throws AmazonEC2Exception {
+                        return disassociateAddress(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Get Console Output 
      *
@@ -1157,31 +1153,31 @@ DisassociateAddressRequest request) {
      * @throws AmazonEC2Exception
      */
     public GetConsoleOutputResponse getConsoleOutput(GetConsoleOutputRequest request)
-        throws AmazonEC2Exception {
+            throws AmazonEC2Exception {
         GetConsoleOutputResponse response;
         try {
-            response = (GetConsoleOutputResponse)getUnmarshaller().unmarshal
-                    (new InputSource(this.getClass().getResourceAsStream("GetConsoleOutputResponse.xml")));
+            response = (GetConsoleOutputResponse) getUnmarshaller().unmarshal(
+                    new InputSource(this.getClass().getResourceAsStream("GetConsoleOutputResponse.xml")));
 
             log.debug("Response from Mock Service: " + response.toXML());
-            
+
         } catch (JAXBException jbe) {
             throw new AmazonEC2Exception("Unable to process mock response", jbe);
         }
         return response;
     }
 
-    public Future<GetConsoleOutputResponse> getConsoleOutputAsync(final
-GetConsoleOutputRequest request) {
-        Future<GetConsoleOutputResponse> response = asyncExecutor.submit(new Callable<GetConsoleOutputResponse>() {
+    public Future<GetConsoleOutputResponse> getConsoleOutputAsync(final GetConsoleOutputRequest request) {
+        Future<GetConsoleOutputResponse> response = asyncExecutor
+                .submit(new Callable<GetConsoleOutputResponse>() {
 
-            public GetConsoleOutputResponse call() throws AmazonEC2Exception {
-                return getConsoleOutput(request);
-            }
-            });
+                    public GetConsoleOutputResponse call() throws AmazonEC2Exception {
+                        return getConsoleOutput(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Modify Image Attribute 
      *
@@ -1195,31 +1191,32 @@ GetConsoleOutputRequest request) {
      * @throws AmazonEC2Exception
      */
     public ModifyImageAttributeResponse modifyImageAttribute(ModifyImageAttributeRequest request)
-        throws AmazonEC2Exception {
+            throws AmazonEC2Exception {
         ModifyImageAttributeResponse response;
         try {
-            response = (ModifyImageAttributeResponse)getUnmarshaller().unmarshal
-                    (new InputSource(this.getClass().getResourceAsStream("ModifyImageAttributeResponse.xml")));
+            response = (ModifyImageAttributeResponse) getUnmarshaller().unmarshal(
+                    new InputSource(this.getClass().getResourceAsStream("ModifyImageAttributeResponse.xml")));
 
             log.debug("Response from Mock Service: " + response.toXML());
-            
+
         } catch (JAXBException jbe) {
             throw new AmazonEC2Exception("Unable to process mock response", jbe);
         }
         return response;
     }
 
-    public Future<ModifyImageAttributeResponse> modifyImageAttributeAsync(final
-ModifyImageAttributeRequest request) {
-        Future<ModifyImageAttributeResponse> response = asyncExecutor.submit(new Callable<ModifyImageAttributeResponse>() {
+    public Future<ModifyImageAttributeResponse> modifyImageAttributeAsync(
+            final ModifyImageAttributeRequest request) {
+        Future<ModifyImageAttributeResponse> response = asyncExecutor
+                .submit(new Callable<ModifyImageAttributeResponse>() {
 
-            public ModifyImageAttributeResponse call() throws AmazonEC2Exception {
-                return modifyImageAttribute(request);
-            }
-            });
+                    public ModifyImageAttributeResponse call() throws AmazonEC2Exception {
+                        return modifyImageAttribute(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Reboot Instances 
      *
@@ -1235,32 +1232,31 @@ ModifyImageAttributeRequest request) {
      *
      * @throws AmazonEC2Exception
      */
-    public RebootInstancesResponse rebootInstances(RebootInstancesRequest request)
-        throws AmazonEC2Exception {
+    public RebootInstancesResponse rebootInstances(RebootInstancesRequest request) throws AmazonEC2Exception {
         RebootInstancesResponse response;
         try {
-            response = (RebootInstancesResponse)getUnmarshaller().unmarshal
-                    (new InputSource(this.getClass().getResourceAsStream("RebootInstancesResponse.xml")));
+            response = (RebootInstancesResponse) getUnmarshaller().unmarshal(
+                    new InputSource(this.getClass().getResourceAsStream("RebootInstancesResponse.xml")));
 
             log.debug("Response from Mock Service: " + response.toXML());
-            
+
         } catch (JAXBException jbe) {
             throw new AmazonEC2Exception("Unable to process mock response", jbe);
         }
         return response;
     }
 
-    public Future<RebootInstancesResponse> rebootInstancesAsync(final
-RebootInstancesRequest request) {
-        Future<RebootInstancesResponse> response = asyncExecutor.submit(new Callable<RebootInstancesResponse>() {
+    public Future<RebootInstancesResponse> rebootInstancesAsync(final RebootInstancesRequest request) {
+        Future<RebootInstancesResponse> response = asyncExecutor
+                .submit(new Callable<RebootInstancesResponse>() {
 
-            public RebootInstancesResponse call() throws AmazonEC2Exception {
-                return rebootInstances(request);
-            }
-            });
+                    public RebootInstancesResponse call() throws AmazonEC2Exception {
+                        return rebootInstances(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Register Image 
      *
@@ -1282,32 +1278,30 @@ RebootInstancesRequest request) {
      *
      * @throws AmazonEC2Exception
      */
-    public RegisterImageResponse registerImage(RegisterImageRequest request)
-        throws AmazonEC2Exception {
+    public RegisterImageResponse registerImage(RegisterImageRequest request) throws AmazonEC2Exception {
         RegisterImageResponse response;
         try {
-            response = (RegisterImageResponse)getUnmarshaller().unmarshal
-                    (new InputSource(this.getClass().getResourceAsStream("RegisterImageResponse.xml")));
+            response = (RegisterImageResponse) getUnmarshaller().unmarshal(
+                    new InputSource(this.getClass().getResourceAsStream("RegisterImageResponse.xml")));
 
             log.debug("Response from Mock Service: " + response.toXML());
-            
+
         } catch (JAXBException jbe) {
             throw new AmazonEC2Exception("Unable to process mock response", jbe);
         }
         return response;
     }
 
-    public Future<RegisterImageResponse> registerImageAsync(final
-RegisterImageRequest request) {
+    public Future<RegisterImageResponse> registerImageAsync(final RegisterImageRequest request) {
         Future<RegisterImageResponse> response = asyncExecutor.submit(new Callable<RegisterImageResponse>() {
 
             public RegisterImageResponse call() throws AmazonEC2Exception {
                 return registerImage(request);
             }
-            });
+        });
         return response;
     }
-        
+
     /**
      * Release Address 
      *
@@ -1331,32 +1325,31 @@ RegisterImageRequest request) {
      *
      * @throws AmazonEC2Exception
      */
-    public ReleaseAddressResponse releaseAddress(ReleaseAddressRequest request)
-        throws AmazonEC2Exception {
+    public ReleaseAddressResponse releaseAddress(ReleaseAddressRequest request) throws AmazonEC2Exception {
         ReleaseAddressResponse response;
         try {
-            response = (ReleaseAddressResponse)getUnmarshaller().unmarshal
-                    (new InputSource(this.getClass().getResourceAsStream("ReleaseAddressResponse.xml")));
+            response = (ReleaseAddressResponse) getUnmarshaller().unmarshal(
+                    new InputSource(this.getClass().getResourceAsStream("ReleaseAddressResponse.xml")));
 
             log.debug("Response from Mock Service: " + response.toXML());
-            
+
         } catch (JAXBException jbe) {
             throw new AmazonEC2Exception("Unable to process mock response", jbe);
         }
         return response;
     }
 
-    public Future<ReleaseAddressResponse> releaseAddressAsync(final
-ReleaseAddressRequest request) {
-        Future<ReleaseAddressResponse> response = asyncExecutor.submit(new Callable<ReleaseAddressResponse>() {
+    public Future<ReleaseAddressResponse> releaseAddressAsync(final ReleaseAddressRequest request) {
+        Future<ReleaseAddressResponse> response = asyncExecutor
+                .submit(new Callable<ReleaseAddressResponse>() {
 
-            public ReleaseAddressResponse call() throws AmazonEC2Exception {
-                return releaseAddress(request);
-            }
-            });
+                    public ReleaseAddressResponse call() throws AmazonEC2Exception {
+                        return releaseAddress(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Reset Image Attribute 
      *
@@ -1373,31 +1366,32 @@ ReleaseAddressRequest request) {
      * @throws AmazonEC2Exception
      */
     public ResetImageAttributeResponse resetImageAttribute(ResetImageAttributeRequest request)
-        throws AmazonEC2Exception {
+            throws AmazonEC2Exception {
         ResetImageAttributeResponse response;
         try {
-            response = (ResetImageAttributeResponse)getUnmarshaller().unmarshal
-                    (new InputSource(this.getClass().getResourceAsStream("ResetImageAttributeResponse.xml")));
+            response = (ResetImageAttributeResponse) getUnmarshaller().unmarshal(
+                    new InputSource(this.getClass().getResourceAsStream("ResetImageAttributeResponse.xml")));
 
             log.debug("Response from Mock Service: " + response.toXML());
-            
+
         } catch (JAXBException jbe) {
             throw new AmazonEC2Exception("Unable to process mock response", jbe);
         }
         return response;
     }
 
-    public Future<ResetImageAttributeResponse> resetImageAttributeAsync(final
-ResetImageAttributeRequest request) {
-        Future<ResetImageAttributeResponse> response = asyncExecutor.submit(new Callable<ResetImageAttributeResponse>() {
+    public Future<ResetImageAttributeResponse> resetImageAttributeAsync(
+            final ResetImageAttributeRequest request) {
+        Future<ResetImageAttributeResponse> response = asyncExecutor
+                .submit(new Callable<ResetImageAttributeResponse>() {
 
-            public ResetImageAttributeResponse call() throws AmazonEC2Exception {
-                return resetImageAttribute(request);
-            }
-            });
+                    public ResetImageAttributeResponse call() throws AmazonEC2Exception {
+                        return resetImageAttribute(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Revoke Security Group Ingress 
      *
@@ -1423,32 +1417,34 @@ ResetImageAttributeRequest request) {
      *
      * @throws AmazonEC2Exception
      */
-    public RevokeSecurityGroupIngressResponse revokeSecurityGroupIngress(RevokeSecurityGroupIngressRequest request)
-        throws AmazonEC2Exception {
+    public RevokeSecurityGroupIngressResponse revokeSecurityGroupIngress(
+            RevokeSecurityGroupIngressRequest request) throws AmazonEC2Exception {
         RevokeSecurityGroupIngressResponse response;
         try {
-            response = (RevokeSecurityGroupIngressResponse)getUnmarshaller().unmarshal
-                    (new InputSource(this.getClass().getResourceAsStream("RevokeSecurityGroupIngressResponse.xml")));
+            response = (RevokeSecurityGroupIngressResponse) getUnmarshaller().unmarshal(
+                    new InputSource(this.getClass().getResourceAsStream(
+                            "RevokeSecurityGroupIngressResponse.xml")));
 
             log.debug("Response from Mock Service: " + response.toXML());
-            
+
         } catch (JAXBException jbe) {
             throw new AmazonEC2Exception("Unable to process mock response", jbe);
         }
         return response;
     }
 
-    public Future<RevokeSecurityGroupIngressResponse> revokeSecurityGroupIngressAsync(final
-RevokeSecurityGroupIngressRequest request) {
-        Future<RevokeSecurityGroupIngressResponse> response = asyncExecutor.submit(new Callable<RevokeSecurityGroupIngressResponse>() {
+    public Future<RevokeSecurityGroupIngressResponse> revokeSecurityGroupIngressAsync(
+            final RevokeSecurityGroupIngressRequest request) {
+        Future<RevokeSecurityGroupIngressResponse> response = asyncExecutor
+                .submit(new Callable<RevokeSecurityGroupIngressResponse>() {
 
-            public RevokeSecurityGroupIngressResponse call() throws AmazonEC2Exception {
-                return revokeSecurityGroupIngress(request);
-            }
-            });
+                    public RevokeSecurityGroupIngressResponse call() throws AmazonEC2Exception {
+                        return revokeSecurityGroupIngress(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Run Instances 
      *
@@ -1496,32 +1492,30 @@ RevokeSecurityGroupIngressRequest request) {
      *
      * @throws AmazonEC2Exception
      */
-    public RunInstancesResponse runInstances(RunInstancesRequest request)
-        throws AmazonEC2Exception {
+    public RunInstancesResponse runInstances(RunInstancesRequest request) throws AmazonEC2Exception {
         RunInstancesResponse response;
         try {
-            response = (RunInstancesResponse)getUnmarshaller().unmarshal
-                    (new InputSource(this.getClass().getResourceAsStream("RunInstancesResponse.xml")));
+            response = (RunInstancesResponse) getUnmarshaller().unmarshal(
+                    new InputSource(this.getClass().getResourceAsStream("RunInstancesResponse.xml")));
 
             log.debug("Response from Mock Service: " + response.toXML());
-            
+
         } catch (JAXBException jbe) {
             throw new AmazonEC2Exception("Unable to process mock response", jbe);
         }
         return response;
     }
 
-    public Future<RunInstancesResponse> runInstancesAsync(final
-RunInstancesRequest request) {
+    public Future<RunInstancesResponse> runInstancesAsync(final RunInstancesRequest request) {
         Future<RunInstancesResponse> response = asyncExecutor.submit(new Callable<RunInstancesResponse>() {
 
             public RunInstancesResponse call() throws AmazonEC2Exception {
                 return runInstances(request);
             }
-            });
+        });
         return response;
     }
-        
+
     /**
      * Terminate Instances 
      *
@@ -1539,28 +1533,28 @@ RunInstancesRequest request) {
      * @throws AmazonEC2Exception
      */
     public TerminateInstancesResponse terminateInstances(TerminateInstancesRequest request)
-        throws AmazonEC2Exception {
+            throws AmazonEC2Exception {
         TerminateInstancesResponse response;
         try {
-            response = (TerminateInstancesResponse)getUnmarshaller().unmarshal
-                    (new InputSource(this.getClass().getResourceAsStream("TerminateInstancesResponse.xml")));
+            response = (TerminateInstancesResponse) getUnmarshaller().unmarshal(
+                    new InputSource(this.getClass().getResourceAsStream("TerminateInstancesResponse.xml")));
 
             log.debug("Response from Mock Service: " + response.toXML());
-            
+
         } catch (JAXBException jbe) {
             throw new AmazonEC2Exception("Unable to process mock response", jbe);
         }
         return response;
     }
 
-    public Future<TerminateInstancesResponse> terminateInstancesAsync(final
-TerminateInstancesRequest request) {
-        Future<TerminateInstancesResponse> response = asyncExecutor.submit(new Callable<TerminateInstancesResponse>() {
+    public Future<TerminateInstancesResponse> terminateInstancesAsync(final TerminateInstancesRequest request) {
+        Future<TerminateInstancesResponse> response = asyncExecutor
+                .submit(new Callable<TerminateInstancesResponse>() {
 
-            public TerminateInstancesResponse call() throws AmazonEC2Exception {
-                return terminateInstances(request);
-            }
-            });
+                    public TerminateInstancesResponse call() throws AmazonEC2Exception {
+                        return terminateInstances(request);
+                    }
+                });
         return response;
     }
 

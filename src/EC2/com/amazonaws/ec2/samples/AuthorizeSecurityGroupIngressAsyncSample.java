@@ -19,8 +19,6 @@
  * 
  */
 
-
-
 package com.amazonaws.ec2.samples;
 
 import java.util.List;
@@ -28,6 +26,7 @@ import java.util.ArrayList;
 import com.amazonaws.ec2.*;
 import com.amazonaws.ec2.model.*;
 import java.util.concurrent.Future;
+
 
 /**
  *
@@ -44,13 +43,13 @@ public class AuthorizeSecurityGroupIngressAsyncSample {
      * @param args unused
      */
     public static void main(String... args) {
-        
+
         /************************************************************************
          * Access Key ID and Secret Acess Key ID, obtained from:
          * http://aws.amazon.com
          ***********************************************************************/
-         String accessKeyId = "<Your Access Key ID>";
-         String secretAccessKey = "<Your Secret Access Key>";
+        String accessKeyId = "<Your Access Key ID>";
+        String secretAccessKey = "<Your Secret Access Key>";
 
         /************************************************************************
          * Instantiate Http Client Implementation of Amazon EC2 
@@ -58,29 +57,27 @@ public class AuthorizeSecurityGroupIngressAsyncSample {
          * spawn for processing.
          *
          ***********************************************************************/
-         AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey, 35);
+        AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey, 35);
 
         /************************************************************************
          * Setup requests parameters and invoke parallel processing. Of course
          * in real world application, there will be much more than a couple of
          * requests to process.
          ***********************************************************************/
-         AuthorizeSecurityGroupIngressRequest requestOne = new AuthorizeSecurityGroupIngressRequest();
-         // @TODO: set request parameters here
+        AuthorizeSecurityGroupIngressRequest requestOne = new AuthorizeSecurityGroupIngressRequest();
+        // @TODO: set request parameters here
 
-         AuthorizeSecurityGroupIngressRequest requestTwo = new AuthorizeSecurityGroupIngressRequest();
-         // @TODO: set second request parameters here
+        AuthorizeSecurityGroupIngressRequest requestTwo = new AuthorizeSecurityGroupIngressRequest();
+        // @TODO: set second request parameters here
 
-         List<AuthorizeSecurityGroupIngressRequest> requests = new ArrayList<AuthorizeSecurityGroupIngressRequest>();
-         requests.add(requestOne);
-         requests.add(requestTwo);
+        List<AuthorizeSecurityGroupIngressRequest> requests = new ArrayList<AuthorizeSecurityGroupIngressRequest>();
+        requests.add(requestOne);
+        requests.add(requestTwo);
 
-         // invokeAuthorizeSecurityGroupIngress(service, requests);
+        // invokeAuthorizeSecurityGroupIngress(service, requests);
 
     }
 
-
-                                    
     /**
      * Authorize Security Group Ingress request sample
      * The AuthorizeSecurityGroupIngress operation adds permissions to a security
@@ -101,7 +98,8 @@ public class AuthorizeSecurityGroupIngressAsyncSample {
      * @param service instance of AmazonEC2 service
      * @param requests list of requests to process
      */
-    public static void invokeAuthorizeSecurityGroupIngress(AmazonEC2 service, List<AuthorizeSecurityGroupIngressRequest> requests) {
+    public static void invokeAuthorizeSecurityGroupIngress(AmazonEC2 service,
+            List<AuthorizeSecurityGroupIngressRequest> requests) {
         List<Future<AuthorizeSecurityGroupIngressResponse>> responses = new ArrayList<Future<AuthorizeSecurityGroupIngressResponse>>();
         for (AuthorizeSecurityGroupIngressRequest request : requests) {
             responses.add(service.authorizeSecurityGroupIngressAsync(request));
@@ -113,7 +111,8 @@ public class AuthorizeSecurityGroupIngressAsyncSample {
             try {
                 AuthorizeSecurityGroupIngressResponse response = future.get();
                 // Original request corresponding to this response, if needed:
-                AuthorizeSecurityGroupIngressRequest originalRequest = requests.get(responses.indexOf(future));
+                AuthorizeSecurityGroupIngressRequest originalRequest = requests
+                        .get(responses.indexOf(future));
                 System.out.println("Response request id: " + response.getResponseMetadata().getRequestId());
             } catch (Exception e) {
                 if (e.getCause() instanceof AmazonEC2Exception) {
@@ -130,5 +129,5 @@ public class AuthorizeSecurityGroupIngressAsyncSample {
             }
         }
     }
-                                                                                                                            
+
 }

@@ -1,4 +1,3 @@
-
 package com.amazonaws.ec2.model;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -31,10 +30,7 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-    "groupName",
-    "groupDescription"
-})
+@XmlType(name = "", propOrder = { "groupName", "groupDescription" })
 @XmlRootElement(name = "CreateSecurityGroupRequest")
 public class CreateSecurityGroupRequest {
 
@@ -85,7 +81,7 @@ public class CreateSecurityGroupRequest {
     }
 
     public boolean isSetGroupName() {
-        return (this.groupName!= null);
+        return (this.groupName != null);
     }
 
     /**
@@ -113,7 +109,7 @@ public class CreateSecurityGroupRequest {
     }
 
     public boolean isSetGroupDescription() {
-        return (this.groupDescription!= null);
+        return (this.groupDescription != null);
     }
 
     /**
@@ -139,8 +135,6 @@ public class CreateSecurityGroupRequest {
         setGroupDescription(value);
         return this;
     }
-    
-
 
     /**
      *
@@ -155,14 +149,16 @@ public class CreateSecurityGroupRequest {
         StringBuffer json = new StringBuffer();
         boolean first = true;
         if (isSetGroupName()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("GroupName"));
             json.append(" : ");
             json.append(quoteJSON(getGroupName()));
             first = false;
         }
         if (isSetGroupDescription()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("GroupDescription"));
             json.append(" : ");
             json.append(quoteJSON(getGroupDescription()));
@@ -182,41 +178,40 @@ public class CreateSecurityGroupRequest {
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             switch (c) {
-            case '"':
-                sb.append("\\\"");
-                break;
-            case '\\':
-                sb.append("\\\\");
-                break;
-            case '/':
-                sb.append("\\/");
-                break;
-            case '\b':
-                sb.append("\\b");
-                break;
-            case '\f':
-                sb.append("\\f");
-                break;
-            case '\n':
-                sb.append("\\n");
-                break;
-            case '\r':
-                sb.append("\\r");
-                break;
-            case '\t':
-                sb.append("\\t");
-                break;
-            default:
-                if (c <  ' ') {
-                    sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
-                } else {
-                sb.append(c);
+                case '"':
+                    sb.append("\\\"");
+                    break;
+                case '\\':
+                    sb.append("\\\\");
+                    break;
+                case '/':
+                    sb.append("\\/");
+                    break;
+                case '\b':
+                    sb.append("\\b");
+                    break;
+                case '\f':
+                    sb.append("\\f");
+                    break;
+                case '\n':
+                    sb.append("\\n");
+                    break;
+                case '\r':
+                    sb.append("\\r");
+                    break;
+                case '\t':
+                    sb.append("\\t");
+                    break;
+                default:
+                    if (c < ' ') {
+                        sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
+                    } else {
+                        sb.append(c);
+                    }
             }
-        }
         }
         sb.append("\"");
         return sb.toString();
     }
-
 
 }

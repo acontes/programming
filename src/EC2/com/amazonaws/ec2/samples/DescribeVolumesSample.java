@@ -19,8 +19,6 @@
  * 
  */
 
-
-
 package com.amazonaws.ec2.samples;
 
 import java.util.List;
@@ -28,6 +26,7 @@ import java.util.ArrayList;
 import com.amazonaws.ec2.*;
 import com.amazonaws.ec2.model.*;
 import com.amazonaws.ec2.mock.AmazonEC2Mock;
+
 
 /**
  *
@@ -44,7 +43,7 @@ public class DescribeVolumesSample {
      * @param args unused
      */
     public static void main(String... args) {
-        
+
         /************************************************************************
          * Access Key ID and Secret Acess Key ID, obtained from:
          * http://aws.amazon.com
@@ -56,7 +55,7 @@ public class DescribeVolumesSample {
          * Instantiate Http Client Implementation of Amazon EC2 
          ***********************************************************************/
         AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey);
-        
+
         /************************************************************************
          * Uncomment to try advanced configuration options. Available options are:
          *
@@ -69,7 +68,6 @@ public class DescribeVolumesSample {
         // AmazonEC2Config config = new AmazonEC2Config();
         // config.setSignatureVersion("0");
         // AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey, config);
- 
         /************************************************************************
          * Uncomment to try out Mock Service that simulates Amazon EC2 
          * responses without calling Amazon EC2  service.
@@ -81,21 +79,18 @@ public class DescribeVolumesSample {
          *
          ***********************************************************************/
         // AmazonEC2 service = new AmazonEC2Mock();
-
         /************************************************************************
          * Setup request parameters and uncomment invoke to try out 
          * sample for Describe Volumes 
          ***********************************************************************/
-         DescribeVolumesRequest request = new DescribeVolumesRequest();
-        
-         // @TODO: set request parameters here
+        DescribeVolumesRequest request = new DescribeVolumesRequest();
 
-         // invokeDescribeVolumes(service, request);
+        // @TODO: set request parameters here
+
+        // invokeDescribeVolumes(service, request);
 
     }
 
-
-                                                                                                                
     /**
      * Describe Volumes  request sample
      * Describes the status of the indicated or, in lieu of any specified,  all volumes belonging to the caller. Volumes that have been deleted are not described.
@@ -105,20 +100,20 @@ public class DescribeVolumesSample {
      */
     public static void invokeDescribeVolumes(AmazonEC2 service, DescribeVolumesRequest request) {
         try {
-            
+
             DescribeVolumesResponse response = service.describeVolumes(request);
 
-            
-            System.out.println ("DescribeVolumes Action Response");
-            System.out.println ("=============================================================================");
-            System.out.println ();
+            System.out.println("DescribeVolumes Action Response");
+            System.out
+                    .println("=============================================================================");
+            System.out.println();
 
             System.out.print("    DescribeVolumesResponse");
             System.out.println();
             if (response.isSetDescribeVolumesResult()) {
                 System.out.print("        DescribeVolumesResult");
                 System.out.println();
-                DescribeVolumesResult  describeVolumesResult = response.getDescribeVolumesResult();
+                DescribeVolumesResult describeVolumesResult = response.getDescribeVolumesResult();
                 java.util.List<Volume> volumeList = describeVolumesResult.getVolume();
                 for (Volume volume : volumeList) {
                     System.out.print("            Volume");
@@ -195,23 +190,22 @@ public class DescribeVolumesSample {
                         }
                     }
                 }
-            } 
+            }
             if (response.isSetResponseMetadata()) {
                 System.out.print("        ResponseMetadata");
                 System.out.println();
-                ResponseMetadata  responseMetadata = response.getResponseMetadata();
+                ResponseMetadata responseMetadata = response.getResponseMetadata();
                 if (responseMetadata.isSetRequestId()) {
                     System.out.print("            RequestId");
                     System.out.println();
                     System.out.print("                " + responseMetadata.getRequestId());
                     System.out.println();
                 }
-            } 
+            }
             System.out.println();
 
-           
         } catch (AmazonEC2Exception ex) {
-            
+
             System.out.println("Caught Exception: " + ex.getMessage());
             System.out.println("Response Status Code: " + ex.getStatusCode());
             System.out.println("Error Code: " + ex.getErrorCode());
@@ -220,5 +214,5 @@ public class DescribeVolumesSample {
             System.out.print("XML: " + ex.getXML());
         }
     }
-                                                
+
 }

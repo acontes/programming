@@ -19,8 +19,6 @@
  * 
  */
 
-
-
 package com.amazonaws.ec2.samples;
 
 import java.util.List;
@@ -28,6 +26,7 @@ import java.util.ArrayList;
 import com.amazonaws.ec2.*;
 import com.amazonaws.ec2.model.*;
 import com.amazonaws.ec2.mock.AmazonEC2Mock;
+
 
 /**
  *
@@ -44,7 +43,7 @@ public class RunInstancesSample {
      * @param args unused
      */
     public static void main(String... args) {
-        
+
         /************************************************************************
          * Access Key ID and Secret Acess Key ID, obtained from:
          * http://aws.amazon.com
@@ -56,7 +55,7 @@ public class RunInstancesSample {
          * Instantiate Http Client Implementation of Amazon EC2 
          ***********************************************************************/
         AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey);
-        
+
         /************************************************************************
          * Uncomment to try advanced configuration options. Available options are:
          *
@@ -69,7 +68,6 @@ public class RunInstancesSample {
         // AmazonEC2Config config = new AmazonEC2Config();
         // config.setSignatureVersion("0");
         // AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey, config);
- 
         /************************************************************************
          * Uncomment to try out Mock Service that simulates Amazon EC2 
          * responses without calling Amazon EC2  service.
@@ -81,25 +79,22 @@ public class RunInstancesSample {
          *
          ***********************************************************************/
         // AmazonEC2 service = new AmazonEC2Mock();
-
         /************************************************************************
          * Setup request parameters and uncomment invoke to try out 
          * sample for Run Instances 
          ***********************************************************************/
-         RunInstancesRequest request = new RunInstancesRequest();
-       
-         request.setImageId("ami-3bd63252");
-         request.setMinCount(1);
-         request.setMaxCount(1);
- 
-         // @TODO: set request parameters here
+        RunInstancesRequest request = new RunInstancesRequest();
 
-         invokeRunInstances(service, request);
+        request.setImageId("ami-3bd63252");
+        request.setMinCount(1);
+        request.setMaxCount(1);
+
+        // @TODO: set request parameters here
+
+        invokeRunInstances(service, request);
 
     }
 
-
-                                                                                                                                                        
     /**
      * Run Instances  request sample
      * The RunInstances operation launches a specified number of instances.
@@ -144,35 +139,35 @@ public class RunInstancesSample {
      */
     public static void invokeRunInstances(AmazonEC2 service, RunInstancesRequest request) {
         try {
-            
+
             RunInstancesResponse response = service.runInstances(request);
 
-            
-            System.out.println ("RunInstances Action Response");
-            System.out.println ("=============================================================================");
-            System.out.println ();
+            System.out.println("RunInstances Action Response");
+            System.out
+                    .println("=============================================================================");
+            System.out.println();
 
             System.out.print("    RunInstancesResponse");
             System.out.println();
             if (response.isSetResponseMetadata()) {
                 System.out.print("        ResponseMetadata");
                 System.out.println();
-                ResponseMetadata  responseMetadata = response.getResponseMetadata();
+                ResponseMetadata responseMetadata = response.getResponseMetadata();
                 if (responseMetadata.isSetRequestId()) {
                     System.out.print("            RequestId");
                     System.out.println();
                     System.out.print("                " + responseMetadata.getRequestId());
                     System.out.println();
                 }
-            } 
+            }
             if (response.isSetRunInstancesResult()) {
                 System.out.print("        RunInstancesResult");
                 System.out.println();
-                RunInstancesResult  runInstancesResult = response.getRunInstancesResult();
+                RunInstancesResult runInstancesResult = response.getRunInstancesResult();
                 if (runInstancesResult.isSetReservation()) {
                     System.out.print("            Reservation");
                     System.out.println();
-                    Reservation  reservation = runInstancesResult.getReservation();
+                    Reservation reservation = runInstancesResult.getReservation();
                     if (reservation.isSetReservationId()) {
                         System.out.print("                ReservationId");
                         System.out.println();
@@ -185,12 +180,12 @@ public class RunInstancesSample {
                         System.out.print("                    " + reservation.getOwnerId());
                         System.out.println();
                     }
-                    java.util.List<String> groupNameList  =  reservation.getGroupName();
-                    for (String groupName : groupNameList) { 
+                    java.util.List<String> groupNameList = reservation.getGroupName();
+                    for (String groupName : groupNameList) {
                         System.out.print("                GroupName");
-                            System.out.println();
+                        System.out.println();
                         System.out.print("                    " + groupName);
-                    }	
+                    }
                     java.util.List<RunningInstance> runningInstanceList = reservation.getRunningInstance();
                     for (RunningInstance runningInstance : runningInstanceList) {
                         System.out.print("                RunningInstance");
@@ -210,7 +205,7 @@ public class RunInstancesSample {
                         if (runningInstance.isSetInstanceState()) {
                             System.out.print("                    InstanceState");
                             System.out.println();
-                            InstanceState  instanceState = runningInstance.getInstanceState();
+                            InstanceState instanceState = runningInstance.getInstanceState();
                             if (instanceState.isSetCode()) {
                                 System.out.print("                        Code");
                                 System.out.println();
@@ -223,11 +218,12 @@ public class RunInstancesSample {
                                 System.out.print("                            " + instanceState.getName());
                                 System.out.println();
                             }
-                        } 
+                        }
                         if (runningInstance.isSetPrivateDnsName()) {
                             System.out.print("                    PrivateDnsName");
                             System.out.println();
-                            System.out.print("                        " + runningInstance.getPrivateDnsName());
+                            System.out
+                                    .print("                        " + runningInstance.getPrivateDnsName());
                             System.out.println();
                         }
                         if (runningInstance.isSetPublicDnsName()) {
@@ -239,7 +235,8 @@ public class RunInstancesSample {
                         if (runningInstance.isSetStateTransitionReason()) {
                             System.out.print("                    StateTransitionReason");
                             System.out.println();
-                            System.out.print("                        " + runningInstance.getStateTransitionReason());
+                            System.out.print("                        " +
+                                runningInstance.getStateTransitionReason());
                             System.out.println();
                         }
                         if (runningInstance.isSetKeyName()) {
@@ -251,15 +248,16 @@ public class RunInstancesSample {
                         if (runningInstance.isSetAmiLaunchIndex()) {
                             System.out.print("                    AmiLaunchIndex");
                             System.out.println();
-                            System.out.print("                        " + runningInstance.getAmiLaunchIndex());
+                            System.out
+                                    .print("                        " + runningInstance.getAmiLaunchIndex());
                             System.out.println();
                         }
-                        java.util.List<String> productCodeList  =  runningInstance.getProductCode();
-                        for (String productCode : productCodeList) { 
+                        java.util.List<String> productCodeList = runningInstance.getProductCode();
+                        for (String productCode : productCodeList) {
                             System.out.print("                    ProductCode");
-                                System.out.println();
+                            System.out.println();
                             System.out.print("                        " + productCode);
-                        }	
+                        }
                         if (runningInstance.isSetInstanceType()) {
                             System.out.print("                    InstanceType");
                             System.out.println();
@@ -275,14 +273,15 @@ public class RunInstancesSample {
                         if (runningInstance.isSetPlacement()) {
                             System.out.print("                    Placement");
                             System.out.println();
-                            Placement  placement = runningInstance.getPlacement();
+                            Placement placement = runningInstance.getPlacement();
                             if (placement.isSetAvailabilityZone()) {
                                 System.out.print("                        AvailabilityZone");
                                 System.out.println();
-                                System.out.print("                            " + placement.getAvailabilityZone());
+                                System.out.print("                            " +
+                                    placement.getAvailabilityZone());
                                 System.out.println();
                             }
-                        } 
+                        }
                         if (runningInstance.isSetKernelId()) {
                             System.out.print("                    KernelId");
                             System.out.println();
@@ -296,13 +295,12 @@ public class RunInstancesSample {
                             System.out.println();
                         }
                     }
-                } 
-            } 
+                }
+            }
             System.out.println();
 
-           
         } catch (AmazonEC2Exception ex) {
-            
+
             System.out.println("Caught Exception: " + ex.getMessage());
             System.out.println("Response Status Code: " + ex.getStatusCode());
             System.out.println("Error Code: " + ex.getErrorCode());
@@ -311,5 +309,5 @@ public class RunInstancesSample {
             System.out.print("XML: " + ex.getXML());
         }
     }
-        
+
 }

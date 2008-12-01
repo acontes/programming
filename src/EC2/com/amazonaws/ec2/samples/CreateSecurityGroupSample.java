@@ -19,8 +19,6 @@
  * 
  */
 
-
-
 package com.amazonaws.ec2.samples;
 
 import java.util.List;
@@ -28,6 +26,7 @@ import java.util.ArrayList;
 import com.amazonaws.ec2.*;
 import com.amazonaws.ec2.model.*;
 import com.amazonaws.ec2.mock.AmazonEC2Mock;
+
 
 /**
  *
@@ -44,7 +43,7 @@ public class CreateSecurityGroupSample {
      * @param args unused
      */
     public static void main(String... args) {
-        
+
         /************************************************************************
          * Access Key ID and Secret Acess Key ID, obtained from:
          * http://aws.amazon.com
@@ -56,7 +55,7 @@ public class CreateSecurityGroupSample {
          * Instantiate Http Client Implementation of Amazon EC2 
          ***********************************************************************/
         AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey);
-        
+
         /************************************************************************
          * Uncomment to try advanced configuration options. Available options are:
          *
@@ -69,7 +68,6 @@ public class CreateSecurityGroupSample {
         // AmazonEC2Config config = new AmazonEC2Config();
         // config.setSignatureVersion("0");
         // AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey, config);
- 
         /************************************************************************
          * Uncomment to try out Mock Service that simulates Amazon EC2 
          * responses without calling Amazon EC2  service.
@@ -81,21 +79,18 @@ public class CreateSecurityGroupSample {
          *
          ***********************************************************************/
         // AmazonEC2 service = new AmazonEC2Mock();
-
         /************************************************************************
          * Setup request parameters and uncomment invoke to try out 
          * sample for Create Security Group 
          ***********************************************************************/
-         CreateSecurityGroupRequest request = new CreateSecurityGroupRequest();
-        
-         // @TODO: set request parameters here
+        CreateSecurityGroupRequest request = new CreateSecurityGroupRequest();
 
-         // invokeCreateSecurityGroup(service, request);
+        // @TODO: set request parameters here
+
+        // invokeCreateSecurityGroup(service, request);
 
     }
 
-
-                                                
     /**
      * Create Security Group  request sample
      * The CreateSecurityGroup operation creates a new security group.
@@ -112,32 +107,31 @@ public class CreateSecurityGroupSample {
      */
     public static void invokeCreateSecurityGroup(AmazonEC2 service, CreateSecurityGroupRequest request) {
         try {
-            
+
             CreateSecurityGroupResponse response = service.createSecurityGroup(request);
 
-            
-            System.out.println ("CreateSecurityGroup Action Response");
-            System.out.println ("=============================================================================");
-            System.out.println ();
+            System.out.println("CreateSecurityGroup Action Response");
+            System.out
+                    .println("=============================================================================");
+            System.out.println();
 
             System.out.print("    CreateSecurityGroupResponse");
             System.out.println();
             if (response.isSetResponseMetadata()) {
                 System.out.print("        ResponseMetadata");
                 System.out.println();
-                ResponseMetadata  responseMetadata = response.getResponseMetadata();
+                ResponseMetadata responseMetadata = response.getResponseMetadata();
                 if (responseMetadata.isSetRequestId()) {
                     System.out.print("            RequestId");
                     System.out.println();
                     System.out.print("                " + responseMetadata.getRequestId());
                     System.out.println();
                 }
-            } 
+            }
             System.out.println();
 
-           
         } catch (AmazonEC2Exception ex) {
-            
+
             System.out.println("Caught Exception: " + ex.getMessage());
             System.out.println("Response Status Code: " + ex.getStatusCode());
             System.out.println("Error Code: " + ex.getErrorCode());
@@ -146,5 +140,5 @@ public class CreateSecurityGroupSample {
             System.out.print("XML: " + ex.getXML());
         }
     }
-                                                                                                                
+
 }

@@ -1,4 +1,3 @@
-
 package com.amazonaws.ec2.model;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -31,10 +30,7 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-    "detachVolumeResult",
-    "responseMetadata"
-})
+@XmlType(name = "", propOrder = { "detachVolumeResult", "responseMetadata" })
 @XmlRootElement(name = "DetachVolumeResponse")
 public class DetachVolumeResponse {
 
@@ -55,7 +51,8 @@ public class DetachVolumeResponse {
      * Value constructor
      * 
      */
-    public DetachVolumeResponse(final DetachVolumeResult detachVolumeResult, final ResponseMetadata responseMetadata) {
+    public DetachVolumeResponse(final DetachVolumeResult detachVolumeResult,
+            final ResponseMetadata responseMetadata) {
         this.detachVolumeResult = detachVolumeResult;
         this.responseMetadata = responseMetadata;
     }
@@ -85,7 +82,7 @@ public class DetachVolumeResponse {
     }
 
     public boolean isSetDetachVolumeResult() {
-        return (this.detachVolumeResult!= null);
+        return (this.detachVolumeResult != null);
     }
 
     /**
@@ -113,7 +110,7 @@ public class DetachVolumeResponse {
     }
 
     public boolean isSetResponseMetadata() {
-        return (this.responseMetadata!= null);
+        return (this.responseMetadata != null);
     }
 
     /**
@@ -139,7 +136,6 @@ public class DetachVolumeResponse {
         setResponseMetadata(value);
         return this;
     }
-    
 
     /**
      * 
@@ -151,17 +147,17 @@ public class DetachVolumeResponse {
         StringBuffer xml = new StringBuffer();
         xml.append("<DetachVolumeResponse xmlns=\"http://ec2.amazonaws.com/doc/2008-05-05/\">");
         if (isSetDetachVolumeResult()) {
-            DetachVolumeResult  detachVolumeResult = getDetachVolumeResult();
+            DetachVolumeResult detachVolumeResult = getDetachVolumeResult();
             xml.append("<DetachVolumeResult>");
             xml.append(detachVolumeResult.toXMLFragment());
             xml.append("</DetachVolumeResult>");
-        } 
+        }
         if (isSetResponseMetadata()) {
-            ResponseMetadata  responseMetadata = getResponseMetadata();
+            ResponseMetadata responseMetadata = getResponseMetadata();
             xml.append("<ResponseMetadata>");
             xml.append(responseMetadata.toXMLFragment());
             xml.append("</ResponseMetadata>");
-        } 
+        }
         xml.append("</DetachVolumeResponse>");
         return xml.toString();
     }
@@ -176,29 +172,27 @@ public class DetachVolumeResponse {
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             switch (c) {
-            case '&':
-                sb.append("&amp;");
-                break;
-            case '<':
-                sb.append("&lt;");
-                break;
-            case '>':
-                sb.append("&gt;");
-                break;
-            case '\'':
-                sb.append("&#039;");
-                break;
-            case '"':
-                sb.append("&quot;");
-                break;
-            default:
-                sb.append(c);
+                case '&':
+                    sb.append("&amp;");
+                    break;
+                case '<':
+                    sb.append("&lt;");
+                    break;
+                case '>':
+                    sb.append("&gt;");
+                    break;
+                case '\'':
+                    sb.append("&#039;");
+                    break;
+                case '"':
+                    sb.append("&quot;");
+                    break;
+                default:
+                    sb.append(c);
             }
         }
         return sb.toString();
     }
-
-
 
     /**
      * 
@@ -215,23 +209,25 @@ public class DetachVolumeResponse {
         boolean first = true;
         json.append(", ");
         if (isSetDetachVolumeResult()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append("\"DetachVolumeResult\" : {");
-            DetachVolumeResult  detachVolumeResult = getDetachVolumeResult();
+            DetachVolumeResult detachVolumeResult = getDetachVolumeResult();
 
             json.append(detachVolumeResult.toJSONFragment());
             json.append("}");
             first = false;
-        } 
+        }
         if (isSetResponseMetadata()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append("\"ResponseMetadata\" : {");
-            ResponseMetadata  responseMetadata = getResponseMetadata();
+            ResponseMetadata responseMetadata = getResponseMetadata();
 
             json.append(responseMetadata.toJSONFragment());
             json.append("}");
             first = false;
-        } 
+        }
         json.append("}");
         json.append("}");
         return json.toString();
@@ -248,41 +244,40 @@ public class DetachVolumeResponse {
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             switch (c) {
-            case '"':
-                sb.append("\\\"");
-                break;
-            case '\\':
-                sb.append("\\\\");
-                break;
-            case '/':
-                sb.append("\\/");
-                break;
-            case '\b':
-                sb.append("\\b");
-                break;
-            case '\f':
-                sb.append("\\f");
-                break;
-            case '\n':
-                sb.append("\\n");
-                break;
-            case '\r':
-                sb.append("\\r");
-                break;
-            case '\t':
-                sb.append("\\t");
-                break;
-            default:
-                if (c <  ' ') {
-                    sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
-                } else {
-                sb.append(c);
-                }
+                case '"':
+                    sb.append("\\\"");
+                    break;
+                case '\\':
+                    sb.append("\\\\");
+                    break;
+                case '/':
+                    sb.append("\\/");
+                    break;
+                case '\b':
+                    sb.append("\\b");
+                    break;
+                case '\f':
+                    sb.append("\\f");
+                    break;
+                case '\n':
+                    sb.append("\\n");
+                    break;
+                case '\r':
+                    sb.append("\\r");
+                    break;
+                case '\t':
+                    sb.append("\\t");
+                    break;
+                default:
+                    if (c < ' ') {
+                        sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
+                    } else {
+                        sb.append(c);
+                    }
             }
         }
         sb.append("\"");
         return sb.toString();
     }
-
 
 }

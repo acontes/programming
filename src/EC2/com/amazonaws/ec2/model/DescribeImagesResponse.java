@@ -1,4 +1,3 @@
-
 package com.amazonaws.ec2.model;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -31,10 +30,7 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-    "responseMetadata",
-    "describeImagesResult"
-})
+@XmlType(name = "", propOrder = { "responseMetadata", "describeImagesResult" })
 @XmlRootElement(name = "DescribeImagesResponse")
 public class DescribeImagesResponse {
 
@@ -55,7 +51,8 @@ public class DescribeImagesResponse {
      * Value constructor
      * 
      */
-    public DescribeImagesResponse(final ResponseMetadata responseMetadata, final DescribeImagesResult describeImagesResult) {
+    public DescribeImagesResponse(final ResponseMetadata responseMetadata,
+            final DescribeImagesResult describeImagesResult) {
         this.responseMetadata = responseMetadata;
         this.describeImagesResult = describeImagesResult;
     }
@@ -85,7 +82,7 @@ public class DescribeImagesResponse {
     }
 
     public boolean isSetResponseMetadata() {
-        return (this.responseMetadata!= null);
+        return (this.responseMetadata != null);
     }
 
     /**
@@ -113,7 +110,7 @@ public class DescribeImagesResponse {
     }
 
     public boolean isSetDescribeImagesResult() {
-        return (this.describeImagesResult!= null);
+        return (this.describeImagesResult != null);
     }
 
     /**
@@ -139,7 +136,6 @@ public class DescribeImagesResponse {
         setDescribeImagesResult(value);
         return this;
     }
-    
 
     /**
      * 
@@ -151,17 +147,17 @@ public class DescribeImagesResponse {
         StringBuffer xml = new StringBuffer();
         xml.append("<DescribeImagesResponse xmlns=\"http://ec2.amazonaws.com/doc/2008-05-05/\">");
         if (isSetResponseMetadata()) {
-            ResponseMetadata  responseMetadata = getResponseMetadata();
+            ResponseMetadata responseMetadata = getResponseMetadata();
             xml.append("<ResponseMetadata>");
             xml.append(responseMetadata.toXMLFragment());
             xml.append("</ResponseMetadata>");
-        } 
+        }
         if (isSetDescribeImagesResult()) {
-            DescribeImagesResult  describeImagesResult = getDescribeImagesResult();
+            DescribeImagesResult describeImagesResult = getDescribeImagesResult();
             xml.append("<DescribeImagesResult>");
             xml.append(describeImagesResult.toXMLFragment());
             xml.append("</DescribeImagesResult>");
-        } 
+        }
         xml.append("</DescribeImagesResponse>");
         return xml.toString();
     }
@@ -176,29 +172,27 @@ public class DescribeImagesResponse {
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             switch (c) {
-            case '&':
-                sb.append("&amp;");
-                break;
-            case '<':
-                sb.append("&lt;");
-                break;
-            case '>':
-                sb.append("&gt;");
-                break;
-            case '\'':
-                sb.append("&#039;");
-                break;
-            case '"':
-                sb.append("&quot;");
-                break;
-            default:
-                sb.append(c);
+                case '&':
+                    sb.append("&amp;");
+                    break;
+                case '<':
+                    sb.append("&lt;");
+                    break;
+                case '>':
+                    sb.append("&gt;");
+                    break;
+                case '\'':
+                    sb.append("&#039;");
+                    break;
+                case '"':
+                    sb.append("&quot;");
+                    break;
+                default:
+                    sb.append(c);
             }
         }
         return sb.toString();
     }
-
-
 
     /**
      * 
@@ -215,23 +209,25 @@ public class DescribeImagesResponse {
         boolean first = true;
         json.append(", ");
         if (isSetResponseMetadata()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append("\"ResponseMetadata\" : {");
-            ResponseMetadata  responseMetadata = getResponseMetadata();
+            ResponseMetadata responseMetadata = getResponseMetadata();
 
             json.append(responseMetadata.toJSONFragment());
             json.append("}");
             first = false;
-        } 
+        }
         if (isSetDescribeImagesResult()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append("\"DescribeImagesResult\" : {");
-            DescribeImagesResult  describeImagesResult = getDescribeImagesResult();
+            DescribeImagesResult describeImagesResult = getDescribeImagesResult();
 
             json.append(describeImagesResult.toJSONFragment());
             json.append("}");
             first = false;
-        } 
+        }
         json.append("}");
         json.append("}");
         return json.toString();
@@ -248,41 +244,40 @@ public class DescribeImagesResponse {
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             switch (c) {
-            case '"':
-                sb.append("\\\"");
-                break;
-            case '\\':
-                sb.append("\\\\");
-                break;
-            case '/':
-                sb.append("\\/");
-                break;
-            case '\b':
-                sb.append("\\b");
-                break;
-            case '\f':
-                sb.append("\\f");
-                break;
-            case '\n':
-                sb.append("\\n");
-                break;
-            case '\r':
-                sb.append("\\r");
-                break;
-            case '\t':
-                sb.append("\\t");
-                break;
-            default:
-                if (c <  ' ') {
-                    sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
-                } else {
-                sb.append(c);
-                }
+                case '"':
+                    sb.append("\\\"");
+                    break;
+                case '\\':
+                    sb.append("\\\\");
+                    break;
+                case '/':
+                    sb.append("\\/");
+                    break;
+                case '\b':
+                    sb.append("\\b");
+                    break;
+                case '\f':
+                    sb.append("\\f");
+                    break;
+                case '\n':
+                    sb.append("\\n");
+                    break;
+                case '\r':
+                    sb.append("\\r");
+                    break;
+                case '\t':
+                    sb.append("\\t");
+                    break;
+                default:
+                    if (c < ' ') {
+                        sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
+                    } else {
+                        sb.append(c);
+                    }
             }
         }
         sb.append("\"");
         return sb.toString();
     }
-
 
 }

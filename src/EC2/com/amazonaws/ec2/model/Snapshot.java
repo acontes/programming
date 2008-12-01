@@ -1,4 +1,3 @@
-
 package com.amazonaws.ec2.model;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -33,13 +32,7 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "Snapshot", propOrder = {
-    "snapshotId",
-    "volumeId",
-    "status",
-    "startTime",
-    "progress"
-})
+@XmlType(name = "Snapshot", propOrder = { "snapshotId", "volumeId", "status", "startTime", "progress" })
 public class Snapshot {
 
     @XmlElement(name = "SnapshotId", required = true)
@@ -65,7 +58,8 @@ public class Snapshot {
      * Value constructor
      * 
      */
-    public Snapshot(final String snapshotId, final String volumeId, final String status, final String startTime, final String progress) {
+    public Snapshot(final String snapshotId, final String volumeId, final String status,
+            final String startTime, final String progress) {
         this.snapshotId = snapshotId;
         this.volumeId = volumeId;
         this.status = status;
@@ -98,7 +92,7 @@ public class Snapshot {
     }
 
     public boolean isSetSnapshotId() {
-        return (this.snapshotId!= null);
+        return (this.snapshotId != null);
     }
 
     /**
@@ -126,7 +120,7 @@ public class Snapshot {
     }
 
     public boolean isSetVolumeId() {
-        return (this.volumeId!= null);
+        return (this.volumeId != null);
     }
 
     /**
@@ -154,7 +148,7 @@ public class Snapshot {
     }
 
     public boolean isSetStatus() {
-        return (this.status!= null);
+        return (this.status != null);
     }
 
     /**
@@ -182,7 +176,7 @@ public class Snapshot {
     }
 
     public boolean isSetStartTime() {
-        return (this.startTime!= null);
+        return (this.startTime != null);
     }
 
     /**
@@ -210,7 +204,7 @@ public class Snapshot {
     }
 
     public boolean isSetProgress() {
-        return (this.progress!= null);
+        return (this.progress != null);
     }
 
     /**
@@ -272,7 +266,6 @@ public class Snapshot {
         setProgress(value);
         return this;
     }
-    
 
     /**
      * 
@@ -322,29 +315,27 @@ public class Snapshot {
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             switch (c) {
-            case '&':
-                sb.append("&amp;");
-                break;
-            case '<':
-                sb.append("&lt;");
-                break;
-            case '>':
-                sb.append("&gt;");
-                break;
-            case '\'':
-                sb.append("&#039;");
-                break;
-            case '"':
-                sb.append("&quot;");
-                break;
-            default:
-                sb.append(c);
+                case '&':
+                    sb.append("&amp;");
+                    break;
+                case '<':
+                    sb.append("&lt;");
+                    break;
+                case '>':
+                    sb.append("&gt;");
+                    break;
+                case '\'':
+                    sb.append("&#039;");
+                    break;
+                case '"':
+                    sb.append("&quot;");
+                    break;
+                default:
+                    sb.append(c);
             }
         }
         return sb.toString();
     }
-
-
 
     /**
      *
@@ -359,35 +350,40 @@ public class Snapshot {
         StringBuffer json = new StringBuffer();
         boolean first = true;
         if (isSetSnapshotId()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("SnapshotId"));
             json.append(" : ");
             json.append(quoteJSON(getSnapshotId()));
             first = false;
         }
         if (isSetVolumeId()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("VolumeId"));
             json.append(" : ");
             json.append(quoteJSON(getVolumeId()));
             first = false;
         }
         if (isSetStatus()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("Status"));
             json.append(" : ");
             json.append(quoteJSON(getStatus()));
             first = false;
         }
         if (isSetStartTime()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("StartTime"));
             json.append(" : ");
             json.append(quoteJSON(getStartTime()));
             first = false;
         }
         if (isSetProgress()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("Progress"));
             json.append(" : ");
             json.append(quoteJSON(getProgress()));
@@ -407,41 +403,40 @@ public class Snapshot {
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             switch (c) {
-            case '"':
-                sb.append("\\\"");
-                break;
-            case '\\':
-                sb.append("\\\\");
-                break;
-            case '/':
-                sb.append("\\/");
-                break;
-            case '\b':
-                sb.append("\\b");
-                break;
-            case '\f':
-                sb.append("\\f");
-                break;
-            case '\n':
-                sb.append("\\n");
-                break;
-            case '\r':
-                sb.append("\\r");
-                break;
-            case '\t':
-                sb.append("\\t");
-                break;
-            default:
-                if (c <  ' ') {
-                    sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
-                } else {
-                sb.append(c);
+                case '"':
+                    sb.append("\\\"");
+                    break;
+                case '\\':
+                    sb.append("\\\\");
+                    break;
+                case '/':
+                    sb.append("\\/");
+                    break;
+                case '\b':
+                    sb.append("\\b");
+                    break;
+                case '\f':
+                    sb.append("\\f");
+                    break;
+                case '\n':
+                    sb.append("\\n");
+                    break;
+                case '\r':
+                    sb.append("\\r");
+                    break;
+                case '\t':
+                    sb.append("\\t");
+                    break;
+                default:
+                    if (c < ' ') {
+                        sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
+                    } else {
+                        sb.append(c);
+                    }
             }
-        }
         }
         sb.append("\"");
         return sb.toString();
     }
-
 
 }

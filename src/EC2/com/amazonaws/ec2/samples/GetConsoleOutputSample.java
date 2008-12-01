@@ -19,8 +19,6 @@
  * 
  */
 
-
-
 package com.amazonaws.ec2.samples;
 
 import java.util.List;
@@ -28,6 +26,7 @@ import java.util.ArrayList;
 import com.amazonaws.ec2.*;
 import com.amazonaws.ec2.model.*;
 import com.amazonaws.ec2.mock.AmazonEC2Mock;
+
 
 /**
  *
@@ -44,7 +43,7 @@ public class GetConsoleOutputSample {
      * @param args unused
      */
     public static void main(String... args) {
-        
+
         /************************************************************************
          * Access Key ID and Secret Acess Key ID, obtained from:
          * http://aws.amazon.com
@@ -56,7 +55,7 @@ public class GetConsoleOutputSample {
          * Instantiate Http Client Implementation of Amazon EC2 
          ***********************************************************************/
         AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey);
-        
+
         /************************************************************************
          * Uncomment to try advanced configuration options. Available options are:
          *
@@ -69,7 +68,6 @@ public class GetConsoleOutputSample {
         // AmazonEC2Config config = new AmazonEC2Config();
         // config.setSignatureVersion("0");
         // AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey, config);
- 
         /************************************************************************
          * Uncomment to try out Mock Service that simulates Amazon EC2 
          * responses without calling Amazon EC2  service.
@@ -81,21 +79,18 @@ public class GetConsoleOutputSample {
          *
          ***********************************************************************/
         // AmazonEC2 service = new AmazonEC2Mock();
-
         /************************************************************************
          * Setup request parameters and uncomment invoke to try out 
          * sample for Get Console Output 
          ***********************************************************************/
-         GetConsoleOutputRequest request = new GetConsoleOutputRequest();
-        
-         // @TODO: set request parameters here
+        GetConsoleOutputRequest request = new GetConsoleOutputRequest();
 
-         // invokeGetConsoleOutput(service, request);
+        // @TODO: set request parameters here
+
+        // invokeGetConsoleOutput(service, request);
 
     }
 
-
-                                                                                                                            
     /**
      * Get Console Output  request sample
      * The GetConsoleOutput operation retrieves console output for the specified
@@ -109,35 +104,35 @@ public class GetConsoleOutputSample {
      */
     public static void invokeGetConsoleOutput(AmazonEC2 service, GetConsoleOutputRequest request) {
         try {
-            
+
             GetConsoleOutputResponse response = service.getConsoleOutput(request);
 
-            
-            System.out.println ("GetConsoleOutput Action Response");
-            System.out.println ("=============================================================================");
-            System.out.println ();
+            System.out.println("GetConsoleOutput Action Response");
+            System.out
+                    .println("=============================================================================");
+            System.out.println();
 
             System.out.print("    GetConsoleOutputResponse");
             System.out.println();
             if (response.isSetResponseMetadata()) {
                 System.out.print("        ResponseMetadata");
                 System.out.println();
-                ResponseMetadata  responseMetadata = response.getResponseMetadata();
+                ResponseMetadata responseMetadata = response.getResponseMetadata();
                 if (responseMetadata.isSetRequestId()) {
                     System.out.print("            RequestId");
                     System.out.println();
                     System.out.print("                " + responseMetadata.getRequestId());
                     System.out.println();
                 }
-            } 
+            }
             if (response.isSetGetConsoleOutputResult()) {
                 System.out.print("        GetConsoleOutputResult");
                 System.out.println();
-                GetConsoleOutputResult  getConsoleOutputResult = response.getGetConsoleOutputResult();
+                GetConsoleOutputResult getConsoleOutputResult = response.getGetConsoleOutputResult();
                 if (getConsoleOutputResult.isSetConsoleOutput()) {
                     System.out.print("            ConsoleOutput");
                     System.out.println();
-                    ConsoleOutput  consoleOutput = getConsoleOutputResult.getConsoleOutput();
+                    ConsoleOutput consoleOutput = getConsoleOutputResult.getConsoleOutput();
                     if (consoleOutput.isSetInstanceId()) {
                         System.out.print("                InstanceId");
                         System.out.println();
@@ -156,13 +151,12 @@ public class GetConsoleOutputSample {
                         System.out.print("                    " + consoleOutput.getOutput());
                         System.out.println();
                     }
-                } 
-            } 
+                }
+            }
             System.out.println();
 
-           
         } catch (AmazonEC2Exception ex) {
-            
+
             System.out.println("Caught Exception: " + ex.getMessage());
             System.out.println("Response Status Code: " + ex.getStatusCode());
             System.out.println("Error Code: " + ex.getErrorCode());
@@ -171,5 +165,5 @@ public class GetConsoleOutputSample {
             System.out.print("XML: " + ex.getXML());
         }
     }
-                                    
+
 }

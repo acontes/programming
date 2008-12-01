@@ -1,4 +1,3 @@
-
 package com.amazonaws.ec2.model;
 
 import java.util.ArrayList;
@@ -32,9 +31,7 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-    "reservation"
-})
+@XmlType(name = "", propOrder = { "reservation" })
 @XmlRootElement(name = "DescribeInstancesResult")
 public class DescribeInstancesResult {
 
@@ -87,7 +84,7 @@ public class DescribeInstancesResult {
     }
 
     public boolean isSetReservation() {
-        return ((this.reservation!= null)&&(!this.reservation.isEmpty()));
+        return ((this.reservation != null) && (!this.reservation.isEmpty()));
     }
 
     public void unsetReservation() {
@@ -102,7 +99,7 @@ public class DescribeInstancesResult {
      *     this instance
      */
     public DescribeInstancesResult withReservation(Reservation... values) {
-        for (Reservation value: values) {
+        for (Reservation value : values) {
             getReservation().add(value);
         }
         return this;
@@ -119,7 +116,6 @@ public class DescribeInstancesResult {
     public void setReservation(List<Reservation> reservation) {
         this.reservation = reservation;
     }
-    
 
     /**
      * 
@@ -150,29 +146,27 @@ public class DescribeInstancesResult {
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             switch (c) {
-            case '&':
-                sb.append("&amp;");
-                break;
-            case '<':
-                sb.append("&lt;");
-                break;
-            case '>':
-                sb.append("&gt;");
-                break;
-            case '\'':
-                sb.append("&#039;");
-                break;
-            case '"':
-                sb.append("&quot;");
-                break;
-            default:
-                sb.append(c);
+                case '&':
+                    sb.append("&amp;");
+                    break;
+                case '<':
+                    sb.append("&lt;");
+                    break;
+                case '>':
+                    sb.append("&gt;");
+                    break;
+                case '\'':
+                    sb.append("&#039;");
+                    break;
+                case '"':
+                    sb.append("&quot;");
+                    break;
+                default:
+                    sb.append(c);
             }
         }
         return sb.toString();
     }
-
-
 
     /**
      *
@@ -187,11 +181,13 @@ public class DescribeInstancesResult {
         StringBuffer json = new StringBuffer();
         boolean first = true;
         if (isSetReservation()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append("\"Reservation\" : [");
             java.util.List<Reservation> reservationList = getReservation();
             for (Reservation reservation : reservationList) {
-                if (reservationList.indexOf(reservation) > 0) json.append(", ");
+                if (reservationList.indexOf(reservation) > 0)
+                    json.append(", ");
                 json.append("{");
                 json.append("");
                 json.append(reservation.toJSONFragment());
@@ -214,41 +210,40 @@ public class DescribeInstancesResult {
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             switch (c) {
-            case '"':
-                sb.append("\\\"");
-                break;
-            case '\\':
-                sb.append("\\\\");
-                break;
-            case '/':
-                sb.append("\\/");
-                break;
-            case '\b':
-                sb.append("\\b");
-                break;
-            case '\f':
-                sb.append("\\f");
-                break;
-            case '\n':
-                sb.append("\\n");
-                break;
-            case '\r':
-                sb.append("\\r");
-                break;
-            case '\t':
-                sb.append("\\t");
-                break;
-            default:
-                if (c <  ' ') {
-                    sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
-                } else {
-                sb.append(c);
+                case '"':
+                    sb.append("\\\"");
+                    break;
+                case '\\':
+                    sb.append("\\\\");
+                    break;
+                case '/':
+                    sb.append("\\/");
+                    break;
+                case '\b':
+                    sb.append("\\b");
+                    break;
+                case '\f':
+                    sb.append("\\f");
+                    break;
+                case '\n':
+                    sb.append("\\n");
+                    break;
+                case '\r':
+                    sb.append("\\r");
+                    break;
+                case '\t':
+                    sb.append("\\t");
+                    break;
+                default:
+                    if (c < ' ') {
+                        sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
+                    } else {
+                        sb.append(c);
+                    }
             }
-        }
         }
         sb.append("\"");
         return sb.toString();
     }
-
 
 }

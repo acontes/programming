@@ -1,4 +1,3 @@
-
 package com.amazonaws.ec2.model;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -30,9 +29,7 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-    "consoleOutput"
-})
+@XmlType(name = "", propOrder = { "consoleOutput" })
 @XmlRootElement(name = "GetConsoleOutputResult")
 public class GetConsoleOutputResult {
 
@@ -80,7 +77,7 @@ public class GetConsoleOutputResult {
     }
 
     public boolean isSetConsoleOutput() {
-        return (this.consoleOutput!= null);
+        return (this.consoleOutput != null);
     }
 
     /**
@@ -94,7 +91,6 @@ public class GetConsoleOutputResult {
         setConsoleOutput(value);
         return this;
     }
-    
 
     /**
      * 
@@ -107,11 +103,11 @@ public class GetConsoleOutputResult {
     protected String toXMLFragment() {
         StringBuffer xml = new StringBuffer();
         if (isSetConsoleOutput()) {
-            ConsoleOutput  consoleOutput = getConsoleOutput();
+            ConsoleOutput consoleOutput = getConsoleOutput();
             xml.append("<ConsoleOutput>");
             xml.append(consoleOutput.toXMLFragment());
             xml.append("</ConsoleOutput>");
-        } 
+        }
         return xml.toString();
     }
 
@@ -125,29 +121,27 @@ public class GetConsoleOutputResult {
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             switch (c) {
-            case '&':
-                sb.append("&amp;");
-                break;
-            case '<':
-                sb.append("&lt;");
-                break;
-            case '>':
-                sb.append("&gt;");
-                break;
-            case '\'':
-                sb.append("&#039;");
-                break;
-            case '"':
-                sb.append("&quot;");
-                break;
-            default:
-                sb.append(c);
+                case '&':
+                    sb.append("&amp;");
+                    break;
+                case '<':
+                    sb.append("&lt;");
+                    break;
+                case '>':
+                    sb.append("&gt;");
+                    break;
+                case '\'':
+                    sb.append("&#039;");
+                    break;
+                case '"':
+                    sb.append("&quot;");
+                    break;
+                default:
+                    sb.append(c);
             }
         }
         return sb.toString();
     }
-
-
 
     /**
      *
@@ -162,10 +156,10 @@ public class GetConsoleOutputResult {
         StringBuffer json = new StringBuffer();
         boolean first = true;
         if (isSetConsoleOutput()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append("\"ConsoleOutput\" : {");
-            ConsoleOutput  consoleOutput = getConsoleOutput();
-
+            ConsoleOutput consoleOutput = getConsoleOutput();
 
             json.append(consoleOutput.toJSONFragment());
             json.append("}");
@@ -185,41 +179,40 @@ public class GetConsoleOutputResult {
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             switch (c) {
-            case '"':
-                sb.append("\\\"");
-                break;
-            case '\\':
-                sb.append("\\\\");
-                break;
-            case '/':
-                sb.append("\\/");
-                break;
-            case '\b':
-                sb.append("\\b");
-                break;
-            case '\f':
-                sb.append("\\f");
-                break;
-            case '\n':
-                sb.append("\\n");
-                break;
-            case '\r':
-                sb.append("\\r");
-                break;
-            case '\t':
-                sb.append("\\t");
-                break;
-            default:
-                if (c <  ' ') {
-                    sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
-                } else {
-                sb.append(c);
+                case '"':
+                    sb.append("\\\"");
+                    break;
+                case '\\':
+                    sb.append("\\\\");
+                    break;
+                case '/':
+                    sb.append("\\/");
+                    break;
+                case '\b':
+                    sb.append("\\b");
+                    break;
+                case '\f':
+                    sb.append("\\f");
+                    break;
+                case '\n':
+                    sb.append("\\n");
+                    break;
+                case '\r':
+                    sb.append("\\r");
+                    break;
+                case '\t':
+                    sb.append("\\t");
+                    break;
+                default:
+                    if (c < ' ') {
+                        sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
+                    } else {
+                        sb.append(c);
+                    }
             }
-        }
         }
         sb.append("\"");
         return sb.toString();
     }
-
 
 }

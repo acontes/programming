@@ -1,4 +1,3 @@
-
 package com.amazonaws.ec2.model;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -31,11 +30,7 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "KeyPair", propOrder = {
-    "keyName",
-    "keyFingerprint",
-    "keyMaterial"
-})
+@XmlType(name = "KeyPair", propOrder = { "keyName", "keyFingerprint", "keyMaterial" })
 public class KeyPair {
 
     @XmlElement(name = "KeyName", required = true)
@@ -88,7 +83,7 @@ public class KeyPair {
     }
 
     public boolean isSetKeyName() {
-        return (this.keyName!= null);
+        return (this.keyName != null);
     }
 
     /**
@@ -116,7 +111,7 @@ public class KeyPair {
     }
 
     public boolean isSetKeyFingerprint() {
-        return (this.keyFingerprint!= null);
+        return (this.keyFingerprint != null);
     }
 
     /**
@@ -144,7 +139,7 @@ public class KeyPair {
     }
 
     public boolean isSetKeyMaterial() {
-        return (this.keyMaterial!= null);
+        return (this.keyMaterial != null);
     }
 
     /**
@@ -182,7 +177,6 @@ public class KeyPair {
         setKeyMaterial(value);
         return this;
     }
-    
 
     /**
      * 
@@ -222,29 +216,27 @@ public class KeyPair {
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             switch (c) {
-            case '&':
-                sb.append("&amp;");
-                break;
-            case '<':
-                sb.append("&lt;");
-                break;
-            case '>':
-                sb.append("&gt;");
-                break;
-            case '\'':
-                sb.append("&#039;");
-                break;
-            case '"':
-                sb.append("&quot;");
-                break;
-            default:
-                sb.append(c);
+                case '&':
+                    sb.append("&amp;");
+                    break;
+                case '<':
+                    sb.append("&lt;");
+                    break;
+                case '>':
+                    sb.append("&gt;");
+                    break;
+                case '\'':
+                    sb.append("&#039;");
+                    break;
+                case '"':
+                    sb.append("&quot;");
+                    break;
+                default:
+                    sb.append(c);
             }
         }
         return sb.toString();
     }
-
-
 
     /**
      *
@@ -259,21 +251,24 @@ public class KeyPair {
         StringBuffer json = new StringBuffer();
         boolean first = true;
         if (isSetKeyName()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("KeyName"));
             json.append(" : ");
             json.append(quoteJSON(getKeyName()));
             first = false;
         }
         if (isSetKeyFingerprint()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("KeyFingerprint"));
             json.append(" : ");
             json.append(quoteJSON(getKeyFingerprint()));
             first = false;
         }
         if (isSetKeyMaterial()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("KeyMaterial"));
             json.append(" : ");
             json.append(quoteJSON(getKeyMaterial()));
@@ -293,41 +288,40 @@ public class KeyPair {
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             switch (c) {
-            case '"':
-                sb.append("\\\"");
-                break;
-            case '\\':
-                sb.append("\\\\");
-                break;
-            case '/':
-                sb.append("\\/");
-                break;
-            case '\b':
-                sb.append("\\b");
-                break;
-            case '\f':
-                sb.append("\\f");
-                break;
-            case '\n':
-                sb.append("\\n");
-                break;
-            case '\r':
-                sb.append("\\r");
-                break;
-            case '\t':
-                sb.append("\\t");
-                break;
-            default:
-                if (c <  ' ') {
-                    sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
-                } else {
-                sb.append(c);
+                case '"':
+                    sb.append("\\\"");
+                    break;
+                case '\\':
+                    sb.append("\\\\");
+                    break;
+                case '/':
+                    sb.append("\\/");
+                    break;
+                case '\b':
+                    sb.append("\\b");
+                    break;
+                case '\f':
+                    sb.append("\\f");
+                    break;
+                case '\n':
+                    sb.append("\\n");
+                    break;
+                case '\r':
+                    sb.append("\\r");
+                    break;
+                case '\t':
+                    sb.append("\\t");
+                    break;
+                default:
+                    if (c < ' ') {
+                        sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
+                    } else {
+                        sb.append(c);
+                    }
             }
-        }
         }
         sb.append("\"");
         return sb.toString();
     }
-
 
 }

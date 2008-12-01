@@ -19,8 +19,6 @@
  * 
  */
 
-
-
 package com.amazonaws.ec2;
 
 import com.amazonaws.ec2.model.*;
@@ -81,8 +79,6 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 
-
-
 /**
  * The Amazon Elastic Compute Cloud (Amazon EC2) web service provides you with
  * the ability to execute your applications in Amazon's computing environment.
@@ -112,7 +108,7 @@ import javax.xml.transform.stream.StreamSource;
  * Apache <a href="http://jakarta.apache.org/commons/httpclient/">HttpClient</a>.
  *
  */
-public  class AmazonEC2Client implements AmazonEC2 {
+public class AmazonEC2Client implements AmazonEC2 {
 
     private final Log log = LogFactory.getLog(AmazonEC2Client.class);
 
@@ -121,20 +117,21 @@ public  class AmazonEC2Client implements AmazonEC2 {
     private AmazonEC2Config config = null;
     private HttpClient httpClient = null;
     private ExecutorService asyncExecutor;
-    private static JAXBContext  jaxbContext;
+    private static JAXBContext jaxbContext;
     private static ThreadLocal<Unmarshaller> unmarshaller;
-    private static Pattern ERROR_PATTERN_ONE = Pattern.compile(".*\\<RequestId>(.*)\\</RequestId>.*\\<Error>" +
-            "\\<Code>(.*)\\</Code>\\<Message>(.*)\\</Message>\\</Error>.*(\\<Error>)?.*",
+    private static Pattern ERROR_PATTERN_ONE = Pattern.compile(".*\\<RequestId>(.*)\\</RequestId>.*\\<Error>"
+        + "\\<Code>(.*)\\</Code>\\<Message>(.*)\\</Message>\\</Error>.*(\\<Error>)?.*", Pattern.MULTILINE |
+        Pattern.DOTALL);
+    private static Pattern ERROR_PATTERN_TWO = Pattern.compile(
+            ".*\\<Error>\\<Code>(.*)\\</Code>\\<Message>(.*)"
+                + "\\</Message>\\</Error>.*(\\<Error>)?.*\\<RequestID>(.*)\\</RequestID>.*",
             Pattern.MULTILINE | Pattern.DOTALL);
-    private static Pattern ERROR_PATTERN_TWO = Pattern.compile(".*\\<Error>\\<Code>(.*)\\</Code>\\<Message>(.*)" +
-            "\\</Message>\\</Error>.*(\\<Error>)?.*\\<RequestID>(.*)\\</RequestID>.*",
-            Pattern.MULTILINE | Pattern.DOTALL);
-
 
     /** Initialize JAXBContext and  Unmarshaller **/
     static {
         try {
-            jaxbContext = JAXBContext.newInstance("com.amazonaws.ec2.model", AmazonEC2.class.getClassLoader());
+            jaxbContext = JAXBContext
+                    .newInstance("com.amazonaws.ec2.model", AmazonEC2.class.getClassLoader());
         } catch (JAXBException ex) {
             throw new ExceptionInInitializerError(ex);
         }
@@ -143,13 +140,12 @@ public  class AmazonEC2Client implements AmazonEC2 {
             protected synchronized Unmarshaller initialValue() {
                 try {
                     return jaxbContext.createUnmarshaller();
-                } catch(JAXBException e) {
+                } catch (JAXBException e) {
                     throw new ExceptionInInitializerError(e);
                 }
             }
         };
     }
-
 
     /**
      * Constructs AmazonEC2Client with AWS Access Key ID and AWS Secret Key
@@ -159,8 +155,8 @@ public  class AmazonEC2Client implements AmazonEC2 {
      * @param awsSecretAccessKey
      *          AWS Secret Access Key
      */
-    public  AmazonEC2Client(String awsAccessKeyId,String awsSecretAccessKey) {
-        this (awsAccessKeyId, awsSecretAccessKey, new AmazonEC2Config());
+    public AmazonEC2Client(String awsAccessKeyId, String awsSecretAccessKey) {
+        this(awsAccessKeyId, awsSecretAccessKey, new AmazonEC2Config());
     }
 
     /**
@@ -178,8 +174,6 @@ public  class AmazonEC2Client implements AmazonEC2 {
         this(awsAccessKeyId, awsSecretAccessKey, new AmazonEC2Config().withMaxAsyncThreads(maxAsyncThreads));
     }
 
-
-
     /**
      * Constructs AmazonEC2Client with AWS Access Key ID, AWS Secret Key
      * and AmazonEC2Config. Use AmazonEC2Config to pass additional
@@ -192,53 +186,47 @@ public  class AmazonEC2Client implements AmazonEC2 {
      * @param config
      *          Additional configuration options
      */
-    public  AmazonEC2Client(String awsAccessKeyId, String awsSecretAccessKey,
-            AmazonEC2Config config) {
+    public AmazonEC2Client(String awsAccessKeyId, String awsSecretAccessKey, AmazonEC2Config config) {
         this.awsAccessKeyId = awsAccessKeyId;
         this.awsSecretAccessKey = awsSecretAccessKey;
         this.config = config;
         this.httpClient = configureHttpClient();
-        this.asyncExecutor = new ThreadPoolExecutor(config.getMaxAsyncThreads(),
-                config.getMaxAsyncThreads(), 60L, TimeUnit.SECONDS,
-                new ArrayBlockingQueue<Runnable>(config.getMaxAsyncQueueSize()) {
+        this.asyncExecutor = new ThreadPoolExecutor(config.getMaxAsyncThreads(), config.getMaxAsyncThreads(),
+            60L, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(config.getMaxAsyncQueueSize()) {
 
-                    @Override
-                    public boolean offer(Runnable task) {
-                        log.debug("Maximum number of concurrent threads reached, queuing task...");
-                        return super.offer(task);
+                @Override
+                public boolean offer(Runnable task) {
+                    log.debug("Maximum number of concurrent threads reached, queuing task...");
+                    return super.offer(task);
+                }
+            }, new ThreadFactory() {
+
+                private final AtomicInteger threadNumber = new AtomicInteger(1);
+
+                public Thread newThread(Runnable task) {
+                    Thread thread = new Thread(task, "AmazonEC2Client-Thread-" +
+                        threadNumber.getAndIncrement());
+                    thread.setDaemon(true);
+                    if (thread.getPriority() != Thread.NORM_PRIORITY) {
+                        thread.setPriority(Thread.NORM_PRIORITY);
                     }
-                },
-                new ThreadFactory() {
+                    log.debug("ThreadFactory created new thread: " + thread.getName());
+                    return thread;
+                }
+            }, new RejectedExecutionHandler() {
 
-                    private final AtomicInteger threadNumber = new AtomicInteger(1);
-
-                    public Thread newThread(Runnable task) {
-                        Thread thread = new Thread(task, "AmazonEC2Client-Thread-" +
-                                threadNumber.getAndIncrement());
-                        thread.setDaemon(true);
-                        if (thread.getPriority() != Thread.NORM_PRIORITY) {
-                            thread.setPriority(Thread.NORM_PRIORITY);
-                        }
-                        log.debug("ThreadFactory created new thread: " + thread.getName());
-                        return thread;
+                public void rejectedExecution(Runnable task, ThreadPoolExecutor executor) {
+                    log.debug("Maximum number of concurrent threads reached, and queue is full. " +
+                        "Running task in the calling thread..." + Thread.currentThread().getName());
+                    if (!executor.isShutdown()) {
+                        task.run();
                     }
-                },
-                new RejectedExecutionHandler() {
-
-                    public void rejectedExecution(Runnable task, ThreadPoolExecutor executor) {
-                        log.debug("Maximum number of concurrent threads reached, and queue is full. " +
-                                "Running task in the calling thread..." + Thread.currentThread().getName());
-                        if (!executor.isShutdown()) {
-                            task.run();
-                        }
-                    }
-                });
+                }
+            });
     }
 
     // Public API ------------------------------------------------------------//
 
-
-        
     /**
      * Allocate Address 
      *
@@ -303,15 +291,16 @@ public  class AmazonEC2Client implements AmazonEC2 {
      * 
      */
     public Future<AllocateAddressResponse> allocateAddressAsync(final AllocateAddressRequest request) {
-        Future<AllocateAddressResponse> response = asyncExecutor.submit(new Callable<AllocateAddressResponse>() {
+        Future<AllocateAddressResponse> response = asyncExecutor
+                .submit(new Callable<AllocateAddressResponse>() {
 
-            public AllocateAddressResponse call() throws AmazonEC2Exception {
-                return allocateAddress(request);
-            }
-            });
+                    public AllocateAddressResponse call() throws AmazonEC2Exception {
+                        return allocateAddress(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Associate Address 
      *
@@ -328,7 +317,8 @@ public  class AmazonEC2Client implements AmazonEC2 {
      *
      * @throws AmazonEC2Exception
      */
-    public AssociateAddressResponse associateAddress(AssociateAddressRequest request) throws AmazonEC2Exception {
+    public AssociateAddressResponse associateAddress(AssociateAddressRequest request)
+            throws AmazonEC2Exception {
         return invoke(AssociateAddressResponse.class, convertAssociateAddress(request));
     }
 
@@ -379,15 +369,16 @@ public  class AmazonEC2Client implements AmazonEC2 {
      * 
      */
     public Future<AssociateAddressResponse> associateAddressAsync(final AssociateAddressRequest request) {
-        Future<AssociateAddressResponse> response = asyncExecutor.submit(new Callable<AssociateAddressResponse>() {
+        Future<AssociateAddressResponse> response = asyncExecutor
+                .submit(new Callable<AssociateAddressResponse>() {
 
-            public AssociateAddressResponse call() throws AmazonEC2Exception {
-                return associateAddress(request);
-            }
-            });
+                    public AssociateAddressResponse call() throws AmazonEC2Exception {
+                        return associateAddress(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Attach Volume 
      *
@@ -456,10 +447,10 @@ public  class AmazonEC2Client implements AmazonEC2 {
             public AttachVolumeResponse call() throws AmazonEC2Exception {
                 return attachVolume(request);
             }
-            });
+        });
         return response;
     }
-        
+
     /**
      * Authorize Security Group Ingress 
      *
@@ -485,8 +476,10 @@ public  class AmazonEC2Client implements AmazonEC2 {
      *
      * @throws AmazonEC2Exception
      */
-    public AuthorizeSecurityGroupIngressResponse authorizeSecurityGroupIngress(AuthorizeSecurityGroupIngressRequest request) throws AmazonEC2Exception {
-        return invoke(AuthorizeSecurityGroupIngressResponse.class, convertAuthorizeSecurityGroupIngress(request));
+    public AuthorizeSecurityGroupIngressResponse authorizeSecurityGroupIngress(
+            AuthorizeSecurityGroupIngressRequest request) throws AmazonEC2Exception {
+        return invoke(AuthorizeSecurityGroupIngressResponse.class,
+                convertAuthorizeSecurityGroupIngress(request));
     }
 
     /**
@@ -535,16 +528,18 @@ public  class AmazonEC2Client implements AmazonEC2 {
      * @return Future&lt;AuthorizeSecurityGroupIngressResponse&gt; future pointer to AuthorizeSecurityGroupIngressResponse
      * 
      */
-    public Future<AuthorizeSecurityGroupIngressResponse> authorizeSecurityGroupIngressAsync(final AuthorizeSecurityGroupIngressRequest request) {
-        Future<AuthorizeSecurityGroupIngressResponse> response = asyncExecutor.submit(new Callable<AuthorizeSecurityGroupIngressResponse>() {
+    public Future<AuthorizeSecurityGroupIngressResponse> authorizeSecurityGroupIngressAsync(
+            final AuthorizeSecurityGroupIngressRequest request) {
+        Future<AuthorizeSecurityGroupIngressResponse> response = asyncExecutor
+                .submit(new Callable<AuthorizeSecurityGroupIngressResponse>() {
 
-            public AuthorizeSecurityGroupIngressResponse call() throws AmazonEC2Exception {
-                return authorizeSecurityGroupIngress(request);
-            }
-            });
+                    public AuthorizeSecurityGroupIngressResponse call() throws AmazonEC2Exception {
+                        return authorizeSecurityGroupIngress(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Confirm Product Instance 
      *
@@ -562,7 +557,8 @@ public  class AmazonEC2Client implements AmazonEC2 {
      *
      * @throws AmazonEC2Exception
      */
-    public ConfirmProductInstanceResponse confirmProductInstance(ConfirmProductInstanceRequest request) throws AmazonEC2Exception {
+    public ConfirmProductInstanceResponse confirmProductInstance(ConfirmProductInstanceRequest request)
+            throws AmazonEC2Exception {
         return invoke(ConfirmProductInstanceResponse.class, convertConfirmProductInstance(request));
     }
 
@@ -612,16 +608,18 @@ public  class AmazonEC2Client implements AmazonEC2 {
      * @return Future&lt;ConfirmProductInstanceResponse&gt; future pointer to ConfirmProductInstanceResponse
      * 
      */
-    public Future<ConfirmProductInstanceResponse> confirmProductInstanceAsync(final ConfirmProductInstanceRequest request) {
-        Future<ConfirmProductInstanceResponse> response = asyncExecutor.submit(new Callable<ConfirmProductInstanceResponse>() {
+    public Future<ConfirmProductInstanceResponse> confirmProductInstanceAsync(
+            final ConfirmProductInstanceRequest request) {
+        Future<ConfirmProductInstanceResponse> response = asyncExecutor
+                .submit(new Callable<ConfirmProductInstanceResponse>() {
 
-            public ConfirmProductInstanceResponse call() throws AmazonEC2Exception {
-                return confirmProductInstance(request);
-            }
-            });
+                    public ConfirmProductInstanceResponse call() throws AmazonEC2Exception {
+                        return confirmProductInstance(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Create Key Pair 
      *
@@ -692,10 +690,10 @@ public  class AmazonEC2Client implements AmazonEC2 {
             public CreateKeyPairResponse call() throws AmazonEC2Exception {
                 return createKeyPair(request);
             }
-            });
+        });
         return response;
     }
-        
+
     /**
      * Create Security Group 
      *
@@ -715,7 +713,8 @@ public  class AmazonEC2Client implements AmazonEC2 {
      *
      * @throws AmazonEC2Exception
      */
-    public CreateSecurityGroupResponse createSecurityGroup(CreateSecurityGroupRequest request) throws AmazonEC2Exception {
+    public CreateSecurityGroupResponse createSecurityGroup(CreateSecurityGroupRequest request)
+            throws AmazonEC2Exception {
         return invoke(CreateSecurityGroupResponse.class, convertCreateSecurityGroup(request));
     }
 
@@ -765,16 +764,18 @@ public  class AmazonEC2Client implements AmazonEC2 {
      * @return Future&lt;CreateSecurityGroupResponse&gt; future pointer to CreateSecurityGroupResponse
      * 
      */
-    public Future<CreateSecurityGroupResponse> createSecurityGroupAsync(final CreateSecurityGroupRequest request) {
-        Future<CreateSecurityGroupResponse> response = asyncExecutor.submit(new Callable<CreateSecurityGroupResponse>() {
+    public Future<CreateSecurityGroupResponse> createSecurityGroupAsync(
+            final CreateSecurityGroupRequest request) {
+        Future<CreateSecurityGroupResponse> response = asyncExecutor
+                .submit(new Callable<CreateSecurityGroupResponse>() {
 
-            public CreateSecurityGroupResponse call() throws AmazonEC2Exception {
-                return createSecurityGroup(request);
-            }
-            });
+                    public CreateSecurityGroupResponse call() throws AmazonEC2Exception {
+                        return createSecurityGroup(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Create Snapshot 
      *
@@ -846,15 +847,16 @@ public  class AmazonEC2Client implements AmazonEC2 {
      * 
      */
     public Future<CreateSnapshotResponse> createSnapshotAsync(final CreateSnapshotRequest request) {
-        Future<CreateSnapshotResponse> response = asyncExecutor.submit(new Callable<CreateSnapshotResponse>() {
+        Future<CreateSnapshotResponse> response = asyncExecutor
+                .submit(new Callable<CreateSnapshotResponse>() {
 
-            public CreateSnapshotResponse call() throws AmazonEC2Exception {
-                return createSnapshot(request);
-            }
-            });
+                    public CreateSnapshotResponse call() throws AmazonEC2Exception {
+                        return createSnapshot(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Create Volume 
      *
@@ -923,10 +925,10 @@ public  class AmazonEC2Client implements AmazonEC2 {
             public CreateVolumeResponse call() throws AmazonEC2Exception {
                 return createVolume(request);
             }
-            });
+        });
         return response;
     }
-        
+
     /**
      * Delete Key Pair 
      *
@@ -995,10 +997,10 @@ public  class AmazonEC2Client implements AmazonEC2 {
             public DeleteKeyPairResponse call() throws AmazonEC2Exception {
                 return deleteKeyPair(request);
             }
-            });
+        });
         return response;
     }
-        
+
     /**
      * Delete Security Group 
      *
@@ -1018,7 +1020,8 @@ public  class AmazonEC2Client implements AmazonEC2 {
      *
      * @throws AmazonEC2Exception
      */
-    public DeleteSecurityGroupResponse deleteSecurityGroup(DeleteSecurityGroupRequest request) throws AmazonEC2Exception {
+    public DeleteSecurityGroupResponse deleteSecurityGroup(DeleteSecurityGroupRequest request)
+            throws AmazonEC2Exception {
         return invoke(DeleteSecurityGroupResponse.class, convertDeleteSecurityGroup(request));
     }
 
@@ -1068,16 +1071,18 @@ public  class AmazonEC2Client implements AmazonEC2 {
      * @return Future&lt;DeleteSecurityGroupResponse&gt; future pointer to DeleteSecurityGroupResponse
      * 
      */
-    public Future<DeleteSecurityGroupResponse> deleteSecurityGroupAsync(final DeleteSecurityGroupRequest request) {
-        Future<DeleteSecurityGroupResponse> response = asyncExecutor.submit(new Callable<DeleteSecurityGroupResponse>() {
+    public Future<DeleteSecurityGroupResponse> deleteSecurityGroupAsync(
+            final DeleteSecurityGroupRequest request) {
+        Future<DeleteSecurityGroupResponse> response = asyncExecutor
+                .submit(new Callable<DeleteSecurityGroupResponse>() {
 
-            public DeleteSecurityGroupResponse call() throws AmazonEC2Exception {
-                return deleteSecurityGroup(request);
-            }
-            });
+                    public DeleteSecurityGroupResponse call() throws AmazonEC2Exception {
+                        return deleteSecurityGroup(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Delete Snapshot 
      *
@@ -1141,15 +1146,16 @@ public  class AmazonEC2Client implements AmazonEC2 {
      * 
      */
     public Future<DeleteSnapshotResponse> deleteSnapshotAsync(final DeleteSnapshotRequest request) {
-        Future<DeleteSnapshotResponse> response = asyncExecutor.submit(new Callable<DeleteSnapshotResponse>() {
+        Future<DeleteSnapshotResponse> response = asyncExecutor
+                .submit(new Callable<DeleteSnapshotResponse>() {
 
-            public DeleteSnapshotResponse call() throws AmazonEC2Exception {
-                return deleteSnapshot(request);
-            }
-            });
+                    public DeleteSnapshotResponse call() throws AmazonEC2Exception {
+                        return deleteSnapshot(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Delete Volume 
      *
@@ -1218,10 +1224,10 @@ public  class AmazonEC2Client implements AmazonEC2 {
             public DeleteVolumeResponse call() throws AmazonEC2Exception {
                 return deleteVolume(request);
             }
-            });
+        });
         return response;
     }
-        
+
     /**
      * Deregister Image 
      *
@@ -1286,15 +1292,16 @@ public  class AmazonEC2Client implements AmazonEC2 {
      * 
      */
     public Future<DeregisterImageResponse> deregisterImageAsync(final DeregisterImageRequest request) {
-        Future<DeregisterImageResponse> response = asyncExecutor.submit(new Callable<DeregisterImageResponse>() {
+        Future<DeregisterImageResponse> response = asyncExecutor
+                .submit(new Callable<DeregisterImageResponse>() {
 
-            public DeregisterImageResponse call() throws AmazonEC2Exception {
-                return deregisterImage(request);
-            }
-            });
+                    public DeregisterImageResponse call() throws AmazonEC2Exception {
+                        return deregisterImage(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Describe Addresses 
      *
@@ -1308,7 +1315,8 @@ public  class AmazonEC2Client implements AmazonEC2 {
      *
      * @throws AmazonEC2Exception
      */
-    public DescribeAddressesResponse describeAddresses(DescribeAddressesRequest request) throws AmazonEC2Exception {
+    public DescribeAddressesResponse describeAddresses(DescribeAddressesRequest request)
+            throws AmazonEC2Exception {
         return invoke(DescribeAddressesResponse.class, convertDescribeAddresses(request));
     }
 
@@ -1359,15 +1367,16 @@ public  class AmazonEC2Client implements AmazonEC2 {
      * 
      */
     public Future<DescribeAddressesResponse> describeAddressesAsync(final DescribeAddressesRequest request) {
-        Future<DescribeAddressesResponse> response = asyncExecutor.submit(new Callable<DescribeAddressesResponse>() {
+        Future<DescribeAddressesResponse> response = asyncExecutor
+                .submit(new Callable<DescribeAddressesResponse>() {
 
-            public DescribeAddressesResponse call() throws AmazonEC2Exception {
-                return describeAddresses(request);
-            }
-            });
+                    public DescribeAddressesResponse call() throws AmazonEC2Exception {
+                        return describeAddresses(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Describe Availability Zones 
      *
@@ -1384,7 +1393,8 @@ public  class AmazonEC2Client implements AmazonEC2 {
      *
      * @throws AmazonEC2Exception
      */
-    public DescribeAvailabilityZonesResponse describeAvailabilityZones(DescribeAvailabilityZonesRequest request) throws AmazonEC2Exception {
+    public DescribeAvailabilityZonesResponse describeAvailabilityZones(
+            DescribeAvailabilityZonesRequest request) throws AmazonEC2Exception {
         return invoke(DescribeAvailabilityZonesResponse.class, convertDescribeAvailabilityZones(request));
     }
 
@@ -1434,16 +1444,18 @@ public  class AmazonEC2Client implements AmazonEC2 {
      * @return Future&lt;DescribeAvailabilityZonesResponse&gt; future pointer to DescribeAvailabilityZonesResponse
      * 
      */
-    public Future<DescribeAvailabilityZonesResponse> describeAvailabilityZonesAsync(final DescribeAvailabilityZonesRequest request) {
-        Future<DescribeAvailabilityZonesResponse> response = asyncExecutor.submit(new Callable<DescribeAvailabilityZonesResponse>() {
+    public Future<DescribeAvailabilityZonesResponse> describeAvailabilityZonesAsync(
+            final DescribeAvailabilityZonesRequest request) {
+        Future<DescribeAvailabilityZonesResponse> response = asyncExecutor
+                .submit(new Callable<DescribeAvailabilityZonesResponse>() {
 
-            public DescribeAvailabilityZonesResponse call() throws AmazonEC2Exception {
-                return describeAvailabilityZones(request);
-            }
-            });
+                    public DescribeAvailabilityZonesResponse call() throws AmazonEC2Exception {
+                        return describeAvailabilityZones(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Describe Image Attribute 
      *
@@ -1457,7 +1469,8 @@ public  class AmazonEC2Client implements AmazonEC2 {
      *
      * @throws AmazonEC2Exception
      */
-    public DescribeImageAttributeResponse describeImageAttribute(DescribeImageAttributeRequest request) throws AmazonEC2Exception {
+    public DescribeImageAttributeResponse describeImageAttribute(DescribeImageAttributeRequest request)
+            throws AmazonEC2Exception {
         return invoke(DescribeImageAttributeResponse.class, convertDescribeImageAttribute(request));
     }
 
@@ -1507,16 +1520,18 @@ public  class AmazonEC2Client implements AmazonEC2 {
      * @return Future&lt;DescribeImageAttributeResponse&gt; future pointer to DescribeImageAttributeResponse
      * 
      */
-    public Future<DescribeImageAttributeResponse> describeImageAttributeAsync(final DescribeImageAttributeRequest request) {
-        Future<DescribeImageAttributeResponse> response = asyncExecutor.submit(new Callable<DescribeImageAttributeResponse>() {
+    public Future<DescribeImageAttributeResponse> describeImageAttributeAsync(
+            final DescribeImageAttributeRequest request) {
+        Future<DescribeImageAttributeResponse> response = asyncExecutor
+                .submit(new Callable<DescribeImageAttributeResponse>() {
 
-            public DescribeImageAttributeResponse call() throws AmazonEC2Exception {
-                return describeImageAttribute(request);
-            }
-            });
+                    public DescribeImageAttributeResponse call() throws AmazonEC2Exception {
+                        return describeImageAttribute(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Describe Images 
      *
@@ -1611,15 +1626,16 @@ public  class AmazonEC2Client implements AmazonEC2 {
      * 
      */
     public Future<DescribeImagesResponse> describeImagesAsync(final DescribeImagesRequest request) {
-        Future<DescribeImagesResponse> response = asyncExecutor.submit(new Callable<DescribeImagesResponse>() {
+        Future<DescribeImagesResponse> response = asyncExecutor
+                .submit(new Callable<DescribeImagesResponse>() {
 
-            public DescribeImagesResponse call() throws AmazonEC2Exception {
-                return describeImages(request);
-            }
-            });
+                    public DescribeImagesResponse call() throws AmazonEC2Exception {
+                        return describeImages(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Describe Instances 
      *
@@ -1640,7 +1656,8 @@ public  class AmazonEC2Client implements AmazonEC2 {
      *
      * @throws AmazonEC2Exception
      */
-    public DescribeInstancesResponse describeInstances(DescribeInstancesRequest request) throws AmazonEC2Exception {
+    public DescribeInstancesResponse describeInstances(DescribeInstancesRequest request)
+            throws AmazonEC2Exception {
         return invoke(DescribeInstancesResponse.class, convertDescribeInstances(request));
     }
 
@@ -1691,15 +1708,16 @@ public  class AmazonEC2Client implements AmazonEC2 {
      * 
      */
     public Future<DescribeInstancesResponse> describeInstancesAsync(final DescribeInstancesRequest request) {
-        Future<DescribeInstancesResponse> response = asyncExecutor.submit(new Callable<DescribeInstancesResponse>() {
+        Future<DescribeInstancesResponse> response = asyncExecutor
+                .submit(new Callable<DescribeInstancesResponse>() {
 
-            public DescribeInstancesResponse call() throws AmazonEC2Exception {
-                return describeInstances(request);
-            }
-            });
+                    public DescribeInstancesResponse call() throws AmazonEC2Exception {
+                        return describeInstances(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Describe Key Pairs 
      *
@@ -1714,7 +1732,8 @@ public  class AmazonEC2Client implements AmazonEC2 {
      *
      * @throws AmazonEC2Exception
      */
-    public DescribeKeyPairsResponse describeKeyPairs(DescribeKeyPairsRequest request) throws AmazonEC2Exception {
+    public DescribeKeyPairsResponse describeKeyPairs(DescribeKeyPairsRequest request)
+            throws AmazonEC2Exception {
         return invoke(DescribeKeyPairsResponse.class, convertDescribeKeyPairs(request));
     }
 
@@ -1765,15 +1784,16 @@ public  class AmazonEC2Client implements AmazonEC2 {
      * 
      */
     public Future<DescribeKeyPairsResponse> describeKeyPairsAsync(final DescribeKeyPairsRequest request) {
-        Future<DescribeKeyPairsResponse> response = asyncExecutor.submit(new Callable<DescribeKeyPairsResponse>() {
+        Future<DescribeKeyPairsResponse> response = asyncExecutor
+                .submit(new Callable<DescribeKeyPairsResponse>() {
 
-            public DescribeKeyPairsResponse call() throws AmazonEC2Exception {
-                return describeKeyPairs(request);
-            }
-            });
+                    public DescribeKeyPairsResponse call() throws AmazonEC2Exception {
+                        return describeKeyPairs(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Describe Security Groups 
      *
@@ -1790,7 +1810,8 @@ public  class AmazonEC2Client implements AmazonEC2 {
      *
      * @throws AmazonEC2Exception
      */
-    public DescribeSecurityGroupsResponse describeSecurityGroups(DescribeSecurityGroupsRequest request) throws AmazonEC2Exception {
+    public DescribeSecurityGroupsResponse describeSecurityGroups(DescribeSecurityGroupsRequest request)
+            throws AmazonEC2Exception {
         return invoke(DescribeSecurityGroupsResponse.class, convertDescribeSecurityGroups(request));
     }
 
@@ -1840,16 +1861,18 @@ public  class AmazonEC2Client implements AmazonEC2 {
      * @return Future&lt;DescribeSecurityGroupsResponse&gt; future pointer to DescribeSecurityGroupsResponse
      * 
      */
-    public Future<DescribeSecurityGroupsResponse> describeSecurityGroupsAsync(final DescribeSecurityGroupsRequest request) {
-        Future<DescribeSecurityGroupsResponse> response = asyncExecutor.submit(new Callable<DescribeSecurityGroupsResponse>() {
+    public Future<DescribeSecurityGroupsResponse> describeSecurityGroupsAsync(
+            final DescribeSecurityGroupsRequest request) {
+        Future<DescribeSecurityGroupsResponse> response = asyncExecutor
+                .submit(new Callable<DescribeSecurityGroupsResponse>() {
 
-            public DescribeSecurityGroupsResponse call() throws AmazonEC2Exception {
-                return describeSecurityGroups(request);
-            }
-            });
+                    public DescribeSecurityGroupsResponse call() throws AmazonEC2Exception {
+                        return describeSecurityGroups(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Describe Snapshots 
      *
@@ -1862,7 +1885,8 @@ public  class AmazonEC2Client implements AmazonEC2 {
      *
      * @throws AmazonEC2Exception
      */
-    public DescribeSnapshotsResponse describeSnapshots(DescribeSnapshotsRequest request) throws AmazonEC2Exception {
+    public DescribeSnapshotsResponse describeSnapshots(DescribeSnapshotsRequest request)
+            throws AmazonEC2Exception {
         return invoke(DescribeSnapshotsResponse.class, convertDescribeSnapshots(request));
     }
 
@@ -1913,15 +1937,16 @@ public  class AmazonEC2Client implements AmazonEC2 {
      * 
      */
     public Future<DescribeSnapshotsResponse> describeSnapshotsAsync(final DescribeSnapshotsRequest request) {
-        Future<DescribeSnapshotsResponse> response = asyncExecutor.submit(new Callable<DescribeSnapshotsResponse>() {
+        Future<DescribeSnapshotsResponse> response = asyncExecutor
+                .submit(new Callable<DescribeSnapshotsResponse>() {
 
-            public DescribeSnapshotsResponse call() throws AmazonEC2Exception {
-                return describeSnapshots(request);
-            }
-            });
+                    public DescribeSnapshotsResponse call() throws AmazonEC2Exception {
+                        return describeSnapshots(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Describe Volumes 
      *
@@ -1985,15 +2010,16 @@ public  class AmazonEC2Client implements AmazonEC2 {
      * 
      */
     public Future<DescribeVolumesResponse> describeVolumesAsync(final DescribeVolumesRequest request) {
-        Future<DescribeVolumesResponse> response = asyncExecutor.submit(new Callable<DescribeVolumesResponse>() {
+        Future<DescribeVolumesResponse> response = asyncExecutor
+                .submit(new Callable<DescribeVolumesResponse>() {
 
-            public DescribeVolumesResponse call() throws AmazonEC2Exception {
-                return describeVolumes(request);
-            }
-            });
+                    public DescribeVolumesResponse call() throws AmazonEC2Exception {
+                        return describeVolumes(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Detach Volume 
      *
@@ -2062,10 +2088,10 @@ public  class AmazonEC2Client implements AmazonEC2 {
             public DetachVolumeResponse call() throws AmazonEC2Exception {
                 return detachVolume(request);
             }
-            });
+        });
         return response;
     }
-        
+
     /**
      * Disassociate Address 
      *
@@ -2080,7 +2106,8 @@ public  class AmazonEC2Client implements AmazonEC2 {
      *
      * @throws AmazonEC2Exception
      */
-    public DisassociateAddressResponse disassociateAddress(DisassociateAddressRequest request) throws AmazonEC2Exception {
+    public DisassociateAddressResponse disassociateAddress(DisassociateAddressRequest request)
+            throws AmazonEC2Exception {
         return invoke(DisassociateAddressResponse.class, convertDisassociateAddress(request));
     }
 
@@ -2130,16 +2157,18 @@ public  class AmazonEC2Client implements AmazonEC2 {
      * @return Future&lt;DisassociateAddressResponse&gt; future pointer to DisassociateAddressResponse
      * 
      */
-    public Future<DisassociateAddressResponse> disassociateAddressAsync(final DisassociateAddressRequest request) {
-        Future<DisassociateAddressResponse> response = asyncExecutor.submit(new Callable<DisassociateAddressResponse>() {
+    public Future<DisassociateAddressResponse> disassociateAddressAsync(
+            final DisassociateAddressRequest request) {
+        Future<DisassociateAddressResponse> response = asyncExecutor
+                .submit(new Callable<DisassociateAddressResponse>() {
 
-            public DisassociateAddressResponse call() throws AmazonEC2Exception {
-                return disassociateAddress(request);
-            }
-            });
+                    public DisassociateAddressResponse call() throws AmazonEC2Exception {
+                        return disassociateAddress(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Get Console Output 
      *
@@ -2156,7 +2185,8 @@ public  class AmazonEC2Client implements AmazonEC2 {
      *
      * @throws AmazonEC2Exception
      */
-    public GetConsoleOutputResponse getConsoleOutput(GetConsoleOutputRequest request) throws AmazonEC2Exception {
+    public GetConsoleOutputResponse getConsoleOutput(GetConsoleOutputRequest request)
+            throws AmazonEC2Exception {
         return invoke(GetConsoleOutputResponse.class, convertGetConsoleOutput(request));
     }
 
@@ -2207,15 +2237,16 @@ public  class AmazonEC2Client implements AmazonEC2 {
      * 
      */
     public Future<GetConsoleOutputResponse> getConsoleOutputAsync(final GetConsoleOutputRequest request) {
-        Future<GetConsoleOutputResponse> response = asyncExecutor.submit(new Callable<GetConsoleOutputResponse>() {
+        Future<GetConsoleOutputResponse> response = asyncExecutor
+                .submit(new Callable<GetConsoleOutputResponse>() {
 
-            public GetConsoleOutputResponse call() throws AmazonEC2Exception {
-                return getConsoleOutput(request);
-            }
-            });
+                    public GetConsoleOutputResponse call() throws AmazonEC2Exception {
+                        return getConsoleOutput(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Modify Image Attribute 
      *
@@ -2228,7 +2259,8 @@ public  class AmazonEC2Client implements AmazonEC2 {
      *
      * @throws AmazonEC2Exception
      */
-    public ModifyImageAttributeResponse modifyImageAttribute(ModifyImageAttributeRequest request) throws AmazonEC2Exception {
+    public ModifyImageAttributeResponse modifyImageAttribute(ModifyImageAttributeRequest request)
+            throws AmazonEC2Exception {
         return invoke(ModifyImageAttributeResponse.class, convertModifyImageAttribute(request));
     }
 
@@ -2278,16 +2310,18 @@ public  class AmazonEC2Client implements AmazonEC2 {
      * @return Future&lt;ModifyImageAttributeResponse&gt; future pointer to ModifyImageAttributeResponse
      * 
      */
-    public Future<ModifyImageAttributeResponse> modifyImageAttributeAsync(final ModifyImageAttributeRequest request) {
-        Future<ModifyImageAttributeResponse> response = asyncExecutor.submit(new Callable<ModifyImageAttributeResponse>() {
+    public Future<ModifyImageAttributeResponse> modifyImageAttributeAsync(
+            final ModifyImageAttributeRequest request) {
+        Future<ModifyImageAttributeResponse> response = asyncExecutor
+                .submit(new Callable<ModifyImageAttributeResponse>() {
 
-            public ModifyImageAttributeResponse call() throws AmazonEC2Exception {
-                return modifyImageAttribute(request);
-            }
-            });
+                    public ModifyImageAttributeResponse call() throws AmazonEC2Exception {
+                        return modifyImageAttribute(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Reboot Instances 
      *
@@ -2354,15 +2388,16 @@ public  class AmazonEC2Client implements AmazonEC2 {
      * 
      */
     public Future<RebootInstancesResponse> rebootInstancesAsync(final RebootInstancesRequest request) {
-        Future<RebootInstancesResponse> response = asyncExecutor.submit(new Callable<RebootInstancesResponse>() {
+        Future<RebootInstancesResponse> response = asyncExecutor
+                .submit(new Callable<RebootInstancesResponse>() {
 
-            public RebootInstancesResponse call() throws AmazonEC2Exception {
-                return rebootInstances(request);
-            }
-            });
+                    public RebootInstancesResponse call() throws AmazonEC2Exception {
+                        return rebootInstances(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Register Image 
      *
@@ -2440,10 +2475,10 @@ public  class AmazonEC2Client implements AmazonEC2 {
             public RegisterImageResponse call() throws AmazonEC2Exception {
                 return registerImage(request);
             }
-            });
+        });
         return response;
     }
-        
+
     /**
      * Release Address 
      *
@@ -2518,15 +2553,16 @@ public  class AmazonEC2Client implements AmazonEC2 {
      * 
      */
     public Future<ReleaseAddressResponse> releaseAddressAsync(final ReleaseAddressRequest request) {
-        Future<ReleaseAddressResponse> response = asyncExecutor.submit(new Callable<ReleaseAddressResponse>() {
+        Future<ReleaseAddressResponse> response = asyncExecutor
+                .submit(new Callable<ReleaseAddressResponse>() {
 
-            public ReleaseAddressResponse call() throws AmazonEC2Exception {
-                return releaseAddress(request);
-            }
-            });
+                    public ReleaseAddressResponse call() throws AmazonEC2Exception {
+                        return releaseAddress(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Reset Image Attribute 
      *
@@ -2542,7 +2578,8 @@ public  class AmazonEC2Client implements AmazonEC2 {
      *
      * @throws AmazonEC2Exception
      */
-    public ResetImageAttributeResponse resetImageAttribute(ResetImageAttributeRequest request) throws AmazonEC2Exception {
+    public ResetImageAttributeResponse resetImageAttribute(ResetImageAttributeRequest request)
+            throws AmazonEC2Exception {
         return invoke(ResetImageAttributeResponse.class, convertResetImageAttribute(request));
     }
 
@@ -2592,16 +2629,18 @@ public  class AmazonEC2Client implements AmazonEC2 {
      * @return Future&lt;ResetImageAttributeResponse&gt; future pointer to ResetImageAttributeResponse
      * 
      */
-    public Future<ResetImageAttributeResponse> resetImageAttributeAsync(final ResetImageAttributeRequest request) {
-        Future<ResetImageAttributeResponse> response = asyncExecutor.submit(new Callable<ResetImageAttributeResponse>() {
+    public Future<ResetImageAttributeResponse> resetImageAttributeAsync(
+            final ResetImageAttributeRequest request) {
+        Future<ResetImageAttributeResponse> response = asyncExecutor
+                .submit(new Callable<ResetImageAttributeResponse>() {
 
-            public ResetImageAttributeResponse call() throws AmazonEC2Exception {
-                return resetImageAttribute(request);
-            }
-            });
+                    public ResetImageAttributeResponse call() throws AmazonEC2Exception {
+                        return resetImageAttribute(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Revoke Security Group Ingress 
      *
@@ -2627,7 +2666,8 @@ public  class AmazonEC2Client implements AmazonEC2 {
      *
      * @throws AmazonEC2Exception
      */
-    public RevokeSecurityGroupIngressResponse revokeSecurityGroupIngress(RevokeSecurityGroupIngressRequest request) throws AmazonEC2Exception {
+    public RevokeSecurityGroupIngressResponse revokeSecurityGroupIngress(
+            RevokeSecurityGroupIngressRequest request) throws AmazonEC2Exception {
         return invoke(RevokeSecurityGroupIngressResponse.class, convertRevokeSecurityGroupIngress(request));
     }
 
@@ -2677,16 +2717,18 @@ public  class AmazonEC2Client implements AmazonEC2 {
      * @return Future&lt;RevokeSecurityGroupIngressResponse&gt; future pointer to RevokeSecurityGroupIngressResponse
      * 
      */
-    public Future<RevokeSecurityGroupIngressResponse> revokeSecurityGroupIngressAsync(final RevokeSecurityGroupIngressRequest request) {
-        Future<RevokeSecurityGroupIngressResponse> response = asyncExecutor.submit(new Callable<RevokeSecurityGroupIngressResponse>() {
+    public Future<RevokeSecurityGroupIngressResponse> revokeSecurityGroupIngressAsync(
+            final RevokeSecurityGroupIngressRequest request) {
+        Future<RevokeSecurityGroupIngressResponse> response = asyncExecutor
+                .submit(new Callable<RevokeSecurityGroupIngressResponse>() {
 
-            public RevokeSecurityGroupIngressResponse call() throws AmazonEC2Exception {
-                return revokeSecurityGroupIngress(request);
-            }
-            });
+                    public RevokeSecurityGroupIngressResponse call() throws AmazonEC2Exception {
+                        return revokeSecurityGroupIngress(request);
+                    }
+                });
         return response;
     }
-        
+
     /**
      * Run Instances 
      *
@@ -2790,10 +2832,10 @@ public  class AmazonEC2Client implements AmazonEC2 {
             public RunInstancesResponse call() throws AmazonEC2Exception {
                 return runInstances(request);
             }
-            });
+        });
         return response;
     }
-        
+
     /**
      * Terminate Instances 
      *
@@ -2810,7 +2852,8 @@ public  class AmazonEC2Client implements AmazonEC2 {
      *
      * @throws AmazonEC2Exception
      */
-    public TerminateInstancesResponse terminateInstances(TerminateInstancesRequest request) throws AmazonEC2Exception {
+    public TerminateInstancesResponse terminateInstances(TerminateInstancesRequest request)
+            throws AmazonEC2Exception {
         return invoke(TerminateInstancesResponse.class, convertTerminateInstances(request));
     }
 
@@ -2861,15 +2904,15 @@ public  class AmazonEC2Client implements AmazonEC2 {
      * 
      */
     public Future<TerminateInstancesResponse> terminateInstancesAsync(final TerminateInstancesRequest request) {
-        Future<TerminateInstancesResponse> response = asyncExecutor.submit(new Callable<TerminateInstancesResponse>() {
+        Future<TerminateInstancesResponse> response = asyncExecutor
+                .submit(new Callable<TerminateInstancesResponse>() {
 
-            public TerminateInstancesResponse call() throws AmazonEC2Exception {
-                return terminateInstances(request);
-            }
-            });
+                    public TerminateInstancesResponse call() throws AmazonEC2Exception {
+                        return terminateInstances(request);
+                    }
+                });
         return response;
     }
-
 
     // Private API ------------------------------------------------------------//
 
@@ -2932,19 +2975,18 @@ public  class AmazonEC2Client implements AmazonEC2 {
 
         /* Set proxy if configured */
         if (config.isSetProxyHost() && config.isSetProxyPort()) {
-            log.info("Configuring Proxy. Proxy Host: " + config.getProxyHost() +
-                    "Proxy Port: " + config.getProxyPort() );
+            log.info("Configuring Proxy. Proxy Host: " + config.getProxyHost() + "Proxy Port: " +
+                config.getProxyPort());
             hostConfiguration.setProxy(config.getProxyHost(), config.getProxyPort());
-            if (config.isSetProxyUsername() &&   config.isSetProxyPassword()) {
-                httpClient.getState().setProxyCredentials (new AuthScope(
-                                          config.getProxyHost(),
-                                          config.getProxyPort()),
-                                          new UsernamePasswordCredentials(
-                                              config.getProxyUsername(),
-                                              config.getProxyPassword()));
+            if (config.isSetProxyUsername() && config.isSetProxyPassword()) {
+                httpClient.getState()
+                        .setProxyCredentials(
+                                new AuthScope(config.getProxyHost(), config.getProxyPort()),
+                                new UsernamePasswordCredentials(config.getProxyUsername(), config
+                                        .getProxyPassword()));
 
             }
-         }
+        }
 
         httpClient.setHostConfiguration(hostConfiguration);
         return httpClient;
@@ -2954,8 +2996,7 @@ public  class AmazonEC2Client implements AmazonEC2 {
      * Invokes request using parameters from parameters map.
      * Returns response of the T type passed to this method
      */
-    private <T> T invoke(Class<T> clazz, Map<String, String> parameters)
-            throws AmazonEC2Exception {
+    private <T> T invoke(Class<T> clazz, Map<String, String> parameters) throws AmazonEC2Exception {
 
         String actionName = parameters.get("Action");
         T response = null;
@@ -2986,59 +3027,56 @@ public  class AmazonEC2Client implements AmazonEC2 {
                     /* Submit request */
                     status = httpClient.executeMethod(method);
 
-
-
                     /* Consume response stream */
                     responseBodyString = getResponsBodyAsString(method.getResponseBodyAsStream());
 
                     /* Successful response. Attempting to unmarshal into the <Action>Response type */
                     if (status == HttpStatus.SC_OK) {
                         shouldRetry = false;
-                        log.debug("Received Response. Status: " + status + ". " +
-                                "Response Body: " + responseBodyString);
+                        log.debug("Received Response. Status: " + status + ". " + "Response Body: " +
+                            responseBodyString);
                         if (responseBodyString.endsWith(actionName + "Response>")) {
-                            responseBodyString.replace("<?xml version=\"1.0\"?>", "<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+                            responseBodyString.replace("<?xml version=\"1.0\"?>",
+                                    "<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
                             log.debug("Attempting to transform " + actionName + "Response type...");
-                            responseBodyString = ResponseTransformer.transform(responseBodyString, actionName);
+                            responseBodyString = ResponseTransformer
+                                    .transform(responseBodyString, actionName);
                             log.debug("Transformed response to: " + responseBodyString);
                         }
                         log.debug("Attempting to unmarshal into the " + actionName + "Response type...");
-                        response = clazz.cast(getUnmarshaller().unmarshal(new StreamSource(new StringReader(responseBodyString))));
+                        response = clazz.cast(getUnmarshaller().unmarshal(
+                                new StreamSource(new StringReader(responseBodyString))));
 
                         log.debug("Unmarshalled response into " + actionName + "Response type.");
 
                     } else { /* Unsucessful response. Attempting to unmarshall into ErrorResponse  type */
 
-                        log.debug("Received Response. Status: " + status + ". " +
-                                "Response Body: " + responseBodyString);
+                        log.debug("Received Response. Status: " + status + ". " + "Response Body: " +
+                            responseBodyString);
 
-                        if ((status == HttpStatus.SC_INTERNAL_SERVER_ERROR
-                            || status == HttpStatus.SC_SERVICE_UNAVAILABLE)
-                            && pauseIfRetryNeeded(++retries)){
+                        if ((status == HttpStatus.SC_INTERNAL_SERVER_ERROR || status == HttpStatus.SC_SERVICE_UNAVAILABLE) &&
+                            pauseIfRetryNeeded(++retries)) {
                             shouldRetry = true;
                         } else {
                             log.debug("Attempting to unmarshal into the ErrorResponse type...");
-                            ErrorResponse errorResponse = (ErrorResponse) getUnmarshaller().unmarshal(new StreamSource(new StringReader(responseBodyString)));
+                            ErrorResponse errorResponse = (ErrorResponse) getUnmarshaller().unmarshal(
+                                    new StreamSource(new StringReader(responseBodyString)));
 
                             log.debug("Unmarshalled response into the ErrorResponse type.");
 
                             com.amazonaws.ec2.model.Error error = errorResponse.getError().get(0);
 
-                                    throw new AmazonEC2Exception(error.getMessage(),
-                                    status,
-                                    error.getCode(),
-                                    error.getType(),
-                                    errorResponse.getRequestId(),
-                                    errorResponse.toXML());
+                            throw new AmazonEC2Exception(error.getMessage(), status, error.getCode(), error
+                                    .getType(), errorResponse.getRequestId(), errorResponse.toXML());
                         }
                     }
                 } catch (JAXBException je) {
                     /* Response cannot be unmarshalled neither as <Action>Response or ErrorResponse types.
                     Checking for other possible errors. */
 
-                    log.debug ("Caught JAXBException", je);
-                    log.debug("Response cannot be unmarshalled neither as " + actionName + "Response or ErrorResponse types." +
-                            "Checking for other possible errors.");
+                    log.debug("Caught JAXBException", je);
+                    log.debug("Response cannot be unmarshalled neither as " + actionName +
+                        "Response or ErrorResponse types." + "Checking for other possible errors.");
 
                     AmazonEC2Exception awse = processErrors(responseBodyString, status);
 
@@ -3092,8 +3130,7 @@ public  class AmazonEC2Client implements AmazonEC2 {
      * @param retries current retry
      * @throws java.lang.InterruptedException
      */
-    private boolean pauseIfRetryNeeded(int retries)
-          throws InterruptedException {
+    private boolean pauseIfRetryNeeded(int retries) throws InterruptedException {
         if (retries <= config.getMaxErrorRetry()) {
             long delay = (long) (Math.pow(4, retries) * 100L);
             log.debug("Retriable error detected, will retry in " + delay + "ms, attempt numer: " + retries);
@@ -3113,33 +3150,33 @@ public  class AmazonEC2Client implements AmazonEC2 {
         parameters.put("Version", config.getServiceVersion());
         parameters.put("SignatureVersion", config.getSignatureVersion());
         parameters.put("Timestamp", getFormattedTimestamp());
-        parameters.put("AWSAccessKeyId",  this.awsAccessKeyId);
+        parameters.put("AWSAccessKeyId", this.awsAccessKeyId);
         parameters.put("Signature", signParameters(parameters, this.awsSecretAccessKey));
         for (Entry<String, String> entry : parameters.entrySet()) {
             method.addParameter(entry.getKey(), entry.getValue());
         }
     }
 
-    private AmazonEC2Exception processErrors(String responseString, int status)  {
+    private AmazonEC2Exception processErrors(String responseString, int status) {
         AmazonEC2Exception ex = null;
         Matcher matcher = null;
         if (responseString != null && responseString.startsWith("<")) {
             matcher = ERROR_PATTERN_ONE.matcher(responseString);
             if (matcher.matches()) {
-                ex = new AmazonEC2Exception(matcher.group(3), status,
-                        matcher.group(2), "Unknown", matcher.group(1), responseString);
+                ex = new AmazonEC2Exception(matcher.group(3), status, matcher.group(2), "Unknown", matcher
+                        .group(1), responseString);
             } else {
                 matcher = ERROR_PATTERN_TWO.matcher(responseString);
                 if (matcher.matches()) {
-                    ex = new AmazonEC2Exception(matcher.group(2), status,
-                            matcher.group(1), "Unknown", matcher.group(4), responseString);
-            } else {
-                ex =  new AmazonEC2Exception("Internal Error", status);
-                log.error("Service Error. Response Status: " + status);
-            }
+                    ex = new AmazonEC2Exception(matcher.group(2), status, matcher.group(1), "Unknown",
+                        matcher.group(4), responseString);
+                } else {
+                    ex = new AmazonEC2Exception("Internal Error", status);
+                    log.error("Service Error. Response Status: " + status);
+                }
             }
         } else {
-            ex =  new AmazonEC2Exception("Internal Error", status);
+            ex = new AmazonEC2Exception("Internal Error", status);
             log.error("Service Error. Response Status: " + status);
         }
         return ex;
@@ -3171,21 +3208,20 @@ public  class AmazonEC2Client implements AmazonEC2 {
      *
      *
      */
-    private String signParameters(Map<String, String> parameters, String key)
-            throws  SignatureException {
+    private String signParameters(Map<String, String> parameters, String key) throws SignatureException {
 
         String signatureVersion = parameters.get("SignatureVersion");
         StringBuffer data = new StringBuffer();
 
         if ("0".equals(signatureVersion)) {
             data.append(parameters.get("Action")).append(parameters.get("Timestamp"));
-        } else if ("1".equals(signatureVersion))  {
-            Map<String, String> sorted =  new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
+        } else if ("1".equals(signatureVersion)) {
+            Map<String, String> sorted = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
             parameters.remove("Signature");
             sorted.putAll(parameters);
             Iterator pairs = sorted.entrySet().iterator();
             while (pairs.hasNext()) {
-                Map.Entry pair = (Map.Entry)pairs.next();
+                Map.Entry pair = (Map.Entry) pairs.next();
                 data.append(pair.getKey());
                 data.append(pair.getValue());
             }
@@ -3200,11 +3236,11 @@ public  class AmazonEC2Client implements AmazonEC2 {
      *
      */
     private String sign(String data, String key) throws SignatureException {
-        byte [] signature;
+        byte[] signature;
         try {
             Mac mac = Mac.getInstance("HmacSHA1");
             mac.init(new SecretKeySpec(key.getBytes(), "HmacSHA1"));
-                signature = Base64.encodeBase64(mac.doFinal(data.getBytes("UTF-8")));
+            signature = Base64.encodeBase64(mac.doFinal(data.getBytes("UTF-8")));
         } catch (Exception e) {
             throw new SignatureException("Failed to generate signature: " + e.getMessage(), e);
         }
@@ -3218,22 +3254,23 @@ public  class AmazonEC2Client implements AmazonEC2 {
     private Unmarshaller getUnmarshaller() {
         return unmarshaller.get();
     }
-            /**
-     * Convert AllocateAddressRequest to name value pairs
-     */
+
+    /**
+    * Convert AllocateAddressRequest to name value pairs
+    */
     private Map<String, String> convertAllocateAddress(AllocateAddressRequest request) {
-        
+
         Map<String, String> params = new HashMap<String, String>();
         params.put("Action", "AllocateAddress");
 
         return params;
     }
-        
-                            /**
-     * Convert AssociateAddressRequest to name value pairs
-     */
+
+    /**
+    * Convert AssociateAddressRequest to name value pairs
+    */
     private Map<String, String> convertAssociateAddress(AssociateAddressRequest request) {
-        
+
         Map<String, String> params = new HashMap<String, String>();
         params.put("Action", "AssociateAddress");
         if (request.isSetInstanceId()) {
@@ -3245,12 +3282,13 @@ public  class AmazonEC2Client implements AmazonEC2 {
 
         return params;
     }
-        
-                            /**
-     * Convert AuthorizeSecurityGroupIngressRequest to name value pairs
-     */
-    private Map<String, String> convertAuthorizeSecurityGroupIngress(AuthorizeSecurityGroupIngressRequest request) {
-        
+
+    /**
+    * Convert AuthorizeSecurityGroupIngressRequest to name value pairs
+    */
+    private Map<String, String> convertAuthorizeSecurityGroupIngress(
+            AuthorizeSecurityGroupIngressRequest request) {
+
         Map<String, String> params = new HashMap<String, String>();
         params.put("Action", "AuthorizeSecurityGroupIngress");
         if (request.isSetGroupName()) {
@@ -3277,12 +3315,12 @@ public  class AmazonEC2Client implements AmazonEC2 {
 
         return params;
     }
-        
-                            /**
-     * Convert ConfirmProductInstanceRequest to name value pairs
-     */
+
+    /**
+    * Convert ConfirmProductInstanceRequest to name value pairs
+    */
     private Map<String, String> convertConfirmProductInstance(ConfirmProductInstanceRequest request) {
-        
+
         Map<String, String> params = new HashMap<String, String>();
         params.put("Action", "ConfirmProductInstance");
         if (request.isSetProductCode()) {
@@ -3294,12 +3332,12 @@ public  class AmazonEC2Client implements AmazonEC2 {
 
         return params;
     }
-        
-                            /**
-     * Convert CreateKeyPairRequest to name value pairs
-     */
+
+    /**
+    * Convert CreateKeyPairRequest to name value pairs
+    */
     private Map<String, String> convertCreateKeyPair(CreateKeyPairRequest request) {
-        
+
         Map<String, String> params = new HashMap<String, String>();
         params.put("Action", "CreateKeyPair");
         if (request.isSetKeyName()) {
@@ -3308,12 +3346,12 @@ public  class AmazonEC2Client implements AmazonEC2 {
 
         return params;
     }
-        
-                            /**
-     * Convert CreateSecurityGroupRequest to name value pairs
-     */
+
+    /**
+    * Convert CreateSecurityGroupRequest to name value pairs
+    */
     private Map<String, String> convertCreateSecurityGroup(CreateSecurityGroupRequest request) {
-        
+
         Map<String, String> params = new HashMap<String, String>();
         params.put("Action", "CreateSecurityGroup");
         if (request.isSetGroupName()) {
@@ -3325,12 +3363,12 @@ public  class AmazonEC2Client implements AmazonEC2 {
 
         return params;
     }
-        
-                            /**
-     * Convert DeleteKeyPairRequest to name value pairs
-     */
+
+    /**
+    * Convert DeleteKeyPairRequest to name value pairs
+    */
     private Map<String, String> convertDeleteKeyPair(DeleteKeyPairRequest request) {
-        
+
         Map<String, String> params = new HashMap<String, String>();
         params.put("Action", "DeleteKeyPair");
         if (request.isSetKeyName()) {
@@ -3339,12 +3377,12 @@ public  class AmazonEC2Client implements AmazonEC2 {
 
         return params;
     }
-        
-                            /**
-     * Convert DeleteSecurityGroupRequest to name value pairs
-     */
+
+    /**
+    * Convert DeleteSecurityGroupRequest to name value pairs
+    */
     private Map<String, String> convertDeleteSecurityGroup(DeleteSecurityGroupRequest request) {
-        
+
         Map<String, String> params = new HashMap<String, String>();
         params.put("Action", "DeleteSecurityGroup");
         if (request.isSetGroupName()) {
@@ -3353,12 +3391,12 @@ public  class AmazonEC2Client implements AmazonEC2 {
 
         return params;
     }
-        
-                            /**
-     * Convert DeregisterImageRequest to name value pairs
-     */
+
+    /**
+    * Convert DeregisterImageRequest to name value pairs
+    */
     private Map<String, String> convertDeregisterImage(DeregisterImageRequest request) {
-        
+
         Map<String, String> params = new HashMap<String, String>();
         params.put("Action", "DeregisterImage");
         if (request.isSetImageId()) {
@@ -3367,42 +3405,42 @@ public  class AmazonEC2Client implements AmazonEC2 {
 
         return params;
     }
-        
-                            /**
-     * Convert DescribeAddressesRequest to name value pairs
-     */
+
+    /**
+    * Convert DescribeAddressesRequest to name value pairs
+    */
     private Map<String, String> convertDescribeAddresses(DescribeAddressesRequest request) {
-        
+
         Map<String, String> params = new HashMap<String, String>();
         params.put("Action", "DescribeAddresses");
-        java.util.List<String> publicIpList  =  request.getPublicIp();
-        for  (String publicIp : publicIpList) { 
-            params.put("PublicIp" + "."  + (publicIpList.indexOf(publicIp) + 1), publicIp);
-        }	
+        java.util.List<String> publicIpList = request.getPublicIp();
+        for (String publicIp : publicIpList) {
+            params.put("PublicIp" + "." + (publicIpList.indexOf(publicIp) + 1), publicIp);
+        }
 
         return params;
     }
-        
-                            /**
-     * Convert DescribeAvailabilityZonesRequest to name value pairs
-     */
+
+    /**
+    * Convert DescribeAvailabilityZonesRequest to name value pairs
+    */
     private Map<String, String> convertDescribeAvailabilityZones(DescribeAvailabilityZonesRequest request) {
-        
+
         Map<String, String> params = new HashMap<String, String>();
         params.put("Action", "DescribeAvailabilityZones");
-        java.util.List<String> zoneNameList  =  request.getZoneName();
-        for  (String zoneName : zoneNameList) { 
-            params.put("ZoneName" + "."  + (zoneNameList.indexOf(zoneName) + 1), zoneName);
-        }	
+        java.util.List<String> zoneNameList = request.getZoneName();
+        for (String zoneName : zoneNameList) {
+            params.put("ZoneName" + "." + (zoneNameList.indexOf(zoneName) + 1), zoneName);
+        }
 
         return params;
     }
-        
-                            /**
-     * Convert DescribeImageAttributeRequest to name value pairs
-     */
+
+    /**
+    * Convert DescribeImageAttributeRequest to name value pairs
+    */
     private Map<String, String> convertDescribeImageAttribute(DescribeImageAttributeRequest request) {
-        
+
         Map<String, String> params = new HashMap<String, String>();
         params.put("Action", "DescribeImageAttribute");
         if (request.isSetImageId()) {
@@ -3414,80 +3452,80 @@ public  class AmazonEC2Client implements AmazonEC2 {
 
         return params;
     }
-        
-                            /**
-     * Convert DescribeImagesRequest to name value pairs
-     */
+
+    /**
+    * Convert DescribeImagesRequest to name value pairs
+    */
     private Map<String, String> convertDescribeImages(DescribeImagesRequest request) {
-        
+
         Map<String, String> params = new HashMap<String, String>();
         params.put("Action", "DescribeImages");
-        java.util.List<String> imageIdList  =  request.getImageId();
-        for  (String imageId : imageIdList) { 
-            params.put("ImageId" + "."  + (imageIdList.indexOf(imageId) + 1), imageId);
-        }	
-        java.util.List<String> ownerList  =  request.getOwner();
-        for  (String owner : ownerList) { 
-            params.put("Owner" + "."  + (ownerList.indexOf(owner) + 1), owner);
-        }	
-        java.util.List<String> executableByList  =  request.getExecutableBy();
-        for  (String executableBy : executableByList) { 
-            params.put("ExecutableBy" + "."  + (executableByList.indexOf(executableBy) + 1), executableBy);
-        }	
+        java.util.List<String> imageIdList = request.getImageId();
+        for (String imageId : imageIdList) {
+            params.put("ImageId" + "." + (imageIdList.indexOf(imageId) + 1), imageId);
+        }
+        java.util.List<String> ownerList = request.getOwner();
+        for (String owner : ownerList) {
+            params.put("Owner" + "." + (ownerList.indexOf(owner) + 1), owner);
+        }
+        java.util.List<String> executableByList = request.getExecutableBy();
+        for (String executableBy : executableByList) {
+            params.put("ExecutableBy" + "." + (executableByList.indexOf(executableBy) + 1), executableBy);
+        }
 
         return params;
     }
-        
-                            /**
-     * Convert DescribeInstancesRequest to name value pairs
-     */
+
+    /**
+    * Convert DescribeInstancesRequest to name value pairs
+    */
     private Map<String, String> convertDescribeInstances(DescribeInstancesRequest request) {
-        
+
         Map<String, String> params = new HashMap<String, String>();
         params.put("Action", "DescribeInstances");
-        java.util.List<String> instanceIdList  =  request.getInstanceId();
-        for  (String instanceId : instanceIdList) { 
-            params.put("InstanceId" + "."  + (instanceIdList.indexOf(instanceId) + 1), instanceId);
-        }	
+        java.util.List<String> instanceIdList = request.getInstanceId();
+        for (String instanceId : instanceIdList) {
+            params.put("InstanceId" + "." + (instanceIdList.indexOf(instanceId) + 1), instanceId);
+        }
 
         return params;
     }
-        
-                            /**
-     * Convert DescribeKeyPairsRequest to name value pairs
-     */
+
+    /**
+    * Convert DescribeKeyPairsRequest to name value pairs
+    */
     private Map<String, String> convertDescribeKeyPairs(DescribeKeyPairsRequest request) {
-        
+
         Map<String, String> params = new HashMap<String, String>();
         params.put("Action", "DescribeKeyPairs");
-        java.util.List<String> keyNameList  =  request.getKeyName();
-        for  (String keyName : keyNameList) { 
-            params.put("KeyName" + "."  + (keyNameList.indexOf(keyName) + 1), keyName);
-        }	
+        java.util.List<String> keyNameList = request.getKeyName();
+        for (String keyName : keyNameList) {
+            params.put("KeyName" + "." + (keyNameList.indexOf(keyName) + 1), keyName);
+        }
 
         return params;
     }
-        
-                            /**
-     * Convert DescribeSecurityGroupsRequest to name value pairs
-     */
+
+    /**
+    * Convert DescribeSecurityGroupsRequest to name value pairs
+    */
     private Map<String, String> convertDescribeSecurityGroups(DescribeSecurityGroupsRequest request) {
-        
+
         Map<String, String> params = new HashMap<String, String>();
         params.put("Action", "DescribeSecurityGroups");
-        java.util.List<String> groupNameList  =  request.getGroupName();
-        for  (String groupName : groupNameList) { 
-            params.put("GroupName" + "."  + (groupNameList.indexOf(groupName) + 1), groupName);
-        }	
+        java.util.List<String> groupNameList = request.getGroupName();
+        for (String groupName : groupNameList) {
+            params.put("GroupName" + "." + (groupNameList.indexOf(groupName) + 1), groupName);
+        }
 
         return params;
     }
-        
-                            /**
-     * Convert DisassociateAddressRequest to name value pairs
-     */
+
+    /**
+    * Convert DisassociateAddressRequest to name value pairs
+    */
     private Map<String, String> convertDisassociateAddress(DisassociateAddressRequest request) {
-        
+
         Map<String, String> params = new HashMap<String, String>();
         params.put("Action", "DisassociateAddress");
         if (request.isSetPublicIp()) {
@@ -3496,12 +3534,12 @@ public  class AmazonEC2Client implements AmazonEC2 {
 
         return params;
     }
-        
-                            /**
-     * Convert GetConsoleOutputRequest to name value pairs
-     */
+
+    /**
+    * Convert GetConsoleOutputRequest to name value pairs
+    */
     private Map<String, String> convertGetConsoleOutput(GetConsoleOutputRequest request) {
-        
+
         Map<String, String> params = new HashMap<String, String>();
         params.put("Action", "GetConsoleOutput");
         if (request.isSetInstanceId()) {
@@ -3510,12 +3548,12 @@ public  class AmazonEC2Client implements AmazonEC2 {
 
         return params;
     }
-        
-                            /**
-     * Convert ModifyImageAttributeRequest to name value pairs
-     */
+
+    /**
+    * Convert ModifyImageAttributeRequest to name value pairs
+    */
     private Map<String, String> convertModifyImageAttribute(ModifyImageAttributeRequest request) {
-        
+
         Map<String, String> params = new HashMap<String, String>();
         params.put("Action", "ModifyImageAttribute");
         if (request.isSetImageId()) {
@@ -3527,42 +3565,42 @@ public  class AmazonEC2Client implements AmazonEC2 {
         if (request.isSetOperationType()) {
             params.put("OperationType", request.getOperationType());
         }
-        java.util.List<String> userIdList  =  request.getUserId();
-        for  (String userId : userIdList) { 
-            params.put("UserId" + "."  + (userIdList.indexOf(userId) + 1), userId);
-        }	
-        java.util.List<String> userGroupList  =  request.getUserGroup();
-        for  (String userGroup : userGroupList) { 
-            params.put("UserGroup" + "."  + (userGroupList.indexOf(userGroup) + 1), userGroup);
-        }	
-        java.util.List<String> productCodeList  =  request.getProductCode();
-        for  (String productCode : productCodeList) { 
-            params.put("ProductCode" + "."  + (productCodeList.indexOf(productCode) + 1), productCode);
-        }	
+        java.util.List<String> userIdList = request.getUserId();
+        for (String userId : userIdList) {
+            params.put("UserId" + "." + (userIdList.indexOf(userId) + 1), userId);
+        }
+        java.util.List<String> userGroupList = request.getUserGroup();
+        for (String userGroup : userGroupList) {
+            params.put("UserGroup" + "." + (userGroupList.indexOf(userGroup) + 1), userGroup);
+        }
+        java.util.List<String> productCodeList = request.getProductCode();
+        for (String productCode : productCodeList) {
+            params.put("ProductCode" + "." + (productCodeList.indexOf(productCode) + 1), productCode);
+        }
 
         return params;
     }
-        
-                            /**
-     * Convert RebootInstancesRequest to name value pairs
-     */
+
+    /**
+    * Convert RebootInstancesRequest to name value pairs
+    */
     private Map<String, String> convertRebootInstances(RebootInstancesRequest request) {
-        
+
         Map<String, String> params = new HashMap<String, String>();
         params.put("Action", "RebootInstances");
-        java.util.List<String> instanceIdList  =  request.getInstanceId();
-        for  (String instanceId : instanceIdList) { 
-            params.put("InstanceId" + "."  + (instanceIdList.indexOf(instanceId) + 1), instanceId);
-        }	
+        java.util.List<String> instanceIdList = request.getInstanceId();
+        for (String instanceId : instanceIdList) {
+            params.put("InstanceId" + "." + (instanceIdList.indexOf(instanceId) + 1), instanceId);
+        }
 
         return params;
     }
-        
-                            /**
-     * Convert RegisterImageRequest to name value pairs
-     */
+
+    /**
+    * Convert RegisterImageRequest to name value pairs
+    */
     private Map<String, String> convertRegisterImage(RegisterImageRequest request) {
-        
+
         Map<String, String> params = new HashMap<String, String>();
         params.put("Action", "RegisterImage");
         if (request.isSetImageLocation()) {
@@ -3571,12 +3609,12 @@ public  class AmazonEC2Client implements AmazonEC2 {
 
         return params;
     }
-        
-                            /**
-     * Convert ReleaseAddressRequest to name value pairs
-     */
+
+    /**
+    * Convert ReleaseAddressRequest to name value pairs
+    */
     private Map<String, String> convertReleaseAddress(ReleaseAddressRequest request) {
-        
+
         Map<String, String> params = new HashMap<String, String>();
         params.put("Action", "ReleaseAddress");
         if (request.isSetPublicIp()) {
@@ -3585,12 +3623,12 @@ public  class AmazonEC2Client implements AmazonEC2 {
 
         return params;
     }
-        
-                            /**
-     * Convert ResetImageAttributeRequest to name value pairs
-     */
+
+    /**
+    * Convert ResetImageAttributeRequest to name value pairs
+    */
     private Map<String, String> convertResetImageAttribute(ResetImageAttributeRequest request) {
-        
+
         Map<String, String> params = new HashMap<String, String>();
         params.put("Action", "ResetImageAttribute");
         if (request.isSetImageId()) {
@@ -3602,12 +3640,12 @@ public  class AmazonEC2Client implements AmazonEC2 {
 
         return params;
     }
-        
-                            /**
-     * Convert RevokeSecurityGroupIngressRequest to name value pairs
-     */
+
+    /**
+    * Convert RevokeSecurityGroupIngressRequest to name value pairs
+    */
     private Map<String, String> convertRevokeSecurityGroupIngress(RevokeSecurityGroupIngressRequest request) {
-        
+
         Map<String, String> params = new HashMap<String, String>();
         params.put("Action", "RevokeSecurityGroupIngress");
         if (request.isSetGroupName()) {
@@ -3634,12 +3672,12 @@ public  class AmazonEC2Client implements AmazonEC2 {
 
         return params;
     }
-        
-                            /**
-     * Convert RunInstancesRequest to name value pairs
-     */
+
+    /**
+    * Convert RunInstancesRequest to name value pairs
+    */
     private Map<String, String> convertRunInstances(RunInstancesRequest request) {
-        
+
         Map<String, String> params = new HashMap<String, String>();
         params.put("Action", "RunInstances");
         if (request.isSetImageId()) {
@@ -3654,10 +3692,10 @@ public  class AmazonEC2Client implements AmazonEC2 {
         if (request.isSetKeyName()) {
             params.put("KeyName", request.getKeyName());
         }
-        java.util.List<String> securityGroupList  =  request.getSecurityGroup();
-        for  (String securityGroup : securityGroupList) { 
-            params.put("SecurityGroup" + "."  + (securityGroupList.indexOf(securityGroup) + 1), securityGroup);
-        }	
+        java.util.List<String> securityGroupList = request.getSecurityGroup();
+        for (String securityGroup : securityGroupList) {
+            params.put("SecurityGroup" + "." + (securityGroupList.indexOf(securityGroup) + 1), securityGroup);
+        }
         if (request.isSetUserData()) {
             params.put("UserData", request.getUserData());
         }
@@ -3665,11 +3703,11 @@ public  class AmazonEC2Client implements AmazonEC2 {
             params.put("InstanceType", request.getInstanceType());
         }
         if (request.isSetPlacement()) {
-            Placement  placement = request.getPlacement();
+            Placement placement = request.getPlacement();
             if (placement.isSetAvailabilityZone()) {
                 params.put("Placement" + "." + "AvailabilityZone", placement.getAvailabilityZone());
             }
-        } 
+        }
         if (request.isSetKernelId()) {
             params.put("KernelId", request.getKernelId());
         }
@@ -3679,37 +3717,41 @@ public  class AmazonEC2Client implements AmazonEC2 {
         java.util.List<BlockDeviceMapping> blockDeviceMappingList = request.getBlockDeviceMapping();
         for (BlockDeviceMapping blockDeviceMapping : blockDeviceMappingList) {
             if (blockDeviceMapping.isSetVirtualName()) {
-                params.put("BlockDeviceMapping" + "."  + (blockDeviceMappingList.indexOf(blockDeviceMapping) + 1) + "." + "VirtualName", blockDeviceMapping.getVirtualName());
+                params.put("BlockDeviceMapping" + "." +
+                    (blockDeviceMappingList.indexOf(blockDeviceMapping) + 1) + "." + "VirtualName",
+                        blockDeviceMapping.getVirtualName());
             }
             if (blockDeviceMapping.isSetDeviceName()) {
-                params.put("BlockDeviceMapping" + "."  + (blockDeviceMappingList.indexOf(blockDeviceMapping) + 1) + "." + "DeviceName", blockDeviceMapping.getDeviceName());
+                params.put("BlockDeviceMapping" + "." +
+                    (blockDeviceMappingList.indexOf(blockDeviceMapping) + 1) + "." + "DeviceName",
+                        blockDeviceMapping.getDeviceName());
             }
 
         }
 
         return params;
     }
-        
-                            /**
-     * Convert TerminateInstancesRequest to name value pairs
-     */
+
+    /**
+    * Convert TerminateInstancesRequest to name value pairs
+    */
     private Map<String, String> convertTerminateInstances(TerminateInstancesRequest request) {
-        
+
         Map<String, String> params = new HashMap<String, String>();
         params.put("Action", "TerminateInstances");
-        java.util.List<String> instanceIdList  =  request.getInstanceId();
-        for  (String instanceId : instanceIdList) { 
-            params.put("InstanceId" + "."  + (instanceIdList.indexOf(instanceId) + 1), instanceId);
-        }	
+        java.util.List<String> instanceIdList = request.getInstanceId();
+        for (String instanceId : instanceIdList) {
+            params.put("InstanceId" + "." + (instanceIdList.indexOf(instanceId) + 1), instanceId);
+        }
 
         return params;
     }
-        
-                            /**
-     * Convert DeleteVolumeRequest to name value pairs
-     */
+
+    /**
+    * Convert DeleteVolumeRequest to name value pairs
+    */
     private Map<String, String> convertDeleteVolume(DeleteVolumeRequest request) {
-        
+
         Map<String, String> params = new HashMap<String, String>();
         params.put("Action", "DeleteVolume");
         if (request.isSetVolumeId()) {
@@ -3718,12 +3760,12 @@ public  class AmazonEC2Client implements AmazonEC2 {
 
         return params;
     }
-        
-                            /**
-     * Convert CreateVolumeRequest to name value pairs
-     */
+
+    /**
+    * Convert CreateVolumeRequest to name value pairs
+    */
     private Map<String, String> convertCreateVolume(CreateVolumeRequest request) {
-        
+
         Map<String, String> params = new HashMap<String, String>();
         params.put("Action", "CreateVolume");
         if (request.isSetSize()) {
@@ -3738,27 +3780,27 @@ public  class AmazonEC2Client implements AmazonEC2 {
 
         return params;
     }
-        
-                            /**
-     * Convert DescribeVolumesRequest to name value pairs
-     */
+
+    /**
+    * Convert DescribeVolumesRequest to name value pairs
+    */
     private Map<String, String> convertDescribeVolumes(DescribeVolumesRequest request) {
-        
+
         Map<String, String> params = new HashMap<String, String>();
         params.put("Action", "DescribeVolumes");
-        java.util.List<String> volumeIdList  =  request.getVolumeId();
-        for  (String volumeId : volumeIdList) { 
-            params.put("VolumeId" + "."  + (volumeIdList.indexOf(volumeId) + 1), volumeId);
-        }	
+        java.util.List<String> volumeIdList = request.getVolumeId();
+        for (String volumeId : volumeIdList) {
+            params.put("VolumeId" + "." + (volumeIdList.indexOf(volumeId) + 1), volumeId);
+        }
 
         return params;
     }
-        
-                            /**
-     * Convert DetachVolumeRequest to name value pairs
-     */
+
+    /**
+    * Convert DetachVolumeRequest to name value pairs
+    */
     private Map<String, String> convertDetachVolume(DetachVolumeRequest request) {
-        
+
         Map<String, String> params = new HashMap<String, String>();
         params.put("Action", "DetachVolume");
         if (request.isSetVolumeId()) {
@@ -3776,27 +3818,27 @@ public  class AmazonEC2Client implements AmazonEC2 {
 
         return params;
     }
-        
-                            /**
-     * Convert DescribeSnapshotsRequest to name value pairs
-     */
+
+    /**
+    * Convert DescribeSnapshotsRequest to name value pairs
+    */
     private Map<String, String> convertDescribeSnapshots(DescribeSnapshotsRequest request) {
-        
+
         Map<String, String> params = new HashMap<String, String>();
         params.put("Action", "DescribeSnapshots");
-        java.util.List<String> snapshotIdList  =  request.getSnapshotId();
-        for  (String snapshotId : snapshotIdList) { 
-            params.put("SnapshotId" + "."  + (snapshotIdList.indexOf(snapshotId) + 1), snapshotId);
-        }	
+        java.util.List<String> snapshotIdList = request.getSnapshotId();
+        for (String snapshotId : snapshotIdList) {
+            params.put("SnapshotId" + "." + (snapshotIdList.indexOf(snapshotId) + 1), snapshotId);
+        }
 
         return params;
     }
-        
-                            /**
-     * Convert DeleteSnapshotRequest to name value pairs
-     */
+
+    /**
+    * Convert DeleteSnapshotRequest to name value pairs
+    */
     private Map<String, String> convertDeleteSnapshot(DeleteSnapshotRequest request) {
-        
+
         Map<String, String> params = new HashMap<String, String>();
         params.put("Action", "DeleteSnapshot");
         if (request.isSetSnapshotId()) {
@@ -3805,12 +3847,12 @@ public  class AmazonEC2Client implements AmazonEC2 {
 
         return params;
     }
-        
-                            /**
-     * Convert CreateSnapshotRequest to name value pairs
-     */
+
+    /**
+    * Convert CreateSnapshotRequest to name value pairs
+    */
     private Map<String, String> convertCreateSnapshot(CreateSnapshotRequest request) {
-        
+
         Map<String, String> params = new HashMap<String, String>();
         params.put("Action", "CreateSnapshot");
         if (request.isSetVolumeId()) {
@@ -3819,12 +3861,12 @@ public  class AmazonEC2Client implements AmazonEC2 {
 
         return params;
     }
-        
-                            /**
-     * Convert AttachVolumeRequest to name value pairs
-     */
+
+    /**
+    * Convert AttachVolumeRequest to name value pairs
+    */
     private Map<String, String> convertAttachVolume(AttachVolumeRequest request) {
-        
+
         Map<String, String> params = new HashMap<String, String>();
         params.put("Action", "AttachVolume");
         if (request.isSetVolumeId()) {
@@ -3839,8 +3881,7 @@ public  class AmazonEC2Client implements AmazonEC2 {
 
         return params;
     }
-        
-                                                                                                                                                                                                                                                                                                                                                                
+
     private static class ResponseTransformer {
 
         /**
@@ -3850,8 +3891,7 @@ public  class AmazonEC2Client implements AmazonEC2 {
          * @return transformed string
          */
         private static String transform(String response, String actionName) {
-            return transform(fromString(response),
-                    fromResource(actionName), null);
+            return transform(fromString(response), fromResource(actionName), null);
         }
 
         /**
@@ -3882,9 +3922,8 @@ public  class AmazonEC2Client implements AmazonEC2 {
         }
 
         private static Source fromResource(String resource) {
-            return new StreamSource(AmazonEC2.class.getClassLoader()
-                    .getResourceAsStream("com/amazonaws/ec2/model/"
-                    + resource + "Response.xslt"));
+            return new StreamSource(AmazonEC2.class.getClassLoader().getResourceAsStream(
+                    "com/amazonaws/ec2/model/" + resource + "Response.xslt"));
         }
     }
 }

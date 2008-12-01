@@ -19,8 +19,6 @@
  * 
  */
 
-
-
 package com.amazonaws.ec2.samples;
 
 import java.util.List;
@@ -28,6 +26,7 @@ import java.util.ArrayList;
 import com.amazonaws.ec2.*;
 import com.amazonaws.ec2.model.*;
 import java.util.concurrent.Future;
+
 
 /**
  *
@@ -44,13 +43,13 @@ public class CreateVolumeAsyncSample {
      * @param args unused
      */
     public static void main(String... args) {
-        
+
         /************************************************************************
          * Access Key ID and Secret Acess Key ID, obtained from:
          * http://aws.amazon.com
          ***********************************************************************/
-         String accessKeyId = "<Your Access Key ID>";
-         String secretAccessKey = "<Your Secret Access Key>";
+        String accessKeyId = "<Your Access Key ID>";
+        String secretAccessKey = "<Your Secret Access Key>";
 
         /************************************************************************
          * Instantiate Http Client Implementation of Amazon EC2 
@@ -58,29 +57,27 @@ public class CreateVolumeAsyncSample {
          * spawn for processing.
          *
          ***********************************************************************/
-         AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey, 35);
+        AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey, 35);
 
         /************************************************************************
          * Setup requests parameters and invoke parallel processing. Of course
          * in real world application, there will be much more than a couple of
          * requests to process.
          ***********************************************************************/
-         CreateVolumeRequest requestOne = new CreateVolumeRequest();
-         // @TODO: set request parameters here
+        CreateVolumeRequest requestOne = new CreateVolumeRequest();
+        // @TODO: set request parameters here
 
-         CreateVolumeRequest requestTwo = new CreateVolumeRequest();
-         // @TODO: set second request parameters here
+        CreateVolumeRequest requestTwo = new CreateVolumeRequest();
+        // @TODO: set second request parameters here
 
-         List<CreateVolumeRequest> requests = new ArrayList<CreateVolumeRequest>();
-         requests.add(requestOne);
-         requests.add(requestTwo);
+        List<CreateVolumeRequest> requests = new ArrayList<CreateVolumeRequest>();
+        requests.add(requestOne);
+        requests.add(requestTwo);
 
-         // invokeCreateVolume(service, requests);
+        // invokeCreateVolume(service, requests);
 
     }
 
-
-                                                        
     /**
      * Create Volume request sample
      * Initializes an empty volume of a given size
@@ -117,5 +114,5 @@ public class CreateVolumeAsyncSample {
             }
         }
     }
-                                                                                                        
+
 }

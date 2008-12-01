@@ -1,4 +1,3 @@
-
 package com.amazonaws.ec2.model;
 
 import java.util.ArrayList;
@@ -32,9 +31,7 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-    "volumeId"
-})
+@XmlType(name = "", propOrder = { "volumeId" })
 @XmlRootElement(name = "DescribeVolumesRequest")
 public class DescribeVolumesRequest {
 
@@ -87,7 +84,7 @@ public class DescribeVolumesRequest {
     }
 
     public boolean isSetVolumeId() {
-        return ((this.volumeId!= null)&&(!this.volumeId.isEmpty()));
+        return ((this.volumeId != null) && (!this.volumeId.isEmpty()));
     }
 
     public void unsetVolumeId() {
@@ -102,7 +99,7 @@ public class DescribeVolumesRequest {
      *     this instance
      */
     public DescribeVolumesRequest withVolumeId(String... values) {
-        for (String value: values) {
+        for (String value : values) {
             getVolumeId().add(value);
         }
         return this;
@@ -119,8 +116,6 @@ public class DescribeVolumesRequest {
     public void setVolumeId(List<String> volumeId) {
         this.volumeId = volumeId;
     }
-    
-
 
     /**
      *
@@ -135,12 +130,14 @@ public class DescribeVolumesRequest {
         StringBuffer json = new StringBuffer();
         boolean first = true;
         if (isSetVolumeId()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append("\"VolumeId\" : [");
-            java.util.List<String> volumeIdList  =  getVolumeId();
+            java.util.List<String> volumeIdList = getVolumeId();
             for (String volumeId : volumeIdList) {
-                if (volumeIdList.indexOf(volumeId) > 0) json.append(", ");
-                    json.append(quoteJSON(volumeId));
+                if (volumeIdList.indexOf(volumeId) > 0)
+                    json.append(", ");
+                json.append(quoteJSON(volumeId));
             }
             json.append("]");
             first = false;
@@ -159,41 +156,40 @@ public class DescribeVolumesRequest {
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             switch (c) {
-            case '"':
-                sb.append("\\\"");
-                break;
-            case '\\':
-                sb.append("\\\\");
-                break;
-            case '/':
-                sb.append("\\/");
-                break;
-            case '\b':
-                sb.append("\\b");
-                break;
-            case '\f':
-                sb.append("\\f");
-                break;
-            case '\n':
-                sb.append("\\n");
-                break;
-            case '\r':
-                sb.append("\\r");
-                break;
-            case '\t':
-                sb.append("\\t");
-                break;
-            default:
-                if (c <  ' ') {
-                    sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
-                } else {
-                sb.append(c);
+                case '"':
+                    sb.append("\\\"");
+                    break;
+                case '\\':
+                    sb.append("\\\\");
+                    break;
+                case '/':
+                    sb.append("\\/");
+                    break;
+                case '\b':
+                    sb.append("\\b");
+                    break;
+                case '\f':
+                    sb.append("\\f");
+                    break;
+                case '\n':
+                    sb.append("\\n");
+                    break;
+                case '\r':
+                    sb.append("\\r");
+                    break;
+                case '\t':
+                    sb.append("\\t");
+                    break;
+                default:
+                    if (c < ' ') {
+                        sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
+                    } else {
+                        sb.append(c);
+                    }
             }
-        }
         }
         sb.append("\"");
         return sb.toString();
     }
-
 
 }

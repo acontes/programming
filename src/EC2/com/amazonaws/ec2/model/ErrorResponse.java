@@ -1,4 +1,3 @@
-
 package com.amazonaws.ec2.model;
 
 import java.util.ArrayList;
@@ -33,10 +32,7 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-    "error",
-    "requestId"
-})
+@XmlType(name = "", propOrder = { "error", "requestId" })
 @XmlRootElement(name = "ErrorResponse")
 public class ErrorResponse {
 
@@ -92,7 +88,7 @@ public class ErrorResponse {
     }
 
     public boolean isSetError() {
-        return ((this.error!= null)&&(!this.error.isEmpty()));
+        return ((this.error != null) && (!this.error.isEmpty()));
     }
 
     public void unsetError() {
@@ -124,7 +120,7 @@ public class ErrorResponse {
     }
 
     public boolean isSetRequestId() {
-        return (this.requestId!= null);
+        return (this.requestId != null);
     }
 
     /**
@@ -135,7 +131,7 @@ public class ErrorResponse {
      *     this instance
      */
     public ErrorResponse withError(Error... values) {
-        for (Error value: values) {
+        for (Error value : values) {
             getError().add(value);
         }
         return this;
@@ -164,7 +160,6 @@ public class ErrorResponse {
     public void setError(List<Error> error) {
         this.error = error;
     }
-    
 
     /**
      * 
@@ -200,29 +195,27 @@ public class ErrorResponse {
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             switch (c) {
-            case '&':
-                sb.append("&amp;");
-                break;
-            case '<':
-                sb.append("&lt;");
-                break;
-            case '>':
-                sb.append("&gt;");
-                break;
-            case '\'':
-                sb.append("&#039;");
-                break;
-            case '"':
-                sb.append("&quot;");
-                break;
-            default:
-                sb.append(c);
+                case '&':
+                    sb.append("&amp;");
+                    break;
+                case '<':
+                    sb.append("&lt;");
+                    break;
+                case '>':
+                    sb.append("&gt;");
+                    break;
+                case '\'':
+                    sb.append("&#039;");
+                    break;
+                case '"':
+                    sb.append("&quot;");
+                    break;
+                default:
+                    sb.append(c);
             }
         }
         return sb.toString();
     }
-
-
 
     /**
      * 
@@ -239,11 +232,13 @@ public class ErrorResponse {
         boolean first = true;
         json.append(", ");
         if (isSetError()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append("\"Error\" : [");
             java.util.List<Error> errorList = getError();
             for (Error error : errorList) {
-                if (errorList.indexOf(error) > 0) json.append(", ");
+                if (errorList.indexOf(error) > 0)
+                    json.append(", ");
                 json.append("{");
                 json.append("");
                 json.append(error.toJSONFragment());
@@ -253,7 +248,8 @@ public class ErrorResponse {
             json.append("]");
         }
         if (isSetRequestId()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("RequestId"));
             json.append(" : ");
             json.append(quoteJSON(getRequestId()));
@@ -275,41 +271,40 @@ public class ErrorResponse {
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             switch (c) {
-            case '"':
-                sb.append("\\\"");
-                break;
-            case '\\':
-                sb.append("\\\\");
-                break;
-            case '/':
-                sb.append("\\/");
-                break;
-            case '\b':
-                sb.append("\\b");
-                break;
-            case '\f':
-                sb.append("\\f");
-                break;
-            case '\n':
-                sb.append("\\n");
-                break;
-            case '\r':
-                sb.append("\\r");
-                break;
-            case '\t':
-                sb.append("\\t");
-                break;
-            default:
-                if (c <  ' ') {
-                    sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
-                } else {
-                sb.append(c);
-                }
+                case '"':
+                    sb.append("\\\"");
+                    break;
+                case '\\':
+                    sb.append("\\\\");
+                    break;
+                case '/':
+                    sb.append("\\/");
+                    break;
+                case '\b':
+                    sb.append("\\b");
+                    break;
+                case '\f':
+                    sb.append("\\f");
+                    break;
+                case '\n':
+                    sb.append("\\n");
+                    break;
+                case '\r':
+                    sb.append("\\r");
+                    break;
+                case '\t':
+                    sb.append("\\t");
+                    break;
+                default:
+                    if (c < ' ') {
+                        sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
+                    } else {
+                        sb.append(c);
+                    }
             }
         }
         sb.append("\"");
         return sb.toString();
     }
-
 
 }

@@ -64,7 +64,7 @@ public class GCMDeploymentResources {
     }
 
     public void addJavaGroup(JavaGroup javaGroup) {
-        javaGroups.add(javaGroup);        
+        javaGroups.add(javaGroup);
     }
 
     public void addBridge(Bridge bridge) {

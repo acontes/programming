@@ -1,4 +1,3 @@
-
 package com.amazonaws.ec2.model;
 
 import java.util.ArrayList;
@@ -44,22 +43,9 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "RunningInstance", propOrder = {
-    "instanceId",
-    "imageId",
-    "instanceState",
-    "privateDnsName",
-    "publicDnsName",
-    "stateTransitionReason",
-    "keyName",
-    "amiLaunchIndex",
-    "productCode",
-    "instanceType",
-    "launchTime",
-    "placement",
-    "kernelId",
-    "ramdiskId"
-})
+@XmlType(name = "RunningInstance", propOrder = { "instanceId", "imageId", "instanceState", "privateDnsName",
+        "publicDnsName", "stateTransitionReason", "keyName", "amiLaunchIndex", "productCode", "instanceType",
+        "launchTime", "placement", "kernelId", "ramdiskId" })
 public class RunningInstance {
 
     @XmlElement(name = "InstanceId", required = true)
@@ -103,7 +89,11 @@ public class RunningInstance {
      * Value constructor
      * 
      */
-    public RunningInstance(final String instanceId, final String imageId, final InstanceState instanceState, final String privateDnsName, final String publicDnsName, final String stateTransitionReason, final String keyName, final String amiLaunchIndex, final List<String> productCode, final String instanceType, final String launchTime, final Placement placement, final String kernelId, final String ramdiskId) {
+    public RunningInstance(final String instanceId, final String imageId, final InstanceState instanceState,
+            final String privateDnsName, final String publicDnsName, final String stateTransitionReason,
+            final String keyName, final String amiLaunchIndex, final List<String> productCode,
+            final String instanceType, final String launchTime, final Placement placement,
+            final String kernelId, final String ramdiskId) {
         this.instanceId = instanceId;
         this.imageId = imageId;
         this.instanceState = instanceState;
@@ -145,7 +135,7 @@ public class RunningInstance {
     }
 
     public boolean isSetInstanceId() {
-        return (this.instanceId!= null);
+        return (this.instanceId != null);
     }
 
     /**
@@ -173,7 +163,7 @@ public class RunningInstance {
     }
 
     public boolean isSetImageId() {
-        return (this.imageId!= null);
+        return (this.imageId != null);
     }
 
     /**
@@ -201,7 +191,7 @@ public class RunningInstance {
     }
 
     public boolean isSetInstanceState() {
-        return (this.instanceState!= null);
+        return (this.instanceState != null);
     }
 
     /**
@@ -229,7 +219,7 @@ public class RunningInstance {
     }
 
     public boolean isSetPrivateDnsName() {
-        return (this.privateDnsName!= null);
+        return (this.privateDnsName != null);
     }
 
     /**
@@ -257,7 +247,7 @@ public class RunningInstance {
     }
 
     public boolean isSetPublicDnsName() {
-        return (this.publicDnsName!= null);
+        return (this.publicDnsName != null);
     }
 
     /**
@@ -285,7 +275,7 @@ public class RunningInstance {
     }
 
     public boolean isSetStateTransitionReason() {
-        return (this.stateTransitionReason!= null);
+        return (this.stateTransitionReason != null);
     }
 
     /**
@@ -313,7 +303,7 @@ public class RunningInstance {
     }
 
     public boolean isSetKeyName() {
-        return (this.keyName!= null);
+        return (this.keyName != null);
     }
 
     /**
@@ -341,7 +331,7 @@ public class RunningInstance {
     }
 
     public boolean isSetAmiLaunchIndex() {
-        return (this.amiLaunchIndex!= null);
+        return (this.amiLaunchIndex != null);
     }
 
     /**
@@ -374,7 +364,7 @@ public class RunningInstance {
     }
 
     public boolean isSetProductCode() {
-        return ((this.productCode!= null)&&(!this.productCode.isEmpty()));
+        return ((this.productCode != null) && (!this.productCode.isEmpty()));
     }
 
     public void unsetProductCode() {
@@ -406,7 +396,7 @@ public class RunningInstance {
     }
 
     public boolean isSetInstanceType() {
-        return (this.instanceType!= null);
+        return (this.instanceType != null);
     }
 
     /**
@@ -434,7 +424,7 @@ public class RunningInstance {
     }
 
     public boolean isSetLaunchTime() {
-        return (this.launchTime!= null);
+        return (this.launchTime != null);
     }
 
     /**
@@ -462,7 +452,7 @@ public class RunningInstance {
     }
 
     public boolean isSetPlacement() {
-        return (this.placement!= null);
+        return (this.placement != null);
     }
 
     /**
@@ -490,7 +480,7 @@ public class RunningInstance {
     }
 
     public boolean isSetKernelId() {
-        return (this.kernelId!= null);
+        return (this.kernelId != null);
     }
 
     /**
@@ -518,7 +508,7 @@ public class RunningInstance {
     }
 
     public boolean isSetRamdiskId() {
-        return (this.ramdiskId!= null);
+        return (this.ramdiskId != null);
     }
 
     /**
@@ -625,7 +615,7 @@ public class RunningInstance {
      *     this instance
      */
     public RunningInstance withProductCode(String... values) {
-        for (String value: values) {
+        for (String value : values) {
             getProductCode().add(value);
         }
         return this;
@@ -702,7 +692,6 @@ public class RunningInstance {
     public void setProductCode(List<String> productCode) {
         this.productCode = productCode;
     }
-    
 
     /**
      * 
@@ -725,11 +714,11 @@ public class RunningInstance {
             xml.append("</ImageId>");
         }
         if (isSetInstanceState()) {
-            InstanceState  instanceState = getInstanceState();
+            InstanceState instanceState = getInstanceState();
             xml.append("<InstanceState>");
             xml.append(instanceState.toXMLFragment());
             xml.append("</InstanceState>");
-        } 
+        }
         if (isSetPrivateDnsName()) {
             xml.append("<PrivateDnsName>");
             xml.append(escapeXML(getPrivateDnsName()));
@@ -755,12 +744,12 @@ public class RunningInstance {
             xml.append(escapeXML(getAmiLaunchIndex()));
             xml.append("</AmiLaunchIndex>");
         }
-        java.util.List<String> productCodeList  =  getProductCode();
-        for (String productCode : productCodeList) { 
+        java.util.List<String> productCodeList = getProductCode();
+        for (String productCode : productCodeList) {
             xml.append("<ProductCode>");
             xml.append(escapeXML(productCode));
             xml.append("</ProductCode>");
-        }	
+        }
         if (isSetInstanceType()) {
             xml.append("<InstanceType>");
             xml.append(escapeXML(getInstanceType()));
@@ -772,11 +761,11 @@ public class RunningInstance {
             xml.append("</LaunchTime>");
         }
         if (isSetPlacement()) {
-            Placement  placement = getPlacement();
+            Placement placement = getPlacement();
             xml.append("<Placement>");
             xml.append(placement.toXMLFragment());
             xml.append("</Placement>");
-        } 
+        }
         if (isSetKernelId()) {
             xml.append("<KernelId>");
             xml.append(escapeXML(getKernelId()));
@@ -800,29 +789,27 @@ public class RunningInstance {
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             switch (c) {
-            case '&':
-                sb.append("&amp;");
-                break;
-            case '<':
-                sb.append("&lt;");
-                break;
-            case '>':
-                sb.append("&gt;");
-                break;
-            case '\'':
-                sb.append("&#039;");
-                break;
-            case '"':
-                sb.append("&quot;");
-                break;
-            default:
-                sb.append(c);
+                case '&':
+                    sb.append("&amp;");
+                    break;
+                case '<':
+                    sb.append("&lt;");
+                    break;
+                case '>':
+                    sb.append("&gt;");
+                    break;
+                case '\'':
+                    sb.append("&#039;");
+                    break;
+                case '"':
+                    sb.append("&quot;");
+                    break;
+                default:
+                    sb.append(c);
             }
         }
         return sb.toString();
     }
-
-
 
     /**
      *
@@ -837,108 +824,121 @@ public class RunningInstance {
         StringBuffer json = new StringBuffer();
         boolean first = true;
         if (isSetInstanceId()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("InstanceId"));
             json.append(" : ");
             json.append(quoteJSON(getInstanceId()));
             first = false;
         }
         if (isSetImageId()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("ImageId"));
             json.append(" : ");
             json.append(quoteJSON(getImageId()));
             first = false;
         }
         if (isSetInstanceState()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append("\"InstanceState\" : {");
-            InstanceState  instanceState = getInstanceState();
-
+            InstanceState instanceState = getInstanceState();
 
             json.append(instanceState.toJSONFragment());
             json.append("}");
             first = false;
         }
         if (isSetPrivateDnsName()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("PrivateDnsName"));
             json.append(" : ");
             json.append(quoteJSON(getPrivateDnsName()));
             first = false;
         }
         if (isSetPublicDnsName()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("PublicDnsName"));
             json.append(" : ");
             json.append(quoteJSON(getPublicDnsName()));
             first = false;
         }
         if (isSetStateTransitionReason()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("StateTransitionReason"));
             json.append(" : ");
             json.append(quoteJSON(getStateTransitionReason()));
             first = false;
         }
         if (isSetKeyName()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("KeyName"));
             json.append(" : ");
             json.append(quoteJSON(getKeyName()));
             first = false;
         }
         if (isSetAmiLaunchIndex()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("AmiLaunchIndex"));
             json.append(" : ");
             json.append(quoteJSON(getAmiLaunchIndex()));
             first = false;
         }
         if (isSetProductCode()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append("\"ProductCode\" : [");
-            java.util.List<String> productCodeList  =  getProductCode();
+            java.util.List<String> productCodeList = getProductCode();
             for (String productCode : productCodeList) {
-                if (productCodeList.indexOf(productCode) > 0) json.append(", ");
-                    json.append(quoteJSON(productCode));
+                if (productCodeList.indexOf(productCode) > 0)
+                    json.append(", ");
+                json.append(quoteJSON(productCode));
             }
             json.append("]");
             first = false;
         }
         if (isSetInstanceType()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("InstanceType"));
             json.append(" : ");
             json.append(quoteJSON(getInstanceType()));
             first = false;
         }
         if (isSetLaunchTime()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("LaunchTime"));
             json.append(" : ");
             json.append(quoteJSON(getLaunchTime()));
             first = false;
         }
         if (isSetPlacement()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append("\"Placement\" : {");
-            Placement  placement = getPlacement();
-
+            Placement placement = getPlacement();
 
             json.append(placement.toJSONFragment());
             json.append("}");
             first = false;
         }
         if (isSetKernelId()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("KernelId"));
             json.append(" : ");
             json.append(quoteJSON(getKernelId()));
             first = false;
         }
         if (isSetRamdiskId()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("RamdiskId"));
             json.append(" : ");
             json.append(quoteJSON(getRamdiskId()));
@@ -958,41 +958,40 @@ public class RunningInstance {
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             switch (c) {
-            case '"':
-                sb.append("\\\"");
-                break;
-            case '\\':
-                sb.append("\\\\");
-                break;
-            case '/':
-                sb.append("\\/");
-                break;
-            case '\b':
-                sb.append("\\b");
-                break;
-            case '\f':
-                sb.append("\\f");
-                break;
-            case '\n':
-                sb.append("\\n");
-                break;
-            case '\r':
-                sb.append("\\r");
-                break;
-            case '\t':
-                sb.append("\\t");
-                break;
-            default:
-                if (c <  ' ') {
-                    sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
-                } else {
-                sb.append(c);
+                case '"':
+                    sb.append("\\\"");
+                    break;
+                case '\\':
+                    sb.append("\\\\");
+                    break;
+                case '/':
+                    sb.append("\\/");
+                    break;
+                case '\b':
+                    sb.append("\\b");
+                    break;
+                case '\f':
+                    sb.append("\\f");
+                    break;
+                case '\n':
+                    sb.append("\\n");
+                    break;
+                case '\r':
+                    sb.append("\\r");
+                    break;
+                case '\t':
+                    sb.append("\\t");
+                    break;
+                default:
+                    if (c < ' ') {
+                        sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
+                    } else {
+                        sb.append(c);
+                    }
             }
-        }
         }
         sb.append("\"");
         return sb.toString();
     }
-
 
 }

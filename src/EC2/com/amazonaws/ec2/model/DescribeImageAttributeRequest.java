@@ -1,4 +1,3 @@
-
 package com.amazonaws.ec2.model;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -31,10 +30,7 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-    "imageId",
-    "attribute"
-})
+@XmlType(name = "", propOrder = { "imageId", "attribute" })
 @XmlRootElement(name = "DescribeImageAttributeRequest")
 public class DescribeImageAttributeRequest {
 
@@ -85,7 +81,7 @@ public class DescribeImageAttributeRequest {
     }
 
     public boolean isSetImageId() {
-        return (this.imageId!= null);
+        return (this.imageId != null);
     }
 
     /**
@@ -113,7 +109,7 @@ public class DescribeImageAttributeRequest {
     }
 
     public boolean isSetAttribute() {
-        return (this.attribute!= null);
+        return (this.attribute != null);
     }
 
     /**
@@ -139,8 +135,6 @@ public class DescribeImageAttributeRequest {
         setAttribute(value);
         return this;
     }
-    
-
 
     /**
      *
@@ -155,14 +149,16 @@ public class DescribeImageAttributeRequest {
         StringBuffer json = new StringBuffer();
         boolean first = true;
         if (isSetImageId()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("ImageId"));
             json.append(" : ");
             json.append(quoteJSON(getImageId()));
             first = false;
         }
         if (isSetAttribute()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("Attribute"));
             json.append(" : ");
             json.append(quoteJSON(getAttribute()));
@@ -182,41 +178,40 @@ public class DescribeImageAttributeRequest {
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             switch (c) {
-            case '"':
-                sb.append("\\\"");
-                break;
-            case '\\':
-                sb.append("\\\\");
-                break;
-            case '/':
-                sb.append("\\/");
-                break;
-            case '\b':
-                sb.append("\\b");
-                break;
-            case '\f':
-                sb.append("\\f");
-                break;
-            case '\n':
-                sb.append("\\n");
-                break;
-            case '\r':
-                sb.append("\\r");
-                break;
-            case '\t':
-                sb.append("\\t");
-                break;
-            default:
-                if (c <  ' ') {
-                    sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
-                } else {
-                sb.append(c);
+                case '"':
+                    sb.append("\\\"");
+                    break;
+                case '\\':
+                    sb.append("\\\\");
+                    break;
+                case '/':
+                    sb.append("\\/");
+                    break;
+                case '\b':
+                    sb.append("\\b");
+                    break;
+                case '\f':
+                    sb.append("\\f");
+                    break;
+                case '\n':
+                    sb.append("\\n");
+                    break;
+                case '\r':
+                    sb.append("\\r");
+                    break;
+                case '\t':
+                    sb.append("\\t");
+                    break;
+                default:
+                    if (c < ' ') {
+                        sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
+                    } else {
+                        sb.append(c);
+                    }
             }
-        }
         }
         sb.append("\"");
         return sb.toString();
     }
-
 
 }

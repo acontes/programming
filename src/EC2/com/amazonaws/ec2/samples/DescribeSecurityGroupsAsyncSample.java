@@ -19,8 +19,6 @@
  * 
  */
 
-
-
 package com.amazonaws.ec2.samples;
 
 import java.util.List;
@@ -28,6 +26,7 @@ import java.util.ArrayList;
 import com.amazonaws.ec2.*;
 import com.amazonaws.ec2.model.*;
 import java.util.concurrent.Future;
+
 
 /**
  *
@@ -44,13 +43,13 @@ public class DescribeSecurityGroupsAsyncSample {
      * @param args unused
      */
     public static void main(String... args) {
-        
+
         /************************************************************************
          * Access Key ID and Secret Acess Key ID, obtained from:
          * http://aws.amazon.com
          ***********************************************************************/
-         String accessKeyId = "<Your Access Key ID>";
-         String secretAccessKey = "<Your Secret Access Key>";
+        String accessKeyId = "<Your Access Key ID>";
+        String secretAccessKey = "<Your Secret Access Key>";
 
         /************************************************************************
          * Instantiate Http Client Implementation of Amazon EC2 
@@ -58,29 +57,27 @@ public class DescribeSecurityGroupsAsyncSample {
          * spawn for processing.
          *
          ***********************************************************************/
-         AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey, 35);
+        AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey, 35);
 
         /************************************************************************
          * Setup requests parameters and invoke parallel processing. Of course
          * in real world application, there will be much more than a couple of
          * requests to process.
          ***********************************************************************/
-         DescribeSecurityGroupsRequest requestOne = new DescribeSecurityGroupsRequest();
-         // @TODO: set request parameters here
+        DescribeSecurityGroupsRequest requestOne = new DescribeSecurityGroupsRequest();
+        // @TODO: set request parameters here
 
-         DescribeSecurityGroupsRequest requestTwo = new DescribeSecurityGroupsRequest();
-         // @TODO: set second request parameters here
+        DescribeSecurityGroupsRequest requestTwo = new DescribeSecurityGroupsRequest();
+        // @TODO: set second request parameters here
 
-         List<DescribeSecurityGroupsRequest> requests = new ArrayList<DescribeSecurityGroupsRequest>();
-         requests.add(requestOne);
-         requests.add(requestTwo);
+        List<DescribeSecurityGroupsRequest> requests = new ArrayList<DescribeSecurityGroupsRequest>();
+        requests.add(requestOne);
+        requests.add(requestTwo);
 
-         // invokeDescribeSecurityGroups(service, requests);
+        // invokeDescribeSecurityGroups(service, requests);
 
     }
 
-
-                                                                                                        
     /**
      * Describe Security Groups request sample
      * The DescribeSecurityGroups operation returns information about security groups
@@ -92,7 +89,8 @@ public class DescribeSecurityGroupsAsyncSample {
      * @param service instance of AmazonEC2 service
      * @param requests list of requests to process
      */
-    public static void invokeDescribeSecurityGroups(AmazonEC2 service, List<DescribeSecurityGroupsRequest> requests) {
+    public static void invokeDescribeSecurityGroups(AmazonEC2 service,
+            List<DescribeSecurityGroupsRequest> requests) {
         List<Future<DescribeSecurityGroupsResponse>> responses = new ArrayList<Future<DescribeSecurityGroupsResponse>>();
         for (DescribeSecurityGroupsRequest request : requests) {
             responses.add(service.describeSecurityGroupsAsync(request));
@@ -121,5 +119,5 @@ public class DescribeSecurityGroupsAsyncSample {
             }
         }
     }
-                                                        
+
 }

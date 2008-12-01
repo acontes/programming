@@ -1,4 +1,3 @@
-
 package com.amazonaws.ec2.model;
 
 import java.util.ArrayList;
@@ -40,18 +39,8 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "Image", propOrder = {
-    "imageId",
-    "imageLocation",
-    "imageState",
-    "ownerId",
-    "visibility",
-    "productCode",
-    "architecture",
-    "imageType",
-    "kernelId",
-    "ramdiskId"
-})
+@XmlType(name = "Image", propOrder = { "imageId", "imageLocation", "imageState", "ownerId", "visibility",
+        "productCode", "architecture", "imageType", "kernelId", "ramdiskId" })
 public class Image {
 
     @XmlElement(name = "ImageId", required = true)
@@ -87,7 +76,9 @@ public class Image {
      * Value constructor
      * 
      */
-    public Image(final String imageId, final String imageLocation, final String imageState, final String ownerId, final String visibility, final List<String> productCode, final String architecture, final String imageType, final String kernelId, final String ramdiskId) {
+    public Image(final String imageId, final String imageLocation, final String imageState,
+            final String ownerId, final String visibility, final List<String> productCode,
+            final String architecture, final String imageType, final String kernelId, final String ramdiskId) {
         this.imageId = imageId;
         this.imageLocation = imageLocation;
         this.imageState = imageState;
@@ -125,7 +116,7 @@ public class Image {
     }
 
     public boolean isSetImageId() {
-        return (this.imageId!= null);
+        return (this.imageId != null);
     }
 
     /**
@@ -153,7 +144,7 @@ public class Image {
     }
 
     public boolean isSetImageLocation() {
-        return (this.imageLocation!= null);
+        return (this.imageLocation != null);
     }
 
     /**
@@ -181,7 +172,7 @@ public class Image {
     }
 
     public boolean isSetImageState() {
-        return (this.imageState!= null);
+        return (this.imageState != null);
     }
 
     /**
@@ -209,7 +200,7 @@ public class Image {
     }
 
     public boolean isSetOwnerId() {
-        return (this.ownerId!= null);
+        return (this.ownerId != null);
     }
 
     /**
@@ -237,7 +228,7 @@ public class Image {
     }
 
     public boolean isSetVisibility() {
-        return (this.visibility!= null);
+        return (this.visibility != null);
     }
 
     /**
@@ -270,7 +261,7 @@ public class Image {
     }
 
     public boolean isSetProductCode() {
-        return ((this.productCode!= null)&&(!this.productCode.isEmpty()));
+        return ((this.productCode != null) && (!this.productCode.isEmpty()));
     }
 
     public void unsetProductCode() {
@@ -302,7 +293,7 @@ public class Image {
     }
 
     public boolean isSetArchitecture() {
-        return (this.architecture!= null);
+        return (this.architecture != null);
     }
 
     /**
@@ -330,7 +321,7 @@ public class Image {
     }
 
     public boolean isSetImageType() {
-        return (this.imageType!= null);
+        return (this.imageType != null);
     }
 
     /**
@@ -358,7 +349,7 @@ public class Image {
     }
 
     public boolean isSetKernelId() {
-        return (this.kernelId!= null);
+        return (this.kernelId != null);
     }
 
     /**
@@ -386,7 +377,7 @@ public class Image {
     }
 
     public boolean isSetRamdiskId() {
-        return (this.ramdiskId!= null);
+        return (this.ramdiskId != null);
     }
 
     /**
@@ -457,7 +448,7 @@ public class Image {
      *     this instance
      */
     public Image withProductCode(String... values) {
-        for (String value: values) {
+        for (String value : values) {
             getProductCode().add(value);
         }
         return this;
@@ -522,7 +513,6 @@ public class Image {
     public void setProductCode(List<String> productCode) {
         this.productCode = productCode;
     }
-    
 
     /**
      * 
@@ -559,12 +549,12 @@ public class Image {
             xml.append(escapeXML(getVisibility()));
             xml.append("</Visibility>");
         }
-        java.util.List<String> productCodeList  =  getProductCode();
-        for (String productCode : productCodeList) { 
+        java.util.List<String> productCodeList = getProductCode();
+        for (String productCode : productCodeList) {
             xml.append("<ProductCode>");
             xml.append(escapeXML(productCode));
             xml.append("</ProductCode>");
-        }	
+        }
         if (isSetArchitecture()) {
             xml.append("<Architecture>");
             xml.append(escapeXML(getArchitecture()));
@@ -598,29 +588,27 @@ public class Image {
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             switch (c) {
-            case '&':
-                sb.append("&amp;");
-                break;
-            case '<':
-                sb.append("&lt;");
-                break;
-            case '>':
-                sb.append("&gt;");
-                break;
-            case '\'':
-                sb.append("&#039;");
-                break;
-            case '"':
-                sb.append("&quot;");
-                break;
-            default:
-                sb.append(c);
+                case '&':
+                    sb.append("&amp;");
+                    break;
+                case '<':
+                    sb.append("&lt;");
+                    break;
+                case '>':
+                    sb.append("&gt;");
+                    break;
+                case '\'':
+                    sb.append("&#039;");
+                    break;
+                case '"':
+                    sb.append("&quot;");
+                    break;
+                default:
+                    sb.append(c);
             }
         }
         return sb.toString();
     }
-
-
 
     /**
      *
@@ -635,74 +623,85 @@ public class Image {
         StringBuffer json = new StringBuffer();
         boolean first = true;
         if (isSetImageId()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("ImageId"));
             json.append(" : ");
             json.append(quoteJSON(getImageId()));
             first = false;
         }
         if (isSetImageLocation()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("ImageLocation"));
             json.append(" : ");
             json.append(quoteJSON(getImageLocation()));
             first = false;
         }
         if (isSetImageState()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("ImageState"));
             json.append(" : ");
             json.append(quoteJSON(getImageState()));
             first = false;
         }
         if (isSetOwnerId()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("OwnerId"));
             json.append(" : ");
             json.append(quoteJSON(getOwnerId()));
             first = false;
         }
         if (isSetVisibility()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("Visibility"));
             json.append(" : ");
             json.append(quoteJSON(getVisibility()));
             first = false;
         }
         if (isSetProductCode()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append("\"ProductCode\" : [");
-            java.util.List<String> productCodeList  =  getProductCode();
+            java.util.List<String> productCodeList = getProductCode();
             for (String productCode : productCodeList) {
-                if (productCodeList.indexOf(productCode) > 0) json.append(", ");
-                    json.append(quoteJSON(productCode));
+                if (productCodeList.indexOf(productCode) > 0)
+                    json.append(", ");
+                json.append(quoteJSON(productCode));
             }
             json.append("]");
             first = false;
         }
         if (isSetArchitecture()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("Architecture"));
             json.append(" : ");
             json.append(quoteJSON(getArchitecture()));
             first = false;
         }
         if (isSetImageType()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("ImageType"));
             json.append(" : ");
             json.append(quoteJSON(getImageType()));
             first = false;
         }
         if (isSetKernelId()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("KernelId"));
             json.append(" : ");
             json.append(quoteJSON(getKernelId()));
             first = false;
         }
         if (isSetRamdiskId()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("RamdiskId"));
             json.append(" : ");
             json.append(quoteJSON(getRamdiskId()));
@@ -722,41 +721,40 @@ public class Image {
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             switch (c) {
-            case '"':
-                sb.append("\\\"");
-                break;
-            case '\\':
-                sb.append("\\\\");
-                break;
-            case '/':
-                sb.append("\\/");
-                break;
-            case '\b':
-                sb.append("\\b");
-                break;
-            case '\f':
-                sb.append("\\f");
-                break;
-            case '\n':
-                sb.append("\\n");
-                break;
-            case '\r':
-                sb.append("\\r");
-                break;
-            case '\t':
-                sb.append("\\t");
-                break;
-            default:
-                if (c <  ' ') {
-                    sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
-                } else {
-                sb.append(c);
+                case '"':
+                    sb.append("\\\"");
+                    break;
+                case '\\':
+                    sb.append("\\\\");
+                    break;
+                case '/':
+                    sb.append("\\/");
+                    break;
+                case '\b':
+                    sb.append("\\b");
+                    break;
+                case '\f':
+                    sb.append("\\f");
+                    break;
+                case '\n':
+                    sb.append("\\n");
+                    break;
+                case '\r':
+                    sb.append("\\r");
+                    break;
+                case '\t':
+                    sb.append("\\t");
+                    break;
+                default:
+                    if (c < ' ') {
+                        sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
+                    } else {
+                        sb.append(c);
+                    }
             }
-        }
         }
         sb.append("\"");
         return sb.toString();
     }
-
 
 }

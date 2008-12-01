@@ -19,8 +19,6 @@
  * 
  */
 
-
-
 package com.amazonaws.ec2.samples;
 
 import java.util.List;
@@ -28,6 +26,7 @@ import java.util.ArrayList;
 import com.amazonaws.ec2.*;
 import com.amazonaws.ec2.model.*;
 import com.amazonaws.ec2.mock.AmazonEC2Mock;
+
 
 /**
  *
@@ -44,7 +43,7 @@ public class DetachVolumeSample {
      * @param args unused
      */
     public static void main(String... args) {
-        
+
         /************************************************************************
          * Access Key ID and Secret Acess Key ID, obtained from:
          * http://aws.amazon.com
@@ -56,7 +55,7 @@ public class DetachVolumeSample {
          * Instantiate Http Client Implementation of Amazon EC2 
          ***********************************************************************/
         AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey);
-        
+
         /************************************************************************
          * Uncomment to try advanced configuration options. Available options are:
          *
@@ -69,7 +68,6 @@ public class DetachVolumeSample {
         // AmazonEC2Config config = new AmazonEC2Config();
         // config.setSignatureVersion("0");
         // AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey, config);
- 
         /************************************************************************
          * Uncomment to try out Mock Service that simulates Amazon EC2 
          * responses without calling Amazon EC2  service.
@@ -81,21 +79,18 @@ public class DetachVolumeSample {
          *
          ***********************************************************************/
         // AmazonEC2 service = new AmazonEC2Mock();
-
         /************************************************************************
          * Setup request parameters and uncomment invoke to try out 
          * sample for Detach Volume 
          ***********************************************************************/
-         DetachVolumeRequest request = new DetachVolumeRequest();
-        
-         // @TODO: set request parameters here
+        DetachVolumeRequest request = new DetachVolumeRequest();
 
-         // invokeDetachVolume(service, request);
+        // @TODO: set request parameters here
+
+        // invokeDetachVolume(service, request);
 
     }
 
-
-                                                                                                                    
     /**
      * Detach Volume  request sample
      * Detach a previously attached volume from a running instance.
@@ -105,24 +100,24 @@ public class DetachVolumeSample {
      */
     public static void invokeDetachVolume(AmazonEC2 service, DetachVolumeRequest request) {
         try {
-            
+
             DetachVolumeResponse response = service.detachVolume(request);
 
-            
-            System.out.println ("DetachVolume Action Response");
-            System.out.println ("=============================================================================");
-            System.out.println ();
+            System.out.println("DetachVolume Action Response");
+            System.out
+                    .println("=============================================================================");
+            System.out.println();
 
             System.out.print("    DetachVolumeResponse");
             System.out.println();
             if (response.isSetDetachVolumeResult()) {
                 System.out.print("        DetachVolumeResult");
                 System.out.println();
-                DetachVolumeResult  detachVolumeResult = response.getDetachVolumeResult();
+                DetachVolumeResult detachVolumeResult = response.getDetachVolumeResult();
                 if (detachVolumeResult.isSetAttachment()) {
                     System.out.print("            Attachment");
                     System.out.println();
-                    Attachment  attachment = detachVolumeResult.getAttachment();
+                    Attachment attachment = detachVolumeResult.getAttachment();
                     if (attachment.isSetVolumeId()) {
                         System.out.print("                VolumeId");
                         System.out.println();
@@ -153,24 +148,23 @@ public class DetachVolumeSample {
                         System.out.print("                    " + attachment.getAttachTime());
                         System.out.println();
                     }
-                } 
-            } 
+                }
+            }
             if (response.isSetResponseMetadata()) {
                 System.out.print("        ResponseMetadata");
                 System.out.println();
-                ResponseMetadata  responseMetadata = response.getResponseMetadata();
+                ResponseMetadata responseMetadata = response.getResponseMetadata();
                 if (responseMetadata.isSetRequestId()) {
                     System.out.print("            RequestId");
                     System.out.println();
                     System.out.print("                " + responseMetadata.getRequestId());
                     System.out.println();
                 }
-            } 
+            }
             System.out.println();
 
-           
         } catch (AmazonEC2Exception ex) {
-            
+
             System.out.println("Caught Exception: " + ex.getMessage());
             System.out.println("Response Status Code: " + ex.getStatusCode());
             System.out.println("Error Code: " + ex.getErrorCode());
@@ -179,5 +173,5 @@ public class DetachVolumeSample {
             System.out.print("XML: " + ex.getXML());
         }
     }
-                                            
+
 }

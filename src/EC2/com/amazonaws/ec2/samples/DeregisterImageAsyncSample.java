@@ -19,8 +19,6 @@
  * 
  */
 
-
-
 package com.amazonaws.ec2.samples;
 
 import java.util.List;
@@ -28,6 +26,7 @@ import java.util.ArrayList;
 import com.amazonaws.ec2.*;
 import com.amazonaws.ec2.model.*;
 import java.util.concurrent.Future;
+
 
 /**
  *
@@ -44,13 +43,13 @@ public class DeregisterImageAsyncSample {
      * @param args unused
      */
     public static void main(String... args) {
-        
+
         /************************************************************************
          * Access Key ID and Secret Acess Key ID, obtained from:
          * http://aws.amazon.com
          ***********************************************************************/
-         String accessKeyId = "<Your Access Key ID>";
-         String secretAccessKey = "<Your Secret Access Key>";
+        String accessKeyId = "<Your Access Key ID>";
+        String secretAccessKey = "<Your Secret Access Key>";
 
         /************************************************************************
          * Instantiate Http Client Implementation of Amazon EC2 
@@ -58,29 +57,27 @@ public class DeregisterImageAsyncSample {
          * spawn for processing.
          *
          ***********************************************************************/
-         AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey, 35);
+        AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey, 35);
 
         /************************************************************************
          * Setup requests parameters and invoke parallel processing. Of course
          * in real world application, there will be much more than a couple of
          * requests to process.
          ***********************************************************************/
-         DeregisterImageRequest requestOne = new DeregisterImageRequest();
-         // @TODO: set request parameters here
+        DeregisterImageRequest requestOne = new DeregisterImageRequest();
+        // @TODO: set request parameters here
 
-         DeregisterImageRequest requestTwo = new DeregisterImageRequest();
-         // @TODO: set second request parameters here
+        DeregisterImageRequest requestTwo = new DeregisterImageRequest();
+        // @TODO: set second request parameters here
 
-         List<DeregisterImageRequest> requests = new ArrayList<DeregisterImageRequest>();
-         requests.add(requestOne);
-         requests.add(requestTwo);
+        List<DeregisterImageRequest> requests = new ArrayList<DeregisterImageRequest>();
+        requests.add(requestOne);
+        requests.add(requestTwo);
 
-         // invokeDeregisterImage(service, requests);
+        // invokeDeregisterImage(service, requests);
 
     }
 
-
-                                                                            
     /**
      * Deregister Image request sample
      * The DeregisterImage operation deregisters an AMI. Once deregistered, instances
@@ -118,5 +115,5 @@ public class DeregisterImageAsyncSample {
             }
         }
     }
-                                                                                    
+
 }

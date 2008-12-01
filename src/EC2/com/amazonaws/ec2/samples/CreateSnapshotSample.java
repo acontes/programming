@@ -19,8 +19,6 @@
  * 
  */
 
-
-
 package com.amazonaws.ec2.samples;
 
 import java.util.List;
@@ -28,6 +26,7 @@ import java.util.ArrayList;
 import com.amazonaws.ec2.*;
 import com.amazonaws.ec2.model.*;
 import com.amazonaws.ec2.mock.AmazonEC2Mock;
+
 
 /**
  *
@@ -44,7 +43,7 @@ public class CreateSnapshotSample {
      * @param args unused
      */
     public static void main(String... args) {
-        
+
         /************************************************************************
          * Access Key ID and Secret Acess Key ID, obtained from:
          * http://aws.amazon.com
@@ -56,7 +55,7 @@ public class CreateSnapshotSample {
          * Instantiate Http Client Implementation of Amazon EC2 
          ***********************************************************************/
         AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey);
-        
+
         /************************************************************************
          * Uncomment to try advanced configuration options. Available options are:
          *
@@ -69,7 +68,6 @@ public class CreateSnapshotSample {
         // AmazonEC2Config config = new AmazonEC2Config();
         // config.setSignatureVersion("0");
         // AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey, config);
- 
         /************************************************************************
          * Uncomment to try out Mock Service that simulates Amazon EC2 
          * responses without calling Amazon EC2  service.
@@ -81,21 +79,18 @@ public class CreateSnapshotSample {
          *
          ***********************************************************************/
         // AmazonEC2 service = new AmazonEC2Mock();
-
         /************************************************************************
          * Setup request parameters and uncomment invoke to try out 
          * sample for Create Snapshot 
          ***********************************************************************/
-         CreateSnapshotRequest request = new CreateSnapshotRequest();
-        
-         // @TODO: set request parameters here
+        CreateSnapshotRequest request = new CreateSnapshotRequest();
 
-         // invokeCreateSnapshot(service, request);
+        // @TODO: set request parameters here
+
+        // invokeCreateSnapshot(service, request);
 
     }
 
-
-                                                    
     /**
      * Create Snapshot  request sample
      * Create a snapshot of the volume identified by volume ID. A volume does not have to be detached
@@ -113,24 +108,24 @@ public class CreateSnapshotSample {
      */
     public static void invokeCreateSnapshot(AmazonEC2 service, CreateSnapshotRequest request) {
         try {
-            
+
             CreateSnapshotResponse response = service.createSnapshot(request);
 
-            
-            System.out.println ("CreateSnapshot Action Response");
-            System.out.println ("=============================================================================");
-            System.out.println ();
+            System.out.println("CreateSnapshot Action Response");
+            System.out
+                    .println("=============================================================================");
+            System.out.println();
 
             System.out.print("    CreateSnapshotResponse");
             System.out.println();
             if (response.isSetCreateSnapshotResult()) {
                 System.out.print("        CreateSnapshotResult");
                 System.out.println();
-                CreateSnapshotResult  createSnapshotResult = response.getCreateSnapshotResult();
+                CreateSnapshotResult createSnapshotResult = response.getCreateSnapshotResult();
                 if (createSnapshotResult.isSetSnapshot()) {
                     System.out.print("            Snapshot");
                     System.out.println();
-                    Snapshot  snapshot = createSnapshotResult.getSnapshot();
+                    Snapshot snapshot = createSnapshotResult.getSnapshot();
                     if (snapshot.isSetSnapshotId()) {
                         System.out.print("                SnapshotId");
                         System.out.println();
@@ -161,24 +156,23 @@ public class CreateSnapshotSample {
                         System.out.print("                    " + snapshot.getProgress());
                         System.out.println();
                     }
-                } 
-            } 
+                }
+            }
             if (response.isSetResponseMetadata()) {
                 System.out.print("        ResponseMetadata");
                 System.out.println();
-                ResponseMetadata  responseMetadata = response.getResponseMetadata();
+                ResponseMetadata responseMetadata = response.getResponseMetadata();
                 if (responseMetadata.isSetRequestId()) {
                     System.out.print("            RequestId");
                     System.out.println();
                     System.out.print("                " + responseMetadata.getRequestId());
                     System.out.println();
                 }
-            } 
+            }
             System.out.println();
 
-           
         } catch (AmazonEC2Exception ex) {
-            
+
             System.out.println("Caught Exception: " + ex.getMessage());
             System.out.println("Response Status Code: " + ex.getStatusCode());
             System.out.println("Error Code: " + ex.getErrorCode());
@@ -187,5 +181,5 @@ public class CreateSnapshotSample {
             System.out.print("XML: " + ex.getXML());
         }
     }
-                                                                                                            
+
 }

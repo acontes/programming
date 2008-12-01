@@ -506,8 +506,8 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
      * @throws XPathExpressionException
      * @throws IOException
      */
-    protected void parseGroupResource(Node resourceNode, GroupHostInfo group) throws XPathExpressionException,
-            IOException {
+    protected void parseGroupResource(Node resourceNode, GroupHostInfo group)
+            throws XPathExpressionException, IOException {
 
         // Get the host node child of this resource node
         Node hostNode = (Node) xpath.evaluate(XPATH_HOST, resourceNode, XPathConstants.NODE);

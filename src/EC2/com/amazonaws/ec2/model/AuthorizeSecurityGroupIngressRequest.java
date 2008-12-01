@@ -1,4 +1,3 @@
-
 package com.amazonaws.ec2.model;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -36,15 +35,8 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-    "groupName",
-    "sourceSecurityGroupName",
-    "sourceSecurityGroupOwnerId",
-    "ipProtocol",
-    "fromPort",
-    "toPort",
-    "cidrIp"
-})
+@XmlType(name = "", propOrder = { "groupName", "sourceSecurityGroupName", "sourceSecurityGroupOwnerId",
+        "ipProtocol", "fromPort", "toPort", "cidrIp" })
 @XmlRootElement(name = "AuthorizeSecurityGroupIngressRequest")
 public class AuthorizeSecurityGroupIngressRequest {
 
@@ -75,7 +67,9 @@ public class AuthorizeSecurityGroupIngressRequest {
      * Value constructor
      * 
      */
-    public AuthorizeSecurityGroupIngressRequest(final String groupName, final String sourceSecurityGroupName, final String sourceSecurityGroupOwnerId, final String ipProtocol, final Integer fromPort, final Integer toPort, final String cidrIp) {
+    public AuthorizeSecurityGroupIngressRequest(final String groupName, final String sourceSecurityGroupName,
+            final String sourceSecurityGroupOwnerId, final String ipProtocol, final Integer fromPort,
+            final Integer toPort, final String cidrIp) {
         this.groupName = groupName;
         this.sourceSecurityGroupName = sourceSecurityGroupName;
         this.sourceSecurityGroupOwnerId = sourceSecurityGroupOwnerId;
@@ -110,7 +104,7 @@ public class AuthorizeSecurityGroupIngressRequest {
     }
 
     public boolean isSetGroupName() {
-        return (this.groupName!= null);
+        return (this.groupName != null);
     }
 
     /**
@@ -138,7 +132,7 @@ public class AuthorizeSecurityGroupIngressRequest {
     }
 
     public boolean isSetSourceSecurityGroupName() {
-        return (this.sourceSecurityGroupName!= null);
+        return (this.sourceSecurityGroupName != null);
     }
 
     /**
@@ -166,7 +160,7 @@ public class AuthorizeSecurityGroupIngressRequest {
     }
 
     public boolean isSetSourceSecurityGroupOwnerId() {
-        return (this.sourceSecurityGroupOwnerId!= null);
+        return (this.sourceSecurityGroupOwnerId != null);
     }
 
     /**
@@ -194,7 +188,7 @@ public class AuthorizeSecurityGroupIngressRequest {
     }
 
     public boolean isSetIpProtocol() {
-        return (this.ipProtocol!= null);
+        return (this.ipProtocol != null);
     }
 
     /**
@@ -222,7 +216,7 @@ public class AuthorizeSecurityGroupIngressRequest {
     }
 
     public boolean isSetFromPort() {
-        return (this.fromPort!= null);
+        return (this.fromPort != null);
     }
 
     /**
@@ -250,7 +244,7 @@ public class AuthorizeSecurityGroupIngressRequest {
     }
 
     public boolean isSetToPort() {
-        return (this.toPort!= null);
+        return (this.toPort != null);
     }
 
     /**
@@ -278,7 +272,7 @@ public class AuthorizeSecurityGroupIngressRequest {
     }
 
     public boolean isSetCidrIp() {
-        return (this.cidrIp!= null);
+        return (this.cidrIp != null);
     }
 
     /**
@@ -364,8 +358,6 @@ public class AuthorizeSecurityGroupIngressRequest {
         setCidrIp(value);
         return this;
     }
-    
-
 
     /**
      *
@@ -380,49 +372,56 @@ public class AuthorizeSecurityGroupIngressRequest {
         StringBuffer json = new StringBuffer();
         boolean first = true;
         if (isSetGroupName()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("GroupName"));
             json.append(" : ");
             json.append(quoteJSON(getGroupName()));
             first = false;
         }
         if (isSetSourceSecurityGroupName()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("SourceSecurityGroupName"));
             json.append(" : ");
             json.append(quoteJSON(getSourceSecurityGroupName()));
             first = false;
         }
         if (isSetSourceSecurityGroupOwnerId()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("SourceSecurityGroupOwnerId"));
             json.append(" : ");
             json.append(quoteJSON(getSourceSecurityGroupOwnerId()));
             first = false;
         }
         if (isSetIpProtocol()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("IpProtocol"));
             json.append(" : ");
             json.append(quoteJSON(getIpProtocol()));
             first = false;
         }
         if (isSetFromPort()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("FromPort"));
             json.append(" : ");
             json.append(quoteJSON(getFromPort() + ""));
             first = false;
         }
         if (isSetToPort()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("ToPort"));
             json.append(" : ");
             json.append(quoteJSON(getToPort() + ""));
             first = false;
         }
         if (isSetCidrIp()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("CidrIp"));
             json.append(" : ");
             json.append(quoteJSON(getCidrIp()));
@@ -442,41 +441,40 @@ public class AuthorizeSecurityGroupIngressRequest {
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             switch (c) {
-            case '"':
-                sb.append("\\\"");
-                break;
-            case '\\':
-                sb.append("\\\\");
-                break;
-            case '/':
-                sb.append("\\/");
-                break;
-            case '\b':
-                sb.append("\\b");
-                break;
-            case '\f':
-                sb.append("\\f");
-                break;
-            case '\n':
-                sb.append("\\n");
-                break;
-            case '\r':
-                sb.append("\\r");
-                break;
-            case '\t':
-                sb.append("\\t");
-                break;
-            default:
-                if (c <  ' ') {
-                    sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
-                } else {
-                sb.append(c);
+                case '"':
+                    sb.append("\\\"");
+                    break;
+                case '\\':
+                    sb.append("\\\\");
+                    break;
+                case '/':
+                    sb.append("\\/");
+                    break;
+                case '\b':
+                    sb.append("\\b");
+                    break;
+                case '\f':
+                    sb.append("\\f");
+                    break;
+                case '\n':
+                    sb.append("\\n");
+                    break;
+                case '\r':
+                    sb.append("\\r");
+                    break;
+                case '\t':
+                    sb.append("\\t");
+                    break;
+                default:
+                    if (c < ' ') {
+                        sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
+                    } else {
+                        sb.append(c);
+                    }
             }
-        }
         }
         sb.append("\"");
         return sb.toString();
     }
-
 
 }

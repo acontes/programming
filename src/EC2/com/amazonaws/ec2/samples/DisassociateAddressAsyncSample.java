@@ -19,8 +19,6 @@
  * 
  */
 
-
-
 package com.amazonaws.ec2.samples;
 
 import java.util.List;
@@ -28,6 +26,7 @@ import java.util.ArrayList;
 import com.amazonaws.ec2.*;
 import com.amazonaws.ec2.model.*;
 import java.util.concurrent.Future;
+
 
 /**
  *
@@ -44,13 +43,13 @@ public class DisassociateAddressAsyncSample {
      * @param args unused
      */
     public static void main(String... args) {
-        
+
         /************************************************************************
          * Access Key ID and Secret Acess Key ID, obtained from:
          * http://aws.amazon.com
          ***********************************************************************/
-         String accessKeyId = "<Your Access Key ID>";
-         String secretAccessKey = "<Your Secret Access Key>";
+        String accessKeyId = "<Your Access Key ID>";
+        String secretAccessKey = "<Your Secret Access Key>";
 
         /************************************************************************
          * Instantiate Http Client Implementation of Amazon EC2 
@@ -58,29 +57,27 @@ public class DisassociateAddressAsyncSample {
          * spawn for processing.
          *
          ***********************************************************************/
-         AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey, 35);
+        AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey, 35);
 
         /************************************************************************
          * Setup requests parameters and invoke parallel processing. Of course
          * in real world application, there will be much more than a couple of
          * requests to process.
          ***********************************************************************/
-         DisassociateAddressRequest requestOne = new DisassociateAddressRequest();
-         // @TODO: set request parameters here
+        DisassociateAddressRequest requestOne = new DisassociateAddressRequest();
+        // @TODO: set request parameters here
 
-         DisassociateAddressRequest requestTwo = new DisassociateAddressRequest();
-         // @TODO: set second request parameters here
+        DisassociateAddressRequest requestTwo = new DisassociateAddressRequest();
+        // @TODO: set second request parameters here
 
-         List<DisassociateAddressRequest> requests = new ArrayList<DisassociateAddressRequest>();
-         requests.add(requestOne);
-         requests.add(requestTwo);
+        List<DisassociateAddressRequest> requests = new ArrayList<DisassociateAddressRequest>();
+        requests.add(requestOne);
+        requests.add(requestTwo);
 
-         // invokeDisassociateAddress(service, requests);
+        // invokeDisassociateAddress(service, requests);
 
     }
 
-
-                                                                                                                        
     /**
      * Disassociate Address request sample
      * The DisassociateAddress operation disassociates the specified elastic IP
@@ -119,5 +116,5 @@ public class DisassociateAddressAsyncSample {
             }
         }
     }
-                                        
+
 }

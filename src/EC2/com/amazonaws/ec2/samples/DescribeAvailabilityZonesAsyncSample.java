@@ -19,8 +19,6 @@
  * 
  */
 
-
-
 package com.amazonaws.ec2.samples;
 
 import java.util.List;
@@ -28,6 +26,7 @@ import java.util.ArrayList;
 import com.amazonaws.ec2.*;
 import com.amazonaws.ec2.model.*;
 import java.util.concurrent.Future;
+
 
 /**
  *
@@ -44,13 +43,13 @@ public class DescribeAvailabilityZonesAsyncSample {
      * @param args unused
      */
     public static void main(String... args) {
-        
+
         /************************************************************************
          * Access Key ID and Secret Acess Key ID, obtained from:
          * http://aws.amazon.com
          ***********************************************************************/
-         String accessKeyId = "<Your Access Key ID>";
-         String secretAccessKey = "<Your Secret Access Key>";
+        String accessKeyId = "<Your Access Key ID>";
+        String secretAccessKey = "<Your Secret Access Key>";
 
         /************************************************************************
          * Instantiate Http Client Implementation of Amazon EC2 
@@ -58,29 +57,27 @@ public class DescribeAvailabilityZonesAsyncSample {
          * spawn for processing.
          *
          ***********************************************************************/
-         AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey, 35);
+        AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey, 35);
 
         /************************************************************************
          * Setup requests parameters and invoke parallel processing. Of course
          * in real world application, there will be much more than a couple of
          * requests to process.
          ***********************************************************************/
-         DescribeAvailabilityZonesRequest requestOne = new DescribeAvailabilityZonesRequest();
-         // @TODO: set request parameters here
+        DescribeAvailabilityZonesRequest requestOne = new DescribeAvailabilityZonesRequest();
+        // @TODO: set request parameters here
 
-         DescribeAvailabilityZonesRequest requestTwo = new DescribeAvailabilityZonesRequest();
-         // @TODO: set second request parameters here
+        DescribeAvailabilityZonesRequest requestTwo = new DescribeAvailabilityZonesRequest();
+        // @TODO: set second request parameters here
 
-         List<DescribeAvailabilityZonesRequest> requests = new ArrayList<DescribeAvailabilityZonesRequest>();
-         requests.add(requestOne);
-         requests.add(requestTwo);
+        List<DescribeAvailabilityZonesRequest> requests = new ArrayList<DescribeAvailabilityZonesRequest>();
+        requests.add(requestOne);
+        requests.add(requestTwo);
 
-         // invokeDescribeAvailabilityZones(service, requests);
+        // invokeDescribeAvailabilityZones(service, requests);
 
     }
 
-
-                                                                                    
     /**
      * Describe Availability Zones request sample
      * The DescribeAvailabilityZones operation describes availability zones that are
@@ -92,7 +89,8 @@ public class DescribeAvailabilityZonesAsyncSample {
      * @param service instance of AmazonEC2 service
      * @param requests list of requests to process
      */
-    public static void invokeDescribeAvailabilityZones(AmazonEC2 service, List<DescribeAvailabilityZonesRequest> requests) {
+    public static void invokeDescribeAvailabilityZones(AmazonEC2 service,
+            List<DescribeAvailabilityZonesRequest> requests) {
         List<Future<DescribeAvailabilityZonesResponse>> responses = new ArrayList<Future<DescribeAvailabilityZonesResponse>>();
         for (DescribeAvailabilityZonesRequest request : requests) {
             responses.add(service.describeAvailabilityZonesAsync(request));
@@ -121,5 +119,5 @@ public class DescribeAvailabilityZonesAsyncSample {
             }
         }
     }
-                                                                            
+
 }

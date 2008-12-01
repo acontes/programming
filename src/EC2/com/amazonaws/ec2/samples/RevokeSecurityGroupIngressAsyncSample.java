@@ -19,8 +19,6 @@
  * 
  */
 
-
-
 package com.amazonaws.ec2.samples;
 
 import java.util.List;
@@ -28,6 +26,7 @@ import java.util.ArrayList;
 import com.amazonaws.ec2.*;
 import com.amazonaws.ec2.model.*;
 import java.util.concurrent.Future;
+
 
 /**
  *
@@ -44,13 +43,13 @@ public class RevokeSecurityGroupIngressAsyncSample {
      * @param args unused
      */
     public static void main(String... args) {
-        
+
         /************************************************************************
          * Access Key ID and Secret Acess Key ID, obtained from:
          * http://aws.amazon.com
          ***********************************************************************/
-         String accessKeyId = "<Your Access Key ID>";
-         String secretAccessKey = "<Your Secret Access Key>";
+        String accessKeyId = "<Your Access Key ID>";
+        String secretAccessKey = "<Your Secret Access Key>";
 
         /************************************************************************
          * Instantiate Http Client Implementation of Amazon EC2 
@@ -58,29 +57,27 @@ public class RevokeSecurityGroupIngressAsyncSample {
          * spawn for processing.
          *
          ***********************************************************************/
-         AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey, 35);
+        AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey, 35);
 
         /************************************************************************
          * Setup requests parameters and invoke parallel processing. Of course
          * in real world application, there will be much more than a couple of
          * requests to process.
          ***********************************************************************/
-         RevokeSecurityGroupIngressRequest requestOne = new RevokeSecurityGroupIngressRequest();
-         // @TODO: set request parameters here
+        RevokeSecurityGroupIngressRequest requestOne = new RevokeSecurityGroupIngressRequest();
+        // @TODO: set request parameters here
 
-         RevokeSecurityGroupIngressRequest requestTwo = new RevokeSecurityGroupIngressRequest();
-         // @TODO: set second request parameters here
+        RevokeSecurityGroupIngressRequest requestTwo = new RevokeSecurityGroupIngressRequest();
+        // @TODO: set second request parameters here
 
-         List<RevokeSecurityGroupIngressRequest> requests = new ArrayList<RevokeSecurityGroupIngressRequest>();
-         requests.add(requestOne);
-         requests.add(requestTwo);
+        List<RevokeSecurityGroupIngressRequest> requests = new ArrayList<RevokeSecurityGroupIngressRequest>();
+        requests.add(requestOne);
+        requests.add(requestTwo);
 
-         // invokeRevokeSecurityGroupIngress(service, requests);
+        // invokeRevokeSecurityGroupIngress(service, requests);
 
     }
 
-
-                                                                                                                                                    
     /**
      * Revoke Security Group Ingress request sample
      * The RevokeSecurityGroupIngress operation revokes permissions from a security
@@ -101,7 +98,8 @@ public class RevokeSecurityGroupIngressAsyncSample {
      * @param service instance of AmazonEC2 service
      * @param requests list of requests to process
      */
-    public static void invokeRevokeSecurityGroupIngress(AmazonEC2 service, List<RevokeSecurityGroupIngressRequest> requests) {
+    public static void invokeRevokeSecurityGroupIngress(AmazonEC2 service,
+            List<RevokeSecurityGroupIngressRequest> requests) {
         List<Future<RevokeSecurityGroupIngressResponse>> responses = new ArrayList<Future<RevokeSecurityGroupIngressResponse>>();
         for (RevokeSecurityGroupIngressRequest request : requests) {
             responses.add(service.revokeSecurityGroupIngressAsync(request));
@@ -130,5 +128,5 @@ public class RevokeSecurityGroupIngressAsyncSample {
             }
         }
     }
-            
+
 }

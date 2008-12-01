@@ -19,8 +19,6 @@
  * 
  */
 
-
-
 package com.amazonaws.ec2.samples;
 
 import java.util.List;
@@ -28,6 +26,7 @@ import java.util.ArrayList;
 import com.amazonaws.ec2.*;
 import com.amazonaws.ec2.model.*;
 import java.util.concurrent.Future;
+
 
 /**
  *
@@ -44,13 +43,13 @@ public class RebootInstancesAsyncSample {
      * @param args unused
      */
     public static void main(String... args) {
-        
+
         /************************************************************************
          * Access Key ID and Secret Acess Key ID, obtained from:
          * http://aws.amazon.com
          ***********************************************************************/
-         String accessKeyId = "<Your Access Key ID>";
-         String secretAccessKey = "<Your Secret Access Key>";
+        String accessKeyId = "<Your Access Key ID>";
+        String secretAccessKey = "<Your Secret Access Key>";
 
         /************************************************************************
          * Instantiate Http Client Implementation of Amazon EC2 
@@ -58,29 +57,27 @@ public class RebootInstancesAsyncSample {
          * spawn for processing.
          *
          ***********************************************************************/
-         AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey, 35);
+        AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey, 35);
 
         /************************************************************************
          * Setup requests parameters and invoke parallel processing. Of course
          * in real world application, there will be much more than a couple of
          * requests to process.
          ***********************************************************************/
-         RebootInstancesRequest requestOne = new RebootInstancesRequest();
-         // @TODO: set request parameters here
+        RebootInstancesRequest requestOne = new RebootInstancesRequest();
+        // @TODO: set request parameters here
 
-         RebootInstancesRequest requestTwo = new RebootInstancesRequest();
-         // @TODO: set second request parameters here
+        RebootInstancesRequest requestTwo = new RebootInstancesRequest();
+        // @TODO: set second request parameters here
 
-         List<RebootInstancesRequest> requests = new ArrayList<RebootInstancesRequest>();
-         requests.add(requestOne);
-         requests.add(requestTwo);
+        List<RebootInstancesRequest> requests = new ArrayList<RebootInstancesRequest>();
+        requests.add(requestOne);
+        requests.add(requestTwo);
 
-         // invokeRebootInstances(service, requests);
+        // invokeRebootInstances(service, requests);
 
     }
 
-
-                                                                                                                                    
     /**
      * Reboot Instances request sample
      * The RebootInstances operation requests a reboot of one or more instances. This
@@ -120,5 +117,5 @@ public class RebootInstancesAsyncSample {
             }
         }
     }
-                            
+
 }

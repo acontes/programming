@@ -19,8 +19,6 @@
  * 
  */
 
-
-
 package com.amazonaws.ec2.samples;
 
 import java.util.List;
@@ -28,6 +26,7 @@ import java.util.ArrayList;
 import com.amazonaws.ec2.*;
 import com.amazonaws.ec2.model.*;
 import java.util.concurrent.Future;
+
 
 /**
  *
@@ -44,13 +43,13 @@ public class DescribeImageAttributeAsyncSample {
      * @param args unused
      */
     public static void main(String... args) {
-        
+
         /************************************************************************
          * Access Key ID and Secret Acess Key ID, obtained from:
          * http://aws.amazon.com
          ***********************************************************************/
-         String accessKeyId = "<Your Access Key ID>";
-         String secretAccessKey = "<Your Secret Access Key>";
+        String accessKeyId = "<Your Access Key ID>";
+        String secretAccessKey = "<Your Secret Access Key>";
 
         /************************************************************************
          * Instantiate Http Client Implementation of Amazon EC2 
@@ -58,29 +57,27 @@ public class DescribeImageAttributeAsyncSample {
          * spawn for processing.
          *
          ***********************************************************************/
-         AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey, 35);
+        AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey, 35);
 
         /************************************************************************
          * Setup requests parameters and invoke parallel processing. Of course
          * in real world application, there will be much more than a couple of
          * requests to process.
          ***********************************************************************/
-         DescribeImageAttributeRequest requestOne = new DescribeImageAttributeRequest();
-         // @TODO: set request parameters here
+        DescribeImageAttributeRequest requestOne = new DescribeImageAttributeRequest();
+        // @TODO: set request parameters here
 
-         DescribeImageAttributeRequest requestTwo = new DescribeImageAttributeRequest();
-         // @TODO: set second request parameters here
+        DescribeImageAttributeRequest requestTwo = new DescribeImageAttributeRequest();
+        // @TODO: set second request parameters here
 
-         List<DescribeImageAttributeRequest> requests = new ArrayList<DescribeImageAttributeRequest>();
-         requests.add(requestOne);
-         requests.add(requestTwo);
+        List<DescribeImageAttributeRequest> requests = new ArrayList<DescribeImageAttributeRequest>();
+        requests.add(requestOne);
+        requests.add(requestTwo);
 
-         // invokeDescribeImageAttribute(service, requests);
+        // invokeDescribeImageAttribute(service, requests);
 
     }
 
-
-                                                                                        
     /**
      * Describe Image Attribute request sample
      * The DescribeImageAttribute operation returns information about an attribute of
@@ -89,7 +86,8 @@ public class DescribeImageAttributeAsyncSample {
      * @param service instance of AmazonEC2 service
      * @param requests list of requests to process
      */
-    public static void invokeDescribeImageAttribute(AmazonEC2 service, List<DescribeImageAttributeRequest> requests) {
+    public static void invokeDescribeImageAttribute(AmazonEC2 service,
+            List<DescribeImageAttributeRequest> requests) {
         List<Future<DescribeImageAttributeResponse>> responses = new ArrayList<Future<DescribeImageAttributeResponse>>();
         for (DescribeImageAttributeRequest request : requests) {
             responses.add(service.describeImageAttributeAsync(request));
@@ -118,5 +116,5 @@ public class DescribeImageAttributeAsyncSample {
             }
         }
     }
-                                                                        
+
 }

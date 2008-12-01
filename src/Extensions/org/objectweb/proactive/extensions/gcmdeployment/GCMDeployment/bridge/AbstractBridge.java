@@ -109,7 +109,7 @@ public abstract class AbstractBridge implements Bridge {
     public void addJavaGroup(JavaGroup group) {
         javaGroups.add(group);
     }
-    
+
     public List<Bridge> getBridges() {
         return bridges;
     }

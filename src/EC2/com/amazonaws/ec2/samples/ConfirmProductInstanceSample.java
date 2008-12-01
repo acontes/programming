@@ -19,8 +19,6 @@
  * 
  */
 
-
-
 package com.amazonaws.ec2.samples;
 
 import java.util.List;
@@ -28,6 +26,7 @@ import java.util.ArrayList;
 import com.amazonaws.ec2.*;
 import com.amazonaws.ec2.model.*;
 import com.amazonaws.ec2.mock.AmazonEC2Mock;
+
 
 /**
  *
@@ -44,7 +43,7 @@ public class ConfirmProductInstanceSample {
      * @param args unused
      */
     public static void main(String... args) {
-        
+
         /************************************************************************
          * Access Key ID and Secret Acess Key ID, obtained from:
          * http://aws.amazon.com
@@ -56,7 +55,7 @@ public class ConfirmProductInstanceSample {
          * Instantiate Http Client Implementation of Amazon EC2 
          ***********************************************************************/
         AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey);
-        
+
         /************************************************************************
          * Uncomment to try advanced configuration options. Available options are:
          *
@@ -69,7 +68,6 @@ public class ConfirmProductInstanceSample {
         // AmazonEC2Config config = new AmazonEC2Config();
         // config.setSignatureVersion("0");
         // AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey, config);
- 
         /************************************************************************
          * Uncomment to try out Mock Service that simulates Amazon EC2 
          * responses without calling Amazon EC2  service.
@@ -81,21 +79,18 @@ public class ConfirmProductInstanceSample {
          *
          ***********************************************************************/
         // AmazonEC2 service = new AmazonEC2Mock();
-
         /************************************************************************
          * Setup request parameters and uncomment invoke to try out 
          * sample for Confirm Product Instance 
          ***********************************************************************/
-         ConfirmProductInstanceRequest request = new ConfirmProductInstanceRequest();
-        
-         // @TODO: set request parameters here
+        ConfirmProductInstanceRequest request = new ConfirmProductInstanceRequest();
 
-         // invokeConfirmProductInstance(service, request);
+        // @TODO: set request parameters here
+
+        // invokeConfirmProductInstance(service, request);
 
     }
 
-
-                                        
     /**
      * Confirm Product Instance  request sample
      * The ConfirmProductInstance operation returns true if the specified product code
@@ -110,43 +105,43 @@ public class ConfirmProductInstanceSample {
      */
     public static void invokeConfirmProductInstance(AmazonEC2 service, ConfirmProductInstanceRequest request) {
         try {
-            
+
             ConfirmProductInstanceResponse response = service.confirmProductInstance(request);
 
-            
-            System.out.println ("ConfirmProductInstance Action Response");
-            System.out.println ("=============================================================================");
-            System.out.println ();
+            System.out.println("ConfirmProductInstance Action Response");
+            System.out
+                    .println("=============================================================================");
+            System.out.println();
 
             System.out.print("    ConfirmProductInstanceResponse");
             System.out.println();
             if (response.isSetResponseMetadata()) {
                 System.out.print("        ResponseMetadata");
                 System.out.println();
-                ResponseMetadata  responseMetadata = response.getResponseMetadata();
+                ResponseMetadata responseMetadata = response.getResponseMetadata();
                 if (responseMetadata.isSetRequestId()) {
                     System.out.print("            RequestId");
                     System.out.println();
                     System.out.print("                " + responseMetadata.getRequestId());
                     System.out.println();
                 }
-            } 
+            }
             if (response.isSetConfirmProductInstanceResult()) {
                 System.out.print("        ConfirmProductInstanceResult");
                 System.out.println();
-                ConfirmProductInstanceResult  confirmProductInstanceResult = response.getConfirmProductInstanceResult();
+                ConfirmProductInstanceResult confirmProductInstanceResult = response
+                        .getConfirmProductInstanceResult();
                 if (confirmProductInstanceResult.isSetOwnerId()) {
                     System.out.print("            OwnerId");
                     System.out.println();
                     System.out.print("                " + confirmProductInstanceResult.getOwnerId());
                     System.out.println();
                 }
-            } 
+            }
             System.out.println();
 
-           
         } catch (AmazonEC2Exception ex) {
-            
+
             System.out.println("Caught Exception: " + ex.getMessage());
             System.out.println("Response Status Code: " + ex.getStatusCode());
             System.out.println("Error Code: " + ex.getErrorCode());
@@ -155,5 +150,5 @@ public class ConfirmProductInstanceSample {
             System.out.print("XML: " + ex.getXML());
         }
     }
-                                                                                                                        
+
 }

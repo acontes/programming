@@ -19,8 +19,6 @@
  * 
  */
 
-
-
 package com.amazonaws.ec2.samples;
 
 import java.util.List;
@@ -28,6 +26,7 @@ import java.util.ArrayList;
 import com.amazonaws.ec2.*;
 import com.amazonaws.ec2.model.*;
 import com.amazonaws.ec2.mock.AmazonEC2Mock;
+
 
 /**
  *
@@ -44,7 +43,7 @@ public class CreateVolumeSample {
      * @param args unused
      */
     public static void main(String... args) {
-        
+
         /************************************************************************
          * Access Key ID and Secret Acess Key ID, obtained from:
          * http://aws.amazon.com
@@ -56,7 +55,7 @@ public class CreateVolumeSample {
          * Instantiate Http Client Implementation of Amazon EC2 
          ***********************************************************************/
         AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey);
-        
+
         /************************************************************************
          * Uncomment to try advanced configuration options. Available options are:
          *
@@ -69,7 +68,6 @@ public class CreateVolumeSample {
         // AmazonEC2Config config = new AmazonEC2Config();
         // config.setSignatureVersion("0");
         // AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey, config);
- 
         /************************************************************************
          * Uncomment to try out Mock Service that simulates Amazon EC2 
          * responses without calling Amazon EC2  service.
@@ -81,21 +79,18 @@ public class CreateVolumeSample {
          *
          ***********************************************************************/
         // AmazonEC2 service = new AmazonEC2Mock();
-
         /************************************************************************
          * Setup request parameters and uncomment invoke to try out 
          * sample for Create Volume 
          ***********************************************************************/
-         CreateVolumeRequest request = new CreateVolumeRequest();
-        
-         // @TODO: set request parameters here
+        CreateVolumeRequest request = new CreateVolumeRequest();
 
-         // invokeCreateVolume(service, request);
+        // @TODO: set request parameters here
+
+        // invokeCreateVolume(service, request);
 
     }
 
-
-                                                        
     /**
      * Create Volume  request sample
      * Initializes an empty volume of a given size
@@ -105,24 +100,24 @@ public class CreateVolumeSample {
      */
     public static void invokeCreateVolume(AmazonEC2 service, CreateVolumeRequest request) {
         try {
-            
+
             CreateVolumeResponse response = service.createVolume(request);
 
-            
-            System.out.println ("CreateVolume Action Response");
-            System.out.println ("=============================================================================");
-            System.out.println ();
+            System.out.println("CreateVolume Action Response");
+            System.out
+                    .println("=============================================================================");
+            System.out.println();
 
             System.out.print("    CreateVolumeResponse");
             System.out.println();
             if (response.isSetCreateVolumeResult()) {
                 System.out.print("        CreateVolumeResult");
                 System.out.println();
-                CreateVolumeResult  createVolumeResult = response.getCreateVolumeResult();
+                CreateVolumeResult createVolumeResult = response.getCreateVolumeResult();
                 if (createVolumeResult.isSetVolume()) {
                     System.out.print("            Volume");
                     System.out.println();
-                    Volume  volume = createVolumeResult.getVolume();
+                    Volume volume = createVolumeResult.getVolume();
                     if (volume.isSetVolumeId()) {
                         System.out.print("                VolumeId");
                         System.out.println();
@@ -194,24 +189,23 @@ public class CreateVolumeSample {
                             System.out.println();
                         }
                     }
-                } 
-            } 
+                }
+            }
             if (response.isSetResponseMetadata()) {
                 System.out.print("        ResponseMetadata");
                 System.out.println();
-                ResponseMetadata  responseMetadata = response.getResponseMetadata();
+                ResponseMetadata responseMetadata = response.getResponseMetadata();
                 if (responseMetadata.isSetRequestId()) {
                     System.out.print("            RequestId");
                     System.out.println();
                     System.out.print("                " + responseMetadata.getRequestId());
                     System.out.println();
                 }
-            } 
+            }
             System.out.println();
 
-           
         } catch (AmazonEC2Exception ex) {
-            
+
             System.out.println("Caught Exception: " + ex.getMessage());
             System.out.println("Response Status Code: " + ex.getStatusCode());
             System.out.println("Error Code: " + ex.getErrorCode());
@@ -220,5 +214,5 @@ public class CreateVolumeSample {
             System.out.print("XML: " + ex.getXML());
         }
     }
-                                                                                                        
+
 }

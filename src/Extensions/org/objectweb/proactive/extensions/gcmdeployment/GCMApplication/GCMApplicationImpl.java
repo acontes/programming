@@ -455,7 +455,7 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
                 buildJavaGroupTreeNode(rootNode, node, group, nodeProvider, gcmd);
             }
         }
-        
+
         // then bridges (and recurse)
         if (bridge.getBridges() != null) {
             for (Bridge subBridge : bridge.getBridges()) {

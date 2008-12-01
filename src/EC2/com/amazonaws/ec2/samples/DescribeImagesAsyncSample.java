@@ -19,8 +19,6 @@
  * 
  */
 
-
-
 package com.amazonaws.ec2.samples;
 
 import java.util.List;
@@ -28,6 +26,7 @@ import java.util.ArrayList;
 import com.amazonaws.ec2.*;
 import com.amazonaws.ec2.model.*;
 import java.util.concurrent.Future;
+
 
 /**
  *
@@ -44,13 +43,13 @@ public class DescribeImagesAsyncSample {
      * @param args unused
      */
     public static void main(String... args) {
-        
+
         /************************************************************************
          * Access Key ID and Secret Acess Key ID, obtained from:
          * http://aws.amazon.com
          ***********************************************************************/
-         String accessKeyId = "<Your Access Key ID>";
-         String secretAccessKey = "<Your Secret Access Key>";
+        String accessKeyId = "<Your Access Key ID>";
+        String secretAccessKey = "<Your Secret Access Key>";
 
         /************************************************************************
          * Instantiate Http Client Implementation of Amazon EC2 
@@ -58,29 +57,27 @@ public class DescribeImagesAsyncSample {
          * spawn for processing.
          *
          ***********************************************************************/
-         AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey, 35);
+        AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey, 35);
 
         /************************************************************************
          * Setup requests parameters and invoke parallel processing. Of course
          * in real world application, there will be much more than a couple of
          * requests to process.
          ***********************************************************************/
-         DescribeImagesRequest requestOne = new DescribeImagesRequest();
-         // @TODO: set request parameters here
+        DescribeImagesRequest requestOne = new DescribeImagesRequest();
+        // @TODO: set request parameters here
 
-         DescribeImagesRequest requestTwo = new DescribeImagesRequest();
-         // @TODO: set second request parameters here
+        DescribeImagesRequest requestTwo = new DescribeImagesRequest();
+        // @TODO: set second request parameters here
 
-         List<DescribeImagesRequest> requests = new ArrayList<DescribeImagesRequest>();
-         requests.add(requestOne);
-         requests.add(requestTwo);
+        List<DescribeImagesRequest> requests = new ArrayList<DescribeImagesRequest>();
+        requests.add(requestOne);
+        requests.add(requestTwo);
 
-         // invokeDescribeImages(service, requests);
+        // invokeDescribeImages(service, requests);
 
     }
 
-
-                                                                                            
     /**
      * Describe Images request sample
      * The DescribeImages operation returns information about AMIs, AKIs, and ARIs
@@ -148,5 +145,5 @@ public class DescribeImagesAsyncSample {
             }
         }
     }
-                                                                    
+
 }

@@ -19,8 +19,6 @@
  * 
  */
 
-
-
 package com.amazonaws.ec2;
 
 /**
@@ -29,15 +27,14 @@ package com.amazonaws.ec2;
  *
  */
 public class AmazonEC2Exception extends Exception {
-    
+
     private String message = null;
     private int statusCode = -1;
     private String errorCode = null;
     private String errorType = null;
     private String requestId = null;
     private String xml = null;
-    
-    
+
     /**
      * Constructs AmazonEC2Exception with message
      * @param message
@@ -46,7 +43,7 @@ public class AmazonEC2Exception extends Exception {
     public AmazonEC2Exception(String message) {
         this.message = message;
     }
-    
+
     /**
      * Constructs AmazonEC2Exception with message and status code
      * @param message
@@ -58,7 +55,7 @@ public class AmazonEC2Exception extends Exception {
         this.message = message;
         this.statusCode = statusCode;
     }
-    
+
     /**
      * Constructs AmazonEC2Exception with wrapped exception
      * @param t
@@ -67,7 +64,7 @@ public class AmazonEC2Exception extends Exception {
     public AmazonEC2Exception(Throwable t) {
         super(t);
         if (t instanceof AmazonEC2Exception) {
-            AmazonEC2Exception ex = (AmazonEC2Exception)t;
+            AmazonEC2Exception ex = (AmazonEC2Exception) t;
             this.message = ex.getMessage();
             this.statusCode = ex.getStatusCode();
             this.errorCode = ex.getErrorCode();
@@ -76,7 +73,7 @@ public class AmazonEC2Exception extends Exception {
             this.xml = ex.getXML();
         }
     }
-    
+
     /**
      * Constructs AmazonEC2Exception with message and wrapped exception
      * @param message
@@ -88,8 +85,7 @@ public class AmazonEC2Exception extends Exception {
         super(message, t);
         this.message = message;
     }
-    
-    
+
     /**
      * Constructs AmazonEC2Exception with information available from service
      * @param message
@@ -105,8 +101,9 @@ public class AmazonEC2Exception extends Exception {
      * @param xml
      *          Compete xml found in response
      */
-    public AmazonEC2Exception(String message, int statusCode, String errorCode, String errorType, String requestId,  String xml) {
-        
+    public AmazonEC2Exception(String message, int statusCode, String errorCode, String errorType,
+            String requestId, String xml) {
+
         this.message = message;
         this.statusCode = statusCode;
         this.errorCode = errorCode;
@@ -114,25 +111,25 @@ public class AmazonEC2Exception extends Exception {
         this.requestId = requestId;
         this.xml = xml;
     }
-    
+
     /**
      * Gets error code returned by the service if available.
      *
      * @return Error Code returned by the service
      */
-    public String getErrorCode(){
+    public String getErrorCode() {
         return errorCode;
     }
-    
+
     /**
      * Gets error type returned by the service if available.
      *
      * @return Error Type returned by the service
      */
-    public String getErrorType(){
+    public String getErrorType() {
         return errorType;
     }
-    
+
     /**
      * Gets error message
      *
@@ -142,7 +139,7 @@ public class AmazonEC2Exception extends Exception {
     public String getMessage() {
         return message;
     }
-    
+
     /**
      * Gets status code returned by the service if available. If status
      * code is set to -1, it means that status code was unavailable at the
@@ -153,7 +150,7 @@ public class AmazonEC2Exception extends Exception {
     public int getStatusCode() {
         return statusCode;
     }
-    
+
     /**
      * Gets XML returned by the service if available.
      *
@@ -162,7 +159,7 @@ public class AmazonEC2Exception extends Exception {
     public String getXML() {
         return xml;
     }
-    
+
     /**
      * Gets Request ID returned by the service if available.
      *

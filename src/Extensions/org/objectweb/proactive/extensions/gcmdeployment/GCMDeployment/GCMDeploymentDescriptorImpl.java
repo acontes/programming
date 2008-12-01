@@ -108,7 +108,7 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
             Executor.getExecutor().submit(javaJob);
         }
     }
-    
+
     private void startBridges(CommandBuilder commandBuilder, GCMApplicationInternal gcma) {
         List<Bridge> bridges = resources.getBridges();
         for (Bridge bridge : bridges) {

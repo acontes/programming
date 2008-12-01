@@ -1,4 +1,3 @@
-
 package com.amazonaws.ec2.model;
 
 import java.util.ArrayList;
@@ -34,11 +33,7 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-    "imageId",
-    "owner",
-    "executableBy"
-})
+@XmlType(name = "", propOrder = { "imageId", "owner", "executableBy" })
 @XmlRootElement(name = "DescribeImagesRequest")
 public class DescribeImagesRequest {
 
@@ -61,7 +56,8 @@ public class DescribeImagesRequest {
      * Value constructor
      * 
      */
-    public DescribeImagesRequest(final List<String> imageId, final List<String> owner, final List<String> executableBy) {
+    public DescribeImagesRequest(final List<String> imageId, final List<String> owner,
+            final List<String> executableBy) {
         this.imageId = imageId;
         this.owner = owner;
         this.executableBy = executableBy;
@@ -97,7 +93,7 @@ public class DescribeImagesRequest {
     }
 
     public boolean isSetImageId() {
-        return ((this.imageId!= null)&&(!this.imageId.isEmpty()));
+        return ((this.imageId != null) && (!this.imageId.isEmpty()));
     }
 
     public void unsetImageId() {
@@ -134,7 +130,7 @@ public class DescribeImagesRequest {
     }
 
     public boolean isSetOwner() {
-        return ((this.owner!= null)&&(!this.owner.isEmpty()));
+        return ((this.owner != null) && (!this.owner.isEmpty()));
     }
 
     public void unsetOwner() {
@@ -171,7 +167,7 @@ public class DescribeImagesRequest {
     }
 
     public boolean isSetExecutableBy() {
-        return ((this.executableBy!= null)&&(!this.executableBy.isEmpty()));
+        return ((this.executableBy != null) && (!this.executableBy.isEmpty()));
     }
 
     public void unsetExecutableBy() {
@@ -186,7 +182,7 @@ public class DescribeImagesRequest {
      *     this instance
      */
     public DescribeImagesRequest withImageId(String... values) {
-        for (String value: values) {
+        for (String value : values) {
             getImageId().add(value);
         }
         return this;
@@ -200,7 +196,7 @@ public class DescribeImagesRequest {
      *     this instance
      */
     public DescribeImagesRequest withOwner(String... values) {
-        for (String value: values) {
+        for (String value : values) {
             getOwner().add(value);
         }
         return this;
@@ -214,7 +210,7 @@ public class DescribeImagesRequest {
      *     this instance
      */
     public DescribeImagesRequest withExecutableBy(String... values) {
-        for (String value: values) {
+        for (String value : values) {
             getExecutableBy().add(value);
         }
         return this;
@@ -255,8 +251,6 @@ public class DescribeImagesRequest {
     public void setExecutableBy(List<String> executableBy) {
         this.executableBy = executableBy;
     }
-    
-
 
     /**
      *
@@ -271,34 +265,40 @@ public class DescribeImagesRequest {
         StringBuffer json = new StringBuffer();
         boolean first = true;
         if (isSetImageId()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append("\"ImageId\" : [");
-            java.util.List<String> imageIdList  =  getImageId();
+            java.util.List<String> imageIdList = getImageId();
             for (String imageId : imageIdList) {
-                if (imageIdList.indexOf(imageId) > 0) json.append(", ");
-                    json.append(quoteJSON(imageId));
+                if (imageIdList.indexOf(imageId) > 0)
+                    json.append(", ");
+                json.append(quoteJSON(imageId));
             }
             json.append("]");
             first = false;
         }
         if (isSetOwner()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append("\"Owner\" : [");
-            java.util.List<String> ownerList  =  getOwner();
+            java.util.List<String> ownerList = getOwner();
             for (String owner : ownerList) {
-                if (ownerList.indexOf(owner) > 0) json.append(", ");
-                    json.append(quoteJSON(owner));
+                if (ownerList.indexOf(owner) > 0)
+                    json.append(", ");
+                json.append(quoteJSON(owner));
             }
             json.append("]");
             first = false;
         }
         if (isSetExecutableBy()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append("\"ExecutableBy\" : [");
-            java.util.List<String> executableByList  =  getExecutableBy();
+            java.util.List<String> executableByList = getExecutableBy();
             for (String executableBy : executableByList) {
-                if (executableByList.indexOf(executableBy) > 0) json.append(", ");
-                    json.append(quoteJSON(executableBy));
+                if (executableByList.indexOf(executableBy) > 0)
+                    json.append(", ");
+                json.append(quoteJSON(executableBy));
             }
             json.append("]");
             first = false;
@@ -317,41 +317,40 @@ public class DescribeImagesRequest {
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             switch (c) {
-            case '"':
-                sb.append("\\\"");
-                break;
-            case '\\':
-                sb.append("\\\\");
-                break;
-            case '/':
-                sb.append("\\/");
-                break;
-            case '\b':
-                sb.append("\\b");
-                break;
-            case '\f':
-                sb.append("\\f");
-                break;
-            case '\n':
-                sb.append("\\n");
-                break;
-            case '\r':
-                sb.append("\\r");
-                break;
-            case '\t':
-                sb.append("\\t");
-                break;
-            default:
-                if (c <  ' ') {
-                    sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
-                } else {
-                sb.append(c);
+                case '"':
+                    sb.append("\\\"");
+                    break;
+                case '\\':
+                    sb.append("\\\\");
+                    break;
+                case '/':
+                    sb.append("\\/");
+                    break;
+                case '\b':
+                    sb.append("\\b");
+                    break;
+                case '\f':
+                    sb.append("\\f");
+                    break;
+                case '\n':
+                    sb.append("\\n");
+                    break;
+                case '\r':
+                    sb.append("\\r");
+                    break;
+                case '\t':
+                    sb.append("\\t");
+                    break;
+                default:
+                    if (c < ' ') {
+                        sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
+                    } else {
+                        sb.append(c);
+                    }
             }
-        }
         }
         sb.append("\"");
         return sb.toString();
     }
-
 
 }

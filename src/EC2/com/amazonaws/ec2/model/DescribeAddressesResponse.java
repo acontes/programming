@@ -1,4 +1,3 @@
-
 package com.amazonaws.ec2.model;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -31,10 +30,7 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-    "responseMetadata",
-    "describeAddressesResult"
-})
+@XmlType(name = "", propOrder = { "responseMetadata", "describeAddressesResult" })
 @XmlRootElement(name = "DescribeAddressesResponse")
 public class DescribeAddressesResponse {
 
@@ -55,7 +51,8 @@ public class DescribeAddressesResponse {
      * Value constructor
      * 
      */
-    public DescribeAddressesResponse(final ResponseMetadata responseMetadata, final DescribeAddressesResult describeAddressesResult) {
+    public DescribeAddressesResponse(final ResponseMetadata responseMetadata,
+            final DescribeAddressesResult describeAddressesResult) {
         this.responseMetadata = responseMetadata;
         this.describeAddressesResult = describeAddressesResult;
     }
@@ -85,7 +82,7 @@ public class DescribeAddressesResponse {
     }
 
     public boolean isSetResponseMetadata() {
-        return (this.responseMetadata!= null);
+        return (this.responseMetadata != null);
     }
 
     /**
@@ -113,7 +110,7 @@ public class DescribeAddressesResponse {
     }
 
     public boolean isSetDescribeAddressesResult() {
-        return (this.describeAddressesResult!= null);
+        return (this.describeAddressesResult != null);
     }
 
     /**
@@ -139,7 +136,6 @@ public class DescribeAddressesResponse {
         setDescribeAddressesResult(value);
         return this;
     }
-    
 
     /**
      * 
@@ -151,17 +147,17 @@ public class DescribeAddressesResponse {
         StringBuffer xml = new StringBuffer();
         xml.append("<DescribeAddressesResponse xmlns=\"http://ec2.amazonaws.com/doc/2008-05-05/\">");
         if (isSetResponseMetadata()) {
-            ResponseMetadata  responseMetadata = getResponseMetadata();
+            ResponseMetadata responseMetadata = getResponseMetadata();
             xml.append("<ResponseMetadata>");
             xml.append(responseMetadata.toXMLFragment());
             xml.append("</ResponseMetadata>");
-        } 
+        }
         if (isSetDescribeAddressesResult()) {
-            DescribeAddressesResult  describeAddressesResult = getDescribeAddressesResult();
+            DescribeAddressesResult describeAddressesResult = getDescribeAddressesResult();
             xml.append("<DescribeAddressesResult>");
             xml.append(describeAddressesResult.toXMLFragment());
             xml.append("</DescribeAddressesResult>");
-        } 
+        }
         xml.append("</DescribeAddressesResponse>");
         return xml.toString();
     }
@@ -176,29 +172,27 @@ public class DescribeAddressesResponse {
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             switch (c) {
-            case '&':
-                sb.append("&amp;");
-                break;
-            case '<':
-                sb.append("&lt;");
-                break;
-            case '>':
-                sb.append("&gt;");
-                break;
-            case '\'':
-                sb.append("&#039;");
-                break;
-            case '"':
-                sb.append("&quot;");
-                break;
-            default:
-                sb.append(c);
+                case '&':
+                    sb.append("&amp;");
+                    break;
+                case '<':
+                    sb.append("&lt;");
+                    break;
+                case '>':
+                    sb.append("&gt;");
+                    break;
+                case '\'':
+                    sb.append("&#039;");
+                    break;
+                case '"':
+                    sb.append("&quot;");
+                    break;
+                default:
+                    sb.append(c);
             }
         }
         return sb.toString();
     }
-
-
 
     /**
      * 
@@ -215,23 +209,25 @@ public class DescribeAddressesResponse {
         boolean first = true;
         json.append(", ");
         if (isSetResponseMetadata()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append("\"ResponseMetadata\" : {");
-            ResponseMetadata  responseMetadata = getResponseMetadata();
+            ResponseMetadata responseMetadata = getResponseMetadata();
 
             json.append(responseMetadata.toJSONFragment());
             json.append("}");
             first = false;
-        } 
+        }
         if (isSetDescribeAddressesResult()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append("\"DescribeAddressesResult\" : {");
-            DescribeAddressesResult  describeAddressesResult = getDescribeAddressesResult();
+            DescribeAddressesResult describeAddressesResult = getDescribeAddressesResult();
 
             json.append(describeAddressesResult.toJSONFragment());
             json.append("}");
             first = false;
-        } 
+        }
         json.append("}");
         json.append("}");
         return json.toString();
@@ -248,41 +244,40 @@ public class DescribeAddressesResponse {
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             switch (c) {
-            case '"':
-                sb.append("\\\"");
-                break;
-            case '\\':
-                sb.append("\\\\");
-                break;
-            case '/':
-                sb.append("\\/");
-                break;
-            case '\b':
-                sb.append("\\b");
-                break;
-            case '\f':
-                sb.append("\\f");
-                break;
-            case '\n':
-                sb.append("\\n");
-                break;
-            case '\r':
-                sb.append("\\r");
-                break;
-            case '\t':
-                sb.append("\\t");
-                break;
-            default:
-                if (c <  ' ') {
-                    sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
-                } else {
-                sb.append(c);
-                }
+                case '"':
+                    sb.append("\\\"");
+                    break;
+                case '\\':
+                    sb.append("\\\\");
+                    break;
+                case '/':
+                    sb.append("\\/");
+                    break;
+                case '\b':
+                    sb.append("\\b");
+                    break;
+                case '\f':
+                    sb.append("\\f");
+                    break;
+                case '\n':
+                    sb.append("\\n");
+                    break;
+                case '\r':
+                    sb.append("\\r");
+                    break;
+                case '\t':
+                    sb.append("\\t");
+                    break;
+                default:
+                    if (c < ' ') {
+                        sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
+                    } else {
+                        sb.append(c);
+                    }
             }
         }
         sb.append("\"");
         return sb.toString();
     }
-
 
 }

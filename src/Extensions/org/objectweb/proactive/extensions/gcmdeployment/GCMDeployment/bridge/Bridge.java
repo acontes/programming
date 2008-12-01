@@ -101,7 +101,7 @@ public interface Bridge extends Serializable {
      * @param group The child group
      */
     public void addJavaGroup(JavaGroup group);
-    
+
     /**
      * Returns all children of type Group
      *
@@ -115,7 +115,7 @@ public interface Bridge extends Serializable {
      * @return
      */
     public List<JavaGroup> getJavaGroups();
-    
+
     /**
      * Set the HostInfo
      *

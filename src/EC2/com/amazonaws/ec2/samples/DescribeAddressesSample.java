@@ -19,8 +19,6 @@
  * 
  */
 
-
-
 package com.amazonaws.ec2.samples;
 
 import java.util.List;
@@ -28,6 +26,7 @@ import java.util.ArrayList;
 import com.amazonaws.ec2.*;
 import com.amazonaws.ec2.model.*;
 import com.amazonaws.ec2.mock.AmazonEC2Mock;
+
 
 /**
  *
@@ -44,7 +43,7 @@ public class DescribeAddressesSample {
      * @param args unused
      */
     public static void main(String... args) {
-        
+
         /************************************************************************
          * Access Key ID and Secret Acess Key ID, obtained from:
          * http://aws.amazon.com
@@ -56,7 +55,7 @@ public class DescribeAddressesSample {
          * Instantiate Http Client Implementation of Amazon EC2 
          ***********************************************************************/
         AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey);
-        
+
         /************************************************************************
          * Uncomment to try advanced configuration options. Available options are:
          *
@@ -69,7 +68,6 @@ public class DescribeAddressesSample {
         // AmazonEC2Config config = new AmazonEC2Config();
         // config.setSignatureVersion("0");
         // AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey, config);
- 
         /************************************************************************
          * Uncomment to try out Mock Service that simulates Amazon EC2 
          * responses without calling Amazon EC2  service.
@@ -81,21 +79,18 @@ public class DescribeAddressesSample {
          *
          ***********************************************************************/
         // AmazonEC2 service = new AmazonEC2Mock();
-
         /************************************************************************
          * Setup request parameters and uncomment invoke to try out 
          * sample for Describe Addresses 
          ***********************************************************************/
-         DescribeAddressesRequest request = new DescribeAddressesRequest();
-        
-         // @TODO: set request parameters here
+        DescribeAddressesRequest request = new DescribeAddressesRequest();
 
-         // invokeDescribeAddresses(service, request);
+        // @TODO: set request parameters here
+
+        // invokeDescribeAddresses(service, request);
 
     }
 
-
-                                                                                
     /**
      * Describe Addresses  request sample
      * The DescribeAddresses operation lists elastic IP addresses assigned to your
@@ -106,31 +101,31 @@ public class DescribeAddressesSample {
      */
     public static void invokeDescribeAddresses(AmazonEC2 service, DescribeAddressesRequest request) {
         try {
-            
+
             DescribeAddressesResponse response = service.describeAddresses(request);
 
-            
-            System.out.println ("DescribeAddresses Action Response");
-            System.out.println ("=============================================================================");
-            System.out.println ();
+            System.out.println("DescribeAddresses Action Response");
+            System.out
+                    .println("=============================================================================");
+            System.out.println();
 
             System.out.print("    DescribeAddressesResponse");
             System.out.println();
             if (response.isSetResponseMetadata()) {
                 System.out.print("        ResponseMetadata");
                 System.out.println();
-                ResponseMetadata  responseMetadata = response.getResponseMetadata();
+                ResponseMetadata responseMetadata = response.getResponseMetadata();
                 if (responseMetadata.isSetRequestId()) {
                     System.out.print("            RequestId");
                     System.out.println();
                     System.out.print("                " + responseMetadata.getRequestId());
                     System.out.println();
                 }
-            } 
+            }
             if (response.isSetDescribeAddressesResult()) {
                 System.out.print("        DescribeAddressesResult");
                 System.out.println();
-                DescribeAddressesResult  describeAddressesResult = response.getDescribeAddressesResult();
+                DescribeAddressesResult describeAddressesResult = response.getDescribeAddressesResult();
                 java.util.List<Address> addressList = describeAddressesResult.getAddress();
                 for (Address address : addressList) {
                     System.out.print("            Address");
@@ -148,12 +143,11 @@ public class DescribeAddressesSample {
                         System.out.println();
                     }
                 }
-            } 
+            }
             System.out.println();
 
-           
         } catch (AmazonEC2Exception ex) {
-            
+
             System.out.println("Caught Exception: " + ex.getMessage());
             System.out.println("Response Status Code: " + ex.getStatusCode());
             System.out.println("Error Code: " + ex.getErrorCode());
@@ -162,5 +156,5 @@ public class DescribeAddressesSample {
             System.out.print("XML: " + ex.getXML());
         }
     }
-                                                                                
+
 }

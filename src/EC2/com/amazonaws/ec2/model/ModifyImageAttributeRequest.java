@@ -1,4 +1,3 @@
-
 package com.amazonaws.ec2.model;
 
 import java.util.ArrayList;
@@ -37,14 +36,8 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-    "imageId",
-    "attribute",
-    "operationType",
-    "userId",
-    "userGroup",
-    "productCode"
-})
+@XmlType(name = "", propOrder = { "imageId", "attribute", "operationType", "userId", "userGroup",
+        "productCode" })
 @XmlRootElement(name = "ModifyImageAttributeRequest")
 public class ModifyImageAttributeRequest {
 
@@ -73,7 +66,9 @@ public class ModifyImageAttributeRequest {
      * Value constructor
      * 
      */
-    public ModifyImageAttributeRequest(final String imageId, final String attribute, final String operationType, final List<String> userId, final List<String> userGroup, final List<String> productCode) {
+    public ModifyImageAttributeRequest(final String imageId, final String attribute,
+            final String operationType, final List<String> userId, final List<String> userGroup,
+            final List<String> productCode) {
         this.imageId = imageId;
         this.attribute = attribute;
         this.operationType = operationType;
@@ -107,7 +102,7 @@ public class ModifyImageAttributeRequest {
     }
 
     public boolean isSetImageId() {
-        return (this.imageId!= null);
+        return (this.imageId != null);
     }
 
     /**
@@ -135,7 +130,7 @@ public class ModifyImageAttributeRequest {
     }
 
     public boolean isSetAttribute() {
-        return (this.attribute!= null);
+        return (this.attribute != null);
     }
 
     /**
@@ -163,7 +158,7 @@ public class ModifyImageAttributeRequest {
     }
 
     public boolean isSetOperationType() {
-        return (this.operationType!= null);
+        return (this.operationType != null);
     }
 
     /**
@@ -196,7 +191,7 @@ public class ModifyImageAttributeRequest {
     }
 
     public boolean isSetUserId() {
-        return ((this.userId!= null)&&(!this.userId.isEmpty()));
+        return ((this.userId != null) && (!this.userId.isEmpty()));
     }
 
     public void unsetUserId() {
@@ -233,7 +228,7 @@ public class ModifyImageAttributeRequest {
     }
 
     public boolean isSetUserGroup() {
-        return ((this.userGroup!= null)&&(!this.userGroup.isEmpty()));
+        return ((this.userGroup != null) && (!this.userGroup.isEmpty()));
     }
 
     public void unsetUserGroup() {
@@ -270,7 +265,7 @@ public class ModifyImageAttributeRequest {
     }
 
     public boolean isSetProductCode() {
-        return ((this.productCode!= null)&&(!this.productCode.isEmpty()));
+        return ((this.productCode != null) && (!this.productCode.isEmpty()));
     }
 
     public void unsetProductCode() {
@@ -321,7 +316,7 @@ public class ModifyImageAttributeRequest {
      *     this instance
      */
     public ModifyImageAttributeRequest withUserId(String... values) {
-        for (String value: values) {
+        for (String value : values) {
             getUserId().add(value);
         }
         return this;
@@ -335,7 +330,7 @@ public class ModifyImageAttributeRequest {
      *     this instance
      */
     public ModifyImageAttributeRequest withUserGroup(String... values) {
-        for (String value: values) {
+        for (String value : values) {
             getUserGroup().add(value);
         }
         return this;
@@ -349,7 +344,7 @@ public class ModifyImageAttributeRequest {
      *     this instance
      */
     public ModifyImageAttributeRequest withProductCode(String... values) {
-        for (String value: values) {
+        for (String value : values) {
             getProductCode().add(value);
         }
         return this;
@@ -390,8 +385,6 @@ public class ModifyImageAttributeRequest {
     public void setProductCode(List<String> productCode) {
         this.productCode = productCode;
     }
-    
-
 
     /**
      *
@@ -406,55 +399,64 @@ public class ModifyImageAttributeRequest {
         StringBuffer json = new StringBuffer();
         boolean first = true;
         if (isSetImageId()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("ImageId"));
             json.append(" : ");
             json.append(quoteJSON(getImageId()));
             first = false;
         }
         if (isSetAttribute()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("Attribute"));
             json.append(" : ");
             json.append(quoteJSON(getAttribute()));
             first = false;
         }
         if (isSetOperationType()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("OperationType"));
             json.append(" : ");
             json.append(quoteJSON(getOperationType()));
             first = false;
         }
         if (isSetUserId()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append("\"UserId\" : [");
-            java.util.List<String> userIdList  =  getUserId();
+            java.util.List<String> userIdList = getUserId();
             for (String userId : userIdList) {
-                if (userIdList.indexOf(userId) > 0) json.append(", ");
-                    json.append(quoteJSON(userId));
+                if (userIdList.indexOf(userId) > 0)
+                    json.append(", ");
+                json.append(quoteJSON(userId));
             }
             json.append("]");
             first = false;
         }
         if (isSetUserGroup()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append("\"UserGroup\" : [");
-            java.util.List<String> userGroupList  =  getUserGroup();
+            java.util.List<String> userGroupList = getUserGroup();
             for (String userGroup : userGroupList) {
-                if (userGroupList.indexOf(userGroup) > 0) json.append(", ");
-                    json.append(quoteJSON(userGroup));
+                if (userGroupList.indexOf(userGroup) > 0)
+                    json.append(", ");
+                json.append(quoteJSON(userGroup));
             }
             json.append("]");
             first = false;
         }
         if (isSetProductCode()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append("\"ProductCode\" : [");
-            java.util.List<String> productCodeList  =  getProductCode();
+            java.util.List<String> productCodeList = getProductCode();
             for (String productCode : productCodeList) {
-                if (productCodeList.indexOf(productCode) > 0) json.append(", ");
-                    json.append(quoteJSON(productCode));
+                if (productCodeList.indexOf(productCode) > 0)
+                    json.append(", ");
+                json.append(quoteJSON(productCode));
             }
             json.append("]");
             first = false;
@@ -473,41 +475,40 @@ public class ModifyImageAttributeRequest {
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             switch (c) {
-            case '"':
-                sb.append("\\\"");
-                break;
-            case '\\':
-                sb.append("\\\\");
-                break;
-            case '/':
-                sb.append("\\/");
-                break;
-            case '\b':
-                sb.append("\\b");
-                break;
-            case '\f':
-                sb.append("\\f");
-                break;
-            case '\n':
-                sb.append("\\n");
-                break;
-            case '\r':
-                sb.append("\\r");
-                break;
-            case '\t':
-                sb.append("\\t");
-                break;
-            default:
-                if (c <  ' ') {
-                    sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
-                } else {
-                sb.append(c);
+                case '"':
+                    sb.append("\\\"");
+                    break;
+                case '\\':
+                    sb.append("\\\\");
+                    break;
+                case '/':
+                    sb.append("\\/");
+                    break;
+                case '\b':
+                    sb.append("\\b");
+                    break;
+                case '\f':
+                    sb.append("\\f");
+                    break;
+                case '\n':
+                    sb.append("\\n");
+                    break;
+                case '\r':
+                    sb.append("\\r");
+                    break;
+                case '\t':
+                    sb.append("\\t");
+                    break;
+                default:
+                    if (c < ' ') {
+                        sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
+                    } else {
+                        sb.append(c);
+                    }
             }
-        }
         }
         sb.append("\"");
         return sb.toString();
     }
-
 
 }

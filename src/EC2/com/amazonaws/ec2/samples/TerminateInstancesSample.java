@@ -19,8 +19,6 @@
  * 
  */
 
-
-
 package com.amazonaws.ec2.samples;
 
 import java.util.List;
@@ -28,6 +26,7 @@ import java.util.ArrayList;
 import com.amazonaws.ec2.*;
 import com.amazonaws.ec2.model.*;
 import com.amazonaws.ec2.mock.AmazonEC2Mock;
+
 
 /**
  *
@@ -44,7 +43,7 @@ public class TerminateInstancesSample {
      * @param args unused
      */
     public static void main(String... args) {
-        
+
         /************************************************************************
          * Access Key ID and Secret Acess Key ID, obtained from:
          * http://aws.amazon.com
@@ -56,7 +55,7 @@ public class TerminateInstancesSample {
          * Instantiate Http Client Implementation of Amazon EC2 
          ***********************************************************************/
         AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey);
-        
+
         /************************************************************************
          * Uncomment to try advanced configuration options. Available options are:
          *
@@ -69,7 +68,6 @@ public class TerminateInstancesSample {
         // AmazonEC2Config config = new AmazonEC2Config();
         // config.setSignatureVersion("0");
         // AmazonEC2 service = new AmazonEC2Client(accessKeyId, secretAccessKey, config);
- 
         /************************************************************************
          * Uncomment to try out Mock Service that simulates Amazon EC2 
          * responses without calling Amazon EC2  service.
@@ -81,21 +79,18 @@ public class TerminateInstancesSample {
          *
          ***********************************************************************/
         // AmazonEC2 service = new AmazonEC2Mock();
-
         /************************************************************************
          * Setup request parameters and uncomment invoke to try out 
          * sample for Terminate Instances 
          ***********************************************************************/
-         TerminateInstancesRequest request = new TerminateInstancesRequest();
-        
-         // @TODO: set request parameters here
+        TerminateInstancesRequest request = new TerminateInstancesRequest();
 
-         // invokeTerminateInstances(service, request);
+        // @TODO: set request parameters here
+
+        // invokeTerminateInstances(service, request);
 
     }
 
-
-                                                                                                                                                            
     /**
      * Terminate Instances  request sample
      * The TerminateInstances operation shuts down one or more instances. This
@@ -109,32 +104,33 @@ public class TerminateInstancesSample {
      */
     public static void invokeTerminateInstances(AmazonEC2 service, TerminateInstancesRequest request) {
         try {
-            
+
             TerminateInstancesResponse response = service.terminateInstances(request);
 
-            
-            System.out.println ("TerminateInstances Action Response");
-            System.out.println ("=============================================================================");
-            System.out.println ();
+            System.out.println("TerminateInstances Action Response");
+            System.out
+                    .println("=============================================================================");
+            System.out.println();
 
             System.out.print("    TerminateInstancesResponse");
             System.out.println();
             if (response.isSetResponseMetadata()) {
                 System.out.print("        ResponseMetadata");
                 System.out.println();
-                ResponseMetadata  responseMetadata = response.getResponseMetadata();
+                ResponseMetadata responseMetadata = response.getResponseMetadata();
                 if (responseMetadata.isSetRequestId()) {
                     System.out.print("            RequestId");
                     System.out.println();
                     System.out.print("                " + responseMetadata.getRequestId());
                     System.out.println();
                 }
-            } 
+            }
             if (response.isSetTerminateInstancesResult()) {
                 System.out.print("        TerminateInstancesResult");
                 System.out.println();
-                TerminateInstancesResult  terminateInstancesResult = response.getTerminateInstancesResult();
-                java.util.List<TerminatingInstance> terminatingInstanceList = terminateInstancesResult.getTerminatingInstance();
+                TerminateInstancesResult terminateInstancesResult = response.getTerminateInstancesResult();
+                java.util.List<TerminatingInstance> terminatingInstanceList = terminateInstancesResult
+                        .getTerminatingInstance();
                 for (TerminatingInstance terminatingInstance : terminatingInstanceList) {
                     System.out.print("            TerminatingInstance");
                     System.out.println();
@@ -147,7 +143,7 @@ public class TerminateInstancesSample {
                     if (terminatingInstance.isSetShutdownState()) {
                         System.out.print("                ShutdownState");
                         System.out.println();
-                        InstanceState  shutdownState = terminatingInstance.getShutdownState();
+                        InstanceState shutdownState = terminatingInstance.getShutdownState();
                         if (shutdownState.isSetCode()) {
                             System.out.print("                    Code");
                             System.out.println();
@@ -160,11 +156,11 @@ public class TerminateInstancesSample {
                             System.out.print("                        " + shutdownState.getName());
                             System.out.println();
                         }
-                    } 
+                    }
                     if (terminatingInstance.isSetPreviousState()) {
                         System.out.print("                PreviousState");
                         System.out.println();
-                        InstanceState  previousState = terminatingInstance.getPreviousState();
+                        InstanceState previousState = terminatingInstance.getPreviousState();
                         if (previousState.isSetCode()) {
                             System.out.print("                    Code");
                             System.out.println();
@@ -177,14 +173,13 @@ public class TerminateInstancesSample {
                             System.out.print("                        " + previousState.getName());
                             System.out.println();
                         }
-                    } 
+                    }
                 }
-            } 
+            }
             System.out.println();
 
-           
         } catch (AmazonEC2Exception ex) {
-            
+
             System.out.println("Caught Exception: " + ex.getMessage());
             System.out.println("Response Status Code: " + ex.getStatusCode());
             System.out.println("Error Code: " + ex.getErrorCode());
@@ -193,5 +188,5 @@ public class TerminateInstancesSample {
             System.out.print("XML: " + ex.getXML());
         }
     }
-    
+
 }

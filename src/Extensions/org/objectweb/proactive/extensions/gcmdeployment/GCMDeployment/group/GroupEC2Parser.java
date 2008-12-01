@@ -40,6 +40,7 @@ import org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLoggers;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMParserHelper;
 import org.w3c.dom.Node;
 
+
 public class GroupEC2Parser extends AbstractJavaGroupParser {
 
     private static final String NODE_NAME = "ec2Group";
@@ -60,25 +61,25 @@ public class GroupEC2Parser extends AbstractJavaGroupParser {
 
     @Override
     public AbstractJavaGroup parseGroupNode(Node groupNode, XPath xpath) {
-        
+
         GroupEC2 ec2Group = (GroupEC2) super.parseGroupNode(groupNode, xpath);
-        
+
         try {
 
             Node imageName = (Node) xpath.evaluate(XPATH_IMAGEID, groupNode, XPathConstants.NODE);
             Node accessKeyId = (Node) xpath.evaluate(XPATH_ACCESSKEYID, groupNode, XPathConstants.NODE);
-            Node secretAccessKey = (Node) xpath.evaluate(XPATH_SECRETACCESSKEY, groupNode, XPathConstants.NODE);
+            Node secretAccessKey = (Node) xpath.evaluate(XPATH_SECRETACCESSKEY, groupNode,
+                    XPathConstants.NODE);
 
             ec2Group.setImageId(GCMParserHelper.getElementValue(imageName));
             ec2Group.setAccessKeyId(GCMParserHelper.getElementValue(accessKeyId));
             ec2Group.setSecretAccessKey(GCMParserHelper.getElementValue(secretAccessKey));
-            
+
         } catch (XPathExpressionException e) {
             GCMDeploymentLoggers.GCMD_LOGGER.error(e.getMessage(), e);
         }
 
-        
         return ec2Group;
     }
-    
+
 }

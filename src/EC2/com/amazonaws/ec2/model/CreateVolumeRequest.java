@@ -1,4 +1,3 @@
-
 package com.amazonaws.ec2.model;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -32,11 +31,7 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-    "size",
-    "snapshotId",
-    "zone"
-})
+@XmlType(name = "", propOrder = { "size", "snapshotId", "zone" })
 @XmlRootElement(name = "CreateVolumeRequest")
 public class CreateVolumeRequest {
 
@@ -90,7 +85,7 @@ public class CreateVolumeRequest {
     }
 
     public boolean isSetSize() {
-        return (this.size!= null);
+        return (this.size != null);
     }
 
     /**
@@ -118,7 +113,7 @@ public class CreateVolumeRequest {
     }
 
     public boolean isSetSnapshotId() {
-        return (this.snapshotId!= null);
+        return (this.snapshotId != null);
     }
 
     /**
@@ -146,7 +141,7 @@ public class CreateVolumeRequest {
     }
 
     public boolean isSetZone() {
-        return (this.zone!= null);
+        return (this.zone != null);
     }
 
     /**
@@ -184,8 +179,6 @@ public class CreateVolumeRequest {
         setZone(value);
         return this;
     }
-    
-
 
     /**
      *
@@ -200,21 +193,24 @@ public class CreateVolumeRequest {
         StringBuffer json = new StringBuffer();
         boolean first = true;
         if (isSetSize()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("Size"));
             json.append(" : ");
             json.append(quoteJSON(getSize()));
             first = false;
         }
         if (isSetSnapshotId()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("SnapshotId"));
             json.append(" : ");
             json.append(quoteJSON(getSnapshotId()));
             first = false;
         }
         if (isSetZone()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("Zone"));
             json.append(" : ");
             json.append(quoteJSON(getZone()));
@@ -234,41 +230,40 @@ public class CreateVolumeRequest {
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             switch (c) {
-            case '"':
-                sb.append("\\\"");
-                break;
-            case '\\':
-                sb.append("\\\\");
-                break;
-            case '/':
-                sb.append("\\/");
-                break;
-            case '\b':
-                sb.append("\\b");
-                break;
-            case '\f':
-                sb.append("\\f");
-                break;
-            case '\n':
-                sb.append("\\n");
-                break;
-            case '\r':
-                sb.append("\\r");
-                break;
-            case '\t':
-                sb.append("\\t");
-                break;
-            default:
-                if (c <  ' ') {
-                    sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
-                } else {
-                sb.append(c);
+                case '"':
+                    sb.append("\\\"");
+                    break;
+                case '\\':
+                    sb.append("\\\\");
+                    break;
+                case '/':
+                    sb.append("\\/");
+                    break;
+                case '\b':
+                    sb.append("\\b");
+                    break;
+                case '\f':
+                    sb.append("\\f");
+                    break;
+                case '\n':
+                    sb.append("\\n");
+                    break;
+                case '\r':
+                    sb.append("\\r");
+                    break;
+                case '\t':
+                    sb.append("\\t");
+                    break;
+                default:
+                    if (c < ' ') {
+                        sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
+                    } else {
+                        sb.append(c);
+                    }
             }
-        }
         }
         sb.append("\"");
         return sb.toString();
     }
-
 
 }

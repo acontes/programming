@@ -1,4 +1,3 @@
-
 package com.amazonaws.ec2.model;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -33,13 +32,7 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "Attachment", propOrder = {
-    "volumeId",
-    "instanceId",
-    "device",
-    "status",
-    "attachTime"
-})
+@XmlType(name = "Attachment", propOrder = { "volumeId", "instanceId", "device", "status", "attachTime" })
 public class Attachment {
 
     @XmlElement(name = "VolumeId", required = true)
@@ -65,7 +58,8 @@ public class Attachment {
      * Value constructor
      * 
      */
-    public Attachment(final String volumeId, final String instanceId, final String device, final String status, final String attachTime) {
+    public Attachment(final String volumeId, final String instanceId, final String device,
+            final String status, final String attachTime) {
         this.volumeId = volumeId;
         this.instanceId = instanceId;
         this.device = device;
@@ -98,7 +92,7 @@ public class Attachment {
     }
 
     public boolean isSetVolumeId() {
-        return (this.volumeId!= null);
+        return (this.volumeId != null);
     }
 
     /**
@@ -126,7 +120,7 @@ public class Attachment {
     }
 
     public boolean isSetInstanceId() {
-        return (this.instanceId!= null);
+        return (this.instanceId != null);
     }
 
     /**
@@ -154,7 +148,7 @@ public class Attachment {
     }
 
     public boolean isSetDevice() {
-        return (this.device!= null);
+        return (this.device != null);
     }
 
     /**
@@ -182,7 +176,7 @@ public class Attachment {
     }
 
     public boolean isSetStatus() {
-        return (this.status!= null);
+        return (this.status != null);
     }
 
     /**
@@ -210,7 +204,7 @@ public class Attachment {
     }
 
     public boolean isSetAttachTime() {
-        return (this.attachTime!= null);
+        return (this.attachTime != null);
     }
 
     /**
@@ -272,7 +266,6 @@ public class Attachment {
         setAttachTime(value);
         return this;
     }
-    
 
     /**
      * 
@@ -322,29 +315,27 @@ public class Attachment {
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             switch (c) {
-            case '&':
-                sb.append("&amp;");
-                break;
-            case '<':
-                sb.append("&lt;");
-                break;
-            case '>':
-                sb.append("&gt;");
-                break;
-            case '\'':
-                sb.append("&#039;");
-                break;
-            case '"':
-                sb.append("&quot;");
-                break;
-            default:
-                sb.append(c);
+                case '&':
+                    sb.append("&amp;");
+                    break;
+                case '<':
+                    sb.append("&lt;");
+                    break;
+                case '>':
+                    sb.append("&gt;");
+                    break;
+                case '\'':
+                    sb.append("&#039;");
+                    break;
+                case '"':
+                    sb.append("&quot;");
+                    break;
+                default:
+                    sb.append(c);
             }
         }
         return sb.toString();
     }
-
-
 
     /**
      *
@@ -359,35 +350,40 @@ public class Attachment {
         StringBuffer json = new StringBuffer();
         boolean first = true;
         if (isSetVolumeId()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("VolumeId"));
             json.append(" : ");
             json.append(quoteJSON(getVolumeId()));
             first = false;
         }
         if (isSetInstanceId()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("InstanceId"));
             json.append(" : ");
             json.append(quoteJSON(getInstanceId()));
             first = false;
         }
         if (isSetDevice()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("Device"));
             json.append(" : ");
             json.append(quoteJSON(getDevice()));
             first = false;
         }
         if (isSetStatus()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("Status"));
             json.append(" : ");
             json.append(quoteJSON(getStatus()));
             first = false;
         }
         if (isSetAttachTime()) {
-            if (!first) json.append(", ");
+            if (!first)
+                json.append(", ");
             json.append(quoteJSON("AttachTime"));
             json.append(" : ");
             json.append(quoteJSON(getAttachTime()));
@@ -407,41 +403,40 @@ public class Attachment {
         for (int i = 0; i < length; ++i) {
             char c = string.charAt(i);
             switch (c) {
-            case '"':
-                sb.append("\\\"");
-                break;
-            case '\\':
-                sb.append("\\\\");
-                break;
-            case '/':
-                sb.append("\\/");
-                break;
-            case '\b':
-                sb.append("\\b");
-                break;
-            case '\f':
-                sb.append("\\f");
-                break;
-            case '\n':
-                sb.append("\\n");
-                break;
-            case '\r':
-                sb.append("\\r");
-                break;
-            case '\t':
-                sb.append("\\t");
-                break;
-            default:
-                if (c <  ' ') {
-                    sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
-                } else {
-                sb.append(c);
+                case '"':
+                    sb.append("\\\"");
+                    break;
+                case '\\':
+                    sb.append("\\\\");
+                    break;
+                case '/':
+                    sb.append("\\/");
+                    break;
+                case '\b':
+                    sb.append("\\b");
+                    break;
+                case '\f':
+                    sb.append("\\f");
+                    break;
+                case '\n':
+                    sb.append("\\n");
+                    break;
+                case '\r':
+                    sb.append("\\r");
+                    break;
+                case '\t':
+                    sb.append("\\t");
+                    break;
+                default:
+                    if (c < ' ') {
+                        sb.append("\\u" + String.format("%03x", Integer.valueOf(c)));
+                    } else {
+                        sb.append(c);
+                    }
             }
-        }
         }
         sb.append("\"");
         return sb.toString();
     }
-
 
 }
