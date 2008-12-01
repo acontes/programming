@@ -69,9 +69,9 @@ public class HostInfoImpl implements HostInfo {
         this.id = id;
     }
 
-    /**
+    /*
      * Checks that all required fields have been set.
-     *
+     * 
      * @throws IllegalStateException If a required field has not been set
      */
     public void check() throws IllegalStateException {

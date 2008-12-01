@@ -50,6 +50,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.services.TechnicalService;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
@@ -358,7 +359,7 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
 
         rootNode.setApplicationDescriptorPath(descriptor.toExternalForm());
 
-        rootNode.setDeploymentPath(getCurrentdDeploymentPath());
+        rootNode.setDeploymentPath(getCurrentDeploymentPath());
         popDeploymentPath();
 
         // Build leaf nodes
@@ -394,7 +395,7 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
      * 
      * @return
      */
-    private List<String> getCurrentdDeploymentPath() {
+    private List<String> getCurrentDeploymentPath() {
         return new ArrayList<String>(currentDeploymentPath);
     }
 
@@ -404,7 +405,7 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
         TopologyImpl node = new TopologyImpl();
         node.setDeploymentDescriptorPath(gcmd.getDescriptorURL().toExternalForm());
         node.setApplicationDescriptorPath(rootNode.getApplicationDescriptorPath());
-        node.setDeploymentPath(getCurrentdDeploymentPath());
+        node.setDeploymentPath(getCurrentDeploymentPath());
         node.setNodeProvider(nodeProvider.getId());
         hostInfo.setTopologyId(node.getId());
         topologyIdToNodeProviderMapping.put(node.getId(), nodeProvider);
@@ -501,10 +502,15 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
     private void updateNodes() {
         Set<FakeNode> fakeNodes = nodeMapper.getUnusedNode(true);
         for (FakeNode fakeNode : fakeNodes) {
-            // create should not be synchronized since it's remote call
-            Node node = fakeNode.create(GCMVirtualNodeImpl.DEFAULT_VN, null);
-            synchronized (nodes) {
-                nodes.add(node);
+            try {
+                // create should not be synchronized since it's remote call
+                Node node = fakeNode.create(GCMVirtualNodeImpl.DEFAULT_VN, null);
+                synchronized (nodes) {
+                    nodes.add(node);
+                }
+            } catch (NodeException e) {
+                GCMA_LOGGER.warn("GCM Deployment failed to create a node on " + fakeNode.getRuntimeURL() +
+                    ". Please check your network configuration", e);
             }
         }
     }

@@ -32,6 +32,7 @@
 package org.objectweb.proactive.core.config;
 
 import java.io.File;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -77,9 +78,11 @@ public class ProActiveConfiguration {
      */
     public static final String PROACTIVE_LOG_PROPERTIES_FILE = "ProActiveLoggers.properties";
 
+    protected static final String FILE_PROTOCOL_PREFIX = "file:";
+
     /** User configuration directory */
-    protected static final String PROACTIVE_USER_CONFIG_FILENAME = Constants.USER_CONFIG_DIR +
-        File.separator + PROACTIVE_CONFIG_FILENAME;
+    protected static final String PROACTIVE_USER_CONFIG_FILENAME = FILE_PROTOCOL_PREFIX +
+        Constants.USER_CONFIG_DIR + File.separator + PROACTIVE_CONFIG_FILENAME;
 
     protected final Logger logger = ProActiveLogger.getLogger(Loggers.CONFIGURATION);
 
@@ -245,17 +248,21 @@ public class ProActiveConfiguration {
             fname = PROACTIVE_USER_CONFIG_FILENAME;
         }
 
-        /* Check that this file exists */
-        File file = new File(fname);
-        if (file.exists()) {
-            String userConfigFile = file.getAbsolutePath();
+        if (!fname.matches("^\\w+:.*$")) {
+            // protocol prefix was not specified
+            // using "file" protocol by default
+            fname = FILE_PROTOCOL_PREFIX + fname;
+        }
 
-            logger.debug("User Config File is: " + userConfigFile);
-            userProps = ProActiveConfigurationParser.parse(userConfigFile, userProps);
-        } else {
+        URL u = null;
+        try {
+            u = new URL(fname);
+            u.openStream();
+            logger.debug("User Config File is: " + u.toExternalForm());
+            userProps = ProActiveConfigurationParser.parse(u.toString(), userProps);
+        } catch (Exception e) {
             if (!fname.equals(PROACTIVE_CONFIG_FILENAME)) {
-                // don't print a warning if the default user config file does not exist
-                logger.warn("Configuration file " + fname + " not found");
+                logger.warn("Configuration file " + u.toExternalForm() + " not found");
             }
         }
 

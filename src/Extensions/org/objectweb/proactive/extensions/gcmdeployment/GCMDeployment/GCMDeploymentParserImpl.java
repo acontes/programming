@@ -211,7 +211,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         }
     }
 
-    /**
+    /*
      * Register all pre-installed group parsers
      */
     protected void registerDefaultGroupParsers() {
@@ -234,7 +234,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         // TODO add other group parsers here
     }
 
-    /**
+    /*
      * Register all pre-installed bridge parsers
      */
     protected void registerDefaultBridgeParsers() {
@@ -257,16 +257,17 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     protected void registerUserGroupParsers() {
     }
 
-    /**
+    /*
      * Override this
      */
     protected void registerUserBridgeParsers() {
     }
 
-    /**
+    /*
      * setup xml parser (inserting schemas, setting up xpath query engine)
      * 
      * @throws IOException
+     * 
      * @throws SAXException
      */
     protected void setupJAXP() throws IOException, SAXException {
@@ -302,10 +303,11 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         xpath.setNamespaceContext(new GCMParserHelper.ProActiveNamespaceContext());
     }
 
-    /**
+    /*
      * Parse the &lt; acquisition&gt; node
-     *
+     * 
      * @throws XPathExpressionException
+     * 
      * @throws IOException
      */
 
@@ -331,10 +333,11 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         }
     }
 
-    /**
+    /*
      * Parse the &lt; aquisition&gt; node
      * 
      * @throws XPathExpressionException
+     * 
      * @throws IOException
      */
     private void parseAcquisitionNode(Node acquisitionNode) throws XPathExpressionException, IOException {
@@ -394,10 +397,11 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         }
     }
 
-    /**
+    /*
      * Parse the &lt;resources&gt; node
      * 
      * @throws XPathExpressionException
+     * 
      * @throws IOException
      */
     public void parseResources() throws XPathExpressionException, IOException {
@@ -424,11 +428,13 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         parsedResource = true;
     }
 
-    /**
+    /*
      * Parse a single child node from the &lt;resources&gt; node
      * 
      * @param resourceNode
+     * 
      * @throws XPathExpressionException
+     * 
      * @throws IOException
      */
     protected void parseResourceNode(Node resourceNode) throws XPathExpressionException, IOException {
@@ -490,20 +496,19 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         return (Bridge) makeDeepCopy(bridge);
     }
 
-    /**
+    /*
      * Parse a &lt;group&gt; child node of a &lt;resources&gt; node :
      * 
      * <pre>
-     *  
-     * &lt;resources&gt;
-     *   &lt;group&gt;
-     *   &lt;/group&gt;
-     * &lt;/resources&gt;
-     * </pre>
+     * 
+     * &lt;resources&gt; &lt;group&gt; &lt;/group&gt; &lt;/resources&gt; </pre>
      * 
      * @param resourceNode
+     * 
      * @param group
+     * 
      * @throws XPathExpressionException
+     * 
      * @throws IOException
      */
     protected void parseGroupResource(Node resourceNode, GroupHostInfo group)
@@ -522,20 +527,19 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         group.setHostInfo(hostInfo);
     }
 
-    /**
+    /*
      * Parse a &lt;bridge&gt; child node of a &lt;resources&gt; node :
      * 
      * <pre>
-     *  
-     * &lt;resources&gt;
-     *   &lt;bridge&gt;
-     *   &lt;/bridge&gt;
-     * &lt;/resources&gt;
-     * </pre>
+     * 
+     * &lt;resources&gt; &lt;bridge&gt; &lt;/bridge&gt; &lt;/resources&gt; </pre>
      * 
      * @param resourceNode
+     * 
      * @param bridge
+     * 
      * @throws XPathExpressionException
+     * 
      * @throws IOException
      */
     protected void parseBridgeResource(Node resourceNode, Bridge bridge) throws IOException,
@@ -564,9 +568,8 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         }
     }
 
-    /**
-     * Parse the &lt;infrastructure&gt; node and build the
-     * {@link #infrastructure} member
+    /*
+     * Parse the &lt;infrastructure&gt; node and build the {@link #infrastructure} member
      * 
      * @throws XPathExpressionException
      */
@@ -635,9 +638,9 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         parsedInfrastructure = true;
     }
 
-    /**
-     * GroupParser registration A GroupParser must be registered to be taken
-     * into account when parsing a descriptor.
+    /*
+     * GroupParser registration A GroupParser must be registered to be taken into account when
+     * parsing a descriptor.
      * 
      * @param groupParser
      */
@@ -649,9 +652,9 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         groupParserMap.put(groupParser.getNodeName(), groupParser);
     }
 
-    /**
-     * BridgeParser registration A BridgeParser must be registered to be taken
-     * into account when parsing a descriptor.
+    /*
+     * BridgeParser registration A BridgeParser must be registered to be taken into account when
+     * parsing a descriptor.
      * 
      * @param bridgeParser
      */
@@ -663,6 +666,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         bridgeParserMap.put(bridgeParser.getNodeName(), bridgeParser);
     }
 
+<<<<<<< HEAD:src/Extensions/org/objectweb/proactive/extensions/gcmdeployment/GCMDeployment/GCMDeploymentParserImpl.java
     /**
      * JavaGroupParser registration A JavaGroupParser must be registered to be taken
      * into account when parsing a descriptor.
@@ -678,10 +682,15 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     }
 
     /**
+=======
+    /*
+>>>>>>> SVN_trunk:src/Extensions/org/objectweb/proactive/extensions/gcmdeployment/GCMDeployment/GCMDeploymentParserImpl.java
      * Parse a &lt;host&gt; node
      * 
      * @param hostNode
+     * 
      * @return
+     * 
      * @throws XPathExpressionException
      */
     protected HostInfo parseHostNode(Node hostNode) throws XPathExpressionException {
@@ -698,13 +707,21 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         }
 
         String hostCapacityStr = GCMParserHelper.getAttributeValue(hostNode, "hostCapacity");
+        String vmCapacityStr = GCMParserHelper.getAttributeValue(hostNode, "vmCapacity");
+
+        if (hostCapacityStr != null && vmCapacityStr == null) {
+            vmCapacityStr = "1";
+        }
+
+        if (hostCapacityStr == null && vmCapacityStr != null) {
+            hostCapacityStr = "1";
+        }
+
         if (hostCapacityStr != null) {
             hostInfo.setHostCapacity(Integer.parseInt(hostCapacityStr));
+        }
 
-            // If host capacity is specified then VM capacity must be specified
-            // too
-            String vmCapacityStr = GCMParserHelper.getAttributeValue(hostNode, "vmCapacity");
-            // FIXME: Check that both Host Capacity and VM Capacity are set
+        if (vmCapacityStr != null) {
             hostInfo.setVmCapacity(Integer.parseInt(vmCapacityStr));
         }
 
@@ -735,9 +752,9 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         return hostInfo;
     }
 
-    /**
-     * Returns the set of variables/values (if any) specified in the
-     * &lt;environment&gt; node of a descriptor
+    /*
+     * Returns the set of variables/values (if any) specified in the &lt;environment&gt; node of a
+     * descriptor
      * 
      * @return the descriptor's VariableContract
      */
@@ -745,7 +762,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         return variableContract;
     }
 
-    /**
+    /*
      * Returns the infrastructure of the descriptor (parses it if needed)
      * 
      * @return the infrastructure of the descriptor
@@ -757,7 +774,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         return infrastructure;
     }
 
-    /**
+    /*
      * Returns the resources of the descriptor (parses them if needed)
      * 
      * @return the resources of the descriptor
@@ -770,8 +787,8 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         return resources;
     }
 
-    /**
-     * Returns the acquisitions defined in descriptor (parses them if needed) * *
+    /*
+     * Returns the acquisitions defined in descriptor (parses them if needed)
      * 
      * @return the acquisitions of the descriptor
      */

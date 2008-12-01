@@ -32,67 +32,70 @@
 //@snippet-start cma_deploy_full
 package org.objectweb.proactive.examples.userguide.cmagent.deployed;
 
+import java.io.File;
+
+import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.examples.userguide.cmagent.initialized.CMAgentInitialized;
-import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
+import org.objectweb.proactive.gcmdeployment.GCMApplication;
+import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
 
 public class Main {
+    private static GCMApplication pad;
+
     //@snippet-start cma_deploy_method
     //deployment method
-    private static VirtualNode deploy(String descriptor) {
-        try {
-            //TODO 1. Create object representation of the deployment file
-            ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(descriptor);
+    private static GCMVirtualNode deploy(String descriptor) throws NodeException, ProActiveException {
 
-            //TODO 2. Activate all Virtual Nodes
-            pad.activateMappings();
+        //TODO 1. Create object representation of the deployment file
+        pad = PAGCMDeployment.loadApplicationDescriptor(new File(descriptor));
+        //TODO 2. Activate all Virtual Nodes
+        pad.startDeployment();
+        //TODO 3. Wait for all the virtual nodes to become ready
+        pad.waitReady();
 
-            //TODO 3. Get the first Virtual Node specified in the descriptor file
-            VirtualNode vn = pad.getVirtualNodes()[0];
+        //TODO 4. Get the first Virtual Node specified in the descriptor file
+        GCMVirtualNode vn = pad.getVirtualNodes().values().iterator().next();
 
-            //TODO 4. Return the virtual node
-            return vn;
-        } catch (NodeException nodeExcep) {
-            System.err.println(nodeExcep.getMessage());
-        } catch (ProActiveException proExcep) {
-            System.err.println(proExcep.getMessage());
-        }
-        return null;
+        //TODO 5. Return the virtual node
+        return vn;
     }
 
     //@snippet-end cma_deploy_method
     public static void main(String args[]) {
         try {
-            //TODO 5. Get the virtual node through the deploy method
-            VirtualNode vn = deploy(args[0]);
+            //TODO 6. Get the virtual node through the deploy method
+            GCMVirtualNode vn = deploy(args[0]);
             //@snippet-start cma_deploy_object
-            //TODO 6. Create the active object using a node on the virtual node
+            //TODO 7. Create the active object using a node on the virtual node
             CMAgentInitialized ao = (CMAgentInitialized) PAActiveObject.newActive(CMAgentInitialized.class
-                    .getName(), new Object[] {}, vn.getNode());
+                    .getName(), new Object[] {}, vn.getANode());
             //@snippet-end cma_deploy_object
-            //TODO 7. Get the current state from the active object
+            //TODO 8. Get the current state from the active object
             String currentState = ao.getCurrentState().toString();
 
-            //TODO 8. Print the state
+            //TODO 9. Print the state
             System.out.println(currentState);
 
-            //TODO 9. Stop the active object
+            //TODO 10. Stop the active object
             PAActiveObject.terminateActiveObject(ao, false);
 
-            //TODO 10. Stop the virtual node
-            vn.killAll(true);
-            PALifeCycle.exitSuccess();
         } catch (NodeException nodeExcep) {
             System.err.println(nodeExcep.getMessage());
         } catch (ActiveObjectCreationException aoExcep) {
             System.err.println(aoExcep.getMessage());
+        } catch (ProActiveException poExcep) {
+            System.err.println(poExcep.getMessage());
+        } finally {
+            //TODO 11. Stop the virtual node
+            if (pad != null)
+                pad.kill();
+            PALifeCycle.exitSuccess();
         }
     }
 }

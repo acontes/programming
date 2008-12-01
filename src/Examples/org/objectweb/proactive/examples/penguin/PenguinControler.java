@@ -37,7 +37,6 @@ import java.util.List;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.migration.MigrationStrategyManagerImpl;
 import org.objectweb.proactive.core.node.Node;
@@ -129,15 +128,29 @@ public class PenguinControler implements org.objectweb.proactive.RunActive, Peng
                 nodesURLs.add(node.getNodeInformation().getURL());
             }
             new PenguinControler(nodesURLs.toArray(new String[0]));
-
+            Runtime.getRuntime().addShutdownHook(new MyShutdownHook(proActiveDescriptor));
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            if (proActiveDescriptor != null) {
-                proActiveDescriptor.kill();
-            }
         }
 
-        PALifeCycle.exitSuccess();
     }
+
+    /**
+     * Shutdown hook for killing the deployed runtimes
+     * when the Gui exits
+     *
+     */
+    static class MyShutdownHook extends Thread {
+
+        private GCMApplication gcma;
+
+        public MyShutdownHook(GCMApplication gcma) {
+            this.gcma = gcma;
+        }
+
+        public void run() {
+            gcma.kill();
+        }
+    }
+
 }

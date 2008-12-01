@@ -44,6 +44,7 @@ import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.management.InstanceAlreadyExistsException;
@@ -268,7 +269,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
         this.roe.createRemoteObject(URI.create(url));
 
         // logging info
-        // MDC.remove("runtime");
+        MDC.remove("runtime");
         MDC.put("runtime", getURL());
     }
 
@@ -571,8 +572,15 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
         return nodeNames;
     }
 
+    /**
+     * Returns a snapshot of all the local nodes 
+     * 
+     * The collection is a copy and is never updated by the ProActive Runtime.
+     * 
+     * @return all the local nodes
+     */
     public Collection<LocalNode> getLocalNodes() {
-        return this.nodeMap.values();
+        return new HashSet<LocalNode>(this.nodeMap.values());
     }
 
     /**
@@ -803,9 +811,12 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
     /**
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getJobID(java.lang.String)
      */
-    public String getJobID(String nodeUrl) {
+    public String getJobID(String nodeUrl) throws ProActiveException {
         String name = URIBuilder.getNameFromURI(nodeUrl);
         LocalNode localNode = this.nodeMap.get(name);
+        if (localNode == null) {
+            throw new ProActiveException("Node " + nodeUrl + " does not exist on the local runtime");
+        }
         return localNode.getJobId();
     }
 

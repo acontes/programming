@@ -151,9 +151,9 @@ public class StubGenerator {
             System.setErr(mute);
         }
 
-        //        ClassPool.releaseUnmodifiedClassFile = true;
+        // ClassPool.releaseUnmodifiedClassFile = true;
         for (File file : files) {
-            String str = file.toString().replaceFirst(srcDir.toString(), "");
+            String str = file.toString().replaceFirst(srcDir.toString().replace("\\", "\\\\"), "");
             try {
                 if (!verbose) {
                     System.setErr(mute);
@@ -196,7 +196,7 @@ public class StubGenerator {
         String className = processClassName(arg);
         String fileName = null;
 
-        String stubClassName;
+        String stubClassName = null;
 
         try {
             // Generates the bytecode for the class
@@ -219,7 +219,7 @@ public class StubGenerator {
             fos.flush();
             fos.close();
         } catch (Exception e) {
-            System.err.println("Cannot write file " + fileName);
+            System.err.println("Cannot compute stub generation for class " + className);
             System.err.println("Reason is " + e);
         }
     }
@@ -227,7 +227,7 @@ public class StubGenerator {
     /**
      * Turn a file name into a class name if necessary. Remove the ending .class
      * and change all the '/' into '.'
-     *
+     * 
      * @param name
      */
     protected static String processClassName(String name) {

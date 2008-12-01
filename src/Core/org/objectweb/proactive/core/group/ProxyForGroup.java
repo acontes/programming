@@ -148,7 +148,7 @@ public class ProxyForGroup<E> extends AbstractProxy implements Proxy, Group<E>, 
         this.proxyForGroupID = new UniqueID();
         this.elementNames = new HashMap<String, Integer>();
         dispatcher = new Dispatcher(this, false, bufferSize);
-        taskFactory = new BasicTaskFactory(this);
+        taskFactory = TaskFactoryFactory.getTaskFactory(this);
     }
 
     public ProxyForGroup(ConstructorCall c, Object[] p) throws ConstructionOfReifiedObjectFailedException {
@@ -341,7 +341,7 @@ public class ProxyForGroup<E> extends AbstractProxy implements Proxy, Group<E>, 
         }
 
         /*
-         * A barrier of synchronisation to ensure that all calls are done before continuing the
+         * A barrier of synchronization to ensure that all calls are done before continuing the
          * execution
          */
         // try {
@@ -1558,6 +1558,6 @@ public class ProxyForGroup<E> extends AbstractProxy implements Proxy, Group<E>, 
         in.defaultReadObject();
         this.proxyForGroupID = new UniqueID();
         dispatcher = new Dispatcher(this, false, bufferSize);
-        taskFactory = new BasicTaskFactory(this);
+        taskFactory = TaskFactoryFactory.getTaskFactory(this);
     }
 }

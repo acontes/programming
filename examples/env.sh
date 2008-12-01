@@ -38,7 +38,8 @@ fi
 # Set up the classpath using classes dir or jar files
 #
 
-if [ -d $PROACTIVE/classes ]
+# Test if classes exists and is not empty
+if [ -d $PROACTIVE/classes/Core ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/classes/Core
     CLASSPATH=$CLASSPATH:$PROACTIVE/classes/Extensions
@@ -55,6 +56,7 @@ then
 else
     CLASSPATH=$CLASSPATH:$PROACTIVE/dist/lib/ProActive.jar
     CLASSPATH=$CLASSPATH:$PROACTIVE/dist/lib/ProActive_examples.jar
+    CLASSPATH=$CLASSPATH:$PROACTIVE/dist/lib/ibis-1.4.jar:$PROACTIVE/dist/lib/ibis-connect-1.0.jar:$PROACTIVE/dist/lib/ibis-util-1.0.jar
 fi
 
 #echo "CLASSPATH"=$CLASSPATH

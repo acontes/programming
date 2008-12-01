@@ -31,7 +31,6 @@
  */
 package org.objectweb.proactive.extensions.gcmdeployment.GCMApplication;
 
-import java.rmi.AlreadyBoundException;
 import java.util.List;
 
 import org.objectweb.proactive.core.descriptor.services.TechnicalService;
@@ -67,7 +66,7 @@ public class FakeNode {
         return part.getVMInformation().getCapacity();
     }
 
-    public Node create(GCMVirtualNodeInternal vn, List<TechnicalService> tsList) {
+    public Node create(GCMVirtualNodeInternal vn, List<TechnicalService> tsList) throws NodeException {
 
         Node node = null;
         if (!created) {
@@ -83,14 +82,17 @@ public class FakeNode {
                 }
 
                 node = part.createGCMNode(siblingPSM, vn.getName(), jobIb, tsList);
+                if (node == null) {
+                    // Remote Object failed to contact the Runtime and returned null
+                    // instead of throwing an exception
+                    throw new NodeException("Failed to create a GCM node, node is null");
+                }
+                gcma.addNode(node);
             } catch (NodeException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (AlreadyBoundException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                throw e;
+            } catch (Exception e) {
+                throw new NodeException(e);
             }
-            gcma.addNode(node);
         }
         return node;
     }

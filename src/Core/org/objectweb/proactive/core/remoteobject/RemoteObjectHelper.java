@@ -41,6 +41,7 @@ import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.remoteobject.adapter.Adapter;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
+import org.objectweb.proactive.core.remoteobject.http.HTTPTransportServlet;
 import org.objectweb.proactive.core.util.URIBuilder;
 
 
@@ -54,13 +55,8 @@ public class RemoteObjectHelper {
      */
     public static int getDefaultPortForProtocol(String protocol) throws UnknownProtocolException {
         if (Constants.XMLHTTP_PROTOCOL_IDENTIFIER.equals(protocol)) {
-            // http port could change according the availability of the default port when activated
-            // so we first instantiate the factory which will set the new port if necessary
-            getRemoteObjectFactory(protocol);
-
-            if (PAProperties.PA_XMLHTTP_PORT.getValue() != null) {
-                return Integer.parseInt(PAProperties.PA_XMLHTTP_PORT.getValue());
-            }
+            HTTPTransportServlet.get();
+            return Integer.parseInt(PAProperties.PA_XMLHTTP_PORT.getValue());
         } else if ((Constants.RMI_PROTOCOL_IDENTIFIER.equals(protocol)) ||
             Constants.IBIS_PROTOCOL_IDENTIFIER.equals(protocol) ||
             Constants.RMISSH_PROTOCOL_IDENTIFIER.equals(protocol)) {

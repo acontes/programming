@@ -32,43 +32,43 @@
 package org.objectweb.proactive.examples.userguide.cmagent.groups;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Vector;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.examples.userguide.cmagent.migration.CMAgentMigrator;
 import org.objectweb.proactive.examples.userguide.cmagent.simple.State;
+import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
+import org.objectweb.proactive.gcmdeployment.GCMApplication;
+import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
 
 public class Main {
-    private static VirtualNode deploy(String descriptor) {
-        try {
-            //create object representation of the deployment file
-            ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(descriptor);
-            //active all Virtual Nodes
-            pad.activateMappings();
-            //get the first Node available in the first Virtual Node 
-            //specified in the descriptor file
-            VirtualNode vn = pad.getVirtualNodes()[0];
-            return vn;
-        } catch (NodeException nodeExcep) {
-            System.err.println(nodeExcep.getMessage());
-        } catch (ProActiveException proExcep) {
-            System.err.println(proExcep.getMessage());
-        }
-        return null;
+    private static GCMApplication pad;
+
+    private static GCMVirtualNode deploy(String descriptor) throws NodeException, ProActiveException {
+
+        //Create object representation of the deployment file
+        pad = PAGCMDeployment.loadApplicationDescriptor(new File(descriptor));
+        //Activate all Virtual Nodes
+        pad.startDeployment();
+        //Wait for all the virtual nodes to become ready
+        pad.waitReady();
+
+        //Get the first Virtual Node specified in the descriptor file
+        GCMVirtualNode vn = pad.getVirtualNodes().values().iterator().next();
+
+        return vn;
     }
 
     //@snippet-start groups_cma_full
@@ -76,14 +76,14 @@ public class Main {
         try {
             Vector<CMAgentMigrator> agents = new Vector<CMAgentMigrator>();
             BufferedReader inputBuffer = new BufferedReader(new InputStreamReader(System.in));
-            VirtualNode vn = deploy(args[0]);
+            GCMVirtualNode vn = deploy(args[0]);
             //@snippet-start groups_group_creation	
             //TODO 1. Create a new empty group
             CMAgentMigrator monitorsGroup = (CMAgentMigrator) PAGroup.newGroup(CMAgentMigrator.class
                     .getName());
 
             //TODO 2. Create a collection of active objects with on object on each node
-            for (Node node : vn.getNodes()) {
+            for (Node node : vn.getCurrentNodes()) {
                 CMAgentMigrator ao = (CMAgentMigrator) PAActiveObject.newActive(CMAgentMigrator.class
                         .getName(), new Object[] {}, node);
                 agents.add(ao);
@@ -142,19 +142,24 @@ public class Main {
                 }
             }
 
-            //stopping all the objects and JVMS
-            vn.killAll(true);
-            PALifeCycle.exitSuccess();
         } catch (NodeException nodeExcep) {
             System.err.println(nodeExcep.getMessage());
         } catch (ActiveObjectCreationException aoExcep) {
             System.err.println(aoExcep.getMessage());
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println(e.getMessage());
         } catch (ClassNotReifiableException e) {
-            e.printStackTrace();
+            System.err.println(e.getMessage());
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            System.err.println(e.getMessage());
+        } catch (ProActiveException e) {
+            // TODO Auto-generated catch block
+            System.err.println(e.getMessage());
+        } finally {
+            //stopping all the objects and JVMS
+            if (pad != null)
+                pad.kill();
+            PALifeCycle.exitSuccess();
         }
     }
     //@snippet-end groups_cma_full

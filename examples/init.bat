@@ -22,14 +22,15 @@ IF DEFINED CLASSPATHEXT (
 	SET CLASSPATH=.
 )
 
-IF EXIST "%PROACTIVE%\classes" (
+rem Test if classes exists and is not empty
+IF EXIST "%PROACTIVE%\classes\Core" (
  	SET CLASSPATH=!CLASSPATH!;%PROACTIVE%\classes\Core;%PROACTIVE%\classes\Extensions;%PROACTIVE%\classes\Extra;%PROACTIVE%\classes\Examples
 	SET JARS=%PROACTIVE%\lib
 	FOR %%j IN ("%PROACTIVE%\lib\*.jar") DO SET JARS=!JARS!;%%j
 	SET CLASSPATH=!CLASSPATH!;!JARS!
 	rem IF EXIST "%PROACTIVE%\ProActive_examples.jar" set CLASSPATH=%CLASSPATH%;%PROACTIVE%\ProActive_examples.jar
 ) ELSE (
-	SET CLASSPATH=%CLASSPATH%;%PROACTIVE%\dist\lib\ProActive.jar;%PROACTIVE%\dist\lib\ProActive_examples.jar
+	SET CLASSPATH=%CLASSPATH%;%PROACTIVE%\dist\lib\ProActive.jar;%PROACTIVE%\dist\lib\ProActive_examples.jar;%PROACTIVE%\dist\lib\ibis-1.4.jar;%PROACTIVE%\dist\lib\ibis-connect-1.0.jar;%PROACTIVE%\dist\lib\ibis-util-1.0.jar
 )
 
 set JAVA_CMD="%JAVA_HOME%\bin\java.exe" -Dproactive.home="%PROACTIVE%"  -Dos="windows" -Djava.security.manager -Djava.security.policy="%PROACTIVE%\examples\proactive.java.policy"

@@ -229,6 +229,12 @@ public class MulticastControllerImpl extends AbstractCollectiveInterfaceControll
         return true;
     }
 
+    protected Group<ProActiveInterface> getDelegatee(String clientItfName) {
+        ProxyForComponentInterfaceGroup clientSideProxy = (ProxyForComponentInterfaceGroup) clientSideProxies
+                .get(clientItfName);
+        return clientSideProxy.getDelegatee();
+    }
+
     /*
      * @see org.objectweb.proactive.core.component.controller.MulticastController#bindFc(java.lang.String,
      *      org.objectweb.proactive.core.component.ProActiveInterface)
@@ -255,10 +261,7 @@ public class MulticastControllerImpl extends AbstractCollectiveInterfaceControll
      */
     public void unbindFcMulticast(String clientItfName, ProActiveInterface serverItf) {
         if (multicastItfs.containsKey(clientItfName)) {
-            Group<ProActiveInterface> g = null;
-            ProxyForComponentInterfaceGroup clientSideProxy = (ProxyForComponentInterfaceGroup) clientSideProxies
-                    .get(clientItfName);
-            g = clientSideProxy.getDelegatee();
+            Group<ProActiveInterface> g = getDelegatee(clientItfName);
             //ProActiveInterface itf = multicastItfs.get(clientItfName);
             //Group<ProActiveInterface> g = PAGroup.getGroup(itf);
             if (g.remove(serverItf)) {
