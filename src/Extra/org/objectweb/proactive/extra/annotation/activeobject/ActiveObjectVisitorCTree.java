@@ -58,6 +58,7 @@ import com.sun.source.tree.StatementTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.tree.Tree.Kind;
+import com.sun.source.util.TreePath;
 import com.sun.source.util.TreePathScanner;
 import com.sun.source.util.Trees;
 
@@ -80,6 +81,7 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void, Trees> {
     private Messager compilerOutput;
     private Types typesUtil;
     private boolean insideClass = false;
+    private TreePath curMethod;
 
     public ActiveObjectVisitorCTree(ProcessingEnvironment procEnv) {
         compilerOutput = procEnv.getMessager();
@@ -161,7 +163,9 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void, Trees> {
     @Override
     public Void visitMethod(MethodTree methodNode, Trees trees) {
 
-        // test modifiers
+    	curMethod = getCurrentPath();
+    	
+    	// test modifiers
         if (methodNode.getModifiers().getFlags().contains(Modifier.FINAL) &&
             !methodNode.getModifiers().getFlags().contains(Modifier.PRIVATE)) {
             reportError(" The class declares the final method " + methodNode.getName() + ".\n" +
@@ -260,7 +264,7 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void, Trees> {
         }
 
         if (returnExpression.getKind().equals(Tree.Kind.NULL_LITERAL)) {
-            reportError(ErrorMessages.NO_NULL_RETURN_ERROR_MSG, trees.getElement(getCurrentPath()));
+            reportError(ErrorMessages.NO_NULL_RETURN_ERROR_MSG, trees.getElement(curMethod));
         }
         return super.visitReturn(returnNode, trees);
     }
