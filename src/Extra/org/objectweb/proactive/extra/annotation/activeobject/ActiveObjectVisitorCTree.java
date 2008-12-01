@@ -163,9 +163,9 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void, Trees> {
     @Override
     public Void visitMethod(MethodTree methodNode, Trees trees) {
 
-    	curMethod = getCurrentPath();
-    	
-    	// test modifiers
+        curMethod = getCurrentPath();
+
+        // test modifiers
         if (methodNode.getModifiers().getFlags().contains(Modifier.FINAL) &&
             !methodNode.getModifiers().getFlags().contains(Modifier.PRIVATE)) {
             reportError(" The class declares the final method " + methodNode.getName() + ".\n" +
@@ -264,12 +264,12 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void, Trees> {
         }
 
         if (returnExpression.getKind().equals(Tree.Kind.NULL_LITERAL)) {
-        	// for private methods it's ok to return null
-        	
-        	MethodTree method = (MethodTree)trees.getTree(trees.getElement(curMethod));
-        	if (!method.getModifiers().getFlags().contains(Modifier.PRIVATE)) {
-        		reportError(ErrorMessages.NO_NULL_RETURN_ERROR_MSG, trees.getElement(curMethod));
-        	}
+            // for private methods it's ok to return null
+
+            MethodTree method = (MethodTree) trees.getTree(trees.getElement(curMethod));
+            if (!method.getModifiers().getFlags().contains(Modifier.PRIVATE)) {
+                reportError(ErrorMessages.NO_NULL_RETURN_ERROR_MSG, trees.getElement(curMethod));
+            }
         }
         return super.visitReturn(returnNode, trees);
     }

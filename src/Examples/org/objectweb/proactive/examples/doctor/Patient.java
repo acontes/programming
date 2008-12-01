@@ -36,11 +36,11 @@ import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 
 @ActiveObject
 public class Patient {
-	private int id;
-	private RandomTime rand;
-	private Office off;
-	private long meanWell;
-	private long sigmaWell;
+    private int id;
+    private RandomTime rand;
+    private Office off;
+    private long meanWell;
+    private long sigmaWell;
 
     public Patient() {
     }

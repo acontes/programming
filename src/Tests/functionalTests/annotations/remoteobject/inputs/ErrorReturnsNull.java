@@ -13,5 +13,5 @@ public class ErrorReturnsNull {
 
     private String testing2() {
         return null;
-    }    
+    }
 }
