@@ -41,9 +41,9 @@ import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 public class Receptionnist implements org.objectweb.proactive.RunActive {
     static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     public final static int NO_ONE = -1;
-    int pat_id;
-    int doc_id;
-    Office off;
+    private int pat_id;
+    private int doc_id;
+    private Office off;
 
     public Receptionnist() {
     }

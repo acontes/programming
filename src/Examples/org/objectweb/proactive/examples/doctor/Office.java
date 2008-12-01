@@ -31,6 +31,8 @@
  */
 package org.objectweb.proactive.examples.doctor;
 
+import java.util.Vector;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -63,13 +65,13 @@ public class Office {
     public static final int DOC_UNDEF = -1;
     public static final int PAT_WELL = -2;
     public static final int PAT_SICK = -1;
-    java.util.Vector patients;
-    java.util.Vector doctors;
-    Office me;
-    Receptionnist recept;
-    DisplayPanel display;
-    RandomTime rand;
-    OfficeWindow win;
+    private Vector patients;
+    private Vector doctors;
+    private Office me;
+    private Receptionnist recept;
+    private DisplayPanel display;
+    private RandomTime rand;
+    private OfficeWindow win;
 
     public Office() {
     }

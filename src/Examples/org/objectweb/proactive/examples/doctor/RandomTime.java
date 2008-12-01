@@ -38,7 +38,7 @@ import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 
 @ActiveObject
 public class RandomTime {
-    Random rand;
+    private Random rand;
 
     public RandomTime() {
         rand = new Random();

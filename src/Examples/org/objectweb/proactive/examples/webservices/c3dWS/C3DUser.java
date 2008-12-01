@@ -121,22 +121,22 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
      * Status log, displays messages from other users concerning action
      * requests
      */
-    TextArea ta_log;
+    private TextArea ta_log;
 
     /**
      * SpyEvent log
      */
-    TextArea ta_mess;
+    private TextArea ta_mess;
 
     /**
      * Name (number) of this user
      */
-    Label l_user;
+    private Label l_user;
 
     /**
      * OS String of the C3Ddispatcher
      */
-    Label l_c3ddispatcher;
+    private Label l_c3ddispatcher;
 
     /**
      * Height of the <code>Image</code> to be rendered
@@ -152,19 +152,19 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
      * <code>MemoryImagesource</code> as pixel source for the
      * <code>Image</code> to be rendered
      */
-    transient MemoryImageSource mis;
+    private transient MemoryImageSource mis;
 
     /**
      * Destination array for the calculated pixels of the <code>Image</code>
      */
-    transient int[] pix;
+    private transient int[] pix;
 
     /**
      * <code>C3DDispatcher</code>, decouples the m user frames and the
      * n rendering engines. There is always exactly one C3DDispatcher object
      * in the ProActive rendering system.
      */
-    C3DDispatcher c3ddispatcher;
+    private C3DDispatcher c3ddispatcher;
 
     /**
      * Number of this user in the set of users registered at the
@@ -194,13 +194,13 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
     /**
      * The number of rotations so far
      */
-    public int nRotate = 0;
-    public transient UserFrame userframe;
-    boolean b_isApplet;
-    boolean b_isBot;
-    String botUrl;
-    String s_username;
-    int i_user;
+    private int nRotate = 0;
+    private transient UserFrame userframe;
+    private boolean b_isApplet;
+    private boolean b_isBot;
+    private String botUrl;
+    private String s_username;
+    private int i_user;
 
     public C3DUser() {
     }
