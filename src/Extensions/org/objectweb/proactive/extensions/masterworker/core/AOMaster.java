@@ -304,7 +304,8 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
             
             	int flooding_value = flooding ? initial_task_flooding : 1;
                 try {
-                	if(((AOSubMaster) worker) instanceof AOSubMaster){
+                	if((((AOSubMaster) worker) instanceof AOSubMaster) && flooding){
+                		
                 		flooding_value = Master.DEFAULT_SubMaster_TASK_FLOODING;
                 	}
     			} catch (Exception e) {

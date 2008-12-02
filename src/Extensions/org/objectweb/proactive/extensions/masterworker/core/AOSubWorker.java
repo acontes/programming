@@ -27,17 +27,10 @@ public class AOSubWorker extends AOWorker implements WorkerPeer{
 	 * 
 	 */
 	private static final long serialVersionUID = 4461125099993797764L;
-
-    /**
-     * log4j logger for the worker manager
-     */
-    private final static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER_WORKERMANAGER);
-    private static final boolean debug = logger.isDebugEnabled();
 	
-	/**
-     * Stub of this active object
-     */
-	private AOSubWorker stubOnThis;
+	static final Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER_SUBWORKERS);
+	static final boolean debug = false;
+
 	
 	private long peerid = 0;
 	
@@ -59,17 +52,13 @@ public class AOSubWorker extends AOWorker implements WorkerPeer{
 
 	public AOSubWorker(final String name, final WorkerMaster provider,
             final Map<String, Serializable> initialMemory, long peerid) {
-        this.name = name;
-        this.provider = provider;
-        this.peerid = peerid;
-
-        this.memory = new WorkerMemoryImpl(initialMemory);
-        this.initialMemory = initialMemory;
-        this.pendingTasksFutures = new LinkedList<Queue<TaskIntern<Serializable>>>();
-        this.pendingTasks = new LinkedList<TaskIntern<Serializable>>();
+		super(name, provider, initialMemory);
+		
+		this.peerid = peerid;
+       
         
         if (debug) {
-            logger.debug("Creating worker : " + name);
+            logger.debug("Creating subworker : " + name);
         }
     }
 	
@@ -198,7 +187,6 @@ public class AOSubWorker extends AOWorker implements WorkerPeer{
 		// TODO Auto-generated method stub
 		
 		stubOnThis = (AOSubWorker) PAActiveObject.getStubOnThis();
-		super.stubOnThis = stubOnThis;
         body.setImmediateService("addWorkerPeer");
         body.setImmediateService("canBeSubMaster");
         body.setImmediateService("iAmSubmaster");
@@ -209,6 +197,23 @@ public class AOSubWorker extends AOWorker implements WorkerPeer{
         // Initial Task
         stubOnThis.getTaskAndSchedule();
 	}
+	
+	public BooleanWrapper terminate() {
+        if (debug) {
+            logger.debug("Terminating " + name + "...");
+        }
+        provider = null;
+        stubOnThis = null;
+        ((WorkerMemoryImpl) memory).clear();
+        initialMemory.clear();
+
+        PAActiveObject.terminateActiveObject(false);
+        if (debug) {
+            logger.debug(name + " terminated...");
+        }
+
+        return new BooleanWrapper(true);
+    }
 	
 	/**
      * Internal class which deal with test if the workers whose peerid is smaller than this are live or not

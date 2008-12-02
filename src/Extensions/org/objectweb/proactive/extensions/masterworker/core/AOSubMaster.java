@@ -60,7 +60,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
     /**
      * log4j logger for the worker manager
      */
-    private final static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER_WORKERMANAGER);
+    private final static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER_SUBMASTER);
     private static final boolean debug = logger.isDebugEnabled();
 
     /** How many tasks do we initially send to each worker */
@@ -456,6 +456,21 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
 		try {
 			tasksToAdd = future.get();
 			pendingTasks.addAll(tasksToAdd);
+			// wake up sleeping workers
+			
+			if (sleepingGroup.size() > 0) {
+                if (debug) {
+                    logger.debug("Waking up sleeping workers...");
+                }
+
+                // We wake up the sleeping guys
+                try {
+                    sleepingGroupStub.wakeup();
+                } catch (Exception e) {
+                    // We ignore NFE pinger is responsible for that
+                }
+            }
+			
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -665,7 +680,18 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
 
 	public BooleanWrapper terminate() {
 		// TODO Auto-generated method stub
-		return null;
+		if (debug) {
+            logger.debug("Terminating SubMaster...");
+        }
+
+        // The cleaner way is to first clear the activity
+        clear();
+
+        // then delay final termination
+        stubOnThis.secondTerminate(false);
+
+        return new BooleanWrapper(true);
+
 	}
 
 	public void wakeup() {

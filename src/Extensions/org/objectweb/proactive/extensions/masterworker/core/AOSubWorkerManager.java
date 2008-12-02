@@ -38,7 +38,7 @@ public class AOSubWorkerManager implements WorkerManager, InitActive, Serializab
     /**
      * log4j logger for the worker manager
      */
-    private final static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER_WORKERMANAGER);
+    private final static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER_SUBWORKERMANAGER);
     private static final boolean debug = logger.isDebugEnabled();
 
     /**

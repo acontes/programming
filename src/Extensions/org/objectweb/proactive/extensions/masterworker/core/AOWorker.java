@@ -65,8 +65,8 @@ import java.util.Queue;
 public class AOWorker implements InitActive, Serializable, Worker {
 
     /** log4j logger of the worker */
-    protected static final Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER_WORKERS);
-    protected static final boolean debug = logger.isDebugEnabled();
+    static final Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER_WORKERS);
+    static final boolean debug = logger.isDebugEnabled();
 
     protected boolean suspended = false;
 
@@ -272,8 +272,6 @@ public class AOWorker implements InitActive, Serializable, Worker {
         while ((pendingTasks.size() == 0) && (pendingTasksFutures.size() > 0)) {
             pendingTasks.addAll(pendingTasksFutures.remove());
         }
-        
-        PAFuture.
 
         if (!suspended && (pendingTasks.size() > 0)) {
 
