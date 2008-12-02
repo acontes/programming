@@ -13,15 +13,13 @@ public class Fi {
     public String migrateToRight(boolean onCondition) throws MigrationException {
         if (onCondition) {
             org.objectweb.proactive.api.PAMobileAgent.migrateTo("");
-            return ""; // the sweet C-style hakz
         } else {
             System.out.println("I refuze to migrate!");
             org.objectweb.proactive.api.PAMobileAgent.migrateTo("");
-            return "";
         }
     }
 
-    // error - else branch fucked up
+    // error - else branch fwcked up
     @MigrationSignal
     public String migrateToWrong(boolean onCondition) throws MigrationException {
         if (onCondition) {
@@ -60,7 +58,7 @@ public class Fi {
         else {
             System.out.println("Ich will migrate");
             migrateToWrong(onCondition);
-            System.out.println("I'll fuck everything up!");
+            System.out.println("I'll fwck everything up!");
         }
     }
 

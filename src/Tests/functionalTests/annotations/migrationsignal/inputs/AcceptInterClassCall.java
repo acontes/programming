@@ -2,9 +2,11 @@ package functionalTests.annotations.migrationsignal.inputs;
 
 import org.objectweb.proactive.api.PAMobileAgent;
 import org.objectweb.proactive.core.body.migration.MigrationException;
+import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 import org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignal;
 
 
+@ActiveObject
 public class AcceptInterClassCall {
 
     @MigrationSignal
@@ -15,14 +17,14 @@ public class AcceptInterClassCall {
     }
 
     @MigrationSignal
-    public void migrateTo1() throws MigrationException {
+    public void migrateTo2() throws MigrationException {
         // a more sophisticated form of call
         new AnotherMigrateTo().migrateTo();
     }
 
 }
 
-//@ActiveObject
+@ActiveObject
 //should not be an active object!!
 class AnotherMigrateTo {
 

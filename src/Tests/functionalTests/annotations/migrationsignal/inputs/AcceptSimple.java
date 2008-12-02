@@ -20,6 +20,7 @@ public class AcceptSimple {
         org.objectweb.proactive.api.PAMobileAgent.migrateTo(new Object());
     }
 
+    // ERROR - REALLY LAST STATEMENT!
     @MigrationSignal
     public int migrateTo3() throws MigrationException {
         PAMobileAgent.migrateTo(new Object());

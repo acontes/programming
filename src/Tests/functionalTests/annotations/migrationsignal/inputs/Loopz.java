@@ -30,6 +30,7 @@ public class Loopz {
         while (onCondition) {
             System.out.println("Will migrate");
             doWhileOne(node, onCondition);
+            System.out.println("not!");
         }
     }
 
@@ -44,6 +45,7 @@ public class Loopz {
         for (;;) {
             System.out.println("Will migrate");
             doWhileOne(node, onCondition);
+            return; // this will actually cause an error!!! :)
         }
     }
 

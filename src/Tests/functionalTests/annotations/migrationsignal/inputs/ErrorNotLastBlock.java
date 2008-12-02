@@ -29,7 +29,6 @@ public class ErrorNotLastBlock {
                 {
                     System.out.println();
                     System.out.println();
-                    System.out.println();
                     migrateTo(node);
                 }
             }
@@ -38,6 +37,22 @@ public class ErrorNotLastBlock {
                 System.out.println();
                 org.objectweb.proactive.api.PAMobileAgent.migrateTo(node);
             }
+        }
+    }
+
+    // should be OK
+    @MigrationSignal
+    public void moreBlocks() throws MigrationException {
+        {
+            {
+                System.out.println();
+                System.out.println();
+                migrateTo(node);
+            }
+        }
+        {
+            System.out.println();
+            System.out.println();
         }
     }
 
