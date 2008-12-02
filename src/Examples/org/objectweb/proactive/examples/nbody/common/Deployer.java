@@ -53,13 +53,13 @@ import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 public class Deployer {
     protected static final Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
-    GCMApplication gcmad;
-    GCMVirtualNode workers;
+    private GCMApplication gcmad;
+    private GCMVirtualNode workers;
 
     /**
      * A list of remote references to terminate
      */
-    public List<Object> referencesToTerminate;
+    private List<Object> referencesToTerminate;
 
     public Deployer() {
         // No args constructor 

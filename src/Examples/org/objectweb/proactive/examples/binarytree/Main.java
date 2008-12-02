@@ -40,7 +40,7 @@ import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 
 @ActiveObject
 public class Main {
-    static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
+    private final static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
     public static void main(String[] args) {
         Main theMainActiveObject = null;

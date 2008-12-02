@@ -39,10 +39,10 @@ import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 
 @ActiveObject
 public class Matrix implements java.io.Serializable {
-    static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
-    int m; // height
-    int n; // width
-    double[][] elements; // values
+    private final static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
+    private int m; // height
+    private int n; // width
+    private double[][] elements; // values
 
     public Matrix() {
         super();

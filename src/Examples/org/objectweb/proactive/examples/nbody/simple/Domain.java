@@ -51,7 +51,7 @@ public class Domain implements Serializable {
     private String hostName = "unknown"; // to display on which host we're running
     private Maestro maestro; // used for synchronization
     private Displayer display; // optional, to have a nice output 
-    Planet info; // the information of the body considered
+    private Planet info; // the information of the body considered
     private Planet[] values; // list of all the bodies within all the other domains
     private int nbvalues; // have we received all values awaited ?
     private int nbReceived = 0; // have we received all values awaited ?

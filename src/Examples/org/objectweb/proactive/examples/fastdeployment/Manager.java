@@ -53,8 +53,8 @@ public class Manager implements Serializable, InitActive, RunActive {
     /** The application logger */
     final static private Logger logger = ProActiveLogger.getLogger(Loggers.CORE + ".app");
     /** List of slaves already in the computation */
-    HashMap<Integer, CPUBurner> slaves;
-    final private int ITERATIONS = 3000;
+    private HashMap<Integer, CPUBurner> slaves;
+    private final int ITERATIONS = 3000;
     private int iteration;
 
     public Manager() {

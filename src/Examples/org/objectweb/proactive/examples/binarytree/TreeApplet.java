@@ -62,7 +62,7 @@ import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
  */
 @ActiveObject
 public class TreeApplet extends org.objectweb.proactive.examples.StandardFrame {
-    static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
+    private final static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     private javax.swing.JPanel rootPanel;
     private javax.swing.Box pCmd;
     private javax.swing.JPanel searchResult;

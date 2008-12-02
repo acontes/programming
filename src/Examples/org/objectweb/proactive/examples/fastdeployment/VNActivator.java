@@ -84,8 +84,8 @@ public class VNActivator implements Serializable, RunActive, NodeCreationEventLi
     private Executor AOCreators;
 
     /** The number of slave already created */
-    int slaveID = 0;
-    Object slaveIDLock;
+    private int slaveID = 0;
+    private Object slaveIDLock;
 
     public VNActivator() {
         // No-args empty descriptor

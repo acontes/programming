@@ -69,7 +69,7 @@ import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
  * */
 @ActiveObject
 public class Main implements ActivePrimeContainerCreator, InitActive {
-    static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
+    private final static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     private PrimeOutputListener outputListener;
     private NumberSource source;
     private GCMVirtualNode containersVirtualNode;

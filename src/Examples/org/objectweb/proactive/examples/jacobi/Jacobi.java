@@ -84,7 +84,7 @@ public class Jacobi implements Serializable {
      */
     public static final String resultsFileName = "resultsJacobi.txt";
     private GCMApplication descriptor = null;
-    public static Jacobi singleton = null;
+    private static Jacobi singleton = null;
     private static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
     private Node[] nodes;

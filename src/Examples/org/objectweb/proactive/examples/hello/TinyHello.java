@@ -46,7 +46,7 @@ import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
  * The object does nothing but reflect the host its on. */
 @ActiveObject
 public class TinyHello implements java.io.Serializable {
-    static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
+    private final static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     private final String message = "Hello World!";
 
     /** ProActive compulsory no-args constructor */

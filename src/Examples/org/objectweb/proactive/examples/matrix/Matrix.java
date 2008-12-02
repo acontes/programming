@@ -45,11 +45,11 @@ import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 
 @ActiveObject
 public class Matrix implements java.io.Serializable {
-    static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
+    private final static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     private int width;
     private int height;
     private double[][] tab;
-    boolean migration = true;
+    private boolean migration = true;
 
     // -----------------------------//
     //        CONSTRUCTORS          //
@@ -225,7 +225,7 @@ public class Matrix implements java.io.Serializable {
     //-----------------------------------//
     //             METHODS               //
     //-----------------------------------//
-    static int k = 0;
+    private static int k = 0;
 
     public void initializeWithRandomValues() {
         //int k= 0;

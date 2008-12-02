@@ -111,18 +111,18 @@ public class Worker extends Timed implements java.io.Serializable {
     private long elapsedTime;
 
     /** Counters for the timing system. */
-    public TimerCounter T_TOTAL = new TimerCounter("total");
-    public TimerCounter T_WORK = new TimerCounter("work");
-    public boolean isTotalStarted = false;
+    private TimerCounter T_TOTAL = new TimerCounter("total");
+    private TimerCounter T_WORK = new TimerCounter("work");
+    private boolean isTotalStarted = false;
 
     /** The size of the group */
     private int groupSize;
 
     /** An communication observer for the number of message density distribution */
-    public CommEventObserver nbCommObserver;
+    private CommEventObserver nbCommObserver;
 
     /** An communication observer for the data density distribution */
-    public CommEventObserver commSizeObserver;
+    private CommEventObserver commSizeObserver;
 
     // ////
     // CONSTRUCTORS

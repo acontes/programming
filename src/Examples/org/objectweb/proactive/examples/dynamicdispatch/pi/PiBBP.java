@@ -61,7 +61,7 @@ public class PiBBP implements Serializable {
     private GCMApplication deploymentDescriptor_;
     private boolean ws_ = false;
     protected PiComputer piComputer;
-    int nbIntervals;
+    private int nbIntervals;
 
     /**
      * Empty constructor

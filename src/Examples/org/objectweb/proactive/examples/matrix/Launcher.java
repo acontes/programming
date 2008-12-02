@@ -42,8 +42,8 @@ import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 
 @ActiveObject
 public class Launcher implements java.io.Serializable {
-    static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
-    List<Node> nodesList;
+    private final static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
+    private List<Node> nodesList;
 
     public Launcher() {
     }

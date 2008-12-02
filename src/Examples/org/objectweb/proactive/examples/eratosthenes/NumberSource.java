@@ -48,7 +48,7 @@ import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
  */
 @ActiveObject
 public class NumberSource implements java.io.Serializable, RunActive, Slowable {
-    static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
+    private final static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     private ActivePrimeContainer first;
     private boolean pause;
     private boolean sleep;

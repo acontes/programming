@@ -56,7 +56,7 @@ import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
  */
 @ActiveObject
 public class Server {
-    static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
+    private final static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     protected String messageOfTheDay;
     protected java.util.ArrayList<Client> clients;
 

@@ -52,7 +52,7 @@ import org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignal
  */
 @ActiveObject
 public class Agent implements InitActive, RunActive, EndActive, java.io.Serializable {
-    static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
+    private final static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     private String name;
     private String nodename;
     private String hostname;

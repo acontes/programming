@@ -62,7 +62,7 @@ import org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignal
  */
 @ActiveObject
 public class Chat implements java.io.Serializable, RunActive {
-    static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
+    private final static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
     /** The name of the user */
     private String name = "";

@@ -40,11 +40,11 @@ import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 
 @ActiveObject
 public class FutureReceiver implements java.io.Serializable {
-    static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
-    int etape = 0; // this is to count the jumps we have made so far
-    BlockedObject blocked;
-    java.util.Vector<EmptyFuture> waitingFutures = new java.util.Vector<EmptyFuture>();
-    FutureList futureList;
+    private final static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
+    private int etape = 0; // this is to count the jumps we have made so far
+    private BlockedObject blocked;
+    private java.util.Vector<EmptyFuture> waitingFutures = new java.util.Vector<EmptyFuture>();
+    private FutureList futureList;
 
     public FutureReceiver() {
     }

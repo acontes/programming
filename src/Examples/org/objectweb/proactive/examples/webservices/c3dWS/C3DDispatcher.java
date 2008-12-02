@@ -87,7 +87,7 @@ import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
  */
 @ActiveObject
 public class C3DDispatcher implements org.objectweb.proactive.RunActive, Serializable {
-    static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
+    private final static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
     /**
      * The array of random colors
@@ -224,7 +224,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive, Seriali
      */
     private ProActiveDescriptor proActiveDescriptor;
     private String[] rendererNodes;
-    long previousTime = -1;
+    private long previousTime = -1;
     private String url;
     private String urn;
 

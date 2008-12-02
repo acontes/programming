@@ -44,8 +44,8 @@ import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 
 @ActiveObject
 public class CPUBurner implements Serializable, InitActive {
-    int id;
-    Manager manager;
+    private int id;
+    private Manager manager;
 
     public CPUBurner() {
         // No-args empty constructor

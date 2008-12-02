@@ -49,9 +49,9 @@ import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 public class Deployer {
     protected static final Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
-    GCMApplication gcmad;
-    GCMVirtualNode renderer;
-    GCMVirtualNode dispatcher;
+    private GCMApplication gcmad;
+    private GCMVirtualNode renderer;
+    private GCMVirtualNode dispatcher;
 
     public Deployer() {
         // No args constructor

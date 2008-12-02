@@ -57,7 +57,7 @@ import org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignal
  */
 @ActiveObject
 public class SimpleObjectMigration implements Serializable {
-    static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
+    private final static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     private static final int SLEEP_TIME = 9000;
     private String name; // The name of the instance
     private String hi = " say hello from "; // The 'hello' sentence

@@ -50,7 +50,7 @@ import org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignal
  */
 @ActiveObject
 public class SimpleAgent implements java.io.Serializable {
-    static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
+    private final static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
     /** ProActive compulsory empty no-args constructor */
     public SimpleAgent() {

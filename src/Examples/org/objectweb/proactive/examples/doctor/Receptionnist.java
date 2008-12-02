@@ -39,7 +39,7 @@ import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 
 @ActiveObject
 public class Receptionnist implements org.objectweb.proactive.RunActive {
-    static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
+    private final static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     public final static int NO_ONE = -1;
     private int pat_id;
     private int doc_id;
