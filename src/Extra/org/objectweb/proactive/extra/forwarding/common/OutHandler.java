@@ -5,7 +5,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.extra.forwarding.tests.TestLogger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -14,7 +15,7 @@ import org.objectweb.proactive.extra.forwarding.tests.TestLogger;
  * The OutHandler push the messages one after the other.
  */
 public class OutHandler implements Runnable {
-    public static final Logger logger = TestLogger.getLogger();
+    public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING);
 
     private LinkedBlockingQueue<ForwardedMessage> messageQueue;
     private ForwardingSocketWrapper sock;
@@ -40,7 +41,7 @@ public class OutHandler implements Runnable {
      */
     public void run() {
         if (logger.isDebugEnabled())
-            logger.debug("OutHandler.run(): start loop");
+            logger.trace("OutHandler.run(): start loop");
         while (isRunning && !sock.getSocket().isClosed()) {
             ForwardedMessage msg = null;
             try {
@@ -48,15 +49,15 @@ public class OutHandler implements Runnable {
             } catch (InterruptedException e1) {
                 // The waiting has been interrupted.
                 if (logger.isDebugEnabled())
-                    logger.debug("The waiting of the blocking queue was interrupted");
+                    logger.warn("The waiting of the blocking queue was interrupted");
             }
             if (msg != null) {
                 if (logger.isDebugEnabled())
-                    logger.debug("message to write: " + msg);
+                    logger.trace("message to write: " + msg);
                 try {
                     writeOnSocket(msg);
                     if (logger.isDebugEnabled())
-                        logger.debug("message written.");
+                        logger.trace("message written.");
                 } catch (IOException e) {
                     listener.connectionHasFailed(e);
                     isRunning = false;
@@ -79,10 +80,9 @@ public class OutHandler implements Runnable {
                 if (!notFull)
                     logger.warn("Queue is full; dropping message");
                 else if (logger.isDebugEnabled())
-                    logger.debug("message queued.");
+                    logger.trace("message queued.");
             } catch (NullPointerException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                logger.warn("Should not pass null messages to OutHandler!");
             }
         }
     }

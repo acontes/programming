@@ -25,17 +25,15 @@ public class ServerSocketForwarder extends SocketForwarder {
      */
     @Override
     protected void initSocket() {
-        // TODO create connection to server
+        // create connection to server
         try {
             sockToHandle = new Socket(ProActiveInet.getInstance().getInetAddress(), localPort);
             tunnel.putMessage(ForwardedMessage.acceptMessage(localID, localPort, targetID, targetPort));
             startHandling();
         } catch (UnknownHostException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.warn("Unknown host: "+ProActiveInet.getInstance().getInetAddress(), e);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        	logger.warn("Unable to connect to host: "+ProActiveInet.getInstance().getInetAddress(), e);
             tunnel.putMessage(ForwardedMessage.abortMessage(localID, localPort, targetID, targetPort, e
                     .getMessage()));
         }

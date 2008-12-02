@@ -3,18 +3,18 @@ package org.objectweb.proactive.extra.forwarding.localforwarder;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.forwarding.common.ConnectionFailureListener;
 import org.objectweb.proactive.extra.forwarding.common.ForwardedMessage;
 import org.objectweb.proactive.extra.forwarding.common.ForwardingSocketWrapper;
-import org.objectweb.proactive.extra.forwarding.tests.TestLogger;
 
 
 /**
  * Class in charge of reading messages from the tunnel.
  */
 public class IncomingDispatcher implements Runnable {
-    //protected Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING);
-    public static final Logger logger = TestLogger.getLogger();
+    public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING);
 
     final private ForwardingSocketWrapper sock;
     final private ConnectionFailureListener listener;

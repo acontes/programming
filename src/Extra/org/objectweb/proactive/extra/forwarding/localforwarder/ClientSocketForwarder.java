@@ -73,8 +73,7 @@ public class ClientSocketForwarder extends SocketForwarder {
                 startHandling();
             }
         } catch (InterruptedException e) {
-            // TODO Logging
-            e.printStackTrace();
+            logger.debug("ClientSocketForwarder interupted while waiting response from forwarding.", e);
         }
         return sock;
     }
@@ -90,8 +89,7 @@ public class ClientSocketForwarder extends SocketForwarder {
         try {
             ss = new ServerSocket(0);
         } catch (IOException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
+            logger.warn("Error while creating local socket for Client Socket Forwarder", e1);
             return null;
         }
         ServerSocketCreator creator = new ServerSocketCreator(ss);
@@ -104,11 +102,9 @@ public class ClientSocketForwarder extends SocketForwarder {
             sockToHandle = sock1;
             return sock2;
         } catch (UnknownHostException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error("Error while creating local socket for Client Socket Forwarder", e);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        	logger.error("Error while creating local socket for Client Socket Forwarder", e);
         }
         return null;
 
@@ -132,8 +128,7 @@ public class ClientSocketForwarder extends SocketForwarder {
                 sock = s.accept();
                 sem.release();
             } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+            	logger.error("Error while creating local socket for Client Socket Forwarder", e);
             }
         }
 
@@ -143,8 +138,7 @@ public class ClientSocketForwarder extends SocketForwarder {
                 sem.acquire();
                 res = sock;
             } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+            	logger.warn("Error while creating local socket for Client Socket Forwarder", e);
             }
             return res;
         }

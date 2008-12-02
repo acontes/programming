@@ -6,18 +6,18 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.forwarding.common.ForwardedMessage;
 import org.objectweb.proactive.extra.forwarding.common.ForwardingSocketWrapper;
 import org.objectweb.proactive.extra.forwarding.common.OutHandler;
-import org.objectweb.proactive.extra.forwarding.tests.TestLogger;
 
 
 /**
  * Handle the message dispatching to the various local forwarders.
  */
 public class LocalConnectionHandler implements Runnable {
-    //protected Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING);
-    public static final Logger logger = TestLogger.getLogger();
+    public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING);
 
     final private LinkedBlockingQueue<ForwardedMessage> messageQueue;
     // TODO Change ID type
@@ -48,8 +48,7 @@ public class LocalConnectionHandler implements Runnable {
             try {
                 msg = messageQueue.poll(1, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+            	logger.warn("Error while trying to get a message to handle", e);
             }
             if (msg != null) {
                 SocketForwarder fw = null;
@@ -61,7 +60,6 @@ public class LocalConnectionHandler implements Runnable {
                         // Send notification to ClientSocketForwarder
                         debug("accept message received: " + msg);
                         synchronized (mappings) {
-                            //fw = mappings.get(new ConnectionID(msg.getSenderID(), msg.getSenderPort(), msg.getTargetPort()));
                             HashMap<ConnectionID, SocketForwarder> map = mappings.get(msg.getSenderID());
                             if (map != null) {
                                 fw = map.get(new ConnectionID(msg.getSenderPort(), msg.getTargetPort()));
@@ -170,8 +168,7 @@ public class LocalConnectionHandler implements Runnable {
                 if (!notFull)
                     logger.warn("Queue is full; dropping message");
             } catch (NullPointerException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                logger.debug("Message received should not be null", e);
             }
         }
     }

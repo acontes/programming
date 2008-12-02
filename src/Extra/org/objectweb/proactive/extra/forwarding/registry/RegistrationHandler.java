@@ -4,12 +4,13 @@ import java.io.IOException;
 import java.net.Socket;
 
 import org.apache.log4j.*;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.forwarding.common.ConnectionFailureListener;
 import org.objectweb.proactive.extra.forwarding.common.ForwardedMessage;
 import org.objectweb.proactive.extra.forwarding.common.ForwardingSocketWrapper;
 import org.objectweb.proactive.extra.forwarding.common.OutHandler;
 import org.objectweb.proactive.extra.forwarding.common.ForwardedMessage.ForwardedMessageType;
-import org.objectweb.proactive.extra.forwarding.tests.TestLogger;
 
 
 /**
@@ -21,8 +22,7 @@ import org.objectweb.proactive.extra.forwarding.tests.TestLogger;
  */
 
 public class RegistrationHandler implements Runnable, ConnectionFailureListener {
-    //	static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING);
-    public static final Logger logger = TestLogger.getLogger();
+    public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING);
 
     final private ForwardingRegistry registry;
     private Object hostId = null;
@@ -67,8 +67,7 @@ public class RegistrationHandler implements Runnable, ConnectionFailureListener 
                     connectionHasFailed(e);
                     continue;
                 } catch (ClassNotFoundException e) {// should not occur
-                    logger.error("read unknown object, exception: " + e);
-                    e.printStackTrace();
+                    logger.error("read unknown object, exception: ", e);
                 }
 
                 // the received message is a REGISTRATION MSG -> handle the registration

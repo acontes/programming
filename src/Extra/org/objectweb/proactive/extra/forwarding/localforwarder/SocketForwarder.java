@@ -6,9 +6,10 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.forwarding.common.ForwardedMessage;
 import org.objectweb.proactive.extra.forwarding.common.OutHandler;
-import org.objectweb.proactive.extra.forwarding.tests.TestLogger;
 
 
 /**
@@ -17,8 +18,7 @@ import org.objectweb.proactive.extra.forwarding.tests.TestLogger;
  * throw the registry.
  */
 public abstract class SocketForwarder {
-    //protected Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING);
-    public static final Logger logger = TestLogger.getLogger();
+    public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING);
     public static final int BUFFER_SIZE = 1024;
 
     // Tunnel
@@ -100,8 +100,7 @@ public abstract class SocketForwarder {
         try {
             sockToHandle.close();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.debug("Error while closing socket: ", e);
         }
     }
 
@@ -135,7 +134,7 @@ public abstract class SocketForwarder {
                 } catch (IOException e) {
                     // TODO Handle disconnection
                     forw.abort(e.getMessage());
-                    e.printStackTrace();
+                    logger.warn("Exception on socket while reading, aborting forwarded connection", e);
                     forw.stop();
                 }
             }
@@ -168,8 +167,7 @@ public abstract class SocketForwarder {
                     try {
                         buf = messageQueue.poll(1, TimeUnit.SECONDS);
                     } catch (InterruptedException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
+                        logger.debug("Error while trying to get a message to handle: ", e);
                     }
 
                     if (buf != null) {
@@ -180,7 +178,7 @@ public abstract class SocketForwarder {
                     // TODO Handle disconnection
                     forw.abort(e.getMessage());
                     forw.stop();
-                    e.printStackTrace();
+                    logger.warn("Error while trying to write into forwarded socket, aborting forwarded connection", e);
                 }
             }
         }

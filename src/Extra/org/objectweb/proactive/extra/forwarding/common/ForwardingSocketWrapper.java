@@ -7,16 +7,16 @@ import java.net.InetAddress;
 import java.net.Socket;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.extra.forwarding.tests.TestLogger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
  * The socket wrapper encapsulate a socket, and provide a direct way to push object in the socket.
  */
 public class ForwardingSocketWrapper {
-    //static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING);
-    public static final Logger logger = TestLogger.getLogger();
-
+    static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING);
+    
     private Socket sock;
 
     private InetAddress inetAddress;
@@ -40,7 +40,7 @@ public class ForwardingSocketWrapper {
         if (!sock.isClosed()) {
             ObjectInputStream in = new ObjectInputStream(sock.getInputStream());
             Object obj = in.readObject();
-            //logger.debug("Read message from "+sock.getInetAddress()+" = "+obj);
+            if(logger.isTraceEnabled()) logger.trace("Read message from "+sock.getInetAddress()+" = "+obj);
             return obj;
         } else {
             throw new IOException("Socket closed : impossible to read object through it");
@@ -54,10 +54,10 @@ public class ForwardingSocketWrapper {
      */
     public void writeObject(Object obj) throws IOException {
         if (!sock.isClosed()) {
-            //logger.debug("Writing message to "+sock.getInetAddress()+" = "+obj);
             ObjectOutputStream out = new ObjectOutputStream(sock.getOutputStream());
             out.writeObject(obj);
             out.flush();
+            if(logger.isTraceEnabled()) logger.trace("Writing message to "+sock.getInetAddress()+" = "+obj);
         } else {
             throw new IOException("Socket closed : impossible to write object through it");
         }
@@ -70,7 +70,8 @@ public class ForwardingSocketWrapper {
         try {
             sock.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.warn("An exception occured while closing socket to "+
+            		inetAddress, e);
         }
     }
 

@@ -5,10 +5,11 @@ import java.net.InetAddress;
 import java.net.Socket;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.forwarding.common.ConnectionFailureListener;
 import org.objectweb.proactive.extra.forwarding.common.ForwardedMessage;
 import org.objectweb.proactive.extra.forwarding.exceptions.ForwardingException;
-import org.objectweb.proactive.extra.forwarding.tests.TestLogger;
 
 
 /**
@@ -31,7 +32,7 @@ public class ForwardingAgent implements ConnectionFailureListener {
     public static final int NB_RETRY = 3;
     public static final long LOCK_TIME = 10000;
     //protected Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING);
-    public static final Logger logger = TestLogger.getLogger();
+    public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING);
     protected LocalConnectionHandler localHandler;
     protected Object uniqueID;
     protected InetAddress regAddress;

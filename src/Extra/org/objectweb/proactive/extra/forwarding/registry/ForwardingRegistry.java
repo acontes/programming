@@ -5,10 +5,11 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.forwarding.common.ForwardedMessage;
 import org.objectweb.proactive.extra.forwarding.common.OutHandler;
 import org.objectweb.proactive.extra.forwarding.common.ForwardedMessage.ForwardedMessageType;
-import org.objectweb.proactive.extra.forwarding.tests.TestLogger;
 
 
 /**
@@ -26,8 +27,7 @@ import org.objectweb.proactive.extra.forwarding.tests.TestLogger;
  *
  */
 public class ForwardingRegistry {
-    //	static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING);
-    public static final Logger logger = TestLogger.getLogger();
+    public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING);
 
     static public final int DEFAULT_SERVER_PORT = 2099;
 
@@ -261,8 +261,7 @@ public class ForwardingRegistry {
             if (!notFull)
                 logger.warn("Queue is full; dropping message");
         } catch (NullPointerException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.warn("Registry should never handle null messages", e);
         }
     }
 

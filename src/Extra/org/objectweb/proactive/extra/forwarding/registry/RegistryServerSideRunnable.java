@@ -3,7 +3,8 @@ package org.objectweb.proactive.extra.forwarding.registry;
 import java.io.IOException;
 import java.net.ServerSocket;
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.extra.forwarding.tests.TestLogger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -13,8 +14,7 @@ import org.objectweb.proactive.extra.forwarding.tests.TestLogger;
  */
 
 public class RegistryServerSideRunnable implements Runnable {
-    //	static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING);
-    public static final Logger logger = TestLogger.getLogger();
+    public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING);
 
     private ForwardingRegistry registry;
     private boolean listening = true;
@@ -57,8 +57,7 @@ public class RegistryServerSideRunnable implements Runnable {
         } catch (IOException e) {
             // TODO Auto-generated catch block
             if (logger.isDebugEnabled())
-                logger.debug("ST, a problem occured while closing the serverSocket, exception: " + e);
-            e.printStackTrace();
+                logger.debug("ST, a problem occured while closing the serverSocket, exception: ", e);
         }
     }
 
