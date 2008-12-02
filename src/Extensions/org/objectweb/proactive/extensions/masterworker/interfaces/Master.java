@@ -59,6 +59,10 @@ public interface Master<T extends Task<R>, R extends Serializable> extends SubMa
      * Default task flooding value
      */
     public final int DEFAULT_TASK_FLOODING = 2;
+    
+    public final int DEFAULT_SubGroup_Size = 100;
+    
+    public final int DEFAULT_SubMaster_TASK_FLOODING = 2 * DEFAULT_SubGroup_Size;
 
     // please keep the resource adding methods inside the tags
     // they are used in the documentation

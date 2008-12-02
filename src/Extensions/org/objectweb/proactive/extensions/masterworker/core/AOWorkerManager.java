@@ -328,7 +328,7 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
             	String workername = node.getVMInformation().getHostName() + "_" + workerNameCounter++;
             	String nodename = node.getNodeInformation().getName();
                 long topologyId = node.getVMInformation().getTopologyId();
-                int subGroupSize = 0;
+                Integer subGroupSize = 0;
                 AOSubMaster subMaster = null;
                 
                 if (debug) {
@@ -343,22 +343,19 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
 	                	
 	                	// If another one worker is added to the group, wait
 	                	// The group size if a critical variable
-	                	while((!subGroupSizes.containsKey(topologyId)) && (subMasters.containsKey(topologyId)))
-	                	{
-	                		try {
-								Thread.sleep(2);
-							} catch (InterruptedException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-	                	}
-	                	subGroupSize = subGroupSizes.remove(topologyId);
 	                	
-	                	if((++subGroupSize) < this.groupSize )
-	                		subGroupSizes.put(topologyId, subGroupSize);
-	                	else{
-	                		subMasters.remove(topologyId);
-	                		fullSubMasters.put(topologyId, subMaster);
+	                	subGroupSize = subGroupSizes.get(topologyId);
+	                	synchronized(subGroupSize){
+	                		subGroupSize = subGroupSizes.remove(topologyId);
+	                		if (debug) {
+	                            logger.debug("subGroupSize is: " + subGroupSize);
+	                        }
+		                	if((++subGroupSize) < this.groupSize )
+		                		subGroupSizes.put(topologyId, subGroupSize);
+		                	else{
+		                		subMasters.remove(topologyId);
+		                		fullSubMasters.put(topologyId, subMaster);
+		                	}
 	                	}
 	                	
 	                	// get the submaster and give the node to the subMaster to create worker

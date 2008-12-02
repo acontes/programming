@@ -299,8 +299,18 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
             }
             Queue<TaskIntern<Serializable>> tasksToDo = new LinkedList<TaskIntern<Serializable>>();
 
+            
             // If we are in a flooding scenario, we send at most initial_task_flooding tasks
-            int flooding_value = flooding ? initial_task_flooding : 1;
+            
+            	int flooding_value = flooding ? initial_task_flooding : 1;
+                try {
+                	if(((AOSubMaster) worker) instanceof AOSubMaster){
+                		flooding_value = Master.DEFAULT_SubMaster_TASK_FLOODING;
+                	}
+    			} catch (Exception e) {
+    				// TODO Auto-generated catch block
+    				// do nothing
+    			}
             int i = 0;
             while (!pendingTasks.isEmpty() && i < flooding_value) {
                 TaskID taskId = pendingTasks.poll();

@@ -46,8 +46,6 @@ public class AOSubWorker extends AOWorker implements WorkerPeer{
      */
     private ExecutorService threadPool;
     
-	private WorkerMaster submaster;
-	
 	
     /**
      * workerpeers deployed so far
@@ -60,10 +58,10 @@ public class AOSubWorker extends AOWorker implements WorkerPeer{
 	}
 
 	public AOSubWorker(final String name, final WorkerMaster provider,
-            final Map<String, Serializable> initialMemory) {
+            final Map<String, Serializable> initialMemory, long peerid) {
         this.name = name;
         this.provider = provider;
-        this.submaster = provider;
+        this.peerid = peerid;
 
         this.memory = new WorkerMemoryImpl(initialMemory);
         this.initialMemory = initialMemory;
@@ -127,7 +125,7 @@ public class AOSubWorker extends AOWorker implements WorkerPeer{
 		// TODO Auto-generated method stub
 		// Remove all workerpeers from the peerlist 
 		this.clear();
-		this.submaster = submaster;
+		this.provider = submaster;
 		// Add all the workerpeers of the given list to the list of the workerpeer
 		this.workerpeerlist.putAll(workerpeerlist);
 		this.workernamelist.putAll(workernamelist);
@@ -200,6 +198,7 @@ public class AOSubWorker extends AOWorker implements WorkerPeer{
 		// TODO Auto-generated method stub
 		
 		stubOnThis = (AOSubWorker) PAActiveObject.getStubOnThis();
+		super.stubOnThis = stubOnThis;
         body.setImmediateService("addWorkerPeer");
         body.setImmediateService("canBeSubMaster");
         body.setImmediateService("iAmSubmaster");

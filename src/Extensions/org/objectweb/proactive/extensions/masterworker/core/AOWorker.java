@@ -272,6 +272,8 @@ public class AOWorker implements InitActive, Serializable, Worker {
         while ((pendingTasks.size() == 0) && (pendingTasksFutures.size() > 0)) {
             pendingTasks.addAll(pendingTasksFutures.remove());
         }
+        
+        PAFuture.
 
         if (!suspended && (pendingTasks.size() > 0)) {
 

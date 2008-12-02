@@ -75,11 +75,12 @@ public class AOSubWorkerManager implements WorkerManager, InitActive, Serializab
      * workers deployed so far
      */
     private Map<String, Worker> workers;
+
     
     /**
      * workerpeers deployed so far
      */
-    private Collection<WorkerPeer> workerpeers;
+    private HashMap<Long, WorkerPeer> workerpeers;
     
     public AOSubWorkerManager(){
     	
@@ -95,6 +96,8 @@ public class AOSubWorkerManager implements WorkerManager, InitActive, Serializab
         this.provider = provider;
         this.memoryFactory = memoryFactory;
         this.submasterName = submasterName;
+        
+        
     }
     
 	/**
@@ -104,7 +107,7 @@ public class AOSubWorkerManager implements WorkerManager, InitActive, Serializab
 	 * Maybe we use booleanwrapper to wait all the results?
 	 */
 	private void broadcastNewPeer(final long peerid, String workername, final WorkerPeer workerpeer) {
-		for(WorkerPeer subworker : workerpeers){
+		for(WorkerPeer subworker : workerpeers.values()){
 			BooleanWrapper wrap = subworker.addWorkerPeer(peerid, workername, workerpeer);
 			PAFuture.waitFor(wrap);
 		}
@@ -125,14 +128,13 @@ public class AOSubWorkerManager implements WorkerManager, InitActive, Serializab
 
                 AOSubWorker subworker = (AOSubWorker) PAActiveObject
                 .newActive(AOSubWorker.class.getName(), new Object[] { workername,
-                    (WorkerMaster) provider, memoryFactory.newMemoryInstance() }, node);
+                    (WorkerMaster) provider, memoryFactory.newMemoryInstance(), workerNameCounter}, node);
                 
-                // Set peerid
-                subworker.setPeerId(workerNameCounter);
+                PAFuture.waitFor(subworker);
                 
                 // Creates the worker which will automatically connect to the master
                 workers.put(workername, (Worker) subworker);
-                workerpeers.add((WorkerPeer) subworker);
+                workerpeers.put(workerNameCounter, (WorkerPeer) subworker);
                 
                 // Broadcast the new peer to all the workers of the submaster
                 broadcastNewPeer(workerNameCounter, workername, subworker);
@@ -239,6 +241,7 @@ public class AOSubWorkerManager implements WorkerManager, InitActive, Serializab
         .getStubOnThis();
 		workerNameCounter = 0;
 		workers = new HashMap<String, Worker>();
+		workerpeers = new HashMap<Long, WorkerPeer>();
 		
 		isTerminated = false;
 		if (debug) {
