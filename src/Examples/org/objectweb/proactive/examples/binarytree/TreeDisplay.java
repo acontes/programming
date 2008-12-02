@@ -94,7 +94,7 @@ public class TreeDisplay {
 
     public ObjectWrapper search(String key) {
         if (tree == null) {
-            return null;
+            return new ObjectWrapper("null");
         }
         return tree.search(key);
     }
