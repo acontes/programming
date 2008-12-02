@@ -183,7 +183,7 @@ public class C3DRenderingEngine implements java.io.Serializable {
     /**
      * Return the Vector's transmission direction
      */
-    Vec TransDir(Surface m1, Surface m2, Vec I, Vec N) {
+    private Vec TransDir(Surface m1, Surface m2, Vec I, Vec N) {
         double n1;
         double n2;
         double eta;

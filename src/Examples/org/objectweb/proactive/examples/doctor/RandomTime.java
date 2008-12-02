@@ -38,10 +38,9 @@ import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 
 @ActiveObject
 public class RandomTime {
-    private Random rand;
+    private Random rand = new Random();
 
     public RandomTime() {
-        rand = new Random();
     }
 
     public long gaussianTime(long mean, long sigma) {

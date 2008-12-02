@@ -362,7 +362,7 @@ public class Matrix implements java.io.Serializable {
         return res;
     }
 
-    public Matrix distributedMultiply(Matrix m, Node[] nodeList) {
+    private Matrix distributedMultiply(Matrix m, Node[] nodeList) {
         if (getWidth() != m.getHeight()) {
             logger.error("Error : no compatible Matrix");
             return null;
@@ -427,7 +427,7 @@ public class Matrix implements java.io.Serializable {
         return result;
     }
 
-    public Matrix distributedMultiplyWithOutGroup(Matrix m, Node[] nodeList) {
+    private Matrix distributedMultiplyWithOutGroup(Matrix m, Node[] nodeList) {
         if (getWidth() != m.getHeight()) {
             logger.error("Error : no compatible Matrix");
             return null;

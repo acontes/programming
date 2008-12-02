@@ -127,7 +127,7 @@ public class PiBBP implements Serializable {
      * Computes the value of PI with a group of "pi computers", deployed on a local node
      * @return the value of PI
      */
-    public String runParallel() {
+    private String runParallel() {
         try {
             // create a group of computers on the current host
             piComputer = (PiComputer) PAGroup.newGroup(PiComputer.class.getName(), new Object[][] {

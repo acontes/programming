@@ -94,7 +94,7 @@ public class Matrix implements java.io.Serializable {
         return m;
     }
 
-    public Matrix identity() {
+    private Matrix identity() {
         Matrix result;
         if (this.m != this.n) {
             return null;
@@ -268,7 +268,7 @@ public class Matrix implements java.io.Serializable {
         return;
     }
 
-    public Matrix rightProduct(Matrix m) {
+    private Matrix rightProduct(Matrix m) {
         // Let's verify dimensions (product is this*m)
         int i;
 
@@ -344,7 +344,7 @@ public class Matrix implements java.io.Serializable {
         return;
     }
 
-    public Matrix getInverse() {
+    private Matrix getInverse() {
         Matrix source;
         Matrix result;
         int i;
