@@ -30,33 +30,19 @@
  */
 package org.objectweb.proactive.extra.annotation.activeobject;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import org.objectweb.proactive.extra.annotation.ErrorMessages;
-import org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignal;
 
 import com.sun.mirror.apt.Messager;
-import com.sun.mirror.declaration.AnnotationMirror;
 import com.sun.mirror.declaration.ClassDeclaration;
 import com.sun.mirror.declaration.ConstructorDeclaration;
 import com.sun.mirror.declaration.Declaration;
 import com.sun.mirror.declaration.FieldDeclaration;
-import com.sun.mirror.declaration.InterfaceDeclaration;
 import com.sun.mirror.declaration.MethodDeclaration;
 import com.sun.mirror.declaration.Modifier;
-import com.sun.mirror.declaration.ParameterDeclaration;
-import com.sun.mirror.declaration.TypeDeclaration;
-import com.sun.mirror.type.ArrayType;
-import com.sun.mirror.type.ClassType;
-import com.sun.mirror.type.DeclaredType;
-import com.sun.mirror.type.EnumType;
-import com.sun.mirror.type.InterfaceType;
-import com.sun.mirror.type.PrimitiveType;
-import com.sun.mirror.type.TypeMirror;
-import com.sun.mirror.type.VoidType;
 import com.sun.mirror.util.SimpleDeclarationVisitor;
 import com.sun.mirror.util.SourcePosition;
 
@@ -100,12 +86,6 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
             reportError(classDeclaration, ErrorMessages.NO_NOARG_CONSTRUCTOR_CANNOT_BE_PRIVATE_MESSAGE);
         }
 
-        if (!ccr.allParamsSerializable) {
-            for (ConstructorDeclaration offendingConstructor : ccr.offendingConstructors) {
-                reportError(offendingConstructor, ErrorMessages.NO_SERIALIZABLE_ARG_CONSTRUCTOR_ERROR_MESSAGE);
-            }
-        }
-
         //		if (!implementsSerializable(classDeclaration)) {
         //			reportWarning(classDeclaration, ErrorMessages.NO_SERIALIZABLE_ERROR_MESSAGE);
         //		}
@@ -129,24 +109,10 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
     public void visitMethodDeclaration(MethodDeclaration methodDeclaration) {
 
         testMethodModifiers(methodDeclaration);
-        testParameterTypes(methodDeclaration);
 
         //checkReturnType(methodDeclaration); - REMOVED
 
         super.visitMethodDeclaration(methodDeclaration);
-    }
-
-    private void testParameterTypes(MethodDeclaration methodDeclaration) {
-
-        // a migration signal can have non-serializable parameters - for instance, the ProActive Node!
-        if (methodDeclaration.getAnnotation(MigrationSignal.class) != null) {
-            return;
-        }
-
-        if (!methodDeclaration.getModifiers().contains(Modifier.PRIVATE) &&
-            !paramsSerializable(methodDeclaration.getParameters())) {
-            reportError(methodDeclaration, ErrorMessages.NO_SERIALIZABLE_METHOD_ARG_ERROR_MESSAGE);
-        }
     }
 
     @Override
@@ -155,64 +121,6 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
         testFieldModifiers(fieldDeclaration);
 
         super.visitFieldDeclaration(fieldDeclaration);
-    }
-
-    /*
-     * Test if the return type of the method can be made a Future Object
-     * @return: true , is the class cannot be an active object
-     * 			false, if the object can be an active object
-     */
-    private boolean checkReturnType(final MethodDeclaration methodDeclaration) {
-        // check the return type
-        final TypeMirror returnType = methodDeclaration.getReturnType();
-        if (!isReifiable(returnType)) {
-            reportError(methodDeclaration, returnType + ErrorMessages.RETURN_TYPE_NOT_REIFIABLE_ERROR_MESSAGE);
-            return false;
-        }
-        return true;
-    }
-
-    /*
-     * Tests whether a given type is reifiable or not.
-     * The notion of "reifiable type" is given in the ProActive manual
-     * @return : true if reifiable, false else
-     */
-    private boolean isReifiable(TypeMirror type) {
-        if (type instanceof VoidType) {
-            // is ok
-            return true;
-        } else if (type instanceof PrimitiveType) {
-            // primitive types not reifiable
-            return false;
-        } else if (type instanceof EnumType) {
-            // enums not reifiable
-            return false;
-        } else if (type instanceof ArrayType) {
-            // TODO arrays not reifiable. right?
-            return false;
-        } else if (type instanceof ClassType) {
-            // must check whether it is reifiable or not
-            ClassType classType = (ClassType) type;
-            // must fulfill the same prereqs as an Active Object
-            testFutureObject(classType.getDeclaration());
-        }
-        return true;
-    }
-
-    /*
-     * Test whether the object defined by the given class declaration 
-     * can be the type of a ProActive Future
-     * TODO what are the prereqs?
-     * @return: true , is the class cannot be an active object
-     * 			false, if the object can be an active object
-     */
-    private boolean testFutureObject(ClassDeclaration classDeclaration) {
-        // test the modifiers
-        boolean ret = testClassModifiers(classDeclaration);
-        // test the contained fields and methods
-        super.visitClassDeclaration(classDeclaration);
-
-        return ret;
     }
 
     /*
@@ -361,11 +269,6 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
                 if (constructorDeclaration.getModifiers().contains(Modifier.PRIVATE))
                     ccr.isFinalNoArgConstructor = true;
             }
-            if (!paramsSerializable(constructorDeclaration.getParameters())) {
-                ccr.allParamsSerializable = false;
-                ccr.offendingConstructors.add(constructorDeclaration);
-            }
-
         }
 
         return ccr;
@@ -389,70 +292,6 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
         public boolean isFinalNoArgConstructor;
         public boolean allParamsSerializable;
         public List<ConstructorDeclaration> offendingConstructors = new ArrayList<ConstructorDeclaration>();
-    }
-
-    // all the constructor parameters must implement Serializable interface
-    private boolean paramsSerializable(Collection<ParameterDeclaration> params) {
-        for (ParameterDeclaration param : params) {
-            // trust me! I know it's a DeclaredType! :P
-            if (param.getType() instanceof DeclaredType) {
-                DeclaredType paramType = (DeclaredType) param.getType();
-                if (!implementsSerializableOrActive(paramType)) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    // check if the given type implements Serializable
-    private boolean implementsSerializableOrActive(DeclaredType paramType) {
-
-        if (paramType.getDeclaration() != null) {
-            for (AnnotationMirror annotationMirrow : paramType.getDeclaration().getAnnotationMirrors()) {
-                if (annotationMirrow.getAnnotationType().toString().equals(ActiveObject.class.getName())) {
-                    return true;
-                }
-            }
-        }
-
-        boolean isSerializable = false;
-
-        // now, verify its base class
-        TypeDeclaration paramTypeDecl = paramType.getDeclaration();
-        if (paramTypeDecl == null) {
-            _compilerOutput.printError(_containingClass.getPosition(), paramType.toString() +
-                " type cannot be found.");
-            // no class definition => we cannot discuss about serialization
-            return true;
-        }
-
-        if (paramTypeDecl instanceof ClassDeclaration) {
-            ClassDeclaration paramClass = (ClassDeclaration) paramTypeDecl;
-            // if we have a superclass...
-            if (paramClass.getSuperclass() != null)
-                isSerializable = isSerializable | implementsSerializableOrActive(paramClass.getSuperclass());
-        }
-
-        for (InterfaceType implementedInterface : paramTypeDecl.getSuperinterfaces()) {
-
-            InterfaceDeclaration implementedInterfaceType = implementedInterface.getDeclaration();
-            if (implementedInterfaceType == null) {
-                _compilerOutput.printError(paramTypeDecl.getPosition(), implementedInterface.toString() +
-                    " type cannot be found.");
-                // if I found undefined interfaces, then maybe those interfaces implement Serializable!
-                return true;
-            }
-
-            isSerializable = isSerializable |
-            // the interface is actually Serializable
-                Serializable.class.getName().equals(implementedInterfaceType.getQualifiedName()) |
-                // verify if one of the superclasses implements Serializable
-                implementsSerializableOrActive(implementedInterface);
-        }
-
-        return isSerializable;
-
     }
 
     protected void reportError(Declaration declaration, String msg) {

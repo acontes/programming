@@ -30,20 +30,13 @@
  */
 package org.objectweb.proactive.extra.annotation.activeobject;
 
-import java.io.Serializable;
 import java.util.List;
 
 import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
-import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.TypeKind;
-import javax.lang.model.type.TypeMirror;
-import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 
 import org.objectweb.proactive.extra.annotation.ErrorMessages;
@@ -79,13 +72,11 @@ import com.sun.source.util.Trees;
 public class ActiveObjectVisitorCTree extends TreePathScanner<Void, Trees> {
 
     private Messager compilerOutput;
-    private Types typesUtil;
     private boolean insideClass = false;
     private TreePath curMethod;
 
     public ActiveObjectVisitorCTree(ProcessingEnvironment procEnv) {
         compilerOutput = procEnv.getMessager();
-        typesUtil = procEnv.getTypeUtils();
     }
 
     @Override
@@ -181,18 +172,6 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void, Trees> {
             if (methodElem.getAnnotation(MigrationSignal.class) != null) {
                 return super.visitMethod(methodNode, trees);
             }
-
-            if (!methodElem.getModifiers().contains(Modifier.PRIVATE) &&
-                !paramsSerializable(methodElem.getParameters())) {
-                if (!isConstructor(methodNode))
-                    reportError(" The class declares the method " + methodNode.getName() + ".\n" +
-                        ErrorMessages.NO_SERIALIZABLE_METHOD_ARG_ERROR_MESSAGE, trees
-                            .getElement(getCurrentPath()));
-                else
-                    reportError(" The class declares the constructor " + methodNode.getName() + ".\n" +
-                        ErrorMessages.NO_SERIALIZABLE_ARG_CONSTRUCTOR_ERROR_MESSAGE, trees
-                            .getElement(getCurrentPath()));
-            }
         }
 
         return super.visitMethod(methodNode, trees);
@@ -204,53 +183,6 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void, Trees> {
     private final boolean isConstructor(MethodTree executable) {
         // a constructor is a method that has returns nothing
         return executable.getReturnType() == null;
-    }
-
-    // all the constructor parameters must implement Serializable interface
-    private boolean paramsSerializable(List<? extends VariableElement> params) {
-        for (VariableElement param : params) {
-            if (param.asType().getKind().equals(TypeKind.DECLARED)) {
-                DeclaredType paramType = (DeclaredType) param.asType();
-                if (!implementsSerializableOrActive(paramType)) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    // check if the given type implements Serializable
-    private boolean implementsSerializableOrActive(DeclaredType paramType) {
-        // System.out.println("Verifying if " + paramType.toString() +
-        // " is Serializable");
-        boolean isSerializable = false;
-        boolean isActive = false;
-
-        if (Serializable.class.getName().equals(paramType.toString()) || hasActiveAnnotation(paramType)) {
-            return true;
-        }
-
-        for (TypeMirror m : typesUtil.directSupertypes(paramType)) {
-            isSerializable = isSerializable ||
-            // the type is Serializable
-                Serializable.class.getName().equals(m.toString()) ||
-                // the type implements Serializable
-                implementsSerializableOrActive((DeclaredType) m);
-
-            isActive = isActive || hasActiveAnnotation((DeclaredType) m) ||
-                implementsSerializableOrActive((DeclaredType) m);
-        }
-
-        return isSerializable || isActive;
-    }
-
-    private boolean hasActiveAnnotation(DeclaredType m) {
-        for (AnnotationMirror annotationMirrow : m.asElement().getAnnotationMirrors()) {
-            if (annotationMirrow.getAnnotationType().toString().equals(ActiveObject.class.getName())) {
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override
