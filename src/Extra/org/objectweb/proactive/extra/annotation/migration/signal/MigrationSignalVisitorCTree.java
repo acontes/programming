@@ -202,7 +202,7 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void, Trees> {
         }
     }
 
-    private BlockVisitInfo verifyBlockStatements(List<? extends StatementTree> statements, Trees trees) {
+    private BlockVisitInfo visitBlockStatements(List<? extends StatementTree> statements, Trees trees) {
 
         boolean migrationUsedCorrectlyInSubBlocks = true;
         boolean hasInSubBlocks = false;
@@ -220,7 +220,7 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void, Trees> {
                 // check all underlying group of statements
                 BlockVisitInfo bviCase;
                 for (CaseTree someCase : ((SwitchTree) statement).getCases()) {
-                    bviCase = verifyBlockStatements(someCase.getStatements(), trees);
+                    bviCase = visitBlockStatements(someCase.getStatements(), trees);
                     bviCase = checkMigrationCorrectness(bviCase, someCase.getStatements());
                     hasInSubBlocks = hasInSubBlocks | bviCase.hasMigrateTo;
                     migrationUsedCorrectlyInSubBlocks = migrationUsedCorrectlyInSubBlocks &
@@ -230,7 +230,7 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void, Trees> {
 
             // is a statement with underlying statements?
             List<UnderlyingStatementsInfo> underlyingBlocks = getSubstatementsInfo(statement);
-            boolean isLoopStmt = isLoop(statement);
+            //            boolean isLoopStmt = isLoop(statement);
 
             // is it a statement that contains sub-blocks/sub-statements?
             if (!underlyingBlocks.isEmpty()) {
@@ -244,8 +244,10 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void, Trees> {
                         bvi = new BlockVisitInfo(isMigrationCall(underInfo.underlyingStatement, trees), true);
                     }
                     hasInSubBlocks = hasInSubBlocks | bvi.hasMigrateTo;
-                    migrationUsedCorrectlyInSubBlocks = isLoopStmt & !bvi.hasMigrateTo // if it is a loop statement, it must not contain migrateTo calls 
-                        || !isLoopStmt & migrationUsedCorrectlyInSubBlocks & bvi.migrationUsedCorrectly; // if it's not a loop statement
+                    // NOTA decided to give up this feature. 
+                    //migrationUsedCorrectlyInSubBlocks = isLoopStmt & !bvi.hasMigrateTo || // if it is a loop statement, it must not contain migrateTo calls 
+                    migrationUsedCorrectlyInSubBlocks = migrationUsedCorrectlyInSubBlocks &
+                        bvi.migrationUsedCorrectly; //(!isLoopStmt & bvi.migrationUsedCorrectly); // if it's not a loop statement
                 }
             }
         }
@@ -261,13 +263,15 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void, Trees> {
 
         // case 1 - migrateTo not in this block
         if (bvi.migrationStatement == null) {
-            if (!hasInSubBlocks)
-                return new BlockVisitInfo(false, false);
-
-            if (!migrationUsedCorrectlyInSubBlocks)
-                return new BlockVisitInfo(true, false);
-            else
-                return new BlockVisitInfo(true, true);
+            // NOT NECESSARY ANYMORE
+            //            if (!hasInSubBlocks)
+            //                return new BlockVisitInfo(false, false);
+            //
+            //            if (!migrationUsedCorrectlyInSubBlocks)
+            //                return new BlockVisitInfo(true, false);
+            //            else
+            //                return new BlockVisitInfo(true, true);
+            return new BlockVisitInfo(hasInSubBlocks, migrationUsedCorrectlyInSubBlocks);
         }
 
         // case 2 - migrateTo call in this block
@@ -284,19 +288,25 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void, Trees> {
             return new BlockVisitInfo(true, true);
         }
 
-        if (statementsNo - 1 == migrateToPos + 1) {
-            // get info on statements
-            StatementTree lastStatement = statements.get(statementsNo - 1);
+        // definitely not the last statement
+        return new BlockVisitInfo(true, false);
 
-            if (!checkReturnStatement(lastStatement))
-                return new BlockVisitInfo(true, false);
-        } else {
-            // definitely not the last statement
-            return new BlockVisitInfo(true, false);
-        }
+        /*      NOTA This code used to allow for return statements as last statements, if the return 
+         * 		expression was not a method invocation. Specification changed, now migrateTo should *really* be the last statement.
+         if (statementsNo - 1 == migrateToPos + 1) {
+         // get info on statements
+         StatementTree lastStatement = statements.get(statementsNo - 1);
 
-        // migrateTo in this block, and used correctly
-        return new BlockVisitInfo(true, true);
+         if (!checkReturnStatement(lastStatement))
+         return new BlockVisitInfo(true, false);
+         } else {
+         // definitely not the last statement
+         return new BlockVisitInfo(true, false);
+         }
+
+         // migrateTo in this block, and used correctly
+         return new BlockVisitInfo(true, true);
+         */
     }
 
     private Map<BlockTree, BlockVisitInfo> _visitedBlocks = new HashMap<BlockTree, BlockVisitInfo>();
@@ -315,10 +325,12 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void, Trees> {
         List<? extends StatementTree> statements = blockNode.getStatements();
 
         // verify the statements of this block
-        BlockVisitInfo bvi = verifyBlockStatements(statements, trees);
+        BlockVisitInfo bvi = visitBlockStatements(statements, trees);
+        //        System.out.println("Visiting block " + blockNode + " has generated following info:" + bvi);
 
         // according to the info for the sub-blocks, determine if migration is used correctly
         BlockVisitInfo bvRet = checkMigrationCorrectness(bvi, statements);
+        //        System.out.println("Block correctness:" + bvRet);
 
         _visitedBlocks.put(blockNode, bvRet);
         return ret;
