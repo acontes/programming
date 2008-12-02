@@ -75,4 +75,7 @@ public class WarningGettersSetters implements Serializable {
     public void setTest5(int test5) {
         this.test5 = test5;
     }
+    
+    // OK (final field)
+    final Object o = new Object();
 }
