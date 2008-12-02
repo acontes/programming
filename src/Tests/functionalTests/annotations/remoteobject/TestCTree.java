@@ -67,7 +67,7 @@ public class TestCTree extends CTreeTest {
 
         // CTREE - specific
         Assert.assertEquals(OK, checkFile("ErrorReturnsNull"));
-        Assert.assertEquals(new Result(1, 0), checkFile("ErrorNonEmptyConstructor"));
+        Assert.assertEquals(new Result(0, 1), checkFile("ErrorNonEmptyConstructor"));
         Assert.assertEquals(OK, checkFile("NoConstructor"));
     }
 

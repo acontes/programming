@@ -68,8 +68,6 @@ public class TestApt extends AptTest {
         Assert.assertEquals(new Result(1, 1), checkFile("Reject"));
         Assert.assertEquals(OK, checkFile("CorrectedReject"));
 
-        Assert.assertEquals(OK, checkFile("ErrorNonEmptyConstructor"));
-
     }
 
     @org.junit.After

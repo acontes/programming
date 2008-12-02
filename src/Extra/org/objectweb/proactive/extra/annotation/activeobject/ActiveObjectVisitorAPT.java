@@ -167,9 +167,8 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
             return true;
 
         // no public/package access without getters/setters for non final fields
-        if (!fieldDeclaration.getModifiers().contains(Modifier.FINAL) && 
-        	!checkGettersSetters(fieldDeclaration.getSimpleName())) 
-        {
+        if (!fieldDeclaration.getModifiers().contains(Modifier.FINAL) &&
+            !checkGettersSetters(fieldDeclaration.getSimpleName())) {
             reportWarning(fieldDeclaration, "The class declares the  " +
                 (modifiers.contains(Modifier.PUBLIC) ? "public" : "package") + " field " +
                 fieldDeclaration.getSimpleName() + ".\n" + ErrorMessages.NO_GETTERS_SETTERS_ERROR_MESSAGE);

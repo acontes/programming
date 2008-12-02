@@ -263,7 +263,7 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void, Trees> {
                             }
 
                             if (!onlySuperInside) {
-                                reportError(ErrorMessages.EMPTY_CONSTRUCTOR, trees
+                                reportWarning(ErrorMessages.EMPTY_CONSTRUCTOR, trees
                                         .getElement(getCurrentPath()));
                             }
                         }
