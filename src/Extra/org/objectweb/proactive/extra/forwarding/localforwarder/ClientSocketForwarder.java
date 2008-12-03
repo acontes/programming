@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
@@ -17,7 +18,7 @@ import org.objectweb.proactive.extra.forwarding.common.OutHandler;
  */
 public class ClientSocketForwarder extends SocketForwarder {
 
-    private Semaphore lock;
+    private CountDownLatch lock;
     private volatile boolean accepted;
     private volatile boolean launched;
 
@@ -31,7 +32,7 @@ public class ClientSocketForwarder extends SocketForwarder {
      */
     protected void initSocket() {
         // lock until message
-        lock = new Semaphore(0);
+        lock = new CountDownLatch(1);
         launched = false;
     }
 
@@ -39,8 +40,7 @@ public class ClientSocketForwarder extends SocketForwarder {
     public void notifyAbort() {
         if (!launched) {
             accepted = false;
-            //lock.unlock();
-            lock.release();
+            lock.countDown();
         } else {
             super.notifyAbort();
         }
@@ -52,8 +52,7 @@ public class ClientSocketForwarder extends SocketForwarder {
     public void notifyAccept() {
         accepted = true;
         launched = true;
-        //lock.unlock();
-        lock.release();
+        lock.countDown();
     }
 
     /**
@@ -67,7 +66,7 @@ public class ClientSocketForwarder extends SocketForwarder {
             if (logger.isDebugEnabled())
                 logger
                         .debug("ClientSocketForwarder.getSocket() : lock until timeout or accept or abort connection.");
-            lock.tryAcquire(lockTime, TimeUnit.MILLISECONDS);
+            lock.await(lockTime, TimeUnit.MILLISECONDS);
             if (accepted) {
                 sock = createLocalSocket();
                 startHandling();
