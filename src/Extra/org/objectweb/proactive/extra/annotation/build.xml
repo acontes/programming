@@ -20,7 +20,7 @@
 				</else>
 			</if>
 
-			<echo>Compiling them annotations...</echo>
+			<echo>Compiling annotation checkers...</echo>
 
 			<echo>  [i] src:  ${src.extra.dir}/${extra.path}/annotation</echo>
 			<echo>  [i] dest: ${cl.extra.dir}</echo>
@@ -36,14 +36,9 @@
 				<classpath>
 					<path refid="compile.libs"/>
 					<pathelement location="${proactive.jar}"/>
-				
-					<!-- XXX temporary workaround to allow functional tests to be moved in extra -->
-					<pathelement location="${cl.test.dir}"/>
-					
 				</classpath>
 				<include name="${extra.path}/annotation/**/*.java" />
 				<exclude name="${annotations_src_exclude}"/>
-				
 			</javac>
 				
 <!--
