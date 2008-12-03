@@ -9,6 +9,9 @@ import org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignal
 @ActiveObject
 public class AcceptInterClassCall {
 
+    private AnotherMigrateTo ao = new AnotherMigrateTo();
+
+    // call against a local variable
     @MigrationSignal
     public void migrateTo1() throws MigrationException {
         // calling another method from another class, that migrates
@@ -16,20 +19,25 @@ public class AcceptInterClassCall {
         amt.migrateTo();
     }
 
+    //    @MigrationSignal
+    //    public void migrateTo2() throws MigrationException {
+    //        // a more sophisticated form of call
+    //        new AnotherMigrateTo().migrateTo();
+    //    }
+
+    // call against a field member
     @MigrationSignal
-    public void migrateTo2() throws MigrationException {
+    public void migrateTo3() throws MigrationException {
         // a more sophisticated form of call
-        new AnotherMigrateTo().migrateTo();
+        ao.migrateTo();
     }
 
 }
 
-@ActiveObject
-//should not be an active object!!
 class AnotherMigrateTo {
 
     @MigrationSignal
-    public void migrateTo() {
+    public void migrateTo() throws MigrationException {
         PAMobileAgent.migrateTo(new Object());
     }
 }

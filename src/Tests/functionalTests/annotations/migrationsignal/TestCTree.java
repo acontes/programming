@@ -50,8 +50,7 @@ public class TestCTree extends CTreeTest {
         // checking conditions that should be ok
         Assert.assertEquals(ERROR, checkFile("AcceptSimple"));
         Assert.assertEquals(OK, checkFile("AcceptIndirectCall"));
-        // TODO not yet implemented. maybe nobody really neads it?!
-        //Assert.assertEquals(new Result(3, 0), checkFile("AcceptInterClassCall")); 
+        Assert.assertEquals(OK, checkFile("AcceptInterClassCall"));
 
         // checking conditions that should be seen as errors
         //      NOTA can be outside active object  Assert.assertEquals(ERROR, checkFile("ErrorNotInActiveObject"));

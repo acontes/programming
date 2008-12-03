@@ -68,6 +68,7 @@ import com.sun.source.tree.SwitchTree;
 import com.sun.source.tree.SynchronizedTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.TryTree;
+import com.sun.source.tree.VariableTree;
 import com.sun.source.tree.WhileLoopTree;
 import com.sun.source.tree.Tree.Kind;
 import com.sun.source.util.TreePathScanner;
@@ -104,6 +105,7 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void, Trees> {
     private Element _methodPosition = null;
     private ClassTree _containingClass;
     private CompilationUnitTree _containingCompilationUnit;
+    private MethodTree _containingMethod;
 
     private Map<BlockTree, Boolean> visitedBlocks = new HashMap<BlockTree, Boolean>();
 
@@ -112,7 +114,6 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void, Trees> {
 
         ERROR_PREFIX = methodNode.getName() + ERROR_PREFIX_STATIC;
         _methodPosition = trees.getElement(getCurrentPath());
-        _containingCompilationUnit = getCurrentPath().getCompilationUnit();
 
         Element clazzElement = trees.getElement(getCurrentPath().getParentPath());
         if (!((clazzElement instanceof TypeElement) && (clazzElement.getKind().isClass()))) {
@@ -122,7 +123,9 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void, Trees> {
             return super.visitMethod(methodNode, trees);
         }
 
+        _containingCompilationUnit = getCurrentPath().getCompilationUnit();
         _containingClass = (ClassTree) trees.getTree(clazzElement);
+        _containingMethod = methodNode;
 
         // the method must be within a class that is tagged with the ActiveObject annotation
         // sometimes, @MigrationSignal annotation can make sense outside an active object. See
@@ -328,11 +331,9 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void, Trees> {
 
         // verify the statements of this block
         BlockVisitInfo bvi = visitBlockStatements(statements, trees);
-        //        System.out.println("Visiting block " + blockNode + " has generated following info:" + bvi);
 
         // according to the info for the sub-blocks, determine if migration is used correctly
         BlockVisitInfo bvRet = checkMigrationCorrectness(bvi, statements);
-        //        System.out.println("Block correctness:" + bvRet);
 
         _visitedBlocks.put(blockNode, bvRet);
         return ret;
@@ -604,24 +605,68 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void, Trees> {
             MemberSelectTree memberSelectionExpression = (MemberSelectTree) methodSelectionExpression;
             String methodName = memberSelectionExpression.getIdentifier().toString();
             ExpressionTree typeNameExpression = memberSelectionExpression.getExpression();
-            // ... which can only be of the form ClassName.migrateTo
-            // ClassName can be ...
-            String clazzName = null;
+            // ... which can only be of the form ${calleeName}.migrateTo
+            // calleeName can be ...
+            String calleeName = null;
             // ... either unqualified name, ie PAMobileAgent ...
             if (typeNameExpression.getKind().equals(Kind.IDENTIFIER)) {
-                clazzName = ((IdentifierTree) typeNameExpression).getName().toString();
+                calleeName = ((IdentifierTree) typeNameExpression).getName().toString();
             }
             // ... or qualified name, ie ${package.name}.PAMobileAgent.
             else if (typeNameExpression.getKind().equals(Kind.MEMBER_SELECT)) {
-                clazzName = ((MemberSelectTree) typeNameExpression).getIdentifier().toString();
+                calleeName = ((MemberSelectTree) typeNameExpression).getIdentifier().toString();
             } else
                 return false;
-            return methodName.equals(MIGRATE_TO) && clazzName.equals(PAMobileAgent.class.getSimpleName());
+            // the call can also be made against members...
+            //            if(isClassField(calleeName)){
+            //                return true;
+            //            }
+            //            //... or against local variables
+            //            if(isLocalVariable(calleeName)) {
+            //                return true;
+            //            }
+            return isClassField(calleeName) || // the call can also be made against members...
+                isLocalVariable(calleeName) || //... or against local variables
+                methodName.equals(MIGRATE_TO) && calleeName.equals(PAMobileAgent.class.getSimpleName());
         } else {
             // is not a migrateTo call!
             return false;
         }
 
+    }
+
+    /**
+     * Tests if the given name represents the name of a local variable 
+     * defined within the containing method
+     * TODO test if the local variable is accessible from this scope! i.e. containig block, superblocks etc 
+     */
+    private boolean isLocalVariable(String calleeName) {
+        for (Tree statement : _containingMethod.getBody().getStatements()) {
+            if (statement.getKind().equals(Kind.VARIABLE)) {
+                VariableTree varDecl = (VariableTree) statement;
+                // IdentifierTree varType = (IdentifierTree)varDecl.getType();
+                // TODO check if the class ${varType} has a method ${methodName} which is annotated with @MigrationSignal
+                if (varDecl.getName().toString().equals(calleeName))
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Tests if the given name represents the name of a field of the containing class
+     */
+    private boolean isClassField(String calleeName) {
+        for (Tree member : _containingClass.getMembers()) {
+            if (member.getKind().equals(Kind.VARIABLE)) {
+                VariableTree field = (VariableTree) member;
+                // IdentifierTree fieldType = (IdentifierTree)field.getType();
+                // TODO check if the class ${fieldType} has a method ${methodName} which is annotated with @MigrationSignal
+                if (field.getName().toString().equals(calleeName))
+                    return true;
+            }
+        }
+        return false;
     }
 
     // error reporting methods
