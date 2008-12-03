@@ -67,7 +67,7 @@ public class SimpleObjectMigration implements Serializable {
      *
      */
     public SimpleObjectMigration() {
-        logger.info("SimpleObjectMigration> Empty constructor");
+        // logger.info("SimpleObjectMigration> Empty constructor");
     }
 
     /**
@@ -111,7 +111,7 @@ public class SimpleObjectMigration implements Serializable {
         try {
             logger.info("SimpleObjectMigration> moveTo(" + t + ") " + "% start migration");
             PAMobileAgent.migrateTo(t);
-            logger.info("SimpleObjectMigration> moveTo(" + t + ") " + "% stop migration");
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -238,6 +238,7 @@ public class SimpleObjectMigration implements Serializable {
 
         // We migrate the Active Object
         activeHello.moveTo(urlDestinationNode);
+        logger.info("SimpleObjectMigration> moveTo(" + urlDestinationNode + ") " + "% stop migration");
 
         logger.info("");
 

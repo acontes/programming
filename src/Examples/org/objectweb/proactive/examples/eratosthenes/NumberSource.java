@@ -50,16 +50,17 @@ import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
 public class NumberSource implements java.io.Serializable, RunActive, Slowable {
     private final static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     private ActivePrimeContainer first;
-    private boolean pause;
+    private boolean pause = true;
     private boolean sleep;
-    private long currentNumber;
+    private long currentNumber = 5;
 
     /**
      * Constructor for NumberSource.
      */
     public NumberSource() {
-        pause = true;
-        currentNumber = 5;
+    	// @ActiveObject
+//        pause = true;
+//        currentNumber = 5;
     }
 
     public void setFirst(ActivePrimeContainer first) {
