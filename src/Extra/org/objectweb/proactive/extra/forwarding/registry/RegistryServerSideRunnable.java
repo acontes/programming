@@ -32,23 +32,27 @@ public class RegistryServerSideRunnable implements Runnable {
             serverSocket = new ServerSocket(registry.getListeningPort());
         } catch (IOException e) {
             //log and quit
-            if (logger.isDebugEnabled())
+            if (logger.isDebugEnabled()) {
                 logger.debug("ST failed while opening server socket listening on port: " +
                     registry.getListeningPort());
+            }
             System.exit(-1);
         }
 
-        if (logger.isDebugEnabled())
+        if (logger.isDebugEnabled()) {
             logger.debug("ST created server socket and listening on port " + registry.getListeningPort());
+        }
         while (listening) {
             try {
                 new Thread(new RegistrationHandler(serverSocket.accept(), registry)).start();
-                if (logger.isDebugEnabled())
+                if (logger.isDebugEnabled()) {
                     logger.debug("ST created new RegistrationHandler");
+                }
             } catch (IOException e) {
                 //log the fact that a connection wasn't correctly accepted and keep listening
-                if (logger.isDebugEnabled())
+                if (logger.isDebugEnabled()) {
                     logger.debug("ST failed while accepting a connection, exception: " + e);
+                }
             }
         }
 
@@ -56,8 +60,9 @@ public class RegistryServerSideRunnable implements Runnable {
             serverSocket.close();
         } catch (IOException e) {
             // TODO Auto-generated catch block
-            if (logger.isDebugEnabled())
+            if (logger.isDebugEnabled()) {
                 logger.debug("ST, a problem occured while closing the serverSocket, exception: ", e);
+            }
         }
     }
 

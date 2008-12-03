@@ -61,8 +61,9 @@ public class RegistrationHandler implements Runnable, ConnectionFailureListener 
                 try {
                     // read new message
                     msg = (ForwardedMessage) clientSocketWrapper.readObject();
-                    if (logger.isDebugEnabled())
+                    if (logger.isDebugEnabled()) {
                         logger.debug("RH read msg: " + msg);
+                    }
                 } catch (IOException e) {
                     connectionHasFailed(e);
                     continue;
@@ -73,33 +74,37 @@ public class RegistrationHandler implements Runnable, ConnectionFailureListener 
                 // the received message is a REGISTRATION MSG -> handle the registration
                 if (msg.getType() == ForwardedMessageType.REGISTRATION) {
                     this.hostId = msg.getSenderID();
-                    if (logger.isDebugEnabled())
+                    if (logger.isDebugEnabled()) {
                         logger.debug("RH handling registration");
+                    }
 
                     // if it is a pre-existing connection (a failure probably happened)
                     if (registry.isKeyInMap(msg.getSenderID())) {
                         // kill the pre-existing connection harshly... there might have been a failure somewhere
                         stop(false);
-                        if (logger.isDebugEnabled())
+                        if (logger.isDebugEnabled()) {
                             logger.debug("RH killed the pre-existing connection for uniqueID: " + hostId);
+                        }
                     }
 
-                    if (logger.isDebugEnabled())
+                    if (logger.isDebugEnabled()) {
                         logger
                                 .debug("RH, processing to a new registration (new outHandler and new mapping) for uniqueID " +
                                     hostId);
+                    }
                     // process to a new registration
                     // create new OutHandler
                     outHandler = new OutHandler(clientSocketWrapper, this);
                     new Thread(outHandler).start();
-                    if (logger.isDebugEnabled())
+                    if (logger.isDebugEnabled()) {
                         logger.debug("RH started the new outHandler for uniqueID " + hostId);
+                    }
                     // add mapping in the HashMap
                     registry.putMapping(msg.getSenderID(), this);
-                    if (logger.isDebugEnabled())
+                    if (logger.isDebugEnabled()) {
                         logger.debug("RH added new mapping for uniqueID " + hostId);
-                    if (logger.isDebugEnabled())
                         logger.debug("RH now using current thread as server side of the tunnel to " + hostId);
+                    }
                 }
                 // use this thread as the listening side of this connection
                 // the received message is not a REGISTRATION MSG, just forward it
@@ -113,8 +118,9 @@ public class RegistrationHandler implements Runnable, ConnectionFailureListener 
                 connectionHasFailed(null);
             }
         }
-        if (logger.isDebugEnabled())
+        if (logger.isDebugEnabled()) {
             logger.debug("RH, calling RegistrationHandler.stop()");
+        }
         stop(true);
     }
 
@@ -123,8 +129,9 @@ public class RegistrationHandler implements Runnable, ConnectionFailureListener 
      */
     protected void stopListening() {
         listening = false;
-        if (logger.isDebugEnabled())
+        if (logger.isDebugEnabled()) {
             logger.debug("RH.stopListening() on uniqueId: " + hostId);
+        }
     }
 
     /**
@@ -139,10 +146,13 @@ public class RegistrationHandler implements Runnable, ConnectionFailureListener 
         listening = false;
 
         // stop writing
-        if (logger.isDebugEnabled())
+        if (logger.isDebugEnabled()) {
             logger.debug("RH.stop(), stopping outHandler, closing socket and removing mapping");
-        if (outHandler != null)
+        }
+
+        if (outHandler != null) {
             outHandler.stop(softly);
+        }
 
         // close the socket
         clientSocketWrapper.close();
@@ -155,8 +165,9 @@ public class RegistrationHandler implements Runnable, ConnectionFailureListener 
      * Calls {@link #stop(boolean) in order to stop properly the current Registration Handler}
      */
     public void connectionHasFailed(Exception e) {
-        if (logger.isDebugEnabled())
+        if (logger.isDebugEnabled()) {
             logger.debug("RH.connectionHasFailed tunnel to " + hostId + " has failed, exception: " + e);
+        }
         stop(false);
     }
 

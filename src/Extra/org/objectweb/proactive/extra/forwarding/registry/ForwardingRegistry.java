@@ -51,8 +51,9 @@ public class ForwardingRegistry {
         for (int i = 0; i < args.length; i++) {
             if (args[i].equals("-port")) {
                 port = Integer.parseInt(args[++i]);
-                if (logger.isDebugEnabled())
+                if (logger.isDebugEnabled()) {
                     logger.debug("FR server port is: " + port);
+                }
             } else {
                 System.err.println("Unknown option: " + args[i]);
                 System.exit(1);
@@ -63,49 +64,58 @@ public class ForwardingRegistry {
 
         Runtime.getRuntime().addShutdownHook(new Thread(new RegistryShutdownHook(registry)));
 
-        if (logger.isDebugEnabled())
+        if (logger.isDebugEnabled()) {
             logger.debug("FR.main(), shutdown hook added, going to start() FR");
+        }
         registry.start();
 
         // TODO connect to other registries if implemented
     }
 
     /**
-     * Launches the server of the ForwardingRegistry in a new thread.
+     * Launches the server of the ForwardingRegistry in a new DAEMON thread.
+     * Since this thread is the one that will create the RegistrationHandlers, which will in turn create the needed OutHandlers, every thread (except main) will be DAEMON  
      * Then handles the blocking message queue by calling {@link #forwardMessage(ForwardedMessage)} whenever a {@link ForwardedMessage} is received. 
      */
     private void start() {
         // launch the server thread
         running = true;
-        new Thread(server).start();
-        if (logger.isDebugEnabled())
+        Thread serverThread = new Thread(server);
+        serverThread.setDaemon(true);
+        serverThread.start();
+
+        if (logger.isDebugEnabled()) {
             logger
                     .debug("FR.start(), created and started a new thread for the registry server\n now processing messageQueue");
-
+        }
         // handle messageQueue
         while (running) {
             ForwardedMessage msg = null;
             try {
                 msg = messageQueue.poll(1, TimeUnit.SECONDS);
-                if (logger.isDebugEnabled() && msg != null)
+                if (logger.isDebugEnabled() && msg != null) {
                     logger.debug("FR.start() dequeued msg: " + msg);
+                }
             } catch (InterruptedException e) {
                 // The waiting has been interrupted.
-                if (logger.isDebugEnabled())
+                if (logger.isDebugEnabled()) {
                     logger
                             .debug("FR.start(), The waiting of the blocking queue was interrupted, exception: " +
                                 e);
+                }
             }
             if (msg != null) {
-                if (logger.isDebugEnabled())
+                if (logger.isDebugEnabled()) {
                     logger.debug("FR.start(), forwarding the following message: \n" + msg.toString());
+                }
                 forwardMessage(msg);
             }
         }
 
-        //FIXME this line of code can't be reached. Add a shutdown hook or similar solution
-        if (logger.isDebugEnabled())
+        //FIXME this line of code can't be reached. A shutdown hook was added to stop the registry properly. But this solution should normally only be used defensively. Add a shell to be able to pass commands to the registry such as start, stop...
+        if (logger.isDebugEnabled()) {
             logger.debug("FR.start() going to call FR.stop");
+        }
         stop(true);
     }
 
@@ -124,29 +134,30 @@ public class ForwardingRegistry {
 
         // if the target is registered, forward the message
         if (regHandler != null) {
-            if (logger.isDebugEnabled())
+            if (logger.isDebugEnabled()) {
                 logger.debug("FR.forwardMessage(), target: " + msg.getTargetID() +
                     " is registered, msg enqueued in OH");
+            }
             regHandler.getOutHandler().putMessage(msg);
         }
 
         // if the target is not registered, create and send an ABORT MSG to the sender
         else {
-            if (logger.isDebugEnabled())
+            if (logger.isDebugEnabled()) {
                 logger.debug("FR.forwardMessage(), target: " + msg.getTargetID() +
                     " is not registered, sending back abortMessage to sender: " + msg.getSenderID());
+            }
             ForwardedMessage response = ForwardedMessage.abortMessage(msg.getTargetID(), msg.getTargetPort(),
                     msg.getSenderID(), msg.getSenderPort(), "Target unreachable");
             synchronized (registrationHandlerMap) {
                 regHandler = registrationHandlerMap.get(msg.getSenderID());
             }
             // check if the sender tunnel died and was removed from the regHandlers mappings in the meantime
-            if (regHandler != null)
+            if (regHandler != null) {
                 regHandler.getOutHandler().putMessage(response);
-            else {
-                if (logger.isDebugEnabled())
-                    logger
-                            .debug("FR.forwardMessage(), sender tunnel died in the meantime, not sending abort message");
+            } else if (logger.isDebugEnabled()) {
+                logger
+                        .debug("FR.forwardMessage(), sender tunnel died in the meantime, not sending abort message");
             }
         }
     }
@@ -167,31 +178,36 @@ public class ForwardingRegistry {
         ForwardedMessage msg = null;
 
         // stop the server
-        if (logger.isDebugEnabled())
+        if (logger.isDebugEnabled()) {
             logger.debug("FR.stop(), calling ServTh.stop()");
+        }
         server.stop();
 
         // stop the Registration Handlers
-        if (logger.isDebugEnabled())
+        if (logger.isDebugEnabled()) {
             logger.debug("FR.stop(), calling RH.stopListening() on every mapped RH");
+        }
         for (RegistrationHandler regHandler : registrationHandlerMap.values()) {
             regHandler.stopListening();
         }
 
         // forward the remaining messages in the Forwarding Registry's messageQueue
-        if (logger.isDebugEnabled())
+        if (logger.isDebugEnabled()) {
             logger.debug("FR.stop(), forwarding remaining messages");
+        }
         msg = messageQueue.poll();
         while (msg != null) {
-            if (logger.isDebugEnabled())
+            if (logger.isDebugEnabled()) {
                 logger.debug("FR.stop(), forwarding the following message: \n" + msg);
+            }
             forwardMessage(msg);
             msg = messageQueue.poll();
         }
 
         // stop the OutHandlers, close the RegistrationHandlers' sockets, deallocate the RegistrationHandlers
-        if (logger.isDebugEnabled())
+        if (logger.isDebugEnabled()) {
             logger.debug("FR.stop(), calling RH.stop() on every mapped RH");
+        }
         for (RegistrationHandler regHandler : registrationHandlerMap.values()) {
             regHandler.stop(softly);
         }
@@ -231,14 +247,18 @@ public class ForwardingRegistry {
         synchronized (registrationHandlerMap) {
             regHandler = registrationHandlerMap.get(key);
         }
-        if (logger.isDebugEnabled())
+        if (logger.isDebugEnabled()) {
             logger.debug("FR.killRegistrationHandler(), calling RH.stop() on RH.uniqueId: " +
                 regHandler.getHostId());
+        }
         regHandler.stop(softly);
     }
 
     /**
      * Performs a synchronized removal on {@link #registrationHandlerMap}
+     * Notifies every other registered agent that tunnel connection, that is going to be removed from the map, 
+     * has undergone a disconnection, and thus that any connection linking two nodes and involving this tunnel
+     * should be closed. 
      * @param key The key to the mapping that should be removed
      */
     public void removeMapping(Object key) {
@@ -258,8 +278,9 @@ public class ForwardingRegistry {
     public void putMessage(ForwardedMessage msg) {
         try {
             boolean notFull = messageQueue.offer(msg);
-            if (!notFull)
+            if (!notFull) {
                 logger.warn("Queue is full; dropping message");
+            }
         } catch (NullPointerException e) {
             logger.warn("Registry should never handle null messages", e);
         }
