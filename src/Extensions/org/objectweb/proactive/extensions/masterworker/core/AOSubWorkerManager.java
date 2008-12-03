@@ -32,8 +32,7 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.internal.Worke
 
 public class AOSubWorkerManager implements WorkerManager, InitActive, Serializable {
 
-	private String submasterName = "subname";
-	
+    private String submasterName = "subname";
 
     /**
      * log4j logger for the worker manager
@@ -44,8 +43,8 @@ public class AOSubWorkerManager implements WorkerManager, InitActive, Serializab
     /**
      * Stub of this active object
      */
-	private AOSubWorkerManager stubOnThis;
-    
+    private AOSubWorkerManager stubOnThis;
+
     /**
      * how many workers have been created
      */
@@ -76,46 +75,45 @@ public class AOSubWorkerManager implements WorkerManager, InitActive, Serializab
      */
     private Map<String, Worker> workers;
 
-    
     /**
      * workerpeers deployed so far
      */
     private HashMap<Long, WorkerPeer> workerpeers;
-    
-    public AOSubWorkerManager(){
-    	
+
+    public AOSubWorkerManager() {
+
     }
-	
+
     /**
      * Creates a task manager with the given task provider
      *
      * @param provider      the entity that will give tasks to the workers created
      * @param memoryFactory factory which will create memory for each new workers
      */
-    public AOSubWorkerManager(final WorkerMaster provider, final MemoryFactory memoryFactory, final String submasterName) {
+    public AOSubWorkerManager(final WorkerMaster provider, final MemoryFactory memoryFactory,
+            final String submasterName) {
         this.provider = provider;
         this.memoryFactory = memoryFactory;
         this.submasterName = submasterName;
-        
-        
+
     }
-    
-	/**
-	 * Broadcast the new added node to all the workers
-	 * For each peer, the addpeer operation should be used as immediate service
-	 * Problem is how to make it synchronize?
-	 * Maybe we use booleanwrapper to wait all the results?
-	 */
-	private void broadcastNewPeer(final long peerid, String workername, final WorkerPeer workerpeer) {
-		for(WorkerPeer subworker : workerpeers.values()){
-			BooleanWrapper wrap = subworker.addWorkerPeer(peerid, workername, workerpeer);
-			PAFuture.waitFor(wrap);
-		}
-	}
-	
-	/**
-	 * Add workers to the SubMaster
-	 */
+
+    /**
+     * Broadcast the new added node to all the workers
+     * For each peer, the addpeer operation should be used as immediate service
+     * Problem is how to make it synchronize?
+     * Maybe we use booleanwrapper to wait all the results?
+     */
+    private void broadcastNewPeer(final long peerid, String workername, final WorkerPeer workerpeer) {
+        for (WorkerPeer subworker : workerpeers.values()) {
+            BooleanWrapper wrap = subworker.addWorkerPeer(peerid, workername, workerpeer);
+            PAFuture.waitFor(wrap);
+        }
+    }
+
+    /**
+     * Add workers to the SubMaster
+     */
     private void createWorker(final Node node) {
         if (!isTerminated) {
             try {
@@ -124,21 +122,22 @@ public class AOSubWorkerManager implements WorkerManager, InitActive, Serializab
                     logger.debug("Creating worker on " + nodename);
                 }
 
-                String workername = node.getVMInformation().getHostName() + "_" + workerNameCounter++ + "@" + submasterName;
+                String workername = node.getVMInformation().getHostName() + "_" + workerNameCounter++ + "@" +
+                    submasterName;
 
-                AOSubWorker subworker = (AOSubWorker) PAActiveObject
-                .newActive(AOSubWorker.class.getName(), new Object[] { workername,
-                    (WorkerMaster) provider, memoryFactory.newMemoryInstance(), workerNameCounter}, node);
-                
+                AOSubWorker subworker = (AOSubWorker) PAActiveObject.newActive(AOSubWorker.class.getName(),
+                        new Object[] { workername, (WorkerMaster) provider,
+                                memoryFactory.newMemoryInstance(), workerNameCounter }, node);
+
                 PAFuture.waitFor(subworker);
-                
+
                 // Creates the worker which will automatically connect to the master
                 workers.put(workername, (Worker) subworker);
                 workerpeers.put(workerNameCounter, (WorkerPeer) subworker);
-                
+
                 // Broadcast the new peer to all the workers of the submaster
                 broadcastNewPeer(workerNameCounter, workername, subworker);
-                
+
                 if (debug) {
                     logger.debug("Worker " + workername + " created on " + nodename);
                 }
@@ -149,30 +148,29 @@ public class AOSubWorkerManager implements WorkerManager, InitActive, Serializab
             }
         }
     }
-	
-	public void addResources(URL descriptorURL) throws ProActiveException {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
-	}
 
-	public void addResources(URL descriptorURL, String virtualNodeName)
-			throws ProActiveException {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
-	}
-	
-	public void addResources(final Collection<Node> nodes) {
-		// TODO Auto-generated method stub
-		if (!isTerminated) {
+    public void addResources(URL descriptorURL) throws ProActiveException {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException();
+    }
+
+    public void addResources(URL descriptorURL, String virtualNodeName) throws ProActiveException {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException();
+    }
+
+    public void addResources(final Collection<Node> nodes) {
+        // TODO Auto-generated method stub
+        if (!isTerminated) {
             for (Node node : nodes) {
                 threadPool.execute(new WorkerCreationHandler(node));
             }
         }
     }
 
-	public BooleanWrapper terminate(boolean freeResources) {
-		// TODO Auto-generated method stub
-		isTerminated = true;
+    public BooleanWrapper terminate(boolean freeResources) {
+        // TODO Auto-generated method stub
+        isTerminated = true;
 
         if (debug) {
             logger.debug("Terminating SubWorkerManager...");
@@ -202,7 +200,7 @@ public class AOSubWorkerManager implements WorkerManager, InitActive, Serializab
                     }
                 }
             }
-            
+
             workers.clear();
             workers = null;
 
@@ -222,40 +220,39 @@ public class AOSubWorkerManager implements WorkerManager, InitActive, Serializab
             e.printStackTrace();
             return new BooleanWrapper(false);
         }
-	}
+    }
 
-	public boolean isDead(Worker worker) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
-	}
+    public boolean isDead(Worker worker) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException();
+    }
 
-	public boolean isDead(String workerName) {
-		// TODO Auto-generated method stub
-		workers.remove(workerName);
+    public boolean isDead(String workerName) {
+        // TODO Auto-generated method stub
+        workers.remove(workerName);
         return true;
-	}
+    }
 
-	public void initActivity(Body body) {
-		// TODO Auto-generated method stub
-		stubOnThis = (AOSubWorkerManager) PAActiveObject
-        .getStubOnThis();
-		workerNameCounter = 0;
-		workers = new HashMap<String, Worker>();
-		workerpeers = new HashMap<Long, WorkerPeer>();
-		
-		isTerminated = false;
-		if (debug) {
-			logger.debug("Subresource Manager Initialized");
-		}
+    public void initActivity(Body body) {
+        // TODO Auto-generated method stub
+        stubOnThis = (AOSubWorkerManager) PAActiveObject.getStubOnThis();
+        workerNameCounter = 0;
+        workers = new HashMap<String, Worker>();
+        workerpeers = new HashMap<Long, WorkerPeer>();
 
-		threadPool = Executors.newCachedThreadPool();
-	}
-	
-	 /**
-     * Internal class which creates workers on top of nodes
-     *
-     * @author The ProActive Team
-     */
+        isTerminated = false;
+        if (debug) {
+            logger.debug("Subresource Manager Initialized");
+        }
+
+        threadPool = Executors.newCachedThreadPool();
+    }
+
+    /**
+    * Internal class which creates workers on top of nodes
+    *
+    * @author The ProActive Team
+    */
     private class WorkerCreationHandler implements Runnable {
 
         /**

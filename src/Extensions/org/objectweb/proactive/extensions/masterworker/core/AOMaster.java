@@ -261,9 +261,28 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
         return pendingTasks.isEmpty();
     }
 
+    private int getFloodingValue(int flooding) {
+        int flooding_value = 0;
+        switch (flooding) {
+            case 1: {
+                flooding_value = initial_task_flooding;
+                break;
+            }
+            case 0: {
+                flooding_value = 1;
+                break;
+            }
+            default: {
+                flooding_value = flooding;
+                break;
+            }
+        }
+        return flooding_value;
+    }
+
     @SuppressWarnings("unchecked")
     private Queue<TaskIntern<Serializable>> getTasksInternal(final Worker worker, final String workerName,
-            boolean flooding) {
+            int flooding) {
         // if we don't know him, we record the worker in our system
         if (!workersByName.containsKey(workerName)) {
             if (debug) {
@@ -281,7 +300,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
             if (workersActivity.containsKey(workerName)) {
                 // If the worker requests a flooding this means that its penqing queue is empty,
                 // thus, it will sleep
-                if (flooding) {
+                if (flooding > 0) {
                     sleepingGroup.add(worker);
                 }
             } else {
@@ -299,19 +318,10 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
             }
             Queue<TaskIntern<Serializable>> tasksToDo = new LinkedList<TaskIntern<Serializable>>();
 
-            
             // If we are in a flooding scenario, we send at most initial_task_flooding tasks
-            
-            	int flooding_value = flooding ? initial_task_flooding : 1;
-                try {
-                	if((((AOSubMaster) worker) instanceof AOSubMaster) && flooding){
-                		
-                		flooding_value = Master.DEFAULT_SubMaster_TASK_FLOODING;
-                	}
-    			} catch (Exception e) {
-    				// TODO Auto-generated catch block
-    				// do nothing
-    			}
+
+            int flooding_value = getFloodingValue(flooding);
+
             int i = 0;
             while (!pendingTasks.isEmpty() && i < flooding_value) {
                 TaskID taskId = pendingTasks.poll();
@@ -350,9 +360,8 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
 
     /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
-    public Queue<TaskIntern<Serializable>> getTasks(final Worker worker, final String workerName,
-            boolean reflooding) {
-        return getTasksInternal(worker, workerName, reflooding);
+    public Queue<TaskIntern<Serializable>> getTasks(final Worker worker, final String workerName, int flooding) {
+        return getTasksInternal(worker, workerName, flooding);
     }
 
     /** {@inheritDoc} */
@@ -780,7 +789,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
 
     /** {@inheritDoc} */
     public Queue<TaskIntern<Serializable>> sendResultAndGetTasks(final ResultIntern<Serializable> result,
-            final String originatorName, boolean reflooding) {
+            final String originatorName, int flooding) {
 
         sendResult(result, originatorName);
         Worker worker = workersByName.get(originatorName);
@@ -789,7 +798,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
             // We do this by removing the worker from our database, which will trigger that it will be recorded again
             workersByName.remove(originatorName);
         }
-        return getTasksInternal(worker, originatorName, reflooding);
+        return getTasksInternal(worker, originatorName, flooding);
     }
 
     /** {@inheritDoc} */
@@ -845,7 +854,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
 
     /** {@inheritDoc} */
     public Queue<TaskIntern<Serializable>> sendResultsAndGetTasks(List<ResultIntern<Serializable>> results,
-            String workerName, boolean reflooding) {
+            String workerName, int flooding) {
         sendResults(results, workerName);
         // if the worker has already reported dead, we need to handle that it suddenly reappears
         Worker worker = workersByName.get(workerName);
@@ -853,7 +862,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
             // We do this by removing the worker from our database, which will trigger that it will be recorded again
             workersByName.remove(workerName);
         }
-        return getTasksInternal(worker, workerName, reflooding);
+        return getTasksInternal(worker, workerName, flooding);
     }
 
     /** {@inheritDoc} */

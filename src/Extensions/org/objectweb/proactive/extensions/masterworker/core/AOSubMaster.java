@@ -21,12 +21,14 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
+import org.objectweb.proactive.annotation.Cache;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAEventProgramming;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.node.Node;
@@ -55,7 +57,7 @@ import org.objectweb.proactive.extensions.masterworker.util.TaskQueue;
 
 
 public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunActive, MasterIntern,
-			WorkerDeadListener, Worker {
+        WorkerDeadListener, Worker {
 
     /**
      * log4j logger for the worker manager
@@ -65,33 +67,35 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
 
     /** How many tasks do we initially send to each worker */
     private int initial_task_flooding = Master.DEFAULT_TASK_FLOODING;
-    
+
+    private int groupSize = 0;
+
     /** stub on this active object */
     private AOSubMaster stubOnThis;
 
     /** Worker manager entity (deploy workers) */
     private WorkerManager smanager;
-    
+
     /** Pinger (checks that workers are alive) */
     private WorkerWatcher pinger;
-    
+
     /** is the submaster terminating */
     private Object terminationResourceManagerAnswer;
-    
+
     /** is the submaster terminated */
     private boolean terminated;
     private boolean terminating;
-    
+
     /** is the submaster in the process of clearing all activity ? * */
     private boolean isClearing;
 
     /** is the submaster in the process of doing some FT mechanism for spawned tasks * */
     private boolean isInFTmechanism;
-    
+
     /** Name of the subMaster */
     private String name;
-   
- // Workers resources :
+
+    // Workers resources :
 
     /** stub to access group of workers */
     private Worker workerGroupStub;
@@ -126,32 +130,30 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
     /** Related to Fault Tolerance Mechanism with divisible tasks * */
     private HashMap<Long, String> divisibleTasksAssociationWithWorkers;
     private List<Request> requestsToServeImmediately;
-    
-    
-    
+
     // Act as workers
     /** The entity which will provide tasks to the worker (i.e. the master) */
     protected WorkerMaster provider;
-    
+
     /** main tasks that are completed */
     private ResultQueue<Serializable> resultQueue;
 
     /** The tasks waiting for solving */
     private Queue<TaskIntern<Serializable>> pendingTasks;
-    
+
     /** tasks that are currently processing */
     private HashMap<Long, String> launchedTasks;
     private HashMap<Long, TaskIntern<Serializable>> launchedTaskList;
-    
+
     /** if there is a pending request from the client */
     private Request pendingRequest;
 
     /** if there is a pending request from the sub clients (the workers) */
     private HashMap<String, Request> pendingSubRequests;
-    
+
     /** sub result queue list */
     private HashMap<DivisibleTaskIdObject, ResultQueue<Serializable>> subResultQueues;
-    
+
     private long taskidcounter = 0;
 
     /** Filters * */
@@ -160,41 +162,42 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
     private final NotTerminateFilter notTerminateFilter = new NotTerminateFilter();
     private final FinalNotTerminateFilter finalNotTerminateFilter = new FinalNotTerminateFilter();
     private final IsClearingFilter clearingFilter = new IsClearingFilter();
-	
-	public AOSubMaster(){
-		
-	}
-	
-	public AOSubMaster(final String name, final WorkerMaster provider, final MemoryFactory memoryFactory) {
-		this.name = name;
-		this.provider = provider;
-		this.memoryFactory = memoryFactory;
-		
-		if (debug) {
+
+    public AOSubMaster() {
+
+    }
+
+    public AOSubMaster(final String name, final WorkerMaster provider, final MemoryFactory memoryFactory) {
+        this.name = name;
+        this.provider = provider;
+        this.memoryFactory = memoryFactory;
+
+        if (debug) {
             logger.debug("Creating submaster : " + name);
         }
     }
-	
-	public void addResources(final Collection<Node> nodes) {
-		
-		if (debug) {
+
+    public void addResources(final Collection<Node> nodes) {
+
+        if (debug) {
             logger.debug("Call add resource success!");
         }
-		
-		smanager.addResources(nodes);
-	}
-	
 
-	public void initActivity(Body body) {
-		// TODO Auto-generated method stub
-		
-		if (debug) {
+        smanager.addResources(nodes);
+        getTasksIntern();
+        groupSize++;
+    }
+
+    public void initActivity(Body body) {
+        // TODO Auto-generated method stub
+
+        if (debug) {
             logger.debug("Init the submaster!");
         }
-		
-		stubOnThis = (AOSubMaster) PAActiveObject.getStubOnThis();
-		
-		// General initializations
+
+        stubOnThis = (AOSubMaster) PAActiveObject.getStubOnThis();
+
+        // General initializations
         terminated = false;
         terminating = false;
         isClearing = false;
@@ -233,8 +236,8 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         try {
             // These two objects are initiated inside the initActivity because of the need to the stub on this
             // The resource manager
-        	smanager = (AOSubWorkerManager) PAActiveObject.newActive(AOSubWorkerManager.class.getName(),
-	                new Object[] { stubOnThis, memoryFactory, name});
+            smanager = (AOSubWorkerManager) PAActiveObject.newActive(AOSubWorkerManager.class.getName(),
+                    new Object[] { stubOnThis, memoryFactory, name });
 
             // The worker pinger
             pinger = (WorkerWatcher) PAActiveObject.newActive(AOPinger.class.getName(),
@@ -244,16 +247,15 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         } catch (NodeException e1) {
             e1.printStackTrace();
         }
-		
-        stubOnThis.getIntialTasks();
-	}
 
-	public BooleanWrapper forwardedTask(Long taskId, String oldWorkerName,
-			String newWorkerName) {
-		// TODO Auto-generated method stub
-		// It is specially used for divisible tasks
-		// Just like what the AOMaster do, change the link of the worker with the task
-		if (debug) {
+        stubOnThis.getIntialTasks();
+    }
+
+    public BooleanWrapper forwardedTask(Long taskId, String oldWorkerName, String newWorkerName) {
+        // TODO Auto-generated method stub
+        // It is specially used for divisible tasks
+        // Just like what the AOMaster do, change the link of the worker with the task
+        if (debug) {
             logger.debug(oldWorkerName + " forwarded Task " + taskId + " to " + newWorkerName);
         }
         Set<Long> wact = workersActivity.get(oldWorkerName);
@@ -265,17 +267,17 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         newSet.add(taskId);
         workersActivity.put(newWorkerName, newSet);
         spawnedWorkerNames.add(newWorkerName);
-        
-        if(divisibleTasksAssociationWithWorkers.containsKey(taskId)){
-        	divisibleTasksAssociationWithWorkers.remove(taskId);
-        }
-        
-        divisibleTasksAssociationWithWorkers.put(taskId, newWorkerName);
-        
-        return new BooleanWrapper(true);
-	}
 
-	/**
+        if (divisibleTasksAssociationWithWorkers.containsKey(taskId)) {
+            divisibleTasksAssociationWithWorkers.remove(taskId);
+        }
+
+        divisibleTasksAssociationWithWorkers.put(taskId, newWorkerName);
+
+        return new BooleanWrapper(true);
+    }
+
+    /**
      * Record the given worker in our system
      *
      * @param worker     the worker to record
@@ -292,7 +294,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             pinger.addWorkerToWatch(worker);
         }
     }
-    
+
     /**
      * Tells if the master has some activity
      *
@@ -301,26 +303,49 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
     private boolean emptyPending() {
         return pendingTasks.isEmpty();
     }
-	
+
     public void getIntialTasks() {
-    	if (debug) {
+        if (debug) {
             logger.debug(name + " get initial tasks from the master...");
         }
         Queue<TaskIntern<Serializable>> newTasks;
-        newTasks = provider.getTasks(stubOnThis, name, true);
+        int flooding_value = Master.DEFAULT_SubMaster_TASK_FLOODING;
+
+        // Ask a task flooding for sleeping workers
+        if (sleepingGroup.size() > 1)
+            flooding_value = flooding_value + sleepingGroup.size() * Master.DEFAULT_TASK_FLOODING;
+
+        newTasks = provider.getTasks(stubOnThis, name, flooding_value);
 
         pendingTasks.addAll(newTasks);
     }
-    
-    public Queue<TaskIntern<Serializable>> getTasks(Worker worker,
-			String workerName, boolean reflooding) {
-    	return getTasksInternal(worker, workerName, reflooding);
+
+    public Queue<TaskIntern<Serializable>> getTasks(Worker worker, String workerName, int flooding) {
+        return getTasksInternal(worker, workerName, flooding);
     }
-    
-	public Queue<TaskIntern<Serializable>> getTasksInternal(Worker worker,
-			String workerName, boolean reflooding) {
-		// TODO Auto-generated method stub
-		// if we don't know him, we record the worker in our system
+
+    private int getFloodingValue(int flooding) {
+        int flooding_value = 0;
+        switch (flooding) {
+            case 1: {
+                flooding_value = initial_task_flooding;
+                break;
+            }
+            case 0: {
+                flooding_value = 1;
+                break;
+            }
+            default: {
+                flooding_value = flooding;
+                break;
+            }
+        }
+        return flooding_value;
+    }
+
+    public Queue<TaskIntern<Serializable>> getTasksInternal(Worker worker, String workerName, int flooding) {
+        // TODO Auto-generated method stub
+        // if we don't know him, we record the worker in our system
         if (!workersByName.containsKey(workerName)) {
             if (debug) {
                 logger.debug("new worker " + workerName + " recorded by the master");
@@ -337,8 +362,10 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             if (workersActivity.containsKey(workerName)) {
                 // If the worker requests a flooding this means that its penqing queue is empty,
                 // thus, it will sleep
-                if (reflooding) {
-                    sleepingGroup.add(worker);
+                if (flooding > 0) {
+                    if (!sleepingGroup.contains(worker)) {
+                        sleepingGroup.add(worker);
+                    }
                 }
             } else {
                 workersActivity.put(workerName, new HashSet<Long>());
@@ -356,11 +383,11 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             Queue<TaskIntern<Serializable>> tasksToDo = new LinkedList<TaskIntern<Serializable>>();
 
             // If we are in a flooding scenario, we send at most initial_task_flooding tasks
-            int flooding_value = reflooding ? initial_task_flooding : 1;
+            int flooding_value = getFloodingValue(flooding);
             int i = 0;
             while (!pendingTasks.isEmpty() && i < flooding_value) {
                 TaskIntern<Serializable> task = pendingTasks.poll();
-                
+
                 // We add the task inside the launched list
                 long tid = task.getId();
                 launchedTasks.put(tid, null);
@@ -388,30 +415,29 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
 
             return tasksToDo;
         }
-		
-	}
 
-	public void isCleared(Worker worker) {
-		// TODO Auto-generated method stub
-		if (debug) {
+    }
+
+    public void isCleared(Worker worker) {
+        // TODO Auto-generated method stub
+        if (debug) {
             String workerName = workersByNameRev.get(worker);
             logger.debug(workerName + " is cleared");
         }
 
         clearedWorkers.add(worker);
-		
-	}
 
-	public BooleanWrapper sendResult(ResultIntern<Serializable> result,
-			String workerName) {
-		// TODO Auto-generated method stub
-		long id = result.getId();
-		if (launchedTasks.containsKey(id)) {
+    }
+
+    public BooleanWrapper sendResult(ResultIntern<Serializable> result, String workerName) {
+        // TODO Auto-generated method stub
+        long id = result.getId();
+        if (launchedTasks.containsKey(id)) {
             if (debug) {
                 logger.debug(workerName + " sends result of task " + id);
             }
             String submitter = launchedTasks.remove(id);
-            
+
             // We remove the task from the worker activity
             if (workersActivity.containsKey(workerName)) {
                 Set<Long> wact = workersActivity.get(workerName);
@@ -427,38 +453,52 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             if (submitter == null) {
                 resultQueue.addCompletedTask(result);
             } else {
-            	if (debug) {
+                if (debug) {
                     logger.debug(workerName + " sends result of task " + id + " but the worker is unknown.");
                 }
             }
-            
+
             // Remove the task from the task list
             launchedTaskList.remove(id);
         } else {
+            // do nothing
             if (debug) {
                 logger.debug(workerName + " sends result of task " + id + " but it's unknown.");
             }
         }
 
         return new BooleanWrapper(true);
-	}
+    }
 
-	public void sendResultAndGetTasksIntern(){
-		while ( resultQueue.countAvailableResults() > 0 ) {
-			Queue<TaskIntern<Serializable>> tasksToAdd = null;
-			tasksToAdd = provider.sendResultAndGetTasks(resultQueue.getNext(), name, false);
-			PAEventProgramming.addActionOnFuture(tasksToAdd, "addTasksToPengding");
-		}
-	}
-	
-	public void addTasksToPengding(Future<Queue<TaskIntern<Serializable>>> future){
-		Queue<TaskIntern<Serializable>> tasksToAdd = null;
-		try {
-			tasksToAdd = future.get();
-			pendingTasks.addAll(tasksToAdd);
-			// wake up sleeping workers
-			
-			if (sleepingGroup.size() > 0) {
+    private void sendResultsAndGetTasksIntern() {
+        if (resultQueue.countAvailableResults() > 0) {
+            Queue<TaskIntern<Serializable>> tasksToAdd = null;
+            List<ResultIntern<Serializable>> results = resultQueue.getNextK(resultQueue
+                    .countAvailableResults());
+            int flooding_value = results.size();
+            if (flooding_value == 1)
+                flooding_value = 0;
+            tasksToAdd = provider.sendResultsAndGetTasks(results, name, flooding_value);
+            PAEventProgramming.addActionOnFuture(tasksToAdd, "addTasksToPengding");
+        }
+    }
+
+    private void getTasksIntern() {
+        Queue<TaskIntern<Serializable>> tasksToAdd = null;
+        int flooding_value = 1;
+
+        tasksToAdd = provider.getTasks(stubOnThis, name, flooding_value);
+        PAEventProgramming.addActionOnFuture(tasksToAdd, "addTasksToPengding");
+    }
+
+    public void addTasksToPengding(Future<Queue<TaskIntern<Serializable>>> future) {
+        Queue<TaskIntern<Serializable>> tasksToAdd = null;
+        try {
+            tasksToAdd = future.get();
+            pendingTasks.addAll(tasksToAdd);
+            // wake up sleeping workers
+
+            if ((sleepingGroup.size() > 0) && (tasksToAdd.size() > 0)) {
                 if (debug) {
                     logger.debug("Waking up sleeping workers...");
                 }
@@ -470,177 +510,165 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
                     // We ignore NFE pinger is responsible for that
                 }
             }
-			
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	public Queue<TaskIntern<Serializable>> sendResultAndGetTasks(
-			ResultIntern<Serializable> result, String workerName,
-			boolean reflooding) {
-		// TODO Auto-generated method stub
-		sendResult(result, workerName);
+
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    public Queue<TaskIntern<Serializable>> sendResultAndGetTasks(ResultIntern<Serializable> result,
+            String workerName, int flooding) {
+        // TODO Auto-generated method stub
+        sendResult(result, workerName);
         Worker worker = workersByName.get(workerName);
         // if the worker has already reported dead, we need to handle that it suddenly reappears
         if (!workersByNameRev.containsKey(worker)) {
             // We do this by removing the worker from our database, which will trigger that it will be recorded again
+            if (debug) {
+                logger.debug("The worker is a dead worker, wo remove it, and wait for a new recorder");
+            }
             workersByName.remove(workerName);
         }
-        return getTasksInternal(worker, workerName, reflooding);
-	}
+        return getTasksInternal(worker, workerName, flooding);
+    }
 
-	public BooleanWrapper sendResults(List<ResultIntern<Serializable>> results,
-			String workerName) {
-		// TODO Auto-generated method stub
-		if(null == workerName)
-		{
-			// it should be the main client to send back the result of a divisble task
-		}
-		for (ResultIntern<Serializable> res : results) {
+    public BooleanWrapper sendResults(List<ResultIntern<Serializable>> results, String workerName) {
+        // TODO Auto-generated method stub
+        if (null == workerName) {
+            // it should be the main client to send back the result of a divisble task
+        }
+        for (ResultIntern<Serializable> res : results) {
             sendResult(res, workerName);
         }
         return new BooleanWrapper(true);
-	}
+    }
 
-	public Queue<TaskIntern<Serializable>> sendResultsAndGetTasks(
-			List<ResultIntern<Serializable>> results, String workerName,
-			boolean reflooding) {
-		// TODO Auto-generated method stub
-		sendResults(results, workerName);
+    public Queue<TaskIntern<Serializable>> sendResultsAndGetTasks(List<ResultIntern<Serializable>> results,
+            String workerName, int flooding) {
+        // TODO Auto-generated method stub
+        sendResults(results, workerName);
         // if the worker has already reported dead, we need to handle that it suddenly reappears
         Worker worker = workersByName.get(workerName);
         if (!workersByNameRev.containsKey(worker)) {
             // We do this by removing the worker from our database, which will trigger that it will be recorded again
             workersByName.remove(workerName);
         }
-        return getTasksInternal(worker, workerName, reflooding);
-	}
+        return getTasksInternal(worker, workerName, flooding);
+    }
 
-	public int countAvailableResults(String originatorName)
-			throws IsClearingError {
-		// TODO Auto-generated method stub
-		if (originatorName == null) {
+    public int countAvailableResults(String originatorName) throws IsClearingError {
+        // TODO Auto-generated method stub
+        if (originatorName == null) {
             return resultQueue.countAvailableResults();
         } else {
-            	throw new IllegalArgumentException("Unsupported originator " + originatorName);
-            }
-	}
-	
-	public int countAvailableResults(String originatorName, int solveId)
-		throws IsClearingError {
-	// TODO Auto-generated method stub
-		
-		// Used for divisible task, the masteraccess ask for the available results of the 
-		// specified solve method
-		if (originatorName == null) {
-		    return resultQueue.countAvailableResults();
-		} else {
-			return getResultQueueByOriginatorNameAndSolveId(originatorName, solveId).countAvailableResults();
-		}
-	}
-	
-	private ResultQueue<Serializable> getResultQueueByOriginatorNameAndSolveId(String originatorName, int solveId)
-			throws IsClearingError{
-		if(divisibleTasksAssociationWithWorkers.values().contains(originatorName)){
-			long dvisibleTaskId = getDivisibleTaskIDByOriginatorName(originatorName);
-			DivisibleTaskIdObject divisibleTaskIdObject = new DivisibleTaskIdObject(dvisibleTaskId, solveId);
-			return getObjValue(divisibleTaskIdObject);
-		}
-		else{
-	    	throw new IllegalArgumentException("Unsupported originator " + originatorName);
-	    }
-	}
-	
-	private ResultQueue<Serializable> getObjValue(DivisibleTaskIdObject obj){
-		for(DivisibleTaskIdObject idObj : subResultQueues.keySet()){
-			if(idObj.equals(obj)){
-				return subResultQueues.get(idObj);
-			}
-		}
-		return null;
-	}
+            throw new IllegalArgumentException("Unsupported originator " + originatorName);
+        }
+    }
 
-	private long getDivisibleTaskIDByOriginatorName(String originatorName){
-		Set<Long> divisibletaskids = divisibleTasksAssociationWithWorkers.keySet();
-        
-        for (Long divisibletaskid : divisibletaskids)
-        {
-        	if(divisibleTasksAssociationWithWorkers.get(divisibletaskid).equals(originatorName)){
-        		return divisibletaskid;
-        	}
+    public int countAvailableResults(String originatorName, int solveId) throws IsClearingError {
+        // TODO Auto-generated method stub
+
+        // Used for divisible task, the masteraccess ask for the available results of the 
+        // specified solve method
+        if (originatorName == null) {
+            return resultQueue.countAvailableResults();
+        } else {
+            return getResultQueueByOriginatorNameAndSolveId(originatorName, solveId).countAvailableResults();
+        }
+    }
+
+    private ResultQueue<Serializable> getResultQueueByOriginatorNameAndSolveId(String originatorName,
+            int solveId) throws IsClearingError {
+        if (divisibleTasksAssociationWithWorkers.values().contains(originatorName)) {
+            long dvisibleTaskId = getDivisibleTaskIDByOriginatorName(originatorName);
+            DivisibleTaskIdObject divisibleTaskIdObject = new DivisibleTaskIdObject(dvisibleTaskId, solveId);
+            return getObjValue(divisibleTaskIdObject);
+        } else {
+            throw new IllegalArgumentException("Unsupported originator " + originatorName);
+        }
+    }
+
+    private ResultQueue<Serializable> getObjValue(DivisibleTaskIdObject obj) {
+        for (DivisibleTaskIdObject idObj : subResultQueues.keySet()) {
+            if (idObj.equals(obj)) {
+                return subResultQueues.get(idObj);
+            }
+        }
+        return null;
+    }
+
+    private long getDivisibleTaskIDByOriginatorName(String originatorName) {
+        Set<Long> divisibletaskids = divisibleTasksAssociationWithWorkers.keySet();
+
+        for (Long divisibletaskid : divisibletaskids) {
+            if (divisibleTasksAssociationWithWorkers.get(divisibletaskid).equals(originatorName)) {
+                return divisibletaskid;
+            }
         }
         return -1;
-	}
-	
-	public int countPending(String originatorName) throws IsClearingError {
-		// TODO Auto-generated method stub
-		if (originatorName == null) {
+    }
+
+    public int countPending(String originatorName) throws IsClearingError {
+        // TODO Auto-generated method stub
+        if (originatorName == null) {
             return resultQueue.countPendingResults();
         } else {
-            	throw new IllegalArgumentException("Unsupported originator " + originatorName);
-            }
-	}
+            throw new IllegalArgumentException("Unsupported originator " + originatorName);
+        }
+    }
 
-	public boolean isEmpty(String originatorName) throws IsClearingError {
-		// TODO Auto-generated method stub
-		if (originatorName == null) {
+    public boolean isEmpty(String originatorName) throws IsClearingError {
+        // TODO Auto-generated method stub
+        if (originatorName == null) {
             return (resultQueue.isEmpty() && pendingTasks.isEmpty());
         } else {
-                throw new IllegalArgumentException("Unsupported originator " + originatorName);
-            }
-	}
+            throw new IllegalArgumentException("Unsupported originator " + originatorName);
+        }
+    }
 
-	public void setResultReceptionOrder(String originatorName, OrderingMode mode)
-			throws IsClearingError {
-		// TODO Auto-generated method stub
-		if (originatorName == null) {
+    public void setResultReceptionOrder(String originatorName, OrderingMode mode) throws IsClearingError {
+        // TODO Auto-generated method stub
+        if (originatorName == null) {
             resultQueue.setMode(mode);
         } else {
-        	throw new IllegalArgumentException("Unsupported originator " + originatorName);
+            throw new IllegalArgumentException("Unsupported originator " + originatorName);
         }
-	}
+    }
 
-	public void solveIntern(String originatorName,
-			List<? extends Task<? extends Serializable>> tasks)
-			throws IsClearingError {
-		// TODO Auto-generated method stub
-		
-	}
+    public void solveIntern(String originatorName, List<? extends Task<? extends Serializable>> tasks)
+            throws IsClearingError {
+        // TODO Auto-generated method stub
 
-	public List<Serializable> waitAllResults(String originatorName)
-			throws TaskException, IsClearingError {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    }
 
-	public List<Serializable> waitKResults(String originatorName, int k)
-			throws TaskException, IsClearingError {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public List<Serializable> waitAllResults(String originatorName) throws TaskException, IsClearingError {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	 public Serializable waitOneResult(String originatorName)
-			throws TaskException, IsClearingError {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public List<Serializable> waitKResults(String originatorName, int k) throws TaskException,
+            IsClearingError {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	public List<Serializable> waitSomeResults(String originatorName)
-			throws TaskException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public Serializable waitOneResult(String originatorName) throws TaskException, IsClearingError {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	
+    public List<Serializable> waitSomeResults(String originatorName) throws TaskException {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	public void clear() {
-		// TODO Auto-generated method stub
-		// Clearing the master is a quite complicated mechanism
+    public void clear() {
+        // TODO Auto-generated method stub
+        // Clearing the master is a quite complicated mechanism
         // It is not possible to wait synchronously for every workers'reply because workers might be requesting something from the master at the same time
         // therefore the clearing process must be first initiated, a message sent to every workers, and then the master will enter a mode "clearing"
         // where every call from the workers will be served immediately by an exception, excepting the acknowledgement of the clear message.
@@ -666,21 +694,33 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         sleepingGroup.clear();
         // We clear the repository
         isClearing = true;
-	}
+    }
 
-	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public String getName() {
+        // TODO Auto-generated method stub
+        return name;
+    }
 
-	public BooleanWrapper heartBeat() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /** {@inheritDoc} */
+    @Override
+    public boolean equals(final Object obj) {
+        return (obj instanceof AOSubMaster) && name.equals(((Worker) obj).getName());
+    }
 
-	public BooleanWrapper terminate() {
-		// TODO Auto-generated method stub
-		if (debug) {
+    /** {@inheritDoc} */
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
+
+    public BooleanWrapper heartBeat() {
+        // TODO Auto-generated method stub
+        return new BooleanWrapper(true);
+    }
+
+    public BooleanWrapper terminate() {
+        // TODO Auto-generated method stub
+        if (debug) {
             logger.debug("Terminating SubMaster...");
         }
 
@@ -692,16 +732,31 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
 
         return new BooleanWrapper(true);
 
-	}
+    }
 
-	public void wakeup() {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	public void runActivity(Body body) {
-		// TODO Auto-generated method stub
-		Service service = new Service(body);
+    public void wakeup() {
+        // TODO Auto-generated method stub
+        if (debug) {
+            logger.debug(name + " receives a wake up message...");
+        }
+
+        if (pendingTasks.size() > 0) {
+            if (debug) {
+                logger.debug(name + " ignored wake up message ...");
+            }
+        } else {
+            if (debug) {
+                logger.debug(name + " wakes up...");
+            }
+            // Initial Task
+            stubOnThis.getIntialTasks();
+            sleepingGroupStub.wakeup();
+        }
+    }
+
+    public void runActivity(Body body) {
+        // TODO Auto-generated method stub
+        Service service = new Service(body);
         while (!terminated) {
             try {
                 service.waitForRequest();
@@ -722,6 +777,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
                         // we maybe serve the pending waitXXX methods if there are some and if the necessary results are collected
                         maybeServePending(service);
                         oldest = service.getOldest();
+
                     }
                     if (!isClearing && (oldest != null) && notTerminateFilter.acceptRequest(oldest)) {
                         // Sweep of wait requests
@@ -730,6 +786,9 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
                         service.serveOldest();
                         // we maybe serve the pending waitXXX methods if there are some and if the necessary results are collected
                         maybeServePending(service);
+
+                        // Send results back to main master and get new tasks
+                        sendResultsAndGetTasksIntern();
                     }
                 }
 
@@ -749,9 +808,6 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            
-            // Send results back to main master and get new tasks
-            sendResultAndGetTasksIntern();
         }
 
         if (logger.isDebugEnabled()) {
@@ -764,9 +820,9 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         body.blockCommunication();
         // we finally terminate the master
         body.terminate();
-	}
-	
-	private void sweepWaitRequests(Service service) {
+    }
+
+    private void sweepWaitRequests(Service service) {
         while (service.hasRequestToServe(findWaitFilter)) {
             Request waitRequest = service.getOldest(findWaitFilter);
             String originatorName = (String) waitRequest.getParameter(0);
@@ -819,7 +875,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             logger.debug("Master cleared");
         }
     }
-    
+
     /**
      * If there is a pending waitXXX method, we serve it if the necessary results are collected
      *
@@ -903,7 +959,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             service.serve(req);
         }
     }
-    
+
     /** {@inheritDoc} */
     public void setPingPeriod(long periodMillis) {
         pinger.setPingPeriod(periodMillis);
@@ -918,7 +974,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
     public int workerpoolSize() {
         return workerGroup.size();
     }
-    
+
     /**
      * When the master is clearing
      * Throws an exception to workers waiting for an answer from the master
@@ -971,7 +1027,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
 
         // We terminate the pinger
         PAFuture.waitFor(pinger.terminate());
-        
+
         // We terminate the worker manager asynchronously to avoid a deadlock occuring
         // when a newly created worker asks for tasks during the termination algorithm
         terminationResourceManagerAnswer = smanager.terminate(freeResources);
@@ -1008,7 +1064,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         terminated = true;
         return new BooleanWrapper(true);
     }
-    
+
     /**
      * @author The ProActive Team
      *         Internal class for filtering requests in the queue
@@ -1104,9 +1160,9 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         }
     }
 
-	public boolean isDead(Worker worker) {
-		// TODO Auto-generated method stub
-		if (workersByNameRev.containsKey(worker)) {
+    public boolean isDead(Worker worker) {
+        // TODO Auto-generated method stub
+        if (workersByNameRev.containsKey(worker)) {
             String workerName = workersByNameRev.get(worker);
             if (logger.isInfoEnabled()) {
                 logger.info(workerName + " reported missing... removing it");
@@ -1127,27 +1183,25 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
                 workersByName.remove(workerName);
                 // We remove the activity of this worker and every children workers
                 removeActivityOfWorker(workerName);
-                
+
                 smanager.isDead(workerName);
             }
             return true;
         }
         return false;
 
-	}
+    }
 
-	/**
+    /**
      * Removes all the activity generated by one dead worker
      *
      * @param workerName
      */
     private void removeActivityOfWorker(String workerName) {
-        Body body = PAActiveObject.getBodyOnThis();
         // if the worker was handling tasks we put the tasks back to the pending queue
         if (workersActivity.containsKey(workerName)) {
             for (Long taskId : workersActivity.get(workerName)) {
                 if (launchedTasks.containsKey(taskId)) {
-                    String submitter = launchedTasks.remove(taskId);
 
                     if (debug) {
                         logger.debug("Rescheduling task " + taskId);
@@ -1177,72 +1231,35 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             workersActivity.remove(workerName);
         }
     }
-	
-	public boolean isDead(String workerName) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
-	}
-	
-	/**
+
+    public boolean isDead(String workerName) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException();
+    }
+
+    /**
      * A sequance element <divisibleTaskID, solveID> which can specify a set of tasks
      * submitted by the divisible task
      *
      * @author The ProActive Team
      */
-	protected class DivisibleTaskIdObject {
-    	private long divisibleTaskId = 0;
-    	private int  solveId = 0;
-    	
-    	public DivisibleTaskIdObject(long divisibleTaskId, int solveId){
-    		this.divisibleTaskId = divisibleTaskId;
-    		this.solveId = solveId;
-    	}
-    	
-    	public boolean equals(DivisibleTaskIdObject object){
-    		if((this.divisibleTaskId == object.divisibleTaskId) && (this.solveId == object.solveId)){
-    			return true;
-    		}
-    		else{
-    			return false;
-    		}
-    	}
-    	
-    }
-	
-	/**
-     * Internal class which send results to the main master and get new tasks
-     *
-     * @author The ProActive Team
-     */
-    private class SendAndGetHandler implements Runnable {
+    protected class DivisibleTaskIdObject {
+        private long divisibleTaskId = 0;
+        private int solveId = 0;
 
-        /**
-         * {@inheritDoc}
-         */
-        public void run() {
-        	while(!terminated  && null != resultQueue){
-        		if(resultQueue.countAvailableResults() > 0){
-        			ResultIntern<Serializable> result = resultQueue.getNext();
-        			provider.sendResultAndGetTasks(result, name, false);
-        		}
-        		else{
-        			// sleep for a while
-        			try {
-        				//if (debug) {
-        	            //    logger.debug("No results available in submaster" + name);
-        	            //}
-						Thread.sleep(100);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-        		}
-        			
-        		
-        	}
-            
+        public DivisibleTaskIdObject(long divisibleTaskId, int solveId) {
+            this.divisibleTaskId = divisibleTaskId;
+            this.solveId = solveId;
         }
+
+        public boolean equals(DivisibleTaskIdObject object) {
+            if ((this.divisibleTaskId == object.divisibleTaskId) && (this.solveId == object.solveId)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
     }
 
-	
 }

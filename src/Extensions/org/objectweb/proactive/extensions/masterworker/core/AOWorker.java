@@ -155,9 +155,9 @@ public class AOWorker implements InitActive, Serializable, Worker {
             if (debug) {
                 logger.debug(name + " requests a task flooding...");
             }
-            newTasks = provider.getTasks(stubOnThis, name, true);
+            newTasks = provider.getTasks(stubOnThis, name, 1);
         } else {
-            newTasks = provider.getTasks(stubOnThis, name, false);
+            newTasks = provider.getTasks(stubOnThis, name, 0);
         }
         pendingTasksFutures.offer(newTasks);
 
@@ -174,10 +174,10 @@ public class AOWorker implements InitActive, Serializable, Worker {
             if (debug) {
                 logger.debug(name + " requests a task flooding...");
             }
-            newTasks = provider.sendResultAndGetTasks(result, name, true);
+            newTasks = provider.sendResultAndGetTasks(result, name, 1);
         } else {
 
-            newTasks = provider.sendResultAndGetTasks(result, name, false);
+            newTasks = provider.sendResultAndGetTasks(result, name, 0);
         }
         pendingTasksFutures.offer(newTasks);
 

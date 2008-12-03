@@ -52,7 +52,7 @@ public interface TaskProvider<R extends Serializable> {
      * @param workerName the name of the worker which asks the tasks
      * @return a list of new tasks to compute
      */
-    Queue<TaskIntern<R>> getTasks(Worker worker, String workerName, boolean reflooding);
+    Queue<TaskIntern<R>> getTasks(Worker worker, String workerName, int flooding);
 
     /**
      * Returns the result of a task to the provider and ask for new ones
@@ -61,7 +61,7 @@ public interface TaskProvider<R extends Serializable> {
      * @param reflooding that means the worker's stack is empty and it asks for a set a tasks bigger than one
      * @return a list of new tasks to compute
      */
-    Queue<TaskIntern<R>> sendResultAndGetTasks(ResultIntern<R> result, String workerName, boolean reflooding);
+    Queue<TaskIntern<R>> sendResultAndGetTasks(ResultIntern<R> result, String workerName, int flooding);
 
     /**
      * Returns the result of a task to the provider
@@ -85,8 +85,7 @@ public interface TaskProvider<R extends Serializable> {
      * @param workerName the name of the worker sending the result
      * @return an aknowledgement (for synchronization)
      */
-    Queue<TaskIntern<R>> sendResultsAndGetTasks(List<ResultIntern<R>> results, String workerName,
-            boolean reflooding);
+    Queue<TaskIntern<R>> sendResultsAndGetTasks(List<ResultIntern<R>> results, String workerName, int flooding);
 
     /**
      * Happens when a worker has forwarded a task to another worker (to handle DivisibleTask)
