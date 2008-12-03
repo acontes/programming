@@ -18,7 +18,7 @@ public class IncomingDispatcher implements Runnable {
 
     final private ForwardingSocketWrapper sock;
     final private ConnectionFailureListener listener;
-    private boolean isRunning;
+    private volatile boolean isRunning;
     final private LocalConnectionHandler connectionHandler;
 
     public IncomingDispatcher(ForwardingSocketWrapper sock, ConnectionFailureListener listener,

@@ -22,8 +22,8 @@ public class LocalConnectionHandler implements Runnable {
     final private LinkedBlockingQueue<ForwardedMessage> messageQueue;
     // TODO Change ID type
     final private HashMap<Object, HashMap<ConnectionID, SocketForwarder>> mappings;
-    private boolean willClose;
-    private boolean isRunning;
+    private volatile boolean willClose;
+    private volatile boolean isRunning;
     final private OutHandler outHandler;
     final private IncomingDispatcher incomingDispatcher;
 
@@ -48,7 +48,7 @@ public class LocalConnectionHandler implements Runnable {
             try {
                 msg = messageQueue.poll(1, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
-            	logger.warn("Error while trying to get a message to handle", e);
+                logger.warn("Error while trying to get a message to handle", e);
             }
             if (msg != null) {
                 SocketForwarder fw = null;

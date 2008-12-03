@@ -17,7 +17,7 @@ public class RegistryServerSideRunnable implements Runnable {
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING);
 
     private ForwardingRegistry registry;
-    private boolean listening = true;
+    private volatile boolean listening = true;
 
     public RegistryServerSideRunnable(ForwardingRegistry registry) {
         this.registry = registry;

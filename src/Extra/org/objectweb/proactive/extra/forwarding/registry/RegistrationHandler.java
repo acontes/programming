@@ -28,7 +28,7 @@ public class RegistrationHandler implements Runnable, ConnectionFailureListener 
     private Object hostId = null;
     final private ForwardingSocketWrapper clientSocketWrapper;
     private OutHandler outHandler;
-    private boolean listening = true;
+    private volatile boolean listening = true;
 
     public RegistrationHandler(Socket clientSocket, ForwardingRegistry registry) {
         this.registry = registry;

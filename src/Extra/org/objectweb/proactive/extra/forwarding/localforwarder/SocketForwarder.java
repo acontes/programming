@@ -111,7 +111,7 @@ public abstract class SocketForwarder {
     private class SocketReader implements Runnable {
 
         private Socket sock;
-        private boolean isRunning;
+        private volatile boolean isRunning;
         private SocketForwarder forw;
 
         public SocketReader(Socket sock, SocketForwarder forw) {
@@ -149,7 +149,7 @@ public abstract class SocketForwarder {
     private class SocketWritter implements Runnable {
 
         private Socket sock;
-        private boolean isRunning;
+        private volatile boolean isRunning;
         private SocketForwarder forw;
         private LinkedBlockingQueue<byte[]> messageQueue;
 
@@ -178,7 +178,10 @@ public abstract class SocketForwarder {
                     // TODO Handle disconnection
                     forw.abort(e.getMessage());
                     forw.stop();
-                    logger.warn("Error while trying to write into forwarded socket, aborting forwarded connection", e);
+                    logger
+                            .warn(
+                                    "Error while trying to write into forwarded socket, aborting forwarded connection",
+                                    e);
                 }
             }
         }

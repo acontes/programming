@@ -20,8 +20,8 @@ public class OutHandler implements Runnable {
     private LinkedBlockingQueue<ForwardedMessage> messageQueue;
     private ForwardingSocketWrapper sock;
     private ConnectionFailureListener listener;
-    private boolean willClose;
-    private boolean isRunning;
+    private volatile boolean willClose;
+    private volatile boolean isRunning;
 
     /**
      * Creation of the OutHandler.

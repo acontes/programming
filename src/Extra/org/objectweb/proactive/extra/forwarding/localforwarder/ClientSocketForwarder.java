@@ -18,8 +18,8 @@ import org.objectweb.proactive.extra.forwarding.common.OutHandler;
 public class ClientSocketForwarder extends SocketForwarder {
 
     private Semaphore lock;
-    private boolean accepted;
-    private boolean launched;
+    private volatile boolean accepted;
+    private volatile boolean launched;
 
     public ClientSocketForwarder(Object localID, int localPort, Object targetID, int targetPort,
             OutHandler tunnel, LocalConnectionHandler handler) {
@@ -104,7 +104,7 @@ public class ClientSocketForwarder extends SocketForwarder {
         } catch (UnknownHostException e) {
             logger.error("Error while creating local socket for Client Socket Forwarder", e);
         } catch (IOException e) {
-        	logger.error("Error while creating local socket for Client Socket Forwarder", e);
+            logger.error("Error while creating local socket for Client Socket Forwarder", e);
         }
         return null;
 
@@ -128,7 +128,7 @@ public class ClientSocketForwarder extends SocketForwarder {
                 sock = s.accept();
                 sem.release();
             } catch (IOException e) {
-            	logger.error("Error while creating local socket for Client Socket Forwarder", e);
+                logger.error("Error while creating local socket for Client Socket Forwarder", e);
             }
         }
 
@@ -138,7 +138,7 @@ public class ClientSocketForwarder extends SocketForwarder {
                 sem.acquire();
                 res = sock;
             } catch (InterruptedException e) {
-            	logger.warn("Error while creating local socket for Client Socket Forwarder", e);
+                logger.warn("Error while creating local socket for Client Socket Forwarder", e);
             }
             return res;
         }

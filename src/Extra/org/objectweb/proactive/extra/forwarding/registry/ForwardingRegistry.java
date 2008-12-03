@@ -31,7 +31,7 @@ public class ForwardingRegistry {
 
     static public final int DEFAULT_SERVER_PORT = 2099;
 
-    private boolean running = false;
+    private volatile boolean running = false;
     private int listeningPort;
 
     final RegistryServerSideRunnable server = new RegistryServerSideRunnable(this);
