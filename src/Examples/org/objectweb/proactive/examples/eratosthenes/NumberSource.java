@@ -58,9 +58,9 @@ public class NumberSource implements java.io.Serializable, RunActive, Slowable {
      * Constructor for NumberSource.
      */
     public NumberSource() {
-    	// @ActiveObject
-//        pause = true;
-//        currentNumber = 5;
+        // @ActiveObject
+        //        pause = true;
+        //        currentNumber = 5;
     }
 
     public void setFirst(ActivePrimeContainer first) {
