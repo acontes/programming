@@ -31,9 +31,9 @@ public class ServerSocketForwarder extends SocketForwarder {
             tunnel.putMessage(ForwardedMessage.acceptMessage(localID, localPort, targetID, targetPort));
             startHandling();
         } catch (UnknownHostException e) {
-            logger.warn("Unknown host: "+ProActiveInet.getInstance().getInetAddress(), e);
+            logger.warn("Unknown host: " + ProActiveInet.getInstance().getInetAddress(), e);
         } catch (IOException e) {
-        	logger.warn("Unable to connect to host: "+ProActiveInet.getInstance().getInetAddress(), e);
+            logger.warn("Unable to connect to host: " + ProActiveInet.getInstance().getInetAddress(), e);
             tunnel.putMessage(ForwardedMessage.abortMessage(localID, localPort, targetID, targetPort, e
                     .getMessage()));
         }
