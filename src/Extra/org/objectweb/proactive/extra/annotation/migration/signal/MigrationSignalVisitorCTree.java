@@ -125,10 +125,12 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void, Trees> {
         _containingClass = (ClassTree) trees.getTree(clazzElement);
 
         // the method must be within a class that is tagged with the ActiveObject annotation
-        if (clazzElement.getAnnotation(ActiveObject.class) == null) {
-            reportError(_methodPosition, ErrorMessages.NOT_IN_ACTIVE_OBJECT_ERROR_MESSAGE);
-            return super.visitMethod(methodNode, trees);
-        }
+        // sometimes, @MigrationSignal annotation can make sense outside an active object. See
+        // examples/chat/ChatGUI.java/MigrateAction.actionPerfomed()
+//        if (clazzElement.getAnnotation(ActiveObject.class) == null) {
+//            reportError(_methodPosition, ErrorMessages.NOT_IN_ACTIVE_OBJECT_ERROR_MESSAGE);
+//            return super.visitMethod(methodNode, trees);
+//        }
 
         // the method must be public
         //		if( !testModifiers(methodNode.getModifiers()) ){
