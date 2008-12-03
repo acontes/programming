@@ -40,7 +40,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.examples.nbody.common.Displayer;
 import org.objectweb.proactive.examples.nbody.common.Force;
 import org.objectweb.proactive.examples.nbody.common.Planet;
-import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
+import org.objectweb.proactive.extensions.annotation.activeobject.ActiveObject;
 
 
 @ActiveObject

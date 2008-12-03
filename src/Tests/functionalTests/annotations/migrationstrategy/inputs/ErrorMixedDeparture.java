@@ -1,6 +1,6 @@
 package functionalTests.annotations.migrationstrategy.inputs;
 
-import org.objectweb.proactive.extra.annotation.migration.strategy.OnDeparture;
+import org.objectweb.proactive.extensions.annotation.migration.strategy.OnDeparture;
 
 
 public class ErrorMixedDeparture {

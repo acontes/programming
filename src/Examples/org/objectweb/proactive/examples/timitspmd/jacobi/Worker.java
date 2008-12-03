@@ -37,7 +37,7 @@ import org.objectweb.proactive.extensions.timitspmd.util.TimerCounter;
 import org.objectweb.proactive.extensions.timitspmd.util.observing.EventObserver;
 import org.objectweb.proactive.extensions.timitspmd.util.observing.commobserv.CommEvent;
 import org.objectweb.proactive.extensions.timitspmd.util.observing.commobserv.CommEventObserver;
-import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
+import org.objectweb.proactive.extensions.annotation.activeobject.ActiveObject;
 
 
 /**

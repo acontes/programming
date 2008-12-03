@@ -1,6 +1,6 @@
 package functionalTests.annotations.remoteobject.inputs;
 
-import org.objectweb.proactive.extra.annotation.remoteobject.RemoteObject;
+import org.objectweb.proactive.extensions.annotation.remoteobject.RemoteObject;
 
 
 public class ErrorClassNotPublic {

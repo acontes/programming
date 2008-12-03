@@ -35,7 +35,7 @@ import java.io.Serializable;
 
 import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.examples.nbody.common.Deployer;
-import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
+import org.objectweb.proactive.extensions.annotation.activeobject.ActiveObject;
 
 
 /**

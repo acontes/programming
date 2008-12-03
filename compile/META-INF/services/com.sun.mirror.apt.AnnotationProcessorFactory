@@ -1,2 +1,2 @@
-org.objectweb.proactive.extra.annotation.ProActiveAnnotationProcessorFactory
-org.objectweb.proactive.extra.annotation.BogusAnnotationProcessorFactory
+org.objectweb.proactive.extensions.annotation.ProActiveAnnotationProcessorFactory
+org.objectweb.proactive.extensions.annotation.BogusAnnotationProcessorFactory

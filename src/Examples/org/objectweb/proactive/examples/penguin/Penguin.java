@@ -39,8 +39,8 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.migration.Destination;
 import org.objectweb.proactive.core.migration.MigrationStrategyImpl;
 import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
-import org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignal;
+import org.objectweb.proactive.extensions.annotation.activeobject.ActiveObject;
+import org.objectweb.proactive.extensions.annotation.migration.signal.MigrationSignal;
 
 
 @ActiveObject

@@ -3,7 +3,7 @@ package functionalTests.annotations.remoteobject.inputs;
 import java.io.Serializable;
 import java.util.List;
 
-import org.objectweb.proactive.extra.annotation.remoteobject.RemoteObject;
+import org.objectweb.proactive.extensions.annotation.remoteobject.RemoteObject;
 
 
 @RemoteObject

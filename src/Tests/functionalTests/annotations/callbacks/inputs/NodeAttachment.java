@@ -1,7 +1,7 @@
 package functionalTests.annotations.callbacks.inputs;
 
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.extra.annotation.callbacks.nodeattachment.NodeAttachmentCallback;
+import org.objectweb.proactive.extensions.annotation.callbacks.nodeattachment.NodeAttachmentCallback;
 
 
 // correct signature "void method(Node, String virtualNodeName)"

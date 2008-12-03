@@ -1,6 +1,6 @@
 package functionalTests.annotations.migrationstrategy.inputs;
 
-import org.objectweb.proactive.extra.annotation.migration.strategy.OnArrival;
+import org.objectweb.proactive.extensions.annotation.migration.strategy.OnArrival;
 
 
 public class ErrorMixedArrival {

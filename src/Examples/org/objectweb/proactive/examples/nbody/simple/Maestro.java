@@ -34,7 +34,7 @@ package org.objectweb.proactive.examples.nbody.simple;
 import java.io.Serializable;
 
 import org.objectweb.proactive.examples.nbody.common.Deployer;
-import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
+import org.objectweb.proactive.extensions.annotation.activeobject.ActiveObject;
 
 
 /**

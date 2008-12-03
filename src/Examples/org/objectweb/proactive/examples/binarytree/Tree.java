@@ -32,7 +32,7 @@
 package org.objectweb.proactive.examples.binarytree;
 
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
+import org.objectweb.proactive.extensions.annotation.activeobject.ActiveObject;
 
 
 @ActiveObject

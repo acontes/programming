@@ -72,7 +72,7 @@
 						</listitem>
 						<listitem>
 							<para>For JDK 1.6:
-							  <screen>$javac -processor org.objectweb.proactive.extra.annotation.ProActiveProcessorCTree -cp $CLASSPATH:$JAVA_HOME/lib/tools.jar [input_files]</screen>
+							  <screen>$javac -processor org.objectweb.proactive.extensions.annotation.ProActiveProcessorCTree -cp $CLASSPATH:$JAVA_HOME/lib/tools.jar [input_files]</screen>
 							</para>
 						</listitem>
 					</itemizedlist>
@@ -145,7 +145,7 @@
 					Project Properties -> Compiling -> Additional compiler options and add the following option
 					</para>
 					<para>
-					  <screen>-processor org.objectweb.proactive.extra.annotation.ProActiveProcessorCTree</screen>
+					  <screen>-processor org.objectweb.proactive.extensions.annotation.ProActiveProcessorCTree</screen>
 					</para>
 					<para>
 					Then build the project.
@@ -165,7 +165,7 @@
 					Then add the following option to Additional command line parameters
 					</para>
 					<para>
-					  <screen>-processor org.objectweb.proactive.extra.annotation.ProActiveProcessorCTree</screen>
+					  <screen>-processor org.objectweb.proactive.extensions.annotation.ProActiveProcessorCTree</screen>
 					</para>
 				</para>
 			  </listitem>

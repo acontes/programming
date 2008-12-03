@@ -51,8 +51,8 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
-import org.objectweb.proactive.extra.annotation.migration.signal.MigrationSignal;
+import org.objectweb.proactive.extensions.annotation.activeobject.ActiveObject;
+import org.objectweb.proactive.extensions.annotation.migration.signal.MigrationSignal;
 
 
 /**

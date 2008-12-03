@@ -39,7 +39,7 @@ import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.util.wrapper.LongWrapper;
 import org.objectweb.proactive.examples.userguide.cmagent.simple.CMAgent;
-import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
+import org.objectweb.proactive.extensions.annotation.activeobject.ActiveObject;
 
 
 @ActiveObject

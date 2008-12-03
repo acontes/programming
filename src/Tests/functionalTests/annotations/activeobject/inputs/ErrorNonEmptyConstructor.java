@@ -1,6 +1,6 @@
 package functionalTests.annotations.activeobject.inputs;
 
-import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
+import org.objectweb.proactive.extensions.annotation.activeobject.ActiveObject;
 
 
 // 1 warning - constructor is not empty

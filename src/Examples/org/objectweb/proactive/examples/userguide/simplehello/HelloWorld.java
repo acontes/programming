@@ -33,7 +33,7 @@
 package org.objectweb.proactive.examples.userguide.simplehello;
 
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
-import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
+import org.objectweb.proactive.extensions.annotation.activeobject.ActiveObject;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

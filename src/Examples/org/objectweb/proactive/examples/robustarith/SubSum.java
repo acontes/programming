@@ -34,7 +34,7 @@ package org.objectweb.proactive.examples.robustarith;
 import java.io.Serializable;
 import java.math.BigInteger;
 
-import org.objectweb.proactive.extra.annotation.activeobject.ActiveObject;
+import org.objectweb.proactive.extensions.annotation.activeobject.ActiveObject;
 
 
 /**

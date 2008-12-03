@@ -290,12 +290,12 @@
 		<if name="ant.java.version" value="1.5">
 			<apt srcdir="${src.examples.dir}" destdir="${cl.examples.dir}" includes="**/*.java" excludes="${proactive.path}/examples/nbody/common/NBody3DFrame.java" compile="false" encoding="UTF-8">
 				<classpath refid="examples.classpath" />
-				<compilerarg line="-factory org.objectweb.proactive.extra.annotation.ProActiveAnnotationProcessorFactory"/>
+				<compilerarg line="-factory org.objectweb.proactive.extensions.annotation.ProActiveAnnotationProcessorFactory"/>
 			</apt>
 			<property name="compilerargs" value=""/>
 		</if>
 		<else>
-			<property name="compilerargs" value="-processor org.objectweb.proactive.extra.annotation.ProActiveProcessorCTree"/>
+			<property name="compilerargs" value="-processor org.objectweb.proactive.extensions.annotation.ProActiveProcessorCTree"/>
 		</else>
 		<!-- XXX, MicroTimer should be in core or not used by examples-->
 		<javac srcdir="${src.examples.dir}" destdir="${cl.examples.dir}" includes="**/*.java" excludes="${proactive.path}/examples/nbody/common/NBody3DFrame.java" deprecation="on" source="${source}" debug="${debug}" encoding="UTF-8">
@@ -435,10 +435,10 @@
 		</jar>
 	</target>
 	
-	<target name="deploy.annotations" depends="compile.core, -deploy.mkdir" description="Create a jar file which contains the JDK 1.6 annotations">
+	<target name="deploy.annotations" depends="compile.extensions, -deploy.mkdir" description="Create a jar file which contains the JDK 1.6 annotations">
 		<jar destfile="${deploy.lib.dir}/ProActive_annotations.jar" index="true">
-			<fileset dir="${cl.extra.dir}"> 
-				<include name="org/objectweb/proactive/extra/annotation/**"/>
+			<fileset dir="${cl.extensions.dir}">
+				<include name="org/objectweb/proactive/extensions/annotation/**"/>
 			</fileset>
 			<!-- annotations info -->
 		    <fileset dir="${compile.dir}" includes="META-INF/services/com.sun.mirror.apt.AnnotationProcessorFactory" />

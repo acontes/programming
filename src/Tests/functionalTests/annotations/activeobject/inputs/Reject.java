@@ -3,7 +3,7 @@ package functionalTests.annotations.activeobject.inputs;
 import java.util.List;
 
 
-@org.objectweb.proactive.extra.annotation.activeobject.ActiveObject
+@org.objectweb.proactive.extensions.annotation.activeobject.ActiveObject
 public class Reject {
     public Reject(int n) {
     } // E no-arg constructor
