@@ -5,7 +5,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 import org.objectweb.proactive.core.util.ProActiveInet;
@@ -71,8 +70,8 @@ public class ClientSocketForwarder extends SocketForwarder {
                 sock = createLocalSocket();
                 startHandling();
             } else {
-            	// need to unregister this socket forwarder
-            	handler.unregisterSocketForwarder(this);
+                // need to unregister this socket forwarder
+                handler.unregisterSocketForwarder(this);
             }
         } catch (InterruptedException e) {
             logger.debug("ClientSocketForwarder interupted while waiting response from forwarding.", e);
