@@ -41,13 +41,6 @@ import functionalTests.annotations.CTreeTest;
  */
 public class TestCTree extends CTreeTest {
 
-    @org.junit.Before
-    public void init() throws Exception {
-        envInit();
-        inputFilesPathInit(this.getClass());
-        testInit();
-    }
-
     @org.junit.Test
     public void action() throws Exception {
 
@@ -76,10 +69,4 @@ public class TestCTree extends CTreeTest {
         Assert.assertEquals(new Result(0, 1), checkFile("ErrorNonEmptyConstructor"));
         Assert.assertEquals(OK, checkFile("NoConstructor"));
     }
-
-    @org.junit.After
-    public void endTest() throws Exception {
-        testCleanup();
-    }
-
 }

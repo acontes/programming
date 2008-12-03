@@ -32,7 +32,6 @@ package functionalTests.annotations.migrationstrategy;
 
 import junit.framework.Assert;
 import functionalTests.annotations.AptTest;
-import functionalTests.annotations.AnnotationTest.Result;
 
 
 /**
@@ -42,13 +41,6 @@ import functionalTests.annotations.AnnotationTest.Result;
  * @since ProActive 4.10
  */
 public class TestApt extends AptTest {
-
-    @org.junit.Before
-    public void init() throws Exception {
-        envInit();
-        inputFilesPathInit(this.getClass());
-        testInit();
-    }
 
     @org.junit.Test
     public void action() throws Exception {
@@ -64,10 +56,4 @@ public class TestApt extends AptTest {
         Assert.assertEquals(new Result(2, 0), checkFile("ErrorMixedDeparture"));
         Assert.assertEquals(new Result(2, 0), checkFile("ErrorMixedArrival"));
     }
-
-    @org.junit.After
-    public void endTest() throws Exception {
-        testCleanup();
-    }
-
 }

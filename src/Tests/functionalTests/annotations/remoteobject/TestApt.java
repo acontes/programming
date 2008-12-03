@@ -36,13 +36,6 @@ import functionalTests.annotations.AptTest;
 
 public class TestApt extends AptTest {
 
-    @org.junit.Before
-    public void init() throws Exception {
-        envInit();
-        inputFilesPathInit(this.getClass());
-        testInit();
-    }
-
     @org.junit.Test
     public void action() throws Exception {
         // misplaced annotation
@@ -64,10 +57,5 @@ public class TestApt extends AptTest {
 
         Assert.assertEquals(ERROR, checkFile("ErrorEmptyConstructor"));
 
-    }
-
-    @org.junit.After
-    public void endTest() throws Exception {
-        testCleanup();
     }
 }

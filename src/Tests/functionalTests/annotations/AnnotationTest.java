@@ -32,6 +32,8 @@ package functionalTests.annotations;
 
 import java.io.File;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.objectweb.proactive.core.config.PAProperties;
 
@@ -50,6 +52,17 @@ public abstract class AnnotationTest extends FunctionalTest {
     // automatic environment configuration stuff
     protected String PROACTIVE_HOME;
     protected String PROC_PATH;
+
+    @Before
+    public void testSetup() throws NoCompilerDetectedException {
+        this.envInit();
+        this.inputFilesPathInit();
+        this.testInit();
+    }
+
+    // test-specific cleanup code
+    @After
+    public abstract void testCleanup();
 
     protected void envInit() {
         if (PAProperties.PA_HOME.isSet()) {
@@ -95,8 +108,8 @@ public abstract class AnnotationTest extends FunctionalTest {
     // "guesses" the path to the test files. this method assumes(does not check!) that 
     // the structure of the tests is the same as described 
     // <a href="http://confluence.activeeon.com/display/PROG/Feature+Compile+time+annotations">here</a>
-    protected void inputFilesPathInit(Class<? extends Object> testClass) {
-
+    protected void inputFilesPathInit() {
+        Class<? extends Object> testClass = this.getClass();
         TEST_FILES_PACKAGE = testClass.getPackage().getName() + ".inputs.";
         String testFilesRelpath = File.separator + "src" + File.separator + "Tests" + File.separator +
             TEST_FILES_PACKAGE.replace('.', File.separatorChar);
@@ -109,9 +122,6 @@ public abstract class AnnotationTest extends FunctionalTest {
 
     // how to execute a compilation process on a compilation unit
     protected abstract Result checkFile(String fileName) throws CompilationExecutionException;
-
-    // test-specific cleanup code
-    protected abstract void testCleanup();
 
     // the results of compilation execution
     public final class Result {
@@ -144,6 +154,7 @@ public abstract class AnnotationTest extends FunctionalTest {
     protected final Result ERROR = new Result(1, 0);
 
     // the errors of compilation execution
+    @SuppressWarnings("serial")
     public final class CompilationExecutionException extends Exception {
 
         public CompilationExecutionException(String str) {
@@ -157,6 +168,7 @@ public abstract class AnnotationTest extends FunctionalTest {
     }
 
     // if I don't find a compiler...
+    @SuppressWarnings("serial")
     public class NoCompilerDetectedException extends Exception {
 
         public NoCompilerDetectedException(String message) {

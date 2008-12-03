@@ -73,7 +73,7 @@ public abstract class AptTest extends AnnotationTest {
     }
 
     @Override
-    protected void testCleanup() {
+    public void testCleanup() {
         // nothing for now...
     }
 

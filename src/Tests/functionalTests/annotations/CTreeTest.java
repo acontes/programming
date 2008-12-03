@@ -91,7 +91,7 @@ public abstract class CTreeTest extends AnnotationTest {
     }
 
     @Override
-    protected void testCleanup() {
+    public void testCleanup() {
         // close the file manager
         try {
             _fileManager.close();
