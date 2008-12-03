@@ -57,8 +57,10 @@
 
 	<path id="examples.classpath">
 		<path refid="project.classpath" />
+		<!-- Annotation processing -->
+		<pathelement path="${deploy.lib.dir}/ProActive_annotations.jar"/>
 	</path>
-
+	
 	<!-- Default testsuite can be overriden by using the -Dtest property -->
 	<if name="test">
 		<fileset dir="${cl.test.dir}" id="testsuite">
@@ -285,22 +287,16 @@
 	</target>
 	
 
-	<target name="compile.examples" depends="compile.core, compile.extensions, compile.extra" description="Compile all examples classes">
+	<target name="compile.examples" depends="compile.core, compile.extensions, compile.extra, deploy.annotations" description="Compile all examples classes">
 		<!-- annotation processing -->
 		<if name="ant.java.version" value="1.5">
 			<apt srcdir="${src.examples.dir}" destdir="${cl.examples.dir}" includes="**/*.java" excludes="${proactive.path}/examples/nbody/common/NBody3DFrame.java" compile="false" encoding="UTF-8">
-				<classpath refid="examples.classpath" />
-				<compilerarg line="-factory org.objectweb.proactive.extensions.annotation.ProActiveAnnotationProcessorFactory"/>
+				<classpath refid="examples.classpath"/>
 			</apt>
-			<property name="compilerargs" value=""/>
 		</if>
-		<else>
-			<property name="compilerargs" value="-processor org.objectweb.proactive.extensions.annotation.ProActiveProcessorCTree"/>
-		</else>
 		<!-- XXX, MicroTimer should be in core or not used by examples-->
 		<javac srcdir="${src.examples.dir}" destdir="${cl.examples.dir}" includes="**/*.java" excludes="${proactive.path}/examples/nbody/common/NBody3DFrame.java" deprecation="on" source="${source}" debug="${debug}" encoding="UTF-8">
-			<classpath refid="examples.classpath" />
-			<compilerarg line="${compilerargs}"/>
+			<classpath refid="examples.classpath"/>
 		</javac>
 
 		<copy todir="${cl.examples.dir}/${proactive.path}/examples" includeEmptyDirs="no">
