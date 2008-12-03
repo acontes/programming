@@ -37,14 +37,15 @@ import java.util.Map;
 
 import javax.annotation.processing.Messager;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
 import javax.tools.Diagnostic;
 
 import org.objectweb.proactive.api.PAMobileAgent;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.extensions.annotation.ErrorMessages;
-import org.objectweb.proactive.extensions.annotation.activeobject.ActiveObject;
 
 import com.sun.source.tree.BlockTree;
 import com.sun.source.tree.CaseTree;
@@ -538,7 +539,7 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void, Trees> {
 
         MethodInvocationTree methodCall = (MethodInvocationTree) lastExpression;
 
-        return isMigrationSignalCall(methodCall, trees) || isMigrateToCall(methodCall);
+        return isMigrationSignalCall(methodCall, trees) || isMigrateToCall(methodCall, trees);
     }
 
     private boolean isMigrationSignalCall(MethodInvocationTree methodCall, Trees trees) {
@@ -591,7 +592,7 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void, Trees> {
      */
     private static final String MIGRATE_TO = "migrateTo"; // i dunno how to do it elseway
 
-    private boolean isMigrateToCall(MethodInvocationTree methodCall) {
+    private boolean isMigrateToCall(MethodInvocationTree methodCall, Trees trees) {
 
         // .. and the selection expression must be ...
         ExpressionTree methodSelectionExpression = methodCall.getMethodSelect();
@@ -617,15 +618,7 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void, Trees> {
                 calleeName = ((MemberSelectTree) typeNameExpression).getIdentifier().toString();
             } else
                 return false;
-            // the call can also be made against members...
-            //            if(isClassField(calleeName)){
-            //                return true;
-            //            }
-            //            //... or against local variables
-            //            if(isLocalVariable(calleeName)) {
-            //                return true;
-            //            }
-            return isClassField(calleeName) || // the call can also be made against members...
+            return isClassField(calleeName, trees) || // the call can also be made against members...
                 isLocalVariable(calleeName) || //... or against local variables
                 methodName.equals(MIGRATE_TO) && calleeName.equals(PAMobileAgent.class.getSimpleName());
         } else {
@@ -656,17 +649,39 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void, Trees> {
     /**
      * Tests if the given name represents the name of a field of the containing class
      */
-    private boolean isClassField(String calleeName) {
-        for (Tree member : _containingClass.getMembers()) {
-            if (member.getKind().equals(Kind.VARIABLE)) {
-                VariableTree field = (VariableTree) member;
-                // IdentifierTree fieldType = (IdentifierTree)field.getType();
-                // TODO check if the class ${fieldType} has a method ${methodName} which is annotated with @MigrationSignal
-                if (field.getName().toString().equals(calleeName))
-                    return true;
+    private boolean isClassField(String calleeName, Trees trees) {
+        Element element = trees.getElement(trees.getPath(_containingCompilationUnit, _containingClass));
+
+        // call the real thing
+        return isClassField(element, calleeName);
+    }
+
+    /**
+     * The real algorithm is recursive
+     */
+    private boolean isClassField(Element clazz, String calleeName) {
+
+        if (clazz.getKind().equals(ElementKind.CLASS)) {
+            TypeElement clazzElement = (TypeElement) clazz;
+            // search in the current class
+            for (Element member : clazzElement.getEnclosedElements()) {
+                if (member.getKind().equals(ElementKind.FIELD)) {
+                    VariableElement field = (VariableElement) member;
+                    // TODO check if the field type has a method ${methodName} which is annotated with @MigrationSignal
+                    if (field.getSimpleName().toString().equals(calleeName))
+                        return true;
+                }
+            }
+
+            // search in the enclosing class, if any...
+            Element enclosingElem = clazzElement.getEnclosingElement();
+            if (enclosingElem != null && enclosingElem.getKind().equals(ElementKind.CLASS)) {
+                return isClassField(enclosingElem, calleeName);
             }
         }
+
         return false;
+
     }
 
     // error reporting methods
