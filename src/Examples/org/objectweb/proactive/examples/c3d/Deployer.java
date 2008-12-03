@@ -57,31 +57,19 @@ public class Deployer {
         // No args constructor
     }
 
-    public Deployer(File applicationDescriptor) {
-        try {
-            ProActiveConfiguration.load();
-            gcmad = PAGCMDeployment.loadApplicationDescriptor(applicationDescriptor);
-            gcmad.startDeployment();
-            renderer = gcmad.getVirtualNode("Renderer");
-            dispatcher = gcmad.getVirtualNode("Dispatcher");
-        } catch (ProActiveException e) {
-            logger.error("Cannot load GCM Application Descriptor: " + applicationDescriptor, e);
-        }
+    public Deployer(GCMApplication gcmad, GCMVirtualNode renderer, GCMVirtualNode dispatcher) {
+        this.gcmad = gcmad;
+        this.renderer = renderer;
+        this.dispatcher = dispatcher;
     }
 
     public Node[] getRendererNodes() {
-        if (renderer == null)
-            return null;
-
         logger.info("Waiting Renderer virtual node to be ready");
         renderer.waitReady();
         return renderer.getCurrentNodes().toArray(new Node[0]);
     }
 
     public Node getDispatcherNode() {
-        if (dispatcher == null)
-            return null;
-
         logger.info("Waiting Dispatcher virtual node to be ready");
         dispatcher.waitReady();
         return dispatcher.getANode();
