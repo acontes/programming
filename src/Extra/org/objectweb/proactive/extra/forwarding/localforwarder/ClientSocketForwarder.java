@@ -70,6 +70,9 @@ public class ClientSocketForwarder extends SocketForwarder {
             if (accepted) {
                 sock = createLocalSocket();
                 startHandling();
+            } else {
+            	// need to unregister this socket forwarder
+            	handler.unregisterSocketForwarder(this);
             }
         } catch (InterruptedException e) {
             logger.debug("ClientSocketForwarder interupted while waiting response from forwarding.", e);
@@ -113,19 +116,19 @@ public class ClientSocketForwarder extends SocketForwarder {
      * Class helping with the creation of the local Sockets.
      */
     private class ServerSocketCreator implements Runnable {
-        private Semaphore sem;
+        private CountDownLatch sem;
         private ServerSocket s;
         private Socket sock = null;
 
         public ServerSocketCreator(ServerSocket s) {
             this.s = s;
-            sem = new Semaphore(0);
+            sem = new CountDownLatch(1);
         }
 
         public void run() {
             try {
                 sock = s.accept();
-                sem.release();
+                sem.countDown();
             } catch (IOException e) {
                 logger.error("Error while creating local socket for Client Socket Forwarder", e);
             }
@@ -134,7 +137,7 @@ public class ClientSocketForwarder extends SocketForwarder {
         public Socket getSocket() {
             Socket res = null;
             try {
-                sem.acquire();
+                sem.await();
                 res = sock;
             } catch (InterruptedException e) {
                 logger.warn("Error while creating local socket for Client Socket Forwarder", e);
