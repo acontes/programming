@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.extensions.annotation.migration.signal;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +42,8 @@ import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeKind;
 import javax.tools.Diagnostic;
 
 import org.objectweb.proactive.api.PAMobileAgent;
@@ -618,7 +621,7 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void, Trees> {
                 calleeName = ((MemberSelectTree) typeNameExpression).getIdentifier().toString();
             } else
                 return false;
-            return isClassField(calleeName, trees) || // the call can also be made against members...
+            return isClassField(calleeName, methodName, trees) || // the call can also be made against members...
                 isLocalVariable(calleeName) || //... or against local variables
                 methodName.equals(MIGRATE_TO) && calleeName.equals(PAMobileAgent.class.getSimpleName());
         } else {
@@ -648,35 +651,55 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void, Trees> {
 
     /**
      * Tests if the given name represents the name of a field of the containing class
+     * If it is a field, also check if the type of the field has a method with the
+     * name ${methodName} and which is annotated with @MigrationSignal  
      */
-    private boolean isClassField(String calleeName, Trees trees) {
+    private boolean isClassField(String calleeName, String methodName, Trees trees) {
         Element element = trees.getElement(trees.getPath(_containingCompilationUnit, _containingClass));
 
         // call the real thing
-        return isClassField(element, calleeName);
+        return isClassField(element, calleeName, methodName);
     }
 
     /**
      * The real algorithm is recursive
      */
-    private boolean isClassField(Element clazz, String calleeName) {
+    private boolean isClassField(Element clazz, String calleeName, String methodName) {
 
         if (clazz.getKind().equals(ElementKind.CLASS)) {
             TypeElement clazzElement = (TypeElement) clazz;
             // search in the current class
             for (Element member : clazzElement.getEnclosedElements()) {
-                if (member.getKind().equals(ElementKind.FIELD)) {
+                if (member.getKind().isField()) {
                     VariableElement field = (VariableElement) member;
-                    // TODO check if the field type has a method ${methodName} which is annotated with @MigrationSignal
-                    if (field.getSimpleName().toString().equals(calleeName))
-                        return true;
+                    if (field.getSimpleName().toString().equals(calleeName)) {
+                        // check if the field type has a method ${methodName} which is annotated with @MigrationSignal
+                        if (field.asType().getKind().equals(TypeKind.DECLARED)) {
+                            DeclaredType decl = (DeclaredType) field.asType();
+                            // if the class is available in the classpath, we can load it using reflection
+                            try {
+                                Class fieldType = Class.forName(decl.toString());
+                                for (Method calleeMethod : fieldType.getMethods()) {
+                                    if (methodName.equals(calleeMethod.getName()) &&
+                                        calleeMethod.getAnnotation(MigrationSignal.class) != null) {
+                                        // OK
+                                        return true;
+                                    }
+                                }
+                                return false;
+                            } catch (Exception e) {
+                                // TODO cannot load class using reflection. Try alternative way
+                                return true;
+                            }
+                        }
+                    }
                 }
             }
 
             // search in the enclosing class, if any...
             Element enclosingElem = clazzElement.getEnclosingElement();
             if (enclosingElem != null && enclosingElem.getKind().equals(ElementKind.CLASS)) {
-                return isClassField(enclosingElem, calleeName);
+                return isClassField(enclosingElem, calleeName, methodName);
             }
         }
 
