@@ -70,8 +70,12 @@ public abstract class SocketForwarder {
     protected void startHandling() {
         reader = new SocketReader(sockToHandle, this);
         writter = new SocketWritter(sockToHandle, this);
-        new Thread(reader).start();
-        new Thread(writter).start();
+        Thread t = new Thread(reader);
+        t.setDaemon(true);
+        t.start();
+        t = new Thread(writter);
+        t.setDaemon(true);
+        t.start();
     }
 
     /**

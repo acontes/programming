@@ -32,9 +32,13 @@ public class LocalConnectionHandler implements Runnable {
         mappings = new HashMap<Object, HashMap<ConnectionID, SocketForwarder>>();
         ForwardingSocketWrapper sw = new ForwardingSocketWrapper(sock);
         outHandler = new OutHandler(sw, agent);
-        new Thread(outHandler).start();
+        Thread t = new Thread(outHandler);
+        t.setDaemon(true);
+        t.start();
         incomingDispatcher = new IncomingDispatcher(sw, agent, this);
-        new Thread(incomingDispatcher).start();
+        t = new Thread(incomingDispatcher);
+        t.setDaemon(true);
+        t.start();
         willClose = false;
         isRunning = true;
     }

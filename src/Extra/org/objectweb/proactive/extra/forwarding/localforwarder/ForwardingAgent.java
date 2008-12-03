@@ -140,7 +140,9 @@ public class ForwardingAgent implements ConnectionFailureListener {
 
         // Start LocalConnectionHandler
         localHandler = new LocalConnectionHandler(sock, this);
-        new Thread(localHandler).start();
+        Thread t = new Thread(localHandler);
+        t.setDaemon(true);
+        t.start();
 
         // Send registration message.
         localHandler.messageToSend(ForwardedMessage.registrationMessage(uniqueID));
