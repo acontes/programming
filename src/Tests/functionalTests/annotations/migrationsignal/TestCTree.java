@@ -62,7 +62,7 @@ public class TestCTree extends CTreeTest {
         //Assert.assertEquals(new Result(3, 0), checkFile("AcceptInterClassCall")); 
 
         // checking conditions that should be seen as errors
-//      NOTA can be outside active object  Assert.assertEquals(ERROR, checkFile("ErrorNotInActiveObject"));
+        //      NOTA can be outside active object  Assert.assertEquals(ERROR, checkFile("ErrorNotInActiveObject"));
         Assert.assertEquals(new Result(4, 0), checkFile("ErrorNotLast"));
 
         Assert.assertEquals(ERROR, checkFile("ErrorNoMigrateTo"));
