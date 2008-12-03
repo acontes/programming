@@ -101,6 +101,9 @@ public class Main implements ActivePrimeContainerCreator, InitActive {
 
     /** Creates a new ActivePrimeContainer starting with number n */
     public ActivePrimeContainer newActivePrimeContainer(long n, Slowable previous) {
+
+        ActivePrimeContainer result = null;
+
         try {
             int containerSize;
 
@@ -133,20 +136,19 @@ public class Main implements ActivePrimeContainerCreator, InitActive {
             }
 
             logger.info("    Creating container with size " + containerSize + " starting with number " + n);
-            ActivePrimeContainer result = (ActivePrimeContainer) PAActiveObject.newActive(
-                    ActivePrimeContainer.class.getName(), new Object[] { PAActiveObject.getStubOnThis(),
-                            outputListener, new Integer(containerSize), new Long(n), previous }, node);
+            result = (ActivePrimeContainer) PAActiveObject.newActive(ActivePrimeContainer.class.getName(),
+                    new Object[] { PAActiveObject.getStubOnThis(), outputListener,
+                            new Integer(containerSize), new Long(n), previous }, node);
 
             // Workaround for a little bug in ProActive (Exception in receiveRequest)
             // may be removed as the bug is fixed
             // This call makes us wait while the newly created object is not yet in his runActivity() method
             long v = result.getValue();
 
-            return result;
         } catch (ProActiveException e) {
             e.printStackTrace();
-            return null;
         }
+        return result;
     }
 
     public void initActivity(Body b) {
