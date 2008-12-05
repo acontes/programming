@@ -52,6 +52,12 @@ public interface ResultIntern<R extends Serializable> extends Identifiable, Seri
     R getResult();
 
     /**
+     * set the id of the result
+     * @param new id of the result
+     */
+    void setId(long id);
+
+    /**
      * sets the result of the task
      * @param res the result
      */

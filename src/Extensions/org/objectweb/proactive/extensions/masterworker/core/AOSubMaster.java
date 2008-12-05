@@ -152,9 +152,8 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
     private HashMap<String, Request> pendingSubRequests;
 
     /** sub result queue list */
-    private HashMap<DivisibleTaskIdObject, ResultQueue<Serializable>> subResultQueues;
-
-    private long taskidcounter = 0;
+    private HashMap<Long, ResultQueue<Serializable>> subResultQueues;
+    private HashMap<Long, Long> taskIdCounters;
 
     /** Filters * */
     private final FindWorkersRequests workersRequestsFilter = new FindWorkersRequests();
@@ -209,7 +208,8 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         resultQueue = new ResultQueue<Serializable>(Master.COMPLETION_ORDER);
 
         pendingSubRequests = new HashMap<String, Request>();
-        subResultQueues = new HashMap<DivisibleTaskIdObject, ResultQueue<Serializable>>();
+        subResultQueues = new HashMap<Long, ResultQueue<Serializable>>();
+        taskIdCounters = new HashMap<Long, Long>();
         clearedWorkers = new HashSet<Worker>();
         spawnedWorkerNames = new HashSet<String>();
         divisibleTasksAssociationWithWorkers = new HashMap<Long, String>();
@@ -321,6 +321,10 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
     }
 
     public Queue<TaskIntern<Serializable>> getTasks(Worker worker, String workerName, int flooding) {
+        if (debug) {
+            logger.debug("Submaster " + name + " ask for new tasks from big master");
+        }
+        getTasksIntern();
         return getTasksInternal(worker, workerName, flooding);
     }
 
@@ -427,6 +431,27 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
 
         clearedWorkers.add(worker);
 
+    }
+
+    public BooleanWrapper sendResultFromMaster(ResultIntern<Serializable> result, String workerName) {
+        if (subResultQueues.containsKey(getDivisibleTaskIDByOriginatorName(workerName))) {
+            if (debug) {
+                logger.debug("Master sends result of task " + result.getId() + " of divisible task " +
+                    getDivisibleTaskIDByOriginatorName(workerName));
+            }
+            subResultQueues.get(getDivisibleTaskIDByOriginatorName(workerName)).addCompletedTask(result);
+            if (debug) {
+                // logger.debug("The result of task " + result.getId() + " is " + result.getResult().toString());
+            }
+            return new BooleanWrapper(true);
+        } else {
+            // do nothing
+            if (debug) {
+                logger.debug("Master sends result of task " + result.getId() + "of worker " + workerName +
+                    " but it's unknown.");
+            }
+            return new BooleanWrapper(false);
+        }
     }
 
     public BooleanWrapper sendResult(ResultIntern<Serializable> result, String workerName) {
@@ -565,40 +590,9 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         if (originatorName == null) {
             return resultQueue.countAvailableResults();
         } else {
-            throw new IllegalArgumentException("Unsupported originator " + originatorName);
+            return subResultQueues.get(getDivisibleTaskIDByOriginatorName(originatorName))
+                    .countAvailableResults();
         }
-    }
-
-    public int countAvailableResults(String originatorName, int solveId) throws IsClearingError {
-        // TODO Auto-generated method stub
-
-        // Used for divisible task, the masteraccess ask for the available results of the 
-        // specified solve method
-        if (originatorName == null) {
-            return resultQueue.countAvailableResults();
-        } else {
-            return getResultQueueByOriginatorNameAndSolveId(originatorName, solveId).countAvailableResults();
-        }
-    }
-
-    private ResultQueue<Serializable> getResultQueueByOriginatorNameAndSolveId(String originatorName,
-            int solveId) throws IsClearingError {
-        if (divisibleTasksAssociationWithWorkers.values().contains(originatorName)) {
-            long dvisibleTaskId = getDivisibleTaskIDByOriginatorName(originatorName);
-            DivisibleTaskIdObject divisibleTaskIdObject = new DivisibleTaskIdObject(dvisibleTaskId, solveId);
-            return getObjValue(divisibleTaskIdObject);
-        } else {
-            throw new IllegalArgumentException("Unsupported originator " + originatorName);
-        }
-    }
-
-    private ResultQueue<Serializable> getObjValue(DivisibleTaskIdObject obj) {
-        for (DivisibleTaskIdObject idObj : subResultQueues.keySet()) {
-            if (idObj.equals(obj)) {
-                return subResultQueues.get(idObj);
-            }
-        }
-        return null;
     }
 
     private long getDivisibleTaskIDByOriginatorName(String originatorName) {
@@ -617,7 +611,8 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         if (originatorName == null) {
             return resultQueue.countPendingResults();
         } else {
-            throw new IllegalArgumentException("Unsupported originator " + originatorName);
+            return subResultQueues.get(getDivisibleTaskIDByOriginatorName(originatorName))
+                    .countPendingResults();
         }
     }
 
@@ -639,31 +634,170 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         }
     }
 
-    public void solveIntern(String originatorName, List<? extends Task<? extends Serializable>> tasks)
-            throws IsClearingError {
+    public void solveIntern(String originatorName, long divisibleTaskId, long taskIdCounter,
+            List<? extends Task<? extends Serializable>> tasks) throws IsClearingError {
         // TODO Auto-generated method stub
+        if (debug) {
+            logger.debug("Request for solving tasks from " + originatorName);
+        }
+        divisibleTaskId = getDivisibleTaskIDByOriginatorName(originatorName);
+        // If one worker is sending the tasks
+        if (subResultQueues.containsKey(divisibleTaskId)) {
+            // If the divisible task has already been solved and new is rescheduled
+            // Because of the old worker is missing, we do nothing
+        } else {
+            if (debug) {
+                logger.debug("Create a resultqueue for the solve of the divisible task " + divisibleTaskId);
+            }
 
+            ResultQueue<Serializable> rq = new ResultQueue<Serializable>(resultQueue.getMode());
+            for (long id = taskIdCounter; id < taskIdCounter + tasks.size(); id++) {
+                rq.addPendingTask(id);
+                if (debug) {
+                    logger.debug("Add task " + id + " to the result queue of divisible task " +
+                        divisibleTaskId);
+                }
+            }
+
+            subResultQueues.put(divisibleTaskId, rq);
+
+            // we can use rq.countAvailableResults() to see if the results are available
+            // the initioal value is 0
+        }
+
+        // If the tasks has already been submitted
+        if (taskIdCounters.containsKey(divisibleTaskId)) {
+            if (taskIdCounters.get(divisibleTaskId) >= taskIdCounter) {
+                // Do nothing
+                return;
+            }
+            taskIdCounters.remove(divisibleTaskId);
+        }
+        taskIdCounters.put(divisibleTaskId, taskIdCounter);
+
+        // Ask the provider to solve, the divisibleTaskIdObj should be passed as a argument
+        provider.solveIntern(originatorName, divisibleTaskId, taskIdCounter, tasks);
     }
 
     public List<Serializable> waitAllResults(String originatorName) throws TaskException, IsClearingError {
         // TODO Auto-generated method stub
-        return null;
+        List<Serializable> results = null;
+        List<ResultIntern<Serializable>> completed = null;
+        if (isInFTmechanism) {
+            throw new MWFTError();
+        }
+        if (isClearing) {
+            clearingCallFromSpawnedWorker(originatorName);
+        }
+        if (debug) {
+            logger.debug("All results received by " + originatorName);
+        }
+
+        if (subResultQueues.containsKey(getDivisibleTaskIDByOriginatorName(originatorName))) {
+            completed = subResultQueues.get(getDivisibleTaskIDByOriginatorName(originatorName)).getAll();
+
+        } else
+            throw new IllegalArgumentException("Unknown originator: " + originatorName);
+        results = new ArrayList<Serializable>(completed.size());
+        for (ResultIntern<Serializable> res : completed) {
+            if (res.threwException()) {
+                throw new RuntimeException(new TaskException(res.getException()));
+            }
+
+            results.add(res.getResult());
+        }
+        return results;
     }
 
     public List<Serializable> waitKResults(String originatorName, int k) throws TaskException,
             IsClearingError {
         // TODO Auto-generated method stub
-        return null;
+        List<Serializable> results = new ArrayList<Serializable>(k);
+        List<ResultIntern<Serializable>> completed = null;
+        if (isInFTmechanism) {
+            throw new MWFTError();
+        }
+        if (isClearing) {
+            clearingCallFromSpawnedWorker(originatorName);
+        }
+        if (subResultQueues.containsKey(getDivisibleTaskIDByOriginatorName(originatorName))) {
+            ResultQueue rq = subResultQueues.get(getDivisibleTaskIDByOriginatorName(originatorName));
+            if ((rq.countPendingResults() + rq.countAvailableResults()) < k) {
+                throw new IllegalArgumentException("" + k + " is too big");
+            } else if (k <= 0) {
+                throw new IllegalArgumentException("Wrong value : " + k);
+            }
+
+            if (debug) {
+                logger.debug("" + k + " results received by " + originatorName);
+            }
+            completed = rq.getNextK(k);
+        } else
+            throw new IllegalArgumentException("Unknown originator: " + originatorName);
+        for (ResultIntern<Serializable> res : completed) {
+            if (res.threwException()) {
+                throw new RuntimeException(new TaskException(res.getException()));
+            }
+
+            results.add(res.getResult());
+        }
+        return results;
     }
 
     public Serializable waitOneResult(String originatorName) throws TaskException, IsClearingError {
         // TODO Auto-generated method stub
-        return null;
+        ResultIntern<Serializable> res = null;
+        if (isInFTmechanism) {
+            throw new MWFTError();
+        }
+        if (isClearing) {
+            clearingCallFromSpawnedWorker(originatorName);
+        }
+        if (subResultQueues.containsKey(getDivisibleTaskIDByOriginatorName(originatorName))) {
+            res = subResultQueues.get(getDivisibleTaskIDByOriginatorName(originatorName)).getNext();
+
+            if (debug) {
+                logger.debug("Result of task " + res.getId() + " received by " + originatorName);
+            }
+
+        } else
+            throw new IllegalArgumentException("Unknown originator: " + originatorName);
+
+        if (res.threwException()) {
+            throw new RuntimeException(new TaskException(res.getException()));
+        }
+        return res.getResult();
     }
 
     public List<Serializable> waitSomeResults(String originatorName) throws TaskException {
         // TODO Auto-generated method stub
-        return null;
+        List<Serializable> results = new ArrayList<Serializable>();
+        List<ResultIntern<Serializable>> completed = null;
+        if (isInFTmechanism) {
+            throw new MWFTError();
+        }
+        if (isClearing) {
+            clearingCallFromSpawnedWorker(originatorName);
+        }
+        if (subResultQueues.containsKey(getDivisibleTaskIDByOriginatorName(originatorName))) {
+            ResultQueue rq = subResultQueues.get(getDivisibleTaskIDByOriginatorName(originatorName));
+            int k = rq.countAvailableResults();
+
+            if (debug) {
+                logger.debug("" + k + " results received by " + originatorName);
+            }
+            completed = rq.getNextK(k);
+        } else
+            throw new IllegalArgumentException("Unknown originator: " + originatorName);
+
+        for (ResultIntern<Serializable> res : completed) {
+            if (res.threwException()) {
+                throw new RuntimeException(new TaskException(res.getException()));
+            }
+
+            results.add(res.getResult());
+        }
+        return results;
     }
 
     public void clear() {
@@ -907,7 +1041,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             Request req = ent.getValue();
             String originator = ent.getKey();
             String methodName = req.getMethodName();
-            ResultQueue rq = subResultQueues.get(originator);
+            ResultQueue rq = subResultQueues.get(getDivisibleTaskIDByOriginatorName(originator));
             if (rq != null) {
                 if ((methodName.equals("waitOneResult") || methodName.equals("waitSomeResults")) &&
                     rq.isOneResultAvailable()) {
@@ -1235,31 +1369,6 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
     public boolean isDead(String workerName) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException();
-    }
-
-    /**
-     * A sequance element <divisibleTaskID, solveID> which can specify a set of tasks
-     * submitted by the divisible task
-     *
-     * @author The ProActive Team
-     */
-    protected class DivisibleTaskIdObject {
-        private long divisibleTaskId = 0;
-        private int solveId = 0;
-
-        public DivisibleTaskIdObject(long divisibleTaskId, int solveId) {
-            this.divisibleTaskId = divisibleTaskId;
-            this.solveId = solveId;
-        }
-
-        public boolean equals(DivisibleTaskIdObject object) {
-            if ((this.divisibleTaskId == object.divisibleTaskId) && (this.solveId == object.solveId)) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-
     }
 
 }

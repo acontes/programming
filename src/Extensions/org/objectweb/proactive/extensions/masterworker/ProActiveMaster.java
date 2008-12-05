@@ -246,7 +246,7 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable> implemen
         if (tasks.size() == 0) {
             throw new IllegalArgumentException("empty list");
         }
-        aomaster.solveIntern(null, tasks);
+        aomaster.solveIntern(null, -1, -1, tasks);
     }
 
     /** {@inheritDoc} */

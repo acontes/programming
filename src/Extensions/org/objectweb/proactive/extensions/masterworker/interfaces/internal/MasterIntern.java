@@ -47,7 +47,7 @@ public interface MasterIntern {
     * @param tasks tasks to compute
     */
     //@snippet-start masterworker_solve
-    public void solveIntern(final String originatorName,
+    public void solveIntern(final String originatorName, long divisibleTaskId, long taskIdCounter,
             final List<? extends Task<? extends Serializable>> tasks) throws IsClearingError;
 
     //@snippet-end masterworker_solve

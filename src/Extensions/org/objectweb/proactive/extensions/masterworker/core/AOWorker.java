@@ -220,7 +220,9 @@ public class AOWorker implements InitActive, Serializable, Worker {
 
         // if the task is a divisible one, we spawn a new specialized worker for it
         if (task.getTask() instanceof DivisibleTask) {
-            String newWorkerName = name + "_" + subWorkerNameCounter;
+            String workerName = name.substring(0, name.indexOf('@'));
+            String subMasterName = name.substring(name.indexOf('@') + 1);
+            String newWorkerName = workerName + "_" + subWorkerNameCounter + "@" + subMasterName;
             subWorkerNameCounter = (subWorkerNameCounter + 1) % (Long.MAX_VALUE - 1);
             AODivisibleTaskWorker spawnedWorker = null;
             try {

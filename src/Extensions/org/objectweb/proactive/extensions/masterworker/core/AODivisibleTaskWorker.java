@@ -136,9 +136,7 @@ public class AODivisibleTaskWorker extends AOWorker implements RunActive, InitAc
             // We store the result inside our internal version of the task
             result.setResult(resultObj);
             if (debug) {
-                logger
-                        .debug(name + " sends the result of task " + result.getId() +
-                            " and asks a new task...");
+                logger.debug(name + " sends the result of task " + result.getId());
             }
 
             // We send the result back to the master

@@ -167,6 +167,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
 
     /** sub tasks that are completed */
     private HashMap<String, ResultQueue<Serializable>> subResultQueues;
+    private HashMap<Long, Long> idMap;
 
     /** if there is a pending request from the client */
     private Request pendingRequest;
@@ -379,6 +380,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
         resultQueue = new ResultQueue<Serializable>(Master.COMPLETION_ORDER);
         pendingSubRequests = new HashMap<String, Request>();
         subResultQueues = new HashMap<String, ResultQueue<Serializable>>();
+        idMap = new HashMap<Long, Long>();
         clearedWorkers = new HashSet<Worker>();
         spawnedWorkerNames = new HashSet<String>();
         workersDependencies = new HashMap<String, List<String>>();
@@ -824,7 +826,19 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
             if (submitter == null) {
                 resultQueue.addCompletedTask(result);
             } else {
+                // store it to the queue
                 subResultQueues.get(submitter).addCompletedTask(result);
+
+                // Forward it the the submaster if it comes from a submaster
+                if (submitter.indexOf('@') > 0) {
+                    String submasterName = submitter.substring(submitter.indexOf('@') + 1);
+
+                    result.setId(idMap.get(result.getId()));
+                    ((AOSubMaster) workersByName.get(submasterName)).sendResultFromMaster(result, submitter);
+                    if (debug) {
+                        logger.debug("Send result to submaster " + submasterName);
+                    }
+                }
             }
             // We remove the task from the repository (it won't be needed anymore)
             repository.removeTask(id);
@@ -1024,10 +1038,10 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
     }
 
     /** {@inheritDoc} */
-    private void solveIds(final List<TaskID> taskIds, String originator) {
+    private void solveIds(final List<TaskID> taskIds, long divisibleTaskId, String originator) {
 
         for (TaskID taskId : taskIds) {
-            solve(taskId, originator);
+            solve(taskId, divisibleTaskId, originator);
         }
     }
 
@@ -1037,7 +1051,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
      * @param taskId id of the task to solve
      * @throws IllegalArgumentException
      */
-    private void solve(final TaskID taskId, String originator) {
+    private void solve(final TaskID taskId, long divisibleTaskId, String originator) {
         if (debug) {
             if (originator == null) {
                 logger.debug("Request for solving task " + taskId.getID() + " from main client");
@@ -1046,6 +1060,11 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
             }
         }
         final long id = taskId.getID();
+
+        if (debug) {
+            logger.debug("sleep group size is:" + sleepingGroup.size());
+        }
+
         // If we have sleepers
         if (pendingTasks.isEmpty() && sleepingGroup.size() > 0) {
             if (debug) {
@@ -1071,7 +1090,12 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
                 rq.addPendingTask(id);
                 subResultQueues.put(originator, rq);
             }
-            Long rootTaskId = workersActivity.get(originator).iterator().next();
+
+            Long rootTaskId = (long) 0;
+            if (divisibleTaskId >= 0)
+                rootTaskId = divisibleTaskId;
+            else
+                rootTaskId = workersActivity.get(originator).iterator().next();
 
             if (tasksDependencies.containsKey(rootTaskId)) {
                 tasksDependencies.get(rootTaskId).add(id);
@@ -1112,19 +1136,29 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
      * @param tasks collection of tasks to be wrapped
      * @return wrapped version
      */
-    private List<TaskID> createIds(List<? extends Task<? extends Serializable>> tasks, String originatorName) {
+    private List<TaskID> createIds(List<? extends Task<? extends Serializable>> tasks, long taskIdCounter,
+            String originatorName) {
         List<TaskID> wrappings = new ArrayList<TaskID>();
+        TaskID taskId = null;
         for (Task<? extends Serializable> task : tasks) {
-            wrappings.add(createId(task, originatorName));
+            taskId = createId(task, originatorName);
+            wrappings.add(taskId);
+            if (taskIdCounter >= 0) {
 
+                if (debug) {
+                    logger.debug("Map task " + taskId.getID() + " with its local id " + taskIdCounter);
+                }
+
+                idMap.put(taskId.getID(), taskIdCounter++);
+            }
         }
 
         return wrappings;
     }
 
     /** {@inheritDoc} */
-    public void solveIntern(String originatorName, List<? extends Task<? extends Serializable>> tasks)
-            throws IsClearingError {
+    public void solveIntern(String originatorName, long divisibleTaskId, long taskIdCounter,
+            List<? extends Task<? extends Serializable>> tasks) throws IsClearingError {
         if (debug) {
             if (originatorName == null) {
                 logger.debug("solve method received from main client");
@@ -1135,8 +1169,8 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
         if (originatorName != null && isClearing) {
             clearingCallFromSpawnedWorker(originatorName);
         }
-        List<TaskID> wrappers = createIds(tasks, originatorName);
-        solveIds(wrappers, originatorName);
+        List<TaskID> wrappers = createIds(tasks, taskIdCounter, originatorName);
+        solveIds(wrappers, divisibleTaskId, originatorName);
     }
 
     /** {@inheritDoc} */

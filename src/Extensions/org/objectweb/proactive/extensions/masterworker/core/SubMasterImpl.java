@@ -53,6 +53,7 @@ public class SubMasterImpl implements SubMaster<Task<Serializable>, Serializable
     private final String originatorName;
     private boolean initCalled = false;
     private AOWorker parentWorker;
+    private long taskId = 1;
 
     public SubMasterImpl(MasterIntern master, String originatorName, AOWorker parentWorker) {
         this.master = master;
@@ -67,11 +68,13 @@ public class SubMasterImpl implements SubMaster<Task<Serializable>, Serializable
     /**
     * {@inheritDoc}
     */
+
     public void solve(List<Task<Serializable>> tasks) {
         if (tasks.size() == 0) {
             throw new IllegalArgumentException("empty list");
         }
-        master.solveIntern(originatorName, tasks);
+        master.solveIntern(originatorName, -1, taskId, tasks);
+        taskId = taskId + tasks.size();
         initCalled = true;
     }
 

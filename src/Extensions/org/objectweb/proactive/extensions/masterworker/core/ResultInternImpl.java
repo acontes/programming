@@ -102,6 +102,13 @@ public class ResultInternImpl implements ResultIntern<Serializable> {
     /**
      * {@inheritDoc}
      */
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public Serializable getResult() {
         return result;
     }
