@@ -31,36 +31,40 @@
  */
 package org.objectweb.proactive.examples.masterworker;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Vector;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.extensions.masterworker.ProActiveMaster;
 import org.objectweb.proactive.extensions.masterworker.TaskException;
+import org.objectweb.proactive.extensions.masterworker.interfaces.DivisibleTask;
+import org.objectweb.proactive.extensions.masterworker.interfaces.SubMaster;
 import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
 import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
 import org.objectweb.proactive.api.PALifeCycle;
 
 
 public class PIExample {
-    public static final long NUMBER_OF_EXPERIENCES = 100;
-    public static final int NUMBER_OF_TASKS = 3;
+    public static final long NUMBER_OF_EXPERIENCES = 10000;
+    public static final int NUMBER_OF_TASKS = 10;
+    public static final int NUMBER_OF_DIVISIBLETASKS = 30;
 
     public static void main(String[] args) throws TaskException, ProActiveException {
 
         findOS();
         //@snippet-start masterworker_montecarlopi_master_creation
         // creation of the master
-        ProActiveMaster<ComputePIMonteCarlo, Long> master = new ProActiveMaster<ComputePIMonteCarlo, Long>();
+        ProActiveMaster<TestDivisibleTask, Long> master = new ProActiveMaster<TestDivisibleTask, Long>();
 
         // adding resources
         master.addResources(PIExample.class.getResource("MWApplication.xml"));
         //@snippet-end masterworker_montecarlopi_master_creation
         //@snippet-start masterworker_montecarlopi_tasks_submit
         // defining tasks
-        Vector<ComputePIMonteCarlo> tasks = new Vector<ComputePIMonteCarlo>();
+        Vector<TestDivisibleTask> tasks = new Vector<TestDivisibleTask>();
         for (int i = 0; i < NUMBER_OF_TASKS; i++) {
-            tasks.add(new ComputePIMonteCarlo());
+            tasks.add(new TestDivisibleTask(NUMBER_OF_DIVISIBLETASKS));
         }
 
         // adding tasks to the queue
@@ -77,9 +81,10 @@ public class PIExample {
             sumSuccesses += successes;
         }
 
-        double pi = (4 * sumSuccesses) / ((double) NUMBER_OF_EXPERIENCES * NUMBER_OF_TASKS);
+        double pi = (4 * sumSuccesses) /
+            ((double) NUMBER_OF_EXPERIENCES * NUMBER_OF_TASKS * NUMBER_OF_DIVISIBLETASKS);
 
-        System.out.println("Computed PI by Monte-Carlo method : " + pi);
+        System.out.println("\nComputed PI by Monte-Carlo method : " + pi);
         //@snippet-end masterworker_montecarlopi_results
         //@snippet-start masterworker_montecarlopi_terminate
         master.terminate(true);
@@ -96,6 +101,60 @@ public class PIExample {
         } else {
             System.setProperty("os", "unix");
         }
+    }
+
+    //@snippet-start masterworker_montecarlopi
+    /**
+     * Task which creates randomly a set of points belonging to the [0, 1[x[0, 1[ interval<br>
+     * and tests how many points are inside the uniter circle.
+     * @author The ProActive Team
+     *
+     */
+    public static class TestDivisibleTask implements DivisibleTask<Long> {
+
+        /**
+         *
+         */
+
+        private int taskNum;
+
+        public TestDivisibleTask() {
+        }
+
+        public TestDivisibleTask(int taskNum) {
+            this.taskNum = taskNum;
+        }
+
+        public Long run(WorkerMemory memory, SubMaster master) throws Exception {
+            Vector<ComputePIMonteCarlo> tasks = new Vector<ComputePIMonteCarlo>();
+            for (int i = 0; i < taskNum; i++) {
+                tasks.add(new ComputePIMonteCarlo());
+            }
+
+            // adding tasks to the queue
+            master.solve(tasks);
+            //@snippet-end masterworker_montecarlopi_tasks_submit
+            //@snippet-start masterworker_montecarlopi_results
+            // waiting for results
+            List<Long> successesList = master.waitAllResults();
+
+            // computing PI using the results
+            long sumSuccesses = 0;
+
+            for (long successes : successesList) {
+                sumSuccesses += successes;
+            }
+
+            System.out.println("\nThe divisible task output is : " + sumSuccesses);
+            return sumSuccesses;
+            //@snippet-end masterworker_montecarlopi_terminate
+        }
+
+        public Long run(WorkerMemory memory) throws Exception {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException();
+        }
+
     }
 
     //@snippet-start masterworker_montecarlopi
