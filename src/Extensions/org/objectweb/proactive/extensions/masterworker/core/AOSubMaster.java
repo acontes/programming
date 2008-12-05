@@ -31,6 +31,7 @@ import org.objectweb.proactive.core.body.request.RequestFilter;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
+import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -217,7 +218,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
 
         // Workers
         try {
-            String workerClassName = AOSubWorker.class.getName();
+            String workerClassName = Worker.class.getName();
             // Worker Group
             workerGroupStub = (Worker) PAGroup.newGroup(workerClassName);
             workerGroup = PAGroup.getGroup(workerGroupStub);
@@ -1370,5 +1371,5 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException();
     }
-
+    
 }

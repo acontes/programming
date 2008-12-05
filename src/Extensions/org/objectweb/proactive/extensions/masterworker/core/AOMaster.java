@@ -297,6 +297,9 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
         }
 
         if (emptyPending()) {
+        	if (debug) {
+                logger.debug("Add worker " + workerName + " to sleeping group");
+            }
             // We say that the worker is sleeping if we don't know it yet or if it's not doing a task
             if (workersActivity.containsKey(workerName)) {
                 // If the worker requests a flooding this means that its penqing queue is empty,
@@ -391,7 +394,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
 
         // Workers
         try {
-            String workerClassName = AOWorker.class.getName();
+            String workerClassName = Worker.class.getName();
             // Worker Group
             workerGroupStub = (Worker) PAGroup.newGroup(workerClassName);
             workerGroup = PAGroup.getGroup(workerGroupStub);
