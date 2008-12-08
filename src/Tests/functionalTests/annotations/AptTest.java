@@ -39,6 +39,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.junit.Ignore;
+import org.objectweb.proactive.extensions.annotation.common.ProActiveAnnotationProcessorFactory;
 
 import functionalTests.FunctionalTest;
 import org.objectweb.proactive.extensions.annotation.common.ProActiveAnnotationProcessorFactory;

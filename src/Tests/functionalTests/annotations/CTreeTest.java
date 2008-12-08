@@ -53,6 +53,7 @@ import javax.tools.JavaFileObject.Kind;
 
 import org.objectweb.proactive.extensions.annotation.common.ProActiveProcessorCTree;
 import org.junit.Ignore;
+import org.objectweb.proactive.extensions.annotation.common.ProActiveProcessorCTree;
 
 
 /**

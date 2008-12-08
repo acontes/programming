@@ -3,7 +3,7 @@ package functionalTests.annotations.activeobject.inputs;
 import java.io.Serializable;
 import java.util.List;
 
-import org.objectweb.proactive.extensions.annotation.activeobject.ActiveObject;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 
 
 @ActiveObject
