@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="Migration">
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="Annotations">
 	<info><title>Making ProActive programming easier: the ProActive Java Annotations System</title></info>
 	
 	<section><info><title>Annotation Overview</title></info>
@@ -286,9 +286,4 @@
 		</para>
 		</section>
 	</section>
-	
-	<section><info><title>Run-time annotations</title></info>
-		<para>TODO</para>
-	</section>
-	
 </chapter>
