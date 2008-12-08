@@ -2,6 +2,7 @@ package org.objectweb.proactive.extensions.masterworker.core;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
@@ -42,8 +43,8 @@ public class AOSubWorker extends AOWorker implements WorkerPeer {
     /**
      * workerpeers deployed so far
      */
-    private Map<Long, WorkerPeer> workerpeerlist;
-    private Map<Long, String> workernamelist;
+    private HashMap<Long, WorkerPeer> workerpeerlist;
+    private HashMap<Long, String> workernamelist;
 
     public AOSubWorker() {
 
@@ -170,21 +171,26 @@ public class AOSubWorker extends AOWorker implements WorkerPeer {
     }
 
     public void clear() {
-        pendingTasks.clear();
-        pendingTasksFutures.clear();
-
+        if (debug) {
+            logger.debug("Worker " + name + " is clearing...");
+        }
         workerpeerlist.clear();
         workernamelist.clear();
 
-        Service service = new Service(PAActiveObject.getBodyOnThis());
-        service.flushAll();
-        provider.isCleared(stubOnThis);
+        super.clear();
+        if (debug) {
+            logger.debug("Worker " + name + " is cleared...");
+        }
     }
 
     public void initActivity(Body body) {
         // TODO Auto-generated method stub
 
         stubOnThis = (AOSubWorker) PAActiveObject.getStubOnThis();
+
+        workerpeerlist = new HashMap<Long, WorkerPeer>();
+        workernamelist = new HashMap<Long, String>();
+
         body.setImmediateService("addWorkerPeer");
         body.setImmediateService("canBeSubMaster");
         body.setImmediateService("iAmSubmaster");

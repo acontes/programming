@@ -297,19 +297,28 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
         }
 
         if (emptyPending()) {
-        	if (debug) {
-                logger.debug("Add worker " + workerName + " to sleeping group");
-            }
+
             // We say that the worker is sleeping if we don't know it yet or if it's not doing a task
             if (workersActivity.containsKey(workerName)) {
                 // If the worker requests a flooding this means that its penqing queue is empty,
                 // thus, it will sleep
                 if (flooding > 0) {
-                    sleepingGroup.add(worker);
+                    if (!sleepingGroup.contains(worker)) {
+                        if (debug) {
+                            logger.debug("Add worker " + workerName + " to sleeping group");
+                        }
+                        sleepingGroup.add(worker);
+                    }
+
                 }
             } else {
                 workersActivity.put(workerName, new HashSet<Long>());
-                sleepingGroup.add(worker);
+                if (!sleepingGroup.contains(worker)) {
+                    if (debug) {
+                        logger.debug("Add worker " + workerName + " to sleeping group");
+                    }
+                    sleepingGroup.add(worker);
+                }
             }
             if (debug) {
                 logger.debug("No task given to " + workerName);
@@ -1022,7 +1031,12 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
         sleepingGroup.clear();
         // We clear the repository
         repository.clear();
+        // We clear the idMap
+        idMap.clear();
         isClearing = true;
+        if (debug) {
+            logger.debug("Master is cleared...");
+        }
     }
 
     /** {@inheritDoc} */
@@ -1243,6 +1257,9 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
 
     protected BooleanWrapper secondTerminate(final boolean freeResources) {
 
+        if (debug) {
+            logger.debug("SencondTerminate of Master...");
+        }
         // We empty pending queues
         pendingTasks.clear();
         launchedTasks.clear();
@@ -1263,6 +1280,9 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
 
         terminating = true;
 
+        if (debug) {
+            logger.debug("SencondTerminate of Master finished...");
+        }
         return new BooleanWrapper(true);
     }
 

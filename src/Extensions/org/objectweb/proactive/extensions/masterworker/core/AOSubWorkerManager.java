@@ -216,7 +216,7 @@ public class AOSubWorkerManager implements WorkerManager, InitActive, Serializab
 
             return new BooleanWrapper(true);
         } catch (Exception e) {
-            logger.error("Couldn't Terminate the Resource manager");
+            logger.error("Couldn't Terminate the Resource manager of the submaster");
             e.printStackTrace();
             return new BooleanWrapper(false);
         }

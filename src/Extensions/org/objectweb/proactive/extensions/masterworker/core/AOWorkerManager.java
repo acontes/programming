@@ -294,6 +294,8 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
                                 node);
 
                         subMasters.put(topologyId, subMaster);
+                        // Add the submaster to worker group
+                        workers.put(workername, subMaster);
                         subGroupSizes.put(topologyId, 0);
 
                         if (debug) {
@@ -456,12 +458,17 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
             // we wait that all threads creating active objects finish
             threadPool.awaitTermination(120, TimeUnit.SECONDS);
 
+            if (debug) {
+                logger.debug("Ask for terminating submamster ");
+            }
             // we send the terminate message to every thread
             for (Entry<String, Worker> worker : workers.entrySet()) {
                 String workerName = worker.getKey();
                 try {
                     BooleanWrapper term = worker.getValue().terminate();
+
                     // as it is a termination algorithm we wait a bit, but not forever
+                    Thread.sleep(100);
                     PAFuture.waitFor(term);
 
                     if (debug) {
@@ -473,6 +480,7 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
                     }
                 }
             }
+
             // if the user asked it, we also release the resources, by killing all JVMs
             if (freeResources) {
 

@@ -313,7 +313,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         int flooding_value = Master.DEFAULT_SubMaster_TASK_FLOODING;
 
         // Ask a task flooding for sleeping workers
-        if (sleepingGroup.size() > 1)
+        if (sleepingGroup.size() >= 1)
             flooding_value = flooding_value + sleepingGroup.size() * Master.DEFAULT_TASK_FLOODING;
 
         newTasks = provider.getTasks(stubOnThis, name, flooding_value);
@@ -810,7 +810,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         // When every workers have answered the master will be declared "cleared" and it can starts its normal serving 
 
         if (debug) {
-            logger.debug("Master is clearing...");
+            logger.debug("SubMaster is clearing...");
         }
         // We clear the queues
         resultQueue.clear();
@@ -828,7 +828,14 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         // We clear every sleeping workers registered
         sleepingGroup.clear();
         // We clear the repository
+        taskIdCounters.clear();
+        // We clear the taskIdCounters
         isClearing = true;
+
+        provider.isCleared(stubOnThis);
+        if (debug) {
+            logger.debug("Submaster is cleared...");
+        }
     }
 
     public String getName() {
@@ -863,10 +870,9 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         clear();
 
         // then delay final termination
-        stubOnThis.secondTerminate(false);
+        stubOnThis.secondTerminate(true);
 
         return new BooleanWrapper(true);
-
     }
 
     public void wakeup() {
@@ -1154,6 +1160,9 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
 
     protected BooleanWrapper secondTerminate(final boolean freeResources) {
 
+        if (debug) {
+            logger.debug("SencondTerminate of Subaster...");
+        }
         // We empty pending queues
         pendingTasks.clear();
         launchedTasks.clear();
@@ -1172,6 +1181,9 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
 
         terminating = true;
 
+        if (debug) {
+            logger.debug("SencondTerminate of Subaster finished...");
+        }
         return new BooleanWrapper(true);
     }
 
@@ -1371,5 +1383,5 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException();
     }
-    
+
 }

@@ -65,7 +65,7 @@ public class AOPinger implements WorkerWatcher, RunActive, InitActive, Serializa
      */
 
     /** pinger log4j logger */
-    private static final Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER_WORKERS);
+    private static final Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER_PINGER);
     private static final boolean debug = logger.isDebugEnabled();
 
     /** Stub on the active object */
