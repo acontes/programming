@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.annotation;
+package org.objectweb.proactive.extensions.annotation.common;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
@@ -47,19 +47,19 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 
-import org.objectweb.proactive.extensions.annotation.activeobject.ActiveObject;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
+import org.objectweb.proactive.extensions.annotation.MigrationSignal;
+import org.objectweb.proactive.extensions.annotation.NodeAttachmentCallback;
+import org.objectweb.proactive.extensions.annotation.OnArrival;
+import org.objectweb.proactive.extensions.annotation.OnDeparture;
+import org.objectweb.proactive.extensions.annotation.RemoteObject;
+import org.objectweb.proactive.extensions.annotation.VirtualNodeIsReadyCallback;
 import org.objectweb.proactive.extensions.annotation.activeobject.ActiveObjectVisitorCTree;
-import org.objectweb.proactive.extensions.annotation.callbacks.isready.VirtualNodeIsReadyCallback;
 import org.objectweb.proactive.extensions.annotation.callbacks.isready.VirtualNodeIsReadyCallbackVisitorCTree;
-import org.objectweb.proactive.extensions.annotation.callbacks.nodeattachment.NodeAttachmentCallback;
 import org.objectweb.proactive.extensions.annotation.callbacks.nodeattachment.NodeAttachmentCallbackVisitorCTree;
-import org.objectweb.proactive.extensions.annotation.migration.signal.MigrationSignal;
 import org.objectweb.proactive.extensions.annotation.migration.signal.MigrationSignalVisitorCTree;
-import org.objectweb.proactive.extensions.annotation.migration.strategy.OnArrival;
 import org.objectweb.proactive.extensions.annotation.migration.strategy.OnArrivalVisitorCTree;
-import org.objectweb.proactive.extensions.annotation.migration.strategy.OnDeparture;
 import org.objectweb.proactive.extensions.annotation.migration.strategy.OnDepartureVisitorCTree;
-import org.objectweb.proactive.extensions.annotation.remoteobject.RemoteObject;
 import org.objectweb.proactive.extensions.annotation.remoteobject.RemoteObjectVisitorCTree;
 
 import com.sun.source.util.TreePathScanner;

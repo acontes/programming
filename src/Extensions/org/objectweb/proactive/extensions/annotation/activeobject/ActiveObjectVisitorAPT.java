@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.objectweb.proactive.extensions.annotation.ErrorMessages;
+import org.objectweb.proactive.extensions.annotation.common.ErrorMessages;
 
 import com.sun.mirror.apt.Messager;
 import com.sun.mirror.declaration.ClassDeclaration;
@@ -49,7 +49,7 @@ import com.sun.mirror.util.SourcePosition;
 
 /**
  * <p> This class implements a visitor for the ActiveObjectAnnotationProcessor, conforming to the Mirror API(jsr199)</p>
- * <p> It verifies whether a class declaration annotated with {@link org.objectweb.proactive.extensions.annotation.activeobject.ActiveObject}
+ * <p> It verifies whether a class declaration annotated with {@link org.objectweb.proactive.extensions.annotation.ActiveObject}
  * respects the rules specified <a href="http://confluence.activeeon.com/display/PROG/Feature+Compile+time+annotations">here</a></p>
  * @author fabratu
  * @version %G%, %I%

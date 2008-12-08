@@ -32,7 +32,7 @@ package org.objectweb.proactive.extensions.annotation.callbacks.isready;
 
 import java.util.Iterator;
 
-import org.objectweb.proactive.extensions.annotation.ErrorMessages;
+import org.objectweb.proactive.extensions.annotation.common.ErrorMessages;
 
 import com.sun.mirror.apt.Messager;
 import com.sun.mirror.declaration.Declaration;

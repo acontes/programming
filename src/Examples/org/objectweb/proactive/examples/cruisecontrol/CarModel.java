@@ -31,7 +31,7 @@
  */
 package org.objectweb.proactive.examples.cruisecontrol;
 
-import org.objectweb.proactive.extensions.annotation.activeobject.ActiveObject;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 
 
 /**

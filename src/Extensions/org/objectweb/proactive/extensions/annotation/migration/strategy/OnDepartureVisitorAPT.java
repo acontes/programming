@@ -30,7 +30,8 @@
  */
 package org.objectweb.proactive.extensions.annotation.migration.strategy;
 
-import org.objectweb.proactive.extensions.annotation.ErrorMessages;
+import org.objectweb.proactive.extensions.annotation.OnDeparture;
+import org.objectweb.proactive.extensions.annotation.common.ErrorMessages;
 
 import com.sun.mirror.apt.Messager;
 import com.sun.mirror.declaration.Declaration;

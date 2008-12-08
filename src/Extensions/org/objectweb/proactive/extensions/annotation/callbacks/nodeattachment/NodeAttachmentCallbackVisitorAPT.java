@@ -33,7 +33,7 @@ package org.objectweb.proactive.extensions.annotation.callbacks.nodeattachment;
 import java.util.Iterator;
 
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.extensions.annotation.ErrorMessages;
+import org.objectweb.proactive.extensions.annotation.common.ErrorMessages;
 
 import com.sun.mirror.apt.Messager;
 import com.sun.mirror.declaration.Declaration;

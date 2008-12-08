@@ -31,7 +31,7 @@
  */
 package org.objectweb.proactive.examples.plugtest;
 
-import org.objectweb.proactive.extensions.annotation.activeobject.ActiveObject;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 
 
 /**

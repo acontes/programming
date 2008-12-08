@@ -1,4 +1,4 @@
-package org.objectweb.proactive.extensions.annotation;
+package org.objectweb.proactive.extensions.annotation.common;
 
 /*
  * ################################################################

@@ -32,6 +32,8 @@ package org.objectweb.proactive.extensions.annotation.migration.strategy;
 
 import javax.annotation.processing.ProcessingEnvironment;
 
+import org.objectweb.proactive.extensions.annotation.OnArrival;
+
 
 /**
  * @author fabratu

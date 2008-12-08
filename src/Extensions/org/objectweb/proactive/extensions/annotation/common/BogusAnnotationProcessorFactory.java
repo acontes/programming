@@ -28,13 +28,14 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.annotation;
+package org.objectweb.proactive.extensions.annotation.common;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Set;
+
+import org.objectweb.proactive.extensions.annotation.common.BogusAnnotationProcessor;
 
 import com.sun.mirror.apt.AnnotationProcessor;
 import com.sun.mirror.apt.AnnotationProcessorEnvironment;

@@ -39,8 +39,8 @@ import org.objectweb.proactive.examples.webservices.c3dWS.prim.Isect;
 import org.objectweb.proactive.examples.webservices.c3dWS.prim.Light;
 import org.objectweb.proactive.examples.webservices.c3dWS.prim.Primitive;
 import org.objectweb.proactive.examples.webservices.c3dWS.prim.Surface;
-import org.objectweb.proactive.extensions.annotation.activeobject.ActiveObject;
-import org.objectweb.proactive.extensions.annotation.migration.signal.MigrationSignal;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
+import org.objectweb.proactive.extensions.annotation.MigrationSignal;
 
 
 /**

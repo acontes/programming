@@ -37,7 +37,7 @@ import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extensions.annotation.activeobject.ActiveObject;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 
 
 /** This class sends increasing numbers to the first PrimeNumber for testing.

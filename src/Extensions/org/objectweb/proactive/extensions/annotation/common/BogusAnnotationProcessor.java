@@ -28,16 +28,27 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.annotation.callbacks.isready;
+package org.objectweb.proactive.extensions.annotation.common;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import com.sun.mirror.apt.AnnotationProcessor;
 
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface VirtualNodeIsReadyCallback {
-    String virtualNode() default "";
+/** This annotation processor processes the annotations provided by default
+ * whith JDK 1.5. This is needed in order to suppress the unnecessary warnings that
+ * apt generates for these default annotations.
+ * See also http://forums.sun.com/thread.jspa?threadID=5345947
+ * @author fabratu
+ * @version %G%, %I%
+ * @since ProActive 4.10
+ */
+
+public class BogusAnnotationProcessor implements AnnotationProcessor {
+
+    public BogusAnnotationProcessor() {
+    }
+
+    public void process() {
+        // nothing!
+    }
+
 }

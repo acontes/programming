@@ -37,7 +37,7 @@ import java.util.List;
 
 import org.objectweb.proactive.examples.nbody.common.Cube;
 import org.objectweb.proactive.examples.nbody.common.Point3D;
-import org.objectweb.proactive.extensions.annotation.activeobject.ActiveObject;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 
 
 @ActiveObject

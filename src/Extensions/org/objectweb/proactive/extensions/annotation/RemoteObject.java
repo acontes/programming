@@ -1,4 +1,4 @@
-package org.objectweb.proactive.extensions.annotation.remoteobject;
+package org.objectweb.proactive.extensions.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

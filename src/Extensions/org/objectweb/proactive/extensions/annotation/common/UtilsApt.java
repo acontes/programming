@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.annotation;
+package org.objectweb.proactive.extensions.annotation.common;
 
 import java.lang.annotation.ElementType;
 

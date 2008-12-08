@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.extensions.annotation.migration.strategy;
 
+import org.objectweb.proactive.extensions.annotation.OnArrival;
+
 import com.sun.mirror.apt.Messager;
 
 

@@ -32,7 +32,7 @@
 package org.objectweb.proactive.examples.philosophers;
 
 import org.objectweb.proactive.ObjectForSynchronousCall;
-import org.objectweb.proactive.extensions.annotation.activeobject.ActiveObject;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 
 
 /**

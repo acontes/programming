@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.annotation;
+package org.objectweb.proactive.extensions.annotation.common;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
@@ -36,17 +36,18 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.objectweb.proactive.extensions.annotation.activeobject.ActiveObject;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
+import org.objectweb.proactive.extensions.annotation.NodeAttachmentCallback;
+import org.objectweb.proactive.extensions.annotation.OnArrival;
+import org.objectweb.proactive.extensions.annotation.OnDeparture;
+import org.objectweb.proactive.extensions.annotation.RemoteObject;
+import org.objectweb.proactive.extensions.annotation.VirtualNodeIsReadyCallback;
 import org.objectweb.proactive.extensions.annotation.activeobject.ActiveObjectVisitorAPT;
-import org.objectweb.proactive.extensions.annotation.migration.strategy.OnArrival;
-import org.objectweb.proactive.extensions.annotation.migration.strategy.OnArrivalVisitorAPT;
-import org.objectweb.proactive.extensions.annotation.callbacks.isready.VirtualNodeIsReadyCallback;
 import org.objectweb.proactive.extensions.annotation.callbacks.isready.VirtualNodeIsReadyCallbackVisitorAPT;
-import org.objectweb.proactive.extensions.annotation.callbacks.nodeattachment.NodeAttachmentCallback;
 import org.objectweb.proactive.extensions.annotation.callbacks.nodeattachment.NodeAttachmentCallbackVisitorAPT;
-import org.objectweb.proactive.extensions.annotation.migration.strategy.OnDeparture;
+import org.objectweb.proactive.extensions.annotation.common.UtilsApt;
+import org.objectweb.proactive.extensions.annotation.migration.strategy.OnArrivalVisitorAPT;
 import org.objectweb.proactive.extensions.annotation.migration.strategy.OnDepartureVisitorAPT;
-import org.objectweb.proactive.extensions.annotation.remoteobject.RemoteObject;
 import org.objectweb.proactive.extensions.annotation.remoteobject.RemoteObjectVisitorAPT;
 
 import com.sun.mirror.apt.AnnotationProcessor;
@@ -72,7 +73,7 @@ public class ProActiveProcessorApt implements AnnotationProcessor {
 
     private final AnnotationProcessorEnvironment _environment;
 
-    private final Map<Class, SimpleDeclarationVisitor> _annotationVisitors = new HashMap<Class, SimpleDeclarationVisitor>();
+    private final Map<Class<?>, SimpleDeclarationVisitor> _annotationVisitors = new HashMap<Class<?>, SimpleDeclarationVisitor>();
 
     public ProActiveProcessorApt(AnnotationProcessorEnvironment env) {
 
@@ -90,8 +91,8 @@ public class ProActiveProcessorApt implements AnnotationProcessor {
     }
 
     public void process() {
-        for (Entry<Class, SimpleDeclarationVisitor> av_pair : _annotationVisitors.entrySet()) {
-            Class annotation = av_pair.getKey();
+        for (Entry<Class<?>, SimpleDeclarationVisitor> av_pair : _annotationVisitors.entrySet()) {
+            Class<?> annotation = av_pair.getKey();
             String annotName = annotation.getName();
             AnnotationTypeDeclaration annotDeclaration = (AnnotationTypeDeclaration) _environment
                     .getTypeDeclaration(annotName);

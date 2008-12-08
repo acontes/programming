@@ -39,7 +39,7 @@ import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.examples.c3d.geom.Vec;
-import org.objectweb.proactive.extensions.annotation.activeobject.ActiveObject;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 
 
 /**

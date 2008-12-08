@@ -53,7 +53,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
 
-import org.objectweb.proactive.extensions.annotation.migration.signal.MigrationSignal;
+import org.objectweb.proactive.extensions.annotation.MigrationSignal;
 
 
 /**

@@ -38,7 +38,7 @@ import org.objectweb.proactive.examples.c3d.prim.Isect;
 import org.objectweb.proactive.examples.c3d.prim.Light;
 import org.objectweb.proactive.examples.c3d.prim.Surface;
 import org.objectweb.proactive.examples.c3d.prim.View;
-import org.objectweb.proactive.extensions.annotation.activeobject.ActiveObject;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 
 
 /**

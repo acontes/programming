@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.annotation.migration.strategy;
+package org.objectweb.proactive.extensions.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -37,11 +37,13 @@ import java.lang.annotation.Target;
 
 
 /**
+ * Annotation to check the signature of the method
+ * executed on the departure of a mobile agent
  * @author fabratu
  * @version %G%, %I%
  * @since ProActive 4.10
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.METHOD)
-public @interface OnArrival {
+public @interface OnDeparture {
 }

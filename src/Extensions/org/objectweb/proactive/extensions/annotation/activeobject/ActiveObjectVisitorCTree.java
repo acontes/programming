@@ -39,8 +39,8 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.tools.Diagnostic;
 
-import org.objectweb.proactive.extensions.annotation.ErrorMessages;
-import org.objectweb.proactive.extensions.annotation.migration.signal.MigrationSignal;
+import org.objectweb.proactive.extensions.annotation.MigrationSignal;
+import org.objectweb.proactive.extensions.annotation.common.ErrorMessages;
 
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.ExpressionTree;
@@ -58,7 +58,7 @@ import com.sun.source.util.Trees;
 
 /**
  * <p>This class implements a visitor for the ProActiveProcessor, according to the Pluggable Annotation Processing API(jsr269) specification</p>
- * <p> It verifies whether a class declaration annotated with {@link org.objectweb.proactive.extensions.annotation.activeobject.ActiveObject}</p>
+ * <p> It verifies whether a class declaration annotated with {@link org.objectweb.proactive.extensions.annotation.ActiveObject}</p>
  * <ul>
  *	<li>
  * has no methods that return null.

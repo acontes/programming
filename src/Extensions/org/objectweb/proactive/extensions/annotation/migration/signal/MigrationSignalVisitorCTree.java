@@ -48,7 +48,8 @@ import javax.tools.Diagnostic;
 
 import org.objectweb.proactive.api.PAMobileAgent;
 import org.objectweb.proactive.core.body.migration.MigrationException;
-import org.objectweb.proactive.extensions.annotation.ErrorMessages;
+import org.objectweb.proactive.extensions.annotation.MigrationSignal;
+import org.objectweb.proactive.extensions.annotation.common.ErrorMessages;
 
 import com.sun.source.tree.BlockTree;
 import com.sun.source.tree.CaseTree;
@@ -463,7 +464,7 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void, Trees> {
         return false;
     }
 
-    private boolean isSimpleNameMigrationException(String clazzName, Class excpClass) {
+    private boolean isSimpleNameMigrationException(String clazzName, Class<?> excpClass) {
         if (excpClass.getSimpleName().equals(clazzName))
             return true;
         if (excpClass.getSuperclass() == null)
@@ -471,7 +472,7 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void, Trees> {
         return isSimpleNameMigrationException(clazzName, excpClass.getSuperclass());
     }
 
-    private boolean isNameMigrationException(String clazzName, Class excpClass) {
+    private boolean isNameMigrationException(String clazzName, Class<?> excpClass) {
         if (excpClass.getName().equals(clazzName))
             return true;
         if (excpClass.getSuperclass() == null)

@@ -35,7 +35,7 @@ import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.type.TypeKind;
 import javax.tools.Diagnostic;
 
-import org.objectweb.proactive.extensions.annotation.ErrorMessages;
+import org.objectweb.proactive.extensions.annotation.common.ErrorMessages;
 
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.PrimitiveTypeTree;

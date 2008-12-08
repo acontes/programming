@@ -32,7 +32,7 @@
 //@snippet-start fullCMA
 package org.objectweb.proactive.examples.userguide.cmagent.simple;
 
-import org.objectweb.proactive.extensions.annotation.activeobject.ActiveObject;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 
 
 @ActiveObject

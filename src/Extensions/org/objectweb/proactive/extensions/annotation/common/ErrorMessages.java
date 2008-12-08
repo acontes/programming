@@ -28,10 +28,10 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.annotation;
+package org.objectweb.proactive.extensions.annotation.common;
 
-import org.objectweb.proactive.extensions.annotation.activeobject.ActiveObject;
-import org.objectweb.proactive.extensions.annotation.migration.signal.MigrationSignal;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
+import org.objectweb.proactive.extensions.annotation.MigrationSignal;
 
 
 /**

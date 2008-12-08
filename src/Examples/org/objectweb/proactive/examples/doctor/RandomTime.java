@@ -33,7 +33,7 @@ package org.objectweb.proactive.examples.doctor;
 
 import java.util.Random;
 
-import org.objectweb.proactive.extensions.annotation.activeobject.ActiveObject;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 
 
 @ActiveObject
