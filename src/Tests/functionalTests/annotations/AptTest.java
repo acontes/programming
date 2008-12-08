@@ -42,7 +42,6 @@ import org.junit.Ignore;
 import org.objectweb.proactive.extensions.annotation.common.ProActiveAnnotationProcessorFactory;
 
 import functionalTests.FunctionalTest;
-import org.objectweb.proactive.extensions.annotation.common.ProActiveAnnotationProcessorFactory;
 
 
 /**

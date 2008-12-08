@@ -1,10 +1,8 @@
 package functionalTests.annotations.migrationsignal.inputs;
 
-import java.awt.event.ActionEvent;
-
 import org.objectweb.proactive.api.PAMobileAgent;
 import org.objectweb.proactive.core.body.migration.MigrationException;
-import org.objectweb.proactive.extensions.annotation.migration.signal.MigrationSignal;
+import org.objectweb.proactive.extensions.annotation.MigrationSignal;
 
 
 // this is inspired from src/Examples/org/objectweb/proactive/examples/chat/ChatGUI.java

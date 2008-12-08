@@ -1,6 +1,6 @@
 package functionalTests.annotations.remoteobject.inputs;
 
-import org.objectweb.proactive.extensions.annotation.remoteobject.RemoteObject;
+import org.objectweb.proactive.extensions.annotation.RemoteObject;
 
 
 // 1 warning - constructor is not empty

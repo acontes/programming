@@ -2,7 +2,7 @@ package functionalTests.annotations.migrationsignal.inputs;
 
 import org.objectweb.proactive.api.PAMobileAgent;
 import org.objectweb.proactive.core.body.migration.MigrationException;
-import org.objectweb.proactive.extensions.annotation.migration.signal.MigrationSignal;
+import org.objectweb.proactive.extensions.annotation.MigrationSignal;
 
 
 public class ErrorNotInActiveObject {

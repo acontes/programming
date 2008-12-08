@@ -1,7 +1,7 @@
 package functionalTests.annotations.migrationstrategy.inputs;
 
-import org.objectweb.proactive.extensions.annotation.migration.strategy.OnArrival;
-import org.objectweb.proactive.extensions.annotation.migration.strategy.OnDeparture;
+import org.objectweb.proactive.extensions.annotation.OnArrival;
+import org.objectweb.proactive.extensions.annotation.OnDeparture;
 
 
 public class ErrorReturnType {

@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
-import org.objectweb.proactive.extensions.annotation.remoteobject.RemoteObject;
+import org.objectweb.proactive.extensions.annotation.RemoteObject;
 
 
 @RemoteObject

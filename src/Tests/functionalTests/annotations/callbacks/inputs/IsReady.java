@@ -1,6 +1,6 @@
 package functionalTests.annotations.callbacks.inputs;
 
-import org.objectweb.proactive.extensions.annotation.callbacks.isready.VirtualNodeIsReadyCallback;
+import org.objectweb.proactive.extensions.annotation.VirtualNodeIsReadyCallback;
 
 
 // correct signature "void method(String virtualNodeName)"
