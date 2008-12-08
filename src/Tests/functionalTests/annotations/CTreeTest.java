@@ -51,6 +51,7 @@ import javax.tools.ToolProvider;
 import javax.tools.JavaCompiler.CompilationTask;
 import javax.tools.JavaFileObject.Kind;
 
+import org.objectweb.proactive.extensions.annotation.common.ProActiveProcessorCTree;
 import org.junit.Ignore;
 
 

@@ -41,7 +41,7 @@ import java.util.regex.Pattern;
 import org.junit.Ignore;
 
 import functionalTests.FunctionalTest;
-
+import org.objectweb.proactive.extensions.annotation.common.ProActiveAnnotationProcessorFactory;
 
 /**
  * Root class for tests for annotation implemented using apt + the Mirror API
