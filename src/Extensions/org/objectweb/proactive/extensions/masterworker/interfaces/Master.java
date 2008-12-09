@@ -62,8 +62,6 @@ public interface Master<T extends Task<R>, R extends Serializable> extends SubMa
 
     public final int DEFAULT_SubGroup_Size = 5;
 
-    public final int DEFAULT_SubMaster_TASK_FLOODING = DEFAULT_TASK_FLOODING * DEFAULT_TASK_FLOODING;
-
     // please keep the resource adding methods inside the tags
     // they are used in the documentation
     //@snippet-start masterworker_addresources

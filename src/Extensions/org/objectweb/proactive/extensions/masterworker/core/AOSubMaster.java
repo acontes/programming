@@ -185,7 +185,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         }
 
         smanager.addResources(nodes);
-        getTasksIntern();
+        getTasksIntern(1);
         groupSize++;
     }
 
@@ -318,15 +318,13 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         }
         try {
             Queue<TaskIntern<Serializable>> newTasks;
-            int flooding_value = Master.DEFAULT_SubMaster_TASK_FLOODING;
+            int flooding_value = initial_task_flooding;
 
             // Ask a task flooding for sleeping workers
-            if (sleepingGroup.size() >= 1)
-                flooding_value = flooding_value + sleepingGroup.size() * Master.DEFAULT_TASK_FLOODING;
+            if (sleepingGroup.size() > 0)
+                flooding_value = flooding_value + sleepingGroup.size();
 
-            newTasks = provider.getTasks(stubOnThis, name, flooding_value);
-
-            pendingTasks.addAll(newTasks);
+            getTasksIntern(flooding_value);
         } catch (SendRequestCommunicationException exp) {
             if (debug) {
                 logger.debug("Master has already been freed.");
@@ -338,30 +336,12 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         if (debug) {
             logger.debug("Submaster " + name + " ask for new tasks from big master");
         }
-        getTasksIntern();
-        return getTasksInternal(worker, workerName, flooding);
+        getTasksIntern(flooding);
+        return getTasksInternal(worker, workerName, 1, flooding);
     }
 
-    private int getFloodingValue(int flooding) {
-        int flooding_value = 0;
-        switch (flooding) {
-            case 1: {
-                flooding_value = initial_task_flooding;
-                break;
-            }
-            case 0: {
-                flooding_value = 1;
-                break;
-            }
-            default: {
-                flooding_value = flooding;
-                break;
-            }
-        }
-        return flooding_value;
-    }
-
-    public Queue<TaskIntern<Serializable>> getTasksInternal(Worker worker, String workerName, int flooding) {
+    public Queue<TaskIntern<Serializable>> getTasksInternal(Worker worker, String workerName,
+            final int resultSize, int flooding) {
         // TODO Auto-generated method stub
         // if we don't know him, we record the worker in our system
         if (!workersByName.containsKey(workerName)) {
@@ -380,14 +360,22 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             if (workersActivity.containsKey(workerName)) {
                 // If the worker requests a flooding this means that its penqing queue is empty,
                 // thus, it will sleep
-                if (flooding > 0) {
+                if (flooding == 1) {
                     if (!sleepingGroup.contains(worker)) {
+                        if (debug) {
+                            logger.debug("Add worker " + workerName + " to sleeping group");
+                        }
                         sleepingGroup.add(worker);
                     }
                 }
             } else {
                 workersActivity.put(workerName, new HashSet<Long>());
-                sleepingGroup.add(worker);
+                if (!sleepingGroup.contains(worker)) {
+                    if (debug) {
+                        logger.debug("Add worker " + workerName + " to sleeping group");
+                    }
+                    sleepingGroup.add(worker);
+                }
             }
             if (debug) {
                 logger.debug("No task given to " + workerName);
@@ -401,7 +389,11 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             Queue<TaskIntern<Serializable>> tasksToDo = new LinkedList<TaskIntern<Serializable>>();
 
             // If we are in a flooding scenario, we send at most initial_task_flooding tasks
-            int flooding_value = getFloodingValue(flooding);
+            int flooding_value = 0;
+            if (flooding > 0)
+                flooding_value = resultSize + flooding * initial_task_flooding - 1;
+            else
+                flooding_value = resultSize + flooding * initial_task_flooding;
             int i = 0;
             while (!pendingTasks.isEmpty() && i < flooding_value) {
                 TaskIntern<Serializable> task = pendingTasks.poll();
@@ -521,21 +513,17 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         return new BooleanWrapper(true);
     }
 
-    private void sendResultsAndGetTasksIntern() {
+    private void getTasksWithResults() {
         if (!terminating) {
             try {
                 if (resultQueue.countAvailableResults() > 0) {
                     Queue<TaskIntern<Serializable>> tasksToAdd = null;
-                    List<ResultIntern<Serializable>> results = resultQueue.getNextK(resultQueue
-                            .countAvailableResults());
-                    int flooding_value = results.size();
 
-                    if (flooding_value == 1)
-                        flooding_value = 0;
-
-                    if (pendingTasks.size() == 0)
-                        flooding_value = 1;
-                    tasksToAdd = provider.sendResultsAndGetTasks(results, name, flooding_value);
+                    int flooding = 0;
+                    if (pendingTasks.size() == 0 && flooding < 1)
+                        flooding = 1;
+                    tasksToAdd = provider.sendResultsAndGetTasks(resultQueue.getNextK(resultQueue
+                            .countAvailableResults()), name, flooding);
                     PAEventProgramming.addActionOnFuture(tasksToAdd, "addTasksToPengding");
                 }
             } catch (SendRequestCommunicationException exp) {
@@ -546,12 +534,14 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         }
     }
 
-    private void getTasksIntern() {
+    private void getTasksIntern(int flooding) {
         if (!terminating) {
             Queue<TaskIntern<Serializable>> tasksToAdd = null;
-            int flooding_value = 1;
+
+            if (pendingTasks.size() == 0 && flooding < 1)
+                flooding = 1;
             try {
-                tasksToAdd = provider.getTasks(stubOnThis, name, flooding_value);
+                tasksToAdd = provider.getTasks(stubOnThis, name, flooding);
                 PAEventProgramming.addActionOnFuture(tasksToAdd, "addTasksToPengding");
             } catch (SendRequestCommunicationException exp) {
                 if (debug) {
@@ -606,7 +596,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             }
             workersByName.remove(workerName);
         }
-        return getTasksInternal(worker, workerName, flooding);
+        return getTasksInternal(worker, workerName, 1, flooding);
     }
 
     public BooleanWrapper sendResults(List<ResultIntern<Serializable>> results, String workerName) {
@@ -630,7 +620,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             // We do this by removing the worker from our database, which will trigger that it will be recorded again
             workersByName.remove(workerName);
         }
-        return getTasksInternal(worker, workerName, flooding);
+        return getTasksInternal(worker, workerName, results.size(), flooding);
     }
 
     public int countAvailableResults(String originatorName) throws IsClearingError {
@@ -760,7 +750,12 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         taskIdCounters.put(divisibleTaskId, taskIdCounter);
 
         // Ask the provider to solve, the divisibleTaskIdObj should be passed as a argument
-        provider.solveIntern(originatorName, divisibleTaskId, taskIdCounter, tasks);
+        try {
+            provider.solveIntern(originatorName, divisibleTaskId, taskIdCounter, tasks);
+        } catch (IsClearingError ex) {
+            // It happened when the master is cleaning, he cleaned all the tasks
+            clearingCallFromSpawnedWorker(originatorName);
+        }
     }
 
     public List<Serializable> waitAllResults(String originatorName) throws TaskException, IsClearingError {
@@ -961,6 +956,9 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             }
             // Initial Task
             stubOnThis.getIntialTasks();
+            if (debug) {
+                logger.debug("Sleeping group size is:" + sleepingGroup.size());
+            }
             sleepingGroupStub.wakeup();
         }
     }
@@ -999,7 +997,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
                         maybeServePending(service);
 
                         // Send results back to main master and get new tasks
-                        sendResultsAndGetTasksIntern();
+                        getTasksWithResults();
                     }
                 }
 
@@ -1072,7 +1070,11 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             //                logger.debug("\nCleared worker size is:" + clearedWorkers.size() + "\nworkergroup size is:" + workerGroup.size() + "\nspawnedWorkers size is:" + spawnedWorkerNames.size());
             //            }
             if (clearedWorkers.size() == workerGroup.size() + spawnedWorkerNames.size()) {
-                sleepingGroup.addAll(clearedWorkers);
+                for (Worker worker : clearedWorkers) {
+                    if (!sleepingGroup.contains(worker))
+                        sleepingGroup.add(worker);
+                }
+
                 isClearing = false;
                 clearedWorkers.clear();
                 break;
@@ -1200,11 +1202,15 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
      * @throws IsClearingError to notify that it's clearing
      */
     private void clearingCallFromSpawnedWorker(String originator) throws IsClearingError {
-        if (debug) {
-            logger.debug(originator + " is cleared");
+        if (workersActivity.containsKey(originator))
+            workersActivity.remove(originator);
+        if (spawnedWorkerNames.contains(originator)) {
+            if (debug) {
+                logger.debug(originator + " is cleared");
+            }
+            spawnedWorkerNames.remove(originator);
         }
-        workersActivity.remove(originator);
-        spawnedWorkerNames.remove(originator);
+
         throw new IsClearingError();
     }
 

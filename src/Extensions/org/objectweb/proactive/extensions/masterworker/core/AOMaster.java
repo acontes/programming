@@ -263,28 +263,9 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
         return pendingTasks.isEmpty();
     }
 
-    private int getFloodingValue(int flooding) {
-        int flooding_value = 0;
-        switch (flooding) {
-            case 1: {
-                flooding_value = initial_task_flooding;
-                break;
-            }
-            case 0: {
-                flooding_value = 1;
-                break;
-            }
-            default: {
-                flooding_value = flooding;
-                break;
-            }
-        }
-        return flooding_value;
-    }
-
     @SuppressWarnings("unchecked")
     private Queue<TaskIntern<Serializable>> getTasksInternal(final Worker worker, final String workerName,
-            int flooding) {
+            final int resultSize, int flooding) {
         // if we don't know him, we record the worker in our system
         if (!workersByName.containsKey(workerName)) {
             if (debug) {
@@ -333,8 +314,11 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
             Queue<TaskIntern<Serializable>> tasksToDo = new LinkedList<TaskIntern<Serializable>>();
 
             // If we are in a flooding scenario, we send at most initial_task_flooding tasks
-
-            int flooding_value = getFloodingValue(flooding);
+            int flooding_value = 0;
+            if (flooding > 0)
+                flooding_value = resultSize + flooding * initial_task_flooding - 1;
+            else
+                flooding_value = resultSize + flooding * initial_task_flooding;
 
             int i = 0;
             while (!pendingTasks.isEmpty() && i < flooding_value) {
@@ -375,7 +359,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
     /** {@inheritDoc} */
     @SuppressWarnings("unchecked")
     public Queue<TaskIntern<Serializable>> getTasks(final Worker worker, final String workerName, int flooding) {
-        return getTasksInternal(worker, workerName, flooding);
+        return getTasksInternal(worker, workerName, 1, flooding);
     }
 
     /** {@inheritDoc} */
@@ -785,7 +769,11 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
                 service.serveOldest(clearingFilter);
             }
             if (clearedWorkers.size() == workerGroup.size() + spawnedWorkerNames.size()) {
-                sleepingGroup.addAll(clearedWorkers);
+                for (Worker worker : clearedWorkers) {
+                    if (!sleepingGroup.contains(worker))
+                        sleepingGroup.add(worker);
+                }
+
                 isClearing = false;
                 clearedWorkers.clear();
                 break;
@@ -814,7 +802,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
             // We do this by removing the worker from our database, which will trigger that it will be recorded again
             workersByName.remove(originatorName);
         }
-        return getTasksInternal(worker, originatorName, flooding);
+        return getTasksInternal(worker, originatorName, 1, flooding);
     }
 
     /** {@inheritDoc} */
@@ -898,7 +886,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
             // We do this by removing the worker from our database, which will trigger that it will be recorded again
             workersByName.remove(workerName);
         }
-        return getTasksInternal(worker, workerName, flooding);
+        return getTasksInternal(worker, workerName, results.size(), flooding);
     }
 
     /** {@inheritDoc} */
@@ -1228,11 +1216,15 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
      * @throws IsClearingError to notify that it's clearing
      */
     private void clearingCallFromSpawnedWorker(String originator) throws IsClearingError {
-        if (debug) {
-            logger.debug(originator + " is cleared");
+        if (workersActivity.containsKey(originator))
+            workersActivity.remove(originator);
+        if (spawnedWorkerNames.contains(originator)) {
+            if (debug) {
+                logger.debug(originator + " is cleared");
+            }
+            spawnedWorkerNames.remove(originator);
         }
-        workersActivity.remove(originator);
-        spawnedWorkerNames.remove(originator);
+
         throw new IsClearingError();
     }
 
