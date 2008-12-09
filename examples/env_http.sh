@@ -6,7 +6,7 @@
 
 CLASSPATH=.
 
-# User environment variable
+# User envrionment variable
 if [ ! -z "$PROACTIVE_HOME" ] ; then
 	PROACTIVE=$PROACTIVE_HOME
 fi
@@ -38,8 +38,7 @@ fi
 # Set up the classpath using classes dir or jar files
 #
 
-# Test if classes exists and is not empty
-if [ -d $PROACTIVE/classes/Core ]
+if [ -d $PROACTIVE/classes ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/classes/Core
     CLASSPATH=$CLASSPATH:$PROACTIVE/classes/Extensions
@@ -56,10 +55,9 @@ then
 else
     CLASSPATH=$CLASSPATH:$PROACTIVE/dist/lib/ProActive.jar
     CLASSPATH=$CLASSPATH:$PROACTIVE/dist/lib/ProActive_examples.jar
-    CLASSPATH=$CLASSPATH:$PROACTIVE/dist/lib/ibis-1.4.jar:$PROACTIVE/dist/lib/ibis-connect-1.0.jar:$PROACTIVE/dist/lib/ibis-util-1.0.jar
 fi
 
-echo "CLASSPATH"=$CLASSPATH
+#echo "CLASSPATH"=$CLASSPATH
 export CLASSPATH
 
 #    -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8066 \
@@ -68,6 +66,8 @@ JAVACMD=$JAVA_HOME/bin/java"\
 	-Djava.security.manager \
 	-Djava.security.policy=$PROACTIVE/examples/proactive.java.policy \
 	-Dlog4j.configuration=file:${PROACTIVE}/examples/proactive-log4j \
+	-Dproactive.communication.protocol=http \
+	-Dproactive.http.port=8080 \
 	-Dproactive.home=$PROACTIVE \
 	-Dos=unix"
 
