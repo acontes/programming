@@ -1,6 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <GCMApplication xmlns="urn:gcm:application:1.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<<<<<<< .mine
+	xsi:schemaLocation="urn:gcm:application:1.0 http://proactive.inria.fr/schemas/gcm/1.0/ApplicationDescriptorSchema.xsd">
+
+	<environment>
+		<javaPropertyVariable name="proactive.home" />
+		<javaPropertyVariable name="user.dir" />
+
+		<descriptorVariable name="hostCapacity" value="2"/>
+		<descriptorVariable name="vmCapacity" value="2"/>
+	</environment>
+
+
+	<application>
+		<proactive base="root" relpath="${proactive.home}">
+			<configuration>
+			<java base="root" relpath="/user/glaurent/home/jdk1.6.0/bin/java"/>
+				<applicationClasspath>
+					<pathElement base="root" relpath="/user/glaurent/home/workspace/amazon_ec2_integration/dist/lib/ProActive_examples.jar"/>
+					<pathElement base="root" relpath="/user/glaurent/home/workspace/amazon_ec2_integration/dist/lib/ibis-1.4.jar"/>
+					<pathElement base="root" relpath="/user/glaurent/home/workspace/amazon_ec2_integration/dist/lib/ibis-connect-1.0.jar"/>
+					<pathElement base="root" relpath="/user/glaurent/home/workspace/amazon_ec2_integration/dist/lib/ibis-util-1.0.jar"/>
+				</applicationClasspath>
+			</configuration>
+
+			<virtualNode id="Workers" capacity="2"/>
+		</proactive>
+
+	</application>
+
+	<resources>
+		<nodeProvider id="workers">
+			<file path="nasEON.xml" />
+		</nodeProvider>
+	</resources>
+</GCMApplication>
+=======
 	xsi:schemaLocation="urn:gcm:application:1.0 http://proactive.inria.fr/schemas/gcm/1.0/ApplicationDescriptorSchema.xsd">
 
 	<environment>
@@ -34,3 +70,4 @@
 		</nodeProvider>
 	</resources>
 </GCMApplication>
+>>>>>>> .r10757

@@ -7,6 +7,7 @@ then
 	CLASSPATH=.
 fi
 
+# . ${workingDir}/../env_http.sh
 . ${workingDir}/../env.sh
 
 default_class=S

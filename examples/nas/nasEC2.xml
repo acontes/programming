@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GCMDeployment xmlns="urn:gcm:deployment:1.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:gcm:deployment:1.0 http://proactive.inria.fr/schemas/gcm/1.0/ExtensionSchemas.xsd	">
+
+	<environment>
+		<!-- CHANGE THIS -->
+		<descriptorVariable name="HOST" value="localhost" />
+		<javaPropertyVariable name="user.dir" />
+		<javaPropertyVariable name="ec2.accessKeyId" />
+		<javaPropertyVariable name="ec2.secretAccessKey" />		
+	</environment>
+
+	<resources>
+		<group refid="remoteEC2">
+			<host refid="host" />
+		</group>
+	</resources>
+
+	<infrastructure>
+
+		<hosts>
+			<host id="host" os="unix" hostCapacity="8" vmCapacity="1">
+				<homeDirectory base="root" relpath="proactive" />
+			</host>
+
+		</hosts>
+
+		<groups>
+			<ec2Group id="remoteEC2">
+				<imageId>ami-6f7e9a06</imageId> 
+				<accessKeyId>${ec2.accessKeyId}</accessKeyId>
+				<secretAccessKey>${ec2.secretAccessKey}</secretAccessKey>
+			</ec2Group>				
+		</groups>
+
+
+	</infrastructure>
+</GCMDeployment>
