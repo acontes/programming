@@ -15,3 +15,14 @@ Eclipse-LazyStart: true
 Bundle-Vendor: ProActive
 Bundle-ClassPath: classes/,
  .
+Export-Package: org.objectweb.proactive.ic2d;
+  uses:="org.eclipse.jface.resource,
+   org.eclipse.ui.application,
+   org.eclipse.ui,
+   org.eclipse.ui.plugin,
+   org.osgi.service.url,
+   org.eclipse.jface.action,
+   org.objectweb.proactive.core.ssh.httpssh,
+   org.eclipse.equinox.app,
+   org.osgi.framework",
+ org.objectweb.proactive.ic2d.actions;uses:="org.eclipse.jface.action,org.eclipse.ui,org.eclipse.jface.viewers"
