@@ -3,39 +3,29 @@
 <chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="Annotations">
 	<info><title>Making ProActive programming easier: the ProActive Java Annotations System</title></info>
 	
-	<section><info><title>Annotation Overview</title></info>
-		<para>TODO</para>
-	</section>
-	
 	<section><info><title>Compile-time annotations</title></info>
 		
-		<section>
-			<info><title>Motivation</title></info>
-		<para>
-		These annotations provide a way to check at compile-time the constraints imposed 
+		Compile-time annotations provide a way to check at compile-time the constraints imposed
 			on Java code by the ProActive library. Usually, these constraints are documented 
-			in the ProActive manual, and it is left to the responsability of the programmer to 
+			in the ProActive manual, and it is left to the responsibility of the programmer to
 			obey these rules. If the rules are broken, the effects are usually seen at runtime,
 			translated into specific runtime exceptions, which are difficult to interpret 
 			by the unexperienced ProActive programmers. The compile-time annotation system  
 			makes it possible to verify these rules at compile-time, in order to avoid long debugging
-			sessions made out of stacktraces eyeballing. Ideally, the runtime errors that the programmer
+			sessions made out of stack traces eyeballing. Ideally, the runtime errors that the programmer
 			will receive will be more related to the logic of the application, and less 
-			to the misusage of the ProActive library...   
-		</para>
-		</section>
-		
+			to the misusage of the ProActive library...
 		<section>
 			<info><title>General usage</title></info>
 		<para>
 		First of all, note that the annotation system is <emphasis role="bold">non-intrusive</emphasis>. 
 			You can easily program using the ProActive library without bothering about annotations. 
-			They only serve as helpers for the developper, as mentioned previously.
+			They only serve as helpers for developers, as mentioned previously.
 		</para>
 			<para>
-		Second of all, the compile-time annotations are implemented using tools provided 
+		Second of all, the compile-time annotations are implemented using tools provided
 			in the standard JDK distribution, starting from version 1.5. 
-			The following backward-compatibility goal was kept in mind while developping 
+			The following backward-compatibility goal was kept in mind while developing 
 			the annotation system: the code written by the ProActive library user should compile using JDK 1.5.
 			But if you want the "full" power of the annotation system, it is advised to use JDK 1.6 or more. If you 
 		    (still) develop using JDK 1.5, some of the checks will not be performed. 
@@ -63,16 +53,16 @@
 			   </listitem>
 			   <listitem>
 				<para>
-					When compiling, use one of the following compilation commands:
+					When compiling, use one of the following compilation commands
 					<itemizedlist>
 						<listitem>
 							<para>For JDK 1.5:
-							  <screen>$apt -cp $CLASSPATH:$JAVA_HOME/lib/tools.jar [input_files]</screen>
+							  <screen>$apt -cp $CLASSPATH:$JAVA_HOME/lib/tools.jar:$PROACTIVE_HOME/dist/lib/ProActive.jar [input_files]</screen>
 							</para>
 						</listitem>
 						<listitem>
 							<para>For JDK 1.6:
-							  <screen>$javac -processor org.objectweb.proactive.extensions.annotation.ProActiveProcessorCTree -cp $CLASSPATH:$JAVA_HOME/lib/tools.jar [input_files]</screen>
+							  <screen>$javac -processor org.objectweb.proactive.extensions.annotation.common.ProActiveProcessorCTree -cp $CLASSPATH:$JAVA_HOME/lib/tools.jar:$PROACTIVE_HOME/dist/lib/ProActive.jar [input_files]</screen>
 							</para>
 						</listitem>
 					</itemizedlist>
@@ -81,11 +71,10 @@
 			   </listitem>
 			   <listitem>
 				<para>
-					Correct the compile-time errors, and repeat. 
+					Correct the compile-time errors.
 				</para>
 			   </listitem>
 			</itemizedlist>
-			ProActive.jar must already be in the classpath.  
 		</para>
 			
 			<para>
@@ -145,7 +134,7 @@
 					Project Properties -> Compiling -> Additional compiler options and add the following option
 					</para>
 					<para>
-					  <screen>-processor org.objectweb.proactive.extensions.annotation.ProActiveProcessorCTree</screen>
+					  <screen>-processor org.objectweb.proactive.extensions.annotation.common.ProActiveProcessorCTree</screen>
 					</para>
 					<para>
 					Then build the project.
@@ -165,7 +154,7 @@
 					Then add the following option to Additional command line parameters
 					</para>
 					<para>
-					  <screen>-processor org.objectweb.proactive.extensions.annotation.ProActiveProcessorCTree</screen>
+					  <screen>-processor org.objectweb.proactive.extensions.annotation.common.ProActiveProcessorCTree</screen>
 					</para>
 				</para>
 			  </listitem>
@@ -185,31 +174,23 @@
 				   <para>non private no-argument constructor should be explicitly defined</para>
 			    </listitem>
 				<listitem>
-				   <para>the class should not be final</para>
+				   <para>the class must not be final</para>
 			    </listitem>
 				<listitem>
-				   <para>the class should be public</para>
+				   <para>the class must be public</para>
 			    </listitem>
 				<listitem>
-				   <para>the class should not have final non-private methods nor final fields</para>
+				   <para>the class must not have final non-private methods</para>
 			    </listitem>
 				<listitem>
 				   <para>a public field without setter and getter is not recommended</para>
 			    </listitem>
 				<listitem>
-				   <para>arguments of constructors must be Serializable, if they are not primitive types</para>
-			    </listitem>
-				<listitem>
-				   <para>arguments of non-private methods must be Serializable, if they are not primitive types</para>
-			    </listitem>
-				<listitem>
 				   <para>an Active Object method should not return null, as this literal cannot be checked on the caller side</para>
 			    </listitem>
 			</itemizedlist>
-			Using JDK 1.6, all the above-mentioned boints will be checked. 
-			If you use JDK 1.5, the last point will not be checked, and also only a test to see if a no-arg constructor 
-			is present will be run - will not test to see if the constructor has an empty body. 
-</para>
+			If you use JDK 1.5, the last point will not be checked.
+		</para>
 		</section>
 		
 		<section>
@@ -222,18 +203,15 @@
 		</section>
 		
 		<section>
-			<info><title>@Migratable</title></info>
-		<para>
-			TODO
-		</para>
-		</section>
-		
-		<section>
 			<info><title>@MigrationSignal</title></info>
 		<para>
-			@MigrationSignal is applied on a method definition, in order to mark the fact that the annotated method should be used as a migration signal. What is a migration signal? The most common way to implement migration using ProActive is for the active object to export a public method inside which to call <strong>PAMobileAgent.migrateTo()</strong>, and this call should be the last statement inside the method body. This kind of method will be called henceforth a *migration signal*.
-			The MigrationSignal annotation enforces the migration guidelines specified in the ProActive manual, section on mobility. At compilation, the annotated method is checked to see if migrateTo() is called, and if this is indeed the last statement.
-			Migration signals can be also defined by calling other methods that perform migration - and not directly through calling migrateTo(). 
+			@MigrationSignal is applied on a method definition, in order to mark the fact that the annotated method should be used
+			as a migration signal. What is a migration signal? The most common way to implement migration using ProActive is for
+			the active object to export a public method inside which to call <emphasis role="bold">PAMobileAgent.migrateTo()</emphasis>,
+			and this call should be the last statement inside the method body. This kind of method will be called henceforth a *migration signal*.
+			The MigrationSignal annotation enforces the migration guidelines specified in the ProActive manual, section on mobility.
+			At compilation, the annotated method is checked to see if migrateTo() is called, and if this is indeed the last statement.
+			Migration signals can be also defined by calling other methods that perform migration - and not directly through calling migrateTo().
 		</para>
 		</section>
 		
@@ -254,14 +232,14 @@
 				   <para><emphasis role="bold">@OnArrival</emphasis> marks the method that should be executed when the mobile agents arrives to a site</para>
 			    </listitem>
 			</itemizedlist>
-			At compilation, the methods are checked to match the above-mentioned signature. The check is done for both JDK versions - 1.5 and 1.6. 
+			At compilation, the methods are checked to match the above-mentioned signature.
 		</para>
 		</section>
 		
 		<section>
 			<info><title>@NodeAttchedCallback</title></info>
 		<para>
-		    When a client subscribe to Node attachment notification, the method passed as parameter is invoked each time a Node is attached to the GCMVirtualNode. 
+		    When a client subscribes to Node attachment notification, the method passed as parameter is invoked each time a Node is attached to the GCMVirtualNode. 
 		    The method must have the following signature: 
 		    
 		    <screen>void method(Node, String)</screen>		    
@@ -275,7 +253,7 @@
 		<section>
 			<info><title>@VirtualNodesReadyCallback</title></info>
 		<para>
-			When a client subscribe to isReady notification, the method passed as parameter is invoked when the Virtual Node becomes Ready.
+			When a client subscribes to isReady notification, the method passed as parameter is invoked when the Virtual Node becomes Ready.
 			The method must have the following signature: 
 			
 			<screen>void method(String)</screen>			
