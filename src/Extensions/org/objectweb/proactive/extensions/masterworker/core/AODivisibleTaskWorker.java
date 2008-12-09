@@ -42,6 +42,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.TaskIntern;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.WorkerMaster;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -52,6 +53,7 @@ import java.util.Map;
  * (it will basically execute only one task and die)
  * @author The ProActive Team
  */
+@ActiveObject
 public class AODivisibleTaskWorker extends AOWorker implements RunActive, InitActive {
 
     /**

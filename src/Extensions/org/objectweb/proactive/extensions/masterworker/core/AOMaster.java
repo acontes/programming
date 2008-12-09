@@ -59,6 +59,7 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.*;
 import org.objectweb.proactive.extensions.masterworker.util.TaskID;
 import org.objectweb.proactive.extensions.masterworker.util.TaskQueue;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 
 import java.io.Serializable;
@@ -73,6 +74,7 @@ import java.util.*;
  *
  * @author The ProActive Team
  */
+@ActiveObject
 public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActive, MasterIntern,
         WorkerDeadListener {
 
@@ -194,7 +196,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
 
     /** Proactive empty no arg constructor */
     @Deprecated
-    public AOMaster() {
+    private AOMaster() {
         /* do nothing */
     }
 
