@@ -196,7 +196,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
 
     /** Proactive empty no arg constructor */
     @Deprecated
-    private AOMaster() {
+    public AOMaster() {
         /* do nothing */
     }
 
