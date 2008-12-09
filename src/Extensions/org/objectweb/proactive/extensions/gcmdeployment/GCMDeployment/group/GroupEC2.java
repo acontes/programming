@@ -1,33 +1,27 @@
 /*
  * ################################################################
- *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
- *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * 
+ * ProActive: The Java(TM) library for Parallel, Distributed, Concurrent computing with Security and
+ * Mobility
+ * 
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis Contact: proactive@ow2.org
+ * 
+ * This library is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation; either version 2 of the
+ * License, or any later version.
+ * 
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * 
+ * You should have received a copy of the GNU General Public License along with this library; if
+ * not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+ * 02111-1307 USA
+ * 
+ * Initial developer(s): The ProActive Team http://proactive.inria.fr/team_members.htm
+ * Contributor(s):
+ * 
+ * ################################################################ $$PROACTIVE_INITIAL_DEV$$
  */
 
 package org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group;
@@ -52,9 +46,13 @@ import com.amazonaws.ec2.model.RunningInstance;
 
 public class GroupEC2 extends AbstractJavaGroup {
 
+    /* the default S3 bucket in which the ProActive jars are expected to be found for image update */
+    public static final String DEFAULT_PROACTIVE_JARS_BUCKET = "oasis-proactive-jars";
     private String imageId;
     private String accessKeyId;
     private String secretAccessKey;
+
+    private static final boolean DEBUG = false;
 
     static protected class EC2InstanceRunner implements Runnable {
         AmazonEC2 service;
@@ -62,8 +60,13 @@ public class GroupEC2 extends AbstractJavaGroup {
         private RunInstancesResponse response;
 
         public EC2InstanceRunner(String accessKeyId, String secretAccessKey, RunInstancesRequest request) {
-            service = new AmazonEC2Client(accessKeyId, secretAccessKey);
-            //            service = new AmazonEC2Mock();
+
+            if (DEBUG) {
+                service = new AmazonEC2Mock();
+            } else {
+                service = new AmazonEC2Client(accessKeyId, secretAccessKey);
+            }
+
             this.request = request;
             this.response = null;
         }
@@ -126,15 +129,27 @@ public class GroupEC2 extends AbstractJavaGroup {
             // 4 deploymentId
             // 5 topologyId
             // 
-            userData.append(parentURL);
+            userData.append("parentURL = ").append(parentURL);
             userData.append('\n');
-            userData.append(hostCapacity);
+            userData.append("hostCapacity = ").append(hostCapacity);
             userData.append('\n');
-            userData.append(getHostInfo().getVmCapacity());
+            userData.append("vmCapacity = ").append(getHostInfo().getVmCapacity());
             userData.append('\n');
-            userData.append(gcma.getDeploymentId());
+            userData.append("deploymentID = ").append(gcma.getDeploymentId());
             userData.append('\n');
-            userData.append(getHostInfo().getToplogyId());
+            userData.append("topologyID = ").append(getHostInfo().getToplogyId());
+            userData.append('\n');
+            userData.append("awsKeyID = ").append(accessKeyId);
+            userData.append('\n');
+            userData.append("awsSecretKey = ").append(secretAccessKey);
+            userData.append('\n');
+            userData.append("proactiveJarsBucket = ").append(DEFAULT_PROACTIVE_JARS_BUCKET);
+            userData.append('\n');
+            userData.append("debug = 1");
+            userData.append('\n');
+            userData.append("noupdate = 0");
+            userData.append('\n');
+            userData.append("jvmParams = -Xmx1000m -Xms512m");
             userData.append('\n');
 
             byte[] charArray = userData.toString().getBytes();
