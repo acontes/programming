@@ -699,7 +699,6 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
                 rq.setMode(mode);
                 subResultQueues.put(getDivisibleTaskIDByOriginatorName(originatorName), rq);
             }
-            throw new IllegalArgumentException("Unsupported originator " + originatorName);
         }
     }
 
