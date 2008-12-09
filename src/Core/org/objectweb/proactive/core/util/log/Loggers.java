@@ -136,9 +136,12 @@ public interface Loggers {
     //  Master Worker loggers
     static final public String MASTERWORKER = CORE + ".masterworker";
     static final public String MASTERWORKER_WORKERMANAGER = MASTERWORKER + ".workermanager";
+    static final public String MASTERWORKER_SUBMASTER = MASTERWORKER + ".submaster";
+    static final public String MASTERWORKER_SUBWORKERMANAGER = MASTERWORKER + ".subworkermanager";
     static final public String MASTERWORKER_PINGER = MASTERWORKER + ".pinger";
     static final public String MASTERWORKER_REPOSITORY = MASTERWORKER + ".repository";
     static final public String MASTERWORKER_WORKERS = MASTERWORKER + ".workers";
+    static final public String MASTERWORKER_SUBWORKERS = MASTERWORKER_SUBMASTER + ".subworkers";
 
     // remote Objects
     static final public String REMOTEOBJECT = CORE + ".remoteobject";
