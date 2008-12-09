@@ -26,6 +26,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAEventProgramming;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.api.PAGroup;
+import org.objectweb.proactive.core.body.exceptions.SendRequestCommunicationException;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
 import org.objectweb.proactive.core.config.PAProperties;
@@ -259,6 +260,12 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         if (debug) {
             logger.debug(oldWorkerName + " forwarded Task " + taskId + " to " + newWorkerName);
         }
+        if (!workersByName.containsKey(oldWorkerName)) {
+            if (isClearing) {
+                // If the master is clearing we send the clearing message to this new worker
+                workersByName.get(oldWorkerName).clear();
+            }
+        }
         Set<Long> wact = workersActivity.get(oldWorkerName);
         wact.remove(taskId);
         if (wact.size() == 0) {
@@ -309,16 +316,22 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         if (debug) {
             logger.debug(name + " get initial tasks from the master...");
         }
-        Queue<TaskIntern<Serializable>> newTasks;
-        int flooding_value = Master.DEFAULT_SubMaster_TASK_FLOODING;
+        try {
+            Queue<TaskIntern<Serializable>> newTasks;
+            int flooding_value = Master.DEFAULT_SubMaster_TASK_FLOODING;
 
-        // Ask a task flooding for sleeping workers
-        if (sleepingGroup.size() >= 1)
-            flooding_value = flooding_value + sleepingGroup.size() * Master.DEFAULT_TASK_FLOODING;
+            // Ask a task flooding for sleeping workers
+            if (sleepingGroup.size() >= 1)
+                flooding_value = flooding_value + sleepingGroup.size() * Master.DEFAULT_TASK_FLOODING;
 
-        newTasks = provider.getTasks(stubOnThis, name, flooding_value);
+            newTasks = provider.getTasks(stubOnThis, name, flooding_value);
 
-        pendingTasks.addAll(newTasks);
+            pendingTasks.addAll(newTasks);
+        } catch (SendRequestCommunicationException exp) {
+            if (debug) {
+                logger.debug("Master has already been freed.");
+            }
+        }
     }
 
     public Queue<TaskIntern<Serializable>> getTasks(Worker worker, String workerName, int flooding) {
@@ -457,6 +470,13 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
 
     public BooleanWrapper sendResult(ResultIntern<Serializable> result, String workerName) {
         // TODO Auto-generated method stub
+        if (!workersByName.containsKey(workerName)) {
+            if (isClearing) {
+                // If the master is clearing we send the clearing message to this new worker
+                workersByName.get(workerName).clear();
+            }
+        }
+
         long id = result.getId();
         if (launchedTasks.containsKey(id)) {
             if (debug) {
@@ -473,6 +493,11 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
                 }
             }
             if (divisibleTasksAssociationWithWorkers.containsKey(id)) {
+                if (spawnedWorkerNames.contains(workerName)) {
+                    // We remove the spawned worker from our knowledge
+                    spawnedWorkerNames.remove(workerName);
+                }
+
                 divisibleTasksAssociationWithWorkers.remove(id);
             }
             // We add the result in the result queue
@@ -497,52 +522,74 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
     }
 
     private void sendResultsAndGetTasksIntern() {
-        if (resultQueue.countAvailableResults() > 0) {
-            Queue<TaskIntern<Serializable>> tasksToAdd = null;
-            List<ResultIntern<Serializable>> results = resultQueue.getNextK(resultQueue
-                    .countAvailableResults());
-            int flooding_value = results.size();
-            if (flooding_value == 1)
-                flooding_value = 0;
-            tasksToAdd = provider.sendResultsAndGetTasks(results, name, flooding_value);
-            PAEventProgramming.addActionOnFuture(tasksToAdd, "addTasksToPengding");
+        if (!terminating) {
+            try {
+                if (resultQueue.countAvailableResults() > 0) {
+                    Queue<TaskIntern<Serializable>> tasksToAdd = null;
+                    List<ResultIntern<Serializable>> results = resultQueue.getNextK(resultQueue
+                            .countAvailableResults());
+                    int flooding_value = results.size();
+
+                    if (flooding_value == 1)
+                        flooding_value = 0;
+
+                    if (pendingTasks.size() == 0)
+                        flooding_value = 1;
+                    tasksToAdd = provider.sendResultsAndGetTasks(results, name, flooding_value);
+                    PAEventProgramming.addActionOnFuture(tasksToAdd, "addTasksToPengding");
+                }
+            } catch (SendRequestCommunicationException exp) {
+                if (debug) {
+                    logger.debug("Master has already been freed.");
+                }
+            }
         }
     }
 
     private void getTasksIntern() {
-        Queue<TaskIntern<Serializable>> tasksToAdd = null;
-        int flooding_value = 1;
-
-        tasksToAdd = provider.getTasks(stubOnThis, name, flooding_value);
-        PAEventProgramming.addActionOnFuture(tasksToAdd, "addTasksToPengding");
+        if (!terminating) {
+            Queue<TaskIntern<Serializable>> tasksToAdd = null;
+            int flooding_value = 1;
+            try {
+                tasksToAdd = provider.getTasks(stubOnThis, name, flooding_value);
+                PAEventProgramming.addActionOnFuture(tasksToAdd, "addTasksToPengding");
+            } catch (SendRequestCommunicationException exp) {
+                if (debug) {
+                    logger.debug("Master has already been freed.");
+                }
+            }
+        }
     }
 
     public void addTasksToPengding(Future<Queue<TaskIntern<Serializable>>> future) {
-        Queue<TaskIntern<Serializable>> tasksToAdd = null;
-        try {
-            tasksToAdd = future.get();
-            pendingTasks.addAll(tasksToAdd);
-            // wake up sleeping workers
+        if (!terminating) {
+            Queue<TaskIntern<Serializable>> tasksToAdd = null;
 
-            if ((sleepingGroup.size() > 0) && (tasksToAdd.size() > 0)) {
-                if (debug) {
-                    logger.debug("Waking up sleeping workers...");
+            try {
+                tasksToAdd = future.get();
+                pendingTasks.addAll(tasksToAdd);
+                // wake up sleeping workers
+
+                if ((sleepingGroup.size() > 0) && (tasksToAdd.size() > 0)) {
+                    if (debug) {
+                        logger.debug("Waking up sleeping workers...");
+                    }
+
+                    // We wake up the sleeping guys
+                    try {
+                        sleepingGroupStub.wakeup();
+                    } catch (Exception e) {
+                        // We ignore NFE pinger is responsible for that
+                    }
                 }
 
-                // We wake up the sleeping guys
-                try {
-                    sleepingGroupStub.wakeup();
-                } catch (Exception e) {
-                    // We ignore NFE pinger is responsible for that
-                }
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
             }
-
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         }
     }
 
@@ -591,8 +638,15 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         if (originatorName == null) {
             return resultQueue.countAvailableResults();
         } else {
-            return subResultQueues.get(getDivisibleTaskIDByOriginatorName(originatorName))
-                    .countAvailableResults();
+            if (isClearing) {
+                clearingCallFromSpawnedWorker(originatorName);
+            }
+            if (subResultQueues.containsKey(getDivisibleTaskIDByOriginatorName(originatorName))) {
+                return subResultQueues.get(getDivisibleTaskIDByOriginatorName(originatorName))
+                        .countAvailableResults();
+            } else {
+                throw new IllegalArgumentException("Unknown originator " + originatorName);
+            }
         }
     }
 
@@ -612,8 +666,15 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         if (originatorName == null) {
             return resultQueue.countPendingResults();
         } else {
-            return subResultQueues.get(getDivisibleTaskIDByOriginatorName(originatorName))
-                    .countPendingResults();
+            if (isClearing) {
+                clearingCallFromSpawnedWorker(originatorName);
+            }
+            if (subResultQueues.containsKey(getDivisibleTaskIDByOriginatorName(originatorName))) {
+                return subResultQueues.get(getDivisibleTaskIDByOriginatorName(originatorName))
+                        .countPendingResults();
+            } else {
+                throw new IllegalArgumentException("Unknown originator " + originatorName);
+            }
         }
     }
 
@@ -622,7 +683,14 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         if (originatorName == null) {
             return (resultQueue.isEmpty() && pendingTasks.isEmpty());
         } else {
-            throw new IllegalArgumentException("Unsupported originator " + originatorName);
+            if (isClearing) {
+                clearingCallFromSpawnedWorker(originatorName);
+            }
+            if (subResultQueues.containsKey(getDivisibleTaskIDByOriginatorName(originatorName))) {
+                return (subResultQueues.get(getDivisibleTaskIDByOriginatorName(originatorName)).isEmpty());
+            } else {
+                throw new IllegalArgumentException("Unsupported originator " + originatorName);
+            }
         }
     }
 
@@ -631,6 +699,16 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         if (originatorName == null) {
             resultQueue.setMode(mode);
         } else {
+            if (isClearing) {
+                clearingCallFromSpawnedWorker(originatorName);
+            }
+            if (subResultQueues.containsKey(getDivisibleTaskIDByOriginatorName(originatorName))) {
+                subResultQueues.get(getDivisibleTaskIDByOriginatorName(originatorName)).setMode(mode);
+            } else {
+                ResultQueue rq = new ResultQueue(mode);
+                rq.setMode(mode);
+                subResultQueues.put(getDivisibleTaskIDByOriginatorName(originatorName), rq);
+            }
             throw new IllegalArgumentException("Unsupported originator " + originatorName);
         }
     }
@@ -641,6 +719,11 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         if (debug) {
             logger.debug("Request for solving tasks from " + originatorName);
         }
+
+        if (originatorName != null && isClearing) {
+            clearingCallFromSpawnedWorker(originatorName);
+        }
+
         divisibleTaskId = getDivisibleTaskIDByOriginatorName(originatorName);
         // If one worker is sending the tasks
         if (subResultQueues.containsKey(divisibleTaskId)) {
@@ -831,11 +914,6 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         taskIdCounters.clear();
         // We clear the taskIdCounters
         isClearing = true;
-
-        provider.isCleared(stubOnThis);
-        if (debug) {
-            logger.debug("Submaster is cleared...");
-        }
     }
 
     public String getName() {
@@ -862,15 +940,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
 
     public BooleanWrapper terminate() {
         // TODO Auto-generated method stub
-        if (debug) {
-            logger.debug("Terminating SubMaster...");
-        }
-
-        // The cleaner way is to first clear the activity
-        clear();
-
-        // then delay final termination
-        stubOnThis.secondTerminate(true);
+        terminateIntern(false);
 
         return new BooleanWrapper(true);
     }
@@ -998,6 +1068,9 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             if (service.hasRequestToServe(clearingFilter)) {
                 service.serveOldest(clearingFilter);
             }
+            //            if (debug) {
+            //                logger.debug("\nCleared worker size is:" + clearedWorkers.size() + "\nworkergroup size is:" + workerGroup.size() + "\nspawnedWorkers size is:" + spawnedWorkerNames.size());
+            //            }
             if (clearedWorkers.size() == workerGroup.size() + spawnedWorkerNames.size()) {
                 sleepingGroup.addAll(clearedWorkers);
                 isClearing = false;
@@ -1012,9 +1085,12 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
                 e.printStackTrace();
             }
         }
+
         if (debug) {
-            logger.debug("Master cleared");
+            logger.debug("SubMaster cleared");
         }
+
+        provider.isCleared(stubOnThis);
     }
 
     /**
@@ -1141,11 +1217,11 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
     public BooleanWrapper terminateIntern(final boolean freeResources) {
 
         if (debug) {
-            logger.debug("Terminating Master...");
+            logger.debug("Terminating SubMaster...");
         }
 
         // The cleaner way is to first clear the activity
-        clear();
+        // clear();
 
         // then delay final termination
         stubOnThis.secondTerminate(freeResources);

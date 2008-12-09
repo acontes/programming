@@ -170,21 +170,9 @@ public class AOSubWorker extends AOWorker implements WorkerPeer {
 
     }
 
-    public void clear() {
-        if (debug) {
-            logger.debug("Worker " + name + " is clearing...");
-        }
-        workerpeerlist.clear();
-        workernamelist.clear();
-
-        super.clear();
-        if (debug) {
-            logger.debug("Worker " + name + " is cleared...");
-        }
-    }
-
     public void initActivity(Body body) {
         // TODO Auto-generated method stub
+        terminated = false;
 
         stubOnThis = (AOSubWorker) PAActiveObject.getStubOnThis();
 
@@ -211,11 +199,11 @@ public class AOSubWorker extends AOWorker implements WorkerPeer {
         ((WorkerMemoryImpl) memory).clear();
         initialMemory.clear();
 
-        PAActiveObject.terminateActiveObject(false);
         if (debug) {
             logger.debug(name + " terminated...");
         }
 
+        PAActiveObject.terminateActiveObject(false);
         return new BooleanWrapper(true);
     }
 

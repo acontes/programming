@@ -41,6 +41,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.body.exceptions.SendRequestCommunicationException;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
 import org.objectweb.proactive.core.group.Group;
@@ -302,7 +303,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
             if (workersActivity.containsKey(workerName)) {
                 // If the worker requests a flooding this means that its penqing queue is empty,
                 // thus, it will sleep
-                if (flooding > 0) {
+                if (flooding == 1) {
                     if (!sleepingGroup.contains(worker)) {
                         if (debug) {
                             logger.debug("Add worker " + workerName + " to sleeping group");
@@ -619,8 +620,9 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
 
     /** {@inheritDoc} */
     public void isCleared(Worker worker) {
+
+        String workerName = workersByNameRev.get(worker);
         if (debug) {
-            String workerName = workersByNameRev.get(worker);
             logger.debug(workerName + " is cleared");
         }
 
@@ -846,9 +848,17 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
                     String submasterName = submitter.substring(submitter.indexOf('@') + 1);
 
                     result.setId(idMap.get(result.getId()));
-                    ((AOSubMaster) workersByName.get(submasterName)).sendResultFromMaster(result, submitter);
+                    try {
+                        ((AOSubMaster) workersByName.get(submasterName)).sendResultFromMaster(result,
+                                submitter);
+                    } catch (SendRequestCommunicationException exp) {
+                        if (debug) {
+                            logger.debug("Submaster " + submasterName + " has already been freed.");
+                        }
+                    }
                     if (debug) {
-                        logger.debug("Send result to submaster " + submasterName);
+                        logger.debug("Send result of task " + result.getId() + " to submaster " +
+                            submasterName);
                     }
                 }
             }
@@ -1034,9 +1044,6 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
         // We clear the idMap
         idMap.clear();
         isClearing = true;
-        if (debug) {
-            logger.debug("Master is cleared...");
-        }
     }
 
     /** {@inheritDoc} */

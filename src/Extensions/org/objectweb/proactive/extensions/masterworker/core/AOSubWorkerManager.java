@@ -122,8 +122,8 @@ public class AOSubWorkerManager implements WorkerManager, InitActive, Serializab
                     logger.debug("Creating worker on " + nodename);
                 }
 
-                String workername = node.getVMInformation().getHostName() + "_" + workerNameCounter++ + "@" +
-                    submasterName;
+                String workername = "SubWoker_" + node.getVMInformation().getHostName() + "_" +
+                    workerNameCounter++ + "@" + submasterName;
 
                 AOSubWorker subworker = (AOSubWorker) PAActiveObject.newActive(AOSubWorker.class.getName(),
                         new Object[] { workername, (WorkerMaster) provider,

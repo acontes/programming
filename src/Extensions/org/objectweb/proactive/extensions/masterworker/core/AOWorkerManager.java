@@ -275,7 +275,8 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
     private boolean createSubMaster(final Node node) {
         if (!isTerminated) {
             try {
-                String workername = node.getVMInformation().getHostName() + "_" + workerNameCounter++;
+                String workername = "SubMaster_" + node.getVMInformation().getHostName() + "_" +
+                    workerNameCounter++;
                 String nodename = node.getNodeInformation().getName();
                 long topologyId = node.getVMInformation().getTopologyId();
 
@@ -325,7 +326,8 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
     private void createWorker(final Node node) {
         if (!isTerminated) {
             try {
-                String workername = node.getVMInformation().getHostName() + "_" + workerNameCounter++;
+                String workername = "Worker_" + node.getVMInformation().getHostName() + "_" +
+                    workerNameCounter++;
                 String nodename = node.getNodeInformation().getName();
                 long topologyId = node.getVMInformation().getTopologyId();
                 Integer subGroupSize = 0;
@@ -458,17 +460,16 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
             // we wait that all threads creating active objects finish
             threadPool.awaitTermination(120, TimeUnit.SECONDS);
 
-            if (debug) {
-                logger.debug("Ask for terminating submamster ");
-            }
             // we send the terminate message to every thread
             for (Entry<String, Worker> worker : workers.entrySet()) {
                 String workerName = worker.getKey();
                 try {
+                    if (debug) {
+                        logger.debug("Ask for terminating worker " + workerName);
+                    }
                     BooleanWrapper term = worker.getValue().terminate();
 
                     // as it is a termination algorithm we wait a bit, but not forever
-                    Thread.sleep(100);
                     PAFuture.waitFor(term);
 
                     if (debug) {
