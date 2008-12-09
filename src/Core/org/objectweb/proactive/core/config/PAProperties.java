@@ -416,6 +416,12 @@ public enum PAProperties {
      * compressing increases CPU usage on the master side, but decrease memory usage, default to false
      */
     PA_MASTERWORKER_COMPRESSTASKS("proactive.masterworker.compresstasks", PAPropertiesType.BOOLEAN),
+    /**
+     * Master/Worker groupsize
+     *
+     * Parameter which decides the size of the group for hierarchical master worker
+     */
+    PA_MASTERWORKER_SUBGROUPSIZE("proactive.masterworker.subgroupsize", PAPropertiesType.INTEGER),
 
     /* ------------------------------------
      *  PEER TO PEER

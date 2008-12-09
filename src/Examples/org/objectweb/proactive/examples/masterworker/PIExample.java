@@ -39,6 +39,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.extensions.masterworker.ProActiveMaster;
 import org.objectweb.proactive.extensions.masterworker.TaskException;
 import org.objectweb.proactive.extensions.masterworker.interfaces.DivisibleTask;
+import org.objectweb.proactive.extensions.masterworker.interfaces.Master;
 import org.objectweb.proactive.extensions.masterworker.interfaces.SubMaster;
 import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
 import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
@@ -47,8 +48,8 @@ import org.objectweb.proactive.api.PALifeCycle;
 
 public class PIExample {
     public static final long NUMBER_OF_EXPERIENCES = 10000;
-    public static final int NUMBER_OF_TASKS = 10;
-    public static final int NUMBER_OF_DIVISIBLETASKS = 30;
+    public static final int NUMBER_OF_TASKS = 1;
+    public static final int NUMBER_OF_DIVISIBLETASKS = 1;
 
     public static void main(String[] args) throws TaskException, ProActiveException {
 
@@ -63,6 +64,21 @@ public class PIExample {
         //@snippet-start masterworker_montecarlopi_tasks_submit
         // defining tasks
         Vector<TestDivisibleTask> tasks = new Vector<TestDivisibleTask>();
+        for (int i = 0; i < NUMBER_OF_TASKS; i++) {
+            tasks.add(new TestDivisibleTask(NUMBER_OF_DIVISIBLETASKS));
+        }
+
+        // adding tasks to the queue
+        master.solve(tasks);
+        //@snippet-end masterworker_montecarlopi_tasks_submit
+        //@snippet-start masterworker_montecarlopi_results
+        // waiting for results
+        System.out.println("\nOne of the result is:" + master.waitOneResult());
+
+        master.clear();
+        master.setResultReceptionOrder(Master.SUBMISSION_ORDER);
+
+        tasks = new Vector<TestDivisibleTask>();
         for (int i = 0; i < NUMBER_OF_TASKS; i++) {
             tasks.add(new TestDivisibleTask(NUMBER_OF_DIVISIBLETASKS));
         }
@@ -131,6 +147,7 @@ public class PIExample {
                 tasks.add(new ComputePIMonteCarlo());
             }
 
+            master.setResultReceptionOrder(Master.SUBMISSION_ORDER);
             // adding tasks to the queue
             master.solve(tasks);
             //@snippet-end masterworker_montecarlopi_tasks_submit

@@ -14,7 +14,7 @@
 	<application>
 		<proactive base="root" relpath="/user/zdai/home/eclipse-3.3.2/workspace/SHORT_MW_Hierarchical/">		
 			<configuration>
-			 	<jvmarg value="-Dlog4j.configuration=file:/user/zdai/home/teams/team3/proactive-log4j"/>			
+			 	<jvmarg value="-Dlog4j.configuration=file:${proactive.home}/compile/proactive-log4j"/>			
 				<applicationClasspath>				
 					<pathElement base="proactive" relpath="dist/lib/ProActive_examples.jar"/>
 				</applicationClasspath>

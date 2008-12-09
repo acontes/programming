@@ -76,7 +76,7 @@ log4j.logger.org.mortbay = WARN
 #log4j.logger.proactive.skeletons.diagnosis	 = DEBUG
 #log4j.logger.proactive.skeletons.system = DEBUG
 
-#log4j.logger.proactive.masterworker = DEBUG
+log4j.logger.proactive.masterworker = DEBUG
 #log4j.logger.proactive.masterworker.workermanager = DEBUG
 #log4j.logger.proactive.masterworker.pinger = DEBUG
 #log4j.logger.proactive.masterworker.repository = DEBUG
