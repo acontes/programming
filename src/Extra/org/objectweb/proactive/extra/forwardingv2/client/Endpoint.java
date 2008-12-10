@@ -25,4 +25,11 @@ public interface Endpoint {
      * @return The reply as a byte array
      */
     public byte[] receiveMsg(long id);
+    
+    /**
+     * Return the EndpointID of this Endpoint
+     * 
+     * @return the EndpointID
+     */
+    public EndpointID getID();
 }
