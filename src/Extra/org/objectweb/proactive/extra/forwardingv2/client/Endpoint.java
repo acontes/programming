@@ -12,10 +12,10 @@ public interface Endpoint {
      * 
      * @param agentID Destination agent
      * @param endpointID Destination endpoint 
+     * @param messageID An unique identifier associated to this message
      * @param data A byte array to be send
-     * @return An unique identifier associated to this message
      */
-    public long sendMsg(AgentID agentID, EndpointID endpointID, byte[] data);
+    public void sendMsg(AgentID agentID, EndpointID endpointID, long messageID, byte[] data);
 
     /**
      * Wait for a reply message
@@ -25,6 +25,13 @@ public interface Endpoint {
      * @return The reply as a byte array
      */
     public byte[] receiveMsg(long id);
+
+    /**
+     * Return the next available ID in the message box
+     * 
+     * @return id The unique ID available
+     */
+    public long nextAvailableID();
     
     /**
      * Return the EndpointID of this Endpoint

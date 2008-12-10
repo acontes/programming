@@ -2,6 +2,7 @@ package org.objectweb.proactive.extra.forwardingv2.client;
 
 import java.net.InetAddress;
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
 import org.objectweb.proactive.extra.forwardingv2.protocol.EndpointID;
@@ -21,10 +22,12 @@ public class ForwardingAgent implements Agent {
 
     // FIELDS
     private final HashMap<EndpointID, Endpoint> endPoints;
+    private final AtomicLong currentEndpointID;
     private AgentID agentID;
     
     protected ForwardingAgent() {
     	endPoints = new HashMap<EndpointID, Endpoint>();
+    	currentEndpointID = new AtomicLong(0);
     }
     
     /**
@@ -40,8 +43,7 @@ public class ForwardingAgent implements Agent {
     }
     
 	public Endpoint getEndpoint() {
-		Endpoint ep = new EndpointImpl(EndpointID.getNext(), getAgentID(), this);
-		
+		Endpoint ep = new EndpointImpl(new EndpointID(currentEndpointID.incrementAndGet()), getAgentID(), this);
 		synchronized (endPoints) {
 			endPoints.put(ep.getID(), ep);
 		}
