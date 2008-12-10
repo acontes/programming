@@ -263,7 +263,13 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         if (!workersByName.containsKey(oldWorkerName)) {
             if (isClearing) {
                 // If the master is clearing we send the clearing message to this new worker
-                workersByName.get(oldWorkerName).clear();
+                try {
+                    workersByName.get(oldWorkerName).clear();
+                } catch (Exception e) {
+                    if (debug) {
+                        logger.debug("Clear worker " + oldWorkerName + "error");
+                    }
+                }
             }
         }
         Set<Long> wact = workersActivity.get(oldWorkerName);
@@ -351,7 +357,13 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             recordWorker(worker, workerName);
             if (isClearing) {
                 // If the master is clearing we send the clearing message to this new worker
-                worker.clear();
+                try {
+                    worker.clear();
+                } catch (Exception e) {
+                    if (debug) {
+                        logger.debug("Clear worker " + workerName + "error");
+                    }
+                }
             }
         }
 
@@ -465,7 +477,13 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         if (!workersByName.containsKey(workerName)) {
             if (isClearing) {
                 // If the master is clearing we send the clearing message to this new worker
-                workersByName.get(workerName).clear();
+                try {
+                    workersByName.get(workerName).clear();
+                } catch (Exception e) {
+                    if (debug) {
+                        logger.debug("Clear worker " + workerName + "error");
+                    }
+                }
             }
         }
 
