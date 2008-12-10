@@ -185,8 +185,8 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         }
 
         smanager.addResources(nodes);
-        getTasksIntern(1);
-        groupSize++;
+        getTasksIntern(nodes.size());
+        groupSize = groupSize + nodes.size();
     }
 
     public void initActivity(Body body) {
@@ -453,7 +453,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         } else {
             // do nothing
             if (debug) {
-                logger.debug("Master sends result of task " + result.getId() + "of worker " + workerName +
+                logger.debug("Master sends result of task " + result.getId() + " of worker " + workerName +
                     " but it's unknown.");
             }
             return new BooleanWrapper(false);
@@ -887,7 +887,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         // When every workers have answered the master will be declared "cleared" and it can starts its normal serving 
 
         if (debug) {
-            logger.debug("SubMaster is clearing...");
+            logger.debug("SubMaster " + name + " is clearing...");
         }
         // We clear the queues
         resultQueue.clear();
@@ -899,11 +899,35 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         }
         subResultQueues.clear();
         // We clear the workers activity memory
-        workersActivity.clear();
+        try {
+            workersActivity.clear();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            if (debug) {
+                logger.debug("A exception happened in clearing workersActivity");
+            }
+        }
+
         // We tell all the worker to clear their pending tasks
-        workerGroupStub.clear();
+        try {
+            workerGroupStub.clear();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            if (debug) {
+                logger.debug("A exception happened in clearing workerGroup");
+            }
+        }
+
         // We clear every sleeping workers registered
-        sleepingGroup.clear();
+        try {
+            sleepingGroup.clear();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            if (debug) {
+                logger.debug("A exception happened in clearing sleepingGroup");
+            }
+        }
+
         // We clear the repository
         taskIdCounters.clear();
         // We clear the taskIdCounters
@@ -958,7 +982,6 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             if (debug) {
                 logger.debug("Sleeping group size is:" + sleepingGroup.size());
             }
-            sleepingGroupStub.wakeup();
         }
     }
 
@@ -994,10 +1017,9 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
                         service.serveOldest();
                         // we maybe serve the pending waitXXX methods if there are some and if the necessary results are collected
                         maybeServePending(service);
-
-                        // Send results back to main master and get new tasks
-                        getTasksWithResults();
                     }
+                    // Send results back to main master and get new tasks
+                    getTasksWithResults();
                 }
 
                 // If a clear request is detected we enter a special mode
@@ -1088,7 +1110,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         }
 
         if (debug) {
-            logger.debug("SubMaster cleared");
+            logger.debug("SubMaster " + name + " cleared");
         }
 
         provider.isCleared(stubOnThis);
@@ -1222,7 +1244,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
     public BooleanWrapper terminateIntern(final boolean freeResources) {
 
         if (debug) {
-            logger.debug("Terminating SubMaster...");
+            logger.debug("Terminating SubMaster " + name + "...");
         }
 
         // The cleaner way is to first clear the activity
@@ -1242,7 +1264,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
     protected BooleanWrapper secondTerminate(final boolean freeResources) {
 
         if (debug) {
-            logger.debug("SencondTerminate of Subaster...");
+            logger.debug("SencondTerminate of Subaster " + name + "...");
         }
         // We empty pending queues
         pendingTasks.clear();
@@ -1263,7 +1285,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         terminating = true;
 
         if (debug) {
-            logger.debug("SencondTerminate of Subaster finished...");
+            logger.debug("SencondTerminate of Subaster " + name + " finished...");
         }
         return new BooleanWrapper(true);
     }

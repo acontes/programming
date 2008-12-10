@@ -1022,11 +1022,34 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
         }
         subResultQueues.clear();
         // We clear the workers activity memory
-        workersActivity.clear();
+        try {
+            workersActivity.clear();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            if (debug) {
+                logger.debug("A exception happened in clearing workersActivity");
+            }
+        }
+
         // We tell all the worker to clear their pending tasks
-        workerGroupStub.clear();
+        try {
+            workerGroupStub.clear();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            if (debug) {
+                logger.debug("A exception happened in clearing workerGroup");
+            }
+        }
+
         // We clear every sleeping workers registered
-        sleepingGroup.clear();
+        try {
+            sleepingGroup.clear();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            if (debug) {
+                logger.debug("A exception happened in clearing sleepingGroup");
+            }
+        }
         // We clear the repository
         repository.clear();
         // We clear the idMap
