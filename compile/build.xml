@@ -356,6 +356,7 @@
 					<include name="*.jar" />
 				</fileset>
 			</indexjars>
+			<fileset dir="${compile.dir}" includes="META-INF/**" />
 		</jar>
 
 		<copy todir="${deploy.lib.dir}">
