@@ -8,6 +8,7 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.EndpointID;
 import org.objectweb.proactive.extra.forwardingv2.protocol.Message;
 
 
+
 public class EndpointImpl implements Endpoint {
 
     private final EndpointID endpointID;

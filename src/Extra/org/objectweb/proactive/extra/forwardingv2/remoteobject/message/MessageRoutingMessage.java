@@ -67,6 +67,6 @@ public abstract class MessageRoutingMessage implements Serializable {
      */
     public final void send() throws MessageRoutingRemoteException {
         /* #@#@ Use endpoint here */
-    	
+
     }
 }

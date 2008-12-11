@@ -7,10 +7,11 @@ import org.objectweb.proactive.extra.forwardingv2.remoteobject.util.MessageRouti
 import com.google.inject.Binder;
 import com.google.inject.Module;
 
+
 public class MessageRoutingModule implements Module {
 
-	public void configure(Binder binder) {
-		binder.bind(Endpoint.class).to(EndpointImpl.class);
-	}
-	
+    public void configure(Binder binder) {
+        binder.bind(Endpoint.class).to(EndpointImpl.class);
+    }
+
 }

@@ -146,15 +146,15 @@ public class RemoteObjectExposer<T> implements Serializable {
             return null;
         }
     }
-    
+
     public synchronized RemoteRemoteObject createRemoteObject(String name) {
-    	try {
-        // select the factory matching the required protocol
-        RemoteObjectFactory rof = AbstractRemoteObjectFactory.getDefaultRemoteObjectFactory();
-        
-        InternalRemoteRemoteObject irro = rof.createRemoteObject(this.remoteObject, name);
-        this.activeRemoteRemoteObjects.put(irro.getURI(), irro);
-        return irro.getRemoteRemoteObject();
+        try {
+            // select the factory matching the required protocol
+            RemoteObjectFactory rof = AbstractRemoteObjectFactory.getDefaultRemoteObjectFactory();
+
+            InternalRemoteRemoteObject irro = rof.createRemoteObject(this.remoteObject, name);
+            this.activeRemoteRemoteObjects.put(irro.getURI(), irro);
+            return irro.getRemoteRemoteObject();
         } catch (Exception e) {
             ProActiveLogger.getLogger(Loggers.REMOTEOBJECT).warn(
                     "unable to activate a remote object at endpoint " + name, e);

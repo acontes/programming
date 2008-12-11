@@ -56,14 +56,14 @@ import org.objectweb.proactive.extra.forwardingv2.remoteobject.util.exceptions.M
 
 public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFactory implements
         RemoteObjectFactory {
-	final private Agent agent;
-	final private MessageRoutingRegistry registry;
-	
-	public MessageRoutingRemoteObjectFactory() {
-		this.agent = null;
-		this.registry = MessageRoutingRegistry.singleton;
-	}
-	
+    final private Agent agent;
+    final private MessageRoutingRegistry registry;
+
+    public MessageRoutingRemoteObjectFactory() {
+        this.agent = null;
+        this.registry = MessageRoutingRegistry.singleton;
+    }
+
     /*
      * (non-Javadoc)
      * 
@@ -178,21 +178,20 @@ public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFacto
         return -1;
     }
 
-	public URI generateURI(String objectName) {
-		return MessageRoutingURIBuilder.create(agent.getAgentID(), objectName);
-	}
+    public URI generateURI(String objectName) {
+        return MessageRoutingURIBuilder.create(agent.getAgentID(), objectName);
+    }
 
-	public InternalRemoteRemoteObject createRemoteObject(
-			RemoteObject<?> remoteObject, String name)
-			throws ProActiveException {
+    public InternalRemoteRemoteObject createRemoteObject(RemoteObject<?> remoteObject, String name)
+            throws ProActiveException {
 
-		URI uri = URI.create(this.getProtocolId() + ":/" + agent.getAgentID() + "/" + name);
-		
-		// register the object on the register
-		InternalRemoteRemoteObject irro = new InternalRemoteRemoteObjectImpl(remoteObject, uri);
-		RemoteRemoteObject rmo = register(irro, uri, true);
-		irro.setRemoteRemoteObject(rmo);
-	        
-		return irro;
-	}
+        URI uri = URI.create(this.getProtocolId() + ":/" + agent.getAgentID() + "/" + name);
+
+        // register the object on the register
+        InternalRemoteRemoteObject irro = new InternalRemoteRemoteObjectImpl(remoteObject, uri);
+        RemoteRemoteObject rmo = register(irro, uri, true);
+        irro.setRemoteRemoteObject(rmo);
+
+        return irro;
+    }
 }

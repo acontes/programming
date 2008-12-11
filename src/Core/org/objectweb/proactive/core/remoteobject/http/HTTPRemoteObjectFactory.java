@@ -56,8 +56,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class HTTPRemoteObjectFactory extends AbstractRemoteObjectFactory implements RemoteObjectFactory {
-  
-	protected String protocolIdentifier = Constants.XMLHTTP_PROTOCOL_IDENTIFIER;
+
+    protected String protocolIdentifier = Constants.XMLHTTP_PROTOCOL_IDENTIFIER;
 
     static {
         createClassServer();
@@ -217,16 +217,17 @@ public class HTTPRemoteObjectFactory extends AbstractRemoteObjectFactory impleme
     public void unexport(RemoteRemoteObject rro) throws ProActiveException {
         // see PROACTIVE-419
     }
-    
-	public InternalRemoteRemoteObject createRemoteObject(RemoteObject remoteObject, String name) throws ProActiveException  {
-		URI uri = URIBuilder.buildURI(ProActiveInet.getInstance().getHostname(), name, this.getProtocolId());
-		
-		 // register the object on the register
+
+    public InternalRemoteRemoteObject createRemoteObject(RemoteObject remoteObject, String name)
+            throws ProActiveException {
+        URI uri = URIBuilder.buildURI(ProActiveInet.getInstance().getHostname(), name, this.getProtocolId());
+
+        // register the object on the register
         InternalRemoteRemoteObject irro = new InternalRemoteRemoteObjectImpl(remoteObject, uri);
         RemoteRemoteObject rmo = register(irro, uri, true);
         irro.setRemoteRemoteObject(rmo);
-        
+
         return irro;
-	}
+    }
 
 }

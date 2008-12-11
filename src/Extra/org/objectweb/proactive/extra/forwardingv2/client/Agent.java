@@ -13,6 +13,6 @@ public interface Agent {
      * - Alreay build msg or not ?
      */
     public void sendMsg(Message msg);
-    
+
     public AgentID getAgentID();
 }

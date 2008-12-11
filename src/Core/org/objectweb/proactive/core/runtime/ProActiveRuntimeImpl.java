@@ -731,8 +731,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
         System.exit(0);
     }
 
-  
-
     /**
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getURL()
      */

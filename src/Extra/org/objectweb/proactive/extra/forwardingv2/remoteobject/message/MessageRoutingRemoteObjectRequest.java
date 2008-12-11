@@ -60,18 +60,18 @@ public class MessageRoutingRemoteObjectRequest extends MessageRoutingMessage imp
     @Override
     public Object processMessage() {
         try {
-        	int max_retry = 10;
-        	InternalRemoteRemoteObject ro = null;
-        	do {
-        	    try {
+            int max_retry = 10;
+            InternalRemoteRemoteObject ro = null;
+            do {
+                try {
                     ro = MessageRoutingRegistry.singleton.lookup(uri);
                     Thread.sleep(1000);
-        	    } catch (InterruptedException e1) {
+                } catch (InterruptedException e1) {
                     e1.printStackTrace();
                 }
                 max_retry--;
-           
-        	} while ((ro == null) && (max_retry > 0));
+
+            } while ((ro == null) && (max_retry > 0));
 
             Object o = ro.receiveMessage(this.request);
 
