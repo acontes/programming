@@ -4,6 +4,10 @@ import org.objectweb.fractal.api.Component;
 
 public class PropagateComponentRequestTagUtilities implements ComponentRequestTagUtilities{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private Object tagRequest = null;
 	
 	public boolean acceptRequest(Object tag) {
