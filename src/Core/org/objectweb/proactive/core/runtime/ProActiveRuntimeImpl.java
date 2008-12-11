@@ -97,8 +97,11 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.process.UniversalProcess;
+import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectProtocolFactoryRegistry;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.rmi.FileProcess;
 import org.objectweb.proactive.core.security.PolicyServer;
@@ -262,11 +265,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
         this.roe = new RemoteObjectExposer<ProActiveRuntime>(
             "org.objectweb.proactive.core.runtime.ProActiveRuntime", this,
             ProActiveRuntimeRemoteObjectAdapter.class);
-
-        String url = URIBuilder.buildURIFromProperties(URIBuilder.getHostNameFromUrl(getInternalURL()),
-                URIBuilder.getNameFromURI(getInternalURL())).toString();
-
-        this.roe.createRemoteObject(URI.create(url));
+        this.roe.createRemoteObject(vmInformation.getName());
 
         // logging info
         MDC.remove("runtime");
@@ -710,7 +709,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
         // END JMX Notification
         killAllNodes();
 
-        logger.info("terminating Runtime " + getInternalURL());
+        logger.info("terminating Runtime " + vmInformation.getName());
 
         // JMX unregistration
         if (getMBean() != null) {
@@ -732,13 +731,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
         System.exit(0);
     }
 
-    /**
-     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getURL()
-     */
-    protected String getInternalURL() {
-        return URIBuilder.buildURI(URIBuilder.getHostNameorIP(this.vmInformation.getInetAddress()),
-                this.vmInformation.getName()).toString();
-    }
+  
 
     /**
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getURL()
@@ -790,10 +783,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
 
     public void registerVirtualNode(String virtualNodeName, boolean replacePreviousBinding)
             throws UnknownProtocolException {
-        String url;
-        url = URIBuilder.buildURIFromProperties(URIBuilder.getHostNameFromUrl(getInternalURL()),
-                virtualNodeName).toString();
-        this.roe.createRemoteObject(URI.create(url));
+        this.roe.createRemoteObject(virtualNodeName);
     }
 
     public void unregisterVirtualNode(String virtualNodeName) {

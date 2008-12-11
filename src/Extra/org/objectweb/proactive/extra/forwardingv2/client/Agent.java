@@ -1,5 +1,6 @@
 package org.objectweb.proactive.extra.forwardingv2.client;
 
+import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
 import org.objectweb.proactive.extra.forwardingv2.protocol.Message;
 
 
@@ -12,4 +13,6 @@ public interface Agent {
      * - Alreay build msg or not ?
      */
     public void sendMsg(Message msg);
+    
+    public AgentID getAgentID();
 }

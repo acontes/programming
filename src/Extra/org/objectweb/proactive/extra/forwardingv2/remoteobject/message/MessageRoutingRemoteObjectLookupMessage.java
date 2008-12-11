@@ -76,7 +76,7 @@ public class MessageRoutingRemoteObjectLookupMessage extends MessageRoutingMessa
     @Override
     public Object processMessage() {
         if (this.urn != null) {
-            InternalRemoteRemoteObject irro = MessageRoutingRegistry.getInstance().lookup(uri);
+            InternalRemoteRemoteObject irro = MessageRoutingRegistry.singleton.lookup(uri);
             if (irro != null) {
                 RemoteRemoteObject rro = null;
                 try {

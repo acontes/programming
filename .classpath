@@ -90,5 +90,6 @@
 	<classpathentry kind="lib" path="lib/xercesImpl.jar"/>
 	<classpathentry kind="lib" path="lib/xml-apis.jar"/>
 	<classpathentry kind="lib" path="compile/lib/junit-4.3.jar"/>
+	<classpathentry kind="lib" path="lib/guice-1.0.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

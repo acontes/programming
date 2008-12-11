@@ -114,4 +114,6 @@ public interface RemoteObjectFactory {
      * @throws ProActiveException if the unexport fails
      */
     public void unexport(RemoteRemoteObject rro) throws ProActiveException;
+    
+    public InternalRemoteRemoteObject createRemoteObject(RemoteObject<?> remoteObject, String name) throws ProActiveException;
 }

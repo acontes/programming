@@ -67,7 +67,7 @@ public class MessageRoutingRegistryListRemoteObjectsMessage extends MessageRouti
      */
     @Override
     public Object processMessage() {
-        URI[] uri = MessageRoutingRegistry.getInstance().list();
+        URI[] uri = MessageRoutingRegistry.singleton.list();
         this.returnedObject = uri;
         return this.returnedObject;
     }

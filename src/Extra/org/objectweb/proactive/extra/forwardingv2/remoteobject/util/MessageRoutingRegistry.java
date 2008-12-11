@@ -46,21 +46,12 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  *
  */
 public class MessageRoutingRegistry {
-    private static MessageRoutingRegistry instance;
-    private static HashMap<URI, InternalRemoteRemoteObject> rRemteObjectMap = new HashMap<URI, InternalRemoteRemoteObject>();
-
+	public final static MessageRoutingRegistry singleton = new MessageRoutingRegistry();
+	
+    private HashMap<URI, InternalRemoteRemoteObject> rRemteObjectMap;
+    
     private MessageRoutingRegistry() {
-    }
-
-    /**
-     * Gets the unique instance of the registry
-     * @return the unique instance of the registry
-     */
-    public static synchronized MessageRoutingRegistry getInstance() {
-        if (instance == null) {
-            instance = new MessageRoutingRegistry();
-        }
-        return instance;
+    	this.rRemteObjectMap = new HashMap<URI, InternalRemoteRemoteObject>();
     }
 
     /**

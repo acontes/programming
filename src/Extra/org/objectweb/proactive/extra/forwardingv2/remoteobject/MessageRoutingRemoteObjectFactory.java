@@ -36,21 +36,34 @@ import java.net.URI;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
+import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObjectImpl;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectAdapter;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
+import org.objectweb.proactive.core.util.ProActiveInet;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.forwardingv2.client.Agent;
+import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.message.MessageRoutingRegistryListRemoteObjectsMessage;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.message.MessageRoutingRemoteObjectLookupMessage;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.util.MessageRoutingRegistry;
+import org.objectweb.proactive.extra.forwardingv2.remoteobject.util.MessageRoutingURIBuilder;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.util.exceptions.MessageRoutingRemoteException;
 
 
 public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFactory implements
         RemoteObjectFactory {
-
+	final private Agent agent;
+	final private MessageRoutingRegistry registry;
+	
+	public MessageRoutingRemoteObjectFactory() {
+		this.agent = null;
+		this.registry = MessageRoutingRegistry.singleton;
+	}
+	
     /*
      * (non-Javadoc)
      * 
@@ -86,7 +99,7 @@ public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFacto
             throws ProActiveException {
 
         /* #@#@# FIXME */
-        MessageRoutingRegistry.getInstance().bind(uri, ro);
+        registry.bind(uri, ro);
         MessageRoutingRemoteObjectImpl rro = new MessageRoutingRemoteObjectImpl(ro, uri);
         ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
                 .debug("registering remote object  at endpoint " + uri);
@@ -100,7 +113,7 @@ public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFacto
      *            the urn under which the active object has been registered
      */
     public void unregister(URI uri) throws ProActiveException {
-        MessageRoutingRegistry.getInstance().unbind(uri);
+        registry.unbind(uri);
     }
 
     /**
@@ -164,4 +177,22 @@ public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFacto
     public int getPort() {
         return -1;
     }
+
+	public URI generateURI(String objectName) {
+		return MessageRoutingURIBuilder.create(agent.getAgentID(), objectName);
+	}
+
+	public InternalRemoteRemoteObject createRemoteObject(
+			RemoteObject<?> remoteObject, String name)
+			throws ProActiveException {
+
+		URI uri = URI.create(this.getProtocolId() + ":/" + agent.getAgentID() + "/" + name);
+		
+		// register the object on the register
+		InternalRemoteRemoteObject irro = new InternalRemoteRemoteObjectImpl(remoteObject, uri);
+		RemoteRemoteObject rmo = register(irro, uri, true);
+		irro.setRemoteRemoteObject(rmo);
+	        
+		return irro;
+	}
 }
