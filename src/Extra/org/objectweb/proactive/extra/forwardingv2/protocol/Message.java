@@ -43,19 +43,24 @@ public class Message {
     Message() {
     }
 
-    Message(byte[] byteArray) {
-        int datalength = TypeHelper.byteArrayToInt(byteArray, LENGTH_OFFSET) - Message.HEADER_LENGTH;
+    /**
+     * Construct a message from the data contained in a formatted byte array.
+     * @param byteArray the byte array from which to read
+     * @param offset the offset at which to find the message in the byte array
+     */
+    Message(byte[] byteArray, int offset) {
+        int datalength = readLength(byteArray, offset) - HEADER_LENGTH;
         data = new byte[datalength];
 
-        type = TypeHelper.byteArrayToInt(byteArray, MSG_TYPE_OFFSET);
-        srcAgentID = new AgentID(TypeHelper.byteArrayToLong(byteArray, SRC_AGENT_ID_OFFSET));
-        srcEndpointID = new EndpointID(TypeHelper.byteArrayToLong(byteArray, SRC_ENDPOINT_ID_OFFSET));
-        dstAgentID = new AgentID(TypeHelper.byteArrayToLong(byteArray, DST_AGENT_ID_OFFSET));
-        dstEndpointID = new EndpointID(TypeHelper.byteArrayToLong(byteArray, DST_ENDPOINT_ID_OFFSET));
-        msgID = TypeHelper.byteArrayToLong(byteArray, MSG_ID_OFFSET);
+        type = readType(byteArray, offset);
+        srcAgentID = readSrcAgentID(byteArray, offset);
+        srcEndpointID = readSrcEndpointID(byteArray, offset);
+        dstAgentID = readDstAgentID(byteArray, offset);
+        dstEndpointID = readDstEndpointID(byteArray, offset);
+        msgID = readMessageID(byteArray, offset);
 
         for (int i = 0; i < datalength; i++) {
-            data[i] = byteArray[Message.HEADER_LENGTH + i];
+            data[i] = byteArray[HEADER_LENGTH + i];
         }
     }
 
@@ -77,14 +82,14 @@ public class Message {
         TypeHelper.longToByteArray(msgID, byteArray, MSG_ID_OFFSET);
 
         for (int i = 0; i < data.length; i++) {
-            byteArray[Message.HEADER_LENGTH + i] = data[i];
+            byteArray[HEADER_LENGTH + i] = data[i];
         }
 
         return byteArray;
     }
 
     /**
-     * @return the total length of the formatted message
+     * @return the total length of the formatted message (header length + data length)
      */
     public int getLength() {
         return HEADER_LENGTH + data.length;
@@ -92,6 +97,77 @@ public class Message {
 
     public int getProtoID() {
         return PROTOV1;
+    }
+
+    /**
+     * Reads the length of a formatted message beginning at a certain offset inside a buffer. 
+     * @param byteArray the buffer in which to read 
+     * @param offset the offset at which to find the beginning of the message in the buffer
+     * @return the total length of the formatted message
+     */
+    public int readLength(byte[] byteArray, int offset) {
+        return TypeHelper.byteArrayToInt(byteArray, offset + LENGTH_OFFSET);
+    }
+
+    /**
+     * Reads the type of a formatted message beginning at a certain offset inside a buffer. 
+     * @param byteArray the buffer in which to read 
+     * @param offset the offset at which to find the beginning of the message in the buffer
+     * @return the type of the formatted message
+     */
+    public int readType(byte[] byteArray, int offset) {
+        return TypeHelper.byteArrayToInt(byteArray, offset + MSG_TYPE_OFFSET);
+    }
+
+    //TODO: see if we also do a function readSrc(/Dst)AgentIDAsLong which returns the ID as a long and does not encapsulate it inside an AgentID object
+    /**
+     * Reads the srcAgentID of a formatted message beginning at a certain offset inside a buffer. Encapsulates it in an AgentID object.
+     * @param byteArray the buffer in which to read 
+     * @param offset the offset at which to find the beginning of the message in the buffer
+     * @return the srcAgentID of the formatted message
+     */
+    public AgentID readSrcAgentID(byte[] byteArray, int offset) {
+        return new AgentID(TypeHelper.byteArrayToLong(byteArray, offset + SRC_AGENT_ID_OFFSET));
+    }
+
+    /**
+     * Reads the srcEndpointID of a formatted message beginning at a certain offset inside a buffer. Encapsulates it in an Endpoint object. 
+     * @param byteArray the buffer in which to read 
+     * @param offset the offset at which to find the beginning of the message in the buffer
+     * @return the srcEndpointID of the formatted message
+     */
+    public EndpointID readSrcEndpointID(byte[] byteArray, int offset) {
+        return new EndpointID(TypeHelper.byteArrayToLong(byteArray, offset + SRC_ENDPOINT_ID_OFFSET));
+    }
+
+    /**
+     * Reads the dstAgentID of a formatted message beginning at a certain offset inside a buffer. Encapsulates it in an AgentID object.
+     * @param byteArray the buffer in which to read 
+     * @param offset the offset at which to find the beginning of the message in the buffer
+     * @return the dstAgentID of the formatted message
+     */
+    public AgentID readDstAgentID(byte[] byteArray, int offset) {
+        return new AgentID(TypeHelper.byteArrayToLong(byteArray, offset + DST_AGENT_ID_OFFSET));
+    }
+
+    /**
+     * Reads the dstEndpointID of a formatted message beginning at a certain offset inside a buffer. Encapsulates it in an Endpoint object. 
+     * @param byteArray the buffer in which to read 
+     * @param offset the offset at which to find the beginning of the message in the buffer
+     * @return the dstEndpointID of the formatted message
+     */
+    public EndpointID readDstEndpointID(byte[] byteArray, int offset) {
+        return new EndpointID(TypeHelper.byteArrayToLong(byteArray, offset + DST_ENDPOINT_ID_OFFSET));
+    }
+
+    /**
+     * Reads the MessageID of a formatted message beginning at a certain offset inside a buffer. 
+     * @param byteArray the buffer in which to read 
+     * @param offset the offset at which to find the beginning of the message in the buffer
+     * @return the MessageID of the formatted message
+     */
+    public long readMessageID(byte[] byteArray, int offset) {
+        return TypeHelper.byteArrayToLong(byteArray, offset + MSG_ID_OFFSET);
     }
 
     //traditional getters and setters

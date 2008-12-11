@@ -32,7 +32,7 @@ public interface Endpoint {
      * @return id The unique ID available
      */
     public long nextAvailableID();
-    
+
     /**
      * Return the EndpointID of this Endpoint
      * 
