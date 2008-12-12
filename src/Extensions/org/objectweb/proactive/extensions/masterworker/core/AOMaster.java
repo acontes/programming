@@ -41,6 +41,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.body.exceptions.BodyTerminatedRequestException;
 import org.objectweb.proactive.core.body.exceptions.SendRequestCommunicationException;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
@@ -120,6 +121,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
 
     /** Group of workers */
     private Group<Worker> workerGroup;
+    private HashMap<String, Worker> workers;
 
     /** Initial memory of the workers */
     private MemoryFactory memoryFactory;
@@ -129,9 +131,10 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
 
     /** Group of sleeping workers */
     private Group<Worker> sleepingGroup;
+    private HashMap<String, Worker> sleepingWorkers;
 
     /** Group of cleared workers */
-    private Set<Worker> clearedWorkers;
+    private Set<String> clearedWorkers;
 
     /** Names of workers which have been spawned * */
     private Set<String> spawnedWorkerNames;
@@ -272,9 +275,12 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
                 logger.debug("new worker " + workerName + " recorded by the master");
             }
             recordWorker(worker, workerName);
-            if (isClearing) {
-                // If the master is clearing we send the clearing message to this new worker
+            try {
                 worker.clear();
+            } catch (Exception e) {
+                if (debug) {
+                    logger.debug("Clear worker " + workerName + "error");
+                }
             }
         }
 
@@ -285,21 +291,26 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
                 // If the worker requests a flooding this means that its penqing queue is empty,
                 // thus, it will sleep
                 if (flooding == 1) {
-                    if (!sleepingGroup.contains(worker)) {
+                    if (!sleepingWorkers.containsKey(workerName)) {
                         if (debug) {
                             logger.debug("Add worker " + workerName + " to sleeping group");
                         }
                         sleepingGroup.add(worker);
+                        sleepingWorkers.put(workerName, worker);
                     }
 
                 }
             } else {
                 workersActivity.put(workerName, new HashSet<Long>());
                 if (!sleepingGroup.contains(worker)) {
-                    if (debug) {
-                        logger.debug("Add worker " + workerName + " to sleeping group");
+                	if (!sleepingWorkers.containsKey(workerName)) {
+                        if (debug) {
+                            logger.debug("Add worker " + workerName + " to sleeping group");
+                        }
+                        sleepingGroup.add(worker);
+                        sleepingWorkers.put(workerName, worker);
                     }
-                    sleepingGroup.add(worker);
+
                 }
             }
             if (debug) {
@@ -308,8 +319,9 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
             // we return an empty queue, this will cause the worker to sleep for a while
             return new LinkedList<TaskIntern<Serializable>>();
         } else {
-            if (sleepingGroup.contains(worker)) {
+            if (sleepingWorkers.containsKey(workerName)) {
                 sleepingGroup.remove(worker);
+                sleepingWorkers.remove(workerName);
             }
             Queue<TaskIntern<Serializable>> tasksToDo = new LinkedList<TaskIntern<Serializable>>();
 
@@ -378,7 +390,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
         pendingSubRequests = new HashMap<String, Request>();
         subResultQueues = new HashMap<String, ResultQueue<Serializable>>();
         idMap = new HashMap<Long, Long>();
-        clearedWorkers = new HashSet<Worker>();
+        clearedWorkers = new HashSet<String>();
         spawnedWorkerNames = new HashSet<String>();
         workersDependencies = new HashMap<String, List<String>>();
         workersDependenciesRev = new HashMap<String, String>();
@@ -392,9 +404,11 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
             // Worker Group
             workerGroupStub = (Worker) PAGroup.newGroup(workerClassName);
             workerGroup = PAGroup.getGroup(workerGroupStub);
+            workers = new HashMap<String, Worker>();
             // Group of sleeping workers
             sleepingGroupStub = (Worker) PAGroup.newGroup(workerClassName);
             sleepingGroup = PAGroup.getGroup(sleepingGroupStub);
+            sleepingWorkers = new HashMap<String, Worker>();
             workersActivity = new HashMap<String, Set<Long>>();
             workersByName = new HashMap<String, Worker>();
             workersByNameRev = new HashMap<Worker, String>();
@@ -409,7 +423,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
             // The resource manager
             smanager = (AOWorkerManager) PAActiveObject.newActive(AOWorkerManager.class.getName(),
                     new Object[] { stubOnThis, memoryFactory, masterDescriptorURL, applicationUsed,
-                            masterVNNAme });
+                            masterVNNAme }, PAActiveObject.getNode());
 
             // The worker pinger
             pinger = (WorkerWatcher) PAActiveObject.newActive(AOPinger.class.getName(),
@@ -423,46 +437,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
 
     /** {@inheritDoc} */
     public boolean isDead(final Worker worker) {
-        if (workersByNameRev.containsKey(worker)) {
-            String workerName = workersByNameRev.get(worker);
-            if (logger.isInfoEnabled()) {
-                logger.info(workerName + " reported missing... removing it");
-            }
-
-            // we remove the worker from our lists
-            if (workerGroup.contains(worker)) {
-                workerGroup.remove(worker);
-                if (sleepingGroup.contains(worker)) {
-                    sleepingGroup.remove(worker);
-                }
-                if (clearedWorkers.contains(worker)) {
-                    clearedWorkers.remove(worker);
-                }
-
-                // Among our "dictionary of workers", we remove only entries in the reverse dictionary,
-                // By doing that, if ever the worker appears not completely dead and reappears, we can handle it
-                workersByName.remove(workerName);
-                // We remove the activity of this worker and every children workers
-                removeActivityOfWorker(workerName);
-                if (workersDependencies.containsKey(workerName)) {
-                    List<String> childrenWorkers = workersDependencies.get(workerName);
-                    // Reverse walk, latest spawned workers need to be handled before the oldest ones
-                    ListIterator<String> it = childrenWorkers.listIterator(childrenWorkers.size());
-                    while (it.hasPrevious()) {
-                        String childWorkerName = it.previous();
-                        removeActivityOfWorker(childWorkerName);
-                        workersDependenciesRev.remove(childWorkerName);
-                    }
-                    childrenWorkers.clear();
-                    workersDependencies.remove(workerName);
-
-                }
-                smanager.isDead(workerName);
-            }
-            return true;
-        }
-        return false;
-
+    	throw new UnsupportedOperationException("Error arguments when call isDead");
     }
 
     /**
@@ -562,7 +537,14 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
                     removeAllTasksDependencies(taskId);
                 }
             }
-            workersActivity.get(workerName).clear();
+            
+            try {
+            	workersActivity.get(workerName).clear();
+            } catch (Exception e) {
+                if (debug) {
+                    logger.debug("Clear worker " + workerName + "error");
+                }
+            }
             workersActivity.remove(workerName);
         }
     }
@@ -605,17 +587,78 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
     /** {@inheritDoc} */
     public void isCleared(Worker worker) {
 
-        String workerName = workersByNameRev.get(worker);
-        if (debug) {
-            logger.debug(workerName + " is cleared");
+    	try {
+    		String workerName = workersByNameRev.get(worker);
+    		if(!clearedWorkers.contains(workerName)){
+            	if (debug) {
+                    logger.debug(workerName + " is cleared");
+                }
+            	clearedWorkers.add(workerName);
+            }
+        } catch (Exception e) {
+            if (debug) {
+                logger.debug("Cleared worker is dead");
+            }
         }
+    }
+    
+    public void isCleared(String workerName) {
 
-        clearedWorkers.add(worker);
+    	if(!clearedWorkers.contains(workerName)){
+        	if (debug) {
+                logger.debug(workerName + " is cleared");
+            }
+        	clearedWorkers.add(workerName);
+        }
     }
 
     /** {@inheritDoc} */
     public boolean isDead(final String workerName) {
-        throw new UnsupportedOperationException();
+    	if(workersByName.containsKey(workerName)){
+    		if (logger.isInfoEnabled()) {
+                logger.info(workerName + " reported missing... removing it");
+            }
+
+            // we remove the worker from our lists
+            if (workers.containsKey(workerName)) {
+                workerGroup.remove(workersByName.get(workerName));
+                workers.remove(workerName);
+                if (sleepingWorkers.containsKey(workerName)) {
+                    sleepingGroup.remove(workersByName.get(workerName));
+                    sleepingWorkers.remove(workerName);
+                }
+                if (clearedWorkers.contains(workerName)) {
+                    clearedWorkers.remove(workerName);
+                }
+
+                // Among our "dictionary of workers", we remove only entries in the reverse dictionary,
+                // By doing that, if ever the worker appears not completely dead and reappears, we can handle it
+                workersByName.remove(workerName);
+                // We remove the activity of this worker and every children workers
+                removeActivityOfWorker(workerName);
+                if (workersDependencies.containsKey(workerName)) {
+                    List<String> childrenWorkers = workersDependencies.get(workerName);
+                    // Reverse walk, latest spawned workers need to be handled before the oldest ones
+                    ListIterator<String> it = childrenWorkers.listIterator(childrenWorkers.size());
+                    while (it.hasPrevious()) {
+                        String childWorkerName = it.previous();
+                        removeActivityOfWorker(childWorkerName);
+                        workersDependenciesRev.remove(childWorkerName);
+                    }
+                    childrenWorkers.clear();
+                    workersDependencies.remove(workerName);
+
+                }
+                smanager.isDead(workerName);
+            }
+            return true;
+    	}
+    	else{
+    		if (debug) {
+                logger.debug("Pinger reports " + workerName + " missing but it is unknown");
+            }
+    		return false;
+    	}
     }
 
     /** {@inheritDoc} */
@@ -663,9 +706,10 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
             workersByName.put(workerName, worker);
             workersByNameRev.put(worker, workerName);
             workerGroup.add(worker);
+            workers.put(workerName, worker);
 
             // We tell the pinger to watch for this new worker
-            pinger.addWorkerToWatch(worker);
+            pinger.addWorkerToWatch(worker, workerName);
         }
     }
 
@@ -769,9 +813,11 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
                 service.serveOldest(clearingFilter);
             }
             if (clearedWorkers.size() == workerGroup.size() + spawnedWorkerNames.size()) {
-                for (Worker worker : clearedWorkers) {
-                    if (!sleepingGroup.contains(worker))
-                        sleepingGroup.add(worker);
+                for (String workerName : clearedWorkers) {
+                    if (!sleepingWorkers.containsKey(workerName)) {
+                    	sleepingGroup.add(workersByName.get(workerName));
+                        sleepingWorkers.put(workerName, workersByName.get(workerName));
+                    }
                 }
 
                 isClearing = false;
@@ -842,6 +888,10 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
                     } catch (SendRequestCommunicationException exp) {
                         if (debug) {
                             logger.debug("Submaster " + submasterName + " has already been freed.");
+                        }
+                    } catch (BodyTerminatedRequestException exp1){
+                    	if (debug) {
+                            logger.debug("Master has already been terminaterd.");
                         }
                     }
                     if (debug) {
@@ -1033,6 +1083,9 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
 
         // We tell all the worker to clear their pending tasks
         try {
+        	if (debug) {
+                logger.debug("WorkerGroup size is: " + workerGroup.size());
+            }
             workerGroupStub.clear();
         } catch (Exception e) {
             // TODO Auto-generated catch block
@@ -1310,16 +1363,21 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
 
     protected BooleanWrapper finalTerminate() {
 
+    	if (debug) {
+            logger.debug("finalTerminate of Master ...");
+        }
         workersByName.clear();
         workersByNameRev.clear();
 
         // we empty groups
         workerGroup.purgeExceptionAndNull();
         workerGroup.clear();
+        workers.clear();
         workerGroupStub = null;
         sleepingGroup.purgeExceptionAndNull();
         sleepingGroup.clear();
         sleepingGroupStub = null;
+        sleepingWorkers.clear();
 
         clearedWorkers.clear();
         pendingRequest = null;
@@ -1331,6 +1389,9 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
         stubOnThis = null;
 
         terminated = true;
+        if (debug) {
+            logger.debug("finalTerminate of Master finished...");
+        }
         return new BooleanWrapper(true);
     }
 

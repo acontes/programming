@@ -52,6 +52,7 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.internal.Worke
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.WorkerDeadListener;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.WorkerManager;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.WorkerMaster;
+import org.objectweb.proactive.extensions.masterworker.interfaces.internal.WorkerPeer;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.WorkerWatcher;
 
 import org.objectweb.proactive.extensions.masterworker.util.TaskID;
@@ -104,6 +105,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
 
     /** Group of workers */
     private Group<Worker> workerGroup;
+    private HashMap<String, Worker> activeWorkers;
 
     /** Initial memory of the workers */
     private MemoryFactory memoryFactory;
@@ -113,9 +115,10 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
 
     /** Group of sleeping workers */
     private Group<Worker> sleepingGroup;
+    private HashMap<String, Worker> sleepingWorkers;
 
     /** Group of cleared workers */
-    private Set<Worker> clearedWorkers;
+    private Set<String> clearedWorkers;
 
     /** Names of workers which have been spawned * */
     private Set<String> spawnedWorkerNames;
@@ -177,6 +180,21 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             logger.debug("Creating submaster : " + name);
         }
     }
+    
+    public BooleanWrapper InitSubMaster(final long workerNameCounter, final HashMap<Long, WorkerPeer> workerPeers, final HashMap<String, Worker> workers) {
+    	BooleanWrapper wrap = ((AOSubWorkerManager)smanager).initSubWorkerManager(workerNameCounter, workerPeers, workers);
+
+    	
+    	sleepingGroup.addAll(workers.values());
+    	sleepingWorkers.putAll(workers);
+    	try {
+            sleepingGroupStub.wakeup();
+        } catch (Exception e) {
+            // We ignore NFE pinger is responsible for that
+        }
+    	PAFuture.waitFor(wrap);
+        return new BooleanWrapper(true);
+    }
 
     public void addResources(final Collection<Node> nodes) {
 
@@ -212,7 +230,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         pendingSubRequests = new HashMap<String, Request>();
         subResultQueues = new HashMap<Long, ResultQueue<Serializable>>();
         taskIdCounters = new HashMap<Long, Long>();
-        clearedWorkers = new HashSet<Worker>();
+        clearedWorkers = new HashSet<String>();
         spawnedWorkerNames = new HashSet<String>();
         divisibleTasksAssociationWithWorkers = new HashMap<Long, String>();
         requestsToServeImmediately = new ArrayList<Request>();
@@ -223,9 +241,11 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             // Worker Group
             workerGroupStub = (Worker) PAGroup.newGroup(workerClassName);
             workerGroup = PAGroup.getGroup(workerGroupStub);
+            activeWorkers = new HashMap<String, Worker>();
             // Group of sleeping workers
             sleepingGroupStub = (Worker) PAGroup.newGroup(workerClassName);
             sleepingGroup = PAGroup.getGroup(sleepingGroupStub);
+            sleepingWorkers = new HashMap<String, Worker>();
             workersActivity = new HashMap<String, Set<Long>>();
             workersByName = new HashMap<String, Worker>();
             workersByNameRev = new HashMap<Worker, String>();
@@ -239,17 +259,19 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             // These two objects are initiated inside the initActivity because of the need to the stub on this
             // The resource manager
             smanager = (AOSubWorkerManager) PAActiveObject.newActive(AOSubWorkerManager.class.getName(),
-                    new Object[] { stubOnThis, memoryFactory, name });
+                    new Object[] { stubOnThis, provider, memoryFactory, name }, PAActiveObject.getNode());
 
             // The worker pinger
             pinger = (WorkerWatcher) PAActiveObject.newActive(AOPinger.class.getName(),
-                    new Object[] { stubOnThis });
+                    new Object[] { stubOnThis }, PAActiveObject.getNode());
         } catch (ActiveObjectCreationException e1) {
             e1.printStackTrace();
         } catch (NodeException e1) {
             e1.printStackTrace();
         }
 
+        PAActiveObject.setImmediateService("heartBeat");
+        PAActiveObject.setImmediateService("initSubMaster");
         stubOnThis.getIntialTasks();
     }
 
@@ -303,9 +325,10 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             workersByName.put(workerName, worker);
             workersByNameRev.put(worker, workerName);
             workerGroup.add(worker);
-
+            activeWorkers.put(workerName, worker);
+            
             // We tell the pinger to watch for this new worker
-            pinger.addWorkerToWatch(worker);
+            pinger.addWorkerToWatch(worker, workerName);
         }
     }
 
@@ -373,21 +396,25 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
                 // If the worker requests a flooding this means that its penqing queue is empty,
                 // thus, it will sleep
                 if (flooding == 1) {
-                    if (!sleepingGroup.contains(worker)) {
+                	if (!sleepingWorkers.containsKey(workerName)) {
                         if (debug) {
                             logger.debug("Add worker " + workerName + " to sleeping group");
                         }
                         sleepingGroup.add(worker);
+                        sleepingWorkers.put(workerName, worker);
                     }
+
                 }
             } else {
                 workersActivity.put(workerName, new HashSet<Long>());
-                if (!sleepingGroup.contains(worker)) {
+                if (!sleepingWorkers.containsKey(workerName)) {
                     if (debug) {
                         logger.debug("Add worker " + workerName + " to sleeping group");
                     }
                     sleepingGroup.add(worker);
+                    sleepingWorkers.put(workerName, worker);
                 }
+
             }
             if (debug) {
                 logger.debug("No task given to " + workerName);
@@ -395,8 +422,9 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             // we return an empty queue, this will cause the worker to sleep for a while
             return new LinkedList<TaskIntern<Serializable>>();
         } else {
-            if (sleepingGroup.contains(worker)) {
+        	if (sleepingWorkers.containsKey(workerName)) {
                 sleepingGroup.remove(worker);
+                sleepingWorkers.remove(workerName);
             }
             Queue<TaskIntern<Serializable>> tasksToDo = new LinkedList<TaskIntern<Serializable>>();
 
@@ -442,13 +470,32 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
 
     public void isCleared(Worker worker) {
         // TODO Auto-generated method stub
-        if (debug) {
-            String workerName = workersByNameRev.get(worker);
-            logger.debug(workerName + " is cleared");
+    	try {
+    		String workerName = workersByNameRev.get(worker);
+    		if(!clearedWorkers.contains(workerName)){
+            	if (debug) {
+                    logger.debug(workerName + " is cleared");
+                }
+            	clearedWorkers.add(workerName);
+            }
+        } catch (Exception e) {
+            if (debug) {
+                logger.debug("Cleared worker is dead");
+            }
         }
-
-        clearedWorkers.add(worker);
-
+    	
+        
+    }
+    
+    public void isCleared(String workerName) {
+        // TODO Auto-generated method stub
+    	
+        if(!clearedWorkers.contains(workerName)){
+        	if (debug) {
+                logger.debug(workerName + " is cleared");
+            }
+        	clearedWorkers.add(workerName);
+        }
     }
 
     public BooleanWrapper sendResultFromMaster(ResultIntern<Serializable> result, String workerName) {
@@ -542,7 +589,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
                         flooding = 1;
                     tasksToAdd = provider.sendResultsAndGetTasks(resultQueue.getNextK(resultQueue
                             .countAvailableResults()), name, flooding);
-                    PAEventProgramming.addActionOnFuture(tasksToAdd, "addTasksToPengding");
+                    PAEventProgramming.addActionOnFuture(tasksToAdd, "addTasksToPending");
                 }
             } catch (SendRequestCommunicationException exp) {
                 if (debug) {
@@ -560,7 +607,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
                 flooding = 1;
             try {
                 tasksToAdd = provider.getTasks(stubOnThis, name, flooding);
-                PAEventProgramming.addActionOnFuture(tasksToAdd, "addTasksToPengding");
+                PAEventProgramming.addActionOnFuture(tasksToAdd, "addTasksToPending");
             } catch (SendRequestCommunicationException exp) {
                 if (debug) {
                     logger.debug("Master has already been freed.");
@@ -569,7 +616,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         }
     }
 
-    public void addTasksToPengding(Future<Queue<TaskIntern<Serializable>>> future) {
+    public void addTasksToPending(Future<Queue<TaskIntern<Serializable>>> future) {
         if (!terminating) {
             Queue<TaskIntern<Serializable>> tasksToAdd = null;
 
@@ -1109,9 +1156,11 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             //                logger.debug("\nCleared worker size is:" + clearedWorkers.size() + "\nworkergroup size is:" + workerGroup.size() + "\nspawnedWorkers size is:" + spawnedWorkerNames.size());
             //            }
             if (clearedWorkers.size() == workerGroup.size() + spawnedWorkerNames.size()) {
-                for (Worker worker : clearedWorkers) {
-                    if (!sleepingGroup.contains(worker))
-                        sleepingGroup.add(worker);
+                for (String workerName : clearedWorkers) {
+                    if (!sleepingWorkers.containsKey(workerName)) {
+                    	sleepingGroup.add(workersByName.get(workerName));
+                        sleepingWorkers.put(workerName, workersByName.get(workerName));
+                    }
                 }
 
                 isClearing = false;
@@ -1131,7 +1180,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             logger.debug("SubMaster " + name + " cleared");
         }
 
-        provider.isCleared(stubOnThis);
+        provider.isCleared(name);
     }
 
     /**
@@ -1317,9 +1366,11 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         workerGroup.purgeExceptionAndNull();
         workerGroup.clear();
         workerGroupStub = null;
+        activeWorkers.clear();
         sleepingGroup.purgeExceptionAndNull();
         sleepingGroup.clear();
         sleepingGroupStub = null;
+        sleepingWorkers.clear();
 
         clearedWorkers.clear();
         pendingRequest = null;
@@ -1430,33 +1481,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
 
     public boolean isDead(Worker worker) {
         // TODO Auto-generated method stub
-        if (workersByNameRev.containsKey(worker)) {
-            String workerName = workersByNameRev.get(worker);
-            if (logger.isInfoEnabled()) {
-                logger.info(workerName + " reported missing... removing it");
-            }
-
-            // we remove the worker from our lists
-            if (workerGroup.contains(worker)) {
-                workerGroup.remove(worker);
-                if (sleepingGroup.contains(worker)) {
-                    sleepingGroup.remove(worker);
-                }
-                if (clearedWorkers.contains(worker)) {
-                    clearedWorkers.remove(worker);
-                }
-
-                // Among our "dictionary of workers", we remove only entries in the reverse dictionary,
-                // By doing that, if ever the worker appears not completely dead and reappears, we can handle it
-                workersByName.remove(workerName);
-                // We remove the activity of this worker and every children workers
-                removeActivityOfWorker(workerName);
-
-                smanager.isDead(workerName);
-            }
-            return true;
-        }
-        return false;
+    	throw new UnsupportedOperationException("Error arguments when call isDead");
 
     }
 
@@ -1495,14 +1520,51 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
                     pendingTasks.add(launchedTaskList.remove(taskId));
                 }
             }
-            workersActivity.get(workerName).clear();
+            try {
+            	workersActivity.get(workerName).clear();
+            } catch (Exception e) {
+                if (debug) {
+                    logger.debug("Clear worker " + workerName + "error");
+                }
+            }
             workersActivity.remove(workerName);
         }
     }
 
-    public boolean isDead(String workerName) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
+    public boolean isDead(final String workerName) {
+    	if(workersByName.containsKey(workerName)){
+    		if (logger.isInfoEnabled()) {
+                logger.info(workerName + " reported missing... removing it");
+            }
+
+            // we remove the worker from our lists
+            if (activeWorkers.containsKey(workerName)) {
+                workerGroup.remove(workersByName.get(workerName));
+                activeWorkers.remove(workerName);
+                if (sleepingWorkers.containsKey(workerName)) {
+                    sleepingGroup.remove(workersByName.get(workerName));
+                    sleepingWorkers.remove(workerName);
+                }
+                if (clearedWorkers.contains(workerName)) {
+                    clearedWorkers.remove(workerName);
+                }
+
+                // Among our "dictionary of workers", we remove only entries in the reverse dictionary,
+                // By doing that, if ever the worker appears not completely dead and reappears, we can handle it
+                workersByName.remove(workerName);
+                // We remove the activity of this worker and every children workers
+                removeActivityOfWorker(workerName);
+
+                smanager.isDead(workerName);
+            }
+            return true;
+    	}
+    	else{
+    		if (debug) {
+                logger.debug("Pinger reports " + workerName + " missing but it is unknown");
+            }
+    		return false;
+    	}
     }
 
 }

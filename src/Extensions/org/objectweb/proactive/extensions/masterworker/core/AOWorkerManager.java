@@ -40,6 +40,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
+import org.objectweb.proactive.core.body.exceptions.BodyTerminatedRequestException;
 import org.objectweb.proactive.core.body.exceptions.SendRequestCommunicationException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -453,14 +454,13 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
             threadPool.awaitTermination(120, TimeUnit.SECONDS);
 
             // we send the terminate message to every thread
-            for (Entry<String, Worker> worker : workers.entrySet()) {
-                String workerName = worker.getKey();
+            for (String workerName : workers.keySet()) {
                 try {
                     if (debug) {
                         logger.debug("Ask for terminating worker " + workerName);
                     }
-                    BooleanWrapper term = worker.getValue().terminate();
 
+                	BooleanWrapper term = (workers.get(workerName)).terminate();
                     // as it is a termination algorithm we wait a bit, but not forever
                     PAFuture.waitFor(term);
 
@@ -471,7 +471,11 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
                     if (debug) {
                         logger.debug(workerName + " is already freed.");
                     }
-                }
+                } catch (BodyTerminatedRequestException exp1){
+                	if (debug) {
+                        logger.debug("Master has already been terminaterd.");
+                    }
+                }                
             }
 
             // if the user asked it, we also release the resources, by killing all JVMs

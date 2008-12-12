@@ -39,6 +39,7 @@ import org.objectweb.proactive.Service;
 import org.objectweb.proactive.annotation.Cache;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
+import org.objectweb.proactive.core.body.exceptions.BodyTerminatedRequestException;
 import org.objectweb.proactive.core.body.exceptions.SendRequestCommunicationException;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -170,7 +171,12 @@ public class AOWorker implements InitActive, Serializable, Worker {
             if (debug) {
                 logger.debug("Master has already been freed.");
             }
+        } catch (BodyTerminatedRequestException exp1){
+        	if (debug) {
+                logger.debug("Master has already been terminaterd.");
+            }
         }
+        
     }
 
     /** gets the initial task to solve */
@@ -196,6 +202,10 @@ public class AOWorker implements InitActive, Serializable, Worker {
         } catch (SendRequestCommunicationException exp) {
             if (debug) {
                 logger.debug("Master has already been freed.");
+            }
+        } catch (BodyTerminatedRequestException exp1){
+        	if (debug) {
+                logger.debug("Master has already been terminaterd.");
             }
         }
 
@@ -258,7 +268,17 @@ public class AOWorker implements InitActive, Serializable, Worker {
                 e.printStackTrace();
             }
             // We tell the master that we forwarded the task to another worker
-            PAFuture.waitFor(provider.forwardedTask(task.getId(), name, newWorkerName));
+            try{
+            	PAFuture.waitFor(provider.forwardedTask(task.getId(), name, newWorkerName));
+            } catch (SendRequestCommunicationException exp) {
+                if (debug) {
+                    logger.debug("Master has already been freed when try to forward task " + task.getId());
+                }
+            } catch (BodyTerminatedRequestException exp1){
+            	if (debug) {
+                    logger.debug("Master has already been terminaterd when try to forward task " + task.getId());
+                }
+            }
             // We tell the worker that it's now known by the master and can do it's job
             spawnedWorker.readyToLive();
             // We get some new tasks
@@ -356,6 +376,20 @@ public class AOWorker implements InitActive, Serializable, Worker {
         pendingTasksFutures.clear();
         Service service = new Service(PAActiveObject.getBodyOnThis());
         service.flushAll();
-        provider.isCleared(stubOnThis);
+        try{
+        	provider.isCleared(name);
+        } catch (SendRequestCommunicationException exp) {
+            if (debug) {
+                logger.debug("Master has already been freed.");
+            }
+        } catch (BodyTerminatedRequestException exp1){
+        	if (debug) {
+                logger.debug("Master has already been terminaterd.");
+            }
+        } catch (Exception exp2){
+        	if (debug) {
+                logger.debug("Master has deaded.");
+            }
+        }
     }
 }
