@@ -115,7 +115,6 @@ public class Message {
         return byteArray;
     }
 
-
     public static Message registrationRequestMessage() {
         return new Message(MessageType.REGISTRATION_REQUEST.getValue(), null, null, 0, null);
     }
@@ -140,7 +139,7 @@ public class Message {
     public static Message dataMessage(AgentID srcAgentID, AgentID dstAgentID, long msgID, byte[] data) {
         return new Message(MessageType.DATA.getValue(), srcAgentID, dstAgentID, msgID, data);
     }
-    
+
     /**
      * @return the total length of the formatted message (header length + data length)
      */
