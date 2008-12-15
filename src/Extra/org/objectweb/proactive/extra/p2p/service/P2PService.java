@@ -76,6 +76,7 @@ import org.objectweb.proactive.extra.p2p.service.util.UniversalUniqueID;
  *
  */
 @PublicAPI
+@SuppressWarnings("serial")
 public class P2PService implements InitActive, P2PConstants, Serializable {
 
     /** Logger. */

@@ -35,7 +35,6 @@ import static org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLogg
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -53,7 +52,6 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
-import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
@@ -195,15 +193,13 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
             // Export this GCMApplication as a remote object
             RemoteObjectExposer<GCMApplication> roe = new RemoteObjectExposer<GCMApplication>(
                 GCMApplication.class.getName(), this, GCMApplicationRemoteObjectAdapter.class);
-            URI uri = RemoteObjectHelper.generateUrl(deploymentId + "/GCMApplication");
-            roe.createRemoteObject(uri);
+            roe.createRemoteObject(deploymentId + "/GCMApplication");
 
             // Export all VirtualNodes as remote objects
             for (GCMVirtualNode vn : virtualNodes.values()) {
                 RemoteObjectExposer<GCMVirtualNode> vnroe = new RemoteObjectExposer<GCMVirtualNode>(
                     GCMVirtualNode.class.getName(), vn, GCMVirtualNodeRemoteObjectAdapter.class);
-                uri = RemoteObjectHelper.generateUrl(deploymentId + "/VirtualNode/" + vn.getName());
-                vnroe.createRemoteObject(uri);
+                vnroe.createRemoteObject(deploymentId + "/VirtualNode/" + vn.getName());
             }
         } catch (Exception e) {
             throw new ProActiveException("Failed to create GCMApplication: " + e.getMessage() +
