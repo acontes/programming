@@ -5,42 +5,98 @@ package org.objectweb.proactive.extra.forwardingv2.protocol;
  *
  * A message MUST have the following structure
  * 
- * MSG = LENGHT | PROTO-ID | MSG_TYPE | SRC_AGENT-ID | SRC_ENDPOINT-ID | DST_AGENT-ID | DST_ENDPOINT-ID | ID | DATA
+ * MSG = LENGHT | PROTO-ID | MSG_TYPE | SRC_AGENT-ID | DST_AGENT-ID | ID | DATA
  * 
  * LENGTH = int
  * PROTO-ID = int
  * MSG_TYPE = int
  * SRC_AGENT-ID = long
- * SRC_ENDPOINT-ID = long
  * DST_AGENT-ID = long
- * DST_ENDPOINT-ID = long
  * ID = long
  * DATA = byte[]
  * 
  */
 public class Message {
 
-    // 1 long for the length, 2 int for protoID and MsgType, 2 long for SrcAgent and SrcEndpoint IDs, 2 long for DstAgent and DstEndpoint IDs, 1 long for MSG_ID 
-    public static final int HEADER_LENGTH = 3 * 4 + 2 * 8 + 2 * 8 + 8; // = 52
-
-    public static final int LENGTH_OFFSET = 0;
-    public static final int PROTO_ID_OFFSET = 4;
-    public static final int MSG_TYPE_OFFSET = 8;
-    public static final int SRC_AGENT_ID_OFFSET = 12;
-    public static final int SRC_ENDPOINT_ID_OFFSET = 20;
-    public static final int DST_AGENT_ID_OFFSET = 28;
-    public static final int DST_ENDPOINT_ID_OFFSET = 36;
-    public static final int MSG_ID_OFFSET = 44;
+    // 1 long for the length, 2 int for protoID and MsgType, 2 long for SrcAgent and DstAgent IDs, 1 long for MSG_ID 
+    public static final int HEADER_LENGTH = 3 * 4 + 2 * 8 + 8; // = 36
 
     public static final int PROTOV1 = 1;
 
+    //offsets in the byte array representation message
+    public enum Offsets {
+        LENGTH_OFFSET(0), PROTO_ID_OFFSET(4), MSG_TYPE_OFFSET(8), SRC_AGENT_ID_OFFSET(12), DST_AGENT_ID_OFFSET(
+                20), MSG_ID_OFFSET(28);
+
+        private final int value;
+
+        private Offsets(int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return this.value;
+        }
+
+    }
+
+    public enum MessageType {
+        REGISTRATION_REQUEST(0), // Registration request to the registry
+        REGISTRATION_REPLY(1), // Registration reply from the registry indicating the attributed localid
+        CONNECTION_REQUEST(2), // Connection request from a client to a server
+        CONNECTION_ACCEPTED(3), // response to a connection request
+        CONNECTION_ABORTED(4), // response to a connection request
+        AGENT_DISCONNECTED(5), // help closing properly the connections
+        DATA(6); // data message
+
+        private final int value;
+
+        private MessageType(int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return this.value;
+        }
+    }
+
+    //attributes
     protected int type;
     protected AgentID srcAgentID, dstAgentID;
-    protected EndpointID srcEndpointID, dstEndpointID;
     protected long msgID;
     protected byte[] data;
 
-    Message() {
+    Message(int type, AgentID srcAgentID, AgentID dstAgentID, long msgID, byte[] data) {
+        this.type = type;
+        this.srcAgentID = srcAgentID;
+        this.dstAgentID = dstAgentID;
+        this.msgID = msgID;
+        this.data = data;
+    }
+
+    public static Message registrationRequestMessage() {
+        return new Message(MessageType.REGISTRATION_REQUEST.getValue(), null, null, 0, null);
+    }
+
+    public static Message registrationReplyMessage(AgentID dstAgentID) {
+        return new Message(MessageType.REGISTRATION_REPLY.getValue(), null, dstAgentID, 0, null);
+    }
+
+    public static Message connectionRequestMessage(AgentID srcAgentID, AgentID dstAgentID, long msgID) {
+        return new Message(MessageType.CONNECTION_REQUEST.getValue(), srcAgentID, dstAgentID, msgID, null);
+    }
+
+    public static Message connectionAcceptedMessage(AgentID srcAgentID, AgentID dstAgentID, long msgID) {
+        return new Message(MessageType.CONNECTION_ACCEPTED.getValue(), srcAgentID, dstAgentID, msgID, null);
+    }
+
+    public static Message connectionAbortedMessage(AgentID srcAgentID, AgentID dstAgentID, long msgID,
+            byte[] cause) {
+        return new Message(MessageType.CONNECTION_ABORTED.getValue(), srcAgentID, dstAgentID, msgID, cause);
+    }
+
+    public static Message dataMessage(AgentID srcAgentID, AgentID dstAgentID, long msgID, byte[] data) {
+        return new Message(MessageType.DATA.getValue(), srcAgentID, dstAgentID, msgID, data);
     }
 
     /**
@@ -54,9 +110,7 @@ public class Message {
 
         type = readType(byteArray, offset);
         srcAgentID = readSrcAgentID(byteArray, offset);
-        srcEndpointID = readSrcEndpointID(byteArray, offset);
         dstAgentID = readDstAgentID(byteArray, offset);
-        dstEndpointID = readDstEndpointID(byteArray, offset);
         msgID = readMessageID(byteArray, offset);
 
         for (int i = 0; i < datalength; i++) {
@@ -72,14 +126,12 @@ public class Message {
         int length = getLength();
         byte[] byteArray = new byte[length];
 
-        TypeHelper.intToByteArray(length, byteArray, LENGTH_OFFSET);
-        TypeHelper.intToByteArray(getProtoID(), byteArray, PROTO_ID_OFFSET);
-        TypeHelper.intToByteArray(type, byteArray, MSG_TYPE_OFFSET);
-        TypeHelper.longToByteArray(srcAgentID.getId(), byteArray, SRC_AGENT_ID_OFFSET);
-        TypeHelper.longToByteArray(srcEndpointID.getId(), byteArray, SRC_ENDPOINT_ID_OFFSET);
-        TypeHelper.longToByteArray(dstAgentID.getId(), byteArray, DST_AGENT_ID_OFFSET);
-        TypeHelper.longToByteArray(dstEndpointID.getId(), byteArray, DST_ENDPOINT_ID_OFFSET);
-        TypeHelper.longToByteArray(msgID, byteArray, MSG_ID_OFFSET);
+        TypeHelper.intToByteArray(length, byteArray, Offsets.LENGTH_OFFSET.getValue());
+        TypeHelper.intToByteArray(getProtoID(), byteArray, Offsets.PROTO_ID_OFFSET.getValue());
+        TypeHelper.intToByteArray(type, byteArray, Offsets.MSG_TYPE_OFFSET.getValue());
+        TypeHelper.longToByteArray(srcAgentID.getId(), byteArray, Offsets.SRC_AGENT_ID_OFFSET.getValue());
+        TypeHelper.longToByteArray(dstAgentID.getId(), byteArray, Offsets.DST_AGENT_ID_OFFSET.getValue());
+        TypeHelper.longToByteArray(msgID, byteArray, Offsets.MSG_ID_OFFSET.getValue());
 
         for (int i = 0; i < data.length; i++) {
             byteArray[HEADER_LENGTH + i] = data[i];
@@ -106,7 +158,7 @@ public class Message {
      * @return the total length of the formatted message
      */
     public int readLength(byte[] byteArray, int offset) {
-        return TypeHelper.byteArrayToInt(byteArray, offset + LENGTH_OFFSET);
+        return TypeHelper.byteArrayToInt(byteArray, offset + Offsets.LENGTH_OFFSET.getValue());
     }
 
     /**
@@ -116,10 +168,10 @@ public class Message {
      * @return the type of the formatted message
      */
     public int readType(byte[] byteArray, int offset) {
-        return TypeHelper.byteArrayToInt(byteArray, offset + MSG_TYPE_OFFSET);
+        return TypeHelper.byteArrayToInt(byteArray, offset + Offsets.MSG_TYPE_OFFSET.getValue());
     }
 
-    //TODO: see if we also do a function readSrc(/Dst)AgentIDAsLong which returns the ID as a long and does not encapsulate it inside an AgentID object
+    //TODO: see if we also do a function readSrc(or Dst)AgentIDAsLong which returns the ID as a long and does not encapsulate it inside an AgentID object
     /**
      * Reads the srcAgentID of a formatted message beginning at a certain offset inside a buffer. Encapsulates it in an AgentID object.
      * @param byteArray the buffer in which to read 
@@ -127,17 +179,8 @@ public class Message {
      * @return the srcAgentID of the formatted message
      */
     public AgentID readSrcAgentID(byte[] byteArray, int offset) {
-        return new AgentID(TypeHelper.byteArrayToLong(byteArray, offset + SRC_AGENT_ID_OFFSET));
-    }
-
-    /**
-     * Reads the srcEndpointID of a formatted message beginning at a certain offset inside a buffer. Encapsulates it in an Endpoint object. 
-     * @param byteArray the buffer in which to read 
-     * @param offset the offset at which to find the beginning of the message in the buffer
-     * @return the srcEndpointID of the formatted message
-     */
-    public EndpointID readSrcEndpointID(byte[] byteArray, int offset) {
-        return new EndpointID(TypeHelper.byteArrayToLong(byteArray, offset + SRC_ENDPOINT_ID_OFFSET));
+        return new AgentID(TypeHelper.byteArrayToLong(byteArray, offset +
+            Offsets.SRC_AGENT_ID_OFFSET.getValue()));
     }
 
     /**
@@ -147,17 +190,8 @@ public class Message {
      * @return the dstAgentID of the formatted message
      */
     public AgentID readDstAgentID(byte[] byteArray, int offset) {
-        return new AgentID(TypeHelper.byteArrayToLong(byteArray, offset + DST_AGENT_ID_OFFSET));
-    }
-
-    /**
-     * Reads the dstEndpointID of a formatted message beginning at a certain offset inside a buffer. Encapsulates it in an Endpoint object. 
-     * @param byteArray the buffer in which to read 
-     * @param offset the offset at which to find the beginning of the message in the buffer
-     * @return the dstEndpointID of the formatted message
-     */
-    public EndpointID readDstEndpointID(byte[] byteArray, int offset) {
-        return new EndpointID(TypeHelper.byteArrayToLong(byteArray, offset + DST_ENDPOINT_ID_OFFSET));
+        return new AgentID(TypeHelper.byteArrayToLong(byteArray, offset +
+            Offsets.DST_AGENT_ID_OFFSET.getValue()));
     }
 
     /**
@@ -167,7 +201,7 @@ public class Message {
      * @return the MessageID of the formatted message
      */
     public long readMessageID(byte[] byteArray, int offset) {
-        return TypeHelper.byteArrayToLong(byteArray, offset + MSG_ID_OFFSET);
+        return TypeHelper.byteArrayToLong(byteArray, offset + Offsets.MSG_ID_OFFSET.getValue());
     }
 
     //traditional getters and setters
@@ -193,22 +227,6 @@ public class Message {
 
     public void setDstAgentID(AgentID dstAgentID) {
         this.dstAgentID = dstAgentID;
-    }
-
-    public EndpointID getSrcEndpointID() {
-        return srcEndpointID;
-    }
-
-    public void setSrcEndpointID(EndpointID srcEndpointID) {
-        this.srcEndpointID = srcEndpointID;
-    }
-
-    public EndpointID getDstEndpointID() {
-        return dstEndpointID;
-    }
-
-    public void setDstEndpointID(EndpointID dstEndpointID) {
-        this.dstEndpointID = dstEndpointID;
     }
 
     public long getMsgID() {
