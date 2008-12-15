@@ -66,7 +66,7 @@ public class Message {
     protected long msgID;
     protected byte[] data;
 
-    Message(int type, AgentID srcAgentID, AgentID dstAgentID, long msgID, byte[] data) {
+    public Message(int type, AgentID srcAgentID, AgentID dstAgentID, long msgID, byte[] data) {
         this.type = type;
         this.srcAgentID = srcAgentID;
         this.dstAgentID = dstAgentID;
@@ -74,37 +74,12 @@ public class Message {
         this.data = data;
     }
 
-    public static Message registrationRequestMessage() {
-        return new Message(MessageType.REGISTRATION_REQUEST.getValue(), null, null, 0, null);
-    }
-
-    public static Message registrationReplyMessage(AgentID dstAgentID) {
-        return new Message(MessageType.REGISTRATION_REPLY.getValue(), null, dstAgentID, 0, null);
-    }
-
-    public static Message connectionRequestMessage(AgentID srcAgentID, AgentID dstAgentID, long msgID) {
-        return new Message(MessageType.CONNECTION_REQUEST.getValue(), srcAgentID, dstAgentID, msgID, null);
-    }
-
-    public static Message connectionAcceptedMessage(AgentID srcAgentID, AgentID dstAgentID, long msgID) {
-        return new Message(MessageType.CONNECTION_ACCEPTED.getValue(), srcAgentID, dstAgentID, msgID, null);
-    }
-
-    public static Message connectionAbortedMessage(AgentID srcAgentID, AgentID dstAgentID, long msgID,
-            byte[] cause) {
-        return new Message(MessageType.CONNECTION_ABORTED.getValue(), srcAgentID, dstAgentID, msgID, cause);
-    }
-
-    public static Message dataMessage(AgentID srcAgentID, AgentID dstAgentID, long msgID, byte[] data) {
-        return new Message(MessageType.DATA.getValue(), srcAgentID, dstAgentID, msgID, data);
-    }
-
     /**
      * Construct a message from the data contained in a formatted byte array.
      * @param byteArray the byte array from which to read
      * @param offset the offset at which to find the message in the byte array
      */
-    Message(byte[] byteArray, int offset) {
+    public Message(byte[] byteArray, int offset) {
         int datalength = readLength(byteArray, offset) - HEADER_LENGTH;
         data = new byte[datalength];
 
@@ -140,6 +115,32 @@ public class Message {
         return byteArray;
     }
 
+
+    public static Message registrationRequestMessage() {
+        return new Message(MessageType.REGISTRATION_REQUEST.getValue(), null, null, 0, null);
+    }
+
+    public static Message registrationReplyMessage(AgentID dstAgentID) {
+        return new Message(MessageType.REGISTRATION_REPLY.getValue(), null, dstAgentID, 0, null);
+    }
+
+    public static Message connectionRequestMessage(AgentID srcAgentID, AgentID dstAgentID, long msgID) {
+        return new Message(MessageType.CONNECTION_REQUEST.getValue(), srcAgentID, dstAgentID, msgID, null);
+    }
+
+    public static Message connectionAcceptedMessage(AgentID srcAgentID, AgentID dstAgentID, long msgID) {
+        return new Message(MessageType.CONNECTION_ACCEPTED.getValue(), srcAgentID, dstAgentID, msgID, null);
+    }
+
+    public static Message connectionAbortedMessage(AgentID srcAgentID, AgentID dstAgentID, long msgID,
+            byte[] cause) {
+        return new Message(MessageType.CONNECTION_ABORTED.getValue(), srcAgentID, dstAgentID, msgID, cause);
+    }
+
+    public static Message dataMessage(AgentID srcAgentID, AgentID dstAgentID, long msgID, byte[] data) {
+        return new Message(MessageType.DATA.getValue(), srcAgentID, dstAgentID, msgID, data);
+    }
+    
     /**
      * @return the total length of the formatted message (header length + data length)
      */
