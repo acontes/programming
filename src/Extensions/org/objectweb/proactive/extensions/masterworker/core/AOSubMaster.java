@@ -694,9 +694,9 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
 
         for (Long divisibletaskid : divisibletaskids) {
             if (divisibleTasksAssociationWithWorkers.get(divisibletaskid).equals(originatorName)) {
-            	if(debug){
-            		logger.debug("Worker " + originatorName + " is running divisible task " + divisibletaskid);
-            	}
+//            	if(debug){
+//            		logger.debug("Worker " + originatorName + " is running divisible task " + divisibletaskid);
+//            	}
                 return divisibletaskid;
             }
         }        
@@ -764,6 +764,8 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         if (originatorName != null && isClearing) {
             clearingCallFromSpawnedWorker(originatorName);
         }
+        
+        divisibleTaskId = getDivisibleTaskIDByOriginatorName(originatorName);
 
         // If the tasks has already been submitted
         if (taskIdCounters.containsKey(divisibleTaskId)) {
@@ -778,7 +780,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         }
         taskIdCounters.put(divisibleTaskId, taskIdCounter);
         
-        divisibleTaskId = getDivisibleTaskIDByOriginatorName(originatorName);
+        
         // If one worker is sending the tasks
         if (subResultQueues.containsKey(divisibleTaskId)) {
         	if (debug) {
@@ -954,6 +956,10 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         if (debug) {
             logger.debug("SubMaster " + name + " is clearing...");
         }
+        
+        // Clear the id counters
+        taskIdCounters.clear();
+        
         // We clear the queues
         resultQueue.clear();
         pendingTasks.clear();
