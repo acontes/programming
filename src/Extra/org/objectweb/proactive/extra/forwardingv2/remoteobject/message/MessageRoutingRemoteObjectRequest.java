@@ -36,6 +36,7 @@ import java.net.URI;
 
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
+import org.objectweb.proactive.extra.forwardingv2.client.AgentV2;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.util.MessageRoutingRegistry;
 
 
@@ -43,8 +44,8 @@ import org.objectweb.proactive.extra.forwardingv2.remoteobject.util.MessageRouti
 public class MessageRoutingRemoteObjectRequest extends MessageRoutingMessage implements Serializable {
     private Request request;
 
-    public MessageRoutingRemoteObjectRequest(Request request, URI uri) {
-        super(uri);
+    public MessageRoutingRemoteObjectRequest(Request request, URI uri, AgentV2 agent) {
+        super(uri, agent);
         this.request = request;
     }
 

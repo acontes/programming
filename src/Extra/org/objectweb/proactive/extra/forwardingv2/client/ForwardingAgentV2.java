@@ -3,6 +3,7 @@ package org.objectweb.proactive.extra.forwardingv2.client;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.URI;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -28,17 +29,6 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.Message.MessageType;
  *
  */
 public class ForwardingAgentV2 implements AgentV2, Runnable {
-
-    // SINGLETON 
-    private static ForwardingAgentV2 _singleton = null;
-
-    synchronized public static ForwardingAgentV2 getAgent() {
-        if (_singleton == null) {
-            _singleton = new ForwardingAgentV2();
-        }
-        return _singleton;
-    }
-
     // FIELDS
     /**
      * Number of retries to connect to the registry.
@@ -77,7 +67,7 @@ public class ForwardingAgentV2 implements AgentV2, Runnable {
 
     private volatile boolean isRunning; // Stopping main Thread
 
-    protected ForwardingAgentV2() {
+    public ForwardingAgentV2() {
         boxes = new ConcurrentHashMap<Long, LocalMailBox>();
         requestIDGenerator = new AtomicLong(0);
         pool = new ThreadPoolExecutor(CORE_POOL_SIZE, MAX_POOL_SIZE, KEEP_ALIVE_TIME, TimeUnit.SECONDS,
@@ -185,6 +175,15 @@ public class ForwardingAgentV2 implements AgentV2, Runnable {
             }
         }
     }
+
+	public byte[] sendMsg(URI targetURI, byte[] data, boolean oneWay) throws ForwardingException {
+		String path = targetURI.getPath();
+	String remoteAgentId = path.substring(0, path.indexOf('/'));
+
+	AgentID agentID = new AgentID(Long.parseLong(remoteAgentId));
+		return sendMsg(agentID, data, oneWay);
+	}
+
 
     /**
      * Send really the message through the tunnel
@@ -337,5 +336,6 @@ public class ForwardingAgentV2 implements AgentV2, Runnable {
             return this.targetID;
         }
     }
+
 
 }

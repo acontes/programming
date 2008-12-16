@@ -40,24 +40,27 @@ import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.SynchronousReplyImpl;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
+import org.objectweb.proactive.extra.forwardingv2.client.AgentV2;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.message.MessageRoutingRemoteObjectRequest;
 
 
 @SuppressWarnings("serial")
 public class MessageRoutingRemoteObjectImpl implements MessageRoutingRemoteObject {
     private URI remoteObjectURL;
+    private AgentV2 agent;
     protected transient InternalRemoteRemoteObject remoteObject;
 
-    public MessageRoutingRemoteObjectImpl(InternalRemoteRemoteObject remoteObject, URI remoteObjectURL) {
+    public MessageRoutingRemoteObjectImpl(InternalRemoteRemoteObject remoteObject, URI remoteObjectURL, AgentV2 agent) {
         this.remoteObject = remoteObject;
         this.remoteObjectURL = remoteObjectURL;
+        this.agent = agent;
     }
 
     public Reply receiveMessage(Request message) throws IOException, RenegotiateSessionException,
             ProActiveException {
 
         MessageRoutingRemoteObjectRequest req = new MessageRoutingRemoteObjectRequest(message,
-            this.remoteObjectURL);
+            this.remoteObjectURL, agent);
         req.send();
         SynchronousReplyImpl rep = (SynchronousReplyImpl) req.getReturnedObject();
         return rep;

@@ -34,6 +34,7 @@ package org.objectweb.proactive.extra.forwardingv2.remoteobject.message;
 import java.io.Serializable;
 import java.net.URI;
 
+import org.objectweb.proactive.extra.forwardingv2.client.AgentV2;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.util.MessageRoutingRegistry;
 
 
@@ -49,8 +50,8 @@ public class MessageRoutingRegistryListRemoteObjectsMessage extends MessageRouti
      * Constructs an HTTP Message
      * @param urn The urn of the Object (it can be an active object or a runtime).
      */
-    public MessageRoutingRegistryListRemoteObjectsMessage(URI uri) {
-        super(uri);
+    public MessageRoutingRegistryListRemoteObjectsMessage(URI uri, AgentV2 agent) {
+        super(uri, agent);
     }
 
     /**

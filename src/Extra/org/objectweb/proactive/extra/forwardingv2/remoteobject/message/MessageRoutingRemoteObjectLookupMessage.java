@@ -37,6 +37,7 @@ import java.net.URI;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
+import org.objectweb.proactive.extra.forwardingv2.client.AgentV2;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.MessageRoutingRemoteObjectFactory;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.MessageRoutingRemoteObjectImpl;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.util.MessageRoutingRegistry;
@@ -57,8 +58,8 @@ public class MessageRoutingRemoteObjectLookupMessage extends MessageRoutingMessa
      * Constructs an HTTP Message
      * @param urn The urn of the Object (it can be an active object or a runtime).
      */
-    public MessageRoutingRemoteObjectLookupMessage(URI uri) {
-        super(uri);
+    public MessageRoutingRemoteObjectLookupMessage(URI uri, AgentV2 agent) {
+        super(uri, agent);
     }
 
     /**

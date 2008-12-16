@@ -38,6 +38,7 @@ import java.net.URI;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.reply.Reply;
+import org.objectweb.proactive.extra.forwardingv2.client.AgentV2;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.util.MessageRoutingUtils;
 
 
@@ -56,8 +57,8 @@ public class MessageRoutingReply extends MessageRoutingMessage implements Serial
      * @param reply The ProActive Reply to encapsulate
      * @param idBody The unique id of the targeted active object
      */
-    public MessageRoutingReply(Reply reply, UniqueID idBody, URI uri) {
-        super(uri);
+    public MessageRoutingReply(Reply reply, UniqueID idBody, URI uri, AgentV2 agent) {
+        super(uri, agent);
         this.reply = reply;
         this.idBody = idBody;
     }

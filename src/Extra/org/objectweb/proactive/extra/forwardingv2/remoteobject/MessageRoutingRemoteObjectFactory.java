@@ -41,12 +41,10 @@ import org.objectweb.proactive.core.remoteobject.RemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectAdapter;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
-import org.objectweb.proactive.core.util.ProActiveInet;
-import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extra.forwardingv2.client.Agent;
-import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
+import org.objectweb.proactive.extra.forwardingv2.client.AgentV2;
+import org.objectweb.proactive.extra.forwardingv2.client.ForwardingAgentV2;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.message.MessageRoutingRegistryListRemoteObjectsMessage;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.message.MessageRoutingRemoteObjectLookupMessage;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.util.MessageRoutingRegistry;
@@ -56,11 +54,11 @@ import org.objectweb.proactive.extra.forwardingv2.remoteobject.util.exceptions.M
 
 public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFactory implements
         RemoteObjectFactory {
-    final private Agent agent;
+    final private AgentV2 agent;
     final private MessageRoutingRegistry registry;
 
     public MessageRoutingRemoteObjectFactory() {
-        this.agent = null;
+        this.agent = new ForwardingAgentV2();
         this.registry = MessageRoutingRegistry.singleton;
     }
 
@@ -73,7 +71,7 @@ public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFacto
      */
     public RemoteRemoteObject newRemoteObject(InternalRemoteRemoteObject target) throws ProActiveException {
         try {
-            return new MessageRoutingRemoteObjectImpl(target, null);
+            return new MessageRoutingRemoteObjectImpl(target, null, agent);
         } catch (Exception e) {
             throw new ProActiveException(e);
         }
@@ -100,7 +98,7 @@ public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFacto
 
         /* #@#@# FIXME */
         registry.bind(uri, ro);
-        MessageRoutingRemoteObjectImpl rro = new MessageRoutingRemoteObjectImpl(ro, uri);
+        MessageRoutingRemoteObjectImpl rro = new MessageRoutingRemoteObjectImpl(ro, uri, agent);
         ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
                 .debug("registering remote object  at endpoint " + uri);
         return rro;
@@ -124,7 +122,7 @@ public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFacto
      * @return a UniversalBody
      */
     public RemoteObject lookup(URI uri) throws ProActiveException {
-        MessageRoutingRemoteObjectLookupMessage message = new MessageRoutingRemoteObjectLookupMessage(uri);
+        MessageRoutingRemoteObjectLookupMessage message = new MessageRoutingRemoteObjectLookupMessage(uri, agent);
         try {
             message.send();
         } catch (MessageRoutingRemoteException e) {
@@ -156,7 +154,7 @@ public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFacto
      */
     public URI[] list(URI uri) throws ProActiveException {
         MessageRoutingRegistryListRemoteObjectsMessage message = new MessageRoutingRegistryListRemoteObjectsMessage(
-            uri);
+            uri, agent);
 
         try {
             message.send();
