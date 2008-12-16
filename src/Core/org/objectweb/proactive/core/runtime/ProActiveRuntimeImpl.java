@@ -465,7 +465,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
         Node node = null;
         try {
             node = new NodeImpl((ProActiveRuntime) PARemoteObject.lookup(URI.create(localNode.getURL())),
-                localNode.getURL(), null, jobId);
+                localNode.getURL(), URIBuilder.getProtocol(localNode.getURL()), jobId);
         } catch (ProActiveException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
