@@ -124,8 +124,10 @@ public class AOPinger implements WorkerWatcher, RunActive, InitActive, Serializa
 
     /** {@inheritDoc} */
     public void removeWorkerToWatch(final String workerName) {
-    	if (workerGroup.containsKey(workerName)) {
-    		workerGroup.remove(workerName);
+    	if(!terminated){
+	    	if (workerGroup.containsKey(workerName)) {
+	    		workerGroup.remove(workerName);
+	    	}
     	}
         
     }
@@ -167,7 +169,8 @@ public class AOPinger implements WorkerWatcher, RunActive, InitActive, Serializa
                             }
                         } catch (Exception exp2){
                     		if (debug) {
-                    			logger.debug("Exception occurs.\n" + exp2.getMessage());
+                    			logger.debug("Exception occurs.\n");
+                    			logger.debug(exp2.getStackTrace().toString());
                     		}
                     	}
                     }

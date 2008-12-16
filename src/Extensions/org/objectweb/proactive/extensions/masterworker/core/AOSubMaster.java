@@ -765,9 +765,32 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             clearingCallFromSpawnedWorker(originatorName);
         }
 
+        // If the tasks has already been submitted
+        if (taskIdCounters.containsKey(divisibleTaskId)) {
+            if (taskIdCounters.get(divisibleTaskId) >= taskIdCounter) {
+                // Do nothing
+            	if (debug) {
+                    logger.debug("The task list from " +  originatorName + " has already been solved... ");
+                }
+                return;
+            }
+            taskIdCounters.remove(divisibleTaskId);
+        }
+        taskIdCounters.put(divisibleTaskId, taskIdCounter);
+        
         divisibleTaskId = getDivisibleTaskIDByOriginatorName(originatorName);
         // If one worker is sending the tasks
         if (subResultQueues.containsKey(divisibleTaskId)) {
+        	if (debug) {
+                logger.debug("The divisible task " + divisibleTaskId + "has already had a result queue");
+            }
+        	for (long id = taskIdCounter; id < taskIdCounter + tasks.size(); id++) {
+        		subResultQueues.get(divisibleTaskId).addPendingTask(id);
+                if (debug) {
+                    logger.debug("Add task " + id + " to the result queue of divisible task " +
+                        divisibleTaskId);
+                }
+            }
             // If the divisible task has already been solved and new is rescheduled
             // Because of the old worker is missing, we do nothing
         } else {
@@ -789,16 +812,6 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             // we can use rq.countAvailableResults() to see if the results are available
             // the initioal value is 0
         }
-
-        // If the tasks has already been submitted
-        if (taskIdCounters.containsKey(divisibleTaskId)) {
-            if (taskIdCounters.get(divisibleTaskId) >= taskIdCounter) {
-                // Do nothing
-                return;
-            }
-            taskIdCounters.remove(divisibleTaskId);
-        }
-        taskIdCounters.put(divisibleTaskId, taskIdCounter);
 
         // Ask the provider to solve, the divisibleTaskIdObj should be passed as a argument
         try {

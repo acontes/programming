@@ -292,7 +292,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
             if (workersActivity.containsKey(workerName)) {
                 // If the worker requests a flooding this means that its pending queue is empty,
                 // thus, it will sleep
-            	if (flooding > 1) {
+            	if (flooding > 0) {
                 	if (!sleepingWorkers.containsKey(workerName)) {
                         if (debug) {
                             logger.debug("Add worker " + workerName + " to sleeping group");
