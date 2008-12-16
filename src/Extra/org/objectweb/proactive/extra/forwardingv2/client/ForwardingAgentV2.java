@@ -16,7 +16,9 @@ import org.objectweb.proactive.core.remoteobject.http.util.HttpMarshaller;
 import org.objectweb.proactive.core.remoteobject.http.util.HttpMessage;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extra.forwarding.exceptions.ForwardingException;
+import org.objectweb.proactive.extra.forwardingv2.exceptions.ExecutionException;
+import org.objectweb.proactive.extra.forwardingv2.exceptions.MessageRoutingException;
+import org.objectweb.proactive.extra.forwardingv2.exceptions.RoutingException;
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
 import org.objectweb.proactive.extra.forwardingv2.protocol.Message;
 import org.objectweb.proactive.extra.forwardingv2.protocol.MessageInputStream;
@@ -135,7 +137,7 @@ public class ForwardingAgentV2 implements AgentV2, Runnable {
 
     }
 
-    public byte[] sendMsg(AgentID targetID, byte[] data, boolean oneWay) throws ForwardingException {
+    public byte[] sendMsg(AgentID targetID, byte[] data, boolean oneWay) throws RoutingException, ExecutionException {
         if (logger.isDebugEnabled()) {
             logger.trace("Sending a message to " + targetID);
         }
@@ -159,12 +161,12 @@ public class ForwardingAgentV2 implements AgentV2, Runnable {
                 return mb.getValue();
             } else {
                 logger.warn("Unable to get the response from request: " + requestID);
-                throw new ForwardingException("Unable to get the response from request");
+                throw new RoutingException("Unable to get the response from request");
             }
         }
     }
 
-    public byte[] sendMsg(URI targetURI, byte[] data, boolean oneWay) throws ForwardingException {
+    public byte[] sendMsg(URI targetURI, byte[] data, boolean oneWay) throws RoutingException, ExecutionException {
         String path = targetURI.getPath();
         String remoteAgentId = path.substring(0, path.indexOf('/'));
 

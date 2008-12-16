@@ -12,11 +12,9 @@ import org.bouncycastle.util.Arrays;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.objectweb.proactive.core.remoteobject.http.util.HttpMarshaller;
-import org.objectweb.proactive.core.remoteobject.http.util.HttpMessage;
-import org.objectweb.proactive.extra.forwarding.exceptions.ForwardingException;
 import org.objectweb.proactive.extra.forwardingv2.client.AgentV2;
 import org.objectweb.proactive.extra.forwardingv2.client.ForwardingAgentV2;
+import org.objectweb.proactive.extra.forwardingv2.exceptions.MessageRoutingException;
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
 import org.objectweb.proactive.extra.forwardingv2.protocol.Message;
 import org.objectweb.proactive.extra.forwardingv2.protocol.MessageInputStream;
@@ -92,7 +90,7 @@ public class TestForwardingAgentV2 {
             Assert.assertNotNull("Must have a result", result);
             Assert.assertTrue("Message should be strict echo", Arrays.areEqual("Hello".getBytes(), result));
 
-        } catch (ForwardingException e) {
+        } catch (MessageRoutingException e) {
             e.printStackTrace();
             Assert.fail(e.getMessage());
 
@@ -124,7 +122,7 @@ public class TestForwardingAgentV2 {
             byte[] result = agent.sendMsg(new AgentID(32l), "Hello".getBytes(), true);
             Assert.assertNull("Result should be null", result);
 
-        } catch (ForwardingException e) {
+        } catch (MessageRoutingException e) {
             e.printStackTrace();
             Assert.fail(e.getMessage());
 

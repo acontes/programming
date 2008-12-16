@@ -4,7 +4,8 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URI;
 
-import org.objectweb.proactive.extra.forwarding.exceptions.ForwardingException;
+import org.objectweb.proactive.extra.forwardingv2.exceptions.ExecutionException;
+import org.objectweb.proactive.extra.forwardingv2.exceptions.RoutingException;
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
 
 
@@ -24,7 +25,7 @@ public interface AgentV2 {
      * @return the data response.
      * @throws ForwardingException if the timeout is reached.
      */
-    public byte[] sendMsg(AgentID targetID, byte[] data, boolean oneWay) throws ForwardingException;
+    public byte[] sendMsg(AgentID targetID, byte[] data, boolean oneWay) throws RoutingException, ExecutionException;
 
     /**
      * Send a message to the target AgentID, containing data.
@@ -38,7 +39,7 @@ public interface AgentV2 {
      * @return the data response.
      * @throws ForwardingException if the timeout is reached.
      */
-    public byte[] sendMsg(URI targetURI, byte[] data, boolean oneWay) throws ForwardingException;
+    public byte[] sendMsg(URI targetURI, byte[] data, boolean oneWay) throws RoutingException, ExecutionException;
 
     public AgentID getAgentID();
 
