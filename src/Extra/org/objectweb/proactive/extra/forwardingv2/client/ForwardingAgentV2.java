@@ -176,14 +176,13 @@ public class ForwardingAgentV2 implements AgentV2, Runnable {
         }
     }
 
-	public byte[] sendMsg(URI targetURI, byte[] data, boolean oneWay) throws ForwardingException {
-		String path = targetURI.getPath();
-	String remoteAgentId = path.substring(0, path.indexOf('/'));
+    public byte[] sendMsg(URI targetURI, byte[] data, boolean oneWay) throws ForwardingException {
+        String path = targetURI.getPath();
+        String remoteAgentId = path.substring(0, path.indexOf('/'));
 
-	AgentID agentID = new AgentID(Long.parseLong(remoteAgentId));
-		return sendMsg(agentID, data, oneWay);
-	}
-
+        AgentID agentID = new AgentID(Long.parseLong(remoteAgentId));
+        return sendMsg(agentID, data, oneWay);
+    }
 
     /**
      * Send really the message through the tunnel
@@ -272,7 +271,12 @@ public class ForwardingAgentV2 implements AgentV2, Runnable {
 
                 // Handle the message
                 HttpMessage message = (HttpMessage) HttpMarshaller.unmarshallObject(_toProcess.getData());
-                Object result = message.processMessage();
+                Object result = null;
+                if (message != null) {
+                    result = message.processMessage();
+                } else {
+                    logger.debug("message " + _toProcess + " doesn't unmarshal itself correctly.");
+                }
                 byte[] resultBytes = HttpMarshaller.marshallObject(result);
 
                 Message reply = Message.dataMessage(agentID, _toProcess.getSrcAgentID(), _toProcess
@@ -336,6 +340,5 @@ public class ForwardingAgentV2 implements AgentV2, Runnable {
             return this.targetID;
         }
     }
-
 
 }

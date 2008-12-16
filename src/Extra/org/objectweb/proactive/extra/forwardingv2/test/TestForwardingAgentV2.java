@@ -12,6 +12,8 @@ import org.bouncycastle.util.Arrays;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.objectweb.proactive.core.remoteobject.http.util.HttpMarshaller;
+import org.objectweb.proactive.core.remoteobject.http.util.HttpMessage;
 import org.objectweb.proactive.extra.forwarding.exceptions.ForwardingException;
 import org.objectweb.proactive.extra.forwardingv2.client.AgentV2;
 import org.objectweb.proactive.extra.forwardingv2.client.ForwardingAgentV2;
@@ -27,13 +29,36 @@ public class TestForwardingAgentV2 {
 
     @Before
     public void setup() {
-        if (reg == null)
-            reg = new FakeRegistry(port);
+        reg = new FakeRegistry(++port);
     }
 
     @After
     public void tearDown() {
         // ?
+    }
+
+    @Test
+    public void testMarshalling() {
+        HttpMessage mess = new HelloHttpMessage();
+        byte[] data = HttpMarshaller.marshallObject(mess);
+
+        HttpMessage message = (HttpMessage) HttpMarshaller.unmarshallObject(data);
+        Object result = null;
+        if (message != null) {
+            try {
+                result = message.processMessage();
+                Assert.assertEquals("Il est 18h", result);
+
+                byte[] resultBytes = HttpMarshaller.marshallObject(result);
+                Assert.assertNotNull(resultBytes);
+
+                Assert.assertEquals("Il est 18h", HttpMarshaller.unmarshallObject(resultBytes));
+            } catch (Exception e) {
+                e.printStackTrace();
+                Assert.fail(e.getMessage());
+            }
+        }
+
     }
 
     @Test
@@ -53,6 +78,13 @@ public class TestForwardingAgentV2 {
     public void testSendMsgWithReply() {
         AgentV2 agent = new ForwardingAgentV2();
         Assert.assertNotNull(agent);
+        try {
+            agent.initialize(InetAddress.getLocalHost(), port);
+        } catch (UnknownHostException e) {
+            Assert.fail(e.getMessage());
+        } catch (IOException e) {
+            Assert.fail(e.getMessage());
+        }
         System.out.println("Sending Hello Message");
 
         try {
@@ -68,10 +100,24 @@ public class TestForwardingAgentV2 {
 
     }
 
+    /**
+     * Not Valid for now, because the Agent Should respond to a oneway message...
+     */
     @Test
     public void testSendMsgWithoutReply() {
+        Assert
+                .fail("Not valid for now, because ForwardingAgent "
+						+"is not able to handle oneWay messages for now "
+						+"(it responds to oneWay messages and it shouldn't)");
         AgentV2 agent = new ForwardingAgentV2();
         Assert.assertNotNull(agent);
+        try {
+            agent.initialize(InetAddress.getLocalHost(), port);
+        } catch (UnknownHostException e) {
+            Assert.fail(e.getMessage());
+        } catch (IOException e) {
+            Assert.fail(e.getMessage());
+        }
         System.out.println("Sending Hello Message");
 
         try {
@@ -93,12 +139,22 @@ public class TestForwardingAgentV2 {
     public void testSendRealMessageToCraft() {
         AgentV2 agent = new ForwardingAgentV2();
         Assert.assertNotNull(agent);
+        try {
+            agent.initialize(InetAddress.getLocalHost(), port);
+        } catch (UnknownHostException e) {
+            Assert.fail(e.getMessage());
+        } catch (IOException e) {
+            Assert.fail(e.getMessage());
+        }
         System.out.println("Sending Crafted Message");
 
         try {
-        	byte[] data = null; // FIXME set a crafted message...
+            HttpMessage mess = new HelloHttpMessage();
+            byte[] data = HttpMarshaller.marshallObject(mess);
+
             byte[] result = agent.sendMsg(new AgentID(9999l), data, false);
-            Assert.assertNotNull("Result shouldn't be null", result);
+            Assert.assertEquals("Result should be 'Il est 18h'", "Il est 18h", HttpMarshaller
+                    .unmarshallObject(result));
         } catch (ForwardingException e) {
             e.printStackTrace();
             Assert.fail(e.getMessage());
@@ -138,28 +194,26 @@ class FakeRegistry implements Runnable {
             sock.getOutputStream().flush();
 
             AgentID crafted = new AgentID(9999l);
-            AgentID craftedResp = new AgentID(7777l);
+            long craftedMessageID = 0;
 
             while (isRunning) {
                 m = new Message(input.readMessage(), 0);
                 System.out.println("FakeReg: Message Received: " + m);
-                AgentID tmp = m.getSrcAgentID();
 
                 if (m.getDstAgentID().equals(crafted)) {
-                    m.setDstAgentID(m.getSrcAgentID());
-                    m.setSrcAgentID(craftedResp);
-
-                } else if (m.getDstAgentID().equals(craftedResp)) {
-                	m.setDstAgentID(m.getSrcAgentID());
-                	m.setSrcAgentID(crafted);
-                } else {
-                    // Simple echo
-                    m.setSrcAgentID(m.getDstAgentID());
-                    m.setDstAgentID(tmp);
-                    // Echo the message
-                    sock.getOutputStream().write(m.toByteArray());
-                    sock.getOutputStream().flush();
+                    if (m.getMsgID() == 99999999l) {
+                        m.setMsgID(craftedMessageID);
+                    } else {
+                        craftedMessageID = m.getMsgID();
+                        m.setMsgID(99999999l);
+                    }
                 }
+                AgentID tmp = m.getSrcAgentID();
+                m.setSrcAgentID(m.getDstAgentID());
+                m.setDstAgentID(tmp);
+                System.out.println("FakeReg: Forwarding message: " + m);
+                sock.getOutputStream().write(m.toByteArray());
+                sock.getOutputStream().flush();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -172,3 +226,15 @@ class FakeRegistry implements Runnable {
         isRunning = false;
     }
 }
+
+class HelloHttpMessage extends HttpMessage {
+    public HelloHttpMessage() {
+        super("Hello");
+    }
+
+    @Override
+    public Object processMessage() throws Exception {
+        return "Il est 18h";
+    }
+
+};
