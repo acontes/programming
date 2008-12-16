@@ -30,11 +30,11 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.Message.MessageType;
 public class ForwardingAgentV2 implements AgentV2, Runnable {
 
     // SINGLETON 
-    private static ForwardingAgent _singleton = null;
+    private static ForwardingAgentV2 _singleton = null;
 
-    synchronized public static ForwardingAgent getAgent() {
+    synchronized public static ForwardingAgentV2 getAgent() {
         if (_singleton == null) {
-            _singleton = new ForwardingAgent();
+            _singleton = new ForwardingAgentV2();
         }
         return _singleton;
     }
@@ -47,7 +47,7 @@ public class ForwardingAgentV2 implements AgentV2, Runnable {
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING);
 
     /** Delay before aborting the response waiting. **/
-    private static final long WAITING_DELAY = 0;
+    private static final long WAITING_DELAY = 5;
 
     /**
      * ThreadPool options:
@@ -119,6 +119,7 @@ public class ForwardingAgentV2 implements AgentV2, Runnable {
         try {
             synchronized (tunnel) {
                 tunnel.getOutputStream().write(reg.toByteArray());
+                tunnel.getOutputStream().flush();
             }
         } catch (IOException e) {
             logger.warn("Exception during registration", e);
@@ -157,6 +158,9 @@ public class ForwardingAgentV2 implements AgentV2, Runnable {
      * @throws ForwardingException if the timeout is reached.
      */
     public byte[] sendMsg(AgentID targetID, byte[] data, boolean oneWay) throws ForwardingException {
+        if (logger.isDebugEnabled()) {
+            logger.trace("Sending a message to " + targetID);
+        }
 
         // Generate a requestID
         Long requestID = requestIDGenerator.incrementAndGet();
@@ -190,9 +194,14 @@ public class ForwardingAgentV2 implements AgentV2, Runnable {
         // Serialize the message
         byte[] sMessage = msg.toByteArray();
         try {
+            if (logger.isTraceEnabled())
+                logger.trace("Sending message on tunnel");
             synchronized (tunnel) {
                 tunnel.getOutputStream().write(sMessage);
+                tunnel.getOutputStream().flush();
             }
+            if (logger.isTraceEnabled())
+                logger.trace("Message sent.");
         } catch (IOException e) {
             logger.warn("Error while writing message into the tunnel: " + msg, e);
         }
@@ -210,16 +219,26 @@ public class ForwardingAgentV2 implements AgentV2, Runnable {
                 msg = new Message(input.readMessage(), 0);
             } catch (IOException e) {
                 logger.error("Error while reading a message from the tunnel", e);
+                return;
             }
 
+            if (logger.isTraceEnabled()) {
+                logger.trace("Message received: " + msg);
+            }
             // TODO Handle different message types.
 
             if (msg.getType() == MessageType.DATA.getValue()) {
                 LocalMailBox mbox = boxes.remove(msg.getMsgID());
                 if (mbox == null) {
+                    if (logger.isTraceEnabled()) {
+                        logger.trace("Message corresponding to request");
+                    }
                     // That message is a request, handle it.
                     pool.execute(new MessageProcessor(msg));
                 } else {
+                    if (logger.isTraceEnabled()) {
+                        logger.trace("Message corresponding to response");
+                    }
                     // this is a reply containing data
                     mbox.setAndUnlock(msg.getData());
                 }

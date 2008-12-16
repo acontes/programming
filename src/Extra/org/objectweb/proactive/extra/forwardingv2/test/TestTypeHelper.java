@@ -1,10 +1,11 @@
-package org.objectweb.proactive.extra.forwardingv2.protocol;
+package org.objectweb.proactive.extra.forwardingv2.test;
 
 import java.util.Random;
 
 import junit.framework.Assert;
 
 import org.junit.Test;
+import org.objectweb.proactive.extra.forwardingv2.protocol.TypeHelper;
 
 
 public class TestTypeHelper {

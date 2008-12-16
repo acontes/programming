@@ -1,5 +1,8 @@
 package org.objectweb.proactive.extra.forwardingv2.protocol;
 
+import java.util.Arrays;
+
+
 /**
  * An object representing a message 
  *
@@ -104,12 +107,18 @@ public class Message {
         TypeHelper.intToByteArray(length, byteArray, Offsets.LENGTH_OFFSET.getValue());
         TypeHelper.intToByteArray(getProtoID(), byteArray, Offsets.PROTO_ID_OFFSET.getValue());
         TypeHelper.intToByteArray(type, byteArray, Offsets.MSG_TYPE_OFFSET.getValue());
-        TypeHelper.longToByteArray(srcAgentID.getId(), byteArray, Offsets.SRC_AGENT_ID_OFFSET.getValue());
-        TypeHelper.longToByteArray(dstAgentID.getId(), byteArray, Offsets.DST_AGENT_ID_OFFSET.getValue());
+        if (srcAgentID != null) {
+            TypeHelper.longToByteArray(srcAgentID.getId(), byteArray, Offsets.SRC_AGENT_ID_OFFSET.getValue());
+        }
+        if (dstAgentID != null) {
+            TypeHelper.longToByteArray(dstAgentID.getId(), byteArray, Offsets.DST_AGENT_ID_OFFSET.getValue());
+        }
         TypeHelper.longToByteArray(msgID, byteArray, Offsets.MSG_ID_OFFSET.getValue());
 
-        for (int i = 0; i < data.length; i++) {
-            byteArray[HEADER_LENGTH + i] = data[i];
+        if (data != null) {
+            for (int i = 0; i < data.length; i++) {
+                byteArray[HEADER_LENGTH + i] = data[i];
+            }
         }
 
         return byteArray;
@@ -148,7 +157,7 @@ public class Message {
      * @return the total length of the formatted message (header length + data length)
      */
     public int getLength() {
-        return HEADER_LENGTH + data.length;
+        return HEADER_LENGTH + (data != null ? data.length : 0);
     }
 
     public int getProtoID() {
@@ -247,6 +256,31 @@ public class Message {
 
     public void setData(byte[] data) {
         this.data = data;
+    }
+
+    @Override
+    public String toString() {
+        switch (type) {
+            case 0: //REGISTRATION_REQUEST
+                return "[Registration request]";
+            case 1: //REGISTRATION_REPLY
+                return "[Registration reply / id=" + dstAgentID + "]";
+            case 2: //REGISTRATION_REQUEST
+                return "[Registration request]";
+            case 6: //DATA
+                return "[Data message / from=" + srcAgentID + "; to=" + dstAgentID + "]";
+            default:
+                return "[Message type=" + type + "]";
+        }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Message) {
+            Message m = (Message) obj;
+            return Arrays.equals(this.toByteArray(), m.toByteArray());
+        }
+        return false;
     }
 
 }
