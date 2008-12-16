@@ -64,7 +64,7 @@ public class PAAgentServiceRMIStarter {
     private static void doAdvert(String nodeName) {
         try {
             // TODO: localhost?
-            Node n = NodeFactory.createNode("//localhost/" + nodeName);
+            Node n = NodeFactory.createNode(nodeName);
             System.out.println("The node was registered at " + n.getNodeInformation().getURL());
         } catch (ProActiveException e) {
             e.printStackTrace();
