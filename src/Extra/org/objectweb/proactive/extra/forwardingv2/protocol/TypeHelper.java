@@ -1,29 +1,14 @@
 package org.objectweb.proactive.extra.forwardingv2.protocol;
 
+import java.nio.ByteBuffer;
+
+
 /**
  * 
  * TypeHelper allows formatting a Message, that is putting it under the form of a Byte array, or recovering it from a byte Array
  *
  */
 public class TypeHelper {
-
-    /**
-     * just to test
-     * @param args
-     */
-    public static void main(String[] args) {
-        long l = 2345667;
-        byte[] a = new byte[8];
-        longToByteArray(l, a, 0);
-
-        System.out.println("the decrypted value of l is : " + byteArrayToLong(a, 0));
-
-        int i = 234;
-        byte[] b = new byte[8];
-        longToByteArray(i, b, 0);
-
-        System.out.println("the decrypted value of i is : " + byteArrayToLong(b, 0));
-    }
 
     /**
      * 
@@ -33,26 +18,17 @@ public class TypeHelper {
      * @param offset the offset in the byte array at which to find the byte representation
      * @return the represented long value
      */
-    public static long byteArrayToLong(byte[] a, int offset) {
-        long l = 0;
+    public static long byteArrayToLong(final byte[] buf, final int offset) {
+        long ret = ((long) (buf[offset + 0] & 0xFF) << 56);
+        ret |= ((long) (buf[offset + 1] & 0xFF) << 48);
+        ret |= ((long) (buf[offset + 2] & 0xFF) << 40);
+        ret |= ((long) (buf[offset + 3] & 0xFF) << 32);
+        ret |= ((long) (buf[offset + 4] & 0xFF) << 24);
+        ret |= ((long) (buf[offset + 5] & 0xFF) << 16);
+        ret |= ((long) (buf[offset + 6] & 0xFF) << 8);
+        ret |= ((long) (buf[offset + 7] & 0xFF));
+        return ret;
 
-        l |= a[offset++] & 0xFF;
-        l <<= 8;
-        l |= a[offset++] & 0xFF;
-        l <<= 8;
-        l |= a[offset++] & 0xFF;
-        l <<= 8;
-        l |= a[offset++] & 0xFF;
-        l <<= 8;
-        l |= a[offset++] & 0xFF;
-        l <<= 8;
-        l |= a[offset++] & 0xFF;
-        l <<= 8;
-        l |= a[offset++] & 0xFF;
-        l <<= 8;
-        l |= a[offset] & 0xFF;
-
-        return l;
     }
 
     /**
@@ -62,63 +38,48 @@ public class TypeHelper {
      * @param a the byte array in which to copy the byte representation
      * @param offset the index of the array at which to start copying
      */
-    public static void longToByteArray(long val, byte[] a, int offset) {
+    public static void longToByteArray(final long val, final byte[] buf, final int offset) {
+        buf[offset + 0] = (byte) ((val >> 56));
+        buf[offset + 1] = (byte) ((val >> 48));
+        buf[offset + 2] = (byte) ((val >> 40));
+        buf[offset + 3] = (byte) ((val >> 32));
+        buf[offset + 4] = (byte) ((val >> 24));
+        buf[offset + 5] = (byte) ((val >> 16));
+        buf[offset + 6] = (byte) ((val >> 8));
+        buf[offset + 7] = (byte) ((val) >> 0);
 
-        a[offset + 7] |= val & 0xFF;
-        val >>= 8;
-        a[offset + 6] |= val & 0xFF;
-        val >>= 8;
-        a[offset + 5] |= val & 0xFF;
-        val >>= 8;
-        a[offset + 4] |= val & 0xFF;
-        val >>= 8;
-        a[offset + 3] |= val & 0xFF;
-        val >>= 8;
-        a[offset + 2] |= val & 0xFF;
-        val >>= 8;
-        a[offset + 1] |= val & 0xFF;
-        val >>= 8;
-        a[offset] |= val & 0xFF;
     }
 
     /**
      * 
      * converts the byte representation of an int into its value as an integer.
      * 
-     * @param a the byte array in which to find the byte representation
+     * @param buf the byte array in which to find the byte representation
      * @param offset the offset in the byte array at which to find the byte representation
      * @return the represented int value
      */
 
-    public static int byteArrayToInt(byte[] a, int offset) {
-        int l = 0;
+    public static int byteArrayToInt(final byte[] buf, final int offset) {
 
-        l |= a[offset++] & 0xFF;
-        l <<= 8;
-        l |= a[offset++] & 0xFF;
-        l <<= 8;
-        l |= a[offset++] & 0xFF;
-        l <<= 8;
-        l |= a[offset] & 0xFF;
+        int ret = (buf[offset + 0] << 24);
+        ret |= (buf[offset + 1] & 0xFF) << 16;
+        ret |= (buf[offset + 2] & 0xFF) << 8;
+        ret |= (buf[offset + 3] & 0xFF);
 
-        return l;
+        return ret;
     }
 
     /**
      * Copies the byte representation of an int into a byte array starting at the given offset
      * 
      * @param val the int to convert
-     * @param a the byte array in which to copy the byte representation
+     * @param buf the byte array in which to copy the byte representation
      * @param offset the index of the array at which to start copying
      */
-    public static void intToByteArray(int val, byte[] a, int offset) {
-
-        a[offset + 3] |= val & 0xFF;
-        val >>= 8;
-        a[offset + 2] |= val & 0xFF;
-        val >>= 8;
-        a[offset + 1] |= val & 0xFF;
-        val >>= 8;
-        a[offset] |= val & 0xFF;
+    public static void intToByteArray(final int val, final byte[] buf, final int offset) {
+        buf[offset + 0] = (byte) (val >>> 24);
+        buf[offset + 1] = (byte) (val >>> 16);
+        buf[offset + 2] = (byte) (val >>> 8);
+        buf[offset + 3] = (byte) (val);
     }
 }
