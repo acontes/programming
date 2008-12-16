@@ -38,7 +38,7 @@ public class TestForwardingAgentV2 {
 
     @Test
     public void testInitialize() {
-        AgentV2 agent = ForwardingAgentV2.getAgent();
+        AgentV2 agent = new ForwardingAgentV2();
         Assert.assertNotNull(agent);
         try {
             agent.initialize(InetAddress.getLocalHost(), port);
@@ -51,7 +51,7 @@ public class TestForwardingAgentV2 {
 
     @Test
     public void testSendMsgWithReply() {
-        AgentV2 agent = ForwardingAgentV2.getAgent();
+        AgentV2 agent = new ForwardingAgentV2();
         Assert.assertNotNull(agent);
         System.out.println("Sending Hello Message");
 
@@ -70,7 +70,7 @@ public class TestForwardingAgentV2 {
 
     @Test
     public void testSendMsgWithoutReply() {
-        AgentV2 agent = ForwardingAgentV2.getAgent();
+        AgentV2 agent = new ForwardingAgentV2();
         Assert.assertNotNull(agent);
         System.out.println("Sending Hello Message");
 
@@ -91,7 +91,7 @@ public class TestForwardingAgentV2 {
      */
     @Test
     public void testSendRealMessageToCraft() {
-        AgentV2 agent = ForwardingAgentV2.getAgent();
+        AgentV2 agent = new ForwardingAgentV2();
         Assert.assertNotNull(agent);
         System.out.println("Sending Crafted Message");
 
