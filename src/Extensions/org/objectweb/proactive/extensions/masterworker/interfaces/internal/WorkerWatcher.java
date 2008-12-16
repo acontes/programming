@@ -45,13 +45,13 @@ public interface WorkerWatcher {
      * adds a worker to be watched
      * @param worker worker which must be watched
      */
-    void addWorkerToWatch(Worker worker);
+    void addWorkerToWatch(Worker worker, String workerName);
 
     /**
      * stops watching a worker
      * @param worker workers which needn't be watched anymore
      */
-    void removeWorkerToWatch(Worker worker);
+    void removeWorkerToWatch(String workerName);
 
     /**
      * Sets the period at which ping messages are sent to the workers <br/>

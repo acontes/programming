@@ -14,7 +14,7 @@
 		<proactive relpath="${proactive.home}" base="root">
 			<configuration>
 				<java base="root" relpath="${java.home}/bin/java"/>
-				<jvmarg value="-Dproactive.test=true"/>
+				<jvmarg value="-Dproactive.test=true -Dlog4j.configuration=file:${proactive.home}/compile/proactive-log4j"/>
 				<proactiveClasspath type="append">
 					<pathElement base="proactive" relpath="classes/Tests"/>
 					<pathElement base="proactive" relpath="dist/lib/clover.jar"/>

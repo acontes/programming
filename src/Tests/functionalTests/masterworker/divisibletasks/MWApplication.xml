@@ -4,7 +4,9 @@
 	xsi:schemaLocation="urn:gcm:application:1.0 http://proactive.inria.fr/schemas/gcm/1.0/ApplicationDescriptorSchema.xsd">
 
 	<environment>
-		<javaPropertyVariable name="proactive.home" />
+		<descriptorVariable name="proactive.home" />
+
+		<javaPropertyVariable name="java.home" />
 		<javaPropertyVariable name="user.dir" />
         <descriptorVariable name="hostCapacity" value="2"/>
         <descriptorVariable name="vmCapacity" value="2"/>

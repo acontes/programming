@@ -160,6 +160,9 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
     private HashMap<Long, ResultQueue<Serializable>> subResultQueues;
     private HashMap<Long, Long> taskIdCounters;
 
+    /** Fault tolerance purpose */
+    private int futureCounter = 0;
+    
     /** Filters * */
     private final FindWorkersRequests workersRequestsFilter = new FindWorkersRequests();
     private final FindWaitFilter findWaitFilter = new FindWaitFilter();
@@ -184,7 +187,9 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
     public BooleanWrapper InitSubMaster(final long workerNameCounter, final HashMap<Long, WorkerPeer> workerPeers, final HashMap<String, Worker> workers) {
     	BooleanWrapper wrap = ((AOSubWorkerManager)smanager).initSubWorkerManager(workerNameCounter, workerPeers, workers);
 
-    	
+    	if (debug) {
+            logger.debug("Initionlize the submaster!");
+        }
     	sleepingGroup.addAll(workers.values());
     	sleepingWorkers.putAll(workers);
     	try {
@@ -282,18 +287,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         if (debug) {
             logger.debug(oldWorkerName + " forwarded Task " + taskId + " to " + newWorkerName);
         }
-        if (!workersByName.containsKey(oldWorkerName)) {
-            if (isClearing) {
-                // If the master is clearing we send the clearing message to this new worker
-                try {
-                    workersByName.get(oldWorkerName).clear();
-                } catch (Exception e) {
-                    if (debug) {
-                        logger.debug("Clear worker " + oldWorkerName + "error");
-                    }
-                }
-            }
-        }
+        
         Set<Long> wact = workersActivity.get(oldWorkerName);
         wact.remove(taskId);
         if (wact.size() == 0) {
@@ -346,7 +340,6 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             logger.debug(name + " get initial tasks from the master...");
         }
         try {
-            Queue<TaskIntern<Serializable>> newTasks;
             int flooding_value = initial_task_flooding;
 
             // Ask a task flooding for sleeping workers
@@ -384,7 +377,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
                     worker.clear();
                 } catch (Exception e) {
                     if (debug) {
-                        logger.debug("Clear worker " + workerName + "error");
+                        logger.debug("Clear worker " + workerName + " error");
                     }
                 }
             }
@@ -395,7 +388,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             if (workersActivity.containsKey(workerName)) {
                 // If the worker requests a flooding this means that its penqing queue is empty,
                 // thus, it will sleep
-                if (flooding == 1) {
+                if (flooding > 0) {
                 	if (!sleepingWorkers.containsKey(workerName)) {
                         if (debug) {
                             logger.debug("Add worker " + workerName + " to sleeping group");
@@ -499,12 +492,12 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
     }
 
     public BooleanWrapper sendResultFromMaster(ResultIntern<Serializable> result, String workerName) {
-        if (subResultQueues.containsKey(getDivisibleTaskIDByOriginatorName(workerName))) {
+    	long id = getDivisibleTaskIDByOriginatorName(workerName);
+        if (subResultQueues.containsKey(id)) {
             if (debug) {
-                logger.debug("Master sends result of task " + result.getId() + " of divisible task " +
-                    getDivisibleTaskIDByOriginatorName(workerName));
+                logger.debug("Master sends result of task " + result.getId() + " of divisible task " + id);
             }
-            subResultQueues.get(getDivisibleTaskIDByOriginatorName(workerName)).addCompletedTask(result);
+            subResultQueues.get(id).addCompletedTask(result);
             if (debug) {
                 // logger.debug("The result of task " + result.getId() + " is " + result.getResult().toString());
             }
@@ -521,19 +514,6 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
 
     public BooleanWrapper sendResult(ResultIntern<Serializable> result, String workerName) {
         // TODO Auto-generated method stub
-        if (!workersByName.containsKey(workerName)) {
-            if (isClearing) {
-                // If the master is clearing we send the clearing message to this new worker
-                try {
-                    workersByName.get(workerName).clear();
-                } catch (Exception e) {
-                    if (debug) {
-                        logger.debug("Clear worker " + workerName + "error");
-                    }
-                }
-            }
-        }
-
         long id = result.getId();
         if (launchedTasks.containsKey(id)) {
             if (debug) {
@@ -585,11 +565,12 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
                     Queue<TaskIntern<Serializable>> tasksToAdd = null;
 
                     int flooding = 0;
-                    if (pendingTasks.size() == 0 && flooding < 1)
+                    if (pendingTasks.size() == 0)
                         flooding = 1;
                     tasksToAdd = provider.sendResultsAndGetTasks(resultQueue.getNextK(resultQueue
                             .countAvailableResults()), name, flooding);
                     PAEventProgramming.addActionOnFuture(tasksToAdd, "addTasksToPending");
+                    futureCounter ++;
                 }
             } catch (SendRequestCommunicationException exp) {
                 if (debug) {
@@ -608,6 +589,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             try {
                 tasksToAdd = provider.getTasks(stubOnThis, name, flooding);
                 PAEventProgramming.addActionOnFuture(tasksToAdd, "addTasksToPending");
+                futureCounter++;
             } catch (SendRequestCommunicationException exp) {
                 if (debug) {
                     logger.debug("Master has already been freed.");
@@ -617,7 +599,8 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
     }
 
     public void addTasksToPending(Future<Queue<TaskIntern<Serializable>>> future) {
-        if (!terminating) {
+    	futureCounter--;
+        if (!terminating && !isClearing) {
             Queue<TaskIntern<Serializable>> tasksToAdd = null;
 
             try {
@@ -705,14 +688,18 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         }
     }
 
+    /** get id of the divisible task by the name of the worker */
     private long getDivisibleTaskIDByOriginatorName(String originatorName) {
         Set<Long> divisibletaskids = divisibleTasksAssociationWithWorkers.keySet();
 
         for (Long divisibletaskid : divisibletaskids) {
             if (divisibleTasksAssociationWithWorkers.get(divisibletaskid).equals(originatorName)) {
+            	if(debug){
+            		logger.debug("Worker " + originatorName + " is running divisible task " + divisibletaskid);
+            	}
                 return divisibletaskid;
             }
-        }
+        }        
         return -1;
     }
 
@@ -973,6 +960,16 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             }
         }
 
+        // We clear every sleeping workers registered
+//        try {
+//            sleepingGroup.clear();
+//        } catch (Exception e) {
+//            // TODO Auto-generated catch block
+//            if (debug) {
+//                logger.debug("A exception happened in clearing sleepingGroup");
+//            }
+//        }
+        
         // We tell all the worker to clear their pending tasks
         try {
             workerGroupStub.clear();
@@ -980,16 +977,6 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             // TODO Auto-generated catch block
             if (debug) {
                 logger.debug("A exception happened in clearing workerGroup");
-            }
-        }
-
-        // We clear every sleeping workers registered
-        try {
-            sleepingGroup.clear();
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            if (debug) {
-                logger.debug("A exception happened in clearing sleepingGroup");
             }
         }
 
@@ -1044,6 +1031,8 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             }
             // Initial Task
             stubOnThis.getIntialTasks();
+            
+            // Wake up sleeping 
             if (debug) {
                 logger.debug("Sleeping group size is:" + sleepingGroup.size());
             }
@@ -1155,7 +1144,10 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             //            if (debug) {
             //                logger.debug("\nCleared worker size is:" + clearedWorkers.size() + "\nworkergroup size is:" + workerGroup.size() + "\nspawnedWorkers size is:" + spawnedWorkerNames.size());
             //            }
-            if (clearedWorkers.size() == workerGroup.size() + spawnedWorkerNames.size()) {
+            
+            // We go on in this clearing activity until every workers have either responded or were reported missing OR we still wait for futures from the big master 
+            if ((clearedWorkers.size() == workerGroup.size() + spawnedWorkerNames.size()) && futureCounter == 0) {
+            	// Add all cleaned workers to sleepingGroup
                 for (String workerName : clearedWorkers) {
                     if (!sleepingWorkers.containsKey(workerName)) {
                     	sleepingGroup.add(workersByName.get(workerName));
@@ -1474,7 +1466,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             }
             return (name.equals("isCleared") || name.equals("isDead") || name.equals("sendResult") ||
                 name.equals("sendResultAndGetTasks") || name.equals("getTasks")) ||
-                name.equals("forwardedTask");
+                name.equals("forwardedTask") || name.equals("addTasksToPending");
 
         }
     }

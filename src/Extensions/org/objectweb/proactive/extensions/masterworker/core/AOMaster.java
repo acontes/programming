@@ -275,42 +275,42 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
                 logger.debug("new worker " + workerName + " recorded by the master");
             }
             recordWorker(worker, workerName);
-            try {
-                worker.clear();
-            } catch (Exception e) {
-                if (debug) {
-                    logger.debug("Clear worker " + workerName + "error");
-                }
-            }
+            if(isClearing){
+	            try {
+	                worker.clear();
+	            } catch (Exception e) {
+	                if (debug) {
+	                    logger.debug("Clear worker " + workerName + "error");
+	                }
+	            }
+            }       
         }
 
         if (emptyPending()) {
 
             // We say that the worker is sleeping if we don't know it yet or if it's not doing a task
             if (workersActivity.containsKey(workerName)) {
-                // If the worker requests a flooding this means that its penqing queue is empty,
+                // If the worker requests a flooding this means that its pending queue is empty,
                 // thus, it will sleep
-                if (flooding == 1) {
-                    if (!sleepingWorkers.containsKey(workerName)) {
-                        if (debug) {
-                            logger.debug("Add worker " + workerName + " to sleeping group");
-                        }
-                        sleepingGroup.add(worker);
-                        sleepingWorkers.put(workerName, worker);
-                    }
-
-                }
-            } else {
-                workersActivity.put(workerName, new HashSet<Long>());
-                if (!sleepingGroup.contains(worker)) {
+            	if (flooding > 1) {
                 	if (!sleepingWorkers.containsKey(workerName)) {
                         if (debug) {
                             logger.debug("Add worker " + workerName + " to sleeping group");
                         }
-                        sleepingGroup.add(worker);
                         sleepingWorkers.put(workerName, worker);
+                        sleepingGroup.add(worker);
+                        
                     }
-
+            	}
+            } else {
+                workersActivity.put(workerName, new HashSet<Long>());
+                if (!sleepingWorkers.containsKey(workerName)) {
+                	if (debug) {
+                        logger.debug("Add worker " + workerName + " to sleeping group");
+                    }
+                	sleepingWorkers.put(workerName, worker);
+                	sleepingGroup.add(worker);
+                        
                 }
             }
             if (debug) {
@@ -363,7 +363,6 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
                     break;
                 }
             }
-
             return tasksToDo;
         }
     }
@@ -814,7 +813,13 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
             }
             if (clearedWorkers.size() == workerGroup.size() + spawnedWorkerNames.size()) {
                 for (String workerName : clearedWorkers) {
+                	if (debug) {
+                        logger.debug("Cleared workers size is: " + clearedWorkers.size() + ". Sleeping workers size is: " + sleepingWorkers.size());
+                    }
                     if (!sleepingWorkers.containsKey(workerName)) {
+                    	if (debug) {
+                            logger.debug("Add worker " + workerName + " to sleeping group");
+                        }
                     	sleepingGroup.add(workersByName.get(workerName));
                         sleepingWorkers.put(workerName, workersByName.get(workerName));
                     }
@@ -1095,14 +1100,14 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
         }
 
         // We clear every sleeping workers registered
-        try {
-            sleepingGroup.clear();
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            if (debug) {
-                logger.debug("A exception happened in clearing sleepingGroup");
-            }
-        }
+//        try {
+//            sleepingGroup.clear();
+//        } catch (Exception e) {
+//            // TODO Auto-generated catch block
+//            if (debug) {
+//                logger.debug("A exception happened in clearing sleepingGroup");
+//            }
+//        }
         // We clear the repository
         repository.clear();
         // We clear the idMap
@@ -1648,7 +1653,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
                 return request.getParameter(0) != null;
             }
             return (name.equals("isCleared") || name.equals("isDead") || name.equals("sendResult") ||
-                name.equals("sendResultAndGetTasks") || name.equals("getTasks")) ||
+                name.equals("sendResultAndGetTasks") || name.equals("sendResultsAndGetTasks") || name.equals("getTasks")) ||
                 name.equals("forwardedTask");
 
         }

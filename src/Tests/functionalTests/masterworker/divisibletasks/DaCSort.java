@@ -31,10 +31,17 @@
  */
 package functionalTests.masterworker.divisibletasks;
 
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.extensions.masterworker.ProActiveMaster;
+import org.objectweb.proactive.extensions.masterworker.TaskException;
 import org.objectweb.proactive.extensions.masterworker.interfaces.DivisibleTask;
+import org.objectweb.proactive.extensions.masterworker.interfaces.Master;
 import org.objectweb.proactive.extensions.masterworker.interfaces.SubMaster;
 import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
 
+import functionalTests.masterworker.basicordered.TestBasicOrdered;
+
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -113,21 +120,66 @@ public class DaCSort implements DivisibleTask<ArrayList<Integer>> {
     }
 
     public static void main(String[] args) {
-        ArrayList<Integer> l1 = new ArrayList<Integer>();
-        ArrayList<Integer> l2 = new ArrayList<Integer>();
-        for (int i = 0; i < 100; i++) {
-            l1.add((int) Math.round(Math.random() * 1000));
-            l2.add((int) Math.round(Math.random() * 1000));
+        URL descriptor = TestBasicOrdered.class
+                .getResource("/functionalTests/masterworker/TestMasterWorker.xml");
+        Master<DaCSort, ArrayList<Integer>> master;
+        List<DaCSort> tasks;
+        int NB_ELEM = 10000;
+
+        master = new ProActiveMaster<DaCSort, ArrayList<Integer>>();
+        try {
+            master.addResources(descriptor);
+        } catch (ProActiveException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
-        Collections.sort(l1);
-        Collections.sort(l2);
-        ArrayList<Integer> l3 = merge(l1, l2);
-        for (int i = 0; i < l3.size() - 1; i++) {
-            if (l3.get(i) > l3.get(i + 1)) {
-                throw new IllegalStateException("List not sorted");
-            }
+        master.setResultReceptionOrder(Master.SUBMISSION_ORDER);
+
+        tasks = new ArrayList<DaCSort>();
+        ArrayList<Integer> bigList = new ArrayList<Integer>();
+        for (int i = 0; i < NB_ELEM; i++) {
+            bigList.add((int) Math.round(Math.random() * NB_ELEM));
         }
-    }
+        tasks.add(new DaCSort(bigList));
+
+        master.solve(tasks);
+
+        ArrayList<Integer> answer = null;
+        try {
+            answer = master.waitOneResult();
+        } catch (TaskException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        System.err.println("TestDivisibleTasks result is: " + answer.size());
+
+        boolean sorted = true;
+        for (int i = 0; i < answer.size() - 1 || !sorted; i++) {
+            sorted = answer.get(i) <= answer.get(i + 1);
+        }
+        if (sorted) {
+            System.out.println("TestDivisibleTasks : LIST IS SORTED");
+        } else {
+            System.err.println("TestDivisibleTasks : LIST IS NOT SORTED");
+        }
+
+        master.terminate(true);
+        /*    	
+         ArrayList<Integer> l1 = new ArrayList<Integer>();
+         ArrayList<Integer> l2 = new ArrayList<Integer>();
+         for (int i = 0; i < 100; i++) {
+         l1.add((int) Math.round(Math.random() * 1000));
+         l2.add((int) Math.round(Math.random() * 1000));
+         }
+         Collections.sort(l1);
+         Collections.sort(l2);
+         ArrayList<Integer> l3 = merge(l1, l2);
+         for (int i = 0; i < l3.size() - 1; i++) {
+         if (l3.get(i) > l3.get(i + 1)) {
+         throw new IllegalStateException("List not sorted");
+         }
+         }
+         */}
 
     public ArrayList<Integer> run(WorkerMemory memory) throws Exception {
         throw new UnsupportedOperationException();

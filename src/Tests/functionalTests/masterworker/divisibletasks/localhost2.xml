@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GCMDeployment xmlns="urn:gcm:deployment:1.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="urn:gcm:deployment:1.0
+http://proactive.inria.fr/schemas/gcm/1.0/ExtensionSchemas.xsd">
+        <environment>
+                <descriptorVariable name="HOST" value="eon[2-5]" />
+                <javaPropertyVariable name="user.dir" />
+        </environment>
+        <resources>
+                <group refid="remoteThroughSSH">
+                        <host refid="host" />
+                </group>
+        </resources>
+        <infrastructure>
+                <hosts>
+            <host id="host" os="unix" hostCapacity="1" vmCapacity="1">
+                <homeDirectory base="root" relpath="${user.dir}" />
+                <!--<tool id="java"
+path="/user/fviale/home/bin/jdk1.6.0_64/jdk1.6.0_04/bin/java"/>-->
+            </host>
+                </hosts>
+                <groups>
+                        <sshGroup id="remoteThroughSSH" hostList="${HOST}" />
+                </groups>
+        </infrastructure>
+</GCMDeployment>

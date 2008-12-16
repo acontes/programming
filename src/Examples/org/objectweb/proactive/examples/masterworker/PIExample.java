@@ -160,6 +160,7 @@ public class PIExample {
 
             for (long successes : successesList) {
                 sumSuccesses += successes;
+                System.out.println("\nsuccesses is : " + successes);
             }
 
             System.out.println("\nThe divisible task output is : " + sumSuccesses);
