@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.util.TimeoutAccounter;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.forwardingv2.exceptions.ExecutionException;
@@ -37,7 +38,7 @@ public class ForwardingAgentV2 implements AgentV2, Runnable {
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING);
 
     /** Delay before aborting the response waiting. **/
-    private static final long WAITING_DELAY = 5;
+    private static final long WAITING_DELAY = 5000;
 
     /** Local Mailboxes used to block the threads waiting for a response. **/
     private final ConcurrentHashMap<Long, LocalMailBox> boxes;
@@ -152,17 +153,17 @@ public class ForwardingAgentV2 implements AgentV2, Runnable {
             return null;
         } else {
             // Put a mailbox, waiting for the result
-            LocalMailBox mb = new LocalMailBox(requestID, msg.getDstAgentID());
+            LocalMailBox mb = new LocalMailBox(requestID);
             boxes.put(requestID, mb);
             internalSendMsg(msg);
             // block until the result arrives
-            if (mb.waitForResponse(WAITING_DELAY)) {
-                // return the response
-                return mb.getValue();
-            } else {
-                logger.warn("Unable to get the response from request: " + requestID);
-                throw new RoutingException("Unable to get the response from request");
+
+            byte[] response = mb.waitForResponse(WAITING_DELAY);
+            if (response == null) {
+                logger.debug("Timeout reached while waiting a response for " + msg);
+                throw new RoutingException("Timeout reached while waiting a response for " + msg);
             }
+            return response;
         }
     }
 
@@ -251,50 +252,32 @@ public class ForwardingAgentV2 implements AgentV2, Runnable {
 
     public class LocalMailBox {
         private final CountDownLatch latch;
-        private byte[] response = null;
+        volatile private byte[] response = null;
         private final long requestID;
-        private boolean aborted;
-        private final AgentID targetID;
 
-        public LocalMailBox(long requestID, AgentID targetID) {
+        public LocalMailBox(long requestID) {
             this.requestID = requestID;
             this.latch = new CountDownLatch(1);
-            this.aborted = false;
-            this.targetID = targetID;
         }
 
-        public boolean waitForResponse(long timeInSeconds) {
-            try {
-                if (latch.await(timeInSeconds, TimeUnit.SECONDS)) {
-                    boxes.remove(requestID);
-                    return !aborted;
-                } else {
-                    boxes.remove(requestID);
-                    return false;
+        public byte[] waitForResponse(long timeout) {
+            TimeoutAccounter ta = TimeoutAccounter.getAccounter(timeout);
+
+            do {
+                try {
+                    latch.await(ta.getRemainingTimeout(), TimeUnit.MILLISECONDS);
+                } catch (InterruptedException e) {
+                    // Miam miam miam, don't care we are looping
                 }
-            } catch (InterruptedException e) {
-                logger.warn("Mailbox was interrupted while waiting for a reply", e);
-                boxes.remove(requestID);
-                return false;
-            }
+            } while (!ta.isTimeoutElapsed());
+
+            boxes.remove(this.requestID);
+            return response;
         }
 
         public void setAndUnlock(byte[] response) {
             this.response = response;
             latch.countDown();
-        }
-
-        public void abort() {
-            this.aborted = true;
-            latch.countDown();
-        }
-
-        public byte[] getValue() {
-            return response;
-        }
-
-        public AgentID getTargetAgentID() {
-            return this.targetID;
         }
     }
 
