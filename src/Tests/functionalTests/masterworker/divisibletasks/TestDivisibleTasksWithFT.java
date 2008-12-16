@@ -75,11 +75,12 @@ public class TestDivisibleTasksWithFT extends FunctionalTest {
         this.pad = PAGCMDeployment.loadApplicationDescriptor(descriptor);
         this.pad.startDeployment();
         this.vn1 = this.pad.getVirtualNode("VN1");
-        this.vn1.waitReady();
-        System.out.println("VN1 is ready");
+        
         this.pad2 = PAGCMDeployment.loadApplicationDescriptor(descriptor2);
         this.pad2.startDeployment();
         this.vn2 = this.pad2.getVirtualNode("VN2");
+        this.vn1.waitReady();
+        System.out.println("VN1 is ready");
         this.vn2.waitReady();
         System.out.println("VN2 is ready");
 

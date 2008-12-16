@@ -553,6 +553,18 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             if (debug) {
                 logger.debug(workerName + " sends result of task " + id + " but it's unknown.");
             }
+            // If it is a spawnedWorker, clean it
+            if (spawnedWorkerNames.contains(workerName)) {
+                // We remove the spawned worker from our knowledge
+                spawnedWorkerNames.remove(workerName);
+                if (debug) {
+                    logger.debug(workerName + " is cleared");
+                }
+                if (isClearing) {
+                	throw new IsClearingError();
+                }
+            }
+            
         }
 
         return new BooleanWrapper(true);
@@ -1165,7 +1177,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             //            }
             
             // We go on in this clearing activity until every workers have either responded or were reported missing OR we still wait for futures from the big master 
-            if ((clearedWorkers.size() == workerGroup.size() + spawnedWorkerNames.size()) && futureCounter == 0) {
+            if ((clearedWorkers.size() == workerGroup.size()) && futureCounter == 0 &&  spawnedWorkerNames.size() == 0) {
             	// Add all cleaned workers to sleepingGroup
                 for (String workerName : clearedWorkers) {
                     if (!sleepingWorkers.containsKey(workerName)) {

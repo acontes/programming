@@ -811,7 +811,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
             if (service.hasRequestToServe(clearingFilter)) {
                 service.serveOldest(clearingFilter);
             }
-            if (clearedWorkers.size() == workerGroup.size() + spawnedWorkerNames.size()) {
+            if (clearedWorkers.size() == workerGroup.size() && spawnedWorkerNames.size() == 0) {
                 for (String workerName : clearedWorkers) {
                 	if (debug) {
                         logger.debug("Cleared workers size is: " + clearedWorkers.size() + ". Sleeping workers size is: " + sleepingWorkers.size());

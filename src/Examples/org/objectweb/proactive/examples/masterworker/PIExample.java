@@ -47,9 +47,9 @@ import org.objectweb.proactive.api.PALifeCycle;
 
 
 public class PIExample {
-    public static final long NUMBER_OF_EXPERIENCES = 10000;
-    public static final int NUMBER_OF_TASKS = 1;
-    public static final int NUMBER_OF_DIVISIBLETASKS = 1;
+    public static final long NUMBER_OF_EXPERIENCES = 1000000;
+    public static final int NUMBER_OF_TASKS = 4;
+    public static final int NUMBER_OF_DIVISIBLETASKS = 4;
 
     public static void main(String[] args) throws TaskException, ProActiveException {
 
@@ -76,7 +76,7 @@ public class PIExample {
         System.out.println("\nOne of the result is:" + master.waitOneResult());
 
         master.clear();
-        master.setResultReceptionOrder(Master.SUBMISSION_ORDER);
+//        master.setResultReceptionOrder(Master.SUBMISSION_ORDER);
 
         tasks = new Vector<TestDivisibleTask>();
         for (int i = 0; i < NUMBER_OF_TASKS; i++) {
