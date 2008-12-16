@@ -263,13 +263,14 @@ public class ForwardingAgentV2 implements AgentV2, Runnable {
         public byte[] waitForResponse(long timeout) {
             TimeoutAccounter ta = TimeoutAccounter.getAccounter(timeout);
 
+            boolean b = false;
             do {
                 try {
-                    latch.await(ta.getRemainingTimeout(), TimeUnit.MILLISECONDS);
+                    b = latch.await(ta.getRemainingTimeout(), TimeUnit.MILLISECONDS);
                 } catch (InterruptedException e) {
                     // Miam miam miam, don't care we are looping
                 }
-            } while (!ta.isTimeoutElapsed());
+            } while (!b & !ta.isTimeoutElapsed());
 
             boxes.remove(this.requestID);
             return response;
