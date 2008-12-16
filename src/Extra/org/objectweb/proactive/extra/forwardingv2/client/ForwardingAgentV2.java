@@ -167,7 +167,7 @@ public class ForwardingAgentV2 implements AgentV2, Runnable {
 			return null;
 		} else {
 			// Put a mailbox, waiting for the result
-			LocalMailBox mb = new LocalMailBox(requestID);
+			LocalMailBox mb = new LocalMailBox(requestID, msg.getDstAgentID());
 			boxes.put(requestID, mb);
 			internalSendMsg(msg);
 			// block until the result arrives
@@ -271,16 +271,21 @@ public class ForwardingAgentV2 implements AgentV2, Runnable {
 		private final CountDownLatch latch;
 		private byte[] response = null;
 		private final long requestID;
+		private boolean aborted;
+		private final AgentID targetID;
 
-		public LocalMailBox(long requestID) {
+		public LocalMailBox(long requestID, AgentID targetID) {
 			this.requestID = requestID;
-			latch = new CountDownLatch(1);
+			this.latch = new CountDownLatch(1);
+			this.aborted = false;
+			this.targetID = targetID;
 		}
 
 		public boolean waitForResponse(long timeInSeconds) {
 			try {
 				if(latch.await(timeInSeconds, TimeUnit.SECONDS)) {
-					return true;
+					boxes.remove(requestID);
+					return !aborted;
 				} else {
 					boxes.remove(requestID);
 					return false;
@@ -297,8 +302,17 @@ public class ForwardingAgentV2 implements AgentV2, Runnable {
 			latch.countDown();
 		}
 
+		public void abort() {
+			this.aborted = true;
+			latch.countDown();
+		}
+
 		public byte[] getValue() {
 			return response;
+		}
+
+		public AgentID getTargetAgentID() {
+			return this.targetID;
 		}
 	}
 
