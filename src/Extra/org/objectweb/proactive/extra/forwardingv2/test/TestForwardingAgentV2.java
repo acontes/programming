@@ -104,10 +104,9 @@ public class TestForwardingAgentV2 {
      */
     @Test
     public void testSendMsgWithoutReply() {
-        Assert
-                .fail("Not valid for now, because ForwardingAgent "
-						+"is not able to handle oneWay messages for now "
-						+"(it responds to oneWay messages and it shouldn't)");
+        Assert.fail("Not valid for now, because ForwardingAgent "
+            + "is not able to handle oneWay messages for now "
+            + "(it responds to oneWay messages and it shouldn't)");
         AgentV2 agent = new ForwardingAgentV2(ProActiveMessageHandler.class);
         Assert.assertNotNull(agent);
         try {

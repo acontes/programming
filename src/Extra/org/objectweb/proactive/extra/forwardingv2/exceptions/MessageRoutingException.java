@@ -8,7 +8,7 @@ package org.objectweb.proactive.extra.forwardingv2.exceptions;
 public class MessageRoutingException extends Exception {
 
     public MessageRoutingException() {
-	super();
+        super();
     }
 
     public MessageRoutingException(String message) {
