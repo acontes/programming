@@ -7,19 +7,19 @@ package org.objectweb.proactive.extra.forwardingv2.exceptions;
 @SuppressWarnings("serial")
 public class RoutingException extends MessageRoutingException {
 
-	public RoutingException() {
-		super();
-	}
+    public RoutingException() {
+        super();
+    }
 
-	public RoutingException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    public RoutingException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-	public RoutingException(String message) {
-		super(message);
-	}
+    public RoutingException(String message) {
+        super(message);
+    }
 
-	public RoutingException(Throwable cause) {
-		super(cause);
-	}
+    public RoutingException(Throwable cause) {
+        super(cause);
+    }
 }

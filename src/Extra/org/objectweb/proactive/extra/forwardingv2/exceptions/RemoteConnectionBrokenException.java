@@ -8,20 +8,20 @@ package org.objectweb.proactive.extra.forwardingv2.exceptions;
 @SuppressWarnings("serial")
 public class RemoteConnectionBrokenException extends RoutingException {
 
-	public RemoteConnectionBrokenException() {
-		super();
-	}
+    public RemoteConnectionBrokenException() {
+        super();
+    }
 
-	public RemoteConnectionBrokenException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    public RemoteConnectionBrokenException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-	public RemoteConnectionBrokenException(String message) {
-		super(message);
-	}
+    public RemoteConnectionBrokenException(String message) {
+        super(message);
+    }
 
-	public RemoteConnectionBrokenException(Throwable cause) {
-		super(cause);
-	}
+    public RemoteConnectionBrokenException(Throwable cause) {
+        super(cause);
+    }
 
 }

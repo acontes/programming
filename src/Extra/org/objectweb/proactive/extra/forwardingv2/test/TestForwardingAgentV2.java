@@ -14,6 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.extra.forwardingv2.client.AgentV2;
 import org.objectweb.proactive.extra.forwardingv2.client.ForwardingAgentV2;
+import org.objectweb.proactive.extra.forwardingv2.client.ProActiveMessageHandler;
 import org.objectweb.proactive.extra.forwardingv2.exceptions.MessageRoutingException;
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
 import org.objectweb.proactive.extra.forwardingv2.protocol.Message;
@@ -61,7 +62,7 @@ public class TestForwardingAgentV2 {
 
     @Test
     public void testInitialize() {
-        AgentV2 agent = new ForwardingAgentV2();
+        AgentV2 agent = new ForwardingAgentV2(ProActiveMessageHandler.class);
         Assert.assertNotNull(agent);
         try {
             agent.initialize(InetAddress.getLocalHost(), port);
@@ -74,7 +75,7 @@ public class TestForwardingAgentV2 {
 
     @Test
     public void testSendMsgWithReply() {
-        AgentV2 agent = new ForwardingAgentV2();
+        AgentV2 agent = new ForwardingAgentV2(ProActiveMessageHandler.class);
         Assert.assertNotNull(agent);
         try {
             agent.initialize(InetAddress.getLocalHost(), port);
@@ -107,7 +108,7 @@ public class TestForwardingAgentV2 {
                 .fail("Not valid for now, because ForwardingAgent "
 						+"is not able to handle oneWay messages for now "
 						+"(it responds to oneWay messages and it shouldn't)");
-        AgentV2 agent = new ForwardingAgentV2();
+        AgentV2 agent = new ForwardingAgentV2(ProActiveMessageHandler.class);
         Assert.assertNotNull(agent);
         try {
             agent.initialize(InetAddress.getLocalHost(), port);
@@ -135,7 +136,7 @@ public class TestForwardingAgentV2 {
      */
     @Test
     public void testSendRealMessageToCraft() {
-        AgentV2 agent = new ForwardingAgentV2();
+        AgentV2 agent = new ForwardingAgentV2(ProActiveMessageHandler.class);
         Assert.assertNotNull(agent);
         try {
             agent.initialize(InetAddress.getLocalHost(), port);

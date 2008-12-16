@@ -1,23 +1,20 @@
 package org.objectweb.proactive.extra.forwardingv2.client;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.URI;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.remoteobject.http.util.HttpMarshaller;
-import org.objectweb.proactive.core.remoteobject.http.util.HttpMessage;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.forwardingv2.exceptions.ExecutionException;
-import org.objectweb.proactive.extra.forwardingv2.exceptions.MessageRoutingException;
 import org.objectweb.proactive.extra.forwardingv2.exceptions.RoutingException;
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
 import org.objectweb.proactive.extra.forwardingv2.protocol.Message;
@@ -27,6 +24,7 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.Message.MessageType;
 
 /**
  * The ForwardingAgent is the implementation of the Agent interface.
+ *
  * @author A. Fawaz, J. Martin
  *
  */
@@ -40,17 +38,6 @@ public class ForwardingAgentV2 implements AgentV2, Runnable {
 
     /** Delay before aborting the response waiting. **/
     private static final long WAITING_DELAY = 5;
-
-    /**
-     * ThreadPool options:
-     * - CORE_POOL_SIZE: Initial size of the thread pool
-     * - MAX_POOL_SIZE: number of request served at the same time
-     * - KEEP_ALIVE_TIME: Time in seconds to keep the threads before decreasing the core pool size.
-     */
-    private static final int CORE_POOL_SIZE = 2;
-    private static final int MAX_POOL_SIZE = 4;
-    private static final long KEEP_ALIVE_TIME = 10;
-    private final ThreadPoolExecutor pool;
 
     /** Local Mailboxes used to block the threads waiting for a response. **/
     private final ConcurrentHashMap<Long, LocalMailBox> boxes;
@@ -69,18 +56,30 @@ public class ForwardingAgentV2 implements AgentV2, Runnable {
 
     private volatile boolean isRunning; // Stopping main Thread
 
-    public ForwardingAgentV2() {
+    /** Every data message will be handled by this object */
+    final private MessageHandler messageHandler;
+
+    public ForwardingAgentV2(Class<? extends MessageHandler> messageHandlerClass) {
+
+        try {
+            Constructor<? extends MessageHandler> mhConstructor;
+            mhConstructor = messageHandlerClass.getConstructor(AgentV2.class);
+            this.messageHandler = mhConstructor.newInstance(this);
+        } catch (Exception e) {
+            throw new ProActiveRuntimeException("Agent failed to create the message handler", e);
+        }
+
         boxes = new ConcurrentHashMap<Long, LocalMailBox>();
         requestIDGenerator = new AtomicLong(0);
-        pool = new ThreadPoolExecutor(CORE_POOL_SIZE, MAX_POOL_SIZE, KEEP_ALIVE_TIME, TimeUnit.SECONDS,
-            new LinkedBlockingQueue<Runnable>());
     }
 
     /**
      * Initialize the tunnel to the registry and get the agentID from it.
      * 
-     * @param registryAddress {@link InetAddress} of the registry
-     * @param registryPort port to connect.
+     * @param registryAddress
+     *            {@link InetAddress} of the registry
+     * @param registryPort
+     *            port to connect.
      */
     public void initialize(InetAddress registryAddress, int registryPort) throws IOException {
         if (logger.isDebugEnabled()) {
@@ -137,7 +136,8 @@ public class ForwardingAgentV2 implements AgentV2, Runnable {
 
     }
 
-    public byte[] sendMsg(AgentID targetID, byte[] data, boolean oneWay) throws RoutingException, ExecutionException {
+    public byte[] sendMsg(AgentID targetID, byte[] data, boolean oneWay) throws RoutingException,
+            ExecutionException {
         if (logger.isDebugEnabled()) {
             logger.trace("Sending a message to " + targetID);
         }
@@ -166,7 +166,8 @@ public class ForwardingAgentV2 implements AgentV2, Runnable {
         }
     }
 
-    public byte[] sendMsg(URI targetURI, byte[] data, boolean oneWay) throws RoutingException, ExecutionException {
+    public byte[] sendMsg(URI targetURI, byte[] data, boolean oneWay) throws RoutingException,
+            ExecutionException {
         String path = targetURI.getPath();
         String remoteAgentId = path.substring(0, path.indexOf('/'));
 
@@ -174,8 +175,15 @@ public class ForwardingAgentV2 implements AgentV2, Runnable {
         return sendMsg(agentID, data, oneWay);
     }
 
+    public void sendReply(Message request, byte[] data) throws RoutingException {
+        Message reply = Message.dataMessage(this.getAgentID(), request.getSrcAgentID(), request.getMsgID(),
+                data);
+        internalSendMsg(reply);
+    }
+
     /**
      * Send really the message through the tunnel
+     *
      * @param msg
      */
     private void internalSendMsg(Message msg) {
@@ -196,9 +204,8 @@ public class ForwardingAgentV2 implements AgentV2, Runnable {
     }
 
     /**
-     * -> Read messages
-     * L> Execute requests or dispatch responses
-     * -> TODO handle other cases
+     * -> Read messages L> Execute requests or dispatch responses -> TODO handle
+     * other cases
      */
     public void run() {
         while (isRunning) {
@@ -222,7 +229,7 @@ public class ForwardingAgentV2 implements AgentV2, Runnable {
                         logger.trace("Message corresponding to request");
                     }
                     // That message is a request, handle it.
-                    pool.execute(new MessageProcessor(msg));
+                    messageHandler.pushMessage(msg);
                 } else {
                     if (logger.isTraceEnabled()) {
                         logger.trace("Message corresponding to response");
@@ -240,46 +247,6 @@ public class ForwardingAgentV2 implements AgentV2, Runnable {
      */
     public AgentID getAgentID() {
         return agentID;
-    }
-
-    /**
-     * Execute the request received and send the response.
-     * 
-     * @author J. Martin, A. Fawaz
-     */
-    public class MessageProcessor implements Runnable {
-        private final Message _toProcess;
-
-        public MessageProcessor(Message msg) {
-            _toProcess = msg;
-        }
-
-        public void run() {
-            ClassLoader savedClassLoader = Thread.currentThread().getContextClassLoader();
-            try {
-                Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
-
-                // Handle the message
-                HttpMessage message = (HttpMessage) HttpMarshaller.unmarshallObject(_toProcess.getData());
-                Object result = null;
-                if (message != null) {
-                    result = message.processMessage();
-                } else {
-                    logger.debug("message " + _toProcess + " doesn't unmarshal itself correctly.");
-                }
-                byte[] resultBytes = HttpMarshaller.marshallObject(result);
-
-                Message reply = Message.dataMessage(agentID, _toProcess.getSrcAgentID(), _toProcess
-                        .getMsgID(), resultBytes);
-                internalSendMsg(reply);
-
-            } catch (Exception e) {
-                logger.warn("HTTP Failed to serve a message", e);
-            } finally {
-                Thread.currentThread().setContextClassLoader(savedClassLoader);
-            }
-        }
-
     }
 
     public class LocalMailBox {

@@ -12,20 +12,20 @@ package org.objectweb.proactive.extra.forwardingv2.exceptions;
 @SuppressWarnings("serial")
 public class AgentNotConnectedException extends RoutingException {
 
-	public AgentNotConnectedException() {
-		super();
-	}
+    public AgentNotConnectedException() {
+        super();
+    }
 
-	public AgentNotConnectedException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    public AgentNotConnectedException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-	public AgentNotConnectedException(String message) {
-		super(message);
-	}
+    public AgentNotConnectedException(String message) {
+        super(message);
+    }
 
-	public AgentNotConnectedException(Throwable cause) {
-		super(cause);
-	}
+    public AgentNotConnectedException(Throwable cause) {
+        super(cause);
+    }
 
 }

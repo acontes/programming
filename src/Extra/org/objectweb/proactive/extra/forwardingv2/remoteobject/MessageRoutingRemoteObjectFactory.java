@@ -45,6 +45,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.forwardingv2.client.AgentV2;
 import org.objectweb.proactive.extra.forwardingv2.client.ForwardingAgentV2;
+import org.objectweb.proactive.extra.forwardingv2.client.ProActiveMessageHandler;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.message.MessageRoutingRegistryListRemoteObjectsMessage;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.message.MessageRoutingRemoteObjectLookupMessage;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.util.MessageRoutingRegistry;
@@ -58,7 +59,7 @@ public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFacto
     final private MessageRoutingRegistry registry;
 
     public MessageRoutingRemoteObjectFactory() {
-        this.agent = new ForwardingAgentV2();
+        this.agent = new ForwardingAgentV2(ProActiveMessageHandler.class);
         this.registry = MessageRoutingRegistry.singleton;
     }
 
