@@ -265,10 +265,9 @@ public class Message {
                 return "[Registration request]";
             case 1: //REGISTRATION_REPLY
                 return "[Registration reply / id=" + dstAgentID + "]";
-            case 2: //REGISTRATION_REQUEST
-                return "[Registration request]";
             case 6: //DATA
-                return "[Data message / from=" + srcAgentID + "; to=" + dstAgentID + "]";
+                return "[Data message / from=" + srcAgentID + "; to=" + dstAgentID + "; messageID=" + msgID +
+                    "]";
             default:
                 return "[Message type=" + type + "]";
         }
