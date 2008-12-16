@@ -50,7 +50,8 @@ public class MessageRoutingRemoteObjectImpl implements MessageRoutingRemoteObjec
     private AgentV2 agent;
     protected transient InternalRemoteRemoteObject remoteObject;
 
-    public MessageRoutingRemoteObjectImpl(InternalRemoteRemoteObject remoteObject, URI remoteObjectURL, AgentV2 agent) {
+    public MessageRoutingRemoteObjectImpl(InternalRemoteRemoteObject remoteObject, URI remoteObjectURL,
+            AgentV2 agent) {
         this.remoteObject = remoteObject;
         this.remoteObjectURL = remoteObjectURL;
         this.agent = agent;

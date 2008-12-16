@@ -116,9 +116,7 @@ public class Message {
         TypeHelper.longToByteArray(msgID, byteArray, Offsets.MSG_ID_OFFSET.getValue());
 
         if (data != null) {
-            for (int i = 0; i < data.length; i++) {
-                byteArray[HEADER_LENGTH + i] = data[i];
-            }
+            System.arraycopy(data, 0, byteArray, HEADER_LENGTH, data.length);
         }
 
         return byteArray;

@@ -135,18 +135,6 @@ public class ForwardingAgentV2 implements AgentV2, Runnable {
 
     }
 
-    /**
-     * Send a message to the target AgentID, containing data.
-     * 
-     * if oneWay, the the result returned is null.
-     * if not, the this call is blocked until an answer is provided.
-     * 
-     * @param targetID the destination of the data.
-     * @param data the data to send.
-     * @param oneWay
-     * @return the data response.
-     * @throws ForwardingException if the timeout is reached.
-     */
     public byte[] sendMsg(AgentID targetID, byte[] data, boolean oneWay) throws ForwardingException {
         if (logger.isDebugEnabled()) {
             logger.trace("Sending a message to " + targetID);

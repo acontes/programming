@@ -122,7 +122,8 @@ public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFacto
      * @return a UniversalBody
      */
     public RemoteObject lookup(URI uri) throws ProActiveException {
-        MessageRoutingRemoteObjectLookupMessage message = new MessageRoutingRemoteObjectLookupMessage(uri, agent);
+        MessageRoutingRemoteObjectLookupMessage message = new MessageRoutingRemoteObjectLookupMessage(uri,
+            agent);
         try {
             message.send();
         } catch (MessageRoutingRemoteException e) {
