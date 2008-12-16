@@ -53,7 +53,7 @@ public abstract class MessageRoutingMessage implements Serializable {
 
     public MessageRoutingMessage(URI uri, AgentV2 agent) {
         this.uri = uri;
-        this.agent  = agent;
+        this.agent = agent;
     }
 
     /**
@@ -70,13 +70,13 @@ public abstract class MessageRoutingMessage implements Serializable {
      * @throws HTTPRemoteException
      */
     public final void send() throws MessageRoutingRemoteException {
-	try {
-	byte[] bytes = HttpMarshaller.marshallObject(this);
-	byte [] response = agent.sendMsg(this.uri, bytes, false);
+        try {
+            byte[] bytes = HttpMarshaller.marshallObject(this);
+            byte[] response = agent.sendMsg(this.uri, bytes, false);
 
-	this.returnedObject = HttpMarshaller.unmarshallObject(response);
-	} catch (Exception e) {
-		throw new MessageRoutingRemoteException("Failed to send message to " + this.uri, e);
-	}
+            this.returnedObject = HttpMarshaller.unmarshallObject(response);
+        } catch (Exception e) {
+            throw new MessageRoutingRemoteException("Failed to send message to " + this.uri, e);
+        }
     }
 }
