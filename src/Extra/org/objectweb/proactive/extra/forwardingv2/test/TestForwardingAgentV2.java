@@ -96,7 +96,8 @@ public class TestForwardingAgentV2 {
         System.out.println("Sending Crafted Message");
 
         try {
-            byte[] result = agent.sendMsg(new AgentID(9999l), "Hello".getBytes(), false);
+        	byte[] data = null; // FIXME set a crafted message...
+            byte[] result = agent.sendMsg(new AgentID(9999l), data, false);
             Assert.assertNotNull("Result shouldn't be null", result);
         } catch (ForwardingException e) {
             e.printStackTrace();
@@ -145,10 +146,12 @@ class FakeRegistry implements Runnable {
                 AgentID tmp = m.getSrcAgentID();
 
                 if (m.getDstAgentID().equals(crafted)) {
+                    m.setDstAgentID(m.getSrcAgentID());
                     m.setSrcAgentID(craftedResp);
 
                 } else if (m.getDstAgentID().equals(craftedResp)) {
-
+                	m.setDstAgentID(m.getSrcAgentID());
+                	m.setSrcAgentID(crafted);
                 } else {
                     // Simple echo
                     m.setSrcAgentID(m.getDstAgentID());
