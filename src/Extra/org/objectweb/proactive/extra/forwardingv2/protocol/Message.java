@@ -136,6 +136,10 @@ public class Message {
         return new Message(MessageType.CONNECTION_ABORTED.getValue(), srcAgentID, dstAgentID, msgID, cause);
     }
 
+    public static Message agentDisconnected(AgentID srcAgentID, AgentID dstAgentID) {
+        return new Message(MessageType.AGENT_DISCONNECTED.getValue(), srcAgentID, dstAgentID, 0, null);
+    }
+
     public static Message dataMessage(AgentID srcAgentID, AgentID dstAgentID, long msgID, byte[] data) {
         return new Message(MessageType.DATA.getValue(), srcAgentID, dstAgentID, msgID, data);
     }
@@ -157,7 +161,7 @@ public class Message {
      * @param offset the offset at which to find the beginning of the message in the buffer
      * @return the total length of the formatted message
      */
-    public int readLength(byte[] byteArray, int offset) {
+    public static int readLength(byte[] byteArray, int offset) {
         return TypeHelper.byteArrayToInt(byteArray, offset + Offsets.LENGTH_OFFSET.getValue());
     }
 
@@ -167,7 +171,7 @@ public class Message {
      * @param offset the offset at which to find the beginning of the message in the buffer
      * @return the type of the formatted message
      */
-    public int readType(byte[] byteArray, int offset) {
+    public static int readType(byte[] byteArray, int offset) {
         return TypeHelper.byteArrayToInt(byteArray, offset + Offsets.MSG_TYPE_OFFSET.getValue());
     }
 
@@ -178,7 +182,7 @@ public class Message {
      * @param offset the offset at which to find the beginning of the message in the buffer
      * @return the srcAgentID of the formatted message
      */
-    public AgentID readSrcAgentID(byte[] byteArray, int offset) {
+    public static AgentID readSrcAgentID(byte[] byteArray, int offset) {
         return new AgentID(TypeHelper.byteArrayToLong(byteArray, offset +
             Offsets.SRC_AGENT_ID_OFFSET.getValue()));
     }
@@ -189,7 +193,7 @@ public class Message {
      * @param offset the offset at which to find the beginning of the message in the buffer
      * @return the dstAgentID of the formatted message
      */
-    public AgentID readDstAgentID(byte[] byteArray, int offset) {
+    public static AgentID readDstAgentID(byte[] byteArray, int offset) {
         return new AgentID(TypeHelper.byteArrayToLong(byteArray, offset +
             Offsets.DST_AGENT_ID_OFFSET.getValue()));
     }
@@ -200,7 +204,7 @@ public class Message {
      * @param offset the offset at which to find the beginning of the message in the buffer
      * @return the MessageID of the formatted message
      */
-    public long readMessageID(byte[] byteArray, int offset) {
+    public static long readMessageID(byte[] byteArray, int offset) {
         return TypeHelper.byteArrayToLong(byteArray, offset + Offsets.MSG_ID_OFFSET.getValue());
     }
 
