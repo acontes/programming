@@ -641,9 +641,10 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void, Trees> {
                     }
                     TypeElement calleeType = _elemUtils.getTypeElement(calleeClassName);
                     if (calleeType == null) {
-                        // cannot do the check. 
+                        // cannot do the check.
                         return true;
                     }
+
                     // loaded
                     return typeDeclaresMigrationMethod(calleeType, methodName);
                 }
@@ -666,7 +667,7 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void, Trees> {
         CompilationUnitTree cu = getCurrentPath().getCompilationUnit();
         ExpressionTree packageExpr = cu.getPackageName();
         ret = packageExpr.toString() + "." + className;
-        TypeElement calleeType = _elemUtils.getTypeElement(className);
+        TypeElement calleeType = _elemUtils.getTypeElement(ret);
         if (calleeType != null) {
             return ret;
         } else {
@@ -686,11 +687,10 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void, Trees> {
                     continue;
 
                 // try it!
-                calleeType = _elemUtils.getTypeElement(className);
+                calleeType = _elemUtils.getTypeElement(ret);
                 if (calleeType != null) {
                     return ret;
                 }
-
             }
         }
         // really no luck!
