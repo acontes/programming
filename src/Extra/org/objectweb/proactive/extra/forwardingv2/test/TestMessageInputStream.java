@@ -3,13 +3,13 @@ package org.objectweb.proactive.extra.forwardingv2.test;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.Assert;
 
 import org.junit.Test;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
 import org.objectweb.proactive.extra.forwardingv2.protocol.Message;
 import org.objectweb.proactive.extra.forwardingv2.protocol.MessageInputStream;
@@ -31,54 +31,54 @@ public class TestMessageInputStream {
         l.add(m3);
 
         // Creating Server
-        new MessageSender(12345, l);
+        MessageSender messageSender = new MessageSender(l);
 
-            Socket sock = new Socket("localhost", 12345);
-            Assert.assertNotNull(sock);
+        Socket sock = new Socket("localhost", messageSender.getPort());
+        Assert.assertNotNull(sock);
 
-            MessageInputStream mis = new MessageInputStream(sock.getInputStream());
-            Assert.assertNotNull(mis);
+        MessageInputStream mis = new MessageInputStream(sock.getInputStream());
+        Assert.assertNotNull(mis);
 
-            // Read registration request
-            Message m = new Message(mis.readMessage(), 0);
-            Assert.assertEquals(m1, m);
+        // Read registration request
+        Message m = new Message(mis.readMessage(), 0);
+        Assert.assertEquals(m1, m);
 
-            m = new Message(mis.readMessage(), 0);
-            Assert.assertEquals(m2, m);
+        m = new Message(mis.readMessage(), 0);
+        Assert.assertEquals(m2, m);
 
-            m = new Message(mis.readMessage(), 0);
-            Assert.assertEquals(m3, m);
+        m = new Message(mis.readMessage(), 0);
+        Assert.assertEquals(m3, m);
     }
 
 }
 
 class MessageSender implements Runnable {
-    List<Message> msg;
-    int port;
+    private List<Message> messages;
+    private ServerSocket server;
 
-    public MessageSender(int port, List<Message> msg) {
-        this.port = port;
-        this.msg = msg;
+    public MessageSender(List<Message> msg) throws IOException {
+        this.server = new ServerSocket(0);
+        this.messages = msg;
+
         Thread t = new Thread(this);
         t.setDaemon(true);
         t.start();
     }
 
+    public int getPort() {
+        return server.getLocalPort();
+    }
+
     public void run() {
         try {
-            ServerSocket server = new ServerSocket(port);
             Socket sock = server.accept();
-            for (Message m : msg) {
+            for (Message m : messages) {
                 sock.getOutputStream().write(m.toByteArray());
                 sock.getOutputStream().flush();
             }
             sock.close();
-        } catch (UnknownHostException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        } catch (Exception e) {
+            Assert.fail(ProActiveLogger.getStackTraceAsString(e));
         }
     }
 }
