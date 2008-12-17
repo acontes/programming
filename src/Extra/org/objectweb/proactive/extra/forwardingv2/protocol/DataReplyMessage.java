@@ -2,8 +2,8 @@ package org.objectweb.proactive.extra.forwardingv2.protocol;
 
 public class DataReplyMessage extends ForwardedMessage {
 
-    public DataReplyMessage(MessageType type, AgentID srcAgentID, AgentID dstAgentID, long msgID, byte[] data) {
-        super(type, srcAgentID, dstAgentID, msgID, data);
+    public DataReplyMessage(AgentID srcAgentID, AgentID dstAgentID, long msgID, byte[] data) {
+        super(MessageType.DATA_REPLY, srcAgentID, dstAgentID, msgID, data);
     }
 
     /**

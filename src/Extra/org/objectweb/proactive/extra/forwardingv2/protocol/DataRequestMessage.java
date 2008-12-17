@@ -2,9 +2,9 @@ package org.objectweb.proactive.extra.forwardingv2.protocol;
 
 public class DataRequestMessage extends ForwardedMessage {
 
-    public DataRequestMessage(MessageType type, AgentID srcAgentID, AgentID dstAgentID, long msgID,
+    public DataRequestMessage(AgentID srcAgentID, AgentID dstAgentID, long msgID,
             byte[] data) {
-        super(type, srcAgentID, dstAgentID, msgID, data);
+        super(MessageType.DATA_REQUEST, srcAgentID, dstAgentID, msgID, data);
     }
 
     /**

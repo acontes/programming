@@ -2,8 +2,8 @@ package org.objectweb.proactive.extra.forwardingv2.protocol;
 
 public class RegistrationReply extends RegistrationMessage {
 
-    public RegistrationReply(MessageType type, AgentID agentID) {
-        super(type, agentID);
+    public RegistrationReply(AgentID agentID) {
+        super(MessageType.REGISTRATION_REPLY, agentID);
     }
 
     /**
