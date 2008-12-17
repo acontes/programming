@@ -37,7 +37,7 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.Message.MessageType;
  * @author A. Fawaz, J. Martin
  *
  */
-public class ForwardingAgentV2 implements AgentV2, Runnable {
+public class ForwardingAgentV2 implements AgentV2Internal, Runnable {
     // FIELDS
     /**
      * Number of retries to connect to the registry.
