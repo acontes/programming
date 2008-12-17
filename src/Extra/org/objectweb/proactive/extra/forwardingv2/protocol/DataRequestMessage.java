@@ -1,8 +1,8 @@
 package org.objectweb.proactive.extra.forwardingv2.protocol;
 
-public class DataReply extends ForwardedMessage {
+public class DataRequestMessage extends ForwardedMessage {
 
-    public DataReply(MessageType type, AgentID srcAgentID, AgentID dstAgentID, long msgID, byte[] data) {
+    public DataRequestMessage(MessageType type, AgentID srcAgentID, AgentID dstAgentID, long msgID, byte[] data) {
         super(type, srcAgentID, dstAgentID, msgID, data);
     }
 
@@ -11,7 +11,7 @@ public class DataReply extends ForwardedMessage {
      * @param byteArray the byte array from which to read
      * @param offset the offset at which to find the message in the byte array
      */
-    public DataReply(byte[] byteArray, int offset) {
+    public DataRequestMessage(byte[] byteArray, int offset) {
         super(byteArray, offset);
     }
 
