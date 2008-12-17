@@ -44,9 +44,6 @@ public interface AgentV2 {
     public byte[] sendMsg(URI targetURI, byte[] data, boolean oneWay) throws RoutingException,
             ExecutionException;
 
-
-    public void sendExceptionReply(DataRequestMessage request, Exception e) throws RoutingException;
-
     public AgentID getAgentID();
 
 }
