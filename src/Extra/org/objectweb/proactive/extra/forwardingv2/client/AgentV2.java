@@ -7,7 +7,7 @@ import java.net.URI;
 import org.objectweb.proactive.extra.forwardingv2.exceptions.ExecutionException;
 import org.objectweb.proactive.extra.forwardingv2.exceptions.RoutingException;
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
-import org.objectweb.proactive.extra.forwardingv2.protocol.Message;
+import org.objectweb.proactive.extra.forwardingv2.protocol.DataRequestMessage;
 
 
 public interface AgentV2 {
@@ -44,7 +44,9 @@ public interface AgentV2 {
     public byte[] sendMsg(URI targetURI, byte[] data, boolean oneWay) throws RoutingException,
             ExecutionException;
 
-    public void sendReply(Message request, byte[] data) throws RoutingException;
+    public void sendReply(DataRequestMessage request, byte[] data) throws RoutingException;
+
+    public void sendExceptionReply(DataRequestMessage request, Exception e) throws RoutingException;
 
     public AgentID getAgentID();
 

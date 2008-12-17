@@ -1,9 +1,9 @@
 package org.objectweb.proactive.extra.forwardingv2.protocol;
 
-public class RegistrationReply extends RegistrationMessage {
+public class RegistrationReplyMessage extends RegistrationMessage {
 
-    public RegistrationReply(AgentID agentID) {
-        super(MessageType.REGISTRATION_REPLY, agentID);
+    public RegistrationReplyMessage(MessageType type, AgentID agentID) {
+        super(type, agentID);
     }
 
     /**
@@ -11,7 +11,7 @@ public class RegistrationReply extends RegistrationMessage {
      * @param byteArray the byte array from which to read
      * @param offset the offset at which to find the message in the byte array
      */
-    public RegistrationReply(byte[] byteArray, int offset) {
+    public RegistrationReplyMessage(byte[] byteArray, int offset) {
         super(byteArray, offset);
     }
 }

@@ -1,14 +1,11 @@
 package org.objectweb.proactive.extra.forwardingv2.protocol;
 
-public class RegistrationRequest extends RegistrationMessage {
+public class RegistrationRequestMessage extends RegistrationMessage {
 
+    //TODO: ajouter ce qu'il faut pour pouvoir fabriquer des requests sans agentID
 
-	public RegistrationRequest() {
-		super(MessageType.REGISTRATION_REQUEST, null);
-	}
-
-    public RegistrationRequest(AgentID agentID) {
-        super(MessageType.REGISTRATION_REQUEST, agentID);
+    public RegistrationRequest(MessageType type, AgentID agentID) {
+        super(type, agentID);
     }
 
     /**

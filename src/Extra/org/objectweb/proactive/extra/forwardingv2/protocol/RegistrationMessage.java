@@ -18,7 +18,7 @@ public abstract class RegistrationMessage extends Message {
         }
     }
 
-    AgentID agentID;
+    protected AgentID agentID;
 
     public RegistrationMessage(MessageType type, AgentID agentID) {
         this.type = type;
@@ -35,6 +35,10 @@ public abstract class RegistrationMessage extends Message {
         agentID = readAgentID(byteArray, offset);
     }
 
+    public AgentID getAgentID() {
+        return this.agentID;
+    }
+
     @Override
     public byte[] toByteArray() {
         int length = REGISTRATION_MESSAGE_LENGTH;
@@ -49,24 +53,22 @@ public abstract class RegistrationMessage extends Message {
         return byteArray;
     }
 
-    //TODO: set it as abstract in Message.java ?
+    //TODO: set it as abstract in Message.kava ?
     /**
      * @return the total length of the formatted message (header length + data length)
      */
     public int getLength() {
-        return (agentID != null) ? REGISTRATION_MESSAGE_LENGTH : REGISTRATION_MESSAGE_LENGTH - 8;
+        return REGISTRATION_MESSAGE_LENGTH;
     }
 
     /**
-     * Reads the agentID of a formatted message beginning at a certain offset inside a buffer. Encapsulates it in an AgentID object.
+     * Reads the srcAgentID of a formatted message beginning at a certain offset inside a buffer. Encapsulates it in an AgentID object.
      * @param byteArray the buffer in which to read 
      * @param offset the offset at which to find the beginning of the message in the buffer
      * @return the srcAgentID of the formatted message
      */
     public static AgentID readAgentID(byte[] byteArray, int offset) {
-    	long id = TypeHelper.byteArrayToLong(byteArray, offset + Offsets.AGENT_ID_OFFSET.getValue());
-    	// TODO: the id 0 corresponds to a null agentID in this case. Does this assumption hold ?
-        return (id != 0) ? new AgentID(id) : null;
+        return new AgentID(TypeHelper.byteArrayToLong(byteArray, offset + Offsets.AGENT_ID_OFFSET.getValue()));
     }
 
 }

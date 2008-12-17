@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extra.forwardingv2.protocol.Message;
+import org.objectweb.proactive.extra.forwardingv2.protocol.DataRequestMessage;
 
 
 /**
@@ -41,7 +41,7 @@ public class ProActiveMessageHandler implements MessageHandler {
         this.agent = agent;
     }
 
-    public void pushMessage(Message message) {
+    public void pushMessage(DataRequestMessage message) {
         ProActiveMessageProcessor pmp = new ProActiveMessageProcessor(message, agent);
         tpe.submit(pmp);
     }

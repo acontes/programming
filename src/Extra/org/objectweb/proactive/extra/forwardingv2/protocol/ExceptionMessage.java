@@ -1,14 +1,16 @@
 package org.objectweb.proactive.extra.forwardingv2.protocol;
 
-import org.objectweb.proactive.extra.forwardingv2.exceptions.MessageRoutingException;
+import org.objectweb.proactive.core.remoteobject.http.util.HttpMarshaller;
+
 
 public class ExceptionMessage extends ForwardedMessage {
 
-	// There are two type of exception, so it remains a parameter to be given to the constructor
-    public ExceptionMessage(MessageType type, AgentID srcAgentID, AgentID dstAgentID, long msgID, MessageRoutingException e) {
-        super(type, srcAgentID, dstAgentID, msgID, null);
-        //TODO: serialize the exception
-        //TODO: set the data of the message with the serialized exception
+    //TODO: modifier le constructeur pour qu'il prenne une exception en parametre au lieu d'un byte array de data, puis qu'il la serialize et ensuite appelle super() avec le byte array construit en paramètre, risque de ne pas marcher car super doit etre appelé avant => utiliser set data après avoir construit le message avec null pour la data dans super puis avoir sérializé l'exception
+
+    public ExceptionMessage(AgentID srcAgentID, AgentID dstAgentID, long msgID, Exception e) {
+        super(MessageType.EXECUTION_EXCEPTION_MSG, srcAgentID, dstAgentID, msgID, null);
+        byte[] data = HttpMarshaller.marshallObject(e);
+        setData(data);
     }
 
     /**

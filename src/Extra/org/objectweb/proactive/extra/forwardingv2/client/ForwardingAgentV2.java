@@ -19,8 +19,13 @@ import org.objectweb.proactive.extra.forwardingv2.exceptions.AgentNotConnectedEx
 import org.objectweb.proactive.extra.forwardingv2.exceptions.ExecutionException;
 import org.objectweb.proactive.extra.forwardingv2.exceptions.RoutingException;
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
+import org.objectweb.proactive.extra.forwardingv2.protocol.DataReplyMessage;
+import org.objectweb.proactive.extra.forwardingv2.protocol.DataRequestMessage;
+import org.objectweb.proactive.extra.forwardingv2.protocol.ExceptionMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.Message;
 import org.objectweb.proactive.extra.forwardingv2.protocol.MessageInputStream;
+import org.objectweb.proactive.extra.forwardingv2.protocol.RegistrationReplyMessage;
+import org.objectweb.proactive.extra.forwardingv2.protocol.RegistrationRequestMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.Message.MessageType;
 
 
@@ -110,7 +115,7 @@ public class ForwardingAgentV2 implements AgentV2, Runnable {
             logger.debug("Connection successful. getting a Unique Agent ID");
         }
 
-        Message reg = Message.registrationRequestMessage();
+        RegistrationRequestMessage reg = new RegistrationRequestMessage();
         try {
             synchronized (tunnel) {
                 tunnel.getOutputStream().write(reg.toByteArray());
@@ -120,10 +125,11 @@ public class ForwardingAgentV2 implements AgentV2, Runnable {
             logger.warn("Exception during registration", e);
         }
 
-        Message resp = new Message(input.readMessage(), 0);
-        if (resp.getType() == Message.MessageType.REGISTRATION_REPLY.getValue()) {
+        Message resp = Message.constructMessage(input.readMessage(), 0);
+        if (resp.getType() == MessageType.REGISTRATION_REPLY) {
+            RegistrationReplyMessage reply = (RegistrationReplyMessage) resp;
             // Registration successfull.
-            agentID = resp.getDstAgentID();
+            agentID = reply.getAgentID();
         }
 
         if (logger.isDebugEnabled()) {
@@ -153,7 +159,7 @@ public class ForwardingAgentV2 implements AgentV2, Runnable {
         // Generate a requestID
         Long requestID = requestIDGenerator.incrementAndGet();
 
-        Message msg = Message.dataMessage(agentID, targetID, requestID, data);
+        DataRequestMessage msg = new DataRequestMessage(agentID, targetID, requestID, data, oneWay);
 
         if (oneWay) { // No response needed, just send it.
             internalSendMsg(msg);
@@ -186,9 +192,18 @@ public class ForwardingAgentV2 implements AgentV2, Runnable {
         return sendMsg(agentID, data, oneWay);
     }
 
-    public void sendReply(Message request, byte[] data) throws RoutingException {
-        Message reply = Message.dataMessage(this.getAgentID(), request.getSrcAgentID(), request.getMsgID(),
-                data);
+    public void sendReply(DataRequestMessage request, byte[] data) throws RoutingException {
+        DataReplyMessage reply = new DataReplyMessage(this.getAgentID(), request.getSrcAgentID(), request
+                .getMsgID(), data);
+        if (!agentConnected) {
+            throw new AgentNotConnectedException();
+        }
+        internalSendMsg(reply);
+    }
+
+    public void sendExceptionReply(DataRequestMessage request, Exception e) throws RoutingException {
+        ExceptionMessage reply = new ExceptionMessage(this.getAgentID(), request.getSrcAgentID(), request
+                .getMsgID(), e);
         if (!agentConnected) {
             throw new AgentNotConnectedException();
         }
@@ -225,7 +240,7 @@ public class ForwardingAgentV2 implements AgentV2, Runnable {
         while (isRunning) {
             Message msg = null;
             try {
-                msg = new Message(input.readMessage(), 0);
+                msg = Message.constructMessage(input.readMessage(), 0);
             } catch (IOException e) {
                 logger.error("Error while reading a message from the tunnel", e);
                 return;
@@ -236,21 +251,23 @@ public class ForwardingAgentV2 implements AgentV2, Runnable {
             }
             // TODO Handle different message types.
 
-            if (msg.getType() == MessageType.DATA.getValue()) {
-                LocalMailBox mbox = boxes.remove(msg.getMsgID());
+            if (msg.getType() == MessageType.DATA_REPLY) {
+                DataReplyMessage reply = (DataReplyMessage) msg;
+                // Have to lookup in the hashtable
+                LocalMailBox mbox = boxes.remove(reply.getMsgID());
                 if (mbox == null) {
-                    if (logger.isTraceEnabled()) {
-                        logger.trace("Message corresponding to request");
-                    }
-                    // That message is a request, handle it.
-                    messageHandler.pushMessage(msg);
+                    logger.warn("Received reply message for unknown request: " + msg);
                 } else {
                     if (logger.isTraceEnabled()) {
                         logger.trace("Message corresponding to response");
                     }
                     // this is a reply containing data
-                    mbox.setAndUnlock(msg.getData());
+                    mbox.setAndUnlock(reply.getData());
                 }
+            } else if (msg.getType() == MessageType.DATA_REQUEST) {
+
+                // That message is a request, handle it.
+                messageHandler.pushMessage((DataRequestMessage) msg);
             }
         }
 
