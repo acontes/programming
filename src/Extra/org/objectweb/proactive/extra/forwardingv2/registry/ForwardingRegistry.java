@@ -8,22 +8,15 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import java.net.ServerSocket;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.objectweb.proactive.extra.forwardingv2.exceptions.UnknownAgentIdException;
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
-import org.objectweb.proactive.extra.forwardingv2.protocol.Message;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message;
 
 
 /**
  * The ForwardingRegistry is a module that handles the registration of new clients and the routing of {@link Message} between registered clients
  * 
- * The Forwarding Registry only handles messages of the following kind: {@link Message}.
- * A {@link LinkedBlockingQueue} is used to handle the list of {@link Message}. This message queue is thread safe.
- * The {@link #messageQueue} is filled by {@link RegistrationHandler}s (server side of a tunnel) 
- * Whenever the {@link #messageQueue} is not empty, messages are popped out and pushed into the queue of the right {@link OutHandler} (client side of the tunnel to a client) 
- * 
- * For each client, its registration and connection to the registry is equivalent to the existence of a {@link RegistrationHandler}.
- * A HashMap keeps track of the mapping between a {@link RegistrationHandler} and a client unique id. Several wrapping functions are provided to performs synchronized calls on this HashMap. 
- * 
- * @author A.Fawaz, J.Martin
+ * The Forwarding Registry only handles messages of the following kind: {@link Message}.  
  *
  */
 public class ForwardingRegistry {
@@ -31,7 +24,6 @@ public class ForwardingRegistry {
 
     static public final int DEFAULT_SERVER_PORT = 2099;
 
-    static long attributedAgentID = 1;
     private volatile boolean listening = true;
     private int listeningPort;
     private ServerSocket serverSocket = null;
@@ -72,11 +64,10 @@ public class ForwardingRegistry {
     }
 
     /**
-     * Launches the server of the ForwardingRegistry in a new DAEMON thread.
-     * Since this thread is the one that will create the RegistrationHandlers, which will in turn create the needed OutHandlers, every thread (except main) will be DAEMON  
-     * Then handles the blocking message queue by calling {@link #forwardMessage(Message)} whenever a {@link Message} is received. 
+     * Launches the server.  
      */
     private void start() {
+
         // launch the server side and listen
         try {
             serverSocket = new ServerSocket(listeningPort);
@@ -94,7 +85,7 @@ public class ForwardingRegistry {
 
         while (listening) {
             try {
-                new Thread(new RegistrationHandler(serverSocket.accept(), this, attributedAgentID++)).start();
+                new Thread(new RegistrationHandler(serverSocket.accept(), this)).start();
                 if (logger.isDebugEnabled()) {
                     logger.debug("FR created new RegistrationHandler");
                 }
@@ -114,60 +105,9 @@ public class ForwardingRegistry {
     }
 
     /**
-     * Handles a {@link Message} in function of its targetId.
-     * If the target is registered, forwards the message to the right destination.
-     * Else discards the message and sends back an {@link ForwardedMessageType #CONNECTION_ABORTED} to the original sender.
-     * 
-     * @param msg the {@link Message} to be handled
-     */
-
-    /*	private void forwardMessage(Message msg) {
-    	RegistrationHandler regHandler = null;
-    	synchronized (registrationHandlerMap) {
-    		regHandler = registrationHandlerMap.get(msg.getTargetID());
-    	}
-
-    	// if the target is registered, forward the message
-    	if (regHandler != null) {
-    		if (logger.isDebugEnabled()) {
-    			logger.debug("FR.forwardMessage(), target: " + msg.getTargetID() +
-    			" is registered, msg enqueued in OH");
-    		}
-    		regHandler.getOutHandler().putMessage(msg);
-    	}
-
-    	// if the target is not registered, create and send an ABORT MSG to the sender
-    	else {
-    		if (logger.isDebugEnabled()) {
-    			logger.debug("FR.forwardMessage(), target: " + msg.getTargetID() +
-    					" is not registered, sending back abortMessage to sender: " + msg.getSenderID());
-    		}
-    		Message response = Message.abortMessage(msg.getTargetID(), msg.getTargetPort(),
-    				msg.getSenderID(), msg.getSenderPort(), "Target unreachable");
-    		synchronized (registrationHandlerMap) {
-    			regHandler = registrationHandlerMap.get(msg.getSenderID());
-    		}
-    		// check if the sender tunnel died and was removed from the regHandlers mappings in the meantime
-    		if (regHandler != null) {
-    			regHandler.getOutHandler().putMessage(response);
-    		} else if (logger.isDebugEnabled()) {
-    			logger
-    			.debug("FR.forwardMessage(), sender tunnel died in the meantime, not sending abort message");
-    		}
-    	}
-    }
-     */
-    /**
-     * Stops the server of the ForwardingRegistry by calling {@link #stop(boolean)} function so that no more {@link RegistrationHandler} is created.
-     * Prevents the existing {@link RegistrationHandler} from listening so that no more {@link Message} is added to the {@link ForwardingRegistry #messageQueue} (call to {@link RegistrationHandler #stopListening()}.
-     * Forwards the remaining messages in the Forwarding Registry's messageQueue.
-     * Call {@link RegistrationHandler #stop(boolean)} in order to:
-     * 		stop the {@link OutHandler} (softly or not).
-     * 		close the {@link RegistrationHandler} socket.
-     * 		remove the mappings to the {@link RegistrationHandler}.
-     * 
-     * @param softly Used to determine whether the {@link OutHandler} that are going to be stopped should be stopped softly or not.
-     */
+    * Makes the ForwardingRegistry stop listening so that no more {@link RegistrationHandler} is created.
+    * Call {@link RegistrationHandler #stop} on each existing registrationHandler
+    */
     protected void stop() { //FIXME: For this function to be called, listening must be set to false... But this function is the only one able to set it to false. Currently a shutdown hook is used as the solution to call this function and stop the registry properly
 
         // stop the server if it was not stopped already
@@ -218,8 +158,12 @@ public class ForwardingRegistry {
      * @param key
      * @return
      */
-    public RegistrationHandler getValueFromHashMap(AgentID key) {
-        return registrationHandlerMap.get(key);
+    public RegistrationHandler getValueFromHashMap(AgentID key) throws UnknownAgentIdException {
+        RegistrationHandler regHandler = registrationHandlerMap.get(key);
+        if (regHandler == null) {
+            throw new UnknownAgentIdException("no tunnel registered for AgentID :" + key.getId());
+        }
+        return regHandler;
     }
 
     /**
@@ -239,15 +183,10 @@ public class ForwardingRegistry {
 
     /**
      * Performs a removal on {@link #registrationHandlerMap}
-     * Notifies every other registered agent that tunnel connection, that is going to be removed from the map, 
-     * has undergone a disconnection, and thus that any connection linking two nodes and involving this tunnel
-     * should be closed. 
+     * 
      * @param key The key to the mapping that should be removed
      */
     public void removeMapping(AgentID key) {
         registrationHandlerMap.remove(key);
-        for (RegistrationHandler regHandler : registrationHandlerMap.values()) {
-            regHandler.sendMessage(Message.agentDisconnected(key, regHandler.getAgentID()).toByteArray());
-        }
     }
 }

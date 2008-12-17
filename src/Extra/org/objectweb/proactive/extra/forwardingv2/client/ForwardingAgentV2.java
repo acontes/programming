@@ -212,8 +212,8 @@ public class ForwardingAgentV2 implements AgentV2Internal, Runnable {
     }
 
     public void sendExceptionReply(DataRequestMessage request, Exception e) throws RoutingException {
-        ExceptionMessage reply = new ExceptionMessage(this.getAgentID(), request.getSrcAgentID(), request
-                .getMsgID(), e);
+        ExceptionMessage reply = new ExceptionMessage(MessageType.EXECUTION_EXCEPTION_MSG, this.getAgentID(),
+            request.getSrcAgentID(), request.getMsgID(), e);
         if (!agentConnected) {
             throw new AgentNotConnectedException();
         }

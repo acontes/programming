@@ -16,8 +16,8 @@ public interface AgentV2 {
     /**
      * Send a message to the target AgentID, containing data.
      *
-     * if oneWay, the the result returned is null.
-     * if not, the this call is blocked until an answer is provided.
+     * if oneWay, the result returned is null.
+     * if not, this call is blocked until an answer is provided.
      *
      * @param targetID the destination of the data.
      * @param data the data to send.

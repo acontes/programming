@@ -5,29 +5,37 @@ import java.net.Socket;
 import org.apache.log4j.*;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.forwardingv2.exceptions.RemoteConnectionBrokenException;
+import org.objectweb.proactive.extra.forwardingv2.exceptions.UnknownAgentIdException;
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
-import org.objectweb.proactive.extra.forwardingv2.protocol.Message;
 import org.objectweb.proactive.extra.forwardingv2.protocol.MessageInputStream;
-import org.objectweb.proactive.extra.forwardingv2.protocol.Message.MessageType;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.ExceptionMessage;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.ForwardedMessage;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationReplyMessage;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationRequestMessage;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message.MessageType;
 
 
 /**
- * The RegistrationHandler represents a "tunnel" (connection) to a client. It handles the registration process for the client: creation of an {@link OutHandler} and a mapping in the and uses its current thread as the listening side of the tunnel.
- * Whenever a correct message is received, it is forwarded to the ForwardingRegistry which will handle it
+ * The RegistrationHandler represents a "tunnel" (connection) to a client. 
+ * It handles the registration process for the client uses its current thread as the listening side of the tunnel.
+ * Whenever a new ForwardedMessage is received, it is passed to the right RegistrationHandler in order to be forwarded.
  */
 
 public class RegistrationHandler implements Runnable {
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING);
 
+    static long attributedAgentID = 1;
+
     final private ForwardingRegistry registry;
-    private AgentID agentID;
+    private AgentID agentID = null;
     final private Socket clientSocket;
     private volatile boolean running = true;
 
-    public RegistrationHandler(Socket clientSocket, ForwardingRegistry registry, long agentID) {
+    public RegistrationHandler(Socket clientSocket, ForwardingRegistry registry) {
         this.registry = registry;
         this.clientSocket = clientSocket;
-        this.agentID = new AgentID(agentID);
     }
 
     /**
@@ -45,6 +53,7 @@ public class RegistrationHandler implements Runnable {
      * 		call {@link #stop()}
      */
     public void run() {
+        Thread.currentThread().setDaemon(true);
         MessageInputStream input = null;
         // initialize the input stream
         try {
@@ -86,11 +95,17 @@ public class RegistrationHandler implements Runnable {
 
     private void processMessage(byte[] msg) {
         // the received message is a REGISTRATION MSG -> handle the registration
-        if (Message.readType(msg, 0) == MessageType.REGISTRATION_REQUEST.getValue()) {
+        if (Message.readType(msg, 0) == MessageType.REGISTRATION_REQUEST) {
             if (logger.isDebugEnabled()) {
                 logger.debug("RH handling registration request");
             }
-
+            AgentID newAgentID = RegistrationRequestMessage.readAgentID(msg, 0);
+            if (agentID != null) {
+                this.agentID = newAgentID;
+            } else {
+                this.agentID = new AgentID(attributedAgentID);
+                attributedAgentID++;
+            }
             // add mapping in the HashMap
             registry.putMapping(agentID, this);
             if (logger.isDebugEnabled()) {
@@ -98,30 +113,54 @@ public class RegistrationHandler implements Runnable {
             }
 
             //send RegistrationReply
-            sendMessage(Message.registrationReplyMessage(agentID).toByteArray());
+            try {
+                sendMessage(new RegistrationReplyMessage(agentID).toByteArray());
+            } catch (RemoteConnectionBrokenException e) { //TODO: check if there is a better solution
+                // The registration reply could not be sent, the user can't be notified. Just stop the current registrationHandler
+                stop();
+            }
         }
 
-        // the received message is not a REGISTRATION MSG, just forward it to the right tunnel
+        // the received message is not a REGISTRATION_REQUEST MSG, just forward it to the right tunnel
         else {
-            RegistrationHandler regHandler = registry.getValueFromHashMap(Message.readDstAgentID(msg, 0));
-            if (regHandler != null) {
+            RegistrationHandler regHandler = null;
+            AgentID dstAgentID = ForwardedMessage.readDstAgentID(msg, 0);
+            try {
+                regHandler = registry.getValueFromHashMap(dstAgentID);
+            }
+            // if regHandler is null we catch an UnknownAgentIdException
+            catch (UnknownAgentIdException e) { //TODO: check if it is possible to use less parameters
+                try {
+                    sendMessage(new ExceptionMessage(MessageType.ROUTING_EXCEPTION_MSG, dstAgentID, agentID,
+                        ForwardedMessage.readMessageID(msg, 0), e).toByteArray());
+                } catch (RemoteConnectionBrokenException e1) {
+                    // could not notify that the destination was unknown because the source tunnel has failed. Just stop the current RegistrationHandler
+                    stop();
+                }
+            }
+            // else just forward the message
+            try {
                 regHandler.sendMessage(msg);
-            } else {
-                //notify this to the sender by sending an abort message with the cause set to "agent unreachable"
-                sendMessage(Message.connectionAbortedMessage(Message.readDstAgentID(msg, 0),
-                        Message.readSrcAgentID(msg, 0), Message.readMessageID(msg, 0),
-                        "Target Unreachable".getBytes()).toByteArray());
+            } catch (RemoteConnectionBrokenException e) {
+                // could not send the message to its destination, notify the source by sending an ExceptionMessage
+                try {
+                    sendMessage(new ExceptionMessage(MessageType.ROUTING_EXCEPTION_MSG, dstAgentID, agentID,
+                        ForwardedMessage.readMessageID(msg, 0), e).toByteArray());
+                } catch (RemoteConnectionBrokenException e1) {
+                    // could not send a notification of the failure to the source, because the source tunnel has also failed... just stop the source tunnel
+                    stop();
+                }
             }
         }
 
     }
 
-    public synchronized void sendMessage(byte[] msg) {
+    public synchronized void sendMessage(byte[] msg) throws RemoteConnectionBrokenException {
         try {
             clientSocket.getOutputStream().write(msg);
         } catch (IOException e) {
-            // the tunnel might be dead, stop it
             stop();
+            throw new RemoteConnectionBrokenException("could not send message: " + msg.toString()); //TODO: give more info ?
         }
     }
 

@@ -61,30 +61,31 @@ public abstract class Message {
             return this.value;
         }
     }
-    
+
     // attributes
     protected MessageType type;
 
     // methods
     public static Message constructMessage(byte[] byteArray, int offset) {
         // depending on the type of message, call a different constructor
-        MessageType type = MessageType.getMessageType(TypeHelper.byteArrayToInt(byteArray, offset + CommonOffsets.MSG_TYPE_OFFSET.getValue()));
+        MessageType type = MessageType.getMessageType(TypeHelper.byteArrayToInt(byteArray, offset +
+            CommonOffsets.MSG_TYPE_OFFSET.getValue()));
         switch (type) {
-		case REGISTRATION_REQUEST:
-			return new RegistrationRequestMessage(byteArray, offset);
-		case REGISTRATION_REPLY:
-			return new RegistrationReplyMessage(byteArray, offset);
-		case DATA_REQUEST:
-			return new DataRequestMessage(byteArray, offset);
-		case DATA_REPLY:
-			return new DataReplyMessage(byteArray, offset);
-		case ROUTING_EXCEPTION_MSG:
-			return new ExceptionMessage(byteArray, offset);
-		case EXECUTION_EXCEPTION_MSG:
-			return new ExceptionMessage(byteArray, offset);
-		default:
-			return null;
-		}
+            case REGISTRATION_REQUEST:
+                return new RegistrationRequestMessage(byteArray, offset);
+            case REGISTRATION_REPLY:
+                return new RegistrationReplyMessage(byteArray, offset);
+            case DATA_REQUEST:
+                return new DataRequestMessage(byteArray, offset);
+            case DATA_REPLY:
+                return new DataReplyMessage(byteArray, offset);
+            case ROUTING_EXCEPTION_MSG:
+                return new ExceptionMessage(byteArray, offset);
+            case EXECUTION_EXCEPTION_MSG:
+                return new ExceptionMessage(byteArray, offset);
+            default:
+                return null;
+        }
     }
 
     /**
@@ -122,7 +123,7 @@ public abstract class Message {
     public abstract byte[] toByteArray();
 
     public abstract int getLength();
-    
+
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Message) {

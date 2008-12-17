@@ -73,7 +73,7 @@ public abstract class RegistrationMessage extends Message {
      * @return the AgentID of the formatted message
      */
     public static AgentID readAgentID(byte[] byteArray, int offset) {
-    	long id = TypeHelper.byteArrayToLong(byteArray, offset + Offsets.AGENT_ID_OFFSET.getValue());
+        long id = TypeHelper.byteArrayToLong(byteArray, offset + Offsets.AGENT_ID_OFFSET.getValue());
         return (id != 0) ? new AgentID(id) : null;
     }
 
