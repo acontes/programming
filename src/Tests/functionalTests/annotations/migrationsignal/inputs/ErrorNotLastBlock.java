@@ -42,7 +42,7 @@ public class ErrorNotLastBlock {
 
     // should be OK
     @MigrationSignal
-    public void moreBlocks() throws MigrationException {
+    public void moreBlocks(Node node) throws MigrationException {
         {
             {
                 System.out.println();
