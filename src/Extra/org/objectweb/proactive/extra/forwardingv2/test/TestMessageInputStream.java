@@ -18,7 +18,7 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.MessageInputStream;
 public class TestMessageInputStream {
 
     @Test
-    public void testMessageReading() {
+    public void testMessageReading() throws IOException {
         AgentID srcID = new AgentID(42l);
         AgentID dstID = new AgentID(12l);
         // create list
@@ -33,7 +33,6 @@ public class TestMessageInputStream {
         // Creating Server
         new MessageSender(12345, l);
 
-        try {
             Socket sock = new Socket("localhost", 12345);
             Assert.assertNotNull(sock);
 
@@ -49,15 +48,6 @@ public class TestMessageInputStream {
 
             m = new Message(mis.readMessage(), 0);
             Assert.assertEquals(m3, m);
-
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-            Assert.fail(e.getMessage());
-        } catch (IOException e) {
-            e.printStackTrace();
-            Assert.fail(e.getMessage());
-        }
-
     }
 
 }
