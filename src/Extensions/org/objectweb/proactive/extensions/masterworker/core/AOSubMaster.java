@@ -165,6 +165,9 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
 
     /** Fault tolerance purpose */
     private int futureCounter = 0;
+
+    // String key = "w"+ waitId + "d" + divisibleTaskId + "e";
+    private HashMap<String, List<Serializable>> resultsReppsitory;
     
     /** Filters * */
     private final FindWorkersRequests workersRequestsFilter = new FindWorkersRequests();
@@ -244,6 +247,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         workersDependenciesRev = new HashMap<String, String>();
         divisibleTasksAssociationWithWorkers = new HashMap<Long, String>();
         divisibleTasksAssociationWithWorkersRev = new HashMap<String, Long>();
+        resultsReppsitory = new HashMap<String, List<Serializable>>();
         requestsToServeImmediately = new ArrayList<Request>();
 
         // Workers
@@ -551,6 +555,19 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
                     spawnedWorkerNames.remove(workerName);
                     String parentWorker = workersDependenciesRev.remove(workerName);
                     workersDependencies.get(parentWorker).remove(workerName);
+    
+                }
+                
+                // Remove all the results related to the divisibletask
+                for(String keyName : resultsReppsitory.keySet()){
+                	String key = "d" + id + "e";
+                	if(keyName.indexOf(key) > 0){
+                		if (debug) {
+                            logger.debug("Remove the divisible task results " + keyName);
+                        }
+                		resultsReppsitory.remove(keyName);
+                	}
+                		
                 }
 
                 divisibleTasksAssociationWithWorkers.remove(id);
@@ -846,7 +863,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         }
     }
 
-    public List<Serializable> waitAllResults(String originatorName) throws TaskException, IsClearingError {
+    public List<Serializable> waitAllResults(String originatorName, final int waitId) throws TaskException, IsClearingError {
         // TODO Auto-generated method stub
         List<Serializable> results = null;
         List<ResultIntern<Serializable>> completed = null;
@@ -861,6 +878,17 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         }
         
         long divisibleTaskId = divisibleTasksAssociationWithWorkersRev.get(originatorName);
+        
+        
+        String key = "w"+ waitId + "d" + divisibleTaskId + "e";
+        
+        if((subResultQueues.containsKey(divisibleTaskId)) && resultsReppsitory.containsKey(key)){
+        	if (debug) {
+                logger.debug("Tasks has already available last time " + key);
+            }
+        	return resultsReppsitory.get(key);
+        }
+        
         if (subResultQueues.containsKey(divisibleTaskId)) {
             completed = subResultQueues.get(divisibleTaskId).getAll();
 
@@ -874,10 +902,12 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
 
             results.add(res.getResult());
         }
+        
+        resultsReppsitory.put(key, results);
         return results;
     }
 
-    public List<Serializable> waitKResults(String originatorName, int k) throws TaskException,
+    public List<Serializable> waitKResults(String originatorName, final int waitId, int k) throws TaskException,
             IsClearingError {
         // TODO Auto-generated method stub
         List<Serializable> results = new ArrayList<Serializable>(k);
@@ -889,6 +919,16 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             clearingCallFromSpawnedWorker(originatorName);
         }
         long divisibleTaskId = divisibleTasksAssociationWithWorkersRev.get(originatorName);
+        
+        String key = "w"+ waitId + "d" + divisibleTaskId + "e";
+        
+        if((subResultQueues.containsKey(divisibleTaskId)) && resultsReppsitory.containsKey(key)){
+        	if (debug) {
+                logger.debug("Tasks has already available last time " + key);
+            }
+        	return resultsReppsitory.get(key);
+        }
+        
         if (subResultQueues.containsKey(divisibleTaskId)) {
             ResultQueue rq = subResultQueues.get(divisibleTaskId);
             if ((rq.countPendingResults() + rq.countAvailableResults()) < k) {
@@ -910,11 +950,13 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
 
             results.add(res.getResult());
         }
+        resultsReppsitory.put(key, results);
         return results;
     }
 
-    public Serializable waitOneResult(String originatorName) throws TaskException, IsClearingError {
+    public Serializable waitOneResult(String originatorName, final int waitId) throws TaskException, IsClearingError {
         // TODO Auto-generated method stub
+    	List<Serializable> results = new ArrayList<Serializable>();
         ResultIntern<Serializable> res = null;
         if (isInFTmechanism) {
             throw new MWFTError();
@@ -923,6 +965,14 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             clearingCallFromSpawnedWorker(originatorName);
         }
         long divisibleTaskId = divisibleTasksAssociationWithWorkersRev.get(originatorName);
+        String key = "w"+ waitId + "d" + divisibleTaskId + "e";
+        
+        if((subResultQueues.containsKey(divisibleTaskId)) && resultsReppsitory.containsKey(key)){
+        	if (debug) {
+                logger.debug("Tasks has already available last time " + key);
+            }
+        	return resultsReppsitory.get(key).iterator().next();
+        }
         if (subResultQueues.containsKey(divisibleTaskId)) {
             res = subResultQueues.get(divisibleTaskId).getNext();
 
@@ -936,10 +986,12 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         if (res.threwException()) {
             throw new RuntimeException(new TaskException(res.getException()));
         }
+        results.add(res);
+        resultsReppsitory.put(key, results);
         return res.getResult();
     }
 
-    public List<Serializable> waitSomeResults(String originatorName) throws TaskException {
+    public List<Serializable> waitSomeResults(String originatorName, final int waitId) throws TaskException {
         // TODO Auto-generated method stub
         List<Serializable> results = new ArrayList<Serializable>();
         List<ResultIntern<Serializable>> completed = null;
@@ -950,6 +1002,14 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             clearingCallFromSpawnedWorker(originatorName);
         }
         long divisibleTaskId = divisibleTasksAssociationWithWorkersRev.get(originatorName);
+        String key = "w"+ waitId + "d" + divisibleTaskId + "e";
+        
+        if((subResultQueues.containsKey(divisibleTaskId)) && resultsReppsitory.containsKey(key)){
+        	if (debug) {
+                logger.debug("Tasks has already available last time " + key);
+            }
+        	return resultsReppsitory.get(key);
+        }
         if (subResultQueues.containsKey(divisibleTaskId)) {
             ResultQueue rq = subResultQueues.get(divisibleTaskId);
             int k = rq.countAvailableResults();
@@ -968,6 +1028,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
 
             results.add(res.getResult());
         }
+        resultsReppsitory.put(key, results);
         return results;
     }
 
@@ -1252,7 +1313,15 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             String originator = ent.getKey();
             String methodName = req.getMethodName();
             long divisibleTaskId = divisibleTasksAssociationWithWorkersRev.get(originator);
+            
+            String key = "w"+ req.getParameter(1) + "d" + divisibleTaskId + "e";
+            
+            if((subResultQueues.containsKey(divisibleTaskId)) && resultsReppsitory.containsKey(key)){
+            	servePending(originator, service);
+            }
+            
             ResultQueue rq = subResultQueues.get(divisibleTaskId);
+            
             if (rq != null) {
                 if ((methodName.equals("waitOneResult") || methodName.equals("waitSomeResults")) &&
                     rq.isOneResultAvailable()) {
@@ -1260,7 +1329,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
                 } else if (methodName.equals("waitAllResults") && rq.areAllResultsAvailable()) {
                     servePending(originator, service);
                 } else if (methodName.equals("waitKResults")) {
-                    int k = (Integer) req.getParameter(1);
+                    int k = (Integer) req.getParameter(2);
                     if (rq.countAvailableResults() >= k) {
                         servePending(originator, service);
                     }

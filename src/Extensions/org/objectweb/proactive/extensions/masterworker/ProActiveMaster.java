@@ -266,7 +266,7 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable> implemen
         }
         List<R> results = null;
         try {
-            results = (List<R>) PAFuture.getFutureValue(aomaster.waitAllResults(null));
+            results = (List<R>) PAFuture.getFutureValue(aomaster.waitAllResults(null, -1));
         } catch (RuntimeException e) {
             Throwable texp = findTaskException(e);
             if (texp != null) {
@@ -288,7 +288,7 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable> implemen
 
         List<R> results = null;
         try {
-            results = (List<R>) PAFuture.getFutureValue(aomaster.waitKResults(null, k));
+            results = (List<R>) PAFuture.getFutureValue(aomaster.waitKResults(null, -1, k));
         } catch (RuntimeException e) {
             Throwable texp = findTaskException(e);
             if (texp != null) {
@@ -308,7 +308,7 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable> implemen
         }
         R result = null;
         try {
-            result = (R) PAFuture.getFutureValue(aomaster.waitOneResult(null));
+            result = (R) PAFuture.getFutureValue(aomaster.waitOneResult(null, -1));
         } catch (RuntimeException e) {
             Throwable texp = findTaskException(e);
             if (texp != null) {
@@ -327,7 +327,7 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable> implemen
 
         List<R> results = null;
         try {
-            results = (List<R>) PAFuture.getFutureValue(aomaster.waitSomeResults(null));
+            results = (List<R>) PAFuture.getFutureValue(aomaster.waitSomeResults(null, -1));
         } catch (RuntimeException e) {
             Throwable texp = findTaskException(e);
             if (texp != null) {

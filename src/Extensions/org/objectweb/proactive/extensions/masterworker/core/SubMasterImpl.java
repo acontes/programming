@@ -53,7 +53,8 @@ public class SubMasterImpl implements SubMaster<Task<Serializable>, Serializable
     private final String originatorName;
     private boolean initCalled = false;
     private AOWorker parentWorker;
-    private long taskId = 1;
+    private long taskId = 0;
+    private int waitId = 0;
 
     public SubMasterImpl(MasterIntern master, String originatorName, AOWorker parentWorker) {
         this.master = master;
@@ -88,7 +89,7 @@ public class SubMasterImpl implements SubMaster<Task<Serializable>, Serializable
         }
 
         List<Serializable> results = null;
-        Object future = master.waitAllResults(originatorName);
+        Object future = master.waitAllResults(originatorName, waitId ++);
         //parentWorker.resumeWork();
         try {
             results = (List<Serializable>) PAFuture.getFutureValue(future);
@@ -113,7 +114,7 @@ public class SubMasterImpl implements SubMaster<Task<Serializable>, Serializable
             throw new IllegalStateException("A call to solve should occur before this call.");
         }
         Serializable result = null;
-        Object future = master.waitOneResult(originatorName);
+        Object future = master.waitOneResult(originatorName, waitId ++);
         //parentWorker.resumeWork();
         try {
             result = (Serializable) PAFuture.getFutureValue(future);
@@ -136,7 +137,7 @@ public class SubMasterImpl implements SubMaster<Task<Serializable>, Serializable
         }
 
         List<Serializable> results = null;
-        Object future = master.waitSomeResults(originatorName);
+        Object future = master.waitSomeResults(originatorName, waitId ++);
         // parentWorker.resumeWork();
         try {
             results = (List<Serializable>) PAFuture.getFutureValue(future);
@@ -164,7 +165,7 @@ public class SubMasterImpl implements SubMaster<Task<Serializable>, Serializable
                 k + ": call to this method will wait forever");
         }
         List<Serializable> results = null;
-        Object future = master.waitKResults(originatorName, k);
+        Object future = master.waitKResults(originatorName, k, waitId ++);
         //  parentWorker.resumeWork();
         try {
             results = (List<Serializable>) PAFuture.getFutureValue(future);

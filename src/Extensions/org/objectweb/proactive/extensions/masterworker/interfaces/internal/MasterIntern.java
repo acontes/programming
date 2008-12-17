@@ -59,7 +59,7 @@ public interface MasterIntern {
      * @param originatorName name of the worker initiating the call
      * @throws org.objectweb.proactive.extensions.masterworker.TaskException if a task threw an Exception
      */
-    List<Serializable> waitAllResults(final String originatorName) throws TaskException, IsClearingError;
+    List<Serializable> waitAllResults(final String originatorName, final int waitId) throws TaskException, IsClearingError;
 
     /**
      * Wait for the first result available <br>
@@ -69,7 +69,7 @@ public interface MasterIntern {
      * @return an object containing the result
      * @throws TaskException if the task threw an Exception
      */
-    Serializable waitOneResult(final String originatorName) throws TaskException, IsClearingError;
+    Serializable waitOneResult(final String originatorName, final int waitId) throws TaskException, IsClearingError;
 
     /**
     * Wait for at least one result is available <br>
@@ -80,7 +80,7 @@ public interface MasterIntern {
     * @return a collection of objects containing the results
     * @throws TaskException if the task threw an Exception
     */
-    List<Serializable> waitSomeResults(final String originatorName) throws TaskException;
+    List<Serializable> waitSomeResults(final String originatorName, final int waitId) throws TaskException;
 
     /**
      * Wait for a number of results<br>
@@ -91,7 +91,7 @@ public interface MasterIntern {
      * @return a collection of objects containing the results
      * @throws TaskException if the task threw an Exception
      */
-    List<Serializable> waitKResults(final String originatorName, int k) throws TaskException, IsClearingError;
+    List<Serializable> waitKResults(final String originatorName, final int waitId, int k) throws TaskException, IsClearingError;
 
     //@snippet-end masterworker_collection
 

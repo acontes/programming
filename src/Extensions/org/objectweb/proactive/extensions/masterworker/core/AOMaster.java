@@ -155,6 +155,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
     private HashMap<Long, String> divisibleTasksAssociationWithWorkers;
     private HashMap<String, Long> divisibleTasksAssociationWithWorkersRev;
     private List<Request> requestsToServeImmediately;
+    private HashMap<Long, Long> taskIdCounters;
 
     // Task Queues :
 
@@ -1014,7 +1015,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
                 } else if (methodName.equals("waitAllResults") && rq.areAllResultsAvailable()) {
                     servePending(originator, service);
                 } else if (methodName.equals("waitKResults")) {
-                    int k = (Integer) req.getParameter(1);
+                    int k = (Integer) req.getParameter(2);
                     if (rq.countAvailableResults() >= k) {
                         servePending(originator, service);
                     }
@@ -1265,6 +1266,37 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
         if (originatorName != null && isClearing) {
             clearingCallFromSpawnedWorker(originatorName);
         }
+        
+        // if the tasklist has solved, give back all the available results now
+//        if(taskIdCounters.containsKey(divisibleTaskId)){
+//        if(taskIdCounters.get(divisibleTaskId) >= taskIdCounter){
+//        	subResultQueues.get(originatorName).getAll();
+//
+//            // Forward it the the submaster if it comes from a submaster
+//            if (originatorName.indexOf('@') > 0) {
+//                String submasterName = originatorName.substring(originatorName.indexOf('@') + 1);
+//
+////                result.setId(idMap.get(result.getId()));
+////                try {
+////                    ((AOSubMaster) workersByName.get(submasterName)).sendResultFromMaster(result,
+////                    		divisibleTasksAssociationWithWorkersRev.get(submitter));
+////                } catch (SendRequestCommunicationException exp) {
+////                    if (debug) {
+////                        logger.debug("Submaster " + submasterName + " has already been freed.");
+////                    }
+////                } catch (BodyTerminatedRequestException exp1){
+////                	if (debug) {
+////                        logger.debug("Master has already been terminaterd.");
+////                    }
+////                }
+////                if (debug) {
+////                    logger.debug("Send result of task " + result.getId() + " to submaster " +
+////                        submasterName);
+////                }
+//            }
+//        }
+//        else
+//        	taskIdCounters.put(divisibleTaskId, taskIdCounter);
         if(!divisibleTasksAssociationWithWorkersRev.containsKey(originatorName))
         	divisibleTasksAssociationWithWorkersRev.put(originatorName, divisibleTaskId);
         List<TaskID> wrappers = createIds(tasks, taskIdCounter, originatorName);
@@ -1406,7 +1438,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
     }
 
     /** {@inheritDoc} */
-    public List<Serializable> waitAllResults(String originatorName) throws TaskException {
+    public List<Serializable> waitAllResults(String originatorName, final int waitId) throws TaskException {
         List<Serializable> results = null;
         List<ResultIntern<Serializable>> completed = null;
         if (isInFTmechanism) {
@@ -1445,7 +1477,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
     }
 
     /** {@inheritDoc} */
-    public List<Serializable> waitKResults(final String originatorName, final int k) {
+    public List<Serializable> waitKResults(final String originatorName, final int waitId, final int k) {
         List<Serializable> results = new ArrayList<Serializable>(k);
         List<ResultIntern<Serializable>> completed = null;
         if (isInFTmechanism) {
@@ -1495,7 +1527,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
     }
 
     /** {@inheritDoc} */
-    public Serializable waitOneResult(String originatorName) throws TaskException {
+    public Serializable waitOneResult(String originatorName, final int waitId) throws TaskException {
         ResultIntern<Serializable> res = null;
         if (isInFTmechanism) {
             throw new MWFTError();
@@ -1528,7 +1560,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
         return res.getResult();
     }
 
-    public List<Serializable> waitSomeResults(String originatorName) throws TaskException {
+    public List<Serializable> waitSomeResults(String originatorName, final int waitId) throws TaskException {
         List<Serializable> results = new ArrayList<Serializable>();
         List<ResultIntern<Serializable>> completed = null;
         if (isInFTmechanism) {
