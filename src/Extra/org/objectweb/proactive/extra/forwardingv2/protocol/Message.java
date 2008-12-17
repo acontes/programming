@@ -2,8 +2,6 @@ package org.objectweb.proactive.extra.forwardingv2.protocol;
 
 import java.util.Arrays;
 
-import org.objectweb.proactive.extra.forwardingv2.protocol.MessageBrouillon.Offsets;
-
 
 public abstract class Message {
     public static final int PROTOV1 = 1;
@@ -33,7 +31,7 @@ public abstract class Message {
 
         private final int value;
 
-        private Offsets(int value) {
+        private CommonOffsets(int value) {
             this.value = value;
         }
 
