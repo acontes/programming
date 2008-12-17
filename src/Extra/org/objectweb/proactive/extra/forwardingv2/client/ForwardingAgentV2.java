@@ -15,6 +15,7 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.util.TimeoutAccounter;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.forwardingv2.exceptions.AgentNotConnectedException;
 import org.objectweb.proactive.extra.forwardingv2.exceptions.ExecutionException;
 import org.objectweb.proactive.extra.forwardingv2.exceptions.RoutingException;
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
@@ -56,6 +57,7 @@ public class ForwardingAgentV2 implements AgentV2, Runnable {
     private MessageInputStream input = null;
 
     private volatile boolean isRunning; // Stopping main Thread
+    private volatile boolean agentConnected;
 
     /** Every data message will be handled by this object */
     final private MessageHandler messageHandler;
@@ -72,6 +74,7 @@ public class ForwardingAgentV2 implements AgentV2, Runnable {
 
         boxes = new ConcurrentHashMap<Long, LocalMailBox>();
         requestIDGenerator = new AtomicLong(0);
+        agentConnected = false;
     }
 
     /**
@@ -135,10 +138,14 @@ public class ForwardingAgentV2 implements AgentV2, Runnable {
 
         // TODO Put a way to stop the localAgent in a better way.
 
+        agentConnected = true;
     }
 
     public byte[] sendMsg(AgentID targetID, byte[] data, boolean oneWay) throws RoutingException,
             ExecutionException {
+        if (!agentConnected) {
+            throw new AgentNotConnectedException();
+        }
         if (logger.isDebugEnabled()) {
             logger.trace("Sending a message to " + targetID);
         }
@@ -169,6 +176,9 @@ public class ForwardingAgentV2 implements AgentV2, Runnable {
 
     public byte[] sendMsg(URI targetURI, byte[] data, boolean oneWay) throws RoutingException,
             ExecutionException {
+        if (!agentConnected) {
+            throw new AgentNotConnectedException();
+        }
         String path = targetURI.getPath();
         String remoteAgentId = path.substring(0, path.indexOf('/'));
 
@@ -179,6 +189,9 @@ public class ForwardingAgentV2 implements AgentV2, Runnable {
     public void sendReply(Message request, byte[] data) throws RoutingException {
         Message reply = Message.dataMessage(this.getAgentID(), request.getSrcAgentID(), request.getMsgID(),
                 data);
+        if (!agentConnected) {
+            throw new AgentNotConnectedException();
+        }
         internalSendMsg(reply);
     }
 
