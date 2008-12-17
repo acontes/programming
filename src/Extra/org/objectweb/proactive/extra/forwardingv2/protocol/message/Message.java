@@ -1,6 +1,8 @@
-package org.objectweb.proactive.extra.forwardingv2.protocol;
+package org.objectweb.proactive.extra.forwardingv2.protocol.message;
 
 import java.util.Arrays;
+
+import org.objectweb.proactive.extra.forwardingv2.protocol.TypeHelper;
 
 
 public abstract class Message {

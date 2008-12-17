@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extra.forwardingv2.protocol.DataRequestMessage;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.DataRequestMessage;
 
 
 /**

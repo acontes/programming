@@ -17,11 +17,11 @@ import org.objectweb.proactive.extra.forwardingv2.client.ForwardingAgentV2;
 import org.objectweb.proactive.extra.forwardingv2.client.ProActiveMessageHandler;
 import org.objectweb.proactive.extra.forwardingv2.exceptions.MessageRoutingException;
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
-import org.objectweb.proactive.extra.forwardingv2.protocol.ForwardedMessage;
-import org.objectweb.proactive.extra.forwardingv2.protocol.Message;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.ForwardedMessage;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message;
 import org.objectweb.proactive.extra.forwardingv2.protocol.MessageInputStream;
-import org.objectweb.proactive.extra.forwardingv2.protocol.RegistrationReplyMessage;
-import org.objectweb.proactive.extra.forwardingv2.protocol.Message.MessageType;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationReplyMessage;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message.MessageType;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.message.MessageRoutingMessage;
 
 

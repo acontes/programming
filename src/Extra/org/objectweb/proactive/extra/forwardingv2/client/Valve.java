@@ -1,6 +1,6 @@
 package org.objectweb.proactive.extra.forwardingv2.client;
 
-import org.objectweb.proactive.extra.forwardingv2.protocol.Message;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message;
 
 
 /** A Valve is a message processing component associated with a particular Agent.

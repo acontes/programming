@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.remoteobject.http.util.HttpMarshaller;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extra.forwardingv2.protocol.DataRequestMessage;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.DataRequestMessage;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.message.MessageRoutingMessage;
 
 
@@ -38,8 +38,7 @@ public class ProActiveMessageProcessor implements Runnable {
             } catch (Exception e) {
                 logger.warn("Exception during execution of message: " + _toProcess, e);
                 // TODO send an ExecutionExceptionMessage
-                byte[] except = HttpMarshaller.marshallObject(e);
-                agent.sendReply(_toProcess, except);
+                agent.sendExceptionReply(_toProcess, e);
                 return;
             }
 

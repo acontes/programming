@@ -21,14 +21,14 @@ import org.objectweb.proactive.extra.forwardingv2.exceptions.AgentNotConnectedEx
 import org.objectweb.proactive.extra.forwardingv2.exceptions.ExecutionException;
 import org.objectweb.proactive.extra.forwardingv2.exceptions.RoutingException;
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
-import org.objectweb.proactive.extra.forwardingv2.protocol.DataReplyMessage;
-import org.objectweb.proactive.extra.forwardingv2.protocol.DataRequestMessage;
-import org.objectweb.proactive.extra.forwardingv2.protocol.ExceptionMessage;
-import org.objectweb.proactive.extra.forwardingv2.protocol.Message;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.DataReplyMessage;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.DataRequestMessage;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.ExceptionMessage;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message;
 import org.objectweb.proactive.extra.forwardingv2.protocol.MessageInputStream;
-import org.objectweb.proactive.extra.forwardingv2.protocol.RegistrationReplyMessage;
-import org.objectweb.proactive.extra.forwardingv2.protocol.RegistrationRequestMessage;
-import org.objectweb.proactive.extra.forwardingv2.protocol.Message.MessageType;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationReplyMessage;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationRequestMessage;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message.MessageType;
 
 
 /**

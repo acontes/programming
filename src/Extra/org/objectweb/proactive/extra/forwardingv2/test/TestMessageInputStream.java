@@ -11,8 +11,11 @@ import junit.framework.Assert;
 import org.junit.Test;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
-import org.objectweb.proactive.extra.forwardingv2.protocol.Message;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.DataRequestMessage;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message;
 import org.objectweb.proactive.extra.forwardingv2.protocol.MessageInputStream;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationReplyMessage;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationRequestMessage;
 
 
 public class TestMessageInputStream {
@@ -23,11 +26,11 @@ public class TestMessageInputStream {
         AgentID dstID = new AgentID(12l);
         // create list
         ArrayList<Message> l = new ArrayList<Message>();
-        Message m1 = Message.registrationRequestMessage();
+        Message m1 = new RegistrationRequestMessage();
         l.add(m1);
-        Message m2 = Message.registrationReplyMessage(srcID);
+        Message m2 = new RegistrationReplyMessage(srcID);
         l.add(m2);
-        Message m3 = Message.dataMessage(srcID, dstID, 100, "Hello".getBytes());
+        Message m3 = new DataRequestMessage(srcID, dstID, 100, "Hello".getBytes(), false);
         l.add(m3);
 
         // Creating Server
@@ -40,13 +43,13 @@ public class TestMessageInputStream {
         Assert.assertNotNull(mis);
 
         // Read registration request
-        Message m = new Message(mis.readMessage(), 0);
+        Message m = Message.constructMessage(mis.readMessage(), 0);
         Assert.assertEquals(m1, m);
 
-        m = new Message(mis.readMessage(), 0);
+        m = Message.constructMessage(mis.readMessage(), 0);
         Assert.assertEquals(m2, m);
 
-        m = new Message(mis.readMessage(), 0);
+        m = Message.constructMessage(mis.readMessage(), 0);
         Assert.assertEquals(m3, m);
     }
 
