@@ -21,6 +21,25 @@ public abstract class Message {
             this.value = value;
         }
 
+        public static MessageType getMessageType(int value) {
+            switch (value) {
+                case 0:
+                    return REGISTRATION_REQUEST;
+                case 1:
+                    return REGISTRATION_REPLY;
+                case 2:
+                    return DATA_REQUEST;
+                case 3:
+                    return DATA_REPLY;
+                case 4:
+                    return ROUTING_EXCEPTION_MSG;
+                case 5:
+                    return EXECUTION_EXCEPTION_MSG;
+                default: //should not occur but TODO: check that this is ok
+                    return null;
+            }
+        }
+
         public int getValue() {
             return this.value;
         }
@@ -69,8 +88,9 @@ public abstract class Message {
      * @param offset the offset at which to find the beginning of the message in the buffer
      * @return the type of the formatted message
      */
-    public static int readType(byte[] byteArray, int offset) {
-        return TypeHelper.byteArrayToInt(byteArray, offset + CommonOffsets.MSG_TYPE_OFFSET.getValue());
+    public static MessageType readType(byte[] byteArray, int offset) {
+        return MessageType.getMessageType(TypeHelper.byteArrayToInt(byteArray, offset +
+            CommonOffsets.MSG_TYPE_OFFSET.getValue()));
     }
 
     /**
