@@ -152,7 +152,7 @@ class FakeRegistry implements Runnable {
             Assert.assertEquals(m.getType(), MessageType.REGISTRATION_REQUEST);
 
             // Put a registration reply
-            
+
             Message resp = new RegistrationReplyMessage(new AgentID(1l));
             sock.getOutputStream().write(resp.toByteArray());
             sock.getOutputStream().flush();
@@ -164,9 +164,9 @@ class FakeRegistry implements Runnable {
                 m = Message.constructMessage(input.readMessage(), 0);
                 System.out.println("FakeReg: Message Received: " + m);
 
-                if(m instanceof ForwardedMessage) {
-                	ForwardedMessage fm = (ForwardedMessage) m;
-                	if (fm.getDstAgentID().equals(crafted)) {
+                if (m instanceof ForwardedMessage) {
+                    ForwardedMessage fm = (ForwardedMessage) m;
+                    if (fm.getDstAgentID().equals(crafted)) {
                         if (fm.getMsgID() == 99999999l) {
                             fm.setMsgID(craftedMessageID);
                         } else {
@@ -181,7 +181,7 @@ class FakeRegistry implements Runnable {
                     sock.getOutputStream().write(m.toByteArray());
                     sock.getOutputStream().flush();
                 }
-                
+
             }
         } catch (IOException e) {
             e.printStackTrace();

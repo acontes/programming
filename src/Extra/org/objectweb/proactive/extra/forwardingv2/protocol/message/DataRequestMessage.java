@@ -2,6 +2,7 @@ package org.objectweb.proactive.extra.forwardingv2.protocol.message;
 
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
 
+
 public class DataRequestMessage extends ForwardedMessage {
 
     private boolean oneWay;

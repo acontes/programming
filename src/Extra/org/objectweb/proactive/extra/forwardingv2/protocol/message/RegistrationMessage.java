@@ -3,6 +3,7 @@ package org.objectweb.proactive.extra.forwardingv2.protocol.message;
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
 import org.objectweb.proactive.extra.forwardingv2.protocol.TypeHelper;
 
+
 public abstract class RegistrationMessage extends Message {
 
     public static final int REGISTRATION_MESSAGE_LENGTH = GLOBAL_COMMON_OFFSET + 8;

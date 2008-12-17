@@ -3,6 +3,7 @@ package org.objectweb.proactive.extra.forwardingv2.protocol.message;
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
 import org.objectweb.proactive.extra.forwardingv2.protocol.TypeHelper;
 
+
 public abstract class ForwardedMessage extends Message {
 
     // 1 long for the length, 2 int for protoID and MsgType, 2 long for SrcAgent and DstAgent IDs, 1 long for MSG_ID 
