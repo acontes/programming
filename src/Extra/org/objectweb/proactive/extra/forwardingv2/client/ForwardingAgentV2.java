@@ -308,6 +308,7 @@ public class ForwardingAgentV2 implements AgentV2, Runnable {
         return agentID;
     }
 
+
     public class LocalMailBox {
         private final CountDownLatch latch;
         volatile private byte[] response = null;

@@ -17,9 +17,9 @@ public class ProActiveMessageProcessor implements Runnable {
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING);
 
     private final DataRequestMessage _toProcess;
-    private final AgentV2 agent;
+    private final AgentV2Internal agent;
 
-    public ProActiveMessageProcessor(DataRequestMessage msg, AgentV2 agent) {
+    public ProActiveMessageProcessor(DataRequestMessage msg, AgentV2Internal agent) {
         this._toProcess = msg;
         this.agent = agent;
     }
