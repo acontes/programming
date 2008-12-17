@@ -153,6 +153,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
     /** Related to Fault Tolerance Mechanism with divisible tasks * */
     private HashMap<Long, Set<Long>> tasksDependencies;
     private HashMap<Long, String> divisibleTasksAssociationWithWorkers;
+    private HashMap<String, Long> divisibleTasksAssociationWithWorkersRev;
     private List<Request> requestsToServeImmediately;
 
     // Task Queues :
@@ -395,6 +396,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
         workersDependenciesRev = new HashMap<String, String>();
         tasksDependencies = new HashMap<Long, Set<Long>>();
         divisibleTasksAssociationWithWorkers = new HashMap<Long, String>();
+        divisibleTasksAssociationWithWorkersRev = new HashMap<String, Long>();
         requestsToServeImmediately = new ArrayList<Request>();
 
         // Workers
@@ -874,6 +876,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
             }
             if (divisibleTasksAssociationWithWorkers.containsKey(id)) {
                 divisibleTasksAssociationWithWorkers.remove(id);
+                divisibleTasksAssociationWithWorkersRev.remove(submitter);
             }
             // We add the result in the result queue
             if (submitter == null) {
@@ -889,7 +892,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
                     result.setId(idMap.get(result.getId()));
                     try {
                         ((AOSubMaster) workersByName.get(submasterName)).sendResultFromMaster(result,
-                                submitter);
+                        		divisibleTasksAssociationWithWorkersRev.get(submitter));
                     } catch (SendRequestCommunicationException exp) {
                         if (debug) {
                             logger.debug("Submaster " + submasterName + " has already been freed.");
@@ -1262,6 +1265,8 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
         if (originatorName != null && isClearing) {
             clearingCallFromSpawnedWorker(originatorName);
         }
+        if(!divisibleTasksAssociationWithWorkersRev.containsKey(originatorName))
+        	divisibleTasksAssociationWithWorkersRev.put(originatorName, divisibleTaskId);
         List<TaskID> wrappers = createIds(tasks, taskIdCounter, originatorName);
         solveIds(wrappers, divisibleTaskId, originatorName);
     }

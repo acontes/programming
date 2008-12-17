@@ -122,6 +122,8 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
 
     /** Names of workers which have been spawned * */
     private Set<String> spawnedWorkerNames;
+    private HashMap<String, List<String>> workersDependencies;
+    private HashMap<String, String> workersDependenciesRev;
 
     /** Associations of workers and workers names */
     private HashMap<String, Worker> workersByName;
@@ -134,6 +136,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
 
     /** Related to Fault Tolerance Mechanism with divisible tasks * */
     private HashMap<Long, String> divisibleTasksAssociationWithWorkers;
+    private HashMap<String, Long> divisibleTasksAssociationWithWorkersRev;
     private List<Request> requestsToServeImmediately;
 
     // Act as workers
@@ -237,7 +240,10 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         taskIdCounters = new HashMap<Long, Long>();
         clearedWorkers = new HashSet<String>();
         spawnedWorkerNames = new HashSet<String>();
+        workersDependencies = new HashMap<String, List<String>>();
+        workersDependenciesRev = new HashMap<String, String>();
         divisibleTasksAssociationWithWorkers = new HashMap<Long, String>();
+        divisibleTasksAssociationWithWorkersRev = new HashMap<String, Long>();
         requestsToServeImmediately = new ArrayList<Request>();
 
         // Workers
@@ -300,9 +306,20 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
 
         if (divisibleTasksAssociationWithWorkers.containsKey(taskId)) {
             divisibleTasksAssociationWithWorkers.remove(taskId);
+            divisibleTasksAssociationWithWorkersRev.remove(oldWorkerName);
         }
 
         divisibleTasksAssociationWithWorkers.put(taskId, newWorkerName);
+        divisibleTasksAssociationWithWorkersRev.put(newWorkerName, taskId);
+        
+        if (workersDependencies.containsKey(oldWorkerName)) {
+            workersDependencies.get(oldWorkerName).add(newWorkerName);
+        } else {
+            List<String> dependency = new ArrayList<String>();
+            dependency.add(newWorkerName);
+            workersDependencies.put(oldWorkerName, dependency);
+        }
+        workersDependenciesRev.put(newWorkerName, oldWorkerName);
 
         return new BooleanWrapper(true);
     }
@@ -491,13 +508,12 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         }
     }
 
-    public BooleanWrapper sendResultFromMaster(ResultIntern<Serializable> result, String workerName) {
-    	long id = getDivisibleTaskIDByOriginatorName(workerName);
-        if (subResultQueues.containsKey(id)) {
+    public BooleanWrapper sendResultFromMaster(ResultIntern<Serializable> result, long divisibleTaskId) {
+    	if (subResultQueues.containsKey(divisibleTaskId)) {
             if (debug) {
-                logger.debug("Master sends result of task " + result.getId() + " of divisible task " + id);
+                logger.debug("Master sends result of task " + result.getId() + " of divisible task " + divisibleTaskId);
             }
-            subResultQueues.get(id).addCompletedTask(result);
+            subResultQueues.get(divisibleTaskId).addCompletedTask(result);
             if (debug) {
                 // logger.debug("The result of task " + result.getId() + " is " + result.getResult().toString());
             }
@@ -505,7 +521,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         } else {
             // do nothing
             if (debug) {
-                logger.debug("Master sends result of task " + result.getId() + " of worker " + workerName +
+                logger.debug("Master sends result of task " + result.getId() + " of worker " + divisibleTasksAssociationWithWorkers.get(divisibleTaskId) +
                     " but it's unknown.");
             }
             return new BooleanWrapper(false);
@@ -533,9 +549,12 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
                 if (spawnedWorkerNames.contains(workerName)) {
                     // We remove the spawned worker from our knowledge
                     spawnedWorkerNames.remove(workerName);
+                    String parentWorker = workersDependenciesRev.remove(workerName);
+                    workersDependencies.get(parentWorker).remove(workerName);
                 }
 
                 divisibleTasksAssociationWithWorkers.remove(id);
+                divisibleTasksAssociationWithWorkersRev.remove(workerName);
             }
             // We add the result in the result queue
             if (submitter == null) {
@@ -557,6 +576,8 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             if (spawnedWorkerNames.contains(workerName)) {
                 // We remove the spawned worker from our knowledge
                 spawnedWorkerNames.remove(workerName);
+                String parentWorker = workersDependenciesRev.remove(workerName);
+                workersDependencies.get(parentWorker).remove(workerName);
                 if (debug) {
                     logger.debug(workerName + " is cleared");
                 }
@@ -691,28 +712,14 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             if (isClearing) {
                 clearingCallFromSpawnedWorker(originatorName);
             }
-            if (subResultQueues.containsKey(getDivisibleTaskIDByOriginatorName(originatorName))) {
-                return subResultQueues.get(getDivisibleTaskIDByOriginatorName(originatorName))
+            long divisibleTaskId = divisibleTasksAssociationWithWorkersRev.get(originatorName);
+            if (subResultQueues.containsKey(divisibleTaskId)) {
+                return subResultQueues.get(divisibleTaskId)
                         .countAvailableResults();
             } else {
                 throw new IllegalArgumentException("Unknown originator " + originatorName);
             }
         }
-    }
-
-    /** get id of the divisible task by the name of the worker */
-    private long getDivisibleTaskIDByOriginatorName(String originatorName) {
-        Set<Long> divisibletaskids = divisibleTasksAssociationWithWorkers.keySet();
-
-        for (Long divisibletaskid : divisibletaskids) {
-            if (divisibleTasksAssociationWithWorkers.get(divisibletaskid).equals(originatorName)) {
-//            	if(debug){
-//            		logger.debug("Worker " + originatorName + " is running divisible task " + divisibletaskid);
-//            	}
-                return divisibletaskid;
-            }
-        }        
-        return -1;
     }
 
     public int countPending(String originatorName) throws IsClearingError {
@@ -723,8 +730,9 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             if (isClearing) {
                 clearingCallFromSpawnedWorker(originatorName);
             }
-            if (subResultQueues.containsKey(getDivisibleTaskIDByOriginatorName(originatorName))) {
-                return subResultQueues.get(getDivisibleTaskIDByOriginatorName(originatorName))
+            long divisibleTaskId = divisibleTasksAssociationWithWorkersRev.get(originatorName);
+            if (subResultQueues.containsKey(divisibleTaskId)) {
+                return subResultQueues.get(divisibleTaskId)
                         .countPendingResults();
             } else {
                 throw new IllegalArgumentException("Unknown originator " + originatorName);
@@ -740,8 +748,9 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             if (isClearing) {
                 clearingCallFromSpawnedWorker(originatorName);
             }
-            if (subResultQueues.containsKey(getDivisibleTaskIDByOriginatorName(originatorName))) {
-                return (subResultQueues.get(getDivisibleTaskIDByOriginatorName(originatorName)).isEmpty());
+            long divisibleTaskId = divisibleTasksAssociationWithWorkersRev.get(originatorName);
+            if (subResultQueues.containsKey(divisibleTaskId)) {
+                return (subResultQueues.get(divisibleTaskId).isEmpty());
             } else {
                 throw new IllegalArgumentException("Unsupported originator " + originatorName);
             }
@@ -756,12 +765,13 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             if (isClearing) {
                 clearingCallFromSpawnedWorker(originatorName);
             }
-            if (subResultQueues.containsKey(getDivisibleTaskIDByOriginatorName(originatorName))) {
-                subResultQueues.get(getDivisibleTaskIDByOriginatorName(originatorName)).setMode(mode);
+            long divisibleTaskId = divisibleTasksAssociationWithWorkersRev.get(originatorName);
+            if (subResultQueues.containsKey(divisibleTaskId)) {
+                subResultQueues.get(divisibleTaskId).setMode(mode);
             } else {
                 ResultQueue rq = new ResultQueue(mode);
                 rq.setMode(mode);
-                subResultQueues.put(getDivisibleTaskIDByOriginatorName(originatorName), rq);
+                subResultQueues.put(divisibleTaskId, rq);
             }
         }
     }
@@ -777,7 +787,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             clearingCallFromSpawnedWorker(originatorName);
         }
         
-        divisibleTaskId = getDivisibleTaskIDByOriginatorName(originatorName);
+        divisibleTaskId = divisibleTasksAssociationWithWorkersRev.get(originatorName);
 
         // If the tasks has already been submitted
         if (taskIdCounters.containsKey(divisibleTaskId)) {
@@ -849,9 +859,10 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         if (debug) {
             logger.debug("All results received by " + originatorName);
         }
-
-        if (subResultQueues.containsKey(getDivisibleTaskIDByOriginatorName(originatorName))) {
-            completed = subResultQueues.get(getDivisibleTaskIDByOriginatorName(originatorName)).getAll();
+        
+        long divisibleTaskId = divisibleTasksAssociationWithWorkersRev.get(originatorName);
+        if (subResultQueues.containsKey(divisibleTaskId)) {
+            completed = subResultQueues.get(divisibleTaskId).getAll();
 
         } else
             throw new IllegalArgumentException("Unknown originator: " + originatorName);
@@ -877,8 +888,9 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         if (isClearing) {
             clearingCallFromSpawnedWorker(originatorName);
         }
-        if (subResultQueues.containsKey(getDivisibleTaskIDByOriginatorName(originatorName))) {
-            ResultQueue rq = subResultQueues.get(getDivisibleTaskIDByOriginatorName(originatorName));
+        long divisibleTaskId = divisibleTasksAssociationWithWorkersRev.get(originatorName);
+        if (subResultQueues.containsKey(divisibleTaskId)) {
+            ResultQueue rq = subResultQueues.get(divisibleTaskId);
             if ((rq.countPendingResults() + rq.countAvailableResults()) < k) {
                 throw new IllegalArgumentException("" + k + " is too big");
             } else if (k <= 0) {
@@ -910,8 +922,9 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         if (isClearing) {
             clearingCallFromSpawnedWorker(originatorName);
         }
-        if (subResultQueues.containsKey(getDivisibleTaskIDByOriginatorName(originatorName))) {
-            res = subResultQueues.get(getDivisibleTaskIDByOriginatorName(originatorName)).getNext();
+        long divisibleTaskId = divisibleTasksAssociationWithWorkersRev.get(originatorName);
+        if (subResultQueues.containsKey(divisibleTaskId)) {
+            res = subResultQueues.get(divisibleTaskId).getNext();
 
             if (debug) {
                 logger.debug("Result of task " + res.getId() + " received by " + originatorName);
@@ -936,8 +949,9 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         if (isClearing) {
             clearingCallFromSpawnedWorker(originatorName);
         }
-        if (subResultQueues.containsKey(getDivisibleTaskIDByOriginatorName(originatorName))) {
-            ResultQueue rq = subResultQueues.get(getDivisibleTaskIDByOriginatorName(originatorName));
+        long divisibleTaskId = divisibleTasksAssociationWithWorkersRev.get(originatorName);
+        if (subResultQueues.containsKey(divisibleTaskId)) {
+            ResultQueue rq = subResultQueues.get(divisibleTaskId);
             int k = rq.countAvailableResults();
 
             if (debug) {
@@ -1237,7 +1251,8 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             Request req = ent.getValue();
             String originator = ent.getKey();
             String methodName = req.getMethodName();
-            ResultQueue rq = subResultQueues.get(getDivisibleTaskIDByOriginatorName(originator));
+            long divisibleTaskId = divisibleTasksAssociationWithWorkersRev.get(originator);
+            ResultQueue rq = subResultQueues.get(divisibleTaskId);
             if (rq != null) {
                 if ((methodName.equals("waitOneResult") || methodName.equals("waitSomeResults")) &&
                     rq.isOneResultAvailable()) {
@@ -1541,6 +1556,20 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
 
                     // get the task and add to the pending tasks again
                     pendingTasks.add(launchedTaskList.remove(taskId));
+                    
+                    if (divisibleTasksAssociationWithWorkers.containsKey(taskId)) {
+                        spawnedWorkerNames.remove(workerName);
+                        if (pendingSubRequests.containsKey(workerName)) {
+                        	// Clean all the request of the spawned worker
+                            Request req = pendingSubRequests.remove(workerName);
+                        }
+                        divisibleTasksAssociationWithWorkers.remove(taskId);
+                        
+                        if (debug) {
+                            logger.debug("Spawned worker " + workerName + " is now obsolete");
+                        }
+
+                    }
                 }
             }
             try {
@@ -1577,6 +1606,20 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
                 workersByName.remove(workerName);
                 // We remove the activity of this worker and every children workers
                 removeActivityOfWorker(workerName);
+                
+                if (workersDependencies.containsKey(workerName)) {
+                    List<String> childrenWorkers = workersDependencies.get(workerName);
+                    // Reverse walk, latest spawned workers need to be handled before the oldest ones
+                    ListIterator<String> it = childrenWorkers.listIterator(childrenWorkers.size());
+                    while (it.hasPrevious()) {
+                        String childWorkerName = it.previous();
+                        removeActivityOfWorker(childWorkerName);
+                        workersDependenciesRev.remove(childWorkerName);
+                    }
+                    childrenWorkers.clear();
+                    workersDependencies.remove(workerName);
+
+                }
 
                 smanager.isDead(workerName);
             }
