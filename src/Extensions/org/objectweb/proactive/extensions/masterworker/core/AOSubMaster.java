@@ -1047,6 +1047,9 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         // Clear the id counters
         taskIdCounters.clear();
         
+        // clear the results Reppsitory 
+        resultsReppsitory.clear();
+        
         // We clear the queues
         resultQueue.clear();
         pendingTasks.clear();
@@ -1087,8 +1090,6 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         }
 
         // We clear the repository
-        taskIdCounters.clear();
-        // We clear the taskIdCounters
         isClearing = true;
     }
 

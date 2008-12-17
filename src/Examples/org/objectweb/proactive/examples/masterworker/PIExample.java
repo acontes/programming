@@ -31,11 +31,17 @@
  */
 package org.objectweb.proactive.examples.masterworker;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Vector;
 
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.extensions.masterworker.ProActiveMaster;
 import org.objectweb.proactive.extensions.masterworker.TaskException;
 import org.objectweb.proactive.extensions.masterworker.interfaces.DivisibleTask;
@@ -43,23 +49,64 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.Master;
 import org.objectweb.proactive.extensions.masterworker.interfaces.SubMaster;
 import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
 import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
+import org.objectweb.proactive.gcmdeployment.GCMApplication;
+import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 import org.objectweb.proactive.api.PALifeCycle;
-
 
 public class PIExample {
     public static final long NUMBER_OF_EXPERIENCES = 1000000;
-    public static final int NUMBER_OF_TASKS = 4;
-    public static final int NUMBER_OF_DIVISIBLETASKS = 4;
-
+    public static final int NUMBER_OF_TASKS = 20;
+    public static final int NUMBER_OF_DIVISIBLETASKS = 1;
+    
     public static void main(String[] args) throws TaskException, ProActiveException {
 
+    	URL descriptor = PIExample.class.getResource("MasterWorkerFT.xml");
+        URL descriptor2 = PIExample.class.getResource("MasterWorkerFT2.xml");
+        GCMApplication pad;
+        GCMApplication pad2;
+        GCMVirtualNode vn1;
+        GCMVirtualNode vn2;
+
+        Node submaster1;
+        Collection<Node> nodes;
+        Collection<Node> nodes1;
+        Collection<Node> nodes2;
+        
         findOS();
         //@snippet-start masterworker_montecarlopi_master_creation
         // creation of the master
         ProActiveMaster<TestDivisibleTask, Long> master = new ProActiveMaster<TestDivisibleTask, Long>();
 
         // adding resources
-        master.addResources(PIExample.class.getResource("MWApplication.xml"));
+        
+        //master.addResources(PIExample.class.getResource("MWApplication.xml"));
+        
+        pad = PAGCMDeployment.loadApplicationDescriptor(descriptor);
+        pad.startDeployment();
+        vn1 = pad.getVirtualNode("VN1");
+        
+        pad2 = PAGCMDeployment.loadApplicationDescriptor(descriptor2);
+        pad2.startDeployment();
+        vn2 = pad2.getVirtualNode("VN2");
+        vn1.waitReady();
+        System.out.println("VN1 is ready");
+        vn2.waitReady();
+        System.out.println("VN2 is ready");
+        
+        nodes = new ArrayList<Node>();
+        nodes1 = vn1.getCurrentNodes();
+        submaster1 = nodes1.iterator().next();
+        nodes1.remove(submaster1);
+        nodes2 = vn2.getCurrentNodes();
+        nodes.add(submaster1);
+        master.addResources(nodes);
+        master.addResources(nodes1);
+        master.addResources(nodes2);
+        
+        master.setResultReceptionOrder(Master.SUBMISSION_ORDER);
+        master.setInitialTaskFlooding(1);
+        master.setPingPeriod(500);
+        
         //@snippet-end masterworker_montecarlopi_master_creation
         //@snippet-start masterworker_montecarlopi_tasks_submit
         // defining tasks
@@ -76,7 +123,9 @@ public class PIExample {
         System.out.println("\nOne of the result is:" + master.waitOneResult());
 
         master.clear();
-//        master.setResultReceptionOrder(Master.SUBMISSION_ORDER);
+        
+        
+        master.setResultReceptionOrder(Master.SUBMISSION_ORDER);
 
         tasks = new Vector<TestDivisibleTask>();
         for (int i = 0; i < NUMBER_OF_TASKS; i++) {
@@ -85,6 +134,19 @@ public class PIExample {
 
         // adding tasks to the queue
         master.solve(tasks);
+        
+        try {
+        	Thread.sleep(500);
+        	//System.out.println("\nkill submaster on host: " + submaster1.getVMInformation().getHostName());
+			//submaster1.killAllActiveObjects();
+        	Node worker = nodes1.iterator().next();
+        	System.out.println("\nkill worker on host: " + worker.getVMInformation().getHostName());
+        	worker.killAllActiveObjects();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
         //@snippet-end masterworker_montecarlopi_tasks_submit
         //@snippet-start masterworker_montecarlopi_results
         // waiting for results
