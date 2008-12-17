@@ -22,5 +22,13 @@ public class ExceptionMessage extends ForwardedMessage {
     public ExceptionMessage(byte[] byteArray, int offset) {
         super(byteArray, offset);
     }
+    
+    public Exception getException() {
+    	Exception e = null;
+    	if(data != null) {
+    		e = (Exception) HttpMarshaller.unmarshallObject(data);
+    	}
+    	return e;
+    }
 
 }
