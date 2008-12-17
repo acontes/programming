@@ -17,8 +17,10 @@ import org.objectweb.proactive.extra.forwardingv2.client.ForwardingAgentV2;
 import org.objectweb.proactive.extra.forwardingv2.client.ProActiveMessageHandler;
 import org.objectweb.proactive.extra.forwardingv2.exceptions.MessageRoutingException;
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
+import org.objectweb.proactive.extra.forwardingv2.protocol.ForwardedMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.Message;
 import org.objectweb.proactive.extra.forwardingv2.protocol.MessageInputStream;
+import org.objectweb.proactive.extra.forwardingv2.protocol.RegistrationReplyMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.Message.MessageType;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.message.MessageRoutingMessage;
 
@@ -145,12 +147,13 @@ class FakeRegistry implements Runnable {
             Socket sock = server.accept();
             System.out.println("FakeReg: Connection accepted, reading registration message");
             MessageInputStream input = new MessageInputStream(sock.getInputStream());
-            Message m = new Message(input.readMessage(), 0);
+            Message m = Message.constructMessage(input.readMessage(), 0);
             // Must be a registration message
-            Assert.assertEquals(m.getType(), MessageType.REGISTRATION_REQUEST.getValue());
+            Assert.assertEquals(m.getType(), MessageType.REGISTRATION_REQUEST);
 
             // Put a registration reply
-            Message resp = Message.registrationReplyMessage(new AgentID(1l));
+            
+            Message resp = new RegistrationReplyMessage(new AgentID(1l));
             sock.getOutputStream().write(resp.toByteArray());
             sock.getOutputStream().flush();
 
@@ -158,23 +161,27 @@ class FakeRegistry implements Runnable {
             long craftedMessageID = 0;
 
             while (isRunning) {
-                m = new Message(input.readMessage(), 0);
+                m = Message.constructMessage(input.readMessage(), 0);
                 System.out.println("FakeReg: Message Received: " + m);
 
-                if (m.getDstAgentID().equals(crafted)) {
-                    if (m.getMsgID() == 99999999l) {
-                        m.setMsgID(craftedMessageID);
-                    } else {
-                        craftedMessageID = m.getMsgID();
-                        m.setMsgID(99999999l);
+                if(m instanceof ForwardedMessage) {
+                	ForwardedMessage fm = (ForwardedMessage) m;
+                	if (fm.getDstAgentID().equals(crafted)) {
+                        if (fm.getMsgID() == 99999999l) {
+                            fm.setMsgID(craftedMessageID);
+                        } else {
+                            craftedMessageID = fm.getMsgID();
+                            fm.setMsgID(99999999l);
+                        }
                     }
+                    AgentID tmp = fm.getSrcAgentID();
+                    fm.setSrcAgentID(fm.getDstAgentID());
+                    fm.setDstAgentID(tmp);
+                    System.out.println("FakeReg: Forwarding message: " + m);
+                    sock.getOutputStream().write(m.toByteArray());
+                    sock.getOutputStream().flush();
                 }
-                AgentID tmp = m.getSrcAgentID();
-                m.setSrcAgentID(m.getDstAgentID());
-                m.setDstAgentID(tmp);
-                System.out.println("FakeReg: Forwarding message: " + m);
-                sock.getOutputStream().write(m.toByteArray());
-                sock.getOutputStream().flush();
+                
             }
         } catch (IOException e) {
             e.printStackTrace();

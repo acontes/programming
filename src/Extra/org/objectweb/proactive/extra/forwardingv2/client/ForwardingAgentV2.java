@@ -77,7 +77,7 @@ public class ForwardingAgentV2 implements AgentV2Internal, Runnable {
 
         try {
             Constructor<? extends MessageHandler> mhConstructor;
-            mhConstructor = messageHandlerClass.getConstructor(AgentV2.class);
+            mhConstructor = messageHandlerClass.getConstructor(AgentV2Internal.class);
             this.messageHandler = mhConstructor.newInstance(this);
         } catch (Exception e) {
             throw new ProActiveRuntimeException("Agent failed to create the message handler", e);
