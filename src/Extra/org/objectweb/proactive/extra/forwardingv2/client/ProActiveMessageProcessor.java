@@ -33,9 +33,11 @@ public class ProActiveMessageProcessor implements Runnable {
             MessageRoutingMessage message = (MessageRoutingMessage) HttpMarshaller
                     .unmarshallObject(_toProcess.getData());
             Object result = message.processMessage();
-            byte[] resultBytes = HttpMarshaller.marshallObject(result);
-
-            agent.sendReply(_toProcess, resultBytes);
+            
+            if(!_toProcess.isOneWay()) {
+                byte[] resultBytes = HttpMarshaller.marshallObject(result);
+                agent.sendReply(_toProcess, resultBytes);            	
+            }
         } catch (Exception e) {
             logger.warn("HTTP Failed to serve a message", e);
         } finally {
