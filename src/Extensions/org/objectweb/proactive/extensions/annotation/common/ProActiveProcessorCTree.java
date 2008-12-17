@@ -100,7 +100,7 @@ public class ProActiveProcessorCTree extends AbstractProcessor {
 
         scanners.put(ActiveObject.class.getName(), new ActiveObjectVisitorCTree(processingEnv));
         scanners.put(RemoteObject.class.getName(), new RemoteObjectVisitorCTree(processingEnv));
-        scanners.put(MigrationSignal.class.getName(), new MigrationSignalVisitorCTree(messager));
+        scanners.put(MigrationSignal.class.getName(), new MigrationSignalVisitorCTree(processingEnv));
         scanners.put(OnDeparture.class.getName(), new OnDepartureVisitorCTree(processingEnv));
         scanners.put(OnArrival.class.getName(), new OnArrivalVisitorCTree(processingEnv));
         scanners.put(VirtualNodeIsReadyCallback.class.getName(), new VirtualNodeIsReadyCallbackVisitorCTree(

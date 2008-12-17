@@ -37,13 +37,11 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.processing.Messager;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.Modifier;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
+import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.*;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
+import javax.lang.model.util.Elements;
 import javax.tools.Diagnostic;
 
 import org.objectweb.proactive.api.PAMobileAgent;
@@ -51,30 +49,7 @@ import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.extensions.annotation.MigrationSignal;
 import org.objectweb.proactive.extensions.annotation.common.ErrorMessages;
 
-import com.sun.source.tree.BlockTree;
-import com.sun.source.tree.CaseTree;
-import com.sun.source.tree.CatchTree;
-import com.sun.source.tree.ClassTree;
-import com.sun.source.tree.CompilationUnitTree;
-import com.sun.source.tree.DoWhileLoopTree;
-import com.sun.source.tree.EnhancedForLoopTree;
-import com.sun.source.tree.ExpressionStatementTree;
-import com.sun.source.tree.ExpressionTree;
-import com.sun.source.tree.ForLoopTree;
-import com.sun.source.tree.IdentifierTree;
-import com.sun.source.tree.IfTree;
-import com.sun.source.tree.MemberSelectTree;
-import com.sun.source.tree.MethodInvocationTree;
-import com.sun.source.tree.MethodTree;
-import com.sun.source.tree.ModifiersTree;
-import com.sun.source.tree.ReturnTree;
-import com.sun.source.tree.StatementTree;
-import com.sun.source.tree.SwitchTree;
-import com.sun.source.tree.SynchronizedTree;
-import com.sun.source.tree.Tree;
-import com.sun.source.tree.TryTree;
-import com.sun.source.tree.VariableTree;
-import com.sun.source.tree.WhileLoopTree;
+import com.sun.source.tree.*;
 import com.sun.source.tree.Tree.Kind;
 import com.sun.source.util.TreePathScanner;
 import com.sun.source.util.Trees;
@@ -100,9 +75,11 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void, Trees> {
 
     // where we should signal the errors
     private final Messager _compilerOutput;
+    private final Elements _elemUtils;
 
-    public MigrationSignalVisitorCTree(Messager messager) {
-        _compilerOutput = messager;
+    public MigrationSignalVisitorCTree(ProcessingEnvironment procEnv) {
+        _compilerOutput = procEnv.getMessager();
+        _elemUtils = procEnv.getElementUtils();
     }
 
     // marks the position of the method declaration inside the source code
@@ -623,7 +600,7 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void, Trees> {
             } else
                 return false;
             return isClassField(calleeName, methodName, trees) || // the call can also be made against members...
-                isLocalVariable(calleeName) || //... or against local variables
+                isLocalVariable(calleeName, methodName) || //... or against local variables
                 methodName.equals(MIGRATE_TO) && calleeName.equals(PAMobileAgent.class.getSimpleName());
         } else {
             // is not a migrateTo call!
@@ -637,17 +614,87 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void, Trees> {
      * defined within the containing method
      * TODO test if the local variable is accessible from this scope! i.e. containig block, superblocks etc
      */
-    private boolean isLocalVariable(String calleeName) {
+    private boolean isLocalVariable(String calleeName, String methodName) {
         for (Tree statement : _containingMethod.getBody().getStatements()) {
             if (statement.getKind().equals(Kind.VARIABLE)) {
                 VariableTree varDecl = (VariableTree) statement;
-                // IdentifierTree varType = (IdentifierTree)varDecl.getType();
-                // TODO check if the class ${varType} has a method ${methodName} which is annotated with @MigrationSignal
-                if (varDecl.getName().toString().equals(calleeName))
-                    return true;
+                if (varDecl.getName().toString().equals(calleeName)) {
+                    String calleeClassName;
+                    if (varDecl.getType().getKind().equals(Kind.IDENTIFIER)) {
+                        IdentifierTree varType = (IdentifierTree) varDecl.getType();
+                        // try directly
+                        calleeClassName = varType.toString();
+                        TypeElement calleeType = _elemUtils.getTypeElement(varType.getName());
+                        if (calleeType == null) {
+                            // no luck? try this then...
+                            calleeClassName = getCanonicalName(calleeClassName);
+                            if (calleeClassName == null) {
+                                // cannot do the check
+                                return true;
+                            }
+                        }
+                    } else if (varDecl.getType().getKind().equals(Kind.MEMBER_SELECT)) {
+                        calleeClassName = varDecl.getType().toString();
+                    } else {
+                        // does something else exist? :D
+                        calleeClassName = null;
+                    }
+                    TypeElement calleeType = _elemUtils.getTypeElement(calleeClassName);
+                    if (calleeType == null) {
+                        // cannot do the check. 
+                        return true;
+                    }
+                    // loaded
+                    return typeDeclaresMigrationMethod(calleeType, methodName);
+                }
             }
         }
         return false;
+    }
+
+    /**
+     * Try to (re)create the canonincal name
+     * Two approaches are used:
+     *  - use the package name of the current compilation unit. Maybe the class is in the same source file?
+     *  - use the imports list. If the name is used just like that, then probably the package is imported
+     * @param className the (simple) name of the class
+     * @return the canonical name. Null if it cannot be guessed
+     */
+    private String getCanonicalName(String className) {
+        String ret;
+        // try with the package of the current compilation unit
+        CompilationUnitTree cu = getCurrentPath().getCompilationUnit();
+        ExpressionTree packageExpr = cu.getPackageName();
+        ret = packageExpr.toString() + "." + className;
+        TypeElement calleeType = _elemUtils.getTypeElement(className);
+        if (calleeType != null) {
+            return ret;
+        } else {
+            // no luck. try the imports list. that ought to do it!
+            for (ImportTree imp : cu.getImports()) {
+
+                String impName = imp.toString();
+                int pos = impName.lastIndexOf('.');
+                String name = impName.substring(pos + 1, impName.length() - 2);
+                String pkg = impName.substring(impName.indexOf(' ') + 1, pos);
+
+                if (name.equals("*")) {
+                    ret = pkg + "." + className;
+                } else if (name.equals(className)) {
+                    ret = imp.getQualifiedIdentifier().toString();
+                } else
+                    continue;
+
+                // try it!
+                calleeType = _elemUtils.getTypeElement(className);
+                if (calleeType != null) {
+                    return ret;
+                }
+
+            }
+        }
+        // really no luck!
+        return null;
     }
 
     /**
@@ -677,21 +724,8 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void, Trees> {
                         // check if the field type has a method ${methodName} which is annotated with @MigrationSignal
                         if (field.asType().getKind().equals(TypeKind.DECLARED)) {
                             DeclaredType decl = (DeclaredType) field.asType();
-                            // if the class is available in the classpath, we can load it using reflection
-                            try {
-                                Class fieldType = Class.forName(decl.toString());
-                                for (Method calleeMethod : fieldType.getMethods()) {
-                                    if (methodName.equals(calleeMethod.getName()) &&
-                                        calleeMethod.getAnnotation(MigrationSignal.class) != null) {
-                                        // OK
-                                        return true;
-                                    }
-                                }
-                                return false;
-                            } catch (Exception e) {
-                                // TODO cannot load class using reflection. Try alternative way
-                                return true;
-                            }
+                            TypeElement calleeType = (TypeElement) decl.asElement();
+                            return typeDeclaresMigrationMethod(calleeType, methodName);
                         }
                     }
                 }
@@ -706,6 +740,29 @@ public class MigrationSignalVisitorCTree extends TreePathScanner<Void, Trees> {
 
         return false;
 
+    }
+
+    /**
+     * Utility method used to check if a class has a method with the given name and
+     * that is annotated with the MigrationSignal annotation 
+     * @param calleeType the class to be checked
+     * @param methodName the method we are looking for
+     * @return true, if the method exists within the class body and is @MIgrationSignal
+     */
+    private boolean typeDeclaresMigrationMethod(TypeElement calleeType, String methodName) {
+        for (Element calleeElement : _elemUtils.getAllMembers(calleeType)) {
+            if (calleeElement.getKind().equals(ElementKind.METHOD)) {
+                ExecutableElement calleeMethod = (ExecutableElement) calleeElement;
+                if (methodName.equals(calleeMethod.getSimpleName().toString()) &&
+                    (calleeMethod.getAnnotation(MigrationSignal.class) != null)) {
+                    // OK
+                    return true;
+                }
+            }
+        }
+
+        // If we're here it means we have no migration signal
+        return false;
     }
 
     // error reporting methods
