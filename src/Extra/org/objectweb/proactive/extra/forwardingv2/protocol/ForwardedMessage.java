@@ -3,7 +3,7 @@ package org.objectweb.proactive.extra.forwardingv2.protocol;
 public abstract class ForwardedMessage extends Message {
 
     // 1 long for the length, 2 int for protoID and MsgType, 2 long for SrcAgent and DstAgent IDs, 1 long for MSG_ID 
-    public static final int HEADER_LENGTH = GLOBAL_COMMON_OFFSET + 2 * 8 + 8; // = 36
+    public static final int FORWARDED_MESSAGE_HEADER_LENGTH = GLOBAL_COMMON_OFFSET + 2 * 8 + 8; // = 36
 
     public enum Offsets {
         SRC_AGENT_ID_OFFSET(0), DST_AGENT_ID_OFFSET(8), MSG_ID_OFFSET(16);
@@ -39,7 +39,7 @@ public abstract class ForwardedMessage extends Message {
      * @param offset the offset at which to find the message in the byte array
      */
     public ForwardedMessage(byte[] byteArray, int offset) {
-        int datalength = readLength(byteArray, offset) - HEADER_LENGTH;
+        int datalength = readLength(byteArray, offset) - FORWARDED_MESSAGE_HEADER_LENGTH;
         data = new byte[datalength];
 
         type = readType(byteArray, offset);
@@ -48,7 +48,7 @@ public abstract class ForwardedMessage extends Message {
         msgID = readMessageID(byteArray, offset);
 
         for (int i = 0; i < datalength; i++) {
-            data[i] = byteArray[HEADER_LENGTH + i];
+            data[i] = byteArray[FORWARDED_MESSAGE_HEADER_LENGTH + i];
         }
     }
 
@@ -69,7 +69,7 @@ public abstract class ForwardedMessage extends Message {
         TypeHelper.longToByteArray(msgID, byteArray, Offsets.MSG_ID_OFFSET.getValue());
 
         if (data != null) {
-            System.arraycopy(data, 0, byteArray, HEADER_LENGTH, data.length);
+            System.arraycopy(data, 0, byteArray, FORWARDED_MESSAGE_HEADER_LENGTH, data.length);
         }
         return byteArray;
     }
@@ -78,7 +78,7 @@ public abstract class ForwardedMessage extends Message {
      * @return the total length of the formatted message (header length + data length)
      */
     public int getLength() {
-        return HEADER_LENGTH + (data != null ? data.length : 0);
+        return FORWARDED_MESSAGE_HEADER_LENGTH + (data != null ? data.length : 0);
     }
 
     /**

@@ -1,10 +1,11 @@
 package org.objectweb.proactive.extra.forwardingv2.protocol;
 
-public class DataRequestMessage extends ForwardedMessage {
+public class RegistrationRequest extends RegistrationMessage {
 
-    public DataRequestMessage(MessageType type, AgentID srcAgentID, AgentID dstAgentID, long msgID,
-            byte[] data) {
-        super(type, srcAgentID, dstAgentID, msgID, data);
+    //TODO: ajouter ce qu'il faut pour pouvoir fabriquer des requests sans agentID
+
+    public RegistrationRequest(MessageType type, AgentID agentID) {
+        super(type, agentID);
     }
 
     /**
@@ -12,7 +13,7 @@ public class DataRequestMessage extends ForwardedMessage {
      * @param byteArray the byte array from which to read
      * @param offset the offset at which to find the message in the byte array
      */
-    public DataRequestMessage(byte[] byteArray, int offset) {
+    public RegistrationRequest(byte[] byteArray, int offset) {
         super(byteArray, offset);
     }
 
