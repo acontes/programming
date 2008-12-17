@@ -36,7 +36,7 @@ public class ProActiveMessageProcessor implements Runnable {
             byte[] resultBytes = HttpMarshaller.marshallObject(result);
 
             agent.sendReply(_toProcess, resultBytes);
-            
+
             /*if(!_toProcess.isOneWay()) {
                 byte[] resultBytes = HttpMarshaller.marshallObject(result);
                 agent.sendReply(_toProcess, resultBytes);            	
