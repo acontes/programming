@@ -106,11 +106,31 @@ public abstract class CTreeTest extends AnnotationTest {
     @Override
     protected Result checkFile(String fileName) throws CompilationExecutionException {
         final String[] fileNames = new String[] { INPUT_FILES_PATH + File.separator + fileName + ".java", };
+        final String[] annotationsClassNames = { TEST_FILES_PACKAGE + fileName };
+        return checkFilesAbsolutePath(fileNames, annotationsClassNames);
+    }
 
-        // get the compilation unit
+    /* (non-Javadoc)
+     * @see functionalTests.annotations.AnnotationTest#checkFile(java.lang.String)
+     */
+    @Override
+    protected Result checkFiles(String... fileNames) throws CompilationExecutionException {
+        String[] fileNamesAbs = new String[fileNames.length];
+        String[] annotationClassNames = new String[fileNames.length];
+        for (int i = 0; i < fileNames.length; i++) {
+            fileNamesAbs[i] = INPUT_FILES_PATH + File.separator +
+                fileNames[i].replace('.', File.separatorChar) + ".java";
+            annotationClassNames[i] = TEST_FILES_PACKAGE + fileNames[i];
+        }
+
+        return checkFilesAbsolutePath(fileNamesAbs, annotationClassNames);
+    }
+
+    private Result checkFilesAbsolutePath(String[] fileNames, String[] annotationsClassNames) {
+        // get the compilation units
         Iterable<? extends JavaFileObject> compilationUnits = _fileManager.getJavaFileObjects(fileNames);
 
-        // setup diagnostic collector 
+        // setup diagnostic collector
         DiagnosticCollector<JavaFileObject> diagnosticListener = new DiagnosticCollector<JavaFileObject>();
 
         // compiler options
@@ -118,15 +138,13 @@ public abstract class CTreeTest extends AnnotationTest {
         String[] compilerOptions = { "-proc:only", "-processorpath", PROC_PATH, "-processor",
                 ProActiveProcessorCTree.class.getName() };
 
-        String[] annotationsClassNames = { TEST_FILES_PACKAGE + fileName };
-
         StringWriter output = new StringWriter();
 
         // create the compilation task
         CompilationTask compilationTask = _compiler.getTask(output, // where to write error messages
-                _fileManager, // the file manager 
+                _fileManager, // the file manager
                 diagnosticListener, // where to receive the errors from compilation
-                Arrays.asList(compilerOptions), // the compiler options 
+                Arrays.asList(compilerOptions), // the compiler options
                 Arrays.asList(annotationsClassNames), // classes on which to perform annotation processing
                 compilationUnits);
 
@@ -134,11 +152,11 @@ public abstract class CTreeTest extends AnnotationTest {
         compilationTask.call();
 
         /**
-         * 
+         *
          * All errors are accumulated in diagnosticListener
          * warning have to be found in the output separately
-         * BTW errors cannot be found in the output because they are not marked explicitly as errors 
-         * 
+         * BTW errors cannot be found in the output because they are not marked explicitly as errors
+         *
          */
 
         int errors = 0;

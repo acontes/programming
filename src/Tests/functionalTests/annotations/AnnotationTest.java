@@ -31,6 +31,7 @@
 package functionalTests.annotations;
 
 import java.io.File;
+import java.util.Map;
 
 import org.junit.After;
 import org.junit.Before;
@@ -78,9 +79,12 @@ public abstract class AnnotationTest extends FunctionalTest {
 
     }
 
+    // TODO this method contains a hardcoded procedure, heavily dependent on the package structure. Change it!
     private final String getPAHomeFromClassPath(String location) {
         int pos = location.lastIndexOf(File.separator);
         String sb = location.substring(0, pos);
+        pos = sb.lastIndexOf(File.separator);
+        sb = sb.substring(0, pos);
         pos = sb.lastIndexOf(File.separator);
         sb = sb.substring(0, pos);
         pos = sb.lastIndexOf(File.separator);
@@ -114,6 +118,11 @@ public abstract class AnnotationTest extends FunctionalTest {
         String testFilesRelpath = File.separator + "src" + File.separator + "Tests" + File.separator +
             TEST_FILES_PACKAGE.replace('.', File.separatorChar);
 
+        // HACK set the test classes in the classpath
+        String cp = System.getProperty("java.class.path");
+        cp = cp + File.pathSeparator + PROACTIVE_HOME + File.separator + "classes" + File.separator + "Tests";
+        System.setProperty("java.class.path", cp);
+
         INPUT_FILES_PATH = PROACTIVE_HOME + testFilesRelpath;
     }
 
@@ -122,6 +131,9 @@ public abstract class AnnotationTest extends FunctionalTest {
 
     // how to execute a compilation process on a compilation unit
     protected abstract Result checkFile(String fileName) throws CompilationExecutionException;
+
+    // how to execute a compilation process on multiple compilation units
+    protected abstract Result checkFiles(String... fileNames) throws CompilationExecutionException;
 
     // the results of compilation execution
     public final class Result {
@@ -139,6 +151,8 @@ public abstract class AnnotationTest extends FunctionalTest {
 
         @Override
         public boolean equals(Object obj) {
+            if (!(obj instanceof Result))
+                return false;
             Result rhs = (Result) obj;
             return errors == rhs.errors && warnings == rhs.warnings;
         }

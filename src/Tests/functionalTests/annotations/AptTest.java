@@ -84,9 +84,21 @@ public abstract class AptTest extends AnnotationTest {
     @Override
     protected Result checkFile(String fileName) throws CompilationExecutionException {
 
-        try {
-            _aptCommand[6] = INPUT_FILES_PATH + File.separator + fileName + ".java";// the input file
+        _aptCommand[6] = INPUT_FILES_PATH + File.separator + fileName + ".java";// the input file
+        return runApt();
+    }
 
+    @Override
+    protected Result checkFiles(String... fileNames) throws CompilationExecutionException {
+        _aptCommand[6] = "";
+        for (String fileName : fileNames) {
+            _aptCommand[6] = _aptCommand[6] + " " + INPUT_FILES_PATH + File.separator + fileName + ".java";// the input file
+        }
+        return runApt();
+    }
+
+    private Result runApt() throws CompilationExecutionException {
+        try {
             ProcessBuilder processBuilder = new ProcessBuilder(Arrays.asList(_aptCommand));
             Map<String, String> env = processBuilder.environment();
             env.put("CLASSPATH", _classpath);
@@ -108,7 +120,6 @@ public abstract class AptTest extends AnnotationTest {
             logger.error(msg, secExcp);
             throw new CompilationExecutionException(msg, secExcp);
         }
-
     }
 
     private Result getResults(BufferedReader stderr) {
