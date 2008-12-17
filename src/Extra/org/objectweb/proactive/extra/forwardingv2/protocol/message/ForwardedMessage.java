@@ -24,7 +24,6 @@ public abstract class ForwardedMessage extends Message {
     }
 
     //attributes
-    protected MessageType type;
     protected AgentID srcAgentID, dstAgentID;
     protected long msgID;
     protected byte[] data;

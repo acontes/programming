@@ -22,6 +22,7 @@ public abstract class RegistrationMessage extends Message {
         }
     }
 
+    // attribute
     protected AgentID agentID;
 
     public RegistrationMessage(MessageType type, AgentID agentID) {
@@ -45,7 +46,7 @@ public abstract class RegistrationMessage extends Message {
 
     @Override
     public byte[] toByteArray() {
-        int length = REGISTRATION_MESSAGE_LENGTH;
+        int length = getLength();
         byte[] byteArray = new byte[length];
 
         TypeHelper.intToByteArray(length, byteArray, CommonOffsets.LENGTH_OFFSET.getValue());
@@ -57,22 +58,23 @@ public abstract class RegistrationMessage extends Message {
         return byteArray;
     }
 
-    //TODO: set it as abstract in Message.kava ?
+    //TODO: set it as abstract in Message.java ?
     /**
      * @return the total length of the formatted message (header length + data length)
      */
     public int getLength() {
-        return REGISTRATION_MESSAGE_LENGTH;
+        return (agentID != null) ? REGISTRATION_MESSAGE_LENGTH : REGISTRATION_MESSAGE_LENGTH - 8;
     }
 
     /**
-     * Reads the srcAgentID of a formatted message beginning at a certain offset inside a buffer. Encapsulates it in an AgentID object.
+     * Reads the AgentID of a formatted message beginning at a certain offset inside a buffer. Encapsulates it in an AgentID object.
      * @param byteArray the buffer in which to read 
      * @param offset the offset at which to find the beginning of the message in the buffer
-     * @return the srcAgentID of the formatted message
+     * @return the AgentID of the formatted message
      */
     public static AgentID readAgentID(byte[] byteArray, int offset) {
-        return new AgentID(TypeHelper.byteArrayToLong(byteArray, offset + Offsets.AGENT_ID_OFFSET.getValue()));
+    	long id = TypeHelper.byteArrayToLong(byteArray, offset + Offsets.AGENT_ID_OFFSET.getValue());
+        return (id != 0) ? new AgentID(id) : null;
     }
 
 }

@@ -9,6 +9,7 @@ public abstract class Message {
     public static final int PROTOV1 = 1;
     public static final int GLOBAL_COMMON_OFFSET = 12; // 3*4 for length, protoID and type
 
+    // enumerations
     public enum MessageType {
         REGISTRATION_REQUEST(0), // Registration request to the registry
         REGISTRATION_REPLY(1), // Registration reply from the registry indicating the attributed localid
@@ -60,9 +61,11 @@ public abstract class Message {
             return this.value;
         }
     }
-
+    
+    // attributes
     protected MessageType type;
 
+    // methods
     public static Message constructMessage(byte[] byteArray, int offset) {
         // TODO depending on the type of message, call a different constructor
         // exemple : new RegistrationRequestMessage(data, offset);
@@ -108,6 +111,8 @@ public abstract class Message {
 
     public abstract byte[] toByteArray();
 
+    public abstract int getLength();
+    
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Message) {
