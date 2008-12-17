@@ -5,6 +5,8 @@ import java.lang.reflect.Constructor;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -67,7 +69,11 @@ public class ForwardingAgentV2 implements AgentV2, Runnable {
     /** Every data message will be handled by this object */
     final private MessageHandler messageHandler;
 
-    public ForwardingAgentV2(Class<? extends MessageHandler> messageHandlerClass) {
+    /** The list of Valve that will process each message */
+    final private List<Valve> valves;
+
+    public ForwardingAgentV2(Class<? extends MessageHandler> messageHandlerClass, List<Valve> valves) {
+        this.valves = valves;
 
         try {
             Constructor<? extends MessageHandler> mhConstructor;
@@ -80,6 +86,10 @@ public class ForwardingAgentV2 implements AgentV2, Runnable {
         boxes = new ConcurrentHashMap<Long, LocalMailBox>();
         requestIDGenerator = new AtomicLong(0);
         agentConnected = false;
+    }
+
+    public ForwardingAgentV2(Class<? extends MessageHandler> messageHandlerClass) {
+        this(messageHandlerClass, new ArrayList<Valve>());
     }
 
     /**
@@ -216,6 +226,15 @@ public class ForwardingAgentV2 implements AgentV2, Runnable {
      * @param msg
      */
     private void internalSendMsg(Message msg) {
+        for (Valve valve : this.valves) {
+            msg = valve.invokeOutgoing(msg);
+            if (logger.isTraceEnabled()) {
+                logger
+                        .trace("Applied valve " + valve.getInfo() + ", resulting message is: " +
+                            msg.toString());
+            }
+        }
+
         // Serialize the message
         byte[] sMessage = msg.toByteArray();
         try {
@@ -249,6 +268,15 @@ public class ForwardingAgentV2 implements AgentV2, Runnable {
             if (logger.isTraceEnabled()) {
                 logger.trace("Message received: " + msg);
             }
+
+            for (Valve valve : this.valves) {
+                msg = valve.invokeIncoming(msg);
+                if (logger.isTraceEnabled()) {
+                    logger.trace("Applied valve " + valve.getInfo() + ", resulting message is: " +
+                        msg.toString());
+                }
+            }
+
             // TODO Handle different message types.
 
             if (msg.getType() == MessageType.DATA_REPLY) {
