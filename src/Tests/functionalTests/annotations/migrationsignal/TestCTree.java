@@ -51,7 +51,7 @@ public class TestCTree extends CTreeTest {
         Assert.assertEquals(ERROR, checkFile("AcceptSimple"));
         Assert.assertEquals(OK, checkFile("AcceptIndirectCall"));
         Assert.assertEquals(OK, checkFile("AcceptInterClassCall"));
-        Assert.assertEquals(OK, checkFile("AcceptInnerInterClassCall"));
+        Assert.assertEquals(OK, checkFiles("inter.MigrationProvider", "AcceptInnerInterClassCall")); // the order counts!
 
         // checking conditions that should be seen as errors
         //      NOTA can be outside active object  Assert.assertEquals(ERROR, checkFile("ErrorNotInActiveObject"));

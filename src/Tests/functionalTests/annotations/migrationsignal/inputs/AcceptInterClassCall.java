@@ -7,35 +7,21 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.extensions.annotation.MigrationSignal;
 
+import functionalTests.annotations.migrationsignal.inputs.inter.MigrationProvider;
+
 
 @ActiveObject
 public class AcceptInterClassCall {
 
     private AnotherMigrateTo ao = new AnotherMigrateTo();
+    private MigrationProvider mig = new MigrationProvider();
 
     // call against a local variable
-    //    @MigrationSignal
-    //    public void migrateTo1() throws MigrationException {
-    //        // calling another method from another class, that migrates
-    //        AnotherMigrateTo amt = new AnotherMigrateTo();
-    //        amt.migrateTo();
-    //    }
-
-    // local variable; type fully named
-    // ERR not a migration signal; only for illustration purposes
-    //    @MigrationSignal
-    //    public void migrateTo2() throws ProActiveException {
-    //        org.objectweb.proactive.core.node.Node node = null;
-    //        node.getActiveObjects();
-    //    }
-
-    // local variable; type imported
-    // ERR not a migration signal; only for illustration purposes
-    //    @MigrationSignal
-    //    public void migrateTo3() throws ProActiveException {
-    //        Node node = null;
-    //        node.getActiveObjects();
-    //    }
+    @MigrationSignal
+    public void migrateTo1() throws MigrationException {
+        AnotherMigrateTo amt = new AnotherMigrateTo();
+        amt.migrateTo();
+    }
 
     //    @MigrationSignal
     //    public void migrateTo2() throws MigrationException {
@@ -43,11 +29,30 @@ public class AcceptInterClassCall {
     //        new AnotherMigrateTo().migrateTo();
     //    }
 
-    // call against a field member
+    // local variable; type fully named
+    @MigrationSignal
+    public void migrateTo2() throws ProActiveException {
+        functionalTests.annotations.migrationsignal.inputs.inter.MigrationProvider mp = new MigrationProvider();
+        mp.migrateTo();
+    }
+
+    // local variable; type imported
+    @MigrationSignal
+    public void migrateTo3() throws ProActiveException {
+        MigrationProvider mp = new MigrationProvider();
+        mp.migrateTo();
+    }
+
+    // call against a field member, class in the same compilation unit
     @MigrationSignal
     public void migrateTo4() throws MigrationException {
-        // a more sophisticated form of call
         ao.migrateTo();
+    }
+
+    // call against a field member, class in different package
+    @MigrationSignal
+    public void migrateTo5() throws MigrationException {
+        mig.migrateTo();
     }
 
 }
