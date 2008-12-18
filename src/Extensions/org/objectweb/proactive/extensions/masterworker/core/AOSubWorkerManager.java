@@ -48,7 +48,7 @@ public class AOSubWorkerManager implements WorkerManager, InitActive, Serializab
     /**
      * how many workers have been created
      */
-    private long workerNameCounter;
+    private Long workerNameCounter;
 
     /**
      * a thread pool used for worker creation
@@ -122,6 +122,21 @@ public class AOSubWorkerManager implements WorkerManager, InitActive, Serializab
      * Maybe we use booleanwrapper to wait all the results?
      */
     private void broadcastNewPeer(final long peerid, String workername, final WorkerPeer workerpeer) {
+    	
+    	// Creates the worker which will automatically connect to the master
+        workers.put(workername, (Worker) workerpeer);
+        workerPeers.put(workerNameCounter, (WorkerPeer) workerpeer);
+        workerNames.put(workerNameCounter, workername);
+        
+        if (debug) {
+        	String output = "Peer list size is :" + workerPeers.size() + " details is: ";
+        	for(long keyid : workerPeers.keySet()){
+        		output = output + keyid ;
+        	}
+        	
+        	logger.debug(output);
+        }
+        
         for (WorkerPeer subworker : workerPeers.values()) {
             BooleanWrapper wrap = subworker.addWorkerPeer(peerid, workername, workerpeer);
             PAFuture.waitFor(wrap);
@@ -150,13 +165,10 @@ public class AOSubWorkerManager implements WorkerManager, InitActive, Serializab
 
                 PAFuture.waitFor(subworker);
 
-                // Creates the worker which will automatically connect to the master
-                workers.put(workername, (Worker) subworker);
-                workerPeers.put(workerNameCounter, (WorkerPeer) subworker);
-                workerNames.put(workerNameCounter, workername);
-
                 // Broadcast the new peer to all the workers of the submaster
-                broadcastNewPeer(workerNameCounter, workername, subworker);
+                synchronized(workerNameCounter) {
+                	broadcastNewPeer(workerNameCounter, workername, subworker);
+                }
 
                 if (debug) {
                     logger.debug("Worker " + workername + " created on " + nodename);
@@ -255,7 +267,7 @@ public class AOSubWorkerManager implements WorkerManager, InitActive, Serializab
     public void initActivity(Body body) {
         // TODO Auto-generated method stub
         stubOnThis = (AOSubWorkerManager) PAActiveObject.getStubOnThis();
-        workerNameCounter = 0;
+        workerNameCounter = (long) 0;
         workers = new HashMap<String, Worker>();
         workerPeers = new HashMap<Long, WorkerPeer>();
         workerNames = new HashMap<Long, String>();

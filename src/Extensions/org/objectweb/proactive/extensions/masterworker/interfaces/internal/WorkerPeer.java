@@ -30,4 +30,9 @@ public interface WorkerPeer extends WorkerDeadListener{
      */
     public abstract BooleanWrapper iAmSubmaster(WorkerMaster submaster, final String subMasterName, final Map<Long, String> workernamelist,
             final Map<Long, WorkerPeer> workerpeerlist);
+    
+    /**
+     * Used for the peer who detect the failure of the subMaster to broadcast the message to the other peers
+     */
+    public abstract BooleanWrapper isDead();
 }

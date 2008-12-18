@@ -37,6 +37,8 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.PAFuture;
+import org.objectweb.proactive.core.body.exceptions.BodyTerminatedRequestException;
+import org.objectweb.proactive.core.body.exceptions.SendRequestCommunicationException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
@@ -141,10 +143,24 @@ public class AODivisibleTaskWorker extends AOWorker implements RunActive, InitAc
 
             // We send the result back to the master
 
-            BooleanWrapper wrap = provider.sendResult(result, name);
-            // We synchronize the answer to avoid a BodyTerminatedException (the AO terminates right after this call)
-            PAFuture.waitFor(wrap);
-            // parentWorker.resumeWork();
+            try{
+                BooleanWrapper wrap = provider.sendResult(result, name);
+                // We synchronize the answer to avoid a BodyTerminatedException (the AO terminates right after this call)
+                PAFuture.waitFor(wrap);
+                // parentWorker.resumeWork();
+            } catch (SendRequestCommunicationException exp) {
+                if (debug) {
+                    logger.debug("Master has already been freed.");
+                }
+            } catch (BodyTerminatedRequestException exp1){
+            	if (debug) {
+                    logger.debug("Master has already been terminaterd.");
+                }
+            } catch (Exception exp2){
+            	if (debug) {
+                    logger.debug("Error occurs.");
+                }
+            }
         }
     }
 }

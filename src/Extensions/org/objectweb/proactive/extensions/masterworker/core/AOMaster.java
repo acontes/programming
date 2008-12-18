@@ -945,6 +945,9 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
             // We do this by removing the worker from our database, which will trigger that it will be recorded again
             workersByName.remove(workerName);
         }
+        if(flooding < 0){
+        	return new LinkedList<TaskIntern<Serializable>>();
+        }
         return getTasksInternal(worker, workerName, results.size(), flooding);
     }
 

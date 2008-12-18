@@ -169,8 +169,7 @@ public class AOPinger implements WorkerWatcher, RunActive, InitActive, Serializa
                             }
                         } catch (Exception exp2){
                     		if (debug) {
-                    			logger.debug("Exception occurs.\n");
-                    			logger.debug(exp2.getStackTrace().toString());
+                    			exp2.printStackTrace();
                     		}
                     	}
                     }
@@ -235,7 +234,8 @@ public class AOPinger implements WorkerWatcher, RunActive, InitActive, Serializa
 	        	} catch (Exception exp2){
 	        		if (debug) {
 	        			logger.debug("Exception occurs when report the missing of " + workerName +
-	        					"to listener.\n" + exp2.getMessage());
+	        					"to listener.\n");
+	        			exp2.printStackTrace();
 	        		}
 	        	}
 	                

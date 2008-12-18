@@ -55,116 +55,124 @@ import org.objectweb.proactive.api.PALifeCycle;
 
 public class PIExample {
     public static final long NUMBER_OF_EXPERIENCES = 1000000;
-    public static final int NUMBER_OF_TASKS = 20;
+    public static final int NUMBER_OF_TASKS = 8;
     public static final int NUMBER_OF_DIVISIBLETASKS = 1;
     
     public static void main(String[] args) throws TaskException, ProActiveException {
 
-    	URL descriptor = PIExample.class.getResource("MasterWorkerFT.xml");
-        URL descriptor2 = PIExample.class.getResource("MasterWorkerFT2.xml");
-        GCMApplication pad;
-        GCMApplication pad2;
-        GCMVirtualNode vn1;
-        GCMVirtualNode vn2;
-
-        Node submaster1;
-        Collection<Node> nodes;
-        Collection<Node> nodes1;
-        Collection<Node> nodes2;
-        
-        findOS();
-        //@snippet-start masterworker_montecarlopi_master_creation
-        // creation of the master
+//    	URL descriptor = PIExample.class.getResource("MasterWorkerFT.xml");
+//        URL descriptor2 = PIExample.class.getResource("MasterWorkerFT2.xml");
+//        GCMApplication pad;
+//        GCMApplication pad2;
+//        GCMVirtualNode vn1;
+//        GCMVirtualNode vn2;
+//
+//        Node submaster1;
+//        Collection<Node> nodes;
+//        Collection<Node> nodes1;
+//        Collection<Node> nodes2;
+//        
+//        findOS();
+//        //@snippet-start masterworker_montecarlopi_master_creation
+//        // creation of the master
         ProActiveMaster<TestDivisibleTask, Long> master = new ProActiveMaster<TestDivisibleTask, Long>();
-
-        // adding resources
-        
-        //master.addResources(PIExample.class.getResource("MWApplication.xml"));
-        
-        pad = PAGCMDeployment.loadApplicationDescriptor(descriptor);
-        pad.startDeployment();
-        vn1 = pad.getVirtualNode("VN1");
-        
-        pad2 = PAGCMDeployment.loadApplicationDescriptor(descriptor2);
-        pad2.startDeployment();
-        vn2 = pad2.getVirtualNode("VN2");
-        vn1.waitReady();
-        System.out.println("VN1 is ready");
-        vn2.waitReady();
-        System.out.println("VN2 is ready");
-        
-        nodes = new ArrayList<Node>();
-        nodes1 = vn1.getCurrentNodes();
-        submaster1 = nodes1.iterator().next();
-        nodes1.remove(submaster1);
-        nodes2 = vn2.getCurrentNodes();
-        nodes.add(submaster1);
-        master.addResources(nodes);
-        master.addResources(nodes1);
-        master.addResources(nodes2);
-        
-        master.setResultReceptionOrder(Master.SUBMISSION_ORDER);
-        master.setInitialTaskFlooding(1);
-        master.setPingPeriod(500);
+//
+//        // adding resources
+//        
+        master.addResources(PIExample.class.getResource("MWApplication.xml"));
+//        
+//        pad = PAGCMDeployment.loadApplicationDescriptor(descriptor);
+//        pad.startDeployment();
+//        vn1 = pad.getVirtualNode("VN1");
+//        
+//        pad2 = PAGCMDeployment.loadApplicationDescriptor(descriptor2);
+//        pad2.startDeployment();
+//        vn2 = pad2.getVirtualNode("VN2");
+//        vn1.waitReady();
+//        System.out.println("VN1 is ready");
+//        vn2.waitReady();
+//        System.out.println("VN2 is ready");
+//        
+//        nodes = new ArrayList<Node>();
+//        nodes1 = vn1.getCurrentNodes();
+//        submaster1 = nodes1.iterator().next();
+//        nodes1.remove(submaster1);
+//        nodes2 = vn2.getCurrentNodes();
+//        nodes.add(submaster1);
+//        master.addResources(nodes);
+//        master.addResources(nodes1);
+//        master.addResources(nodes2);
+//        
+//        master.setResultReceptionOrder(Master.SUBMISSION_ORDER);
+//        master.setInitialTaskFlooding(1);
+//        master.setPingPeriod(500);
         
         //@snippet-end masterworker_montecarlopi_master_creation
         //@snippet-start masterworker_montecarlopi_tasks_submit
         // defining tasks
         Vector<TestDivisibleTask> tasks = new Vector<TestDivisibleTask>();
-        for (int i = 0; i < NUMBER_OF_TASKS; i++) {
-            tasks.add(new TestDivisibleTask(NUMBER_OF_DIVISIBLETASKS));
-        }
+//        for (int i = 0; i < NUMBER_OF_TASKS; i++) {
+//            tasks.add(new TestDivisibleTask(NUMBER_OF_DIVISIBLETASKS));
+//        }
+//
+//        // adding tasks to the queue
+//        master.solve(tasks);
+//        //@snippet-end masterworker_montecarlopi_tasks_submit
+//        //@snippet-start masterworker_montecarlopi_results
+//        // waiting for results
+//        System.out.println("\nOne of the result is:" + master.waitOneResult());
+//
+//        master.clear();
+//        
+//        
+//        master.setResultReceptionOrder(Master.SUBMISSION_ORDER);
 
-        // adding tasks to the queue
-        master.solve(tasks);
-        //@snippet-end masterworker_montecarlopi_tasks_submit
-        //@snippet-start masterworker_montecarlopi_results
-        // waiting for results
-        System.out.println("\nOne of the result is:" + master.waitOneResult());
-
-        master.clear();
-        
-        
-        master.setResultReceptionOrder(Master.SUBMISSION_ORDER);
-
-        tasks = new Vector<TestDivisibleTask>();
-        for (int i = 0; i < NUMBER_OF_TASKS; i++) {
-            tasks.add(new TestDivisibleTask(NUMBER_OF_DIVISIBLETASKS));
-        }
-
-        // adding tasks to the queue
-        master.solve(tasks);
-        
+//        tasks = new Vector<TestDivisibleTask>();
+//        for (int i = 0; i < NUMBER_OF_TASKS; i++) {
+//            tasks.add(new TestDivisibleTask(NUMBER_OF_DIVISIBLETASKS));
+//        }
+//
+//        // adding tasks to the queue
+//        master.solve(tasks);
+//        
+//        try {
+//        	Thread.sleep(2000);
+//        	//System.out.println("\nkill submaster on host: " + submaster1.getVMInformation().getHostName());
+//			//submaster1.killAllActiveObjects();
+////        	Node worker = nodes1.iterator().next();
+////        	System.out.println("\nkill worker on host: " + worker.getVMInformation().getHostName());
+////        	worker.killAllActiveObjects();
+//        	System.out.println("\nkill worker on host: " + submaster1.getVMInformation().getHostName());
+//        	submaster1.killAllActiveObjects();
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		
+//        //@snippet-end masterworker_montecarlopi_tasks_submit
+//        //@snippet-start masterworker_montecarlopi_results
+//        // waiting for results
+//        List<Long> successesList = master.waitAllResults();
+//
+//        // computing PI using the results
+//        long sumSuccesses = 0;
+//
+//        for (long successes : successesList) {
+//            sumSuccesses += successes;
+//        }
+//
+//        double pi = (4 * sumSuccesses) /
+//            ((double) NUMBER_OF_EXPERIENCES * NUMBER_OF_TASKS * NUMBER_OF_DIVISIBLETASKS);
+//
+//        System.out.println("\nComputed PI by Monte-Carlo method : " + pi);
+        //@snippet-end masterworker_montecarlopi_results
+        //@snippet-start masterworker_montecarlopi_terminate
         try {
-        	Thread.sleep(500);
-        	//System.out.println("\nkill submaster on host: " + submaster1.getVMInformation().getHostName());
-			//submaster1.killAllActiveObjects();
-        	Node worker = nodes1.iterator().next();
-        	System.out.println("\nkill worker on host: " + worker.getVMInformation().getHostName());
-        	worker.killAllActiveObjects();
-		} catch (Exception e) {
+			Thread.sleep(10000);
+		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-        //@snippet-end masterworker_montecarlopi_tasks_submit
-        //@snippet-start masterworker_montecarlopi_results
-        // waiting for results
-        List<Long> successesList = master.waitAllResults();
-
-        // computing PI using the results
-        long sumSuccesses = 0;
-
-        for (long successes : successesList) {
-            sumSuccesses += successes;
-        }
-
-        double pi = (4 * sumSuccesses) /
-            ((double) NUMBER_OF_EXPERIENCES * NUMBER_OF_TASKS * NUMBER_OF_DIVISIBLETASKS);
-
-        System.out.println("\nComputed PI by Monte-Carlo method : " + pi);
-        //@snippet-end masterworker_montecarlopi_results
-        //@snippet-start masterworker_montecarlopi_terminate
         master.terminate(true);
         //@snippet-end masterworker_montecarlopi_terminate
 
@@ -209,6 +217,7 @@ public class PIExample {
                 tasks.add(new ComputePIMonteCarlo());
             }
 
+            Thread.sleep(2000);
             master.setResultReceptionOrder(Master.SUBMISSION_ORDER);
             // adding tasks to the queue
             master.solve(tasks);

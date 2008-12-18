@@ -196,13 +196,13 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
     	if (debug) {
             logger.debug("Initionlize the submaster!");
         }
+    	if(workers.size() == 0){
+    		isWorkersLeft();
+    		return new BooleanWrapper(true);
+    	}
     	sleepingGroup.addAll(workers.values());
     	sleepingWorkers.putAll(workers);
-    	try {
-            sleepingGroupStub.wakeup();
-        } catch (Exception e) {
-            // We ignore NFE pinger is responsible for that
-        }
+    	
     	PAFuture.waitFor(wrap);
         return new BooleanWrapper(true);
     }
@@ -628,7 +628,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         return new BooleanWrapper(true);
     }
 
-    private void getTasksWithResults() {
+    private void getTasksWithResults(boolean noWorker) {
         if (!terminating) {
             try {
             	int k = resultQueue.countResults();
@@ -638,6 +638,8 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
                     int flooding = 0;
                     if (pendingTasks.size() == 0)
                         flooding = 1;
+                    if(noWorker)
+                    	flooding = -1;
                     if (debug) {
                         logger.debug("" + k + " results are sent back to the main master");
                     }
@@ -651,6 +653,19 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
                 }
             }
         }
+    }
+    
+    private void isWorkersLeft(){
+    	if(workerGroup.size() == 0 && spawnedWorkerNames.size() == 0) {
+    		clear();
+    		try {
+    			getTasksWithResults(false);
+                ((WorkerDeadListener) provider).isDead(name);
+            } catch (Exception e) {
+                // We ignore NFE pinger is responsible for that
+            	e.printStackTrace();
+            }
+    	}
     }
 
     private void getTasksIntern(int flooding) {
@@ -1176,7 +1191,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             try {
                 // Send results back to main master and get new tasks
             	try {
-            		getTasksWithResults();
+            		getTasksWithResults(true);
             	} catch (Exception e0) {
                     e0.printStackTrace();
                 }
@@ -1778,6 +1793,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
                 }
 
                 smanager.isDead(workerName);
+                isWorkersLeft();
             }
             return true;
     	}
