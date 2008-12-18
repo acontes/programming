@@ -132,6 +132,7 @@ public class RegistrationHandler implements Runnable {
                 try {
                     sendMessage(new ExceptionMessage(MessageType.ROUTING_EXCEPTION_MSG, dstAgentID, agentID,
                         ForwardedMessage.readMessageID(msg, 0), e).toByteArray());
+                    return;
                 } catch (RemoteConnectionBrokenException e1) {
                     // could not notify that the destination was unknown because the source tunnel has failed. Just stop the current RegistrationHandler
                     stop();

@@ -3,7 +3,6 @@ package org.objectweb.proactive.extra.forwardingv2.test;
 import junit.framework.Assert;
 
 import org.bouncycastle.util.Arrays;
-import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.extra.forwardingv2.exceptions.ExecutionException;
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
