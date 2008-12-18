@@ -175,6 +175,10 @@ public class AOWorker implements InitActive, Serializable, Worker {
         	if (debug) {
                 logger.debug("Master has already been terminaterd.");
             }
+        } catch (Exception exp2){
+        	if (debug) {
+                logger.debug("Error occurs.");
+            }
         }
         
     }
@@ -206,6 +210,10 @@ public class AOWorker implements InitActive, Serializable, Worker {
         } catch (BodyTerminatedRequestException exp1){
         	if (debug) {
                 logger.debug("Master has already been terminaterd.");
+            }
+        } catch (Exception exp2){
+        	if (debug) {
+                logger.debug("Error occurs.");
             }
         }
 
@@ -277,6 +285,10 @@ public class AOWorker implements InitActive, Serializable, Worker {
             } catch (BodyTerminatedRequestException exp1){
             	if (debug) {
                     logger.debug("Master has already been terminaterd when try to forward task " + task.getId());
+                }
+            } catch (Exception exp2){
+            	if (debug) {
+                    logger.debug("Error occurs.");
                 }
             }
             // We tell the worker that it's now known by the master and can do it's job
@@ -388,7 +400,7 @@ public class AOWorker implements InitActive, Serializable, Worker {
             }
         } catch (Exception exp2){
         	if (debug) {
-                logger.debug("Master has deaded.");
+                logger.debug("Error occurs.");
             }
         }
     }

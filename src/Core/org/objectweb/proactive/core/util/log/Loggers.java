@@ -135,6 +135,7 @@ public interface Loggers {
 
     //  Master Worker loggers
     static final public String MASTERWORKER = CORE + ".masterworker";
+    static final public String MASTERWORKER_RESULTQUEUE = MASTERWORKER + ".resultqueue";
     static final public String MASTERWORKER_WORKERMANAGER = MASTERWORKER + ".workermanager";
     static final public String MASTERWORKER_SUBMASTER = MASTERWORKER + ".submaster";
     static final public String MASTERWORKER_SUBWORKERMANAGER = MASTERWORKER + ".subworkermanager";

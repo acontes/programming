@@ -54,7 +54,7 @@ public class ResultQueue<R extends Serializable> implements Serializable {
     /**
      * log4j logger of the master
      */
-    private static final Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER);
+    private static final Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER_RESULTQUEUE);
     private static final boolean debug = logger.isDebugEnabled();
 
     /**
@@ -90,10 +90,15 @@ public class ResultQueue<R extends Serializable> implements Serializable {
      * @param result result of the completed task
      */
     public void addCompletedTask(final ResultIntern<R> result) {
+    	
         if (mode == Master.COMPLETION_ORDER) {
             unorderedResults.add(result);
         } else {
             orderedResults.add(result);
+        }
+        if (debug) {
+            logger.debug("Add result of task " + result.getId() + " to the result queue.");
+            logger.debug(this.toString());
         }
     }
 
@@ -144,6 +149,18 @@ public class ResultQueue<R extends Serializable> implements Serializable {
             return resultcount;
         }
     }
+    
+    /**
+     * Used for the submaster, don't consider the order, just give back all the results
+     * @return the number of results available
+     */
+    public int countResults() {
+        if (mode == Master.COMPLETION_ORDER) {
+            return unorderedResults.size();
+        } else {
+        	return orderedResults.size();
+        }
+    }
 
     /**
      * Counts the number of pending tasks
@@ -158,8 +175,7 @@ public class ResultQueue<R extends Serializable> implements Serializable {
      * @return a list containing all completed tasks, if all tasks are completed
      */
     public List<ResultIntern<R>> getAll() {
-        if (areAllResultsAvailable()) {
-
+    	if(areAllResultsAvailable()){
             int size = 0;
 
             Iterator<ResultIntern<R>> it;
@@ -190,6 +206,40 @@ public class ResultQueue<R extends Serializable> implements Serializable {
     }
 
     /**
+     * Used for get all the results of the result queue
+     * @return result list
+     */
+    public List<ResultIntern<R>> getAllResults() {
+
+    	if (debug) {
+            logger.debug("Tasks in Queue is: " + this.toString());
+        }
+		int size = 0;
+        Iterator<ResultIntern<R>> it;
+        if (mode == Master.COMPLETION_ORDER) {
+            it = unorderedResults.iterator();
+            size = unorderedResults.size();
+        } else {
+            it = orderedResults.iterator();
+            size = orderedResults.size();
+        }
+        List<ResultIntern<R>> answer = new ArrayList<ResultIntern<R>>(size);
+        while (it.hasNext()) {
+            ResultIntern<R> res = it.next();
+            answer.add(res);
+            it.remove();
+            long taskId = res.getId();
+            if (debug) {
+                logger.debug("Result " + taskId + " removed from the result queue.");
+            }
+
+            idsubmitted.remove(taskId);
+        }
+
+        return answer;
+    }
+    
+    /**
      * Returns the the result of the next completed task (depending of the current ResultReceptionOrder)
      * @return the result of the next completed task, if the next task in the current ResultReceptionOrder is available
      */
@@ -202,6 +252,9 @@ public class ResultQueue<R extends Serializable> implements Serializable {
                 Iterator<ResultIntern<R>> it = orderedResults.iterator();
                 answer = it.next();
                 it.remove();
+                if (debug) {
+                    logger.debug("Result " + answer.getId() + " removed from the result queue.");
+                }
             }
 
             idsubmitted.remove(answer.getId());
@@ -233,6 +286,9 @@ public class ResultQueue<R extends Serializable> implements Serializable {
                 it.remove();
                 count++;
                 idsubmitted.remove(res.getId());
+                if (debug) {
+                    logger.debug("Result " + res.getId() + " removed from the result queue.");
+                }
             }
 
             return answer;
@@ -288,6 +344,21 @@ public class ResultQueue<R extends Serializable> implements Serializable {
         }
 
         this.mode = mode;
+    }
+    
+    public String toString() {
+    	String output = "";
+    	if (mode == Master.COMPLETION_ORDER) {
+    		for (ResultIntern<R> res : unorderedResults) {
+    			output+=" "+res.getId();
+    		}
+    	}
+    	else {
+    		for (ResultIntern<R> res : orderedResults) {
+    			output+=" "+res.getId();
+    		}
+    	}
+    	return output;
     }
 
     public SubMaster.OrderingMode getMode() {

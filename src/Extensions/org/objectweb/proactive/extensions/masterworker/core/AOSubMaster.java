@@ -167,7 +167,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
     private int futureCounter = 0;
 
     // String key = "w"+ waitId + "d" + divisibleTaskId + "e";
-    private HashMap<String, List<Serializable>> resultsReppsitory;
+    private HashMap<String, List<Serializable>> resultsRepository;
     
     /** Filters * */
     private final FindWorkersRequests workersRequestsFilter = new FindWorkersRequests();
@@ -247,7 +247,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         workersDependenciesRev = new HashMap<String, String>();
         divisibleTasksAssociationWithWorkers = new HashMap<Long, String>();
         divisibleTasksAssociationWithWorkersRev = new HashMap<String, Long>();
-        resultsReppsitory = new HashMap<String, List<Serializable>>();
+        resultsRepository = new HashMap<String, List<Serializable>>();
         requestsToServeImmediately = new ArrayList<Request>();
 
         // Workers
@@ -558,31 +558,51 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
     
                 }
                 
+                try{
+                Set<String> keySet= new HashSet<String>(resultsRepository.keySet());
+                
                 // Remove all the results related to the divisibletask
-                for(String keyName : resultsReppsitory.keySet()){
+                for(String keyName : keySet){
                 	String key = "d" + id + "e";
                 	if(keyName.indexOf(key) > 0){
                 		if (debug) {
                             logger.debug("Remove the divisible task results " + keyName);
                         }
-                		resultsReppsitory.remove(keyName);
+                		resultsRepository.remove(keyName);
                 	}
                 		
                 }
 
-                divisibleTasksAssociationWithWorkers.remove(id);
+
+                divisibleTasksAssociationWithWorkers.remove(id);                
                 divisibleTasksAssociationWithWorkersRev.remove(workerName);
+                } catch (Exception e){
+                	logger.debug("remove workers have a error ");
+                	e.printStackTrace();
+                }
+                
             }
+            try{
             // We add the result in the result queue
-            if (submitter == null) {
+            if (null == submitter) {
                 resultQueue.addCompletedTask(result);
             } else {
                 if (debug) {
                     logger.debug(workerName + " sends result of task " + id + " but the worker is unknown.");
                 }
             }
-
+            } catch (Exception e1){
+            	logger.debug("Add CompletedTask have a error ");
+            	e1.printStackTrace();
+            }
             // Remove the task from the task list
+            if (debug) {
+                logger.debug("Removing task " + id + " from the launched task list.");
+//                logger.debug("launched tasks are: ");
+//                for(long taskId : launchedTaskList.keySet())
+//                	logger.debug(" " + taskId);
+            }
+            
             launchedTaskList.remove(id);
         } else {
             // do nothing
@@ -611,14 +631,17 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
     private void getTasksWithResults() {
         if (!terminating) {
             try {
-                if (resultQueue.countAvailableResults() > 0) {
+            	int k = resultQueue.countResults();
+                if (k > 0) {
                     Queue<TaskIntern<Serializable>> tasksToAdd = null;
 
                     int flooding = 0;
                     if (pendingTasks.size() == 0)
                         flooding = 1;
-                    tasksToAdd = provider.sendResultsAndGetTasks(resultQueue.getNextK(resultQueue
-                            .countAvailableResults()), name, flooding);
+                    if (debug) {
+                        logger.debug("" + k + " results are sent back to the main master");
+                    }
+                    tasksToAdd = provider.sendResultsAndGetTasks(resultQueue.getAllResults(), name, flooding);
                     PAEventProgramming.addActionOnFuture(tasksToAdd, "addTasksToPending");
                     futureCounter ++;
                 }
@@ -823,7 +846,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         // If one worker is sending the tasks
         if (subResultQueues.containsKey(divisibleTaskId)) {
         	if (debug) {
-                logger.debug("The divisible task " + divisibleTaskId + "has already had a result queue");
+                logger.debug("The divisible task " + divisibleTaskId + " has already had a result queue");
             }
         	for (long id = taskIdCounter; id < taskIdCounter + tasks.size(); id++) {
         		subResultQueues.get(divisibleTaskId).addPendingTask(id);
@@ -882,11 +905,11 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         
         String key = "w"+ waitId + "d" + divisibleTaskId + "e";
         
-        if((subResultQueues.containsKey(divisibleTaskId)) && resultsReppsitory.containsKey(key)){
+        if((subResultQueues.containsKey(divisibleTaskId)) && resultsRepository.containsKey(key)){
         	if (debug) {
                 logger.debug("Tasks has already available last time " + key);
             }
-        	return resultsReppsitory.get(key);
+        	return resultsRepository.get(key);
         }
         
         if (subResultQueues.containsKey(divisibleTaskId)) {
@@ -903,7 +926,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             results.add(res.getResult());
         }
         
-        resultsReppsitory.put(key, results);
+        resultsRepository.put(key, results);
         return results;
     }
 
@@ -922,11 +945,11 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         
         String key = "w"+ waitId + "d" + divisibleTaskId + "e";
         
-        if((subResultQueues.containsKey(divisibleTaskId)) && resultsReppsitory.containsKey(key)){
+        if((subResultQueues.containsKey(divisibleTaskId)) && resultsRepository.containsKey(key)){
         	if (debug) {
                 logger.debug("Tasks has already available last time " + key);
             }
-        	return resultsReppsitory.get(key);
+        	return resultsRepository.get(key);
         }
         
         if (subResultQueues.containsKey(divisibleTaskId)) {
@@ -950,7 +973,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
 
             results.add(res.getResult());
         }
-        resultsReppsitory.put(key, results);
+        resultsRepository.put(key, results);
         return results;
     }
 
@@ -967,11 +990,11 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         long divisibleTaskId = divisibleTasksAssociationWithWorkersRev.get(originatorName);
         String key = "w"+ waitId + "d" + divisibleTaskId + "e";
         
-        if((subResultQueues.containsKey(divisibleTaskId)) && resultsReppsitory.containsKey(key)){
+        if((subResultQueues.containsKey(divisibleTaskId)) && resultsRepository.containsKey(key)){
         	if (debug) {
                 logger.debug("Tasks has already available last time " + key);
             }
-        	return resultsReppsitory.get(key).iterator().next();
+        	return resultsRepository.get(key).iterator().next();
         }
         if (subResultQueues.containsKey(divisibleTaskId)) {
             res = subResultQueues.get(divisibleTaskId).getNext();
@@ -987,7 +1010,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             throw new RuntimeException(new TaskException(res.getException()));
         }
         results.add(res);
-        resultsReppsitory.put(key, results);
+        resultsRepository.put(key, results);
         return res.getResult();
     }
 
@@ -1004,11 +1027,11 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         long divisibleTaskId = divisibleTasksAssociationWithWorkersRev.get(originatorName);
         String key = "w"+ waitId + "d" + divisibleTaskId + "e";
         
-        if((subResultQueues.containsKey(divisibleTaskId)) && resultsReppsitory.containsKey(key)){
+        if((subResultQueues.containsKey(divisibleTaskId)) && resultsRepository.containsKey(key)){
         	if (debug) {
                 logger.debug("Tasks has already available last time " + key);
             }
-        	return resultsReppsitory.get(key);
+        	return resultsRepository.get(key);
         }
         if (subResultQueues.containsKey(divisibleTaskId)) {
             ResultQueue rq = subResultQueues.get(divisibleTaskId);
@@ -1028,7 +1051,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
 
             results.add(res.getResult());
         }
-        resultsReppsitory.put(key, results);
+        resultsRepository.put(key, results);
         return results;
     }
 
@@ -1048,7 +1071,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         taskIdCounters.clear();
         
         // clear the results Reppsitory 
-        resultsReppsitory.clear();
+        resultsRepository.clear();
         
         // We clear the queues
         resultQueue.clear();
@@ -1151,10 +1174,29 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         Service service = new Service(body);
         while (!terminated) {
             try {
-                service.waitForRequest();
+                // Send results back to main master and get new tasks
+            	try {
+            		getTasksWithResults();
+            	} catch (Exception e0) {
+                    e0.printStackTrace();
+                }
+                
+                try {
+                	service.waitForRequest();
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
                 // Sweep of wait requests
-                sweepWaitRequests(service);
-                maybeServePending(service);
+                try {
+                	sweepWaitRequests(service);
+                } catch (Exception e2) {
+                    e2.printStackTrace();
+                }
+                try {
+                	maybeServePending(service);
+                } catch (Exception e3) {
+                    e3.printStackTrace();
+                }
 
                 // Serving methods other than waitXXX
                 while (!isClearing && service.hasRequestToServe()) {
@@ -1162,25 +1204,48 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
                     while (!isClearing && (oldest != null) && !workersRequestsFilter.acceptRequest(oldest) &&
                         notTerminateFilter.acceptRequest(oldest)) {
                         // Sweep of wait requests
-                        sweepWaitRequests(service);
+                    	try {
+                    		sweepWaitRequests(service);
+                    	} catch (Exception e1) {
+                            e1.printStackTrace();
+                        }
                         // Serving quick requests
-                        service.serveOldest();
+                        try {
+                        	service.serveOldest();
+                        } catch (Exception e1) {
+                            e1.printStackTrace();
+                        }
 
                         // we maybe serve the pending waitXXX methods if there are some and if the necessary results are collected
-                        maybeServePending(service);
+                        try {
+                        	maybeServePending(service);
+                        } catch (Exception e2) {
+                            e2.printStackTrace();
+                        }
                         oldest = service.getOldest();
+                        
 
                     }
                     if (!isClearing && (oldest != null) && notTerminateFilter.acceptRequest(oldest)) {
                         // Sweep of wait requests
-                        sweepWaitRequests(service);
+                    	try {
+                    		sweepWaitRequests(service);
+                    	} catch (Exception e1) {
+                            e1.printStackTrace();
+                        }
                         // Serving worker requests
-                        service.serveOldest();
+                    	try {
+                    		service.serveOldest();
+                    	} catch (Exception e2) {
+                            e2.printStackTrace();
+                        }
                         // we maybe serve the pending waitXXX methods if there are some and if the necessary results are collected
-                        maybeServePending(service);
+                    	try {
+                    		maybeServePending(service);
+                    	} catch (Exception e3) {
+                            e3.printStackTrace();
+                        }
                     }
-                    // Send results back to main master and get new tasks
-                    getTasksWithResults();
                 }
 
                 // If a clear request is detected we enter a special mode
@@ -1188,14 +1253,30 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
                     clearingRunActivity(service);
                 }
 
-                service.serveAll("secondTerminate");
+                try {
+                	service.serveAll("secondTerminate");
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
                 while (PAFuture.isAwaited(terminationResourceManagerAnswer)) {
-                    service.serveAll(finalNotTerminateFilter);
+                	try {
+                		service.serveAll(finalNotTerminateFilter);	
+                	} catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     // avoids devouring CPU cycles
                     Thread.sleep(100);
                 }
-                service.serveAll("finalTerminate");
-                service.serveAll("awaitsTermination");
+                try {
+                	service.serveAll("finalTerminate");
+                } catch (Exception e2) {
+                    e2.printStackTrace();
+                }
+                try {
+                	service.serveAll("awaitsTermination");
+                } catch (Exception e3) {
+                    e3.printStackTrace();
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -1317,7 +1398,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             
             String key = "w"+ req.getParameter(1) + "d" + divisibleTaskId + "e";
             
-            if((subResultQueues.containsKey(divisibleTaskId)) && resultsReppsitory.containsKey(key)){
+            if((subResultQueues.containsKey(divisibleTaskId)) && resultsRepository.containsKey(key)){
             	servePending(originator, service);
             }
             
@@ -1632,6 +1713,11 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
                         if (pendingSubRequests.containsKey(workerName)) {
                         	// Clean all the request of the spawned worker
                             Request req = pendingSubRequests.remove(workerName);
+                            requestsToServeImmediately.add(req);
+                            if (debug) {
+                                logger.debug("waitXXX method from " + workerName +
+                                    " needs to be served immediately");
+                            }
                         }
                         divisibleTasksAssociationWithWorkers.remove(taskId);
                         

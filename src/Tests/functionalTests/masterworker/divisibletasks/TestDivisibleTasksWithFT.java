@@ -65,9 +65,9 @@ public class TestDivisibleTasksWithFT extends FunctionalTest {
     private GCMVirtualNode vn2;
 
     Node submaster1;
-    Collection<Node> workers1;
-    Node submaster2;
-    Collection<Node> workers2;
+    Collection<Node> nodes;
+    Collection<Node> nodes1;
+    Collection<Node> nodes2;
 
     @Before
     public void initTest() throws Exception {
@@ -85,18 +85,17 @@ public class TestDivisibleTasksWithFT extends FunctionalTest {
         System.out.println("VN2 is ready");
 
         master = new ProActiveMaster<DaCSort, ArrayList<Integer>>();
-        submaster1 = vn1.getANode();
-        workers1 = vn1.getNewNodes();
-        submaster2 = vn2.getANode();
-        workers2 = vn2.getNewNodes();
-        Collection<Node> nodes = new ArrayList<Node>();
+        
+        nodes = new ArrayList<Node>();
+        nodes1 = vn1.getCurrentNodes();
+        submaster1 = nodes1.iterator().next();
+        nodes1.remove(submaster1);
+        nodes2 = vn2.getCurrentNodes();
         nodes.add(submaster1);
         master.addResources(nodes);
-        nodes.clear();
-        nodes.add(submaster2);
-        master.addResources(nodes);
-        master.addResources(workers1);
-        master.addResources(workers2);
+        master.addResources(nodes1);
+        master.addResources(nodes2);
+        
         master.setResultReceptionOrder(Master.SUBMISSION_ORDER);
         master.setInitialTaskFlooding(1);
         master.setPingPeriod(500);
@@ -114,27 +113,35 @@ public class TestDivisibleTasksWithFT extends FunctionalTest {
 
         master.solve(tasks);
 
-        Thread.sleep(3000);
+        try {
+        	Thread.sleep(500);
+        	//System.out.println("\nkill submaster on host: " + submaster1.getVMInformation().getHostName());
+			//submaster1.killAllActiveObjects();
+        	Node worker = nodes1.iterator().next();
+        	System.out.println("\nkill worker on host: " + worker.getVMInformation().getHostName());
+        	worker.killAllActiveObjects();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
-        workers1.iterator().next().killAllActiveObjects();
-
-        pad2.kill();
+        // pad2.kill();
 
         ArrayList<Integer> answer = master.waitOneResult();
-        //
-        //        for (int i = 0; i < answer.size() - 1; i++) {
-        //            assertTrue("List sorted", answer.get(i) <= answer.get(i + 1));
-        //        }
-        //        master.solve(tasks);
-        //        Thread.sleep(2000);
-        //        master.clear();
-        //
-        //        master.solve(tasks);
-        //        answer = master.waitOneResult();
-        //
-        //        for (int i = 0; i < answer.size() - 1; i++) {
-        //            assertTrue("List sorted", answer.get(i) <= answer.get(i + 1));
-        //        }
+        
+                for (int i = 0; i < answer.size() - 1; i++) {
+                    assertTrue("List sorted", answer.get(i) <= answer.get(i + 1));
+                }
+                master.solve(tasks);
+                Thread.sleep(2000);
+                master.clear();
+        
+                master.solve(tasks);
+                answer = master.waitOneResult();
+        
+                for (int i = 0; i < answer.size() - 1; i++) {
+                    assertTrue("List sorted", answer.get(i) <= answer.get(i + 1));
+                }
     }
 
     @After

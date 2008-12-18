@@ -3,6 +3,7 @@ package org.objectweb.proactive.extensions.masterworker.core;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
@@ -167,7 +168,7 @@ public class AOSubWorker extends AOWorker implements WorkerPeer {
 
     private void electNewSubMaster() {
     	clear();
-        Set<Long> peerids = workerPeerList.keySet();
+        Set<Long> peerids = new HashSet<Long>(workerPeerList.keySet());
         Collection<WorkerPeer> workerpeers = workerPeerList.values();
         String workername = null;
         WorkerPeer workerpeer = null;

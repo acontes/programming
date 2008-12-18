@@ -20,6 +20,7 @@
 				<jvmarg value="-Xms384m -Xmx1024m -Dlog4j.configuration=file:${proactive.home}/compile/proactive-log4j -Dproactive.home=${proactive.home} -Dproactive.masterworker.pingperiod=2000"/>
 				<applicationClasspath>
 					<pathElement base="proactive" relpath="dist/lib/ProActive_examples.jar"/>
+					<pathElement base="proactive" relpath="dist/lib/ProActive.jar"/>
 				</applicationClasspath>
 			</configuration>
 			<virtualNode id="Workers" capacity="4">

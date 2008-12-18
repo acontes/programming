@@ -14,10 +14,10 @@
 		<proactive relpath="${proactive.home}" base="root">
 			<configuration>
 				<java base="root" relpath="${java.home}/bin/java"/>
-				<jvmarg value="-Dproactive.test=true -Dlog4j.configuration=file:${proactive.home}/compile/proactive-log4j -Dproactive.masterworker.pingperiod=2000"/>
+				<jvmarg value="-Xms384m -Xmx1024m -Dlog4j.configuration=file:${proactive.home}/compile/proactive-log4j -Dproactive.home=${proactive.home} -Dproactive.masterworker.pingperiod=2000"/>
 				<proactiveClasspath type="append">
-                    <pathElement base="proactive" relpath="classes/Tests"/>
-                    <pathElement base="proactive" relpath="dist/lib/clover.jar"/>
+					<pathElement base="proactive" relpath="dist/lib/ProActive_examples.jar"/>
+					<pathElement base="proactive" relpath="dist/lib/ProActive.jar"/>
 				</proactiveClasspath>
 			</configuration>
 
