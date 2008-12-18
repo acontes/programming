@@ -63,7 +63,7 @@ public abstract class RegistrationMessage extends Message {
      * @return the total length of the formatted message (header length + data length)
      */
     public int getLength() {
-        return (agentID != null) ? REGISTRATION_MESSAGE_LENGTH : REGISTRATION_MESSAGE_LENGTH - 8;
+        return REGISTRATION_MESSAGE_LENGTH;
     }
 
     /**
