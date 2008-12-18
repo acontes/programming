@@ -216,6 +216,14 @@
 		</section>
 		
 		<section>
+			<info><title>@Migratable</title></info>
+		<para>
+			@Migratable is applied on an object, in order to specify that it will be used as a migratable object. This means that the object must be an active object
+			 - it must be annotated using the @ActiveObject annotation - and also that the object must implement the java.io.Serializable interface.
+		</para>
+		</section>
+		
+		<section>
 			<info><title>Migration Strategy</title></info>
 		<para>
 			When implementing mobile agents using ProActive, one can specify methods that should be executed when arriving to, or departing from, a site. The signature of these methods must be:
