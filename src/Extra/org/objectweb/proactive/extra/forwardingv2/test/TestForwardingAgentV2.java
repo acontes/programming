@@ -7,7 +7,6 @@ import java.net.Socket;
 
 import junit.framework.Assert;
 
-import org.bouncycastle.util.Arrays;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,7 +14,6 @@ import org.objectweb.proactive.core.remoteobject.http.util.HttpMarshaller;
 import org.objectweb.proactive.extra.forwardingv2.client.AgentV2;
 import org.objectweb.proactive.extra.forwardingv2.client.ForwardingAgentV2;
 import org.objectweb.proactive.extra.forwardingv2.client.ProActiveMessageHandler;
-import org.objectweb.proactive.extra.forwardingv2.exceptions.MessageRoutingException;
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.ForwardedMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message;
