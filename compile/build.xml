@@ -961,15 +961,6 @@
 			ibis-1.4.jar ibis-connect-1.0.jar ibis-util-1.0.jar"/>
 	</patternset>
 	
-<!--	<target name="rartest">
-		<jar destfile="${deploy.dir}/${rar.name}.rar" >
-		    <!-#- ProActive libs -#->
-			<fileset dir="${deploy.lib.dir}">
-				<include name="ProActive.jar bouncycastle.jar fractal.jar javassist.jar xercesImpl.jar xml-apis.jar xalan.jar log4j.jar"/>
-			</fileset>		
-		</jar>
-	</target>-->
-	
 	<target name="proActiveRar" depends="deploy.all" description="Creates the RAR archive for deployment into the application server">
 		<switch name="as.name">
 	    <case value="geronimo">
@@ -995,6 +986,17 @@
 		    <fileset dir="${deploy.lib.dir}" includes="bouncycastle.jar fractal.jar javassist.jar log4j.jar xercesImpl.jar xml-apis.jar ProActive.jar ProActive_examples.jar" />
 			<!-- appplication-server specific fixup-->
 			<fileset dir="${deploy.lib.dir}/connector_extra" includes="xalan.jar"  /> 
+		</jar>
+		<break/>
+	    </case>
+		<case value="weblogic">
+		<jar destfile="${deploy.dir}/${rar.name}.rar" >
+		    <!-- META-INF -->
+		    <fileset dir="${compile.dir}" includes="META-INF/MANIFEST.MF" />
+		    <fileset dir="${compile.dir}" includes="META-INF/ra.xml" />
+		    <fileset dir="${compile.dir}" includes="META-INF/weblogic-ra.xml" />
+		    <!-- ProActive libs -->
+		    <fileset dir="${deploy.lib.dir}" includes="bouncycastle.jar fractal.jar javassist.jar log4j.jar xercesImpl.jar xml-apis.jar ProActive.jar ProActive_examples.jar" />
 		</jar>
 		<break/>
 	    </case>
