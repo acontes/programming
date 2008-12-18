@@ -94,4 +94,8 @@ public interface ErrorMessages {
     // @VirtualNodeIsReadyCallback and @NodeAttachmentCallback
     public static final String INCORRECT_METHOD_SIGNATURE_FOR_ISREADY_CALLBACK = "Incorrect method signature. \nIsReady callback method must have the following signature: void method(String)";
     public static final String INCORRECT_METHOD_SIGNATURE_FOR_NODE_ATTACHEMENT_CALLBACK = "Incorrect method signature. \nNode attachement callback method must have the following signature: void method(Node, String)";
+
+    // @Migratable
+    public static final String MIGRATABLE_NOT_AO = "The class is not annotated using the @ActiveObject annotation. A migratable object must be an active object.";
+    public static final String MIGRATABLE_SERIALIZABLE = "A migratable object should implement the Serializable interface.";
 }

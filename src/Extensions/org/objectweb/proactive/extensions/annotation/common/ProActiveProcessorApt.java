@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
+import org.objectweb.proactive.extensions.annotation.Migratable;
 import org.objectweb.proactive.extensions.annotation.NodeAttachmentCallback;
 import org.objectweb.proactive.extensions.annotation.OnArrival;
 import org.objectweb.proactive.extensions.annotation.OnDeparture;
@@ -46,6 +47,7 @@ import org.objectweb.proactive.extensions.annotation.activeobject.ActiveObjectVi
 import org.objectweb.proactive.extensions.annotation.callbacks.isready.VirtualNodeIsReadyCallbackVisitorAPT;
 import org.objectweb.proactive.extensions.annotation.callbacks.nodeattachment.NodeAttachmentCallbackVisitorAPT;
 import org.objectweb.proactive.extensions.annotation.common.UtilsApt;
+import org.objectweb.proactive.extensions.annotation.migratable.MigratableVisitorAPT;
 import org.objectweb.proactive.extensions.annotation.migration.strategy.OnArrivalVisitorAPT;
 import org.objectweb.proactive.extensions.annotation.migration.strategy.OnDepartureVisitorAPT;
 import org.objectweb.proactive.extensions.annotation.remoteobject.RemoteObjectVisitorAPT;
@@ -87,6 +89,7 @@ public class ProActiveProcessorApt implements AnnotationProcessor {
         _annotationVisitors.put(NodeAttachmentCallback.class, new NodeAttachmentCallbackVisitorAPT(messager));
         _annotationVisitors.put(VirtualNodeIsReadyCallback.class, new VirtualNodeIsReadyCallbackVisitorAPT(
             messager));
+        _annotationVisitors.put(Migratable.class, new MigratableVisitorAPT(messager));
 
     }
 

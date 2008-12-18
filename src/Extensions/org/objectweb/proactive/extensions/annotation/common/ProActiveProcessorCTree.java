@@ -48,6 +48,7 @@ import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
+import org.objectweb.proactive.extensions.annotation.Migratable;
 import org.objectweb.proactive.extensions.annotation.MigrationSignal;
 import org.objectweb.proactive.extensions.annotation.NodeAttachmentCallback;
 import org.objectweb.proactive.extensions.annotation.OnArrival;
@@ -57,6 +58,8 @@ import org.objectweb.proactive.extensions.annotation.VirtualNodeIsReadyCallback;
 import org.objectweb.proactive.extensions.annotation.activeobject.ActiveObjectVisitorCTree;
 import org.objectweb.proactive.extensions.annotation.callbacks.isready.VirtualNodeIsReadyCallbackVisitorCTree;
 import org.objectweb.proactive.extensions.annotation.callbacks.nodeattachment.NodeAttachmentCallbackVisitorCTree;
+import org.objectweb.proactive.extensions.annotation.migratable.MigratableVisitorAPT;
+import org.objectweb.proactive.extensions.annotation.migratable.MigratableVisitorCTree;
 import org.objectweb.proactive.extensions.annotation.migration.signal.MigrationSignalVisitorCTree;
 import org.objectweb.proactive.extensions.annotation.migration.strategy.OnArrivalVisitorCTree;
 import org.objectweb.proactive.extensions.annotation.migration.strategy.OnDepartureVisitorCTree;
@@ -107,6 +110,7 @@ public class ProActiveProcessorCTree extends AbstractProcessor {
             processingEnv));
         scanners.put(NodeAttachmentCallback.class.getName(), new NodeAttachmentCallbackVisitorCTree(
             processingEnv));
+        scanners.put(Migratable.class.getName(), new MigratableVisitorCTree(processingEnv));
     }
 
     @Override
