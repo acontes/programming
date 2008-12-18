@@ -67,50 +67,12 @@ public class TestForwardingAgentV2 {
         Assert.assertNotNull(agent.getAgentID());
     }
 
-    @Test
-    public void testSendMsgWithReply() throws Exception {
-        AgentV2 agent = new ForwardingAgentV2(ProActiveMessageHandler.class);
-        Assert.assertNotNull(agent);
-        agent.initialize(InetAddress.getLocalHost(), port);
-        System.out.println("Sending Hello Message");
-
-        byte[] result = agent.sendMsg(new AgentID(32l), "Hello".getBytes(), false);
-        Assert.assertNotNull("Must have a result", result);
-        Assert.assertTrue("Message should be strict echo", Arrays.areEqual("Hello".getBytes(), result));
-
-    }
-
-    /**
-     * Not Valid for now, because the Agent Should respond to a oneway
-     * message...
-     */
-    @Test
-    public void testSendMsgWithoutReply() throws Exception {
-        Assert.fail("Not valid for now, because ForwardingAgent "
-            + "is not able to handle oneWay messages for now "
-            + "(it responds to oneWay messages and it shouldn't)");
-        AgentV2 agent = new ForwardingAgentV2(ProActiveMessageHandler.class);
-        Assert.assertNotNull(agent);
-        agent.initialize(InetAddress.getLocalHost(), port);
-        System.out.println("Sending Hello Message");
-
-        try {
-            byte[] result = agent.sendMsg(new AgentID(32l), "Hello".getBytes(), true);
-            Assert.assertNull("Result should be null", result);
-
-        } catch (MessageRoutingException e) {
-            e.printStackTrace();
-            Assert.fail(e.getMessage());
-
-        }
-    }
-
     /**
      * Test the sending of a request containing real data to execute You must
      * send the message to the AgentID #9999
      */
     @Test
-    public void testSendRealMessageToCraft() throws Exception {
+    public void testSendMessageWithReply() throws Exception {
         AgentV2 agent = new ForwardingAgentV2(ProActiveMessageHandler.class);
         Assert.assertNotNull(agent);
         agent.initialize(InetAddress.getLocalHost(), port);
@@ -122,6 +84,24 @@ public class TestForwardingAgentV2 {
         byte[] result = agent.sendMsg(new AgentID(9999l), data, false);
         Assert.assertEquals("Result should be 'Il est 18h'", "Il est 18h", HttpMarshaller
                 .unmarshallObject(result));
+    }
+
+    /**
+     * Not Valid for now, because the Agent Should respond to a oneway
+     * message...
+     */
+    @Test
+    public void testSendMsgWithoutReply() throws Exception {
+        AgentV2 agent = new ForwardingAgentV2(ProActiveMessageHandler.class);
+        Assert.assertNotNull(agent);
+        agent.initialize(InetAddress.getLocalHost(), port);
+        System.out.println("Sending Crafted Message");
+
+        HelloMessage mess = new HelloMessage();
+        byte[] data = HttpMarshaller.marshallObject(mess);
+
+        byte[] result = agent.sendMsg(new AgentID(9999l), data, true);
+        Assert.assertNull(result);
     }
 
 }
