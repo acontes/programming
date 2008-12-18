@@ -11,6 +11,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.DataReplyMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.DataRequestMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message;
 import org.objectweb.proactive.extra.forwardingv2.protocol.MessageInputStream;
@@ -21,7 +22,7 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationR
 public class TestMessageInputStream {
 
     @Test
-    public void testMessageReading() throws IOException {
+    public void testMultipleMessageReading() throws IOException {
         AgentID srcID = new AgentID(42l);
         AgentID dstID = new AgentID(12l);
         // create list
