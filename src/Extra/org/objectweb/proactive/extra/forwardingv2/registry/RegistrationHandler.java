@@ -53,7 +53,6 @@ public class RegistrationHandler implements Runnable {
      * 		call {@link #stop()}
      */
     public void run() {
-        Thread.currentThread().setDaemon(true);
         MessageInputStream input = null;
         // initialize the input stream
         try {

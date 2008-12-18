@@ -66,7 +66,7 @@ public class ForwardingRegistry {
     /**
      * Launches the server.  
      */
-    private void start() {
+    public void start() {
 
         // launch the server side and listen
         try {
@@ -85,7 +85,9 @@ public class ForwardingRegistry {
 
         while (listening) {
             try {
-                new Thread(new RegistrationHandler(serverSocket.accept(), this)).start();
+                Thread t = new Thread(new RegistrationHandler(serverSocket.accept(), this));
+                t.setDaemon(true);
+                t.start();
                 if (logger.isDebugEnabled()) {
                     logger.debug("FR created new RegistrationHandler");
                 }
