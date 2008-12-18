@@ -952,6 +952,7 @@
 	
 	<!-- =================================================================================== -->
 	<!-- ProActive Resource Archive, used for ProActive integration with application servers -->
+	<!-- It receives a single parameter, ${appserver}, which specifies the name of the AS -->
 	<!-- =================================================================================== -->
 
 	<!-- Define jars to be included into the archive -->
@@ -1016,54 +1017,30 @@
 	</target>
 	
 	<!-- Create the rar archive for all the application servers -->
-	<!-- Cannot use the proActiveRar as a subant task, as the properties are immutable, so I cannot change as.name and rar.name
-		Consequences:
-			* all the archives will create a runtime with the same name
-			* all the archives will log to the same file. better make that file appendable in the log4j config
+	<!-- NOTA all the connectors will log to the same file. better make that file appendable 
+		in the log4j config when you have built your ProActive.rar
 		-->
 	<target name="allrars" description="Create a RAR archive for every application server">
-		<!-- JBoss -->
-		<jar destfile="${deploy.dir}/proactive-jboss.rar" >
-		    <!-- META-INF -->
-		    <fileset dir="${compile.dir}" includes="META-INF/MANIFEST.MF" />
-		    <fileset dir="${compile.dir}" includes="META-INF/ra.xml" />
-		    <!-- ProActive libs -->
-		    <fileset dir="${deploy.lib.dir}" includes="ProActive.jar bouncycastle.jar fractal.jar javassist.jar xercesImpl.jar xml-apis.jar log4j.jar ProActive_examples.jar" />
-			<!-- appplication-server specific fixup-->
-			<fileset dir="${deploy.lib.dir}/connector_extra" includes="xalan.jar"  />
-		</jar>
-		<!-- Glassfish -->
-		<jar destfile="${deploy.dir}/proactive-glassfish.rar" >
-		    <!-- META-INF -->
-		    <fileset dir="${compile.dir}" includes="META-INF/MANIFEST.MF" />
-		    <fileset dir="${compile.dir}" includes="META-INF/ra.xml" />
-		    <!-- ProActive libs -->
-		    <fileset dir="${deploy.lib.dir}" includes="ProActive.jar bouncycastle.jar fractal.jar javassist.jar xercesImpl.jar xml-apis.jar log4j.jar ProActive_examples.jar" />
-			<!-- appplication-server specific fixup-->
-			<fileset dir="${deploy.lib.dir}/connector_extra" includes="xalan.jar"  />
-		</jar>
-		<!-- Geronimo -->
-		<jar destfile="${deploy.dir}/proactive-geronimo.rar" >
-		    <!-- META-INF -->
-		    <fileset dir="${compile.dir}" includes="META-INF/MANIFEST.MF" />
-		    <fileset dir="${compile.dir}" includes="META-INF/ra.xml" />
-		    <fileset dir="${compile.dir}" includes="META-INF/geronimo-ra.xml" />
-		    <!-- ProActive libs -->
-		    <fileset dir="${deploy.lib.dir}" includes="ProActive.jar bouncycastle.jar fractal.jar javassist.jar xercesImpl.jar xml-apis.jar log4j.jar ProActive_examples.jar" />
-			<!-- appplication-server specific fixup-->
-			<fileset dir="${deploy.lib.dir}/connector_extra" includes="xalan.jar"  />
-		</jar>
-		<!-- Jonas -->
-		<jar destfile="${deploy.dir}/proactive-jonas.rar" >
-		    <!-- META-INF -->
-		    <fileset dir="${compile.dir}" includes="META-INF/MANIFEST.MF" />
-		    <fileset dir="${compile.dir}" includes="META-INF/ra.xml" />
-		    <fileset dir="${compile.dir}" includes="META-INF/jonas-ra.xml" />
-		    <!-- ProActive libs -->
-		    <fileset dir="${deploy.lib.dir}" includes="bouncycastle.jar fractal.jar javassist.jar log4j.jar xercesImpl.jar xml-apis.jar ProActive.jar ProActive_examples.jar" />
-			<!-- appplication-server specific fixup-->
-			<fileset dir="${deploy.lib.dir}/connector_extra" includes="xalan.jar"  /> 
-		</jar>
+		<antcall target="proActiveRar">
+			<param name="as.name" value="jboss"/>
+			<param name="rar.name" value="proactive-jboss"/>
+		</antcall>
+		<antcall target="proActiveRar">
+			<param name="as.name" value="glassfish"/>
+			<param name="rar.name" value="proactive-glassfish"/>
+		</antcall>
+		<antcall target="proActiveRar">
+			<param name="as.name" value="geronimo"/>
+			<param name="rar.name" value="proactive-geronimo"/>
+		</antcall>
+		<antcall target="proActiveRar">
+			<param name="as.name" value="jonas"/>
+			<param name="rar.name" value="proactive-jonas"/>
+		</antcall>
+		<antcall target="proActiveRar">
+			<param name="as.name" value="weblogic"/>
+			<param name="rar.name" value="proactive-weblogic"/>
+		</antcall>
 	</target>
 	
 
