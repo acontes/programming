@@ -10,7 +10,7 @@ public class Fi {
 
     // OK - both branches have migrateTo last 
     @MigrationSignal
-    public String migrateToRight(boolean onCondition) throws MigrationException {
+    public void migrateToRight(boolean onCondition) throws MigrationException {
         if (onCondition) {
             org.objectweb.proactive.api.PAMobileAgent.migrateTo("");
         } else {
@@ -33,7 +33,7 @@ public class Fi {
     }
 
     @MigrationSignal
-    public String migrateToStSt(boolean onCondition) throws MigrationException {
+    public void migrateToStSt(boolean onCondition) throws MigrationException {
         if (onCondition)
             migrateToRight(onCondition);
         else
@@ -52,7 +52,7 @@ public class Fi {
 
     // wrong on one of the branches
     @MigrationSignal
-    public String migrateToStBl(boolean onCondition) throws MigrationException {
+    public void migrateToStBl(boolean onCondition) throws MigrationException {
         if (onCondition)
             migrateToRight(onCondition);
         else {
