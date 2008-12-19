@@ -77,31 +77,48 @@ public class ProActiveProcessorApt implements AnnotationProcessor {
     private final Messager _messager;
 
     private final Map<Class<?>, SimpleDeclarationVisitor> _annotationVisitors = new HashMap<Class<?>, SimpleDeclarationVisitor>();
+    private final Map<String, AnnotationTypeDeclaration> _annotationDefinitions = new HashMap<String, AnnotationTypeDeclaration>(); 
 
     public ProActiveProcessorApt(AnnotationProcessorEnvironment env) {
 
         _environment = env;
         _messager = _environment.getMessager();
 
-        _annotationVisitors.put(ActiveObject.class, new ActiveObjectVisitorAPT(_messager));
-        _annotationVisitors.put(RemoteObject.class, new RemoteObjectVisitorAPT(_messager));
-        _annotationVisitors.put(OnDeparture.class, new OnDepartureVisitorAPT(_messager));
-        _annotationVisitors.put(OnArrival.class, new OnArrivalVisitorAPT(_messager));
-        _annotationVisitors.put(NodeAttachmentCallback.class, new NodeAttachmentCallbackVisitorAPT(_messager));
-        _annotationVisitors.put(VirtualNodeIsReadyCallback.class, new VirtualNodeIsReadyCallbackVisitorAPT(
-            _messager));
-        _annotationVisitors.put(Migratable.class, new MigratableVisitorAPT(_messager));
+        // populate the map of visitors
+        populateAVMap();
+        // populate the map of annotation definitions
+        populateADMap();
 
     }
 
-    public void process() {
+	private void populateAVMap() {
+		_annotationVisitors.put(ActiveObject.class, new ActiveObjectVisitorAPT(_messager));
+		_annotationVisitors.put(RemoteObject.class, new RemoteObjectVisitorAPT(_messager));
+		_annotationVisitors.put(OnDeparture.class, new OnDepartureVisitorAPT(_messager));
+		_annotationVisitors.put(OnArrival.class, new OnArrivalVisitorAPT(_messager));
+		_annotationVisitors.put(NodeAttachmentCallback.class, new NodeAttachmentCallbackVisitorAPT(_messager));
+		_annotationVisitors.put(VirtualNodeIsReadyCallback.class, new VirtualNodeIsReadyCallbackVisitorAPT(
+				_messager));
+		_annotationVisitors.put(Migratable.class, new MigratableVisitorAPT(_messager));
+	}
+    
+    private void populateADMap() {
+		for(Class<?> annotation:_annotationVisitors.keySet()){
+			String annotName = annotation.getName();
+			AnnotationTypeDeclaration annotDeclaration = (AnnotationTypeDeclaration) _environment
+            		.getTypeDeclaration(annotName);
+			_annotationDefinitions.put(annotName, annotDeclaration);
+		}
+	}
+
+
+	public void process() {
         for (Entry<Class<?>, SimpleDeclarationVisitor> av_pair : _annotationVisitors.entrySet()) {
             
         	Class<?> annotation = av_pair.getKey();
             String annotName = annotation.getName();
             
-            AnnotationTypeDeclaration annotDeclaration = (AnnotationTypeDeclaration) _environment
-                    .getTypeDeclaration(annotName);
+            AnnotationTypeDeclaration annotDeclaration = _annotationDefinitions.get(annotName);
             if(annotDeclaration==null){
             	_messager.printError("Cannot load class definition of annotation @" + annotName + ". This annotation will NOT be processed");
             	continue;
