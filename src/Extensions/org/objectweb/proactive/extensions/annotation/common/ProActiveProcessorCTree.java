@@ -33,6 +33,7 @@ package org.objectweb.proactive.extensions.annotation.common;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -58,7 +59,6 @@ import org.objectweb.proactive.extensions.annotation.VirtualNodeIsReadyCallback;
 import org.objectweb.proactive.extensions.annotation.activeobject.ActiveObjectVisitorCTree;
 import org.objectweb.proactive.extensions.annotation.callbacks.isready.VirtualNodeIsReadyCallbackVisitorCTree;
 import org.objectweb.proactive.extensions.annotation.callbacks.nodeattachment.NodeAttachmentCallbackVisitorCTree;
-import org.objectweb.proactive.extensions.annotation.migratable.MigratableVisitorAPT;
 import org.objectweb.proactive.extensions.annotation.migratable.MigratableVisitorCTree;
 import org.objectweb.proactive.extensions.annotation.migration.signal.MigrationSignalVisitorCTree;
 import org.objectweb.proactive.extensions.annotation.migration.strategy.OnArrivalVisitorCTree;
@@ -91,16 +91,22 @@ import com.sun.source.util.Trees;
 @SupportedOptions("enableTypeGenerationInEditor")
 public class ProActiveProcessorCTree extends AbstractProcessor {
 
-    Trees trees;
-    Messager messager;
-    HashMap<String, TreePathScanner<Void, Trees>> scanners = new HashMap<String, TreePathScanner<Void, Trees>>();
+    private Trees trees;
+    private Messager messager;
+    private Map<String, TreePathScanner<Void, Trees>> scanners = new HashMap<String, TreePathScanner<Void, Trees>>();
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
         trees = Trees.instance(processingEnv);
         messager = processingEnv.getMessager();
+        
+        // populate the map of visitors
+        populateAVMap(processingEnv);
 
+    }
+
+	private void populateAVMap(ProcessingEnvironment processingEnv) {
         scanners.put(ActiveObject.class.getName(), new ActiveObjectVisitorCTree(processingEnv));
         scanners.put(RemoteObject.class.getName(), new RemoteObjectVisitorCTree(processingEnv));
         scanners.put(MigrationSignal.class.getName(), new MigrationSignalVisitorCTree(processingEnv));
@@ -111,9 +117,9 @@ public class ProActiveProcessorCTree extends AbstractProcessor {
         scanners.put(NodeAttachmentCallback.class.getName(), new NodeAttachmentCallbackVisitorCTree(
             processingEnv));
         scanners.put(Migratable.class.getName(), new MigratableVisitorCTree(processingEnv));
-    }
+	}
 
-    @Override
+	@Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
 
         if (annotations.isEmpty()) {
