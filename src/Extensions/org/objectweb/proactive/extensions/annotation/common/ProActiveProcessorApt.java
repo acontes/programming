@@ -79,8 +79,7 @@ public class ProActiveProcessorApt implements AnnotationProcessor {
 
     private final Map<Class<?>, SimpleDeclarationVisitor> _annotationVisitors = new HashMap<Class<?>, SimpleDeclarationVisitor>();
     private final Map<String, AnnotationTypeDeclaration> _annotationDefinitions = new HashMap<String, AnnotationTypeDeclaration>();
-    private final Map<AnnotationTypeDeclaration, Collection<Declaration>> _annotatedElements = 
-    	new HashMap<AnnotationTypeDeclaration, Collection<Declaration>>();
+    private final Map<AnnotationTypeDeclaration, Collection<Declaration>> _annotatedElements = new HashMap<AnnotationTypeDeclaration, Collection<Declaration>>();
 
     public ProActiveProcessorApt(AnnotationProcessorEnvironment env) {
 
@@ -94,59 +93,60 @@ public class ProActiveProcessorApt implements AnnotationProcessor {
 
     }
 
-	private void populateAVMap() {
-		_annotationVisitors.put(ActiveObject.class, new ActiveObjectVisitorAPT(_messager));
-		_annotationVisitors.put(RemoteObject.class, new RemoteObjectVisitorAPT(_messager));
-		_annotationVisitors.put(OnDeparture.class, new OnDepartureVisitorAPT(_messager));
-		_annotationVisitors.put(OnArrival.class, new OnArrivalVisitorAPT(_messager));
-		_annotationVisitors.put(NodeAttachmentCallback.class, new NodeAttachmentCallbackVisitorAPT(_messager));
-		_annotationVisitors.put(VirtualNodeIsReadyCallback.class, new VirtualNodeIsReadyCallbackVisitorAPT(
-				_messager));
-		_annotationVisitors.put(Migratable.class, new MigratableVisitorAPT(_messager));
-	}
-    
+    private void populateAVMap() {
+        _annotationVisitors.put(ActiveObject.class, new ActiveObjectVisitorAPT(_messager));
+        _annotationVisitors.put(RemoteObject.class, new RemoteObjectVisitorAPT(_messager));
+        _annotationVisitors.put(OnDeparture.class, new OnDepartureVisitorAPT(_messager));
+        _annotationVisitors.put(OnArrival.class, new OnArrivalVisitorAPT(_messager));
+        _annotationVisitors
+                .put(NodeAttachmentCallback.class, new NodeAttachmentCallbackVisitorAPT(_messager));
+        _annotationVisitors.put(VirtualNodeIsReadyCallback.class, new VirtualNodeIsReadyCallbackVisitorAPT(
+            _messager));
+        _annotationVisitors.put(Migratable.class, new MigratableVisitorAPT(_messager));
+    }
+
     private void populateADMap() {
-		for(Class<?> annotation:_annotationVisitors.keySet()){
-			String annotName = annotation.getName();
-			AnnotationTypeDeclaration annotDeclaration = (AnnotationTypeDeclaration) _environment
-            		.getTypeDeclaration(annotName);
-			_annotationDefinitions.put(annotName, annotDeclaration);
-			if(annotDeclaration!=null) 
-				_annotatedElements.put(annotDeclaration, 
-						_environment.getDeclarationsAnnotatedWith(annotDeclaration));
-		}
-	}
-
-
-	public void process() {
-        for (Entry<Class<?>, SimpleDeclarationVisitor> av_pair : _annotationVisitors.entrySet()) {
-            
-        	Class<?> annotation = av_pair.getKey();
+        for (Class<?> annotation : _annotationVisitors.keySet()) {
             String annotName = annotation.getName();
-            
+            AnnotationTypeDeclaration annotDeclaration = (AnnotationTypeDeclaration) _environment
+                    .getTypeDeclaration(annotName);
+            _annotationDefinitions.put(annotName, annotDeclaration);
+            if (annotDeclaration != null)
+                _annotatedElements.put(annotDeclaration, _environment
+                        .getDeclarationsAnnotatedWith(annotDeclaration));
+        }
+    }
+
+    public void process() {
+        for (Entry<Class<?>, SimpleDeclarationVisitor> av_pair : _annotationVisitors.entrySet()) {
+
+            Class<?> annotation = av_pair.getKey();
+            String annotName = annotation.getName();
+
             AnnotationTypeDeclaration annotDeclaration = _annotationDefinitions.get(annotName);
-            if(annotDeclaration==null){
-            	_messager.printError("Cannot load class definition of annotation @" + annotName + ". This annotation will NOT be processed");
-            	continue;
+            if (annotDeclaration == null) {
+                _messager.printError("Cannot load class definition of annotation @" + annotName +
+                    ". This annotation will NOT be processed");
+                continue;
             }
-            
+
             Target applicableOn = annotDeclaration.getAnnotation(Target.class);
-            
+
             SimpleDeclarationVisitor visitor = av_pair.getValue();
             if (visitor == null) {
-            	_messager.printError("Cannot find the visitor for annotation @" + annotName + ". This annotation will NOT be processed");
+                _messager.printError("Cannot find the visitor for annotation @" + annotName +
+                    ". This annotation will NOT be processed");
                 continue;
             }
 
             for (Declaration typeDeclaration : _annotatedElements.get(annotDeclaration)) {
 
-            	if(applicableOn != null)
-            		if (!testSuitableDeclaration(typeDeclaration, applicableOn)) {
-            			_messager.printError(
-            					typeDeclaration.getPosition(),
-            						"[ERROR] The @" + annotation.getSimpleName() +
-            						"annotation is not applicable for this type of Java construct.");
-            		}
+                if (applicableOn != null)
+                    if (!testSuitableDeclaration(typeDeclaration, applicableOn)) {
+                        _messager.printError(typeDeclaration.getPosition(), "[ERROR] The @" +
+                            annotation.getSimpleName() +
+                            "annotation is not applicable for this type of Java construct.");
+                    }
 
                 // check using the visitor
                 typeDeclaration.accept(visitor);

@@ -100,13 +100,13 @@ public class ProActiveProcessorCTree extends AbstractProcessor {
         super.init(processingEnv);
         trees = Trees.instance(processingEnv);
         messager = processingEnv.getMessager();
-        
+
         // populate the map of visitors
         populateAVMap(processingEnv);
 
     }
 
-	private void populateAVMap(ProcessingEnvironment processingEnv) {
+    private void populateAVMap(ProcessingEnvironment processingEnv) {
         scanners.put(ActiveObject.class.getName(), new ActiveObjectVisitorCTree(processingEnv));
         scanners.put(RemoteObject.class.getName(), new RemoteObjectVisitorCTree(processingEnv));
         scanners.put(MigrationSignal.class.getName(), new MigrationSignalVisitorCTree(processingEnv));
@@ -117,9 +117,9 @@ public class ProActiveProcessorCTree extends AbstractProcessor {
         scanners.put(NodeAttachmentCallback.class.getName(), new NodeAttachmentCallbackVisitorCTree(
             processingEnv));
         scanners.put(Migratable.class.getName(), new MigratableVisitorCTree(processingEnv));
-	}
+    }
 
-	@Override
+    @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
 
         if (annotations.isEmpty()) {
