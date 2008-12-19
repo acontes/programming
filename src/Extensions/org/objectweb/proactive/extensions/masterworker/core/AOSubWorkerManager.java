@@ -4,7 +4,9 @@ import java.io.Serializable;
 import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -102,6 +104,7 @@ public class AOSubWorkerManager implements WorkerManager, InitActive, Serializab
         this.memoryFactory = memoryFactory;
         this.subMasterName = subMasterName;
         this.superProvider = superProvider;
+        
 
     }
     
@@ -121,26 +124,37 @@ public class AOSubWorkerManager implements WorkerManager, InitActive, Serializab
      * Problem is how to make it synchronize?
      * Maybe we use booleanwrapper to wait all the results?
      */
-    private void broadcastNewPeer(final long peerid, String workername, final WorkerPeer workerpeer) {
+    private void updateWorkerPeerList() {
     	
     	// Creates the worker which will automatically connect to the master
-        workers.put(workername, (Worker) workerpeer);
-        workerPeers.put(workerNameCounter, (WorkerPeer) workerpeer);
-        workerNames.put(workerNameCounter, workername);
+        
+        
+        
+        Map<Long, WorkerPeer> workerPeerSet = null;
+        Map<Long, String> workerNameSet = null;
+        
+        synchronized(workerPeers) {
+        	synchronized(workerNames){
+        		workerPeerSet= new HashMap<Long, WorkerPeer> ();
+        		workerPeerSet.putAll(workerPeers);
+        		workerNameSet = new HashMap<Long, String> ();
+        		workerNameSet.putAll(workerNames);
+        	}
+        }
         
         if (debug) {
-        	String output = "Peer list size is :" + workerPeers.size() + " details is: ";
-        	for(long keyid : workerPeers.keySet()){
+        	String output = "Peer list size is :" + workerPeerSet.size() + " details is: ";
+        	for(long keyid : workerPeerSet.keySet()){
         		output = output + keyid ;
         	}
         	
         	logger.debug(output);
         }
         
-        for (WorkerPeer subworker : workerPeers.values()) {
-            BooleanWrapper wrap = subworker.addWorkerPeer(peerid, workername, workerpeer);
+        for(WorkerPeer subworker : workerPeerSet.values()) {
+            BooleanWrapper wrap = subworker.updateWorkerPeerList(workerNameCounter, workerPeerSet, workerNameSet);
             PAFuture.waitFor(wrap);
-        }
+            }
     }
 
     /**
@@ -153,23 +167,33 @@ public class AOSubWorkerManager implements WorkerManager, InitActive, Serializab
                 if (debug) {
                     logger.debug("Creating worker on " + nodename);
                 }
-
+                
+                long workerId = 0;
+                synchronized(workerNameCounter) {
+                	workerId = workerNameCounter ++;
+                }
+                
                 String workername = "SubWoker_" + node.getVMInformation().getHostName() + "_" +
-                    workerNameCounter++ + "@" + subMasterName;
+                workerId + "@" + subMasterName;
 
                 AOSubWorker subworker = (AOSubWorker) PAActiveObject.newActive(AOSubWorker.class.getName(),
                         new Object[] { workername, (WorkerMaster) provider, 
-                                memoryFactory.newMemoryInstance(), workerNameCounter, 
-                                (WorkerMaster) superProvider, memoryFactory, subMasterName, 
-                                workerPeers, workerNames}, node);
+                                memoryFactory.newMemoryInstance(), workerId, 
+                                (WorkerMaster) superProvider, memoryFactory, subMasterName}, node);
 
                 PAFuture.waitFor(subworker);
 
-                // Broadcast the new peer to all the workers of the submaster
-                synchronized(workerNameCounter) {
-                	broadcastNewPeer(workerNameCounter, workername, subworker);
+                synchronized(workerPeers) {
+                	synchronized(workerNames){
+	                workers.put(workername, (Worker) subworker);
+	                workerPeers.put(workerId, (WorkerPeer) subworker);
+	                workerNames.put(workerId, workername);
+                	}
                 }
-
+               
+                // Broadcast the new peer to all the workers of the submaster
+                updateWorkerPeerList();
+                
                 if (debug) {
                     logger.debug("Worker " + workername + " created on " + nodename);
                 }

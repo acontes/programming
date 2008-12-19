@@ -53,6 +53,7 @@ public class AOSubWorker extends AOWorker implements WorkerPeer {
     private long workerNameCounter;
     private BooleanWrapper subMasterFailed = new BooleanWrapper(false);
     private boolean electedSubMaster = false;
+    private boolean isElecting = false;
     
     private Node currentNode = null;
     
@@ -76,7 +77,7 @@ public class AOSubWorker extends AOWorker implements WorkerPeer {
     public AOSubWorker(final String name, final WorkerMaster provider,
             final Map<String, Serializable> initialMemory, long peerid, 
             final WorkerMaster superProvider, final MemoryFactory memoryFactory, 
-            final String subMasterName, final HashMap<Long, WorkerPeer> workerPeerList, HashMap<Long, String> workerNameList) {
+            final String subMasterName) {
         super(name, provider, initialMemory);
 
         this.peerid = peerid;
@@ -86,8 +87,6 @@ public class AOSubWorker extends AOWorker implements WorkerPeer {
         
         this.workerPeerList = new HashMap<Long, WorkerPeer>();
         this.workerNameList = new HashMap<Long, String>();
-        this.workerPeerList.putAll(workerPeerList); 
-        this.workerNameList.putAll(workerNameList);
         
         if (debug) {
             logger.debug("Creating subworker : " + name);
@@ -115,15 +114,33 @@ public class AOSubWorker extends AOWorker implements WorkerPeer {
         this.peerid = peerid;
     }
 
-    public BooleanWrapper addWorkerPeer(long peerid, String workername, WorkerPeer workerpeer) {
+    public BooleanWrapper updateWorkerPeerList(long workerNameCounter, Map<Long, WorkerPeer> workerPeerList, Map<Long, String> workerNameList) {
         // TODO Auto-generated method stub
 
-        workerNameList.put(peerid, workername);
-        workerPeerList.put(peerid, workerpeer);
-        this.workerNameCounter = peerid;
+
+    	synchronized(workerPeerList){
+    		synchronized(workerNameList){
+    			if(workerPeerList.size() > this.workerNameList.size() && workerNameList.size() > this.workerNameList.size()) {
+	    			this.workerPeerList.clear();
+	    			this.workerNameList.clear();
+	    			this.workerPeerList.putAll(workerPeerList);
+	    			this.workerNameList.putAll(workerNameList);	
+    			}
+    			else {
+    				if (debug) {
+	    	        	logger.debug("The peerlist that the peer already have is new than the given one..");
+	    			}
+	    			return new BooleanWrapper(false);
+    			}
+    		}
+    	}
+    	if(workerNameCounter > this.workerNameCounter)
+    		this.workerNameCounter = workerNameCounter;
         if (debug) {
+        	logger.debug("Worker Manager update peerlist " + peerid);
+        	
         	String output = "Peer list size is :" + workerPeerList.size() + " details is: ";
-        	for(long keyid : workerPeerList.keySet()){
+        	for(long keyid : this.workerPeerList.keySet()){
         		output = output + keyid ;
         	}
         	
@@ -203,6 +220,7 @@ public class AOSubWorker extends AOWorker implements WorkerPeer {
 	    			return new BooleanWrapper(false);
 	    		} catch (Exception e) {
 	    			if(!subMasterFailed.booleanValue()){
+	    				
 	    				subMasterFailed = new BooleanWrapper(true);
 	        			try{
 	        				pinger.removeWorkerToWatch(subMasterName);
@@ -238,6 +256,7 @@ public class AOSubWorker extends AOWorker implements WorkerPeer {
         if (debug) {
         	logger.debug("Start the election of a new submaster");
         }
+        isElecting = true;
 
         // do a loop, if get no response, elect himself as a submaster
         // otherwise the one who give him a response will take charge in the election
@@ -345,6 +364,7 @@ public class AOSubWorker extends AOWorker implements WorkerPeer {
         stubOnThis = (AOSubWorker) PAActiveObject.getStubOnThis();
 
         PAActiveObject.setImmediateService("canBeSubMaster");
+        PAActiveObject.setImmediateService("addWorkerPeer", new Class<?> [] {long.class , String.class,  WorkerPeer.class});
         // PAActiveObject.setImmediateService("iAmSubmaster", new Class<?> [] {WorkerMaster.class, String.class, HashMap.class});
         PAActiveObject.setImmediateService("isDead");
         PAActiveObject.setImmediateService("isDead", new Class<?> [] {String.class});
@@ -430,9 +450,11 @@ public class AOSubWorker extends AOWorker implements WorkerPeer {
             }
             
             if(electedSubMaster) {
+            	electedSubMaster = false;
             	stubOnThis.terminate();
             }
-            else {
+            else if (isElecting){
+            	isElecting = false;
             	stubOnThis.getTaskAndSchedule();
             }
             

@@ -21,7 +21,7 @@ public interface WorkerPeer extends WorkerDeadListener{
      * The SubMaster informs a new peer join the group.
      * The worker peer adds a new peer to the worker peer list
      */
-    public abstract BooleanWrapper addWorkerPeer(long peerid, String workername, WorkerPeer workerpeer);
+    public abstract BooleanWrapper updateWorkerPeerList(long workerNameCounter, Map<Long, WorkerPeer> workerPeerList, Map<Long, String> workerNameSet);
 
     /**
      * The worker peer inform the all the workers that he is the new SubMaster
