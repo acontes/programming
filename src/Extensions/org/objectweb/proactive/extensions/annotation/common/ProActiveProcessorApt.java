@@ -32,6 +32,7 @@ package org.objectweb.proactive.extensions.annotation.common;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -77,7 +78,9 @@ public class ProActiveProcessorApt implements AnnotationProcessor {
     private final Messager _messager;
 
     private final Map<Class<?>, SimpleDeclarationVisitor> _annotationVisitors = new HashMap<Class<?>, SimpleDeclarationVisitor>();
-    private final Map<String, AnnotationTypeDeclaration> _annotationDefinitions = new HashMap<String, AnnotationTypeDeclaration>(); 
+    private final Map<String, AnnotationTypeDeclaration> _annotationDefinitions = new HashMap<String, AnnotationTypeDeclaration>();
+    private final Map<AnnotationTypeDeclaration, Collection<Declaration>> _annotatedElements = 
+    	new HashMap<AnnotationTypeDeclaration, Collection<Declaration>>();
 
     public ProActiveProcessorApt(AnnotationProcessorEnvironment env) {
 
@@ -86,7 +89,7 @@ public class ProActiveProcessorApt implements AnnotationProcessor {
 
         // populate the map of visitors
         populateAVMap();
-        // populate the map of annotation definitions
+        // populate the map of annotation definitions and annotated elements
         populateADMap();
 
     }
@@ -108,6 +111,9 @@ public class ProActiveProcessorApt implements AnnotationProcessor {
 			AnnotationTypeDeclaration annotDeclaration = (AnnotationTypeDeclaration) _environment
             		.getTypeDeclaration(annotName);
 			_annotationDefinitions.put(annotName, annotDeclaration);
+			if(annotDeclaration!=null) 
+				_annotatedElements.put(annotDeclaration, 
+						_environment.getDeclarationsAnnotatedWith(annotDeclaration));
 		}
 	}
 
@@ -132,7 +138,7 @@ public class ProActiveProcessorApt implements AnnotationProcessor {
                 continue;
             }
 
-            for (Declaration typeDeclaration : _environment.getDeclarationsAnnotatedWith(annotDeclaration)) {
+            for (Declaration typeDeclaration : _annotatedElements.get(annotDeclaration)) {
 
             	if(applicableOn != null)
             		if (!testSuitableDeclaration(typeDeclaration, applicableOn)) {
