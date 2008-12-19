@@ -16,6 +16,7 @@ import org.objectweb.proactive.extra.forwardingv2.client.ForwardingAgentV2;
 import org.objectweb.proactive.extra.forwardingv2.client.ProActiveMessageHandler;
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
 import org.objectweb.proactive.extra.forwardingv2.protocol.MessageInputStream;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.DataReplyMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.ForwardedMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationReplyMessage;
@@ -99,8 +100,6 @@ public class TestForwardingAgentV2 {
         HelloMessage mess = new HelloMessage();
         byte[] data = HttpMarshaller.marshallObject(mess);
 
-        byte[] result = agent.sendMsg(new AgentID(9999l), data, true);
-        Assert.assertNull(result);
     }
 
 }
@@ -139,28 +138,17 @@ class FakeRegistry implements Runnable {
             sock.getOutputStream().write(resp.toByteArray());
             sock.getOutputStream().flush();
 
-            AgentID crafted = new AgentID(9999l);
-            long craftedMessageID = 0;
-
             while (isRunning) {
                 m = Message.constructMessage(input.readMessage(), 0);
                 System.out.println("FakeReg: Message Received: " + m);
 
                 if (m instanceof ForwardedMessage) {
                     ForwardedMessage fm = (ForwardedMessage) m;
-                    if (fm.getDstAgentID().equals(crafted)) {
-                        if (fm.getMsgID() == 99999999l) {
-                            fm.setMsgID(craftedMessageID);
-                        } else {
-                            craftedMessageID = fm.getMsgID();
-                            fm.setMsgID(99999999l);
-                        }
-                    }
-                    AgentID tmp = fm.getSrcAgentID();
-                    fm.setSrcAgentID(fm.getDstAgentID());
-                    fm.setDstAgentID(tmp);
-                    System.out.println("FakeReg: Forwarding message: " + m);
-                    sock.getOutputStream().write(m.toByteArray());
+                    resp = new DataReplyMessage(fm.getDstAgentID(), fm.getSrcAgentID(), fm.getMsgID(),
+                        HttpMarshaller.marshallObject(TestForwardingAgentV2.PAYLOAD));
+
+                    System.out.println("FakeReg: Forwarding message: " + resp);
+                    sock.getOutputStream().write(resp.toByteArray());
                     sock.getOutputStream().flush();
                 }
 

@@ -92,67 +92,80 @@ public class RegistrationHandler implements Runnable {
         stop();
     }
 
-    private void processMessage(byte[] msg) {
-        // the received message is a REGISTRATION MSG -> handle the registration
-        if (Message.readType(msg, 0) == MessageType.REGISTRATION_REQUEST) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("RH handling registration request");
-            }
-            AgentID newAgentID = RegistrationRequestMessage.readAgentID(msg, 0);
-            if (agentID != null) {
-                this.agentID = newAgentID;
-            } else {
-                this.agentID = new AgentID(attributedAgentID);
-                attributedAgentID++;
-            }
-            // add mapping in the HashMap
-            registry.putMapping(agentID, this);
-            if (logger.isDebugEnabled()) {
-                logger.debug("RH added new mapping for uniqueID " + agentID.getId());
-            }
+    private void handleRegistrationRequest(RegistrationRequestMessage msg) {
 
-            //send RegistrationReply
+        if (logger.isDebugEnabled()) {
+            logger.debug("RH handling registration request");
+        }
+
+        AgentID newAgentID = msg.getAgentID();
+        if (agentID != null) {
+            this.agentID = newAgentID;
+        } else {
+            this.agentID = new AgentID(attributedAgentID);
+            attributedAgentID++;
+        }
+        // add mapping in the HashMap
+        registry.putMapping(agentID, this);
+        if (logger.isDebugEnabled()) {
+            logger.debug("RH added new mapping for uniqueID " + agentID.getId());
+        }
+
+        //send RegistrationReply
+        try {
+            sendMessage(new RegistrationReplyMessage(agentID).toByteArray());
+        } catch (RemoteConnectionBrokenException e) { //TODO: check if there is a better solution
+            // The registration reply could not be sent, the user can't be notified. Just stop the current registrationHandler
+            stop();
+        }
+    }
+
+    private void handleData(ForwardedMessage msg) {
+        RegistrationHandler regHandler = null;
+        AgentID dstAgentID = msg.getDstAgentID();
+        try {
+            regHandler = registry.getValueFromHashMap(dstAgentID);
+        }
+        // if regHandler is null we catch an UnknownAgentIdException
+        catch (UnknownAgentIdException e) { //TODO: check if it is possible to use less parameters
             try {
-                sendMessage(new RegistrationReplyMessage(agentID).toByteArray());
-            } catch (RemoteConnectionBrokenException e) { //TODO: check if there is a better solution
-                // The registration reply could not be sent, the user can't be notified. Just stop the current registrationHandler
+                sendMessage(new ExceptionMessage(MessageType.ROUTING_EXCEPTION_MSG, dstAgentID, agentID, msg
+                        .getMsgID(), e).toByteArray());
+                return;
+            } catch (RemoteConnectionBrokenException e1) {
+                // could not notify that the destination was unknown because the source tunnel has failed. Just stop the current RegistrationHandler
                 stop();
             }
         }
-
-        // the received message is not a REGISTRATION_REQUEST MSG, just forward it to the right tunnel
-        else {
-            RegistrationHandler regHandler = null;
-            AgentID dstAgentID = ForwardedMessage.readDstAgentID(msg, 0);
+        // else just forward the message
+        try {
+            regHandler.sendMessage(msg.toByteArray());
+        } catch (RemoteConnectionBrokenException e) {
+            // could not send the message to its destination, notify the source by sending an ExceptionMessage
             try {
-                regHandler = registry.getValueFromHashMap(dstAgentID);
-            }
-            // if regHandler is null we catch an UnknownAgentIdException
-            catch (UnknownAgentIdException e) { //TODO: check if it is possible to use less parameters
-                try {
-                    sendMessage(new ExceptionMessage(MessageType.ROUTING_EXCEPTION_MSG, dstAgentID, agentID,
-                        ForwardedMessage.readMessageID(msg, 0), e).toByteArray());
-                    return;
-                } catch (RemoteConnectionBrokenException e1) {
-                    // could not notify that the destination was unknown because the source tunnel has failed. Just stop the current RegistrationHandler
-                    stop();
-                }
-            }
-            // else just forward the message
-            try {
-                regHandler.sendMessage(msg);
-            } catch (RemoteConnectionBrokenException e) {
-                // could not send the message to its destination, notify the source by sending an ExceptionMessage
-                try {
-                    sendMessage(new ExceptionMessage(MessageType.ROUTING_EXCEPTION_MSG, dstAgentID, agentID,
-                        ForwardedMessage.readMessageID(msg, 0), e).toByteArray());
-                } catch (RemoteConnectionBrokenException e1) {
-                    // could not send a notification of the failure to the source, because the source tunnel has also failed... just stop the source tunnel
-                    stop();
-                }
+                sendMessage(new ExceptionMessage(MessageType.ROUTING_EXCEPTION_MSG, dstAgentID, agentID, msg
+                        .getMsgID(), e).toByteArray());
+            } catch (RemoteConnectionBrokenException e1) {
+                // could not send a notification of the failure to the source, because the source tunnel has also failed... just stop the source tunnel
+                stop();
             }
         }
+    }
 
+    private void processMessage(byte[] msgBuf) {
+        Message msg = Message.constructMessage(msgBuf, 0);
+
+        switch (msg.getType()) {
+            case REGISTRATION_REQUEST:
+                handleRegistrationRequest((RegistrationRequestMessage) msg);
+                break;
+            case DATA_REPLY:
+            case DATA_REQUEST:
+                handleData((ForwardedMessage) msg);
+                break;
+            default:
+                break;
+        }
     }
 
     public synchronized void sendMessage(byte[] msg) throws RemoteConnectionBrokenException {

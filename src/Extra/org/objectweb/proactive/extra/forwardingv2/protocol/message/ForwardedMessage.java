@@ -24,9 +24,10 @@ public abstract class ForwardedMessage extends Message {
     }
 
     //attributes
-    protected AgentID srcAgentID, dstAgentID;
-    protected long msgID;
-    protected byte[] data;
+    final protected AgentID srcAgentID, dstAgentID;
+    final protected long msgID;
+    final protected byte[] data; // Since data is not used by the router should be lazily created to avoid data duplication
+    final protected byte[] toByteArray;
 
     public ForwardedMessage(MessageType type, AgentID srcAgentID, AgentID dstAgentID, long msgID, byte[] data) {
         this.type = type;
@@ -34,6 +35,7 @@ public abstract class ForwardedMessage extends Message {
         this.dstAgentID = dstAgentID;
         this.msgID = msgID;
         this.data = data;
+        this.toByteArray = null;
     }
 
     /**
@@ -43,16 +45,16 @@ public abstract class ForwardedMessage extends Message {
      */
     public ForwardedMessage(byte[] byteArray, int offset) {
         int datalength = readLength(byteArray, offset) - FORWARDED_MESSAGE_HEADER_LENGTH;
-        data = new byte[datalength];
 
-        type = readType(byteArray, offset);
-        srcAgentID = readSrcAgentID(byteArray, offset);
-        dstAgentID = readDstAgentID(byteArray, offset);
-        msgID = readMessageID(byteArray, offset);
+        this.type = readType(byteArray, offset);
+        this.srcAgentID = readSrcAgentID(byteArray, offset);
+        this.dstAgentID = readDstAgentID(byteArray, offset);
+        this.msgID = readMessageID(byteArray, offset);
 
-        for (int i = 0; i < datalength; i++) {
-            data[i] = byteArray[FORWARDED_MESSAGE_HEADER_LENGTH + i];
-        }
+        this.data = new byte[datalength];
+        System.arraycopy(byteArray, offset + FORWARDED_MESSAGE_HEADER_LENGTH, this.data, 0, datalength);
+
+        this.toByteArray = byteArray;
     }
 
     @Override
@@ -90,7 +92,7 @@ public abstract class ForwardedMessage extends Message {
      * @param offset the offset at which to find the beginning of the message in the buffer
      * @return the srcAgentID of the formatted message
      */
-    public static AgentID readSrcAgentID(byte[] byteArray, int offset) {
+    private AgentID readSrcAgentID(byte[] byteArray, int offset) {
         return new AgentID(TypeHelper.byteArrayToLong(byteArray, offset +
             Offsets.SRC_AGENT_ID_OFFSET.getValue()));
     }
@@ -101,7 +103,7 @@ public abstract class ForwardedMessage extends Message {
      * @param offset the offset at which to find the beginning of the message in the buffer
      * @return the dstAgentID of the formatted message
      */
-    public static AgentID readDstAgentID(byte[] byteArray, int offset) {
+    private AgentID readDstAgentID(byte[] byteArray, int offset) {
         return new AgentID(TypeHelper.byteArrayToLong(byteArray, offset +
             Offsets.DST_AGENT_ID_OFFSET.getValue()));
     }
@@ -112,7 +114,7 @@ public abstract class ForwardedMessage extends Message {
      * @param offset the offset at which to find the beginning of the message in the buffer
      * @return the MessageID of the formatted message
      */
-    public static long readMessageID(byte[] byteArray, int offset) {
+    private long readMessageID(byte[] byteArray, int offset) {
         return TypeHelper.byteArrayToLong(byteArray, offset + Offsets.MSG_ID_OFFSET.getValue());
     }
 
@@ -120,31 +122,15 @@ public abstract class ForwardedMessage extends Message {
         return srcAgentID;
     }
 
-    public void setSrcAgentID(AgentID srcAgentID) {
-        this.srcAgentID = srcAgentID;
-    }
-
     public AgentID getDstAgentID() {
         return dstAgentID;
-    }
-
-    public void setDstAgentID(AgentID dstAgentID) {
-        this.dstAgentID = dstAgentID;
     }
 
     public long getMsgID() {
         return msgID;
     }
 
-    public void setMsgID(long msgID) {
-        this.msgID = msgID;
-    }
-
     public byte[] getData() {
         return data;
-    }
-
-    public void setData(byte[] data) {
-        this.data = data;
     }
 }

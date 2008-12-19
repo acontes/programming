@@ -1,8 +1,5 @@
 package org.objectweb.proactive.extra.forwardingv2.protocol;
 
-import java.nio.ByteBuffer;
-
-
 /**
  * 
  * TypeHelper allows formatting a Message, that is putting it under the form of a Byte array, or recovering it from a byte Array

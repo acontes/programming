@@ -7,9 +7,7 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
 public class ExceptionMessage extends ForwardedMessage {
 
     public ExceptionMessage(MessageType type, AgentID srcAgentID, AgentID dstAgentID, long msgID, Exception e) {
-        super(type, srcAgentID, dstAgentID, msgID, null);
-        byte[] data = HttpMarshaller.marshallObject(e);
-        setData(data);
+        super(type, srcAgentID, dstAgentID, msgID, HttpMarshaller.marshallObject(e));
     }
 
     /**
