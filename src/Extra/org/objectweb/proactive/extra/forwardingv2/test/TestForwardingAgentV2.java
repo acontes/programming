@@ -15,21 +15,21 @@ import org.objectweb.proactive.extra.forwardingv2.client.AgentV2;
 import org.objectweb.proactive.extra.forwardingv2.client.ForwardingAgentV2;
 import org.objectweb.proactive.extra.forwardingv2.client.ProActiveMessageHandler;
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
+import org.objectweb.proactive.extra.forwardingv2.protocol.MessageInputStream;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.ForwardedMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message;
-import org.objectweb.proactive.extra.forwardingv2.protocol.MessageInputStream;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationReplyMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message.MessageType;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.message.MessageRoutingMessage;
 
 
 public class TestForwardingAgentV2 {
-    static FakeRegistry reg = null;
-    static int port = 9999;
+    FakeRegistry reg = null;
+    static final String PAYLOAD = "Il est 18h";
 
     @Before
-    public void setup() {
-        reg = new FakeRegistry(++port);
+    public void setup() throws IOException {
+        reg = new FakeRegistry();
     }
 
     @After
@@ -46,12 +46,12 @@ public class TestForwardingAgentV2 {
         Object result = null;
         if (message != null) {
             result = message.processMessage();
-            Assert.assertEquals("Il est 18h", result);
+            Assert.assertEquals(PAYLOAD, result);
 
             byte[] resultBytes = HttpMarshaller.marshallObject(result);
             Assert.assertNotNull(resultBytes);
 
-            Assert.assertEquals("Il est 18h", HttpMarshaller.unmarshallObject(resultBytes));
+            Assert.assertEquals(PAYLOAD, HttpMarshaller.unmarshallObject(resultBytes));
         }
 
     }
@@ -61,7 +61,7 @@ public class TestForwardingAgentV2 {
         AgentV2 agent = new ForwardingAgentV2(ProActiveMessageHandler.class);
         Assert.assertNotNull(agent);
         Assert.assertNull(agent.getAgentID());
-        agent.initialize(InetAddress.getLocalHost(), port);
+        agent.initialize(InetAddress.getLocalHost(), reg.getPort());
         Assert.assertNotNull(agent.getAgentID());
     }
 
@@ -73,15 +73,16 @@ public class TestForwardingAgentV2 {
     public void testSendMessageWithReply() throws Exception {
         AgentV2 agent = new ForwardingAgentV2(ProActiveMessageHandler.class);
         Assert.assertNotNull(agent);
-        agent.initialize(InetAddress.getLocalHost(), port);
+        agent.initialize(InetAddress.getLocalHost(), reg.getPort());
         System.out.println("Sending Crafted Message");
 
         HelloMessage mess = new HelloMessage();
         byte[] data = HttpMarshaller.marshallObject(mess);
 
         byte[] result = agent.sendMsg(new AgentID(9999l), data, false);
-        Assert.assertEquals("Result should be 'Il est 18h'", "Il est 18h", HttpMarshaller
-                .unmarshallObject(result));
+        Assert
+                .assertEquals("Result should be 'Il est 18h'", PAYLOAD, HttpMarshaller
+                        .unmarshallObject(result));
     }
 
     /**
@@ -92,7 +93,7 @@ public class TestForwardingAgentV2 {
     public void testSendMsgWithoutReply() throws Exception {
         AgentV2 agent = new ForwardingAgentV2(ProActiveMessageHandler.class);
         Assert.assertNotNull(agent);
-        agent.initialize(InetAddress.getLocalHost(), port);
+        agent.initialize(InetAddress.getLocalHost(), reg.getPort());
         System.out.println("Sending Crafted Message");
 
         HelloMessage mess = new HelloMessage();
@@ -105,11 +106,13 @@ public class TestForwardingAgentV2 {
 }
 
 class FakeRegistry implements Runnable {
-    private int port;
     private volatile boolean isRunning;
+    final private ServerSocket server;
 
-    public FakeRegistry(int port) {
-        this.port = port;
+    public FakeRegistry() throws IOException {
+        this.server = new ServerSocket(0);
+        System.out.println("FakeReg: Start listenning on port " + server.getLocalPort());
+
         isRunning = true;
 
         Thread t = new Thread(this);
@@ -117,11 +120,12 @@ class FakeRegistry implements Runnable {
         t.start();
     }
 
+    public int getPort() {
+        return server.getLocalPort();
+    }
+
     public void run() {
-        System.out.println("FakeReg: Starting fake registry");
         try {
-            ServerSocket server = new ServerSocket(port);
-            System.out.println("FakeReg: Start listenning on port " + port);
             Socket sock = server.accept();
             System.out.println("FakeReg: Connection accepted, reading registration message");
             MessageInputStream input = new MessageInputStream(sock.getInputStream());
@@ -181,7 +185,7 @@ class HelloMessage extends MessageRoutingMessage {
 
     @Override
     public Object processMessage() throws Exception {
-        return "Il est 18h";
+        return TestForwardingAgentV2.PAYLOAD;
     }
 
 };
