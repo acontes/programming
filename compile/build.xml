@@ -431,7 +431,7 @@
 		</jar>
 	</target>
 	
-	<target name="deploy.annotations" depends="compile.extensions, -deploy.mkdir" description="Create a jar file which contains the JDK 1.6 annotations">
+	<target name="deploy.annotations" depends="compile.extensions, -deploy.mkdir" description="Create a jar file which contains all the annotations">
 		<jar destfile="${deploy.lib.dir}/ProActive_annotations.jar" index="true">
 			<fileset dir="${cl.extensions.dir}">
 				<include name="org/objectweb/proactive/extensions/annotation/**"/>
@@ -439,6 +439,16 @@
 			<!-- annotations info -->
 		    <fileset dir="${compile.dir}" includes="META-INF/services/com.sun.mirror.apt.AnnotationProcessorFactory" />
 			<fileset dir="${compile.dir}" includes="META-INF/services/javax.annotation.processing.Processor"/>
+		</jar>
+	</target>
+	
+	<target name="deploy.annotations.eclipse" depends="compile.extensions, -deploy.mkdir" description="Create a jar file which contains only the JDK 1.5 annotations">
+		<jar destfile="${deploy.lib.dir}/ProActive_annotations_Eclipse.jar" index="true">
+			<fileset dir="${cl.extensions.dir}">
+				<include name="org/objectweb/proactive/extensions/annotation/**"/>
+				<exclude name="org/objectweb/proactive/extensions/annotation/**/*CTree*"/>
+			</fileset>
+		    <fileset dir="${compile.dir}" includes="META-INF/services/com.sun.mirror.apt.AnnotationProcessorFactory" />
 		</jar>
 	</target>
 
