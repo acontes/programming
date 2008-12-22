@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" output="classes/Core" path="src/Core"/>
-	<classpathentry kind="src" output="classes/Benchmarks" path="src/Benchmarks"/>
-	<classpathentry excluding="org/objectweb/proactive/examples/nbody/common/NBody3DFrame.java" kind="src" output="classes/Examples" path="src/Examples"/>
-	<classpathentry kind="src" output="classes/Extensions" path="src/Extensions"/>
-	<classpathentry kind="src" output="classes/Extra" path="src/Extra"/>
-	<classpathentry kind="src" output="classes/Tests" path="src/Tests"/>
-	<classpathentry excluding="doc/PublishedAPIDoclet.java" kind="src" output="classes/Utils" path="src/Utils"/>
+	<classpathentry kind="src" path="src/Core"/>
+	<classpathentry kind="src" path="src/Benchmarks"/>
+	<classpathentry excluding="org/objectweb/proactive/examples/nbody/common/NBody3DFrame.java" kind="src" path="src/Examples"/>
+	<classpathentry kind="src" path="src/Extensions"/>
+	<classpathentry kind="src" path="src/Extra"/>
+	<classpathentry kind="src" path="src/Tests"/>
+	<classpathentry excluding="doc/PublishedAPIDoclet.java" kind="src" path="src/Utils"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/activation.jar"/>
 	<classpathentry kind="lib" path="lib/ajo.jar"/>
@@ -90,5 +90,11 @@
 	<classpathentry kind="lib" path="lib/xercesImpl.jar"/>
 	<classpathentry kind="lib" path="lib/xml-apis.jar"/>
 	<classpathentry kind="lib" path="compile/lib/junit-4.3.jar"/>
+	<classpathentry kind="lib" path="lib/commons-codec-1.3.jar"/>
+	<classpathentry kind="lib" path="lib/commons-httpclient-2.0.jar"/>
+	<classpathentry kind="lib" path="lib/commons-net-1.4.1.jar"/>
+	<classpathentry kind="lib" path="lib/jakarta-oro-2.0.8.jar"/>
+	<classpathentry kind="lib" path="lib/jsch-20080903.jar"/>
+	<classpathentry kind="lib" path="lib/commons-vfs-1.0.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

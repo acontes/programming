@@ -4,7 +4,7 @@
 	<import file="${basedir}/build.xml" />
 	
 	<path id="apachevfs.lib">
-		<pathelement location="${base.dir}/../VFS/commons-vfs-20070730/commons-vfs-20070730.jar" />
+		<pathelement location="${base.dir}/lib/commons-vfs-1.0.jar" />
 	</path>
 	
 	<target name="compile" depends="core, stubGenerator, -compile"/>

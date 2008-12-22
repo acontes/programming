@@ -1,5 +1,6 @@
 package org.objectweb.proactive.extra.vfs;
 
+
 public class FileNameMap implements java.io.Serializable{
 	
 	private String realURI;
@@ -19,4 +20,3 @@ public class FileNameMap implements java.io.Serializable{
 		return mountingPoint;
 	}
 }
-

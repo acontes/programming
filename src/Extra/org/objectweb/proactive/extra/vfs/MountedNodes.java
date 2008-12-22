@@ -1,99 +1,51 @@
 package org.objectweb.proactive.extra.vfs;
 
-
-
 import java.util.ArrayList;
-import java.util.Hashtable;
 
-
-
+import org.apache.commons.vfs.AllFileSelector;
+import org.apache.commons.vfs.FileFilter;
+import org.apache.commons.vfs.FileFilterSelector;
+import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.FileSelectInfo;
+import org.apache.commons.vfs.FileSystem;
+import org.apache.commons.vfs.FileSystemException;
+import org.apache.commons.vfs.VFS;
 import org.objectweb.proactive.core.node.Node;
 
-/*
- * this class stores the node to it's url map 
- */
-
 public class MountedNodes {
+	
+	private static ArrayList<MountedNodesMap> mountedNodeMap = new ArrayList<MountedNodesMap>();
 
-	
-	public static ArrayList<Node> mountedNodes = new ArrayList<Node>();
-	public static ArrayList<String> mountedNodesURL = new ArrayList<String>();
-	public static ArrayList<String> realURIs = new ArrayList();
-	public static Hashtable<Node,String> nodeurlMap = new Hashtable<Node,String>();
-	
-	public static void addNodeToList(Node node)
+	public void addNodetoMap(Node node)
 	{
-		MountedNodes.mountedNodes.add(node);
-		
-		String url = createPA_URL(node);
-		
-		MountedNodes.mountedNodesURL.add(url);                     //this is the PA URL
-		
-		MountedNodes.nodeurlMap.put(node, url);
-		
-		MountedNodes.realURIs.add(node.getNodeInformation().getURL());
-		
+		//String url = "sftp://kqadir@"+node.getVMInformation().getHostName()+"/tmp/output/"+node.getNodeInformation().getName(); 
+		//String url = node.getNodeInformation().getURL();
+		//String url = "/tmp/output/"+node.getNodeInformation().getName();
+		//String url = node.getNodeInformation().getDataSpaceInformation().getAbsolutePath();
+		String scheme = node.getNodeInformation().getProtocol();
+		String host = node.getVMInformation().getHostName() ;
+		int port = 1099;
+		String url = scheme + "://" + host +":" + port + "/" + "VFS_"+node.getNodeInformation().getName();
+		mountedNodeMap.add(new MountedNodesMap (node, url) );
+	}
+
+	public static ArrayList<MountedNodesMap> getMountedNodeMap() {
+		return mountedNodeMap;
 	}
 	
-	public static ArrayList<Node> getMountedNodesList()
+	public void printMountedNodes()
 	{
-		return MountedNodes.mountedNodes;
-	}
-	
-	public static ArrayList<String> getMountedNodesURLList()
-	{
-		return MountedNodes.mountedNodesURL;
-	}
-	
-	public static void addRealURI(String uri)
-	{
-		realURIs.add(uri);
-	}
-	
-	public static ArrayList<String> getRealURIs()
-	{
-		return realURIs;
-	}
-	
-	public static Hashtable<Node,String> getNodeURLMap()
-	{
-		return MountedNodes.nodeurlMap;
-	}
-	
-	
-	
-	
-	
-	//---------------------------Methods to Create URLs-------------------------------------
-	
-	public static String createPA_URL(Node node)
-	{
-        String hostname = node.getVMInformation().getHostName();
-		
-		String protocol = node.getNodeInformation().getProtocol();
-		
-		String port = null;
-		
-		if(protocol.equalsIgnoreCase("rmi"))
-		{
-			port = "1099";
+	for(MountedNodesMap mn:mountedNodeMap) {
+		System.out.println("Mounted Node :" + mn.getMountedNode().getNodeInformation().getName());
+		System.out.println("Mounted Node URL :" + mn.getMountedUrl());
 		}
-		
-		//form: protocol://machine_name:port.					
-		String url = protocol + "://" + hostname + ":" + port + "/" + node.getNodeInformation().getName();
-		
-		return url;
 	}
 	
-	public static String createHttpURL(Node node)
-	{
-		return null;
+	public void setMountRemoteSpaceURI() {
+		System.out.println("==================********* Remote Mounting ***********======================");
+		for(MountedNodesMap a: MountedNodes.getMountedNodeMap()) {
+			ProActiveVFS.mountRemoteSpaceURI(a);
+		}
 	}
-	
-	public static String createFtpURL(Node node)
-	{
-	   return null;	
-	}	
-	
 	
 }
