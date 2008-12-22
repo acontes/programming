@@ -125,6 +125,7 @@ public class AOPinger implements WorkerWatcher, RunActive, InitActive, Serializa
     /** {@inheritDoc} */
     public void removeWorkerToWatch(final String workerName) {
     	if(!terminated){
+    		
 	    	if (workerGroup.containsKey(workerName)) {
 	    		workerGroup.remove(workerName);
 	    	}
@@ -141,7 +142,9 @@ public class AOPinger implements WorkerWatcher, RunActive, InitActive, Serializa
 
                 long checkpoint1 = System.currentTimeMillis();
 
-                for (String workerName : workerGroup.keySet()) {
+                Set<String> keySet = new HashSet<String>(workerGroup.keySet());
+                
+                for (String workerName : keySet) {
                     try {
                         if (debug) {
                             logger.debug("Pinging " + workerName);
@@ -152,8 +155,15 @@ public class AOPinger implements WorkerWatcher, RunActive, InitActive, Serializa
                             logger.debug("Misfunctioning worker " + workerName + ", investigating...");
                         }
                         try{
-                        	if(!terminated && null != stubOnThis){
+                        	if(!terminated && null != stubOnThis && null != workerName){
+                        		try{
                         		stubOnThis.workerMissing(workerName);
+                        		} catch (NullPointerException exp){
+                            		if (debug) {
+                            			logger.debug("Pinging " + workerName + " has a error! Terminate the Pinger");
+                                        terminated = true;
+                            		}
+                        		}
                         	}
                         	else{
                         		terminated = true;
@@ -169,6 +179,7 @@ public class AOPinger implements WorkerWatcher, RunActive, InitActive, Serializa
                             }
                         } catch (Exception exp2){
                     		if (debug) {
+                    			logger.debug("Zhen ta ma yumen, daodi shui shi null a?.");
                     			exp2.printStackTrace();
                     		}
                     	}
@@ -220,27 +231,26 @@ public class AOPinger implements WorkerWatcher, RunActive, InitActive, Serializa
 	        	logger.debug("A worker" + workerName + " is missing...reporting back to the Master");
 	        }
 	
-	        if (workerGroup.containsKey(workerName)) {
-	        	try{
+	    	try{
+	    		if (workerGroup.containsKey(workerName)) {	        	
 	        		listener.isDead(workerName);
-	        	} catch (SendRequestCommunicationException exp) {
-	        		if (debug) {
-	        			logger.debug("listener has already been freed.");
-	        		}
-	        	} catch (BodyTerminatedRequestException exp1){
-	        		if (debug) {
-	        			logger.debug("listener has already been terminaterd.");
-	        		}
-	        	} catch (Exception exp2){
-	        		if (debug) {
-	        			logger.debug("Exception occurs when report the missing of " + workerName +
-	        					"to listener.\n");
-	        			exp2.printStackTrace();
-	        		}
-	        	}
-	                
-	        	workerGroup.remove(workerName);
-	        }
+	        		workerGroup.remove(workerName);
+		        }
+	        } catch (SendRequestCommunicationException exp) {
+        		if (debug) {
+        			logger.debug("listener has already been freed.");
+        		}
+        	} catch (BodyTerminatedRequestException exp1){
+        		if (debug) {
+        			logger.debug("listener has already been terminaterd.");
+        		}
+        	} catch (Exception exp2){
+        		if (debug) {
+        			logger.debug("Exception occurs when report the missing of " + workerName +
+        					"to listener.\n");
+        			exp2.printStackTrace();
+        		}
+        	}
         }
     }
 

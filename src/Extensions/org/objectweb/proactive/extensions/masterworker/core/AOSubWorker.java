@@ -1,6 +1,7 @@
 package org.objectweb.proactive.extensions.masterworker.core;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -136,9 +137,7 @@ public class AOSubWorker extends AOWorker implements WorkerPeer {
     	}
     	if(workerNameCounter > this.workerNameCounter)
     		this.workerNameCounter = workerNameCounter;
-        if (debug) {
-        	logger.debug("Worker Manager update peerlist " + peerid);
-        	
+        if (debug) {        	
         	String output = "Peer list size is :" + workerPeerList.size() + " details is: ";
         	for(long keyid : this.workerPeerList.keySet()){
         		output = output + keyid ;
@@ -220,10 +219,15 @@ public class AOSubWorker extends AOWorker implements WorkerPeer {
 	    			return new BooleanWrapper(false);
 	    		} catch (Exception e) {
 	    			if(!subMasterFailed.booleanValue()){
-	    				
+	    				if (debug) {
+	    		        	logger.debug("SubMaster " + subMasterName + " really missed!");
+	    		        }
 	    				subMasterFailed = new BooleanWrapper(true);
 	        			try{
 	        				pinger.removeWorkerToWatch(subMasterName);
+	        				if (debug) {
+		    		        	logger.debug("Remove the SubMaster " + subMasterName + " from pinger!");
+		    		        }
 	        			} catch (Exception e1){
 	        				if (debug) {
 	        	            	logger.debug("Error happens when do the clear for submaster missing!");
@@ -249,7 +253,7 @@ public class AOSubWorker extends AOWorker implements WorkerPeer {
 
     private void electNewSubMaster() {
     	Set<Long> peerids = new HashSet<Long>(workerPeerList.keySet());
-        Collection<WorkerPeer> workerpeers = workerPeerList.values();
+        Collection<WorkerPeer> workerpeers = new ArrayList<WorkerPeer> (workerPeerList.values());
         String workername = null;
         WorkerPeer workerpeer = null;
         
@@ -258,6 +262,15 @@ public class AOSubWorker extends AOWorker implements WorkerPeer {
         }
         isElecting = true;
 
+        if (debug) {        	
+        	String output = "Peer list size is :" + peerids.size() + " details is: ";
+        	for(long keyid : peerids){
+        		output = output + keyid ;
+        	}
+        	
+        	logger.debug(output);
+        }
+        
         // do a loop, if get no response, elect himself as a submaster
         // otherwise the one who give him a response will take charge in the election
         for (Long peerid : peerids) {
@@ -272,6 +285,10 @@ public class AOSubWorker extends AOWorker implements WorkerPeer {
 	                    // Send a message to ask those peers whose peerids are smaller than this 
 	                    // If any of the workers has heartbeat, then go out and waiting
 	                    BooleanWrapper warp = workerpeer.canBeSubMaster();
+	                    PAFuture.waitFor(warp);
+	                    if (debug) {
+	                        logger.debug("Receive a reply from Worker " + workername + ", waiting");
+	                    }
 //	                    if(!warp.booleanValue()) {
 //                    	// If it return that the subMaster is alive
 //                    	subMasterFailed = true;
@@ -281,7 +298,7 @@ public class AOSubWorker extends AOWorker implements WorkerPeer {
 	                    return;
 	                } catch (Exception e) {
 	                    if (debug) {
-	                        logger.debug("Worker" + workername + " is missing");
+	                        logger.debug("Worker " + workername + " is missing");
 	                    }
 	                }                	
 	            }

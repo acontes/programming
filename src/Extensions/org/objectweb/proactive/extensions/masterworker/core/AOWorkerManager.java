@@ -523,7 +523,15 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
      * {@inheritDoc}
      */
     public boolean isDead(String workerName) {
+    	if(workers.containsKey(workerName))
         workers.remove(workerName);
+        return true;
+    }
+    
+    public boolean addWorker(String workerName, Worker worker) {
+    	if(!workers.containsKey(workerName)){
+    		workers.put(workerName, worker);
+    	}
         return true;
     }
 

@@ -710,6 +710,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
             workerGroup.add(worker);
             workers.put(workerName, worker);
 
+            ((AOWorkerManager) smanager).addWorker(workerName, worker);
             // We tell the pinger to watch for this new worker
             pinger.addWorkerToWatch(worker, workerName);
         }

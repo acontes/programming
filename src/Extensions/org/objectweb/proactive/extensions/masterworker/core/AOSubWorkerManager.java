@@ -113,6 +113,15 @@ public class AOSubWorkerManager implements WorkerManager, InitActive, Serializab
     	this.workerPeers = workerPeers;
         this.workers = workers;
         
+        if (debug) {        	
+        	String output = "Peer list size is :" + workerPeers.size() + " details is: ";
+        	for(long keyid : workerPeers.keySet()){
+        		output = output + keyid ;
+        	}
+        	
+        	logger.debug(output);
+        }
+        
         return new BooleanWrapper(true);
     }
     
