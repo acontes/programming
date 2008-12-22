@@ -57,4 +57,6 @@ public interface FileTransferServiceReceive {
     public boolean isDirectory(File path);
 
     public boolean isFile(File path);
+
+	public OperationStatus createFile(File path);
 }

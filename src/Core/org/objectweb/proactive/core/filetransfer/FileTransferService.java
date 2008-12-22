@@ -341,4 +341,22 @@ public class FileTransferService implements ProActiveInternalObject, InitActive,
         putBackInLocalPool();
         ftsDst.putBackInLocalPool();
     }
+
+	public OperationStatus createFile(File dstFile) {
+    	
+    	try {
+			if(!dstFile.createNewFile())
+			{
+				return new OperationStatus(new IOException("Cannot create file: " + dstFile));
+			}
+	    	
+	        if (!dstFile.canWrite()) {
+	            return new OperationStatus(new IOException("Cannot write to: " + dstFile));
+	        }
+    	} catch (IOException e) {
+			e.printStackTrace();
+		}
+    	
+        return new OperationStatus();
+    }
 }

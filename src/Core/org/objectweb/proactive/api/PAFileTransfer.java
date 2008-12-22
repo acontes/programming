@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.filetransfer.FileBlock;
 import org.objectweb.proactive.core.filetransfer.FileTransferEngine;
@@ -267,6 +268,21 @@ public class PAFileTransfer {
         }
 
         OperationStatus status = ftsDst.mkdirs(path);
+
+        return new RemoteFileImpl(node, path, status);
+    }
+    
+    public static RemoteFile createFile(Node node, File path) throws ActiveObjectCreationException, NodeException
+    {
+    	
+    	System.out.println("Creating file for Node: " + node.getNodeInformation().getURL() + " and file URL is: " + path.toURI());
+    	FileTransferServiceReceive ftsDst;
+    	 	
+		ftsDst = FileTransferEngine.getFileTransferEngine(node).getFTS();
+		
+		
+		OperationStatus status = ftsDst.createFile(path);
+		
 
         return new RemoteFileImpl(node, path, status);
     }

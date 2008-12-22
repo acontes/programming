@@ -155,4 +155,6 @@ public interface Loggers {
     public static final String EXCEPTIONS_SEND_REPLY = EXCEPTIONS + ".send_reply";
 
     public static final String WEB_SERVICES = CORE + "webservices";
+    
+    public static final String VFS = CORE + "vfs";
 }
