@@ -541,6 +541,16 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
             if (debug) {
                 logger.debug(workerName + " sends result of task " + id);
             }
+
+            if (debug) {
+            	String output = "Launched task size is :" + launchedTasks.size() + " details is: ";
+            	for(long keyid : launchedTasks.keySet()){
+            		output = output + keyid + " ";
+            	}
+            	
+            	logger.debug(output);
+            }
+            
             String submitter = launchedTasks.remove(id);
 
             // We remove the task from the worker activity
@@ -640,7 +650,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
                     int flooding = 0;
                     if (pendingTasks.size() == 0)
                         flooding = 1;
-                    if(noWorker)
+                    if(!noWorker)
                     	flooding = -1;
                     if (debug) {
                         logger.debug("" + k + " results are sent back to the main master");
@@ -1026,7 +1036,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         if (res.threwException()) {
             throw new RuntimeException(new TaskException(res.getException()));
         }
-        results.add(res);
+        results.add(res.getResult());
         resultsRepository.put(key, results);
         return res.getResult();
     }
@@ -1192,76 +1202,43 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         while (!terminated) {
             try {
                 // Send results back to main master and get new tasks
-            	try {
-            		getTasksWithResults(true);
-            	} catch (Exception e0) {
-                    e0.printStackTrace();
-                }
+            	getTasksWithResults(true);
+            	
+                service.waitForRequest();
                 
-                try {
-                	service.waitForRequest();
-                } catch (Exception e1) {
-                    e1.printStackTrace();
-                }
                 // Sweep of wait requests
-                try {
-                	sweepWaitRequests(service);
-                } catch (Exception e2) {
-                    e2.printStackTrace();
-                }
-                try {
-                	maybeServePending(service);
-                } catch (Exception e3) {
-                    e3.printStackTrace();
-                }
-
+                sweepWaitRequests(service);
+                maybeServePending(service);
+                
                 // Serving methods other than waitXXX
                 while (!isClearing && service.hasRequestToServe()) {
                     Request oldest = service.getOldest();
                     while (!isClearing && (oldest != null) && !workersRequestsFilter.acceptRequest(oldest) &&
                         notTerminateFilter.acceptRequest(oldest)) {
                         // Sweep of wait requests
-                    	try {
-                    		sweepWaitRequests(service);
-                    	} catch (Exception e1) {
-                            e1.printStackTrace();
-                        }
+                    	sweepWaitRequests(service);
+                    	
                         // Serving quick requests
-                        try {
-                        	service.serveOldest();
-                        } catch (Exception e1) {
-                            e1.printStackTrace();
-                        }
+                        service.serveOldest();
+                        
 
                         // we maybe serve the pending waitXXX methods if there are some and if the necessary results are collected
-                        try {
-                        	maybeServePending(service);
-                        } catch (Exception e2) {
-                            e2.printStackTrace();
-                        }
+                        maybeServePending(service);
+                        
                         oldest = service.getOldest();
                         
 
                     }
                     if (!isClearing && (oldest != null) && notTerminateFilter.acceptRequest(oldest)) {
                         // Sweep of wait requests
-                    	try {
-                    		sweepWaitRequests(service);
-                    	} catch (Exception e1) {
-                            e1.printStackTrace();
-                        }
+                    	sweepWaitRequests(service);
+                    	
                         // Serving worker requests
-                    	try {
-                    		service.serveOldest();
-                    	} catch (Exception e2) {
-                            e2.printStackTrace();
-                        }
+                    	service.serveOldest();
+                    	
                         // we maybe serve the pending waitXXX methods if there are some and if the necessary results are collected
-                    	try {
-                    		maybeServePending(service);
-                    	} catch (Exception e3) {
-                            e3.printStackTrace();
-                        }
+                    	maybeServePending(service);
+                    	
                     }
                 }
 
@@ -1270,31 +1247,20 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
                     clearingRunActivity(service);
                 }
 
-                try {
-                	service.serveAll("secondTerminate");
-                } catch (Exception e1) {
-                    e1.printStackTrace();
-                }
+                service.serveAll("secondTerminate");
+                
                 while (PAFuture.isAwaited(terminationResourceManagerAnswer)) {
-                	try {
-                		service.serveAll(finalNotTerminateFilter);	
-                	} catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                	service.serveAll(finalNotTerminateFilter);	
+                	
                     // avoids devouring CPU cycles
                     Thread.sleep(100);
                 }
-                try {
-                	service.serveAll("finalTerminate");
-                } catch (Exception e2) {
-                    e2.printStackTrace();
-                }
-                try {
-                	service.serveAll("awaitsTermination");
-                } catch (Exception e3) {
-                    e3.printStackTrace();
-                }
+                service.serveAll("finalTerminate");
+                
+                service.serveAll("awaitsTermination");
+                
             } catch (Exception e) {
+            	logger.error(e.getMessage());
                 e.printStackTrace();
             }
         }

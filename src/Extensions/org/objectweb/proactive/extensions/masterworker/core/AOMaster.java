@@ -725,6 +725,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
                 service.serveAll("finalTerminate");
                 service.serveAll("awaitsTermination");
             } catch (Exception e) {
+            	logger.error(e.getMessage());
                 e.printStackTrace();
             }
         }
@@ -828,6 +829,16 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
             if (debug) {
                 logger.debug(originatorName + " sends result of task " + id);
             }
+            
+            if (debug) {
+            	String output = "Launched task size is :" + launchedTasks.size() + " details is: ";
+            	for(long keyid : launchedTasks.keySet()){
+            		output = output + keyid + " ";
+            	}
+            	
+            	logger.debug(output);
+            }
+            
             String submitter = launchedTasks.remove(id);
             // We remove the task from the worker activity
             if (workersActivity.containsKey(originatorName)) {
@@ -875,8 +886,10 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
                     List<ResultIntern<Serializable>> results = new ArrayList<ResultIntern<Serializable>>();
                     results.add(result);
                     try {
-                        ((AOSubMaster) workersByName.get(submasterName)).sendResultFromMaster(results,
-                        		divisibleTasksAssociationWithWorkersRev.get(submitter));
+                    	if(workersByName.containsKey(submasterName)){
+	                        ((AOSubMaster) workersByName.get(submasterName)).sendResultFromMaster(results,
+	                        		divisibleTasksAssociationWithWorkersRev.get(submitter));
+                    	}
                     } catch (SendRequestCommunicationException exp) {
                         if (debug) {
                             logger.debug("Submaster " + submasterName + " has already been freed.");
@@ -885,7 +898,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
                     	if (debug) {
                             logger.debug("Master has already been terminaterd.");
                         }
-                    } catch (Exception exp2){
+                    }  catch (Exception exp2){
                     	if (debug) {
                     		exp2.printStackTrace();
                         }
@@ -1269,44 +1282,45 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
             clearingCallFromSpawnedWorker(originatorName);
         }
         
-        if(!divisibleTasksAssociationWithWorkersRev.containsKey(originatorName))
-        	divisibleTasksAssociationWithWorkersRev.put(originatorName, divisibleTaskId);
-        
-        // if the tasklist has solved, send back all the available results now
-        if(taskIdCounters.containsKey(divisibleTaskId)){
-	        if(taskIdCounters.get(divisibleTaskId) >= taskIdCounter){
-	            // Forward it the the submaster if it comes from a submaster
-	
-	            if (originatorName.indexOf('@') > 0) {
-	                String submasterName = originatorName.substring(originatorName.indexOf('@') + 1);
-	
-	                try {
-	                    ((AOSubMaster) workersByName.get(submasterName)).sendResultFromMaster(subResultQueues.get(divisibleTasksAssociationWithWorkersRev.get(originatorName)).getAvailableResults(),
-	                    		divisibleTasksAssociationWithWorkersRev.get(originatorName));
-	                } catch (SendRequestCommunicationException exp) {
-	                    if (debug) {
-	                        logger.debug("Submaster " + submasterName + " has already been freed.");
+        if(null != originatorName){
+	        if(!divisibleTasksAssociationWithWorkersRev.containsKey(originatorName))
+	        	divisibleTasksAssociationWithWorkersRev.put(originatorName, divisibleTaskId);
+	        
+	        // if the tasklist has solved, send back all the available results now
+	        if(taskIdCounters.containsKey(divisibleTaskId)){
+		        if(taskIdCounters.get(divisibleTaskId) >= taskIdCounter){
+		            // Forward it the the submaster if it comes from a submaster
+		
+		            if (originatorName.indexOf('@') > 0) {
+		                String submasterName = originatorName.substring(originatorName.indexOf('@') + 1);
+		
+		                try {
+		                    ((AOSubMaster) workersByName.get(submasterName)).sendResultFromMaster(subResultQueues.get(divisibleTasksAssociationWithWorkersRev.get(originatorName)).getAvailableResults(),
+		                    		divisibleTasksAssociationWithWorkersRev.get(originatorName));
+		                } catch (SendRequestCommunicationException exp) {
+		                    if (debug) {
+		                        logger.debug("Submaster " + submasterName + " has already been freed.");
+		                    }
+		                } catch (BodyTerminatedRequestException exp1){
+		                	if (debug) {
+		                        logger.debug("Master has already been terminaterd.");
+		                    }
+		                } catch (Exception exp2){
+	                    	if (debug) {
+	                    		exp2.printStackTrace();
+	                        }
 	                    }
-	                } catch (BodyTerminatedRequestException exp1){
-	                	if (debug) {
-	                        logger.debug("Master has already been terminaterd.");
-	                    }
-	                } catch (Exception exp2){
-                    	if (debug) {
-                    		exp2.printStackTrace();
-                        }
-                    }
-	                if (debug) {
-	                    logger.debug("Send results of task " + divisibleTaskId + " to submaster " +
-	                        submasterName);
-	                }
-	            }
+		                if (debug) {
+		                    logger.debug("Send results of task " + divisibleTaskId + " to submaster " +
+		                        submasterName);
+		                }
+		            }
+		        }
+		        return;
 	        }
-	        return;
+	        else
+	        	taskIdCounters.put(divisibleTaskId, taskIdCounter);
         }
-        else
-        	taskIdCounters.put(divisibleTaskId, taskIdCounter);
-        
         List<TaskID> wrappers = createIds(tasks, taskIdCounter, originatorName);
         solveIds(wrappers, divisibleTaskId, originatorName);
     }
@@ -1613,7 +1627,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
         if (res.threwException()) {
             throw new RuntimeException(new TaskException(res.getException()));
         }
-        results.add(res);
+        results.add(res.getResult());
         if(null != originatorName && null != key)
         	resultsRepository.put(key, results);
         return res.getResult();
