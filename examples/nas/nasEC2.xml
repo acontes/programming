@@ -20,15 +20,15 @@
 	<infrastructure>
 
 		<hosts>
-			<host id="host" os="unix" hostCapacity="8" vmCapacity="1">
+			<host id="host" os="unix" hostCapacity="1" vmCapacity="1">
 				<homeDirectory base="root" relpath="proactive" />
 			</host>
 
 		</hosts>
 
 		<groups>
-			<ec2Group id="remoteEC2">
-				<imageId>ami-6f7e9a06</imageId> 
+			<ec2Group id="remoteEC2" numberOfInstances="8" >
+				<imageId>ami-1b57b372</imageId> 
 				<accessKeyId>${ec2.accessKeyId}</accessKeyId>
 				<secretAccessKey>${ec2.secretAccessKey}</secretAccessKey>
 			</ec2Group>				

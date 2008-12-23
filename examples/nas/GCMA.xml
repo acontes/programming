@@ -7,8 +7,8 @@
 		<javaPropertyVariable name="proactive.home" />
 		<javaPropertyVariable name="user.dir" />
 
-		<descriptorVariable name="hostCapacity" value="2"/>
-		<descriptorVariable name="vmCapacity" value="2"/>
+		<descriptorVariable name="hostCapacity" value="1"/>
+		<descriptorVariable name="vmCapacity" value="1"/>
 	</environment>
 
 
@@ -24,14 +24,14 @@
 				</applicationClasspath>
 			</configuration>
 
-			<virtualNode id="Workers" capacity="2"/>
+			<virtualNode id="Workers" capacity="8"/>
 		</proactive>
 
 	</application>
 
 	<resources>
 		<nodeProvider id="workers">
-			<file path="nasEON.xml" />
+			<file path="nasEC2.xml" />
 		</nodeProvider>
 	</resources>
 </GCMApplication>
