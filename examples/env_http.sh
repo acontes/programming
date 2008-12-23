@@ -65,7 +65,10 @@ export CLASSPATH
 JAVACMD=$JAVA_HOME/bin/java"\
 	-Djava.security.manager \
 	-Djava.security.policy=$PROACTIVE/examples/proactive.java.policy \
+	-Djava.endorsed.dirs=${PROACTIVE}/lib/amazon-ec2/third-party/jaxb-ri-2.1 \
 	-Dlog4j.configuration=file:${PROACTIVE}/examples/proactive-log4j \
+	-Dec2.accessKeyId=0F326N2S93BJQBH1VDR2 \
+    -Dec2.secretAccessKey=OuwVaTRRbf1cZG71pPq3QrnhqxhVn6Cv5A1uhthz \
 	-Dproactive.communication.protocol=http \
 	-Dproactive.http.port=8080 \
 	-Dproactive.home=$PROACTIVE \
