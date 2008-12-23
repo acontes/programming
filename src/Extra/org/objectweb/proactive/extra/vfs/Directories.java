@@ -75,7 +75,7 @@ public class Directories {
 	public boolean createDataFile(Node n, int AOId, String data) {
 		RemoteFile a;
 		try {
-			a = PAFileTransfer.createFile(n, new File("/tmp/scratch/VFS_"+ n.getNodeInformation().getName()+"/"+AOId+"/Data.dat"),data.getBytes());
+			a = PAFileTransfer.createFile(n, new File("/tmp/scratch/VFS_"+ n.getNodeInformation().getName()+"/"+AOId+"/Data.dat"));
 			if (a.exists()) System.out.println("Test Data File Created Successfully Inside AO Directory ");
 		} catch (IOException e) {
 			e.printStackTrace();
