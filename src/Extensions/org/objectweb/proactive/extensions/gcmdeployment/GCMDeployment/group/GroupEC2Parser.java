@@ -49,6 +49,11 @@ public class GroupEC2Parser extends AbstractJavaGroupParser {
     private static final String XPATH_ACCESSKEYID = "dep:accessKeyId";
     private static final String XPATH_SECRETACCESSKEY = "dep:secretAccessKey";
 
+    private static final String ATTR_NUMBER_OF_INSTANCES = "numberOfInstances";
+    private static final String ATTR_INSTANCE_TYPE = "instanceType";
+
+    private static final String ATTR_BUCKET_NAME = "proactiveJarBucket";
+
     @Override
     public AbstractJavaGroup createGroup() {
         return new GroupEC2();
@@ -71,9 +76,26 @@ public class GroupEC2Parser extends AbstractJavaGroupParser {
             Node secretAccessKey = (Node) xpath.evaluate(XPATH_SECRETACCESSKEY, groupNode,
                     XPathConstants.NODE);
 
+            String numberOfInstancesString = GCMParserHelper.getAttributeValue(groupNode,
+                    ATTR_NUMBER_OF_INSTANCES);
+            int numberOfInstances = Integer.parseInt(numberOfInstancesString);
+
+            String instanceType = GCMParserHelper.getAttributeValue(groupNode, ATTR_INSTANCE_TYPE);
+
+            String bucketName = GCMParserHelper.getAttributeValue(groupNode, ATTR_BUCKET_NAME);
+
             ec2Group.setImageId(GCMParserHelper.getElementValue(imageName));
             ec2Group.setAccessKeyId(GCMParserHelper.getElementValue(accessKeyId));
             ec2Group.setSecretAccessKey(GCMParserHelper.getElementValue(secretAccessKey));
+            ec2Group.setNumberOfInstances(numberOfInstances);
+
+            if (instanceType != null) {
+                ec2Group.setInstanceType(instanceType);
+            }
+
+            if (bucketName != null) {
+                ec2Group.setProactiveJarsBucket(bucketName);
+            }
 
         } catch (XPathExpressionException e) {
             GCMDeploymentLoggers.GCMD_LOGGER.error(e.getMessage(), e);

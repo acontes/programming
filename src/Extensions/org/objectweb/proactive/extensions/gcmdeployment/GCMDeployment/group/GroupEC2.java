@@ -48,9 +48,12 @@ public class GroupEC2 extends AbstractJavaGroup {
 
     /* the default S3 bucket in which the ProActive jars are expected to be found for image update */
     public static final String DEFAULT_PROACTIVE_JARS_BUCKET = "oasis-proactive-jars";
+    private String proactiveJarsBucket = DEFAULT_PROACTIVE_JARS_BUCKET;
     private String imageId;
     private String accessKeyId;
     private String secretAccessKey;
+    private int numberOfInstances;
+    private String instanceType;
 
     private static final boolean DEBUG = false;
 
@@ -109,29 +112,26 @@ public class GroupEC2 extends AbstractJavaGroup {
         RunInstancesRequest request = new RunInstancesRequest();
 
         request.setImageId(imageId);
-        int hostCapacity = getHostInfo().getHostCapacity();
 
         // request for the number of instances equal to host capacity
         //
-        request.setMinCount(hostCapacity);
-        request.setMaxCount(hostCapacity);
+        request.setMinCount(numberOfInstances);
+        request.setMaxCount(numberOfInstances);
+        if (instanceType != null) {
+            request.setInstanceType(instanceType);
+        }
 
         try {
             StringBuffer userData = new StringBuffer();
             String parentURL = RuntimeFactory.getDefaultRuntime().getURL();
 
             // set root node access data in the instance's user data, one item per line,
-            // according to the following sequence :
+            // in a 'key = value' format
             //
-            // 1 parentURL
-            // 2 hostCapacity
-            // 3 vmCapacity
-            // 4 deploymentId
-            // 5 topologyId
             // 
             userData.append("parentURL = ").append(parentURL);
             userData.append('\n');
-            userData.append("hostCapacity = ").append(hostCapacity);
+            userData.append("hostCapacity = ").append(getHostInfo().getHostCapacity());
             userData.append('\n');
             userData.append("vmCapacity = ").append(getHostInfo().getVmCapacity());
             userData.append('\n');
@@ -147,7 +147,7 @@ public class GroupEC2 extends AbstractJavaGroup {
             userData.append('\n');
             userData.append("debug = 1");
             userData.append('\n');
-            userData.append("noupdate = 0");
+            userData.append("noupdate = 1");
             userData.append('\n');
             userData.append("jvmParams = -Xmx1000m -Xms512m");
             userData.append('\n');
@@ -178,6 +178,18 @@ public class GroupEC2 extends AbstractJavaGroup {
 
     public void setSecretAccessKey(String secretAccessKey) {
         this.secretAccessKey = secretAccessKey;
+    }
+
+    public void setNumberOfInstances(int numberOfInstances) {
+        this.numberOfInstances = numberOfInstances;
+    }
+
+    public void setInstanceType(String instanceType) {
+        this.instanceType = instanceType;
+    }
+
+    public void setProactiveJarsBucket(String proactiveJarsBucket) {
+        this.proactiveJarsBucket = proactiveJarsBucket;
     }
 
     @Override
