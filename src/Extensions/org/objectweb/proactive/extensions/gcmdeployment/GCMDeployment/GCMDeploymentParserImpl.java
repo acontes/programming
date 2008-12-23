@@ -666,7 +666,6 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         bridgeParserMap.put(bridgeParser.getNodeName(), bridgeParser);
     }
 
-<<<<<<< HEAD:src/Extensions/org/objectweb/proactive/extensions/gcmdeployment/GCMDeployment/GCMDeploymentParserImpl.java
     /**
      * JavaGroupParser registration A JavaGroupParser must be registered to be taken
      * into account when parsing a descriptor.
@@ -681,10 +680,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         javaGroupParserMap.put(javaGroupParser.getNodeName(), javaGroupParser);
     }
 
-    /**
-=======
     /*
->>>>>>> SVN_trunk:src/Extensions/org/objectweb/proactive/extensions/gcmdeployment/GCMDeployment/GCMDeploymentParserImpl.java
      * Parse a &lt;host&gt; node
      * 
      * @param hostNode
