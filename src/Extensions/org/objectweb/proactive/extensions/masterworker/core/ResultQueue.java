@@ -240,6 +240,37 @@ public class ResultQueue<R extends Serializable> implements Serializable {
     }
     
     /**
+     * Used for get all the available results of the result queue when 
+     * @return result list
+     */
+    public List<ResultIntern<R>> getAvailableResults() {
+
+    	if (debug) {
+            logger.debug("Tasks in Queue is: " + this.toString());
+        }
+		int size = 0;
+        Iterator<ResultIntern<R>> it;
+        if (mode == Master.COMPLETION_ORDER) {
+            it = unorderedResults.iterator();
+            size = unorderedResults.size();
+        } else {
+            it = orderedResults.iterator();
+            size = orderedResults.size();
+        }
+        List<ResultIntern<R>> answer = new ArrayList<ResultIntern<R>>(size);
+        while (it.hasNext()) {
+            ResultIntern<R> res = it.next();
+            answer.add(res);
+            long taskId = res.getId();
+            if (debug) {
+                logger.debug("Result " + taskId + " is available in the result queue.");
+            }
+        }
+
+        return answer;
+    }
+    
+    /**
      * Returns the the result of the next completed task (depending of the current ResultReceptionOrder)
      * @return the result of the next completed task, if the next task in the current ResultReceptionOrder is available
      */

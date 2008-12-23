@@ -512,20 +512,22 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
         }
     }
 
-    public BooleanWrapper sendResultFromMaster(ResultIntern<Serializable> result, long divisibleTaskId) {
+    public BooleanWrapper sendResultFromMaster(List<ResultIntern<Serializable>> results, long divisibleTaskId) {
     	if (subResultQueues.containsKey(divisibleTaskId)) {
-            if (debug) {
-                logger.debug("Master sends result of task " + result.getId() + " of divisible task " + divisibleTaskId);
-            }
-            subResultQueues.get(divisibleTaskId).addCompletedTask(result);
-            if (debug) {
-                // logger.debug("The result of task " + result.getId() + " is " + result.getResult().toString());
-            }
+    		for(ResultIntern<Serializable> result : results){
+	            if (debug) {
+	                logger.debug("Master sends result of task " + result.getId() + " of divisible task " + divisibleTaskId);
+	            }
+	            subResultQueues.get(divisibleTaskId).addCompletedTask(result);
+	            if (debug) {
+	                // logger.debug("The result of task " + result.getId() + " is " + result.getResult().toString());
+	            }
+    		}
             return new BooleanWrapper(true);
         } else {
             // do nothing
             if (debug) {
-                logger.debug("Master sends result of task " + result.getId() + " of worker " + divisibleTasksAssociationWithWorkers.get(divisibleTaskId) +
+                logger.debug("Master sends result of divisible task " + divisibleTaskId + " of worker " + divisibleTasksAssociationWithWorkers.get(divisibleTaskId) +
                     " but it's unknown.");
             }
             return new BooleanWrapper(false);
@@ -1734,7 +1736,6 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
                                     " needs to be served immediately");
                             }
                         }
-                        divisibleTasksAssociationWithWorkers.remove(taskId);
                         
                         if (debug) {
                             logger.debug("Spawned worker " + workerName + " is now obsolete");
