@@ -81,7 +81,7 @@ public class AOSubWorkerManager implements WorkerManager, InitActive, Serializab
      * workerpeers deployed so far
      */
     private HashMap<Long, WorkerPeer> workerPeers;
-    
+
     private HashMap<Long, String> workerNames;
     /**
      * For fault torlerance purpose
@@ -98,34 +98,32 @@ public class AOSubWorkerManager implements WorkerManager, InitActive, Serializab
      * @param provider      the entity that will give tasks to the workers created
      * @param memoryFactory factory which will create memory for each new workers
      */
-    public AOSubWorkerManager(final WorkerMaster provider, final WorkerMaster superProvider, final MemoryFactory memoryFactory,
-            final String subMasterName) {
+    public AOSubWorkerManager(final WorkerMaster provider, final WorkerMaster superProvider,
+            final MemoryFactory memoryFactory, final String subMasterName) {
         this.provider = provider;
         this.memoryFactory = memoryFactory;
         this.subMasterName = subMasterName;
         this.superProvider = superProvider;
-        
 
     }
-    
-    public BooleanWrapper initSubWorkerManager(final long workerNameCounter, final HashMap<Long, WorkerPeer> workerPeers, final HashMap<String, Worker> workers) {
+
+    public BooleanWrapper initSubWorkerManager(final long workerNameCounter,
+            final HashMap<Long, WorkerPeer> workerPeers, final HashMap<String, Worker> workers) {
         this.workerNameCounter = workerNameCounter;
-    	this.workerPeers = workerPeers;
+        this.workerPeers = workerPeers;
         this.workers = workers;
-        
-        if (debug) {        	
-        	String output = "Peer list size is :" + workerPeers.size() + " details is: ";
-        	for(long keyid : workerPeers.keySet()){
-        		output = output + keyid ;
-        	}
-        	
-        	logger.debug(output);
+
+        if (debug) {
+            String output = "Peer list size is :" + workerPeers.size() + " details is: ";
+            for (long keyid : workerPeers.keySet()) {
+                output = output + keyid;
+            }
+
+            logger.debug(output);
         }
-        
+
         return new BooleanWrapper(true);
     }
-    
-    
 
     /**
      * Broadcast the new added node to all the workers
@@ -134,36 +132,35 @@ public class AOSubWorkerManager implements WorkerManager, InitActive, Serializab
      * Maybe we use booleanwrapper to wait all the results?
      */
     private void updateWorkerPeerList() {
-    	
-    	// Creates the worker which will automatically connect to the master
-        
-        
-        
+
+        // Creates the worker which will automatically connect to the master
+
         Map<Long, WorkerPeer> workerPeerSet = null;
         Map<Long, String> workerNameSet = null;
-        
-        synchronized(workerPeers) {
-        	synchronized(workerNames){
-        		workerPeerSet= new HashMap<Long, WorkerPeer> ();
-        		workerPeerSet.putAll(workerPeers);
-        		workerNameSet = new HashMap<Long, String> ();
-        		workerNameSet.putAll(workerNames);
-        	}
-        }
-        
-        if (debug) {
-        	String output = "Peer list size is :" + workerPeerSet.size() + " details is: ";
-        	for(long keyid : workerPeerSet.keySet()){
-        		output = output + keyid ;
-        	}
-        	
-        	logger.debug(output);
-        }
-        
-        for(WorkerPeer subworker : workerPeerSet.values()) {
-            BooleanWrapper wrap = subworker.updateWorkerPeerList(workerNameCounter, workerPeerSet, workerNameSet);
-            PAFuture.waitFor(wrap);
+
+        synchronized (workerPeers) {
+            synchronized (workerNames) {
+                workerPeerSet = new HashMap<Long, WorkerPeer>();
+                workerPeerSet.putAll(workerPeers);
+                workerNameSet = new HashMap<Long, String>();
+                workerNameSet.putAll(workerNames);
             }
+        }
+
+        if (debug) {
+            String output = "Peer list size is :" + workerPeerSet.size() + " details is: ";
+            for (long keyid : workerPeerSet.keySet()) {
+                output = output + keyid;
+            }
+
+            logger.debug(output);
+        }
+
+        for (WorkerPeer subworker : workerPeerSet.values()) {
+            BooleanWrapper wrap = subworker.updateWorkerPeerList(workerNameCounter, workerPeerSet,
+                    workerNameSet);
+            PAFuture.waitFor(wrap);
+        }
     }
 
     /**
@@ -176,33 +173,33 @@ public class AOSubWorkerManager implements WorkerManager, InitActive, Serializab
                 if (debug) {
                     logger.debug("Creating worker on " + nodename);
                 }
-                
+
                 long workerId = 0;
-                synchronized(workerNameCounter) {
-                	workerId = workerNameCounter ++;
+                synchronized (workerNameCounter) {
+                    workerId = workerNameCounter++;
                 }
-                
-                String workername = "SubWoker_" + node.getVMInformation().getHostName() + "_" +
-                workerId + "@" + subMasterName;
+
+                String workername = "SubWoker_" + node.getVMInformation().getHostName() + "_" + workerId +
+                    "@" + subMasterName;
 
                 AOSubWorker subworker = (AOSubWorker) PAActiveObject.newActive(AOSubWorker.class.getName(),
-                        new Object[] { workername, (WorkerMaster) provider, 
-                                memoryFactory.newMemoryInstance(), workerId, 
-                                (WorkerMaster) superProvider, memoryFactory, subMasterName}, node);
+                        new Object[] { workername, (WorkerMaster) provider,
+                                memoryFactory.newMemoryInstance(), workerId, (WorkerMaster) superProvider,
+                                memoryFactory, subMasterName }, node);
 
                 PAFuture.waitFor(subworker);
 
-                synchronized(workerPeers) {
-                	synchronized(workerNames){
-	                workers.put(workername, (Worker) subworker);
-	                workerPeers.put(workerId, (WorkerPeer) subworker);
-	                workerNames.put(workerId, workername);
-                	}
+                synchronized (workerPeers) {
+                    synchronized (workerNames) {
+                        workers.put(workername, (Worker) subworker);
+                        workerPeers.put(workerId, (WorkerPeer) subworker);
+                        workerNames.put(workerId, workername);
+                    }
                 }
-               
+
                 // Broadcast the new peer to all the workers of the submaster
                 updateWorkerPeerList();
-                
+
                 if (debug) {
                     logger.debug("Worker " + workername + " created on " + nodename);
                 }
@@ -312,7 +309,7 @@ public class AOSubWorkerManager implements WorkerManager, InitActive, Serializab
 
         PAActiveObject.setImmediateService("heartBeat");
         PAActiveObject.setImmediateService("initSubWorkerManager");
-        
+
         threadPool = Executors.newCachedThreadPool();
     }
 

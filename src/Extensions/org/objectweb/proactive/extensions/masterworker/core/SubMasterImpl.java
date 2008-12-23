@@ -89,7 +89,7 @@ public class SubMasterImpl implements SubMaster<Task<Serializable>, Serializable
         }
 
         List<Serializable> results = null;
-        Object future = master.waitAllResults(originatorName, waitId ++);
+        Object future = master.waitAllResults(originatorName, waitId++);
         //parentWorker.resumeWork();
         try {
             results = (List<Serializable>) PAFuture.getFutureValue(future);
@@ -114,7 +114,7 @@ public class SubMasterImpl implements SubMaster<Task<Serializable>, Serializable
             throw new IllegalStateException("A call to solve should occur before this call.");
         }
         Serializable result = null;
-        Object future = master.waitOneResult(originatorName, waitId ++);
+        Object future = master.waitOneResult(originatorName, waitId++);
         //parentWorker.resumeWork();
         try {
             result = (Serializable) PAFuture.getFutureValue(future);
@@ -137,7 +137,7 @@ public class SubMasterImpl implements SubMaster<Task<Serializable>, Serializable
         }
 
         List<Serializable> results = null;
-        Object future = master.waitSomeResults(originatorName, waitId ++);
+        Object future = master.waitSomeResults(originatorName, waitId++);
         // parentWorker.resumeWork();
         try {
             results = (List<Serializable>) PAFuture.getFutureValue(future);
@@ -165,7 +165,7 @@ public class SubMasterImpl implements SubMaster<Task<Serializable>, Serializable
                 k + ": call to this method will wait forever");
         }
         List<Serializable> results = null;
-        Object future = master.waitKResults(originatorName, k, waitId ++);
+        Object future = master.waitKResults(originatorName, k, waitId++);
         //  parentWorker.resumeWork();
         try {
             results = (List<Serializable>) PAFuture.getFutureValue(future);

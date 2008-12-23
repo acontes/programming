@@ -111,7 +111,7 @@ log4j.logger.proactive.masterworker = DEBUG
 # CONSOLE appender is used by default
 log4j.appender.CONSOLE=org.apache.log4j.ConsoleAppender
 log4j.appender.CONSOLE.layout=org.apache.log4j.PatternLayout
-log4j.appender.CONSOLE.layout.ConversionPattern=%n%X{shortid@hostname} - [%p %20.20c{2}] %m
+log4j.appender.CONSOLE.layout.ConversionPattern=%n%X{shortid@hostname} - [%p %20.20c{2} %d] %m
 
 # Appender FILE writes to the file "tests.log".
 # This file is recreated a file for each run

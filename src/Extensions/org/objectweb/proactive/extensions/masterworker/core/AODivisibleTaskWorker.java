@@ -143,7 +143,7 @@ public class AODivisibleTaskWorker extends AOWorker implements RunActive, InitAc
 
             // We send the result back to the master
 
-            try{
+            try {
                 BooleanWrapper wrap = provider.sendResult(result, name);
                 // We synchronize the answer to avoid a BodyTerminatedException (the AO terminates right after this call)
                 PAFuture.waitFor(wrap);
@@ -152,12 +152,12 @@ public class AODivisibleTaskWorker extends AOWorker implements RunActive, InitAc
                 if (debug) {
                     logger.debug("Master has already been freed.");
                 }
-            } catch (BodyTerminatedRequestException exp1){
-            	if (debug) {
+            } catch (BodyTerminatedRequestException exp1) {
+                if (debug) {
                     logger.debug("Master has already been terminaterd.");
                 }
-            } catch (Exception exp2){
-            	if (debug) {
+            } catch (Exception exp2) {
+                if (debug) {
                     logger.debug("Error occurs.");
                 }
             }

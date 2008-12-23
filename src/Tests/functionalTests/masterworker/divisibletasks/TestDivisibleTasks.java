@@ -60,20 +60,24 @@ public class TestDivisibleTasks extends FunctionalTest {
         master.solve(tasks);
 
         ArrayList<Integer> answer = master.waitOneResult();
+        System.out.println("-------> Task 1 finished");
 
         for (int i = 0; i < answer.size() - 1; i++) {
             assertTrue("List sorted", answer.get(i) <= answer.get(i + 1));
         }
+        System.out.println("-------> List 1 sorted");
         master.solve(tasks);
         Thread.sleep(2000);
         master.clear();
 
         master.solve(tasks);
         answer = master.waitOneResult();
+        System.out.println("-------> Task 2 finished");
 
         for (int i = 0; i < answer.size() - 1; i++) {
             assertTrue("List sorted", answer.get(i) <= answer.get(i + 1));
         }
+        System.out.println("-------> List 2 sorted");
     }
 
     @Before

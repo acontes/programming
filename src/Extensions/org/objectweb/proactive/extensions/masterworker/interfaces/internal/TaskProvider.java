@@ -100,7 +100,7 @@ public interface TaskProvider<R extends Serializable> {
      * @param worker worker sending the message
      */
     void isCleared(Worker worker);
-    
+
     /**
      * Callback function sent from the workers to the master to acknowledge
      * That their activity is cleared

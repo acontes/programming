@@ -171,16 +171,16 @@ public class AOWorker implements InitActive, Serializable, Worker {
             if (debug) {
                 logger.debug("Master has already been freed.");
             }
-        } catch (BodyTerminatedRequestException exp1){
-        	if (debug) {
+        } catch (BodyTerminatedRequestException exp1) {
+            if (debug) {
                 logger.debug("Master has already been terminaterd.");
             }
-        } catch (Exception exp2){
-        	if (debug) {
+        } catch (Exception exp2) {
+            if (debug) {
                 logger.debug("Error occurs.");
             }
         }
-        
+
     }
 
     /** gets the initial task to solve */
@@ -207,12 +207,12 @@ public class AOWorker implements InitActive, Serializable, Worker {
             if (debug) {
                 logger.debug("Master has already been freed.");
             }
-        } catch (BodyTerminatedRequestException exp1){
-        	if (debug) {
+        } catch (BodyTerminatedRequestException exp1) {
+            if (debug) {
                 logger.debug("Master has already been terminaterd.");
             }
-        } catch (Exception exp2){
-        	if (debug) {
+        } catch (Exception exp2) {
+            if (debug) {
                 logger.debug("Error occurs.");
             }
         }
@@ -276,18 +276,19 @@ public class AOWorker implements InitActive, Serializable, Worker {
                 e.printStackTrace();
             }
             // We tell the master that we forwarded the task to another worker
-            try{
-            	PAFuture.waitFor(provider.forwardedTask(task.getId(), name, newWorkerName));
+            try {
+                PAFuture.waitFor(provider.forwardedTask(task.getId(), name, newWorkerName));
             } catch (SendRequestCommunicationException exp) {
                 if (debug) {
                     logger.debug("Master has already been freed when try to forward task " + task.getId());
                 }
-            } catch (BodyTerminatedRequestException exp1){
-            	if (debug) {
-                    logger.debug("Master has already been terminaterd when try to forward task " + task.getId());
+            } catch (BodyTerminatedRequestException exp1) {
+                if (debug) {
+                    logger.debug("Master has already been terminaterd when try to forward task " +
+                        task.getId());
                 }
-            } catch (Exception exp2){
-            	if (debug) {
+            } catch (Exception exp2) {
+                if (debug) {
                     logger.debug("Error occurs.");
                 }
             }
@@ -388,18 +389,18 @@ public class AOWorker implements InitActive, Serializable, Worker {
         pendingTasksFutures.clear();
         Service service = new Service(PAActiveObject.getBodyOnThis());
         service.flushAll();
-        try{
-        	provider.isCleared(name);
+        try {
+            provider.isCleared(name);
         } catch (SendRequestCommunicationException exp) {
             if (debug) {
                 logger.debug("Master has already been freed.");
             }
-        } catch (BodyTerminatedRequestException exp1){
-        	if (debug) {
+        } catch (BodyTerminatedRequestException exp1) {
+            if (debug) {
                 logger.debug("Master has already been terminaterd.");
             }
-        } catch (Exception exp2){
-        	if (debug) {
+        } catch (Exception exp2) {
+            if (debug) {
                 logger.debug("Error occurs.");
             }
         }

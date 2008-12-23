@@ -30,7 +30,7 @@
 
 	<resources>
 		<nodeProvider id="localhost1">
-			<file path="localhost2.xml"/>
+			<file path="localhost3.xml"/>
 		</nodeProvider>
     </resources>
 

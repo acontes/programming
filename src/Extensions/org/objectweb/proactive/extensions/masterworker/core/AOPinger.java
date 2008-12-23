@@ -124,26 +124,26 @@ public class AOPinger implements WorkerWatcher, RunActive, InitActive, Serializa
 
     /** {@inheritDoc} */
     public void removeWorkerToWatch(final String workerName) {
-    	if(!terminated){
-    		
-	    	if (workerGroup.containsKey(workerName)) {
-	    		workerGroup.remove(workerName);
-	    	}
-    	}
-        
+        if (!terminated) {
+
+            if (workerGroup.containsKey(workerName)) {
+                workerGroup.remove(workerName);
+            }
+        }
+
     }
 
     /** {@inheritDoc} */
     public void runActivity(final Body body) {
         localThread = Thread.currentThread();
         Service service = new Service(body);
-        while (!terminated) {
-            try {
+        try {
+            while (!terminated) {
 
                 long checkpoint1 = System.currentTimeMillis();
 
                 Set<String> keySet = new HashSet<String>(workerGroup.keySet());
-                
+
                 for (String workerName : keySet) {
                     try {
                         if (debug) {
@@ -154,35 +154,50 @@ public class AOPinger implements WorkerWatcher, RunActive, InitActive, Serializa
                         if (debug) {
                             logger.debug("Misfunctioning worker " + workerName + ", investigating...");
                         }
-                        try{
-                        	if(!terminated && null != stubOnThis && null != workerName){
-                        		try{
-                        		stubOnThis.workerMissing(workerName);
-                        		} catch (NullPointerException exp){
-                            		if (debug) {
-                            			logger.debug("Pinging " + workerName + " has a error! Terminate the Pinger");
-                                        terminated = true;
-                            		}
-                        		}
-                        	}
-                        	else{
-                        		terminated = true;
-                        		break;
-                        	}
-                        } catch (SendRequestCommunicationException exp) {
-                            if (debug) {
-                                logger.debug("listener has already been freed.");
+                        //                        while (service.hasRequestToServe()) {
+                        //                        	service.serveOldest();
+                        //                        }
+                        if (!terminated) {
+                            try {
+                                stubOnThis.workerMissing(workerName);
+                            } catch (Exception exp) {
+                                if (debug) {
+                                    logger.debug("Pinging " + workerName +
+                                        " has a error! Terminate the Pinger");
+                                    terminated = true;
+                                }
                             }
-                        } catch (BodyTerminatedRequestException exp1){
-                        	if (debug) {
-                                logger.debug("listener has already been terminaterd.");
-                            }
-                        } catch (Exception exp2){
-                    		if (debug) {
-                    			logger.debug("Zhen ta ma yumen, daodi shui shi null a?.");
-                    			exp2.printStackTrace();
-                    		}
-                    	}
+                        }
+
+                        //                        try{
+                        //                        	if(!terminated && null != stubOnThis && null != workerName){
+                        //                        		try{
+                        //                        		
+                        //                        		} catch (NullPointerException exp){
+                        //                            		if (debug) {
+                        //                            			logger.debug("Pinging " + workerName + " has a error! Terminate the Pinger");
+                        //                                        terminated = true;
+                        //                            		}
+                        //                        		}
+                        //                        	}
+                        //                        	else{
+                        //                        		terminated = true;
+                        //                        		break;
+                        //                        	}
+                        //                        } catch (SendRequestCommunicationException exp) {
+                        //                            if (debug) {
+                        //                                logger.debug("listener has already been freed.");
+                        //                            }
+                        //                        } catch (BodyTerminatedRequestException exp1){
+                        //                        	if (debug) {
+                        //                                logger.debug("listener has already been terminaterd.");
+                        //                            }
+                        //                        } catch (Exception exp2){
+                        //                    		if (debug) {
+                        //                    			logger.debug("Zhen ta ma yumen, daodi shui shi null a?.");
+                        //                    			exp2.printStackTrace();
+                        //                    		}
+                        //                    	}
                     }
                 }
 
@@ -195,18 +210,20 @@ public class AOPinger implements WorkerWatcher, RunActive, InitActive, Serializa
                 while (!terminated && service.hasRequestToServe()) {
                     service.serveOldest();
                 }
-            } catch (InterruptedException ex) {
-                // do not print message, pinger is terminating
 
-            } catch (Exception e) {
-                e.printStackTrace();
             }
+        } catch (InterruptedException ex) {
+            // do not print message, pinger is terminating
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         if (debug) {
             logger.debug("Pinger Terminated...");
         }
 
+        stubOnThis = null;
         // we clear the service to avoid dirty pending requests
         service.flushAll();
         // we block the communications because a getTask request might still be coming from a worker created just before the master termination
@@ -226,31 +243,31 @@ public class AOPinger implements WorkerWatcher, RunActive, InitActive, Serializa
      * @param worker the missing worker
      */
     public void workerMissing(final String workerName) {
-        if(!terminated){
-	    	if (debug) {
-	        	logger.debug("A worker" + workerName + " is missing...reporting back to the Master");
-	        }
-	
-	    	try{
-	    		if (workerGroup.containsKey(workerName)) {	        	
-	        		listener.isDead(workerName);
-	        		workerGroup.remove(workerName);
-		        }
-	        } catch (SendRequestCommunicationException exp) {
-        		if (debug) {
-        			logger.debug("listener has already been freed.");
-        		}
-        	} catch (BodyTerminatedRequestException exp1){
-        		if (debug) {
-        			logger.debug("listener has already been terminaterd.");
-        		}
-        	} catch (Exception exp2){
-        		if (debug) {
-        			logger.debug("Exception occurs when report the missing of " + workerName +
-        					"to listener.\n");
-        			exp2.printStackTrace();
-        		}
-        	}
+        if (!terminated) {
+            if (debug) {
+                logger.debug("A worker" + workerName + " is missing...reporting back to the Master");
+            }
+
+            try {
+                if (workerGroup.containsKey(workerName)) {
+                    listener.isDead(workerName);
+                    workerGroup.remove(workerName);
+                }
+            } catch (SendRequestCommunicationException exp) {
+                if (debug) {
+                    logger.debug("listener has already been freed.");
+                }
+            } catch (BodyTerminatedRequestException exp1) {
+                if (debug) {
+                    logger.debug("listener has already been terminaterd.");
+                }
+            } catch (Exception exp2) {
+                if (debug) {
+                    logger.debug("Exception occurs when report the missing of " + workerName +
+                        "to listener.\n");
+                    exp2.printStackTrace();
+                }
+            }
         }
     }
 
@@ -260,14 +277,12 @@ public class AOPinger implements WorkerWatcher, RunActive, InitActive, Serializa
             logger.debug("Terminating Pinger...");
         }
         this.terminated = true;
-        
+
         workerGroup.clear();
         workerGroup = null;
-        
+
         localThread.interrupt();
         localThread = null;
-
-        stubOnThis = null;
 
         return new BooleanWrapper(true);
     }

@@ -153,9 +153,9 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
      * Hierarchical master worker
      */
     private int groupSize = 100;
-    private HashMap<Long, AOSubMaster> subMasters;
+    private HashMap<Long, String> subMasters;
     private HashMap<Long, Integer> subGroupSizes;
-    private HashMap<Long, AOSubMaster> fullSubMasters;
+    private HashMap<Long, String> fullSubMasters;
 
     /**
      * ProActive no arg constructor
@@ -182,8 +182,8 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
         if (null != PAProperties.PA_MASTERWORKER_SUBGROUPSIZE.getValue()) {
             groupSize = Integer.parseInt(PAProperties.PA_MASTERWORKER_SUBGROUPSIZE.getValue());
         }
-        subMasters = new HashMap<Long, AOSubMaster>();
-        fullSubMasters = new HashMap<Long, AOSubMaster>();
+        subMasters = new HashMap<Long, String>();
+        fullSubMasters = new HashMap<Long, String>();
         subGroupSizes = new HashMap<Long, Integer>();
     }
 
@@ -291,7 +291,7 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
                                 new Object[] { workername, (WorkerMaster) provider, this.memoryFactory },
                                 node);
 
-                        subMasters.put(topologyId, subMaster);
+                        subMasters.put(topologyId, workername);
                         // Add the submaster to worker group
                         workers.put(workername, subMaster);
                         subGroupSizes.put(topologyId, 0);
@@ -334,7 +334,7 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
                         // if the size of the group is bigger than the set size
                         // Remove it from the subMaster group and add it to the full group
 
-                        subMaster = subMasters.get(topologyId);
+                        subMaster = (AOSubMaster) workers.get(subMasters.get(topologyId));
 
                         // If another one worker is added to the group, wait
                         // The group size if a critical variable
@@ -347,7 +347,7 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
                                 subGroupSizes.put(topologyId, subGroupSize);
                             else {
                                 subMasters.remove(topologyId);
-                                fullSubMasters.put(topologyId, subMaster);
+                                fullSubMasters.put(topologyId, subMasters.get(topologyId));
                             }
 
                             if (debug) {
@@ -359,8 +359,31 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
                         Collection<Node> nodes = new Vector<Node>();
                         nodes.add(node);
 
-                        subMaster.addResources(nodes);
+                        while (true) {
+                            try {
+                                subMaster.addResources(nodes);
+                                break;
+                            } catch (SendRequestCommunicationException exp) {
+                                if (debug) {
+                                    logger.debug("Master has already been freed.");
+                                }
 
+                            } catch (BodyTerminatedRequestException exp1) {
+                                if (debug) {
+                                    logger.debug("Master has already been terminaterd.");
+                                }
+                            } catch (Exception exp2) {
+                                if (debug) {
+                                    logger.debug("Error occurs when call addResource to subMaster.");
+                                }
+                            }
+                            try {
+                                Thread.sleep(200);
+                            } catch (InterruptedException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
+                        }
                     }
                 } else {
                     String workername = "Worker_" + node.getVMInformation().getHostName() + "_" +
@@ -460,7 +483,7 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
                         logger.debug("Ask for terminating worker " + workerName);
                     }
 
-                	BooleanWrapper term = (workers.get(workerName)).terminate();
+                    BooleanWrapper term = (workers.get(workerName)).terminate();
                     // as it is a termination algorithm we wait a bit, but not forever
                     PAFuture.waitFor(term);
 
@@ -471,11 +494,11 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
                     if (debug) {
                         logger.debug(workerName + " is already freed.");
                     }
-                } catch (BodyTerminatedRequestException exp1){
-                	if (debug) {
+                } catch (BodyTerminatedRequestException exp1) {
+                    if (debug) {
                         logger.debug("Master has already been terminaterd.");
                     }
-                }                
+                }
             }
 
             // if the user asked it, we also release the resources, by killing all JVMs
@@ -523,15 +546,25 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
      * {@inheritDoc}
      */
     public boolean isDead(String workerName) {
-    	if(workers.containsKey(workerName))
-        workers.remove(workerName);
+        if (workers.containsKey(workerName)) {
+            if (!((workers.get(workerName)) instanceof AOSubMaster)) {
+                workers.remove(workerName);
+            }
+        }
+
         return true;
     }
-    
+
     public boolean addWorker(String workerName, Worker worker) {
-    	if(!workers.containsKey(workerName)){
-    		workers.put(workerName, worker);
-    	}
+        if (!workers.containsKey(workerName)) {
+            workers.put(workerName, worker);
+        } else {
+            workers.remove(workerName);
+            workers.put(workerName, worker);
+            if (debug) {
+                logger.debug("Update submaster " + workerName);
+            }
+        }
         return true;
     }
 
