@@ -67,7 +67,6 @@ import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.component.representative.ItfID;
 import org.objectweb.proactive.core.component.request.Shortcut;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.debug.dconnection.DebuggerConnection;
 import org.objectweb.proactive.core.debug.stepbystep.BreakpointType;
 import org.objectweb.proactive.core.debug.stepbystep.Debugger;
 import org.objectweb.proactive.core.gc.GCMessage;
@@ -411,13 +410,13 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
      * perform AFTER entering in the ThreadStore.
      */
     public void registerIncomingFutures() {
-        // get list of futures that should be deserialized and registred "behind the ThreadStore"
+        // get list of futures that should be deserialized and registered "behind the ThreadStore"
         java.util.ArrayList<Future> incomingFutures = FuturePool.getIncomingFutures();
 
         if (incomingFutures != null) {
             // if futurePool is not null, we are in an Active Body
             if (getFuturePool() != null) {
-                // some futures have to be registred in the local futurePool
+                // some futures have to be registered in the local futurePool
                 java.util.Iterator<Future> it = incomingFutures.iterator();
                 while (it.hasNext()) {
                     Future current = it.next();
@@ -425,7 +424,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                 }
                 FuturePool.removeIncomingFutures();
             } else {
-                // we are in a migration forwarder,just remove registred futures
+                // we are in a migration forwarder,just remove registered futures
                 FuturePool.removeIncomingFutures();
             }
         }
@@ -453,7 +452,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                     if (this.openedSessions.contains(sessionID)) {
                         this.openedSessions.remove(sessionID);
                         this.internalBodySecurity.terminateSession(sID);
-                        // System.out.println("Object has migrated : Renegotiate Session");
+                        // System.out.println("Object has migrated : Renegociate Session");
                         throw new RenegotiateSessionException(this.internalBodySecurity.getDistantBody());
                     }
                 }
@@ -1148,7 +1147,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     }
 
     /**
-     * Returns true iff an immediate service request is being served now.
+     * Returns true if an immediate service request is being served now.
      */
     public abstract boolean isInImmediateService() throws IOException;
 
@@ -1172,7 +1171,8 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                 if (toKill != null) {
                     // this body is still alive
                     toKill.blockCommunication();
-                    RemoteObjectExposer toKillRoe = ((AbstractBody) toKill).getRemoteObjectExposer();
+                    RemoteObjectExposer<UniversalBody> toKillRoe = ((AbstractBody) toKill)
+                            .getRemoteObjectExposer();
                     toKillRoe.getRemoteObject().setTarget(this);
 
                     this.roe = toKillRoe;

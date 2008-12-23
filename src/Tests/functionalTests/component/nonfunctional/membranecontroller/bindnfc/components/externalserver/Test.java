@@ -143,7 +143,7 @@ public class Test extends ComponentTest {
 
         //Creation of the non-functional name controller component
         Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getNFFactory();
-        Map context = new HashMap();
+        Map<Object, Object> context = new HashMap<Object, Object>();
         Component nameController = null;
         nameController = (Component) f.newComponent(
                 "org.objectweb.proactive.core.component.componentcontroller.adl.nameControllerComponent",

@@ -152,7 +152,7 @@ public class RemoteObjectHelper {
      * @return a remote object adapter wrapping a remote reference to a remote object
      * @throws ProActiveException
      */
-    public static RemoteObject lookup(URI url) throws ProActiveException {
+    public static <T> RemoteObject<T> lookup(URI url) throws ProActiveException {
         return getFactoryFromURL(url).lookup(expandURI(url));
     }
 
@@ -175,7 +175,7 @@ public class RemoteObjectHelper {
             if (adapter != null) {
                 Class<?>[] classArray = new Class<?>[] {};
 
-                Constructor<?>[] c = adapter.getConstructors();
+                adapter.getConstructors();
 
                 Adapter<T> ad = adapter.getConstructor(classArray).newInstance();
                 ad.setTargetAndCallConstruct(reifiedObjectStub);

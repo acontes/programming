@@ -372,7 +372,7 @@ public class OctTree implements Serializable {
         radius = rad;
     }
 
-    public List getListPlanets() {
+    public List<Planet> getListPlanets() {
         return listPlanets;
     }
 

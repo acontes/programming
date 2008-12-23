@@ -58,7 +58,7 @@ public class FuturePool extends Object implements java.io.Serializable {
     protected boolean newState;
 
     // table of future and ACs
-    // this map is rebuilt on deserailisation of the object
+    // this map is rebuilt on deserialization of the object
     public transient FutureMap futures;
 
     // body corresponding to this futurePool
@@ -68,7 +68,7 @@ public class FuturePool extends Object implements java.io.Serializable {
     private transient ActiveACQueue queueAC;
 
     // toggles for enabling or disabling automatic continuation
-    // outgoing ACs has to be registred if true
+    // outgoing ACs has to be registered if true
     private boolean registerACs;
 
     // incoming replies can be sent by ACs
@@ -102,7 +102,7 @@ public class FuturePool extends Object implements java.io.Serializable {
     // Automatic continuation
 
     // this table is used to register destination before sending.
-    // So, a future could retreive its destination during serialization
+    // So, a future could retrieve its destination during serialization
     // this table indexed by the thread which perform the registration.
     static private ThreadLocal<ArrayList<UniversalBody>> bodiesDestination;
 
@@ -284,8 +284,8 @@ public class FuturePool extends Object implements java.io.Serializable {
 
             // 2) create and put ACservices
             if (this.registerACs) {
-                ArrayList<UniversalBody> bodiesToContinue = (ArrayList<UniversalBody>) (futures
-                        .getAutomaticContinuation(id, creatorID).clone());
+                ArrayList<UniversalBody> bodiesToContinue = (ArrayList<UniversalBody>) futures
+                        .getAutomaticContinuation(id, creatorID).clone();
                 if ((bodiesToContinue != null) && (bodiesToContinue.size() != 0)) {
                     ProActiveSecurityManager psm = ((AbstractBody) PAActiveObject.getBodyOnThis())
                             .getProActiveSecurityManager();
@@ -296,7 +296,7 @@ public class FuturePool extends Object implements java.io.Serializable {
                     }
 
                     // the added reply is a deep copy (concurrent modification of result)
-                    // ACs are registred during this deep copy (no copy mode)
+                    // ACs are registered during this deep copy (no copy mode)
                     // Warn : this copy does not avoid the copy for local communications !
                     this.registerDestinations(bodiesToContinue);
                     MethodCallResult newResult = (MethodCallResult) Utils.makeDeepCopy(result);
@@ -444,7 +444,7 @@ public class FuturePool extends Object implements java.io.Serializable {
             boolean queueStarted = in.readBoolean();
             if (queueStarted) {
                 // create a new ActiveACQueue
-                ArrayList<ACService> queue = (ArrayList<ACService>) (in.readObject());
+                ArrayList<ACService> queue = (ArrayList<ACService>) in.readObject();
                 queueAC = new ActiveACQueue(queue);
                 queueAC.start();
             } else {
