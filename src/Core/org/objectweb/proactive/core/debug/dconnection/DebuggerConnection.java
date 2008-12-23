@@ -1,3 +1,35 @@
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ActiveEon Team
+ *                        http://www.activeeon.com/
+ *  Contributor(s):
+ *
+ *
+ * ################################################################
+ * $$ACTIVEEON_INITIAL_DEV$$
+ */
 package org.objectweb.proactive.core.debug.dconnection;
 
 import java.io.BufferedReader;
@@ -14,6 +46,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.node.StartNode;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
+import org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger;
 
 
 public class DebuggerConnection implements Serializable {
@@ -73,7 +106,7 @@ public class DebuggerConnection implements Serializable {
         Node node = getNode();
         try {
             if (node == null && !created) {
-                JVMProcessImpl vm = new JVMProcessImpl();
+                JVMProcessImpl vm = new JVMProcessImpl(new StandardOutputMessageLogger());
                 vm.setClassname(StartNode.class.getName());
                 vm.setParameters(nodeName);
                 vm.startProcess();
@@ -81,6 +114,7 @@ public class DebuggerConnection implements Serializable {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e2) {
+                    e2.printStackTrace();
                 }
                 node = getNode();
             }

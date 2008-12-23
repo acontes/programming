@@ -1,17 +1,16 @@
-<?xml version="1.0" encoding="utf-8"?><chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="OOSPMDJacobiexample"><info><title>OO SPMD PROGRAMMING</title></info>
+<?xml version="1.0" encoding="utf-8"?><chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="OOSPMDJacobiexample"><info><title xml:id="OOSPMDPROGRAMMING_10">OO SPMD PROGRAMMING</title></info>
   
 
   <para>If you want to learn more about the OO SPMD programming model before
   reading this example, you should take a look at <xref linkend="OOSPMD"/>.</para> 
 
-  <section><info><title>OO SPMD on a Jacobi example</title></info>
+  <section xml:id="OOSPMDonaJacobiexample_10"><info><title>OO SPMD on a Jacobi example</title></info>
     
 
-    <section><info><title>Execution and first glance at the Jacobi code</title></info>
+    <section xml:id="ExecutionandfirstglanceattheJacobicode_10"><info><title>Execution and first glance at the Jacobi code</title></info>
       
 
-      <section><info><title>Source files:
-        ProActive/src/Examples/org/objectweb/proactive/examples/jacobi</title></info>
+      <section xml:id="source_files_jacob_5"><info><title >Source files: ProActive/src/Examples/org/objectweb/proactive/examples/jacobi</title></info>
         
 
         <para>The Jacobi example is made of two Java classes:</para>
@@ -35,7 +34,7 @@
         SubMatrix.java later on.</para>
       </section>
 
-      <section><info><title>Execution</title></info>
+      <section xml:id="Execution_10"><info><title>Execution</title></info>
         
 
         <para>Each ProActive example comes with an easy to launch script for
@@ -91,17 +90,17 @@
           </listitem>
         </itemizedlist>
 
-	<para>You can start IC2D (see link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://proactive.inria.fr/release-doc/ic2d/manual/single_html/IC2D.html"> ProActive Optimizing</link> documentation) in order to
+	<para>You can start IC2D (see link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://proactive.inria.fr/release-doc/ic2d/single_html/IC2DManual.html"> ProActive Optimizing</link> documentation) in order to
         visualize the JVMs and the Active Objects. To stop the Jacobi
         computation and all the associated AOs, and JVMs, just Ctrl+C
         in the console you used to launch the Jacobi script.</para>
       </section>
     </section>
 
-    <section><info><title>Modification and compilation</title></info>
+    <section xml:id="Modificationandcompilation_10"><info><title>Modification and compilation</title></info>
       
 
-      <section><info><title>Source modification</title></info>
+      <section xml:id="Sourcemodification_10"><info><title>Source modification</title></info>
         
 
         <para>Do a simple source modification, for instance changing the
@@ -113,7 +112,7 @@
         constants.</para>
       </section>
 
-      <section><info><title>Compilation</title></info>
+      <section xml:id="Compilation_10"><info><title>Compilation</title></info>
         
 
         <para>ProActive distribution comes with scripts to easily recompile
@@ -134,10 +133,10 @@
       </section>
     </section>
 
-    <section><info><title>Detailed understanding of the OO SPMD Jacobi</title></info>
+    <section xml:id="DetailedunderstandingoftheOOSPMDJacobi_10"><info><title>Detailed understanding of the OO SPMD Jacobi</title></info>
       
 
-      <section><info><title>Structure of the code</title></info>
+      <section xml:id="Structureofthecode_10"><info><title>Structure of the code</title></info>
         
 
         <para>Within the class SubMatrix.java the following methods correspond
@@ -235,7 +234,7 @@
         <para>We will detail them in the next section.</para>
       </section>
 
-      <section><info><title>OO SPMD behavior</title></info>
+      <section xml:id="OOSPMDbehavior_10"><info><title>OO SPMD behavior</title></info>
         
 
         <para>Let us describe the OO SPMD techniques which are used and the
@@ -284,7 +283,7 @@
         ProActive will simplify this process.</para>
       </section>
 
-      <section><info><title>Adding a method barrier for a step by step execution</title></info>
+      <section xml:id="Addingamethodbarrierforastepby_10"><info><title>Adding a method barrier for a step by step execution</title></info>
         
 
         <para>Let's say we would like to control step by step the execution of
@@ -337,7 +336,7 @@ private static void printMessageAndWait() {
         <para>You can try and test other modifications to the Jacobi
         code.</para>
 
-        <figure><info><title>Running the Jacobi application, and viewing with IC2D</title></info>
+        <figure xml:id="RunningtheJacobiapplicationandviewingwithIC2D_10"><info><title>Running the Jacobi application, and viewing with IC2D</title></info>
           
 
           <indexterm>
@@ -354,7 +353,7 @@ private static void printMessageAndWait() {
         </figure>
       </section>
 
-      <section><info><title>Understanding various different kind of barriers</title></info>
+      <section xml:id="Understandingvariousdifferentkindofbarriers_10"><info><title>Understanding various different kind of barriers</title></info>
         
 
         <para>The group of neighbors built above is important wrt
@@ -378,7 +377,7 @@ private static void printMessageAndWait() {
         <para>Then recompile and execute again. Using IC2D observe that much
         more communications are necessary.</para>
 
-        <figure><info><title>With all communications</title></info>
+        <figure xml:id="Withallcommunications_10"><info><title>With all communications</title></info>
           
 
           <mediaobject>
@@ -388,7 +387,7 @@ private static void printMessageAndWait() {
           </mediaobject>
         </figure>
 
-        <figure><info><title>With a barrier, there are many less communications</title></info>
+        <figure xml:id="Withabarriertherearemanylesscommunications_10"><info><title>With a barrier, there are many less communications</title></info>
           
 
           <mediaobject>
@@ -403,10 +402,10 @@ private static void printMessageAndWait() {
       </section>
     </section>
 
-    <section><info><title>Virtual Nodes and Deployment descriptors</title></info>
+    <section xml:id="VirtualNodesandDeploymentdescriptors_10"><info><title>Virtual Nodes and Deployment descriptors</title></info>
       
 
-      <section><info><title>Virtual Nodes</title></info>
+      <section xml:id="VirtualNodes_10"><info><title>Virtual Nodes</title></info>
         
 
         <para>Now, we will return to the source code of Jacobi.java to
@@ -414,7 +413,7 @@ private static void printMessageAndWait() {
         used.</para>
       </section>
 
-      <section><info><title>XML Descriptors</title></info>
+      <section xml:id="XMLDescriptors_10"><info><title>XML Descriptors</title></info>
         
 
         <para>The XML descriptor being used is:</para>
@@ -444,15 +443,14 @@ private static void printMessageAndWait() {
         <para>A detailed presentation of XML descriptors is available in <xref linkend="Descriptor_html_objectives"/>.</para>
       </section>
 
-      <section><info><title>Changing the descriptor</title></info>
+      <section xml:id="Changingthedescriptor_10"><info><title>Changing the descriptor</title></info>
         
 
         <para>Edit the file Matrix.xml in order to change the number of JVMs
         being used. For instance, if your machine is powerful enough, start 9
         JVMs, in order to have a single SubMatrix per JVM.</para>
 
-        <figure><info><title>IC2D viewing the Jacobi application with 9 JVMS on the same
-          machine</title></info>
+        <figure xml:id="jacobi_ic2d_9JVMS"><info><title>IC2D viewing the Jacobi application with 9 JVMS on the same machine</title></info>
           
 
           <mediaobject>
@@ -467,10 +465,10 @@ private static void printMessageAndWait() {
       </section>
     </section>
 
-    <section><info><title>Execution on several machines and Clusters</title></info>
+    <section xml:id="ExecutiononseveralmachinesandClusters_10"><info><title>Execution on several machines and Clusters</title></info>
       
 
-      <section><info><title>Execution on several machines in the room</title></info>
+      <section xml:id="Executiononseveralmachinesintheroom_10"><info><title>Execution on several machines in the room</title></info>
         
 
         <para>
@@ -546,7 +544,7 @@ private static void printMessageAndWait() {
         once connected to those machines with rsh.</para>
 	  </section>
 	  
-      <section><info><title>Execution on Clusters</title></info>
+      <section xml:id="ExecutiononClusters_10"><info><title>Execution on Clusters</title></info>
         
 
         <para>If you have access to your own cluster, configure the XML
@@ -564,10 +562,10 @@ private static void printMessageAndWait() {
 
   <!-- Pi MPI -> Pi ProActive -->
 
-  <section><info><title>An MPI to ProActive example through an Integral Pi application</title></info>
+  <section xml:id="AnMPItoProActiveexamplethroughanIntegral_10"><info><title>An MPI to ProActive example through an Integral Pi application</title></info>
     
 
-    <section><info><title>Introduction</title></info>
+    <section xml:id="Introduction_10"><info><title>Introduction</title></info>
       
 
       <para>In this chapter we are going to see a simple example of an MPI
@@ -609,10 +607,10 @@ private static void printMessageAndWait() {
       </itemizedlist>
     </section>
 
-    <section><info><title>Initialization</title></info>
+    <section xml:id="Initialization_10"><info><title>Initialization</title></info>
       
 
-      <section><info><title>MPI Initialization primitives</title></info>
+      <section xml:id="MPIInitializationprimitives_10"><info><title>MPI Initialization primitives</title></info>
         
 
         <para>Some basic primitives are used, notice that MPI provides a rank
@@ -628,7 +626,7 @@ private static void printMessageAndWait() {
   solicit (&amp;N, &amp;nprocs, mynum);</programlisting>
       </section>
 
-      <section><info><title>ProActive Initialization primitives</title></info>
+      <section xml:id="ProActiveInitializationprimitives_10"><info><title>ProActive Initialization primitives</title></info>
         
 
         <para>First we need to create the group of workers (MPI processes
@@ -661,10 +659,10 @@ private static void printMessageAndWait() {
       </section>
     </section>
 
-    <section><info><title>Communication primitives</title></info>
+    <section xml:id="Communicationprimitives_10"><info><title>Communication primitives</title></info>
       
 
-      <section><info><title>Communication pattern</title></info>
+      <section xml:id="Communicationpattern_10"><info><title>Communication pattern</title></info>
         
 
         <para>The communication pattern is very simple, it's done in 2 steps.
@@ -672,7 +670,7 @@ private static void printMessageAndWait() {
         other process and sums the received values.</para>
       </section>
 
-      <section><info><title>MPI Approach</title></info>
+      <section xml:id="MPIApproach_10"><info><title>MPI Approach</title></info>
         
 
         <para>The MPI implementation involves 3 communication primitives
@@ -715,7 +713,7 @@ private static void printMessageAndWait() {
   }  </programlisting>
       </section>
 
-      <section><info><title>ProActive Approach</title></info>
+      <section xml:id="ProActiveApproach_10"><info><title>ProActive Approach</title></info>
         
 
         <para>The ProActive implementation is quite similar to MPI one. The
@@ -744,7 +742,7 @@ private static void printMessageAndWait() {
       </section>
     </section>
 
-    <section><info><title>Running the ProActive example</title></info>
+    <section xml:id="RunningtheProActiveexample_10"><info><title>Running the ProActive example</title></info>
       
 
         <para>In ProActive/scripts/unix or windows run integralpi.sh or .bat,
