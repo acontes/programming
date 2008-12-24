@@ -172,7 +172,7 @@ public class Test extends ComponentTest {
                 org.objectweb.proactive.core.component.controller.ProActiveNameController.class.getName());
 
         Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getNFFactory();
-        Map<Object, Object> context = new HashMap<Object, Object>();
+        Map context = new HashMap();
         Component dummyMaster = (Component) f.newComponent(
                 "functionalTests.component.nonfunctional.adl.dummyMaster", context);
         Fractal.getNameController(dummyMaster).setFcName("dummyMaster");

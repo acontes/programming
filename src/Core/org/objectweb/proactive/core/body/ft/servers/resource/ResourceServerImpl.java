@@ -48,7 +48,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public class ResourceServerImpl implements ResourceServer {
 
-    /** Connection port for recovery nodes p2p network */
+    /** Connexion port for recovery nodes p2p network */
     // public static final String P2P_PORT = "2603";
     //logger
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.FAULT_TOLERANCE);
@@ -59,7 +59,7 @@ public class ResourceServerImpl implements ResourceServer {
     // list of free ProActiveRuntime
     private List<Node> freeNodes;
 
-    // OR use p2p infrastructure
+    // OR use p2p infracstructure
     // private P2PService serviceP2P;
 
     // number of returned free nodes
