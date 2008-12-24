@@ -278,7 +278,25 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
 
                 if (topologyId > 0) {
                     if (subMasters.containsKey(topologyId)) {
-                        // do nothing
+                    	// Make sure the subMaster is alive
+                    	// Otherwise wait it to recover
+                        try{
+                        	(workers.get(subMasters.get(topologyId))).heartBeat();
+                        } catch (Exception e) {
+                        	if(debug){
+                        		e.printStackTrace();
+                        	}
+                        	if (subGroupSizes.get(topologyId) > 0)
+                        		stubOnThis.createSubMaster(node);
+                        	else {
+                        		subGroupSizes.remove(topologyId);
+                        		
+                        		workers.remove(subMasters.remove(topologyId));
+                        		stubOnThis.createSubMaster(node);
+                        	}
+                        	
+                        	return;
+                        }
                         threadPool.execute(new WorkerCreationHandler(node));
                     }
 
@@ -336,6 +354,28 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
 
                         subMaster = (AOSubMaster) workers.get(subMasters.get(topologyId));
 
+                        
+
+                        // get the submaster and give the node to the subMaster to create worker
+                        Collection<Node> nodes = new Vector<Node>();
+                        nodes.add(node);
+
+                        try {
+                            subMaster.addResources(nodes);
+                            if (debug) {
+                                logger.debug("Call add resource to subMaster success.");
+                            }
+                            subMaster.heartBeat();
+                        } catch (Exception exp) {
+                            if (debug) {
+                                logger.debug("Error occurs when call addResource to subMaster.");
+                                exp.printStackTrace();
+                            }
+                            // readd the resources
+                            stubOnThis.addResources(nodes);
+                            return;
+                        }
+                        
                         // If another one worker is added to the group, wait
                         // The group size if a critical variable
 
@@ -354,36 +394,7 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
                                 logger.debug("subGroupSize is: " + subGroupSize);
                             }
                         }
-
-                        // get the submaster and give the node to the subMaster to create worker
-                        Collection<Node> nodes = new Vector<Node>();
-                        nodes.add(node);
-
-                        while (true) {
-                            try {
-                                subMaster.addResources(nodes);
-                                break;
-                            } catch (SendRequestCommunicationException exp) {
-                                if (debug) {
-                                    logger.debug("Master has already been freed.");
-                                }
-
-                            } catch (BodyTerminatedRequestException exp1) {
-                                if (debug) {
-                                    logger.debug("Master has already been terminaterd.");
-                                }
-                            } catch (Exception exp2) {
-                                if (debug) {
-                                    logger.debug("Error occurs when call addResource to subMaster.");
-                                }
-                            }
-                            try {
-                                Thread.sleep(200);
-                            } catch (InterruptedException e) {
-                                // TODO Auto-generated catch block
-                                e.printStackTrace();
-                            }
-                        }
+                            
                     }
                 } else {
                     String workername = "Worker_" + node.getVMInformation().getHostName() + "_" +

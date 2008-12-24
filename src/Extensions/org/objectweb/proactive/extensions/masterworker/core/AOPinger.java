@@ -257,10 +257,13 @@ public class AOPinger implements WorkerWatcher, RunActive, InitActive, Serializa
                 if (debug) {
                     logger.debug("listener has already been freed.");
                 }
+                // then terminate the pinger
+                terminate();
             } catch (BodyTerminatedRequestException exp1) {
                 if (debug) {
                     logger.debug("listener has already been terminaterd.");
                 }
+                terminate();
             } catch (Exception exp2) {
                 if (debug) {
                     logger.debug("Exception occurs when report the missing of " + workerName +

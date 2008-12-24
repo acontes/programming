@@ -15,7 +15,7 @@ public interface WorkerPeer extends WorkerDeadListener {
     /**
      * Return whether it can be SubMaster or not
      */
-    public abstract BooleanWrapper canBeSubMaster();
+    public abstract WorkerMaster canBeSubMaster(final Long peerId, final String peerName, final WorkerPeer workerPeer);
 
     /**
      * The SubMaster informs a new peer join the group.

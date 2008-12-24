@@ -295,6 +295,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
 
         PAActiveObject.setImmediateService("heartBeat");
         PAActiveObject.setImmediateService("initSubMaster");
+        PAActiveObject.setImmediateService("addResources", new Class<?>[] { Collection.class});
         stubOnThis.getIntialTasks();
     }
 
@@ -352,6 +353,7 @@ public class AOSubMaster implements Serializable, WorkerMaster, InitActive, RunA
 
             // We tell the pinger to watch for this new worker
             pinger.addWorkerToWatch(worker, workerName);
+            ((AOSubWorkerManager) this.smanager).addWorker(workerName, worker);
         }
     }
 

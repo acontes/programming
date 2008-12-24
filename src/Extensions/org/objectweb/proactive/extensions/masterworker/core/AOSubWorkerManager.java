@@ -83,6 +83,8 @@ public class AOSubWorkerManager implements WorkerManager, InitActive, Serializab
     private HashMap<Long, WorkerPeer> workerPeers;
 
     private HashMap<Long, String> workerNames;
+    
+    private HashMap<Long, Node> deployedNodes;
     /**
      * For fault torlerance purpose
      */
@@ -176,6 +178,7 @@ public class AOSubWorkerManager implements WorkerManager, InitActive, Serializab
 
                 long workerId = 0;
                 synchronized (workerNameCounter) {
+                	deployedNodes.put(workerNameCounter, node);
                     workerId = workerNameCounter++;
                 }
 
@@ -185,7 +188,7 @@ public class AOSubWorkerManager implements WorkerManager, InitActive, Serializab
                 AOSubWorker subworker = (AOSubWorker) PAActiveObject.newActive(AOSubWorker.class.getName(),
                         new Object[] { workername, (WorkerMaster) provider,
                                 memoryFactory.newMemoryInstance(), workerId, (WorkerMaster) superProvider,
-                                memoryFactory, subMasterName }, node);
+                                memoryFactory, subMasterName, deployedNodes }, node);
 
                 PAFuture.waitFor(subworker);
 
@@ -225,6 +228,9 @@ public class AOSubWorkerManager implements WorkerManager, InitActive, Serializab
         // TODO Auto-generated method stub
         if (!isTerminated) {
             for (Node node : nodes) {
+            	if(this.deployedNodes.containsValue(node)) {
+            		continue;
+            	}
                 threadPool.execute(new WorkerCreationHandler(node));
             }
         }
@@ -294,6 +300,14 @@ public class AOSubWorkerManager implements WorkerManager, InitActive, Serializab
         return true;
     }
 
+    public boolean addWorker(String workerName, Worker worker) {
+        if (!workers.containsKey(workerName)) {
+            workers.put(workerName, worker);
+            ((AOSubWorker) worker).updateWorkerPeerList(workerNameCounter, workerPeers, workerNames);
+        } 
+        return true;
+    }
+    
     public void initActivity(Body body) {
         // TODO Auto-generated method stub
         stubOnThis = (AOSubWorkerManager) PAActiveObject.getStubOnThis();
@@ -301,6 +315,7 @@ public class AOSubWorkerManager implements WorkerManager, InitActive, Serializab
         workers = new HashMap<String, Worker>();
         workerPeers = new HashMap<Long, WorkerPeer>();
         workerNames = new HashMap<Long, String>();
+        deployedNodes = new HashMap<Long, Node>();
 
         isTerminated = false;
         if (debug) {
@@ -309,6 +324,7 @@ public class AOSubWorkerManager implements WorkerManager, InitActive, Serializab
 
         PAActiveObject.setImmediateService("heartBeat");
         PAActiveObject.setImmediateService("initSubWorkerManager");
+        PAActiveObject.setImmediateService("addResources", new Class<?>[] { Collection.class});
 
         threadPool = Executors.newCachedThreadPool();
     }
