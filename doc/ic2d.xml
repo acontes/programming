@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project>
-    <property name="doc.name"	value="ProActive" />
+<project name="doc.IC2D">
+    <property name="doc.name"               value="IC2D" />
+    <property name="docs.src.dir"           value="../doc/src_ic2d" />  
 
      <!-- ##used for DocBookize## -->
     <!-- the path for java file inclusion -->
     <property name="java.inclusion" value="${src.proactive.dir}/${proactive.path}" />
-    
+
     <property name="xml.inclusion" value="${descriptors.dir}/" />
 
     <!-- The path to find java files in html -->
@@ -15,5 +16,6 @@
     <property name="otherpath3.inclusion" value="./"/>
     <property name="otherpath4.inclusion" value="./"/>
     <property name="otherpath5.inclusion" value="./"/>
-    
+
+    <import file="toolchain/doc.xml"/>
 </project>    
