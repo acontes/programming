@@ -67,7 +67,10 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectAdapter;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
+import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
@@ -872,6 +875,19 @@ public class PAActiveObject {
         }
     }
 
+    /**
+     * <B>TMP For GMO Version</B>. Will be available in better version in PA4.1
+     * Turn any object into a remotely accessible version of this object.
+     */
+	public static Object turnRemote(Object o) throws ProActiveException {
+		RemoteObjectExposer<Object> roe = new RemoteObjectExposer<Object>(
+				o.getClass().getCanonicalName(), o);
+		URI uri = RemoteObjectHelper.generateUrl(o.toString());
+		RemoteRemoteObject rro = roe.createRemoteObject(uri);
+		return new RemoteObjectAdapter(rro).getObjectProxy();
+	}
+    
+    
     /**
      * Registers an active object into a registry(RMI or IBIS or HTTP, default is RMI). In fact it
      * is the remote version of the body of the active object that is registered into the registry
