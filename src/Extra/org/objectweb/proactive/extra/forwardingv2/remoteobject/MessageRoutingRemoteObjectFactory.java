@@ -61,7 +61,7 @@ import org.objectweb.proactive.extra.forwardingv2.remoteobject.util.exceptions.M
 
 public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFactory implements
         RemoteObjectFactory {
-    static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING);
+    static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_REMOTE_OBJECT);
 
     final private AgentV2 agent;
     final private MessageRoutingRegistry registry;
@@ -237,5 +237,9 @@ public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFacto
         irro.setRemoteRemoteObject(rmo);
 
         return irro;
+    }
+
+    public AgentV2 getAgent() {
+        return this.agent;
     }
 }

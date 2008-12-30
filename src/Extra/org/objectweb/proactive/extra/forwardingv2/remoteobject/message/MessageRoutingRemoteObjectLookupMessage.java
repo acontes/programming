@@ -35,6 +35,7 @@ import java.io.Serializable;
 import java.net.URI;
 
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
 import org.objectweb.proactive.extra.forwardingv2.client.AgentV2;
@@ -50,7 +51,6 @@ import org.objectweb.proactive.extra.forwardingv2.remoteobject.util.MessageRouti
  */
 @SuppressWarnings("serial")
 public class MessageRoutingRemoteObjectLookupMessage extends MessageRoutingMessage implements Serializable {
-    private String urn;
 
     //Caller Side
 
@@ -76,19 +76,28 @@ public class MessageRoutingRemoteObjectLookupMessage extends MessageRoutingMessa
      */
     @Override
     public Object processMessage() {
-        if (this.urn != null) {
+        System.out.println("MessageRoutingRemoteObjectLookupMessage.processMessage() for " + uri);
+        if (this.uri != null) {
             InternalRemoteRemoteObject irro = MessageRoutingRegistry.singleton.lookup(uri);
             if (irro != null) {
                 RemoteRemoteObject rro = null;
                 try {
-                    rro = new MessageRoutingRemoteObjectFactory().newRemoteObject(irro);
+                    MessageRoutingRemoteObjectFactory f = (MessageRoutingRemoteObjectFactory) AbstractRemoteObjectFactory
+                            .getRemoteObjectFactory("pamr");
+                    rro = f.newRemoteObject(irro);
                     ((MessageRoutingRemoteObjectImpl) rro).setURI(uri);
                 } catch (ProActiveException e) {
                     e.printStackTrace();
                 }
                 this.returnedObject = rro;
+            } else {
+                System.err.println(this.uri + " not found. Items in the registry are ");
+                for (URI uri : MessageRoutingRegistry.singleton.list()) {
+                    System.err.println(" -> " + uri);
+                }
             }
         }
+
         return this.returnedObject;
     }
 }

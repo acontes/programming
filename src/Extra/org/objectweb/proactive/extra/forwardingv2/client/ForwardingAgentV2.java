@@ -43,7 +43,7 @@ public class ForwardingAgentV2 implements AgentV2Internal, Runnable {
      * Number of retries to connect to the registry.
      */
     public static final int NB_RETRY = 3;
-    public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING);
+    public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_CLIENT);
 
     /** Delay before aborting the response waiting. **/
     private static final long WAITING_DELAY = 5000;
@@ -181,7 +181,7 @@ public class ForwardingAgentV2 implements AgentV2Internal, Runnable {
             internalSendMsg(msg);
             // block until the result arrives
 
-            byte[] response = mb.waitForResponse(WAITING_DELAY);
+            byte[] response = mb.waitForResponse(0);
             if (response == null) {
                 logger.debug("Timeout reached while waiting a response for " + msg);
                 throw new RoutingException("Timeout reached while waiting a response for " + msg);
@@ -196,7 +196,7 @@ public class ForwardingAgentV2 implements AgentV2Internal, Runnable {
             throw new AgentNotConnectedException();
         }
         String path = targetURI.getPath();
-        String remoteAgentId = path.split("/")[1];
+        String remoteAgentId = path.split("/", 3)[1];
 
         AgentID agentID = new AgentID(Long.parseLong(remoteAgentId));
         return sendMsg(agentID, data, oneWay);

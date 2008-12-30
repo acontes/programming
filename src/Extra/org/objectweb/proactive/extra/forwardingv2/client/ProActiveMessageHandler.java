@@ -1,5 +1,7 @@
 package org.objectweb.proactive.extra.forwardingv2.client;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -16,7 +18,7 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.message.DataRequestMe
  * @since ProActive 4.1.0
  */
 public class ProActiveMessageHandler implements MessageHandler {
-    public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING);
+    public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_CLIENT);
     /**
      * ThreadPool options:
      * - CORE_POOL_SIZE: Initial size of the thread pool
@@ -27,17 +29,19 @@ public class ProActiveMessageHandler implements MessageHandler {
     private static final int MAX_POOL_SIZE = 4;
     private static final long KEEP_ALIVE_TIME = 10;
 
-    final private ThreadPoolExecutor tpe;
+    final private ExecutorService tpe;
 
     private AgentV2Internal agent;
 
     public ProActiveMessageHandler(AgentV2Internal agent) {
         this.agent = agent;
-        tpe = new ThreadPoolExecutor(CORE_POOL_SIZE, MAX_POOL_SIZE, KEEP_ALIVE_TIME, TimeUnit.SECONDS,
-            new LinkedBlockingQueue<Runnable>());
+        tpe = Executors.newFixedThreadPool(10);
     }
 
     public void pushMessage(DataRequestMessage message) {
+        if (logger.isTraceEnabled()) {
+            logger.trace("pushing message " + message + " into the executor queue");
+        }
         ProActiveMessageProcessor pmp = new ProActiveMessageProcessor(message, agent);
         tpe.submit(pmp);
     }

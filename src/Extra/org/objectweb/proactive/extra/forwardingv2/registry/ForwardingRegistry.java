@@ -23,7 +23,7 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message;
  * 
  */
 public class ForwardingRegistry implements Runnable {
-    public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING);
+    public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_ROUTER);
 
     static public final int DEFAULT_SERVER_PORT = 2099;
 
@@ -113,7 +113,7 @@ public class ForwardingRegistry implements Runnable {
                 // log the fact that a connection wasn't correctly accepted and
                 // keep listening
                 if (logger.isDebugEnabled()) {
-                    logger.debug("FR failed while accepting a connection, exception: " + e);
+                    logger.debug("FR failed while accepting a connection, exception: ", e);
                 }
             }
         }
@@ -140,6 +140,7 @@ public class ForwardingRegistry implements Runnable {
         // this function and stop the registry properly
 
         // stop the server if it was not stopped already
+        Thread.dumpStack();
         listening = false;
         try {
             serverSocket.close();

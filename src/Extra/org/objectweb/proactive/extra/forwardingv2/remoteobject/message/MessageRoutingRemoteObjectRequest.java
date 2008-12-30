@@ -60,6 +60,8 @@ public class MessageRoutingRemoteObjectRequest extends MessageRoutingMessage imp
 
     @Override
     public Object processMessage() {
+        System.out.println("MessageRoutingRemoteObjectRequest.processMessage() " + this.request);
+
         try {
             int max_retry = 10;
             InternalRemoteRemoteObject ro = null;

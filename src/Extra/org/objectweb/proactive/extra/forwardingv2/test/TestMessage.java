@@ -14,10 +14,8 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationR
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationRequestMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message.MessageType;
 
-import functionalTests.FunctionalTest;
 
-
-public class TestMessage extends FunctionalTest {
+public class TestMessage {
     AgentID srcID = new AgentID(2222l);
     AgentID dstID = new AgentID(1111l);
     long msgID = 1l;

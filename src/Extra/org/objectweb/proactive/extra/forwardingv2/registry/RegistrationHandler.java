@@ -24,7 +24,7 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message.Messa
  */
 
 public class RegistrationHandler implements Runnable {
-    public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING);
+    public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_ROUTER);
 
     static long attributedAgentID = 1;
 

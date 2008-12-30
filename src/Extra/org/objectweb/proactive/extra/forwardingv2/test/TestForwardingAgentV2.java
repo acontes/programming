@@ -23,10 +23,8 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationR
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message.MessageType;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.message.MessageRoutingMessage;
 
-import functionalTests.FunctionalTest;
 
-
-public class TestForwardingAgentV2 extends FunctionalTest {
+public class TestForwardingAgentV2 {
     FakeRegistry reg = null;
     static final String PAYLOAD = "Il est 18h";
 

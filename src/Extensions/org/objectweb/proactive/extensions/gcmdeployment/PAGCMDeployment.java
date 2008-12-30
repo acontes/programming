@@ -38,10 +38,12 @@ import java.net.URL;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationImpl;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationRemoteObjectAdapter;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 
 
@@ -102,13 +104,13 @@ public class PAGCMDeployment {
             throws ProActiveException {
         GCMApplication gcma = new GCMApplicationImpl(url, vContract);
 
+        // Export this GCMApplication as a remote object
         String name = gcma.getDeploymentId() + "/GCMApplication";
+        RemoteObjectExposer<GCMApplication> roe = new RemoteObjectExposer<GCMApplication>(
+            GCMApplication.class.getName(), gcma, GCMApplicationRemoteObjectAdapter.class);
+        roe.createRemoteObject(name);
 
-        URI uri = URIBuilder.buildURI("localhost", name);
-        RemoteObject ro = RemoteObjectHelper.lookup(uri);
-        gcma = (GCMApplication) RemoteObjectHelper.generatedObjectStub(ro);
-
-        return gcma;
+        return (GCMApplication) roe.getRemoteObject();
     }
 
     /**
@@ -127,12 +129,12 @@ public class PAGCMDeployment {
             throws ProActiveException {
         GCMApplication gcma = new GCMApplicationImpl(Helpers.fileToURL(file), vContract);
 
+        // Export this GCMApplication as a remote object
         String name = gcma.getDeploymentId() + "/GCMApplication";
+        RemoteObjectExposer<GCMApplication> roe = new RemoteObjectExposer<GCMApplication>(
+            GCMApplication.class.getName(), gcma, GCMApplicationRemoteObjectAdapter.class);
+        roe.createRemoteObject(name);
 
-        URI uri = URIBuilder.buildURI("localhost", name);
-        RemoteObject ro = RemoteObjectHelper.lookup(uri);
-        gcma = (GCMApplication) RemoteObjectHelper.generatedObjectStub(ro);
-
-        return gcma;
+        return (GCMApplication) roe.getRemoteObject();
     }
 }

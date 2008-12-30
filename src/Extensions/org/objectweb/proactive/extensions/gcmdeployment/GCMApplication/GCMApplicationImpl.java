@@ -190,11 +190,6 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
                 }
             }
 
-            // Export this GCMApplication as a remote object
-            RemoteObjectExposer<GCMApplication> roe = new RemoteObjectExposer<GCMApplication>(
-                GCMApplication.class.getName(), this, GCMApplicationRemoteObjectAdapter.class);
-            roe.createRemoteObject(deploymentId + "/GCMApplication");
-
             // Export all VirtualNodes as remote objects
             for (GCMVirtualNode vn : virtualNodes.values()) {
                 RemoteObjectExposer<GCMVirtualNode> vnroe = new RemoteObjectExposer<GCMVirtualNode>(

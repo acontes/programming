@@ -80,7 +80,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 @PublicAPI
 public class NodeFactory {
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT);
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.NODE);
 
     public static final String DEFAULT_VIRTUAL_NODE_NAME = "DefaultVN";
 
@@ -264,12 +264,11 @@ public class NodeFactory {
 
         //String noProtocolUrl = UrlBuilder.removeProtocol(nodeURL, protocol);
         try {
-            url = URIBuilder.checkURI(nodeURL).toString();
+            //            url = URIBuilder.checkURI(nodeURL).toString();
+            url = nodeURL; // #@#@ This modification can break proactive
             proActiveRuntime = RuntimeFactory.getRuntime(url);
             jobID = proActiveRuntime.getJobID(url);
         } catch (ProActiveException e) {
-            throw new NodeException("Cannot get the node based on " + nodeURL, e);
-        } catch (URISyntaxException e) {
             throw new NodeException("Cannot get the node based on " + nodeURL, e);
         }
 

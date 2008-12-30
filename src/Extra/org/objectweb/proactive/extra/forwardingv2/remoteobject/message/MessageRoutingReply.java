@@ -72,6 +72,7 @@ public class MessageRoutingReply extends MessageRoutingMessage implements Serial
 
     @Override
     public Object processMessage() {
+        System.out.println("MessageRoutingReply.processMessage()");
         try {
             Body body = MessageRoutingUtils.getBody(idBody);
             if (this.reply != null) {

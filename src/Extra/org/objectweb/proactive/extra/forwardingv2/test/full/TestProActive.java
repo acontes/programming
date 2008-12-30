@@ -16,18 +16,14 @@ import org.objectweb.proactive.extra.forwardingv2.registry.ForwardingRegistry;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
-import functionalTests.FunctionalTest;
 
-
-public class TestProActive extends FunctionalTest {
+public class TestProActive {
     ForwardingRegistry forwarder;
     Node remoteNode;
 
     @Before
     public void b() throws ProActiveException {
-        System.err.println("\ntiti\n");
         this.forwarder = new ForwardingRegistry(0, true);
-        System.err.println("\ntoto\n");
 
         PAProperties.PA_COMMUNICATION_PROTOCOL.setValue("pamr");
         //		PAProperties.PA_NET_ROUTER_ADDRESS.setValue(this.forwarder.getInetAddress().getCanonicalHostName());
@@ -42,9 +38,13 @@ public class TestProActive extends FunctionalTest {
 
         URL gcmaUrl = this.getClass().getResource("gcma.xml");
         GCMApplication gcma = PAGCMDeployment.loadApplicationDescriptor(gcmaUrl, vc);
+        System.err.println("before startDeployment");
         gcma.startDeployment();
+        System.err.println("after startDeployment");
         GCMVirtualNode vn = gcma.getVirtualNode("vn");
+        System.err.println("after getVN");
         this.remoteNode = vn.getANode();
+        System.err.println("after getANode");
     }
 
     @Test

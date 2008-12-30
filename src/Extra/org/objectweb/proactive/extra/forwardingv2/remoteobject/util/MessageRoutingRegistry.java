@@ -32,7 +32,9 @@
 package org.objectweb.proactive.extra.forwardingv2.remoteobject.util;
 
 import java.net.URI;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -48,10 +50,11 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class MessageRoutingRegistry {
     public final static MessageRoutingRegistry singleton = new MessageRoutingRegistry();
 
-    private HashMap<URI, InternalRemoteRemoteObject> rRemteObjectMap;
+    private Map<URI, InternalRemoteRemoteObject> rRemteObjectMap;
 
     private MessageRoutingRegistry() {
-        this.rRemteObjectMap = new HashMap<URI, InternalRemoteRemoteObject>();
+        this.rRemteObjectMap = Collections.synchronizedMap(new HashMap<URI, InternalRemoteRemoteObject>());
+        //        this.rRemteObjectMap = new HashMap<URI, InternalRemoteRemoteObject>(); 
     }
 
     /**
@@ -69,6 +72,7 @@ public class MessageRoutingRegistry {
      * @param uri the name binded with a body
      */
     public void unbind(URI uri) {
+        ProActiveLogger.getLogger(Loggers.REMOTEOBJECT).debug("unregistering remote object at " + uri);
         rRemteObjectMap.remove(uri);
     }
 

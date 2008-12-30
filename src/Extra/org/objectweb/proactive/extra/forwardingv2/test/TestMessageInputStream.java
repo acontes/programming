@@ -11,16 +11,14 @@ import junit.framework.Assert;
 import org.junit.Test;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
+import org.objectweb.proactive.extra.forwardingv2.protocol.MessageInputStream;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.DataRequestMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message;
-import org.objectweb.proactive.extra.forwardingv2.protocol.MessageInputStream;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationReplyMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationRequestMessage;
 
-import functionalTests.FunctionalTest;
 
-
-public class TestMessageInputStream extends FunctionalTest {
+public class TestMessageInputStream {
 
     @Test
     public void testMultipleMessageReading() throws IOException {

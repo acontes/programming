@@ -32,22 +32,31 @@
 package org.objectweb.proactive.extra.forwardingv2.remoteobject;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.URI;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.SynchronousReplyImpl;
+import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.forwardingv2.client.AgentV2;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.message.MessageRoutingRemoteObjectRequest;
 
 
 @SuppressWarnings("serial")
 public class MessageRoutingRemoteObjectImpl implements MessageRoutingRemoteObject {
+    final static private Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_REMOTE_OBJECT);
+
     private URI remoteObjectURL;
-    private AgentV2 agent;
+    private transient AgentV2 agent;
     protected transient InternalRemoteRemoteObject remoteObject;
 
     public MessageRoutingRemoteObjectImpl(InternalRemoteRemoteObject remoteObject, URI remoteObjectURL,
@@ -57,7 +66,7 @@ public class MessageRoutingRemoteObjectImpl implements MessageRoutingRemoteObjec
         this.agent = agent;
 
         // #@#@ DEBUG 
-        System.out.println("\n" + this.remoteObjectURL.getPath());
+        //        System.out.println("\n" + this.remoteObjectURL.getPath());
     }
 
     public Reply receiveMessage(Request message) throws IOException, RenegotiateSessionException,
@@ -77,4 +86,18 @@ public class MessageRoutingRemoteObjectImpl implements MessageRoutingRemoteObjec
     public URI getURI() {
         return this.remoteObjectURL;
     }
+
+    private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
+        ois.defaultReadObject();
+
+        try {
+            MessageRoutingRemoteObjectFactory f = (MessageRoutingRemoteObjectFactory) AbstractRemoteObjectFactory
+                    .getRemoteObjectFactory("pamr");
+            this.agent = f.getAgent();
+        } catch (UnknownProtocolException e) {
+            logger.error(e);
+        }
+
+    }
+
 }

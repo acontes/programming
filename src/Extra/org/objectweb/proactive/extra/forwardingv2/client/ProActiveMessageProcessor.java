@@ -14,7 +14,7 @@ import org.objectweb.proactive.extra.forwardingv2.remoteobject.message.MessageRo
  * @since ProActive 4.1.0
  */
 public class ProActiveMessageProcessor implements Runnable {
-    public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING);
+    public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_CLIENT);
 
     private final DataRequestMessage _toProcess;
     private final AgentV2Internal agent;
@@ -25,6 +25,10 @@ public class ProActiveMessageProcessor implements Runnable {
     }
 
     public void run() {
+        if (logger.isTraceEnabled()) {
+            logger.trace(ProActiveMessageProcessor.class.getName() + "is starting");
+        }
+
         ClassLoader savedClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
@@ -34,6 +38,9 @@ public class ProActiveMessageProcessor implements Runnable {
                     .unmarshallObject(_toProcess.getData());
             Object result = null;
             try {
+                if (logger.isTraceEnabled()) {
+                    logger.trace("Processing message: " + message);
+                }
                 result = message.processMessage();
             } catch (Exception e) {
                 logger.warn("Exception during execution of message: " + _toProcess, e);
