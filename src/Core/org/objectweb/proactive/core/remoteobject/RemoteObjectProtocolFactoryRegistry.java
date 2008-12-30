@@ -59,12 +59,12 @@ public class RemoteObjectProtocolFactoryRegistry {
         remoteObjectFactories.put(Constants.RMISSH_PROTOCOL_IDENTIFIER, RmiSshRemoteObjectFactory.class);
         remoteObjectFactories.put(Constants.IBIS_PROTOCOL_IDENTIFIER, IbisRemoteObjectFactory.class);
 
-        Iterator<RemoteObjectFactory> iter = ServiceRegistry.lookupProviders(RemoteObjectFactory.class);
+        Iterator<RemoteObjectFactorySPI> iter = ServiceRegistry.lookupProviders(RemoteObjectFactorySPI.class);
         while (iter.hasNext()) {
-            RemoteObjectFactory remoteObjectFactory = iter.next();
+            RemoteObjectFactorySPI remoteObjectFactorySPI = iter.next();
 
-            String protoId = remoteObjectFactory.getProtocolId();
-            Class<? extends RemoteObjectFactory> cl = remoteObjectFactory.getClass();
+            String protoId = remoteObjectFactorySPI.getProtocolId();
+            Class<? extends RemoteObjectFactory> cl = remoteObjectFactorySPI.getFactoryClass();
 
             if (!remoteObjectFactories.contains(protoId)) {
                 logger.info("Loading <" + protoId + ", " + cl + ">");

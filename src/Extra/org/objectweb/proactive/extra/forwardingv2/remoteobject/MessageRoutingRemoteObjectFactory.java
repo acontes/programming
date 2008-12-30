@@ -31,9 +31,15 @@
  */
 package org.objectweb.proactive.extra.forwardingv2.remoteobject;
 
+import java.io.IOException;
+import java.net.InetAddress;
 import java.net.URI;
+import java.net.UnknownHostException;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObjectImpl;
@@ -55,12 +61,50 @@ import org.objectweb.proactive.extra.forwardingv2.remoteobject.util.exceptions.M
 
 public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFactory implements
         RemoteObjectFactory {
+    static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING);
+
     final private AgentV2 agent;
     final private MessageRoutingRegistry registry;
 
     public MessageRoutingRemoteObjectFactory() {
         this.agent = new ForwardingAgentV2(ProActiveMessageHandler.class);
         this.registry = MessageRoutingRegistry.singleton;
+
+        String routerAddressStr = PAProperties.PA_NET_ROUTER_ADDRESS.getValue();
+        if (routerAddressStr == null) {
+            ProActiveRuntimeException e = new ProActiveRuntimeException(
+                "Message routing cannot be started because " + PAProperties.PA_NET_ROUTER_ADDRESS.getKey() +
+                    " is not set.");
+            logger.fatal(e);
+            throw e;
+        }
+        InetAddress routerAddress;
+        try {
+            routerAddress = InetAddress.getByName(routerAddressStr);
+        } catch (UnknownHostException e1) {
+            ProActiveRuntimeException e = new ProActiveRuntimeException("Router address, " +
+                routerAddressStr + " cannot be resolved", e1);
+            logger.fatal(e);
+            throw e;
+        }
+
+        int routerPort = PAProperties.PA_NET_ROUTER_PORT.getValueAsInt();
+        if (routerPort == 0) {
+            ProActiveRuntimeException e = new ProActiveRuntimeException(
+                "Message routing cannot be started because " + PAProperties.PA_NET_ROUTER_PORT.getKey() +
+                    " is not set.");
+            logger.fatal(e);
+            throw e;
+        }
+
+        try {
+            this.agent.initialize(routerAddress, routerPort);
+        } catch (IOException e1) {
+            ProActiveRuntimeException e = new ProActiveRuntimeException("The router cannot be contacted ", e1);
+            logger.fatal(e);
+            throw e;
+        }
+
     }
 
     /*

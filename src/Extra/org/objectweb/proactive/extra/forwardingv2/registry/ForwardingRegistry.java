@@ -1,25 +1,28 @@
 package org.objectweb.proactive.extra.forwardingv2.registry;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-
-import java.net.ServerSocket;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.objectweb.proactive.extra.forwardingv2.exceptions.UnknownAgentIdException;
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message;
 
 
 /**
- * The ForwardingRegistry is a module that handles the registration of new clients and the routing of {@link Message} between registered clients
+ * The ForwardingRegistry is a module that handles the registration of new
+ * clients and the routing of {@link Message} between registered clients
  * 
- * The Forwarding Registry only handles messages of the following kind: {@link Message}.  
- *
+ * The Forwarding Registry only handles messages of the following kind:
+ * {@link Message}.
+ * 
  */
-public class ForwardingRegistry {
+public class ForwardingRegistry implements Runnable {
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING);
 
     static public final int DEFAULT_SERVER_PORT = 2099;
@@ -28,14 +31,37 @@ public class ForwardingRegistry {
     private int listeningPort;
     private ServerSocket serverSocket = null;
     final private ConcurrentHashMap<AgentID, RegistrationHandler> registrationHandlerMap = new ConcurrentHashMap<AgentID, RegistrationHandler>();
+    private CountDownLatch routerIsReady;
 
-    public ForwardingRegistry(int listeningPort) {
+    public ForwardingRegistry(int listeningPort, boolean forked) {
         this.listeningPort = listeningPort;
+        this.routerIsReady = new CountDownLatch(1);
+        Runtime.getRuntime().addShutdownHook(new Thread(new RegistryShutdownHook(this)));
+
+        if (forked) {
+            Thread t = new Thread(this);
+            t.setDaemon(true);
+            t.setName("Message Router thread");
+
+            t.start();
+        } else {
+            this.run();
+        }
+
+        do {
+            try {
+                routerIsReady.await();
+            } catch (InterruptedException e) {
+                // Miam Miam Miam
+            }
+        } while (routerIsReady.getCount() != 0);
     }
 
     /**
      * Generates a new ForwardingRegistry and calls {@link #start()} function
-     * @param args: <-regport>
+     * 
+     * @param args
+     *            : <-regport>
      */
     public static void main(String[] args) {
         int port = DEFAULT_SERVER_PORT;
@@ -51,28 +77,19 @@ public class ForwardingRegistry {
             }
         }
 
-        ForwardingRegistry registry = new ForwardingRegistry(port);
-
-        Runtime.getRuntime().addShutdownHook(new Thread(new RegistryShutdownHook(registry)));
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("FR.main(), shutdown hook added, going to start() FR");
-        }
-        registry.start();
-
-        // TODO connect to other registries if implemented
+        ForwardingRegistry router = new ForwardingRegistry(port, false);
     }
 
     /**
-     * Launches the server.  
+     * Launches the server.
      */
-    public void start() {
+    public void run() {
 
         // launch the server side and listen
         try {
             serverSocket = new ServerSocket(listeningPort);
         } catch (IOException e) {
-            //log and quit
+            // log and quit
             if (logger.isDebugEnabled()) {
                 logger.debug("FR failed while opening server socket listening on port: " + listeningPort);
             }
@@ -83,6 +100,7 @@ public class ForwardingRegistry {
             logger.debug("FR created server socket and listening on port " + listeningPort);
         }
 
+        this.routerIsReady.countDown();
         while (listening) {
             try {
                 Thread t = new Thread(new RegistrationHandler(serverSocket.accept(), this));
@@ -92,14 +110,18 @@ public class ForwardingRegistry {
                     logger.debug("FR created new RegistrationHandler");
                 }
             } catch (IOException e) {
-                //log the fact that a connection wasn't correctly accepted and keep listening
+                // log the fact that a connection wasn't correctly accepted and
+                // keep listening
                 if (logger.isDebugEnabled()) {
                     logger.debug("FR failed while accepting a connection, exception: " + e);
                 }
             }
         }
 
-        //FIXME this line of code can't be reached. A shutdown hook was added to stop the registry properly. But this solution should normally only be used defensively. Add a shell to be able to pass commands to the registry such as start, stop...
+        // FIXME this line of code can't be reached. A shutdown hook was added
+        // to stop the registry properly. But this solution should normally only
+        // be used defensively. Add a shell to be able to pass commands to the
+        // registry such as start, stop...
         if (logger.isDebugEnabled()) {
             logger.debug("FR.start() going to call FR.stop");
         }
@@ -107,10 +129,15 @@ public class ForwardingRegistry {
     }
 
     /**
-    * Makes the ForwardingRegistry stop listening so that no more {@link RegistrationHandler} is created.
-    * Call {@link RegistrationHandler #stop} on each existing registrationHandler
-    */
-    protected void stop() { //FIXME: For this function to be called, listening must be set to false... But this function is the only one able to set it to false. Currently a shutdown hook is used as the solution to call this function and stop the registry properly
+     * Makes the ForwardingRegistry stop listening so that no more
+     * {@link RegistrationHandler} is created. Call
+     * {@link RegistrationHandler #stop} on each existing registrationHandler
+     */
+    protected void stop() { // FIXME: For this function to be called, listening
+        // must be set to false... But this function is the
+        // only one able to set it to false. Currently a
+        // shutdown hook is used as the solution to call
+        // this function and stop the registry properly
 
         // stop the server if it was not stopped already
         listening = false;
@@ -126,7 +153,8 @@ public class ForwardingRegistry {
             logger.debug("FR.stop(), stopped server");
         }
 
-        // stop the Registration Handlers, close the RegistrationHandlers' sockets, deallocate the RegistrationHandlers
+        // stop the Registration Handlers, close the RegistrationHandlers'
+        // sockets, deallocate the RegistrationHandlers
         if (logger.isDebugEnabled()) {
             logger.debug("FR.stop(), calling RH.stop() on every mapped RH");
         }
@@ -137,7 +165,9 @@ public class ForwardingRegistry {
 
     /**
      * Performs a lookup on {@link #registrationHandlerMap}
-     * @param key The key to be looked up
+     * 
+     * @param key
+     *            The key to be looked up
      * @return True if the key is mapped and false otherwise
      */
     public boolean isKeyInMap(Object key) {
@@ -148,6 +178,7 @@ public class ForwardingRegistry {
 
     /**
      * Adds a mapping to the {@link #registrationHandlerMap}
+     * 
      * @param senderID
      * @param regHandler
      */
@@ -157,6 +188,7 @@ public class ForwardingRegistry {
 
     /**
      * retrieves a registration handler given its agentId key
+     * 
      * @param key
      * @return
      */
@@ -169,8 +201,12 @@ public class ForwardingRegistry {
     }
 
     /**
-     * Kills a {@link RegistrationHandler}. For example, if the tunnel failed on client side and if this client is trying to establish a new tunnel while ForwardingRegistry thinks that the first tunnel is still active. 
-     * @param key Key to the {@link RegistrationHandler}
+     * Kills a {@link RegistrationHandler}. For example, if the tunnel failed on
+     * client side and if this client is trying to establish a new tunnel while
+     * ForwardingRegistry thinks that the first tunnel is still active.
+     * 
+     * @param key
+     *            Key to the {@link RegistrationHandler}
      */
     public void killRegistrationHandler(AgentID key) {
         RegistrationHandler regHandler = null;
@@ -186,9 +222,18 @@ public class ForwardingRegistry {
     /**
      * Performs a removal on {@link #registrationHandlerMap}
      * 
-     * @param key The key to the mapping that should be removed
+     * @param key
+     *            The key to the mapping that should be removed
      */
     public void removeMapping(AgentID key) {
         registrationHandlerMap.remove(key);
+    }
+
+    public int getLocalPort() {
+        return serverSocket.getLocalPort();
+    }
+
+    public InetAddress getInetAddress() {
+        return serverSocket.getInetAddress();
     }
 }

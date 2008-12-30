@@ -49,7 +49,7 @@ import org.objectweb.proactive.extra.forwardingv2.remoteobject.util.exceptions.M
 public abstract class MessageRoutingMessage implements Serializable {
     protected Object returnedObject;
     final protected URI uri;
-    final protected AgentV2 agent;
+    transient final protected AgentV2 agent;
 
     public MessageRoutingMessage(URI uri, AgentV2 agent) {
         this.uri = uri;

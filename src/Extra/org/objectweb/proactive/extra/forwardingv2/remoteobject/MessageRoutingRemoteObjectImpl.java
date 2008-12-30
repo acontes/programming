@@ -55,6 +55,9 @@ public class MessageRoutingRemoteObjectImpl implements MessageRoutingRemoteObjec
         this.remoteObject = remoteObject;
         this.remoteObjectURL = remoteObjectURL;
         this.agent = agent;
+
+        // #@#@ DEBUG 
+        System.out.println("\n" + this.remoteObjectURL.getPath());
     }
 
     public Reply receiveMessage(Request message) throws IOException, RenegotiateSessionException,

@@ -23,8 +23,10 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationR
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message.MessageType;
 import org.objectweb.proactive.extra.forwardingv2.registry.ForwardingRegistry;
 
+import functionalTests.FunctionalTest;
 
-public class TestForwardingRegistry {
+
+public class TestForwardingRegistry extends FunctionalTest {
 
     static int port = 10000;
     ForwardingRegistry reg = null;
@@ -34,14 +36,7 @@ public class TestForwardingRegistry {
 
     @Before
     public void setup() {
-        reg = new ForwardingRegistry(++port);
-        final ForwardingRegistry thisReg = reg;
-        Thread t = new Thread(new Runnable() {
-            public void run() {
-                thisReg.start();
-            }
-        });
-        t.start();
+        this.reg = new ForwardingRegistry(++port, true);
     }
 
     @Test

@@ -7,8 +7,10 @@ import junit.framework.Assert;
 import org.junit.Test;
 import org.objectweb.proactive.extra.forwardingv2.protocol.TypeHelper;
 
+import functionalTests.FunctionalTest;
 
-public class TestTypeHelper {
+
+public class TestTypeHelper extends FunctionalTest {
 
     @Test
     public void testIntBound() {

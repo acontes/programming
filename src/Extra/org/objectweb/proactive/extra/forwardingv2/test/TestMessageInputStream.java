@@ -17,8 +17,10 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.MessageInputStream;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationReplyMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationRequestMessage;
 
+import functionalTests.FunctionalTest;
 
-public class TestMessageInputStream {
+
+public class TestMessageInputStream extends FunctionalTest {
 
     @Test
     public void testMultipleMessageReading() throws IOException {

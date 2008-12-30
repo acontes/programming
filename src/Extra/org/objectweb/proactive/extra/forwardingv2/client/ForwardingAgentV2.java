@@ -196,7 +196,7 @@ public class ForwardingAgentV2 implements AgentV2Internal, Runnable {
             throw new AgentNotConnectedException();
         }
         String path = targetURI.getPath();
-        String remoteAgentId = path.substring(0, path.indexOf('/'));
+        String remoteAgentId = path.split("/")[1];
 
         AgentID agentID = new AgentID(Long.parseLong(remoteAgentId));
         return sendMsg(agentID, data, oneWay);

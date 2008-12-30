@@ -249,6 +249,10 @@ public enum PAProperties {
     PA_NET_SECONDARYNAMES("proactive.net.secondaryNames", PAPropertiesType.STRING), SCHEMA_VALIDATION(
             "schema.validation", PAPropertiesType.BOOLEAN, true),
 
+    PA_NET_ROUTER_ADDRESS("proactive.net.router.address", PAPropertiesType.STRING),
+
+    PA_NET_ROUTER_PORT("proactive.net.router.port", PAPropertiesType.INTEGER),
+
     /* ------------------------------------
      *  RMI
      */
