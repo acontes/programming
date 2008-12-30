@@ -198,8 +198,6 @@ public class ProActiveServicesImpl implements ProActiveService {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (ProActiveException e) {
-            e.printStackTrace();
         }
 
         /* unregister Servlet */

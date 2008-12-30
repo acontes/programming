@@ -184,53 +184,47 @@ public class NodeFactory {
     }
 
     /**
-     * Creates a new node on the local machine. This call can only be used
-     * to create a node on the local JVM on the local machine.
-     * The node URL can be in the form
-     * <ul>
-     * <li>///nodeName</li>
-     * <li>//localhost/nodeName</li>
-     * <li>//<i>&lt;hostname></i>/nodeName</li>
-     * </ul>
-     * where <i>&lt;hostname></i> is the name of the localhost.
-     * @param nodeURL the URL of the node to create
+     * Creates a new node on the current ProActive runtime.
+     * 
+     * <b>Warning:</b> Since ProActive 4.1.0 the String parameter is no longer be an url 
+     * but a <b>nodeName</b>
+     * 
+     * @param nodeName the name of the node to create
      * @return the newly created node on the local JVM
      * @exception NodeException if the node cannot be created
      */
-    public static Node createNode(String nodeURL) throws NodeException, AlreadyBoundException {
-        return createNode(nodeURL, false, null, null, null);
+
+    public static Node createNode(String nodeName) throws NodeException, AlreadyBoundException {
+        return createNode(nodeName, false, null, null, null);
     }
 
     /**
-     * Creates a new node on the local machine. This call can only be used
-     * to create a node on the local JVM on the local machine.
-     * The node URL can be in the form
-     * <ul>
-     * <li>///nodeName</li>
-     * <li>//localhost/nodeName</li>
-     * <li>//<i>&lt;hostname></i>/nodeName</li>
-     * </ul>
-     * where <i>&lt;hostname></i> is the name of the localhost.
-     * @param url the URL of the node to create
+     * Creates a new node on the current ProActive runtime.
+     * 
+     * <b>Warning:</b> Since ProActive 4.1.0 the String parameter is no longer be an url 
+     * but a <b>nodeName</b>
+     * 
+     * @param nodeName the name of the node to create
      * @param replacePreviousBinding
      * @return the newly created node on the local JVM
      * @exception NodeException if the node cannot be created
      */
-    public static Node createNode(String url, boolean replacePreviousBinding, ProActiveSecurityManager psm,
-            String vnname, String jobId) throws NodeException, AlreadyBoundException {
+    public static Node createNode(String nodeName, boolean replacePreviousBinding,
+            ProActiveSecurityManager psm, String vnname, String jobId) throws NodeException,
+            AlreadyBoundException {
         ProActiveRuntime proActiveRuntime;
 
-        if (!checkNodeName(url)) {
-            throw new NodeException(url + " is not a valid url for a node. A node URL cannot contain " +
+        if (!checkNodeName(nodeName)) {
+            throw new NodeException(nodeName + " is not a valid url for a node. A node URL cannot contain " +
                 HALFBODIES_NODE_NAME);
         }
 
         if (logger.isDebugEnabled()) {
-            logger.debug("NodeFactory: createNode(" + url + ")");
+            logger.debug("NodeFactory: createNode(" + nodeName + ")");
         }
 
         //first look for the protocol
-        String protocol = URIBuilder.getProtocol(url);
+        String protocol = URIBuilder.getProtocol(nodeName);
 
         if (vnname == null) {
             vnname = DEFAULT_VIRTUAL_NODE_NAME;
@@ -240,9 +234,9 @@ public class NodeFactory {
         //then create a node
         try {
             proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(protocol);
-            return proActiveRuntime.createLocalNode(url, replacePreviousBinding, psm, vnname, jobId);
+            return proActiveRuntime.createLocalNode(nodeName, replacePreviousBinding, psm, vnname, jobId);
         } catch (Exception e) {
-            throw new NodeException("Cannot create a Node based on " + url, e);
+            throw new NodeException("Cannot create a Node based on " + nodeName, e);
         }
     }
 

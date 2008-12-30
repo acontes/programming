@@ -18,8 +18,8 @@ public class TestEquals extends FunctionalTest {
 
     @Test
     public void test() throws NodeException, AlreadyBoundException {
-        Node node1 = NodeFactory.createNode("///node1");
-        Node node2 = NodeFactory.createNode("///node2");
+        Node node1 = NodeFactory.createNode("node1");
+        Node node2 = NodeFactory.createNode("node2");
 
         VMInformation localVM1 = node1.getVMInformation();
         VMInformation localVM2 = node2.getVMInformation();
