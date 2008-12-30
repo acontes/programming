@@ -75,8 +75,8 @@ import org.objectweb.proactive.core.process.ExternalProcessDecorator;
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition;
-import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition.FileDescription;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
+import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition.FileDescription;
 import org.objectweb.proactive.core.process.mpi.MPIProcess;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
@@ -100,6 +100,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @see ProActiveDescriptorInternal
  * @see VirtualMachine
  */
+@SuppressWarnings("serial")
 public class VirtualNodeImpl extends NodeCreationEventProducerImpl implements VirtualNodeInternal,
         Serializable, ServiceUser {
 
@@ -1131,7 +1132,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl implements Vi
             // this method should be called when in the xml document the tag currenJVM is encountered. It means that one node must be created
             // on the jvm that originates the creation of this virtualNode(the current jvm) and mapped on this virtualNode
             // we must increase the node count
-            String url = null;
             increaseNumberOfNodes(1);
 
             // get the Runtime for the given protocol
@@ -1147,20 +1147,18 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl implements Vi
 
             int registrationAttempts = this.REGISTRATION_ATTEMPTS;
 
+            Node node = null;
             while (registrationAttempts > 0) { //If there is an AlreadyBoundException, we generate an other random node name
                 String nodeName = this.name + Integer.toString(ProActiveRandom.nextPosInt());
 
                 try {
-                    url = defaultRuntime.createLocalNode(nodeName, false, siblingPSM, this.getName(),
+                    node = defaultRuntime.createLocalNode(nodeName, false, siblingPSM, this.getName(),
                             PAActiveObject.getJobId());
                     registrationAttempts = 0;
                 } catch (AlreadyBoundException e) {
                     registrationAttempts--;
                 }
             }
-
-            //add this node to this virtualNode
-            Node node = new NodeImpl(defaultRuntime, url, protocol, this.jobID);
 
             // JMX Notification
             ProActiveRuntimeWrapperMBean mbean = ProActiveRuntimeImpl.getProActiveRuntime().getMBean();

@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.node;
 
 import java.net.URISyntaxException;
 import java.rmi.AlreadyBoundException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Job;
@@ -45,7 +46,6 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
-import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -84,18 +84,16 @@ public class NodeFactory {
 
     public static final String DEFAULT_VIRTUAL_NODE_NAME = "DefaultVN";
 
-    private static final String DEFAULT_NODE_NAME;
+    private static final String DEFAULT_NODE_NAME = "Node";
+    private static final AtomicInteger nodeCounter = new AtomicInteger();
     private static Node defaultNode = null;
 
-    private static final String HALFBODIES_NODE_URL;
     private static final String HALFBODIES_NODE_NAME = "__PA__HalfbodiesNode";
+    private static final AtomicInteger halfbodyCounter = new AtomicInteger();
     private static Node halfBodiesNode = null;
 
     static {
         ProActiveConfiguration.load();
-        DEFAULT_NODE_NAME = URIBuilder.buildURI("localhost", "Node").toString();
-        // mmm, this name is supposed to be unique :(
-        HALFBODIES_NODE_URL = URIBuilder.buildURI("localhost", HALFBODIES_NODE_NAME).toString();
     }
 
     //test with class loader
@@ -111,24 +109,19 @@ public class NodeFactory {
      * @throws NodeException
      */
     public static synchronized Node getDefaultNode() throws NodeException {
-        String nodeURL = null;
         ProActiveRuntime defaultRuntime = null;
         String jobID = PAActiveObject.getJobId();
         ProActiveSecurityManager securityManager = null;
         if (defaultNode == null) {
             try {
                 defaultRuntime = RuntimeFactory.getDefaultRuntime();
-                nodeURL = defaultRuntime.createLocalNode(DEFAULT_NODE_NAME +
-                    Integer.toString(ProActiveRandom.nextPosInt()), false, securityManager,
-                        DEFAULT_VIRTUAL_NODE_NAME, jobID);
+                defaultNode = defaultRuntime.createLocalNode(DEFAULT_NODE_NAME +
+                    nodeCounter.incrementAndGet(), false, securityManager, DEFAULT_VIRTUAL_NODE_NAME, jobID);
             } catch (ProActiveException e) {
                 throw new NodeException("Cannot create the default Node", e);
             } catch (AlreadyBoundException e) { //if this exception is risen, we generate another random name for the node
                 getDefaultNode();
             }
-
-            defaultNode = new NodeImpl(defaultRuntime, nodeURL, PAProperties.PA_COMMUNICATION_PROTOCOL
-                    .getValue(), jobID);
         }
         return defaultNode;
     }
@@ -139,23 +132,20 @@ public class NodeFactory {
      * @throws NodeException
      */
     public static synchronized Node getHalfBodiesNode() throws NodeException {
-        String nodeURL = null;
         ProActiveRuntime defaultRuntime = null;
         ProActiveSecurityManager securityManager = null;
         if (halfBodiesNode == null) {
             try {
                 defaultRuntime = RuntimeFactory.getDefaultRuntime();
-                nodeURL = defaultRuntime.createLocalNode(HALFBODIES_NODE_URL +
-                    Integer.toString(ProActiveRandom.nextPosInt()), false, securityManager,
-                        DEFAULT_VIRTUAL_NODE_NAME, Job.DEFAULT_JOBID);
+                halfBodiesNode = defaultRuntime.createLocalNode(HALFBODIES_NODE_NAME +
+                    halfbodyCounter.incrementAndGet(), false, securityManager, DEFAULT_VIRTUAL_NODE_NAME,
+                        Job.DEFAULT_JOBID);
             } catch (ProActiveException e) {
                 throw new NodeException("Cannot create the halfbodies hosting Node", e);
             } catch (AlreadyBoundException e) {
                 // try another name
                 getHalfBodiesNode();
             }
-            halfBodiesNode = new NodeImpl(defaultRuntime, nodeURL, PAProperties.PA_COMMUNICATION_PROTOCOL
-                    .getValue(), Job.DEFAULT_JOBID);
         }
         return halfBodiesNode;
     }
@@ -229,7 +219,6 @@ public class NodeFactory {
     public static Node createNode(String url, boolean replacePreviousBinding, ProActiveSecurityManager psm,
             String vnname, String jobId) throws NodeException, AlreadyBoundException {
         ProActiveRuntime proActiveRuntime;
-        String nodeURL;
 
         if (!checkNodeName(url)) {
             throw new NodeException(url + " is not a valid url for a node. A node URL cannot contain " +
@@ -251,14 +240,10 @@ public class NodeFactory {
         //then create a node
         try {
             proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(protocol);
-            nodeURL = proActiveRuntime.createLocalNode(url, replacePreviousBinding, psm, vnname, jobId);
-        } catch (ProActiveException e) {
+            return proActiveRuntime.createLocalNode(url, replacePreviousBinding, psm, vnname, jobId);
+        } catch (Exception e) {
             throw new NodeException("Cannot create a Node based on " + url, e);
         }
-
-        Node node = new NodeImpl(proActiveRuntime, nodeURL, protocol, jobId);
-
-        return node;
     }
 
     /**

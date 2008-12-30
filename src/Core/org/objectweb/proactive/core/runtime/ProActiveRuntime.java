@@ -96,7 +96,7 @@ public interface ProActiveRuntime extends SecurityEntity {
      * @exception NodeException if the new node cannot be created
      * @see Job
      */
-    public String createLocalNode(String nodeName, boolean replacePreviousBinding,
+    public Node createLocalNode(String nodeName, boolean replacePreviousBinding,
             ProActiveSecurityManager nodeSecurityManager, String vnName, String jobId) throws NodeException,
             AlreadyBoundException;
 

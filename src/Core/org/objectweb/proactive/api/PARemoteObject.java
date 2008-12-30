@@ -56,7 +56,11 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 @PublicAPI
 public class PARemoteObject {
     public final static Logger logger = ProActiveLogger.getLogger(Loggers.REMOTEOBJECT);
+
+    /* Used to attribute an unique name to RO created by turnRemote */
     private final static String TURN_REMOTE_PREFIX = "__@@__TURN_REMOTE_";
+
+    /* Used to attribute an unique name to RO created by turnRemote */
     private final static AtomicLong counter = new AtomicLong();
 
     public static <T> RemoteObjectExposer<T> newRemoteObject(String className, T target) {
@@ -116,7 +120,7 @@ public class PARemoteObject {
      * @param object the object to be exported as a remote object
      * @return A remote object that can be called from any JVM
      */
-    @SuppressWarnings("unsafe")
+    @SuppressWarnings("unchecked")
     public static <T> T turnRemote(T object) {
         RemoteObjectExposer<T> roe = newRemoteObject(object.getClass().getName(), object);
         RemoteRemoteObject rro = roe.createRemoteObject(TURN_REMOTE_PREFIX + counter.incrementAndGet());
