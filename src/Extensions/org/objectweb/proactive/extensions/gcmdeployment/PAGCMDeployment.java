@@ -32,15 +32,12 @@
 package org.objectweb.proactive.extensions.gcmdeployment;
 
 import java.io.File;
-import java.net.URI;
 import java.net.URL;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.remoteobject.RemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
-import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationImpl;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationRemoteObjectAdapter;
@@ -103,14 +100,7 @@ public class PAGCMDeployment {
     public static GCMApplication loadApplicationDescriptor(URL url, VariableContractImpl vContract)
             throws ProActiveException {
         GCMApplication gcma = new GCMApplicationImpl(url, vContract);
-
-        // Export this GCMApplication as a remote object
-        String name = gcma.getDeploymentId() + "/GCMApplication";
-        RemoteObjectExposer<GCMApplication> roe = new RemoteObjectExposer<GCMApplication>(
-            GCMApplication.class.getName(), gcma, GCMApplicationRemoteObjectAdapter.class);
-        roe.createRemoteObject(name);
-
-        return (GCMApplication) roe.getRemoteObject();
+        return getRemoteObjectAdapter(gcma);
     }
 
     /**
@@ -128,13 +118,15 @@ public class PAGCMDeployment {
     public static GCMApplication loadApplicationDescriptor(File file, VariableContractImpl vContract)
             throws ProActiveException {
         GCMApplication gcma = new GCMApplicationImpl(Helpers.fileToURL(file), vContract);
+        return getRemoteObjectAdapter(gcma);
+    }
 
+    private static GCMApplication getRemoteObjectAdapter(GCMApplication gcma) throws ProActiveException {
         // Export this GCMApplication as a remote object
         String name = gcma.getDeploymentId() + "/GCMApplication";
         RemoteObjectExposer<GCMApplication> roe = new RemoteObjectExposer<GCMApplication>(
-            GCMApplication.class.getName(), gcma, GCMApplicationRemoteObjectAdapter.class);
+            GCMApplication.class.getName(), gcma, null);
         roe.createRemoteObject(name);
-
-        return (GCMApplication) roe.getRemoteObject();
+        return (GCMApplication) RemoteObjectHelper.generatedObjectStub(roe.getRemoteObject());
     }
 }

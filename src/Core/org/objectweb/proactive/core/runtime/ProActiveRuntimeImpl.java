@@ -1581,7 +1581,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
     }
 
     public void register(GCMRuntimeRegistrationNotificationData notification) {
-        createRegistrationForwarder();
+        //        createRegistrationForwarder();
         getMBean().sendNotification(NotificationType.GCMRuntimeRegistered, notification);
     }
 

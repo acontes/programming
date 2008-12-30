@@ -16,10 +16,11 @@
 	</environment>
 	
 	<application>
-		<proactive base="home" relpath="${proactive.home}">
+		<proactive base="root" relpath="${proactive.home}">
 			<configuration>
 				<jvmarg value="-Dproactive.net.router.address=${router.address} -Dproactive.net.router.port=${router.port}"/>
 				<jvmarg value="-Dproactive.test=true"/>
+				<jvmarg value="-Dproactive.communication.protocol=pamr"/>
 			</configuration>
 			
 			<virtualNode id="vn"/>

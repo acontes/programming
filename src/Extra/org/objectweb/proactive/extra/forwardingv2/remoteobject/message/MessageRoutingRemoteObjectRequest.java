@@ -66,12 +66,7 @@ public class MessageRoutingRemoteObjectRequest extends MessageRoutingMessage imp
             int max_retry = 10;
             InternalRemoteRemoteObject ro = null;
             do {
-                try {
-                    ro = MessageRoutingRegistry.singleton.lookup(uri);
-                    Thread.sleep(1000);
-                } catch (InterruptedException e1) {
-                    e1.printStackTrace();
-                }
+                ro = MessageRoutingRegistry.singleton.lookup(uri);
                 max_retry--;
 
             } while ((ro == null) && (max_retry > 0));

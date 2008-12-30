@@ -52,6 +52,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
@@ -66,7 +67,6 @@ import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.Grou
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
 import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeImpl;
 import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeInternal;
-import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeRemoteObjectAdapter;
 import org.objectweb.proactive.extensions.gcmdeployment.core.TopologyImpl;
 import org.objectweb.proactive.extensions.gcmdeployment.core.TopologyRootImpl;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
@@ -91,6 +91,7 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
 
     /** Defined Virtual Nodes */
     private Map<String, GCMVirtualNodeInternal> virtualNodes = null;
+    private Map<String, GCMVirtualNode> ROvirtualNodes = null;
 
     /** The Deployment Tree */
     private TopologyRootImpl deploymentTree;
@@ -190,12 +191,11 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
                 }
             }
 
-            // Export all VirtualNodes as remote objects
-            for (GCMVirtualNode vn : virtualNodes.values()) {
-                RemoteObjectExposer<GCMVirtualNode> vnroe = new RemoteObjectExposer<GCMVirtualNode>(
-                    GCMVirtualNode.class.getName(), vn, GCMVirtualNodeRemoteObjectAdapter.class);
-                vnroe.createRemoteObject(deploymentId + "/VirtualNode/" + vn.getName());
+            this.ROvirtualNodes = new HashMap<String, GCMVirtualNode>();
+            for (GCMVirtualNode vn : this.virtualNodes.values()) {
+                this.ROvirtualNodes.put(vn.getName(), vnAsRemoteObject(vn));
             }
+
         } catch (Exception e) {
             throw new ProActiveException("Failed to create GCMApplication: " + e.getMessage() +
                 ", see embded message for more details", e);
@@ -231,12 +231,26 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
         }
     }
 
+    private GCMVirtualNode vnAsRemoteObject(GCMVirtualNode vn) {
+        // Export this GCMApplication as a remote object
+        String name = this.getDeploymentId() + "/VirtualNode/" + vn.getName();
+        RemoteObjectExposer<GCMVirtualNode> roe = new RemoteObjectExposer<GCMVirtualNode>(
+            GCMVirtualNode.class.getName(), vn, null);
+        roe.createRemoteObject(name);
+        try {
+            return (GCMVirtualNode) RemoteObjectHelper.generatedObjectStub(roe.getRemoteObject());
+        } catch (ProActiveException e) {
+            GCMA_LOGGER.error(e);
+            return null;
+        }
+    }
+
     public GCMVirtualNode getVirtualNode(String vnName) {
-        return virtualNodes.get(vnName);
+        return this.ROvirtualNodes.get(vnName);
     }
 
     public Map<String, GCMVirtualNode> getVirtualNodes() {
-        return new HashMap<String, GCMVirtualNode>(virtualNodes);
+        return this.ROvirtualNodes;
     }
 
     public void kill() {
@@ -453,7 +467,7 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
     }
 
     public Set<String> getVirtualNodeNames() {
-        return new HashSet<String>(virtualNodes.keySet());
+        return new HashSet<String>(ROvirtualNodes.keySet());
     }
 
     public ProActiveSecurityManager getProActiveApplicationSecurityManager() {
