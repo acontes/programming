@@ -246,7 +246,7 @@ public class RequestReceiverImpl implements RequestReceiver, java.io.Serializabl
     	}
     	
     	public synchronized void doCall(Request request, Body receiver) {
-    		System.out.println(">>> Doing a call " + request.getMethodName() + " for caller " + this.associatedCaller);
+    		//System.out.println(">>> Doing a call " + request.getMethodName() + " for caller " + this.associatedCaller);
     		this.currentRequest = request;
     		this.currentReceiver = receiver;
     		this.localLock.release();
