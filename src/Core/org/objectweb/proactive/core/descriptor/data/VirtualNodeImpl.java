@@ -41,6 +41,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.management.Notification;
 
@@ -66,7 +67,6 @@ import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.core.node.NodeImpl;
 import org.objectweb.proactive.core.process.AbstractExternalProcessDecorator;
 import org.objectweb.proactive.core.process.AbstractSequentialListProcessDecorator;
 import org.objectweb.proactive.core.process.DependentProcess;
@@ -112,7 +112,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl implements Vi
     private final static Logger FILETRANSFER_LOGGER = ProActiveLogger.getLogger(Loggers.FILETRANSFER);
     private final static Logger DEPLOYMENT_FILETRANSFER_LOGGER = ProActiveLogger
             .getLogger(Loggers.DEPLOYMENT_FILETRANSFER);
-    public static int counter = 0;
+    public static AtomicInteger vnCounter = new AtomicInteger();
 
     //
     //  ----- PRIVATE MEMBERS -----------------------------------------------------------------------------------
@@ -164,6 +164,9 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl implements Vi
 
     /** Number of Nodes mapped to this VitualNode in the XML Descriptor that are actually created */
     private int nbCreatedNodes;
+
+    /** Number of node already created. Used to attribute an unique ID to each node */
+    private AtomicInteger nodeCounter;
 
     /** true if the node has been created*/
     private boolean nodeCreated = false;
@@ -225,10 +228,12 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl implements Vi
         // the register, otherwise we will monitor each time all the last
         // main VNs with the same name.
         if (isMainVN) {
-            this.name = name + "_" + (counter++);
+            this.name = name + "_" + vnCounter.getAndIncrement();
         } else {
             this.name = name;
         }
+
+        this.nodeCounter = new AtomicInteger();
 
         this.virtualMachines = new java.util.ArrayList<VirtualMachine>(5);
         this.localVirtualMachines = new java.util.ArrayList<String>();
@@ -986,18 +991,12 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl implements Vi
     }
 
     private void createNodes(RuntimeNotificationData notification, VirtualMachine _virtualMachine) {
-        String protocol;
         ProActiveRuntime proActiveRuntimeRegistered;
         String nodeHost;
-        int port;
-        String url;
 
-        protocol = URIBuilder.getProtocol(notification.getRuntimeUrl());
         try {
             proActiveRuntimeRegistered = RuntimeFactory.getRuntime(notification.getRuntimeUrl());
             nodeHost = proActiveRuntimeRegistered.getVMInformation().getHostName();
-            port = URIBuilder.getPortNumber(proActiveRuntimeRegistered.getURL());
-            url = null;
 
             int nodeNumber = (new Integer(_virtualMachine.getNbNodesOnCreatedVMs())).intValue();
 
@@ -1016,8 +1015,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl implements Vi
                     // will gerate an other
                     // random node's name and
                     // try to register it again
-                    String nodeName = this.name + Integer.toString(ProActiveRandom.nextPosInt());
-                    url = buildURL(nodeHost, nodeName, protocol, port);
+                    String nodeName = this.name + nodeCounter.getAndIncrement();
 
                     // nodes are created from the registered runtime, since
                     // this
@@ -1026,10 +1024,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl implements Vi
                     // co-allocation
                     // in the jvm.
                     try {
-                        proActiveRuntimeRegistered.createLocalNode(url, false, siblingPSM, this.getName(),
-                                this.jobID);
-
-                        Node node = new NodeImpl(proActiveRuntimeRegistered, url, protocol, this.jobID);
+                        Node node = proActiveRuntimeRegistered.createLocalNode(nodeName, false, siblingPSM,
+                                this.getName(), this.jobID);
 
                         // JMX Notification
                         ProActiveRuntimeWrapperMBean mbean = ProActiveRuntimeImpl.getProActiveRuntime()
