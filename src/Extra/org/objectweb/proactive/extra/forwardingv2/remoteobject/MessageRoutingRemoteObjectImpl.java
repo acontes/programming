@@ -31,32 +31,37 @@
  */
 package org.objectweb.proactive.extra.forwardingv2.remoteobject;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.URI;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.SynchronousReplyImpl;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
-import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.forwardingv2.client.AgentV2;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.message.MessageRoutingRemoteObjectRequest;
+import org.objectweb.proactive.extra.forwardingv2.remoteobject.util.exceptions.MessageRoutingRemoteException;
 
 
 @SuppressWarnings("serial")
 public class MessageRoutingRemoteObjectImpl implements MessageRoutingRemoteObject {
     final static private Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_REMOTE_OBJECT);
 
+    /** The URL of the RemoteObject */
     private URI remoteObjectURL;
+
+    /** The local message routing agent 
+     *
+     * This field must NOT be used since it is set by the getAgent() method. Each time this
+     * object is sent on a remote runtime, the local agent needs to be retrieved. Custom readObject()
+     * is avoid by the use of a transient field and the getAgent() method.
+     */
     private transient AgentV2 agent;
+
     protected transient InternalRemoteRemoteObject remoteObject;
 
     public MessageRoutingRemoteObjectImpl(InternalRemoteRemoteObject remoteObject, URI remoteObjectURL,
@@ -64,16 +69,12 @@ public class MessageRoutingRemoteObjectImpl implements MessageRoutingRemoteObjec
         this.remoteObject = remoteObject;
         this.remoteObjectURL = remoteObjectURL;
         this.agent = agent;
-
-        // #@#@ DEBUG 
-        //        System.out.println("\n" + this.remoteObjectURL.getPath());
     }
 
-    public Reply receiveMessage(Request message) throws IOException, RenegotiateSessionException,
-            ProActiveException {
+    public Reply receiveMessage(Request message) throws MessageRoutingRemoteException {
 
         MessageRoutingRemoteObjectRequest req = new MessageRoutingRemoteObjectRequest(message,
-            this.remoteObjectURL, agent);
+            this.remoteObjectURL, getAgent());
         req.send();
         SynchronousReplyImpl rep = (SynchronousReplyImpl) req.getReturnedObject();
         return rep;
@@ -87,17 +88,20 @@ public class MessageRoutingRemoteObjectImpl implements MessageRoutingRemoteObjec
         return this.remoteObjectURL;
     }
 
-    private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
-        ois.defaultReadObject();
-
-        try {
-            MessageRoutingRemoteObjectFactory f = (MessageRoutingRemoteObjectFactory) AbstractRemoteObjectFactory
-                    .getRemoteObjectFactory("pamr");
-            this.agent = f.getAgent();
-        } catch (UnknownProtocolException e) {
-            logger.error(e);
+    private AgentV2 getAgent() {
+        if (this.agent == null) {
+            try {
+                // FIXME: The factory cast is a hack but there is no clean way to do it
+                MessageRoutingRemoteObjectFactory f;
+                f = (MessageRoutingRemoteObjectFactory) AbstractRemoteObjectFactory
+                        .getRemoteObjectFactory("pamr");
+                this.agent = f.getAgent();
+            } catch (UnknownProtocolException e) {
+                logger.fatal("Failed to get the local message routing agent", e);
+            }
         }
 
+        return this.agent;
     }
 
 }

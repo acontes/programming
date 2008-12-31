@@ -44,36 +44,34 @@ import org.objectweb.proactive.extra.forwardingv2.remoteobject.util.MessageRouti
 public class MessageRoutingRemoteObjectRequest extends MessageRoutingMessage implements Serializable {
     private Request request;
 
+    /** Construct a request message
+     * 
+     * @param request the request to be send
+     * @param uri the recipient (aka the remote object) of the request
+     * @param agent the local agent to use to send this message
+     */
     public MessageRoutingRemoteObjectRequest(Request request, URI uri, AgentV2 agent) {
         super(uri, agent);
         this.request = request;
     }
 
+    /** Get the response of this request */
+    // client side
     public Object getReturnedObject() {
         return this.returnedObject;
     }
 
     @Override
-    public boolean isOneWay() {
-        return this.request.isOneWay();
-    }
-
-    @Override
+    // server side
     public Object processMessage() {
-        System.out.println("MessageRoutingRemoteObjectRequest.processMessage() " + this.request);
+        if (logger.isTraceEnabled()) {
+            logger.trace("Executing the request message " + this.request + " on " + uri);
+        }
 
         try {
-            int max_retry = 10;
-            InternalRemoteRemoteObject ro = null;
-            do {
-                ro = MessageRoutingRegistry.singleton.lookup(uri);
-                max_retry--;
-
-            } while ((ro == null) && (max_retry > 0));
-
-            Object o = ro.receiveMessage(this.request);
-
-            return o;
+            InternalRemoteRemoteObject ro;
+            ro = MessageRoutingRegistry.singleton.lookup(uri);
+            return ro.receiveMessage(this.request);
         } catch (Exception e) {
             return e;
         }

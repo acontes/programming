@@ -55,13 +55,15 @@ import org.objectweb.proactive.extra.forwardingv2.client.ProActiveMessageHandler
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.message.MessageRoutingRegistryListRemoteObjectsMessage;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.message.MessageRoutingRemoteObjectLookupMessage;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.util.MessageRoutingRegistry;
-import org.objectweb.proactive.extra.forwardingv2.remoteobject.util.MessageRoutingURIBuilder;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.util.exceptions.MessageRoutingRemoteException;
 
 
 public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFactory implements
         RemoteObjectFactory {
     static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_REMOTE_OBJECT);
+
+    /** The protocol id of the facotry */
+    static final public String PROTOCOL_ID = "pamr";
 
     final private AgentV2 agent;
     final private MessageRoutingRegistry registry;
@@ -70,41 +72,47 @@ public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFacto
         this.agent = new ForwardingAgentV2(ProActiveMessageHandler.class);
         this.registry = MessageRoutingRegistry.singleton;
 
+        // Start the agent and contact the router
+        // Since there is no initialization phase in ProActive, if the router cannot be contacted
+        // we log the error and throw a runtime exception. We cannot do better here
         String routerAddressStr = PAProperties.PA_NET_ROUTER_ADDRESS.getValue();
         if (routerAddressStr == null) {
-            ProActiveRuntimeException e = new ProActiveRuntimeException(
-                "Message routing cannot be started because " + PAProperties.PA_NET_ROUTER_ADDRESS.getKey() +
-                    " is not set.");
-            logger.fatal(e);
-            throw e;
-        }
-        InetAddress routerAddress;
-        try {
-            routerAddress = InetAddress.getByName(routerAddressStr);
-        } catch (UnknownHostException e1) {
-            ProActiveRuntimeException e = new ProActiveRuntimeException("Router address, " +
-                routerAddressStr + " cannot be resolved", e1);
-            logger.fatal(e);
-            throw e;
+            logAndThrowException("Message routing cannot be started because " +
+                PAProperties.PA_NET_ROUTER_ADDRESS.getKey() + " is not set.");
         }
 
         int routerPort = PAProperties.PA_NET_ROUTER_PORT.getValueAsInt();
         if (routerPort == 0) {
-            ProActiveRuntimeException e = new ProActiveRuntimeException(
-                "Message routing cannot be started because " + PAProperties.PA_NET_ROUTER_PORT.getKey() +
-                    " is not set.");
-            logger.fatal(e);
-            throw e;
+            logAndThrowException("Message routing cannot be started because " +
+                PAProperties.PA_NET_ROUTER_PORT.getKey() + " is not set.");
         }
 
+        InetAddress routerAddress;
         try {
+            routerAddress = InetAddress.getByName(routerAddressStr);
             this.agent.initialize(routerAddress, routerPort);
-        } catch (IOException e1) {
-            ProActiveRuntimeException e = new ProActiveRuntimeException("The router cannot be contacted ", e1);
-            logger.fatal(e);
-            throw e;
-        }
 
+        } catch (UnknownHostException e) {
+            logAndThrowException("Router address, " + routerAddressStr + " cannot be resolved", e);
+        } catch (IOException e) {
+            logAndThrowException("The router cannot be contacted ", e);
+        }
+    }
+
+    private void logAndThrowException(String message) {
+        ProActiveRuntimeException exception;
+
+        exception = new ProActiveRuntimeException(message);
+        logger.fatal("Failed to initialize" + this.getClass().getName(), exception);
+        throw exception;
+    }
+
+    private void logAndThrowException(String message, Exception e) {
+        ProActiveRuntimeException exception;
+
+        exception = new ProActiveRuntimeException(message, e);
+        logger.fatal("Failed to initialize" + this.getClass().getName(), exception);
+        throw exception;
     }
 
     /*
@@ -114,12 +122,8 @@ public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFacto
      * org.objectweb.proactive.core.remoteobject.RemoteObjectFactory#newRemoteObject(org.objectweb
      * .proactive.core.remoteobject.RemoteObject)
      */
-    public RemoteRemoteObject newRemoteObject(InternalRemoteRemoteObject target) throws ProActiveException {
-        try {
-            return new MessageRoutingRemoteObjectImpl(target, null, agent);
-        } catch (Exception e) {
-            throw new ProActiveException(e);
-        }
+    public RemoteRemoteObject newRemoteObject(InternalRemoteRemoteObject target) {
+        return new MessageRoutingRemoteObjectImpl(target, null, agent);
     }
 
     /**
@@ -140,12 +144,11 @@ public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFacto
      */
     public RemoteRemoteObject register(InternalRemoteRemoteObject ro, URI uri, boolean replacePrevious)
             throws ProActiveException {
-
-        /* #@#@# FIXME */
-        registry.bind(uri, ro);
+        this.registry.bind(uri, ro);
         MessageRoutingRemoteObjectImpl rro = new MessageRoutingRemoteObjectImpl(ro, uri, agent);
-        ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
-                .debug("registering remote object  at endpoint " + uri);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Registered remote object at endpoint" + uri);
+        }
         return rro;
     }
 
@@ -171,15 +174,14 @@ public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFacto
             agent);
         try {
             message.send();
+            RemoteRemoteObject result = message.getReturnedObject();
+            if (result == null) {
+                throw new ProActiveException("The uri " + uri + " is not bound to any known object");
+            } else {
+                return new RemoteObjectAdapter(result);
+            }
         } catch (MessageRoutingRemoteException e) {
             throw new ProActiveException(e);
-        }
-        RemoteRemoteObject result = message.getReturnedObject();
-
-        if (result == null) {
-            throw new ProActiveException("The uri " + uri + " is not bound to any known object");
-        } else {
-            return new RemoteObjectAdapter(result);
         }
     }
 
@@ -201,7 +203,6 @@ public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFacto
     public URI[] list(URI uri) throws ProActiveException {
         MessageRoutingRegistryListRemoteObjectsMessage message = new MessageRoutingRegistryListRemoteObjectsMessage(
             uri, agent);
-
         try {
             message.send();
             return message.getReturnedObject();
@@ -219,17 +220,14 @@ public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFacto
     }
 
     public int getPort() {
-        return -1;
-    }
-
-    public URI generateURI(String objectName) {
-        return MessageRoutingURIBuilder.create(agent.getAgentID(), objectName);
+        // Reverse connections are used with message routing so this method is irrelevant
+        throw new UnsupportedOperationException();
     }
 
     public InternalRemoteRemoteObject createRemoteObject(RemoteObject<?> remoteObject, String name)
             throws ProActiveException {
 
-        URI uri = URI.create(this.getProtocolId() + ":/" + agent.getAgentID() + "/" + name);
+        URI uri = URI.create(this.getProtocolId() + ":/" + this.agent.getAgentID() + "/" + name);
 
         // register the object on the register
         InternalRemoteRemoteObject irro = new InternalRemoteRemoteObjectImpl(remoteObject, uri);

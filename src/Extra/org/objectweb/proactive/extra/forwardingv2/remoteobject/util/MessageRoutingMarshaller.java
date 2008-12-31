@@ -33,32 +33,26 @@ package org.objectweb.proactive.extra.forwardingv2.remoteobject.util;
 
 import java.io.IOException;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
 import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
-// #@#@ TODO: Duplicate code between HTTP and Message Routing
+// FIXME: This is exactly the same marshaller than HTTPMarshaller
+// They should be factorized somewhere else
 
-/**
- * @author The ProActive Team
- *
- * To change the template for this generated type comment go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
- */
 public class MessageRoutingMarshaller {
+    static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_REMOTE_OBJECT);
 
-    /**
-     *
-     * @param o
-     * @return byte array representation of the object o
-     */
     public static byte[] marshallObject(Object o) {
         byte[] buffer = null;
 
         try {
             buffer = ObjectToByteConverter.MarshallStream.convert(o);
         } catch (IOException e) {
-            e.printStackTrace();
+            ProActiveLogger.logImpossibleException(logger, e);
         }
 
         return buffer;
@@ -69,10 +63,11 @@ public class MessageRoutingMarshaller {
         try {
             o = ByteToObjectConverter.MarshallStream.convert(bytes);
         } catch (IOException e) {
-            e.printStackTrace();
+            ProActiveLogger.logImpossibleException(logger, e);
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            ProActiveLogger.logImpossibleException(logger, e);
         }
+
         return o;
     }
 }

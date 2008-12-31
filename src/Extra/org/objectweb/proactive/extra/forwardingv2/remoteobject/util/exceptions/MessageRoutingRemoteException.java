@@ -35,9 +35,9 @@ import java.io.IOException;
 
 
 /**
- * Exception raised when problems occur in HTTP communications
+ * Exception raised when problems occur in communications
+ * 
  * @author The ProActive Team
- * @see java.rmi.RemoteException
  */
 @SuppressWarnings("serial")
 public class MessageRoutingRemoteException extends IOException {
@@ -50,7 +50,6 @@ public class MessageRoutingRemoteException extends IOException {
     }
 
     public MessageRoutingRemoteException(String s, Throwable ex) {
-        super(s);
-        initCause(ex);
+        super(s, ex);
     }
 }

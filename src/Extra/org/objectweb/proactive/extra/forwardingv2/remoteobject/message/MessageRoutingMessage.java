@@ -34,8 +34,10 @@ package org.objectweb.proactive.extra.forwardingv2.remoteobject.message;
 import java.io.Serializable;
 import java.net.URI;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.remoteobject.http.util.HttpMarshaller;
-import org.objectweb.proactive.core.remoteobject.http.util.exceptions.HTTPRemoteException;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.forwardingv2.client.AgentV2;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.util.exceptions.MessageRoutingRemoteException;
 
@@ -47,13 +49,31 @@ import org.objectweb.proactive.extra.forwardingv2.remoteobject.util.exceptions.M
  */
 @SuppressWarnings("serial")
 public abstract class MessageRoutingMessage implements Serializable {
-    protected Object returnedObject;
+    static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_REMOTE_OBJECT);
+
+    /** The recipient of this message */
     final protected URI uri;
+
+    /** The local agent to use to send the message 
+     *
+     * Once the message has been sent, the agent is never used again. So this field can
+     * safely be transient. Anyway, an external entity should be in charge of message sending
+     * for a given runtime instead of embedding the logic in each message.
+     */
     transient final protected AgentV2 agent;
+
+    /** The response to this message 
+     *
+     * <b>warning</b> send() and getReturnedObject() are <b>NOT thread safe</b>.
+     * send will block until the response is received but getReturnedObject() is only 
+     * a getter. It will return null is the response has not yet been received.
+     */
+    protected Object returnedObject;
 
     public MessageRoutingMessage(URI uri, AgentV2 agent) {
         this.uri = uri;
         this.agent = agent;
+        this.returnedObject = null;
     }
 
     /**
@@ -62,18 +82,14 @@ public abstract class MessageRoutingMessage implements Serializable {
      */
     public abstract Object processMessage() throws Exception;
 
-    public boolean isOneWay() {
-        return false;
-    }
-
-    /**
-     * @throws HTTPRemoteException
+    /** Send the message to its recipient using the local agent
+     * 
+     * @throws MessageRoutingRemoteException if something bad happened when sending this message
      */
     public final void send() throws MessageRoutingRemoteException {
         try {
             byte[] bytes = HttpMarshaller.marshallObject(this);
             byte[] response = agent.sendMsg(this.uri, bytes, false);
-
             this.returnedObject = HttpMarshaller.unmarshallObject(response);
         } catch (Exception e) {
             throw new MessageRoutingRemoteException("Failed to send message to " + this.uri, e);

@@ -9,7 +9,6 @@ log4j.rootLogger=INFO,CONSOLE
 # If INFO is enabled Jetty is too verbose at startup
 log4j.logger.org.mortbay = WARN
 
-
 ########### The following are existing categories in ProActive
 #log4j.logger.proactive = INFO
 #log4j.logger.proactive.classloader = DEBUG

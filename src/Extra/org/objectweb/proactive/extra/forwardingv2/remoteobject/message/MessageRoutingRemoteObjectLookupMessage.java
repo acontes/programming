@@ -34,10 +34,11 @@ package org.objectweb.proactive.extra.forwardingv2.remoteobject.message;
 import java.io.Serializable;
 import java.net.URI;
 
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
+import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.forwardingv2.client.AgentV2;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.MessageRoutingRemoteObjectFactory;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.MessageRoutingRemoteObjectImpl;
@@ -45,59 +46,63 @@ import org.objectweb.proactive.extra.forwardingv2.remoteobject.util.MessageRouti
 
 
 /**
- * This classes represents a HTTPMessage. When processed, this message performs a lookup thanks to the urn.
+ * When processed, this message performs return the RemoteObject associated to
+ * the given URI.
+ * 
  * @author The ProActive Team
  * @see MessageRoutingMessage
  */
 @SuppressWarnings("serial")
 public class MessageRoutingRemoteObjectLookupMessage extends MessageRoutingMessage implements Serializable {
 
-    //Caller Side
-
     /**
-     * Constructs an HTTP Message
-     * @param urn The urn of the Object (it can be an active object or a runtime).
+     * Construct a lookup message
+     * 
+     * @param uri
+     *            The URI of the RemoteObject to be retrieved
+     * @param agent
+     *            The local agent to use to send the message
      */
+
     public MessageRoutingRemoteObjectLookupMessage(URI uri, AgentV2 agent) {
         super(uri, agent);
     }
 
-    /**
-     * Get the returned object.
-     * @return the returned object
-     */
+    /** Get the remote object */
+    // client side
     public RemoteRemoteObject getReturnedObject() {
         return (RemoteRemoteObject) this.returnedObject;
     }
 
-    /**
-     * Performs the lookup
-     * @return The Object associated with the urn
-     */
     @Override
+    // server side
     public Object processMessage() {
-        System.out.println("MessageRoutingRemoteObjectLookupMessage.processMessage() for " + uri);
+        if (logger.isTraceEnabled()) {
+            logger.trace("Executing a lookup message for " + uri);
+        }
+
         if (this.uri != null) {
             InternalRemoteRemoteObject irro = MessageRoutingRegistry.singleton.lookup(uri);
             if (irro != null) {
                 RemoteRemoteObject rro = null;
                 try {
                     MessageRoutingRemoteObjectFactory f = (MessageRoutingRemoteObjectFactory) AbstractRemoteObjectFactory
-                            .getRemoteObjectFactory("pamr");
+                            .getRemoteObjectFactory(MessageRoutingRemoteObjectFactory.PROTOCOL_ID);
                     rro = f.newRemoteObject(irro);
                     ((MessageRoutingRemoteObjectImpl) rro).setURI(uri);
-                } catch (ProActiveException e) {
-                    e.printStackTrace();
+                    return rro;
+                } catch (UnknownProtocolException e) {
+                    // Impossible because that class has been created by the factory
+                    ProActiveLogger.logImpossibleException(logger, e);
                 }
-                this.returnedObject = rro;
             } else {
-                System.err.println(this.uri + " not found. Items in the registry are ");
-                for (URI uri : MessageRoutingRegistry.singleton.list()) {
-                    System.err.println(" -> " + uri);
-                }
+                logger.info("Someone performed a lookup on " + uri + " but this remote object is not known");
             }
+        } else {
+            logger
+                    .warn("Tried to perform a lookup on null. This is probably a bug in the MessageRoutingRemoteObjectFactory");
         }
 
-        return this.returnedObject;
+        return null;
     }
 }

@@ -110,7 +110,7 @@ public abstract class AbstractRemoteObjectFactory {
             e.printStackTrace();
         }
 
-        throw new UnknownProtocolException("there is no RemoteObjectFactory defined for the protocol : " +
+        throw new UnknownProtocolException("There is no RemoteObjectFactory defined for the protocol : " +
             protocol);
     }
 

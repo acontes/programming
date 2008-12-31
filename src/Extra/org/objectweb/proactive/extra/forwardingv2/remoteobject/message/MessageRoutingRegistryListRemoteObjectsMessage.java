@@ -39,38 +39,40 @@ import org.objectweb.proactive.extra.forwardingv2.remoteobject.util.MessageRouti
 
 
 /**
- * This classes represents a HTTPMessage. When processed, this message performs a lookup thanks to the urn.
+ * This classes represents a MessageRoutingMessage. When processed, this message
+ * list all the remote objects registered on the receiver.
+ * 
  * @author The ProActive Team
  * @see MessageRoutingMessage
  */
 @SuppressWarnings("serial")
 public class MessageRoutingRegistryListRemoteObjectsMessage extends MessageRoutingMessage implements
         Serializable {
+
     /**
-     * Constructs an HTTP Message
-     * @param urn The urn of the Object (it can be an active object or a runtime).
+     * Construct a list message
+     * 
+     * @param uri
+     *            the URI of the remote runtime to be retrieved, only the agent
+     *            id part is used for this type of message. The path part is ignored
+     * @param agent
+     *            the local agent to use to send the message
      */
     public MessageRoutingRegistryListRemoteObjectsMessage(URI uri, AgentV2 agent) {
         super(uri, agent);
     }
 
-    /**
-     * Get the returned object.
-     * @return the returned object
-     */
+    /** Get the list of the objects registered on the remote runtime */
     public URI[] getReturnedObject() {
         return (URI[]) this.returnedObject;
     }
 
-    /**
-     * Performs the lookup
-     * @return The Object associated with the urn
-     */
     @Override
     public Object processMessage() {
-        System.out.println("MessageRoutingRegistryListRemoteObjectsMessage.processMessage()");
-        URI[] uri = MessageRoutingRegistry.singleton.list();
-        this.returnedObject = uri;
-        return this.returnedObject;
+        if (logger.isTraceEnabled()) {
+            logger.trace("Executing a list message");
+        }
+
+        return MessageRoutingRegistry.singleton.list();
     }
 }
