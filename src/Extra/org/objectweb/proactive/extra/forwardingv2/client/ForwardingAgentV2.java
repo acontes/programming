@@ -3,9 +3,9 @@ package org.objectweb.proactive.extra.forwardingv2.client;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.net.InetAddress;
-import java.net.Socket;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
@@ -13,40 +13,33 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.util.TimeoutAccounter;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extra.forwardingv2.exceptions.AgentNotConnectedException;
-import org.objectweb.proactive.extra.forwardingv2.exceptions.ExecutionException;
-import org.objectweb.proactive.extra.forwardingv2.exceptions.RoutingException;
+import org.objectweb.proactive.extra.forwardingv2.exceptions.MessageRoutingException;
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.DataReplyMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.DataRequestMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.ExceptionMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message;
-import org.objectweb.proactive.extra.forwardingv2.protocol.MessageInputStream;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationReplyMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationRequestMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message.MessageType;
 
 
 /**
- * The ForwardingAgent is the implementation of the Agent interface.
- *
- * @author A. Fawaz, J. Martin
- *
+ * A local message routing agent in charge of sending and receiving the messages
+ * 
+ * It will contact the router as soon as created and will try to maintain the
+ * connection open (eg. if the connection is closed then it will be reopened).
  */
-public class ForwardingAgentV2 implements AgentV2Internal, Runnable {
-    // FIELDS
-    /**
-     * Number of retries to connect to the registry.
-     */
-    public static final int NB_RETRY = 3;
-    public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_CLIENT);
+public class ForwardingAgentV2 implements AgentV2Internal {
 
-    /** Delay before aborting the response waiting. **/
-    private static final long WAITING_DELAY = 5000;
+    final private InetAddress routerAddr;
+    final private int routerPort;
+
+    public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_CLIENT);
 
     /** Local Mailboxes used to block the threads waiting for a response. **/
     private final ConcurrentHashMap<Long, LocalMailBox> boxes;
@@ -55,16 +48,10 @@ public class ForwardingAgentV2 implements AgentV2Internal, Runnable {
     private final AtomicLong requestIDGenerator;
 
     /** Local AgentID, set after initialization. **/
-    private AgentID agentID;
+    private AgentID agentID = null;
 
-    /** Socket connected to the registry. **/
-    private Socket tunnel = null;
-
-    /** Read part of the tunnel. **/
-    private MessageInputStream input = null;
-
-    private volatile boolean isRunning; // Stopping main Thread
-    private volatile boolean agentConnected;
+    private Tunnel t = null;
+    final private List<Tunnel> failedTunnels;
 
     /** Every data message will be handled by this object */
     final private MessageHandler messageHandler;
@@ -72,160 +59,185 @@ public class ForwardingAgentV2 implements AgentV2Internal, Runnable {
     /** The list of Valve that will process each message */
     final private List<Valve> valves;
 
-    public ForwardingAgentV2(Class<? extends MessageHandler> messageHandlerClass, List<Valve> valves) {
+    public ForwardingAgentV2(InetAddress routerAddr, int routerPort,
+            Class<? extends MessageHandler> messageHandlerClass) throws ProActiveException {
+        this(routerAddr, routerPort, messageHandlerClass, new ArrayList<Valve>());
+    }
+
+    public ForwardingAgentV2(InetAddress routerAddr, int routerPort,
+            Class<? extends MessageHandler> messageHandlerClass, List<Valve> valves)
+            throws ProActiveException {
+        this.routerAddr = routerAddr;
+        this.routerPort = routerPort;
         this.valves = valves;
+        this.boxes = new ConcurrentHashMap<Long, LocalMailBox>();
+        this.requestIDGenerator = new AtomicLong(0);
+        this.failedTunnels = new LinkedList<Tunnel>();
 
         try {
             Constructor<? extends MessageHandler> mhConstructor;
             mhConstructor = messageHandlerClass.getConstructor(AgentV2Internal.class);
             this.messageHandler = mhConstructor.newInstance(this);
         } catch (Exception e) {
-            throw new ProActiveRuntimeException("Agent failed to create the message handler", e);
+            throw new ProActiveException("Message routing agent failed to create the message handler", e);
         }
 
-        boxes = new ConcurrentHashMap<Long, LocalMailBox>();
-        requestIDGenerator = new AtomicLong(0);
-        agentConnected = false;
-    }
+        try {
+            this.t = reconnectToRouter();
+        } catch (IOException e) {
+            throw new ProActiveException("Failed to create the tunnel to " + routerAddr + ":" + routerPort, e);
+        }
 
-    public ForwardingAgentV2(Class<? extends MessageHandler> messageHandlerClass) {
-        this(messageHandlerClass, new ArrayList<Valve>());
+        // Start the message receiver
+        Thread mrThread = new Thread(new MessageReader(this));
+        mrThread.setDaemon(true);
+        mrThread.start();
     }
 
     /**
-     * Initialize the tunnel to the registry and get the agentID from it.
+     * Returns a new tunnel to the router
      * 
-     * @param registryAddress
-     *            {@link InetAddress} of the registry
-     * @param registryPort
-     *            port to connect.
+     * The tunnel instance field is updated. The agentID instance field is set
+     * on the first call
+     * 
+     * @return the new tunnel
+     * @throws IOException
+     *             if not able to contact the router or if an erroneous response
+     *             if received
      */
-    public void initialize(InetAddress registryAddress, int registryPort) throws IOException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Connecting to registry on " + registryAddress + ":" + registryPort);
+    synchronized private Tunnel reconnectToRouter() throws IOException {
+
+        Tunnel tunnel = new Tunnel(this.routerAddr, this.routerPort);
+
+        // if call for the first time then agentID is null
+        RegistrationRequestMessage reg = new RegistrationRequestMessage(this.agentID);
+        tunnel.write(reg.toByteArray());
+
+        // Waiting the router response
+        byte[] reply = tunnel.readMessage();
+        Message replyMsg = Message.constructMessage(reply, 0);
+
+        if (!(replyMsg instanceof RegistrationReplyMessage)) {
+            throw new IOException("Invalid router response: expected a " +
+                RegistrationReplyMessage.class.getName() + " message but got " +
+                replyMsg.getClass().getName());
         }
 
-        int retry = NB_RETRY;
-        // Connect a socket.
-        while (tunnel == null && retry-- > 0) {
-            try {
-                tunnel = new Socket(registryAddress, registryPort);
-                input = new MessageInputStream(tunnel.getInputStream());
-            } catch (IOException e) {
-                if (retry > 0) {
-                    logger.warn("Connection to registry failed. Retrying...");
-                } else {
-                    logger.error("Connection to registry failed.", e);
-                    throw e;
-                }
+        AgentID replyAgentID = ((RegistrationReplyMessage) replyMsg).getAgentID();
+        if (this.agentID == null) {
+            this.agentID = replyAgentID;
+        } else {
+            if (!this.agentID.equals(replyAgentID)) {
+                throw new IOException("Invalid router response: Local ID is " + this.agentID +
+                    " but server told " + replyAgentID);
             }
         }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Connection successful. getting a Unique Agent ID");
-        }
-
-        RegistrationRequestMessage reg = new RegistrationRequestMessage();
-        try {
-            synchronized (tunnel) {
-                tunnel.getOutputStream().write(reg.toByteArray());
-                tunnel.getOutputStream().flush();
-            }
-        } catch (IOException e) {
-            logger.warn("Exception during registration", e);
-        }
-
-        Message resp = Message.constructMessage(input.readMessage(), 0);
-        if (resp.getType() == MessageType.REGISTRATION_REPLY) {
-            RegistrationReplyMessage reply = (RegistrationReplyMessage) resp;
-            // Registration successfull.
-            agentID = reply.getAgentID();
-        }
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("Local Unique Agent ID is " + agentID);
-        }
-
-        // Start handling incoming messages
-        isRunning = true;
-        Thread t = new Thread(this);
-        t.setDaemon(true);
-        t.start();
-
-        // TODO Put a way to stop the localAgent in a better way.
-
-        agentConnected = true;
+        this.t = tunnel;
+        return this.t;
     }
 
-    public byte[] sendMsg(AgentID targetID, byte[] data, boolean oneWay) throws RoutingException,
-            ExecutionException {
-        if (!agentConnected) {
-            throw new AgentNotConnectedException();
+    /**
+     * Report a tunnel failure to the agent
+     * 
+     * Threads get from the local agent a tunnel to use. If this tunnel fails
+     * then they have to notify this failure to the local agent. It will try to
+     * reconnect to the router and returns a new Tunnel.
+     * 
+     * Since several threads can encounter and report the same failure this
+     * method checks if the error has already been fixed.
+     * 
+     * @param brokenTunnel
+     *            the tunnel that throwed an IOException
+     * @return a new tunnel to use
+     * @throws IOException
+     *             if not able to reconnect to the router
+     */
+    private synchronized Tunnel reportTunnelFailure(Tunnel brokenTunnel) throws IOException {
+        if (!this.failedTunnels.contains(brokenTunnel)) {
+            this.failedTunnels.add(brokenTunnel);
+            logger.debug("Tunnel" + brokenTunnel + "has failed, creating a new one");
+
+            // TODO: Add a several retry algorithm with an exponential backoff
+            this.t.shutdown();
+            this.t = reconnectToRouter();
+        } else {
+            logger.debug("This failure for tunnel" + brokenTunnel + "has already been reported");
         }
+
+        return this.t;
+    }
+
+    /**
+     * @return the local {@link AgentID}.
+     */
+    public AgentID getAgentID() {
+        return agentID;
+    }
+
+    public byte[] sendMsg(URI targetURI, byte[] data, boolean oneWay) throws MessageRoutingException {
+        // Extract the AgentID from the targetURI
+        String path = targetURI.getPath();
+        String remoteAgentId = path.split("/", 3)[1];
+        AgentID agentID = new AgentID(Long.parseLong(remoteAgentId));
+
+        return sendMsg(agentID, data, oneWay);
+    }
+
+    public byte[] sendMsg(AgentID targetID, byte[] data, boolean oneWay) throws MessageRoutingException {
         if (logger.isDebugEnabled()) {
             logger.trace("Sending a message to " + targetID);
         }
 
         // Generate a requestID
-        Long requestID = requestIDGenerator.incrementAndGet();
+        Long requestID = requestIDGenerator.getAndIncrement();
 
         DataRequestMessage msg = new DataRequestMessage(agentID, targetID, requestID, data, oneWay);
 
+        byte[] response = null;
         if (oneWay) { // No response needed, just send it.
             internalSendMsg(msg);
-            return null;
         } else {
             // Put a mailbox, waiting for the result
             LocalMailBox mb = new LocalMailBox(requestID);
             boxes.put(requestID, mb);
             internalSendMsg(msg);
+
             // block until the result arrives
-
-            byte[] response = mb.waitForResponse(0);
-            if (response == null) {
-                logger.debug("Timeout reached while waiting a response for " + msg);
-                throw new RoutingException("Timeout reached while waiting a response for " + msg);
-            }
-            return response;
+            response = mb.waitForResponse(0);
         }
+
+        return response;
     }
 
-    public byte[] sendMsg(URI targetURI, byte[] data, boolean oneWay) throws RoutingException,
-            ExecutionException {
-        if (!agentConnected) {
-            throw new AgentNotConnectedException();
-        }
-        String path = targetURI.getPath();
-        String remoteAgentId = path.split("/", 3)[1];
-
-        AgentID agentID = new AgentID(Long.parseLong(remoteAgentId));
-        return sendMsg(agentID, data, oneWay);
-    }
-
-    public void sendReply(DataRequestMessage request, byte[] data) throws RoutingException {
+    public void sendReply(DataRequestMessage request, byte[] data) throws MessageRoutingException {
         DataReplyMessage reply = new DataReplyMessage(this.getAgentID(), request.getSrcAgentID(), request
                 .getMsgID(), data);
-        if (!agentConnected) {
-            throw new AgentNotConnectedException();
-        }
+
         internalSendMsg(reply);
     }
 
-    public void sendExceptionReply(DataRequestMessage request, Exception e) throws RoutingException {
+    public void sendExceptionReply(DataRequestMessage request, Exception e) throws MessageRoutingException {
         ExceptionMessage reply = new ExceptionMessage(MessageType.EXECUTION_EXCEPTION_MSG, this.getAgentID(),
             request.getSrcAgentID(), request.getMsgID(), e);
-        if (!agentConnected) {
-            throw new AgentNotConnectedException();
-        }
         internalSendMsg(reply);
     }
 
     /**
-     * Send really the message through the tunnel
-     *
+     * Apply each valve to the message and the write it into the tunnel
+     * 
+     * This method throws a {@link MessageRoutingException} if:
+     * <ol>
+     * 	<li>The tunnel fails and cannot be recreated</li>
+     * 	<li>The tunnel fails, can be recreated but the second tunnel fails too</li>
+     * </ol>
+     * 
      * @param msg
+     *            The message to be sent
+     * @exception MessageRoutingException
+     *                if the message cannot be sent
      */
-    private void internalSendMsg(Message msg) {
+    private void internalSendMsg(Message msg) throws MessageRoutingException {
         for (Valve valve : this.valves) {
             msg = valve.invokeOutgoing(msg);
             if (logger.isTraceEnabled()) {
@@ -236,76 +248,34 @@ public class ForwardingAgentV2 implements AgentV2Internal, Runnable {
         }
 
         // Serialize the message
-        byte[] sMessage = msg.toByteArray();
+        byte[] msgBuf = msg.toByteArray();
+
+        // this.t can change a anytime, get a ref on it
+        Tunnel tunnel = this.t;
+
         try {
-            if (logger.isTraceEnabled())
-                logger.trace("Sending message on tunnel");
-            synchronized (tunnel) {
-                tunnel.getOutputStream().write(sMessage);
-                tunnel.getOutputStream().flush();
-            }
-            if (logger.isTraceEnabled())
-                logger.trace("Message sent.");
+            tunnel.write(msgBuf);
         } catch (IOException e) {
-            logger.warn("Error while writing message into the tunnel: " + msg, e);
-        }
-    }
-
-    /**
-     * -> Read messages L> Execute requests or dispatch responses -> TODO handle
-     * other cases
-     */
-    public void run() {
-        while (isRunning) {
-            Message msg = null;
+            // tunnel failed try to reopen the connnection
             try {
-                msg = Message.constructMessage(input.readMessage(), 0);
-            } catch (IOException e) {
-                logger.error("Error while reading a message from the tunnel", e);
-                return;
+                tunnel = this.reportTunnelFailure(tunnel);
+            } catch (IOException e1) {
+                // reportTunnelFailure throw an IOException only when
+                // the router cannot be contacted again. We just loose the
+                // game
+                throw new MessageRoutingException(
+                    "Message cannot be sent because tunnel failed and the agent is unable to recreate it", e1);
             }
 
-            if (logger.isTraceEnabled()) {
-                logger.trace("Message received: " + msg);
-            }
-
-            for (Valve valve : this.valves) {
-                msg = valve.invokeIncoming(msg);
-                if (logger.isTraceEnabled()) {
-                    logger.trace("Applied valve " + valve.getInfo() + ", resulting message is: " +
-                        msg.toString());
-                }
-            }
-
-            // TODO Handle different message types.
-
-            if (msg.getType() == MessageType.DATA_REPLY) {
-                DataReplyMessage reply = (DataReplyMessage) msg;
-                // Have to lookup in the hashtable
-                LocalMailBox mbox = boxes.remove(reply.getMsgID());
-                if (mbox == null) {
-                    logger.warn("Received reply message for unknown request: " + msg);
-                } else {
-                    if (logger.isTraceEnabled()) {
-                        logger.trace("Message corresponding to response");
-                    }
-                    // this is a reply containing data
-                    mbox.setAndUnlock(reply.getData());
-                }
-            } else if (msg.getType() == MessageType.DATA_REQUEST) {
-
-                // That message is a request, handle it.
-                messageHandler.pushMessage((DataRequestMessage) msg);
+            // Try again to send the message
+            try {
+                tunnel.write(msgBuf);
+            } catch (IOException e1) {
+                // Message sending failed twice with to different tunnel.
+                // Aborting
+                throw new MessageRoutingException("Message cannot be sent. Failed twice", e1);
             }
         }
-
-    }
-
-    /**
-     * @return the local {@link AgentID}.
-     */
-    public AgentID getAgentID() {
-        return agentID;
     }
 
     public class LocalMailBox {
@@ -337,6 +307,87 @@ public class ForwardingAgentV2 implements AgentV2Internal, Runnable {
         public void setAndUnlock(byte[] response) {
             this.response = response;
             latch.countDown();
+        }
+    }
+
+    public class MessageReader implements Runnable {
+        final ForwardingAgentV2 agent;
+
+        public MessageReader(ForwardingAgentV2 agent) {
+            this.agent = agent;
+        }
+
+        public void run() {
+            while (true) {
+                Message msg = readMessage();
+
+                for (Valve valve : valves) {
+                    msg = valve.invokeIncoming(msg);
+                    if (logger.isTraceEnabled()) {
+                        logger.trace("Applied valve " + valve.getInfo() + ", resulting message is: " +
+                            msg.toString());
+                    }
+                }
+
+                handleMessage(msg);
+            }
+        }
+
+        /** Block until a message arrive
+         * 
+         * This method is also in charge of handling tunnel failures
+         * 
+         * @return a received message
+         */
+        public Message readMessage() {
+            while (true) {
+                Tunnel tunnel = this.agent.t;
+                try {
+                    byte[] msgBuf = tunnel.readMessage();
+                    return Message.constructMessage(msgBuf, 0);
+                } catch (IOException e) {
+                    logger.trace("Tunnel failed while waiting for a message asking for a new one", e);
+                    // Create a new tunnel
+                    boolean newTunnelReady = false;
+                    while (!newTunnelReady) {
+                        try {
+                            tunnel = this.agent.reportTunnelFailure(tunnel);
+                        } catch (IOException e1) {
+                            logger.error("Failed to create a new tunnel, sleeping for 10 seconds", e1);
+                            TimeoutAccounter timeout = TimeoutAccounter.getAccounter(10000);
+                            while (!timeout.isTimeoutElapsed()) {
+                                try {
+                                    Thread.sleep(timeout.getRemainingTimeout());
+                                } catch (InterruptedException e2) {
+                                    // Miam miam miam
+                                }
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
+
+        public void handleMessage(Message msg) {
+            if (msg.getType() == MessageType.DATA_REPLY) {
+                DataReplyMessage reply = (DataReplyMessage) msg;
+                // Have to lookup in the hashtable
+                LocalMailBox mbox = boxes.remove(reply.getMsgID());
+                if (mbox == null) {
+                    logger.warn("Received reply message for unknown request: " + msg);
+                } else {
+                    if (logger.isTraceEnabled()) {
+                        logger.trace("Message corresponding to response");
+                    }
+                    // this is a reply containing data
+                    mbox.setAndUnlock(reply.getData());
+                }
+            } else if (msg.getType() == MessageType.DATA_REQUEST) {
+
+                // That message is a request, handle it.
+                messageHandler.pushMessage((DataRequestMessage) msg);
+            }
         }
     }
 

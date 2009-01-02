@@ -59,11 +59,9 @@ public class TestForwardingAgentV2 {
 
     @Test
     public void testInitialize() throws Exception {
-        AgentV2 agent = new ForwardingAgentV2(ProActiveMessageHandler.class);
+        AgentV2 agent = new ForwardingAgentV2(InetAddress.getLocalHost(), reg.getPort(),
+            ProActiveMessageHandler.class);
         Assert.assertNotNull(agent);
-        Assert.assertNull(agent.getAgentID());
-        agent.initialize(InetAddress.getLocalHost(), reg.getPort());
-        Assert.assertNotNull(agent.getAgentID());
     }
 
     /**
@@ -72,9 +70,9 @@ public class TestForwardingAgentV2 {
      */
     @Test
     public void testSendMessageWithReply() throws Exception {
-        AgentV2 agent = new ForwardingAgentV2(ProActiveMessageHandler.class);
+        AgentV2 agent = new ForwardingAgentV2(InetAddress.getLocalHost(), reg.getPort(),
+            ProActiveMessageHandler.class);
         Assert.assertNotNull(agent);
-        agent.initialize(InetAddress.getLocalHost(), reg.getPort());
         System.out.println("Sending Crafted Message");
 
         HelloMessage mess = new HelloMessage();
@@ -92,9 +90,9 @@ public class TestForwardingAgentV2 {
      */
     @Test
     public void testSendMsgWithoutReply() throws Exception {
-        AgentV2 agent = new ForwardingAgentV2(ProActiveMessageHandler.class);
+        AgentV2 agent = new ForwardingAgentV2(InetAddress.getLocalHost(), reg.getPort(),
+            ProActiveMessageHandler.class);
         Assert.assertNotNull(agent);
-        agent.initialize(InetAddress.getLocalHost(), reg.getPort());
         System.out.println("Sending Crafted Message");
 
         HelloMessage mess = new HelloMessage();

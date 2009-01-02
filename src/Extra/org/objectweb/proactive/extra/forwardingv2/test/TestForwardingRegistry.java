@@ -68,8 +68,7 @@ public class TestForwardingRegistry {
         Assert.assertNotNull(input);
 
         // Connect Agent
-        AgentV2 agent = new ForwardingAgentV2(ProActiveMessageHandler.class);
-        agent.initialize(InetAddress.getLocalHost(), port);
+        AgentV2 agent = new ForwardingAgentV2(InetAddress.getLocalHost(), port, ProActiveMessageHandler.class);
 
         AgentID targetID = agent.getAgentID();
         Assert.assertNotNull(targetID);
@@ -99,8 +98,7 @@ public class TestForwardingRegistry {
         Assert.assertNotNull(input);
 
         // Connect Agent
-        AgentV2 agent = new ForwardingAgentV2(ProActiveMessageHandler.class);
-        agent.initialize(InetAddress.getLocalHost(), port);
+        AgentV2 agent = new ForwardingAgentV2(InetAddress.getLocalHost(), port, ProActiveMessageHandler.class);
 
         AgentID targetID = agent.getAgentID();
         Assert.assertNotNull(targetID);

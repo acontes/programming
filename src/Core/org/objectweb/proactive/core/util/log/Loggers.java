@@ -153,6 +153,7 @@ public interface Loggers {
     static final public String FORWARDING = CORE + ".forwarding";
     static final public String FORWARDING_ROUTER = FORWARDING + ".router";
     static final public String FORWARDING_CLIENT = FORWARDING + ".client";
+    static final public String FORWARDING_CLIENT_TUNNEL = FORWARDING_CLIENT + ".tunnel";
     static final public String FORWARDING_REMOTE_OBJECT = FORWARDING + ".remoteobject";
 
     // Exceptions

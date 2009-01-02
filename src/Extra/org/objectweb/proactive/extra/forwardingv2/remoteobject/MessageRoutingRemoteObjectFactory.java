@@ -31,7 +31,6 @@
  */
 package org.objectweb.proactive.extra.forwardingv2.remoteobject;
 
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.UnknownHostException;
@@ -69,9 +68,6 @@ public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFacto
     final private MessageRoutingRegistry registry;
 
     public MessageRoutingRemoteObjectFactory() {
-        this.agent = new ForwardingAgentV2(ProActiveMessageHandler.class);
-        this.registry = MessageRoutingRegistry.singleton;
-
         // Start the agent and contact the router
         // Since there is no initialization phase in ProActive, if the router cannot be contacted
         // we log the error and throw a runtime exception. We cannot do better here
@@ -87,16 +83,22 @@ public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFacto
                 PAProperties.PA_NET_ROUTER_PORT.getKey() + " is not set.");
         }
 
-        InetAddress routerAddress;
+        InetAddress routerAddress = null;
         try {
             routerAddress = InetAddress.getByName(routerAddressStr);
-            this.agent.initialize(routerAddress, routerPort);
-
         } catch (UnknownHostException e) {
             logAndThrowException("Router address, " + routerAddressStr + " cannot be resolved", e);
-        } catch (IOException e) {
-            logAndThrowException("The router cannot be contacted ", e);
         }
+
+        AgentV2 agent = null;
+        try {
+            agent = new ForwardingAgentV2(routerAddress, routerPort, ProActiveMessageHandler.class);
+        } catch (ProActiveException e) {
+            logAndThrowException("Failed to create the local agent", e);
+        }
+
+        this.agent = agent;
+        this.registry = MessageRoutingRegistry.singleton;
     }
 
     private void logAndThrowException(String message) {
@@ -119,8 +121,8 @@ public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFacto
      * (non-Javadoc)
      * 
      * @see
-     * org.objectweb.proactive.core.remoteobject.RemoteObjectFactory#newRemoteObject(org.objectweb
-     * .proactive.core.remoteobject.RemoteObject)
+     * org.objectweb.proactive.core.remoteobject.RemoteObjectFactory#newRemoteObject
+     * (org.objectweb .proactive.core.remoteobject.RemoteObject)
      */
     public RemoteRemoteObject newRemoteObject(InternalRemoteRemoteObject target) {
         return new MessageRoutingRemoteObjectImpl(target, null, agent);
@@ -139,8 +141,9 @@ public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFacto
      * (non-Javadoc)
      * 
      * @see
-     * org.objectweb.proactive.core.remoteobject.RemoteObjectFactory#register(org.objectweb.proactive
-     * .core.remoteobject.RemoteObject, java.net.URI, boolean)
+     * org.objectweb.proactive.core.remoteobject.RemoteObjectFactory#register
+     * (org.objectweb.proactive .core.remoteobject.RemoteObject, java.net.URI,
+     * boolean)
      */
     public RemoteRemoteObject register(InternalRemoteRemoteObject ro, URI uri, boolean replacePrevious)
             throws ProActiveException {
@@ -166,7 +169,8 @@ public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFacto
      * Looks-up a remote object previously registered in the bodies table .
      * 
      * @param urn
-     *            the urn (in fact its url + name) the remote Body is registered to
+     *            the urn (in fact its url + name) the remote Body is registered
+     *            to
      * @return a UniversalBody
      */
     public RemoteObject lookup(URI uri) throws ProActiveException {
@@ -190,15 +194,18 @@ public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFacto
      * 
      * @param url
      *            the url of the host to scan, typically //machine_name
-     * @return a list of Strings, representing the registered names, and {} if no registry
+     * @return a list of Strings, representing the registered names, and {} if
+     *         no registry
      * @exception java.io.IOException
-     *                if scanning reported some problem (registry not found, or malformed Url)
+     *                if scanning reported some problem (registry not found, or
+     *                malformed Url)
      */
 
     /*
      * (non-Javadoc)
      * 
-     * @see org.objectweb.proactive.core.body.BodyAdapterImpl#list(java.lang.String)
+     * @see
+     * org.objectweb.proactive.core.body.BodyAdapterImpl#list(java.lang.String)
      */
     public URI[] list(URI uri) throws ProActiveException {
         MessageRoutingRegistryListRemoteObjectsMessage message = new MessageRoutingRegistryListRemoteObjectsMessage(
@@ -220,7 +227,8 @@ public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFacto
     }
 
     public int getPort() {
-        // Reverse connections are used with message routing so this method is irrelevant
+        // Reverse connections are used with message routing so this method is
+        // irrelevant
         throw new UnsupportedOperationException();
     }
 

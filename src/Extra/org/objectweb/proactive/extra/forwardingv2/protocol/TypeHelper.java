@@ -1,9 +1,9 @@
 package org.objectweb.proactive.extra.forwardingv2.protocol;
 
-/**
- * 
- * TypeHelper allows formatting a Message, that is putting it under the form of a Byte array, or recovering it from a byte Array
+/** Helper class to allows int/long <-> byte[] conversion
  *
+ * <b>warn</b> These functions should depend on machine endianess but is a not been
+ * well tested...
  */
 public class TypeHelper {
 
