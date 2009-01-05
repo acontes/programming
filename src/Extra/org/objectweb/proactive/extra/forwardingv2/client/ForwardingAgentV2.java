@@ -176,9 +176,7 @@ public class ForwardingAgentV2 implements AgentV2Internal {
     }
 
     public byte[] sendMsg(URI targetURI, byte[] data, boolean oneWay) throws MessageRoutingException {
-        // Extract the AgentID from the targetURI
-        String path = targetURI.getPath();
-        String remoteAgentId = path.split("/", 3)[1];
+        String remoteAgentId = targetURI.getHost();
         AgentID agentID = new AgentID(Long.parseLong(remoteAgentId));
 
         return sendMsg(agentID, data, oneWay);

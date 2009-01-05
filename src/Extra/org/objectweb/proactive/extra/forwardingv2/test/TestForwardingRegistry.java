@@ -1,5 +1,6 @@
 package org.objectweb.proactive.extra.forwardingv2.test;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 
@@ -33,7 +34,7 @@ public class TestForwardingRegistry {
     AgentID localID = null;
 
     @Before
-    public void setup() {
+    public void setup() throws IOException {
         this.reg = new ForwardingRegistry(++port, true);
     }
 

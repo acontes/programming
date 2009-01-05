@@ -53,6 +53,7 @@ public class MessageRoutingRemoteObjectRequest extends MessageRoutingMessage imp
     public MessageRoutingRemoteObjectRequest(Request request, URI uri, AgentV2 agent) {
         super(uri, agent);
         this.request = request;
+        this.isOneWay = request.isOneWay();
     }
 
     /** Get the response of this request */

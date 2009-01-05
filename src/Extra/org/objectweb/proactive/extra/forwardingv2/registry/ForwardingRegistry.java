@@ -28,15 +28,15 @@ public class ForwardingRegistry implements Runnable {
     static public final int DEFAULT_SERVER_PORT = 2099;
 
     private volatile boolean listening = true;
-    private int listeningPort;
     private ServerSocket serverSocket = null;
     final private ConcurrentHashMap<AgentID, RegistrationHandler> registrationHandlerMap = new ConcurrentHashMap<AgentID, RegistrationHandler>();
     private CountDownLatch routerIsReady;
 
-    public ForwardingRegistry(int listeningPort, boolean forked) {
-        this.listeningPort = listeningPort;
+    public ForwardingRegistry(int listeningPort, boolean forked) throws IOException {
         this.routerIsReady = new CountDownLatch(1);
-        Runtime.getRuntime().addShutdownHook(new Thread(new RegistryShutdownHook(this)));
+        //        Runtime.getRuntime().addShutdownHook(new Thread(new RegistryShutdownHook(this)));
+
+        this.serverSocket = new ServerSocket(listeningPort);
 
         if (forked) {
             Thread t = new Thread(this);
@@ -62,8 +62,9 @@ public class ForwardingRegistry implements Runnable {
      * 
      * @param args
      *            : <-regport>
+     * @throws IOException 
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         int port = DEFAULT_SERVER_PORT;
         for (int i = 0; i < args.length; i++) {
             if (args[i].equals("-port")) {
@@ -84,22 +85,6 @@ public class ForwardingRegistry implements Runnable {
      * Launches the server.
      */
     public void run() {
-
-        // launch the server side and listen
-        try {
-            serverSocket = new ServerSocket(listeningPort);
-        } catch (IOException e) {
-            // log and quit
-            if (logger.isDebugEnabled()) {
-                logger.debug("FR failed while opening server socket listening on port: " + listeningPort);
-            }
-            listening = false;
-        }
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("FR created server socket and listening on port " + listeningPort);
-        }
-
         this.routerIsReady.countDown();
         while (listening) {
             try {
@@ -140,7 +125,6 @@ public class ForwardingRegistry implements Runnable {
         // this function and stop the registry properly
 
         // stop the server if it was not stopped already
-        Thread.dumpStack();
         listening = false;
         try {
             serverSocket.close();

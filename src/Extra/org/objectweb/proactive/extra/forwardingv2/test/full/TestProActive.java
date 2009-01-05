@@ -1,5 +1,6 @@
 package org.objectweb.proactive.extra.forwardingv2.test.full;
 
+import java.io.IOException;
 import java.net.URL;
 
 import junit.framework.Assert;
@@ -22,7 +23,7 @@ public class TestProActive {
     Node remoteNode;
 
     @Before
-    public void b() throws ProActiveException {
+    public void b() throws ProActiveException, IOException {
         this.forwarder = new ForwardingRegistry(0, true);
 
         PAProperties.PA_COMMUNICATION_PROTOCOL.setValue("pamr");

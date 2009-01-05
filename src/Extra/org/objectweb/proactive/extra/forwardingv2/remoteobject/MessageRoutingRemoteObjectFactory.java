@@ -150,7 +150,7 @@ public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFacto
         this.registry.bind(uri, ro);
         MessageRoutingRemoteObjectImpl rro = new MessageRoutingRemoteObjectImpl(ro, uri, agent);
         if (logger.isDebugEnabled()) {
-            logger.debug("Registered remote object at endpoint" + uri);
+            logger.debug("Registered remote object at endpoint " + uri);
         }
         return rro;
     }
@@ -235,7 +235,7 @@ public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFacto
     public InternalRemoteRemoteObject createRemoteObject(RemoteObject<?> remoteObject, String name)
             throws ProActiveException {
 
-        URI uri = URI.create(this.getProtocolId() + ":/" + this.agent.getAgentID() + "/" + name);
+        URI uri = URI.create(this.getProtocolId() + "://" + this.agent.getAgentID() + "/" + name);
 
         // register the object on the register
         InternalRemoteRemoteObject irro = new InternalRemoteRemoteObjectImpl(remoteObject, uri);

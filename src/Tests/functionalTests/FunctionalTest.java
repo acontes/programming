@@ -47,6 +47,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.util.OperatingSystem;
+import org.objectweb.proactive.extra.forwardingv2.registry.ForwardingRegistry;
+import org.objectweb.proactive.extra.forwardingv2.remoteobject.MessageRoutingRemoteObjectFactory;
 
 
 public class FunctionalTest {
@@ -135,6 +137,17 @@ public class FunctionalTest {
             timer.schedule(timerTask, timeout);
         } else {
             logger.trace("Timeout disabled");
+        }
+    }
+
+    @BeforeClass
+    public static void BCForMessageRouting() throws IOException {
+        if (PAProperties.PA_COMMUNICATION_PROTOCOL.getValue().equals(
+                MessageRoutingRemoteObjectFactory.PROTOCOL_ID)) {
+            // Start a router for this test
+            logger.info("Starting a router on port " + PAProperties.PA_NET_ROUTER_PORT.getValue());
+            ForwardingRegistry router = new ForwardingRegistry(PAProperties.PA_NET_ROUTER_PORT
+                    .getValueAsInt(), true);
         }
     }
 
