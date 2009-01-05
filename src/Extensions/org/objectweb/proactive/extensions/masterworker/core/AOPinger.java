@@ -110,7 +110,6 @@ public class AOPinger implements WorkerWatcher, RunActive, InitActive, Serializa
     }
 
     /** {@inheritDoc} */
-    @SuppressWarnings("unchecked")
     public void initActivity(final Body body) {
 
         stubOnThis = (AOPinger) PAActiveObject.getStubOnThis();

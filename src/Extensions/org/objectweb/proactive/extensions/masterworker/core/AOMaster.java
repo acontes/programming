@@ -338,14 +338,12 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
     }
 
     /** {@inheritDoc} */
-    @SuppressWarnings("unchecked")
     public Queue<TaskIntern<Serializable>> getTasks(final Worker worker, final String workerName,
             boolean reflooding) {
         return getTasksInternal(worker, workerName, reflooding);
     }
 
     /** {@inheritDoc} */
-    @SuppressWarnings("unchecked")
     public void initActivity(final Body body) {
         stubOnThis = (AOMaster) PAActiveObject.getStubOnThis();
         // General initializations
@@ -452,7 +450,6 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
      * @param workerName
      */
     private void removeActivityOfWorker(String workerName) {
-        Body body = PAActiveObject.getBodyOnThis();
         // if the worker was handling tasks we put the tasks back to the pending queue
         if (workersActivity.containsKey(workerName)) {
             for (Long taskId : workersActivity.get(workerName)) {
@@ -904,7 +901,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
             Request req = ent.getValue();
             String originator = ent.getKey();
             String methodName = req.getMethodName();
-            ResultQueue rq = subResultQueues.get(originator);
+            ResultQueue<Serializable> rq = subResultQueues.get(originator);
             if (rq != null) {
                 if ((methodName.equals("waitOneResult") || methodName.equals("waitSomeResults")) &&
                     rq.isOneResultAvailable()) {
@@ -1047,7 +1044,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
             if (subResultQueues.containsKey(originator)) {
                 subResultQueues.get(originator).addPendingTask(id);
             } else {
-                ResultQueue rq = new ResultQueue(resultQueue.getMode());
+                ResultQueue<Serializable> rq = new ResultQueue<Serializable>(resultQueue.getMode());
                 rq.addPendingTask(id);
                 subResultQueues.put(originator, rq);
             }
@@ -1131,7 +1128,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
             if (subResultQueues.containsKey(originatorName)) {
                 subResultQueues.get(originatorName).setMode(mode);
             } else {
-                ResultQueue rq = new ResultQueue(mode);
+                ResultQueue<Serializable> rq = new ResultQueue<Serializable>(mode);
                 rq.setMode(mode);
                 subResultQueues.put(originatorName, rq);
             }
@@ -1299,7 +1296,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
                 clearingCallFromSpawnedWorker(originatorName);
             }
             if (subResultQueues.containsKey(originatorName)) {
-                ResultQueue rq = subResultQueues.get(originatorName);
+                ResultQueue<Serializable> rq = subResultQueues.get(originatorName);
                 if ((rq.countPendingResults() + rq.countAvailableResults()) < k) {
                     throw new IllegalArgumentException("" + k + " is too big");
                 } else if (k <= 0) {
@@ -1378,7 +1375,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
                 clearingCallFromSpawnedWorker(originatorName);
             }
             if (subResultQueues.containsKey(originatorName)) {
-                ResultQueue rq = subResultQueues.get(originatorName);
+                ResultQueue<Serializable> rq = subResultQueues.get(originatorName);
                 int k = rq.countAvailableResults();
 
                 if (debug) {

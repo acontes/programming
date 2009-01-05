@@ -99,7 +99,7 @@ public class PAMonteCarlo<T extends Serializable> {
      * @param randomStreamClass Random Number Generator class that workers will be using
      * @throws ProActiveException
      */
-    public PAMonteCarlo(URL descriptorURL, String workersVNName, String masterVNName, Class randomStreamClass)
+    public PAMonteCarlo(URL descriptorURL, String workersVNName, String masterVNName, Class<?> randomStreamClass)
             throws ProActiveException
     //@snippet-end montecarlo_constructor
     {

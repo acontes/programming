@@ -53,7 +53,7 @@ public class ExecutorImpl implements Executor {
     SubMaster<EngineTaskAdapter<Serializable>, Serializable> master;
     private SubMasterLock lock;
 
-    public ExecutorImpl(SubMaster master, SubMasterLock lock) {
+    public ExecutorImpl(SubMaster<EngineTaskAdapter<Serializable>,Serializable> master, SubMasterLock lock) {
         this.master = master;
         this.lock = lock;
     }
@@ -86,7 +86,8 @@ public class ExecutorImpl implements Executor {
             return buffer.size() > 0 || pendingTasks > 0;
         }
 
-        public R nextElement() {
+        @SuppressWarnings("unchecked")
+		public R nextElement() {
             if (buffer.isEmpty()) {
                 if (pendingTasks > 0) {
                     try {
