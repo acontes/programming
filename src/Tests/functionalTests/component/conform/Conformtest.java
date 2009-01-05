@@ -160,8 +160,8 @@ public abstract class Conformtest extends ComponentTest {
         return true;
     }
 
-    protected void checkComponent(Component c, Set itfs) throws Exception {
-        Set extItfs = getExternalItfs(c);
+    protected void checkComponent(Component c, Set<String> itfs) throws Exception {
+        Set<String> extItfs = getExternalItfs(c);
         //System.err.println("containAll: " + containsAll(itfs, extItfs));
         assertEquals("Wrong external interface list", itfs, extItfs);
         @SuppressWarnings("unchecked")

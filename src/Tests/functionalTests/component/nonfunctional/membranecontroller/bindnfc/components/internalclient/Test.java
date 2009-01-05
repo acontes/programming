@@ -31,8 +31,6 @@
  */
 package functionalTests.component.nonfunctional.membranecontroller.bindnfc.components.internalclient;
 
-import java.util.HashMap;
-import java.util.Map;
 
 import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.api.Component;
@@ -175,9 +173,8 @@ public class Test extends ComponentTest {
                 org.objectweb.proactive.core.component.controller.ProActiveNameController.class.getName());
 
         Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getNFFactory();
-        Map context = new HashMap();
         Component dummyMaster = (Component) f.newComponent(
-                "functionalTests.component.nonfunctional.adl.dummyMaster", context);
+                "functionalTests.component.nonfunctional.adl.dummyMaster", null);
 
         Fractal.getNameController(dummyMaster).setFcName("dummyMaster");
 
@@ -195,7 +192,7 @@ public class Test extends ComponentTest {
                         .getName());
 
         Component dummyController = (Component) f.newComponent(
-                "functionalTests.component.nonfunctional.adl.dummyPrimitive", context);
+                "functionalTests.component.nonfunctional.adl.dummyPrimitive", null);
 
         Fractal.getNameController(dummyController).setFcName("dummyPrimitive");
 
