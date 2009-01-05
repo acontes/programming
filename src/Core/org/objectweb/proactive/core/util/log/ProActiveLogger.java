@@ -126,6 +126,23 @@ public class ProActiveLogger extends Logger {
         logger.error("The following impossible exception occured", t);
     }
 
+    /** Log an exception we don't want to handle
+    *
+    * @param t The nasty exception
+    */
+    static public void logEatedException(Logger logger, String message, Throwable t) {
+        logger.info(message, t);
+    }
+
+    /** Log an exception we don't want to handle
+    *
+    * 
+    * @param t The nasty exception
+    */
+    static public void logEatedException(Logger logger, Throwable t) {
+        logEatedException(logger, "The following exception occured but we don't care ", t);
+    }
+
     /**
        Just calls the parent constructor.
      */
