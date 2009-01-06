@@ -238,7 +238,7 @@ public class XMLHelper {
         Pattern p = Pattern.compile("[^\\x24\\x7B\\x7D]*\\x24\\x7B" + // *${
             "([^\\x7D]*)" + // A,B,C
             "\\x7D[^\\x7D\\x24\\x7B]*"); // }*
-        
+
         Iterator<Element> it = serieList.iterator();
         while (it.hasNext()) {
             Element serie = it.next();
@@ -296,7 +296,7 @@ public class XMLHelper {
      *            names to accept
      */
     @SuppressWarnings("unchecked")
-	public static void tagFiltering(Element eTag, String[] values) {
+    public static void tagFiltering(Element eTag, String[] values) {
         Arrays.sort(values);
         List<Element> children = eTag.getChildren();
         int i = 0;
@@ -318,7 +318,7 @@ public class XMLHelper {
     }
 
     @SuppressWarnings("unchecked")
-	private static boolean filter(Element eTag, String[] values) {
+    private static boolean filter(Element eTag, String[] values) {
         if (values.length == 0) {
             return true;
         }

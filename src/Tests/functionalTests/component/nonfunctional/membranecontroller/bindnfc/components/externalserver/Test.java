@@ -31,6 +31,9 @@
  */
 package functionalTests.component.nonfunctional.membranecontroller.bindnfc.components.externalserver;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Type;
@@ -141,9 +144,10 @@ public class Test extends ComponentTest {
         //Creation of the non-functional name controller component
         Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getNFFactory();
         Component nameController = null;
+        Map context = new HashMap();
         nameController = (Component) f.newComponent(
                 "org.objectweb.proactive.core.component.componentcontroller.adl.nameControllerComponent",
-                null);
+                context);
 
         System.out.println("The name of the nameController component is : " +
             Fractal.getNameController(nameController).getFcName());
@@ -155,14 +159,14 @@ public class Test extends ComponentTest {
 
         //Adding a non-functional GCM component into the membrane.
         Component dummyMaster = (Component) f.newComponent(
-                "functionalTests.component.nonfunctional.adl.dummyMaster", null);
+                "functionalTests.component.nonfunctional.adl.dummyMaster", context);
         Fractal.getNameController(dummyMaster).setFcName("dummyMaster");
 
         memController.addNFSubComponent(dummyMaster);
         memController.bindNFc("dummy-controller", "dummyMaster.dummy-master");
 
         Component dummyController = (Component) f.newComponent(
-                "functionalTests.component.nonfunctional.adl.dummyPrimitive", null);
+                "functionalTests.component.nonfunctional.adl.dummyPrimitive", context);
 
         Fractal.getNameController(dummyController).setFcName("dummyPrimitive");
 

@@ -321,7 +321,7 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable> implemen
     }
 
     @SuppressWarnings("unchecked")
-	public List<R> waitSomeResults() throws TaskException {
+    public List<R> waitSomeResults() throws TaskException {
         if (aomaster.isEmpty(null)) {
             throw new IllegalStateException("Master is empty, call to this method will wait forever");
         }

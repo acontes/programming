@@ -62,7 +62,7 @@ public class TryWithCatch {
     }
 
     @SuppressWarnings("unchecked")
-	private static List<Anything> getParseData(String filename) {
+    private static List<Anything> getParseData(String filename) {
         FileInputStream fis = null;
         Symbol s;
 

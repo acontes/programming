@@ -124,11 +124,11 @@ public class CAttributesCompositeImpl implements CAttributes {
         this.setX11(x11);
     }
 
-	public void setX11(boolean x11) {
-		this.x11 = x11;
-	}
+    public void setX11(boolean x11) {
+        this.x11 = x11;
+    }
 
-	public boolean getX11() {
-		return x11;
-	}
+    public boolean getX11() {
+        return x11;
+    }
 }
