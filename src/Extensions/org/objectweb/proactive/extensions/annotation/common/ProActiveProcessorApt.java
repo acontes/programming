@@ -141,7 +141,7 @@ public class ProActiveProcessorApt implements AnnotationProcessor {
 
             for (Declaration typeDeclaration : _annotatedElements.get(annotDeclaration)) {
 
-                if (applicableOn != null)
+                if (applicableOn != null && applicableOn.value() != null )
                     if (!testSuitableDeclaration(typeDeclaration, applicableOn)) {
                         _messager.printError(typeDeclaration.getPosition(), "[ERROR] The @" +
                             annotation.getSimpleName() +
