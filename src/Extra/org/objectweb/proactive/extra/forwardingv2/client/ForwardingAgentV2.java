@@ -126,6 +126,7 @@ public class ForwardingAgentV2 implements AgentV2Internal {
         AgentID replyAgentID = ((RegistrationReplyMessage) replyMsg).getAgentID();
         if (this.agentID == null) {
             this.agentID = replyAgentID;
+            logger.debug("AgentID is " + this.agentID);
         } else {
             if (!this.agentID.equals(replyAgentID)) {
                 throw new IOException("Invalid router response: Local ID is " + this.agentID +
@@ -253,6 +254,9 @@ public class ForwardingAgentV2 implements AgentV2Internal {
 
         try {
             tunnel.write(msgBuf);
+            if (logger.isTraceEnabled()) {
+                logger.trace("Sent message " + msg);
+            }
         } catch (IOException e) {
             // tunnel failed try to reopen the connnection
             try {

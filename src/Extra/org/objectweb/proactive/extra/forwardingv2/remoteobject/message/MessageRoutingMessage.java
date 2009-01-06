@@ -92,7 +92,9 @@ public abstract class MessageRoutingMessage implements Serializable {
         try {
             byte[] bytes = HttpMarshaller.marshallObject(this);
             byte[] response = agent.sendMsg(this.uri, bytes, isOneWay);
-            this.returnedObject = HttpMarshaller.unmarshallObject(response);
+            if (!isOneWay) {
+                this.returnedObject = HttpMarshaller.unmarshallObject(response);
+            }
         } catch (Exception e) {
             throw new MessageRoutingRemoteException("Failed to send message to " + this.uri, e);
         }

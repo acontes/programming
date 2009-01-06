@@ -57,6 +57,11 @@ public abstract class ForwardedMessage extends Message {
         this.toByteArray = byteArray;
     }
 
+    public String toString() {
+        return "dest=" + this.dstAgentID + " src=" + this.srcAgentID + " msgID=" + this.msgID + " type=" +
+            this.type;
+    }
+
     @Override
     public byte[] toByteArray() {
         int length = getLength();
