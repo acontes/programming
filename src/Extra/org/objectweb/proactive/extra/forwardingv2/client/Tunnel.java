@@ -17,7 +17,7 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.TypeHelper;
  * Message Routing
  * 
  * Error handling performed by higher level component. If the connection goes down
- * or something bad happens then an IOException is thrown. It is the responsability
+ * or something bad happens then an IOException is thrown. It is the responsibility
  * of the caller to create a new tunnel  
  */
 public class Tunnel {
@@ -53,11 +53,11 @@ public class Tunnel {
         this.read(buf, 0, buf.length, timeout);
     }
 
-    public void read(byte[] buf, int offset, int length, long timeount) throws IOException {
+    public void read(byte[] buf, int offset, int length, long timeout) throws IOException {
         int retVal = this.socket.getInputStream().read(buf, offset, length);
         if (retVal != length) {
             // According to the InputStream.read() contract there is nothing we can do
-            // Just warn the caller than something gone wrong
+            // Just warn the caller that something went wrong
             throw new IOException("Failed to read " + length + " byte (read returned only " + length +
                 " bytes)");
         }

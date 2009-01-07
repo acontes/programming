@@ -35,7 +35,7 @@ public interface Valve {
      * 	<li>Examine the properties of the specified outgoing message, wrap it to supplement its functionality</li>
      * </ul>
      *
-     * @param message The incoming message. It <b>can</b> be modified by this Valve
+     * @param message The outgoing message. It <b>can</b> be modified by this Valve
      * @return The result of the processing performed by this Valve
      */
     public Message invokeOutgoing(Message message);

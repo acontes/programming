@@ -148,6 +148,7 @@ public class ForwardingRegistry implements Runnable {
         }
     }
 
+    // TODO: Not Used, might be useful. leave it.
     /**
      * Performs a lookup on {@link #registrationHandlerMap}
      * 
@@ -185,6 +186,7 @@ public class ForwardingRegistry implements Runnable {
         return regHandler;
     }
 
+    // TODO: Not Used, might be useful. leave it.
     /**
      * Kills a {@link RegistrationHandler}. For example, if the tunnel failed on
      * client side and if this client is trying to establish a new tunnel while

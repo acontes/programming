@@ -2,6 +2,8 @@ package org.objectweb.proactive.extra.forwardingv2.registry;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.concurrent.atomic.AtomicLong;
+
 import org.apache.log4j.*;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -26,7 +28,7 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message.Messa
 public class RegistrationHandler implements Runnable {
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_ROUTER);
 
-    static long attributedAgentID = 1;
+    static final AtomicLong attributedAgentID = new AtomicLong(1);
 
     final private ForwardingRegistry registry;
     private AgentID agentID = null;
@@ -102,8 +104,7 @@ public class RegistrationHandler implements Runnable {
         if (agentID != null) {
             this.agentID = newAgentID;
         } else {
-            this.agentID = new AgentID(attributedAgentID);
-            attributedAgentID++;
+            this.agentID = new AgentID(attributedAgentID.getAndIncrement());
         }
         // add mapping in the HashMap
         registry.putMapping(agentID, this);
@@ -152,6 +153,8 @@ public class RegistrationHandler implements Runnable {
         }
     }
 
+    // Does not handle Exception Messages but normally the registry should not receive such messages
+    // TODO: why to work on messages instead of byte arrays... We can spare a lot of time if we don't deserialize the whole message each time...
     private void processMessage(byte[] msgBuf) {
         Message msg = Message.constructMessage(msgBuf, 0);
 

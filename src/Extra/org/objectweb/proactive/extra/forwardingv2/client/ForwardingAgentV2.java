@@ -149,7 +149,7 @@ public class ForwardingAgentV2 implements AgentV2Internal {
      * method checks if the error has already been fixed.
      * 
      * @param brokenTunnel
-     *            the tunnel that throwed an IOException
+     *            the tunnel that threw an IOException
      * @return a new tunnel to use
      * @throws IOException
      *             if not able to reconnect to the router
@@ -223,7 +223,7 @@ public class ForwardingAgentV2 implements AgentV2Internal {
     }
 
     /**
-     * Apply each valve to the message and the write it into the tunnel
+     * Apply each valve to the message and write it into the tunnel
      * 
      * This method throws a {@link MessageRoutingException} if:
      * <ol>
@@ -249,7 +249,7 @@ public class ForwardingAgentV2 implements AgentV2Internal {
         // Serialize the message
         byte[] msgBuf = msg.toByteArray();
 
-        // this.t can change a anytime, get a ref on it
+        // this.t can change at any time, get a ref on it
         Tunnel tunnel = this.t;
 
         try {
@@ -258,7 +258,7 @@ public class ForwardingAgentV2 implements AgentV2Internal {
                 logger.trace("Sent message " + msg);
             }
         } catch (IOException e) {
-            // tunnel failed try to reopen the connnection
+            // tunnel failed try to reopen the connection
             try {
                 tunnel = this.reportTunnelFailure(tunnel);
             } catch (IOException e1) {
@@ -273,7 +273,7 @@ public class ForwardingAgentV2 implements AgentV2Internal {
             try {
                 tunnel.write(msgBuf);
             } catch (IOException e1) {
-                // Message sending failed twice with to different tunnel.
+                // Message sending failed twice with two different tunnels.
                 // Aborting
                 throw new MessageRoutingException("Message cannot be sent. Failed twice", e1);
             }
