@@ -54,6 +54,7 @@ import org.objectweb.proactive.extra.forwardingv2.remoteobject.MessageRoutingRem
 public class FunctionalTest {
     static final protected Logger logger = Logger.getLogger("testsuite");
     static final public String JVM_PARAMETERS = "-Dproactive.test=true";
+    static ForwardingRegistry router = null;
 
     /** The amount of time given to a test to success or fail */
     static final private long TIMEOUT = 300000;
@@ -144,10 +145,17 @@ public class FunctionalTest {
     public static void BCForMessageRouting() throws IOException {
         if (PAProperties.PA_COMMUNICATION_PROTOCOL.getValue().equals(
                 MessageRoutingRemoteObjectFactory.PROTOCOL_ID)) {
+
             // Start a router for this test
             logger.info("Starting a router on port " + PAProperties.PA_NET_ROUTER_PORT.getValue());
-            ForwardingRegistry router = new ForwardingRegistry(PAProperties.PA_NET_ROUTER_PORT
-                    .getValueAsInt(), true);
+
+            if (PAProperties.PA_NET_ROUTER_PORT.getValue() == null ||
+                PAProperties.PA_NET_ROUTER_PORT.getValueAsInt() == 0) {
+                router = new ForwardingRegistry(0, true);
+                PAProperties.PA_NET_ROUTER_PORT.setValue(router.getLocalPort());
+            } else {
+                router = new ForwardingRegistry(PAProperties.PA_NET_ROUTER_PORT.getValueAsInt(), false);
+            }
         }
     }
 
