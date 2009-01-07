@@ -1115,19 +1115,19 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
             workerGroupStub.clear();
         } catch (Exception e) {
             // TODO Auto-generated catch block
-        	if (debug) {
+            if (debug) {
                 logger.debug("A exception happened in clearing workerGroup");
             }
-        	Collection<String> workerlist = new ArrayList<String>();
-        	workerlist.addAll(workers.keySet());
-        	for(String clearingWorker : workerlist){
-        		try{
-        			workers.get(clearingWorker).heartBeat();
-        		} catch (Exception exp){
-        			isDead(clearingWorker);
-        		}
-        	}
-        	workerGroupStub.clear();
+            Collection<String> workerlist = new ArrayList<String>();
+            workerlist.addAll(workers.keySet());
+            for (String clearingWorker : workerlist) {
+                try {
+                    workers.get(clearingWorker).heartBeat();
+                } catch (Exception exp) {
+                    isDead(clearingWorker);
+                }
+            }
+            workerGroupStub.clear();
         }
 
         // We clear every sleeping workers registered

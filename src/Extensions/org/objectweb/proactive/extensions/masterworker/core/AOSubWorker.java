@@ -52,9 +52,9 @@ public class AOSubWorker extends AOWorker implements WorkerPeer {
     private MemoryFactory memoryFactory;
     private String subMasterName;
     private long workerNameCounter;
-    
+
     private HashMap<Long, Node> deployedNodes;
-    
+
     private BooleanWrapper subMasterFailed = new BooleanWrapper(false);
     private boolean electedSubMaster = false;
     private boolean isElecting = false;
@@ -158,19 +158,17 @@ public class AOSubWorker extends AOWorker implements WorkerPeer {
      * We create a new thread to ask other workers and the main thread return a true
      */
     public WorkerMaster canBeSubMaster(final Long peerId, final String peerName, final WorkerPeer workerPeer) {
-        // TODO Auto-generated method stub
-    	synchronized (workerPeerList) {
-    		synchronized (workerNameList) {
-		    	if(!workerPeerList.containsKey(peerId)) {
-		    		workerPeerList.put(peerId, workerPeer);
-		    		if(!workerNameList.containsKey(peerId)) {
-			    		workerNameList.put(peerId, peerName);
-			    	}
-		    	}
-    		}
-    	}
-    	
-    	
+        synchronized (workerPeerList) {
+            synchronized (workerNameList) {
+                if (!workerPeerList.containsKey(peerId)) {
+                    workerPeerList.put(peerId, workerPeer);
+                    if (!workerNameList.containsKey(peerId)) {
+                        workerNameList.put(peerId, peerName);
+                    }
+                }
+            }
+        }
+
         if (!subMasterFailed.booleanValue()) {
             if (isDead().booleanValue()) {
                 threadPool.execute(new HeartBeatHandler());
@@ -264,32 +262,34 @@ public class AOSubWorker extends AOWorker implements WorkerPeer {
     }
 
     private void electNewSubMaster() {
-    	// If the workerPeerList is null, try to descover all the workerPeer
-    	if(workerPeerList.size() == 0) {
-    		if(deployedNodes.size() > 1) {
-    			for(Long keyId : deployedNodes.keySet()) {
-    				try {
-						workerPeerList.put(keyId, ((WorkerPeer) (deployedNodes.get(keyId).getActiveObjects(AOSubWorker.class.getName()))[0]));
-						if (debug) {
-				            logger.debug("Find workerPeer " + keyId);
-				        }
-					} catch (NodeException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (ActiveObjectCreationException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-    			}
-    		} else{
-    			// has no connection to other nodes, do nothing
-    			
-    		}
-    		
-    	}
-    	
-    	
-    	
+        // If the workerPeerList is null, try to descover all the workerPeer
+        if (workerPeerList.size() == 0) {
+            if (deployedNodes.size() > 1) {
+                for (Long keyId : deployedNodes.keySet()) {
+                    try {
+                        Object[] aos = deployedNodes.get(keyId).getActiveObjects(AOSubWorker.class.getName());
+                        if (aos.length > 0) {
+                            workerPeerList.put(keyId, ((WorkerPeer) aos[0]));
+                            if (debug) {
+                                logger.debug("Found workerPeer " + keyId);
+                            }
+                        }
+
+                    } catch (NodeException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    } catch (ActiveObjectCreationException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+            } else {
+                // has no connection to other nodes, do nothing
+
+            }
+
+        }
+
         Set<Long> peerids = new HashSet<Long>(workerPeerList.keySet());
         String workername = null;
         WorkerPeer workerpeer = null;
@@ -300,7 +300,7 @@ public class AOSubWorker extends AOWorker implements WorkerPeer {
         isElecting = true;
 
         if (debug) {
-            String output = "Peer list size is :" + peerids.size() + " details is: ";
+            String output = "Peer list size is : " + peerids.size() + " details is: ";
             for (long keyid : peerids) {
                 output = output + keyid;
             }
@@ -321,16 +321,17 @@ public class AOSubWorker extends AOWorker implements WorkerPeer {
                         }
                         // Send a message to ask those peers whose peerids are smaller than this 
                         // If any of the workers has heartbeat, then go out and waiting
-                        WorkerMaster subMaster = workerpeer.canBeSubMaster(this.peerid, this.name, (AOSubWorker) this.stubOnThis);
+                        WorkerMaster subMaster = workerpeer.canBeSubMaster(this.peerid, this.name,
+                                (AOSubWorker) this.stubOnThis);
                         PAFuture.waitFor(subMaster);
                         // If get the subMaster
-                        if(null != subMaster) {
-                        	this.provider = subMaster;
-                        	this.subMasterFailed = new BooleanWrapper(false);
-                        	this.isElecting = false;
-                        	this.electedSubMaster = false;
-                        	this.pinger.removeWorkerToWatch(subMasterName);
-                        	this.pinger.addWorkerToWatch((Worker) subMaster, subMasterName);
+                        if (null != subMaster) {
+                            this.provider = subMaster;
+                            this.subMasterFailed = new BooleanWrapper(false);
+                            this.isElecting = false;
+                            this.electedSubMaster = false;
+                            this.pinger.removeWorkerToWatch(subMasterName);
+                            this.pinger.addWorkerToWatch((Worker) subMaster, subMasterName);
                         }
                         if (debug) {
                             logger.debug("Receive a reply from Worker " + workername + ", waiting");
@@ -436,8 +437,10 @@ public class AOSubWorker extends AOWorker implements WorkerPeer {
 
         stubOnThis = (AOSubWorker) PAActiveObject.getStubOnThis();
 
-        PAActiveObject.setImmediateService("canBeSubMaster", new Class<?>[] { long.class, String.class, WorkerPeer.class });
-        PAActiveObject.setImmediateService("addWorkerPeer", new Class<?>[] { long.class, String.class, WorkerPeer.class });
+        PAActiveObject.setImmediateService("canBeSubMaster", new Class<?>[] { long.class, String.class,
+                WorkerPeer.class });
+        PAActiveObject.setImmediateService("addWorkerPeer", new Class<?>[] { long.class, String.class,
+                WorkerPeer.class });
         // PAActiveObject.setImmediateService("iAmSubmaster", new Class<?> [] {WorkerMaster.class, String.class, HashMap.class});
         PAActiveObject.setImmediateService("isDead");
         PAActiveObject.setImmediateService("isDead", new Class<?>[] { String.class });
@@ -553,9 +556,8 @@ public class AOSubWorker extends AOWorker implements WorkerPeer {
     private class HeartBeatHandler implements Runnable {
 
         /**
-         * Creates a worker on a given node
+         * HeartBeatHandler
          *
-         * @param node node on which the worker will be created
          */
         public HeartBeatHandler() {
         }

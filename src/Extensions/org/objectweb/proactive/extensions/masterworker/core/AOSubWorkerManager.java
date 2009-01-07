@@ -83,7 +83,7 @@ public class AOSubWorkerManager implements WorkerManager, InitActive, Serializab
     private HashMap<Long, WorkerPeer> workerPeers;
 
     private HashMap<Long, String> workerNames;
-    
+
     private HashMap<Long, Node> deployedNodes;
     /**
      * For fault torlerance purpose
@@ -178,7 +178,7 @@ public class AOSubWorkerManager implements WorkerManager, InitActive, Serializab
 
                 long workerId = 0;
                 synchronized (workerNameCounter) {
-                	deployedNodes.put(workerNameCounter, node);
+                    deployedNodes.put(workerNameCounter, node);
                     workerId = workerNameCounter++;
                 }
 
@@ -228,9 +228,9 @@ public class AOSubWorkerManager implements WorkerManager, InitActive, Serializab
         // TODO Auto-generated method stub
         if (!isTerminated) {
             for (Node node : nodes) {
-            	if(this.deployedNodes.containsValue(node)) {
-            		continue;
-            	}
+                if (this.deployedNodes.containsValue(node)) {
+                    continue;
+                }
                 threadPool.execute(new WorkerCreationHandler(node));
             }
         }
@@ -304,10 +304,10 @@ public class AOSubWorkerManager implements WorkerManager, InitActive, Serializab
         if (!workers.containsKey(workerName)) {
             workers.put(workerName, worker);
             ((AOSubWorker) worker).updateWorkerPeerList(workerNameCounter, workerPeers, workerNames);
-        } 
+        }
         return true;
     }
-    
+
     public void initActivity(Body body) {
         // TODO Auto-generated method stub
         stubOnThis = (AOSubWorkerManager) PAActiveObject.getStubOnThis();
@@ -324,7 +324,7 @@ public class AOSubWorkerManager implements WorkerManager, InitActive, Serializab
 
         PAActiveObject.setImmediateService("heartBeat");
         PAActiveObject.setImmediateService("initSubWorkerManager");
-        PAActiveObject.setImmediateService("addResources", new Class<?>[] { Collection.class});
+        PAActiveObject.setImmediateService("addResources", new Class<?>[] { Collection.class });
 
         threadPool = Executors.newCachedThreadPool();
     }

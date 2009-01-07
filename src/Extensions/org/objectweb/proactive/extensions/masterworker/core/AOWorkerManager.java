@@ -278,24 +278,24 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
 
                 if (topologyId > 0) {
                     if (subMasters.containsKey(topologyId)) {
-                    	// Make sure the subMaster is alive
-                    	// Otherwise wait it to recover
-                        try{
-                        	(workers.get(subMasters.get(topologyId))).heartBeat();
+                        // Make sure the subMaster is alive
+                        // Otherwise wait it to recover
+                        try {
+                            (workers.get(subMasters.get(topologyId))).heartBeat();
                         } catch (Exception e) {
-                        	if(debug){
-                        		e.printStackTrace();
-                        	}
-                        	if (subGroupSizes.get(topologyId) > 0)
-                        		stubOnThis.createSubMaster(node);
-                        	else {
-                        		subGroupSizes.remove(topologyId);
-                        		
-                        		workers.remove(subMasters.remove(topologyId));
-                        		stubOnThis.createSubMaster(node);
-                        	}
-                        	
-                        	return;
+                            if (debug) {
+                                e.printStackTrace();
+                            }
+                            if (subGroupSizes.get(topologyId) > 0)
+                                stubOnThis.createSubMaster(node);
+                            else {
+                                subGroupSizes.remove(topologyId);
+
+                                workers.remove(subMasters.remove(topologyId));
+                                stubOnThis.createSubMaster(node);
+                            }
+
+                            return;
                         }
                         threadPool.execute(new WorkerCreationHandler(node));
                     }
@@ -354,8 +354,6 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
 
                         subMaster = (AOSubMaster) workers.get(subMasters.get(topologyId));
 
-                        
-
                         // get the submaster and give the node to the subMaster to create worker
                         Collection<Node> nodes = new Vector<Node>();
                         nodes.add(node);
@@ -375,7 +373,7 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
                             stubOnThis.addResources(nodes);
                             return;
                         }
-                        
+
                         // If another one worker is added to the group, wait
                         // The group size if a critical variable
 
@@ -394,7 +392,7 @@ public class AOWorkerManager implements WorkerManager, InitActive, Serializable 
                                 logger.debug("subGroupSize is: " + subGroupSize);
                             }
                         }
-                            
+
                     }
                 } else {
                     String workername = "Worker_" + node.getVMInformation().getHostName() + "_" +
