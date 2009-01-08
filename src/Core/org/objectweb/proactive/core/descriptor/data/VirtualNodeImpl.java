@@ -848,8 +848,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl implements Vi
                 if (!NodeFactory.isNodeLocal(node)) {
                     try {
                         part.killRT(softly);
-                    } catch (ProActiveException e1) {
-                        e1.printStackTrace();
                     } catch (Exception e) {
                         logger.info(" Virtual Machine " + part.getVMInformation().getVMID() + " on host " +
                             URIBuilder.getHostNameorIP(part.getVMInformation().getInetAddress()) +

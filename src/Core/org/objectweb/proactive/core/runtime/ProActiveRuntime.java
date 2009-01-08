@@ -209,7 +209,7 @@ public interface ProActiveRuntime extends SecurityEntity {
      * registered.
      * @exception Exception if a problem occurs when killing this ProActiveRuntime
      */
-    public void killRT(boolean softly) throws Exception;
+    public void killRT(boolean softly);
 
     /**
      * Returns the url of this ProActiveRuntime on the local or remote VM

@@ -213,7 +213,7 @@ public class ProActiveRuntimeRemoteObjectAdapter extends Adapter<ProActiveRuntim
         target.killNode(nodeName);
     }
 
-    public void killRT(boolean softly) throws Exception {
+    public void killRT(boolean softly) {
         target.killRT(softly);
     }
 
