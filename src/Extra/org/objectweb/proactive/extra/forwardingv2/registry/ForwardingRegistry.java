@@ -118,7 +118,7 @@ public class ForwardingRegistry implements Runnable {
      * {@link RegistrationHandler} is created. Call
      * {@link RegistrationHandler #stop} on each existing registrationHandler
      */
-    protected void stop() { // FIXME: For this function to be called, listening
+    public void stop() { // FIXME: For this function to be called, listening
         // must be set to false... But this function is the
         // only one able to set it to false. Currently a
         // shutdown hook is used as the solution to call

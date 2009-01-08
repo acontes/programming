@@ -31,6 +31,7 @@
  */
 package functionalTests;
 
+import java.io.IOException;
 import java.net.URL;
 
 import org.junit.After;
@@ -64,6 +65,7 @@ public class GCMFunctionalTest extends FunctionalTest {
 
     @Before
     public void startDeployment() throws ProActiveException {
+        logger.info(GCMFunctionalTest.class.getName() + " @Before: startDeployment");
         if (gcmad != null) {
             throw new IllegalStateException("deployment already started");
         }
@@ -73,9 +75,11 @@ public class GCMFunctionalTest extends FunctionalTest {
     }
 
     @After
-    public void killDeployment() {
+    public void killDeployment() throws Throwable {
+        logger.info(GCMFunctionalTest.class.getName() + " @After: killDeployment");
         if (gcmad != null) {
             gcmad.kill();
         }
+        logger.info(GCMFunctionalTest.class.getName() + " @After: killDeployment");
     }
 }

@@ -59,6 +59,8 @@ public class FunctionalTest {
     /** The amount of time given to a test to success or fail */
     static final private long TIMEOUT = 300000;
 
+    static private ForwardingRegistry router = null;
+
     /** A shutdown hook to kill all forked JVMs when exiting the main JVM */
     static final private Thread shutdownHook = new Thread() {
         @Override
@@ -70,6 +72,7 @@ public class FunctionalTest {
 
     @BeforeClass
     public static void beforeClass() {
+        logger.info(FunctionalTest.class.getName() + " @BeforeClass: beforeClass");
         // Set PA_TEST to automatically flag child processes
         // When PA_TEST is set GCM Deployment framework will add it to 
         // started JVM. 
@@ -143,6 +146,7 @@ public class FunctionalTest {
 
     @BeforeClass
     public static void BCForMessageRouting() throws IOException {
+        logger.info(FunctionalTest.class.getName() + " @BeforeClass: BCForMessageRouting");
         if (PAProperties.PA_COMMUNICATION_PROTOCOL.getValue().equals(
                 MessageRoutingRemoteObjectFactory.PROTOCOL_ID)) {
 
@@ -161,10 +165,14 @@ public class FunctionalTest {
 
     @AfterClass
     public static void afterClass() {
-        logger.trace("afterClass");
+        logger.info(FunctionalTest.class.getName() + " @AfterClass: afterClass");
 
         logger.trace("Removing the shutdownHook");
         Runtime.getRuntime().removeShutdownHook(shutdownHook);
+
+        if (router != null) {
+            router.stop();
+        }
 
         logger.trace("Killing remaining ProActive Runtime");
         killProActive();
