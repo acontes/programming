@@ -130,15 +130,15 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void, Trees> {
     private boolean hasAccessors(String fieldName, List<? extends Tree> clazzMembers) {
         boolean hasSetter = false;
         boolean hasGetter = false;
-        String getterName = GenerateGettersSetters.getterName(fieldName);
-        String setterName = GenerateGettersSetters.setterName(fieldName);
+        String getterName = GenerateGettersSetters.getterPattern(fieldName);
+        String setterName = GenerateGettersSetters.setterPattern(fieldName);
 
         for (Tree member : clazzMembers) {
             if (member.getKind().equals(Kind.METHOD)) {
-                if (((MethodTree) member).getName().toString().equals(getterName)) {
+                if (((MethodTree) member).getName().toString().matches(getterName)) {
                     hasGetter = true;
                 }
-                if (((MethodTree) member).getName().toString().equals(setterName)) {
+                if (((MethodTree) member).getName().toString().matches(setterName)) {
                     hasSetter = true;
                 }
 

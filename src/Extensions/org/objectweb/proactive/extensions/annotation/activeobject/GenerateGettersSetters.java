@@ -38,23 +38,33 @@ package org.objectweb.proactive.extensions.annotation.activeobject;
  */
 public class GenerateGettersSetters {
 
-    public static String getterName(String fieldName) {
+	/**
+	 * generate a pattern which the getter method should match 
+	 * @param fieldName 
+	 * @return the pattern
+	 */
+    public static String getterPattern(String fieldName) {
 
         String name = fieldName;
         if (name.length() > 0) {
             name = Character.toUpperCase(name.charAt(0)) + name.substring(1);
         }
 
-        return "get" + name;
+        return "get.*" + name + ".*";
     }
 
-    public static String setterName(String fieldName) {
+    /**
+     * generate a pattern which the setter method should match 
+     * @param fieldName
+     * @return the pattern
+     */
+    public static String setterPattern(String fieldName) {
         String name = fieldName;
         if (name.length() > 0) {
             name = Character.toUpperCase(name.charAt(0)) + name.substring(1);
         }
 
-        return "set" + name;
+        return "set.*" + name + ".*";
     }
 
 }

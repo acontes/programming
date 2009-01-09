@@ -78,4 +78,31 @@ public class WarningGettersSetters implements Serializable {
 
     // OK (final field)
     final Object o = new Object();
+
+    // OK - P2PAcquaintanceManager inspired
+    private int NOA;
+
+    public int getMaxNOA() {
+        return NOA;
+    }
+
+    public void setMaxNOA(int noa) {
+        NOA = noa;
+    }
+
+    public int getNOAMax() {
+        return NOA;
+    }
+
+    public void setNOAMax(int noa) {
+        NOA = noa;
+    }
+
+    public int getMaxNOAMinPayne() {
+        return NOA;
+    }
+
+    public void setMaxPayneNOAMin(int noa) {
+        NOA = noa;
+    }
 }

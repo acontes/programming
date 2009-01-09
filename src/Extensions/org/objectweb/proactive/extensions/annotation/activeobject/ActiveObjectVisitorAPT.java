@@ -185,17 +185,17 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
      */
     private boolean checkGettersSetters(String fieldName) {
 
-        final String getField = GenerateGettersSetters.getterName(fieldName);
+        final String getField = GenerateGettersSetters.getterPattern(fieldName);
         boolean foundGet = false;
-        final String setField = GenerateGettersSetters.setterName(fieldName);
+        final String setField = GenerateGettersSetters.setterPattern(fieldName);
         boolean foundSet = false;
 
         Collection<MethodDeclaration> methods = _containingClass.getMethods();
         for (MethodDeclaration methodDeclaration : methods) {
-            if (!foundGet && methodDeclaration.getSimpleName().equals(getField)) {
+            if (!foundGet && methodDeclaration.getSimpleName().matches(getField)) {
                 foundGet = true;
             }
-            if (!foundSet && methodDeclaration.getSimpleName().equals(setField)) {
+            if (!foundSet && methodDeclaration.getSimpleName().matches(setField)) {
                 foundSet = true;
             }
             if (foundGet && foundSet)
