@@ -74,6 +74,7 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void, Trees> {
     private Messager compilerOutput;
     private boolean insideClass = false;
     private TreePath curMethod;
+    private boolean methodReturnsNull = false;
 
     public ActiveObjectVisitorCTree(ProcessingEnvironment procEnv) {
         compilerOutput = procEnv.getMessager();
@@ -174,6 +175,7 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void, Trees> {
             }
         }
 
+        methodReturnsNull = false;
         return super.visitMethod(methodNode, trees);
     }
 
@@ -188,6 +190,11 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void, Trees> {
     @Override
     public Void visitReturn(ReturnTree returnNode, Trees trees) {
 
+        if (methodReturnsNull == true) {
+            // already reported the error. carry on!
+            return super.visitReturn(returnNode, trees);
+        }
+
         ExpressionTree returnExpression = returnNode.getExpression();
 
         if (returnExpression == null) {
@@ -201,6 +208,8 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void, Trees> {
             MethodTree method = (MethodTree) trees.getTree(trees.getElement(curMethod));
             if (!method.getModifiers().getFlags().contains(Modifier.PRIVATE)) {
                 reportError(ErrorMessages.NO_NULL_RETURN_ERROR_MSG, trees.getElement(curMethod));
+                // mark that we've reported the error for this method
+                methodReturnsNull = true;
             }
         }
         return super.visitReturn(returnNode, trees);
