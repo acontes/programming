@@ -47,7 +47,7 @@ import org.objectweb.proactive.extensions.annotation.VirtualNodeIsReadyCallback;
 import org.objectweb.proactive.extensions.annotation.activeobject.ActiveObjectVisitorAPT;
 import org.objectweb.proactive.extensions.annotation.callbacks.isready.VirtualNodeIsReadyCallbackVisitorAPT;
 import org.objectweb.proactive.extensions.annotation.callbacks.nodeattachment.NodeAttachmentCallbackVisitorAPT;
-import org.objectweb.proactive.extensions.annotation.common.UtilsApt;
+import org.objectweb.proactive.extensions.annotation.common.UtilsAPT;
 import org.objectweb.proactive.extensions.annotation.migratable.MigratableVisitorAPT;
 import org.objectweb.proactive.extensions.annotation.migration.strategy.OnArrivalVisitorAPT;
 import org.objectweb.proactive.extensions.annotation.migration.strategy.OnDepartureVisitorAPT;
@@ -72,7 +72,7 @@ import com.sun.mirror.util.SimpleDeclarationVisitor;
  * @since ProActive 3.90
  */
 
-public class ProActiveProcessorApt implements AnnotationProcessor {
+public class ProActiveProcessorAPT implements AnnotationProcessor {
 
     private final AnnotationProcessorEnvironment _environment;
     private final Messager _messager;
@@ -81,7 +81,7 @@ public class ProActiveProcessorApt implements AnnotationProcessor {
     private final Map<String, AnnotationTypeDeclaration> _annotationDefinitions = new HashMap<String, AnnotationTypeDeclaration>();
     private final Map<AnnotationTypeDeclaration, Collection<Declaration>> _annotatedElements = new HashMap<AnnotationTypeDeclaration, Collection<Declaration>>();
 
-    public ProActiveProcessorApt(AnnotationProcessorEnvironment env) {
+    public ProActiveProcessorAPT(AnnotationProcessorEnvironment env) {
 
         _environment = env;
         _messager = _environment.getMessager();
@@ -157,7 +157,7 @@ public class ProActiveProcessorApt implements AnnotationProcessor {
     private boolean testSuitableDeclaration(Declaration typeDeclaration, Target applicableOn) {
 
         for (ElementType applicableType : applicableOn.value()) {
-            if (UtilsApt.applicableOnDeclaration(applicableType, typeDeclaration))
+            if (UtilsAPT.applicableOnDeclaration(applicableType, typeDeclaration))
                 return true;
         }
         return false;

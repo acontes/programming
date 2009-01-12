@@ -80,7 +80,7 @@ public class ProActiveAnnotationProcessorFactory implements AnnotationProcessorF
         if (annotations.isEmpty()) {
             return AnnotationProcessors.NO_OP;
         } else {
-            return new ProActiveProcessorApt(env);
+            return new ProActiveProcessorAPT(env);
         }
 
     }

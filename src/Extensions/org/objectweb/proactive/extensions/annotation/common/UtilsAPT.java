@@ -44,7 +44,7 @@ import com.sun.mirror.declaration.MethodDeclaration;
  * @version %G%, %I%
  * @since ProActive 4.10
  */
-public class UtilsApt {
+public class UtilsAPT {
     // hack
     public static boolean applicableOnDeclaration(ElementType applicableType, Declaration typeDeclaration) {
 

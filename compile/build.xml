@@ -439,13 +439,25 @@
 		</jar>
 	</target>
 	
-	<target name="deploy.annotations.eclipse" depends="compile.extensions, -deploy.mkdir" description="Create a jar file which contains only the JDK 1.5 annotations">
-		<jar destfile="${deploy.lib.dir}/ProActive_annotations_Eclipse.jar" index="true">
+	<target name="deploy.annotations.java5" depends="compile.extensions, -deploy.mkdir" description="Create a jar file which contains only the JDK 1.5 annotations">
+		<jar destfile="${deploy.lib.dir}/ProActive_annotations_APT.jar" index="true">
 			<fileset dir="${cl.extensions.dir}">
 				<include name="org/objectweb/proactive/extensions/annotation/**"/>
 				<exclude name="org/objectweb/proactive/extensions/annotation/**/*CTree*"/>
 			</fileset>
 		    <fileset dir="${compile.dir}" includes="META-INF/services/com.sun.mirror.apt.AnnotationProcessorFactory" />
+		</jar>
+	</target>
+	
+	<target name="deploy.annotations.java6" depends="compile.extensions, -deploy.mkdir" description="Create a jar file which contains only the JDK 1.6 annotations">
+		<jar destfile="${deploy.lib.dir}/ProActive_annotations_CTree.jar" index="true">
+			<fileset dir="${cl.extensions.dir}">
+				<include name="org/objectweb/proactive/extensions/annotation/**"/>
+				<exclude name="org/objectweb/proactive/extensions/annotation/**/*APT*"/>
+				<exclude name="org/objectweb/proactive/extensions/annotation/**/ProActiveAnnotationProcessorFactory*"/>
+				<exclude name="org/objectweb/proactive/extensions/annotation/**/Bogus*"/>
+			</fileset>
+		    <fileset dir="${compile.dir}" includes="META-INF/services/javax.annotation.processing.Processor" />
 		</jar>
 	</target>
 
@@ -456,8 +468,9 @@
 		<mkdir dir="${deploy.scripts.dir}" />
 	</target>
 
+	<target name="deploy.annotations.all" depends="deploy.annotations.java5, deploy.annotations.java6, deploy.annotations" />
 
-	<target name="deploy.all" depends="deploy.core, deploy.examples, deploy.tests, deploy.utils, deploy.annotations" description="Populate dist/ with all ProActive Programming dependencies and JARs" />
+	<target name="deploy.all" depends="deploy.core, deploy.examples, deploy.tests, deploy.utils, deploy.annotations.all" description="Populate dist/ with all ProActive Programming dependencies and JARs" />
 
 	<target name="deploy" depends="deploy.all" description="Populate dist/ (with ProActive_examples.jar)" />
 
