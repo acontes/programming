@@ -38,11 +38,11 @@ package org.objectweb.proactive.extensions.annotation.activeobject;
  */
 public class GenerateGettersSetters {
 
-	/**
-	 * generate a pattern which the getter method should match 
-	 * @param fieldName 
-	 * @return the pattern
-	 */
+    /**
+     * generate a pattern which the getter method should match 
+     * @param fieldName 
+     * @return the pattern
+     */
     public static String getterPattern(String fieldName) {
 
         String name = fieldName;
