@@ -244,7 +244,7 @@ public class ActiveObjectVisitorCTree extends TreePathScanner<Void, Trees> {
 
         boolean hasNonArgsPublicConstructor = false;
         for (Tree member : clazzTree.getMembers()) {
-            if (member instanceof MethodTree) {
+            if (member.getKind().equals(Kind.METHOD)) {
                 MethodTree constructor = (MethodTree) member;
                 if (isConstructor(constructor)) {
                     // it is constructor
