@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.extensions.annotation.callbacks.isready;
 
+import java.util.Collection;
 import java.util.Iterator;
 
 import org.objectweb.proactive.extensions.annotation.common.ErrorMessages;
@@ -56,10 +57,10 @@ public class VirtualNodeIsReadyCallbackVisitorAPT extends SimpleDeclarationVisit
     public void visitMethodDeclaration(MethodDeclaration methodDeclaration) {
 
         boolean correctSignature = false;
+        Collection<ParameterDeclaration> methodParams = methodDeclaration.getParameters();
         // return type must be void
-        if (methodDeclaration.getReturnType() instanceof VoidType &&
-            methodDeclaration.getParameters().size() == 1) {
-            Iterator<ParameterDeclaration> it = methodDeclaration.getParameters().iterator();
+        if (methodDeclaration.getReturnType() instanceof VoidType && methodParams.size() == 1) {
+            Iterator<ParameterDeclaration> it = methodParams.iterator();
             ParameterDeclaration param = it.next();
 
             if (param.getType().toString().equals(String.class.getName())) {

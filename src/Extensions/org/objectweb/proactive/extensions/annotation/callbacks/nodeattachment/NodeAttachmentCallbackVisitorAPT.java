@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.extensions.annotation.callbacks.nodeattachment;
 
+import java.util.Collection;
 import java.util.Iterator;
 
 import org.objectweb.proactive.core.node.Node;
@@ -56,10 +57,10 @@ public class NodeAttachmentCallbackVisitorAPT extends SimpleDeclarationVisitor {
     @Override
     public void visitMethodDeclaration(MethodDeclaration methodDeclaration) {
         boolean correctSignature = false;
+        Collection<ParameterDeclaration> methodParams = methodDeclaration.getParameters();
         // return type must be void
-        if (methodDeclaration.getReturnType() instanceof VoidType &&
-            methodDeclaration.getParameters().size() == 2) {
-            Iterator<ParameterDeclaration> it = methodDeclaration.getParameters().iterator();
+        if (methodDeclaration.getReturnType() instanceof VoidType && methodParams.size() == 2) {
+            Iterator<ParameterDeclaration> it = methodParams.iterator();
             ParameterDeclaration param = it.next();
             ParameterDeclaration param2 = it.next();
 

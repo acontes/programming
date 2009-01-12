@@ -68,11 +68,13 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
     }
 
     private transient ClassDeclaration _containingClass;
+    private transient Collection<MethodDeclaration> _containingClassMethods; // memory optimization
 
     @Override
     public void visitClassDeclaration(ClassDeclaration classDeclaration) {
 
         _containingClass = classDeclaration;
+        _containingClassMethods = classDeclaration.getMethods();
 
         testClassModifiers(classDeclaration);
 
@@ -93,7 +95,7 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
         // super.visitClassDeclaration(classDeclaration);
         // visit the subcomponents of this class
         // this should have been already provided by the MirrorAPI. bad API, bad! :P
-        final Collection<MethodDeclaration> methods = classDeclaration.getMethods();
+        final Collection<MethodDeclaration> methods = _containingClassMethods;
         for (MethodDeclaration methodDeclaration : methods) {
             methodDeclaration.accept(this);
         }
@@ -190,7 +192,7 @@ public class ActiveObjectVisitorAPT extends SimpleDeclarationVisitor {
         final String setField = GenerateGettersSetters.setterPattern(fieldName);
         boolean foundSet = false;
 
-        Collection<MethodDeclaration> methods = _containingClass.getMethods();
+        Collection<MethodDeclaration> methods = _containingClassMethods;
         for (MethodDeclaration methodDeclaration : methods) {
             if (!foundGet && methodDeclaration.getSimpleName().matches(getField)) {
                 foundGet = true;
