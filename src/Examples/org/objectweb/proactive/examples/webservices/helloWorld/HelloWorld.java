@@ -40,7 +40,7 @@ import org.objectweb.proactive.extensions.annotation.ActiveObject;
 
 /**
  * A simple example to expose an active object as a web service.
- * A web server must be installed first to run this example
+ *
  * @author The ProActive Team
  */
 @ActiveObject
