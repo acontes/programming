@@ -1,5 +1,6 @@
 package org.objectweb.proactive.extra.forwardingv2.client;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -24,9 +25,11 @@ public class Tunnel {
     static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_CLIENT_TUNNEL);
 
     final private Socket socket;
+    final private BufferedInputStream bis;
 
     public Tunnel(InetAddress routerAddr, int routerPort) throws IOException {
         this.socket = new Socket(routerAddr, routerPort);
+        this.bis = new BufferedInputStream(socket.getInputStream());
 
         // Configure the socket
         this.socket.setKeepAlive(true);
@@ -54,12 +57,18 @@ public class Tunnel {
     }
 
     public void read(byte[] buf, int offset, int length, long timeout) throws IOException {
-        int retVal = this.socket.getInputStream().read(buf, offset, length);
-        if (retVal != length) {
-            // According to the InputStream.read() contract there is nothing we can do
-            // Just warn the caller that something went wrong
-            throw new IOException("Failed to read " + length + " byte (read returned only " + length +
-                " bytes)");
+        int read = 0;
+        while (read < length) {
+            int retVal = bis.read(buf, offset + read, length - read);
+            if (retVal == -1) {
+                throw new IOException("Failed to read " + length + "byte. EOF reached after " + read +
+                    " bytes");
+            }
+
+            read += retVal;
+            if (logger.isDebugEnabled()) {
+                logger.debug("" + read + " bytes have been read, " + (length - read) + " remaining");
+            }
         }
     }
 
