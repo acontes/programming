@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.util.Sleeper;
 import org.objectweb.proactive.core.util.TimeoutAccounter;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -154,10 +155,11 @@ public class ForwardingAgentV2 implements AgentV2Internal {
      * @throws IOException
      *             if not able to reconnect to the router
      */
-    private synchronized Tunnel reportTunnelFailure(Tunnel brokenTunnel) throws IOException {
+    private synchronized Tunnel reportTunnelFailure(Tunnel brokenTunnel, Throwable failure)
+            throws IOException {
         if (!this.failedTunnels.contains(brokenTunnel)) {
             this.failedTunnels.add(brokenTunnel);
-            logger.debug("Tunnel" + brokenTunnel + "has failed, creating a new one");
+            logger.debug("Creating a new tunnel because" + brokenTunnel + "failed due to", failure);
 
             // TODO: Add a several retry algorithm with an exponential backoff
             this.t.shutdown();
@@ -260,7 +262,7 @@ public class ForwardingAgentV2 implements AgentV2Internal {
         } catch (IOException e) {
             // tunnel failed try to reopen the connection
             try {
-                tunnel = this.reportTunnelFailure(tunnel);
+                tunnel = this.reportTunnelFailure(tunnel, e);
             } catch (IOException e1) {
                 // reportTunnelFailure throw an IOException only when
                 // the router cannot be contacted again. We just loose the
@@ -353,17 +355,11 @@ public class ForwardingAgentV2 implements AgentV2Internal {
                     boolean newTunnelReady = false;
                     while (!newTunnelReady) {
                         try {
-                            tunnel = this.agent.reportTunnelFailure(tunnel);
+                            tunnel = this.agent.reportTunnelFailure(tunnel, e);
+                            newTunnelReady = true;
                         } catch (IOException e1) {
                             logger.error("Failed to create a new tunnel, sleeping for 10 seconds", e1);
-                            TimeoutAccounter timeout = TimeoutAccounter.getAccounter(10000);
-                            while (!timeout.isTimeoutElapsed()) {
-                                try {
-                                    Thread.sleep(timeout.getRemainingTimeout());
-                                } catch (InterruptedException e2) {
-                                    // Miam miam miam
-                                }
-                            }
+                            new Sleeper(10000).sleep();
                         }
                     }
 

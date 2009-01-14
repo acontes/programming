@@ -101,7 +101,7 @@ public class RegistrationHandler implements Runnable {
         }
 
         AgentID newAgentID = msg.getAgentID();
-        if (agentID != null) {
+        if (newAgentID != null) {
             this.agentID = newAgentID;
         } else {
             this.agentID = new AgentID(attributedAgentID.getAndIncrement());
