@@ -6,9 +6,7 @@ import java.io.Serializable;
 import org.junit.Test;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.xml.VariableContractType;
 
 import performanceTests.HudsonReport;
 import performanceTests.Performance;
@@ -23,25 +21,13 @@ import functionalTests.GCMFunctionalTestDefaultNodes;
  */
 public class TestMessageRouting extends GCMFunctionalTestDefaultNodes {
 
-    static {
-//        PAProperties.PA_COMMUNICATION_PROTOCOL.setValue("pamr");
-//        PAProperties.PA_NET_ROUTER_PORT.setValue(0);
-//        PAProperties.PA_NET_ROUTER_ADDRESS.setValue("localhost");
-    }
-
     public TestMessageRouting() throws IOException {
         super(1, 1);
-        super.vContract.setVariableFromProgram(super.VAR_JVMARG, PAProperties.PA_COMMUNICATION_PROTOCOL
-                .getCmdLine() +
-            "pamr", VariableContractType.DescriptorDefaultVariable);
-        super.vContract.setVariableFromProgram("router.address", PAProperties.PA_NET_ROUTER_ADDRESS
-                .getValue(), VariableContractType.ProgramVariable);
-        super.vContract.setVariableFromProgram("router.port", PAProperties.PA_NET_ROUTER_PORT.getValue(),
-                VariableContractType.ProgramVariable);
+        //router = new ForwardingRegistry(PAProperties.PA_NET_ROUTER_PORT.getValueAsInt(), false);
     }
 
     @Test
-    public void test() throws ActiveObjectCreationException, NodeException {
+    public void testMessageRouting() throws ActiveObjectCreationException, NodeException {
         // Creating Client and Server
         Server server = (Server) PAActiveObject.newActive(Server.class.getName(), new Object[] {}, super
                 .getANode());
@@ -95,7 +81,6 @@ public class TestMessageRouting extends GCMFunctionalTestDefaultNodes {
             // Warmup
             for (int i = 0; i < 1000; i++) {
                 server.serve();
-                System.out.println("warmup");
             }
             System.out.println("End of warmup");
 
