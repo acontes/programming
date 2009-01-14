@@ -36,6 +36,7 @@ import java.io.Serializable;
 import org.junit.Test;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.node.NodeException;
 
 import performanceTests.HudsonReport;
@@ -44,6 +45,10 @@ import functionalTests.GCMFunctionalTestDefaultNodes;
 
 
 public class TestForgetOnSend extends GCMFunctionalTestDefaultNodes {
+
+    static {
+        PAProperties.PA_COMMUNICATION_PROTOCOL.setValue("rmi");
+    }
 
     public TestForgetOnSend() {
         super(1, 1);
