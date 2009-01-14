@@ -33,8 +33,12 @@ package functionalTests;
 
 import java.net.URL;
 
+import org.junit.Before;
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.xml.VariableContractType;
+import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
 
@@ -52,6 +56,7 @@ public class GCMFunctionalTestDefaultNodes extends GCMFunctionalTest {
     static public final String VN_NAME = "nodes";
     static public final String VAR_DEPDESCRIPTOR = "deploymentDescriptor";
     static public final String VAR_JVMARG = "jvmargDefinedByTest";
+    static public final String VAR_JVMARG_PROP = "jvmargPropagated";
 
     static public final String VAR_HOSTCAPACITY = "hostCapacity";
     int hostCapacity;
@@ -70,6 +75,26 @@ public class GCMFunctionalTestDefaultNodes extends GCMFunctionalTest {
         super.vContract.setVariableFromProgram(GCMFunctionalTestDefaultNodes.VAR_VMCAPACITY, new Integer(
             vmCapacity).toString(), VariableContractType.DescriptorDefaultVariable);
 
+    }
+
+    @Override
+    public void startDeployment() throws ProActiveException {
+        logger.info(GCMFunctionalTest.class.getName() + " @Before: startDeployment");
+
+        StringBuilder jvmArgProp = new StringBuilder(" ");
+        if ("pamr".equals(PAProperties.PA_COMMUNICATION_PROTOCOL.getValue())) {
+            jvmArgProp.append(PAProperties.PA_NET_ROUTER_ADDRESS.getCmdLine());
+            jvmArgProp.append(PAProperties.PA_NET_ROUTER_ADDRESS.getValue());
+            jvmArgProp.append(" ");
+
+            jvmArgProp.append(PAProperties.PA_NET_ROUTER_PORT.getCmdLine());
+            jvmArgProp.append(PAProperties.PA_NET_ROUTER_PORT.getValue());
+            jvmArgProp.append(" ");
+        }
+        super.vContract.setVariableFromProgram(GCMFunctionalTestDefaultNodes.VAR_JVMARG_PROP, jvmArgProp
+                .toString(), VariableContractType.DescriptorDefaultVariable);
+
+        super.startDeployment();
     }
 
     public Node getANode() {

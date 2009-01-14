@@ -32,5 +32,5 @@
 package performanceTests;
 
 public class Performance {
-    static final public int DURATION = 30000; // 30 seconds
+    static final public int DURATION = 3000; // 30 seconds
 }

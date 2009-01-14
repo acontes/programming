@@ -44,6 +44,7 @@ import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.util.OperatingSystem;
@@ -143,14 +144,13 @@ public class FunctionalTest {
         }
     }
 
-    @BeforeClass
-    public static void BCForMessageRouting() throws IOException {
-        logger.info(FunctionalTest.class.getName() + " @BeforeClass: BCForMessageRouting");
+    @Before
+    public void BeforMessageRouting() throws IOException {
+        logger.info(FunctionalTest.class.getName() + " @Before: BeforMessageRouting");
         if (PAProperties.PA_COMMUNICATION_PROTOCOL.getValue().equals(
                 MessageRoutingRemoteObjectFactory.PROTOCOL_ID)) {
 
             // Start a router for this test
-            logger.info("Starting a router on port " + PAProperties.PA_NET_ROUTER_PORT.getValue());
 
             if (PAProperties.PA_NET_ROUTER_PORT.getValue() == null ||
                 PAProperties.PA_NET_ROUTER_PORT.getValueAsInt() == 0) {
@@ -159,6 +159,9 @@ public class FunctionalTest {
             } else {
                 router = new ForwardingRegistry(PAProperties.PA_NET_ROUTER_PORT.getValueAsInt(), true);
             }
+
+            logger.info("Started a message router on port " + router.getLocalPort());
+
         }
     }
 
