@@ -508,7 +508,12 @@
 	</target>
 
 	<target name="junit.pamr" depends="compile.tests, deploy.all" description="Run all non regression tests on the current host only">
-		<junitMacro communication.protocol="pamr" nodedescriptor="/functionalTests/descriptor/defaultnodes/NodesLocal.xml" testsuite="testsuite"/>
+		<junitMacro communication.protocol="pamr" nodedescriptor="/functionalTests/descriptor/defaultnodes/NodesLocal.xml" testsuite="testsuite">
+			<jvmargs>
+				<jvmarg value="-Dproactive.net.router.address=localhost" />
+				<jvmarg value="-Dproactive.net.router.port=0" />
+			</jvmargs>
+		</junitMacro>
 	</target>
 
 	<target name="with.clover">
