@@ -14,6 +14,7 @@
 			<configuration>
 				<java base="root" relpath="${java.home}/bin/java"/>
 				<jvmarg value="-Dproactive.test=true"/>
+				<jvmarg value="-Dproactive.net.router.address=localhost -Dproactive.net.router.port=0"/>		
 				<proactiveClasspath type="append">
 					<pathElement base="proactive" relpath="classes/Tests"/>
 					<pathElement base="proactive" relpath="dist/lib/clover.jar"/>
