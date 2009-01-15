@@ -70,20 +70,24 @@
 
 	<target name="rar.all" depends="build" description="generate rar files for all supported application servers">
 		<echo message="creating the RAR files..."/>
-		<antcall target="rar"><param name="appserver" value="${jboss42}"/></antcall>
-		<antcall target="rar"><param name="appserver" value="${glassfishv2}"/></antcall>
-		<antcall target="rar"><param name="appserver" value="${geronimo21}"/></antcall>
+		<antcall target="-rar"><param name="appserver" value="${jboss42}"/></antcall>
+		<antcall target="-rar"><param name="appserver" value="${glassfishv2}"/></antcall>
+		<antcall target="-rar"><param name="appserver" value="${geronimo21}"/></antcall>
 		<!-- ***** add RAR generation for other application servers here ***** -->
 		<echo message="RAR files created!"/>
 	</target>
 	
 	<target name="rar.generic" depends="build" description="generate generic rar module, conforming to JCA standard">
 		<echo message="creating the generic RAR file ..."/>
-		<antcall target="rar"><param name="appserver" value="generic"/></antcall>
+		<antcall target="-rar"><param name="appserver" value="generic"/></antcall>
 		<echo message="RAR file created!"/>
 	</target>
+	
+	<target name="rar" depends="build" description="generate rar file for a specific application server">
+		<antcall target="-rar"/>
+	</target>
 
-	<target name="rar" description="generate rar file for a specific application server">
+	<target name="-rar">
 		<delete dir="${build.dir}/${appserver}" quiet="true"/>
  		<mkdir dir="${build.dir}/${appserver}"/>
 		<copy todir="${build.dir}/${appserver}">
