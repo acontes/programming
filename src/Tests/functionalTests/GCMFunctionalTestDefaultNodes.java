@@ -82,7 +82,13 @@ public class GCMFunctionalTestDefaultNodes extends GCMFunctionalTest {
         logger.info(GCMFunctionalTest.class.getName() + " @Before: startDeployment");
 
         StringBuilder jvmArgProp = new StringBuilder(" ");
+
+        jvmArgProp.append(PAProperties.PA_COMMUNICATION_PROTOCOL.getCmdLine());
+        jvmArgProp.append(PAProperties.PA_COMMUNICATION_PROTOCOL.getValue());
+        jvmArgProp.append(" ");
+
         if ("pamr".equals(PAProperties.PA_COMMUNICATION_PROTOCOL.getValue())) {
+
             jvmArgProp.append(PAProperties.PA_NET_ROUTER_ADDRESS.getCmdLine());
             jvmArgProp.append(PAProperties.PA_NET_ROUTER_ADDRESS.getValue());
             jvmArgProp.append(" ");
