@@ -51,7 +51,7 @@ public abstract class RegistrationMessage extends Message {
 
         TypeHelper.intToByteArray(length, byteArray, CommonOffsets.LENGTH_OFFSET.getValue());
         TypeHelper.intToByteArray(getProtoID(), byteArray, CommonOffsets.PROTO_ID_OFFSET.getValue());
-        TypeHelper.intToByteArray(type.getValue(), byteArray, CommonOffsets.MSG_TYPE_OFFSET.getValue());
+        TypeHelper.intToByteArray(type.ordinal(), byteArray, CommonOffsets.MSG_TYPE_OFFSET.getValue());
         if (agentID != null) {
             TypeHelper.longToByteArray(agentID.getId(), byteArray, Offsets.AGENT_ID_OFFSET.getValue());
         }

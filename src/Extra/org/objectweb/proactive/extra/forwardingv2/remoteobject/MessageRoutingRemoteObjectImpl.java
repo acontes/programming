@@ -43,6 +43,7 @@ import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolExcept
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.forwardingv2.client.AgentV2;
+import org.objectweb.proactive.extra.forwardingv2.exceptions.MessageRoutingException;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.message.MessageRoutingRemoteObjectRequest;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.util.exceptions.MessageRoutingRemoteException;
 
@@ -71,7 +72,7 @@ public class MessageRoutingRemoteObjectImpl implements MessageRoutingRemoteObjec
         this.agent = agent;
     }
 
-    public Reply receiveMessage(Request message) throws MessageRoutingRemoteException {
+    public Reply receiveMessage(Request message) throws MessageRoutingException {
 
         MessageRoutingRemoteObjectRequest req = new MessageRoutingRemoteObjectRequest(message,
             this.remoteObjectURL, getAgent());

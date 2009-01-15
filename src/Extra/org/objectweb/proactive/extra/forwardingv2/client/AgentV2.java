@@ -36,8 +36,7 @@ public interface AgentV2 {
      * @return the data response.
      * @throws ForwardingException if the timeout is reached.
      */
-    public byte[] sendMsg(URI targetURI, byte[] data, boolean oneWay) throws MessageRoutingException,
-            ExecutionException;
+    public byte[] sendMsg(URI targetURI, byte[] data, boolean oneWay) throws MessageRoutingException;
 
     public AgentID getAgentID();
 

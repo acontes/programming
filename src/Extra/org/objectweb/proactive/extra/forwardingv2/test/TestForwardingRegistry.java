@@ -17,7 +17,7 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
 import org.objectweb.proactive.extra.forwardingv2.protocol.MessageInputStream;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.DataReplyMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.DataRequestMessage;
-import org.objectweb.proactive.extra.forwardingv2.protocol.message.ExceptionMessage;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.ErrorMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationReplyMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationRequestMessage;
@@ -117,11 +117,11 @@ public class TestForwardingRegistry {
         Assert.assertNotNull(result);
         Assert.assertFalse("Result should not be a DataReplyMessage", DataReplyMessage.class
                 .isAssignableFrom(result.getClass()));
-        Assert.assertTrue("Message should be an exception", ExceptionMessage.class.isAssignableFrom(result
+        Assert.assertTrue("Message should be an exception", ErrorMessage.class.isAssignableFrom(result
                 .getClass()));
-        Assert.assertEquals(MessageType.ROUTING_EXCEPTION_MSG, result.getType());
+        Assert.assertEquals(MessageType.ERR_UNKNOW_RCPT, result.getType());
 
-        ExceptionMessage reply = (ExceptionMessage) result;
+        ErrorMessage reply = (ErrorMessage) result;
         Assert.assertTrue("Exception should be a subclass of RoutingException", RoutingException.class
                 .isAssignableFrom(reply.getException().getClass()));
     }

@@ -39,6 +39,7 @@ import org.objectweb.proactive.core.remoteobject.http.util.HttpMarshaller;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.forwardingv2.client.AgentV2;
+import org.objectweb.proactive.extra.forwardingv2.exceptions.MessageRoutingException;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.util.exceptions.MessageRoutingRemoteException;
 
 
@@ -88,15 +89,16 @@ public abstract class MessageRoutingMessage implements Serializable {
      * 
      * @throws MessageRoutingRemoteException if something bad happened when sending this message
      */
-    public final void send() throws MessageRoutingRemoteException {
+    public final void send() throws MessageRoutingException {
         try {
             byte[] bytes = HttpMarshaller.marshallObject(this);
             byte[] response = agent.sendMsg(this.uri, bytes, isOneWay);
             if (!isOneWay) {
                 this.returnedObject = HttpMarshaller.unmarshallObject(response);
             }
-        } catch (Exception e) {
-            throw new MessageRoutingRemoteException("Failed to send message to " + this.uri, e);
+        } catch (MessageRoutingException e) {
+            logger.error("Failed to send message to " + this.uri, e);
+            throw e;
         }
     }
 }

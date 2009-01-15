@@ -51,6 +51,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.forwardingv2.client.AgentV2;
 import org.objectweb.proactive.extra.forwardingv2.client.ForwardingAgentV2;
 import org.objectweb.proactive.extra.forwardingv2.client.ProActiveMessageHandler;
+import org.objectweb.proactive.extra.forwardingv2.exceptions.MessageRoutingException;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.message.MessageRoutingRegistryListRemoteObjectsMessage;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.message.MessageRoutingRemoteObjectLookupMessage;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.util.MessageRoutingRegistry;
@@ -184,7 +185,7 @@ public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFacto
             } else {
                 return new RemoteObjectAdapter(result);
             }
-        } catch (MessageRoutingRemoteException e) {
+        } catch (MessageRoutingException e) {
             throw new ProActiveException(e);
         }
     }
@@ -213,7 +214,7 @@ public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFacto
         try {
             message.send();
             return message.getReturnedObject();
-        } catch (MessageRoutingRemoteException e) {
+        } catch (MessageRoutingException e) {
             throw new ProActiveException(e);
         }
     }

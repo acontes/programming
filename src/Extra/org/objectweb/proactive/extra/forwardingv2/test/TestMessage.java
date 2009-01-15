@@ -8,7 +8,7 @@ import org.objectweb.proactive.extra.forwardingv2.exceptions.ExecutionException;
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.DataReplyMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.DataRequestMessage;
-import org.objectweb.proactive.extra.forwardingv2.protocol.message.ExceptionMessage;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.ErrorMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationReplyMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationRequestMessage;
@@ -162,8 +162,7 @@ public class TestMessage {
     public void testExceptionMessage() {
         // SETUP PART
         ExecutionException ex = new ExecutionException("Blablabla");
-        ExceptionMessage r = new ExceptionMessage(MessageType.EXECUTION_EXCEPTION_MSG, srcID, dstID, msgID,
-            ex);
+        ErrorMessage r = new ErrorMessage(MessageType.ERR_DISCONNECTED_RCPT, srcID, dstID, msgID, ex);
         Assert.assertEquals(srcID, r.getSrcAgentID());
         Assert.assertEquals(dstID, r.getDstAgentID());
         Assert.assertEquals(msgID, r.getMsgID());
@@ -183,8 +182,8 @@ public class TestMessage {
         Assert.assertTrue(Arrays.areEqual(b, r2.toByteArray()));
 
         // CUSTOM PART
-        Assert.assertTrue(r2 instanceof ExceptionMessage);
-        ExceptionMessage res = (ExceptionMessage) r2;
+        Assert.assertTrue(r2 instanceof ErrorMessage);
+        ErrorMessage res = (ErrorMessage) r2;
         Assert.assertEquals(srcID, res.getSrcAgentID());
         Assert.assertEquals(dstID, res.getDstAgentID());
         Assert.assertEquals(msgID, res.getMsgID());

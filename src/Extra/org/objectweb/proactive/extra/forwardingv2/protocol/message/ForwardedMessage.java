@@ -69,7 +69,7 @@ public abstract class ForwardedMessage extends Message {
 
         TypeHelper.intToByteArray(length, byteArray, CommonOffsets.LENGTH_OFFSET.getValue());
         TypeHelper.intToByteArray(getProtoID(), byteArray, CommonOffsets.PROTO_ID_OFFSET.getValue());
-        TypeHelper.intToByteArray(type.getValue(), byteArray, CommonOffsets.MSG_TYPE_OFFSET.getValue());
+        TypeHelper.intToByteArray(type.ordinal(), byteArray, CommonOffsets.MSG_TYPE_OFFSET.getValue());
         if (srcAgentID != null) {
             TypeHelper.longToByteArray(srcAgentID.getId(), byteArray, Offsets.SRC_AGENT_ID_OFFSET.getValue());
         }

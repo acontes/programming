@@ -45,7 +45,7 @@ public class ProActiveMessageProcessor implements Runnable {
             } catch (Exception e) {
                 logger.warn("Exception during execution of message: " + _toProcess, e);
                 // TODO send an ExecutionExceptionMessage
-                agent.sendExceptionReply(_toProcess, e);
+                // agent.sendExceptionReply(_toProcess, e);
                 return;
             }
 

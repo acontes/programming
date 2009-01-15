@@ -22,7 +22,7 @@ import org.objectweb.proactive.extra.forwardingv2.exceptions.MessageRoutingExcep
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.DataReplyMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.DataRequestMessage;
-import org.objectweb.proactive.extra.forwardingv2.protocol.message.ExceptionMessage;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.ErrorMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationReplyMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationRequestMessage;
@@ -83,13 +83,15 @@ public class ForwardingAgentV2 implements AgentV2Internal {
             throw new ProActiveException("Message routing agent failed to create the message handler", e);
         }
 
+        // Avoid lazy connection to spot invalid host/port ASAP
         try {
             this.t = reconnectToRouter();
         } catch (IOException e) {
             throw new ProActiveException("Failed to create the tunnel to " + routerAddr + ":" + routerPort, e);
         }
 
-        // Start the message receiver
+        // Start the message receiver even if connection failed
+        // Message reader will try to open the tunnel later
         Thread mrThread = new Thread(new MessageReader(this));
         mrThread.setDaemon(true);
         mrThread.start();
@@ -107,7 +109,6 @@ public class ForwardingAgentV2 implements AgentV2Internal {
      *             if received
      */
     synchronized private Tunnel reconnectToRouter() throws IOException {
-
         Tunnel tunnel = new Tunnel(this.routerAddr, this.routerPort);
 
         // if call for the first time then agentID is null
@@ -192,7 +193,6 @@ public class ForwardingAgentV2 implements AgentV2Internal {
 
         // Generate a requestID
         Long requestID = requestIDGenerator.getAndIncrement();
-
         DataRequestMessage msg = new DataRequestMessage(agentID, targetID, requestID, data, oneWay);
 
         byte[] response = null;
@@ -215,12 +215,6 @@ public class ForwardingAgentV2 implements AgentV2Internal {
         DataReplyMessage reply = new DataReplyMessage(this.getAgentID(), request.getSrcAgentID(), request
                 .getMsgID(), data);
 
-        internalSendMsg(reply);
-    }
-
-    public void sendExceptionReply(DataRequestMessage request, Exception e) throws MessageRoutingException {
-        ExceptionMessage reply = new ExceptionMessage(MessageType.EXECUTION_EXCEPTION_MSG, this.getAgentID(),
-            request.getSrcAgentID(), request.getMsgID(), e);
         internalSendMsg(reply);
     }
 
@@ -265,8 +259,9 @@ public class ForwardingAgentV2 implements AgentV2Internal {
                 tunnel = this.reportTunnelFailure(tunnel, e);
             } catch (IOException e1) {
                 // reportTunnelFailure throw an IOException only when
-                // the router cannot be contacted again. We just loose the
-                // game
+                // the router cannot be contacted again.
+                // Notify the sender this message cannot be send. It will be able
+                // to-retry later if he wants.
                 throw new MessageRoutingException(
                     "Message cannot be sent because tunnel failed and the agent is unable to recreate it", e1);
             }
@@ -276,7 +271,6 @@ public class ForwardingAgentV2 implements AgentV2Internal {
                 tunnel.write(msgBuf);
             } catch (IOException e1) {
                 // Message sending failed twice with two different tunnels.
-                // Aborting
                 throw new MessageRoutingException("Message cannot be sent. Failed twice", e1);
             }
         }
@@ -285,6 +279,8 @@ public class ForwardingAgentV2 implements AgentV2Internal {
     public class LocalMailBox {
         private final CountDownLatch latch;
         volatile private byte[] response = null;
+        volatile private MessageRoutingException exception = null;
+
         private final long requestID;
 
         public LocalMailBox(long requestID) {
@@ -292,7 +288,7 @@ public class ForwardingAgentV2 implements AgentV2Internal {
             this.latch = new CountDownLatch(1);
         }
 
-        public byte[] waitForResponse(long timeout) {
+        public byte[] waitForResponse(long timeout) throws MessageRoutingException {
             TimeoutAccounter ta = TimeoutAccounter.getAccounter(timeout);
 
             boolean b = false;
@@ -305,6 +301,9 @@ public class ForwardingAgentV2 implements AgentV2Internal {
             } while (!b & !ta.isTimeoutElapsed());
 
             boxes.remove(this.requestID);
+            if (exception != null) {
+                throw exception;
+            }
             return response;
         }
 
@@ -312,6 +311,12 @@ public class ForwardingAgentV2 implements AgentV2Internal {
             this.response = response;
             latch.countDown();
         }
+
+        public void setAndUnlock(MessageRoutingException exception) {
+            this.exception = exception;
+            latch.countDown();
+        }
+
     }
 
     public class MessageReader implements Runnable {
@@ -368,23 +373,42 @@ public class ForwardingAgentV2 implements AgentV2Internal {
         }
 
         public void handleMessage(Message msg) {
-            if (msg.getType() == MessageType.DATA_REPLY) {
-                DataReplyMessage reply = (DataReplyMessage) msg;
-                // Have to lookup in the hashtable
-                LocalMailBox mbox = boxes.remove(reply.getMsgID());
-                if (mbox == null) {
-                    logger.warn("Received reply message for unknown request: " + msg);
-                } else {
-                    if (logger.isTraceEnabled()) {
-                        logger.trace("Message corresponding to response");
+            switch (msg.getType()) {
+                case DATA_REPLY:
+                    DataReplyMessage reply = (DataReplyMessage) msg;
+                    // Have to lookup in the hashtable
+                    LocalMailBox mbox = boxes.remove(reply.getMsgID());
+                    if (mbox == null) {
+                        logger.error("Received reply for an unknown request: " + msg);
+                    } else {
+                        if (logger.isTraceEnabled()) {
+                            logger.trace("Received reply: " + msg);
+                        }
+                        // this is a reply containing data
+                        mbox.setAndUnlock(reply.getData());
                     }
-                    // this is a reply containing data
-                    mbox.setAndUnlock(reply.getData());
-                }
-            } else if (msg.getType() == MessageType.DATA_REQUEST) {
+                    break;
+                case DATA_REQUEST:
+                    // That message is a request, handle it.
+                    messageHandler.pushMessage((DataRequestMessage) msg);
+                    break;
+                case ERR_UNKNOW_RCPT:
+                    ErrorMessage errorMsg = (ErrorMessage) msg;
+                    logger.error("Router notified that reciptient " + errorMsg.getSrcAgentID() +
+                        " is unknown");
+                    // try to unlock the sender
+                    mbox = boxes.remove(errorMsg.getMsgID());
+                    if (mbox == null) {
+                        logger.error("Received an unknow recipient error for an unknown request: " + msg);
+                    } else {
+                        mbox.setAndUnlock(errorMsg.getException());
+                    }
 
-                // That message is a request, handle it.
-                messageHandler.pushMessage((DataRequestMessage) msg);
+                    // TODO
+                    break;
+                default:
+                    // Bad message type. Log it.
+                    logger.error("Invalid Message received, wrong type: " + msg);
             }
         }
     }

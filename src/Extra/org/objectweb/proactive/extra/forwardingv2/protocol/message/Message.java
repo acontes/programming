@@ -1,6 +1,8 @@
 package org.objectweb.proactive.extra.forwardingv2.protocol.message;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.objectweb.proactive.extra.forwardingv2.protocol.TypeHelper;
 
@@ -11,40 +13,26 @@ public abstract class Message {
 
     // enumerations
     public enum MessageType {
-        REGISTRATION_REQUEST(0), // Registration request to the registry
-        REGISTRATION_REPLY(1), // Registration reply from the registry indicating the attributed localid
-        DATA_REQUEST(2), // Request from a client to a server
-        DATA_REPLY(3), // Reply from a server to a client
-        ROUTING_EXCEPTION_MSG(4), // Message signaling a routing error
-        EXECUTION_EXCEPTION_MSG(5); // Message signaling an exception error
+        REGISTRATION_REQUEST, // Registration request to the registry
+        REGISTRATION_REPLY, // Registration reply from the registry indicating the attributed localid
+        DATA_REQUEST, // Request from a client to a server
+        DATA_REPLY, // Reply from a server to a client
+        ERR_DISCONNECTED_RCPT, // Signals that the RCPT disconnected from the router
+        ERR_UNKNOW_RCPT // Signals that the router does not known the RCPT
+        ;
 
-        private final int value;
-
-        private MessageType(int value) {
-            this.value = value;
-        }
-
-        public static MessageType getMessageType(int value) {
-            switch (value) {
-                case 0:
-                    return REGISTRATION_REQUEST;
-                case 1:
-                    return REGISTRATION_REPLY;
-                case 2:
-                    return DATA_REQUEST;
-                case 3:
-                    return DATA_REPLY;
-                case 4:
-                    return ROUTING_EXCEPTION_MSG;
-                case 5:
-                    return EXECUTION_EXCEPTION_MSG;
-                default: //should not occur but TODO: check that this is ok
-                    return null;
+        final static Map<Integer, MessageType> idToMessageType;
+        static {
+            // Can't populate idToMessageType from constructor since enums are initialized before 
+            // any static initializers are run. It is safe to do it from this static block
+            idToMessageType = new HashMap<Integer, MessageType>();
+            for (MessageType messageType : values()) {
+                idToMessageType.put(messageType.ordinal(), messageType);
             }
         }
 
-        public int getValue() {
-            return this.value;
+        public static MessageType getMessageType(int value) {
+            return idToMessageType.get(value);
         }
     }
 
@@ -79,10 +67,9 @@ public abstract class Message {
                 return new DataRequestMessage(byteArray, offset);
             case DATA_REPLY:
                 return new DataReplyMessage(byteArray, offset);
-            case ROUTING_EXCEPTION_MSG:
-                return new ExceptionMessage(byteArray, offset);
-            case EXECUTION_EXCEPTION_MSG:
-                return new ExceptionMessage(byteArray, offset);
+            case ERR_DISCONNECTED_RCPT:
+            case ERR_UNKNOW_RCPT:
+                return new ErrorMessage(byteArray, offset);
             default:
                 return null;
         }

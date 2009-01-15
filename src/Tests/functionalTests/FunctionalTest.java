@@ -147,6 +147,11 @@ public class FunctionalTest {
     @Before
     public void BeforMessageRouting() throws IOException {
         logger.info(FunctionalTest.class.getName() + " @Before: BeforMessageRouting");
+        if (router != null) {
+            logger.info("Message router already started, reusing the same one");
+            return;
+        }
+
         if (PAProperties.PA_COMMUNICATION_PROTOCOL.getValue().equals(
                 MessageRoutingRemoteObjectFactory.PROTOCOL_ID)) {
 

@@ -7,6 +7,4 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.message.DataRequestMe
 public interface AgentV2Internal extends AgentV2 {
     public void sendReply(DataRequestMessage request, byte[] data) throws MessageRoutingException;
 
-    public void sendExceptionReply(DataRequestMessage request, Exception e) throws MessageRoutingException;
-
 }

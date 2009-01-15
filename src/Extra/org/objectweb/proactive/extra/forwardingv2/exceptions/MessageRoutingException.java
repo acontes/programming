@@ -1,11 +1,14 @@
 package org.objectweb.proactive.extra.forwardingv2.exceptions;
 
+import java.io.IOException;
+
+
 /** Signals that an error of some sort has occurred.
  *
  * This class is the general class of exceptions produced by failed message sending.
  */
 @SuppressWarnings("serial")
-public class MessageRoutingException extends Exception {
+public class MessageRoutingException extends IOException {
 
     public MessageRoutingException() {
         super();
