@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Class-Path: proactive-jca.jar 
+ ProActive.jar 
+ bouncycastle.jar 
+ fractal.jar 
+ javassist.jar 
+ xercesImpl.jar 
+ xml-apis.jar
+ xalan.jar 
+ log4j.jar
+ 
+
