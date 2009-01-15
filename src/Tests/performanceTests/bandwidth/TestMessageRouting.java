@@ -101,7 +101,7 @@ public class TestMessageRouting extends GCMFunctionalTestDefaultNodes {
 
             double bandwith = (1000.0 * size) / (endTime - startTime);
             System.out.println("Bandwidth " + bandwith);
-            HudsonReport.reportToHudson(TestRMI.class, bandwith);
+            HudsonReport.reportToHudson(TestMessageRouting.class, bandwith);
         }
     }
 
