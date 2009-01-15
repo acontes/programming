@@ -43,7 +43,6 @@ import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.MessageRoutingRemoteObjectFactory;
 
 import performanceTests.HudsonReport;
-import performanceTests.Performance;
 import functionalTests.GCMFunctionalTestDefaultNodes;
 
 
@@ -125,7 +124,8 @@ public class TestMessageRouting extends GCMFunctionalTestDefaultNodes {
 
             long startTime = System.currentTimeMillis();
             while (true) {
-                if (System.currentTimeMillis() - startTime > Performance.DURATION)
+                if (System.currentTimeMillis() - startTime > PAProperties.PA_TEST_PERF_DURATION
+                        .getValueAsInt())
                     break;
 
                 server.serve(TestRMI.buf);

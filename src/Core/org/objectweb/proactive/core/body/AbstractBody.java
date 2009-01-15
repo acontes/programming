@@ -66,6 +66,10 @@ import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.component.representative.ItfID;
 import org.objectweb.proactive.core.component.request.Shortcut;
+import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.debug.dconnection.DebuggerConnection;
+import org.objectweb.proactive.core.debug.stepbystep.BreakpointType;
+import org.objectweb.proactive.core.debug.stepbystep.Debugger;
 import org.objectweb.proactive.core.gc.GCMessage;
 import org.objectweb.proactive.core.gc.GCResponse;
 import org.objectweb.proactive.core.gc.GarbageCollector;
@@ -185,6 +189,9 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     // Initialized in the subclasses after the local body strategy
     protected transient GarbageCollector gc;
 
+    // the StepByStep mode
+    protected Debugger debugger;
+
     private String reifiedObjectClassName;
 
     //
@@ -221,6 +228,9 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             this.reifiedObjectClassName = reifiedObject.getClass().getName();
 
         ProActiveSecurity.loadProvider();
+
+        this.debugger = factory.newDebuggerFactory().newDebugger();
+        this.debugger.setTarget(this);
 
         // SECURITY
         if (reifiedObject instanceof Secure) {
@@ -948,6 +958,12 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                     // e.printStackTrace();
                 }
             }
+
+            // add StepByStep breakpoint
+            if (!isProActiveInternalObject) {
+                debugger.breakpoint(BreakpointType.SendRequest, null);
+            }
+
             this.localBodyStrategy.sendRequest(methodCall, future, destinationBody);
 
         } catch (RenegotiateSessionException e) {
@@ -1201,4 +1217,9 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         UniversalBody body = myBodyProxy.getBody().getRemoteAdapter();
         return body;
     }
+
+    public Debugger getDebugger() {
+        return debugger;
+    }
+
 }

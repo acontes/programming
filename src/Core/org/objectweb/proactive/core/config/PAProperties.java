@@ -483,6 +483,13 @@ public enum PAProperties {
     PA_DGC_TTB("proactive.dgc.ttb", PAPropertiesType.INTEGER),
 
     /* ------------------------------------
+     *  DISTRIBUTED DEBUGGER
+     */
+
+    /** Enable the distributed debugger */
+    PA_DEBUG("proactive.debug", PAPropertiesType.BOOLEAN),
+
+    /* ------------------------------------
      *  FILE TRANSFER
      */
 
@@ -518,6 +525,9 @@ public enum PAProperties {
      * after a functional test are found by using this property
      */
     PA_TEST("proactive.test", PAPropertiesType.BOOLEAN),
+
+    /** Duration of each performance test in ms */
+    PA_TEST_PERF_DURATION("proactive.test.perf.duration", PAPropertiesType.INTEGER),
 
     /**
      * Functional test timeout in ms

@@ -40,7 +40,6 @@ import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.node.NodeException;
 
 import performanceTests.HudsonReport;
-import performanceTests.Performance;
 import functionalTests.GCMFunctionalTestDefaultNodes;
 
 
@@ -63,6 +62,7 @@ public class TestRMI extends GCMFunctionalTestDefaultNodes {
         client.startTest();
     }
 
+    @SuppressWarnings("serial")
     static public class Server implements Serializable {
         boolean firstRequest = true;
         long count = 0;
@@ -95,6 +95,7 @@ public class TestRMI extends GCMFunctionalTestDefaultNodes {
         }
     }
 
+    @SuppressWarnings("serial")
     static public class Client implements Serializable {
         private Server server;
 
@@ -115,7 +116,8 @@ public class TestRMI extends GCMFunctionalTestDefaultNodes {
 
             long startTime = System.currentTimeMillis();
             while (true) {
-                if (System.currentTimeMillis() - startTime > Performance.DURATION)
+                if (System.currentTimeMillis() - startTime > PAProperties.PA_TEST_PERF_DURATION
+                        .getValueAsInt())
                     break;
 
                 server.serve(TestRMI.buf);
