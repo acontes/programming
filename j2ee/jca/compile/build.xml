@@ -11,6 +11,11 @@
 	<property name="build.dir"             value="${base.dir}/dist"/>
 	<property name="meta.inf.dir"          value="${base.dir}/appserver"/>
 	<property name="proactive.lib.dir"     value="${proactive.home}/dist/lib"/>
+	
+		<!-- Javac properties -->
+	<property name="debug" value="on" />
+	<property name="source" value="1.5" />
+	
 	<!-- ========================================================================= -->
 	<!-- definition of application server-specific properties                      -->
 	<!-- the value is used to generate the names of the corresponding EAR and RAR  -->
@@ -37,7 +42,7 @@
 	</path>
 	
 	<target name="compile" depends="-init" description="Compile the connector">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" source="${source}" debug="${debug}">
 			<include name="**/*.java" />
 			<classpath refid="connector.classpath" />
 		</javac>
