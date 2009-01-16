@@ -84,8 +84,8 @@ log4j.logger.org.mortbay = WARN
 
 #log4j.logger.proactive.configuration = DEBUG
 #log4j.logger.proactive.remoteobject = DEBUG
-log4j.logger.proactive.forwarding = DEBUG
-log4j.logger.proactive.runtime.node = DEBUG
+#log4j.logger.proactive.forwarding = DEBUG
+#log4j.logger.proactive.runtime.node = DEBUG
 
 #log4j.logger.proactive.jmx = DEBUG
 #log4j.logger.proactive.jmx.mbean = DEBUG
