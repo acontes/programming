@@ -50,6 +50,7 @@
 				<jvmParameters>
 						<parameter value="-Dtiti=titi"/>
 						<parameter value="-Dproactive.test=true"/>
+						<parameter value="-Dproactive.net.router.address=localhost -Dproactive.net.router.port=0"/>
 					</jvmParameters>
 				</jvmProcess>
 			</processDefinition>
@@ -73,6 +74,7 @@
 					<jvmParameters >
 						<parameter value="-Dtata=tata"/>
 						<parameter value="-Dproactive.test=true"/>
+						<parameter value="-Dproactive.net.router.address=localhost -Dproactive.net.router.port=0"/>
 					</jvmParameters>
 				</jvmProcess>
 			</processDefinition>
@@ -82,6 +84,7 @@
 					<jvmParameters>
 						<parameter value="-Dtoto=toto"/>
 						<parameter value="-Dproactive.test=true"/>
+						<parameter value="-Dproactive.net.router.address=localhost -Dproactive.net.router.port=0"/>
 					</jvmParameters>
 				</jvmProcess>
 			</processDefinition>

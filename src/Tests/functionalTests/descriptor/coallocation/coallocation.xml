@@ -33,6 +33,7 @@
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<jvmParameters>
 						<parameter value="-Dproactive.test=true"/>
+						<parameter value="-Dproactive.net.router.address=localhost -Dproactive.net.router.port=0"/>
 					</jvmParameters>
 				</jvmProcess>
 			</processDefinition>

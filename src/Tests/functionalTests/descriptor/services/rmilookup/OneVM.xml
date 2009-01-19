@@ -30,6 +30,7 @@
 						<parameter value="-Dproactive.communication.protocol=rmi" />  						
 						<parameter value="-Dproactive.rmi.port=3020" />  
 						<parameter value="-Dproactive.test=true"/>
+						<parameter value="-Dproactive.net.router.address=localhost -Dproactive.net.router.port=0"/>
 					</jvmParameters> 
 				 </jvmProcess>
 			</processDefinition>
