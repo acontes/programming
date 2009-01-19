@@ -77,4 +77,8 @@ public class DummyProtocol implements RemoteObjectFactory {
         return null;
     }
 
+    public URI getBaseURI() {
+        return null;
+    }
+
 }

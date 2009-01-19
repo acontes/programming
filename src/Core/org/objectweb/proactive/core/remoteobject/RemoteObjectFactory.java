@@ -117,4 +117,11 @@ public interface RemoteObjectFactory {
 
     public InternalRemoteRemoteObject createRemoteObject(RemoteObject<?> remoteObject, String name)
             throws ProActiveException;
+
+    /**
+     * @return the base URI for all object in this {@link RemoteObjectFactory}
+     * 
+     * To lookup an object on this host, caller can use this base URI and just set the name part.
+     */
+    public URI getBaseURI();
 }

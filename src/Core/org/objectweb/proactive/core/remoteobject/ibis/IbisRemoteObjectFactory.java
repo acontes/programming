@@ -243,4 +243,8 @@ public class IbisRemoteObjectFactory extends AbstractRemoteObjectFactory impleme
         return irro;
     }
 
+    public URI getBaseURI() {
+        return URIBuilder.buildURI(ProActiveInet.getInstance().getHostname(), "");
+    }
+
 }

@@ -249,4 +249,8 @@ public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFacto
     public AgentV2 getAgent() {
         return this.agent;
     }
+
+    public URI getBaseURI() {
+        return URI.create(this.getProtocolId() + "://" + this.agent.getAgentID() + "/");
+    }
 }
