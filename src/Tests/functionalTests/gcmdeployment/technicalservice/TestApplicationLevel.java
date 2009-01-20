@@ -37,6 +37,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.xml.VariableContractImpl;
+import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
@@ -48,13 +50,17 @@ import functionalTests.GCMFunctionalTest;
 /**
  * Deployment descriptor technical services.
  */
-public class TestApplicationLevel extends GCMFunctionalTest {
+public class TestApplicationLevel extends FunctionalTest {
     private Node node;
 
     @Before
     public void before() throws ProActiveException {
         URL desc = this.getClass().getResource("TestApplicationLevelApplication.xml");
-        GCMApplication app = PAGCMDeployment.loadApplicationDescriptor(desc);
+
+        VariableContractImpl vc = new VariableContractImpl();
+        vc.setVariableFromProgram(FunctionalTest.VAR_JVM_PARAMETERS,
+                FunctionalTest.JVM_PARAMETERS.toString(), VariableContractType.ProgramVariable);
+        GCMApplication app = PAGCMDeployment.loadApplicationDescriptor(desc, vc);
         app.startDeployment();
         GCMVirtualNode vn = app.getVirtualNode("nodes");
         node = vn.getANode();
