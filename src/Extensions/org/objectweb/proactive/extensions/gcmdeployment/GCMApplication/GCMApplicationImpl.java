@@ -69,6 +69,7 @@ import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.Grou
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
 import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeImpl;
 import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeInternal;
+import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeRemoteObjectAdapter;
 import org.objectweb.proactive.extensions.gcmdeployment.core.TopologyImpl;
 import org.objectweb.proactive.extensions.gcmdeployment.core.TopologyRootImpl;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
@@ -237,7 +238,7 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
         // Export this GCMApplication as a remote object
         String name = this.getDeploymentId() + "/VirtualNode/" + vn.getName();
         RemoteObjectExposer<GCMVirtualNode> roe = new RemoteObjectExposer<GCMVirtualNode>(
-            GCMVirtualNode.class.getName(), vn, null);
+            GCMVirtualNode.class.getName(), vn, GCMVirtualNodeRemoteObjectAdapter.class);
         roe.createRemoteObject(name);
         try {
             return (GCMVirtualNode) RemoteObjectHelper.generatedObjectStub(roe.getRemoteObject());
