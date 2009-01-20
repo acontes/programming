@@ -1,5 +1,7 @@
 package org.objectweb.proactive.extra.forwardingv2.protocol.message;
 
+import java.nio.ByteBuffer;
+
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
 import org.objectweb.proactive.extra.forwardingv2.protocol.TypeHelper;
 
@@ -58,6 +60,19 @@ public abstract class RegistrationMessage extends Message {
         return byteArray;
     }
 
+    @Override
+    public ByteBuffer toByteBuffer() {
+        int length = getLength();
+        ByteBuffer buffer = ByteBuffer.allocate(length);
+
+        buffer.putInt(length).putInt(getProtoID()).putInt(type.ordinal());
+
+        if (agentID != null) {
+            buffer.putLong(agentID.getId());
+        }
+        return buffer;
+    }
+
     //TODO: set it as abstract in Message.java ?
     /**
      * @return the total length of the formatted message (header length + data length)
@@ -77,4 +92,13 @@ public abstract class RegistrationMessage extends Message {
         return (id != 0) ? new AgentID(id) : null;
     }
 
+    /**
+     * Reads the AgentID of a formatted message beginning at a certain offset inside a buffer. Encapsulates it in an AgentID object.
+     * @param buffer the buffer in which to read 
+     * @return the AgentID of the formatted message
+     */
+    public static AgentID readAgentID(ByteBuffer buffer) {
+        long id = buffer.getLong(Offsets.AGENT_ID_OFFSET.getValue());
+        return (id != 0) ? new AgentID(id) : null;
+    }
 }

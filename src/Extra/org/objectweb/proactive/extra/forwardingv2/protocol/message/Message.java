@@ -1,5 +1,6 @@
 package org.objectweb.proactive.extra.forwardingv2.protocol.message;
 
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -87,13 +88,22 @@ public abstract class Message {
 
     /**
      * Reads the type of a formatted message beginning at a certain offset inside a buffer. 
-     * @param byteArray the buffer in which to read 
+     * @param byteArray the array in which to read 
      * @param offset the offset at which to find the beginning of the message in the buffer
      * @return the type of the formatted message
      */
     public static MessageType readType(byte[] byteArray, int offset) {
         return MessageType.getMessageType(TypeHelper.byteArrayToInt(byteArray, offset +
             CommonOffsets.MSG_TYPE_OFFSET.getValue()));
+    }
+
+    /**
+     * Reads the type of a formatted message beginning at a certain offset inside a buffer. 
+     * @param buffer the {@link ByteBuffer} in which to read 
+     * @return the type of the formatted message
+     */
+    public static MessageType readType(ByteBuffer buffer) {
+        return MessageType.getMessageType(buffer.getInt(CommonOffsets.MSG_TYPE_OFFSET.getValue()));
     }
 
     /**
@@ -108,6 +118,8 @@ public abstract class Message {
     }
 
     public abstract byte[] toByteArray();
+
+    public abstract ByteBuffer toByteBuffer();
 
     public abstract int getLength();
 

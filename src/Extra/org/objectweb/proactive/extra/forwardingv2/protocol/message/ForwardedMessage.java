@@ -1,5 +1,7 @@
 package org.objectweb.proactive.extra.forwardingv2.protocol.message;
 
+import java.nio.ByteBuffer;
+
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
 import org.objectweb.proactive.extra.forwardingv2.protocol.TypeHelper;
 
@@ -84,6 +86,27 @@ public abstract class ForwardedMessage extends Message {
         return byteArray;
     }
 
+    @Override
+    public ByteBuffer toByteBuffer() {
+        int length = getLength();
+        ByteBuffer buffer = ByteBuffer.allocate(length);
+
+        buffer.putInt(length).putInt(getProtoID()).putInt(type.ordinal());
+        if (srcAgentID != null) {
+            buffer.putLong(srcAgentID.getId());
+        }
+        if (dstAgentID != null) {
+            buffer.putLong(Offsets.DST_AGENT_ID_OFFSET.getValue(), dstAgentID.getId());
+        }
+        buffer.putLong(Offsets.MSG_ID_OFFSET.getValue(), msgID);
+
+        if (data != null) {
+            buffer.position(FORWARDED_MESSAGE_HEADER_LENGTH);
+            buffer.put(data);
+        }
+        return buffer;
+    }
+
     /**
      * @return the total length of the formatted message (header length + data length)
      */
@@ -104,23 +127,41 @@ public abstract class ForwardedMessage extends Message {
 
     /**
      * Reads the dstAgentID of a formatted message beginning at a certain offset inside a buffer. Encapsulates it in an AgentID object.
-     * @param byteArray the buffer in which to read 
+     * @param byteArray the array in which to read 
      * @param offset the offset at which to find the beginning of the message in the buffer
      * @return the dstAgentID of the formatted message
      */
-    private AgentID readDstAgentID(byte[] byteArray, int offset) {
+    public static AgentID readDstAgentID(byte[] byteArray, int offset) {
         return new AgentID(TypeHelper.byteArrayToLong(byteArray, offset +
             Offsets.DST_AGENT_ID_OFFSET.getValue()));
     }
 
     /**
+     * Reads the dstAgentID of a formatted message beginning at a certain offset inside a buffer. Encapsulates it in an AgentID object.
+     * @param buffer the ByteBuffer in which to read 
+     * @return the dstAgentID of the formatted message
+     */
+    public static AgentID readDstAgentID(ByteBuffer buffer) {
+        return new AgentID(buffer.getLong(Offsets.DST_AGENT_ID_OFFSET.getValue()));
+    }
+
+    /**
      * Reads the MessageID of a formatted message beginning at a certain offset inside a buffer. 
-     * @param byteArray the buffer in which to read 
+     * @param byteArray the array in which to read 
      * @param offset the offset at which to find the beginning of the message in the buffer
      * @return the MessageID of the formatted message
      */
-    private long readMessageID(byte[] byteArray, int offset) {
+    public static long readMessageID(byte[] byteArray, int offset) {
         return TypeHelper.byteArrayToLong(byteArray, offset + Offsets.MSG_ID_OFFSET.getValue());
+    }
+
+    /**
+     * Reads the MessageID of a formatted message beginning at a certain offset inside a buffer. 
+     * @param buffer the {@link ByteBuffer} in which to read 
+     * @return the MessageID of the formatted message
+     */
+    public static long readMessageID(ByteBuffer buffer) {
+        return buffer.getLong(Offsets.MSG_ID_OFFSET.getValue());
     }
 
     public AgentID getSrcAgentID() {

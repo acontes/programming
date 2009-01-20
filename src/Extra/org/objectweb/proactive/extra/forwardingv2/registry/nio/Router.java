@@ -15,6 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.forwardingv2.exceptions.UnknownAgentIdException;
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
 
 
@@ -106,7 +107,7 @@ public class Router {
             sc.register(selector, SelectionKey.OP_READ);
 
             // Add the new connection in our Map 
-            socketChannelToChannelHandlerMap.put(sc, new ChannelHandler(sc));
+            socketChannelToChannelHandlerMap.put(sc, new ChannelHandler(this, sc));
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -143,6 +144,23 @@ public class Router {
                 handler.putBuffer(buffer);
             }
         }
+    }
+
+    /**
+     * Adds a mapping to the {@link #agentIDtoChannelHandlerMap}
+     * @param srcAgentID
+     * @param channelHandler
+     */
+    public void putMapping(AgentID srcAgentID, ChannelHandler channelHandler) {
+        agentIDtoChannelHandlerMap.put(srcAgentID, channelHandler);
+    }
+
+    public ChannelHandler getChannelHandlerFromAgentID(AgentID key) throws UnknownAgentIdException {
+        ChannelHandler channelHandler = agentIDtoChannelHandlerMap.get(key);
+        if (channelHandler == null) {
+            throw new UnknownAgentIdException("no tunnel registered for AgentID :" + key.getId());
+        }
+        return channelHandler;
     }
 
 }
