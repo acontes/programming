@@ -53,7 +53,20 @@ public class MessageRoutingRemoteObjectRequest extends MessageRoutingMessage imp
     public MessageRoutingRemoteObjectRequest(Request request, URI uri, AgentV2 agent) {
         super(uri, agent);
         this.request = request;
-        this.isOneWay = request.isOneWay();
+
+        // this statement is not needed but someone will want to change it in:
+        //   this.asynchronous = request.isOneWay().
+        //
+        // IT DOES NOT WORK. Even if a ProActive Request is one way, we must perform the
+        // rendez-vous and wait for the answer. asynchronous messages and one way request ARE NOT
+        // THE SAME THING.
+        this.isAsynchronous = isAsynchronous(request);
+    }
+
+    private boolean isAsynchronous(Request request) {
+        // TODO FIXME UGLY UGLY UGLY UGLY UGLY HACK
+        // Chuck norris will kill your mother if not fixed before the merge
+        return "killRT".equals(request.getMethodName());
     }
 
     /** Get the response of this request */
