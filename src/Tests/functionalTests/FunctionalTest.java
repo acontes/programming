@@ -53,12 +53,46 @@ import org.objectweb.proactive.extra.forwardingv2.remoteobject.MessageRoutingRem
 
 public class FunctionalTest {
     static final protected Logger logger = Logger.getLogger("testsuite");
-    static final public String JVM_PARAMETERS = "-Dproactive.test=true";
+
+    static private ForwardingRegistry router;
+    static final public String VAR_JVM_PARAMETERS = "JVM_PARAMETERS";
+    static final public String JVM_PARAMETERS;
+    static {
+        StringBuilder jvmParameters = new StringBuilder(" ");
+        jvmParameters.append("-Dproactive.test=true ");
+
+        try {
+            jvmParameters.append(PAProperties.PA_COMMUNICATION_PROTOCOL.getCmdLine());
+            jvmParameters.append(PAProperties.PA_COMMUNICATION_PROTOCOL.getValue());
+            jvmParameters.append(" ");
+            if (MessageRoutingRemoteObjectFactory.PROTOCOL_ID.equals(PAProperties.PA_COMMUNICATION_PROTOCOL
+                    .getValue())) {
+                if (PAProperties.PA_NET_ROUTER_PORT.getValue() == null ||
+                    PAProperties.PA_NET_ROUTER_PORT.getValueAsInt() == 0) {
+                    router = new ForwardingRegistry(0, true);
+                    PAProperties.PA_NET_ROUTER_PORT.setValue(router.getLocalPort());
+                } else {
+                    router = new ForwardingRegistry(PAProperties.PA_NET_ROUTER_PORT.getValueAsInt(), true);
+                }
+                logger.info("Started a message router on port " + router.getLocalPort());
+
+                jvmParameters.append(PAProperties.PA_NET_ROUTER_ADDRESS.getCmdLine());
+                jvmParameters.append(PAProperties.PA_NET_ROUTER_ADDRESS.getValue());
+                jvmParameters.append(" ");
+
+                jvmParameters.append(PAProperties.PA_NET_ROUTER_PORT.getCmdLine());
+                jvmParameters.append(PAProperties.PA_NET_ROUTER_PORT.getValue());
+                jvmParameters.append(" ");
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        JVM_PARAMETERS = jvmParameters.toString();
+    }
 
     /** The amount of time given to a test to success or fail */
     static final private long TIMEOUT = 300000;
-
-    static private ForwardingRegistry router = null;
 
     /** A shutdown hook to kill all forked JVMs when exiting the main JVM */
     static final private Thread shutdownHook = new Thread() {
@@ -140,22 +174,6 @@ public class FunctionalTest {
             timer.schedule(timerTask, timeout);
         } else {
             logger.trace("Timeout disabled");
-        }
-    }
-
-    @BeforeClass
-    static public void setupMessageRouting() throws IOException {
-        if (PAProperties.PA_COMMUNICATION_PROTOCOL.getValue().equals(
-                MessageRoutingRemoteObjectFactory.PROTOCOL_ID)) {
-            if (PAProperties.PA_NET_ROUTER_PORT.getValue() == null ||
-                PAProperties.PA_NET_ROUTER_PORT.getValueAsInt() == 0) {
-                router = new ForwardingRegistry(0, true);
-                PAProperties.PA_NET_ROUTER_PORT.setValue(router.getLocalPort());
-            } else {
-                router = new ForwardingRegistry(PAProperties.PA_NET_ROUTER_PORT.getValueAsInt(), true);
-            }
-
-            logger.info("Started a message router on port " + router.getLocalPort());
         }
     }
 

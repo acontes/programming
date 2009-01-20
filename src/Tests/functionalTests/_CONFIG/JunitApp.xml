@@ -10,6 +10,7 @@
 
 		<descriptorDefaultVariable name="deploymentDescriptor" value="localhost/generic.xml" />
 		<descriptorDefaultVariable name="jvmargDefinedByTest" value=" "/>
+		<programVariable name="JVM_PARAMETERS"/>
 	</environment>
 	
 	<application>
@@ -17,7 +18,7 @@
 		<proactive relpath="${proactive.home}" base="root">
 			<configuration>
 				<java base="root" relpath="${java.home}/bin/java"/>		
-				<jvmarg value="-Dproactive.test=true ${jvmargPropagated} ${jvmargDefinedByTest} -Dclover.initstring=${proactive.home}/compile/ProActiveCoverage.db"/>
+				<jvmarg value="-Dproactive.test=true ${JVM_PARAMETERS} ${jvmargDefinedByTest} -Dclover.initstring=${proactive.home}/compile/ProActiveCoverage.db"/>
 				<proactiveClasspath type="append">
 					<pathElement base="proactive" relpath="classes/Tests"/>
 					<pathElement base="proactive" relpath="dist/lib/clover.jar"/>

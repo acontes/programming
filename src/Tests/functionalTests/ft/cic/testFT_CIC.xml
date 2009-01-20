@@ -19,7 +19,7 @@
 				<java base="root" relpath="${java.home}/bin/java" />
 				<jvmarg
 					value="-Dproactive.test=true ${jvmargDefinedByTest} -Dclover.initstring=${proactive.home}/compile/ProActiveCoverage.db" />
-				<jvmarg value="-Dproactive.net.router.address=localhost -Dproactive.net.router.port=0"/>
+				<jvmarg value="${JVM_PARAMETERS}"/>
 				<proactiveClasspath type="append">
 					<pathElement base="proactive"
 						relpath="classes/Tests" />

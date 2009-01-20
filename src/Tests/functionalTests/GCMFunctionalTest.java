@@ -37,6 +37,7 @@ import java.net.URL;
 import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.core.xml.VariableContractType;
@@ -56,6 +57,7 @@ public class GCMFunctionalTest extends FunctionalTest {
         vContract = new VariableContractImpl();
         vContract.setVariableFromProgram(VAR_OS, OperatingSystem.getOperatingSystem().name(),
                 VariableContractType.DescriptorDefaultVariable);
+
     }
 
     public GCMFunctionalTest(URL applicationDescriptor) {
@@ -69,6 +71,9 @@ public class GCMFunctionalTest extends FunctionalTest {
         if (gcmad != null) {
             throw new IllegalStateException("deployment already started");
         }
+
+        vContract.setVariableFromProgram(FunctionalTest.VAR_JVM_PARAMETERS, FunctionalTest.JVM_PARAMETERS
+                .toString(), VariableContractType.ProgramVariable);
 
         gcmad = PAGCMDeployment.loadApplicationDescriptor(applicationDescriptor, vContract);
         gcmad.startDeployment();
