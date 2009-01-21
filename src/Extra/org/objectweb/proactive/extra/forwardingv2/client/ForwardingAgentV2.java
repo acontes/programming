@@ -26,7 +26,6 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.message.ErrorMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationReplyMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationRequestMessage;
-import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message.MessageType;
 
 
 /**
@@ -94,6 +93,7 @@ public class ForwardingAgentV2 implements AgentV2Internal {
         // Message reader will try to open the tunnel later
         Thread mrThread = new Thread(new MessageReader(this));
         mrThread.setDaemon(true);
+        mrThread.setName("Message routing: message reader for agent " + this.agentID);
         mrThread.start();
     }
 
