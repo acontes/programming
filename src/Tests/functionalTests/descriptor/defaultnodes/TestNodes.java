@@ -37,6 +37,8 @@ import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.xml.VariableContractImpl;
+import org.objectweb.proactive.core.xml.VariableContractType;
 
 import functionalTests.FunctionalTest;
 
@@ -74,7 +76,12 @@ public class TestNodes extends FunctionalTest {
 
     @Test
     public void action() throws Exception {
-        proActiveDescriptor = PADeployment.getProactiveDescriptor("file:" + XML_LOCATION);
+
+        VariableContractImpl vContract = new VariableContractImpl();
+        vContract.setVariableFromProgram(FunctionalTest.VAR_JVM_PARAMETERS, FunctionalTest.JVM_PARAMETERS
+                .toString(), VariableContractType.ProgramVariable);
+
+        proActiveDescriptor = PADeployment.getProactiveDescriptor("file:" + XML_LOCATION, vContract);
         proActiveDescriptor.activateMappings();
         TestNodes.virtualNodes = proActiveDescriptor.getVirtualNodes();
         for (int i = 0; i < virtualNodes.length; i++) {
