@@ -75,6 +75,10 @@ public class URIBuilder {
         }
     }
 
+    public static URI buildURI(URI baseURI, String name) {
+        return URI.create(baseURI.toString() + name);
+    }
+
     /**
      * Returns an url compliant with RFC 2396 [protocol:][//host][[/]path]
      * loopback address is replaced by a non-loopback address localhost -> [DNS/IP] Address
