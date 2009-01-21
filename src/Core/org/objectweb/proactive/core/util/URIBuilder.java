@@ -119,7 +119,7 @@ public class URIBuilder {
      * @returnan url under the form [protocol:][//host[:port]][[/]name]
      */
     public static URI buildURI(String host, String name, String protocol, int port) {
-        return buildURI(host, name, protocol, port, true);
+        return buildURI(host, name, protocol, port, false);
     }
 
     /**
