@@ -67,7 +67,7 @@ public class TestRemoteMaster extends FunctionalTest {
 
         master = new ProActiveMaster<A, Integer>(descriptor, "Master");
         // We use the same descriptor as resource, the Master VN should be ignored
-        master.addResources(descriptor);
+        master.addResources(descriptor, super.vContract);
         master.setResultReceptionOrder(Master.SUBMISSION_ORDER);
 
         master.solve(tasks);
