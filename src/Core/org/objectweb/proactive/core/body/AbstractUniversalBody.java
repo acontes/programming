@@ -196,7 +196,7 @@ public abstract class AbstractUniversalBody implements UniversalBody, Serializab
      * @see org.objectweb.proactive.core.body.UniversalBody#register(java.lang.String)
      */
     public void register(String url) throws IOException, UnknownProtocolException {
-        this.roe.createRemoteObject(RemoteObjectHelper.expandURI(URI.create(url)));
+        this.roe.createRemoteObject(url);
     }
 
     public RemoteObjectExposer<UniversalBody> getRemoteObjectExposer() {
