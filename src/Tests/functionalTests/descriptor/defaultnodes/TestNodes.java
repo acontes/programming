@@ -76,12 +76,7 @@ public class TestNodes extends FunctionalTest {
 
     @Test
     public void action() throws Exception {
-
-        VariableContractImpl vContract = new VariableContractImpl();
-        vContract.setVariableFromProgram(FunctionalTest.VAR_JVM_PARAMETERS, FunctionalTest.JVM_PARAMETERS
-                .toString(), VariableContractType.ProgramVariable);
-
-        proActiveDescriptor = PADeployment.getProactiveDescriptor("file:" + XML_LOCATION, vContract);
+        proActiveDescriptor = PADeployment.getProactiveDescriptor("file:" + XML_LOCATION, super.vContract);
         proActiveDescriptor.activateMappings();
         TestNodes.virtualNodes = proActiveDescriptor.getVirtualNodes();
         for (int i = 0; i < virtualNodes.length; i++) {

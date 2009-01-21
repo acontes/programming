@@ -47,6 +47,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.util.OperatingSystem;
+import org.objectweb.proactive.core.xml.VariableContractImpl;
+import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.extra.forwardingv2.registry.ForwardingRegistry;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.MessageRoutingRemoteObjectFactory;
 
@@ -102,6 +104,19 @@ public class FunctionalTest {
             killProActive();
         }
     };
+
+    /** The default variable contract to pass to PA(GCM)Deployment.load 
+     * 
+     * This variable contract MUST ALWAYS be used. Otherwise tests will fail 
+     * when some protocol are enabled (message routing for example) 
+     */
+    public VariableContractImpl vContract;
+
+    public FunctionalTest() {
+        vContract = new VariableContractImpl();
+        vContract.setVariableFromProgram(FunctionalTest.VAR_JVM_PARAMETERS, FunctionalTest.JVM_PARAMETERS
+                .toString(), VariableContractType.ProgramVariable);
+    }
 
     @BeforeClass
     public static void beforeClass() {

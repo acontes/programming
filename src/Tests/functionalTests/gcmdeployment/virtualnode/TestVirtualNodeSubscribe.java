@@ -62,9 +62,6 @@ public class TestVirtualNodeSubscribe extends FunctionalTest {
 
     @Before
     public void before() throws ProActiveException, FileNotFoundException {
-        VariableContractImpl vContract = new VariableContractImpl();
-        vContract.setVariableFromProgram(FunctionalTest.VAR_JVM_PARAMETERS, FunctionalTest.JVM_PARAMETERS
-                .toString(), VariableContractType.ProgramVariable);
         gcma = PAGCMDeployment.loadApplicationDescriptor(LocalHelpers.getDescriptor(this), vContract);
         vnGreedy = gcma.getVirtualNode("greedy");
         vnMaster = gcma.getVirtualNode("master");

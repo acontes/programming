@@ -50,12 +50,10 @@ public class GCMFunctionalTest extends FunctionalTest {
     static public final String VAR_OS = "os";
 
     public URL applicationDescriptor;
-    public VariableContractImpl vContract;
     public GCMApplication gcmad;
 
     public GCMFunctionalTest() {
-        vContract = new VariableContractImpl();
-        vContract.setVariableFromProgram(VAR_OS, OperatingSystem.getOperatingSystem().name(),
+        super.vContract.setVariableFromProgram(VAR_OS, OperatingSystem.getOperatingSystem().name(),
                 VariableContractType.DescriptorDefaultVariable);
 
     }
@@ -72,10 +70,7 @@ public class GCMFunctionalTest extends FunctionalTest {
             throw new IllegalStateException("deployment already started");
         }
 
-        vContract.setVariableFromProgram(FunctionalTest.VAR_JVM_PARAMETERS, FunctionalTest.JVM_PARAMETERS
-                .toString(), VariableContractType.ProgramVariable);
-
-        gcmad = PAGCMDeployment.loadApplicationDescriptor(applicationDescriptor, vContract);
+        gcmad = PAGCMDeployment.loadApplicationDescriptor(applicationDescriptor, super.vContract);
         gcmad.startDeployment();
     }
 
