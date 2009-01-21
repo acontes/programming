@@ -64,7 +64,7 @@ public class AbstractFTTezt extends FunctionalTest {
         this.server = new JVMProcessImpl(
             new org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger());
         this.server.setClassname("org.objectweb.proactive.core.body.ft.servers.StartFTServer");
-        this.server.setJvmOptions(FunctionalTest.JVM_PARAMETERS);
+        this.server.setJvmOptions(super.getJvmParameters());
         this.server.setParameters("-proto " + protocol);
         this.server.startProcess();
         try {

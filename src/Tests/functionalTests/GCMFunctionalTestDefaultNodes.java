@@ -73,12 +73,6 @@ public class GCMFunctionalTestDefaultNodes extends GCMFunctionalTest {
 
     }
 
-    @Override
-    public void startDeployment() throws ProActiveException {
-        logger.info(GCMFunctionalTest.class.getName() + " @Before: startDeployment");
-        super.startDeployment();
-    }
-
     public Node getANode() {
         return getANodeFrom(VN_NAME);
     }

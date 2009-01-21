@@ -8,8 +8,6 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.xml.VariableContractType;
-import org.objectweb.proactive.extra.forwardingv2.remoteobject.MessageRoutingRemoteObjectFactory;
 
 import performanceTests.HudsonReport;
 import functionalTests.GCMFunctionalTestDefaultNodes;
@@ -31,10 +29,6 @@ public class TestMessageRouting extends GCMFunctionalTestDefaultNodes {
 
     public TestMessageRouting() throws IOException {
         super(1, 1);
-        super.vContract.setVariableFromProgram(GCMFunctionalTestDefaultNodes.VAR_JVMARG,
-                PAProperties.PA_COMMUNICATION_PROTOCOL.getCmdLine() +
-                    MessageRoutingRemoteObjectFactory.PROTOCOL_ID,
-                VariableContractType.DescriptorDefaultVariable);
     }
 
     @Test

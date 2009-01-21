@@ -31,7 +31,6 @@
  */
 package performanceTests.bandwidth;
 
-import java.io.IOException;
 import java.io.Serializable;
 
 import org.junit.Test;
@@ -39,29 +38,17 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.xml.VariableContractType;
-import org.objectweb.proactive.extra.forwardingv2.remoteobject.MessageRoutingRemoteObjectFactory;
 
 import performanceTests.HudsonReport;
-import functionalTests.GCMFunctionalTestDefaultNodes;
 
 
 @SuppressWarnings("serial")
-public class TestMessageRouting extends GCMFunctionalTestDefaultNodes {
-    final static public byte buf[] = new byte[10 * 1024 * 1024]; // 1Mo
-
+public class TestMessageRouting extends Bandwidth {
     static {
         System.err.println("PLOP STATIC");
         PAProperties.PA_COMMUNICATION_PROTOCOL.setValue("pamr");
         PAProperties.PA_NET_ROUTER_PORT.setValue(0);
         PAProperties.PA_NET_ROUTER_ADDRESS.setValue("localhost");
-    }
-
-    public TestMessageRouting() throws IOException {
-        super(1, 1);
-        super.vContract.setVariableFromProgram(super.VAR_JVMARG, PAProperties.PA_COMMUNICATION_PROTOCOL
-                .getCmdLine() +
-            MessageRoutingRemoteObjectFactory.PROTOCOL_ID, VariableContractType.DescriptorDefaultVariable);
     }
 
     @Test
@@ -93,7 +80,7 @@ public class TestMessageRouting extends GCMFunctionalTestDefaultNodes {
 
         public void finish() {
             long endTime = System.currentTimeMillis();
-            double size = (1.0 * TestMessageRouting.buf.length * count) / (1024 * 1024);
+            double size = (1.0 * Bandwidth.buf.length * count) / (1024 * 1024);
 
             System.out.println("Size: " + size);
             System.out.println("Duration: " + (endTime - startTime));

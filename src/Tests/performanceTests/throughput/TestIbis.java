@@ -38,7 +38,6 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.xml.VariableContractType;
 
 import performanceTests.HudsonReport;
 import functionalTests.GCMFunctionalTestDefaultNodes;
@@ -51,9 +50,6 @@ public class TestIbis extends GCMFunctionalTestDefaultNodes {
 
     public TestIbis() {
         super(1, 1);
-        super.vContract.setVariableFromProgram(GCMFunctionalTestDefaultNodes.VAR_JVMARG,
-                PAProperties.PA_COMMUNICATION_PROTOCOL.getCmdLine() + "ibis",
-                VariableContractType.DescriptorDefaultVariable);
     }
 
     @Test

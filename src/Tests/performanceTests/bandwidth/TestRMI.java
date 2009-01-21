@@ -40,18 +40,11 @@ import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.node.NodeException;
 
 import performanceTests.HudsonReport;
-import functionalTests.GCMFunctionalTestDefaultNodes;
 
 
-public class TestRMI extends GCMFunctionalTestDefaultNodes {
-    final static public byte buf[] = new byte[10 * 1024 * 1024]; // 1Mo
-
+public class TestRMI extends Bandwidth {
     static {
         PAProperties.PA_COMMUNICATION_PROTOCOL.setValue("rmi");
-    }
-
-    public TestRMI() {
-        super(1, 1);
     }
 
     @Test
@@ -84,7 +77,7 @@ public class TestRMI extends GCMFunctionalTestDefaultNodes {
 
         public void finish() {
             long endTime = System.currentTimeMillis();
-            double size = (1.0 * TestRMI.buf.length * count) / (1024 * 1024);
+            double size = (1.0 * Bandwidth.buf.length * count) / (1024 * 1024);
 
             System.out.println("Size: " + size);
             System.out.println("Duration: " + (endTime - startTime));

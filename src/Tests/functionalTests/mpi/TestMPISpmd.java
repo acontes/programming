@@ -72,8 +72,8 @@ public class TestMPISpmd extends FunctionalTest {
         }
 
         VariableContractImpl vContract = new VariableContractImpl();
-        vContract.setVariableFromProgram(FunctionalTest.VAR_JVM_PARAMETERS, FunctionalTest.JVM_PARAMETERS
-                .toString(), VariableContractType.ProgramVariable);
+        vContract.setVariableFromProgram(FunctionalTest.VAR_JVM_PARAMETERS,
+                FunctionalTest.getJvmParameters(), VariableContractType.ProgramVariable);
 
         pad = PADeployment.getProactiveDescriptor(XML_FILE, vContract);
 

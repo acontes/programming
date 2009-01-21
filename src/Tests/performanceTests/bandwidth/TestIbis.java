@@ -38,24 +38,13 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.xml.VariableContractType;
 
 import performanceTests.HudsonReport;
-import functionalTests.GCMFunctionalTestDefaultNodes;
 
 
-public class TestIbis extends GCMFunctionalTestDefaultNodes {
+public class TestIbis extends Bandwidth {
     static {
         PAProperties.PA_COMMUNICATION_PROTOCOL.setValue("ibis");
-    }
-
-    final static public byte buf[] = new byte[10 * 1024 * 1024]; // 1Mo
-
-    public TestIbis() {
-        super(1, 1);
-        super.vContract.setVariableFromProgram(GCMFunctionalTestDefaultNodes.VAR_JVMARG,
-                PAProperties.PA_COMMUNICATION_PROTOCOL.getCmdLine() + "ibis",
-                VariableContractType.DescriptorDefaultVariable);
     }
 
     @Test
@@ -88,7 +77,7 @@ public class TestIbis extends GCMFunctionalTestDefaultNodes {
 
         public void finish() {
             long endTime = System.currentTimeMillis();
-            double size = (1.0 * TestIbis.buf.length * count) / (1024 * 1024);
+            double size = (1.0 * Bandwidth.buf.length * count) / (1024 * 1024);
 
             System.out.println("Size: " + size);
             System.out.println("Duration: " + (endTime - startTime));

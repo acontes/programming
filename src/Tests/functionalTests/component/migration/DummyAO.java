@@ -69,8 +69,8 @@ public class DummyAO implements Serializable {
         Map<String, ProActiveDescriptor> context = new HashMap<String, ProActiveDescriptor>();
 
         VariableContractImpl vContract = new VariableContractImpl();
-        vContract.setVariableFromProgram(GCMFunctionalTestDefaultNodes.VAR_JVM_PARAMETERS,
-                FunctionalTest.JVM_PARAMETERS, VariableContractType.ProgramVariable);
+        vContract.setVariableFromProgram(GCMFunctionalTestDefaultNodes.VAR_JVM_PARAMETERS, FunctionalTest
+                .getJvmParameters(), VariableContractType.ProgramVariable);
 
         ProActiveDescriptor deploymentDescriptor = PADeployment.getProactiveDescriptor(Test.class
                 .getResource("/functionalTests/component/descriptor/deploymentDescriptor.xml").getPath(),
@@ -141,8 +141,8 @@ public class DummyAO implements Serializable {
                 .toString(), VariableContractType.DescriptorDefaultVariable);
         vContract.setVariableFromProgram(GCMFunctionalTestDefaultNodes.VAR_VMCAPACITY, new Integer(1)
                 .toString(), VariableContractType.DescriptorDefaultVariable);
-        vContract.setVariableFromProgram(GCMFunctionalTestDefaultNodes.VAR_JVM_PARAMETERS,
-                FunctionalTest.JVM_PARAMETERS, VariableContractType.ProgramVariable);
+        vContract.setVariableFromProgram(GCMFunctionalTestDefaultNodes.VAR_JVM_PARAMETERS, FunctionalTest
+                .getJvmParameters(), VariableContractType.ProgramVariable);
 
         newDeploymentDescriptor = PAGCMDeployment.loadApplicationDescriptor(descriptorPath, vContract);
 

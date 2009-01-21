@@ -58,8 +58,8 @@ public class TestApplicationLevel extends FunctionalTest {
         URL desc = this.getClass().getResource("TestApplicationLevelApplication.xml");
 
         VariableContractImpl vc = new VariableContractImpl();
-        vc.setVariableFromProgram(FunctionalTest.VAR_JVM_PARAMETERS,
-                FunctionalTest.JVM_PARAMETERS.toString(), VariableContractType.ProgramVariable);
+        vc.setVariableFromProgram(FunctionalTest.VAR_JVM_PARAMETERS, FunctionalTest.getJvmParameters()
+                .toString(), VariableContractType.ProgramVariable);
         GCMApplication app = PAGCMDeployment.loadApplicationDescriptor(desc, vc);
         app.startDeployment();
         GCMVirtualNode vn = app.getVirtualNode("nodes");

@@ -56,17 +56,13 @@ import org.objectweb.proactive.extra.forwardingv2.remoteobject.MessageRoutingRem
 public class FunctionalTest {
     static final protected Logger logger = Logger.getLogger("testsuite");
 
-    static private ForwardingRegistry router;
     static final public String VAR_JVM_PARAMETERS = "JVM_PARAMETERS";
-    static final public String JVM_PARAMETERS;
-    static {
-        StringBuilder jvmParameters = new StringBuilder(" ");
-        jvmParameters.append("-Dproactive.test=true ");
+    static private ForwardingRegistry router;
 
+    @BeforeClass
+    static public void configureMessageRouting() {
         try {
-            jvmParameters.append(PAProperties.PA_COMMUNICATION_PROTOCOL.getCmdLine());
-            jvmParameters.append(PAProperties.PA_COMMUNICATION_PROTOCOL.getValue());
-            jvmParameters.append(" ");
+            // Configure the Message routing
             if (MessageRoutingRemoteObjectFactory.PROTOCOL_ID.equals(PAProperties.PA_COMMUNICATION_PROTOCOL
                     .getValue())) {
                 if (PAProperties.PA_NET_ROUTER_PORT.getValue() == null ||
@@ -76,21 +72,32 @@ public class FunctionalTest {
                 } else {
                     router = new ForwardingRegistry(PAProperties.PA_NET_ROUTER_PORT.getValueAsInt(), true);
                 }
-                logger.info("Started a message router on port " + router.getLocalPort());
-
-                jvmParameters.append(PAProperties.PA_NET_ROUTER_ADDRESS.getCmdLine());
-                jvmParameters.append(PAProperties.PA_NET_ROUTER_ADDRESS.getValue());
-                jvmParameters.append(" ");
-
-                jvmParameters.append(PAProperties.PA_NET_ROUTER_PORT.getCmdLine());
-                jvmParameters.append(PAProperties.PA_NET_ROUTER_PORT.getValue());
-                jvmParameters.append(" ");
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
 
-        JVM_PARAMETERS = jvmParameters.toString();
+    static public String getJvmParameters() {
+        StringBuilder jvmParameters = new StringBuilder(" ");
+        jvmParameters.append("-Dproactive.test=true ");
+
+        jvmParameters.append(PAProperties.PA_COMMUNICATION_PROTOCOL.getCmdLine());
+        jvmParameters.append(PAProperties.PA_COMMUNICATION_PROTOCOL.getValue());
+        jvmParameters.append(" ");
+
+        if (MessageRoutingRemoteObjectFactory.PROTOCOL_ID.equals(PAProperties.PA_COMMUNICATION_PROTOCOL
+                .getValue())) {
+            jvmParameters.append(PAProperties.PA_NET_ROUTER_ADDRESS.getCmdLine());
+            jvmParameters.append(PAProperties.PA_NET_ROUTER_ADDRESS.getValue());
+            jvmParameters.append(" ");
+
+            jvmParameters.append(PAProperties.PA_NET_ROUTER_PORT.getCmdLine());
+            jvmParameters.append(PAProperties.PA_NET_ROUTER_PORT.getValue());
+            jvmParameters.append(" ");
+        }
+
+        return jvmParameters.toString();
     }
 
     /** The amount of time given to a test to success or fail */
@@ -114,8 +121,8 @@ public class FunctionalTest {
 
     public FunctionalTest() {
         vContract = new VariableContractImpl();
-        vContract.setVariableFromProgram(FunctionalTest.VAR_JVM_PARAMETERS, FunctionalTest.JVM_PARAMETERS
-                .toString(), VariableContractType.ProgramVariable);
+        vContract.setVariableFromProgram(FunctionalTest.VAR_JVM_PARAMETERS, getJvmParameters(),
+                VariableContractType.ProgramVariable);
     }
 
     @BeforeClass
