@@ -249,9 +249,29 @@ public enum PAProperties {
     PA_NET_SECONDARYNAMES("proactive.net.secondaryNames", PAPropertiesType.STRING), SCHEMA_VALIDATION(
             "schema.validation", PAPropertiesType.BOOLEAN, true),
 
+    /** The address of the router to use. Must be set if message routing is enabled 
+     * 
+     * Can be FQDN or an IP address
+     */
     PA_NET_ROUTER_ADDRESS("proactive.net.router.address", PAPropertiesType.STRING),
 
+    /** The port of the router to use. Must be set if message routing is enabled
+     * 
+     */
     PA_NET_ROUTER_PORT("proactive.net.router.port", PAPropertiesType.INTEGER),
+
+    /** The number of worker in the client thread pool in charge of handling the messages
+     * 
+     * Message reception is single thread (only one thread reads the socket). But as soon as the
+     * message has been read, it is processed by a thread pool. This value defines the number of 
+     * worker in the thread pool.
+     *
+     * Unless your application heavily uses long lived immediate services, there is no need to customize this 
+     * value. Task processed by this thread pool are usually really short lived (compared to the cost 
+     * of reading the message from the network). 
+     */
+    PA_NET_ROUTER_CLIENT_HANDLER_THREADS("proactive.net.router.client.handler.thread",
+            PAPropertiesType.INTEGER),
 
     /* ------------------------------------
      *  RMI

@@ -3,6 +3,7 @@ package org.objectweb.proactive.extra.forwardingv2.client;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.DataRequestMessage;
@@ -15,15 +16,6 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.message.DataRequestMe
  */
 public class ProActiveMessageHandler implements MessageHandler {
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_CLIENT);
-    /**
-     * ThreadPool options:
-     * - CORE_POOL_SIZE: Initial size of the thread pool
-     * - MAX_POOL_SIZE: number of request served at the same time
-     * - KEEP_ALIVE_TIME: Time in seconds to keep the threads before decreasing the core pool size.
-     */
-    private static final int CORE_POOL_SIZE = 2;
-    private static final int MAX_POOL_SIZE = 4;
-    private static final long KEEP_ALIVE_TIME = 10;
 
     final private ExecutorService tpe;
 
@@ -31,7 +23,11 @@ public class ProActiveMessageHandler implements MessageHandler {
 
     public ProActiveMessageHandler(AgentV2Internal agent) {
         this.agent = agent;
-        tpe = Executors.newFixedThreadPool(10);
+
+        int workers = PAProperties.PA_NET_ROUTER_CLIENT_HANDLER_THREADS.getValueAsInt();
+        logger.debug("ProActiveMessageHandler threadpool has " + workers + " workers");
+        tpe = Executors.newFixedThreadPool(workers);
+
     }
 
     public void pushMessage(DataRequestMessage message) {

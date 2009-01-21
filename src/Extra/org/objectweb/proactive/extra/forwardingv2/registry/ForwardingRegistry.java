@@ -3,6 +3,7 @@ package org.objectweb.proactive.extra.forwardingv2.registry;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 
@@ -41,8 +42,7 @@ public class ForwardingRegistry implements Runnable {
         if (forked) {
             Thread t = new Thread(this);
             t.setDaemon(true);
-            t.setName("Message Router thread");
-
+            t.setName("Message Router: accept thread");
             t.start();
         } else {
             this.run();
@@ -88,8 +88,11 @@ public class ForwardingRegistry implements Runnable {
         this.routerIsReady.countDown();
         while (listening) {
             try {
-                Thread t = new Thread(new RegistrationHandler(serverSocket.accept(), this));
+                Socket socket = serverSocket.accept();
+                RegistrationHandler registrationHandler = new RegistrationHandler(socket, this);
+                Thread t = new Thread(registrationHandler);
                 t.setDaemon(true);
+                t.setName("Message router: handler for" + socket.getRemoteSocketAddress().toString());
                 t.start();
                 if (logger.isDebugEnabled()) {
                     logger.debug("FR created new RegistrationHandler");
