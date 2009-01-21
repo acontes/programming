@@ -93,7 +93,7 @@ public class TestMessageRouting extends GCMFunctionalTestDefaultNodes {
 
         public void finish() {
             long endTime = System.currentTimeMillis();
-            double size = (1.0 * TestRMI.buf.length * count) / (1024 * 1024);
+            double size = (1.0 * TestMessageRouting.buf.length * count) / (1024 * 1024);
 
             System.out.println("Size: " + size);
             System.out.println("Duration: " + (endTime - startTime));
@@ -118,7 +118,7 @@ public class TestMessageRouting extends GCMFunctionalTestDefaultNodes {
         public int startTest() {
             // Warmup
             for (int i = 0; i < 10; i++) {
-                server.serve(TestRMI.buf);
+                server.serve(TestMessageRouting.buf);
             }
             System.out.println("End of warmup");
 
@@ -128,7 +128,7 @@ public class TestMessageRouting extends GCMFunctionalTestDefaultNodes {
                         .getValueAsInt())
                     break;
 
-                server.serve(TestRMI.buf);
+                server.serve(TestMessageRouting.buf);
             }
             server.finish();
 
