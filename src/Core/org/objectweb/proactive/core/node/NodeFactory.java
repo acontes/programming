@@ -171,8 +171,18 @@ public class NodeFactory {
     /*
      * check if the node name does not conflict with halfbodiesnode name.
      */
-    private static boolean checkNodeName(String nodeUrl) {
-        return !nodeUrl.contains(HALFBODIES_NODE_NAME);
+    private static void checkNodeName(String nodeName) throws NodeException {
+        if (nodeName == null) {
+            throw new NodeException("Node name cannot be null");
+        }
+
+        if (!nodeName.matches("[a-zA-Z0-9_-]+")) {
+            throw new NodeException(nodeName + " is not a valid Node name");
+        }
+
+        if (nodeName.startsWith(HALFBODIES_NODE_NAME)) {
+            throw new NodeException(nodeName + " is a reserved Node name");
+        }
     }
 
     /**
@@ -214,10 +224,8 @@ public class NodeFactory {
             AlreadyBoundException {
         ProActiveRuntime proActiveRuntime;
 
-        if (!checkNodeName(nodeName)) {
-            throw new NodeException(nodeName + " is not a valid url for a node. A node URL cannot contain " +
-                HALFBODIES_NODE_NAME);
-        }
+        // Throws an Exception is the name is invalid
+        checkNodeName(nodeName);
 
         if (logger.isDebugEnabled()) {
             logger.debug("NodeFactory: createNode(" + nodeName + ")");
