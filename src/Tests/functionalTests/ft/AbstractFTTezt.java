@@ -91,10 +91,9 @@ public class AbstractFTTezt extends FunctionalTest {
         GCMVirtualNode vnode;
 
         //	create nodes
-        VariableContractImpl vContract = new VariableContractImpl();
-        vContract.setVariableFromProgram(GCMFunctionalTestDefaultNodes.VAR_HOSTCAPACITY, "4",
+        super.vContract.setVariableFromProgram(GCMFunctionalTestDefaultNodes.VAR_HOSTCAPACITY, "4",
                 VariableContractType.DescriptorDefaultVariable);
-        vContract.setVariableFromProgram(GCMFunctionalTestDefaultNodes.VAR_VMCAPACITY, "1",
+        super.vContract.setVariableFromProgram(GCMFunctionalTestDefaultNodes.VAR_VMCAPACITY, "1",
                 VariableContractType.DescriptorDefaultVariable);
 
         gcma = PAGCMDeployment.loadApplicationDescriptor(gcmApplicationFile, vContract);
