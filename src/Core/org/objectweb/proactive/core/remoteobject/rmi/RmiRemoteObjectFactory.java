@@ -256,7 +256,8 @@ public class RmiRemoteObjectFactory extends AbstractRemoteObjectFactory implemen
     }
 
     public URI getBaseURI() {
-        return URIBuilder.buildURI(ProActiveInet.getInstance().getHostname(), "");
+        return URIBuilder.buildURI(ProActiveInet.getInstance().getHostname(), "",
+                Constants.RMI_PROTOCOL_IDENTIFIER);
     }
 
 }
