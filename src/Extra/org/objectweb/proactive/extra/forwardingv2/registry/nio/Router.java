@@ -69,6 +69,7 @@ public class Router {
             try {
                 selector.select();
             } catch (IOException e1) {
+                // an error occurred while selecting, what should be done ?
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
             }
@@ -83,13 +84,11 @@ public class Router {
                     // Accept the new connection
                     handleAccept(key);
                     it.remove();
-                    // TODO: log the fact that we got a connection from sc
                 }
 
                 else if ((key.readyOps() & SelectionKey.OP_READ) == SelectionKey.OP_READ) {
                     handleRead(key);
                     it.remove();
-                    // TODO: log the reading operation
                 }
             }
         }
@@ -111,7 +110,7 @@ public class Router {
 
         } catch (IOException e) {
             // TODO Auto-generated catch block
-            // Failed during initialization, notify and exit.
+            // Failed during initialization: notify and stop the router.
             e.printStackTrace();
         }
     }
@@ -129,6 +128,7 @@ public class Router {
             // Add the new connection in our Map 
             socketChannelToChannelHandlerMap.put(sc, new ChannelHandler(this, sc));
         } catch (IOException e) {
+            // An error occurred while accepting a new connection, what should be done ? stop the router ? simply clean this connection ?
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -147,6 +147,7 @@ public class Router {
             try {
                 r = sc.read(buffer);
             } catch (IOException e) {
+                // an error occurred while reading from the channel. What to do ? Clean this SocketChannel connection
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
@@ -156,8 +157,8 @@ public class Router {
             }
 
             ChannelHandler handler = socketChannelToChannelHandlerMap.get(sc);
-            if (handler == null) { // should never happen except in case of an error
-                // TODO: handle this case, notify to registry, clean registry, send error message to client
+            if (handler == null) { // should not happen
+                // TODO: handle this case, notify to router, clean router, send error message to client
             }
 
             else {
@@ -216,6 +217,7 @@ public class Router {
         return channelHandler;
     }
 
+    //TODO: should this method be synchronized ?
     public void submitTask(Runnable task) {
         tpe.submit(task);
     }

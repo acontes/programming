@@ -175,7 +175,6 @@ public class ChannelHandler {
             return;
         }
 
-        //TODO: check this
         connected = false; // this is a transition ChannelHandler...
 
         // if the received agentID is known, proceed to the reconnection of a disconnected former ChannelHandler
@@ -195,7 +194,7 @@ public class ChannelHandler {
             logger.debug("CH added new mapping for uniqueID " + agentID.getId());
         }
         // Prepare registration reply and write it
-        write(new RegistrationReplyMessage(agentID).toByteBuffer(), false);
+        write(this, new RegistrationReplyMessage(agentID).toByteBuffer(), false);
     }
 
     /**
@@ -218,7 +217,7 @@ public class ChannelHandler {
 
         // send a registration reply
         // TODO: do we need to send buffered messages immediately or should we try to be fair regarding the number of messages sent by ChannelHandler
-        write(new RegistrationReplyMessage(agentID).toByteBuffer(), false);
+        write(this, new RegistrationReplyMessage(agentID).toByteBuffer(), false);
     }
 
     private void handleDataMessage(ByteBuffer msg, MessageType type) {
@@ -230,18 +229,18 @@ public class ChannelHandler {
         }
         // if dstChannelHandler is null we catch an UnknownAgentIdException
         catch (UnknownAgentIdException e) {
-            write(new ErrorMessage(MessageType.ERR_UNKNOW_RCPT, dstAgentID, agentID, ForwardedMessage
+            write(this, new ErrorMessage(MessageType.ERR_UNKNOW_RCPT, dstAgentID, agentID, ForwardedMessage
                     .readMessageID(msg), e).toByteBuffer(), false);
             return;
         }
         // the recipient is known, check if it is connected
         if (!dstChannelHandler.isConnected()) {
             // the recipient is known but disconnected
-            handleMessageCaching(msg, type, dstAgentID, dstChannelHandler, new AgentNotConnectedException(
-                "dstAgentID[" + dstAgentID.getId() + "] disconnected"), false);
+            handleDisconnectedRecipient(msg, type, dstAgentID, dstChannelHandler,
+                    new AgentNotConnectedException("dstAgentID[" + dstAgentID.getId() + "] disconnected"));
         } else {
             // at this point the recipient is known, and connected, forward the message
-            dstChannelHandler.write(msg, false);
+            dstChannelHandler.write(this, msg, false);
         }
     }
 
@@ -257,8 +256,8 @@ public class ChannelHandler {
      * @param e the exception detailing which error occurred.
      * @param first whether the message to cache should be added at the beginning or at the end of {@link #messagesToWrite} list
      */
-    public void handleMessageCaching(ByteBuffer msg, MessageType type, AgentID dstAgentID,
-            ChannelHandler dstChannelHandler, IOException e, boolean first) {
+    private void handleDisconnectedRecipient(ByteBuffer msg, MessageType type, AgentID dstAgentID,
+            ChannelHandler dstChannelHandler, IOException e) {
         switch (type) {
             case DATA_REQUEST: // log and send an error message
                 if (logger.isDebugEnabled()) {
@@ -267,8 +266,8 @@ public class ChannelHandler {
                         "] could not be sent, returning error message");
                 }
                 // send error message
-                write(new ErrorMessage(MessageType.ERR_DISCONNECTED_RCPT, dstAgentID, agentID,
-                    ForwardedMessage.readMessageID(msg), e).toByteBuffer(), first);
+                write(this, new ErrorMessage(MessageType.ERR_DISCONNECTED_RCPT, dstAgentID, agentID,
+                    ForwardedMessage.readMessageID(msg), e).toByteBuffer(), false);
                 break;
             case DATA_REPLY: // cache reply
                 if (logger.isDebugEnabled()) {
@@ -276,10 +275,8 @@ public class ChannelHandler {
                         "] [dstAgentID: " + dstAgentID.getId() + "] could not be sent, caching reply");
                 }
                 // cache the reply (at this point the status of dstChannelHandler should be not connected)
-                dstChannelHandler.write(msg, first);
+                dstChannelHandler.write(this, msg, false);
                 break;
-            case ERR_DISCONNECTED_RCPT:
-            case ERR_UNKNOW_RCPT:
             default:
                 break;
         }
@@ -294,13 +291,13 @@ public class ChannelHandler {
      * @param msg the message to send
      * @param first whether the message to send should be added at the beginning or at the end of the {@link #messagesToWrite} list if needed
      */
-
-    private void write(ByteBuffer msg, boolean first) {
+    // TODO: should this method be synchronized ?
+    public void write(ChannelHandler srcChannelHandler, ByteBuffer msg, boolean first) {
         /* if this is a Registration Reply, the status of the channelHandler might be "not connected" in the case of a reconnection.
          * In this case we by pass the test (!writing && connected), because this channel handler can't be writing (it is trying to connect) and we need to send the message in the case of a reconnection
          */
         if ((Message.readType(msg) == MessageType.REGISTRATION_REPLY) || (!writing && connected)) {
-            MessageProcessor msgProcessor = new MessageProcessor(this, agentID, sc, msg);
+            MessageProcessor msgProcessor = new MessageProcessor(srcChannelHandler, this, msg);
             router.submitTask(msgProcessor);
             writing = true;
         } else {
@@ -315,10 +312,22 @@ public class ChannelHandler {
     /**
      * if this channel handler is connected and has a message to write, submit it
      * Else set writing to false 
+     * Note that the next message can only be a ForwardedMessage. Indeed, a registration message can never be in the list {@link #messagesToWrite}
+     * Note that if a message is in the list messagesToWrite, it means that it has been aggregated by its srcChannelHandler. This srcChannelHandler might be disconnected but can't be unknown.
      */
     public void submitNextMessage() {
         if (!messagesToWrite.isEmpty() && connected) {
-            MessageProcessor msgProcessor = new MessageProcessor(this, agentID, sc, messagesToWrite.remove(0));
+            ByteBuffer msg = messagesToWrite.remove(0); // is necessarily a forwarded message
+            AgentID srcAgentID = ForwardedMessage.readSrcAgentID(msg);
+            ChannelHandler srcChannelHandler = null;
+            try {
+                srcChannelHandler = router.getValueFromHashMap(srcAgentID);
+            } catch (UnknownAgentIdException e) {
+                // Should never occur: if a message is in the list messagesToWrite, it means that it has been aggregated by its srcChannelHandler. This srcChannelHandler might be disconnected but can't be unknown. 
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            MessageProcessor msgProcessor = new MessageProcessor(srcChannelHandler, this, msg);
             router.submitTask(msgProcessor);
         } else {
             writing = false;
@@ -352,6 +361,14 @@ public class ChannelHandler {
         if (removeAgentIDMapping) {
             router.removeMapping(agentID);
         }
+    }
+
+    public AgentID getAgentID() {
+        return agentID;
+    }
+
+    public SocketChannel getSc() {
+        return sc;
     }
 
     public boolean isConnected() {

@@ -120,9 +120,18 @@ public abstract class ForwardedMessage extends Message {
      * @param offset the offset at which to find the beginning of the message in the buffer
      * @return the srcAgentID of the formatted message
      */
-    private AgentID readSrcAgentID(byte[] byteArray, int offset) {
+    public static AgentID readSrcAgentID(byte[] byteArray, int offset) {
         return new AgentID(TypeHelper.byteArrayToLong(byteArray, offset +
             Offsets.SRC_AGENT_ID_OFFSET.getValue()));
+    }
+
+    /**
+     * Reads the dstAgentID of a formatted message beginning at a certain offset inside a buffer. Encapsulates it in an AgentID object.
+     * @param buffer the ByteBuffer in which to read 
+     * @return the dstAgentID of the formatted message
+     */
+    public static AgentID readSrcAgentID(ByteBuffer buffer) {
+        return new AgentID(buffer.getLong(Offsets.SRC_AGENT_ID_OFFSET.getValue()));
     }
 
     /**

@@ -15,16 +15,20 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message.Messa
 public class MessageProcessor implements Runnable {
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_ROUTER);
 
-    ChannelHandler channelHandler;
-    AgentID agentID;
+    ChannelHandler srcChannelHandler;
+    ChannelHandler dstChannelHandler;
+    AgentID dstAgentID;
     SocketChannel sc;
     ByteBuffer msg;
+    MessageType type;
 
-    public MessageProcessor(ChannelHandler channelHandler, AgentID agentID, SocketChannel sc, ByteBuffer msg) {
-        this.channelHandler = channelHandler;
-        this.agentID = agentID;
-        this.sc = sc;
+    public MessageProcessor(ChannelHandler srcChannelHandler, ChannelHandler dstChannelHandler, ByteBuffer msg) {
+        this.srcChannelHandler = srcChannelHandler;
+        this.dstChannelHandler = dstChannelHandler;
+        this.dstAgentID = dstChannelHandler.getAgentID();
+        this.sc = dstChannelHandler.getSc();
         this.msg = msg;
+        this.type = Message.readType(msg);
     }
 
     @Override
@@ -32,7 +36,6 @@ public class MessageProcessor implements Runnable {
 
         msg.flip();
 
-        MessageType type = Message.readType(msg);
         switch (type) {
             case REGISTRATION_REPLY:
                 processRegistrationReply();
@@ -52,35 +55,80 @@ public class MessageProcessor implements Runnable {
         }
 
         // submit next message
-        channelHandler.submitNextMessage();
+        dstChannelHandler.submitNextMessage();
     }
 
+    /**
+     * try sending the registration reply.
+     * If it works, then set the status of the ChannelHandler to connected.
+     * Else log the failure and clean the router
+     */
     private void processRegistrationReply() {
         try {
             sc.write(msg);
         } catch (IOException e) {
-            // could not send a registration Reply, log error and clean HashMaps
+            // could not send a registration Reply, log error and clean router
             if (logger.isDebugEnabled()) {
-                logger.warn("Failed to send a registration reply for agentID: " + agentID.getId() +
+                logger.warn("Failed to send registration reply for dstAgentID: " + dstAgentID.getId() +
                     ". Cleaning this connection");
             }
             // the cleaning is not the same if it was a reply to a reconnection or a reply to a new connection			
-            // if it was a new connection: the channelHandler status is true by default
-            // Else if it was a reconnection: the channelHandler status is false at this point
-            channelHandler.stop(!channelHandler.isConnected());
+            // if it was a new connection: the dstChannelHandler status is true by default
+            // Else if it was a reconnection: the dstChannelHandler status is false at this point
+            dstChannelHandler.stop(!dstChannelHandler.isConnected());
+            return;
         }
+        dstChannelHandler.setConnected(true); // for the case of a reconnection
     }
 
     private void processDataReply() {
-
+        try {
+            sc.write(msg);
+        } catch (IOException e) {
+            // could not send a Data Reply, log error, cache reply, clean router
+            if (logger.isDebugEnabled()) {
+                logger.warn("Failed to send data reply for dstAgentID: " + dstAgentID.getId() +
+                    ". Caching reply and Cleaning this connection");
+            }
+            // clean handler
+            dstChannelHandler.stop(false);
+            // cache reply
+            dstChannelHandler.write(srcChannelHandler, msg, true);
+            return;
+        }
     }
 
     private void processDataRequest() {
-
+        try {
+            sc.write(msg);
+        } catch (IOException e) {
+            // could not send a Data Request, log error, return error message, clean router
+            if (logger.isDebugEnabled()) {
+                logger.warn("Failed to send data request for dstAgentID: " + dstAgentID.getId() +
+                    ". Returning error message to sender and Cleaning this connection");
+            }
+            // clean router
+            dstChannelHandler.stop(false);
+            // return error message
+            srcChannelHandler.write(dstChannelHandler, msg, false);
+            return;
+        }
     }
 
     private void processErrorMsg() {
-
+        try {
+            sc.write(msg);
+        } catch (IOException e) {
+            // could not send an Error Message, log error, cache Error Message, clean router
+            if (logger.isDebugEnabled()) {
+                logger.warn("Failed to send error message for dstAgentID: " + dstAgentID.getId() +
+                    ". Caching Error Message and Cleaning this connection");
+            }
+            // clean handler
+            dstChannelHandler.stop(false);
+            // cache ErrorMessage
+            dstChannelHandler.write(srcChannelHandler, msg, true);
+            return;
+        }
     }
-
 }
