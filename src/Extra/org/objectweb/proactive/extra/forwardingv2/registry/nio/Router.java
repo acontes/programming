@@ -11,6 +11,8 @@ import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -24,7 +26,22 @@ public class Router {
     static public final int DEFAULT_SERVER_PORT = 2099;
     static public final int BUFFER_CAPACITY = 2048;
 
-    // TODO: handle the cases where a connection fails: clean the maps 
+    /**
+     * ThreadPool options:
+     * - CORE_POOL_SIZE: If there are less than CORE_POOL_SIZE threads, a new thread is created for each new task (even if an existing thread is available). If there are more than CORE_POOL_SIZE threads, a new thread is created only if the queue of tasks is full.
+     * Note that there might be more than CORE_POOL_SIZE threads only if the queue of tasks is bounded.
+     * - MAX_POOL_SIZE: Max number of threads if the task queue is bounded. Else, if the queue is unbounded, CORE_POOL_SIZE is the max number of threads since the queue can never be full.
+     * - KEEP_ALIVE_TIME: if there are more than CORE_POOL_SIZE threads, excess threads will be terminated if they have been idle for more than the KeepAliveTime (in seconds).
+     * Note that in the case of an unbounded queue, since there can't be more than CORE_POOL_SIZE threads, the KEEP_ALIVE_TIME won't be applied. Thus once the number of threads has reached CORE_POOL_SIZE, it remains constant.
+     */
+    private static final int CORE_POOL_SIZE = 10;
+
+    // useless here because we use an unbounded queue of tasks.
+    // private static final int MAX_POOL_SIZE = 20; 
+    // private static final long KEEP_ALIVE_TIME = 10;
+
+    private final ExecutorService tpe;
+
     private final ConcurrentHashMap<SocketChannel, ChannelHandler> socketChannelToChannelHandlerMap = new ConcurrentHashMap<SocketChannel, ChannelHandler>();
     private final ConcurrentHashMap<AgentID, ChannelHandler> agentIDtoChannelHandlerMap = new ConcurrentHashMap<AgentID, ChannelHandler>();
 
@@ -36,6 +53,9 @@ public class Router {
 
     public Router(int listeningPort) {
         this.listeningPort = listeningPort;
+
+        // a FixedThreadPool operates off a shared UNBOUNDED queue of tasks. Thus the number of threads is indeed fixed once it has reached CORE_POOL_SIZE
+        tpe = Executors.newFixedThreadPool(CORE_POOL_SIZE);
     }
 
     public void start() {
@@ -147,7 +167,8 @@ public class Router {
     }
 
     /**
-     * Adds a mapping to the {@link #agentIDtoChannelHandlerMap}
+     * If a mapping for the key given as a parameter exists, replaces the value of this mapping with the value given as a parameter.
+     * Else, adds a mapping to {@link #agentIDtoChannelHandlerMap}.
      * @param srcAgentID
      * @param channelHandler
      */
@@ -155,7 +176,38 @@ public class Router {
         agentIDtoChannelHandlerMap.put(srcAgentID, channelHandler);
     }
 
-    public ChannelHandler getChannelHandlerFromAgentID(AgentID key) throws UnknownAgentIdException {
+    /**
+     * If a mapping for the key given as a parameter exists, replaces the value of this mapping with the value given as a parameter.
+     * Else, adds a mapping to {@link #socketChannelToChannelHandlerMap}.
+     * @param socketChannel
+     * @param channelHandler
+     */
+    public void putMapping(SocketChannel socketChannel, ChannelHandler channelHandler) {
+        socketChannelToChannelHandlerMap.put(socketChannel, channelHandler);
+    }
+
+    /**
+     * Removes a mapping from {@link #socketChannelToChannelHandlerMap}
+     * @param key
+     */
+    public void removeMapping(SocketChannel key) {
+        socketChannelToChannelHandlerMap.remove(key);
+    }
+
+    /**
+     * Removes a mapping from {{@link #agentIDtoChannelHandlerMap}}
+     * @param key
+     */
+    public void removeMapping(AgentID key) {
+        agentIDtoChannelHandlerMap.remove(key);
+    }
+
+    /**
+     * @param key The AgentID for which to find the ChannelHandler
+     * @return The ChannelHandler associated with the key
+     * @throws UnknownAgentIdException If no ChannelHandler was found
+     */
+    public ChannelHandler getValueFromHashMap(AgentID key) throws UnknownAgentIdException {
         ChannelHandler channelHandler = agentIDtoChannelHandlerMap.get(key);
         if (channelHandler == null) {
             throw new UnknownAgentIdException("no tunnel registered for AgentID :" + key.getId());
@@ -163,4 +215,7 @@ public class Router {
         return channelHandler;
     }
 
+    public void submitTask(Runnable task) {
+        tpe.submit(task);
+    }
 }
