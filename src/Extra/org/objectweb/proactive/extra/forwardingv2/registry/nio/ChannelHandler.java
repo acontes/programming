@@ -11,6 +11,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.forwardingv2.exceptions.AgentNotConnectedException;
 import org.objectweb.proactive.extra.forwardingv2.exceptions.UnknownAgentIdException;
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.ErrorMessage;
@@ -117,9 +118,7 @@ public class ChannelHandler {
                 break;
             case DATA_REPLY:
             case DATA_REQUEST:
-            case ERR_DISCONNECTED_RCPT:
-            case ERR_UNKNOW_RCPT:
-                handleForwardedMessage(msg);
+                handleDataMessage(msg, type);
                 break;
             default:
                 break;
@@ -196,7 +195,7 @@ public class ChannelHandler {
             logger.debug("CH added new mapping for uniqueID " + agentID.getId());
         }
         // Prepare registration reply and write it
-        write(new RegistrationReplyMessage(agentID).toByteBuffer());
+        write(new RegistrationReplyMessage(agentID).toByteBuffer(), false);
     }
 
     /**
@@ -219,39 +218,71 @@ public class ChannelHandler {
 
         // send a registration reply
         // TODO: do we need to send buffered messages immediately or should we try to be fair regarding the number of messages sent by ChannelHandler
-        write(new RegistrationReplyMessage(agentID).toByteBuffer());
+        write(new RegistrationReplyMessage(agentID).toByteBuffer(), false);
     }
 
-    private void handleForwardedMessage(ByteBuffer msg) {
+    private void handleDataMessage(ByteBuffer msg, MessageType type) {
         ChannelHandler dstChannelHandler = null;
         AgentID dstAgentID = ForwardedMessage.readDstAgentID(msg);
 
         try {
             dstChannelHandler = router.getValueFromHashMap(dstAgentID);
         }
-        // if channelHandler is null we catch an UnknownAgentIdException
+        // if dstChannelHandler is null we catch an UnknownAgentIdException
         catch (UnknownAgentIdException e) {
             write(new ErrorMessage(MessageType.ERR_UNKNOW_RCPT, dstAgentID, agentID, ForwardedMessage
-                    .readMessageID(msg), e).toByteBuffer());
+                    .readMessageID(msg), e).toByteBuffer(), false);
             return;
         }
+        // the recipient is known, check if it is connected
+        if (!dstChannelHandler.isConnected()) {
+            // the recipient is known but disconnected
+            handleMessageCaching(msg, type, dstAgentID, dstChannelHandler, new AgentNotConnectedException(
+                "dstAgentID[" + dstAgentID.getId() + "] disconnected"), false);
+        } else {
+            // at this point the recipient is known, and connected, forward the message
+            dstChannelHandler.write(msg, false);
+        }
+    }
 
-        // else just forward the message
-        // TODO: handle the Remote connection problem (either here or in the write() function)
-        //		try {
-        dstChannelHandler.write(msg);
-        /*		} catch (RemoteConnectionBrokenException e) {
-         // could not send the message to its destination, notify the source by sending an ExceptionMessage
-         try {
-         sendMessage(new ErrorMessage(MessageType.ERR_DISCONNECTED_RCPT, dstAgentID, agentID, msg
-         .getMsgID(), e).toByteArray());
-         } catch (RemoteConnectionBrokenException e1) {
-         // could not send a notification of the failure to the source, because the source tunnel has also failed... just stop the source tunnel
-         stop();
-         }
-         }
-         */
-
+    /**
+     * The exception given as a parameter can be an {@link AgentNotConnectedException} or another {@link IOException}.
+     * In the first case the recipient was not connected even before trying to send the message. 
+     * In the second case, a failure occurred while sending the message.
+     * In both cases the recipient is considered as disconnected in the logging since the second case implies a disconnection of the recipient.
+     * 
+     * @param msg the message that was being sent
+     * @param type the type of the message
+     * @param dstAgentID the recipient of the message
+     * @param e the exception detailing which error occurred.
+     * @param first whether the message to cache should be added at the beginning or at the end of {@link #messagesToWrite} list
+     */
+    public void handleMessageCaching(ByteBuffer msg, MessageType type, AgentID dstAgentID,
+            ChannelHandler dstChannelHandler, IOException e, boolean first) {
+        switch (type) {
+            case DATA_REQUEST: // log and send an error message
+                if (logger.isDebugEnabled()) {
+                    logger.debug("CH recipient disconnected, DataRequest [srcAgentID: " + agentID.getId() +
+                        "] [dstAgentID: " + dstAgentID.getId() +
+                        "] could not be sent, returning error message");
+                }
+                // send error message
+                write(new ErrorMessage(MessageType.ERR_DISCONNECTED_RCPT, dstAgentID, agentID,
+                    ForwardedMessage.readMessageID(msg), e).toByteBuffer(), first);
+                break;
+            case DATA_REPLY: // cache reply
+                if (logger.isDebugEnabled()) {
+                    logger.debug("CH recipient disconnected, DataReply [srcAgentID: " + agentID.getId() +
+                        "] [dstAgentID: " + dstAgentID.getId() + "] could not be sent, caching reply");
+                }
+                // cache the reply (at this point the status of dstChannelHandler should be not connected)
+                dstChannelHandler.write(msg, first);
+                break;
+            case ERR_DISCONNECTED_RCPT:
+            case ERR_UNKNOW_RCPT:
+            default:
+                break;
+        }
     }
 
     /**
@@ -259,26 +290,34 @@ public class ChannelHandler {
      * If a thread was already called (writing is true), then puts the message in the list of messagesToWrite, else submit a runnable to the thread pool. 
      * The runnable writes the message and then asks if it should send another message (ie if checks if the arrayList of messages to be written is empty or not). 
      * If yes it processes the new message, else it is released.
-     * @param buffer
+     * 
+     * @param msg the message to send
+     * @param first whether the message to send should be added at the beginning or at the end of the {@link #messagesToWrite} list if needed
      */
 
-    private void write(ByteBuffer msg) {
-        if (!writing) {
+    private void write(ByteBuffer msg, boolean first) {
+        /* if this is a Registration Reply, the status of the channelHandler might be "not connected" in the case of a reconnection.
+         * In this case we by pass the test (!writing && connected), because this channel handler can't be writing (it is trying to connect) and we need to send the message in the case of a reconnection
+         */
+        if ((Message.readType(msg) == MessageType.REGISTRATION_REPLY) || (!writing && connected)) {
             MessageProcessor msgProcessor = new MessageProcessor(this, agentID, sc, msg);
             router.submitTask(msgProcessor);
             writing = true;
         } else {
-            messagesToWrite.add(msg);
+            if (first) {
+                messagesToWrite.add(0, msg);
+            } else {
+                messagesToWrite.add(msg);
+            }
         }
     }
 
     /**
-     * check if there is a new message to submit for this channelHandler,
-     * if yes, submit it
+     * if this channel handler is connected and has a message to write, submit it
      * Else set writing to false 
      */
     public void submitNextMessage() {
-        if (!messagesToWrite.isEmpty()) {
+        if (!messagesToWrite.isEmpty() && connected) {
             MessageProcessor msgProcessor = new MessageProcessor(this, agentID, sc, messagesToWrite.remove(0));
             router.submitTask(msgProcessor);
         } else {

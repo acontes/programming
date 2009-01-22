@@ -212,6 +212,7 @@ public class Router {
         if (channelHandler == null) {
             throw new UnknownAgentIdException("no tunnel registered for AgentID :" + key.getId());
         }
+
         return channelHandler;
     }
 

@@ -36,13 +36,17 @@ public class MessageProcessor implements Runnable {
         switch (type) {
             case REGISTRATION_REPLY:
                 processRegistrationReply();
+                break;
             case DATA_REPLY:
                 processDataReply();
+                break;
             case DATA_REQUEST:
                 processDataRequest();
+                break;
             case ERR_DISCONNECTED_RCPT:
             case ERR_UNKNOW_RCPT:
                 processErrorMsg();
+                break;
             default:
                 break;
         }
