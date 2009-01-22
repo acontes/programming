@@ -9,6 +9,7 @@
 	<property name="classes.dir"           value="${base.dir}/classes"/>	
 	<property name="src.dir"               value="${base.dir}/src"/>
 	<property name="build.dir"             value="${base.dir}/dist"/>
+	<property name="lib.dir"             value="${base.dir}/lib"/>
 	<property name="meta.inf.dir"          value="${base.dir}/appserver"/>
 	<property name="proactive.lib.dir"     value="${proactive.home}/dist/lib"/>
 	
@@ -24,7 +25,7 @@
 	<property name="glassfishv2"     value="GlassfishV2"/>
 	<property name="geronimo21"      value="Geronimo-2.1"/>
 	
-	<target name="clean">
+	<target name="clean" description="Clean the output folders">
 		<delete dir="${classes.dir}" />
 		<delete dir="${build.dir}" />
     </target>
@@ -36,6 +37,9 @@
 	
 	<path id="connector.classpath">
 		<pathelement location="${classes.dir}"/>
+		<fileset dir="${lib.dir}">
+			<include name="**/*.jar"/>
+		</fileset>
 		<fileset dir="${proactive.lib.dir}">
 			<include name="**/*.jar"/>
 		</fileset>
@@ -132,7 +136,6 @@
 				<include name="xercesImpl.jar" />
 				<include name="xml-apis.jar" />
 				<include name="ProActive.jar" />
-				<include name="ProActive_examples.jar" />
 			</zipfileset>
 		</jar>
 		<delete dir="${build.dir}/${appserver}" quiet="true"/>
