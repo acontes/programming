@@ -35,6 +35,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.security.CodeSource;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -390,9 +391,9 @@ public class MethodCall implements java.io.Serializable, Cloneable {
         } catch (IllegalAccessException e) {
             throw new MethodCallExecutionFailedException("Access rights to the method denied: " + e);
         } catch (IllegalArgumentException e) {
+        	logger.error(" Target object is " + targetObject + "\n Class info for the target object:" + getClassIdentity(targetObject.getClass()), e);
             throw new MethodCallExecutionFailedException("Arguments for the method " + this.getName() +
-                " are invalid: " + e + " for the object " + targetObject + "(" +
-                targetObject.getClass().getName() + ")" , e );        
+                " are invalid: " , e );        
             }
     }
     
@@ -444,21 +445,43 @@ public class MethodCall implements java.io.Serializable, Cloneable {
         logger.debug("MethodCall.execute() name = " + this.getName());
         logger.debug("MethodCall.execute() reifiedMethod = " + this.reifiedMethod);
         logger.debug("MethodCall.execute() reifiedMethod.getDeclaringClass() = " +
-            this.reifiedMethod.getDeclaringClass());
-        logger.debug("MethodCall.execute() targetObject " + targetObject);
-        logger.debug("MethodCall.execute() arguments:" + (this.effectiveArguments.length==0 ? "none" : "") );
+            getClassIdentity(this.reifiedMethod.getDeclaringClass()));
+        logger.debug("MethodCall.execute() targetObject class" + getClassIdentity(targetObject.getClass()));
+        logger.debug("MethodCall.execute() effective arguments:" + (this.effectiveArguments.length==0 ? "none" : "") );
         for (int i = 0; i < this.effectiveArguments.length; i++) {
         	Object argument = this.effectiveArguments[i];
-        	logger.debug("MethodCall.execute() formal argument #" + i + "=" 
+        	logger.debug("MethodCall.execute() effective argument #" + i + "=" 
         				+ argument + ";" + ( argument != null ? argument.getClass() : "null" )
         			);
 		}
+        logger.debug("MethodCall.execute() formal arguments:" + (this.effectiveArguments.length==0 ? "none" : "") );
         Class<?>[] methodFormalParameters = this.reifiedMethod.getParameterTypes();
         for (int i = 0; i < methodFormalParameters.length; i++) {
         	Object argument = methodFormalParameters[i];
-        	logger.debug("MethodCall.execute() actual argument #" + i + "=" + argument );
+        	logger.debug("MethodCall.execute() formal argument #" + i + "=" + argument );
         }
 	}
+    
+    /*
+     * Prints info that uniquely identify the class given as parameter
+     * This info is the pair <name,classloader>
+     */
+    private String getClassIdentity(Class<?> clazz) {
+    	StringBuffer result = new StringBuffer();
+    	
+    	ClassLoader cl = clazz.getClassLoader();
+    	result.append( clazz.getName() + "(" + 
+    	               Integer.toHexString(clazz.hashCode()) + ").ClassLoader=" + cl + "\n");
+    	
+    	CodeSource clazzCS = clazz.getProtectionDomain().getCodeSource();
+    	if (clazzCS != null) {
+    	    result.append("++++CodeSource: "+clazzCS + "\n");
+    	} else {
+    	    result.append("++++Null CodeSource"+ "\n");
+    	}
+    	
+    	return result.toString();
+    }
 
 	@Override
     protected void finalize() {
