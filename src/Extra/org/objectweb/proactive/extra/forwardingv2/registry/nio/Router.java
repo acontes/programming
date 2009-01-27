@@ -241,7 +241,7 @@ public class Router {
         tpe.submit(task);
     }
 
-    private void stop() {
+    public void stop() {
 
         // Stop listening: close the ServerSocket, the ServerSocketChannel
         try {
