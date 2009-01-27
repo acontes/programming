@@ -26,7 +26,7 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message.Messa
 import org.objectweb.proactive.extra.forwardingv2.registry.nio.Router;
 
 
-public class TestForwardingRegistryNIO implements Runnable {
+public class TestForwardingRegistryNIO {
 
     static int port = 10000;
     Router reg = null;
@@ -37,23 +37,12 @@ public class TestForwardingRegistryNIO implements Runnable {
     @Before
     public void setup() throws IOException {
         System.out.println("----------------------- SETUP -------------------------");
-        this.reg = new Router(++port);
-        new Thread(this).start();
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        this.reg = new Router(++port, true);
     }
 
     @After
     public void tearDown() throws IOException {
         //reg.stop();
-    }
-
-    public void run() {
-        reg.start();
     }
 
     @Test
@@ -101,7 +90,7 @@ public class TestForwardingRegistryNIO implements Runnable {
         byte[] data = HttpMarshaller.marshallObject(mess);
 
         DataRequestMessage req = new DataRequestMessage(localID, targetID, 1l, data, false);
-
+        
         System.out.println("Sending Hello Message to Router.");
 
         tunnel.getOutputStream().write(req.toByteArray());
