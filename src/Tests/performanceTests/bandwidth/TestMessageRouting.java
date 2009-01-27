@@ -47,7 +47,7 @@ public class TestMessageRouting extends Bandwidth {
     static {
         System.err.println("PLOP STATIC");
         PAProperties.PA_COMMUNICATION_PROTOCOL.setValue("pamr");
-        PAProperties.PA_NET_ROUTER_PORT.setValue(0);
+        PAProperties.PA_NET_ROUTER_PORT.setValue(6567);
         PAProperties.PA_NET_ROUTER_ADDRESS.setValue("localhost");
     }
 
@@ -104,6 +104,7 @@ public class TestMessageRouting extends Bandwidth {
 
         public int startTest() {
             // Warmup
+            System.out.println("Begin warmup");
             for (int i = 0; i < 10; i++) {
                 server.serve(TestMessageRouting.buf);
             }

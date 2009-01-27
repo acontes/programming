@@ -64,7 +64,7 @@ public class Router implements Runnable {
 		init();
 
 		// add a shutdownHook
-		Runtime.getRuntime().addShutdownHook(new Thread(new RouterShutdownHook(this)));
+		//Runtime.getRuntime().addShutdownHook(new Thread(new RouterShutdownHook(this)));
 		
 		this.routerIsReady = new CountDownLatch(1);
 
@@ -147,7 +147,7 @@ public class Router implements Runnable {
 			// Accept the new connection TODO: (Here key.channel() should always be equal to ssc), replace the call by ssc ?
 			sc = ((ServerSocketChannel) key.channel()).accept();
 			if (logger.isDebugEnabled()) {
-				logger.debug("Router -> New connection from " + sc.socket().getInetAddress());
+				logger.trace("Router -> New connection from " + sc.socket().getInetAddress());
 			}
 			sc.configureBlocking(false);
 
@@ -161,7 +161,7 @@ public class Router implements Runnable {
 			try {
 				if (logger.isDebugEnabled()) {
 					logger
-					.debug("Router, an error occured while accepting a new connection. Closing the socket channel corresponding to this connection");
+					.warn("Router, an error occured while accepting a new connection. Closing the socket channel corresponding to this connection");
 				}
 				if (sc != null) {
 					sc.close();

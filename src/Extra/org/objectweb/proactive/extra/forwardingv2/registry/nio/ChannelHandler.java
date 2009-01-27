@@ -73,7 +73,7 @@ public class ChannelHandler {
             // absolute function, does not affect the position of the buffer
             length = buffer.getInt();
             if (logger.isDebugEnabled()) {
-                logger.debug("CH -> Start reading a new message; length = " + length);
+                logger.trace("CH -> Start reading a new message; length = " + length);
             }
             currentlyReadMessage = ByteBuffer.allocate(length);
             currentlyReadMessage.putInt(length);
@@ -133,7 +133,7 @@ public class ChannelHandler {
     private void handleRegistrationRequest(ByteBuffer msg) {
 
         if (logger.isDebugEnabled()) {
-            logger.debug("CH handling registration request");
+            logger.trace("CH handling registration request");
         }
 
         AgentID newAgentID = RegistrationMessage.readAgentID(msg);
@@ -163,7 +163,7 @@ public class ChannelHandler {
         this.agentID = newAgentID;
 
         if (logger.isDebugEnabled()) {
-            logger.debug("CH handling a re-connection request for agentID: " + agentID.getId());
+            logger.trace("CH handling a re-connection request for agentID: " + agentID.getId());
         }
         // find the former ChannelHandler associated with this agentID
         ChannelHandler formerCH = null;
@@ -193,10 +193,14 @@ public class ChannelHandler {
         // generate the agentID
         this.agentID = new AgentID(attributedAgentID.getAndIncrement());
 
+        if (logger.isDebugEnabled()) {
+            logger.trace("CH handling a new connection for agentID: " + agentID.getId());
+        }
+
         // add mapping in the HashMap
         router.putMapping(agentID, this);
         if (logger.isDebugEnabled()) {
-            logger.debug("CH added new mapping for uniqueID " + agentID.getId());
+            logger.trace("CH added new mapping for uniqueID " + agentID.getId());
         }
         // Prepare registration reply and write it
         ByteBuffer reply = new RegistrationReplyMessage(agentID).toByteBuffer();
@@ -233,8 +237,7 @@ public class ChannelHandler {
         AgentID dstAgentID = ForwardedMessage.readDstAgentID(msg);
 
         if (logger.isDebugEnabled()) {
-            AgentID srcAgentID = ForwardedMessage.readSrcAgentID(msg);
-            logger.debug("CH -> handling data message from " + srcAgentID + " to " + dstAgentID);
+            logger.trace("CH -> handling data message from " + agentID + " to " + dstAgentID);
         }
 
         try {
@@ -258,7 +261,7 @@ public class ChannelHandler {
         } else {
             // at this point the recipient is known, and connected, forward the message
             if (logger.isDebugEnabled()) {
-                logger.warn("CH -> Forwarding the message to Channel handler in charge of ID " + dstAgentID);
+                logger.trace("CH -> Forwarding the message to Channel handler in charge of ID " + dstAgentID);
             }
             dstChannelHandler.write(this, msg, false);
         }
@@ -281,7 +284,7 @@ public class ChannelHandler {
         switch (type) {
             case DATA_REQUEST: // log and send an error message
                 if (logger.isDebugEnabled()) {
-                    logger.debug("CH recipient disconnected, DataRequest [srcAgentID: " + agentID.getId() +
+                    logger.trace("CH recipient disconnected, DataRequest [srcAgentID: " + agentID.getId() +
                         "] [dstAgentID: " + dstAgentID.getId() +
                         "] could not be sent, returning error message");
                 }
@@ -291,7 +294,7 @@ public class ChannelHandler {
                 break;
             case DATA_REPLY: // cache reply
                 if (logger.isDebugEnabled()) {
-                    logger.debug("CH recipient disconnected, DataReply [srcAgentID: " + agentID.getId() +
+                    logger.trace("CH recipient disconnected, DataReply [srcAgentID: " + agentID.getId() +
                         "] [dstAgentID: " + dstAgentID.getId() + "] could not be sent, caching reply");
                 }
                 // cache the reply (at this point the status of dstChannelHandler should be not connected)

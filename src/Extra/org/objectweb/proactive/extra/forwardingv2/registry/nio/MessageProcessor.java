@@ -43,7 +43,7 @@ public class MessageProcessor implements Runnable {
 
     public void run() {
 
-        logger.debug("Message to write: " + msg.remaining());
+        logger.trace("Message to write: " + msg.remaining());
 
         switch (type) {
             case REGISTRATION_REPLY:
@@ -123,7 +123,7 @@ public class MessageProcessor implements Runnable {
             return;
         }
         if (logger.isDebugEnabled()) {
-            logger.debug("Data request correctly sent to destination: " + dstAgentID);
+            logger.trace("Data request correctly sent to destination: " + dstAgentID);
         }
     }
 

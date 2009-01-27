@@ -23,7 +23,7 @@ public class TestMessageRouting extends GCMFunctionalTestDefaultNodes {
 
     static {
         PAProperties.PA_COMMUNICATION_PROTOCOL.setValue("pamr");
-        PAProperties.PA_NET_ROUTER_PORT.setValue(0);
+        PAProperties.PA_NET_ROUTER_PORT.setValue(6567);
         PAProperties.PA_NET_ROUTER_ADDRESS.setValue("localhost");
     }
 
