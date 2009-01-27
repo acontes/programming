@@ -22,8 +22,11 @@
 	<property name="docs.mainFile" 			value="main.xml" />
 	<property name="snippets.location"		value="${docs.tmp.dir}/automatic_snippets" />
 	
-	
-	
+   <!-- Directory of xml configuration files for highlighting -->
+   <property name="docs.highlighting.dir" value="${docs.toolchain.dir}/highlighting"/>
+
+
+
 	<!-- DocBook --> 
 	<property name="docbook.version" 		value="ns-1.74.0" />
 	<property name="docbook.archive"                value="docbook-xsl-${docbook.version}" />
@@ -67,7 +70,6 @@
 	<property name="docs.docbook.dtd"			value="${docs.src.dir}/${docs.docbook.dtd.name}" />
 	<!--//FIXME ? for html files this is defined in html.xsl -->
 	<property name="docs.html.css.name"			value="main.css" />
-	
 	<!-- ================================================================ -->
 	<!--                   Javadoc build properties                       -->
 	<!--  =============================================================== -->

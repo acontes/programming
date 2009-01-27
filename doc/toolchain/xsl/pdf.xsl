@@ -8,6 +8,11 @@
 	<xsl:import
 		href="http://docbook.sourceforge.net/release/xsl/1.73.2/fo/docbook.xsl" />
 	<xsl:import href="common.xsl" />
+
+   <!-- Import profiled highlighting color -->
+   <xsl:import href="../highlighting/xsl/fo-hl.xsl" />
+
+
 	<!-- ignore the scaling values the someone might put in the XML files 
 		<xsl:param name="ignore.image.scaling" select="0">1</xsl:param>-->
 

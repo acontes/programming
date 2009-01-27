@@ -48,26 +48,16 @@
 	<target name="-docbookTransform"	>
 		<!-- Profiling step: keep only the tags which have the attribute os="${docbook.profile}" or no os attribute -->
 		<xslt basedir="${docs.src.dir}"  in="${docs.tmp.dir}/${docbookInputFile}" out="${docs.tmp.dir}/profiled.xml" style="${docs.xsl.profiling}" force="yes">
+         <xmlcatalog refid="docbookcatalog" />
 			<param name="profile.os" expression="${docbook.profile}" />
 			<!--docbook.profile can be html, pdf or empty-->
-			<xmlcatalog refid="docbookcatalog" />
 			<classpath refid="docs.utils.classpath" />
-
 		</xslt>
-
-		<!-- Do the real conversion, docbook to pdf or html -->
-		<xslt basedir="${docs.src.dir}" in="${docs.tmp.dir}/profiled.xml" out="${docbookOutputFile}" style="${docbookStyle}" force="yes">
-			<xmlcatalog refid="docbookcatalog" />
-			<param name="TODAY" expression="${TODAY}" />
-			<!-- the date for the first page -->
-			<param name="VERSION" expression="${version}" />
-			<!-- the version number, for the first page -->
-
-			<!-- Output dir for the chunked stylesheet-->
-			<param name="base.dir" expression="${docs.html.multiple.dir}"/>
+      <java classname="com.icl.saxon.StyleSheet" dir="${docbookOutputDir}" fork="true">
 			<classpath refid="docs.utils.classpath" />
-
-		</xslt>
+         <jvmarg value="-Dxslthl.config=file://${docs.highlighting.dir}/xml/xslthl-config.xml"/>
+         <arg line="-o ${docbookOutputFile} ${docs.tmp.dir}/profiled.xml ${docbookStyle}"/>
+      </java>
 	</target>
 	
 	
@@ -79,7 +69,9 @@
 
 		<!--   First translate into intermediate fo format -->
 		<antcall target="-docbookTransform">
+			<param name="docbookInputFile" value="${docs.mainFile}" />
 			<param name="docbookOutputFile" value="${fo.output}" />
+         <param name="docbookOutputDir"  value="${docs.pdf.dir}" />
 			<param name="docbookStyle" value="${docs.xsl.pdf}" />
 			<param name="docbook.profile" value="pdf" />
 		</antcall>
@@ -244,11 +236,6 @@
 			</fileset>
 		</copy>
 
-		<!-- Decorate the code a bit (code examples in programlistings) -->
-		<antcall target="-docbookBeautify">
-			<param name="docbookInputFile" value="${docs.mainFile}" />
-		</antcall>
-
 	</target>
 
 
@@ -262,6 +249,7 @@
 		<antcall target="-docbookTransform">
 			<param name="docbookInputFile" value="${docs.mainFile}" />
 			<param name="docbookOutputFile" value="${docs.html.multiple.output}" />
+			<param name="docbookOutputDir" value="${docs.html.multiple.dir}" />
 			<param name="docbookStyle" value="${docs.xsl.html.chunked}" />
 			<param name="docbook.profile" value="html" />
 		</antcall>
@@ -301,6 +289,7 @@
 		<antcall target="-docbookTransform">
 			<param name="docbookInputFile" value="${docs.mainFile}" />
 			<param name="docbookOutputFile" value="${docs.html.single.output}" />
+			<param name="docbookOutputDir" value="${docs.html.single.dir}" />
 			<param name="docbookStyle" value="${docs.xsl.html.one}" />
 			<param name="docbook.profile" value="html" />
 		</antcall>

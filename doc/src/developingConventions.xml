@@ -25,7 +25,7 @@
         
         
 
-        <programlisting xml:lang="java">/** Root logger for ProActive P2P. **/
+        <programlisting language="java">/** Root logger for ProActive P2P. **/
 public static final String P2P = "proactive.p2p";
 
 /** Sub logger for starting P2P service. */
@@ -43,16 +43,16 @@ public static final String P2P_FIRST_CONTACT = P2P + ".first_contact";</programl
 
       <para>Firstly, import good classes:</para>
 
-      <programlisting xml:lang="java">import org.objectweb.proactive.core.util.log.ProActiveLogger;
+      <programlisting language="java">import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.log.Loggers;</programlisting>
 
       <para>Secondly, get the logger or loggers:</para>
 
-      <programlisting xml:lang="java">private static final ProActiveLogger logger_acq = ProActiveLogger.getLogger(Loggers.P2P_ACQUAINTANCES);</programlisting>
+      <programlisting language="java">private static final ProActiveLogger logger_acq = ProActiveLogger.getLogger(Loggers.P2P_ACQUAINTANCES);</programlisting>
 
       <para>Thirdly, log your code:</para>
 
-      <programlisting xml:lang="java">if (logger.isDeubugEnable()) {
+      <programlisting language="java">if (logger.isDeubugEnable()) {
           logger_acq.debug("message log debug  level for P2P acquaintances managing");
        }</programlisting>
 
