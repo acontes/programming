@@ -24,27 +24,27 @@ xmlns:xslthl="http://xslthl.sf.net"
 </xsl:template>
 
 <xsl:template match='xslthl:comment'>
-  <i class="hl-comment" style="color: #018101"><xsl:apply-templates/></i>
+  <i class="hl-comment" style="color: #016101"><xsl:apply-templates/></i>
 </xsl:template>
 
 <xsl:template match='xslthl:tag'>
-  <b class="hl-tag" style="color: blue"><xsl:apply-templates/></b>
+  <b class="hl-tag"><i style="color: #0101ff"><xsl:apply-templates/></i></b>
 </xsl:template>
 
 <xsl:template match='xslthl:attribute'>
-  <span class="hl-attribute" style="color: red"><xsl:apply-templates/></span>
+  <span class="hl-attribute" style="color: #ff0101"><xsl:apply-templates/></span>
 </xsl:template>
 
 <xsl:template match='xslthl:value'>
-  <span class="hl-value" style="color: blue"><xsl:apply-templates/></span>
+  <span class="hl-value" style="color: #ff2aff"><xsl:apply-templates/></span>
 </xsl:template>
 
 <xsl:template match='xslthl:html'>
-  <b><i style="color: red"><xsl:apply-templates/></i></b>
+  <b><i style="color: #0101ff"><xsl:apply-templates/></i></b>
 </xsl:template>
 
 <xsl:template match='xslthl:xslt'>
-  <b style="color: blue"><xsl:apply-templates/></b>
+  <b style="color: #aa00ff"><xsl:apply-templates/></b>
 </xsl:template>
 
 <xsl:template match='xslthl:section'>
