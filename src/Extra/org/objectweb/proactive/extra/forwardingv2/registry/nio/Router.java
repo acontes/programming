@@ -59,6 +59,7 @@ public class Router {
     }
 
     public void start() {
+    	logger.debug("Starting Router on port "+listeningPort);
         Set<SelectionKey> selectedKeys = null;
         Iterator<SelectionKey> it;
         SelectionKey key;
@@ -107,7 +108,7 @@ public class Router {
 
             // register the listener with the selector
             ssc.register(selector, SelectionKey.OP_ACCEPT);
-
+            logger.debug("Router correctly started on port "+listeningPort);
         } catch (IOException e) {
             // TODO Auto-generated catch block
             // Failed during initialization: notify and stop the router.
@@ -221,4 +222,8 @@ public class Router {
     public void submitTask(Runnable task) {
         tpe.submit(task);
     }
+    
+    public static void main(String[] args) {
+		new  Router(6565).start();
+	}
 }
