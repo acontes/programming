@@ -11,6 +11,7 @@ import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -19,9 +20,10 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.forwardingv2.exceptions.UnknownAgentIdException;
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
+import org.objectweb.proactive.extra.forwardingv2.registry.ForwardingRegistry;
 
 
-public class Router {
+public class Router implements Runnable {
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_ROUTER);
     static public final int DEFAULT_SERVER_PORT = 2099;
     static public final int BUFFER_CAPACITY = 2048;
@@ -51,14 +53,36 @@ public class Router {
 
     private ServerSocket serverSocket = null;
 
-    public Router(int listeningPort) {
+    private CountDownLatch routerIsReady;
+
+    public Router(int listeningPort, boolean forked) {
         this.listeningPort = listeningPort;
 
         // a FixedThreadPool operates off a shared UNBOUNDED queue of tasks. Thus the number of threads is indeed fixed once it has reached CORE_POOL_SIZE
         tpe = Executors.newFixedThreadPool(CORE_POOL_SIZE);
+
+        this.routerIsReady = new CountDownLatch(1);
+        //        Runtime.getRuntime().addShutdownHook(new Thread(new RegistryShutdownHook(this)));
+
+        if (forked) {
+            Thread t = new Thread(this);
+            t.setDaemon(true);
+            t.setName("Message Router: accept thread");
+            t.start();
+        } else {
+            this.run();
+        }
+
+        do {
+            try {
+                routerIsReady.await();
+            } catch (InterruptedException e) {
+                // Miam Miam Miam
+            }
+        } while (routerIsReady.getCount() != 0);
     }
 
-    public void start() {
+    public void run() {
         logger.debug("Starting Router on port " + listeningPort);
         Set<SelectionKey> selectedKeys = null;
         Iterator<SelectionKey> it;
@@ -68,6 +92,7 @@ public class Router {
         Runtime.getRuntime().addShutdownHook(new Thread(new RouterShutdownHook(this)));
 
         init();
+        this.routerIsReady.countDown();
         while (true) {
             // select new keys
             try {
@@ -271,6 +296,30 @@ public class Router {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Generates a new Router and calls {@link #run()} function
+     * 
+     * @param args
+     *            : <-regport>
+     * @throws IOException 
+     */
+    public static void main(String[] args) throws IOException {
+        int port = DEFAULT_SERVER_PORT;
+        for (int i = 0; i < args.length; i++) {
+            if (args[i].equals("-port")) {
+                port = Integer.parseInt(args[++i]);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Router -> server port is: " + port);
+                }
+            } else {
+                System.out.println("Unknown option: " + args[i]);
+                System.exit(1);
+            }
+        }
+
+        Router router = new Router(port, false);
     }
 
     public class RouterShutdownHook implements Runnable {

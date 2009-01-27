@@ -29,9 +29,9 @@ public class MessageProcessor implements Runnable {
      * @param msg The message should be ready to be read
      */
     public MessageProcessor(ChannelHandler srcChannelHandler, ChannelHandler dstChannelHandler, ByteBuffer msg) {
-        if(!msg.hasRemaining()) {
-        	logger.warn("Message not ready to be read, flipping it. ");
-        	msg.flip();
+        if (!msg.hasRemaining()) {
+            logger.warn("Message not ready to be read, flipping it. ");
+            msg.flip();
         }
         this.srcChannelHandler = srcChannelHandler;
         this.dstChannelHandler = dstChannelHandler;
@@ -42,8 +42,8 @@ public class MessageProcessor implements Runnable {
     }
 
     public void run() {
-        
-    	logger.debug("Message to write: "+msg.remaining());
+
+        logger.debug("Message to write: " + msg.remaining());
 
         switch (type) {
             case REGISTRATION_REPLY:
@@ -123,7 +123,7 @@ public class MessageProcessor implements Runnable {
             return;
         }
         if (logger.isDebugEnabled()) {
-            logger.debug("Data request correctly sent to destination: "+dstAgentID);
+            logger.debug("Data request correctly sent to destination: " + dstAgentID);
         }
     }
 
