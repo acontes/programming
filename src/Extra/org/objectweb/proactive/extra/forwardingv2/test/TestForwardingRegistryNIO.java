@@ -101,7 +101,7 @@ public class TestForwardingRegistryNIO implements Runnable {
         byte[] data = HttpMarshaller.marshallObject(mess);
 
         DataRequestMessage req = new DataRequestMessage(localID, targetID, 1l, data, false);
-        
+
         System.out.println("Sending Hello Message to Router.");
 
         tunnel.getOutputStream().write(req.toByteArray());

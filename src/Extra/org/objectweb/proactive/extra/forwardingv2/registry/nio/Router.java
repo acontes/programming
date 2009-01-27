@@ -1,6 +1,7 @@
 package org.objectweb.proactive.extra.forwardingv2.registry.nio;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.nio.ByteBuffer;
@@ -60,13 +61,12 @@ public class Router implements Runnable {
 		// a FixedThreadPool operates off a shared UNBOUNDED queue of tasks. Thus the number of threads is indeed fixed once it has reached CORE_POOL_SIZE
 		tpe = Executors.newFixedThreadPool(CORE_POOL_SIZE);
 
-		// add a shutdownHook
-		Runtime.getRuntime().addShutdownHook(new Thread(new RouterShutdownHook(this)));
-
 		init();
 
+		// add a shutdownHook
+		Runtime.getRuntime().addShutdownHook(new Thread(new RouterShutdownHook(this)));
+		
 		this.routerIsReady = new CountDownLatch(1);
-		//        Runtime.getRuntime().addShutdownHook(new Thread(new RegistryShutdownHook(this)));
 
 		if (forked) {
 			Thread t = new Thread(this);
@@ -294,6 +294,36 @@ public class Router implements Runnable {
 		}
 	}
 
+    public int getLocalPort() {
+        return serverSocket.getLocalPort();
+    }
+
+    public InetAddress getInetAddress() {
+        return serverSocket.getInetAddress();
+    }
+	
+	
+    
+	public class RouterShutdownHook implements Runnable {
+
+		Router router;
+
+		/**
+		 * @param router the router to be stopped
+		 */
+		public RouterShutdownHook(Router router) {
+			this.router = router;
+		}
+
+		/**
+		 * stops the router
+		 */
+		public void run() {
+			router.stop();
+		}
+	}
+    
+    
 	/**
 	 * Generates a new Router and calls {@link #run()} function
 	 * 
@@ -316,24 +346,5 @@ public class Router implements Runnable {
 		}
 
 		Router router = new Router(port, false);
-	}
-
-	public class RouterShutdownHook implements Runnable {
-
-		Router router;
-
-		/**
-		 * @param router the router to be stopped
-		 */
-		public RouterShutdownHook(Router router) {
-			this.router = router;
-		}
-
-		/**
-		 * stops the router
-		 */
-		public void run() {
-			router.stop();
-		}
 	}
 }
