@@ -66,6 +66,20 @@ public class MessageProcessor implements Runnable {
         // submit next message
         dstChannelHandler.submitNextMessage();
     }
+    
+    /**
+     * Takes care of writing the totality of the message in the socketChannel
+     * @throws IOException
+     */
+    private void write() throws IOException {
+    	int nbToWrite = msg.remaining();
+    	
+    	int nbWritten = 0; 
+    		
+    	while (nbWritten < nbToWrite) {
+    		nbWritten += sc.write(msg);
+    	}
+    }
 
     /**
      * try sending the registration reply.
@@ -74,7 +88,7 @@ public class MessageProcessor implements Runnable {
      */
     private void processRegistrationReply() {
         try {
-            sc.write(msg);
+           write();
         } catch (IOException e) {
             // could not send a registration Reply, log error and clean router
             if (logger.isDebugEnabled()) {
@@ -92,7 +106,7 @@ public class MessageProcessor implements Runnable {
 
     private void processDataReply() {
         try {
-            sc.write(msg);
+           write();
         } catch (IOException e) {
             // could not send a Data Reply, log error, cache reply, clean router
             if (logger.isDebugEnabled()) {
@@ -109,7 +123,7 @@ public class MessageProcessor implements Runnable {
 
     private void processDataRequest() {
         try {
-            sc.write(msg);
+           write();
         } catch (IOException e) {
             // could not send a Data Request, log error, return error message, clean router
             if (logger.isDebugEnabled()) {
@@ -129,7 +143,7 @@ public class MessageProcessor implements Runnable {
 
     private void processErrorMsg() {
         try {
-            sc.write(msg);
+           write();
         } catch (IOException e) {
             // could not send an Error Message, log error, cache Error Message, clean router
             if (logger.isDebugEnabled()) {
