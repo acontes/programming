@@ -100,10 +100,11 @@ public abstract class ForwardedMessage extends Message {
         }
         buffer.putLong(Offsets.MSG_ID_OFFSET.getValue(), msgID);
 
+        buffer.position(FORWARDED_MESSAGE_HEADER_LENGTH);
         if (data != null) {
-            buffer.position(FORWARDED_MESSAGE_HEADER_LENGTH);
             buffer.put(data);
         }
+        buffer.flip();
         return buffer;
     }
 

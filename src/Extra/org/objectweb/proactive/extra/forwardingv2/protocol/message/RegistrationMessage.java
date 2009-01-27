@@ -70,6 +70,7 @@ public abstract class RegistrationMessage extends Message {
         if (agentID != null) {
             buffer.putLong(agentID.getId());
         }
+        buffer.flip();
         return buffer;
     }
 
