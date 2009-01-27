@@ -199,7 +199,8 @@ public class ChannelHandler {
             logger.debug("CH added new mapping for uniqueID " + agentID.getId());
         }
         // Prepare registration reply and write it
-        write(this, new RegistrationReplyMessage(agentID).toByteBuffer(), false);
+        ByteBuffer reply =  new RegistrationReplyMessage(agentID).toByteBuffer();
+        write(this, reply, false);
     }
 
     /**
@@ -222,7 +223,8 @@ public class ChannelHandler {
 
         // send a registration reply
         // TODO: do we need to send buffered messages immediately or should we try to be fair regarding the number of messages sent by ChannelHandler
-        write(this, new RegistrationReplyMessage(agentID).toByteBuffer(), false);
+        ByteBuffer reply =  new RegistrationReplyMessage(agentID).toByteBuffer();
+        write(this, reply, false);
     }
 
     private void handleDataMessage(ByteBuffer msg, MessageType type) {

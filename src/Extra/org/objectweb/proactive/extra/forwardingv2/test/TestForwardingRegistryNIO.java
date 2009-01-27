@@ -49,7 +49,7 @@ public class TestForwardingRegistryNIO implements Runnable {
 
     @After
     public void tearDown() throws IOException {
-        // reg.stop();
+        //reg.stop();
     }
 
     public void run() {
@@ -101,9 +101,13 @@ public class TestForwardingRegistryNIO implements Runnable {
         byte[] data = HttpMarshaller.marshallObject(mess);
 
         DataRequestMessage req = new DataRequestMessage(localID, targetID, 1l, data, false);
+        
+        System.out.println("Sending Hello Message to Router.");
 
         tunnel.getOutputStream().write(req.toByteArray());
         tunnel.getOutputStream().flush();
+
+        System.out.println("Hello Message sent to Router. Waiting for reply.");
 
         Message result = Message.constructMessage(input.readMessage(), 0);
         Assert.assertNotNull(result);
@@ -112,6 +116,8 @@ public class TestForwardingRegistryNIO implements Runnable {
         DataReplyMessage reply = (DataReplyMessage) result;
         Assert.assertEquals("Result should be 'Il est 18h'", "Il est 18h", HttpMarshaller
                 .unmarshallObject(reply.getData()));
+
+        System.out.println("Reply arrived and OK.");
     }
 
     @Test
