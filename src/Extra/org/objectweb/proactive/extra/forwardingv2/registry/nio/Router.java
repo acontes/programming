@@ -59,10 +59,13 @@ public class Router {
     }
 
     public void start() {
-    	logger.debug("Starting Router on port "+listeningPort);
+        logger.debug("Starting Router on port " + listeningPort);
         Set<SelectionKey> selectedKeys = null;
         Iterator<SelectionKey> it;
         SelectionKey key;
+
+        // add a shutdownHook
+        Runtime.getRuntime().addShutdownHook(new Thread(new RouterShutdownHook(this)));
 
         init();
         while (true) {
@@ -70,9 +73,11 @@ public class Router {
             try {
                 selector.select();
             } catch (IOException e1) {
-                // an error occurred while selecting, what should be done ?
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
+                // TODO: an error occurred while selecting, the server side of the router failed, notify and quit. Reflect if there is a better solution
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Router failed while selecting, quitting");
+                }
+                stop();
             }
 
             selectedKeys = selector.selectedKeys();
@@ -108,33 +113,48 @@ public class Router {
 
             // register the listener with the selector
             ssc.register(selector, SelectionKey.OP_ACCEPT);
-            logger.debug("Router correctly started on port "+listeningPort);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Router correctly started on port " + listeningPort);
+            }
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             // Failed during initialization: notify and stop the router.
-            e.printStackTrace();
+            if (logger.isDebugEnabled()) {
+                logger.debug("Router failed during initialization, aborting");
+            }
+            stop();
         }
     }
 
     private void handleAccept(SelectionKey key) {
-        SocketChannel sc;
+        SocketChannel sc = null;
         try {
             // Accept the new connection TODO: (Here key.channel() should always be equal to ssc), replace the call by ssc ?
             sc = ((ServerSocketChannel) key.channel()).accept();
-            if(logger.isDebugEnabled()) {
-            	logger.debug("Router -> New connection from "+sc.socket().getInetAddress());
+            if (logger.isDebugEnabled()) {
+                logger.debug("Router -> New connection from " + sc.socket().getInetAddress());
             }
             sc.configureBlocking(false);
 
             // Add the new connection to the selector
             sc.register(selector, SelectionKey.OP_READ);
 
-            // Add the new connection in our Map 
+            // Add the new connection in our Map (is not added if an exception occurred just before)
             socketChannelToChannelHandlerMap.put(sc, new ChannelHandler(this, sc));
         } catch (IOException e) {
-            // An error occurred while accepting a new connection, what should be done ? stop the router ? simply clean this connection ?
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            // An error occurred while accepting a new connection, simply close the socket Channel
+            try {
+                if (logger.isDebugEnabled()) {
+                    logger
+                            .debug("Router, an error occured while accepting a new connection. Closing the socket channel corresponding to this connection");
+                }
+                if (sc != null) {
+                    sc.close();
+                }
+            } catch (IOException e1) {
+                if (logger.isDebugEnabled()) {
+                    logger.warn("Router, an error occured while closing a failing socket channel", e);
+                }
+            }
         }
     }
 
@@ -144,35 +164,37 @@ public class Router {
 
         // Read the data
         sc = (SocketChannel) key.channel();
-        if(logger.isDebugEnabled()) {
-        	logger.debug("Router -> Receiving data from "+sc.socket().getInetAddress());
-        }
-
-        while (true) {
-            buffer.clear();
-            int r = 0;
-            try {
-                r = sc.read(buffer);
-            } catch (IOException e) {
-                // an error occurred while reading from the channel. What to do ? Clean this SocketChannel connection
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+        ChannelHandler handler = socketChannelToChannelHandlerMap.get(sc);
+        if (handler == null) { // should never happen
+            // TODO: Should really never happen. If this happens, there is huge bug !!! kill the router
+            if (logger.isDebugEnabled()) {
+                logger
+                        .warn("Router, a fatal error happened in the way ChannelHandlers are handled. Quitting");
             }
-
-            if (r <= 0) {
-                break;
-            }
-
-            ChannelHandler handler = socketChannelToChannelHandlerMap.get(sc);
-            if (handler == null) { // should not happen
-                // TODO: handle this case, notify to router, clean router, send error message to client
-            	logger.warn("Router -> No mapping found for SocketChannel "+sc);
-            }
-
-            else {
-                if(logger.isDebugEnabled()) {
-                	logger.debug("Router -> Sending data to ChannelHandler for connection "+sc.socket().getInetAddress());
+            stop();
+        } else {
+            while (true) {
+                buffer.clear();
+                int r = 0;
+                try {
+                    r = sc.read(buffer);
+                } catch (IOException e) {
+                    // an error occurred while reading from the channel. What to do ? Stop this ChannelHandler
+                    e.printStackTrace();
+                    if (logger.isDebugEnabled()) {
+                        logger
+                                .warn(
+                                        "Router an error occured while reading from a channel, cleaning this channelHandler connection",
+                                        e);
+                    }
+                    handler.stop(false);
+                    break;
                 }
+
+                if (r <= 0) {
+                    break;
+                }
+
                 handler.putBuffer(buffer);
             }
         }
@@ -224,16 +246,61 @@ public class Router {
         if (channelHandler == null) {
             throw new UnknownAgentIdException("Router -> no tunnel registered for AgentID :" + key.getId());
         }
-
         return channelHandler;
     }
 
-    //TODO: should this method be synchronized ?
     public void submitTask(Runnable task) {
         tpe.submit(task);
     }
-    
-    public static void main(String[] args) {
-		new  Router(6565).start();
-	}
+
+    private void stop() {
+
+        // Stop listening: close the ServerSocket, the ServerSocketChannel
+        try {
+            serverSocket.close();
+            ssc.close();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        // Stop writing: shutdown the threadPool executor
+        tpe.shutdown();
+
+        // Stop every ChannelHandler
+        for (ChannelHandler channelHandler : agentIDtoChannelHandlerMap.values()) {
+            channelHandler.stop(true);
+        }
+        // Stop the possibly existing transition ChannelHandler (which have no agentID mappings)
+        for (ChannelHandler channelHandler : socketChannelToChannelHandlerMap.values()) {
+            channelHandler.stop(false);
+        }
+
+        // Stop the selector
+        try {
+            selector.close();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    public class RouterShutdownHook implements Runnable {
+
+        Router router;
+
+        /**
+         * @param router the router to be stopped
+         */
+        public RouterShutdownHook(Router router) {
+            this.router = router;
+        }
+
+        /**
+         * stops the router
+         */
+        public void run() {
+            router.stop();
+        }
+    }
 }

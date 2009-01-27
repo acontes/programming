@@ -72,8 +72,8 @@ public class ChannelHandler {
             reading = true;
             // absolute function, does not affect the position of the buffer
             length = buffer.getInt();
-            if(logger.isDebugEnabled()) {
-            	logger.debug("CH -> Start reading a new message; length = "+length);
+            if (logger.isDebugEnabled()) {
+                logger.debug("CH -> Start reading a new message; length = " + length);
             }
             currentlyReadMessage = ByteBuffer.allocate(length);
             currentlyReadMessage.putInt(length);
@@ -125,7 +125,7 @@ public class ChannelHandler {
                 handleDataMessage(msg, type);
                 break;
             default:
-            	logger.warn("CH -> Unknown type of message");
+                logger.warn("CH -> Unknown type of message");
                 break;
         }
     }
@@ -226,14 +226,13 @@ public class ChannelHandler {
     }
 
     private void handleDataMessage(ByteBuffer msg, MessageType type) {
-        
+
         ChannelHandler dstChannelHandler = null;
         AgentID dstAgentID = ForwardedMessage.readDstAgentID(msg);
-        
 
         if (logger.isDebugEnabled()) {
             AgentID srcAgentID = ForwardedMessage.readSrcAgentID(msg);
-            logger.debug("CH -> handling data message from "+srcAgentID+" to "+dstAgentID);
+            logger.debug("CH -> handling data message from " + srcAgentID + " to " + dstAgentID);
         }
 
         try {
@@ -241,24 +240,24 @@ public class ChannelHandler {
         }
         // if dstChannelHandler is null we catch an UnknownAgentIdException
         catch (UnknownAgentIdException e) {
-        	logger.warn("CH -> No channel handler found for destination ID "+dstAgentID, e);
+            logger.warn("CH -> No channel handler found for destination ID " + dstAgentID, e);
             write(this, new ErrorMessage(MessageType.ERR_UNKNOW_RCPT, dstAgentID, agentID, ForwardedMessage
                     .readMessageID(msg), e).toByteBuffer(), false);
             return;
         }
         // the recipient is known, check if it is connected
         if (!dstChannelHandler.isConnected()) {
-        	 if (logger.isDebugEnabled()) {
-                 logger.warn("CH -> destination ID "+dstAgentID+" is known but disconnected.");
-             }
+            if (logger.isDebugEnabled()) {
+                logger.warn("CH -> destination ID " + dstAgentID + " is known but disconnected.");
+            }
             // the recipient is known but disconnected
             handleDisconnectedRecipient(msg, type, dstAgentID, dstChannelHandler,
                     new AgentNotConnectedException("dstAgentID[" + dstAgentID.getId() + "] disconnected"));
         } else {
             // at this point the recipient is known, and connected, forward the message
-       	 if (logger.isDebugEnabled()) {
-             logger.warn("CH -> Forwarding the message to Channel handler in charge of ID "+dstAgentID);
-         }
+            if (logger.isDebugEnabled()) {
+                logger.warn("CH -> Forwarding the message to Channel handler in charge of ID " + dstAgentID);
+            }
             dstChannelHandler.write(this, msg, false);
         }
     }
@@ -312,7 +311,7 @@ public class ChannelHandler {
      */
     public synchronized void write(ChannelHandler srcChannelHandler, ByteBuffer msg, boolean first) {
         /* if this is a Registration Reply, the status of the channelHandler might be "not connected" in the case of a reconnection.
-         * In this case we by pass the test (!writing && connected), because this channel handler can't be writing (it is trying to connect) and we need to send the message in the case of a reconnection
+         * In this case we bypass the test (!writing && connected), because this channel handler can't be writing (it is trying to connect) and we need to send the message in the case of a reconnection
          */
         if ((Message.readType(msg) == MessageType.REGISTRATION_REPLY) || (!writing && connected)) {
             MessageProcessor msgProcessor = new MessageProcessor(srcChannelHandler, this, msg);

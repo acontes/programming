@@ -26,7 +26,7 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message.Messa
 import org.objectweb.proactive.extra.forwardingv2.registry.nio.Router;
 
 
-public class TestForwardingRegistryNIO implements Runnable{
+public class TestForwardingRegistryNIO implements Runnable {
 
     static int port = 10000;
     Router reg = null;
@@ -36,29 +36,29 @@ public class TestForwardingRegistryNIO implements Runnable{
 
     @Before
     public void setup() throws IOException {
-    	System.out.println("----------------------- SETUP -------------------------");
+        System.out.println("----------------------- SETUP -------------------------");
         this.reg = new Router(++port);
         new Thread(this).start();
         try {
-			Thread.sleep(2000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
-    
+
     @After
     public void tearDown() throws IOException {
         // reg.stop();
     }
 
-	public void run() {
-		reg.start();
-	}
+    public void run() {
+        reg.start();
+    }
 
     @Test
     public void testConnection() throws Exception {
-    	System.out.println("------------------------ TEST -------------------------");
+        System.out.println("------------------------ TEST -------------------------");
         Assert.assertNotNull(reg);
         System.out.println("Creating connection to registry on port " + port);
         tunnel = new Socket(InetAddress.getLocalHost(), port);
