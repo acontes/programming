@@ -226,30 +226,39 @@ public class ChannelHandler {
     }
 
     private void handleDataMessage(ByteBuffer msg, MessageType type) {
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("CH handling data message");
-        }
         
         ChannelHandler dstChannelHandler = null;
         AgentID dstAgentID = ForwardedMessage.readDstAgentID(msg);
+        
+
+        if (logger.isDebugEnabled()) {
+            AgentID srcAgentID = ForwardedMessage.readSrcAgentID(msg);
+            logger.debug("CH -> handling data message from "+srcAgentID+" to "+dstAgentID);
+        }
 
         try {
             dstChannelHandler = router.getValueFromHashMap(dstAgentID);
         }
         // if dstChannelHandler is null we catch an UnknownAgentIdException
         catch (UnknownAgentIdException e) {
+        	logger.warn("CH -> No channel handler found for destination ID "+dstAgentID, e);
             write(this, new ErrorMessage(MessageType.ERR_UNKNOW_RCPT, dstAgentID, agentID, ForwardedMessage
                     .readMessageID(msg), e).toByteBuffer(), false);
             return;
         }
         // the recipient is known, check if it is connected
         if (!dstChannelHandler.isConnected()) {
+        	 if (logger.isDebugEnabled()) {
+                 logger.warn("CH -> destination ID "+dstAgentID+" is known but disconnected.");
+             }
             // the recipient is known but disconnected
             handleDisconnectedRecipient(msg, type, dstAgentID, dstChannelHandler,
                     new AgentNotConnectedException("dstAgentID[" + dstAgentID.getId() + "] disconnected"));
         } else {
             // at this point the recipient is known, and connected, forward the message
+       	 if (logger.isDebugEnabled()) {
+             logger.warn("CH -> Forwarding the message to Channel handler in charge of ID "+dstAgentID);
+         }
             dstChannelHandler.write(this, msg, false);
         }
     }
@@ -301,8 +310,7 @@ public class ChannelHandler {
      * @param msg the message to send
      * @param first whether the message to send should be added at the beginning or at the end of the {@link #messagesToWrite} list if needed
      */
-    // TODO: should this method be synchronized ?
-    public void write(ChannelHandler srcChannelHandler, ByteBuffer msg, boolean first) {
+    public synchronized void write(ChannelHandler srcChannelHandler, ByteBuffer msg, boolean first) {
         /* if this is a Registration Reply, the status of the channelHandler might be "not connected" in the case of a reconnection.
          * In this case we by pass the test (!writing && connected), because this channel handler can't be writing (it is trying to connect) and we need to send the message in the case of a reconnection
          */
