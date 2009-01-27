@@ -72,11 +72,9 @@ public class Router {
             // select new keys
             try {
                 selector.select();
-            } catch (IOException e1) {
+            } catch (IOException e) {
                 // TODO: an error occurred while selecting, the server side of the router failed, notify and quit. Reflect if there is a better solution
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Router failed while selecting, quitting");
-                }
+                logger.warn("Router failed while selecting, quitting", e);
                 stop();
             }
 
@@ -118,9 +116,7 @@ public class Router {
             }
         } catch (IOException e) {
             // Failed during initialization: notify and stop the router.
-            if (logger.isDebugEnabled()) {
-                logger.debug("Router failed during initialization, aborting");
-            }
+            logger.warn("Router failed during initialization, aborting");
             stop();
         }
     }
@@ -151,9 +147,7 @@ public class Router {
                     sc.close();
                 }
             } catch (IOException e1) {
-                if (logger.isDebugEnabled()) {
-                    logger.warn("Router, an error occured while closing a failing socket channel", e);
-                }
+                logger.warn("Router, an error occured while closing a failing socket channel", e);
             }
         }
     }
@@ -167,10 +161,7 @@ public class Router {
         ChannelHandler handler = socketChannelToChannelHandlerMap.get(sc);
         if (handler == null) { // should never happen
             // TODO: Should really never happen. If this happens, there is huge bug !!! kill the router
-            if (logger.isDebugEnabled()) {
-                logger
-                        .warn("Router, a fatal error happened in the way ChannelHandlers are handled. Quitting");
-            }
+            logger.warn("Router, a fatal error happened in the way ChannelHandlers are handled. Quitting");
             stop();
         } else {
             while (true) {
@@ -180,13 +171,10 @@ public class Router {
                     r = sc.read(buffer);
                 } catch (IOException e) {
                     // an error occurred while reading from the channel. What to do ? Stop this ChannelHandler
-                    e.printStackTrace();
-                    if (logger.isDebugEnabled()) {
-                        logger
-                                .warn(
-                                        "Router an error occured while reading from a channel, cleaning this channelHandler connection",
-                                        e);
-                    }
+                    logger
+                            .warn(
+                                    "Router an error occured while reading from a channel, cleaning this channelHandler connection",
+                                    e);
                     handler.stop(false);
                     break;
                 }
