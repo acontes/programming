@@ -121,6 +121,9 @@ public class Router {
         try {
             // Accept the new connection TODO: (Here key.channel() should always be equal to ssc), replace the call by ssc ?
             sc = ((ServerSocketChannel) key.channel()).accept();
+            if(logger.isDebugEnabled()) {
+            	logger.debug("Router -> New connection from "+sc.socket().getInetAddress());
+            }
             sc.configureBlocking(false);
 
             // Add the new connection to the selector
@@ -141,6 +144,9 @@ public class Router {
 
         // Read the data
         sc = (SocketChannel) key.channel();
+        if(logger.isDebugEnabled()) {
+        	logger.debug("Router -> Receiving data from "+sc.socket().getInetAddress());
+        }
 
         while (true) {
             buffer.clear();
@@ -160,9 +166,13 @@ public class Router {
             ChannelHandler handler = socketChannelToChannelHandlerMap.get(sc);
             if (handler == null) { // should not happen
                 // TODO: handle this case, notify to router, clean router, send error message to client
+            	logger.warn("Router -> No mapping found for SocketChannel "+sc);
             }
 
             else {
+                if(logger.isDebugEnabled()) {
+                	logger.debug("Router -> Sending data to ChannelHandler for connection "+sc.socket().getInetAddress());
+                }
                 handler.putBuffer(buffer);
             }
         }
@@ -212,7 +222,7 @@ public class Router {
     public ChannelHandler getValueFromHashMap(AgentID key) throws UnknownAgentIdException {
         ChannelHandler channelHandler = agentIDtoChannelHandlerMap.get(key);
         if (channelHandler == null) {
-            throw new UnknownAgentIdException("no tunnel registered for AgentID :" + key.getId());
+            throw new UnknownAgentIdException("Router -> no tunnel registered for AgentID :" + key.getId());
         }
 
         return channelHandler;

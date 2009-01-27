@@ -70,10 +70,13 @@ public class ChannelHandler {
         // start receiving a new message
         if (!reading) {
             reading = true;
-
             // absolute function, does not affect the position of the buffer
             length = buffer.getInt();
+            if(logger.isDebugEnabled()) {
+            	logger.debug("CH -> Start reading a new message; length = "+length);
+            }
             currentlyReadMessage = ByteBuffer.allocate(length);
+            currentlyReadMessage.putInt(length);
         }
 
         /* if the buffer contains parts of several messages (example given, the last part of the currently read message and the first part of a new message)
@@ -92,6 +95,7 @@ public class ChannelHandler {
             buffer.limit(buffer.capacity());
             length = buffer.getInt();
             currentlyReadMessage = ByteBuffer.allocate(length);
+            currentlyReadMessage.putInt(length);
         }
 
         // copy the part of the message contained in the buffer into the message
@@ -121,6 +125,7 @@ public class ChannelHandler {
                 handleDataMessage(msg, type);
                 break;
             default:
+            	logger.warn("CH -> Unknown type of message");
                 break;
         }
     }
@@ -221,6 +226,11 @@ public class ChannelHandler {
     }
 
     private void handleDataMessage(ByteBuffer msg, MessageType type) {
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("CH handling data message");
+        }
+        
         ChannelHandler dstChannelHandler = null;
         AgentID dstAgentID = ForwardedMessage.readDstAgentID(msg);
 
