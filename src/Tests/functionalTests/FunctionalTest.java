@@ -50,6 +50,7 @@ import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.extra.forwardingv2.registry.ForwardingRegistry;
+import org.objectweb.proactive.extra.forwardingv2.registry.nio.Router;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.MessageRoutingRemoteObjectFactory;
 
 
@@ -58,6 +59,7 @@ public class FunctionalTest {
 
     static final public String VAR_JVM_PARAMETERS = "JVM_PARAMETERS";
     static private ForwardingRegistry router;
+    static private Router routerNIO;
 
     @BeforeClass
     static public void configureMessageRouting() {
@@ -67,11 +69,15 @@ public class FunctionalTest {
                     .getValue())) {
                 if (PAProperties.PA_NET_ROUTER_PORT.getValue() == null ||
                     PAProperties.PA_NET_ROUTER_PORT.getValueAsInt() == 0) {
-                    router = new ForwardingRegistry(0, true);
-                    PAProperties.PA_NET_ROUTER_PORT.setValue(router.getLocalPort());
+                	routerNIO = new Router(0, true);
+                    PAProperties.PA_NET_ROUTER_PORT.setValue(routerNIO.getLocalPort());
+                    //router = new ForwardingRegistry(0, true);
+                    //PAProperties.PA_NET_ROUTER_PORT.setValue(router.getLocalPort());
                 } else {
-                    router = new ForwardingRegistry(PAProperties.PA_NET_ROUTER_PORT.getValueAsInt(), true);
+                	routerNIO = new Router(PAProperties.PA_NET_ROUTER_PORT.getValueAsInt(), true);
+                    //router = new ForwardingRegistry(PAProperties.PA_NET_ROUTER_PORT.getValueAsInt(), true);
                 }
+                System.out.println("Registry started on port "+PAProperties.PA_NET_ROUTER_PORT.getValueAsInt());
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
