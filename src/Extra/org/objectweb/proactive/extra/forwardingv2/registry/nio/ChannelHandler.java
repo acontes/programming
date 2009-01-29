@@ -3,9 +3,7 @@ package org.objectweb.proactive.extra.forwardingv2.registry.nio;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
-import java.util.Collections;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.log4j.Logger;
@@ -35,26 +33,66 @@ public class ChannelHandler {
     private AgentID agentID = null;
     private SocketChannel sc;
 
-    /* "connected" describes the status of this channel handler. It allows making the difference between an unknown agentID and a disconnected agentID.
-     * Initially true. This means that upon reception of a RegistrationRequest, if connected is true, it is a new connection, else it is a reconnection.
-     * Indeed the cleaning of HashMaps is different if:
+    /* "connected" describes the status of this channel handler. 
+     * "firstConnection" allows making the difference between an unknown agentID and a disconnected agentID.
+     * Note that the cleaning of HashMaps is different if:
      * a registrationReply failed for a new connection (no message was sent yet so there is no need to keep the AgentID/ChannelHandler mapping)
      * or if a reconnection failed (keep this mapping for caching of messages purpose).
      */
-    private volatile boolean connected = true;
+    private volatile boolean connected = false;
+    private boolean firstConnection = true;
 
     // For reading
+    private int length = 0;
     private ByteBuffer currentlyReadMessage = null;
-    private volatile boolean reading = false; // for initialization of the process of aggregating various parts of a message
+    private volatile boolean readyToRead = false;
+
+    // For getting the length of a read message 
+    private ByteBuffer lengthBuffer = ByteBuffer.allocate(4);
+    private int nbBytesOfLengthWritten = 0;
+    private volatile boolean gettingLength = false;
+    private volatile boolean gotLength = false;
 
     // For writing
-    private final List<ByteBuffer> messagesToWrite; // synchronized, encapsulates a LinkedList. We need to addfirst, addlast and getfirst. Thus using a method for indexed access will be in constant time since the only index to be used will be 0.
+    private final LinkedList<ByteBuffer> messagesToWrite = new LinkedList<ByteBuffer>();
     private volatile boolean writing = false; // for a single ChannelHandler, no more than one task should be submitted at the same time in order to avoid mixing two different messages on the client side
 
     public ChannelHandler(Router router, SocketChannel sc) {
         this.router = router;
         this.sc = sc;
-        messagesToWrite = Collections.synchronizedList(new LinkedList<ByteBuffer>());
+    }
+
+    private void getLength(ByteBuffer buffer) {
+        int remaining = buffer.remaining();
+        int initialLimit = buffer.limit();
+
+        if (!gettingLength) {
+            gettingLength = true;
+            lengthBuffer.clear();
+            nbBytesOfLengthWritten = 0;
+        }
+
+        if (remaining >= (4 - nbBytesOfLengthWritten)) {
+            // get the missing bytes of the length
+            buffer.limit(buffer.position() + 4 - nbBytesOfLengthWritten);
+            lengthBuffer.put(buffer);
+            nbBytesOfLengthWritten = 4;
+
+            // restore the initial limit of buffer
+            buffer.limit(initialLimit);
+
+            // read the length
+            lengthBuffer.flip();
+            length = lengthBuffer.getInt();
+
+            // set the status of the reading phase
+            gettingLength = false;
+            gotLength = true;
+        } else {
+            // get some of the length's missing bytes
+            lengthBuffer.put(buffer);
+            nbBytesOfLengthWritten += remaining;
+        }
     }
 
     /**
@@ -62,49 +100,55 @@ public class ChannelHandler {
      * @param buffer a part of the currently read message, and possibly of the next message
      */
     public void putBuffer(ByteBuffer buffer) {
-        int length = 0;
 
         // prepare for reading from the buffer
         buffer.flip();
+        int initialLimit = buffer.limit();
 
-        // start receiving a new message
-        if (!reading) {
-            reading = true;
-            // absolute function, does not affect the position of the buffer
-            length = buffer.getInt();
-            if (logger.isDebugEnabled()) {
-                logger.trace("CH -> Start reading a new message; length = " + length);
+        while (buffer.hasRemaining()) {
+            // if we start receiving a new message
+            if (!readyToRead) {
+                getLength(buffer);
+
+                // if we got the length
+                if (gotLength) {
+                    readyToRead = true;
+                    if (logger.isDebugEnabled()) {
+                        logger.trace("CH -> Start reading a new message; length = " + length);
+                    }
+                    currentlyReadMessage = ByteBuffer.allocate(length);
+                    currentlyReadMessage.putInt(length);
+                }
+                // else we got only part of the length because we reached the end of the buffer (buffer.hasRemaining() is false), return and get the rest of it in next buffer
+                else {
+                    return;
+                }
             }
-            currentlyReadMessage = ByteBuffer.allocate(length);
-            currentlyReadMessage.putInt(length);
-        }
 
-        /* if the buffer contains parts of several messages (example given, the last part of the currently read message and the first part of a new message)
-         * Note that messages might so small that more than two messages could fit in a single 2kB buffer.
-         * These cases is handled by the following while loop. 
-         */
-        while (buffer.remaining() > currentlyReadMessage.remaining()) {
-            // copy last part of currently read message
-            buffer.limit(currentlyReadMessage.remaining());
-            currentlyReadMessage.put(buffer);
+            /* 
+             * Now we are ready to read.
+             * if the buffer contains parts of several messages (example given, the last part of the currently read message and the first part of a new message)
+             * Note that messages might so small that more than two messages could fit in a single 2kB buffer.
+             * These cases is handled by the following while loop. 
+             */
+            if (buffer.remaining() >= currentlyReadMessage.remaining()) {
+                // copy last part of currently read message
+                buffer.limit(buffer.position() + currentlyReadMessage.remaining());
+                currentlyReadMessage.put(buffer);
 
-            // handle read message
-            handleReadMessage(currentlyReadMessage);
+                // handle read message
+                handleReadMessage(currentlyReadMessage);
 
-            // prepare the new message to receive its first part
-            buffer.limit(buffer.capacity());
-            length = buffer.getInt();
-            currentlyReadMessage = ByteBuffer.allocate(length);
-            currentlyReadMessage.putInt(length);
-        }
+                // prepare the new message to receive its first part
+                buffer.limit(initialLimit);
+                gotLength = false;
+                readyToRead = false;
+            }
 
-        // copy the part of the message contained in the buffer into the message
-        currentlyReadMessage.put(buffer);
-
-        // check if the buffer contained exactly the last part of the currently read message and if yes, set reading to false
-        if (currentlyReadMessage.remaining() == 0) {
-            handleReadMessage(currentlyReadMessage);
-            reading = false;
+            else {
+                // simply copy the part of the message contained in the buffer into the message
+                currentlyReadMessage.put(buffer);
+            }
         }
     }
 
@@ -118,7 +162,15 @@ public class ChannelHandler {
 
         switch (type) {
             case REGISTRATION_REQUEST:
-                handleRegistrationRequest(msg);
+                // in the case of a reconnection, a transition ChannelHandler is created and by default firstConnection is set to true. So a reconnection registrationRequest won't be discarded.
+                if (firstConnection) {
+                    handleRegistrationRequest(msg);
+                } else {
+                    if (logger.isDebugEnabled()) {
+                        logger.trace("CH -> received a registration request while channelHandler [agentID:" +
+                            agentID.getId() + "] was connected... Just discard it");
+                    }
+                }
                 break;
             case DATA_REPLY:
             case DATA_REQUEST:
@@ -180,8 +232,6 @@ public class ChannelHandler {
             return;
         }
 
-        connected = false; // this is a transition ChannelHandler...
-
         // if the received agentID is known, proceed to the reconnection of a disconnected former ChannelHandler
         formerCH.processFormerChannelHandlerReconnection(sc);
     }
@@ -192,7 +242,6 @@ public class ChannelHandler {
     private void handleNewConnection() {
         // generate the agentID
         this.agentID = new AgentID(attributedAgentID.getAndIncrement());
-
         if (logger.isDebugEnabled()) {
             logger.trace("CH handling a new connection for agentID: " + agentID.getId());
         }
@@ -226,7 +275,6 @@ public class ChannelHandler {
         router.putMapping(sc, this);
 
         // send a registration reply
-        // TODO: do we need to send buffered messages immediately or should we try to be fair regarding the number of messages sent by ChannelHandler
         ByteBuffer reply = new RegistrationReplyMessage(agentID).toByteBuffer();
         write(this, reply, false);
     }
@@ -297,7 +345,7 @@ public class ChannelHandler {
                     logger.trace("CH recipient disconnected, DataReply [srcAgentID: " + agentID.getId() +
                         "] [dstAgentID: " + dstAgentID.getId() + "] could not be sent, caching reply");
                 }
-                // cache the reply (at this point the status of dstChannelHandler should be not connected)
+                // cache the reply (at this point the status of dstChannelHandler should be not connected, indeed we checked its value just before calling handleDisconnectedRecipient())
                 dstChannelHandler.write(this, msg, false);
                 break;
             default:
@@ -318,16 +366,28 @@ public class ChannelHandler {
         /* if this is a Registration Reply, the status of the channelHandler might be "not connected" in the case of a reconnection.
          * In this case we bypass the test (!writing && connected), because this channel handler can't be writing (it is trying to connect) and we need to send the message in the case of a reconnection
          */
-        if ((Message.readType(msg) == MessageType.REGISTRATION_REPLY) || (!writing && connected)) {
-            MessageProcessor msgProcessor = new MessageProcessor(srcChannelHandler, this, msg);
-            router.submitTask(msgProcessor);
-            writing = true;
-        } else {
-            if (first) {
-                messagesToWrite.add(0, msg);
+        synchronized (messagesToWrite) {
+            if ((Message.readType(msg) == MessageType.REGISTRATION_REPLY) || (!writing && connected)) {
+                MessageProcessor msgProcessor = new MessageProcessor(srcChannelHandler, this, msg);
+                router.submitTask(msgProcessor);
+                if (logger.isDebugEnabled()) {
+                    logger.trace("CH -> created and submitted a msgProcessor task");
+                }
+                writing = true;
             } else {
-                messagesToWrite.add(msg);
+                if (first) {
+                    messagesToWrite.addFirst(msg);
+                    if (logger.isDebugEnabled()) {
+                        logger.trace("CH -> allready writing ");
+                    }
+                } else {
+                    messagesToWrite.addLast(msg);
+                    if (logger.isDebugEnabled()) {
+                        logger.trace("CH -> created and submitted a msgProcessor task");
+                    }
+                }
             }
+
         }
     }
 
@@ -338,19 +398,25 @@ public class ChannelHandler {
      * Note that if a message is in the list messagesToWrite, it means that it has been aggregated by its srcChannelHandler. This srcChannelHandler might be disconnected but can't be unknown.
      */
     public void submitNextMessage() {
-        if (!messagesToWrite.isEmpty() && connected) {
-            ByteBuffer msg = messagesToWrite.remove(0); // is necessarily a forwarded message
-            AgentID srcAgentID = ForwardedMessage.readSrcAgentID(msg);
-            ChannelHandler srcChannelHandler = null;
-            try {
-                srcChannelHandler = router.getValueFromHashMap(srcAgentID);
-            } catch (UnknownAgentIdException e) {
-                // Should never occur: if a message is in the list messagesToWrite, it means that it has been aggregated by its srcChannelHandler. This srcChannelHandler might be disconnected but can't be unknown. 
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+        if (connected) {
+            synchronized (messagesToWrite) {
+                if (!messagesToWrite.isEmpty()) {
+                    ByteBuffer msg = messagesToWrite.removeFirst(); // is necessarily a forwarded message
+                    AgentID srcAgentID = ForwardedMessage.readSrcAgentID(msg);
+                    ChannelHandler srcChannelHandler = null;
+                    try {
+                        srcChannelHandler = router.getValueFromHashMap(srcAgentID);
+                    } catch (UnknownAgentIdException e) {
+                        // Should never occur: if a message is in the list messagesToWrite, it means that it has been aggregated by its srcChannelHandler. This srcChannelHandler might be disconnected but can't be unknown. 
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                    MessageProcessor msgProcessor = new MessageProcessor(srcChannelHandler, this, msg);
+                    router.submitTask(msgProcessor);
+                } else {
+                    writing = false;
+                }
             }
-            MessageProcessor msgProcessor = new MessageProcessor(srcChannelHandler, this, msg);
-            router.submitTask(msgProcessor);
         } else {
             writing = false;
         }
@@ -401,4 +467,11 @@ public class ChannelHandler {
         this.connected = connected;
     }
 
+    public boolean isFirstConnection() {
+        return firstConnection;
+    }
+
+    public void setFirstConnection(boolean firstConnection) {
+        this.firstConnection = firstConnection;
+    }
 }

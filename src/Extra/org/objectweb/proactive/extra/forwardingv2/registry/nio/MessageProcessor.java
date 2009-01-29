@@ -15,12 +15,12 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message.Messa
 public class MessageProcessor implements Runnable {
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_ROUTER);
 
-    ChannelHandler srcChannelHandler;
-    ChannelHandler dstChannelHandler;
-    AgentID dstAgentID;
-    SocketChannel sc;
-    ByteBuffer msg;
-    MessageType type;
+    private final ChannelHandler srcChannelHandler;
+    private final ChannelHandler dstChannelHandler;
+    private final AgentID dstAgentID;
+    private final SocketChannel sc;
+    private final ByteBuffer msg;
+    private final MessageType type;
 
     /** 
      * 
@@ -66,19 +66,21 @@ public class MessageProcessor implements Runnable {
         // submit next message
         dstChannelHandler.submitNextMessage();
     }
-    
+
     /**
      * Takes care of writing the totality of the message in the socketChannel
      * @throws IOException
      */
     private void write() throws IOException {
-    	int nbToWrite = msg.remaining();
-    	
-    	int nbWritten = 0; 
-    		
-    	while (nbWritten < nbToWrite) {
-    		nbWritten += sc.write(msg);
-    	}
+        int nbToWrite = msg.remaining();
+
+        int nbWritten = 0;
+
+        synchronized (sc) {
+            while (nbWritten < nbToWrite) {
+                nbWritten += sc.write(msg);
+            }
+        }
     }
 
     /**
@@ -88,7 +90,7 @@ public class MessageProcessor implements Runnable {
      */
     private void processRegistrationReply() {
         try {
-           write();
+            write();
         } catch (IOException e) {
             // could not send a registration Reply, log error and clean router
             if (logger.isDebugEnabled()) {
@@ -96,17 +98,16 @@ public class MessageProcessor implements Runnable {
                     ". Cleaning this connection");
             }
             // the cleaning is not the same if it was a reply to a reconnection or a reply to a new connection			
-            // if it was a new connection: the dstChannelHandler status is true by default
-            // Else if it was a reconnection: the dstChannelHandler status is false at this point
-            dstChannelHandler.stop(!dstChannelHandler.isConnected());
+            dstChannelHandler.stop(dstChannelHandler.isFirstConnection());
             return;
         }
-        dstChannelHandler.setConnected(true); // for the case of a reconnection
+        dstChannelHandler.setConnected(true);
+        dstChannelHandler.setFirstConnection(false);
     }
 
     private void processDataReply() {
         try {
-           write();
+            write();
         } catch (IOException e) {
             // could not send a Data Reply, log error, cache reply, clean router
             if (logger.isDebugEnabled()) {
@@ -123,7 +124,7 @@ public class MessageProcessor implements Runnable {
 
     private void processDataRequest() {
         try {
-           write();
+            write();
         } catch (IOException e) {
             // could not send a Data Request, log error, return error message, clean router
             if (logger.isDebugEnabled()) {
@@ -143,7 +144,7 @@ public class MessageProcessor implements Runnable {
 
     private void processErrorMsg() {
         try {
-           write();
+            write();
         } catch (IOException e) {
             // could not send an Error Message, log error, cache Error Message, clean router
             if (logger.isDebugEnabled()) {
