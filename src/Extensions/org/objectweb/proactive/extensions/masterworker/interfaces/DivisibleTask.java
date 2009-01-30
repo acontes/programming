@@ -52,5 +52,5 @@ public interface DivisibleTask<R extends Serializable> extends Task<R> {
     * @return the result
     * @throws Exception any exception thrown by the task
     */
-    R run(WorkerMemory memory, SubMaster master) throws Exception;
+    R run(WorkerMemory memory, SubMaster<Task<R>, R> master) throws Exception;
 }

@@ -60,16 +60,10 @@ public class Executor {
         return singleton;
     }
 
-    private String addDebugInCommand(String command) {
-        String debugCommand = command.replaceAll("[$]DBGID[$]", "debuggee_port" + jobId);
-        return debugCommand;
-    }
-
     public void submit(String command) {
         Logger logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT + ".job." + jobId);
         jobId++;
 
-        command = addDebugInCommand(command);
         command = command.replaceAll("'", "\"");
         logger.debug("Command submited: " + command);
         try {
@@ -115,6 +109,7 @@ public class Executor {
             this.stream = stream;
             this.cmd = cmd;
             setDaemon(true);
+            setName("GCM Deployment" + type.toString() + " Monitor for " + cmd.subSequence(0, 100));
         }
 
         @Override

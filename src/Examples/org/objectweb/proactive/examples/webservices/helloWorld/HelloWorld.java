@@ -35,13 +35,15 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.webservices.WebServices;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 
 
 /**
  * A simple example to expose an active object as a web service.
- * A web server must be installed first to run this example
+ *
  * @author The ProActive Team
  */
+@ActiveObject
 public class HelloWorld {
     public HelloWorld() {
     }

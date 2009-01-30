@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="JMX"><info><title>An extended ProActive JMX Connector</title></info>
 	
 
-	<section xml:id="jmx_overview"><info><title>Overview of JMX - Java Management eXtention</title></info>
+	<section xml:id="jmx_overview"><info><title>Overview of JMX - Java Management eXtension</title></info>
 		
 		<para>
 			<emphasis role="bold">
@@ -12,11 +12,11 @@
 			Java Management Extensions is a Java technology providing
 			tools and APIs for managing and monitoring Java applications
 			and their resources. Resources are represented by objects
-			called MBeans (for Managed Bean).
+			called  Managed Beans (MBeans).
 		</para>
 
 		<para>
-			<figure><info><title>
+			<figure xml:id="JMX3levelsarchitecture"><info><title>
 					This figure shows the JMX 3 levels architecture and
 					the integration of the ProActive JMX Connector.
 				</title></info>
@@ -24,7 +24,7 @@
 
 				<mediaobject>
 					<imageobject>
-						<imagedata scalefit="1" width="100%" contentdepth="100%" fileref="jmx/jmx-proactive.png" format="PNG"/>
+						<imagedata scalefit="1" width="100%" contentdepth="100%" fileref="images/jmx-proactive.png" format="PNG"/>
 					</imageobject>
 				</mediaobject>
 			</figure>
@@ -114,7 +114,7 @@
 			</para>
 	</section>
 
-	<section><info><title>How to use the connector ?</title></info>
+	<section xml:id="Howtousetheconnector"><info><title>How to use the connector ?</title></info>
 		
 		<para>
 			The ProActive connector allows you yo connect to an MBean in
@@ -208,7 +208,7 @@
 			</para>
 		</note>
 	</section>
-	<section><info><title>Example : a simple textual JMX Console</title></info>
+	<section xml:id="ExampleasimpletextualJMXConsole"><info><title>Example : a simple textual JMX Console</title></info>
 		
 
 		<para>

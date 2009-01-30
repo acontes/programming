@@ -48,6 +48,7 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.TaskIntern;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.Worker;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.WorkerMaster;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 
 import java.io.Serializable;
 import java.util.LinkedList;
@@ -62,6 +63,7 @@ import java.util.Queue;
  *
  * @author The ProActive Team
  */
+@ActiveObject
 public class AOWorker implements InitActive, Serializable, Worker {
 
     /** log4j logger of the worker */
@@ -145,7 +147,6 @@ public class AOWorker implements InitActive, Serializable, Worker {
     }
 
     /** gets the initial task to solve */
-    @SuppressWarnings("unchecked")
     protected void getTasks() {
         if (debug) {
             logger.debug(name + " asks a new task...");
@@ -164,7 +165,6 @@ public class AOWorker implements InitActive, Serializable, Worker {
     }
 
     /** gets the initial task to solve */
-    @SuppressWarnings("unchecked")
     protected void getTasksWithResult(ResultInternImpl result) {
         if (debug) {
             logger.debug(name + " sends the result of task " + result.getId() + " and asks a new task...");
@@ -202,7 +202,6 @@ public class AOWorker implements InitActive, Serializable, Worker {
     }
 
     /** gets the initial task to solve */
-    @SuppressWarnings("unchecked")
     public void getTaskAndSchedule() {
         // We get some tasks
         getTasks();
