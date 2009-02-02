@@ -26,7 +26,7 @@
 		 In order to facilitate the use of the debugging features, the GCMA descriptor has been extended to easily start runtimes
 		 in debug mode.
 		 One has to add the tag &lt;debug/&gt; as child of the application/proactive tag. An example is shown hereafter:
-		  <programlisting><textobject><textdata fileref="debugging/GCMA.xml"/></textobject></programlisting>
+		  <programlisting language="xml"><textobject><textdata fileref="debugging/GCMA.xml"/></textobject></programlisting>
 		</para>
 	<section xml:id="Connection">
 		<info>

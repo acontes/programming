@@ -1017,7 +1017,7 @@ public void writerPolicy(org.objectweb.proactive.Service service)</programlistin
         can be defined, for instance in order to specify different jvm
         configurations (e.g classpath, java path,...).</para>
         
-		<programlisting><textobject><textdata fileref="../descriptors/Matrix.xml"/></textobject></programlisting>
+		<programlisting language="xml"><textobject><textdata fileref="../descriptors/Matrix.xml"/></textobject></programlisting>
 
         <para>Modify your XML deployment file to use the current JVM (i.e the
         JVM reading the descriptor) and also to start 4 JVMs on remote
@@ -1116,7 +1116,7 @@ public void writerPolicy(org.objectweb.proactive.Service service)</programlistin
         to each process and the group size ( the number of involved processes
         ).</para>
 
-        <programlisting><textobject><textdata fileref="guided_tour/code_snippets/mpi_primitives.txt"/></textobject></programlisting>
+        <programlisting language="java"><textobject><textdata fileref="guided_tour/code_snippets/mpi_primitives.txt"/></textobject></programlisting>
       </section>
 
       <section xml:id="ProActiveInitializationprimitives_11"><info><title>ProActive Initialization primitives</title></info>
@@ -1189,7 +1189,7 @@ public void writerPolicy(org.objectweb.proactive.Service service)</programlistin
         non-blocking ) by default, therefore we need to specify explicitly to
         block until a specific request.</para>
 
-        <programlisting><textobject><textdata fileref="guided_tour/code_snippets/pa_version.txt"/></textobject></programlisting>
+        <programlisting language="java"><textobject><textdata fileref="guided_tour/code_snippets/pa_version.txt"/></textobject></programlisting>
 
         <para>The leader blocks his request queue until another worker will do
         a distant call on the leader's <emphasis role="bold">updateX</emphasis> method which is :</para>
@@ -1557,7 +1557,7 @@ public void writerPolicy(org.objectweb.proactive.Service service)</programlistin
                         space, with velocity and mass - the diameter
                         expresses the size to use for the display:
                     </para>
-        <programlisting><textobject><textdata fileref="guided_tour/code_snippets/planet_fields.txt"/></textobject></programlisting>
+        <programlisting language="java"><textobject><textdata fileref="guided_tour/code_snippets/planet_fields.txt"/></textobject></programlisting>
                     <para>
                         Please take note that it implements Serializable
                         because it will be sent as parameter to method
@@ -1601,7 +1601,7 @@ public void writerPolicy(org.objectweb.proactive.Service service)</programlistin
                         Displayer. Before choosing which example to run,
                         it creates the nodes required by the simulation:
                     </para>
-        <programlisting><textobject><textdata fileref="guided_tour/code_snippets/nbody_node_creation.txt"/></textobject></programlisting>
+        <programlisting language="java"><textobject><textdata fileref="guided_tour/code_snippets/nbody_node_creation.txt"/></textobject></programlisting>
                     <para>
                         The
                         <literal>Node [] nodes</literal>
@@ -1623,7 +1623,7 @@ public void writerPolicy(org.objectweb.proactive.Service service)</programlistin
                         <literal>Start</literal>
                         (it will be detailed later):
                     </para>
-        <programlisting><textobject><textdata fileref="guided_tour/code_snippets/maestro_creation.txt"/></textobject></programlisting>
+        <programlisting language="java"><textobject><textdata fileref="guided_tour/code_snippets/maestro_creation.txt"/></textobject></programlisting>
                 </listitem>
             </itemizedlist>
             <para>

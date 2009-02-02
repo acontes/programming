@@ -912,7 +912,7 @@ Default target: compile.all</screen>
          active object. It was of no use most of the time and was made
          obsolete with the introduction of the MetaObjectFactory 
          in the <emphasis role="bold">0.9.3</emphasis> release.</para>
-      <programlisting><textobject><textdata fileref="automatic_snippets/metaobjectfactory.snip"/></textobject></programlisting>        
+      <programlisting language="java"><textobject><textdata fileref="automatic_snippets/metaobjectfactory.snip"/></textobject></programlisting>        
 
         <para>Up to <emphasis role="bold">ProActive 0.9.3</emphasis> the
          activity of an active object was given by a method

@@ -488,7 +488,7 @@ private static void printMessageAndWait() {
         can be defined, for instance in order to specify different jvm
         configurations (e.g classpath, java path,...).</para>
         
-		<programlisting><textobject><textdata fileref="../descriptors/Matrix.xml"/></textobject></programlisting>
+		<programlisting language="xml"><textobject><textdata fileref="../descriptors/Matrix.xml"/></textobject></programlisting>
 
         <para>Modify your XML deployment file to use the current JVM (i.e the
         JVM reading the descriptor) and also to start 4 JVMs on remote
@@ -617,7 +617,7 @@ private static void printMessageAndWait() {
         to each process and the group size ( the number of involved processes
         ).</para>
 
-        <programlisting>  // All instances call startup routine to get their instance number (mynum) 
+        <programlisting language="java">  // All instances call startup routine to get their instance number (mynum) 
   MPI_Init(&amp;argc, &amp;argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &amp;mynum);
   MPI_Comm_size(MPI_COMM_WORLD, &amp;nprocs);
@@ -736,7 +736,7 @@ private static void printMessageAndWait() {
         <para>The leader blocks his request queue until another worker will do
         a distant call on the leader's <emphasis role="bold">updateX</emphasis> method which is :</para>
 
-        <programlisting>  public void updateX(double value){
+        <programlisting language="java">  public void updateX(double value){
      this.x = value;
   } </programlisting>
       </section>

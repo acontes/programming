@@ -144,7 +144,7 @@
 			To perform remote operations on a given MBean, you have to
 			get the reference of the current MBeanServerConnection,
 			which is actually a ProActiveConnection :
-			<programlisting>
+			<programlisting language="java">
 				ProActiveConnection connection =
 				clientConnector.getConnection(); //invoke the
 				performAction method on the MBean named beanName with

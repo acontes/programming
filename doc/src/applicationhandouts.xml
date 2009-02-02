@@ -518,7 +518,7 @@ or
         to each process and the group size ( the number of involved processes
         ).</para>
 
-        <programlisting>  // All instances call startup routine to get their instance number (mynum) 
+        <programlisting language="java">  // All instances call startup routine to get their instance number (mynum) 
   MPI_Init(&amp;argc, &amp;argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &amp;mynum);
   MPI_Comm_size(MPI_COMM_WORLD, &amp;nprocs);
@@ -597,7 +597,7 @@ or
         <para>Please note that MPI_Bcast, MPI_Send and MPI_Recv primitives are
         blocking.</para>
 
-        <programlisting>  // Get a value of N from stdin for the next run and Broadcast it
+        <programlisting language="java">  // Get a value of N from stdin for the next run and Broadcast it
   <emphasis role="bold">MPI_Bcast</emphasis>(pN, 1, MPI_INT, source, MPI_COMM_WORLD);
 
   // LOCAL COMPUTATION LOOP
@@ -637,7 +637,7 @@ or
         <para>The leader blocks his request queue until another worker will do
         a distant call on the leader's <emphasis role="bold">updateX</emphasis> method which is :</para>
 
-        <programlisting>  public void updateX(double value){
+        <programlisting language="java">  public void updateX(double value){
      this.x = value;
   } </programlisting>
       </section>
