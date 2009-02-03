@@ -13,14 +13,14 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
  * This intended to be used by router components.
  */
 public interface Router extends Runnable {
-	/** Submit a job to be executed asynchronously. 
-	 * 
-	 * All time consuming tasks should be submitted by using this method. The single threaded
-	 * front end should not execute any other code than reading data chunk from {@link SocketChannel}.
-	 * 
-	 * @param message the received message to be handled
-	 * @param attachment the attachment used to received the message
-	 */
+    /** Submit a job to be executed asynchronously. 
+     * 
+     * All time consuming tasks should be submitted by using this method. The single threaded
+     * front end should not execute any other code than reading data chunk from {@link SocketChannel}.
+     * 
+     * @param message the received message to be handled
+     * @param attachment the attachment used to received the message
+     */
     public void handleAsynchronously(ByteBuffer message, Attachment attachment);
 
     /** Returns the client corresponding to a given {@link AgentID}

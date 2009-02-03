@@ -8,6 +8,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message;
 
+
 /** Reassemble messages from data chunks
  * 
  * {@link RouterImpl} reads chunk of data from a {@link SocketChannel}. We have to 
@@ -22,7 +23,7 @@ public class MessageAssembler {
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_ROUTER);
 
     final private Router router;
-    
+
     final private Attachment attachment;
 
     /** The current incomplete message
@@ -31,7 +32,7 @@ public class MessageAssembler {
      * still unknown. 
      */
     private ByteBuffer currentMessage;
-    
+
     /** Length and protocol id of the current message 
      * 
      * null when a message has been assembled and no data is available
@@ -61,21 +62,21 @@ public class MessageAssembler {
                 }
 
                 if (lengthAndProto.isReady()) {
-                	
+
                     int proto = lengthAndProto.getProto();
                     int l = this.lengthAndProto.getLength();
 
                     // Check the protocol is correct. Otherwise something fucked up
-                	// and the connection is closed to avoid a disaster
+                    // and the connection is closed to avoid a disaster
                     if (proto != Message.PROTOV1) {
-                    	logger.error("Invalid protocol ID received from " + attachment + ": expected=" +
+                        logger.error("Invalid protocol ID received from " + attachment + ": expected=" +
                             Message.PROTOV1 + " received=" + proto);
-                    	throw new IllegalStateException("Invalid protocol ID");
+                        throw new IllegalStateException("Invalid protocol ID");
                     } else if (l < Message.Field.getTotalOffset()) {
-                    	logger.error("Invalid message length received from " + attachment + ": " + l);
-                    	throw new IllegalStateException("Invalid message length");
+                        logger.error("Invalid message length received from " + attachment + ": " + l);
+                        throw new IllegalStateException("Invalid message length");
                     }
-                    
+
                     // Allocate a buffer for the reassembled message
                     currentMessage = ByteBuffer.allocate(l);
 

@@ -157,8 +157,8 @@ public class RouterImpl implements Runnable, Router {
         } catch (IOException e) {
             clientDisconnected(key);
         } catch (IllegalStateException e) {
-        	// Disconnect the client to avoid a disaster
-        	clientDisconnected(key);
+            // Disconnect the client to avoid a disaster
+            clientDisconnected(key);
         }
     }
 
@@ -173,26 +173,24 @@ public class RouterImpl implements Runnable, Router {
             sc.socket().close();
         } catch (IOException e) {
             // Miam Miam Miam
-        	ProActiveLogger.logEatedException(logger, e);
+            ProActiveLogger.logEatedException(logger, e);
         }
 
         try {
             sc.close();
         } catch (IOException e) {
             // Miam Miam Miam
-        	ProActiveLogger.logEatedException(logger, e);
+            ProActiveLogger.logEatedException(logger, e);
         }
         attachment.getClient().discardAttachment();
         logger.debug("Client " + sc.socket() + " disconnected");
-        
+
         // Broadcast the disconnection to every client
         Collection<Client> clients = clientMap.values();
         AgentID disconnectedAgent = attachment.getClient().getAgentId();
         tpe.submit(new DisconnectionBroadcaster(clients, disconnectedAgent));
     }
 
- 
-    
     public void handleAsynchronously(ByteBuffer message, Attachment attachment) {
         TopLevelProcessor tlp = new TopLevelProcessor(message, attachment, this);
         tpe.execute(tlp);
@@ -213,25 +211,26 @@ public class RouterImpl implements Runnable, Router {
     public int getLocalPort() {
         return this.port;
     }
-    
-    private static class DisconnectionBroadcaster implements Runnable {
-    	final private List<Client> clients;
-    	final private AgentID disconnectedAgent;
-    	
-    	public DisconnectionBroadcaster(Collection<Client> clients, AgentID disconnectedAgent) {
-    		this.clients = new ArrayList<Client>(clients);
-    		this.disconnectedAgent = disconnectedAgent;
-    	}
 
-		public void run() {
-	        for (Client client : this.clients) {
-	            ErrorMessage error = new ErrorMessage(this.disconnectedAgent, 0, ErrorType.ERR_DISCONNECTED_RCPT_BROADCAST);
-	            try {
-	                client.sendMessage(error.toByteArray());
-	            } catch (Exception e) {
-	                ProActiveLogger.logEatedException(logger, e);
-	            }
-	        }
-		}
+    private static class DisconnectionBroadcaster implements Runnable {
+        final private List<Client> clients;
+        final private AgentID disconnectedAgent;
+
+        public DisconnectionBroadcaster(Collection<Client> clients, AgentID disconnectedAgent) {
+            this.clients = new ArrayList<Client>(clients);
+            this.disconnectedAgent = disconnectedAgent;
+        }
+
+        public void run() {
+            for (Client client : this.clients) {
+                ErrorMessage error = new ErrorMessage(this.disconnectedAgent, 0,
+                    ErrorType.ERR_DISCONNECTED_RCPT_BROADCAST);
+                try {
+                    client.sendMessage(error.toByteArray());
+                } catch (Exception e) {
+                    ProActiveLogger.logEatedException(logger, e);
+                }
+            }
+        }
     }
 }

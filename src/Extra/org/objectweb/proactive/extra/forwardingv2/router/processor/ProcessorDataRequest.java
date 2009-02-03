@@ -28,9 +28,9 @@ public class ProcessorDataRequest extends Processor {
         Client destClient = this.router.getClient(agentId);
 
         if (destClient != null) {
-        	/* The recipient is known. Try to forward the message.
-        	 * If an error occurs while sending the message, notify the sender
-        	 */
+            /* The recipient is known. Try to forward the message.
+             * If an error occurs while sending the message, notify the sender
+             */
             try {
                 destClient.sendMessage(this.messageAsByteBuffer);
             } catch (Exception e) {
@@ -47,28 +47,29 @@ public class ProcessorDataRequest extends Processor {
                 srcClient.sendMessageOrCache(error.toByteArray());
             }
         } else {
-        	/* The recipient is unknown.
-        	 * If the sender is known an error message is sent (or cached) to unblock it.
-        	 * Otherwise the message is dropped (unknown sender & recipient: game over)
-        	 */
+            /* The recipient is unknown.
+             * If the sender is known an error message is sent (or cached) to unblock it.
+             * Otherwise the message is dropped (unknown sender & recipient: game over)
+             */
             AgentID srcAgentId = ForwardedMessage.readSrcAgentID(messageAsByteBuffer.array(), 0);
             Client client = router.getClient(srcAgentId);
             if (client != null) {
-            	long messageId = Message.readMessageID(messageAsByteBuffer.array(), 0);
-            	ErrorMessage error = new ErrorMessage(srcAgentId, agentId, messageId,
-                        ErrorType.ERR_UNKNOW_RCPT);
+                long messageId = Message.readMessageID(messageAsByteBuffer.array(), 0);
+                ErrorMessage error = new ErrorMessage(srcAgentId, agentId, messageId,
+                    ErrorType.ERR_UNKNOW_RCPT);
                 // Cache on error to avoid a blocked a sender
                 client.sendMessageOrCache(error.toByteArray());
-            	logger.warn("Received invalid data request: unknown recipient: " + agentId + ". Sender notified");
+                logger.warn("Received invalid data request: unknown recipient: " + agentId +
+                    ". Sender notified");
             } else {
                 // Something is utterly broken: Unknown sender & recipient
-				try {
-	            	Message message;
-					message = new DataRequestMessage(messageAsByteBuffer.array(), 0);
-	                logger.error("Dropped invalid data request: unknown sender and recipient. " + message);
-				} catch (InstantiationException e) {
-					ProActiveLogger.logImpossibleException(logger, e);
-				}
+                try {
+                    Message message;
+                    message = new DataRequestMessage(messageAsByteBuffer.array(), 0);
+                    logger.error("Dropped invalid data request: unknown sender and recipient. " + message);
+                } catch (InstantiationException e) {
+                    ProActiveLogger.logImpossibleException(logger, e);
+                }
             }
         }
 

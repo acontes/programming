@@ -10,6 +10,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
 
+
 /** A remote agent 
  * 
  * When a remote agent connects to the router a client is created with the remote agent id.
@@ -141,7 +142,6 @@ public class Client {
         this.sendMessageOrCache(ByteBuffer.wrap(message));
     }
 
-    
     /** Discard the current attachment 
      * 
      * Must be called when an IOException is raised by a read or write operation on the 
@@ -163,10 +163,10 @@ public class Client {
      */
     public void setAttachment(Attachment attachment) {
         synchronized (this.attachment_lock) {
-        	if (this.attachment != null ) {
-        		logger.warn("set attachment called but attachment is not null. Race condition occured !");
-        	}
-        	
+            if (this.attachment != null) {
+                logger.warn("set attachment called but attachment is not null. Race condition occured !");
+            }
+
             logger.debug("New attachment for " + this.agentId);
             this.attachment = attachment;
             this.attachment.setClient(this);

@@ -13,6 +13,7 @@ import org.objectweb.proactive.extra.forwardingv2.router.processor.ProcessorData
 import org.objectweb.proactive.extra.forwardingv2.router.processor.ProcessorDebug;
 import org.objectweb.proactive.extra.forwardingv2.router.processor.ProcessorRegistrationRequest;
 
+
 /** Asynchronous message handler.
  * 
  * Each message received is asynchronously handled by a {@link TopLevelProcessor}.
@@ -22,16 +23,16 @@ import org.objectweb.proactive.extra.forwardingv2.router.processor.ProcessorRegi
 public class TopLevelProcessor implements Runnable {
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_ROUTER);
 
-    /** The message to process */ 
+    /** The message to process */
     final private ByteBuffer message;
-    
+
     /** The attachment which received the message
      * 
      * Should NOT be passed to the processor, ProcessorRegistrationRequest excepted
      * since we need the attachment to create a new Client. 
      */
     final private Attachment attachment;
-    
+
     /** The local router */
     final private Router router;
 
@@ -54,8 +55,8 @@ public class TopLevelProcessor implements Runnable {
                 processor = new ProcessorRegistrationRequest(this.message, this.attachment, this.router);
                 break;
             case DATA_REPLY:
-            	processor = new ProcessorDataReply(this.message, this.router);
-            	break;
+                processor = new ProcessorDataReply(this.message, this.router);
+                break;
             case DATA_REQUEST:
                 processor = new ProcessorDataRequest(this.message, this.router);
                 break;
@@ -63,13 +64,13 @@ public class TopLevelProcessor implements Runnable {
                 processor = new ProcessorDebug(this.message, this.attachment, this.router);
                 break;
             default:
-            	Message msg = Message.constructMessage(message.array(), 0);
-            	logger.error("Unexpected message type: " + type + ". Dropped message " + msg);
+                Message msg = Message.constructMessage(message.array(), 0);
+                logger.error("Unexpected message type: " + type + ". Dropped message " + msg);
                 break;
         }
 
         if (processor != null) {
             processor.process();
-        } 
+        }
     }
 }

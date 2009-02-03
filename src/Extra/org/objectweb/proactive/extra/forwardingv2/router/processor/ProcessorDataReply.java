@@ -10,6 +10,7 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message;
 import org.objectweb.proactive.extra.forwardingv2.router.Client;
 import org.objectweb.proactive.extra.forwardingv2.router.Router;
 
+
 public class ProcessorDataReply extends Processor {
 
     final private ByteBuffer messageAsByteBuffer;
@@ -26,25 +27,25 @@ public class ProcessorDataReply extends Processor {
         Client destClient = this.router.getClient(agentId);
 
         if (destClient != null) {
-        	/* The recipient is known. Try to forward the message.
-        	 * If the reply cannot be send now, we have to cache it to send it later.
-        	 * We don't want to send a error message to the sender. Our goal is to unblock
-        	 * the recipient which is waiting for the reply
-        	 */
-        	destClient.sendMessageOrCache(this.messageAsByteBuffer);
+            /* The recipient is known. Try to forward the message.
+             * If the reply cannot be send now, we have to cache it to send it later.
+             * We don't want to send a error message to the sender. Our goal is to unblock
+             * the recipient which is waiting for the reply
+             */
+            destClient.sendMessageOrCache(this.messageAsByteBuffer);
         } else {
-        	/* The recipient is unknown.
-        	 * 
-        	 * We can't do better than dropping the reply. Notifying the sender is useless since
-        	 * it will not unblock the recipient. 
-			 */
-        	try {
-        		Message message;
-        		message = new DataRequestMessage(messageAsByteBuffer.array(), 0);
-        		logger.error("Dropped invalid data reply: unknown recipient. " + message);
-        	} catch (InstantiationException e) {
-					ProActiveLogger.logImpossibleException(logger, e);
-			}
+            /* The recipient is unknown.
+             * 
+             * We can't do better than dropping the reply. Notifying the sender is useless since
+             * it will not unblock the recipient. 
+             */
+            try {
+                Message message;
+                message = new DataRequestMessage(messageAsByteBuffer.array(), 0);
+                logger.error("Dropped invalid data reply: unknown recipient. " + message);
+            } catch (InstantiationException e) {
+                ProActiveLogger.logImpossibleException(logger, e);
+            }
         }
     }
 }
