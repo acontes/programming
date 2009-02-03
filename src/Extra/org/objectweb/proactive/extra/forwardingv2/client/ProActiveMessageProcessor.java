@@ -25,10 +25,6 @@ public class ProActiveMessageProcessor implements Runnable {
     }
 
     public void run() {
-        if (logger.isTraceEnabled()) {
-            logger.trace(ProActiveMessageProcessor.class.getName() + "is starting");
-        }
-
         ClassLoader savedClassLoader = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());

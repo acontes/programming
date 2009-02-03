@@ -15,8 +15,9 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.ErrorMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.ForwardedMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message;
-import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationReplyMessage;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationRequestMessage;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.ErrorMessage.ErrorType;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message.MessageType;
 
 
@@ -188,7 +189,9 @@ public class ChannelHandler {
             logger.trace("CH handling registration request");
         }
 
-        AgentID newAgentID = RegistrationMessage.readAgentID(msg);
+        RegistrationRequestMessage request = (RegistrationRequestMessage) Message.constructMessage(msg
+                .array(), 0);
+        AgentID newAgentID = request.getAgentID();
         // if it is a re-connection
         if (newAgentID != null) {
             handleReConnection(newAgentID);
@@ -252,8 +255,7 @@ public class ChannelHandler {
             logger.trace("CH added new mapping for uniqueID " + agentID.getId());
         }
         // Prepare registration reply and write it
-        ByteBuffer reply = new RegistrationReplyMessage(agentID).toByteBuffer();
-        write(this, reply, false);
+        write(ByteBuffer.wrap(new RegistrationReplyMessage(agentID, 0).toByteArray()), false);
     }
 
     /**
@@ -275,14 +277,14 @@ public class ChannelHandler {
         router.putMapping(sc, this);
 
         // send a registration reply
-        ByteBuffer reply = new RegistrationReplyMessage(agentID).toByteBuffer();
-        write(this, reply, false);
+        // TODO: do we need to send buffered messages immediately or should we try to be fair regarding the number of messages sent by ChannelHandler
+        write(ByteBuffer.wrap(new RegistrationReplyMessage(agentID, 0).toByteArray()), false);
     }
 
     private void handleDataMessage(ByteBuffer msg, MessageType type) {
 
         ChannelHandler dstChannelHandler = null;
-        AgentID dstAgentID = ForwardedMessage.readDstAgentID(msg);
+        AgentID dstAgentID = ForwardedMessage.readDstAgentID(msg.array());
 
         if (logger.isDebugEnabled()) {
             logger.trace("CH -> handling data message from " + agentID + " to " + dstAgentID);
@@ -293,9 +295,8 @@ public class ChannelHandler {
         }
         // if dstChannelHandler is null we catch an UnknownAgentIdException
         catch (UnknownAgentIdException e) {
-            logger.warn("CH -> No channel handler found for destination ID " + dstAgentID, e);
-            write(this, new ErrorMessage(MessageType.ERR_UNKNOW_RCPT, dstAgentID, agentID, ForwardedMessage
-                    .readMessageID(msg), e).toByteBuffer(), false);
+            write(ByteBuffer.wrap(new ErrorMessage(agentID, ForwardedMessage.readMessageID(msg.array(), 0),
+                ErrorType.ERR_UNKNOW_RCPT).toByteArray()), false);
             return;
         }
         // the recipient is known, check if it is connected
@@ -337,8 +338,9 @@ public class ChannelHandler {
                         "] could not be sent, returning error message");
                 }
                 // send error message
-                write(this, new ErrorMessage(MessageType.ERR_DISCONNECTED_RCPT, dstAgentID, agentID,
-                    ForwardedMessage.readMessageID(msg), e).toByteBuffer(), false);
+                write(ByteBuffer.wrap(new ErrorMessage(agentID, ForwardedMessage
+                        .readMessageID(msg.array(), 0), ErrorType.ERR_DISCONNECTED_RCPT_BROADCAST)
+                        .toByteArray()), first);
                 break;
             case DATA_REPLY: // cache reply
                 if (logger.isDebugEnabled()) {
@@ -348,6 +350,7 @@ public class ChannelHandler {
                 // cache the reply (at this point the status of dstChannelHandler should be not connected, indeed we checked its value just before calling handleDisconnectedRecipient())
                 dstChannelHandler.write(this, msg, false);
                 break;
+            case ERR_:
             default:
                 break;
         }

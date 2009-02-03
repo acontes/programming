@@ -9,10 +9,10 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.core.remoteobject.http.util.HttpMarshaller;
+import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.extra.forwardingv2.client.AgentV2;
 import org.objectweb.proactive.extra.forwardingv2.client.ForwardingAgentV2;
 import org.objectweb.proactive.extra.forwardingv2.client.ProActiveMessageHandler;
-import org.objectweb.proactive.extra.forwardingv2.exceptions.RoutingException;
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
 import org.objectweb.proactive.extra.forwardingv2.protocol.MessageInputStream;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.DataReplyMessage;
@@ -47,7 +47,7 @@ public class TestForwardingRegistry {
         input = new MessageInputStream(tunnel.getInputStream());
         Assert.assertNotNull(input);
 
-        RegistrationRequestMessage reg = new RegistrationRequestMessage();
+        RegistrationRequestMessage reg = new RegistrationRequestMessage(ProActiveRandom.nextPosLong());
         tunnel.getOutputStream().write(reg.toByteArray());
         tunnel.getOutputStream().flush();
 
@@ -78,7 +78,7 @@ public class TestForwardingRegistry {
         HelloMessage mess = new HelloMessage();
         byte[] data = HttpMarshaller.marshallObject(mess);
 
-        DataRequestMessage req = new DataRequestMessage(localID, targetID, 1l, data, false);
+        DataRequestMessage req = new DataRequestMessage(localID, targetID, 1l, data);
 
         tunnel.getOutputStream().write(req.toByteArray());
         tunnel.getOutputStream().flush();
@@ -108,7 +108,7 @@ public class TestForwardingRegistry {
         HelloMessage mess = new HelloMessage();
         byte[] data = HttpMarshaller.marshallObject(mess);
 
-        DataRequestMessage req = new DataRequestMessage(localID, new AgentID(9999l), 1l, data, false);
+        DataRequestMessage req = new DataRequestMessage(localID, new AgentID(9999l), 1l, data);
 
         tunnel.getOutputStream().write(req.toByteArray());
         tunnel.getOutputStream().flush();
@@ -119,11 +119,9 @@ public class TestForwardingRegistry {
                 .isAssignableFrom(result.getClass()));
         Assert.assertTrue("Message should be an exception", ErrorMessage.class.isAssignableFrom(result
                 .getClass()));
-        Assert.assertEquals(MessageType.ERR_UNKNOW_RCPT, result.getType());
+        Assert.assertEquals(MessageType.ERR_, result.getType());
 
         ErrorMessage reply = (ErrorMessage) result;
-        Assert.assertTrue("Exception should be a subclass of RoutingException", RoutingException.class
-                .isAssignableFrom(reply.getException().getClass()));
     }
 
 }

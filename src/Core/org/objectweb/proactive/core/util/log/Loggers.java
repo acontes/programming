@@ -152,6 +152,7 @@ public interface Loggers {
 
     // Forwarding
     static final public String FORWARDING = CORE + ".forwarding";
+    static final public String FORWARDING_MESSAGE = FORWARDING + ".message";
     static final public String FORWARDING_ROUTER = FORWARDING + ".router";
     static final public String FORWARDING_CLIENT = FORWARDING + ".client";
     static final public String FORWARDING_CLIENT_TUNNEL = FORWARDING_CLIENT + ".tunnel";

@@ -16,6 +16,7 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.message.ForwardedMess
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationReplyMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationRequestMessage;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.ErrorMessage.ErrorType;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message.MessageType;
 
 
@@ -114,7 +115,7 @@ public class RegistrationHandler implements Runnable {
 
         //send RegistrationReply
         try {
-            sendMessage(new RegistrationReplyMessage(agentID).toByteArray());
+            sendMessage(new RegistrationReplyMessage(agentID, msg.getMessageID()).toByteArray());
         } catch (RemoteConnectionBrokenException e) { //TODO: check if there is a better solution
             // The registration reply could not be sent, the user can't be notified. Just stop the current registrationHandler
             stop();
@@ -130,8 +131,8 @@ public class RegistrationHandler implements Runnable {
         // if regHandler is null we catch an UnknownAgentIdException
         catch (UnknownAgentIdException e) { //TODO: check if it is possible to use less parameters
             try {
-                sendMessage(new ErrorMessage(MessageType.ERR_UNKNOW_RCPT, dstAgentID, agentID,
-                    msg.getMsgID(), e).toByteArray());
+                sendMessage(new ErrorMessage(dstAgentID, msg.getMessageID(), ErrorType.ERR_UNKNOW_RCPT)
+                        .toByteArray());
                 return;
             } catch (RemoteConnectionBrokenException e1) {
                 // could not notify that the destination was unknown because the source tunnel has failed. Just stop the current RegistrationHandler
@@ -144,8 +145,8 @@ public class RegistrationHandler implements Runnable {
         } catch (RemoteConnectionBrokenException e) {
             // could not send the message to its destination, notify the source by sending an ExceptionMessage
             try {
-                sendMessage(new ErrorMessage(MessageType.ERR_DISCONNECTED_RCPT, dstAgentID, agentID, msg
-                        .getMsgID(), e).toByteArray());
+                sendMessage(new ErrorMessage(dstAgentID, msg.getMessageID(),
+                    ErrorType.ERR_DISCONNECTED_RCPT_BROADCAST).toByteArray());
             } catch (RemoteConnectionBrokenException e1) {
                 // could not send a notification of the failure to the source, because the source tunnel has also failed... just stop the source tunnel
                 stop();

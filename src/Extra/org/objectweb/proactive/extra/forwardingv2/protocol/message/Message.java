@@ -1,16 +1,19 @@
 package org.objectweb.proactive.extra.forwardingv2.protocol.message;
 
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.forwardingv2.protocol.TypeHelper;
 
 
 public abstract class Message {
+    static final private Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_MESSAGE);
+
     public static final int PROTOV1 = 1;
-    public static final int GLOBAL_COMMON_OFFSET = 12; // 3*4 for length, protoID and type
 
     // enumerations
     public enum MessageType {
@@ -18,8 +21,10 @@ public abstract class Message {
         REGISTRATION_REPLY, // Registration reply from the registry indicating the attributed localid
         DATA_REQUEST, // Request from a client to a server
         DATA_REPLY, // Reply from a server to a client
-        ERR_DISCONNECTED_RCPT, // Signals that the RCPT disconnected from the router
-        ERR_UNKNOW_RCPT // Signals that the router does not known the RCPT
+        ERR_, DEBUG_,
+        //        ERR_DISCONNECTED_RCPT, // Signals that the RCPT disconnected from the router
+        //        ERR_UNKNOW_RCPT, // Signals that the router does not known the RCPT
+        //        ERR_INVALID_AGENT_ID // a client advertised an unknow agent id on reconnection
         ;
 
         final static Map<Integer, MessageType> idToMessageType;
@@ -37,42 +42,74 @@ public abstract class Message {
         }
     }
 
-    public enum CommonOffsets {
-        LENGTH_OFFSET(0), PROTO_ID_OFFSET(4), MSG_TYPE_OFFSET(8);
+    public enum Field {
+        LENGTH(4, Integer.class), PROTO_ID(4, Integer.class), MSG_TYPE(4, Integer.class), MSG_ID(8,
+                Long.class);
 
-        private final int value;
+        private int length;
+        private Class<?> type;
 
-        private CommonOffsets(int value) {
-            this.value = value;
+        private Field(int length, Class<?> type) {
+            this.length = length;
+            this.type = type;
         }
 
-        public int getValue() {
-            return this.value;
+        public int getLength() {
+            return this.length;
+        }
+
+        public int getOffset() {
+            int offset = 0;
+            // No way to avoid this iteration over ALL the field
+            // There is no such method than Field.getOrdinal(x)
+            for (Field field : values()) {
+                if (field.ordinal() < this.ordinal()) {
+                    offset += field.getLength();
+                }
+            }
+            return offset;
+        }
+
+        public String getType() {
+            return this.type.toString();
+        }
+
+        static public int getTotalOffset() {
+            // OPTIM: Can be optimized with caching if needed
+            int totalOffset = 0;
+            for (Field field : values()) {
+                totalOffset += field.getLength();
+            }
+            return totalOffset;
         }
     }
-
-    // attributes
-    protected MessageType type;
 
     // methods
     public static Message constructMessage(byte[] byteArray, int offset) {
         // depending on the type of message, call a different constructor
         MessageType type = MessageType.getMessageType(TypeHelper.byteArrayToInt(byteArray, offset +
-            CommonOffsets.MSG_TYPE_OFFSET.getValue()));
-        switch (type) {
-            case REGISTRATION_REQUEST:
-                return new RegistrationRequestMessage(byteArray, offset);
-            case REGISTRATION_REPLY:
-                return new RegistrationReplyMessage(byteArray, offset);
-            case DATA_REQUEST:
-                return new DataRequestMessage(byteArray, offset);
-            case DATA_REPLY:
-                return new DataReplyMessage(byteArray, offset);
-            case ERR_DISCONNECTED_RCPT:
-            case ERR_UNKNOW_RCPT:
-                return new ErrorMessage(byteArray, offset);
-            default:
-                return null;
+            Field.MSG_TYPE.getOffset()));
+        try {
+            switch (type) {
+                case REGISTRATION_REQUEST:
+                    return new RegistrationRequestMessage(byteArray, offset);
+                case REGISTRATION_REPLY:
+                    return new RegistrationReplyMessage(byteArray, offset);
+                case DATA_REQUEST:
+                    return new DataRequestMessage(byteArray, offset);
+                case DATA_REPLY:
+                    return new DataReplyMessage(byteArray, offset);
+                case ERR_:
+                    return new ErrorMessage(byteArray, offset);
+                case DEBUG_:
+                    return new DebugMessage(byteArray, offset);
+                default:
+                    logger.error("Construct message failed: unknown message type " + type);
+                    return null;
+            }
+        } catch (InstantiationException e) {
+            logger.error("Construct message failed: wrong message type", e);
+            return null;
         }
     }
 
@@ -83,7 +120,19 @@ public abstract class Message {
      * @return the total length of the formatted message
      */
     public static int readLength(byte[] byteArray, int offset) {
-        return TypeHelper.byteArrayToInt(byteArray, offset + CommonOffsets.LENGTH_OFFSET.getValue());
+        return TypeHelper.byteArrayToInt(byteArray, offset + Field.LENGTH.getOffset());
+    }
+
+    public static int readProtoID(byte[] byteArray, int offset) {
+        return TypeHelper.byteArrayToInt(byteArray, offset + Field.PROTO_ID.getOffset());
+    }
+
+    public static long readMessageID(byte[] byteArray, int offset) {
+        return TypeHelper.byteArrayToLong(byteArray, offset + Field.MSG_ID.getOffset());
+    }
+
+    public static int readLength(ByteBuffer buffer) {
+        return buffer.getInt(Field.LENGTH.getOffset());
     }
 
     /**
@@ -94,7 +143,7 @@ public abstract class Message {
      */
     public static MessageType readType(byte[] byteArray, int offset) {
         return MessageType.getMessageType(TypeHelper.byteArrayToInt(byteArray, offset +
-            CommonOffsets.MSG_TYPE_OFFSET.getValue()));
+            Field.MSG_TYPE.getOffset()));
     }
 
     /**
@@ -103,32 +152,100 @@ public abstract class Message {
      * @return the type of the formatted message
      */
     public static MessageType readType(ByteBuffer buffer) {
-        return MessageType.getMessageType(buffer.getInt(CommonOffsets.MSG_TYPE_OFFSET.getValue()));
+        return MessageType.getMessageType(buffer.getInt(Field.MSG_TYPE.getOffset()));
     }
 
-    /**
-     * @return the type of the message
-     */
+    // attributes
+    private int length;
+    final private int protoId;
+    final private MessageType type;
+    final private long messageId;
+
+    public Message(MessageType type, long messageId) {
+        this.type = type;
+        this.protoId = PROTOV1;
+        this.messageId = messageId;
+    }
+
+    public Message(byte[] buf, int offset) {
+        this.length = readLength(buf, offset);
+        this.protoId = readProtoID(buf, offset);
+        this.type = readType(buf, offset);
+        this.messageId = readMessageID(buf, offset);
+
+        // Should probably throw an exception...
+        if (this.protoId != PROTOV1) {
+            logger.fatal("Invalid protocol id. Expected: " + PROTOV1 + " Received: " + this.protoId);
+        }
+    }
+
+    public int getLength() {
+        return length;
+    }
+
+    protected void setLength(int length) {
+        this.length = length;
+    }
+
     public MessageType getType() {
-        return type;
+        return this.type;
+    }
+
+    public long getMessageID() {
+        return this.messageId;
     }
 
     public int getProtoID() {
-        return PROTOV1;
+        return this.protoId;
     }
 
     public abstract byte[] toByteArray();
 
-    public abstract ByteBuffer toByteBuffer();
+    protected void writeHeader(byte[] buf, int offset) {
+        TypeHelper.intToByteArray(this.length, buf, offset + Field.LENGTH.getOffset());
+        TypeHelper.intToByteArray(this.protoId, buf, offset + Field.PROTO_ID.getOffset());
+        TypeHelper.intToByteArray(this.type.ordinal(), buf, offset + Field.MSG_TYPE.getOffset());
+        TypeHelper.longToByteArray(this.messageId, buf, offset + Field.MSG_ID.getOffset());
+    }
 
-    public abstract int getLength();
+    @Override
+    public String toString() {
+        return "length=" + this.length + " protoId=" + this.protoId + " type=" + this.type + " msgId=" +
+            messageId + " ";
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + length;
+        result = prime * result + (int) (messageId ^ (messageId >>> 32));
+        result = prime * result + protoId;
+        result = prime * result + ((type == null) ? 0 : type.hashCode());
+        return result;
+    }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Message) {
-            Message m = (Message) obj;
-            return Arrays.equals(this.toByteArray(), m.toByteArray());
-        }
-        return false;
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Message other = (Message) obj;
+        if (length != other.length)
+            return false;
+        if (messageId != other.messageId)
+            return false;
+        if (protoId != other.protoId)
+            return false;
+        if (type == null) {
+            if (other.type != null)
+                return false;
+        } else if (!type.equals(other.type))
+            return false;
+        return true;
     }
+
 }

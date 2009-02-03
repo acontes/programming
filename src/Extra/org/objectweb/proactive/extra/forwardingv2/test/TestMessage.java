@@ -4,7 +4,7 @@ import junit.framework.Assert;
 
 import org.bouncycastle.util.Arrays;
 import org.junit.Test;
-import org.objectweb.proactive.extra.forwardingv2.exceptions.ExecutionException;
+import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.DataReplyMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.DataRequestMessage;
@@ -12,7 +12,7 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.message.ErrorMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationReplyMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationRequestMessage;
-import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message.MessageType;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.ErrorMessage.ErrorType;
 
 
 public class TestMessage {
@@ -23,7 +23,7 @@ public class TestMessage {
     @Test
     public void testRegistrationRequestMessageWithoutID() {
         // SETUP PART
-        RegistrationRequestMessage r = new RegistrationRequestMessage();
+        RegistrationRequestMessage r = new RegistrationRequestMessage(ProActiveRandom.nextPosLong());
         Assert.assertNull(r.getAgentID());
 
         // GENERIC PART
@@ -47,7 +47,7 @@ public class TestMessage {
     @Test
     public void testRegistrationRequestMessageWithID() {
         // SETUP PART
-        RegistrationRequestMessage r = new RegistrationRequestMessage(srcID);
+        RegistrationRequestMessage r = new RegistrationRequestMessage(srcID, ProActiveRandom.nextPosLong());
         Assert.assertNotNull(r.getAgentID());
         Assert.assertEquals(srcID, r.getAgentID());
 
@@ -73,7 +73,7 @@ public class TestMessage {
     @Test
     public void testRegistrationReplyMessage() {
         // SETUP PART
-        RegistrationReplyMessage r = new RegistrationReplyMessage(srcID);
+        RegistrationReplyMessage r = new RegistrationReplyMessage(srcID, ProActiveRandom.nextPosLong());
         Assert.assertNotNull(r.getAgentID());
         Assert.assertEquals(srcID, r.getAgentID());
 
@@ -100,10 +100,10 @@ public class TestMessage {
     public void testDataRequestMessage() {
         // SETUP PART
         byte[] msg = "Hello".getBytes();
-        DataRequestMessage r = new DataRequestMessage(srcID, dstID, msgID, msg, false);
+        DataRequestMessage r = new DataRequestMessage(srcID, dstID, msgID, msg);
         Assert.assertEquals(srcID, r.getSrcAgentID());
         Assert.assertEquals(dstID, r.getDstAgentID());
-        Assert.assertEquals(msgID, r.getMsgID());
+        Assert.assertEquals(msgID, r.getMessageID());
         Assert.assertTrue("Data is OK", Arrays.areEqual(msg, r.getData()));
 
         // GENERIC PART
@@ -123,7 +123,7 @@ public class TestMessage {
         DataRequestMessage res = (DataRequestMessage) r2;
         Assert.assertEquals(srcID, res.getSrcAgentID());
         Assert.assertEquals(dstID, res.getDstAgentID());
-        Assert.assertEquals(msgID, res.getMsgID());
+        Assert.assertEquals(msgID, res.getMessageID());
         Assert.assertTrue("Data is OK", Arrays.areEqual(msg, res.getData()));
     }
 
@@ -134,7 +134,7 @@ public class TestMessage {
         DataReplyMessage r = new DataReplyMessage(srcID, dstID, msgID, msg);
         Assert.assertEquals(srcID, r.getSrcAgentID());
         Assert.assertEquals(dstID, r.getDstAgentID());
-        Assert.assertEquals(msgID, r.getMsgID());
+        Assert.assertEquals(msgID, r.getMessageID());
         Assert.assertTrue("Data is OK", Arrays.areEqual(msg, r.getData()));
 
         // GENERIC PART
@@ -154,20 +154,17 @@ public class TestMessage {
         DataReplyMessage res = (DataReplyMessage) r2;
         Assert.assertEquals(srcID, res.getSrcAgentID());
         Assert.assertEquals(dstID, res.getDstAgentID());
-        Assert.assertEquals(msgID, res.getMsgID());
+        Assert.assertEquals(msgID, res.getMessageID());
         Assert.assertTrue("Data is OK", Arrays.areEqual(msg, res.getData()));
     }
 
     @Test
     public void testExceptionMessage() {
         // SETUP PART
-        ExecutionException ex = new ExecutionException("Blablabla");
-        ErrorMessage r = new ErrorMessage(MessageType.ERR_DISCONNECTED_RCPT, srcID, dstID, msgID, ex);
+        ErrorMessage r = new ErrorMessage(dstID, msgID, ErrorType.ERR_DISCONNECTED_RCPT_BROADCAST);
         Assert.assertEquals(srcID, r.getSrcAgentID());
         Assert.assertEquals(dstID, r.getDstAgentID());
-        Assert.assertEquals(msgID, r.getMsgID());
-        Assert.assertEquals(ex.getClass(), r.getException().getClass());
-        Assert.assertEquals(ex.getMessage(), r.getException().getMessage());
+        Assert.assertEquals(msgID, r.getMessageID());
 
         // GENERIC PART
         Assert.assertNotNull(r);
@@ -186,9 +183,7 @@ public class TestMessage {
         ErrorMessage res = (ErrorMessage) r2;
         Assert.assertEquals(srcID, res.getSrcAgentID());
         Assert.assertEquals(dstID, res.getDstAgentID());
-        Assert.assertEquals(msgID, res.getMsgID());
-        Assert.assertEquals(ex.getClass(), res.getException().getClass());
-        Assert.assertEquals(ex.getMessage(), res.getException().getMessage());
+        Assert.assertEquals(msgID, res.getMessageID());
     }
 
 }

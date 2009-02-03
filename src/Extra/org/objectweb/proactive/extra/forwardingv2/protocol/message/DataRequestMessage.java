@@ -5,24 +5,21 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
 
 public class DataRequestMessage extends ForwardedMessage {
 
-    private boolean oneWay;
-
-    public DataRequestMessage(AgentID srcAgentID, AgentID dstAgentID, long msgID, byte[] data, boolean oneWay) {
+    public DataRequestMessage(AgentID srcAgentID, AgentID dstAgentID, long msgID, byte[] data) {
         super(MessageType.DATA_REQUEST, srcAgentID, dstAgentID, msgID, data);
-        this.oneWay = oneWay;
     }
 
     /**
      * Construct a message from the data contained in a formatted byte array.
      * @param byteArray the byte array from which to read
      * @param offset the offset at which to find the message in the byte array
+     * @throws InstantiationException
      */
-    public DataRequestMessage(byte[] byteArray, int offset) {
+    public DataRequestMessage(byte[] byteArray, int offset) throws InstantiationException {
         super(byteArray, offset);
-    }
 
-    public boolean isOneWay() {
-        return oneWay;
+        if (this.getType() != MessageType.DATA_REQUEST) {
+            throw new InstantiationException("Invalid message type " + this.getType());
+        }
     }
-
 }

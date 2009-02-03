@@ -49,17 +49,16 @@ import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.core.xml.VariableContractType;
-import org.objectweb.proactive.extra.forwardingv2.registry.ForwardingRegistry;
-import org.objectweb.proactive.extra.forwardingv2.registry.nio.Router;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.MessageRoutingRemoteObjectFactory;
+import org.objectweb.proactive.extra.forwardingv2.router.Router;
+import org.objectweb.proactive.extra.forwardingv2.router.RouterImpl;
 
 
 public class FunctionalTest {
     static final protected Logger logger = Logger.getLogger("testsuite");
 
     static final public String VAR_JVM_PARAMETERS = "JVM_PARAMETERS";
-    static private ForwardingRegistry router;
-    static private Router routerNIO;
+    static private Router router;
 
     @BeforeClass
     static public void configureMessageRouting() {
@@ -69,15 +68,14 @@ public class FunctionalTest {
                     .getValue())) {
                 if (PAProperties.PA_NET_ROUTER_PORT.getValue() == null ||
                     PAProperties.PA_NET_ROUTER_PORT.getValueAsInt() == 0) {
-                	routerNIO = new Router(0, true);
-                    PAProperties.PA_NET_ROUTER_PORT.setValue(routerNIO.getLocalPort());
-                    //router = new ForwardingRegistry(0, true);
-                    //PAProperties.PA_NET_ROUTER_PORT.setValue(router.getLocalPort());
+                    router = new RouterImpl(0);
+                    PAProperties.PA_NET_ROUTER_PORT.setValue(router.getLocalPort());
                 } else {
-                	routerNIO = new Router(PAProperties.PA_NET_ROUTER_PORT.getValueAsInt(), true);
-                    //router = new ForwardingRegistry(PAProperties.PA_NET_ROUTER_PORT.getValueAsInt(), true);
+                    router = new RouterImpl(PAProperties.PA_NET_ROUTER_PORT.getValueAsInt());
                 }
-                System.out.println("Registry started on port "+PAProperties.PA_NET_ROUTER_PORT.getValueAsInt());
+                Thread routerThread = new Thread(router);
+                routerThread.setName("Router: main thread");
+                routerThread.start();
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -213,7 +211,7 @@ public class FunctionalTest {
         Runtime.getRuntime().removeShutdownHook(shutdownHook);
 
         if (router != null) {
-            router.stop();
+            //     	       router.stop();
         }
 
         logger.trace("Killing remaining ProActive Runtime");

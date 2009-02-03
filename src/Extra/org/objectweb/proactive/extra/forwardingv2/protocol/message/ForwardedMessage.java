@@ -1,6 +1,6 @@
 package org.objectweb.proactive.extra.forwardingv2.protocol.message;
 
-import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
 import org.objectweb.proactive.extra.forwardingv2.protocol.TypeHelper;
@@ -8,36 +8,62 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.TypeHelper;
 
 public abstract class ForwardedMessage extends Message {
 
-    // 1 long for the length, 2 int for protoID and MsgType, 2 long for SrcAgent and DstAgent IDs, 1 long for MSG_ID 
-    public static final int FORWARDED_MESSAGE_HEADER_LENGTH = GLOBAL_COMMON_OFFSET + 2 * 8 + 8; // = 36
+    public static final int FORWARDED_MESSAGE_HEADER_LENGTH = Message.Field.getTotalOffset() +
+        Field.getTotalOffset(); // = 36
 
-    public enum Offsets {
-        SRC_AGENT_ID_OFFSET(0), DST_AGENT_ID_OFFSET(8), MSG_ID_OFFSET(16);
+    public enum Field {
+        SRC_AGENT_ID(8, Long.class), DST_AGENT_ID(8, Integer.class);
 
-        private final int value;
+        private int length;
+        private Class<?> type;
 
-        private Offsets(int value) {
-            this.value = GLOBAL_COMMON_OFFSET + value;
+        private Field(int length, Class<?> type) {
+            this.length = length;
+            this.type = type;
         }
 
-        public int getValue() {
-            return this.value;
+        public long getLength() {
+            return this.length;
+        }
+
+        public int getOffset() {
+            int offset = 0;
+            // No way to avoid this iteration over ALL the field
+            // There is no such method than Field.getOrdinal(x)
+            for (Field field : values()) {
+                if (field.ordinal() < this.ordinal()) {
+                    offset += field.getLength();
+                }
+            }
+            return offset;
+        }
+
+        public String getType() {
+            return this.type.toString();
+        }
+
+        static public int getTotalOffset() {
+            // OPTIM: Can be optimized with caching if needed
+            int totalOffset = 0;
+            for (Field field : values()) {
+                totalOffset += field.getLength();
+            }
+            return totalOffset;
         }
     }
 
     //attributes
     final protected AgentID srcAgentID, dstAgentID;
-    final protected long msgID;
     final protected byte[] data; // Since data is not used by the router should be lazily created to avoid data duplication
     final protected byte[] toByteArray;
 
     public ForwardedMessage(MessageType type, AgentID srcAgentID, AgentID dstAgentID, long msgID, byte[] data) {
-        this.type = type;
+        super(type, msgID);
         this.srcAgentID = srcAgentID;
         this.dstAgentID = dstAgentID;
-        this.msgID = msgID;
         this.data = data;
         this.toByteArray = null;
+        super.setLength(this.getLength());
     }
 
     /**
@@ -46,13 +72,12 @@ public abstract class ForwardedMessage extends Message {
      * @param offset the offset at which to find the message in the byte array
      */
     public ForwardedMessage(byte[] byteArray, int offset) {
-        int datalength = readLength(byteArray, offset) - FORWARDED_MESSAGE_HEADER_LENGTH;
+        super(byteArray, offset);
 
-        this.type = readType(byteArray, offset);
         this.srcAgentID = readSrcAgentID(byteArray, offset);
         this.dstAgentID = readDstAgentID(byteArray, offset);
-        this.msgID = readMessageID(byteArray, offset);
 
+        int datalength = readLength(byteArray, offset) - FORWARDED_MESSAGE_HEADER_LENGTH;
         this.data = new byte[datalength];
         System.arraycopy(byteArray, offset + FORWARDED_MESSAGE_HEADER_LENGTH, this.data, 0, datalength);
 
@@ -60,52 +85,34 @@ public abstract class ForwardedMessage extends Message {
     }
 
     public String toString() {
-        return "dest=" + this.dstAgentID + " src=" + this.srcAgentID + " msgID=" + this.msgID + " type=" +
-            this.type;
+        return super.toString() + " src=" + this.srcAgentID + " dst=" + this.dstAgentID;
     }
 
     @Override
     public byte[] toByteArray() {
         int length = getLength();
-        byte[] byteArray = new byte[length];
+        byte[] buf = new byte[length];
 
-        TypeHelper.intToByteArray(length, byteArray, CommonOffsets.LENGTH_OFFSET.getValue());
-        TypeHelper.intToByteArray(getProtoID(), byteArray, CommonOffsets.PROTO_ID_OFFSET.getValue());
-        TypeHelper.intToByteArray(type.ordinal(), byteArray, CommonOffsets.MSG_TYPE_OFFSET.getValue());
+        super.writeHeader(buf, 0);
+
+        long srcId = -1;
         if (srcAgentID != null) {
-            TypeHelper.longToByteArray(srcAgentID.getId(), byteArray, Offsets.SRC_AGENT_ID_OFFSET.getValue());
+            srcId = srcAgentID.getId();
         }
+        TypeHelper.longToByteArray(srcId, buf, Message.Field.getTotalOffset() +
+            Field.SRC_AGENT_ID.getOffset());
+
+        long dstId = -1;
         if (dstAgentID != null) {
-            TypeHelper.longToByteArray(dstAgentID.getId(), byteArray, Offsets.DST_AGENT_ID_OFFSET.getValue());
+            dstId = dstAgentID.getId();
         }
-        TypeHelper.longToByteArray(msgID, byteArray, Offsets.MSG_ID_OFFSET.getValue());
+        TypeHelper.longToByteArray(dstId, buf, Message.Field.getTotalOffset() +
+            Field.DST_AGENT_ID.getOffset());
 
         if (data != null) {
-            System.arraycopy(data, 0, byteArray, FORWARDED_MESSAGE_HEADER_LENGTH, data.length);
+            System.arraycopy(data, 0, buf, FORWARDED_MESSAGE_HEADER_LENGTH, data.length);
         }
-        return byteArray;
-    }
-
-    @Override
-    public ByteBuffer toByteBuffer() {
-        int length = getLength();
-        ByteBuffer buffer = ByteBuffer.allocate(length);
-
-        buffer.putInt(length).putInt(getProtoID()).putInt(type.ordinal());
-        if (srcAgentID != null) {
-            buffer.putLong(srcAgentID.getId());
-        }
-        if (dstAgentID != null) {
-            buffer.putLong(Offsets.DST_AGENT_ID_OFFSET.getValue(), dstAgentID.getId());
-        }
-        buffer.putLong(Offsets.MSG_ID_OFFSET.getValue(), msgID);
-
-        buffer.position(FORWARDED_MESSAGE_HEADER_LENGTH);
-        if (data != null) {
-            buffer.put(data);
-        }
-        buffer.flip();
-        return buffer;
+        return buf;
     }
 
     /**
@@ -115,15 +122,29 @@ public abstract class ForwardedMessage extends Message {
         return FORWARDED_MESSAGE_HEADER_LENGTH + (data != null ? data.length : 0);
     }
 
+    public AgentID getSrcAgentID() {
+        return srcAgentID;
+    }
+
+    public AgentID getDstAgentID() {
+        return dstAgentID;
+    }
+
+    public byte[] getData() {
+        return data;
+    }
+
     /**
      * Reads the srcAgentID of a formatted message beginning at a certain offset inside a buffer. Encapsulates it in an AgentID object.
      * @param byteArray the buffer in which to read 
      * @param offset the offset at which to find the beginning of the message in the buffer
      * @return the srcAgentID of the formatted message
      */
-    public static AgentID readSrcAgentID(byte[] byteArray, int offset) {
-        return new AgentID(TypeHelper.byteArrayToLong(byteArray, offset +
-            Offsets.SRC_AGENT_ID_OFFSET.getValue()));
+    static public AgentID readSrcAgentID(byte[] byteArray, int offset) {
+        long id = TypeHelper.byteArrayToLong(byteArray, offset + Message.Field.getTotalOffset() +
+            Field.SRC_AGENT_ID.getOffset());
+
+        return id < 0 ? null : new AgentID(id);
     }
 
     /**
@@ -142,51 +163,52 @@ public abstract class ForwardedMessage extends Message {
      * @return the dstAgentID of the formatted message
      */
     public static AgentID readDstAgentID(byte[] byteArray, int offset) {
-        return new AgentID(TypeHelper.byteArrayToLong(byteArray, offset +
-            Offsets.DST_AGENT_ID_OFFSET.getValue()));
+        long id = TypeHelper.byteArrayToLong(byteArray, offset + Message.Field.getTotalOffset() +
+            Field.DST_AGENT_ID.getOffset());
+
+        return id < 0 ? null : new AgentID(id);
     }
 
     /**
      * Reads the dstAgentID of a formatted message beginning at a certain offset inside a buffer. Encapsulates it in an AgentID object.
-     * @param buffer the ByteBuffer in which to read 
+     * @param byteArray the array in which to read 
      * @return the dstAgentID of the formatted message
      */
-    public static AgentID readDstAgentID(ByteBuffer buffer) {
-        return new AgentID(buffer.getLong(Offsets.DST_AGENT_ID_OFFSET.getValue()));
+    public static AgentID readDstAgentID(byte[] byteArray) {
+        return readDstAgentID(byteArray, 0);
     }
 
-    /**
-     * Reads the MessageID of a formatted message beginning at a certain offset inside a buffer. 
-     * @param byteArray the array in which to read 
-     * @param offset the offset at which to find the beginning of the message in the buffer
-     * @return the MessageID of the formatted message
-     */
-    public static long readMessageID(byte[] byteArray, int offset) {
-        return TypeHelper.byteArrayToLong(byteArray, offset + Offsets.MSG_ID_OFFSET.getValue());
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + Arrays.hashCode(data);
+        result = prime * result + ((dstAgentID == null) ? 0 : dstAgentID.hashCode());
+        result = prime * result + ((srcAgentID == null) ? 0 : srcAgentID.hashCode());
+        return result;
     }
 
-    /**
-     * Reads the MessageID of a formatted message beginning at a certain offset inside a buffer. 
-     * @param buffer the {@link ByteBuffer} in which to read 
-     * @return the MessageID of the formatted message
-     */
-    public static long readMessageID(ByteBuffer buffer) {
-        return buffer.getLong(Offsets.MSG_ID_OFFSET.getValue());
-    }
-
-    public AgentID getSrcAgentID() {
-        return srcAgentID;
-    }
-
-    public AgentID getDstAgentID() {
-        return dstAgentID;
-    }
-
-    public long getMsgID() {
-        return msgID;
-    }
-
-    public byte[] getData() {
-        return data;
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        ForwardedMessage other = (ForwardedMessage) obj;
+        if (!Arrays.equals(data, other.data))
+            return false;
+        if (dstAgentID == null) {
+            if (other.dstAgentID != null)
+                return false;
+        } else if (!dstAgentID.equals(other.dstAgentID))
+            return false;
+        if (srcAgentID == null) {
+            if (other.srcAgentID != null)
+                return false;
+        } else if (!srcAgentID.equals(other.srcAgentID))
+            return false;
+        return true;
     }
 }

@@ -11,6 +11,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.core.remoteobject.http.util.HttpMarshaller;
+import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.extra.forwardingv2.client.AgentV2;
 import org.objectweb.proactive.extra.forwardingv2.client.ForwardingAgentV2;
 import org.objectweb.proactive.extra.forwardingv2.client.ProActiveMessageHandler;
@@ -132,7 +133,7 @@ class FakeRegistry implements Runnable {
 
             // Put a registration reply
 
-            Message resp = new RegistrationReplyMessage(new AgentID(1l));
+            Message resp = new RegistrationReplyMessage(new AgentID(1l), ProActiveRandom.nextPosLong());
             sock.getOutputStream().write(resp.toByteArray());
             sock.getOutputStream().flush();
 
@@ -142,7 +143,7 @@ class FakeRegistry implements Runnable {
 
                 if (m instanceof ForwardedMessage) {
                     ForwardedMessage fm = (ForwardedMessage) m;
-                    resp = new DataReplyMessage(fm.getDstAgentID(), fm.getSrcAgentID(), fm.getMsgID(),
+                    resp = new DataReplyMessage(fm.getDstAgentID(), fm.getSrcAgentID(), fm.getMessageID(),
                         HttpMarshaller.marshallObject(TestForwardingAgentV2.PAYLOAD));
 
                     System.out.println("FakeReg: Forwarding message: " + resp);

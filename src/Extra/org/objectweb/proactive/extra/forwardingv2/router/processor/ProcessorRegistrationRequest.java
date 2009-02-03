@@ -1,0 +1,121 @@
+package org.objectweb.proactive.extra.forwardingv2.router.processor;
+
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicLong;
+
+import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.ErrorMessage;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationMessage;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationReplyMessage;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationRequestMessage;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.ErrorMessage.ErrorType;
+import org.objectweb.proactive.extra.forwardingv2.router.Attachment;
+import org.objectweb.proactive.extra.forwardingv2.router.Client;
+import org.objectweb.proactive.extra.forwardingv2.router.Router;
+
+
+public class ProcessorRegistrationRequest extends Processor {
+
+    final private RegistrationRequestMessage message;
+    final private Attachment attachment;
+    final private Router router;
+
+    public ProcessorRegistrationRequest(ByteBuffer messageAsByteBuffer, Attachment attachment, Router router) {
+        this.attachment = attachment;
+        this.router = router;
+
+        Message tmpMsg = Message.constructMessage(messageAsByteBuffer.array(), 0);
+        this.message = (RegistrationRequestMessage) tmpMsg;
+    }
+
+    public void process() {
+        AgentID agentId = this.message.getAgentID();
+        if (agentId == null) {
+            connection();
+        } else {
+            reconnection();
+        }
+    }
+
+    /* Generate and unique AgentID and send the registration reply
+     * in best effort. If succeeded, add the new client to the router
+     */
+    private void connection() {
+        AgentID agentId = AgentIdGenerator.getId();
+
+        RegistrationMessage reply = new RegistrationReplyMessage(agentId, this.message.getMessageID());
+
+        Client client = new Client(attachment, agentId);
+        boolean resp = this.sendReply(client, reply);
+        if (resp) {
+            this.router.addClient(client);
+        }
+    }
+
+    /* Check if the client is known. If not send an ERR_.
+     * Otherwise, send the registration reply in best effort.
+     * If succeeded, update the attachment in the client, and
+     * flush the pending messages.
+     */
+    private void reconnection() {
+        // Check if the client is know
+        AgentID agentId = message.getAgentID();
+        Client client = router.getClient(agentId);
+
+        if (client == null) {
+            // Send an ERR_ message (best effort)
+            logger.warn("AgentId " + agentId + " asked to reconnect but is not known by this router");
+
+            ErrorMessage errMessage = new ErrorMessage(null, this.message.getMessageID(),
+                ErrorType.ERR_INVALID_AGENT_ID);
+            try {
+                attachment.send(0, ByteBuffer.wrap(errMessage.toByteArray()));
+            } catch (IOException e) {
+                logger.info("Failed to notify the client that invalid agent has been advertised");
+            }
+        } else {
+            // Acknowledge the registration
+            client.setAttachment(attachment);
+            RegistrationReplyMessage reply = new RegistrationReplyMessage(agentId, this.message
+                    .getMessageID());
+
+            boolean resp = this.sendReply(client, reply);
+            if (resp) {
+                client.send_pending_message();
+            } else {
+                logger.info("Failed to acknowledge the registration for " + agentId);
+                // Drop the attachment
+            }
+        }
+    }
+
+    /* Send the registration reply to the client (best effort)
+     *
+     * We don't want to cache the message on failure because if the tunnel
+     * failed, the client will register again anyway.
+     */
+    private boolean sendReply(Client client, RegistrationMessage reply) {
+        try {
+            client.sendMessage(DEFAULT_TIMEOUT, reply.toByteArray());
+            return true;
+        } catch (IOException e) {
+            logger.info("Failed to send registration reply to " + reply.getAgentID() + ", IOException");
+        } catch (TimeoutException e) {
+            logger.info("Failed to send registration reply to " + reply.getAgentID() + ", timeout reached");
+        }
+
+        return false;
+    }
+
+    static abstract private class AgentIdGenerator {
+        static final private AtomicLong generator = new AtomicLong(0);
+
+        static public AgentID getId() {
+            return new AgentID(generator.getAndIncrement());
+        }
+    }
+
+}

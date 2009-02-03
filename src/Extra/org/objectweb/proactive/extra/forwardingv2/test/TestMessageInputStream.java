@@ -9,6 +9,7 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.junit.Test;
+import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
 import org.objectweb.proactive.extra.forwardingv2.protocol.MessageInputStream;
@@ -26,11 +27,11 @@ public class TestMessageInputStream {
         AgentID dstID = new AgentID(12l);
         // create list
         ArrayList<Message> l = new ArrayList<Message>();
-        Message m1 = new RegistrationRequestMessage();
+        Message m1 = new RegistrationRequestMessage(ProActiveRandom.nextPosLong());
         l.add(m1);
-        Message m2 = new RegistrationReplyMessage(srcID);
+        Message m2 = new RegistrationReplyMessage(srcID, ProActiveRandom.nextPosLong());
         l.add(m2);
-        Message m3 = new DataRequestMessage(srcID, dstID, 100, "Hello".getBytes(), false);
+        Message m3 = new DataRequestMessage(srcID, dstID, 100, "Hello".getBytes());
         l.add(m3);
 
         // Creating Server

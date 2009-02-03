@@ -1,35 +1,60 @@
 package org.objectweb.proactive.extra.forwardingv2.protocol.message;
 
-import java.nio.ByteBuffer;
-
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
 import org.objectweb.proactive.extra.forwardingv2.protocol.TypeHelper;
 
 
 public abstract class RegistrationMessage extends Message {
 
-    public static final int REGISTRATION_MESSAGE_LENGTH = GLOBAL_COMMON_OFFSET + 8;
+    public enum Field {
+        AGENT_ID(8, Long.class);
 
-    public enum Offsets {
-        AGENT_ID_OFFSET(0);
+        private int length;
+        private Class<?> type;
 
-        private final int value;
-
-        private Offsets(int value) {
-            this.value = GLOBAL_COMMON_OFFSET + value;
+        private Field(int length, Class<?> type) {
+            this.length = length;
+            this.type = type;
         }
 
-        public int getValue() {
-            return this.value;
+        public long getLength() {
+            return this.length;
+        }
+
+        public int getOffset() {
+            int offset = 0;
+            // No way to avoid this iteration over ALL the field
+            // There is no such method than Field.getOrdinal(x)
+            for (Field field : values()) {
+                if (field.ordinal() < this.ordinal()) {
+                    offset += field.getLength();
+                }
+            }
+            return offset;
+        }
+
+        public String getType() {
+            return this.type.toString();
+        }
+
+        static public int getTotalOffset() {
+            // OPTIM: Can be optimized with caching if needed
+            int totalOffset = 0;
+            for (Field field : values()) {
+                totalOffset += field.getLength();
+            }
+            return totalOffset;
         }
     }
 
     // attribute
-    protected AgentID agentID;
+    final private AgentID agentID;
 
-    public RegistrationMessage(MessageType type, AgentID agentID) {
-        this.type = type;
+    public RegistrationMessage(MessageType type, long messageId, AgentID agentID) {
+        super(type, messageId);
+
         this.agentID = agentID;
+        super.setLength(this.getLength());
     }
 
     /**
@@ -38,8 +63,9 @@ public abstract class RegistrationMessage extends Message {
      * @param offset the offset at which to find the message in the byte array
      */
     public RegistrationMessage(byte[] byteArray, int offset) {
-        type = readType(byteArray, offset);
-        agentID = readAgentID(byteArray, offset);
+        super(byteArray, offset);
+
+        this.agentID = readAgentID(byteArray, offset);
     }
 
     public AgentID getAgentID() {
@@ -49,29 +75,16 @@ public abstract class RegistrationMessage extends Message {
     @Override
     public byte[] toByteArray() {
         int length = getLength();
-        byte[] byteArray = new byte[length];
+        byte[] buff = new byte[length];
 
-        TypeHelper.intToByteArray(length, byteArray, CommonOffsets.LENGTH_OFFSET.getValue());
-        TypeHelper.intToByteArray(getProtoID(), byteArray, CommonOffsets.PROTO_ID_OFFSET.getValue());
-        TypeHelper.intToByteArray(type.ordinal(), byteArray, CommonOffsets.MSG_TYPE_OFFSET.getValue());
-        if (agentID != null) {
-            TypeHelper.longToByteArray(agentID.getId(), byteArray, Offsets.AGENT_ID_OFFSET.getValue());
+        super.writeHeader(buff, 0);
+
+        long id = -1;
+        if (this.agentID != null) {
+            id = this.agentID.getId();
         }
-        return byteArray;
-    }
-
-    @Override
-    public ByteBuffer toByteBuffer() {
-        int length = getLength();
-        ByteBuffer buffer = ByteBuffer.allocate(length);
-
-        buffer.putInt(length).putInt(getProtoID()).putInt(type.ordinal());
-
-        if (agentID != null) {
-            buffer.putLong(agentID.getId());
-        }
-        buffer.flip();
-        return buffer;
+        TypeHelper.longToByteArray(id, buff, Message.Field.getTotalOffset() + Field.AGENT_ID.getOffset());
+        return buff;
     }
 
     //TODO: set it as abstract in Message.java ?
@@ -79,7 +92,7 @@ public abstract class RegistrationMessage extends Message {
      * @return the total length of the formatted message (header length + data length)
      */
     public int getLength() {
-        return REGISTRATION_MESSAGE_LENGTH;
+        return Message.Field.getTotalOffset() + Field.getTotalOffset();
     }
 
     /**
@@ -88,18 +101,35 @@ public abstract class RegistrationMessage extends Message {
      * @param offset the offset at which to find the beginning of the message in the buffer
      * @return the AgentID of the formatted message
      */
-    public static AgentID readAgentID(byte[] byteArray, int offset) {
-        long id = TypeHelper.byteArrayToLong(byteArray, offset + Offsets.AGENT_ID_OFFSET.getValue());
-        return (id != 0) ? new AgentID(id) : null;
+    public AgentID readAgentID(byte[] byteArray, int offset) {
+        long id = TypeHelper.byteArrayToLong(byteArray, offset + Message.Field.getTotalOffset() +
+            Field.AGENT_ID.getOffset());
+        return (id >= 0) ? new AgentID(id) : null;
     }
 
-    /**
-     * Reads the AgentID of a formatted message beginning at a certain offset inside a buffer. Encapsulates it in an AgentID object.
-     * @param buffer the buffer in which to read 
-     * @return the AgentID of the formatted message
-     */
-    public static AgentID readAgentID(ByteBuffer buffer) {
-        long id = buffer.getLong(Offsets.AGENT_ID_OFFSET.getValue());
-        return (id != 0) ? new AgentID(id) : null;
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((agentID == null) ? 0 : agentID.hashCode());
+        return result;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        RegistrationMessage other = (RegistrationMessage) obj;
+        if (agentID == null) {
+            if (other.agentID != null)
+                return false;
+        } else if (!agentID.equals(other.agentID))
+            return false;
+        return true;
+    }
+
 }

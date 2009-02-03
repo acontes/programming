@@ -55,8 +55,7 @@ public class MessageProcessor implements Runnable {
             case DATA_REQUEST:
                 processDataRequest();
                 break;
-            case ERR_DISCONNECTED_RCPT:
-            case ERR_UNKNOW_RCPT:
+            case ERR_:
                 processErrorMsg();
                 break;
             default:

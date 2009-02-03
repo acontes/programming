@@ -27,12 +27,19 @@ public class Tunnel {
     final private Socket socket;
     final private BufferedInputStream bis;
 
+    final private String debugString;
+
     public Tunnel(InetAddress routerAddr, int routerPort) throws IOException {
         this.socket = new Socket(routerAddr, routerPort);
         this.bis = new BufferedInputStream(socket.getInputStream());
 
         // Configure the socket
         this.socket.setKeepAlive(true);
+
+        this.debugString = "local=" + socket.getLocalAddress() + " remote=" + socket.getRemoteSocketAddress();
+        if (logger.isDebugEnabled()) {
+            logger.debug("Opened a new tunnel to router: " + this.debugString);
+        }
     }
 
     public void write(byte[] buf) throws IOException {
@@ -61,13 +68,17 @@ public class Tunnel {
         while (read < length) {
             int retVal = bis.read(buf, offset + read, length - read);
             if (retVal == -1) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Tunnel " + this.debugString + " got EOF");
+                }
                 throw new IOException("Failed to read " + length + "byte. EOF reached after " + read +
                     " bytes");
             }
 
             read += retVal;
             if (logger.isDebugEnabled()) {
-                logger.debug("" + read + " bytes have been read, " + (length - read) + " remaining");
+                logger.debug("" + read + " bytes have been read on, " + this.debugString + " " +
+                    (length - read) + " remaining");
             }
         }
     }
