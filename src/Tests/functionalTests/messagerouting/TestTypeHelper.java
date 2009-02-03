@@ -1,4 +1,4 @@
-package org.objectweb.proactive.extra.forwardingv2.test;
+package functionalTests.messagerouting;
 
 import java.util.Random;
 

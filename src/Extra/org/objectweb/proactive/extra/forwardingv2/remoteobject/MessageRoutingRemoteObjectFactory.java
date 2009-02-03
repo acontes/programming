@@ -55,7 +55,6 @@ import org.objectweb.proactive.extra.forwardingv2.exceptions.MessageRoutingExcep
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.message.MessageRoutingRegistryListRemoteObjectsMessage;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.message.MessageRoutingRemoteObjectLookupMessage;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.util.MessageRoutingRegistry;
-import org.objectweb.proactive.extra.forwardingv2.remoteobject.util.exceptions.MessageRoutingRemoteException;
 
 
 public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFactory implements

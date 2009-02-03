@@ -1,8 +1,6 @@
 package org.objectweb.proactive.extra.forwardingv2.router.processor;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.concurrent.TimeoutException;
 
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.ErrorMessage;
