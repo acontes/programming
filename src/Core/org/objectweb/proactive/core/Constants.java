@@ -89,9 +89,6 @@ public interface Constants {
     /** this property identifies the https protocol */
     public static final String HTTPSSH_PROTOCOL_IDENTIFIER = "httpssh";
 
-    /** this property identifies the forwarding protocol */
-    public static final String FORWARDING_PROTOCOL_IDENTIFIER = "rmifw";
-
     /** default protocol identifier */
     public static final String DEFAULT_PROTOCOL_IDENTIFIER = RMI_PROTOCOL_IDENTIFIER;
 

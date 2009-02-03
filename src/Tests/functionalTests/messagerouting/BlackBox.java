@@ -5,14 +5,13 @@ import java.net.InetAddress;
 
 import org.junit.Before;
 import org.objectweb.proactive.extra.forwardingv2.client.Tunnel;
-import org.objectweb.proactive.extra.forwardingv2.router.Router;
 import org.objectweb.proactive.extra.forwardingv2.router.RouterImpl;
 
 import functionalTests.FunctionalTest;
 
 
 public class BlackBox extends FunctionalTest {
-    protected Router router;
+    protected RouterImpl router;
     protected Tunnel tunnel;
 
     @Before

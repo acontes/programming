@@ -131,7 +131,8 @@ public class ProActiveLogger extends Logger {
     * @param t The nasty exception
     */
     static public void logEatedException(Logger logger, String message, Throwable t) {
-        logger.info(message, t);
+        /* Usually we don't want to see theses exceptions. DEBUG is the right level to use */
+    	logger.debug(message, t);
     }
 
     /** Log an exception we don't want to handle

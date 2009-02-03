@@ -9,7 +9,5 @@ public abstract class Processor {
 
     final static protected Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_ROUTER);
 
-    final static protected int DEFAULT_TIMEOUT = 10000; // ten seconds
-
     abstract public void process();
 }

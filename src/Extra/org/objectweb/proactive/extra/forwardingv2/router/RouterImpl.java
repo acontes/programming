@@ -8,7 +8,10 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -25,18 +28,38 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.message.ErrorMessage.
 public class RouterImpl implements Runnable, Router {
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_ROUTER);
 
+    /** Read {@link ByteBuffer} size. */
     private final static int READ_BUFFER_SIZE = 4096;
 
+    /** Thread pool used to execute all asynchronous tasks */
     private final ExecutorService tpe;
 
+    /** All the clients known by {@link AgentID}*/
     private final ConcurrentHashMap<AgentID, Client> clientMap = new ConcurrentHashMap<AgentID, Client>();
 
+    /** The local TCP port on which the router is listening */
     private int port;
 
     private Selector selector = null;
     private ServerSocketChannel ssc = null;
     private ServerSocket serverSocket = null;
 
+    /** Create a new router
+     * 
+     * When a new router is created it binds onto the given port.
+     * 
+     * To start handling connections, a thread MUST be spawned by the caller.
+     * <code>
+     *  RouterImpl this.router = new RouterImpl(0);
+     *  Thread t = new Thread(router);
+     *  t.setDaemon(true);
+     *  t.setName("Router");
+     *  t.start();
+     * </code>
+     * 
+     * @param port port number to bind to
+     * @throws IOException if the router failed to bind
+     */
     public RouterImpl(int port) throws IOException {
         init(port);
         tpe = Executors.newFixedThreadPool(10);
@@ -87,6 +110,7 @@ public class RouterImpl implements Runnable, Router {
         }
     }
 
+    /** Accept a new connection */
     private void handleAccept(SelectionKey key) {
         SocketChannel sc;
         try {
@@ -100,6 +124,7 @@ public class RouterImpl implements Runnable, Router {
         }
     }
 
+    /** Read available data for this key */
     private void handleRead(SelectionKey key) {
         SocketChannel sc;
         ByteBuffer buffer = ByteBuffer.allocate(READ_BUFFER_SIZE);
@@ -131,9 +156,13 @@ public class RouterImpl implements Runnable, Router {
             }
         } catch (IOException e) {
             clientDisconnected(key);
+        } catch (IllegalStateException e) {
+        	// Disconnect the client to avoid a disaster
+        	clientDisconnected(key);
         }
     }
 
+    /** clean everything when a client disconnect */
     private void clientDisconnected(SelectionKey key) {
         Attachment attachment = (Attachment) key.attachment();
 
@@ -144,29 +173,26 @@ public class RouterImpl implements Runnable, Router {
             sc.socket().close();
         } catch (IOException e) {
             // Miam Miam Miam
+        	ProActiveLogger.logEatedException(logger, e);
         }
 
         try {
             sc.close();
         } catch (IOException e) {
             // Miam Miam Miam
+        	ProActiveLogger.logEatedException(logger, e);
         }
         attachment.getClient().discardAttachment();
-
         logger.debug("Client " + sc.socket() + " disconnected");
-
-        AgentID agentId = attachment.getClient().getAgentId();
-        for (Client client : clientMap.values()) {
-
-            ErrorMessage error = new ErrorMessage(agentId, 0, ErrorType.ERR_DISCONNECTED_RCPT_BROADCAST);
-            try {
-                client.sendMessage(0, error.toByteArray());
-            } catch (Exception e) {
-                ProActiveLogger.logEatedException(logger, e);
-            }
-        }
+        
+        // Broadcast the disconnection to every client
+        Collection<Client> clients = clientMap.values();
+        AgentID disconnectedAgent = attachment.getClient().getAgentId();
+        tpe.submit(new DisconnectionBroadcaster(clients, disconnectedAgent));
     }
 
+ 
+    
     public void handleAsynchronously(ByteBuffer message, Attachment attachment) {
         TopLevelProcessor tlp = new TopLevelProcessor(message, attachment, this);
         tpe.execute(tlp);
@@ -186,5 +212,26 @@ public class RouterImpl implements Runnable, Router {
 
     public int getLocalPort() {
         return this.port;
+    }
+    
+    private static class DisconnectionBroadcaster implements Runnable {
+    	final private List<Client> clients;
+    	final private AgentID disconnectedAgent;
+    	
+    	public DisconnectionBroadcaster(Collection<Client> clients, AgentID disconnectedAgent) {
+    		this.clients = new ArrayList<Client>(clients);
+    		this.disconnectedAgent = disconnectedAgent;
+    	}
+
+		public void run() {
+	        for (Client client : this.clients) {
+	            ErrorMessage error = new ErrorMessage(this.disconnectedAgent, 0, ErrorType.ERR_DISCONNECTED_RCPT_BROADCAST);
+	            try {
+	                client.sendMessage(error.toByteArray());
+	            } catch (Exception e) {
+	                ProActiveLogger.logEatedException(logger, e);
+	            }
+	        }
+		}
     }
 }

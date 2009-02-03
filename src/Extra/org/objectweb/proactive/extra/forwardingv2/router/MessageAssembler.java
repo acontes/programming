@@ -1,20 +1,41 @@
 package org.objectweb.proactive.extra.forwardingv2.router;
 
 import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message;
 
-
+/** Reassemble messages from data chunks
+ * 
+ * {@link RouterImpl} reads chunk of data from a {@link SocketChannel}. We have to 
+ * reassemble the messages from the data chunks. Each {@link SocketChannel} correspond 
+ * to one and only one client, so we just have to use the message length and protocol id
+ * to assemble the messages.
+ * 
+ * If an invalid message is detected (wrong message length or protocol id) the socket 
+ * channel is closed
+ */
 public class MessageAssembler {
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_ROUTER);
 
     final private Router router;
+    
     final private Attachment attachment;
 
+    /** The current incomplete message
+     * 
+     * null when the length and the protocol id of the current message are
+     * still unknown. 
+     */
     private ByteBuffer currentMessage;
+    
+    /** Length and protocol id of the current message 
+     * 
+     * null when a message has been assembled and no data is available
+     */
     private LengthAndProto lengthAndProto;
 
     public MessageAssembler(Router router, Attachment attachment) {
@@ -25,7 +46,7 @@ public class MessageAssembler {
         this.lengthAndProto = null;
     }
 
-    synchronized public void pushBuffer(ByteBuffer buffer) {
+    synchronized public void pushBuffer(ByteBuffer buffer) throws IllegalStateException {
 
         while (buffer.remaining() != 0) {
 
@@ -40,15 +61,21 @@ public class MessageAssembler {
                 }
 
                 if (lengthAndProto.isReady()) {
-                    // Check the protocol is correct. Otherwise something is really fucked up
+                	
                     int proto = lengthAndProto.getProto();
-                    if (lengthAndProto.getProto() != Message.PROTOV1) {
-                        logger.error("Invalid protocol ID received from " + attachment + ": expected=" +
-                            Message.PROTOV1 + " received=" + proto);
-                        // TODO: close the socket
-                    }
-
                     int l = this.lengthAndProto.getLength();
+
+                    // Check the protocol is correct. Otherwise something fucked up
+                	// and the connection is closed to avoid a disaster
+                    if (proto != Message.PROTOV1) {
+                    	logger.error("Invalid protocol ID received from " + attachment + ": expected=" +
+                            Message.PROTOV1 + " received=" + proto);
+                    	throw new IllegalStateException("Invalid protocol ID");
+                    } else if (l < Message.Field.getTotalOffset()) {
+                    	logger.error("Invalid message length received from " + attachment + ": " + l);
+                    	throw new IllegalStateException("Invalid message length");
+                    }
+                    
                     // Allocate a buffer for the reassembled message
                     currentMessage = ByteBuffer.allocate(l);
 
@@ -92,7 +119,7 @@ public class MessageAssembler {
         }
     }
 
-    static class LengthAndProto {
+    private static class LengthAndProto {
         static private int SIZE = Message.Field.LENGTH.getLength() + Message.Field.PROTO_ID.getLength();
 
         private byte[] buf;

@@ -8,16 +8,31 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message.MessageType;
 import org.objectweb.proactive.extra.forwardingv2.router.processor.Processor;
-import org.objectweb.proactive.extra.forwardingv2.router.processor.ProcessorData;
+import org.objectweb.proactive.extra.forwardingv2.router.processor.ProcessorDataReply;
+import org.objectweb.proactive.extra.forwardingv2.router.processor.ProcessorDataRequest;
 import org.objectweb.proactive.extra.forwardingv2.router.processor.ProcessorDebug;
 import org.objectweb.proactive.extra.forwardingv2.router.processor.ProcessorRegistrationRequest;
 
-
+/** Asynchronous message handler.
+ * 
+ * Each message received is asynchronously handled by a {@link TopLevelProcessor}.
+ * This class dispatch the work to a dedicated message {@link Processor} according
+ * to the type of the message.
+ */
 public class TopLevelProcessor implements Runnable {
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_ROUTER);
 
+    /** The message to process */ 
     final private ByteBuffer message;
+    
+    /** The attachment which received the message
+     * 
+     * Should NOT be passed to the processor, ProcessorRegistrationRequest excepted
+     * since we need the attachment to create a new Client. 
+     */
     final private Attachment attachment;
+    
+    /** The local router */
     final private Router router;
 
     public TopLevelProcessor(ByteBuffer message, Attachment attachment, Router router) {
@@ -39,21 +54,22 @@ public class TopLevelProcessor implements Runnable {
                 processor = new ProcessorRegistrationRequest(this.message, this.attachment, this.router);
                 break;
             case DATA_REPLY:
+            	processor = new ProcessorDataReply(this.message, this.router);
+            	break;
             case DATA_REQUEST:
-                processor = new ProcessorData(this.message, this.router);
+                processor = new ProcessorDataRequest(this.message, this.router);
                 break;
             case DEBUG_:
                 processor = new ProcessorDebug(this.message, this.attachment, this.router);
                 break;
             default:
-                logger.error("Unhandled message type " + type);
+            	Message msg = Message.constructMessage(message.array(), 0);
+            	logger.error("Unexpected message type: " + type + ". Dropped message " + msg);
                 break;
         }
 
         if (processor != null) {
             processor.process();
-        } else {
-            logger.error("Processor is null", new Exception());
-        }
+        } 
     }
 }

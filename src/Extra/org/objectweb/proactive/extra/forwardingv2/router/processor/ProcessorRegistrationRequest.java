@@ -2,7 +2,6 @@ package org.objectweb.proactive.extra.forwardingv2.router.processor;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
@@ -72,7 +71,7 @@ public class ProcessorRegistrationRequest extends Processor {
             ErrorMessage errMessage = new ErrorMessage(null, this.message.getMessageID(),
                 ErrorType.ERR_INVALID_AGENT_ID);
             try {
-                attachment.send(0, ByteBuffer.wrap(errMessage.toByteArray()));
+                attachment.send(ByteBuffer.wrap(errMessage.toByteArray()));
             } catch (IOException e) {
                 logger.info("Failed to notify the client that invalid agent has been advertised");
             }
@@ -84,7 +83,7 @@ public class ProcessorRegistrationRequest extends Processor {
 
             boolean resp = this.sendReply(client, reply);
             if (resp) {
-                client.send_pending_message();
+                client.sendPendingMessage();
             } else {
                 logger.info("Failed to acknowledge the registration for " + agentId);
                 // Drop the attachment
@@ -99,14 +98,11 @@ public class ProcessorRegistrationRequest extends Processor {
      */
     private boolean sendReply(Client client, RegistrationMessage reply) {
         try {
-            client.sendMessage(DEFAULT_TIMEOUT, reply.toByteArray());
+            client.sendMessage(reply.toByteArray());
             return true;
         } catch (IOException e) {
             logger.info("Failed to send registration reply to " + reply.getAgentID() + ", IOException");
-        } catch (TimeoutException e) {
-            logger.info("Failed to send registration reply to " + reply.getAgentID() + ", timeout reached");
         }
-
         return false;
     }
 

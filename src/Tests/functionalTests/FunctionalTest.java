@@ -58,7 +58,7 @@ public class FunctionalTest {
     static final protected Logger logger = Logger.getLogger("testsuite");
 
     static final public String VAR_JVM_PARAMETERS = "JVM_PARAMETERS";
-    static private Router router;
+    static private RouterImpl router;
 
     @BeforeClass
     static public void configureMessageRouting() {
