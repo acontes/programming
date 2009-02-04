@@ -1,4 +1,4 @@
-package performanceTests.bandwidth;
+package performanceTests.throughput;
 
 import java.io.Serializable;
 
@@ -12,13 +12,11 @@ import performanceTests.HudsonReport;
 import functionalTests.GCMFunctionalTestDefaultNodes;
 
 
-public abstract class Bandwidth extends GCMFunctionalTestDefaultNodes {
-    /** The buffer included in each message */
-    static final public byte buf[] = new byte[10 * 1024 * 1024]; // 1Mo
+public abstract class Throughput extends GCMFunctionalTestDefaultNodes {
 
     private Class<?> cl;
 
-    public Bandwidth(Class<?> cl) {
+    public Throughput(Class<?> cl) {
         super(1, 1);
         this.cl = cl;
     }
@@ -28,8 +26,9 @@ public abstract class Bandwidth extends GCMFunctionalTestDefaultNodes {
         Server server = (Server) PAActiveObject.newActive(Server.class.getName(), new Object[] {}, super
                 .getANode());
         Client client = (Client) PAActiveObject.newActive(Client.class.getName(), new Object[] { server });
-        double bandwidth = client.runTest();
-        HudsonReport.reportToHudson(this.cl, bandwidth);
+
+        double throughput = client.runTest();
+        HudsonReport.reportToHudson(this.cl, throughput);
     }
 
     @SuppressWarnings("serial")
@@ -42,26 +41,23 @@ public abstract class Bandwidth extends GCMFunctionalTestDefaultNodes {
 
         }
 
-        public int serve(byte[] buf) {
+        public void serve() {
             if (firstRequest) {
                 startTime = System.currentTimeMillis();
                 firstRequest = false;
             }
 
             count++;
-            return 0;
         }
 
         public double finish() {
             long endTime = System.currentTimeMillis();
-            double size = (1.0 * Bandwidth.buf.length * count) / (1024 * 1024);
+            double throughput = (1000.0 * count) / (endTime - startTime);
 
-            System.out.println("Size: " + size);
+            System.out.println("Count: " + count);
             System.out.println("Duration: " + (endTime - startTime));
-
-            double bandwith = (1000.0 * size) / (endTime - startTime);
-            System.out.println("Bandwidth " + bandwith);
-            return bandwith;
+            System.out.println("Throughput " + throughput);
+            return throughput;
         }
     }
 
@@ -79,10 +75,9 @@ public abstract class Bandwidth extends GCMFunctionalTestDefaultNodes {
 
         public double runTest() {
             // Warmup
-            for (int i = 0; i < 10; i++) {
-                server.serve(TestRMI.buf);
+            for (int i = 0; i < 1000; i++) {
+                server.serve();
             }
-            System.out.println("End of warmup");
 
             long startTime = System.currentTimeMillis();
             while (true) {
@@ -90,12 +85,14 @@ public abstract class Bandwidth extends GCMFunctionalTestDefaultNodes {
                         .getValueAsInt())
                     break;
 
-                server.serve(TestRMI.buf);
+                for (int i = 0; i < 50; i++) {
+                    server.serve();
+                }
             }
-            double bandwidth = server.finish();
+            double throughput = server.finish();
 
-            // startTest must be sync
-            return bandwidth;
+            // startTest must be sync 
+            return throughput;
         }
     }
 }
