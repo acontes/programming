@@ -1,38 +1,41 @@
 package org.objectweb.proactive.extra.forwardingv2.router;
 
-import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
-
-import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
+import java.io.IOException;
+import java.net.InetAddress;
 
 
-/** A router instance
+/** A ProActive message router 
+ * 
  *  
  * A router receives messages from client and forward them to another client.
- * 
- * This intended to be used by router components.
  */
-public interface Router extends Runnable {
-    /** Submit a job to be executed asynchronously. 
-     * 
-     * All time consuming tasks should be submitted by using this method. The single threaded
-     * front end should not execute any other code than reading data chunk from {@link SocketChannel}.
-     * 
-     * @param message the received message to be handled
-     * @param attachment the attachment used to received the message
-     */
-    public void handleAsynchronously(ByteBuffer message, Attachment attachment);
+public abstract class Router {
 
-    /** Returns the client corresponding to a given {@link AgentID}
-     * 
-     * @param agentId the {@link AgentID}
-     * @return the corresponding client or null is unknonwn
-     */
-    public Client getClient(AgentID agentId);
+    static public Router createAndStart(RouterConfig config) throws IOException {
+        // config is now immutable
+        config.setReadOnly();
 
-    /** Add a new client to the routing table
+        RouterImpl r = new RouterImpl(config);
+
+        Thread rThread = new Thread(r);
+        rThread.setName("Router: select");
+        if (config.isDaemon()) {
+            rThread.setDaemon(config.isDaemon());
+        }
+        rThread.start();
+
+        return r;
+    }
+
+    /** Returns the port on which the router is, or was, listening */
+    abstract public int getPort();
+
+    /** Returns the {@link InetAddress} on which the router is, or was, listening */
+    abstract public InetAddress getInetAddr();
+
+    /** Stops the router
      * 
-     * @param client the new client
+     * Terminates all the threads and unbind all the sockets.
      */
-    public void addClient(Client client);
+    abstract public void stop();
 }

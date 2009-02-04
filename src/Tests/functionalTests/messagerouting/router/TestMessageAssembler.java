@@ -1,5 +1,6 @@
 package functionalTests.messagerouting.router;
 
+import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,7 +15,7 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message;
 import org.objectweb.proactive.extra.forwardingv2.router.Attachment;
 import org.objectweb.proactive.extra.forwardingv2.router.Client;
 import org.objectweb.proactive.extra.forwardingv2.router.MessageAssembler;
-import org.objectweb.proactive.extra.forwardingv2.router.Router;
+import org.objectweb.proactive.extra.forwardingv2.router.RouterInternal;
 
 
 public class TestMessageAssembler {
@@ -88,39 +89,12 @@ public class TestMessageAssembler {
         return byteBuffers;
     }
 
-    private class FakeRouter implements Router {
+    private class FakeRouter extends RouterInternal {
         boolean handleAsynchronouslyCalled;
         ByteBuffer receivedByteBuffer;
         long attachmentId = -1;
 
-        public Attachment getAttachment(long attachmentId) {
-            // Mock
-            return null;
-        }
-
-        public void addClient(Client client) {
-            // Mock
-        }
-
-        public Client getClient(AgentID agentId) {
-            // Mock
-            return null;
-        }
-
-        public Client getClient(long attachmentId) {
-            // Mock
-            return null;
-        }
-
-        public void run() {
-            // Mock
-        }
-
-        public int getLocalPort() {
-            // Mock
-            return 0;
-        }
-
+        @Override
         public void handleAsynchronously(ByteBuffer message, Attachment attachment) {
             Assert.assertNull("Badly rassembled message, only one message was expected", receivedByteBuffer);
 
@@ -139,6 +113,29 @@ public class TestMessageAssembler {
 
             this.receivedByteBuffer = null;
             this.attachmentId = -1;
+        }
+
+        @Override
+        public InetAddress getInetAddr() {
+            return null;
+        }
+
+        @Override
+        public int getPort() {
+            return 0;
+        }
+
+        @Override
+        public void stop() {
+        }
+
+        @Override
+        public void addClient(Client client) {
+        }
+
+        @Override
+        public Client getClient(AgentID agentId) {
+            return null;
         }
 
     }

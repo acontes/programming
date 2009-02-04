@@ -51,14 +51,14 @@ import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.MessageRoutingRemoteObjectFactory;
 import org.objectweb.proactive.extra.forwardingv2.router.Router;
-import org.objectweb.proactive.extra.forwardingv2.router.RouterImpl;
+import org.objectweb.proactive.extra.forwardingv2.router.RouterConfig;
 
 
 public class FunctionalTest {
     static final protected Logger logger = Logger.getLogger("testsuite");
 
     static final public String VAR_JVM_PARAMETERS = "JVM_PARAMETERS";
-    static private RouterImpl router;
+    static private Router router;
 
     @BeforeClass
     static public void configureMessageRouting() {
@@ -66,19 +66,25 @@ public class FunctionalTest {
             // Configure the Message routing
             if (MessageRoutingRemoteObjectFactory.PROTOCOL_ID.equals(PAProperties.PA_COMMUNICATION_PROTOCOL
                     .getValue())) {
-                if (PAProperties.PA_NET_ROUTER_PORT.getValue() == null ||
-                    PAProperties.PA_NET_ROUTER_PORT.getValueAsInt() == 0) {
-                    router = new RouterImpl(0);
-                    PAProperties.PA_NET_ROUTER_PORT.setValue(router.getLocalPort());
+                RouterConfig config = new RouterConfig();
+
+                if (PAProperties.PA_NET_ROUTER_PORT.getValueAsInt() == 0) {
+                    router = Router.createAndStart(config);
+                    PAProperties.PA_NET_ROUTER_PORT.setValue(router.getPort());
                 } else {
-                    router = new RouterImpl(PAProperties.PA_NET_ROUTER_PORT.getValueAsInt());
+                    config.setPort(PAProperties.PA_NET_ROUTER_PORT.getValueAsInt());
+                    router = Router.createAndStart(config);
                 }
-                Thread routerThread = new Thread(router);
-                routerThread.setName("Router: main thread");
-                routerThread.start();
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    @AfterClass
+    static public void terminateMessageRouting() {
+        if (router != null) {
+            router.stop();
         }
     }
 

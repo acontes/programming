@@ -63,7 +63,7 @@ public class TestUnknownSender extends BlackBox {
         ErrorMessage error = new ErrorMessage(resp, 0);
         Assert.assertEquals(error.getErrorType(), ErrorType.ERR_UNKNOW_RCPT);
         Assert.assertEquals(error.getMessageID(), msgId);
-        Assert.assertEquals(error.getSrcAgentID(), null);
+        Assert.assertEquals(error.getSrcAgentID(), dstAgentID);
         Assert.assertEquals(error.getDstAgentID(), myAgentId);
     }
 }

@@ -31,7 +31,7 @@ public class ClientIOException extends BlackBox {
     @Test
     public void test() throws UnknownHostException, ProActiveException, MessageRoutingException {
         InetAddress localhost = InetAddress.getLocalHost();
-        Agent agent = new Agent(localhost, super.router.getLocalPort(), FakeMessageHandler.class);
+        Agent agent = new Agent(localhost, super.router.getPort(), FakeMessageHandler.class);
         AgentID agentId = agent.getAgentID();
 
         Message message;

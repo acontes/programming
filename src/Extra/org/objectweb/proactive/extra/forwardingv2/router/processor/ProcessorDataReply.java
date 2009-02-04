@@ -8,15 +8,15 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.message.DataRequestMe
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.ForwardedMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message;
 import org.objectweb.proactive.extra.forwardingv2.router.Client;
-import org.objectweb.proactive.extra.forwardingv2.router.Router;
+import org.objectweb.proactive.extra.forwardingv2.router.RouterImpl;
 
 
 public class ProcessorDataReply extends Processor {
 
     final private ByteBuffer messageAsByteBuffer;
-    final private Router router;
+    final private RouterImpl router;
 
-    public ProcessorDataReply(ByteBuffer messageAsByteBuffer, Router router) {
+    public ProcessorDataReply(ByteBuffer messageAsByteBuffer, RouterImpl router) {
         this.messageAsByteBuffer = messageAsByteBuffer;
         this.router = router;
     }

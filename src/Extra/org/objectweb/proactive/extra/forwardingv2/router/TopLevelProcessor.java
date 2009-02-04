@@ -20,7 +20,7 @@ import org.objectweb.proactive.extra.forwardingv2.router.processor.ProcessorRegi
  * This class dispatch the work to a dedicated message {@link Processor} according
  * to the type of the message.
  */
-public class TopLevelProcessor implements Runnable {
+class TopLevelProcessor implements Runnable {
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_ROUTER);
 
     /** The message to process */
@@ -34,9 +34,9 @@ public class TopLevelProcessor implements Runnable {
     final private Attachment attachment;
 
     /** The local router */
-    final private Router router;
+    final private RouterImpl router;
 
-    public TopLevelProcessor(ByteBuffer message, Attachment attachment, Router router) {
+    public TopLevelProcessor(ByteBuffer message, Attachment attachment, RouterImpl router) {
         this.message = message;
         this.attachment = attachment;
         this.router = router;

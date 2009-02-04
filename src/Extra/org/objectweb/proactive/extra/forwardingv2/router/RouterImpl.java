@@ -1,6 +1,7 @@
 package org.objectweb.proactive.extra.forwardingv2.router;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.nio.ByteBuffer;
@@ -16,6 +17,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -25,11 +27,14 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.message.ErrorMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.ErrorMessage.ErrorType;
 
 
-public class RouterImpl implements Runnable, Router {
+public class RouterImpl extends RouterInternal implements Runnable {
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_ROUTER);
 
     /** Read {@link ByteBuffer} size. */
     private final static int READ_BUFFER_SIZE = 4096;
+
+    /** True is the router must stop or is stopped*/
+    private AtomicBoolean stopped = new AtomicBoolean(false);
 
     /** Thread pool used to execute all asynchronous tasks */
     private final ExecutorService tpe;
@@ -37,6 +42,8 @@ public class RouterImpl implements Runnable, Router {
     /** All the clients known by {@link AgentID}*/
     private final ConcurrentHashMap<AgentID, Client> clientMap = new ConcurrentHashMap<AgentID, Client>();
 
+    /** The local InetAddress on which the router is listening */
+    private InetAddress inetAddress;
     /** The local TCP port on which the router is listening */
     private int port;
 
@@ -60,12 +67,13 @@ public class RouterImpl implements Runnable, Router {
      * @param port port number to bind to
      * @throws IOException if the router failed to bind
      */
-    public RouterImpl(int port) throws IOException {
-        init(port);
-        tpe = Executors.newFixedThreadPool(10);
+    RouterImpl(RouterConfig config) throws IOException {
+
+        init(config);
+        tpe = Executors.newFixedThreadPool(config.getNbWorkerThreads());
     }
 
-    private void init(int port) throws IOException {
+    private void init(RouterConfig config) throws IOException {
         // Create a new selector
         selector = Selector.open();
 
@@ -73,7 +81,12 @@ public class RouterImpl implements Runnable, Router {
         ssc = ServerSocketChannel.open();
         ssc.configureBlocking(false);
         serverSocket = ssc.socket();
-        serverSocket.bind(new InetSocketAddress(port));
+
+        this.inetAddress = config.getInetAddress();
+        this.port = config.getPort();
+        InetSocketAddress isa = new InetSocketAddress(this.inetAddress, this.port);
+        serverSocket.bind(isa);
+
         this.port = serverSocket.getLocalPort();
         logger.info("Message router listening on " + serverSocket.toString());
 
@@ -86,7 +99,7 @@ public class RouterImpl implements Runnable, Router {
         Iterator<SelectionKey> it;
         SelectionKey key;
 
-        while (true) {
+        while (this.stopped.get() == false) {
             // select new keys
             try {
                 selector.select();
@@ -96,9 +109,9 @@ public class RouterImpl implements Runnable, Router {
                     key = (SelectionKey) it.next();
                     it.remove();
                     if ((key.readyOps() & SelectionKey.OP_ACCEPT) == SelectionKey.OP_ACCEPT) {
-                        handleAccept(key);
+                        this.handleAccept(key);
                     } else if ((key.readyOps() & SelectionKey.OP_READ) == SelectionKey.OP_READ) {
-                        handleRead(key);
+                        this.handleRead(key);
                     } else {
                         logger.warn("Unhandled SelectionKey operation");
                     }
@@ -108,6 +121,29 @@ public class RouterImpl implements Runnable, Router {
                 logger.warn("Select failed", e);
             }
         }
+
+        this.cleanup();
+    }
+
+    /** Stop the router and free all resources*/
+    private void cleanup() {
+        tpe.shutdown();
+
+        for (Client client : clientMap.values()) {
+            client.discardAttachment();
+        }
+
+        try {
+            /* Not sure if we have to set the attachments to null 
+             * Possible memory leak
+             */
+            this.ssc.socket().close();
+            this.ssc.close();
+            this.selector.close();
+        } catch (IOException e) {
+            ProActiveLogger.logEatedException(logger, e);
+        }
+
     }
 
     /** Accept a new connection */
@@ -191,6 +227,11 @@ public class RouterImpl implements Runnable, Router {
         tpe.submit(new DisconnectionBroadcaster(clients, disconnectedAgent));
     }
 
+    /* @@@@@@@@@@ ROUTER PACKAGE INTERFACE 
+     * 
+     * Theses methods cannot be package private due to the processor sub package 
+     */
+
     public void handleAsynchronously(ByteBuffer message, Attachment attachment) {
         TopLevelProcessor tlp = new TopLevelProcessor(message, attachment, this);
         tpe.execute(tlp);
@@ -208,8 +249,21 @@ public class RouterImpl implements Runnable, Router {
         }
     }
 
-    public int getLocalPort() {
+    /* @@@@@@@@@@ ROUTER PUBLIC INTERFACE: Router */
+
+    public int getPort() {
         return this.port;
+    }
+
+    public InetAddress getInetAddr() {
+        return this.inetAddress;
+    }
+
+    public void stop() {
+        if (this.stopped.get() == true)
+            throw new IllegalStateException("Router already stopped");
+
+        this.stopped.set(true);
     }
 
     private static class DisconnectionBroadcaster implements Runnable {

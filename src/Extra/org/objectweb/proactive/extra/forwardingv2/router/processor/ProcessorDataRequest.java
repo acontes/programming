@@ -10,14 +10,14 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.message.ForwardedMess
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.ErrorMessage.ErrorType;
 import org.objectweb.proactive.extra.forwardingv2.router.Client;
-import org.objectweb.proactive.extra.forwardingv2.router.Router;
+import org.objectweb.proactive.extra.forwardingv2.router.RouterImpl;
 
 
 public class ProcessorDataRequest extends Processor {
     final private ByteBuffer messageAsByteBuffer;
-    final private Router router;
+    final private RouterImpl router;
 
-    public ProcessorDataRequest(ByteBuffer messageAsByteBuffer, Router router) {
+    public ProcessorDataRequest(ByteBuffer messageAsByteBuffer, RouterImpl router) {
         this.messageAsByteBuffer = messageAsByteBuffer;
         this.router = router;
     }

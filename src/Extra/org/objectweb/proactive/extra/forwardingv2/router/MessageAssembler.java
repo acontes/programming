@@ -22,7 +22,7 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message;
 public class MessageAssembler {
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_ROUTER);
 
-    final private Router router;
+    final private RouterInternal router;
 
     final private Attachment attachment;
 
@@ -39,7 +39,7 @@ public class MessageAssembler {
      */
     private LengthAndProto lengthAndProto;
 
-    public MessageAssembler(Router router, Attachment attachment) {
+    public MessageAssembler(RouterInternal router, Attachment attachment) {
         this.router = router;
         this.attachment = attachment;
 

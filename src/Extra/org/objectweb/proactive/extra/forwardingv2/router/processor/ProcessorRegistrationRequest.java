@@ -13,16 +13,17 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationR
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.ErrorMessage.ErrorType;
 import org.objectweb.proactive.extra.forwardingv2.router.Attachment;
 import org.objectweb.proactive.extra.forwardingv2.router.Client;
-import org.objectweb.proactive.extra.forwardingv2.router.Router;
+import org.objectweb.proactive.extra.forwardingv2.router.RouterImpl;
 
 
 public class ProcessorRegistrationRequest extends Processor {
 
     final private RegistrationRequestMessage message;
     final private Attachment attachment;
-    final private Router router;
+    final private RouterImpl router;
 
-    public ProcessorRegistrationRequest(ByteBuffer messageAsByteBuffer, Attachment attachment, Router router) {
+    public ProcessorRegistrationRequest(ByteBuffer messageAsByteBuffer, Attachment attachment,
+            RouterImpl router) {
         this.attachment = attachment;
         this.router = router;
 

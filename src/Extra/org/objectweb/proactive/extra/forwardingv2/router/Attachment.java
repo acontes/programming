@@ -45,7 +45,7 @@ public class Attachment {
     /** The socket channel where to write for this given client */
     final private SocketChannel socketChannel;
 
-    public Attachment(Router router, SocketChannel socketChannel) {
+    public Attachment(RouterImpl router, SocketChannel socketChannel) {
         this.attachmentId = AttachmentIdGenerator.getId();
         this.assembler = new MessageAssembler(router, this);
         this.socketChannel = socketChannel;
