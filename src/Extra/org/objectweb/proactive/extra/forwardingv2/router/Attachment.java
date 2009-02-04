@@ -88,12 +88,16 @@ public class Attachment {
          * of the calls is useless
          */
         byteBuffer.clear();
-        int bytes = this.socketChannel.write(byteBuffer);
+        while (byteBuffer.remaining() > 0) {
+            int bytes = this.socketChannel.write(byteBuffer);
 
-        if (logger.isDebugEnabled()) {
-            String dstClient = this.client == null ? "unknown" : client.getAgentId().toString();
-            logger.debug("Sent a " + bytes + " bytes message to client " + dstClient + " with " +
-                this.socketChannel.socket());
+            if (logger.isDebugEnabled()) {
+                String dstClient = this.client == null ? "unknown" : client.getAgentId().toString();
+                String remaining = byteBuffer.remaining() > 0 ? byteBuffer.remaining() + " remaining to send"
+                        : "";
+                logger.debug("Sent a " + bytes + " bytes message to client " + dstClient + " with " +
+                    this.socketChannel.socket() + ". " + remaining);
+            }
         }
     }
 
