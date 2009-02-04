@@ -41,9 +41,18 @@ public class RouterConfig {
         return port;
     }
 
-    /** The port on which the server will bind */
+    /** The port on which the server will bind 
+     * 
+     * If 0 the router will bind to a random free port
+     * 
+     * @throws IllegalArgumentException if the port number is invalid
+     */
     public void setPort(int port) {
         checkReadOnly();
+
+        if (port < 0 || port > 65535)
+            throw new IllegalArgumentException("port must be between 0 and 65535");
+
         this.port = port;
     }
 
