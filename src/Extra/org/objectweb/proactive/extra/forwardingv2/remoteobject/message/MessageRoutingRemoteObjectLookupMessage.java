@@ -39,7 +39,7 @@ import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extra.forwardingv2.client.AgentV2;
+import org.objectweb.proactive.extra.forwardingv2.client.Agent;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.MessageRoutingRemoteObjectFactory;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.MessageRoutingRemoteObjectImpl;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.util.MessageRoutingRegistry;
@@ -64,7 +64,7 @@ public class MessageRoutingRemoteObjectLookupMessage extends MessageRoutingMessa
      *            The local agent to use to send the message
      */
 
-    public MessageRoutingRemoteObjectLookupMessage(URI uri, AgentV2 agent) {
+    public MessageRoutingRemoteObjectLookupMessage(URI uri, Agent agent) {
         super(uri, agent);
     }
 

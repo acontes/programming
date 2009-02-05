@@ -6,6 +6,8 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message;
 /** A Valve is a message processing component associated with a particular Agent.
  *
  * A series of Valves are generally associated with each other into a Pipeline.
+ * 
+ * @since ProActive 4.1.0
  */
 public interface Valve {
 

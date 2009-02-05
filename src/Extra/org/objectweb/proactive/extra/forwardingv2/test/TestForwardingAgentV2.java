@@ -12,8 +12,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.core.remoteobject.http.util.HttpMarshaller;
 import org.objectweb.proactive.core.util.ProActiveRandom;
-import org.objectweb.proactive.extra.forwardingv2.client.AgentV2;
-import org.objectweb.proactive.extra.forwardingv2.client.ForwardingAgentV2;
+import org.objectweb.proactive.extra.forwardingv2.client.Agent;
+import org.objectweb.proactive.extra.forwardingv2.client.AgentImpl;
 import org.objectweb.proactive.extra.forwardingv2.client.ProActiveMessageHandler;
 import org.objectweb.proactive.extra.forwardingv2.client.Tunnel;
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
@@ -60,8 +60,7 @@ public class TestForwardingAgentV2 {
 
     @Test
     public void testInitialize() throws Exception {
-        AgentV2 agent = new ForwardingAgentV2(InetAddress.getLocalHost(), reg.getPort(),
-            ProActiveMessageHandler.class);
+        Agent agent = new AgentImpl(InetAddress.getLocalHost(), reg.getPort(), ProActiveMessageHandler.class);
         Assert.assertNotNull(agent);
     }
 
@@ -71,8 +70,7 @@ public class TestForwardingAgentV2 {
      */
     @Test
     public void testSendMessageWithReply() throws Exception {
-        AgentV2 agent = new ForwardingAgentV2(InetAddress.getLocalHost(), reg.getPort(),
-            ProActiveMessageHandler.class);
+        Agent agent = new AgentImpl(InetAddress.getLocalHost(), reg.getPort(), ProActiveMessageHandler.class);
         Assert.assertNotNull(agent);
         System.out.println("Sending Crafted Message");
 
@@ -91,8 +89,7 @@ public class TestForwardingAgentV2 {
      */
     @Test
     public void testSendMsgWithoutReply() throws Exception {
-        AgentV2 agent = new ForwardingAgentV2(InetAddress.getLocalHost(), reg.getPort(),
-            ProActiveMessageHandler.class);
+        Agent agent = new AgentImpl(InetAddress.getLocalHost(), reg.getPort(), ProActiveMessageHandler.class);
         Assert.assertNotNull(agent);
         System.out.println("Sending Crafted Message");
 

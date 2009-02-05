@@ -36,7 +36,7 @@ import java.net.URI;
 
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
-import org.objectweb.proactive.extra.forwardingv2.client.AgentV2;
+import org.objectweb.proactive.extra.forwardingv2.client.Agent;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.util.MessageRoutingRegistry;
 
 
@@ -50,7 +50,7 @@ public class MessageRoutingRemoteObjectRequest extends MessageRoutingMessage imp
      * @param uri the recipient (aka the remote object) of the request
      * @param agent the local agent to use to send this message
      */
-    public MessageRoutingRemoteObjectRequest(Request request, URI uri, AgentV2 agent) {
+    public MessageRoutingRemoteObjectRequest(Request request, URI uri, Agent agent) {
         super(uri, agent);
         this.request = request;
 

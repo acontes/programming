@@ -38,7 +38,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.remoteobject.http.util.HttpMarshaller;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extra.forwardingv2.client.AgentV2;
+import org.objectweb.proactive.extra.forwardingv2.client.Agent;
 import org.objectweb.proactive.extra.forwardingv2.exceptions.MessageRoutingException;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.util.exceptions.MessageRoutingRemoteException;
 
@@ -61,7 +61,7 @@ public abstract class MessageRoutingMessage implements Serializable {
      * safely be transient. Anyway, an external entity should be in charge of message sending
      * for a given runtime instead of embedding the logic in each message.
      */
-    transient final protected AgentV2 agent;
+    transient final protected Agent agent;
 
     /** The response to this message 
      *
@@ -73,7 +73,7 @@ public abstract class MessageRoutingMessage implements Serializable {
 
     protected boolean isAsynchronous = false;
 
-    public MessageRoutingMessage(URI uri, AgentV2 agent) {
+    public MessageRoutingMessage(URI uri, Agent agent) {
         this.uri = uri;
         this.agent = agent;
         this.returnedObject = null;

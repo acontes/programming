@@ -7,6 +7,8 @@ import java.io.Serializable;
  *
  * Each client is identified by an unique {@link AgentID}. A client receive its
  * ID when it connects to the router for the first time. 
+ * 
+ * @since ProActive 4.1.0
  */
 @SuppressWarnings("serial")
 public class AgentID implements Serializable {

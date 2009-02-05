@@ -4,7 +4,6 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.net.SocketException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -20,7 +19,9 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.TypeHelper;
  * 
  * Error handling performed by higher level component. If the connection goes down
  * or something bad happens then an IOException is thrown. It is the responsibility
- * of the caller to create a new tunnel  
+ * of the caller to create a new tunnel
+ * 
+ * @since ProActive 4.1.0
  */
 public class Tunnel {
     static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_CLIENT_TUNNEL);

@@ -42,7 +42,7 @@ import org.objectweb.proactive.core.remoteobject.SynchronousReplyImpl;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extra.forwardingv2.client.AgentV2;
+import org.objectweb.proactive.extra.forwardingv2.client.Agent;
 import org.objectweb.proactive.extra.forwardingv2.exceptions.MessageRoutingException;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.message.MessageRoutingRemoteObjectRequest;
 
@@ -60,12 +60,12 @@ public class MessageRoutingRemoteObjectImpl implements MessageRoutingRemoteObjec
      * object is sent on a remote runtime, the local agent needs to be retrieved. Custom readObject()
      * is avoid by the use of a transient field and the getAgent() method.
      */
-    private transient AgentV2 agent;
+    private transient Agent agent;
 
     protected transient InternalRemoteRemoteObject remoteObject;
 
     public MessageRoutingRemoteObjectImpl(InternalRemoteRemoteObject remoteObject, URI remoteObjectURL,
-            AgentV2 agent) {
+            Agent agent) {
         this.remoteObject = remoteObject;
         this.remoteObjectURL = remoteObjectURL;
         this.agent = agent;
@@ -88,7 +88,7 @@ public class MessageRoutingRemoteObjectImpl implements MessageRoutingRemoteObjec
         return this.remoteObjectURL;
     }
 
-    private AgentV2 getAgent() {
+    private Agent getAgent() {
         if (this.agent == null) {
             try {
                 // FIXME: The factory cast is a hack but there is no clean way to do it

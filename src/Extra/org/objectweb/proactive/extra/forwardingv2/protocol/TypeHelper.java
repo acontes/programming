@@ -3,6 +3,8 @@ package org.objectweb.proactive.extra.forwardingv2.protocol;
 /** Helper class to allows int/long to byte array conversion
  *
  * Theses functions do not depend on the endianess of the machine
+ * 
+ * @since ProActive 4.1.0
  */
 public class TypeHelper {
 

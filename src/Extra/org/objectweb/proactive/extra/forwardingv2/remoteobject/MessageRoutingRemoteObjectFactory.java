@@ -48,8 +48,8 @@ import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extra.forwardingv2.client.AgentV2;
-import org.objectweb.proactive.extra.forwardingv2.client.ForwardingAgentV2;
+import org.objectweb.proactive.extra.forwardingv2.client.Agent;
+import org.objectweb.proactive.extra.forwardingv2.client.AgentImpl;
 import org.objectweb.proactive.extra.forwardingv2.client.ProActiveMessageHandler;
 import org.objectweb.proactive.extra.forwardingv2.exceptions.MessageRoutingException;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.message.MessageRoutingRegistryListRemoteObjectsMessage;
@@ -64,7 +64,7 @@ public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFacto
     /** The protocol id of the facotry */
     static final public String PROTOCOL_ID = "pamr";
 
-    final private AgentV2 agent;
+    final private Agent agent;
     final private MessageRoutingRegistry registry;
 
     public MessageRoutingRemoteObjectFactory() {
@@ -90,9 +90,9 @@ public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFacto
             logAndThrowException("Router address, " + routerAddressStr + " cannot be resolved", e);
         }
 
-        AgentV2 agent = null;
+        Agent agent = null;
         try {
-            agent = new ForwardingAgentV2(routerAddress, routerPort, ProActiveMessageHandler.class);
+            agent = new AgentImpl(routerAddress, routerPort, ProActiveMessageHandler.class);
         } catch (ProActiveException e) {
             logAndThrowException("Failed to create the local agent", e);
         }
@@ -245,7 +245,7 @@ public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFacto
         return irro;
     }
 
-    public AgentV2 getAgent() {
+    public Agent getAgent() {
         return this.agent;
     }
 

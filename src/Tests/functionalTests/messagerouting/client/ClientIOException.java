@@ -8,8 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.util.Sleeper;
-import org.objectweb.proactive.extra.forwardingv2.client.AgentV2Internal;
-import org.objectweb.proactive.extra.forwardingv2.client.ForwardingAgentV2;
+import org.objectweb.proactive.extra.forwardingv2.client.AgentImpl;
 import org.objectweb.proactive.extra.forwardingv2.client.MessageHandler;
 import org.objectweb.proactive.extra.forwardingv2.exceptions.MessageRoutingException;
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
@@ -51,7 +50,7 @@ public class ClientIOException extends BlackBox {
 
     static public class FakeMessageHandler implements MessageHandler {
 
-        public FakeMessageHandler(AgentV2Internal agentV2Internal) {
+        public FakeMessageHandler(AgentImpl agentV2Internal) {
         }
 
         public void pushMessage(DataRequestMessage message) {
@@ -59,7 +58,7 @@ public class ClientIOException extends BlackBox {
         }
     }
 
-    static public class Agent extends ForwardingAgentV2 {
+    static public class Agent extends AgentImpl {
 
         public Agent(InetAddress routerAddr, int routerPort,
                 Class<? extends MessageHandler> messageHandlerClass) throws ProActiveException {

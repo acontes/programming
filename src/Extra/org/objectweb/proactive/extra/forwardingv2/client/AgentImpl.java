@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.log4j.Logger;
@@ -30,42 +31,78 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationR
 
 
 /**
- * A local message routing agent in charge of sending and receiving the messages
+ * Implementation of the local message routing client.
  * 
- * It will contact the router as soon as created and will try to maintain the
- * connection open (eg. if the connection is closed then it will be reopened).
+ * 
+ * It contacts the router as soon as created and try to maintain the connection
+ * open (eg. if the connection is closed then it will be reopened).
+ * 
+ * @since ProActive 4.1.0
  */
-public class ForwardingAgentV2 implements AgentV2Internal {
-
-    final private InetAddress routerAddr;
-    final private int routerPort;
-
+public class AgentImpl implements Agent {
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_CLIENT);
 
-    final private Mailboxes mailboxes;
-
-    /** Request ID Generator **/
-    private final AtomicLong requestIDGenerator;
+    /** Address of the router */
+    final private InetAddress routerAddr;
+    /** Port of the router */
+    final private int routerPort;
 
     /** Local AgentID, set after initialization. **/
     private AgentID agentID = null;
+    /** Request ID Generator **/
+    private final AtomicLong requestIDGenerator;
 
+    /** Senders waiting for a response */
+    final private Mailboxes mailboxes;
+
+    /** Current tunnel, can be null */
     private Tunnel t = null;
-    final private Object t_lock = new Object();
+    /** List of tunnel reported as failed */
     final private List<Tunnel> failedTunnels;
 
-    /** Every data message will be handled by this object */
+    /** Every received data message will be handled by this object */
     final private MessageHandler messageHandler;
 
-    /** The list of Valve that will process each message */
+    /** List of Valves that will process each message */
     final private List<Valve> valves;
 
-    public ForwardingAgentV2(InetAddress routerAddr, int routerPort,
+    /**
+     * Create a routing agent
+     * 
+     * The router must be available when the constructor is called.
+     * 
+     * @param routerAddr
+     *            Address of the router
+     * @param routerPort
+     *            TCP port on which the router listen
+     * @param messageHandlerClass
+     *            Class the will handled received message
+     * @throws ProActiveException
+     *             If the router cannot be contacted.
+     */
+    public AgentImpl(InetAddress routerAddr, int routerPort,
             Class<? extends MessageHandler> messageHandlerClass) throws ProActiveException {
         this(routerAddr, routerPort, messageHandlerClass, new ArrayList<Valve>());
     }
 
-    public ForwardingAgentV2(InetAddress routerAddr, int routerPort,
+    /**
+     * Create a routing agent
+     * 
+     * The router must be available when the constructor is called.
+     * 
+     * @param routerAddr
+     *            Address of the router
+     * @param routerPort
+     *            TCP port on which the router listen
+     * @param messageHandlerClass
+     *            Class the will handled received message
+     * @param valves
+     *            List of {@link Valve} to be applied to all incomming and
+     *            outgoing messages.
+     * @throws ProActiveException
+     *             If the router cannot be contacted.
+     */
+    public AgentImpl(InetAddress routerAddr, int routerPort,
             Class<? extends MessageHandler> messageHandlerClass, List<Valve> valves)
             throws ProActiveException {
         this.routerAddr = routerAddr;
@@ -77,7 +114,7 @@ public class ForwardingAgentV2 implements AgentV2Internal {
 
         try {
             Constructor<? extends MessageHandler> mhConstructor;
-            mhConstructor = messageHandlerClass.getConstructor(AgentV2Internal.class);
+            mhConstructor = messageHandlerClass.getConstructor(Agent.class);
             this.messageHandler = mhConstructor.newInstance(this);
         } catch (Exception e) {
             throw new ProActiveException("Message routing agent failed to create the message handler", e);
@@ -96,8 +133,9 @@ public class ForwardingAgentV2 implements AgentV2Internal {
         mrThread.start();
     }
 
-    /** Get the current tunnel
-     *
+    /**
+     * Get the current tunnel
+     * 
      * @return the current tunnel or null is a tunnel cannot be open
      */
     synchronized private Tunnel getTunnel() {
@@ -112,8 +150,8 @@ public class ForwardingAgentV2 implements AgentV2Internal {
      * Returns a new tunnel to the router
      * 
      * The tunnel instance field is updated. The agentID instance field is set
-     * on the first call. If the agent cannot reconnect to the router, this.t is set
-     * to null.
+     * on the first call. If the agent cannot reconnect to the router, this.t is
+     * set to null.
      * 
      * <b>This method must only be called by getNewTunnel</b>
      */
@@ -155,7 +193,7 @@ public class ForwardingAgentV2 implements AgentV2Internal {
     }
 
     /**
-     * Report a tunnel failure to the agent
+     * Reports a tunnel failure to the agent
      * 
      * Threads get from the local agent a tunnel to use. If this tunnel fails
      * then they have to notify this failure to the local agent.
@@ -164,7 +202,7 @@ public class ForwardingAgentV2 implements AgentV2Internal {
      * method checks if the error has already been fixed.
      * 
      * <b>This method must only be called by getNewTunnel</b>
-     *
+     * 
      * @param brokenTunnel
      *            the tunnel that threw an IOException
      */
@@ -180,9 +218,6 @@ public class ForwardingAgentV2 implements AgentV2Internal {
         }
     }
 
-    /**
-     * @return the local {@link AgentID}.
-     */
     public AgentID getAgentID() {
         return agentID;
     }
@@ -212,7 +247,11 @@ public class ForwardingAgentV2 implements AgentV2Internal {
             internalSendMsg(msg);
 
             // block until the result arrives
-            response = mb.waitForResponse(0);
+            try {
+                response = mb.waitForResponse(0);
+            } catch (TimeoutException e) {
+                throw new MessageRoutingException("Timeout reached", e);
+            }
         }
 
         return response;
@@ -230,8 +269,8 @@ public class ForwardingAgentV2 implements AgentV2Internal {
      * 
      * This method throws a {@link MessageRoutingException} if:
      * <ol>
-     * 	<li>The tunnel fails and cannot be recreated</li>
-     * 	<li>The tunnel fails, can be recreated but the second tunnel fails too</li>
+     * <li>The tunnel fails and cannot be recreated</li>
+     * <li>The tunnel fails, can be recreated but the second tunnel fails too</li>
      * </ol>
      * 
      * @param msg
@@ -271,17 +310,38 @@ public class ForwardingAgentV2 implements AgentV2Internal {
         }
     }
 
-    public class Mailboxes {
+    /**
+     * All the clients waiting for a response
+     * 
+     * MailBox must be created by using
+     * {@link Mailboxes#createMailbox(AgentID, long)} and not by calling its
+     * constructor.
+     * 
+     * It allows to group mailboxes by recipient. When a remote client crash or
+     * disconnect, the agent must unblock all the threads waiting for a response
+     * from this remote client.
+     */
+    private class Mailboxes {
         final private Map<AgentID, Map<Long, LocalMailBox>> byRemoteAgent;
 
+        /** Must be hold for each addition or removal */
         final private Object lock = new Object();
 
-        public Mailboxes() {
+        private Mailboxes() {
             this.byRemoteAgent = new HashMap<AgentID, Map<Long, LocalMailBox>>();
         }
 
-        public LocalMailBox createMailbox(AgentID remoteAgentId, long messageId) {
-            LocalMailBox mb = new LocalMailBox(this, remoteAgentId, messageId);
+        /**
+         * Create a new mailbox for a given recipient and messageId
+         * 
+         * @param remoteAgentId
+         *            Message recipient
+         * @param messageId
+         *            Message ID
+         * @return a newly created mailbox
+         */
+        private LocalMailBox createMailbox(AgentID remoteAgentId, long messageId) {
+            LocalMailBox mb = new LocalMailBox(remoteAgentId, messageId);
             synchronized (this.lock) {
                 Map<Long, LocalMailBox> byMessageId;
                 byMessageId = this.byRemoteAgent.get(remoteAgentId);
@@ -295,7 +355,14 @@ public class ForwardingAgentV2 implements AgentV2Internal {
             return mb;
         }
 
-        public void unlockDueToDisconnection(AgentID agentID) {
+        /**
+         * Unblock all the threads waiting for a response from a given remote
+         * agent
+         * 
+         * @param agentID
+         *            the remote Agent ID
+         */
+        private void unlockDueToDisconnection(AgentID agentID) {
             synchronized (this.lock) {
                 MessageRoutingException e = new MessageRoutingException("Remote agent disconnected");
 
@@ -304,7 +371,7 @@ public class ForwardingAgentV2 implements AgentV2Internal {
                     for (LocalMailBox mb : map.values()) {
                         if (logger.isTraceEnabled()) {
                             logger.trace("Unlocked request " + mb.requestID + " because remote agent" +
-                                mb.getRemoteAgent() + " disconnected");
+                                mb.recipient + " disconnected");
                         }
                         mb.setAndUnlock(e);
                     }
@@ -312,7 +379,8 @@ public class ForwardingAgentV2 implements AgentV2Internal {
             }
         }
 
-        public LocalMailBox remove(AgentID agentId, long messageId) {
+        /** Remove a mailbox on response arrival */
+        private LocalMailBox remove(AgentID agentId, long messageId) {
             LocalMailBox mb = null;
             synchronized (this.lock) {
                 Map<Long, LocalMailBox> map;
@@ -326,33 +394,41 @@ public class ForwardingAgentV2 implements AgentV2Internal {
         }
     }
 
-    public class LocalMailBox {
+    /** Allows threads to wait for a response */
+    private class LocalMailBox {
+        /** 0 when the response is available or an error has been received */
         final private CountDownLatch latch;
+        /** The response */
         volatile private byte[] response = null;
+        /** Received exception */
         volatile private MessageRoutingException exception = null;
 
-        final private Mailboxes mailboxes;
-
+        /** message ID of the request */
         final private long requestID;
-        final private AgentID agentId;
+        /** Agent ID of recipient of the request */
+        final private AgentID recipient;
 
-        public LocalMailBox(Mailboxes mailboxes, AgentID agentId, long requestID) {
-            this.mailboxes = mailboxes;
+        private LocalMailBox(AgentID agentId, long recipient) {
             this.latch = new CountDownLatch(1);
 
-            this.requestID = requestID;
-            this.agentId = agentId;
+            this.requestID = recipient;
+            this.recipient = agentId;
         }
 
-        public long getMessageId() {
-            return this.requestID;
-        }
-
-        public AgentID getRemoteAgent() {
-            return this.agentId;
-        }
-
-        public byte[] waitForResponse(long timeout) throws MessageRoutingException {
+        /**
+         * Wait until the response is available or an error is received
+         * 
+         * @param timeout
+         *            Maximum amount of time to wait before throwing an
+         *            exception
+         * @return the response
+         * @throws MessageRoutingException
+         *             If the request failed to be send or if the recipient
+         *             disconnected before sending the response.
+         * @throws TimeoutException
+         *             If the timeout is reached
+         */
+        private byte[] waitForResponse(long timeout) throws MessageRoutingException, TimeoutException {
             TimeoutAccounter ta = TimeoutAccounter.getAccounter(timeout);
 
             boolean b = false;
@@ -364,31 +440,45 @@ public class ForwardingAgentV2 implements AgentV2Internal {
                 }
             } while (!b & !ta.isTimeoutElapsed());
 
+            if (ta.isTimeoutElapsed()) {
+                throw new TimeoutException("Timeout reached");
+            }
+
             if (exception != null) {
                 throw exception;
             }
             return response;
         }
 
-        public void setAndUnlock(byte[] response) {
+        /**
+         * Set the response and unlock the waiting thread
+         * 
+         * @param response
+         *            the response
+         */
+        private void setAndUnlock(byte[] response) {
             this.response = response;
-            unlock();
+            latch.countDown();
         }
 
+        /**
+         * Set the exception and unlock the waiting thread
+         * 
+         * @param exception
+         *            received error
+         */
         public void setAndUnlock(MessageRoutingException exception) {
             this.exception = exception;
-            unlock();
-        }
-
-        private void unlock() {
             latch.countDown();
         }
     }
 
-    public class MessageReader implements Runnable {
-        final ForwardingAgentV2 agent;
+    /** Read incoming messages from the tunnel */
+    class MessageReader implements Runnable {
+        /** The local Agent */
+        final AgentImpl agent;
 
-        public MessageReader(ForwardingAgentV2 agent) {
+        public MessageReader(AgentImpl agent) {
             this.agent = agent;
         }
 
@@ -408,16 +498,18 @@ public class ForwardingAgentV2 implements AgentV2Internal {
             }
         }
 
-        /** Block until a message arrive
+        /**
+         * Block until a message is received
          * 
-         * This method is also in charge of handling tunnel failures
+         * Also in charge of handling tunnel failures
          * 
-         * @return a received message
+         * @return the received message
          */
         public Message readMessage() {
             while (true) {
                 Tunnel tunnel = this.agent.t;
                 try {
+                    // Blocking call
                     byte[] msgBuf = tunnel.readMessage();
                     return Message.constructMessage(msgBuf, 0);
                 } catch (IOException e) {
@@ -437,7 +529,7 @@ public class ForwardingAgentV2 implements AgentV2Internal {
             }
         }
 
-        public void handleMessage(Message msg) {
+        private void handleMessage(Message msg) {
             switch (msg.getType()) {
                 case DATA_REPLY:
                     DataReplyMessage reply = (DataReplyMessage) msg;
@@ -460,15 +552,16 @@ public class ForwardingAgentV2 implements AgentV2Internal {
         private void handleError(ErrorMessage error) {
             switch (error.getErrorType()) {
                 case ERR_DISCONNECTION_BROADCAST:
-                    /* An agent disconnected. To avoid blocked thread we have
-                     * to unlock all thread that are waiting a response from this
-                     * agent
+                    /*
+                     * An agent disconnected. To avoid blocked thread we have to
+                     * unlock all thread that are waiting a response from this agent
                      */
                     mailboxes.unlockDueToDisconnection(error.getRecipient());
                     break;
                 case ERR_NOT_CONNECTED_RCPT:
-                    /* The recipient of a given message is not connected to the router
-                     * Unlock the sender
+                    /*
+                     * The recipient of a given message is not connected to the
+                     * router Unlock the sender
                      */
                     AgentID sender = error.getSender();
                     long messageId = error.getMessageID();
@@ -491,9 +584,7 @@ public class ForwardingAgentV2 implements AgentV2Internal {
             }
         }
 
-        public void handleDataReply(DataReplyMessage reply) {
-            // Have to lookup in the hashtable
-
+        private void handleDataReply(DataReplyMessage reply) {
             LocalMailBox mbox = mailboxes.remove(reply.getSender(), reply.getMessageID());
             if (mbox == null) {
                 logger.error("Received reply for an unknown request: " + reply);
@@ -501,13 +592,11 @@ public class ForwardingAgentV2 implements AgentV2Internal {
                 if (logger.isTraceEnabled()) {
                     logger.trace("Received reply: " + reply);
                 }
-                // this is a reply containing data
                 mbox.setAndUnlock(reply.getData());
             }
         }
 
-        public void handleDataRequest(DataRequestMessage request) {
-            // That message is a request, handle it.
+        private void handleDataRequest(DataRequestMessage request) {
             messageHandler.pushMessage(request);
         }
 
