@@ -42,7 +42,10 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 // FIXME: This is exactly the same marshaller than HTTPMarshaller
 // They should be factorized somewhere else
-
+/** Object marshaller and unmarshaller
+ * 
+ *  @since ProActive 4.1.0
+ */
 public class MessageRoutingMarshaller {
     static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_REMOTE_OBJECT);
 

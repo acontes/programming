@@ -40,6 +40,10 @@ import org.objectweb.proactive.extra.forwardingv2.client.Agent;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.util.MessageRoutingRegistry;
 
 
+/** Represent a {@link Request}
+ * 
+ * @since ProActive 4.1.0
+ */
 @SuppressWarnings("serial")
 public class MessageRoutingRemoteObjectRequest extends MessageRoutingMessage implements Serializable {
     private Request request;

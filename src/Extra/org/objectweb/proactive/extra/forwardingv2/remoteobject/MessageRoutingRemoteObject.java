@@ -22,21 +22,90 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- *  Initial developer(s):               The ActiveEon Team
- *                        http://www.activeeon.com/
+ *  Initial developer(s):               The ProActive Team
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
- *
  * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive.extra.forwardingv2.remoteobject;
 
-import java.io.Serializable;
+import java.net.URI;
 
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.body.reply.Reply;
+import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
+import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
+import org.objectweb.proactive.core.remoteobject.SynchronousReplyImpl;
+import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.forwardingv2.client.Agent;
+import org.objectweb.proactive.extra.forwardingv2.exceptions.MessageRoutingException;
+import org.objectweb.proactive.extra.forwardingv2.remoteobject.message.MessageRoutingRemoteObjectRequest;
 
 
-public interface MessageRoutingRemoteObject extends RemoteRemoteObject, Serializable {
+/**
+ * 
+ * @since ProActive 4.1.0
+ */
+public class MessageRoutingRemoteObject implements RemoteRemoteObject {
+    final static private Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_REMOTE_OBJECT);
+
+    /** The URL of the RemoteObject */
+    private URI remoteObjectURL;
+
+    /** The local message routing agent 
+     *
+     * This field must NOT be used since it is set by the getAgent() method. Each time this
+     * object is sent on a remote runtime, the local agent needs to be retrieved. Custom readObject()
+     * is avoid by the use of a transient field and the getAgent() method.
+     */
+    private transient Agent agent;
+
+    protected transient InternalRemoteRemoteObject remoteObject;
+
+    public MessageRoutingRemoteObject(InternalRemoteRemoteObject remoteObject, URI remoteObjectURL,
+            Agent agent) {
+        this.remoteObject = remoteObject;
+        this.remoteObjectURL = remoteObjectURL;
+        this.agent = agent;
+    }
+
+    public Reply receiveMessage(Request message) throws MessageRoutingException {
+
+        MessageRoutingRemoteObjectRequest req = new MessageRoutingRemoteObjectRequest(message,
+            this.remoteObjectURL, getAgent());
+        req.send();
+        SynchronousReplyImpl rep = (SynchronousReplyImpl) req.getReturnedObject();
+        return rep;
+    }
+
+    public void setURI(URI url) {
+        this.remoteObjectURL = url;
+    }
+
+    public URI getURI() {
+        return this.remoteObjectURL;
+    }
+
+    private Agent getAgent() {
+        if (this.agent == null) {
+            try {
+                // FIXME: The factory cast is a hack but there is no clean way to do it
+                MessageRoutingRemoteObjectFactory f;
+                f = (MessageRoutingRemoteObjectFactory) AbstractRemoteObjectFactory
+                        .getRemoteObjectFactory("pamr");
+                this.agent = f.getAgent();
+            } catch (UnknownProtocolException e) {
+                logger.fatal("Failed to get the local message routing agent", e);
+            }
+        }
+
+        return this.agent;
+    }
 
 }

@@ -38,12 +38,11 @@ import org.objectweb.proactive.extra.forwardingv2.client.Agent;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.util.MessageRoutingRegistry;
 
 
-/**
- * This classes represents a MessageRoutingMessage. When processed, this message
- * list all the remote objects registered on the receiver.
+/** Represents a MessageRoutingMessage. 
  * 
- * @author The ProActive Team
- * @see MessageRoutingMessage
+ * When processed, this message list all the remote objects registered on the receiver.
+ *
+ * @since ProActive 4.1.0
  */
 @SuppressWarnings("serial")
 public class MessageRoutingRegistryListRemoteObjectsMessage extends MessageRoutingMessage implements

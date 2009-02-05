@@ -57,6 +57,10 @@ import org.objectweb.proactive.extra.forwardingv2.remoteobject.message.MessageRo
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.util.MessageRoutingRegistry;
 
 
+/**
+ * 
+ * @since ProActive 4.1.0
+ */
 public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFactory implements
         RemoteObjectFactory {
     static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_REMOTE_OBJECT);
@@ -125,7 +129,7 @@ public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFacto
      * (org.objectweb .proactive.core.remoteobject.RemoteObject)
      */
     public RemoteRemoteObject newRemoteObject(InternalRemoteRemoteObject target) {
-        return new MessageRoutingRemoteObjectImpl(target, null, agent);
+        return new MessageRoutingRemoteObject(target, null, agent);
     }
 
     /**
@@ -148,7 +152,7 @@ public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFacto
     public RemoteRemoteObject register(InternalRemoteRemoteObject ro, URI uri, boolean replacePrevious)
             throws ProActiveException {
         this.registry.bind(uri, ro);
-        MessageRoutingRemoteObjectImpl rro = new MessageRoutingRemoteObjectImpl(ro, uri, agent);
+        MessageRoutingRemoteObject rro = new MessageRoutingRemoteObject(ro, uri, agent);
         if (logger.isDebugEnabled()) {
             logger.debug("Registered remote object at endpoint " + uri);
         }

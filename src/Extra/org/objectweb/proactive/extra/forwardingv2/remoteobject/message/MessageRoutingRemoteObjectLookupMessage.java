@@ -40,17 +40,17 @@ import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.forwardingv2.client.Agent;
+import org.objectweb.proactive.extra.forwardingv2.remoteobject.MessageRoutingRemoteObject;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.MessageRoutingRemoteObjectFactory;
-import org.objectweb.proactive.extra.forwardingv2.remoteobject.MessageRoutingRemoteObjectImpl;
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.util.MessageRoutingRegistry;
 
 
-/**
+/** Represents a lookup message
+ * 
  * When processed, this message performs return the RemoteObject associated to
  * the given URI.
  * 
- * @author The ProActive Team
- * @see MessageRoutingMessage
+ * @since ProActive 4.1.0
  */
 @SuppressWarnings("serial")
 public class MessageRoutingRemoteObjectLookupMessage extends MessageRoutingMessage implements Serializable {
@@ -89,7 +89,7 @@ public class MessageRoutingRemoteObjectLookupMessage extends MessageRoutingMessa
                     MessageRoutingRemoteObjectFactory f = (MessageRoutingRemoteObjectFactory) AbstractRemoteObjectFactory
                             .getRemoteObjectFactory(MessageRoutingRemoteObjectFactory.PROTOCOL_ID);
                     rro = f.newRemoteObject(irro);
-                    ((MessageRoutingRemoteObjectImpl) rro).setURI(uri);
+                    ((MessageRoutingRemoteObject) rro).setURI(uri);
                     return rro;
                 } catch (UnknownProtocolException e) {
                     // Impossible because that class has been created by the factory

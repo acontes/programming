@@ -37,7 +37,7 @@ import java.io.IOException;
 /**
  * Exception raised when problems occur in communications
  * 
- * @author The ProActive Team
+ * @since ProActive 4.1.0
  */
 @SuppressWarnings("serial")
 public class MessageRoutingRemoteException extends IOException {

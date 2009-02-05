@@ -42,12 +42,13 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
-/**
- * A registry for the message routing protocol
+/** A registry for the message routing protocol
  * 
  * This registry is currently implemented as a singleton because lookup message
  * must be able to find it. If the RemoteObjectFactory can easily be reached by
  * the message, then the singleton can be removed.
+ * 
+ * @since ProActive 4.1.0
  */
 public class MessageRoutingRegistry {
     static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_REMOTE_OBJECT);

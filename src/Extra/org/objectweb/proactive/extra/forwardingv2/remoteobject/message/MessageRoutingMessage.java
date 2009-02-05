@@ -43,10 +43,9 @@ import org.objectweb.proactive.extra.forwardingv2.exceptions.MessageRoutingExcep
 import org.objectweb.proactive.extra.forwardingv2.remoteobject.util.exceptions.MessageRoutingRemoteException;
 
 
-/**
- * This interface is used to encapsulate any kind of routed message.
- * @author The ProActive Team
- * @see java.io.Serializable
+/** Any kind of routed message.
+ * 
+ * @since ProActive 4.1.0 
  */
 @SuppressWarnings("serial")
 public abstract class MessageRoutingMessage implements Serializable {
