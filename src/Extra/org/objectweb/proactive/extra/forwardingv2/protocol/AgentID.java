@@ -3,8 +3,10 @@ package org.objectweb.proactive.extra.forwardingv2.protocol;
 import java.io.Serializable;
 
 
-/**
- * An unique identifier for Agents 
+/** An unique identifier for Agents 
+ *
+ * Each client is identified by an unique {@link AgentID}. A client receive its
+ * ID when it connects to the router for the first time. 
  */
 @SuppressWarnings("serial")
 public class AgentID implements Serializable {

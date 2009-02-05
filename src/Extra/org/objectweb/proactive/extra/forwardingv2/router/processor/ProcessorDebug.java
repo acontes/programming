@@ -5,10 +5,15 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.DebugMessage;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message.MessageType;
 import org.objectweb.proactive.extra.forwardingv2.router.Attachment;
 import org.objectweb.proactive.extra.forwardingv2.router.Router;
 
 
+/** Asynchronous handler for {@link MessageType#DEBUG_}
+ * 
+ * @since ProActive 4.1.0
+ */
 public class ProcessorDebug extends Processor {
     DebugMessage message;
     Attachment attachment;
@@ -20,7 +25,7 @@ public class ProcessorDebug extends Processor {
 
         try {
             this.message = new DebugMessage(message.array(), 0);
-        } catch (InstantiationException e) {
+        } catch (IllegalArgumentException e) {
             logger.warn(e);
             this.message = null;
         }

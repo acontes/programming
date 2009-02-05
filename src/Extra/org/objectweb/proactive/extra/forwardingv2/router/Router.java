@@ -3,12 +3,17 @@ package org.objectweb.proactive.extra.forwardingv2.router;
 import java.io.IOException;
 import java.net.InetAddress;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
 
 /** A ProActive message router 
  * 
  *  
  * A router receives messages from client and forward them to another client.
+ * 
+ * @since ProActive 4.1.0
  */
+@PublicAPI
 public abstract class Router {
 
     static public Router createAndStart(RouterConfig config) throws IOException {

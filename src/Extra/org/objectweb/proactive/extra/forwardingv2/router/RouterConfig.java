@@ -3,8 +3,19 @@ package org.objectweb.proactive.extra.forwardingv2.router;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 
-/** A bean for router configuration. */
+
+/** A bean for router configuration. 
+ * 
+ * This bean can be used to pass options to the router. 
+ * 
+ * Once the bean has been passed to a router is cannot be modified anymore. Any subsequent 
+ * call to a setter will throw a {@link IllegalStateException}
+ * 
+ * @since ProActive 4.1.0
+ */
+@PublicAPI
 public class RouterConfig {
 
     volatile private boolean readyOnly;

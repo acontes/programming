@@ -23,6 +23,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * <b>Back end</b>: it holds the only reference onto the SocketChannel
  * associated to the current tunnel.</li>
  * </ul>
+ * 
+ * @since ProActive 4.1.0
  */
 public class Attachment {
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_ROUTER);

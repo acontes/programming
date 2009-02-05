@@ -7,8 +7,10 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
 
 
 /**
+ *  
+ * <i>This class cannot be package private because of the processor subpackage and test</i>
  * 
- * This class cannot be package private because of the processor subpackage and test
+ * @since ProActive 4.1.0
  */
 public abstract class RouterInternal extends Router {
     /** Submit a job to be executed asynchronously. 

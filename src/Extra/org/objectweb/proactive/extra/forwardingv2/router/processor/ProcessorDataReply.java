@@ -5,12 +5,17 @@ import java.nio.ByteBuffer;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.DataRequestMessage;
-import org.objectweb.proactive.extra.forwardingv2.protocol.message.ForwardedMessage;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.DataMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message.MessageType;
 import org.objectweb.proactive.extra.forwardingv2.router.Client;
 import org.objectweb.proactive.extra.forwardingv2.router.RouterImpl;
 
 
+/** Asynchronous handler for {@link MessageType#DATA_REPLY}
+ * 
+ * @since ProActive 4.1.0
+ */
 public class ProcessorDataReply extends Processor {
 
     final private ByteBuffer messageAsByteBuffer;
@@ -23,7 +28,7 @@ public class ProcessorDataReply extends Processor {
 
     @Override
     public void process() {
-        AgentID agentId = ForwardedMessage.readDstAgentID(messageAsByteBuffer.array());
+        AgentID agentId = DataMessage.readRecipient(messageAsByteBuffer.array(), 0);
         Client destClient = this.router.getClient(agentId);
 
         if (destClient != null) {
@@ -43,7 +48,7 @@ public class ProcessorDataReply extends Processor {
                 Message message;
                 message = new DataRequestMessage(messageAsByteBuffer.array(), 0);
                 logger.error("Dropped invalid data reply: unknown recipient. " + message);
-            } catch (InstantiationException e) {
+            } catch (IllegalArgumentException e) {
                 ProActiveLogger.logImpossibleException(logger, e);
             }
         }

@@ -18,7 +18,7 @@ public class TestReconnection extends BlackBox {
 
     @Test
     public void test() throws IOException, InstantiationException {
-        Message message = new RegistrationRequestMessage(ProActiveRandom.nextLong());
+        Message message = new RegistrationRequestMessage(null, ProActiveRandom.nextLong());
         tunnel.write(message.toByteArray());
 
         byte[] resp = tunnel.readMessage();

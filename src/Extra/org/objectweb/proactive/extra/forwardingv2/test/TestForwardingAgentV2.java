@@ -15,10 +15,10 @@ import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.extra.forwardingv2.client.AgentV2;
 import org.objectweb.proactive.extra.forwardingv2.client.ForwardingAgentV2;
 import org.objectweb.proactive.extra.forwardingv2.client.ProActiveMessageHandler;
+import org.objectweb.proactive.extra.forwardingv2.client.Tunnel;
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
-import org.objectweb.proactive.extra.forwardingv2.protocol.MessageInputStream;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.DataReplyMessage;
-import org.objectweb.proactive.extra.forwardingv2.protocol.message.ForwardedMessage;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.DataMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationReplyMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message.MessageType;
@@ -126,8 +126,8 @@ class FakeRegistry implements Runnable {
         try {
             Socket sock = server.accept();
             System.out.println("FakeReg: Connection accepted, reading registration message");
-            MessageInputStream input = new MessageInputStream(sock.getInputStream());
-            Message m = Message.constructMessage(input.readMessage(), 0);
+            Tunnel tunnel = new Tunnel(sock);
+            Message m = Message.constructMessage(tunnel.readMessage(), 0);
             // Must be a registration message
             Assert.assertEquals(m.getType(), MessageType.REGISTRATION_REQUEST);
 
@@ -138,12 +138,12 @@ class FakeRegistry implements Runnable {
             sock.getOutputStream().flush();
 
             while (isRunning) {
-                m = Message.constructMessage(input.readMessage(), 0);
+                m = Message.constructMessage(tunnel.readMessage(), 0);
                 System.out.println("FakeReg: Message Received: " + m);
 
-                if (m instanceof ForwardedMessage) {
-                    ForwardedMessage fm = (ForwardedMessage) m;
-                    resp = new DataReplyMessage(fm.getDstAgentID(), fm.getSrcAgentID(), fm.getMessageID(),
+                if (m instanceof DataMessage) {
+                    DataMessage fm = (DataMessage) m;
+                    resp = new DataReplyMessage(fm.getRecipient(), fm.getSender(), fm.getMessageID(),
                         HttpMarshaller.marshallObject(TestForwardingAgentV2.PAYLOAD));
 
                     System.out.println("FakeReg: Forwarding message: " + resp);

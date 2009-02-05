@@ -219,7 +219,7 @@ public class ForwardingAgentV2 implements AgentV2Internal {
     }
 
     public void sendReply(DataRequestMessage request, byte[] data) throws MessageRoutingException {
-        DataReplyMessage reply = new DataReplyMessage(this.getAgentID(), request.getSrcAgentID(), request
+        DataReplyMessage reply = new DataReplyMessage(this.getAgentID(), request.getSender(), request
                 .getMessageID(), data);
 
         internalSendMsg(reply);
@@ -459,18 +459,18 @@ public class ForwardingAgentV2 implements AgentV2Internal {
 
         private void handleError(ErrorMessage error) {
             switch (error.getErrorType()) {
-                case ERR_DISCONNECTED_RCPT_BROADCAST:
+                case ERR_DISCONNECTION_BROADCAST:
                     /* An agent disconnected. To avoid blocked thread we have
                      * to unlock all thread that are waiting a response from this
                      * agent
                      */
-                    mailboxes.unlockDueToDisconnection(error.getDstAgentID());
+                    mailboxes.unlockDueToDisconnection(error.getRecipient());
                     break;
                 case ERR_NOT_CONNECTED_RCPT:
                     /* The recipient of a given message is not connected to the router
                      * Unlock the sender
                      */
-                    AgentID sender = error.getSrcAgentID();
+                    AgentID sender = error.getSender();
                     long messageId = error.getMessageID();
 
                     LocalMailBox mbox = mailboxes.remove(sender, messageId);
@@ -494,7 +494,7 @@ public class ForwardingAgentV2 implements AgentV2Internal {
         public void handleDataReply(DataReplyMessage reply) {
             // Have to lookup in the hashtable
 
-            LocalMailBox mbox = mailboxes.remove(reply.getSrcAgentID(), reply.getMessageID());
+            LocalMailBox mbox = mailboxes.remove(reply.getSender(), reply.getMessageID());
             if (mbox == null) {
                 logger.error("Received reply for an unknown request: " + reply);
             } else {

@@ -27,6 +27,10 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.message.ErrorMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.ErrorMessage.ErrorType;
 
 
+/**
+ * 
+ * @since ProActive 4.1.0
+ */
 public class RouterImpl extends RouterInternal implements Runnable {
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_ROUTER);
 
@@ -277,8 +281,8 @@ public class RouterImpl extends RouterInternal implements Runnable {
 
         public void run() {
             for (Client client : this.clients) {
-                ErrorMessage error = new ErrorMessage(this.disconnectedAgent, 0,
-                    ErrorType.ERR_DISCONNECTED_RCPT_BROADCAST);
+                ErrorMessage error = new ErrorMessage(ErrorType.ERR_DISCONNECTION_BROADCAST, client
+                        .getAgentId(), this.disconnectedAgent, 0);
                 try {
                     client.sendMessage(error.toByteArray());
                 } catch (Exception e) {

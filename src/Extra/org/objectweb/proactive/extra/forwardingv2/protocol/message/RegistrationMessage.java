@@ -4,8 +4,23 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
 import org.objectweb.proactive.extra.forwardingv2.protocol.TypeHelper;
 
 
+/** A registration message
+ * 
+ * When a client connects to the router. It has to negociate its registration with 
+ * {@link MessageType#REGISTRATION_REQUEST} and {@link MessageType#REGISTRATION_REPLY}
+ * 
+ * The first time a client connect to the router, it asks for an {@link AgentID}. If
+ * the client is disconnected, it can reconnect to by advertising its {@link AgentID}.
+ * 
+ * @since ProActive 4.1.0
+ */
 public abstract class RegistrationMessage extends Message {
 
+    /**
+     * Fields of the {@link RegistrationMessage} header.
+     * 
+     * These fields are put after the {@link Message} header.
+     */
     public enum Field {
         AGENT_ID(8, Long.class);
 
@@ -47,9 +62,19 @@ public abstract class RegistrationMessage extends Message {
         }
     }
 
-    // attribute
+    /** The {@link AgentID} */
     final private AgentID agentID;
 
+    /** Create a registration message.
+     * 
+     * @param type
+     * 		Type of the message {@link MessageType#REGISTRATION_REQUEST} or {@link MessageType#REGISTRATION_REPLY}
+     * @param messageId
+     * 		The message ID of the message. If {@link MessageType#REGISTRATION_REPLY}, then the message ID
+     * 		must be the same than the correlated {@link MessageType#REGISTRATION_REQUEST}
+     * @param agentID
+     * 		The agentID or null
+     */
     public RegistrationMessage(MessageType type, long messageId, AgentID agentID) {
         super(type, messageId);
 
@@ -87,21 +112,13 @@ public abstract class RegistrationMessage extends Message {
         return buff;
     }
 
-    //TODO: set it as abstract in Message.java ?
-    /**
-     * @return the total length of the formatted message (header length + data length)
-     */
-    public int getLength() {
-        return Message.Field.getTotalOffset() + Field.getTotalOffset();
-    }
-
     /**
      * Reads the AgentID of a formatted message beginning at a certain offset inside a buffer. Encapsulates it in an AgentID object.
      * @param byteArray the buffer in which to read 
      * @param offset the offset at which to find the beginning of the message in the buffer
      * @return the AgentID of the formatted message
      */
-    public AgentID readAgentID(byte[] byteArray, int offset) {
+    static public AgentID readAgentID(byte[] byteArray, int offset) {
         long id = TypeHelper.byteArrayToLong(byteArray, offset + Message.Field.getTotalOffset() +
             Field.AGENT_ID.getOffset());
         return (id >= 0) ? new AgentID(id) : null;

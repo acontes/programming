@@ -34,7 +34,7 @@ public class TestInvalidReconnection extends BlackBox {
         byte[] resp = tunnel.readMessage();
         ErrorMessage error = (ErrorMessage) Message.constructMessage(resp, 0);
         Assert.assertEquals(ErrorType.ERR_INVALID_AGENT_ID, error.getErrorType());
-        Assert.assertNull(error.getDstAgentID()); // Not set since it was invalid
-        Assert.assertNull(error.getSrcAgentID());
+        Assert.assertNull(error.getRecipient()); // Not set since it was invalid
+        Assert.assertNull(error.getSender());
     }
 }

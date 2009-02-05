@@ -11,11 +11,16 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationM
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationReplyMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationRequestMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.ErrorMessage.ErrorType;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message.MessageType;
 import org.objectweb.proactive.extra.forwardingv2.router.Attachment;
 import org.objectweb.proactive.extra.forwardingv2.router.Client;
 import org.objectweb.proactive.extra.forwardingv2.router.RouterImpl;
 
 
+/** Asynchronous handler for {@link MessageType#DATA_REQUEST}
+ * 
+ * @since ProActive 4.1.0
+ */
 public class ProcessorRegistrationRequest extends Processor {
 
     final private RegistrationRequestMessage message;
@@ -69,8 +74,8 @@ public class ProcessorRegistrationRequest extends Processor {
             // Send an ERR_ message (best effort)
             logger.warn("AgentId " + agentId + " asked to reconnect but is not known by this router");
 
-            ErrorMessage errMessage = new ErrorMessage(null, this.message.getMessageID(),
-                ErrorType.ERR_INVALID_AGENT_ID);
+            ErrorMessage errMessage = new ErrorMessage(ErrorType.ERR_INVALID_AGENT_ID, null, agentId,
+                this.message.getMessageID());
             try {
                 attachment.send(ByteBuffer.wrap(errMessage.toByteArray()));
             } catch (IOException e) {

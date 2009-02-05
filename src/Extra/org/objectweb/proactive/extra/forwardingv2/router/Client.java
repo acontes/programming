@@ -25,6 +25,8 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
  * A list of pending message is maintained for each client. They will be send to the client when
  * the client will reconnect. Only message that cannot be dropped must be put in the pending message
  * queue. If possible, it is preferable to send an error message to notify a failure. 
+ * 
+ * @since ProActive 4.1.0
  */
 public class Client {
     static final private Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_ROUTER);

@@ -5,7 +5,7 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
 import org.objectweb.proactive.extra.forwardingv2.protocol.TypeHelper;
 
 
-public class DebugMessage extends ForwardedMessage {
+public class DebugMessage extends DataMessage {
 
     public enum DebugType {
         DEB_DISCONNECT, DEB_NOOP;
@@ -33,17 +33,17 @@ public class DebugMessage extends ForwardedMessage {
      *            the offset at which to find the message in the byte array
      * @throws InstantiationException
      */
-    public DebugMessage(byte[] byteArray, int offset) throws InstantiationException {
+    public DebugMessage(byte[] byteArray, int offset) throws IllegalArgumentException {
         super(byteArray, offset);
 
         if (this.getType() != MessageType.DEBUG_) {
-            throw new InstantiationException("Invalid message type " + this.getType());
+            throw new IllegalArgumentException("Invalid message type " + this.getType());
         }
 
         try {
             this.debug = (DebugType) HttpMarshaller.unmarshallObject(this.getData());
         } catch (ClassCastException e) {
-            throw new InstantiationError("Invalid error type:" + e);
+            throw new IllegalArgumentException("Invalid error type:" + e);
         }
     }
 

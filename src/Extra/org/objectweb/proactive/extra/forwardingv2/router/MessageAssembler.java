@@ -18,6 +18,8 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message;
  * 
  * If an invalid message is detected (wrong message length or protocol id) the socket 
  * channel is closed
+ * 
+ * @since ProActive 4.1.0
  */
 public class MessageAssembler {
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_ROUTER);

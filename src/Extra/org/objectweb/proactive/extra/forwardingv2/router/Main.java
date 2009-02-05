@@ -17,7 +17,11 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
-public class Main {
+/** Start a router.
+ * 
+ * @since ProActive 4.1.0
+ */
+class Main {
     static final private Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_ROUTER);
 
     static final private int DEFAULT_PORT = 33647;
@@ -29,7 +33,7 @@ public class Main {
         new Main(args);
     }
 
-    public Main(String[] args) throws IOException {
+    private Main(String[] args) throws IOException {
         this.config = parseOptions(args);
 
         try {

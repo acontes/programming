@@ -45,7 +45,7 @@ public class TestUnknownSender extends BlackBox {
     @Test
     public void testOK() throws IOException, InstantiationException {
         // Connect
-        Message message = new RegistrationRequestMessage(ProActiveRandom.nextPosLong());
+        Message message = new RegistrationRequestMessage(null, ProActiveRandom.nextPosLong());
         tunnel.write(message.toByteArray());
 
         byte[] resp = tunnel.readMessage();
@@ -63,7 +63,7 @@ public class TestUnknownSender extends BlackBox {
         ErrorMessage error = new ErrorMessage(resp, 0);
         Assert.assertEquals(error.getErrorType(), ErrorType.ERR_UNKNOW_RCPT);
         Assert.assertEquals(error.getMessageID(), msgId);
-        Assert.assertEquals(error.getSrcAgentID(), dstAgentID);
-        Assert.assertEquals(error.getDstAgentID(), myAgentId);
+        Assert.assertEquals(error.getSender(), dstAgentID);
+        Assert.assertEquals(error.getRecipient(), myAgentId);
     }
 }

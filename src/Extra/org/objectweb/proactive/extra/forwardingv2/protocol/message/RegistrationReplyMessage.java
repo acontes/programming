@@ -3,6 +3,10 @@ package org.objectweb.proactive.extra.forwardingv2.protocol.message;
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
 
 
+/** 
+ * 
+ * @since ProActive 4.1.0
+ */
 public class RegistrationReplyMessage extends RegistrationMessage {
 
     public RegistrationReplyMessage(AgentID agentID, long messageId) {
@@ -14,11 +18,11 @@ public class RegistrationReplyMessage extends RegistrationMessage {
      * @param byteArray the byte array from which to read
      * @param offset the offset at which to find the message in the byte array
      */
-    public RegistrationReplyMessage(byte[] byteArray, int offset) throws InstantiationException {
+    public RegistrationReplyMessage(byte[] byteArray, int offset) throws IllegalArgumentException {
         super(byteArray, offset);
 
         if (this.getType() != MessageType.REGISTRATION_REPLY) {
-            throw new InstantiationException("Invalid message type " + this.getType());
+            throw new IllegalArgumentException("Invalid message type " + this.getType());
         }
     }
 }

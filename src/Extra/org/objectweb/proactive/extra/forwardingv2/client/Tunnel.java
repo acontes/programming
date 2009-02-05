@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.SocketException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -30,10 +31,13 @@ public class Tunnel {
     final private String debugString;
 
     public Tunnel(InetAddress routerAddr, int routerPort) throws IOException {
-        this.socket = new Socket(routerAddr, routerPort);
+        this(new Socket(routerAddr, routerPort));
+    }
+
+    public Tunnel(Socket socket) throws IOException {
+        this.socket = socket;
         this.bis = new BufferedInputStream(socket.getInputStream());
 
-        // Configure the socket
         this.socket.setKeepAlive(true);
 
         this.debugString = "local=" + socket.getLocalAddress() + " remote=" + socket.getRemoteSocketAddress();

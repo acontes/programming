@@ -22,7 +22,7 @@ public class TestConnection extends BlackBox {
      */
     @Test
     public void testConnection() throws IOException {
-        Message message = new RegistrationRequestMessage(ProActiveRandom.nextPosLong());
+        Message message = new RegistrationRequestMessage(null, ProActiveRandom.nextPosLong());
         tunnel.write(message.toByteArray());
 
         byte[] resp = tunnel.readMessage();

@@ -1,15 +1,12 @@
 package org.objectweb.proactive.extra.forwardingv2.protocol;
 
-/** Helper class to allows int/long <-> byte[] conversion
+/** Helper class to allows int/long to byte array conversion
  *
- * <b>warn</b> These functions should depend on machine endianess but is a not been
- * well tested...
+ * Theses functions do not depend on the endianess of the machine
  */
 public class TypeHelper {
 
-    /**
-     * 
-     * converts the byte representation of a long into its value.
+    /** Converts the byte representation of a long into its value.
      * 
      * @param a the byte array in which to find the byte representation
      * @param offset the offset in the byte array at which to find the byte representation
@@ -25,11 +22,9 @@ public class TypeHelper {
         ret |= ((long) (buf[offset + 6] & 0xFF) << 8);
         ret |= ((long) (buf[offset + 7] & 0xFF));
         return ret;
-
     }
 
-    /**
-     * Copies the byte representation of a long into a byte array starting at the given offset
+    /** Copies the byte representation of a long into a byte array starting at the given offset
      * 
      * @param val the long to convert
      * @param a the byte array in which to copy the byte representation
@@ -44,12 +39,9 @@ public class TypeHelper {
         buf[offset + 5] = (byte) ((val >> 16));
         buf[offset + 6] = (byte) ((val >> 8));
         buf[offset + 7] = (byte) ((val) >> 0);
-
     }
 
-    /**
-     * 
-     * converts the byte representation of an int into its value as an integer.
+    /** converts the byte representation of an int into its value as an integer.
      * 
      * @param buf the byte array in which to find the byte representation
      * @param offset the offset in the byte array at which to find the byte representation
@@ -57,7 +49,6 @@ public class TypeHelper {
      */
 
     public static int byteArrayToInt(final byte[] buf, final int offset) {
-
         int ret = (buf[offset + 0] << 24);
         ret |= (buf[offset + 1] & 0xFF) << 16;
         ret |= (buf[offset + 2] & 0xFF) << 8;
@@ -66,8 +57,7 @@ public class TypeHelper {
         return ret;
     }
 
-    /**
-     * Copies the byte representation of an int into a byte array starting at the given offset
+    /** Copies the byte representation of an int into a byte array starting at the given offset
      * 
      * @param val the int to convert
      * @param buf the byte array in which to copy the byte representation

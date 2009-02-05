@@ -1,32 +1,48 @@
 package org.objectweb.proactive.extra.forwardingv2.protocol.message;
 
-import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.remoteobject.SynchronousReplyImpl;
 import org.objectweb.proactive.extra.forwardingv2.protocol.TypeHelper;
 
 
+/** The common part of every ProActive Message Routing protocol.
+ * 
+ * The ProActive Message Routing protocol uses different type of messages defined
+ * in the {@link MessageType} enumeration. All theses messages use the same base 
+ * format defined in this classes. Subclasses can add additional fields or a payload.
+ * They must.
+ * 
+ * Fields are defined in the {@link Field} enumeration.
+ * 
+ * @since ProActive 4.1.0
+ */
 public abstract class Message {
-    static final private Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_MESSAGE);
 
+    /** Protocol version implemented by this class */
     public static final int PROTOV1 = 1;
 
-    // enumerations
+    /** All the message types supported by the ProActive message routing protocol */
+    /* ORDER MATTERS ! ordinal() is used to attribute an id to each message type */
     public enum MessageType {
-        REGISTRATION_REQUEST, // Registration request to the registry
-        REGISTRATION_REPLY, // Registration reply from the registry indicating the attributed localid
-        DATA_REQUEST, // Request from a client to a server
-        DATA_REPLY, // Reply from a server to a client
-        ERR_, DEBUG_,
-        //        ERR_DISCONNECTED_RCPT, // Signals that the RCPT disconnected from the router
-        //        ERR_UNKNOW_RCPT, // Signals that the router does not known the RCPT
-        //        ERR_INVALID_AGENT_ID // a client advertised an unknow agent id on reconnection
+        /** A registration request send by a client to the router */
+        REGISTRATION_REQUEST,
+        /** A registration reply send the router to a client */
+        REGISTRATION_REPLY,
+        /** A data message which encapsulate a {@link Request} */
+        DATA_REQUEST,
+        /** A data message which encapsulate a {@link SynchronousReplyImpl} */
+        DATA_REPLY,
+        /** An error notification. Send by the router to a client */
+        ERR_,
+        /** A message only used for debug and testing */
+        DEBUG_
+        /* That's all*/
         ;
 
+        /** Reverse map associate a message type to an ID  */
         final static Map<Integer, MessageType> idToMessageType;
         static {
             // Can't populate idToMessageType from constructor since enums are initialized before 
@@ -42,26 +58,63 @@ public abstract class Message {
         }
     }
 
+    /** All the fields
+     * 
+     * This is the common header of all messages.
+     */
+    /* ORDER MATTERS ! ordinal() is used */
     public enum Field {
-        LENGTH(4, Integer.class), PROTO_ID(4, Integer.class), MSG_TYPE(4, Integer.class), MSG_ID(8,
-                Long.class);
+        /** Length of this message, all fields included
+         * 
+         * Value must be greater than getTotalOffset() and smaller than
+         * {@link Integer}.MAX_INT
+         */
+        LENGTH(4, Integer.class),
+        /** The protocol ID of this message
+         * 
+         * This field can be used to distinguish different protocol version.
+         * 
+         * Value is a strictly positive integer.
+         */
+        PROTO_ID(4, Integer.class),
+        /** The type of this message.
+         * 
+         * ProActive Message Routing protocol support different types of message.
+         *
+         * Value is the ID of the message type as defined by {@link MessageType}
+         */
+        MSG_TYPE(4, Integer.class),
+        /** The ID of this message
+         * 
+         * An ID is associated to each message. An unique ID is given to all
+         * requests (DataRequest and Registration request). Reply and error message
+         * reuse this ID to allow "transaction tracking". 
+         */
+        MSG_ID(8, Long.class);
 
         private int length;
-        private Class<?> type;
 
+        /* type is only informative */
         private Field(int length, Class<?> type) {
             this.length = length;
-            this.type = type;
         }
 
+        /** Length of the field in bytes */
         public int getLength() {
             return this.length;
         }
 
+        /** Offset of the field in the message */
         public int getOffset() {
             int offset = 0;
-            // No way to avoid this iteration over ALL the field
-            // There is no such method than Field.getOrdinal(x)
+            /* TODO OPTIM: Cache the response.
+             * This function is called at least 3 times for each message
+             * received on by the router. Could be a bottleneck.  
+             */
+
+            /* No way to avoid this iteration over ALL the field
+             * There is no such method than Field.getOrdinal(x)
+             */
             for (Field field : values()) {
                 if (field.ordinal() < this.ordinal()) {
                     offset += field.getLength();
@@ -70,12 +123,9 @@ public abstract class Message {
             return offset;
         }
 
-        public String getType() {
-            return this.type.toString();
-        }
-
+        /** Length of the fields defined by {@link Message} */
         static public int getTotalOffset() {
-            // OPTIM: Can be optimized with caching if needed
+            /* TODO OPTIM: Can be optimized with caching if needed */
             int totalOffset = 0;
             for (Field field : values()) {
                 totalOffset += field.getLength();
@@ -84,123 +134,177 @@ public abstract class Message {
         }
     }
 
-    // methods
-    public static Message constructMessage(byte[] byteArray, int offset) {
+    /* @@@@@@@@@@@@@@@@@@@@ Static methods @@@@@@@@@@@@@@@@@@@@@@ */
+
+    /** Construct a message from a byte array
+     * 
+     * @param buf 
+     * 		a buffer which contains a message
+     * @param offset
+     * 		the offset at which the message begins  
+     * @throws IllegalArgumentException
+     * 		If a message cannot be constructed from the buffer
+     */
+    public static Message constructMessage(byte[] buf, int offset) throws IllegalArgumentException {
         // depending on the type of message, call a different constructor
-        MessageType type = MessageType.getMessageType(TypeHelper.byteArrayToInt(byteArray, offset +
+        MessageType type = MessageType.getMessageType(TypeHelper.byteArrayToInt(buf, offset +
             Field.MSG_TYPE.getOffset()));
-        try {
-            switch (type) {
-                case REGISTRATION_REQUEST:
-                    return new RegistrationRequestMessage(byteArray, offset);
-                case REGISTRATION_REPLY:
-                    return new RegistrationReplyMessage(byteArray, offset);
-                case DATA_REQUEST:
-                    return new DataRequestMessage(byteArray, offset);
-                case DATA_REPLY:
-                    return new DataReplyMessage(byteArray, offset);
-                case ERR_:
-                    return new ErrorMessage(byteArray, offset);
-                case DEBUG_:
-                    return new DebugMessage(byteArray, offset);
-                default:
-                    logger.error("Construct message failed: unknown message type " + type);
-                    return null;
-            }
-        } catch (InstantiationException e) {
-            logger.error("Construct message failed: wrong message type", e);
-            return null;
+
+        switch (type) {
+            case REGISTRATION_REQUEST:
+                return new RegistrationRequestMessage(buf, offset);
+            case REGISTRATION_REPLY:
+                return new RegistrationReplyMessage(buf, offset);
+            case DATA_REQUEST:
+                return new DataRequestMessage(buf, offset);
+            case DATA_REPLY:
+                return new DataReplyMessage(buf, offset);
+            case ERR_:
+                return new ErrorMessage(buf, offset);
+            case DEBUG_:
+                return new DebugMessage(buf, offset);
+            default:
+                throw new IllegalArgumentException("Unknown message type: " + type);
         }
     }
 
-    /**
-     * Reads the length of a formatted message beginning at a certain offset inside a buffer. 
-     * @param byteArray the buffer in which to read 
-     * @param offset the offset at which to find the beginning of the message in the buffer
-     * @return the total length of the formatted message
+    /** Reads the length of a message 
+     * 
+     * @param buf 
+     *		a buffer which contains a message
+     * @param offset 
+     * 		the offset at which the message begins  
+     * @return The value of the length field of the message contained in buf at the given offset
      */
-    public static int readLength(byte[] byteArray, int offset) {
-        return TypeHelper.byteArrayToInt(byteArray, offset + Field.LENGTH.getOffset());
+    public static int readLength(byte[] buf, int offset) {
+        return TypeHelper.byteArrayToInt(buf, offset + Field.LENGTH.getOffset());
     }
 
-    public static int readProtoID(byte[] byteArray, int offset) {
-        return TypeHelper.byteArrayToInt(byteArray, offset + Field.PROTO_ID.getOffset());
+    /** Reads the protocol ID of a message 
+     * 
+     * @param buf 
+     *		a buffer which contains a message
+     * @param offset 
+     * 		the offset at which the message begins  
+     * @return The value of the protocol ID field of the message contained in buf at the given offset
+     */
+    public static int readProtoID(byte[] buf, int offset) {
+        return TypeHelper.byteArrayToInt(buf, offset + Field.PROTO_ID.getOffset());
     }
 
-    public static long readMessageID(byte[] byteArray, int offset) {
-        return TypeHelper.byteArrayToLong(byteArray, offset + Field.MSG_ID.getOffset());
+    /** Reads the message ID of a message 
+     * 
+     * @param buf 
+     *		a buffer which contains a message
+     * @param offset 
+     * 		the offset at which the message begins  
+     * @return The value of the message ID field of the message contained in buf at the given offset
+     */
+    public static long readMessageID(byte[] buf, int offset) {
+        return TypeHelper.byteArrayToLong(buf, offset + Field.MSG_ID.getOffset());
     }
 
-    public static int readLength(ByteBuffer buffer) {
-        return buffer.getInt(Field.LENGTH.getOffset());
-    }
-
-    /**
-     * Reads the type of a formatted message beginning at a certain offset inside a buffer. 
-     * @param byteArray the array in which to read 
-     * @param offset the offset at which to find the beginning of the message in the buffer
-     * @return the type of the formatted message
+    /** Reads the type of a message 
+     * 
+     * @param buf 
+     *		a buffer which contains a message
+     * @param offset 
+     * 		the offset at which the message begins  
+     * @return The value of the message type field of the message contained in buf at the given offset
      */
     public static MessageType readType(byte[] byteArray, int offset) {
         return MessageType.getMessageType(TypeHelper.byteArrayToInt(byteArray, offset +
             Field.MSG_TYPE.getOffset()));
     }
 
-    /**
-     * Reads the type of a formatted message beginning at a certain offset inside a buffer. 
-     * @param buffer the {@link ByteBuffer} in which to read 
-     * @return the type of the formatted message
-     */
-    public static MessageType readType(ByteBuffer buffer) {
-        return MessageType.getMessageType(buffer.getInt(Field.MSG_TYPE.getOffset()));
-    }
-
-    // attributes
+    /** Length of this message */
     private int length;
+    /** Protocol ID of this message */
     final private int protoId;
+    /** Type of this message */
     final private MessageType type;
+    /** ID of this message*/
     final private long messageId;
 
-    public Message(MessageType type, long messageId) {
+    /** Create the header of a message 
+     * 
+     * length and protocol ID fields will be automatically set when available
+     * @param type
+     * 		Type of the message
+     * @param messageId
+     * 		ID of the message
+     */
+    protected Message(MessageType type, long messageId) {
         this.type = type;
         this.protoId = PROTOV1;
         this.messageId = messageId;
     }
 
-    public Message(byte[] buf, int offset) {
+    /** Create the header of a message from a byte array
+     * 
+     * @param buf 
+     *		a buffer which contains a message
+     * @param offset 
+     * 		the offset at which the message begins  
+     * @throws IllegalArgumentException
+     * 		If the buffer does not match message requirements (proto ID, length etc.)
+     */
+    protected Message(byte[] buf, int offset) throws IllegalArgumentException {
         this.length = readLength(buf, offset);
         this.protoId = readProtoID(buf, offset);
         this.type = readType(buf, offset);
         this.messageId = readMessageID(buf, offset);
 
-        // Should probably throw an exception...
+        if (this.length < Field.getTotalOffset()) {
+            throw new IllegalArgumentException("Invalid message length: " + this.length);
+        }
+
         if (this.protoId != PROTOV1) {
-            logger.fatal("Invalid protocol id. Expected: " + PROTOV1 + " Received: " + this.protoId);
+            throw new IllegalArgumentException("Invalid message protocol ID: " + this.protoId);
         }
     }
 
+    /** Return the length of this message */
     public int getLength() {
         return length;
     }
 
+    /** Set the length of this message 
+     * 
+     * This method must be called by subclass when constructing a message from
+     * scratch.
+     */
     protected void setLength(int length) {
         this.length = length;
     }
 
+    /** Return the type of this message */
     public MessageType getType() {
         return this.type;
     }
 
+    /** Return the message of this message */
     public long getMessageID() {
         return this.messageId;
     }
 
+    /** Return the protocol ID of this message */
     public int getProtoID() {
         return this.protoId;
     }
 
+    /** Convert this message into a byte array */
     public abstract byte[] toByteArray();
 
+    /** Write the header of this message into buf
+     * 
+     * This method must be called by toByteArray() implementations.
+     * 
+     * @param buf
+     * 		The buffer into the header must be put
+     * @param offset
+     * 		The offset a which the message will begin
+     */
     protected void writeHeader(byte[] buf, int offset) {
         TypeHelper.intToByteArray(this.length, buf, offset + Field.LENGTH.getOffset());
         TypeHelper.intToByteArray(this.protoId, buf, offset + Field.PROTO_ID.getOffset());
@@ -247,5 +351,4 @@ public abstract class Message {
             return false;
         return true;
     }
-
 }

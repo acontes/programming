@@ -3,23 +3,41 @@ package org.objectweb.proactive.extra.forwardingv2.protocol.message;
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
 
 
-public class DataRequestMessage extends ForwardedMessage {
+/** A {@link MessageType#DATA_REQUEST} message
+ * 
+ * @since ProActive 4.1.0
+ */
+public class DataRequestMessage extends DataMessage {
 
-    public DataRequestMessage(AgentID srcAgentID, AgentID dstAgentID, long msgID, byte[] data) {
-        super(MessageType.DATA_REQUEST, srcAgentID, dstAgentID, msgID, data);
+    /** Create a {@link MessageType#DATA_REQUEST} message
+     * 
+     * @param sender
+     * 		sender of the request
+     * @param recipient
+     * 		recipient of the request
+     * @param msgID
+     * 		an unique ID per sender.
+     * @param data
+     * 		the payload
+     */
+    public DataRequestMessage(AgentID sender, AgentID recipient, long msgID, byte[] data) {
+        super(MessageType.DATA_REQUEST, sender, recipient, msgID, data);
     }
 
-    /**
-     * Construct a message from the data contained in a formatted byte array.
-     * @param byteArray the byte array from which to read
-     * @param offset the offset at which to find the message in the byte array
-     * @throws InstantiationException
+    /** Create a {@link MessageType#DATA_REQUEST} message from a byte array
+     * 
+     * @param buf 
+     *		a buffer which contains a message
+     * @param offset 
+     * 		the offset at which the message begins  
+     * @throws IllegalArgumentException
+     * 		If the buffer does not match message requirements (proto ID, length etc.)
      */
-    public DataRequestMessage(byte[] byteArray, int offset) throws InstantiationException {
+    public DataRequestMessage(byte[] byteArray, int offset) throws IllegalArgumentException {
         super(byteArray, offset);
 
         if (this.getType() != MessageType.DATA_REQUEST) {
-            throw new InstantiationException("Invalid message type " + this.getType());
+            throw new IllegalArgumentException("Invalid message type " + this.getType());
         }
     }
 }

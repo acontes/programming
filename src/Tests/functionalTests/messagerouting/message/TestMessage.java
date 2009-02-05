@@ -14,7 +14,6 @@ public class TestMessage extends FunctionalTest {
             System.out.println(field.ordinal());
             System.out.println(field.getLength());
             System.out.println(field.getOffset());
-            System.out.println(field.getType());
         }
 
         System.out.println(Message.Field.getTotalOffset());

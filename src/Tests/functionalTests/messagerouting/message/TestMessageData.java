@@ -10,7 +10,7 @@ import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.DataReplyMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.DataRequestMessage;
-import org.objectweb.proactive.extra.forwardingv2.protocol.message.ForwardedMessage;
+import org.objectweb.proactive.extra.forwardingv2.protocol.message.DataMessage;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message;
 import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message.MessageType;
 
@@ -62,7 +62,7 @@ public class TestMessageData extends UnitTests {
         Assert.assertEquals(0, rp.getData().length);
     }
 
-    private void buildAndCheckDataRequest(Class<? extends ForwardedMessage> cl, MessageType type)
+    private void buildAndCheckDataRequest(Class<? extends DataMessage> cl, MessageType type)
             throws SecurityException, NoSuchMethodException, IllegalArgumentException,
             InstantiationException, IllegalAccessException, InvocationTargetException {
         AgentID srcAgent = new AgentID(ProActiveRandom.nextPosLong());
@@ -77,15 +77,15 @@ public class TestMessageData extends UnitTests {
         }
         logger.info("data.length " + data.length);
 
-        Constructor<? extends ForwardedMessage> constructor;
+        Constructor<? extends DataMessage> constructor;
         constructor = cl.getConstructor(AgentID.class, AgentID.class, long.class, byte[].class);
-        ForwardedMessage m = (ForwardedMessage) constructor.newInstance(srcAgent, dstAgent, msgId, data);
+        DataMessage m = (DataMessage) constructor.newInstance(srcAgent, dstAgent, msgId, data);
 
         Assert.assertEquals(Message.PROTOV1, m.getProtoID());
         Assert.assertEquals(type, m.getType());
         Assert.assertEquals(msgId, m.getMessageID());
-        Assert.assertEquals(srcAgent, m.getSrcAgentID());
-        Assert.assertEquals(dstAgent, m.getDstAgentID());
+        Assert.assertEquals(srcAgent, m.getSender());
+        Assert.assertEquals(dstAgent, m.getRecipient());
 
         for (int i = 0; i < m.getData().length; i++) {
             Assert.assertEquals((byte) i, m.getData()[i]);
@@ -95,14 +95,14 @@ public class TestMessageData extends UnitTests {
         Assert.assertEquals(buf.length, m.getLength());
 
         constructor = cl.getConstructor(byte[].class, int.class);
-        ForwardedMessage m2 = (ForwardedMessage) constructor.newInstance(buf, 0);
+        DataMessage m2 = (DataMessage) constructor.newInstance(buf, 0);
 
         Assert.assertEquals(m.getLength(), m2.getLength());
         Assert.assertEquals(m.getProtoID(), m2.getProtoID());
         Assert.assertEquals(m.getType(), m2.getType());
         Assert.assertEquals(m.getMessageID(), m2.getMessageID());
-        Assert.assertEquals(m.getSrcAgentID(), m2.getSrcAgentID());
-        Assert.assertEquals(m.getDstAgentID(), m2.getDstAgentID());
+        Assert.assertEquals(m.getSender(), m2.getSender());
+        Assert.assertEquals(m.getRecipient(), m2.getRecipient());
         Assert.assertEquals(m.getData().length, m2.getData().length);
 
         for (int i = 0; i < m.getData().length; i++) {

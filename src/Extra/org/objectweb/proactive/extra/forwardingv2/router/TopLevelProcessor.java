@@ -19,6 +19,8 @@ import org.objectweb.proactive.extra.forwardingv2.router.processor.ProcessorRegi
  * Each message received is asynchronously handled by a {@link TopLevelProcessor}.
  * This class dispatch the work to a dedicated message {@link Processor} according
  * to the type of the message.
+ * 
+ * @since ProActive 4.1.0
  */
 class TopLevelProcessor implements Runnable {
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_ROUTER);
@@ -48,7 +50,7 @@ class TopLevelProcessor implements Runnable {
             logger.trace("Asynchronous handling of " + message);
         }
 
-        MessageType type = Message.readType(message);
+        MessageType type = Message.readType(message.array(), 0);
         Processor processor = null;
         switch (type) {
             case REGISTRATION_REQUEST:
