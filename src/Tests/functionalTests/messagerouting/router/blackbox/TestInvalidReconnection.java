@@ -27,14 +27,16 @@ public class TestInvalidReconnection extends BlackBox {
     @Test
     public void test() throws IOException {
         AgentID agentID = new AgentID(0xcafe);
-
-        Message message = new RegistrationRequestMessage(agentID, ProActiveRandom.nextPosLong());
+        long messageID = ProActiveRandom.nextPosLong();
+        Message message = new RegistrationRequestMessage(agentID, messageID);
         tunnel.write(message.toByteArray());
 
         byte[] resp = tunnel.readMessage();
         ErrorMessage error = (ErrorMessage) Message.constructMessage(resp, 0);
         Assert.assertEquals(ErrorType.ERR_INVALID_AGENT_ID, error.getErrorType());
-        Assert.assertNull(error.getRecipient()); // Not set since it was invalid
-        Assert.assertNull(error.getSender());
+        Assert.assertEquals(agentID, error.getRecipient());
+        Assert.assertEquals(agentID, error.getSender());
+        Assert.assertEquals(messageID, error.getMessageID());
+
     }
 }

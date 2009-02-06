@@ -79,7 +79,8 @@ public abstract class RegistrationMessage extends Message {
         super(type, messageId);
 
         this.agentID = agentID;
-        super.setLength(this.getLength());
+        super.setLength(Message.Field.getTotalOffset() + Field.getTotalOffset());
+
     }
 
     /**
@@ -99,7 +100,7 @@ public abstract class RegistrationMessage extends Message {
 
     @Override
     public byte[] toByteArray() {
-        int length = getLength();
+        int length = super.getLength();
         byte[] buff = new byte[length];
 
         super.writeHeader(buff, 0);

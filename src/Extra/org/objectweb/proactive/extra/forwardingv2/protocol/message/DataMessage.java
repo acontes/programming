@@ -148,7 +148,12 @@ public abstract class DataMessage extends Message {
         this.recipient = dst;
         this.data = data;
         this.toByteArray = null;
-        super.setLength(this.getLength());
+
+        int length = 0;
+        length += Message.Field.getTotalOffset();
+        length += Field.getTotalOffset();
+        length += (data != null ? data.length : 0);
+        super.setLength(length);
     }
 
     /**

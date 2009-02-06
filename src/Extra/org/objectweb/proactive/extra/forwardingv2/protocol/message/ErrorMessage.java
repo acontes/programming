@@ -64,7 +64,7 @@ public class ErrorMessage extends DataMessage {
          * the following properties:
          *
          * <ul>
-         * 	<li>Recipient and Faulty is not set</li>
+         * 	<li>Recipient and Faulty set to the bogus Agent ID</li>
          *  <li>message ID is the message ID of the {@link MessageType#REGISTRATION_REQUEST}</li>
          * </ul>
          */

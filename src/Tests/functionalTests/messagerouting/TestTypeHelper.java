@@ -33,7 +33,7 @@ public class TestTypeHelper {
         Random rand = new Random();
         byte[] buf = new byte[32];
 
-        for (int i = 0; i < 100000000; i++) {
+        for (int i = 0; i < 10000000; i++) {
             int retval;
             int val = rand.nextInt();
             int offset = rand.nextInt(24);
@@ -74,7 +74,7 @@ public class TestTypeHelper {
         Random rand = new Random();
         byte[] buf = new byte[32];
 
-        for (int i = 0; i < 100000000; i++) {
+        for (int i = 0; i < 10000000; i++) {
             long retval;
             long val = rand.nextLong();
             int offset = rand.nextInt(24);

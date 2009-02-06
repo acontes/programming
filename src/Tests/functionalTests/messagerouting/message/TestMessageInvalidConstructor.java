@@ -13,7 +13,7 @@ import unitTests.UnitTests;
 
 public class TestMessageInvalidConstructor extends UnitTests {
 
-    @Test(expected = InstantiationException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test1() throws InstantiationException {
         AgentID srcAgent = new AgentID(ProActiveRandom.nextPosLong());
         AgentID dstAgent = new AgentID(ProActiveRandom.nextPosLong());
@@ -23,7 +23,7 @@ public class TestMessageInvalidConstructor extends UnitTests {
         new DataRequestMessage(rp.toByteArray(), 0);
     }
 
-    @Test(expected = InstantiationException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test2() throws InstantiationException {
         AgentID srcAgent = new AgentID(ProActiveRandom.nextPosLong());
         AgentID dstAgent = new AgentID(ProActiveRandom.nextPosLong());
@@ -33,7 +33,7 @@ public class TestMessageInvalidConstructor extends UnitTests {
         new RegistrationReplyMessage(rp.toByteArray(), 0);
     }
 
-    @Test(expected = InstantiationException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void test3() throws InstantiationException {
         AgentID srcAgent = new AgentID(ProActiveRandom.nextPosLong());
         AgentID dstAgent = new AgentID(ProActiveRandom.nextPosLong());

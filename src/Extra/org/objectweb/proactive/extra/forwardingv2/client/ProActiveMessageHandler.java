@@ -25,9 +25,9 @@ public class ProActiveMessageHandler implements MessageHandler {
     final private ExecutorService tpe;
 
     /** Local agent */
-    private AgentImpl agent;
+    private Agent agent;
 
-    public ProActiveMessageHandler(AgentImpl agent) {
+    public ProActiveMessageHandler(Agent agent) {
         this.agent = agent;
 
         int workers = PAProperties.PA_NET_ROUTER_CLIENT_HANDLER_THREADS.getValueAsInt();
@@ -49,9 +49,9 @@ public class ProActiveMessageHandler implements MessageHandler {
         /** the request*/
         private final DataRequestMessage _toProcess;
         /** the local agent*/
-        private final AgentImpl agent;
+        private final Agent agent;
 
-        public ProActiveMessageProcessor(DataRequestMessage msg, AgentImpl agent) {
+        public ProActiveMessageProcessor(DataRequestMessage msg, Agent agent) {
             this._toProcess = msg;
             this.agent = agent;
         }
