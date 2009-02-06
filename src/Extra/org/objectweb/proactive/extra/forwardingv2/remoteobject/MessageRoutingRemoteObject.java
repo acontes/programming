@@ -31,6 +31,7 @@
  */
 package org.objectweb.proactive.extra.forwardingv2.remoteobject;
 
+import java.io.Serializable;
 import java.net.URI;
 
 import org.apache.log4j.Logger;
@@ -52,7 +53,8 @@ import org.objectweb.proactive.extra.forwardingv2.remoteobject.message.MessageRo
  * 
  * @since ProActive 4.1.0
  */
-public class MessageRoutingRemoteObject implements RemoteRemoteObject {
+@SuppressWarnings("serial")
+public class MessageRoutingRemoteObject implements RemoteRemoteObject, Serializable {
     final static private Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_REMOTE_OBJECT);
 
     /** The URL of the RemoteObject */
