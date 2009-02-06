@@ -56,15 +56,6 @@
 	<!--  Changing font sizes -->
 	<xsl:param name="monospace.font.family">Helvetica</xsl:param>
 
-	<xsl:param name="use.extensions" select="'1'" />
-	<xsl:param name="linenumbering.extension" select="'1'" />
-	<xsl:param name="tablecolumns.extension" select="'1'" />
-	<xsl:param name="textinsert.extension" select="'1'" />
-	<xsl:param name="highlight.source" select="1"/>
-	<xsl:param name="linenumbering.everyNth" select="'1'"/>
-	<xsl:param name="linenumbering.separator" select="':'"/>
-
-
 
 
 	<!-- This avoids having "Draft" mode set on. Avoids the other two lines -->
