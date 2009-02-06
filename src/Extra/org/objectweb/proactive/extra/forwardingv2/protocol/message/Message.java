@@ -94,6 +94,10 @@ public abstract class Message {
 
         private int length;
 
+        static private int totalOffset = 0;
+
+        private int myOffset = 0;
+
         /* type is only informative */
         private Field(int length, Class<?> type) {
             this.length = length;
@@ -106,30 +110,49 @@ public abstract class Message {
 
         /** Offset of the field in the message */
         public int getOffset() {
-            int offset = 0;
-            /* TODO OPTIM: Cache the response.
-             * This function is called at least 3 times for each message
-             * received on by the router. Could be a bottleneck.  
+            /* WARNING: RACY SINGLE-CHECK INTIALIZATION
+             * 
+             * This method relies on the Java Memory Model specification to perform
+             * a racy single-check initialization. 
+             * DO NOT CHANGE THIS METHOD IF YOU DON'T KNOW WHAT IT IS.
+             * 
+             * See: Effective Java, chapter 10, Item 71: Lazy initialization
+             * See: http://jeremymanson.blogspot.com/2008/12/benign-data-races-in-java.html
              */
-
-            /* No way to avoid this iteration over ALL the field
-             * There is no such method than Field.getOrdinal(x)
-             */
-            for (Field field : values()) {
-                if (field.ordinal() < this.ordinal()) {
-                    offset += field.getLength();
+            int tmpOffset = myOffset;
+            if (tmpOffset == 0) {
+                for (Field field : values()) {
+                    if (field.ordinal() < this.ordinal()) {
+                        tmpOffset += field.getLength();
+                    }
                 }
+
+                myOffset = tmpOffset;
             }
-            return offset;
+
+            return myOffset;
         }
 
         /** Length of the fields defined by {@link Message} */
         static public int getTotalOffset() {
-            /* TODO OPTIM: Can be optimized with caching if needed */
-            int totalOffset = 0;
-            for (Field field : values()) {
-                totalOffset += field.getLength();
+            /* WARNING: RACY SINGLE-CHECK INTIALIZATION
+             * 
+             * This method relies on the Java Memory Model specification to perform
+             * a racy single-check initialization. 
+             * DO NOT CHANGE THIS METHOD IF YOU DON'T KNOW WHAT IT IS.
+             * 
+             * See: Effective Java, chapter 10, Item 71: Lazy initialization
+             * See: http://jeremymanson.blogspot.com/2008/12/benign-data-races-in-java.html
+             */
+            int tmpOffset = totalOffset;
+            if (tmpOffset == 0) {
+                for (Field field : values()) {
+                    tmpOffset += field.getLength();
+                }
+
+                totalOffset = tmpOffset;
             }
+
             return totalOffset;
         }
     }
