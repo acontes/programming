@@ -5,7 +5,6 @@ import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.remoteobject.http.util.HttpMarshaller;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -30,9 +29,16 @@ public class ProActiveMessageHandler implements MessageHandler {
     public ProActiveMessageHandler(Agent agent) {
         this.agent = agent;
 
-        int workers = PAProperties.PA_NET_ROUTER_CLIENT_HANDLER_THREADS.getValueAsInt();
-        logger.debug("ProActiveMessageHandler threadpool has " + workers + " workers");
-        tpe = Executors.newFixedThreadPool(workers);
+        /* DO NOT USE A FIXED THREAD POOL
+         * 
+         * Each time a message arrives, it is handled by a task submitted to 
+         * this executor service. Each task can a perform remote calls. If 
+         * the number of workers is fixed it can lead to deadlock.
+         * 
+         * Reentrant calls is the most obvious case of deadlock. But the same 
+         * issue can occur with remote calls. 
+         */
+        tpe = Executors.newCachedThreadPool();
 
     }
 
@@ -40,6 +46,7 @@ public class ProActiveMessageHandler implements MessageHandler {
         if (logger.isTraceEnabled()) {
             logger.trace("pushing message " + message + " into the executor queue");
         }
+
         ProActiveMessageProcessor pmp = new ProActiveMessageProcessor(message, agent);
         tpe.submit(pmp);
     }
@@ -72,15 +79,15 @@ public class ProActiveMessageHandler implements MessageHandler {
                     result = message.processMessage();
                 } catch (Exception e) {
                     logger.warn("Exception during execution of message: " + _toProcess, e);
-                    // TODO send an ExecutionExceptionMessage
-                    // agent.sendExceptionReply(_toProcess, e);
+                    // TODO: Send an ERR_ ?
                     return;
                 }
 
                 byte[] resultBytes = HttpMarshaller.marshallObject(result);
                 agent.sendReply(_toProcess, resultBytes);
             } catch (Exception e) {
-                logger.warn("HTTP Failed to serve a message", e);
+                logger.warn("ProActive Message failed to serve a message", e);
+                // TODO: Send an ERR_ ?
             } finally {
                 Thread.currentThread().setContextClassLoader(savedClassLoader);
             }

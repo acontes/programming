@@ -12,7 +12,13 @@ import unitTests.UnitTests;
 
 
 public class TestMessageInvalidConstructor extends UnitTests {
+    /*
+     *  NOTE: Does not test all the combinations
+     *  
+     */
 
+    /* Data reply -> byte [] -> Data request must throw an IllegalArgumentException
+     */
     @Test(expected = IllegalArgumentException.class)
     public void test1() throws InstantiationException {
         AgentID srcAgent = new AgentID(ProActiveRandom.nextPosLong());
@@ -23,6 +29,8 @@ public class TestMessageInvalidConstructor extends UnitTests {
         new DataRequestMessage(rp.toByteArray(), 0);
     }
 
+    /* Data reply -> byte [] -> Registration reply must throw an IllegalArgumentException
+     */
     @Test(expected = IllegalArgumentException.class)
     public void test2() throws InstantiationException {
         AgentID srcAgent = new AgentID(ProActiveRandom.nextPosLong());
@@ -33,6 +41,8 @@ public class TestMessageInvalidConstructor extends UnitTests {
         new RegistrationReplyMessage(rp.toByteArray(), 0);
     }
 
+    /* Data reply -> byte [] -> Registration request must throw an IllegalArgumentException
+     */
     @Test(expected = IllegalArgumentException.class)
     public void test3() throws InstantiationException {
         AgentID srcAgent = new AgentID(ProActiveRandom.nextPosLong());

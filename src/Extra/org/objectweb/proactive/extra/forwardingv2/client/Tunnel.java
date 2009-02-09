@@ -118,4 +118,20 @@ public class Tunnel {
         this.read(msg, 4, messageLength - 4, 0);
         return msg;
     }
+
+    int getLocalPort() {
+        return this.socket.getLocalPort();
+    }
+
+    String getLocalAddress() {
+        return this.socket.getLocalAddress().toString();
+    }
+
+    int getRemotePort() {
+        return this.socket.getPort();
+    }
+
+    String getRemoteAddress() {
+        return this.socket.getInetAddress().toString();
+    }
 }

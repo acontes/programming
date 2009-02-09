@@ -20,6 +20,8 @@ public class TestMessageRegistration extends UnitTests {
 
     static final int NB_CHECK = 100;
 
+    /* Randomly construct valid registration request then check all the fields.
+     */
     @Test
     public void testRegistrationRequest() throws SecurityException, NoSuchMethodException,
             IllegalArgumentException, InstantiationException, IllegalAccessException,
@@ -29,6 +31,8 @@ public class TestMessageRegistration extends UnitTests {
         }
     }
 
+    /* Randomly construct valid registration reply then check all the fields.
+     */
     @Test
     public void testRegistrationReply() throws SecurityException, NoSuchMethodException,
             IllegalArgumentException, InstantiationException, IllegalAccessException,

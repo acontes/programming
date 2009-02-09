@@ -20,6 +20,8 @@ import unitTests.UnitTests;
 public class TestMessageData extends UnitTests {
     static final int NB_CHECK = 100;
 
+    /* Randomly construct valid data request then check all the fields.
+     */
     @Test
     public void testDataRequest() throws SecurityException, NoSuchMethodException, IllegalArgumentException,
             InstantiationException, IllegalAccessException, InvocationTargetException {
@@ -28,6 +30,8 @@ public class TestMessageData extends UnitTests {
         }
     }
 
+    /* Randomly construct valid data reply then check all the fields.
+     */
     @Test
     public void testDataReply() throws SecurityException, NoSuchMethodException, IllegalArgumentException,
             InstantiationException, IllegalAccessException, InvocationTargetException {
@@ -36,6 +40,8 @@ public class TestMessageData extends UnitTests {
         }
     }
 
+    /* Construct a data request with a null payload
+     */
     @Test
     public void testRequestNullData() throws InstantiationException {
         AgentID srcAgent = new AgentID(ProActiveRandom.nextPosLong());
@@ -46,9 +52,11 @@ public class TestMessageData extends UnitTests {
         Assert.assertNull(rq.getData());
         byte[] buf = rq.toByteArray();
         rq = new DataRequestMessage(buf, 0);
-        byte[] data = rq.getData();
+        rq.getData();
     }
 
+    /* Construct a data reply with a null payload
+     */
     @Test
     public void testReplyNullData() throws InstantiationException {
         AgentID srcAgent = new AgentID(ProActiveRandom.nextPosLong());

@@ -1,6 +1,7 @@
 package org.objectweb.proactive.extra.forwardingv2.client;
 
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.lang.reflect.Constructor;
 import java.net.InetAddress;
 import java.net.URI;
@@ -14,8 +15,14 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
 
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanRegistrationException;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.util.Sleeper;
 import org.objectweb.proactive.core.util.TimeoutAccounter;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -39,7 +46,7 @@ import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationR
  * 
  * @since ProActive 4.1.0
  */
-public class AgentImpl implements Agent {
+public class AgentImpl implements Agent, AgentImplMBean {
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_CLIENT);
 
     /** Address of the router */
@@ -131,6 +138,17 @@ public class AgentImpl implements Agent {
         mrThread.setDaemon(true);
         mrThread.setName("Message routing: message reader for agent " + this.agentID);
         mrThread.start();
+
+        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+        ObjectName name = null;
+        try {
+            // Uniquely identify the MBeans and register them with the platform MBeanServer 
+            name = new ObjectName("org.objectweb.proactive.extra.messagerouting:type=AgentImpl,name=" +
+                this.agentID);
+            mbs.registerMBean(this, name);
+        } catch (Exception e) {
+            logger.warn("Failed to register a JMX MBean for agent " + this.agentID);
+        }
     }
 
     /**
@@ -392,6 +410,22 @@ public class AgentImpl implements Agent {
 
             return mb;
         }
+
+        private String[] getBlockedCaller() {
+            List<String> ret = new LinkedList<String>();
+
+            synchronized (this.lock) {
+                for (AgentID recipient : this.byRemoteAgent.keySet()) {
+                    Map<Long, LocalMailBox> m = this.byRemoteAgent.get(recipient);
+                    for (Long messageId : m.keySet()) {
+                        LocalMailBox mb = m.get(messageId);
+                        ret.add("recipient: " + recipient + " messageId: " + messageId);
+                    }
+                }
+            }
+
+            return ret.toArray(new String[0]);
+        }
     }
 
     /** Allows threads to wait for a response */
@@ -599,6 +633,62 @@ public class AgentImpl implements Agent {
         private void handleDataRequest(DataRequestMessage request) {
             messageHandler.pushMessage(request);
         }
+
+    }
+
+    /* @@@@@@@@@@@@@@@@@@@@@@@@@@@ MBean @@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */
+
+    public String getLocalAddress() {
+        String ret = "unknown";
+
+        Tunnel t = this.getTunnel();
+        if (t != null) {
+            ret = t.getLocalAddress();
+        }
+
+        return ret;
+
+    }
+
+    public int getLocalPort() {
+        int ret = -1;
+
+        Tunnel t = this.getTunnel();
+        if (t != null) {
+            ret = t.getLocalPort();
+        }
+
+        return ret;
+    }
+
+    public String getRemoteAddress() {
+        String ret = "unknown";
+
+        Tunnel t = this.getTunnel();
+        if (t != null) {
+            ret = t.getRemoteAddress();
+        }
+
+        return ret;
+    }
+
+    public int getRemotePort() {
+        int ret = -1;
+
+        Tunnel t = this.getTunnel();
+        if (t != null) {
+            ret = t.getRemotePort();
+        }
+
+        return ret;
+    }
+
+    public long getLocalAgentID() {
+        return this.agentID.getId();
+    }
+
+    public String[] getMailboxes() {
+        return this.mailboxes.getBlockedCaller();
 
     }
 
