@@ -142,7 +142,7 @@ public class ProActiveServicesImpl implements ProActiveService {
         //    	System.out.println("url du class server = ");
         try {
             Thread.currentThread().setContextClassLoader(ProActiveServicesImpl.class.getClassLoader());
-            this.node = NodeFactory.createNode(OSGI_NODE_NAME);
+            this.node = NodeFactory.createLocalNode(OSGI_NODE_NAME, false, null, null, null);
         } catch (NodeException e) {
             e.printStackTrace();
         } catch (AlreadyBoundException e) {

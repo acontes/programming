@@ -47,7 +47,7 @@ public class Test extends FunctionalTest {
 
     @org.junit.Test
     public void action() throws Exception {
-        Node node = NodeFactory.createNode(NODE_NAME);
+        Node node = NodeFactory.createLocalNode(NODE_NAME, false, null, null, null);
         String nodeURL = node.getNodeInformation().getURL();
         Node returnedNode = NodeFactory.getNode(nodeURL);
         assertTrue((returnedNode != null) && NodeFactory.isNodeLocal(returnedNode));

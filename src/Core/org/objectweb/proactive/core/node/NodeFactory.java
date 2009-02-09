@@ -193,33 +193,23 @@ public class NodeFactory {
         return node.getVMInformation().getVMID().equals(UniqueID.getCurrentVMID());
     }
 
-    /**
-     * Creates a new node on the current ProActive runtime.
+    /** Creates a new node on the local ProActive runtime.
      * 
-     * <b>Warning:</b> Since ProActive 4.1.0 the String parameter is no longer be an url 
-     * but a <b>nodeName</b>
-     * 
-     * @param nodeName the name of the node to create
-     * @return the newly created node on the local JVM
-     * @exception NodeException if the node cannot be created
-     */
-
-    public static Node createNode(String nodeName) throws NodeException, AlreadyBoundException {
-        return createNode(nodeName, false, null, null, null);
-    }
-
-    /**
-     * Creates a new node on the current ProActive runtime.
-     * 
-     * <b>Warning:</b> Since ProActive 4.1.0 the String parameter is no longer be an url 
-     * but a <b>nodeName</b>
-     * 
-     * @param nodeName the name of the node to create
+     * @param nodeName 
+     * 			name of the node to create
      * @param replacePreviousBinding
-     * @return the newly created node on the local JVM
-     * @exception NodeException if the node cannot be created
+     * 			Should an already existing node with the same name be replaced or not			
+     * @param psm
+     * 			A {@link ProActiveSecurityManager} or null
+     * @param vnname
+     * 			A Virtual Node name or null
+     * @param jobId
+     * 			A jobID or null
+     * @return  the newly created node on the local JVM
+     * @exception NodeException 
+     * 			if the node cannot be created
      */
-    public static Node createNode(String nodeName, boolean replacePreviousBinding,
+    public static Node createLocalNode(String nodeName, boolean replacePreviousBinding,
             ProActiveSecurityManager psm, String vnname, String jobId) throws NodeException,
             AlreadyBoundException {
         ProActiveRuntime proActiveRuntime;
@@ -231,9 +221,6 @@ public class NodeFactory {
             logger.debug("NodeFactory: createNode(" + nodeName + ")");
         }
 
-        //first look for the protocol
-        String protocol = URIBuilder.getProtocol(nodeName);
-
         if (vnname == null) {
             vnname = DEFAULT_VIRTUAL_NODE_NAME;
         }
@@ -241,11 +228,59 @@ public class NodeFactory {
         //NodeFactory factory = getFactory(protocol);
         //then create a node
         try {
-            proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(protocol);
+            proActiveRuntime = RuntimeFactory.getDefaultRuntime();
             return proActiveRuntime.createLocalNode(nodeName, replacePreviousBinding, psm, vnname, jobId);
         } catch (Exception e) {
-            throw new NodeException("Cannot create a Node based on " + nodeName, e);
+            throw new NodeException("Failed to create a local node. name=" + nodeName, e);
         }
+    }
+
+    /** Creates a new node on the local ProActive runtime
+     * 
+     * The node URL can be in the form:
+     * <ul>
+     *  <li>nodeName</li>
+     *  <li>//localhost/nodeName</li>
+     *  <li>//<hostname>/nodeName</li>
+     *  <li>protocol://hostname[:port]/nodeName</li>
+     * </ul>
+     * 
+     * @param nodeURL the URL of the node to create
+     * @return the newly created node on the local JVM
+     * @exception NodeException if the node cannot be created
+     * 
+     * @deprecated replaced by {@link #createLocalNode(String, boolean, ProActiveSecurityManager, String, String)}
+     */
+    @Deprecated
+    public static Node createNode(String nodeURL) throws NodeException, AlreadyBoundException {
+        String nodeName = URIBuilder.getNameFromURI(nodeURL);
+        return createLocalNode(nodeName, false, null, null, null);
+    }
+
+    /** Creates a new node on the local ProActive runtime
+     * 
+     * The node URL can be in the form:
+     * <ul>
+     *  <li>nodeName</li>
+     *  <li>//localhost/nodeName</li>
+     *  <li>//<hostname>/nodeName</li>
+     *  <li>protocol://hostname[:port]/nodeName</li>
+     * </ul>
+     * 
+     * @param nodeName the name of the node to create
+     * @param replacePreviousBinding
+     * @return the newly created node on the local JVM
+     * @exception NodeException if the node cannot be created
+     * 
+     * @deprecated replaced by {@link #createLocalNode(String, boolean, ProActiveSecurityManager, String, String)}
+     */
+    @Deprecated
+    public static Node createNode(String nodeURL, boolean replacePreviousBinding,
+            ProActiveSecurityManager psm, String vnname, String jobId) throws NodeException,
+            AlreadyBoundException {
+        String nodeName = URIBuilder.getHostNameFromUrl(nodeURL);
+
+        return createLocalNode(nodeName, replacePreviousBinding, psm, vnname, jobId);
     }
 
     /**
