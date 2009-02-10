@@ -12,9 +12,12 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.URIBuilder;
 
+import functionalTests.FunctionalTest;
+
 
 @SuppressWarnings("deprecation")
-public class TestDeprecated {
+public class TestDeprecated extends FunctionalTest {
+
     /* Test deprecated methods of NodeFactory
      */
 
