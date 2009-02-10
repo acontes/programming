@@ -89,6 +89,7 @@ public class RouterImpl extends RouterInternal implements Runnable {
         this.inetAddress = config.getInetAddress();
         this.port = config.getPort();
         InetSocketAddress isa = new InetSocketAddress(this.inetAddress, this.port);
+        this.inetAddress = isa.getAddress();
         serverSocket.bind(isa);
 
         this.port = serverSocket.getLocalPort();

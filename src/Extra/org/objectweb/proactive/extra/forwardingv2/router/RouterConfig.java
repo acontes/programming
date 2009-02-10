@@ -1,7 +1,6 @@
 package org.objectweb.proactive.extra.forwardingv2.router;
 
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
@@ -32,11 +31,7 @@ public class RouterConfig {
         this.port = 0;
         this.isDaemon = false;
         this.nbWorkerThreads = 4;
-        try {
-            this.inetAddress = InetAddress.getLocalHost();
-        } catch (UnknownHostException e) {
-            this.inetAddress = null;
-        }
+        this.inetAddress = null;
     }
 
     public void setReadOnly() {
