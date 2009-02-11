@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
@@ -21,7 +20,7 @@ import javax.management.ObjectName;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.util.Sleeper;
-import org.objectweb.proactive.core.util.TimeoutAccounter;
+import org.objectweb.proactive.core.util.SweetCountDownLatch;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.messagerouting.exceptions.MessageRoutingException;
@@ -57,7 +56,7 @@ public class AgentImpl implements Agent, AgentImplMBean {
     private final AtomicLong requestIDGenerator;
 
     /** Senders waiting for a response */
-    final private Mailboxes mailboxes;
+    final private WaitingRoom mailboxes;
 
     /** Current tunnel, can be null */
     private Tunnel t = null;
@@ -112,7 +111,7 @@ public class AgentImpl implements Agent, AgentImplMBean {
         this.routerAddr = routerAddr;
         this.routerPort = routerPort;
         this.valves = valves;
-        this.mailboxes = new Mailboxes();
+        this.mailboxes = new WaitingRoom();
         this.requestIDGenerator = new AtomicLong(0);
         this.failedTunnels = new LinkedList<Tunnel>();
 
@@ -258,7 +257,7 @@ public class AgentImpl implements Agent, AgentImplMBean {
             internalSendMsg(msg);
         } else {
 
-            LocalMailBox mb = mailboxes.createMailbox(targetID, requestID);
+            Patient mb = mailboxes.enter(targetID, requestID);
             internalSendMsg(msg);
 
             // block until the result arrives
@@ -325,29 +324,30 @@ public class AgentImpl implements Agent, AgentImplMBean {
         }
     }
 
-    /**
-     * All the clients waiting for a response
+    /** All the clients waiting for a response
      * 
-     * MailBox must be created by using
-     * {@link Mailboxes#createMailbox(AgentID, long)} and not by calling its
+     * Add thread sending a message is a "patient". It will wait in the waiting room
+     * until the response is available.
+     * 
+     * Patient must be created by using
+     * {@link WaitingRoom#enter(AgentID, long)} and not by calling its
      * constructor.
      * 
      * It allows to group mailboxes by recipient. When a remote client crash or
      * disconnect, the agent must unblock all the threads waiting for a response
      * from this remote client.
      */
-    private class Mailboxes {
-        final private Map<AgentID, Map<Long, LocalMailBox>> byRemoteAgent;
+    private class WaitingRoom {
+        final private Map<AgentID, Map<Long, Patient>> byRemoteAgent;
 
         /** Must be hold for each addition or removal */
         final private Object lock = new Object();
 
-        private Mailboxes() {
-            this.byRemoteAgent = new HashMap<AgentID, Map<Long, LocalMailBox>>();
+        private WaitingRoom() {
+            this.byRemoteAgent = new HashMap<AgentID, Map<Long, Patient>>();
         }
 
-        /**
-         * Create a new mailbox for a given recipient and messageId
+        /** Add a new patient into the waiting room
          * 
          * @param remoteAgentId
          *            Message recipient
@@ -355,13 +355,13 @@ public class AgentImpl implements Agent, AgentImplMBean {
          *            Message ID
          * @return a newly created mailbox
          */
-        private LocalMailBox createMailbox(AgentID remoteAgentId, long messageId) {
-            LocalMailBox mb = new LocalMailBox(remoteAgentId, messageId);
+        private Patient enter(AgentID remoteAgentId, long messageId) {
+            Patient mb = new Patient(remoteAgentId, messageId);
             synchronized (this.lock) {
-                Map<Long, LocalMailBox> byMessageId;
+                Map<Long, Patient> byMessageId;
                 byMessageId = this.byRemoteAgent.get(remoteAgentId);
                 if (byMessageId == null) {
-                    byMessageId = new HashMap<Long, LocalMailBox>();
+                    byMessageId = new HashMap<Long, Patient>();
                     this.byRemoteAgent.put(remoteAgentId, byMessageId);
                 }
                 byMessageId.put(messageId, mb);
@@ -381,31 +381,31 @@ public class AgentImpl implements Agent, AgentImplMBean {
             synchronized (this.lock) {
                 MessageRoutingException e = new MessageRoutingException("Remote agent disconnected");
 
-                Map<Long, LocalMailBox> map = this.byRemoteAgent.get(agentID);
+                Map<Long, Patient> map = this.byRemoteAgent.get(agentID);
                 if (map != null) {
-                    for (LocalMailBox mb : map.values()) {
+                    for (Patient patient : map.values()) {
                         if (logger.isTraceEnabled()) {
-                            logger.trace("Unlocked request " + mb.requestID + " because remote agent" +
-                                mb.recipient + " disconnected");
+                            logger.trace("Unlocked request " + patient.requestID + " because remote agent" +
+                                patient.recipient + " disconnected");
                         }
-                        mb.setAndUnlock(e);
+                        patient.setAndUnlock(e);
                     }
                 }
             }
         }
 
-        /** Remove a mailbox on response arrival */
-        private LocalMailBox remove(AgentID agentId, long messageId) {
-            LocalMailBox mb = null;
+        /** Remove a patient on response arrival */
+        private Patient remove(AgentID agentId, long messageId) {
+            Patient patient = null;
             synchronized (this.lock) {
-                Map<Long, LocalMailBox> map;
+                Map<Long, Patient> map;
                 map = this.byRemoteAgent.get(agentId);
                 if (map != null) {
-                    mb = map.remove(messageId);
+                    patient = map.remove(messageId);
                 }
             }
 
-            return mb;
+            return patient;
         }
 
         private String[] getBlockedCallers() {
@@ -413,7 +413,7 @@ public class AgentImpl implements Agent, AgentImplMBean {
 
             synchronized (this.lock) {
                 for (AgentID recipient : this.byRemoteAgent.keySet()) {
-                    Map<Long, LocalMailBox> m = this.byRemoteAgent.get(recipient);
+                    Map<Long, Patient> m = this.byRemoteAgent.get(recipient);
                     for (Long messageId : m.keySet()) {
                         ret.add("recipient: " + recipient + " messageId: " + messageId);
                     }
@@ -425,9 +425,9 @@ public class AgentImpl implements Agent, AgentImplMBean {
     }
 
     /** Allows threads to wait for a response */
-    private class LocalMailBox {
+    private class Patient {
         /** 0 when the response is available or an error has been received */
-        final private CountDownLatch latch;
+        final private SweetCountDownLatch latch;
         /** The response */
         volatile private byte[] response = null;
         /** Received exception */
@@ -438,8 +438,8 @@ public class AgentImpl implements Agent, AgentImplMBean {
         /** Agent ID of recipient of the request */
         final private AgentID recipient;
 
-        private LocalMailBox(AgentID agentId, long recipient) {
-            this.latch = new CountDownLatch(1);
+        private Patient(AgentID agentId, long recipient) {
+            this.latch = new SweetCountDownLatch(1);
 
             this.requestID = recipient;
             this.recipient = agentId;
@@ -450,7 +450,7 @@ public class AgentImpl implements Agent, AgentImplMBean {
          * 
          * @param timeout
          *            Maximum amount of time to wait before throwing an
-         *            exception
+         *            exception in milliseconds. 0 means no timeout
          * @return the response
          * @throws MessageRoutingException
          *             If the request failed to be send or if the recipient
@@ -459,24 +459,21 @@ public class AgentImpl implements Agent, AgentImplMBean {
          *             If the timeout is reached
          */
         private byte[] waitForResponse(long timeout) throws MessageRoutingException, TimeoutException {
-            TimeoutAccounter ta = TimeoutAccounter.getAccounter(timeout);
 
-            boolean b = false;
-            do {
-                try {
-                    b = latch.await(ta.getRemainingTimeout(), TimeUnit.MILLISECONDS);
-                } catch (InterruptedException e) {
-                    // Miam miam miam, don't care we are looping
+            if (timeout == 0) {
+                this.latch.await();
+            } else {
+                boolean b = this.latch.await(timeout, TimeUnit.MILLISECONDS);
+
+                if (!b) {
+                    throw new TimeoutException("Timeout reached");
                 }
-            } while (!b & !ta.isTimeoutElapsed());
-
-            if (ta.isTimeoutElapsed()) {
-                throw new TimeoutException("Timeout reached");
             }
 
             if (exception != null) {
                 throw exception;
             }
+
             return response;
         }
 
@@ -596,7 +593,7 @@ public class AgentImpl implements Agent, AgentImplMBean {
                     AgentID sender = error.getSender();
                     long messageId = error.getMessageID();
 
-                    LocalMailBox mbox = mailboxes.remove(sender, messageId);
+                    Patient mbox = mailboxes.remove(sender, messageId);
                     if (mbox == null) {
                         logger.error("Received error for an unknown request: " + error);
                     } else {
@@ -615,7 +612,7 @@ public class AgentImpl implements Agent, AgentImplMBean {
         }
 
         private void handleDataReply(DataReplyMessage reply) {
-            LocalMailBox mbox = mailboxes.remove(reply.getSender(), reply.getMessageID());
+            Patient mbox = mailboxes.remove(reply.getSender(), reply.getMessageID());
             if (mbox == null) {
                 logger.error("Received reply for an unknown request: " + reply);
             } else {
