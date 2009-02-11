@@ -15,14 +15,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
 
-import javax.management.InstanceNotFoundException;
-import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.util.Sleeper;
 import org.objectweb.proactive.core.util.TimeoutAccounter;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -411,14 +408,13 @@ public class AgentImpl implements Agent, AgentImplMBean {
             return mb;
         }
 
-        private String[] getBlockedCaller() {
+        private String[] getBlockedCallers() {
             List<String> ret = new LinkedList<String>();
 
             synchronized (this.lock) {
                 for (AgentID recipient : this.byRemoteAgent.keySet()) {
                     Map<Long, LocalMailBox> m = this.byRemoteAgent.get(recipient);
                     for (Long messageId : m.keySet()) {
-                        LocalMailBox mb = m.get(messageId);
                         ret.add("recipient: " + recipient + " messageId: " + messageId);
                     }
                 }
@@ -688,7 +684,7 @@ public class AgentImpl implements Agent, AgentImplMBean {
     }
 
     public String[] getMailboxes() {
-        return this.mailboxes.getBlockedCaller();
+        return this.mailboxes.getBlockedCallers();
 
     }
 
