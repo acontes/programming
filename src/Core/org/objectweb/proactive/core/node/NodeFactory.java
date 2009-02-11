@@ -196,7 +196,7 @@ public class NodeFactory {
     /** Creates a new node on the local ProActive runtime.
      * 
      * @param nodeName 
-     * 			name of the node to create
+     * 			name of the node to create. It musts comply to the following regular expression: "[a-zA-Z0-9_-]+"
      * @param replacePreviousBinding
      * 			Should an already existing node with the same name be replaced or not			
      * @param psm
@@ -207,7 +207,7 @@ public class NodeFactory {
      * 			A jobID or null
      * @return  the newly created node on the local JVM
      * @exception NodeException 
-     * 			if the node cannot be created
+     * 			if the node cannot be created or if the nodeName is invalid
      */
     public static Node createLocalNode(String nodeName, boolean replacePreviousBinding,
             ProActiveSecurityManager psm, String vnname, String jobId) throws NodeException,
