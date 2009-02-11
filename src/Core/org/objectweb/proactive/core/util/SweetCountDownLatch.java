@@ -1,6 +1,7 @@
 package org.objectweb.proactive.core.util;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -34,4 +35,23 @@ public class SweetCountDownLatch extends CountDownLatch {
             }
         }
     }
+
+    @Override
+    public boolean await(long timeout, TimeUnit unit) {
+
+        boolean b = false;
+        boolean anotherLoop;
+        do {
+            try {
+                anotherLoop = false;
+                b = super.await(timeout, unit);
+            } catch (InterruptedException e) {
+                // Miam miam miam, don't care we are looping
+                anotherLoop = true;
+            }
+        } while (anotherLoop);
+
+        return b;
+    }
+
 }

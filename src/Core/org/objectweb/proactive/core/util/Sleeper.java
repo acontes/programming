@@ -22,6 +22,11 @@ public class Sleeper {
     }
 
     public void sleep() {
+        if (this.duration == 0) {
+            // Avoid to sleep forever
+            return;
+        }
+
         TimeoutAccounter timeoutAccounter = TimeoutAccounter.getAccounter(this.duration);
         while (!timeoutAccounter.isTimeoutElapsed()) {
             try {
