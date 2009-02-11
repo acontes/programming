@@ -268,7 +268,7 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
         throw new ProActiveRuntimeException("create shortcut method not implemented yet");
     }
 
-    @SuppressWarnings("deprecation")
+    @Deprecated
     public void register(String url) throws IOException, UnknownProtocolException {
         this.wrappedBody.register(url);
     }

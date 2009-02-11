@@ -173,7 +173,7 @@ public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody> imp
         return target.receiveRequest(request);
     }
 
-    @SuppressWarnings("deprecation")
+    @Deprecated
     public void register(String url) throws IOException, UnknownProtocolException {
         target.register(url);
     }

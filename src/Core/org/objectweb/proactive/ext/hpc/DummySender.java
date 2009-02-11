@@ -128,6 +128,7 @@ public class DummySender implements UniversalBody {
         return 0;
     }
 
+    @Deprecated
     public void register(String url) throws IOException, UnknownProtocolException {
         // TODO Auto-generated method stub
 
