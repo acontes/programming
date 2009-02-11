@@ -9,13 +9,13 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.objectweb.proactive.core.util.ProActiveRandom;
-import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
-import org.objectweb.proactive.extra.forwardingv2.protocol.message.DataReplyMessage;
-import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message;
-import org.objectweb.proactive.extra.forwardingv2.router.Attachment;
-import org.objectweb.proactive.extra.forwardingv2.router.Client;
-import org.objectweb.proactive.extra.forwardingv2.router.MessageAssembler;
-import org.objectweb.proactive.extra.forwardingv2.router.RouterInternal;
+import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
+import org.objectweb.proactive.extra.messagerouting.protocol.message.DataReplyMessage;
+import org.objectweb.proactive.extra.messagerouting.protocol.message.Message;
+import org.objectweb.proactive.extra.messagerouting.router.Attachment;
+import org.objectweb.proactive.extra.messagerouting.router.Client;
+import org.objectweb.proactive.extra.messagerouting.router.MessageAssembler;
+import org.objectweb.proactive.extra.messagerouting.router.RouterInternal;
 
 
 public class TestMessageAssembler {

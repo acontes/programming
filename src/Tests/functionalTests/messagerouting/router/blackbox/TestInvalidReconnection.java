@@ -6,11 +6,11 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.objectweb.proactive.core.util.ProActiveRandom;
-import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
-import org.objectweb.proactive.extra.forwardingv2.protocol.message.ErrorMessage;
-import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message;
-import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationRequestMessage;
-import org.objectweb.proactive.extra.forwardingv2.protocol.message.ErrorMessage.ErrorType;
+import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
+import org.objectweb.proactive.extra.messagerouting.protocol.message.ErrorMessage;
+import org.objectweb.proactive.extra.messagerouting.protocol.message.Message;
+import org.objectweb.proactive.extra.messagerouting.protocol.message.RegistrationRequestMessage;
+import org.objectweb.proactive.extra.messagerouting.protocol.message.ErrorMessage.ErrorType;
 
 import functionalTests.messagerouting.BlackBox;
 

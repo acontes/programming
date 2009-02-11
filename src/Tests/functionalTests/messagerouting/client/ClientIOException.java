@@ -8,14 +8,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.util.Sleeper;
-import org.objectweb.proactive.extra.forwardingv2.client.AgentImpl;
-import org.objectweb.proactive.extra.forwardingv2.client.MessageHandler;
-import org.objectweb.proactive.extra.forwardingv2.exceptions.MessageRoutingException;
-import org.objectweb.proactive.extra.forwardingv2.protocol.AgentID;
-import org.objectweb.proactive.extra.forwardingv2.protocol.message.DataRequestMessage;
-import org.objectweb.proactive.extra.forwardingv2.protocol.message.DebugMessage;
-import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message;
-import org.objectweb.proactive.extra.forwardingv2.protocol.message.DebugMessage.DebugType;
+import org.objectweb.proactive.extra.messagerouting.client.AgentImpl;
+import org.objectweb.proactive.extra.messagerouting.client.MessageHandler;
+import org.objectweb.proactive.extra.messagerouting.exceptions.MessageRoutingException;
+import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
+import org.objectweb.proactive.extra.messagerouting.protocol.message.DataRequestMessage;
+import org.objectweb.proactive.extra.messagerouting.protocol.message.DebugMessage;
+import org.objectweb.proactive.extra.messagerouting.protocol.message.Message;
+import org.objectweb.proactive.extra.messagerouting.protocol.message.DebugMessage.DebugType;
 
 import functionalTests.messagerouting.BlackBox;
 

@@ -5,8 +5,8 @@ import java.net.UnknownHostException;
 
 import org.junit.Test;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.extra.forwardingv2.client.AgentImpl;
-import org.objectweb.proactive.extra.forwardingv2.client.ProActiveMessageHandler;
+import org.objectweb.proactive.extra.messagerouting.client.AgentImpl;
+import org.objectweb.proactive.extra.messagerouting.client.ProActiveMessageHandler;
 
 import unitTests.UnitTests;
 

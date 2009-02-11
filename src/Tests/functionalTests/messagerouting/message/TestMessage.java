@@ -1,7 +1,7 @@
 package functionalTests.messagerouting.message;
 
 import org.junit.Test;
-import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message;
+import org.objectweb.proactive.extra.messagerouting.protocol.message.Message;
 
 import functionalTests.FunctionalTest;
 

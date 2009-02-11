@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.net.InetAddress;
 
 import org.junit.Before;
-import org.objectweb.proactive.extra.forwardingv2.client.Tunnel;
-import org.objectweb.proactive.extra.forwardingv2.router.Router;
-import org.objectweb.proactive.extra.forwardingv2.router.RouterConfig;
+import org.objectweb.proactive.extra.messagerouting.client.Tunnel;
+import org.objectweb.proactive.extra.messagerouting.router.Router;
+import org.objectweb.proactive.extra.messagerouting.router.RouterConfig;
 
 import functionalTests.FunctionalTest;
 

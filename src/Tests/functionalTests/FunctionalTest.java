@@ -49,9 +49,9 @@ import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.core.xml.VariableContractType;
-import org.objectweb.proactive.extra.forwardingv2.remoteobject.MessageRoutingRemoteObjectFactory;
-import org.objectweb.proactive.extra.forwardingv2.router.Router;
-import org.objectweb.proactive.extra.forwardingv2.router.RouterConfig;
+import org.objectweb.proactive.extra.messagerouting.remoteobject.MessageRoutingRemoteObjectFactory;
+import org.objectweb.proactive.extra.messagerouting.router.Router;
+import org.objectweb.proactive.extra.messagerouting.router.RouterConfig;
 
 
 public class FunctionalTest {

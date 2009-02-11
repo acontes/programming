@@ -6,9 +6,9 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.objectweb.proactive.core.util.ProActiveRandom;
-import org.objectweb.proactive.extra.forwardingv2.protocol.message.Message;
-import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationReplyMessage;
-import org.objectweb.proactive.extra.forwardingv2.protocol.message.RegistrationRequestMessage;
+import org.objectweb.proactive.extra.messagerouting.protocol.message.Message;
+import org.objectweb.proactive.extra.messagerouting.protocol.message.RegistrationReplyMessage;
+import org.objectweb.proactive.extra.messagerouting.protocol.message.RegistrationRequestMessage;
 
 import functionalTests.messagerouting.BlackBox;
 
