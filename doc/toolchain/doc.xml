@@ -52,6 +52,7 @@
 			<!--docbook.profile can be html, pdf or empty-->
 			<xmlcatalog refid="docbookcatalog" />
 			<classpath refid="docs.utils.classpath" />
+
 		</xslt>
 
 		<!-- Do the real conversion, docbook to pdf or html -->
@@ -167,6 +168,7 @@
 
 		<java classname="doc.Validate" fork="true" failonerror="true">
 			<classpath refid="docs.utils.classpath" />
+
 			<arg value="${docs.tmp.dir}/${docbookInputFile}" />
 		</java>
 
