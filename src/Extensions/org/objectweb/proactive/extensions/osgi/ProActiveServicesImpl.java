@@ -95,6 +95,7 @@ public class ProActiveServicesImpl implements ProActiveService {
     /**
      * @see org.objectweb.proactive.osgi.ProActiveService#register(java.lang.Object, java.lang.String)
      */
+    @SuppressWarnings("deprecation")
     public void register(Object obj, String url) throws IOException {
         PAActiveObject.register(obj, url);
     }

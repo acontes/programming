@@ -34,6 +34,8 @@ package org.objectweb.proactive.core.body;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -196,7 +198,12 @@ public abstract class AbstractUniversalBody implements UniversalBody, Serializab
      * @see org.objectweb.proactive.core.body.UniversalBody#register(java.lang.String)
      */
     public void register(String url) throws IOException, UnknownProtocolException {
-        this.roe.createRemoteObject(url);
+        this.roe.createRemoteObject(RemoteObjectHelper.expandURI(URI.create(url)));
+    }
+
+    public String registerByName(String name) throws IOException {
+        this.roe.createRemoteObject(name);
+        return this.roe.getURL();
     }
 
     public RemoteObjectExposer<UniversalBody> getRemoteObjectExposer() {
