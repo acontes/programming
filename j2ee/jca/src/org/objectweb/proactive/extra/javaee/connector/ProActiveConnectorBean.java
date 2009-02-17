@@ -37,6 +37,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 /**
  * Some basic functionality for the Resource Adapter
@@ -63,7 +64,7 @@ public abstract class ProActiveConnectorBean {
 		// logging is configured via a separate RepositorySelector
 		try {
 			ContextRepositorySelector.init(this);
-			_raLogger = Logger.getLogger(Loggers.CONNECTOR);
+			_raLogger = ProActiveLogger.getLogger(Loggers.CONNECTOR);
 			_raLogger.debug("log4j initialised succesfully!");
 		} catch (Exception e) {
 			System.err.println("ERROR - Could not init log4j system. " +

@@ -6,7 +6,7 @@
  	<vendor-name>ProActive</vendor-name>
   	<eis-type>ProActive adapter</eis-type>
   	<resourceadapter-version>5.0</resourceadapter-version>                                  
-  	
+ 
   	<resourceadapter>
   	    <resourceadapter-class>org.objectweb.proactive.extra.javaee.connector.ProActiveResourceAdapter</resourceadapter-class>
   	    <config-property>
@@ -15,5 +15,5 @@
 		<config-property-value>asVM</config-property-value>
 	    </config-property>
   	</resourceadapter>
-  	
+		
 </connector>

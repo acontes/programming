@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="ProActive" default="rar.generic" basedir=".">
+<project name="ProActive library J2EE JCA connector" default="rar.generic" basedir=".">
 	
 	<property file="${user.home}/.proactive/build.properties" />
 	
-	<property name="proactive.home"        value="${basedir}/../../../"/>
+	<property name="proactive.home"        value="${basedir}/../../../" />
 	
 	<property name="base.dir"              value="${basedir}/.." />
 	<property name="classes.dir"           value="${base.dir}/classes"/>	
@@ -110,7 +110,7 @@
 			<fileset dir="${meta.inf.dir}/${appserver}/ra">
 				<include name="*.*"/>
 			</fileset>
-			<fileset dir="${meta.inf.dir}" includes="ra.xml"/>
+			<fileset dir="${meta.inf.dir}/META-INF/" includes="**/*"/>
 		</copy>
 
 		<jar destfile="${build.dir}/proactive_ra_${appserver}.rar" index="true">
@@ -121,7 +121,7 @@
 			</zipfileset>
 			<!-- as-specific descriptor -->
 			<zipfileset dir="${build.dir}/${appserver}/ra" prefix="META-INF">
-				<include name="*.*"/>
+				<include name="*"/>
 			</zipfileset>
 			<!-- jar containing connector classes -->
 			<zipfileset dir="${build.dir}/lib">
@@ -136,6 +136,8 @@
 				<include name="xercesImpl.jar" />
 				<include name="xml-apis.jar" />
 				<include name="ProActive.jar" />
+				<include name="jetty-6.1.11.jar" />
+				<include name="jetty-util-6.1.11.jar" />
 			</zipfileset>
 		</jar>
 		<delete dir="${build.dir}/${appserver}" quiet="true"/>

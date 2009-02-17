@@ -73,7 +73,7 @@ public class ContextRepositorySelector implements RepositorySelector
 	/*
 	 * This method initializes a new log4j hierarchy for ProActive Logging.
 	 */
-	public static synchronized void init(ProActiveConnectorBean caller) throws Exception 
+	public static synchronized void init(Object caller) throws Exception 
 	{
 		Hierarchy hierarchy = loadLog4JConfig(caller);
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
@@ -91,7 +91,7 @@ public class ContextRepositorySelector implements RepositorySelector
 	// specified in the LOG4J_CONFIG_FILE
 	// caller is needed in order to have the path where to search for the log4j config file
 	// this file is LOG4J_CONFIG_FILE, placed relative to the caller class's path
-	private static Hierarchy loadLog4JConfig(ProActiveConnectorBean caller) 
+	private static Hierarchy loadLog4JConfig(Object caller) 
 		throws Exception
 	{
 		
