@@ -1,0 +1,20 @@
+#!/bin/bash
+#build file for Unix system
+baseDir=$(cd `dirname $0` && /bin/pwd)
+if [ $# -lt 1 ]
+then
+  args="-projecthelp"
+else
+  args=$@
+fi
+#test PROACTIVE_HOME
+if test "${PROACTIVE_HOME+set}" != set ;
+then
+	echo "PROACTIVE_HOME environment variable is not set. Will try to guess it..."
+	PROACTIVE_HOME="$baseDir/../../"
+	echo "I guess your PROACTIVE_HOME is $PROACTIVE_HOME. If not, try to set it manually!"
+fi 
+compileDir="$PROACTIVE_HOME"/compile
+# Go inside the jca dir
+cd "$baseDir/.."
+ANT_HOME="$baseDir" "$JAVA_HOME"/bin/java  -Dant.home="$baseDir" -Dant.library.dir="$compileDir/lib" -Xmx512000000 -classpath "$compileDir"/lib/ant-launcher.jar org.apache.tools.ant.launch.Launcher -buildfile  "$baseDir"/build.xml $args

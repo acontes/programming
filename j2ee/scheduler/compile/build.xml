@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ProActive Scheduler connector" default="rar.generic" basedir=".">
+<!-- TODO this project depends on jca project, because of the ContextRepositorySelector -->
+	
+	<property file="${user.home}/.proactive/build.properties" />
+	<property environment="env" />
+	
+	<property name="proactive.home"        value="${basedir}/../../../" />
+	<property name="scheduler.home"        value="${env.SCHEDULER_HOME}"/>
+	<property name="jca.home"        value="${basedir}/../../jca" />
+	
+	<property name="base.dir"              value="${basedir}/.." />
+	<property name="classes.dir"           value="${base.dir}/classes"/>	
+	<property name="src.dir"               value="${base.dir}/src"/>
+	<property name="build.dir"             value="${base.dir}/dist"/>
+	<property name="lib.dir"             value="${base.dir}/lib"/>
+	<property name="meta.inf.dir"          value="${base.dir}/appserver"/>
+	<property name="proactive.lib.dir"     value="${proactive.home}/dist/lib"/>
+	<property name="scheduler.lib.dir"     value="${scheduler.home}/dist/lib" />
+	<property name="jca.lib.dir"           value="${jca.home}/dist/lib"/>
+	
+		<!-- Javac properties -->
+	<property name="debug" value="on" />
+	<property name="source" value="1.5" />
+	
+	<!-- ========================================================================= -->
+	<!-- definition of application server-specific properties                      -->
+	<!-- the value is used to generate the names of the corresponding EAR and RAR  -->
+	<!-- ========================================================================= -->
+	<property name="jboss42"         value="jboss-4.2.2.GA"/>
+	<property name="glassfishv2"     value="GlassfishV2"/>
+	<property name="geronimo21"      value="Geronimo-2.1"/>
+	
+	<target name="clean" description="Clean the output folders">
+		<delete dir="${classes.dir}" />
+		<delete dir="${build.dir}" />
+    </target>
+	
+	<target name="-init" depends="clean">
+ 		<mkdir dir="${classes.dir}"/>
+ 		<mkdir dir="${build.dir}"/>
+	</target>
+	
+	<path id="connector.classpath">
+		<pathelement location="${classes.dir}"/>
+		<fileset dir="${lib.dir}">
+			<include name="**/*.jar"/>
+		</fileset>
+		<fileset dir="${proactive.lib.dir}">
+			<include name="**/*.jar"/>
+		</fileset>
+		<fileset dir="${scheduler.lib.dir}">
+			<include name="**/*.jar"/>
+		</fileset>
+		<!-- log4j ContextRepositorySelector -->
+		<fileset dir="${jca.lib.dir}">
+			<include name="**/*.jar"/>
+		</fileset>
+	</path>
+	
+	<target name="compile" depends="-init" description="Compile the connector">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" source="${source}" debug="${debug}">
+			<include name="**/*.java" />
+			<classpath refid="connector.classpath" />
+		</javac>
+	</target>
+	
+	<target name="build" depends="compile" description="Create the jar with the connector code">
+		<echo message="Building the utility jar file ..."/>
+		<delete dir="${build.dir}/lib" quiet="true"/>
+ 		<mkdir dir="${build.dir}/lib"/>
+		<!-- log4j -->
+		<jar jarfile="${build.dir}/lib/scheduler-jca.jar" basedir="${classes.dir}">
+			<zipfileset dir="${meta.inf.dir}" prefix="META-INF">
+				<include name="proactive-log4j"/>
+			</zipfileset>
+		</jar>
+	</target>
+	
+	<!-- ========================================================================= -->
+	<!--                     Generate the RAR files                                -->
+	<!-- ========================================================================= -->
+
+	<!-- ========================================================================= -->
+	<!-- To generate a RAR file, use the following parameter:                      -->
+	<!--                                                                           -->
+	<!-- "appserver" = name of the appserver for which the ear is build            -->
+	<!--                                                                           -->
+	<!--   the value is that of one of the application server-specific properties  -->
+	<!--   defined at the top of this file                                         -->
+	<!-- ========================================================================= -->
+
+	<target name="rar.all" depends="build" description="generate rar files for all supported application servers">
+		<echo message="creating the RAR files..."/>
+		<antcall target="-rar"><param name="appserver" value="${jboss42}"/></antcall>
+		<antcall target="-rar"><param name="appserver" value="${glassfishv2}"/></antcall>
+		<antcall target="-rar"><param name="appserver" value="${geronimo21}"/></antcall>
+		<!-- ***** add RAR generation for other application servers here ***** -->
+		<echo message="RAR files created!"/>
+	</target>
+	
+	<target name="rar.generic" depends="build" description="generate generic rar module, conforming to JCA standard">
+		<echo message="creating the generic RAR file ..."/>
+		<antcall target="-rar"><param name="appserver" value="generic"/></antcall>
+		<echo message="RAR file created!"/>
+	</target>
+	
+	<target name="rar" depends="build" description="generate rar file for a specific application server">
+		<antcall target="-rar"/>
+	</target>
+
+	<target name="-rar">
+		<delete dir="${build.dir}/${appserver}" quiet="true"/>
+ 		<mkdir dir="${build.dir}/${appserver}"/>
+		<copy todir="${build.dir}/${appserver}">
+			<fileset dir="${meta.inf.dir}/${appserver}">
+				<include name="*.*"/>
+			</fileset>
+			<fileset dir="${meta.inf.dir}" includes="ra.xml"/>
+		</copy>
+ 		<mkdir dir="${build.dir}/${appserver}/ra"/>
+		<copy todir="${build.dir}/${appserver}/ra">
+			<fileset dir="${meta.inf.dir}/${appserver}/ra">
+				<include name="*.*"/>
+			</fileset>
+			<fileset dir="${meta.inf.dir}/META-INF/" includes="**/*"/>
+		</copy>
+
+		<jar destfile="${build.dir}/scheduler_ra_${appserver}.rar" index="true">
+			<!-- generic descriptor -->
+			<zipfileset dir="${build.dir}/${appserver}">
+				<include name="*.*"/>
+				<exclude name="ra.xml"/>
+			</zipfileset>
+			<!-- as-specific descriptor -->
+			<zipfileset dir="${build.dir}/${appserver}/ra" prefix="META-INF">
+				<include name="*"/>
+			</zipfileset>
+			<!-- jar containing connector classes -->
+			<zipfileset dir="${build.dir}/lib">
+				<include name="scheduler-jca.jar"/>
+			</zipfileset>
+			<!-- jar containing original connector classes -->
+			<zipfileset dir="${jca.lib.dir}">
+				<include name="proactive-jca.jar"/>
+			</zipfileset>
+			<!-- ProActive libs -->
+			<zipfileset dir="${proactive.lib.dir}">
+				<include name="bouncycastle.jar" />
+				<include name="fractal.jar" />
+				<include name="javassist.jar" />
+				<include name="log4j.jar" />
+				<include name="xercesImpl.jar" />
+				<include name="xml-apis.jar" />
+				<include name="ProActive.jar" />
+				<include name="jetty-6.1.11.jar" />
+				<include name="jetty-util-6.1.11.jar" />
+			</zipfileset>
+			<!-- Scheduler libs -->
+			<zipfileset dir="${scheduler.lib.dir}">
+				<include name="ProActive_scheduler.jar" />
+				<include name="ProActive_resource-manager.jar" />
+			</zipfileset>
+		</jar>
+		<delete dir="${build.dir}/${appserver}" quiet="true"/>
+	</target>
+	
+</project>
