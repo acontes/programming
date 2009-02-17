@@ -42,6 +42,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.Job;
+import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 
 /** We need this because there must be a way for the EJBs
@@ -97,7 +98,23 @@ public class SchedulerConnectionManager
 
 	@Override
 	public JobResult submitJob(Job job) throws SchedulerException {
-		return scm.submitJob(job);
+		JobId id = scm.submitJobNonBlocking(job);
+		
+		return waitForJobResult(id);
+	}
+	
+	private JobResult waitForJobResult(JobId id) throws SchedulerException {
+		JobResult jResult = null;
+		while (jResult == null) {
+			try{
+				Thread.sleep(2);
+				jResult = scm.getJobResult(id); 
+			}
+			catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		return jResult;
 	}
 	
     private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {

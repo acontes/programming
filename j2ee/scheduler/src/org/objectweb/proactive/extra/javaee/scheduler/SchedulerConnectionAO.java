@@ -81,23 +81,17 @@ public class SchedulerConnectionAO implements SchedulerConnectionInterface{
 	public JobResult submitJob(Job job) throws SchedulerException {
 		JobId id = schedulerUI.submit(job);
 	
-		return waitForJobResult(id);
+		return schedulerUI.getJobResult(id);
 	}
 	
-	private JobResult waitForJobResult(JobId id) throws SchedulerException {
-		JobResult jResult = null;
-		while (jResult == null) {
-			try{
-				Thread.sleep(2);
-				jResult = schedulerUI.getJobResult(id); 
-			}
-			catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		return jResult;
+	public JobId submitJobNonBlocking(Job job) throws SchedulerException {
+		return schedulerUI.submit(job);
 	}
-
+	
+	public JobResult getJobResult(JobId id) throws SchedulerException {
+		return schedulerUI.getJobResult(id);
+	}
+	
 	public void closeConnection() throws SchedulerException {
 		schedulerUI.disconnect();
 	}
