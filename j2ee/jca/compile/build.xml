@@ -58,7 +58,7 @@
  		<mkdir dir="${build.dir}/lib"/>
 		<!-- log4j -->
 		<jar jarfile="${build.dir}/lib/proactive-jca.jar" basedir="${classes.dir}">
-			<zipfileset dir="${meta.inf.dir}" prefix="META-INF">
+			<zipfileset dir="${meta.inf.dir}/META-INF/" prefix="META-INF">
 				<include name="proactive-log4j"/>
 			</zipfileset>
 		</jar>

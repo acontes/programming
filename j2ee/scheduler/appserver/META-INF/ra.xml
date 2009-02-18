@@ -10,22 +10,22 @@
 	<resourceadapter>
   	    <resourceadapter-class>org.objectweb.proactive.extra.javaee.scheduler.SchedulerResourceAdapter</resourceadapter-class>
   	    <config-property>
-			<config-property-name>schedulerURL</config-property-name>
+			<config-property-name>SchedulerURL</config-property-name>
 			<config-property-type>java.lang.String</config-property-type>
 			<config-property-value>//localhost/SCHEDULER</config-property-value>
 	    </config-property>
 		<config-property>
-			<config-property-name>username</config-property-name>
+			<config-property-name>Username</config-property-name>
 			<config-property-type>java.lang.String</config-property-type>
 			<config-property-value>jl</config-property-value>
 	    </config-property>
 		<config-property>
-			<config-property-name>password</config-property-name>
+			<config-property-name>Password</config-property-name>
 			<config-property-type>java.lang.String</config-property-type>
 			<config-property-value>jl</config-property-value>
 	    </config-property>
 		<config-property>
-			<config-property-name>jndiName</config-property-name>
+			<config-property-name>JndiName</config-property-name>
 			<config-property-type>java.lang.String</config-property-type>
 			<config-property-value>proactivescheduler</config-property-value>
 	    </config-property>

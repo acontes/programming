@@ -4,8 +4,8 @@
   	xmlns:dep="http://geronimo.apache.org/xml/ns/deployment-1.1">
   	<dep:moduleId>
       	<dep:groupId>proactive</dep:groupId>
-      	<dep:artifactId>proactive</dep:artifactId>
-      	<dep:version>1.20</dep:version>
+      	<dep:artifactId>scheduler</dep:artifactId>
+      	<dep:version>1.0</dep:version>
       	<dep:type>rar</dep:type>
     </dep:moduleId>
     <dep:dependencies/>
@@ -17,8 +17,11 @@
   </dep:environment>
       <resourceadapter>
         <resourceadapter-instance>
-            <resourceadapter-name>ProActiveResourceAdapter</resourceadapter-name>
-            <config-property-setting name="VmName">geronimoVM</config-property-setting>
+            <resourceadapter-name>ProActiveSchedulerResourceAdapter</resourceadapter-name>
+            <config-property-setting name="SchedulerURL">//localhost/SCHEDULER</config-property-setting>
+			<config-property-setting name="Username">jl</config-property-setting>
+			<config-property-setting name="Password">jl</config-property-setting>
+			<config-property-setting name="JndiName">proactivescheduler</config-property-setting>
             <nam:workmanager xmlns:nam="http://geronimo.apache.org/xml/ns/naming-1.1">
 		<nam:gbean-link>DefaultWorkManager</nam:gbean-link>
 	    </nam:workmanager>
