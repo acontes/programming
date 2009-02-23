@@ -1,13 +1,5 @@
 <project>
 	<import file="doc_paths.xml" />
-	<!-- ==================================================================== -->
-	<!-- ==================================================================== -->	
-	<!-- ==================================================================== -->
-	<!--     MACRODEFS   work in progres    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX    -->
-	<!-- ==================================================================== -->
-	<!-- ==================================================================== -->
-	<!-- ==================================================================== -->
-
 	<!-- If a needed file doesn't exist, it will be fetched on the web -->	
 	<xmlcatalog id="docbookcatalog">
 		<!-- If a needed file doesn't exist, it will be fetched on the web -->
@@ -19,10 +11,10 @@
 		<dtd publicId="-//OASIS//DTD DocBook XML V5.0//EN" location="${docs.docbook.dtd}" />
 		<dtd publicId="http://www.oasis-open.org/docbook/xml/5.0b5/dtd/docbook.dtd"  location="${docs.docbook.dtd}"/>
 		
-		<entity publicid="http://docbook.sourceforge.net/release/xsl/${docbook.version}/profiling/profile.xsl" location="profiling/profile.xsl" />
-		<entity publicid="http://docbook.sourceforge.net/release/xsl/${docbook.version}/html/chunk.xsl" location="html/chunk.xsl" />
-		<entity publicid="http://docbook.sourceforge.net/release/xsl/${docbook.version}/html/docbook.xsl" location="html/docbook.xsl" />
-		<entity publicid="http://docbook.sourceforge.net/release/xsl/${docbook.version}/fo/docbook.xsl" location="fo/docbook.xsl" />
+		<entity publicid="http://docbook.sourceforge.net/release/xsl-ns/${docbook.version}/profiling/profile.xsl" location="docbook-xsl-ns-${docbook.version}/profiling/profile.xsl" />
+		<entity publicid="http://docbook.sourceforge.net/release/xsl-ns/${docbook.version}/html/chunk.xsl" location="docbook-xsl-ns-${docbook.version}/html/chunk.xsl" />
+		<entity publicid="http://docbook.sourceforge.net/release/xsl-ns/${docbook.version}/html/docbook.xsl" location="docbook-xsl-ns-${docbook.version}/html/docbook.xsl" />
+		<entity publicid="http://docbook.sourceforge.net/release/xsl-ns/${docbook.version}/fo/docbook.xsl" location="docbook-xsl-ns-${docbook.version}/fo/docbook.xsl" />
 	</xmlcatalog>
 	
 	
@@ -61,34 +53,6 @@
 			<zip destfile="${docs.html.multiple.zip}" basedir="${docs.html.multiple.dir}"/>
 		</sequential>
 	</macrodef>
-
-	
-	<!-- ==================================================================== -->
-	<!--    Add some highlighting information to the docbook source code      -->
-	<!-- ==================================================================== -->
-	<macrodef name="docbookBeautify">
-		<attribute name="docbookInputFile"/>
-		<sequential>
-			<java classname="doc.DocBookize" fork="true">
-				<classpath refid="docs.utils.classpath"/>
-				<!-- The xml file to parse -->
-				<arg value="${docs.tmp.dir}/@{docbookInputFile}" />
-				
-				<arg value="${java.inclusion}" />
-				<arg value="${xml.inclusion}" />
-				<!-- use to add other paths for file inclusion -->
-				<arg value="${otherpath1.inclusion}" />
-				<arg value="${otherpath2.inclusion}" />
-				<arg value="${otherpath3.inclusion}" />
-				<arg value="${otherpath4.inclusion}" />
-				<arg value="${otherpath5.inclusion}" />
-			</java>
-			<xmlvalidate file="${docs.src.dir}/${docs.mainFile}" 
-				     warn="true" />
-		</sequential>
-	</macrodef>
-
-	
 	<!-- ==================================================================== -->
 	<!--          Create the snippets necessary for programlistings           -->
 	<!-- ==================================================================== -->
@@ -122,10 +86,15 @@
 		<attribute name="docbookOutputDir"/>
 
 		<sequential>
+			<taskdef name="xml_validate" classname="org.apache.tools.ant.taskdefs.optional.XMLValidateTask" description="XML Validation">
+				<classpath refid="docs.utils.classpath" />
+			</taskdef>
+			<xml_validate file="${docs.src.dir}/${docs.mainFile}"  warn="true" />
 			<!-- Profiling step: keep only the tags which have the attribute os="${docbook.profile}" or no os attribute -->
 			<xslt basedir="${docs.src.dir}"  in="${docs.tmp.dir}/@{docbookInputFile}" out="${docs.tmp.dir}/profiled.xml" style="${docs.xsl.profiling}" force="yes">
 				<param name="profile.os" expression="@{docbook.profile}" />
 				<param name="tmp.dir" expression="${docs.tmp.dir}/" />
+				<!-- the date for the first page --> 
 				<!--docbook.profile can be html, pdf or empty-->
 				<xmlcatalog refid="docbookcatalog" />
 				<classpath refid="docs.utils.classpath" />
@@ -135,23 +104,9 @@
 				<classpath refid="docs.utils.classpath" />
 				<jvmarg value="-Dxslthl.config=file://${docs.highlighting.dir}/xml/xslthl-config.xml"/>
 				<arg line="-o @{docbookOutputFile} ${docs.tmp.dir}/profiled.xml @{docbookStyle}"/>
+				<arg value="TODAY=${TODAY}" />
+				<arg value="VERSION=${version}" />
 			</java>
-
-		    
-			<!-- Do the real conversion, docbook to pdf or html -->
-<!--			<xslt basedir="${docs.src.dir}" in="${docs.tmp.dir}/profiled.xml" out="@{docbookOutputFile}" style="@{docbookStyle}" force="yes">
-				<xmlcatalog refid="docbookcatalog" />
-				<param name="TODAY" expression="${TODAY}" />
-				<!- the date for the first page 
-				<param name="VERSION" expression="${version}" />
-				<!- the version number, for the first page
-				
-				<!- Output dir for the chunked stylesheet 
-				<param name="base.dir" expression="${docs.html.multiple.dir}"/>
-				<classpath refid="docs.utils.classpath" />
-				
-			</xslt>-->
-			
 		</sequential>
 	</macrodef>
 
@@ -245,16 +200,4 @@
 					docbookOutputDir="${docs.html.multiple.dir}"/>
 		</sequential>
 	</macrodef>
-	<macrodef name="javadoc_test">
-	  <element name="doclets"/>
-	  <sequential>
-	     <doclets/>
-	  </sequential>
-	</macrodef>
-	
-	
-	
-	
-	
-	
 </project>

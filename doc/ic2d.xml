@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
   
+  	<property name="ic2d.file.set" value="../doc/toolchain" />
+	<property name="ic2d.src.dir" value="../doc/src_ic2d" />
+	<property name="ic2d.doc.name" value="IC2D" />
 	<!-- ================================================================ -->
 	<!--            Create docs, which is the javadoc + manual            -->
 	<!--  =============================================================== -->
@@ -16,20 +19,20 @@
 	<!--          Make just the html files for the manual                     -->
 	<!-- ==================================================================== -->
 	<target name="doc.IC2D.manualHtml" description="Generate the ProActive Optimizing HTML manual">
-		<subant target="manualHtml">
-			<property name="doc.name"               value="IC2D" />
-			<property name="docs.src.dir"           value="../src_ic2d" />  
-			<fileset dir="../doc/toolchain" includes="doc.xml"/>
+		<subant target="manualHtml" 	inheritall="true">
+			<property name="doc.name"               value="${ic2d.doc.name}"/>
+			<property name="docs.src.dir"           value="${ic2d.src.dir}" />  
+			<fileset dir="${ic2d.file.set}" includes="doc.xml"/>
 		</subant>
 	</target>
 	<!-- ==================================================================== -->
 	<!--   Make an archive from the files for the multiple html manual        -->
 	<!-- ==================================================================== -->
 	<target name="doc.IC2D.manualHtmlZip" description="Generate the zip of the ProActive Optimizing HTML manual" depends="doc.IC2D.manualHtml">
-		<subant target="manualHtmlZip">
-			<property name="doc.name"               value="IC2D" />
-			<property name="docs.src.dir"           value="../src_ic2d" />  
-			<fileset dir="../doc/toolchain" includes="doc.xml"/>
+		<subant target="manualHtmlZip" 	inheritall="true">
+			<property name="doc.name"               value="${ic2d.doc.name}"/>
+			<property name="docs.src.dir"           value="${ic2d.src.dir}" />  
+			<fileset dir="${ic2d.file.set}" includes="doc.xml"/>
 		</subant>
 	</target>
 
@@ -37,20 +40,20 @@
 	<!--               Make just the pdf files for the manual                 -->
 	<!-- ==================================================================== -->
 	<target name="doc.IC2D.manualPdf" description="Generate the ProActive Optimizing PDF manual">
-		<subant target="manualPdf">
-			<property name="doc.name"               value="IC2D" />
-			<property name="docs.src.dir"           value="../src_ic2d" />  
-			<fileset dir="../doc/toolchain" includes="doc.xml"/>
+		<subant target="manualPdf" 	inheritall="true">
+			<property name="doc.name"               value="${ic2d.doc.name}"/>
+			<property name="docs.src.dir"           value="${ic2d.src.dir}" />  
+			<fileset dir="${ic2d.file.set}" includes="doc.xml"/>
 		</subant>
 	</target>
 	<!-- ==================================================================== -->
 	<!--           Make only one huge html-file from the doc                  -->
 	<!-- ==================================================================== -->
 	<target name="doc.IC2D.manualSingleHtml" description="Generate the ProActive Optimizing single HTML manual">
-		<subant target="manualSingleHtml">
-			<property name="doc.name"               value="IC2D" />
-			<property name="docs.src.dir"           value="../src_ic2d" />  
-			<fileset dir="../doc/toolchain" includes="doc.xml"/>
+		<subant target="manualSingleHtml" 	inheritall="true">
+			<property name="doc.name"               value="${ic2d.doc.name}"/>
+			<property name="docs.src.dir"           value="${ic2d.src.dir}" />  
+			<fileset dir="${ic2d.file.set}" includes="doc.xml"/>
 		</subant>
 	</target>
 	
@@ -58,10 +61,10 @@
 	<!--      Make an archive from the files for the single html manual       -->
 	<!-- ==================================================================== -->
 	<target name="doc.IC2D.manualSingleHtmlZip" description="Generate a zip of the ProActive Optimizing single HTML manual" depends="doc.IC2D.manualSingleHtml">
-		<subant target="manualSingleHtmlZip">
-			<property name="doc.name"               value="IC2D" />
-			<property name="docs.src.dir"           value="../src_ic2d" />  
-			<fileset dir="../doc/toolchain" includes="doc.xml"/>
+		<subant target="manualSingleHtmlZip" 	inheritall="true">
+			<property name="doc.name"               value="${ic2d.doc.name}"/>
+			<property name="docs.src.dir"           value="${ic2d.src.dir}" />  
+			<fileset dir="${ic2d.file.set}" includes="doc.xml"/>
 		</subant>
 	</target>
 
@@ -71,8 +74,8 @@
 	<target name="doc.IC2D.javadoc.completeZip" description="Generate the ProActive Optimizing complete javadoc zip" depends="doc.IC2D.javadoc.complete"> 
 <!--		<javadoc.completeZip /> -->
 		<subant target="javadoc.completeZip">
-			<property name="doc.name"               value="IC2D" />
-			<fileset dir="../doc/toolchain" includes="doc.xml"/>
+			<property name="doc.name"               value="${ic2d.doc.name}"/>
+			<fileset dir="${ic2d.file.set}" includes="doc.xml"/>
 		</subant>
 	</target>
 	

@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
   
+	<property name="pa.file.set" value="../doc/toolchain" />
+	<property name="pa.src.dir" value="../doc/src" />
+	<property name="pa.doc.name" value="ProActive" />
 	<!-- ================================================================ -->
 	<!--            Create docs, which is the javadoc + manual            -->
 	<!--  =============================================================== -->
@@ -22,20 +25,20 @@
 	<!--          Make just the html files for the manual                     -->
 	<!-- ==================================================================== -->
 	<target name="doc.ProActive.manualHtml" description="Generate the ProActive Programming HTML manual">
-		<subant target="manualHtml">
-			<property name="doc.name"               value="ProActive" />
-			<property name="docs.src.dir"           value="../src" />  
-			<fileset dir="../doc/toolchain" includes="doc.xml"/>
+		<subant target="manualHtml" 			inheritall="true">
+			<property name="doc.name"               value="${pa.doc.name}" />
+			<property name="docs.src.dir"           value="${pa.src.dir}" />  
+			<fileset dir="${pa.file.set}" 	includes="doc.xml"/>
 		</subant>
 	</target>
 	<!-- ==================================================================== -->
 	<!--   Make an archive from the files for the multiple html manual        -->
 	<!-- ==================================================================== -->
-	<target name="doc.ProActive.manualHtmlZip" description="Generate the ProActive Programming HTML manual zip" depends="doc.ProActive.manualHtml">
-		<subant target="manualHtmlZip">
-			<property name="doc.name"               value="ProActive" />
-			<property name="docs.src.dir"           value="../src" />  
-			<fileset dir="../doc/toolchain" includes="doc.xml"/>
+	<target name="doc.ProActive.manualHtmlZip" description="Generate the ProActive Programming HTML manual zip" depends="doc.ProActive.manualHtml" >
+		<subant target="manualHtmlZip" inheritall="true">
+			<property name="doc.name"               value="${pa.doc.name}" />
+			<property name="docs.src.dir"           value="${pa.src.dir}" />  
+			<fileset dir="${pa.file.set}" includes="doc.xml"/>
 		</subant>
 	</target>
 
@@ -43,31 +46,31 @@
 	<!--               Make just the pdf files for the manual                 -->
 	<!-- ==================================================================== -->
 	<target name="doc.ProActive.manualPdf" description="Generate the ProActive Programming PDF manual">
-		<subant target="manualPdf">
-			<property name="doc.name"               value="ProActive" />
-			<property name="docs.src.dir"           value="../src" />  
-			<fileset dir="../doc/toolchain" includes="doc.xml"/>
+		<subant target="manualPdf" inheritall="true">
+			<property name="doc.name"               value="${pa.doc.name}" />
+			<property name="docs.src.dir"           value="${pa.src.dir}" />  
+			<fileset dir="${pa.file.set}" includes="doc.xml"/>
 		</subant>
 	</target>
 	<!-- ==================================================================== -->
 	<!--           Make only one huge html-file from the doc                  -->
 	<!-- ==================================================================== -->
 	<target name="doc.ProActive.manualSingleHtml" description="Generate the ProActive Programming single HTML manual">
-		<subant target="manualSingleHtml">
-			<property name="doc.name"               value="ProActive" />
-			<property name="docs.src.dir"           value="../src" />  
-			<fileset dir="../doc/toolchain" includes="doc.xml"/>
+		<subant target="manualSingleHtml" inheritall="true">
+			<property name="doc.name"               value="${pa.doc.name}" />
+			<property name="docs.src.dir"           value="${pa.src.dir}" />  
+			<fileset dir="${pa.file.set}" includes="doc.xml"/>
 		</subant>
 	</target>
 	
 	<!-- ==================================================================== -->
 	<!--      Make an archive from the files for the single html manual       -->
 	<!-- ==================================================================== -->
-	<target name="doc.ProActive.manualSingleHtmlZip" description="Generate the ProActive Programming single HTML manual zip" depends="doc.ProActive.manualSingleHtml">
-		<subant target="manualSingleHtmlZip">
-			<property name="doc.name"               value="ProActive" />
-			<property name="docs.src.dir"           value="../src" />  
-			<fileset dir="../doc/toolchain" includes="doc.xml"/>
+	<target name="doc.ProActive.manualSingleHtmlZip" description="Generate the ProActive Programming single HTML manual zip" depends="doc.ProActive.manualSingleHtml" >
+		<subant target="manualSingleHtmlZip" inheritall="true">
+			<property name="doc.name"               value="${pa.doc.name}" />
+			<property name="docs.src.dir"           value="${pa.src.dir}" />  
+			<fileset dir="${pa.file.set}" includes="doc.xml"/>
 		</subant>
 	</target>
 
@@ -76,8 +79,8 @@
 	<!-- ==================================================================== -->
 	<target name="doc.ProActive.javadoc.publishedZip" description="Generate the ProActive Programming published javadoc zip" depends="doc.ProActive.javadoc.published">
 		<subant target="javadoc.publishedZip">
-			<property name="doc.name"               value="ProActive" />
-			<fileset dir="../doc/toolchain" includes="doc.xml"/>
+			<property name="doc.name"               value="${pa.doc.name}" />
+			<fileset dir="${pa.file.set}" includes="doc.xml"/>
 		</subant>
 	</target>
 	
@@ -86,8 +89,8 @@
 	<!-- ==================================================================== -->
 	<target name="doc.ProActive.javadoc.completeZip" description="Generate the ProActive Programming complete javadoc zip" depends="doc.ProActive.javadoc.complete"> 
 		<subant target="javadoc.completeZip">
-			<property name="doc.name"               value="ProActive" />
-			<fileset dir="../doc/toolchain" includes="doc.xml"/>
+			<property name="doc.name"               value="${pa.doc.name}" />
+			<fileset dir="${pa.file.set}" includes="doc.xml"/>
 		</subant>
 	</target>
 	
