@@ -57,7 +57,7 @@ import org.ow2.proactive.scheduler.common.task.TaskEvent;
 public class SchedulerListener implements SchedulerEventListener<Job>, Serializable{
 	
 	private JobId awaitedJob;
-	private volatile boolean resultsAvailable;
+	private boolean resultsAvailable;
 	private transient RemoteManagement remote;
 	
 	public SchedulerListener(){ 
@@ -115,22 +115,20 @@ public class SchedulerListener implements SchedulerEventListener<Job>, Serializa
 		// is it our job?
 		if( !awaitedJob.equals(event.getJobId())) 
 			return;
-		// TODO synchronize!
-		this.resultsAvailable = true;
+		synchronized (this) {
+			this.resultsAvailable = true;
+			this.notifyAll();
+		}
 	}
 	
-	public boolean jobFinished() {
+	public synchronized boolean jobFinished() {
 		return resultsAvailable;
 	}
 	
-	public void waitJobFinished(JobId id) {
-		// TODO synchronize! right now just dumb sleep
-		while(!resultsAvailable){
-			try{
-				Thread.sleep(2);
-			}
-			catch (InterruptedException e) {
-				e.printStackTrace();
+	public void waitJobFinished(JobId id) throws InterruptedException {
+		synchronized (this) {
+			while(!resultsAvailable){
+				this.wait();
 			}
 		}
 	}

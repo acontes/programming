@@ -117,10 +117,14 @@ public class SchedulerConnectionManager
 	}
 	
 	private JobResult waitForJobResult(JobId id) throws SchedulerException {
-		JobResult jResult = null;
-		jobFinishedListener.waitJobFinished(id);
-		jResult = scm.getJobResult(id);
-		return jResult;
+		try {
+			JobResult jResult = null;
+			jobFinishedListener.waitJobFinished(id);
+			jResult = scm.getJobResult(id);
+			return jResult;
+		} catch(InterruptedException e) {
+			throw new SchedulerException("Cannot get the job result because we cannot wait for the job to finish! Reason:" , e);
+		}
 	}
 	
 	@Override
