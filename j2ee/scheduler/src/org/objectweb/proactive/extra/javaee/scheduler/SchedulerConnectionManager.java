@@ -62,6 +62,7 @@ public class SchedulerConnectionManager
 	private String schedulerURL;
 	private String username;
 	private String password;
+	private boolean isConnected;
 	private transient Logger logger;
 	
 	private transient SchedulerConnectionAO scm;
@@ -73,10 +74,17 @@ public class SchedulerConnectionManager
 		this.schedulerURL = schedulerURL;
 		this.username = username;
 		this.password = password;
+		this.isConnected = false;
 		logger = ProActiveLogger.getLogger(Loggers.CONNECTOR);
 		createAO();
 	}
 	
+	private void createSchedulerListener() throws UnknownProtocolException, SchedulerException {
+		jobFinishedListener = new SchedulerListener();
+		SchedulerListener jobFinishedListenerRemoteRef = jobFinishedListener.createRemoteReference();
+		scm.addSchedulerEventListener(jobFinishedListenerRemoteRef, SchedulerEvent.JOB_RUNNING_TO_FINISHED);
+	}
+
 	private void createAO() throws ActiveObjectCreationException, NodeException {
 		// create SCM active object
 		Object[] params = new Object[] {
@@ -92,27 +100,42 @@ public class SchedulerConnectionManager
 
 	@Override
 	public void closeConnection() throws SchedulerException {
+		if(!isConnected)
+			throw new SchedulerException("Must be connected to the scheduler first!");
+		try {
+			jobFinishedListener.destroyRemoteReference();
+		} catch (ProActiveException e) {
+			logger.debug("Cannot destroy listener remote reference. Reason:", e);
+		}
 		scm.closeConnection();
+		isConnected = false;
 	}
 
 	@Override
 	public void connectToScheduler() throws SchedulerException, LoginException {
+		if(isConnected)
+			throw new SchedulerException("Already connected to the scheduler!");
 		scm.connectToScheduler();
+		try {
+			createSchedulerListener();
+		} catch (UnknownProtocolException e) {
+			throw new SchedulerException("Cannot create the remote reference for the scheduler listener, because:",e);
+		}
+		isConnected = true;
 	}
-
+	
 	@Override
 	public JobId submitJob(Job job) throws SchedulerException {
-		try{
+		if(!isConnected)
+			throw new SchedulerException("Must connect to the scheduler first!");
+		try {
 			JobId id = scm.submitJob(job);
 			// register listener
-			jobFinishedListener = new SchedulerListener(id);
-			SchedulerListener jobFinishedListenerRemoteRef = jobFinishedListener.createRemoteReference();
-			scm.addSchedulerEventListener(jobFinishedListenerRemoteRef, SchedulerEvent.JOB_RUNNING_TO_FINISHED);
+			jobFinishedListener.startMonitoring(id);
 			// ret id to user
 			return id;
-		}
-		catch(UnknownProtocolException e){
-			throw new SchedulerException("Cannot create the remote reference for the scheduler listener, because:",e);
+		} catch (SchedulerListenerException e) {
+			throw new SchedulerException(e);
 		}
 	}
 	
@@ -124,28 +147,41 @@ public class SchedulerConnectionManager
 			return jResult;
 		} catch(InterruptedException e) {
 			throw new SchedulerException("Cannot get the job result because we cannot wait for the job to finish! Reason:" , e);
+		} catch (SchedulerListenerException e) {
+			throw new SchedulerException(e);
 		}
 	}
 	
 	@Override
 	public JobResult getJobResult(JobId id) throws SchedulerException {
-		try {
-			JobResult ret = waitForJobResult(id);
-			// do not need remote ref anymore, kill it!
-			jobFinishedListener.destroyRemoteReference();
-			return ret;
-		} catch(ProActiveException e){
-			throw new SchedulerException("Cannot cleanup the remote reference for the scheduler listener, because:",e);
-		}
+		if(!isConnected)
+			throw new SchedulerException("Must connect to the scheduler first!");
+		JobResult ret = waitForJobResult(id);
+		// stop monitoring this id
+		jobFinishedListener.stopMonitoring(id);
+		return ret;
 	}
 	
 	@Override
 	public boolean jobFinished(JobId job) {
-		return jobFinishedListener.jobFinished();
+		try {
+			return jobFinishedListener.jobFinished(job);
+		} catch (SchedulerListenerException e) {
+			logger.warn(e.toString());
+			return false;
+		}
 	}
 	
     private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
     	out.defaultWriteObject();
+    	// terminate listener remote reference && close scheduler connection
+		try {
+			if(isConnected)
+				closeConnection();
+		}  catch (SchedulerException e) {
+			logger.error("Error while closing the connection to the scheduler. Reason:", e);
+		}
+    	// kill active object
     	PAActiveObject.terminateActiveObject(scm, false);
     }
     
@@ -153,13 +189,21 @@ public class SchedulerConnectionManager
     	in.defaultReadObject();
     	try {
 			createAO();
+			if(isConnected) {
+				scm.connectToScheduler();
+				createSchedulerListener();
+			}
 		} catch (ActiveObjectCreationException e) {
-			logger.error("Error while restoring the state of scm:" , e);
+			logger.error("Error while restoring the state of scm: creation of the active object failed." , e);
 		} catch (NodeException e) {
-			logger.error("Error while restoring the state of scm:" , e);
+			logger.error("Error while restoring the state of scm: creation of the active object failed." , e);
+		} catch (UnknownProtocolException e) {
+			logger.error("Error while restoring the state of scm: creation of the scheduler listener failed." , e);
+		} catch (SchedulerException e) {
+			logger.error("Error while restoring the state of scm: creation of the scheduler listener failed." , e);
+		} catch (LoginException e) {
+			logger.error("Error while restoring the state of scm: connecting to the scheduler failed." , e);
 		}
     }
-
-
 
 }

@@ -32,6 +32,9 @@ package org.objectweb.proactive.extra.javaee.scheduler;
 
 import java.io.Serializable;
 import java.net.URI;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.objectweb.proactive.extensions.annotation.RemoteObject;
 import org.objectweb.proactive.api.PARemoteObject;
@@ -56,16 +59,12 @@ import org.ow2.proactive.scheduler.common.task.TaskEvent;
 @RemoteObject
 public class SchedulerListener implements SchedulerEventListener<Job>, Serializable{
 	
-	private JobId awaitedJob;
-	private boolean resultsAvailable;
+	// monitored jobs
+	private Map<JobId,JobInfo> mapOfJobs = Collections.synchronizedMap(
+			new HashMap<JobId, JobInfo>());
 	private transient RemoteManagement remote;
 	
 	public SchedulerListener(){ 
-	}
-	
-	public SchedulerListener(JobId awaitedJob) {
-		this.awaitedJob = awaitedJob;
-		this.resultsAvailable = false;
 	}
 	
 	/**
@@ -110,26 +109,58 @@ public class SchedulerListener implements SchedulerEventListener<Job>, Serializa
 		}
 	}
 	
+	public void startMonitoring(JobId id) throws SchedulerListenerException{
+		if(mapOfJobs.containsKey(id))
+			throw new SchedulerListenerException("The listener already monitors the execution of job " + id);
+		mapOfJobs.put(id, new JobInfo());
+	}
+	
+	public void stopMonitoring(JobId id) {
+		mapOfJobs.remove(id);
+	}
+	
 	@Override
 	public void jobRunningToFinishedEvent(JobEvent event) {
-		// is it our job?
-		if( !awaitedJob.equals(event.getJobId())) 
+		JobInfo job = mapOfJobs.get(event.getJobId());
+		// are we monitoring this job?
+		if( job == null) 
 			return;
-		synchronized (this) {
-			this.resultsAvailable = true;
-			this.notifyAll();
+		
+		synchronized (job.lock) {
+			job.jobFinished = true;
+			job.lock.notifyAll();
 		}
 	}
 	
-	public synchronized boolean jobFinished() {
-		return resultsAvailable;
+	public boolean jobFinished(JobId jobId) throws SchedulerListenerException{
+		JobInfo info = mapOfJobs.get(jobId);
+		if(info == null)
+			throw new SchedulerListenerException("The listener does not monitor the execution of job " + jobId );
+		boolean ret;
+		synchronized (info.lock) {
+			ret = info.jobFinished;
+		}
+		return ret;
 	}
 	
-	public void waitJobFinished(JobId id) throws InterruptedException {
-		synchronized (this) {
-			while(!resultsAvailable){
-				this.wait();
+	public void waitJobFinished(JobId id) throws InterruptedException, SchedulerListenerException{
+		JobInfo info = mapOfJobs.get(id);
+		if(info == null)
+			throw new SchedulerListenerException("The listener does not monitor the execution of job " + id );
+		synchronized (info.lock) {
+			while(!info.jobFinished){
+				info.lock.wait();
 			}
+		}
+	}
+	
+	class JobInfo {
+		boolean jobFinished;
+		final Object lock;
+		
+		public JobInfo() {
+			jobFinished = false;
+			lock = new Object();
 		}
 	}
 	
@@ -254,6 +285,8 @@ public class SchedulerListener implements SchedulerEventListener<Job>, Serializa
 		// TODO Auto-generated method stub
 		
 	}
+
+
 
 
 
