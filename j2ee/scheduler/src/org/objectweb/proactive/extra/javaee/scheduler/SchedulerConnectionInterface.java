@@ -34,6 +34,7 @@ import javax.security.auth.login.LoginException;
 
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.Job;
+import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 
 /**
@@ -45,7 +46,9 @@ import org.ow2.proactive.scheduler.common.job.JobResult;
 public interface SchedulerConnectionInterface {
 
 	public void connectToScheduler() throws SchedulerException, LoginException;
-	public JobResult submitJob(Job job) throws SchedulerException;
+	public JobId submitJob(Job job) throws SchedulerException;
+	public boolean jobFinished(JobId job);
+	public JobResult getJobResult(JobId id) throws SchedulerException;
 	public void closeConnection() throws SchedulerException;
 	
 }

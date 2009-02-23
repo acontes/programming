@@ -32,8 +32,6 @@ package org.objectweb.proactive.extra.javaee.scheduler;
 
 import javax.security.auth.login.LoginException;
 
-import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.Job;
@@ -41,6 +39,7 @@ import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerAuthenticationInterface;
 import org.ow2.proactive.scheduler.common.scheduler.SchedulerConnection;
+import org.ow2.proactive.scheduler.common.scheduler.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface;
 
 /**
@@ -73,27 +72,37 @@ public class SchedulerConnectionAO implements SchedulerConnectionInterface{
 		this.password = password;
 	}
 	
+	@Override
 	public void connectToScheduler() throws SchedulerException, LoginException {
 		 schedulerAuth = SchedulerConnection.join(schedulerURL);
 		 schedulerUI = schedulerAuth.logAsUser(username, password);
 	}
 	
-	public JobResult submitJob(Job job) throws SchedulerException {
-		JobId id = schedulerUI.submit(job);
-	
-		return schedulerUI.getJobResult(id);
-	}
-	
-	public JobId submitJobNonBlocking(Job job) throws SchedulerException {
+	@Override
+	public JobId submitJob(Job job) throws SchedulerException {
 		return schedulerUI.submit(job);
 	}
 	
+	@Override
 	public JobResult getJobResult(JobId id) throws SchedulerException {
 		return schedulerUI.getJobResult(id);
 	}
 	
+	@Override
 	public void closeConnection() throws SchedulerException {
 		schedulerUI.disconnect();
+	}
+	
+	// not really used...
+	@Override
+	public boolean jobFinished(JobId job) {
+		return false;
+	}
+
+	public void addSchedulerEventListener(
+			SchedulerListener jobFinishedListener,
+			SchedulerEvent event) throws SchedulerException {
+		schedulerUI.addSchedulerEventListener(jobFinishedListener, event);
 	}
 	
 }

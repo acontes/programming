@@ -37,13 +37,16 @@ import javax.security.auth.login.LoginException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
+import org.ow2.proactive.scheduler.common.scheduler.SchedulerEvent;
 
 /** We need this because there must be a way for the EJBs
  * to lookup the scheduler service. We use the JNDI for this
@@ -62,6 +65,7 @@ public class SchedulerConnectionManager
 	private transient Logger logger;
 	
 	private transient SchedulerConnectionAO scm;
+	private transient SchedulerListener jobFinishedListener=null;
 	
 	public SchedulerConnectionManager(String schedulerURL, String username, String password) 
 		throws ActiveObjectCreationException, NodeException {
@@ -97,24 +101,43 @@ public class SchedulerConnectionManager
 	}
 
 	@Override
-	public JobResult submitJob(Job job) throws SchedulerException {
-		JobId id = scm.submitJobNonBlocking(job);
-		
-		return waitForJobResult(id);
+	public JobId submitJob(Job job) throws SchedulerException {
+		try{
+			JobId id = scm.submitJob(job);
+			// register listener
+			jobFinishedListener = new SchedulerListener(id);
+			SchedulerListener jobFinishedListenerRemoteRef = jobFinishedListener.createRemoteReference();
+			scm.addSchedulerEventListener(jobFinishedListenerRemoteRef, SchedulerEvent.JOB_RUNNING_TO_FINISHED);
+			// ret id to user
+			return id;
+		}
+		catch(UnknownProtocolException e){
+			throw new SchedulerException("Cannot create the remote reference for the scheduler listener, because:",e);
+		}
 	}
 	
 	private JobResult waitForJobResult(JobId id) throws SchedulerException {
 		JobResult jResult = null;
-		while (jResult == null) {
-			try{
-				Thread.sleep(2);
-				jResult = scm.getJobResult(id); 
-			}
-			catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
+		jobFinishedListener.waitJobFinished(id);
+		jResult = scm.getJobResult(id);
 		return jResult;
+	}
+	
+	@Override
+	public JobResult getJobResult(JobId id) throws SchedulerException {
+		try {
+			JobResult ret = waitForJobResult(id);
+			// do not need remote ref anymore, kill it!
+			jobFinishedListener.destroyRemoteReference();
+			return ret;
+		} catch(ProActiveException e){
+			throw new SchedulerException("Cannot cleanup the remote reference for the scheduler listener, because:",e);
+		}
+	}
+	
+	@Override
+	public boolean jobFinished(JobId job) {
+		return jobFinishedListener.jobFinished();
 	}
 	
     private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
@@ -132,5 +155,7 @@ public class SchedulerConnectionManager
 			logger.error("Error while restoring the state of scm:" , e);
 		}
     }
+
+
 
 }
