@@ -69,7 +69,7 @@ public class ProActiveLogger extends Logger {
 
             if (collectorURL != null) {
                 // Load the ProActive log collector config file
-                InputStream in = PAProperties.class.getResourceAsStream("proactive-collector-log4j");
+                InputStream in = PAProperties.class.getResourceAsStream("distributed-log4j");
                 try {
                     p.load(in);
                     success = true;

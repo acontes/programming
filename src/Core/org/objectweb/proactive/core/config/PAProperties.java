@@ -139,14 +139,6 @@ public enum PAProperties {
 
     PA_LOG4J_APPENDER_PROVIDER("proactive.log4j.appender.provider", PAPropertiesType.STRING),
 
-    LOGGING_EVENT_SENDER_PROVIDER_PERIOD(
-            "org.objectweb.proactive.core.util.log.remote.LoggingEventSenderProvider.period",
-            PAPropertiesType.INTEGER),
-
-    LOGGING_EVENT_SENDER_PROVIDER_THRESHOLD(
-            "org.objectweb.proactive.core.util.log.remote.LoggingEventSenderProvider.threshold",
-            PAPropertiesType.INTEGER),
-
     /**
      * Activates ProActive classloader
      */

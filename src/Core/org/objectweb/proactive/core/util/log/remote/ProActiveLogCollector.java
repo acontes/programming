@@ -20,11 +20,10 @@ import org.objectweb.proactive.api.PAActiveObject;
  */
 @SuppressWarnings("serial")
 public class ProActiveLogCollector implements Serializable, InitActive {
-	final private ConcurrentHashMap<String, Logger> loggers = new ConcurrentHashMap<String, Logger>();
-	
-	
+    final private ConcurrentHashMap<String, Logger> loggers = new ConcurrentHashMap<String, Logger>();
+
     public ProActiveLogCollector() {
-    	
+
     }
 
     public void initActivity(Body body) {
@@ -33,15 +32,15 @@ public class ProActiveLogCollector implements Serializable, InitActive {
 
     public void sendEvent(List<LoggingEvent> events) {
         for (LoggingEvent event : events) {
-        	Logger l;
-        	
-        	l = loggers.get(event.getLoggerName());
-        	if (l == null) {
-        		String name = event.getLoggerName();
-        		l = Logger.getLogger(name);
-        		loggers.put(name, l);
-        	}
-        	
+            Logger l;
+
+            l = loggers.get(event.getLoggerName());
+            if (l == null) {
+                String name = event.getLoggerName();
+                l = Logger.getLogger(name);
+                loggers.put(name, l);
+            }
+
             if (event.getLevel().isGreaterOrEqual(l.getEffectiveLevel())) {
                 l.callAppenders(event);
             }

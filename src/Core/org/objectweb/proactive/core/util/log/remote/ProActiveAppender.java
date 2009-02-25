@@ -16,6 +16,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.config.PAProperties;
 
+
 /**
  * A log4j appender which send the logging events to a remote log collector
  * through ProActive
@@ -32,181 +33,176 @@ import org.objectweb.proactive.core.config.PAProperties;
  */
 public final class ProActiveAppender extends AppenderSkeleton {
 
-	final private LoggingEventSenderSPI spi;
+    final private LoggingEventSenderSPI spi;
 
-	final private AtomicBoolean collectorKnow;
-	final private ConcurrentLinkedQueue<LoggingEvent> bufferedEvents;
-	final private Timer timer;
-	final private int GRACE_TIME = 30000; // ms
-	
-	public ProActiveAppender() {
-		super();
-		this.collectorKnow = new AtomicBoolean(false);
-		this.bufferedEvents = new ConcurrentLinkedQueue<LoggingEvent>();
-		this.spi = findSPI();
+    final private AtomicBoolean collectorKnow;
+    final private ConcurrentLinkedQueue<LoggingEvent> bufferedEvents;
+    final private Timer timer;
+    final private int GRACE_TIME = 30000; // ms
 
-		startFlushingThread();
+    public ProActiveAppender() {
+        super();
+        this.collectorKnow = new AtomicBoolean(false);
+        this.bufferedEvents = new ConcurrentLinkedQueue<LoggingEvent>();
+        this.spi = findSPI();
 
-		this.timer = new Timer();
-		this.timer.schedule(new ConsolePinter(), GRACE_TIME);
-	}
+        startFlushingThread();
 
+        this.timer = new Timer();
+        this.timer.schedule(new ConsolePinter(), GRACE_TIME);
+    }
 
-	
-	public ProActiveAppender(LoggingEventSenderSPI spi,
-			ProActiveLogCollector collector) {
-		super();
-		this.collectorKnow = new AtomicBoolean(true);
-		// these fields are never used since the collector is already known
-		this.bufferedEvents = null; 
-		this.timer = null;
-		
-		this.spi = spi;
-		this.spi.setCollector(collector);
+    public ProActiveAppender(LoggingEventSenderSPI spi, ProActiveLogCollector collector) {
+        super();
+        this.collectorKnow = new AtomicBoolean(true);
+        // these fields are never used since the collector is already known
+        this.bufferedEvents = null;
+        this.timer = null;
 
-		startFlushingThread();
-	}
+        this.spi = spi;
+        this.spi.setCollector(collector);
 
-	@Override
-	protected void append(LoggingEvent event) {
-		spi.append(event);
+        startFlushingThread();
+    }
 
-		if (!this.collectorKnow.get()) {
-			bufferedEvents.add(event);
-		}
-	}
+    @Override
+    protected void append(LoggingEvent event) {
+        spi.append(event);
 
-	@Override
-	public void close() {
-		super.closed = true;
-	}
+        if (!this.collectorKnow.get()) {
+            bufferedEvents.add(event);
+        }
+    }
 
-	@Override
-	public boolean requiresLayout() {
-		return true;
-	}
+    @Override
+    public void close() {
+        super.closed = true;
+    }
 
-	/**
-	 * Notify that the remote object factory is ready and that the log collector
-	 * created by the GCM Deployment descriptor can be retrieved and used
-	 */
-	public void proactiveIsReady() {
-		// TODO: A JMX notification should be sent when a ProActive runtime is
-		// ready
-		try {
-			String url = PAProperties.PA_LOG4J_COLLECTOR.getValue();
-			ProActiveLogCollector collector;
-			collector = (ProActiveLogCollector) PARemoteObject.lookup(URI
-					.create(url));
-			spi.setCollector(collector);
-			this.collectorKnow.set(true);
-			this.bufferedEvents.clear();
-		} catch (ProActiveException e) {
-			e.printStackTrace();
-		}
-	}
+    @Override
+    public boolean requiresLayout() {
+        return true;
+    }
 
-	private void startFlushingThread() {
-		// Start the flushing thread
-		Thread t;
-		t = new Thread(new TerminateLogFlusher(this.spi));
-		Runtime.getRuntime().addShutdownHook(t);
+    /**
+     * Notify that the remote object factory is ready and that the log collector
+     * created by the GCM Deployment descriptor can be retrieved and used
+     */
+    public void proactiveIsReady() {
+        // TODO: A JMX notification should be sent when a ProActive runtime is
+        // ready
+        try {
+            String url = PAProperties.PA_LOG4J_COLLECTOR.getValue();
+            ProActiveLogCollector collector;
+            collector = (ProActiveLogCollector) PARemoteObject.lookup(URI.create(url));
+            spi.setCollector(collector);
+            this.collectorKnow.set(true);
+            this.bufferedEvents.clear();
+        } catch (ProActiveException e) {
+            e.printStackTrace();
+        }
+    }
 
-		t = new Thread(new RunLogFlusher(this.spi));
-		t.setDaemon(false);
-		t.setName("ProActive log4j flusher");
-		t.start();
-	}
+    private void startFlushingThread() {
+        // Start the flushing thread
+        Thread t;
+        t = new Thread(new TerminateLogFlusher(this.spi));
+        Runtime.getRuntime().addShutdownHook(t);
 
-	private LoggingEventSenderSPI findSPI() {
-		LoggingEventSenderSPI spi = null;
+        t = new Thread(new RunLogFlusher(this.spi));
+        t.setDaemon(false);
+        t.setName("ProActive log4j flusher");
+        t.start();
+    }
 
-		// Do not use a PAProperties here, or an infinite recursion will kill your mom
-		String provider = System.getProperty("proactive.log4j.appender.provider");  
-		if (provider != null) {
-			// User asked for a specific provider
-			Iterator<LoggingEventSenderSPI> iter;
-			iter = ServiceRegistry.lookupProviders(LoggingEventSenderSPI.class);
-			while (iter.hasNext()) {
-				LoggingEventSenderSPI next = iter.next();
-				if (next.getClass().getName().equals(provider)) {
-					spi = next;
-					break;
-				}
-			}
+    private LoggingEventSenderSPI findSPI() {
+        LoggingEventSenderSPI spi = null;
 
-			if (spi == null) {
-				System.out.println("Cannot find service provider: " + provider
-						+ " for the service "
-						+ LoggingEventSenderSPI.class.getName()
-						+ ". Any service provider will be used as fallback");
-			}
-		}
+        // Do not use a PAProperties here, or an infinite recursion will kill your mom
+        String provider = System.getProperty("proactive.log4j.appender.provider");
+        if (provider != null) {
+            // User asked for a specific provider
+            Iterator<LoggingEventSenderSPI> iter;
+            iter = ServiceRegistry.lookupProviders(LoggingEventSenderSPI.class);
+            while (iter.hasNext()) {
+                LoggingEventSenderSPI next = iter.next();
+                if (next.getClass().getName().equals(provider)) {
+                    spi = next;
+                    break;
+                }
+            }
 
-		// Use the first provider as fallback
-		if (spi == null) {
-			Iterator<LoggingEventSenderSPI> iter;
-			iter = ServiceRegistry.lookupProviders(LoggingEventSenderSPI.class);
-			spi = iter.next();
-		}
+            if (spi == null) {
+                System.out
+                        .println("Cannot find service provider: " + provider + " for the service " +
+                            LoggingEventSenderSPI.class.getName() +
+                            ". Any service provider will be used as fallback");
+            }
+        }
 
-		// No service provider found
-		if (spi == null) {
-			throw new ProActiveRuntimeException(
-					"No provider availble for the service "
-							+ LoggingEventSenderSPI.class.getName());
-		}
+        // Use the first provider as fallback
+        if (spi == null) {
+            Iterator<LoggingEventSenderSPI> iter;
+            iter = ServiceRegistry.lookupProviders(LoggingEventSenderSPI.class);
+            spi = iter.next();
+        }
 
-		return spi;
-	}
+        // No service provider found
+        if (spi == null) {
+            throw new ProActiveRuntimeException("No provider availble for the service " +
+                LoggingEventSenderSPI.class.getName());
+        }
 
-	private class RunLogFlusher implements Runnable {
-		final private LoggingEventSenderSPI remoteAppender;
+        return spi;
+    }
 
-		public RunLogFlusher(LoggingEventSenderSPI remoteAppender) {
-			this.remoteAppender = remoteAppender;
-		}
+    private class RunLogFlusher implements Runnable {
+        final private LoggingEventSenderSPI remoteAppender;
 
-		public void run() {
-			remoteAppender.run();
-		}
+        public RunLogFlusher(LoggingEventSenderSPI remoteAppender) {
+            this.remoteAppender = remoteAppender;
+        }
 
-	}
+        public void run() {
+            remoteAppender.run();
+        }
 
-	private class TerminateLogFlusher implements Runnable {
-		final private LoggingEventSenderSPI remoteAppender;
+    }
 
-		public TerminateLogFlusher(LoggingEventSenderSPI remoteAppender) {
-			this.remoteAppender = remoteAppender;
-		}
+    private class TerminateLogFlusher implements Runnable {
+        final private LoggingEventSenderSPI remoteAppender;
 
-		public void run() {
-			remoteAppender.terminate();
-		}
-	}
-	
-	class ConsolePinter extends TimerTask {
-		@Override
-		public void run() {
-			if (collectorKnow.get()) {
-				// The collector has been retrieved
-				// The buffered log event can safely be discarded
-				bufferedEvents.clear();
-				return;
-			}
-			
-			synchronized (bufferedEvents) {
-				System.out
-						.println("The ProActive log4j collector is still not availabled, printing logging events on the console to avoid log loss");
-				Iterator<LoggingEvent> it = bufferedEvents.iterator();
-				while (it.hasNext()) {
-					LoggingEvent event = it.next();
-					it.remove();
-					System.out.println(getLayout().format(event));
-				}
-			}
-			
-			timer.schedule(new ConsolePinter(), GRACE_TIME);
-		}
-	}
+        public TerminateLogFlusher(LoggingEventSenderSPI remoteAppender) {
+            this.remoteAppender = remoteAppender;
+        }
+
+        public void run() {
+            remoteAppender.terminate();
+        }
+    }
+
+    class ConsolePinter extends TimerTask {
+        @Override
+        public void run() {
+            if (collectorKnow.get()) {
+                // The collector has been retrieved
+                // The buffered log event can safely be discarded
+                bufferedEvents.clear();
+                return;
+            }
+
+            synchronized (bufferedEvents) {
+                System.out
+                        .println("The ProActive log4j collector is still not availabled, printing logging events on the console to avoid log loss");
+                Iterator<LoggingEvent> it = bufferedEvents.iterator();
+                while (it.hasNext()) {
+                    LoggingEvent event = it.next();
+                    it.remove();
+                    System.out.println(getLayout().format(event));
+                }
+            }
+
+            timer.schedule(new ConsolePinter(), GRACE_TIME);
+        }
+    }
 }

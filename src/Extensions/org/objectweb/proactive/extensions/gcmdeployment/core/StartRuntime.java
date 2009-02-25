@@ -61,7 +61,7 @@ import org.objectweb.proactive.core.util.log.remote.ProActiveAppender;
  * 
  */
 public class StartRuntime {
-    static Logger logger = ProActiveLogger.getLogger(Loggers.RUNTIME);
+    Logger logger = ProActiveLogger.getLogger(Loggers.RUNTIME);
 
     /** The URL of the parent ProActive Runtime */
     private String parentURL;
