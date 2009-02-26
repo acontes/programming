@@ -55,7 +55,7 @@ public class ReplyImpl extends MessageImpl implements Reply, Serializable {
     /**
      * The hypothetic result
      */
-    protected MethodCallResult result;
+    protected volatile MethodCallResult result;
 
     // security features
 

@@ -4,7 +4,7 @@
 # This variable should be set to the directory where is installed PROACTIVE
 #
 
-CLASSPATH=.
+#CLASSPATH=.
 
 # User envrionment variable
 if [ ! -z "$PROACTIVE_HOME" ] ; then
@@ -54,7 +54,7 @@ else
     CLASSPATH=$CLASSPATH:$PROACTIVE/dist/lib/ProActive_examples.jar
 fi
 
-#echo "CLASSPATH"=$CLASSPATH
+echo "CLASSPATH"=$CLASSPATH
 export CLASSPATH
 
 

@@ -94,7 +94,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     private static java.util.Hashtable<String, Method> reifiedMethodsTable = new java.util.Hashtable<String, Method>();
 
     static {
-        MethodCall.setRecycleMethodCallObject(true);
+        MethodCall.setRecycleMethodCallObject(false);
     }
 
     //
@@ -378,9 +378,10 @@ public class MethodCall implements java.io.Serializable, Cloneable {
             logger.debug("MethodCall.execute() targetObject " + targetObject);
         }
 
-        if (this.reifiedMethod.getParameterTypes().length > 0) {
-            this.reifiedMethod.setAccessible(true);
-        }
+        // TODONONO Why setAccessible is called anyway
+        //        if (this.reifiedMethod.getParameterTypes().length > 0) {
+        //            this.reifiedMethod.setAccessible(true);
+        //        }
 
         try {
             targetObject = PAFuture.getFutureValue(targetObject);

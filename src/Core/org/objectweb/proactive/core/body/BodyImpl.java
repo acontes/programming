@@ -76,7 +76,10 @@ import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.jmx.notification.RequestNotificationData;
 import org.objectweb.proactive.core.jmx.server.ServerConnector;
+import org.objectweb.proactive.core.mop.MOP;
+import org.objectweb.proactive.core.mop.MOPException;
 import org.objectweb.proactive.core.mop.MethodCall;
+import org.objectweb.proactive.core.mop.RestoreManager;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
@@ -550,6 +553,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             // it is served normally.
             if (!isTerminateAORequest(request)) {
                 reply = request.serve(BodyImpl.this);
+
             }
 
             if (!isProActiveInternalObject) {
@@ -599,6 +603,35 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             destinations.add(request.getSender());
             this.getFuturePool().registerDestinations(destinations);
 
+            // Modify result object
+            Object initialObject = null;
+            Object stubOnActiveObject = null;
+            Object modifiedObject = null;
+            RestoreManager rm = null;
+
+            if (!reply.isAutomaticContinuation()) {
+                initialObject = reply.getResult().getResultObjet();
+                try {
+                    stubOnActiveObject = (Object) MOP.createStubObject(BodyImpl.this.getReifiedObject()
+                            .getClass().getName(), BodyImpl.this.getRemoteAdapter());
+                    rm = new RestoreManager();
+                    //               try {
+                    //                Thread.sleep(100);
+                    //            } catch (InterruptedException e) {
+                    //                // TODO Auto-generated catch block
+                    //                e.printStackTrace();
+                    //            }
+                    modifiedObject = MOP.changeObject(initialObject, BodyImpl.this.getReifiedObject(),
+                            stubOnActiveObject, rm);
+                    reply.getResult().setResult(modifiedObject);
+
+                } catch (MOPException e) {
+                    throw new ProActiveRuntimeException("Cannot create Stub for this Body e=" + e);
+                } catch (InactiveBodyException e) {
+                    e.printStackTrace();
+                }
+
+            }
             // FAULT-TOLERANCE
             if (BodyImpl.this.ftmanager != null) {
                 BodyImpl.this.ftmanager.sendReply(reply, request.getSender());
@@ -626,6 +659,18 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                 }
             }
 
+            // Restore Result Object
+            if (!reply.isAutomaticContinuation() && (rm != null)) {
+                try {
+                    reply.getResult().setResult(rm.restore(initialObject));
+                } catch (IllegalArgumentException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
             if (Profiling.TIMERS_COMPILED) {
                 TimerWarehouse.stopTimer(BodyImpl.this.bodyID, TimerWarehouse.SEND_REPLY);
             }
