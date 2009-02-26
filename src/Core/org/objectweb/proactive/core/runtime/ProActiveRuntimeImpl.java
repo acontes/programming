@@ -60,6 +60,7 @@ import org.apache.log4j.MDC;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.api.PARemoteObject;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
