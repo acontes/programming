@@ -163,7 +163,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
      * Tests if the object <code>obj</code> is awaited or not. Always returns
      * <code>false</code> if <code>obj</code> is not a future object.
      */
-    public static synchronized boolean isAwaited(Object obj) {
+    public static boolean isAwaited(Object obj) {
         return PAFuture.isAwaited(obj);
     }
 
@@ -238,7 +238,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     /**
      * @return true iff the future has arrived.
      */
-    public synchronized boolean isAvailable() {
+    public boolean isAvailable() {
         return target != null;
     }
 

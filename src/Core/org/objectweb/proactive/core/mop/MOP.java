@@ -72,8 +72,8 @@ public abstract class MOP {
      * The root interface of all metabehaviors
      */
 
-    //protected static String ROOT_INTERFACE_NAME = "org.objectweb.proactive.core.mop.Reflect";
-    //protected static Class ROOT_INTERFACE;
+    // protected static String ROOT_INTERFACE_NAME = "org.objectweb.proactive.core.mop.Reflect";
+    // protected static Class ROOT_INTERFACE;
     /**
      * Class array representing no parameters
      */
@@ -100,15 +100,15 @@ public abstract class MOP {
     protected static java.util.Hashtable<String, Constructor<?>> proxyTable = new java.util.Hashtable<String, Constructor<?>>();
 
     /**
-     * A Hashtable to cache (Class<?> name, proxy class name) couples
-     * this is meant for class-based reification
+     * A Hashtable to cache (Class<?> name, proxy class name) couples this is meant for class-based
+     * reification
      */
     protected static java.util.Hashtable<String, Constructor<?>> secondProxyTable = new java.util.Hashtable<String, Constructor<?>>();
-    protected static MOPClassLoader singleton = MOPClassLoader.getMOPClassLoader(); //MOPClassLoader.createMOPClassLoader();
+    protected static MOPClassLoader singleton = MOPClassLoader.getMOPClassLoader(); // MOPClassLoader.createMOPClassLoader();
 
     /**
-     *        As this class is center to the API, its static initializer is
-     *        a good place to initialize general stuff.
+     * As this class is center to the API, its static initializer is a good place to initialize
+     * general stuff.
      */
     protected static HashMap<String, Class<?>> loadedClass = new HashMap<String, Class<?>>();
 
@@ -122,28 +122,30 @@ public abstract class MOP {
             throw new CannotFindClassException(STUB_OBJECT_INTERFACE_NAME);
         }
 
-        //try {
-        //  ROOT_INTERFACE = forName(ROOT_INTERFACE_NAME);
-        //} catch (ClassNotFoundException e) {
-        //  throw new CannotFindClassException(ROOT_INTERFACE_NAME);
-        //}
+        // try {
+        // ROOT_INTERFACE = forName(ROOT_INTERFACE_NAME);
+        // } catch (ClassNotFoundException e) {
+        // throw new CannotFindClassException(ROOT_INTERFACE_NAME);
+        // }
     }
 
     /**
      * Loads a class using standard classloader or a hashtable
-     * @param s the name of the class to fetch
+     * 
+     * @param s
+     *            the name of the class to fetch
      * @return the Class<?> object representing class s
      */
     public static Class<?> forName(String s) throws java.lang.ClassNotFoundException {
         try {
             return Class.forName(s);
         } catch (ClassNotFoundException e) {
-            //                System.out.println(
-            //                   "MOP forName failed for class " + s + ", looking in table");
+            // System.out.println(
+            // "MOP forName failed for class " + s + ", looking in table");
             Class<?> cl = loadedClass.get(s);
 
-            //                  System.out.println("MOP forName failed, result is " +
-            //                       cl);
+            // System.out.println("MOP forName failed, result is " +
+            // cl);
             if (cl == null) {
                 throw e;
             } else {
@@ -154,11 +156,18 @@ public abstract class MOP {
 
     /**
      * Creates an instance of an object
-     * @param nameOfClass The class to instantiate
-     * @param genericParameters the types of the generic parameters for the class (if any, otherwise this parameter may be null)
-     * @param constructorParameters Array of the constructor's parameters [wrapper]
-     * @param nameOfProxy The name of its proxy class
-     * @param proxyParameters The array holding the proxy parameter
+     * 
+     * @param nameOfClass
+     *            The class to instantiate
+     * @param genericParameters
+     *            the types of the generic parameters for the class (if any, otherwise this
+     *            parameter may be null)
+     * @param constructorParameters
+     *            Array of the constructor's parameters [wrapper]
+     * @param nameOfProxy
+     *            The name of its proxy class
+     * @param proxyParameters
+     *            The array holding the proxy parameter
      */
     public static Object newInstance(String nameOfClass, Class<?>[] genericParameters,
             Object[] constructorParameters, String nameOfProxy, Object[] proxyParameters)
@@ -186,12 +195,20 @@ public abstract class MOP {
 
     /**
      * Creates an instance of an object
-     * @param nameOfStubClass The name of the Stub class corresponding to the object
-     * @param nameOfClass The class to instantiate
-     * @param genericParameters the types of the generic parameters for the class (if any, otherwise this parameter may be null)
-     * @param constructorParameters Array of the constructor's parameters [wrapper]
-     * @param nameOfProxy The name of its proxy class
-     * @param proxyParameters The array holding the proxy parameter
+     * 
+     * @param nameOfStubClass
+     *            The name of the Stub class corresponding to the object
+     * @param nameOfClass
+     *            The class to instantiate
+     * @param genericParameters
+     *            the types of the generic parameters for the class (if any, otherwise this
+     *            parameter may be null)
+     * @param constructorParameters
+     *            Array of the constructor's parameters [wrapper]
+     * @param nameOfProxy
+     *            The name of its proxy class
+     * @param proxyParameters
+     *            The array holding the proxy parameter
      */
     public static Object newInstance(String nameOfStubClass, String nameOfClass,
             Class<?>[] genericParameters, Object[] constructorParameters, String nameOfProxy,
@@ -210,17 +227,17 @@ public abstract class MOP {
         Class<?> targetClass = forName(nameOfClass);
 
         // Class<?> stubClass = null;
-        //        try {
-        //            targetClass = forName(nameOfStubClass);
-        //        } catch (ClassNotFoundException e) {
-        //        	//if (targetClass.getClassLoader() != null) {
-        //           // targetClass = targetClass.getClassLoader().loadClass(nameOfClass);
-        //        	//} else {
-        //        //		System.out.println("TargetClass  " + targetClass + " has null classloader");
+        // try {
+        // targetClass = forName(nameOfStubClass);
+        // } catch (ClassNotFoundException e) {
+        // //if (targetClass.getClassLoader() != null) {
+        // // targetClass = targetClass.getClassLoader().loadClass(nameOfClass);
+        // //} else {
+        // // System.out.println("TargetClass  " + targetClass + " has null classloader");
         //        		
-        //        //	}
-        //            MOP.forName(nameOfClass);//   addClassToCache(nameOfStubClass, targetClass);
-        //        }
+        // // }
+        // MOP.forName(nameOfClass);// addClassToCache(nameOfStubClass, targetClass);
+        // }
         // Instanciates the stub object
         StubObject stub = createStubObject(nameOfStubClass, targetClass, genericParameters);
 
@@ -251,7 +268,7 @@ public abstract class MOP {
         // Throws a ClassNotFoundException
         Class<?> targetClass = null; // forName(nameOfClass);
 
-        //  Class<?> stubClass = null;
+        // Class<?> stubClass = null;
         try {
             targetClass = forName(nameOfClass);
         } catch (ClassNotFoundException e) {
@@ -261,7 +278,7 @@ public abstract class MOP {
                 logger.info("TargetClass  " + targetClass + " has null classloader");
             }
 
-            // MOP.forName(nameOfClass);//   addClassToCache(nameOfStubClass, targetClass);
+            // MOP.forName(nameOfClass);// addClassToCache(nameOfStubClass, targetClass);
         }
 
         // Instantiates the stub object
@@ -280,44 +297,57 @@ public abstract class MOP {
 
     /**
      * Creates an instance of an object
-     * @param nameOfClass The class to instantiate
-     * @param constructorParameters Array of the constructor's parameters [wrapper]
-     * @param proxyParameters The array holding the proxy parameter
+     * 
+     * @param nameOfClass
+     *            The class to instantiate
+     * @param constructorParameters
+     *            Array of the constructor's parameters [wrapper]
+     * @param proxyParameters
+     *            The array holding the proxy parameter
      */
 
-    //     public static Object newInstance(String nameOfClass,
-    //			Object[] constructorParameters, Object[] proxyParameters)
-    //			throws ClassNotFoundException, ClassNotReifiableException,
-    //			CannotGuessProxyNameException, InvalidProxyClassException,
-    //			ConstructionOfProxyObjectFailedException,
-    //			ConstructionOfReifiedObjectFailedException {
-    //		String nameOfProxy = guessProxyName(forName(nameOfClass));
-    //		return newInstance(nameOfClass, constructorParameters, nameOfProxy,
-    //				proxyParameters);
-    //	}
+    // public static Object newInstance(String nameOfClass,
+    // Object[] constructorParameters, Object[] proxyParameters)
+    // throws ClassNotFoundException, ClassNotReifiableException,
+    // CannotGuessProxyNameException, InvalidProxyClassException,
+    // ConstructionOfProxyObjectFailedException,
+    // ConstructionOfReifiedObjectFailedException {
+    // String nameOfProxy = guessProxyName(forName(nameOfClass));
+    // return newInstance(nameOfClass, constructorParameters, nameOfProxy,
+    // proxyParameters);
+    // }
     /**
      * Reifies an object
-     * @param proxyParameters Array holding the proxy parameters
-     * @param target the object to reify
+     * 
+     * @param proxyParameters
+     *            Array holding the proxy parameters
+     * @param target
+     *            the object to reify
      */
 
-    //	  public static Object turnReified(Object[] proxyParameters, Object target)
-    //			throws ClassNotReifiableException, CannotGuessProxyNameException,
-    //			InvalidProxyClassException,
-    //			ConstructionOfProxyObjectFailedException {
-    //		try {
-    //			return turnReified(guessProxyName(target.getClass()),
-    //					proxyParameters, target);
-    //		} catch (ClassNotFoundException e) {
-    //			throw new CannotGuessProxyNameException();
-    //		}
-    //	}
+    // public static Object turnReified(Object[] proxyParameters, Object target)
+    // throws ClassNotReifiableException, CannotGuessProxyNameException,
+    // InvalidProxyClassException,
+    // ConstructionOfProxyObjectFailedException {
+    // try {
+    // return turnReified(guessProxyName(target.getClass()),
+    // proxyParameters, target);
+    // } catch (ClassNotFoundException e) {
+    // throw new CannotGuessProxyNameException();
+    // }
+    // }
     /**
      * Reifies an object
-     * @param nameOfProxyClass the name of the object's proxy
-     * @param proxyParameters Array holding the proxy parameters
-     * @param target the object to reify
-     * @param genericParameters      * @param genericParameters the types of the generic parameters for the class (if any, otherwise this parameter may be null)
+     * 
+     * @param nameOfProxyClass
+     *            the name of the object's proxy
+     * @param proxyParameters
+     *            Array holding the proxy parameters
+     * @param target
+     *            the object to reify
+     * @param genericParameters      *
+     *            @param genericParameters the types of the generic parameters for the class (if
+     *            any, otherwise this parameter may be null)
      */
     public static Object turnReified(String nameOfProxyClass, Object[] proxyParameters, Object target,
             Class<?>[] genericParameters) throws ClassNotFoundException, ClassNotReifiableException,
@@ -325,7 +355,7 @@ public abstract class MOP {
         try {
             return turnReified(target.getClass().getName(), nameOfProxyClass, proxyParameters, target,
                     genericParameters);
-            //	 return turnReifiedFAb(target.getClass(), nameOfProxyClass, proxyParameters, target);
+            // return turnReifiedFAb(target.getClass(), nameOfProxyClass, proxyParameters, target);
         } catch (ReifiedCastException e) {
             throw new InternalException(e);
         }
@@ -333,27 +363,36 @@ public abstract class MOP {
 
     /**
      * Reifies an object
-     * @param proxyParameters Array holding the proxy parameters
-     * @param nameOfStubClass The name of the object's stub class
-     * @param target the object to reify
+     * 
+     * @param proxyParameters
+     *            Array holding the proxy parameters
+     * @param nameOfStubClass
+     *            The name of the object's stub class
+     * @param target
+     *            the object to reify
      */
 
-    //     public static Object turnReified(Object[] proxyParameters,
-    //			String nameOfStubClass, Object target)
-    //			throws ClassNotFoundException, ReifiedCastException,
-    //			ClassNotReifiableException, CannotGuessProxyNameException,
-    //			InvalidProxyClassException,
-    //			ConstructionOfProxyObjectFailedException {
-    //		String nameOfProxy = guessProxyName(target.getClass());
-    //		return turnReified(nameOfStubClass, nameOfProxy, proxyParameters,
-    //				target);
-    //	}
+    // public static Object turnReified(Object[] proxyParameters,
+    // String nameOfStubClass, Object target)
+    // throws ClassNotFoundException, ReifiedCastException,
+    // ClassNotReifiableException, CannotGuessProxyNameException,
+    // InvalidProxyClassException,
+    // ConstructionOfProxyObjectFailedException {
+    // String nameOfProxy = guessProxyName(target.getClass());
+    // return turnReified(nameOfStubClass, nameOfProxy, proxyParameters,
+    // target);
+    // }
     /**
      * Reifies an object
-     * @param nameOfProxyClass the name of the object's proxy
-     * @param nameOfStubClass The name of the object's stub class
-     * @param proxyParameters Array holding the proxy parameters
-     * @param target the object to reify
+     * 
+     * @param nameOfProxyClass
+     *            the name of the object's proxy
+     * @param nameOfStubClass
+     *            The name of the object's stub class
+     * @param proxyParameters
+     *            Array holding the proxy parameters
+     * @param target
+     *            the object to reify
      */
     public static Object turnReified(String nameOfStubClass, String nameOfProxyClass,
             Object[] proxyParameters, Object target, Class<?>[] genericParameters)
@@ -385,45 +424,46 @@ public abstract class MOP {
         return stub;
     }
 
-    //  public static Object turnReifiedFAb(Class<?> targetClass, String nameOfProxyClass, Object[] proxyParameters, Object target)
-    //	throws ClassNotFoundException, ReifiedCastException, ClassNotReifiableException, InvalidProxyClassException, ConstructionOfProxyObjectFailedException {
-    //	 For convenience, allows 'null' to be equivalent to an empty array
-    //   System.out.println("MOP.turnReified");
-    //  System.out.println("turnReifiedFAb");
-    //	if (proxyParameters == null)
-    //	  proxyParameters = EMPTY_OBJECT_ARRAY;
-    //	 Throws a ClassNotFoundException
-    //	Class<?> targetClass = target.getClass();
-    //	 Instanciates the stub object
-    //	StubObject stub = createStubObjectFAb(targetClass);
-    //	 First, build the FakeConstructorCall object to pass to the constructor
-    //	 of the proxy Object
-    //	 FakeConstructorCall fakes a ConstructorCall object by returning
-    //	 an already-existing object as the result of its execution
-    //	ConstructorCall reifiedCall = new FakeConstructorCall(target);
-    //	 Instanciates the proxy object
-    //	Proxy proxy = createProxyObject(nameOfProxyClass, proxyParameters, reifiedCall);
-    //	 Connects the proxy to the stub
-    //	stub.setProxy(proxy);
-    //	return stub;
-    //  }
+    // public static Object turnReifiedFAb(Class<?> targetClass, String nameOfProxyClass, Object[]
+    // proxyParameters, Object target)
+    // throws ClassNotFoundException, ReifiedCastException, ClassNotReifiableException,
+    // InvalidProxyClassException, ConstructionOfProxyObjectFailedException {
+    // For convenience, allows 'null' to be equivalent to an empty array
+    // System.out.println("MOP.turnReified");
+    // System.out.println("turnReifiedFAb");
+    // if (proxyParameters == null)
+    // proxyParameters = EMPTY_OBJECT_ARRAY;
+    // Throws a ClassNotFoundException
+    // Class<?> targetClass = target.getClass();
+    // Instanciates the stub object
+    // StubObject stub = createStubObjectFAb(targetClass);
+    // First, build the FakeConstructorCall object to pass to the constructor
+    // of the proxy Object
+    // FakeConstructorCall fakes a ConstructorCall object by returning
+    // an already-existing object as the result of its execution
+    // ConstructorCall reifiedCall = new FakeConstructorCall(target);
+    // Instanciates the proxy object
+    // Proxy proxy = createProxyObject(nameOfProxyClass, proxyParameters, reifiedCall);
+    // Connects the proxy to the stub
+    // stub.setProxy(proxy);
+    // return stub;
+    // }
 
     /**
-     * Checks if a stub class can be created for the class <code>cl</code>.
-     * A class cannot be reified if at least one of the following conditions are
-     * met :
+     * Checks if a stub class can be created for the class <code>cl</code>. A class cannot be
+     * reified if at least one of the following conditions are met :
      * <UL>
-     * <LI>This <code>Class<?></code> objects represents a primitive type
-     * (except void)
+     * <LI>This <code>Class<?></code> objects represents a primitive type (except void)
      * <LI>The class is <code>final</code>
      * <LI>There is an ambiguity in constructors signatures
      * <LI>There is no noargs constructor
      * </UL>
      * 
      * @author The ProActive Team
-     * @param cl Class<?> to be checked
-     * @return <code>true</code> is the class exists and can be reified,
-     *         <code>false</code> otherwise.
+     * @param cl
+     *            Class<?> to be checked
+     * @return <code>true</code> is the class exists and can be reified, <code>false</code>
+     *         otherwise.
      */
     static void checkClassIsReifiable(String className) throws ClassNotReifiableException,
             ClassNotFoundException {
@@ -456,7 +496,7 @@ public abstract class MOP {
      */
     protected static boolean checkNoArgsConstructor(Class<?> cl) {
         try {
-            // only for member class, use constructor with implicit enclosing class params 
+            // only for member class, use constructor with implicit enclosing class params
             if (cl.isMemberClass() && !Modifier.isStatic(cl.getModifiers())) {
                 cl.getConstructor(cl.getEnclosingClass());
             } else {
@@ -469,12 +509,12 @@ public abstract class MOP {
     }
 
     /**
-     * Checks if an object is a stub object
-     * Being a stub object is equivalent to implementing the StubObject
-     * interface
-     * @param o the object to check
-     * @return <code>true</code> if it is a stub object, <code>false</code>
-     *         otherwise
+     * Checks if an object is a stub object Being a stub object is equivalent to implementing the
+     * StubObject interface
+     * 
+     * @param o
+     *            the object to check
+     * @return <code>true</code> if it is a stub object, <code>false</code> otherwise
      */
     public static boolean isReifiedObject(Object o) {
         if (o != null) {
@@ -486,7 +526,9 @@ public abstract class MOP {
 
     /**
      * Creates a stub class for the specified class
-     * @param nameOfBaseClass The name of the class
+     * 
+     * @param nameOfBaseClass
+     *            The name of the class
      * @return A class object representing the class, or NULL if failed
      */
     private static Class<?> createStubClass(String nameOfBaseClass, Class<?>[] genericParameters) {
@@ -505,7 +547,8 @@ public abstract class MOP {
 
     private static Class<?> createStubClass(String nameOfClass, Class<?>[] genericParameters, ClassLoader cl) {
         try {
-            // return Class.forName(Utils.convertClassNameToStubClassName(nameOfClass), true, singleton);
+            // return Class.forName(Utils.convertClassNameToStubClassName(nameOfClass), true,
+            // singleton);
             return singleton.loadClass(Utils.convertClassNameToStubClassName(nameOfClass, genericParameters),
                     genericParameters, cl);
         } catch (ClassNotFoundException e) {
@@ -516,9 +559,12 @@ public abstract class MOP {
 
     /**
      * Finds the Stub Constructor for a specified class
-     * @param nameOfClass the name of the class
+     * 
+     * @param nameOfClass
+     *            the name of the class
      * @return The Constructor object.
-     * @throws ClassNotFoundException if the class cannot be located
+     * @throws ClassNotFoundException
+     *             if the class cannot be located
      */
     static Constructor<?> findStubConstructor(String nameOfClass, Class<?>[] genericParameters)
             throws ClassNotFoundException {
@@ -527,7 +573,9 @@ public abstract class MOP {
 
     /**
      * Finds the Stub Constructor for a specified class
-     * @param targetClass the representation of the class
+     * 
+     * @param targetClass
+     *            the representation of the class
      * @return The Constructor object.
      */
     private static Constructor<?> findStubConstructor(Class<?> targetClass, Class<?>[] genericParameters) {
@@ -569,9 +617,12 @@ public abstract class MOP {
 
     /**
      * Finds the Constructor of the proxy for a specified class
-     * @param proxyClass The representation of the proxy
+     * 
+     * @param proxyClass
+     *            The representation of the proxy
      * @return the Constructor
-     * @throws InvalidProxyClassException If the class is not a valid Proxy
+     * @throws InvalidProxyClassException
+     *             If the class is not a valid Proxy
      */
     private static Constructor<?> findProxyConstructor(Class<?> proxyClass) throws InvalidProxyClassException {
         Constructor<?> proxyConstructor;
@@ -769,79 +820,86 @@ public abstract class MOP {
 
     /**
      * Try to guess the name of the proxy for a specified class
-     * @param targetClass the source class
+     * 
+     * @param targetClass
+     *            the source class
      * @return the name of the proxy class
-     * @throws CannotGuessProxyNameException If the MOP cannot guess the name of the proxy
+     * @throws CannotGuessProxyNameException
+     *             If the MOP cannot guess the name of the proxy
      */
 
-    //     private static String guessProxyName(Class<?> targetClass)
-    //			throws CannotGuessProxyNameException {
-    //		int i;
-    //		Class<?> cl;
-    //		Class<?> myInterface = null;
-    //		Class<?>[] interfaces;
-    //		Field myField = null;
-    //		// Checks the cache
-    //		String nameOfProxy = (String) secondProxyTable.get(targetClass
-    //				.getName());
-    //		if (nameOfProxy == null) {
-    //			Class<?> currentClass;
-    //			// Checks if this class or any of its superclasses implements an
-    //			// interface that is a subinterface of ROOT_INTERFACE
-    //			currentClass = targetClass;
-    //			// System.out.println("MOP: guessProxyName for targetClass " +
-    //			// targetClass);
-    //			while ((currentClass != null) && (myInterface == null)) {
-    //				boolean multipleMatches = false;
-    //				interfaces = currentClass.getInterfaces();
-    //				for (i = 0; i < interfaces.length; i++) {
-    //					if (ROOT_INTERFACE.isAssignableFrom(interfaces[i])) {
-    //						if (multipleMatches == false) {
-    //							myInterface = interfaces[i];
-    //							multipleMatches = true;
-    //						} else {
-    //							// There are multiple interfaces in the current
-    //							// class
-    //							// that inherit from ROOT_INTERFACE.
-    //							System.err
-    //									.println("More than one interfaces declared in class "
-    //											+ currentClass.getName()
-    //											+ " inherit from "
-    //											+ ROOT_INTERFACE
-    //											+ ". Using " + myInterface);
-    //						}
-    //					}
-    //				}
-    //				currentClass = currentClass.getSuperclass();
-    //			}
-    //			if (myInterface == null) {
-    //				throw new CannotGuessProxyNameException(
-    //						"Class "
-    //								+ targetClass.getName()
-    //								+ " does not implement any interface that inherits from org.objectweb.proactive.core.mop.Reflect");
-    //			}
-    //			// Now look for the PROXY_CLASS_NAME field in this interface
-    //			try {
-    //				myField = myInterface.getField("PROXY_CLASS_NAME");
-    //			} catch (NoSuchFieldException e) {
-    //				throw new CannotGuessProxyNameException(
-    //						"No field PROXY_CLASS_NAME in interface " + myInterface);
-    //			}
-    //			try {
-    //				nameOfProxy = (String) myField.get(null);
-    //			} catch (IllegalAccessException e) {
-    //				throw new CannotGuessProxyNameException(
-    //						"Cannot access field PROXY_CLASS_NAME in interface "
-    //								+ myInterface);
-    //			}
-    //			secondProxyTable.put(targetClass.getName(), nameOfProxy);
-    //		}
-    //		return nameOfProxy;
-    //	}
+    // private static String guessProxyName(Class<?> targetClass)
+    // throws CannotGuessProxyNameException {
+    // int i;
+    // Class<?> cl;
+    // Class<?> myInterface = null;
+    // Class<?>[] interfaces;
+    // Field myField = null;
+    // // Checks the cache
+    // String nameOfProxy = (String) secondProxyTable.get(targetClass
+    // .getName());
+    // if (nameOfProxy == null) {
+    // Class<?> currentClass;
+    // // Checks if this class or any of its superclasses implements an
+    // // interface that is a subinterface of ROOT_INTERFACE
+    // currentClass = targetClass;
+    // // System.out.println("MOP: guessProxyName for targetClass " +
+    // // targetClass);
+    // while ((currentClass != null) && (myInterface == null)) {
+    // boolean multipleMatches = false;
+    // interfaces = currentClass.getInterfaces();
+    // for (i = 0; i < interfaces.length; i++) {
+    // if (ROOT_INTERFACE.isAssignableFrom(interfaces[i])) {
+    // if (multipleMatches == false) {
+    // myInterface = interfaces[i];
+    // multipleMatches = true;
+    // } else {
+    // // There are multiple interfaces in the current
+    // // class
+    // // that inherit from ROOT_INTERFACE.
+    // System.err
+    // .println("More than one interfaces declared in class "
+    // + currentClass.getName()
+    // + " inherit from "
+    // + ROOT_INTERFACE
+    // + ". Using " + myInterface);
+    // }
+    // }
+    // }
+    // currentClass = currentClass.getSuperclass();
+    // }
+    // if (myInterface == null) {
+    // throw new CannotGuessProxyNameException(
+    // "Class "
+    // + targetClass.getName()
+    // +
+    // " does not implement any interface that inherits from org.objectweb.proactive.core.mop.Reflect");
+    // }
+    // // Now look for the PROXY_CLASS_NAME field in this interface
+    // try {
+    // myField = myInterface.getField("PROXY_CLASS_NAME");
+    // } catch (NoSuchFieldException e) {
+    // throw new CannotGuessProxyNameException(
+    // "No field PROXY_CLASS_NAME in interface " + myInterface);
+    // }
+    // try {
+    // nameOfProxy = (String) myField.get(null);
+    // } catch (IllegalAccessException e) {
+    // throw new CannotGuessProxyNameException(
+    // "Cannot access field PROXY_CLASS_NAME in interface "
+    // + myInterface);
+    // }
+    // secondProxyTable.put(targetClass.getName(), nameOfProxy);
+    // }
+    // return nameOfProxy;
+    // }
     /**
      * Finds the reified constructor
-     * @param targetClass The class
-     * @param the effective arguments
+     * 
+     * @param targetClass
+     *            The class
+     * @param the
+     *            effective arguments
      * @return The constructor
      * @throws ConstructionOfReifiedObjectFailedException
      */
@@ -918,10 +976,14 @@ public abstract class MOP {
 
     /**
      * Dynamic cast
-     * @param sourceObject The source object
-     * @param targetTypeName the destination class
+     * 
+     * @param sourceObject
+     *            The source object
+     * @param targetTypeName
+     *            the destination class
      * @return The resulting object
-     * @throws ReifiedCastException if the class cast is invalid
+     * @throws ReifiedCastException
+     *             if the class cast is invalid
      */
     private static Object castInto(Object sourceObject, String targetTypeName) throws ReifiedCastException {
         try {
@@ -929,17 +991,23 @@ public abstract class MOP {
             return castInto(sourceObject, cl, null);
         } catch (ClassNotFoundException e) {
             throw new ReifiedCastException("Cannot load class " + targetTypeName);
-            //      throw new ReifiedCastException ("Cannot cast "+sourceObject.getClass().getName()+" into "+targetTypeName);
+            // throw new ReifiedCastException
+            // ("Cannot cast "+sourceObject.getClass().getName()+" into "+targetTypeName);
         }
     }
 
     /**
      * Dynamic cast
-     * @param sourceObject The source object
-     * @param targetType the destination class
-     * @param genericParameters TODO
+     * 
+     * @param sourceObject
+     *            The source object
+     * @param targetType
+     *            the destination class
+     * @param genericParameters
+     *            TODO
      * @return The resulting object
-     * @throws ReifiedCastException if the class cast is invalid
+     * @throws ReifiedCastException
+     *             if the class cast is invalid
      */
     private static Object castInto(Object sourceObject, Class<?> targetType, Class<?>[] genericParameters)
             throws ReifiedCastException {
@@ -971,7 +1039,7 @@ public abstract class MOP {
     }
 
     public static Class<?> loadClass(String name) throws ClassNotFoundException {
-        //return singleton.loadClass(name);
+        // return singleton.loadClass(name);
         return forName(name);
     }
 
@@ -1166,16 +1234,19 @@ public abstract class MOP {
             boolean root) {
 
         if (objectToAnalyse instanceof BodyImpl) {
-            //            System.out.println("MOP.changeObject() do not replace in Bodyimpl" + ((AOAContinuation)((BodyImpl)objectToAnalyse).getReifiedObject()).getIdName());
+            // System.out.println("MOP.changeObject() do not replace in Bodyimpl" +
+            // ((AOAContinuation)((BodyImpl)objectToAnalyse).getReifiedObject()).getIdName());
             return objectToAnalyse;
         }
 
         if (objectToAnalyse == null) {
-            //             rm.add(new RestoreObject(null,null));
+            // rm.add(new RestoreObject(null,null));
             return null;
         }
 
-        //        System.out.println("MOP.changeObject() Object to Analyse " + objectToAnalyse  + " "+ "root "+ root + " "+ objectToAnalyse.getClass()  + ", isPrimitive:" + objectToAnalyse.getClass().isPrimitive());
+        // System.out.println("MOP.changeObject() Object to Analyse " + objectToAnalyse + " "+
+        // "root "+ root + " "+ objectToAnalyse.getClass() + ", isPrimitive:" +
+        // objectToAnalyse.getClass().isPrimitive());
 
         if (objectToAnalyse == from) {
             System.out.println("ahaha found a reference to change");
@@ -1199,7 +1270,7 @@ public abstract class MOP {
         }
 
         if (objectToAnalyse.getClass().isArray()) {
-            //            System.out.println("MOP.changeObject() in an array " + objectToAnalyse.getClass());
+            // System.out.println("MOP.changeObject() in an array " + objectToAnalyse.getClass());
 
             try {
                 objectToAnalyse.getClass().cast(Array.newInstance(Object.class, 0));
@@ -1220,7 +1291,7 @@ public abstract class MOP {
         }
 
         Field[] fields = objectToAnalyse.getClass().getDeclaredFields();
-        //        Field.setAccessible(fields, true);
+        // Field.setAccessible(fields, true);
 
         Object currentlyTestedField = null;
 
@@ -1243,7 +1314,7 @@ public abstract class MOP {
                             rm.add(new FieldToRestoreNormalField(fields[i], objectToAnalyse, from));
 
                         } else if (currentlyTestedField.getClass().isArray()) {
-                            //                        System.out.println("MOP.changeObject() in an array " + fields[i]);
+                            // System.out.println("MOP.changeObject() in an array " + fields[i]);
 
                             try {
 
@@ -1251,7 +1322,7 @@ public abstract class MOP {
                                 Object[] tmp1 = (Object[]) fields[i].get(objectToAnalyse);
                                 for (int j = 0; j < tmp1.length; j++) {
 
-                                    //                                System.out.println("MOP.changeObject() " + tmp1[j] + "---" );
+                                    // System.out.println("MOP.changeObject() " + tmp1[j] + "---" );
 
                                     Object newObject = changeObject(tmp1[j], from, to, rm, false);
 
@@ -1260,29 +1331,30 @@ public abstract class MOP {
                                         rm
                                                 .add(new FieldToRestoreInArray(fields[i], objectToAnalyse,
                                                     from, j));
-                                        //                                    fields[i].setAccessible(false);
+                                        // fields[i].setAccessible(false);
                                     }
                                 }
 
                             } catch (ClassCastException e) {
                                 // cannot cast into a Object[] so
                                 // it is an array of primitive type
-                                //                            System.out.println("MOP.changeObject() array of primitive type");
-                                //                            e.printStackTrace();
+                                // System.out.println("MOP.changeObject() array of primitive type");
+                                // e.printStackTrace();
                             }
 
                         } else if (!currentlyTestedField.getClass().isPrimitive()) {
-                            //                        System.out.println("MOP.changeObject() not array, not primitive" + tmp);
+                            // System.out.println("MOP.changeObject() not array, not primitive" +
+                            // tmp);
 
-                            //                        if ( ! (objectToAnalyse instanceof Number)) {                        
+                            // if ( ! (objectToAnalyse instanceof Number)) {
                             Object modifiedObject = changeObject(currentlyTestedField, from, to, rm, false);
                             if (modifiedObject != currentlyTestedField) {
-                                //                            fields[i].setAccessible(true);
+                                // fields[i].setAccessible(true);
                                 fields[i].set(objectToAnalyse, modifiedObject);
                                 rm.add(new FieldToRestoreNormalField(fields[i], objectToAnalyse,
                                     currentlyTestedField));
-                                //                            fields[i].setAccessible(false);
-                                //                        }
+                                // fields[i].setAccessible(false);
+                                // }
                             }
                         }
                     }

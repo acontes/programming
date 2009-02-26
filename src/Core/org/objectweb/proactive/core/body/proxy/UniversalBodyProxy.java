@@ -43,21 +43,28 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.AbstractBody;
+import org.objectweb.proactive.core.body.BodyImpl;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.body.SendingQueue;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.exceptions.InactiveBodyException;
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FuturePool;
 import org.objectweb.proactive.core.body.future.FutureProxy;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.exceptions.ExceptionHandler;
 import org.objectweb.proactive.core.gc.GCTag;
 import org.objectweb.proactive.core.gc.GarbageCollector;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.mop.ConstructorCallImpl;
+import org.objectweb.proactive.core.mop.MOP;
+import org.objectweb.proactive.core.mop.MOPException;
 import org.objectweb.proactive.core.mop.MethodCall;
+import org.objectweb.proactive.core.mop.RestoreManager;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -354,6 +361,33 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
         ArrayList<UniversalBody> destinations = new ArrayList<UniversalBody>();
         destinations.add(this.universalBody.getRemoteAdapter());
         sourceBody.getFuturePool().registerDestinations(destinations);
+        
+        // Modify result object
+        Object[] initialObject = null;
+        Object stubOnActiveObject = null;
+        Object[] modifiedObject = null;
+        RestoreManager rm = null;
+        
+        if (PAProperties.PA_IMPLICITGETSTUBONTHIS.isTrue()) {
+            initialObject = methodCall.getParameters();
+            try {
+                stubOnActiveObject = (Object) MOP.createStubObject(BodyImpl.this.getReifiedObject()
+                        .getClass().getName(), BodyImpl.this.getRemoteAdapter());
+                rm = new RestoreManager();
+                modifiedObject = MOP.changeObject(initialObject, BodyImpl.this.getReifiedObject(),
+                        stubOnActiveObject, rm);
+                methodCall.setEffectiveArguments((modifiedObject);
+
+            } catch (MOPException e) {
+                throw new ProActiveRuntimeException("Cannot create Stub for this Body e=" + e);
+            } catch (InactiveBodyException e) {
+                e.printStackTrace();
+            }
+
+        }
+        
+        
+        
         if (this.isLocal) {
             if (Profiling.TIMERS_COMPILED) {
                 TimerWarehouse.startTimer(sourceBody.getID(), TimerWarehouse.LOCAL_COPY);
