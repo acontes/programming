@@ -33,12 +33,11 @@ package functionalTests.activeobject.replaceObject;
 
 import static junit.framework.Assert.assertTrue;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Hashtable;
 
 import org.junit.Test;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.core.mop.FieldToRestore;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.RestoreManager;
 import org.objectweb.proactive.core.node.NodeException;
@@ -57,7 +56,8 @@ public class TestReplaceObject extends FunctionalTest {
         ObjectFrom of = new ObjectFrom();
         ObjectTo ot = new ObjectTo();
         RestoreManager rm = new RestoreManager();
-        Object newObject = MOP.changeObject(of, of, ot, rm);
+        Hashtable<Integer, Object> ht = new Hashtable<Integer, Object>();
+        Object newObject = MOP.changeObject(of, of, ot, rm, ht);
 
         assertTrue(newObject == ot);
 
@@ -67,7 +67,8 @@ public class TestReplaceObject extends FunctionalTest {
         o[2] = of;
 
         rm = new RestoreManager();
-        Object[] newArray = (Object[]) MOP.changeObject(o, of, ot, rm);
+        ht = new Hashtable<Integer, Object>();
+        Object[] newArray = (Object[]) MOP.changeObject(o, of, ot, rm, ht);
 
         System.out.println(Arrays.toString(newArray));
         System.out.println(Arrays.toString(o));

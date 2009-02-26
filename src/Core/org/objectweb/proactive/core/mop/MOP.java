@@ -42,15 +42,19 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Active;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.Constants;
+import org.objectweb.proactive.core.body.ActiveBody;
 import org.objectweb.proactive.core.body.BodyImpl;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -1220,22 +1224,28 @@ public abstract class MOP {
         }
     }
 
-    public static Object changeObject(Object objectToAnalyse, Object from, Object to, RestoreManager rm) {
-        return changeObject(objectToAnalyse, from, to, rm, true);
+    public static Object changeObject(Object objectToAnalyse, Object from, Object to, RestoreManager rm,
+            Hashtable<Integer, Object> visitedObjects) {
+        return changeObject(objectToAnalyse, from, to, rm, true, visitedObjects);
     }
 
     public static Object changeObject(Object objectToAnalyse, Object from, Object to, RestoreManager rm,
-            boolean root) {
+            boolean root, Hashtable<Integer, Object> visitedObjects) {
 
-        if (objectToAnalyse instanceof BodyImpl) {
-            // System.out.println("MOP.changeObject() do not replace in Bodyimpl" +
-            // ((AOAContinuation)((BodyImpl)objectToAnalyse).getReifiedObject()).getIdName());
+        if (objectToAnalyse == null) {
+            return null;
+        }
+
+        if (PAFuture.isAwaited(objectToAnalyse)) {
             return objectToAnalyse;
         }
 
-        if (objectToAnalyse == null) {
-            // rm.add(new RestoreObject(null,null));
-            return null;
+        if (ActiveBody.class.isAssignableFrom(objectToAnalyse.getClass())) {
+            return objectToAnalyse;
+        }
+
+        if (visitedObjects.contains(objectToAnalyse)) {
+            return objectToAnalyse;
         }
 
         // System.out.println("MOP.changeObject() Object to Analyse " + objectToAnalyse + " "+
@@ -1256,10 +1266,10 @@ public abstract class MOP {
         }
 
         if ((objectToAnalyse instanceof Number) || (objectToAnalyse instanceof Boolean)) {
-
             return objectToAnalyse;
-
         }
+
+        visitedObjects.put(System.identityHashCode(objectToAnalyse), objectToAnalyse);
 
         if (objectToAnalyse.getClass().isArray()) {
             // System.out.println("MOP.changeObject() in an array " + objectToAnalyse.getClass());
@@ -1269,7 +1279,7 @@ public abstract class MOP {
             Object currentObject = null;
             for (int j = 0; j < arrayLength; j++) {
                 currentObject = Array.get(objectToAnalyse, j);
-                Object newObject = changeObject(currentObject, from, to, rm, false);
+                Object newObject = changeObject(currentObject, from, to, rm, false, visitedObjects);
                 if (newObject != currentObject) {
                     Array.set(objectToAnalyse, j, newObject);
                     rm.add(new RestoreObjectInArray(objectToAnalyse, from, j));
@@ -1292,51 +1302,20 @@ public abstract class MOP {
                     fields[i].setAccessible(true);
 
                     currentlyTestedField = fields[i].get(objectToAnalyse);
-
+                    //                    System.out.println("Name:"+fields[i].getName());
                     if (currentlyTestedField != null) {
                         if (currentlyTestedField == from) {
                             System.out.println("ahaha found an internal reference to change " + from +
                                 " is now " + to);
                             fields[i].set(objectToAnalyse, to);
                             rm.add(new FieldToRestoreNormalField(fields[i], objectToAnalyse, from));
-
-                            //                        } else if (currentlyTestedField.getClass().isArray()) {
-                            // System.out.println("MOP.changeObject() in an array " + fields[i]);
-
-                            //                        	changeObject(currentlyTestedField, from, to, rm, false);
-
-                            //                            try {
-                            //                            	 int arrayLength = Array.getLength(objectToAnalyse);
-                            //                            	  
-                            //                                 Object currentObject = null;
-                            //                                
-                            //                                for (int j = 0; j < arrayLength; j++) {
-                            //
-                            //                                	currentObject = Array.get(objectToAnalyse,j);
-                            //                                    Object newObject = changeObject(currentObject, from, to, rm, false);
-                            //
-                            //                                    if (newObject != currentObject) {
-                            //                                        Array.set(, index, value)newObject;
-                            //                                        rm
-                            //                                                .add(new FieldToRestoreInArray(fields[i], objectToAnalyse,
-                            //                                                    from, j));
-                            //                                        // fields[i].setAccessible(false);
-                            //                                    }
-                            //                                }
-                            //
-                            //                            } catch (ClassCastException e) {
-                            //                                // cannot cast into a Object[] so
-                            //                                // it is an array of primitive type
-                            //                                // System.out.println("MOP.changeObject() array of primitive type");
-                            //                                // e.printStackTrace();
-                            //                            }
-
                         } else if (!currentlyTestedField.getClass().isPrimitive()) {
                             // System.out.println("MOP.changeObject() not array, not primitive" +
                             // tmp);
 
                             // if ( ! (objectToAnalyse instanceof Number)) {
-                            Object modifiedObject = changeObject(currentlyTestedField, from, to, rm, false);
+                            Object modifiedObject = changeObject(currentlyTestedField, from, to, rm, false,
+                                    visitedObjects);
                             if (modifiedObject != currentlyTestedField) {
                                 // fields[i].setAccessible(true);
                                 fields[i].set(objectToAnalyse, modifiedObject);

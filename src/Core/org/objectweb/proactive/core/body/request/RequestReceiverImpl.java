@@ -100,13 +100,15 @@ public class RequestReceiverImpl implements RequestReceiver, java.io.Serializabl
                 try {
                     if (IS_UNIQUE_THREAD) {
                         UniqueID caller = request.getSourceBodyID();
-                        ThreadForCaller tfc = this.threadsForCallers.get(caller);
-                        if (tfc == null) {
-                            tfc = new ThreadForCaller(caller);
-                            tfc.start();
-                            this.threadsForCallers.put(caller, tfc);
+                        if (caller != null) {
+                            ThreadForCaller tfc = this.threadsForCallers.get(caller);
+                            if (tfc == null) {
+                                tfc = new ThreadForCaller(caller);
+                                tfc.start();
+                                this.threadsForCallers.put(caller, tfc);
+                            }
+                            tfc.doCall(request, bodyReceiver); // TODO MKris : What about exceptions ??
                         }
-                        tfc.doCall(request, bodyReceiver); // TODO MKris : What about exceptions ??
                     } else {
                         bodyReceiver.serve(request);
                     }

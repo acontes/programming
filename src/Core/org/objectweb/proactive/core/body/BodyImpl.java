@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
 
 import javax.management.InstanceAlreadyExistsException;
@@ -608,6 +609,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             Object stubOnActiveObject = null;
             Object modifiedObject = null;
             RestoreManager rm = null;
+            Hashtable<Integer, Object> ht = new Hashtable<Integer, Object>();
 
             if (!reply.isAutomaticContinuation()) {
                 initialObject = reply.getResult().getResultObjet();
@@ -615,18 +617,12 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                     stubOnActiveObject = (Object) MOP.createStubObject(BodyImpl.this.getReifiedObject()
                             .getClass().getName(), BodyImpl.this.getRemoteAdapter());
                     rm = new RestoreManager();
-                    //               try {
-                    //                Thread.sleep(100);
-                    //            } catch (InterruptedException e) {
-                    //                // TODO Auto-generated catch block
-                    //                e.printStackTrace();
-                    //            }
                     long begin = System.currentTimeMillis();
                     modifiedObject = MOP.changeObject(initialObject, BodyImpl.this.getReifiedObject(),
-                            stubOnActiveObject, rm);
+                            stubOnActiveObject, rm, ht);
                     reply.getResult().setResult(modifiedObject);
-                    System.out.println("UniversalBodyProxy.sendRequest() replaceObject took " +
-                        (System.currentTimeMillis() - begin));
+                    System.out.println(" ActiveLocalBodyStrategy.serveInternal() replaceObject took " +
+                       (System.currentTimeMillis() - begin));
                 } catch (MOPException e) {
                     throw new ProActiveRuntimeException("Cannot create Stub for this Body e=" + e);
                 } catch (InactiveBodyException e) {
