@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ProActiveUserProperties>
     <properties>
+      <!-- GMO Only -->
+        <prop key="proactive.implicitgetstubonthis" value="true"/>
         <prop key="proactive.locationserver"
             value="org.objectweb.proactive.ext.locationserver.LocationServer" />
         <prop key="proactive.locationserver.rmi" value="//localhost/LocationServer" />
