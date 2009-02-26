@@ -17,7 +17,7 @@ public class RestoreObjectInArray implements FieldToRestore {
     }
 
     public Object restore(Object modifiedObject) throws IllegalArgumentException, IllegalAccessException {
-    	Array.set(array, indice, value);
+        Array.set(array, indice, value);
         return null;
     }
 

@@ -45,20 +45,17 @@ import functionalTests.GCMFunctionalTestDefaultNodes;
 
 public class TestRMINonEmptyCall extends GCMFunctionalTestDefaultNodes {
 
-    
-    
     public TestRMINonEmptyCall() {
         super(1, 1);
     }
 
     @Test
     public void test() throws ActiveObjectCreationException, NodeException {
-        
-        
-        
+
         Server server = (Server) PAActiveObject.newActive(Server.class.getName(), new Object[] {}, super
                 .getANode());
-        Client client = (Client) PAActiveObject.newActive(Client.class.getName(), new Object[] { server,1000 });
+        Client client = (Client) PAActiveObject.newActive(Client.class.getName(),
+                new Object[] { server, 1000 });
         client.startTest();
     }
 
@@ -67,8 +64,9 @@ public class TestRMINonEmptyCall extends GCMFunctionalTestDefaultNodes {
         boolean firstRequest = true;
         long count = 0;
         long startTime;
-        
-        public Server() {}
+
+        public Server() {
+        }
 
         public void serve(Object[] o) {
             if (firstRequest) {
@@ -95,21 +93,20 @@ public class TestRMINonEmptyCall extends GCMFunctionalTestDefaultNodes {
         private Server server;
 
         private MyObj[] root;
+
         public Client() {
 
         }
 
-        public Client(Server server,int i) {
+        public Client(Server server, int i) {
             this.server = server;
-                i = 10000;
-                root = new MyObj[i];
-            
-                
-                for (int j = 0; j< i; j++) {
-                    root[j] = new MyObj();
-                }
-            
-            
+            i = 10000;
+            root = new MyObj[i];
+
+            for (int j = 0; j < i; j++) {
+                root[j] = new MyObj();
+            }
+
         }
 
         public int startTest() {
@@ -134,6 +131,5 @@ public class TestRMINonEmptyCall extends GCMFunctionalTestDefaultNodes {
             return 0;
         }
     }
-    
-    
+
 }

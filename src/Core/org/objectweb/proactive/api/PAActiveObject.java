@@ -915,6 +915,7 @@ public class PAActiveObject {
      * @exception java.io.IOException
      *                if the remote body cannot be registered
      */
+    @Deprecated
     public static void register(Object obj, String url) throws java.io.IOException {
         UniversalBody body = AbstractBody.getRemoteBody(obj);
 
@@ -928,6 +929,18 @@ public class PAActiveObject {
             e.printStackTrace();
             throw new IOException(e.getMessage());
         }
+    }
+
+    public static String registerByName(Object obj, String name) throws IOException {
+        UniversalBody body = AbstractBody.getRemoteBody(obj);
+
+        String url = body.registerByName(name);
+        body.setRegistered(true);
+        if (PAActiveObject.logger.isInfoEnabled()) {
+            PAActiveObject.logger.info("Success at binding url " + url);
+        }
+
+        return url;
     }
 
     /**
@@ -1123,11 +1136,11 @@ public class PAActiveObject {
     }
 
     /**
-     * Return the URL of the remote <code>activeObject</code>.
+     * Return the URL of the node of the remote <code>activeObject</code>.
      * 
      * @param activeObject
      *            the remote active object.
-     * @return the URL of <code>activeObject</code>.
+     * @return the URL of the node of the <code>activeObject</code>.
      */
     public static String getActiveObjectNodeUrl(Object activeObject) {
         UniversalBody body = AbstractBody.getRemoteBody(activeObject);
@@ -1233,7 +1246,7 @@ public class PAActiveObject {
      *         body found
      * @exception java.io.IOException
      *                if the remote body cannot be found under the given url or if the object found
-     *                is not of type RmiRemoteBody
+     *                is not of type UniversalBody
      * @exception ActiveObjectCreationException
      *                if the stub-proxy couple cannot be created
      */
@@ -1249,6 +1262,9 @@ public class PAActiveObject {
 
             if (o instanceof UniversalBody) {
                 return MOP.createStubObject(classname, (UniversalBody) o);
+            } else {
+                throw new IOException("The remote object located at " + url +
+                    " is not an Active Object. class=" + o.getClass().getName());
             }
         } catch (ProActiveException e) {
             throw new IOException(e.getMessage());
@@ -1261,8 +1277,6 @@ public class PAActiveObject {
 
             throw new ActiveObjectCreationException("Exception occured when trying to create stub-proxy", t);
         }
-
-        return null;
     }
 
     /**

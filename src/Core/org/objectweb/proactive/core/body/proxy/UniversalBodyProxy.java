@@ -363,25 +363,26 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
         ArrayList<UniversalBody> destinations = new ArrayList<UniversalBody>();
         destinations.add(this.universalBody.getRemoteAdapter());
         sourceBody.getFuturePool().registerDestinations(destinations);
-        
+
         // Modify result object
         Object[] initialObject = null;
         Object stubOnActiveObject = null;
         Object[] modifiedObject = null;
         RestoreManager rm = null;
-    	Body body = PAActiveObject.getBodyOnThis();
-        if (PAProperties.PA_IMPLICITGETSTUBONTHIS.isTrue() && body.getClass().isAssignableFrom(ActiveBody.class)) {
+        Body body = PAActiveObject.getBodyOnThis();
+        if (PAProperties.PA_IMPLICITGETSTUBONTHIS.isTrue() &&
+            body.getClass().isAssignableFrom(ActiveBody.class)) {
             initialObject = methodCall.getParameters();
             try {
-            	BodyImpl bodyImpl = (BodyImpl) body;
-                stubOnActiveObject = (Object) MOP.createStubObject(bodyImpl.getReifiedObject()
-                        .getClass().getName(), bodyImpl.getRemoteAdapter());
+                BodyImpl bodyImpl = (BodyImpl) body;
+                stubOnActiveObject = (Object) MOP.createStubObject(bodyImpl.getReifiedObject().getClass()
+                        .getName(), bodyImpl.getRemoteAdapter());
                 rm = new RestoreManager();
-//                long begin = System.currentTimeMillis();
-                modifiedObject = (Object[])MOP.changeObject(initialObject, bodyImpl.getReifiedObject(),
+                //                long begin = System.currentTimeMillis();
+                modifiedObject = (Object[]) MOP.changeObject(initialObject, bodyImpl.getReifiedObject(),
                         stubOnActiveObject, rm);
-//                System.out.println("UniversalBodyProxy.sendRequest() replaceObject took " + (System.currentTimeMillis() - begin ));
-//                System.out.println(Arrays.toString(modifiedObject));
+                //                System.out.println("UniversalBodyProxy.sendRequest() replaceObject took " + (System.currentTimeMillis() - begin ));
+                //                System.out.println(Arrays.toString(modifiedObject));
 
                 methodCall.setEffectiveArguments(modifiedObject);
             } catch (MOPException e) {
@@ -391,9 +392,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
             }
 
         }
-        
-        
-        
+
         if (this.isLocal) {
             if (Profiling.TIMERS_COMPILED) {
                 TimerWarehouse.startTimer(sourceBody.getID(), TimerWarehouse.LOCAL_COPY);
@@ -429,11 +428,11 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
         if (Profiling.TIMERS_COMPILED) {
             TimerWarehouse.stopTimer(sourceBody.getID(), TimerWarehouse.SEND_REQUEST);
         }
-        
+
         // Restore Result Object
         if (PAProperties.PA_IMPLICITGETSTUBONTHIS.isTrue() && (rm != null)) {
             try {
-                methodCall.setEffectiveArguments((Object[])rm.restore(initialObject));
+                methodCall.setEffectiveArguments((Object[]) rm.restore(initialObject));
             } catch (IllegalArgumentException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -442,8 +441,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
                 e.printStackTrace();
             }
         }
-        
-        
+
     }
 
     protected void sendRequestInternal(MethodCall methodCall, Future future, Body sourceBody)

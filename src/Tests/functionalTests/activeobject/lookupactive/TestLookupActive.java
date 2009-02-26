@@ -35,8 +35,11 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
 
+import java.io.IOException;
+
 import org.junit.Test;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.URIBuilder;
 
 import functionalTests.FunctionalTest;
@@ -55,14 +58,16 @@ public class TestLookupActive extends FunctionalTest {
         a.register();
 
         // check lookup works
-        String url = URIBuilder.buildURIFromProperties("localhost", "A").toString();
+        String url = URIBuilder.buildURIFromProperties(ProActiveInet.getInstance().getHostname(), "A")
+                .toString();
         a = (A) PAActiveObject.lookupActive(A.class.getName(), url);
 
         assertTrue(a != null);
         assertEquals(a.getName(), "toto");
 
         // check listActive contains the previous lookup
-        String host = URIBuilder.buildURIFromProperties("localhost", "").toString();
+        String host = URIBuilder.buildURIFromProperties(ProActiveInet.getInstance().getHostname(), "")
+                .toString();
         String[] registered = PAActiveObject.listActive(host);
         assertNotNull(registered);
 
@@ -73,5 +78,12 @@ public class TestLookupActive extends FunctionalTest {
         }
 
         throw new Exception("Could not find registered object in list of objects");
+    }
+
+    @Test(expected = IOException.class)
+    public void lookupNode() throws Exception {
+        A a = (A) PAActiveObject.newActive(A.class.getName(), new Object[] { "toto" });
+        String nodeURL = PAActiveObject.getActiveObjectNodeUrl(a);
+        PAActiveObject.lookupActive(A.class.getName(), nodeURL);
     }
 }
