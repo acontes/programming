@@ -45,6 +45,7 @@ import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.AbstractBody;
+import org.objectweb.proactive.core.body.ActiveBody;
 import org.objectweb.proactive.core.body.BodyImpl;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
@@ -367,16 +368,17 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
         Object stubOnActiveObject = null;
         Object[] modifiedObject = null;
         RestoreManager rm = null;
-        
-        if (PAProperties.PA_IMPLICITGETSTUBONTHIS.isTrue()) {
+    	Body body = PAActiveObject.getBodyOnThis();
+        if (PAProperties.PA_IMPLICITGETSTUBONTHIS.isTrue() && body.getClass().isAssignableFrom(ActiveBody.class)) {
             initialObject = methodCall.getParameters();
             try {
-                stubOnActiveObject = (Object) MOP.createStubObject(BodyImpl.this.getReifiedObject()
-                        .getClass().getName(), BodyImpl.this.getRemoteAdapter());
+            	BodyImpl bodyImpl = (BodyImpl) body;
+                stubOnActiveObject = (Object) MOP.createStubObject(bodyImpl.getReifiedObject()
+                        .getClass().getName(), bodyImpl.getRemoteAdapter());
                 rm = new RestoreManager();
-                modifiedObject = MOP.changeObject(initialObject, BodyImpl.this.getReifiedObject(),
+                modifiedObject = (Object[])MOP.changeObject(initialObject, bodyImpl.getReifiedObject(),
                         stubOnActiveObject, rm);
-                methodCall.setEffectiveArguments((modifiedObject);
+                methodCall.setEffectiveArguments(modifiedObject);
 
             } catch (MOPException e) {
                 throw new ProActiveRuntimeException("Cannot create Stub for this Body e=" + e);
@@ -423,6 +425,21 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
         if (Profiling.TIMERS_COMPILED) {
             TimerWarehouse.stopTimer(sourceBody.getID(), TimerWarehouse.SEND_REQUEST);
         }
+        
+        // Restore Result Object
+        if (PAProperties.PA_IMPLICITGETSTUBONTHIS.isTrue() && (rm != null)) {
+            try {
+                methodCall.setEffectiveArguments((Object[])rm.restore(initialObject));
+            } catch (IllegalArgumentException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        
+        
     }
 
     protected void sendRequestInternal(MethodCall methodCall, Future future, Body sourceBody)
