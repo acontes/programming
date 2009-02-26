@@ -377,11 +377,11 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
                 stubOnActiveObject = (Object) MOP.createStubObject(bodyImpl.getReifiedObject()
                         .getClass().getName(), bodyImpl.getRemoteAdapter());
                 rm = new RestoreManager();
-                long begin = System.currentTimeMillis();
+//                long begin = System.currentTimeMillis();
                 modifiedObject = (Object[])MOP.changeObject(initialObject, bodyImpl.getReifiedObject(),
                         stubOnActiveObject, rm);
-                System.out.println("UniversalBodyProxy.sendRequest() replaceObject took " + (System.currentTimeMillis() - begin ));
-                System.out.println(Arrays.toString(modifiedObject));
+//                System.out.println("UniversalBodyProxy.sendRequest() replaceObject took " + (System.currentTimeMillis() - begin ));
+//                System.out.println(Arrays.toString(modifiedObject));
 
                 methodCall.setEffectiveArguments(modifiedObject);
             } catch (MOPException e) {

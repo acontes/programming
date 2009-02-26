@@ -101,7 +101,7 @@ public class TestRMINonEmptyCall extends GCMFunctionalTestDefaultNodes {
 
         public Client(Server server,int i) {
             this.server = server;
-                i = 1000;
+                i = 10000;
                 root = new MyObj[i];
             
                 

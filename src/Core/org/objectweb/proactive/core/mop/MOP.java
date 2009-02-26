@@ -1233,7 +1233,6 @@ public abstract class MOP {
     public static Object changeObject(Object objectToAnalyse, Object from, Object to, RestoreManager rm,
             boolean root) {
 
-        System.out.println("MOP.changeObject()" + objectToAnalyse);
         
         if (objectToAnalyse instanceof BodyImpl) {
             // System.out.println("MOP.changeObject() do not replace in Bodyimpl" +
@@ -1254,10 +1253,8 @@ public abstract class MOP {
             System.out.println("ahaha found a reference to change");
 
             if (root) {
-
                 rm.add(new RestoreObject(from, to));
             }
-
             return to;
         }
 
@@ -1274,26 +1271,15 @@ public abstract class MOP {
         if (objectToAnalyse.getClass().isArray()) {
             // System.out.println("MOP.changeObject() in an array " + objectToAnalyse.getClass());
 
-          System.out.println("MOP.changeObject() narf" +   objectToAnalyse.getClass().getComponentType() );
-            
-            
-            try {
-                objectToAnalyse.getClass().cast(Array.newInstance(Object.class, 0));
-            } catch (ClassCastException e) {
-                // cannot cast into a Object[] so
-                // it is an array of primitive type
-                e.printStackTrace();
-                return objectToAnalyse;
-            }
-            
-            Object[] tmp1 = (Object[]) objectToAnalyse;
-            System.out.println("MOP.changeObject() size " + tmp1.length);
-
-            for (int j = 0; j < tmp1.length; j++) {
-                Object newObject = changeObject(tmp1[j], from, to, rm, false);
-                if (newObject != tmp1[j]) {
-                    tmp1[j] = newObject;
-                    rm.add(new RestoreObjectInArray(tmp1, from, j));
+            int arrayLength = Array.getLength(objectToAnalyse);
+ 
+            Object currentObject = null;
+            for (int j = 0; j < arrayLength; j++) {
+            	currentObject = Array.get(objectToAnalyse, j);
+                Object newObject = changeObject(currentObject, from, to, rm, false);
+                if (newObject != currentObject) {
+                    Array.set(objectToAnalyse, j, newObject);
+                    rm.add(new RestoreObjectInArray(objectToAnalyse, from, j));
                 }
             }
         }
@@ -1321,34 +1307,36 @@ public abstract class MOP {
                             fields[i].set(objectToAnalyse, to);
                             rm.add(new FieldToRestoreNormalField(fields[i], objectToAnalyse, from));
 
-                        } else if (currentlyTestedField.getClass().isArray()) {
+//                        } else if (currentlyTestedField.getClass().isArray()) {
                             // System.out.println("MOP.changeObject() in an array " + fields[i]);
 
-                            try {
-
-                                objectToAnalyse.getClass().cast(Array.newInstance(Object.class, 0));
-                                Object[] tmp1 = (Object[]) fields[i].get(objectToAnalyse);
-                                for (int j = 0; j < tmp1.length; j++) {
-
-                                    // System.out.println("MOP.changeObject() " + tmp1[j] + "---" );
-
-                                    Object newObject = changeObject(tmp1[j], from, to, rm, false);
-
-                                    if (newObject != tmp1[j]) {
-                                        tmp1[j] = newObject;
-                                        rm
-                                                .add(new FieldToRestoreInArray(fields[i], objectToAnalyse,
-                                                    from, j));
-                                        // fields[i].setAccessible(false);
-                                    }
-                                }
-
-                            } catch (ClassCastException e) {
-                                // cannot cast into a Object[] so
-                                // it is an array of primitive type
-                                // System.out.println("MOP.changeObject() array of primitive type");
-                                // e.printStackTrace();
-                            }
+//                        	changeObject(currentlyTestedField, from, to, rm, false);
+                        	
+//                            try {
+//                            	 int arrayLength = Array.getLength(objectToAnalyse);
+//                            	  
+//                                 Object currentObject = null;
+//                                
+//                                for (int j = 0; j < arrayLength; j++) {
+//
+//                                	currentObject = Array.get(objectToAnalyse,j);
+//                                    Object newObject = changeObject(currentObject, from, to, rm, false);
+//
+//                                    if (newObject != currentObject) {
+//                                        Array.set(, index, value)newObject;
+//                                        rm
+//                                                .add(new FieldToRestoreInArray(fields[i], objectToAnalyse,
+//                                                    from, j));
+//                                        // fields[i].setAccessible(false);
+//                                    }
+//                                }
+//
+//                            } catch (ClassCastException e) {
+//                                // cannot cast into a Object[] so
+//                                // it is an array of primitive type
+//                                // System.out.println("MOP.changeObject() array of primitive type");
+//                                // e.printStackTrace();
+//                            }
 
                         } else if (!currentlyTestedField.getClass().isPrimitive()) {
                             // System.out.println("MOP.changeObject() not array, not primitive" +
