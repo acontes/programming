@@ -235,8 +235,8 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
                     long begin = System.currentTimeMillis();
                     modifiedObject = (Object[]) MOP.changeObject(initialObject, bodyImpl.getReifiedObject(),
                             stubOnActiveObject, rm, ht);
-                    System.out.println("UniversalBodyProxy.createLocalBody() replaceObject took " +
-                        (System.currentTimeMillis() - begin));
+                    //                    System.out.println("UniversalBodyProxy.createLocalBody() replaceObject took " +
+                    //                        (System.currentTimeMillis() - begin));
 
                     reifiedObjectConstructorCall.setEffectiveArguments(modifiedObject);
                 } catch (MOPException e) {
@@ -256,7 +256,22 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
             // if (logger.isDebugEnabled()) {
             // logger.debug("LocalBodyProxy created using " + body + " from ConstructorCall");
             // }
-            return part.createBody(node.getNodeInformation().getName(), bodyConstructorCall, true);
+            UniversalBody result = part.createBody(node.getNodeInformation().getName(), bodyConstructorCall,
+                    true);
+
+            if (PAProperties.PA_IMPLICITGETSTUBONTHIS.isTrue() && (rm != null)) {
+                try {
+                    rm.restore(initialObject);
+                } catch (IllegalArgumentException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+
+            return result;
             // ---------------------added lines------------------------------
         } catch (ConstructorCallExecutionFailedException e) {
             throw new ProActiveException(e);
@@ -301,8 +316,8 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
                     long begin = System.currentTimeMillis();
                     modifiedObject = (Object[]) MOP.changeObject(initialObject, bodyImpl.getReifiedObject(),
                             stubOnActiveObject, rm, ht);
-                    System.out.println("UniversalBodyProxy.createRemoteBody() replaceObject took " +
-                        (System.currentTimeMillis() - begin));
+                    //                    System.out.println("UniversalBodyProxy.createRemoteBody() replaceObject took " +
+                    //                        (System.currentTimeMillis() - begin));
 
                     bodyConstructorCall.setEffectiveArguments(modifiedObject);
                 } catch (MOPException e) {
@@ -319,7 +334,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
             // Restore Result Object
             if (PAProperties.PA_IMPLICITGETSTUBONTHIS.isTrue() && (rm != null)) {
                 try {
-                    bodyConstructorCall.setEffectiveArguments((Object[]) rm.restore(initialObject));
+                    rm.restore(initialObject);
                 } catch (IllegalArgumentException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -460,8 +475,8 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
                 long begin = System.currentTimeMillis();
                 modifiedObject = (Object[]) MOP.changeObject(initialObject, bodyImpl.getReifiedObject(),
                         stubOnActiveObject, rm, ht);
-                System.out.println("UniversalBodyProxy.sendRequest() " + methodCall.getName() +
-                    " replaceObject took " + (System.currentTimeMillis() - begin));
+                //                System.out.println("UniversalBodyProxy.sendRequest() " + methodCall.getName() +
+                //                    " replaceObject took " + (System.currentTimeMillis() - begin));
 
                 methodCall.setEffectiveArguments(modifiedObject);
             } catch (MOPException e) {
@@ -511,7 +526,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
         // Restore Result Object
         if (PAProperties.PA_IMPLICITGETSTUBONTHIS.isTrue() && (rm != null)) {
             try {
-                methodCall.setEffectiveArguments((Object[]) rm.restore(initialObject));
+                rm.restore(initialObject);
             } catch (IllegalArgumentException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();

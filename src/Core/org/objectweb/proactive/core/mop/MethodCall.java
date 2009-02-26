@@ -94,7 +94,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     private static java.util.Hashtable<String, Method> reifiedMethodsTable = new java.util.Hashtable<String, Method>();
 
     static {
-        MethodCall.setRecycleMethodCallObject(false);
+        MethodCall.setRecycleMethodCallObject(true);
     }
 
     //

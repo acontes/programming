@@ -55,6 +55,7 @@ import org.objectweb.proactive.core.body.BodyImpl;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.future.FutureProxy;
+import org.objectweb.proactive.core.mop.proxy.PAProxy;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -1244,6 +1245,20 @@ public abstract class MOP {
             return objectToAnalyse;
         }
 
+        if (PAProxy.class.isAssignableFrom(from.getClass()) &&
+            !StubObject.class.isAssignableFrom(from.getClass())) {
+
+            Object toutou = ((PAProxy) from).getTarget();
+            if (objectToAnalyse == toutou) {
+                //                System.out.println("ahaha found an internal PROXIED reference to change " + toutou +
+                //                    " is now " + to);
+                if (root) {
+                    rm.add(new RestoreObject(objectToAnalyse, to));
+                }
+                return to;
+            }
+        }
+
         if (visitedObjects.contains(objectToAnalyse)) {
             return objectToAnalyse;
         }
@@ -1253,7 +1268,7 @@ public abstract class MOP {
         // objectToAnalyse.getClass().isPrimitive());
 
         if (objectToAnalyse == from) {
-            System.out.println("ahaha found a reference to change");
+            //            System.out.println("ahaha found a reference to change");
 
             if (root) {
                 rm.add(new RestoreObject(from, to));
@@ -1282,7 +1297,11 @@ public abstract class MOP {
                 Object newObject = changeObject(currentObject, from, to, rm, false, visitedObjects);
                 if (newObject != currentObject) {
                     Array.set(objectToAnalyse, j, newObject);
-                    rm.add(new RestoreObjectInArray(objectToAnalyse, from, j));
+                    //                    if (PAProxy.class.isAssignableFrom(from.getClass())) {
+                    //                        rm.add(new RestoreObjectInArray(objectToAnalyse, ((PAProxy)from).getTarget(), j));
+                    //                    } else {
+                    rm.add(new RestoreObjectInArray(objectToAnalyse, currentObject, j));
+                    //                    }
                 }
             }
         }
@@ -1305,11 +1324,24 @@ public abstract class MOP {
                     //                    System.out.println("Name:"+fields[i].getName());
                     if (currentlyTestedField != null) {
                         if (currentlyTestedField == from) {
-                            System.out.println("ahaha found an internal reference to change " + from +
-                                " is now " + to);
+                            //                            System.out.println("ahaha found an internal reference to change " + from +
+                            //                                " is now " + to);
                             fields[i].set(objectToAnalyse, to);
                             rm.add(new FieldToRestoreNormalField(fields[i], objectToAnalyse, from));
-                        } else if (!currentlyTestedField.getClass().isPrimitive()) {
+                        } else if (PAProxy.class.isAssignableFrom(from.getClass()) &&
+                            !StubObject.class.isAssignableFrom(from.getClass())) {
+                            Object toutou = ((PAProxy) from).getTarget();
+                            if (currentlyTestedField == toutou) {
+
+                                //                                System.out.println("ahaha found an internal PROXIED reference to change, Field "+ fields[i].getName()+" " + toutou +
+                                //                                        " is now " + to);
+                                fields[i].set(objectToAnalyse, to);
+                                rm.add(new FieldToRestoreNormalField(fields[i], objectToAnalyse,
+                                    currentlyTestedField));
+                            }
+                        }
+
+                        else if (!currentlyTestedField.getClass().isPrimitive()) {
                             // System.out.println("MOP.changeObject() not array, not primitive" +
                             // tmp);
 

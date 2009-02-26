@@ -50,6 +50,7 @@ import javax.management.ObjectName;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActiveInternalObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.benchmarks.timit.util.CoreTimersContainer;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -70,6 +71,7 @@ import org.objectweb.proactive.core.body.request.RequestQueue;
 import org.objectweb.proactive.core.body.request.RequestReceiver;
 import org.objectweb.proactive.core.body.request.RequestReceiverImpl;
 import org.objectweb.proactive.core.component.request.ComponentRequestImpl;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.debug.stepbystep.BreakpointType;
 import org.objectweb.proactive.core.gc.GarbageCollector;
 import org.objectweb.proactive.core.jmx.mbean.BodyWrapper;
@@ -611,9 +613,10 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             RestoreManager rm = null;
             Hashtable<Integer, Object> ht = new Hashtable<Integer, Object>();
 
-            if (!reply.isAutomaticContinuation()) {
+            if (PAProperties.PA_IMPLICITGETSTUBONTHIS.isTrue()) {
                 initialObject = reply.getResult().getResultObjet();
                 try {
+                    PAActiveObject.getStubOnThis();
                     stubOnActiveObject = (Object) MOP.createStubObject(BodyImpl.this.getReifiedObject()
                             .getClass().getName(), BodyImpl.this.getRemoteAdapter());
                     rm = new RestoreManager();
@@ -621,11 +624,12 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                     modifiedObject = MOP.changeObject(initialObject, BodyImpl.this.getReifiedObject(),
                             stubOnActiveObject, rm, ht);
                     reply.getResult().setResult(modifiedObject);
-                    System.out.println(" ActiveLocalBodyStrategy.serveInternal() replaceObject took " +
-                       (System.currentTimeMillis() - begin));
-                } catch (MOPException e) {
-                    throw new ProActiveRuntimeException("Cannot create Stub for this Body e=" + e);
+                    //                    System.out.println(" ActiveLocalBodyStrategy.serveInternal() replaceObject took " +
+                    //                       (System.currentTimeMillis() - begin));
                 } catch (InactiveBodyException e) {
+                    e.printStackTrace();
+                } catch (MOPException e) {
+                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
 
@@ -657,10 +661,16 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                 }
             }
 
+            if (Profiling.TIMERS_COMPILED) {
+                TimerWarehouse.stopTimer(BodyImpl.this.bodyID, TimerWarehouse.SEND_REPLY);
+            }
+
+            this.getFuturePool().removeDestinations();
+
             // Restore Result Object
-            if (!reply.isAutomaticContinuation() && (rm != null)) {
+            if (PAProperties.PA_IMPLICITGETSTUBONTHIS.isTrue() && (rm != null)) {
                 try {
-                    reply.getResult().setResult(rm.restore(initialObject));
+                    rm.restore(initialObject);
                 } catch (IllegalArgumentException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -669,11 +679,6 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                     e.printStackTrace();
                 }
             }
-            if (Profiling.TIMERS_COMPILED) {
-                TimerWarehouse.stopTimer(BodyImpl.this.bodyID, TimerWarehouse.SEND_REPLY);
-            }
-
-            this.getFuturePool().removeDestinations();
         }
 
         // If a reply sending has failed, try to send the exception as reply

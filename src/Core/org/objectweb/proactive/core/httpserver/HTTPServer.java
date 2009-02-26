@@ -121,7 +121,7 @@ public class HTTPServer {
             }
         }
 
-        this.context = new Context(server, "/", Context.NO_SESSIONS);
+        this.context = new Context(server, "/", Context.SESSIONS);
 
         this.server.start();
         // If a random port is used we have to set it
