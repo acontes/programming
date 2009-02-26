@@ -34,12 +34,14 @@ package org.objectweb.proactive.core.mop;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -1154,4 +1156,52 @@ public abstract class MOP {
             return result;
         }
     }
+        
+    
+    public static  Object changeObject(Object objectToAnalyse, Object from, Object to,List<FieldToRestore> fr) {        
+        if (objectToAnalyse == from) {      
+            System.out.println("ahaha found a reference to change");
+            
+            return to;
+        } else {        
+        
+        Field[] fields = objectToAnalyse.getClass().getDeclaredFields();
+        Field.setAccessible(fields, true);
+        Object tmp = null;
+        for (int i = 0; i < fields.length; i++ ) {
+            try {
+                tmp = fields[i].get(objectToAnalyse);
+                if (tmp == from) {       
+                    System.out.println("ahaha found an internal reference to change");
+                    fields[i].set(objectToAnalyse, to);
+                    fr.add(new FieldToRestoreNormalObject(fields[i], objectToAnalyse,from));
+                } else {
+                    
+                    if (!  fields[i].getType().isPrimitive() ) {                    
+                        changeObject( fields[i].get(objectToAnalyse),  from,  to,fr) ;
+                    } else if ( fields[i].getType().isArray()) {
+                        
+                        Object[] tmp1 =  (Object[]) fields[i].get(objectToAnalyse);
+                        for (int j = 0; j< tmp1.length;j++) {
+                            Object newObject =  changeObject(tmp1[j], from, to,fr);
+                            if (newObject != tmp1[j]) {
+                                fr.add(new FieldToRestoreInArray(fields[i],objectToAnalyse,from,j));
+                            }
+                        }  
+                    }
+                    
+                }
+                
+            } catch (IllegalArgumentException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        }
+        return objectToAnalyse;
+        }
+    
 }
