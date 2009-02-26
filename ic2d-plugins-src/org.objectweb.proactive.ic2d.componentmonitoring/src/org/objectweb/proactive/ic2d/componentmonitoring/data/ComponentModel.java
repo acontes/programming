@@ -24,7 +24,7 @@ public class ComponentModel extends AbstractData {
      * metric recorders
      */
     private long ComponentStartTime;
-    
+
     private double SampleSize;
     private double ArrivalSampleCount;
     private double DepartureSampleCount;
@@ -32,19 +32,19 @@ public class ComponentModel extends AbstractData {
     private long FirstArrivalSampleTime;
     private long FirstDepartureSampleTime;
     private long FirstServiceSampleTime;
-    
+
     private long TimeSize;
     private double ArrivalTimeCount;
     private double DepartureTimeCount;
     private double ServiceTimeCount;
     private long FirstArrivalTimeTime;
     private long FirstDepartureTimeTime;
-    private long FirstServiceTimeTime;   
-    
+    private long FirstServiceTimeTime;
+
     private double TotalArrivalCount;
     private double TotalDepartureCount;
     private double TotalServiceCount;
-    
+
     private Thread timerThread;
     /**
      * ID used to identify the active object globally, even in case of
@@ -122,7 +122,6 @@ public class ComponentModel extends AbstractData {
          */
         //		if (this.parent != null)
         //			this.parent.addChild(this);
-
         this.id = id;
         initialMetricRecorders();
         // System.out.println("ComponentModel()");
@@ -253,12 +252,12 @@ public class ComponentModel extends AbstractData {
      * @param newState
      */
     public void setState(String newState) {
-//        if (newState.equals(this.Status)) {
-//            return;
-//        } else {
-//            this.Status = newState;
-//        }
-    	this.Status = newState;
+        //        if (newState.equals(this.Status)) {
+        //            return;
+        //        } else {
+        //            this.Status = newState;
+        //        }
+        this.Status = newState;
         setChanged();
         notifyObservers(new ComponentMVCNotification(ComponentMVCNotificationTag.STATE_CHANGED, this.Status));
     }
@@ -283,7 +282,6 @@ public class ComponentModel extends AbstractData {
         }
         setChanged();
         notifyObservers(new ComponentMVCNotification(ComponentMVCNotificationTag.NAME_CHANGED, this.ClassName));
-        
 
     }
 
@@ -398,8 +396,7 @@ public class ComponentModel extends AbstractData {
 
         notifyObservers(new ComponentMVCNotification(ComponentMVCNotificationTag.REMOVE_CHILD, key));
     }
-    
-    
+
     /**
      * Operations on metric recorders
      *  private long ComponentStartTime;
@@ -407,191 +404,187 @@ public class ComponentModel extends AbstractData {
     private long TimeSize;
     private double TotalArrivalCount;
      */
-    private void initialMetricRecorders()
-    {
-    	this.ComponentStartTime = System.currentTimeMillis();
-    	this.SampleSize = 5;
-    	this.TimeSize = 60*1000;
-    	this.TotalArrivalCount = 0;
-    	this.TotalDepartureCount = 0;
-    	this.TotalServiceCount = 0;
-    	
-    	this.ArrivalSampleCount = 0;
-    	this.DepartureSampleCount = 0;
-    	this.ServiceSampleCount = 0;
-    	this.FirstArrivalSampleTime = this.ComponentStartTime;
-    	this.FirstDepartureSampleTime = this.ComponentStartTime;
-    	this.FirstServiceSampleTime = this.ComponentStartTime;
-    	
-    	
-    	this.ArrivalTimeCount = 0;
-    	this.DepartureTimeCount = 0;
-    	this.ServiceTimeCount = 0;
-    	this.FirstArrivalTimeTime = this.ComponentStartTime;
-    	this.FirstDepartureTimeTime  = this.ComponentStartTime;
-    	this.FirstServiceTimeTime  = this.ComponentStartTime;   
-    	
+    private void initialMetricRecorders() {
+        this.ComponentStartTime = System.currentTimeMillis();
+        this.SampleSize = 5;
+        this.TimeSize = 60 * 1000;
+        this.TotalArrivalCount = 0;
+        this.TotalDepartureCount = 0;
+        this.TotalServiceCount = 0;
+
+        this.ArrivalSampleCount = 0;
+        this.DepartureSampleCount = 0;
+        this.ServiceSampleCount = 0;
+        this.FirstArrivalSampleTime = this.ComponentStartTime;
+        this.FirstDepartureSampleTime = this.ComponentStartTime;
+        this.FirstServiceSampleTime = this.ComponentStartTime;
+
+        this.ArrivalTimeCount = 0;
+        this.DepartureTimeCount = 0;
+        this.ServiceTimeCount = 0;
+        this.FirstArrivalTimeTime = this.ComponentStartTime;
+        this.FirstDepartureTimeTime = this.ComponentStartTime;
+        this.FirstServiceTimeTime = this.ComponentStartTime;
+
     }
-    
-    public void setComponentStartTime(long componentStartTime){this.ComponentStartTime = componentStartTime;}
-    public void setSampleSize(double SampleSize){this.SampleSize = SampleSize;}
-    public void setTimeSize(long TimeSize){this.TimeSize = TimeSize;}
-    public void setTotalArrivalCount(double TotalArrivalCount){this.TotalArrivalCount = TotalArrivalCount;}
-    
-    public long getComponentStartTime(){return this.ComponentStartTime;}
-    public double getSampleSize(){return this.SampleSize;}
-    public long getTimeSize(){return this.TimeSize;}
-    public double getTotalArrivalCount(){return this.TotalArrivalCount;}
-    
-    
+
+    public void setComponentStartTime(long componentStartTime) {
+        this.ComponentStartTime = componentStartTime;
+    }
+
+    public void setSampleSize(double SampleSize) {
+        this.SampleSize = SampleSize;
+    }
+
+    public void setTimeSize(long TimeSize) {
+        this.TimeSize = TimeSize;
+    }
+
+    public void setTotalArrivalCount(double TotalArrivalCount) {
+        this.TotalArrivalCount = TotalArrivalCount;
+    }
+
+    public long getComponentStartTime() {
+        return this.ComponentStartTime;
+    }
+
+    public double getSampleSize() {
+        return this.SampleSize;
+    }
+
+    public long getTimeSize() {
+        return this.TimeSize;
+    }
+
+    public double getTotalArrivalCount() {
+        return this.TotalArrivalCount;
+    }
+
     /**
      * add events
      */
-    public void getRequestEvent(long time)
-    {
-    	this.TotalArrivalCount ++;
-    	this.ArrivalSampleCount ++;
-    	// Sample Arrival rate
-    	if(this.ArrivalSampleCount==1)
-    	{
-    		this.FirstArrivalSampleTime = time;
-    	}
-    	else if(this.ArrivalSampleCount == this.SampleSize)
-    	{
-    		long CurrentSampleTime = time-this.FirstArrivalSampleTime;
-    		double CurrentArrivalSampleRate = this.SampleSize/(double)(CurrentSampleTime/1000);
-    		setSampleArrivalRate(CurrentArrivalSampleRate);
-    	}
-    	else if(this.ArrivalSampleCount == (this.sampleSize+1))
-    	{
-    		this.FirstArrivalSampleTime = time;
-    		this.ArrivalSampleCount = 1;
-    	}
-    	// Time arrival rate
-    	this.ArrivalTimeCount++;    	
-    	// Mean Arrival rate
-    	long CurrentLifeTime = time-this.ComponentStartTime;
-    	double CurrentMeanArrivalRate=this.TotalArrivalCount/(double)(CurrentLifeTime/1000);
-    	setMeanArrivalRate(CurrentMeanArrivalRate);
+    public void getRequestEvent(long time) {
+        this.TotalArrivalCount++;
+        this.ArrivalSampleCount++;
+        // Sample Arrival rate
+        if (this.ArrivalSampleCount == 1) {
+            this.FirstArrivalSampleTime = time;
+        } else if (this.ArrivalSampleCount == this.SampleSize) {
+            long CurrentSampleTime = time - this.FirstArrivalSampleTime;
+            double CurrentArrivalSampleRate = this.SampleSize / (double) (CurrentSampleTime / 1000);
+            setSampleArrivalRate(CurrentArrivalSampleRate);
+        } else if (this.ArrivalSampleCount == (this.sampleSize + 1)) {
+            this.FirstArrivalSampleTime = time;
+            this.ArrivalSampleCount = 1;
+        }
+        // Time arrival rate
+        this.ArrivalTimeCount++;
+        // Mean Arrival rate
+        long CurrentLifeTime = time - this.ComponentStartTime;
+        double CurrentMeanArrivalRate = this.TotalArrivalCount / (double) (CurrentLifeTime / 1000);
+        setMeanArrivalRate(CurrentMeanArrivalRate);
     }
-    
-    public void getDepartureEvent(long time)
-    {
-    	this.TotalDepartureCount++;
-    	this.DepartureSampleCount ++;
-    	
-    	// 
-    	if(this.DepartureSampleCount==1)
-    	{
-    		this.FirstDepartureSampleTime = time;
-    	}
-    	else if(this.DepartureSampleCount == this.SampleSize)
-    	{
-    		long CurrentSampleTime = time-this.FirstDepartureSampleTime;
-    		double CurrentDepartureSampleRate = this.SampleSize/(double)(CurrentSampleTime/1000);
-    		setSampleDepartureRate(CurrentDepartureSampleRate);
-    	}
-    	else if(this.DepartureSampleCount == (this.sampleSize+1))
-    	{
-    		this.FirstDepartureSampleTime = time;
-    		this.DepartureSampleCount = 1;
-    	}
-    	// Time Departure rate
-    	this.DepartureTimeCount++;    
-    	//
-    	long CurrentLifeTime = time-this.ComponentStartTime;
-    	double CurrentMeanDepartureRate=this.TotalDepartureCount/(double)(CurrentLifeTime/1000);
-    	setMeanDepartureRate(CurrentMeanDepartureRate);
+
+    public void getDepartureEvent(long time) {
+        this.TotalDepartureCount++;
+        this.DepartureSampleCount++;
+
+        // 
+        if (this.DepartureSampleCount == 1) {
+            this.FirstDepartureSampleTime = time;
+        } else if (this.DepartureSampleCount == this.SampleSize) {
+            long CurrentSampleTime = time - this.FirstDepartureSampleTime;
+            double CurrentDepartureSampleRate = this.SampleSize / (double) (CurrentSampleTime / 1000);
+            setSampleDepartureRate(CurrentDepartureSampleRate);
+        } else if (this.DepartureSampleCount == (this.sampleSize + 1)) {
+            this.FirstDepartureSampleTime = time;
+            this.DepartureSampleCount = 1;
+        }
+        // Time Departure rate
+        this.DepartureTimeCount++;
+        //
+        long CurrentLifeTime = time - this.ComponentStartTime;
+        double CurrentMeanDepartureRate = this.TotalDepartureCount / (double) (CurrentLifeTime / 1000);
+        setMeanDepartureRate(CurrentMeanDepartureRate);
     }
-    
-    public void getServiceEvent(long time)
-    {
-    	this.TotalServiceCount++;
-    	this.ServiceSampleCount ++;
-    	
-    	// 
-    	if(this.ServiceSampleCount==1)
-    	{
-    		this.FirstServiceSampleTime = time;
-    	}
-    	else if(this.ServiceSampleCount == this.SampleSize)
-    	{
-    		long CurrentSampleTime = time-this.FirstServiceSampleTime;
-    		double CurrentServiceSampleRate = this.SampleSize/(double)(CurrentSampleTime/1000);
-    		setSampleServiceRate(CurrentServiceSampleRate);
-    	}
-    	else if(this.ServiceSampleCount == (this.sampleSize+1))
-    	{
-    		this.FirstServiceSampleTime = time;
-    		this.ServiceSampleCount = 1;
-    	}
-    	// Time Service rate 
-    	this.ServiceTimeCount++;
-    	//
-    	long CurrentLifeTime = time-this.ComponentStartTime;
-    	double CurrentMeanServiceRate=this.TotalServiceCount/(double)(CurrentLifeTime/1000);
-    	setMeanServiceRate(CurrentMeanServiceRate);
+
+    public void getServiceEvent(long time) {
+        this.TotalServiceCount++;
+        this.ServiceSampleCount++;
+
+        // 
+        if (this.ServiceSampleCount == 1) {
+            this.FirstServiceSampleTime = time;
+        } else if (this.ServiceSampleCount == this.SampleSize) {
+            long CurrentSampleTime = time - this.FirstServiceSampleTime;
+            double CurrentServiceSampleRate = this.SampleSize / (double) (CurrentSampleTime / 1000);
+            setSampleServiceRate(CurrentServiceSampleRate);
+        } else if (this.ServiceSampleCount == (this.sampleSize + 1)) {
+            this.FirstServiceSampleTime = time;
+            this.ServiceSampleCount = 1;
+        }
+        // Time Service rate 
+        this.ServiceTimeCount++;
+        //
+        long CurrentLifeTime = time - this.ComponentStartTime;
+        double CurrentMeanServiceRate = this.TotalServiceCount / (double) (CurrentLifeTime / 1000);
+        setMeanServiceRate(CurrentMeanServiceRate);
     }
-    
-    private void startTimer()
-    {
-    	Timer timer = new Timer(this.TimeSize);
-    	if(this.timerThread==null)
-    	{
-    	this.timerThread = new Thread(timer);
-    	this.timerThread.start();
-    	}
+
+    private void startTimer() {
+        Timer timer = new Timer(this.TimeSize);
+        if (this.timerThread == null) {
+            this.timerThread = new Thread(timer);
+            this.timerThread.start();
+        }
     }
-    
-    private class Timer implements Runnable
-    {
-    	private long interval;
-    	public Timer()
-    	{
-    		this.interval = 0;
-    	}
-    	public Timer(long interval)
-    	{
-    		this.interval = interval;
-    	}
-    	public void setInterval(long interval)
-    	{
-    		this.interval = interval;
-    	}
-    	public long getInterval()
-    	{
-    		return this.interval;
-    	}
-    	
-    	public void run()
-    	{
-    		while(true)
-    		{
-    		timeMetricsUpdate(this.interval);
-    		resetTimeMetrics();
-    		try {
-    			System.out.println("Sleep Begin!");
-				Thread.sleep(this.interval);
-				System.out.println("Now this.interval=" + this.interval+" and ArrivalTimeCount = "+ArrivalTimeCount);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-    		}
-    	}
-    	
-    	private void timeMetricsUpdate(long interval)
-    	{
-    		setTimeArrivalRate(ArrivalTimeCount/(interval/(double)1000));
-    		setTimeDepartureRate(DepartureTimeCount/(interval/(double)1000));
-    		setTimeServiceRate(ServiceTimeCount/(interval/(double)1000));
-    	}
-    	private void resetTimeMetrics()
-    	{
-    		ArrivalTimeCount = 0;
-    		DepartureTimeCount = 0;
-    		ServiceTimeCount = 0;
-    	}
+
+    private class Timer implements Runnable {
+        private long interval;
+
+        public Timer() {
+            this.interval = 0;
+        }
+
+        public Timer(long interval) {
+            this.interval = interval;
+        }
+
+        public void setInterval(long interval) {
+            this.interval = interval;
+        }
+
+        public long getInterval() {
+            return this.interval;
+        }
+
+        public void run() {
+            while (true) {
+                timeMetricsUpdate(this.interval);
+                resetTimeMetrics();
+                try {
+                    System.out.println("Sleep Begin!");
+                    Thread.sleep(this.interval);
+                    System.out.println("Now this.interval=" + this.interval + " and ArrivalTimeCount = " +
+                        ArrivalTimeCount);
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        private void timeMetricsUpdate(long interval) {
+            setTimeArrivalRate(ArrivalTimeCount / (interval / (double) 1000));
+            setTimeDepartureRate(DepartureTimeCount / (interval / (double) 1000));
+            setTimeServiceRate(ServiceTimeCount / (interval / (double) 1000));
+        }
+
+        private void resetTimeMetrics() {
+            ArrivalTimeCount = 0;
+            DepartureTimeCount = 0;
+            ServiceTimeCount = 0;
+        }
     }
-    
+
 }

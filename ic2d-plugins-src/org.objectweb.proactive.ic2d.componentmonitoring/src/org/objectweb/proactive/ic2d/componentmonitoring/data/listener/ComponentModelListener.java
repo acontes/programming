@@ -81,7 +81,7 @@ public class ComponentModelListener implements NotificationListener {
             for (Notification notification : notifications) {
                 String type = notification.getType();
 
-//                System.out.println("*****Component Model Listener*****"+cm.getName()+" Task.run() -> get Notification"+type);
+                //                System.out.println("*****Component Model Listener*****"+cm.getName()+" Task.run() -> get Notification"+type);
                 if (type.equals(NotificationType.requestReceived)) {
                     logger.debug(".................................Request Received : " + cm.getName());
                     RequestNotificationData request = (RequestNotificationData) notification.getUserData();
@@ -90,7 +90,7 @@ public class ComponentModelListener implements NotificationListener {
                     cm.setState(State.START);
                 } else if (type.equals(NotificationType.waitForRequest)) {
                     logger.debug("...............................Wait for request");
-//                    cm.setState(State.START);
+                    //                    cm.setState(State.START);
                 }
                 // --- MessageEvent ---------------------
                 else if (type.equals(NotificationType.replyReceived)) {
@@ -125,7 +125,7 @@ public class ComponentModelListener implements NotificationListener {
                 } else if (type.equals(NotificationType.migrationAboutToStart)) {
                     logger.debug("...............................Migration about to start " + cm + ", node=" +
                         cm.getParent());
-                    
+
                     //                    ao.setState(org.objectweb.proactive.ic2d.jmxmonitoring.util.State.MIGRATING);
                 } else if (type.equals(NotificationType.migrationExceptionThrown)) {
                     logger.debug("...............................Migration Exception thrown : " +
@@ -152,7 +152,6 @@ public class ComponentModelListener implements NotificationListener {
 
     ////////  End -- Task for handling notifications ///////
     private ComponentModel cm;
-    
 
     //private String name;
     public ComponentModelListener(ComponentModel cm) {
@@ -169,7 +168,6 @@ public class ComponentModelListener implements NotificationListener {
         IC2DThreadPool.execute(new Task(notifs));
     }
 
-    
     /**
      *  Manages the fact that the active object this listener is registered for has communicated.
      *  it updates the ActiveObject (the model object) and manages automatic discovery

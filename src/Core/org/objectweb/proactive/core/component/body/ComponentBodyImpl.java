@@ -118,7 +118,6 @@ public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
                      * change the super.mbean into ComponentWrapperMBean if this is a component
                      */
                     // JMX registration  
-
                     MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
                     System.out.println("ComponentBodyImpl.ComponentBodyImpl() -> mbs has " +
                         mbs.getMBeanCount() + " mbean before register");
