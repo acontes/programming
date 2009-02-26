@@ -621,10 +621,11 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                     //                // TODO Auto-generated catch block
                     //                e.printStackTrace();
                     //            }
+                    long begin = System.currentTimeMillis();
                     modifiedObject = MOP.changeObject(initialObject, BodyImpl.this.getReifiedObject(),
                             stubOnActiveObject, rm);
                     reply.getResult().setResult(modifiedObject);
-
+                    System.out.println("UniversalBodyProxy.sendRequest() replaceObject took " + (System.currentTimeMillis() - begin ));
                 } catch (MOPException e) {
                     throw new ProActiveRuntimeException("Cannot create Stub for this Body e=" + e);
                 } catch (InactiveBodyException e) {

@@ -34,6 +34,7 @@ package org.objectweb.proactive.core.body.proxy;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Vector;
 
@@ -376,10 +377,13 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
                 stubOnActiveObject = (Object) MOP.createStubObject(bodyImpl.getReifiedObject()
                         .getClass().getName(), bodyImpl.getRemoteAdapter());
                 rm = new RestoreManager();
+                long begin = System.currentTimeMillis();
                 modifiedObject = (Object[])MOP.changeObject(initialObject, bodyImpl.getReifiedObject(),
                         stubOnActiveObject, rm);
-                methodCall.setEffectiveArguments(modifiedObject);
+                System.out.println("UniversalBodyProxy.sendRequest() replaceObject took " + (System.currentTimeMillis() - begin ));
+                System.out.println(Arrays.toString(modifiedObject));
 
+                methodCall.setEffectiveArguments(modifiedObject);
             } catch (MOPException e) {
                 throw new ProActiveRuntimeException("Cannot create Stub for this Body e=" + e);
             } catch (InactiveBodyException e) {
