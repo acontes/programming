@@ -103,7 +103,6 @@ public class ComponentHolderModel extends AbstractData implements AbstractHolder
         notifyObservers(new ComponentMVCNotification(ComponentMVCNotificationTag.REMOVE_CHILD, key));
     }
 
-    @Override
     public HolderTypes getHolderType() {
         return HolderTypes.COMPONENT_HOLDER;
     }

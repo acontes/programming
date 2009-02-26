@@ -148,15 +148,15 @@ public class ComponentTreeView extends ViewPart {
         addTreeColumn(tree, "Name", 200);
         addTreeColumn(tree, "Hierarchical", 100);
         addTreeColumn(tree, "Status", 100);
-        addTreeColumn(tree, "Mean Arrival Rate", 100);
-        addTreeColumn(tree, "Mean Departure rate", 100);
-        addTreeColumn(tree, "Mean Service rate", 100);
-        addTreeColumn(tree, "Sample Arrival Rate", 100);
-        addTreeColumn(tree, "Sample Departure Rate", 100);
-        addTreeColumn(tree, "Sample Service Rate", 100);
-        addTreeColumn(tree, "Time Arrival Rate", 100);
-        addTreeColumn(tree, "Time Departure Rate", 100);
-        addTreeColumn(tree, "Time Service Rate", 100);
+        addTreeColumn(tree, "Mean Arrival Rate (/s)", 100);
+        addTreeColumn(tree, "Mean Departure rate (/s)", 100);
+        addTreeColumn(tree, "Mean Service rate (/s)", 100);
+        addTreeColumn(tree, "Sample Arrival Rate (/s)", 100);
+        addTreeColumn(tree, "Sample Departure Rate (/s)", 100);
+        addTreeColumn(tree, "Sample Service Rate (/s)", 100);
+        addTreeColumn(tree, "Time Arrival Rate (/s)", 100);
+        addTreeColumn(tree, "Time Departure Rate (/s)", 100);
+        addTreeColumn(tree, "Time Service Rate (/s)", 100);
 
         IToolBarManager toolBarManager = getViewSite().getActionBars().getToolBarManager();
 
@@ -281,7 +281,7 @@ public class ComponentTreeView extends ViewPart {
             ComponentModel C2 = new ComponentModel(CHolder, "Component2");
             C2.setName("Component2");
             C2.setHierachical("primitive");
-            C2.setState("STOP");
+            C2.setState("Stop");
 
             ComponentModel C11 = new ComponentModel(C1, "Component11");
             C11.setName("Component11");
