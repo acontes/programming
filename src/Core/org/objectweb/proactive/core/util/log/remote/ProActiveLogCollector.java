@@ -23,7 +23,6 @@ public class ProActiveLogCollector implements Serializable, InitActive {
     final private ConcurrentHashMap<String, Logger> loggers = new ConcurrentHashMap<String, Logger>();
 
     public ProActiveLogCollector() {
-
     }
 
     public void initActivity(Body body) {
@@ -41,9 +40,8 @@ public class ProActiveLogCollector implements Serializable, InitActive {
                 loggers.put(name, l);
             }
 
-            if (event.getLevel().isGreaterOrEqual(l.getEffectiveLevel())) {
-                l.callAppenders(event);
-            }
+            /* Event are filtered by client side, not server side */
+            l.callAppenders(event);
         }
     }
 }

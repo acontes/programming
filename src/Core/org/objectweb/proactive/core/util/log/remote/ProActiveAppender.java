@@ -2,6 +2,8 @@ package org.objectweb.proactive.core.util.log.remote;
 
 import java.net.URI;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -33,6 +35,8 @@ import org.objectweb.proactive.core.config.PAProperties;
  */
 public final class ProActiveAppender extends AppenderSkeleton {
 
+    final static List<ProActiveAppender> appenders = new LinkedList<ProActiveAppender>();
+
     final private LoggingEventSenderSPI spi;
 
     final private AtomicBoolean collectorKnow;
@@ -42,6 +46,9 @@ public final class ProActiveAppender extends AppenderSkeleton {
 
     public ProActiveAppender() {
         super();
+
+        appenders.add(this);
+
         this.collectorKnow = new AtomicBoolean(false);
         this.bufferedEvents = new ConcurrentLinkedQueue<LoggingEvent>();
         this.spi = findSPI();
@@ -54,6 +61,7 @@ public final class ProActiveAppender extends AppenderSkeleton {
 
     public ProActiveAppender(LoggingEventSenderSPI spi, ProActiveLogCollector collector) {
         super();
+
         this.collectorKnow = new AtomicBoolean(true);
         // these fields are never used since the collector is already known
         this.bufferedEvents = null;
@@ -84,25 +92,6 @@ public final class ProActiveAppender extends AppenderSkeleton {
         return true;
     }
 
-    /**
-     * Notify that the remote object factory is ready and that the log collector
-     * created by the GCM Deployment descriptor can be retrieved and used
-     */
-    public void proactiveIsReady() {
-        // TODO: A JMX notification should be sent when a ProActive runtime is
-        // ready
-        try {
-            String url = PAProperties.PA_LOG4J_COLLECTOR.getValue();
-            ProActiveLogCollector collector;
-            collector = (ProActiveLogCollector) PARemoteObject.lookup(URI.create(url));
-            spi.setCollector(collector);
-            this.collectorKnow.set(true);
-            this.bufferedEvents.clear();
-        } catch (ProActiveException e) {
-            e.printStackTrace();
-        }
-    }
-
     private void startFlushingThread() {
         // Start the flushing thread
         Thread t;
@@ -118,7 +107,8 @@ public final class ProActiveAppender extends AppenderSkeleton {
     private LoggingEventSenderSPI findSPI() {
         LoggingEventSenderSPI spi = null;
 
-        // Do not use a PAProperties here, or an infinite recursion will kill your mom
+        // Do not use a PAProperties here, or an infinite recursion will kill
+        // your mom
         String provider = System.getProperty("proactive.log4j.appender.provider");
         if (provider != null) {
             // User asked for a specific provider
@@ -203,6 +193,30 @@ public final class ProActiveAppender extends AppenderSkeleton {
             }
 
             timer.schedule(new ConsolePinter(), GRACE_TIME);
+        }
+    }
+
+    static public void notifyIsReady() {
+        for (ProActiveAppender appender : appenders) {
+            appender.doLookup();
+        }
+    }
+
+    private void doLookup() {
+        try {
+            String url = PAProperties.PA_LOG4J_COLLECTOR.getValue();
+            if (url != null) {
+                ProActiveLogCollector collector;
+                collector = (ProActiveLogCollector) PARemoteObject.lookup(URI.create(url));
+                spi.setCollector(collector);
+                this.collectorKnow.set(true);
+                this.bufferedEvents.clear();
+            } else {
+                System.err.println("ProActiveAppender loaed but" + PAProperties.PA_LOG4J_COLLECTOR.getKey() +
+                    " is null");
+            }
+        } catch (ProActiveException e) {
+            e.printStackTrace();
         }
     }
 }

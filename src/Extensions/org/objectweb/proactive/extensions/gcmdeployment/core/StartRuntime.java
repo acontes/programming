@@ -222,11 +222,7 @@ public class StartRuntime {
             abort();
         }
 
-        if (PAProperties.PA_LOG4J_COLLECTOR.isSet()) {
-            Logger rootLogger = Logger.getRootLogger();
-            ProActiveAppender appender = (ProActiveAppender) rootLogger.getAppender("REMOTE");
-            appender.proactiveIsReady();
-        }
+        ProActiveAppender.notifyIsReady();
 
         // Say hello to our parent if needed
         if (parentURL != null) {
