@@ -36,7 +36,8 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.examples.userguide.cmagent.initialized.CMAgentInitialized;
-import org.objectweb.proactive.extensions.webservices.WebServices;
+import org.objectweb.proactive.extensions.webservicesBk.WebServices;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 
 
 public class CMAgentService extends CMAgentInitialized {
