@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?><chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="MasterWorker">
-    <info>
-        <title>Master-Worker API</title>
+<info>
+<title xml:id="MasterWorkerAPI_36">Master-Worker API</title>
     </info>
-    <section xml:id="ms_overview">
-        <info>
-            <title>Overview</title>
+    <section xml:id="ms_overview"><info><title>Overview</title>
         </info>
 
         <para>Master-Worker computations are the most common case of distributed computations. They are suited well for
@@ -65,9 +63,7 @@
         </orderedlist>
 
         
-        <figure>            
-            <info>                
-                <title>Master-Worker API main class</title>
+	<figure xml:id="MasterWorkerAPImainclass_36"><info><title>Master-Worker API main class</title>
             </info>
 
             <mediaobject>
@@ -78,9 +74,7 @@
         </figure>
     </section>
 
-        <section>          
-            <info>                
-                <title>Logger Settings</title>            
+        <section xml:id="LoggerSettings_36"><info><title>Logger Settings</title>            
             </info>
 
             <para>Before using the Master-Worker, launch the examples, or write your own code, it is very useful to
@@ -94,9 +88,7 @@
 
 
 
-        <section>
-            <info>
-                <title>Master Creation And Deployment</title>
+        <section xml:id="MasterCreationAndDeployment_36"><info><title>Master Creation And Deployment</title>
             </info>
             <para>When creating the master the user application has the possibility to create either a local master (on
                 the machine the user application is running on) or a remote master. Regardless of the way it is created
@@ -126,11 +118,7 @@
                 .
             </para>
 
-            <figure>
-                <info>
-                    <title>
-                        Deployment of the Master-Worker framework
-                    </title>
+            <figure xml:id="deployment_of_mw_framework"><info><title>Deployment of the Master-Worker framework</title>
                 </info>
 
 
@@ -148,13 +136,11 @@
                 communication and load balancing automatically. In the following figures we will show only the case of
                 several single core machines as the same principles apply regardless of machine type.
             </para>
-        <section>
-                <info>
-                    <title>Local Master creation</title>
+        <section xml:id="LocalMastercreation_36"><info><title>Local Master creation</title>
                 </info>
 
                 <para>In order to create a local master we use a constructor without parameters</para>
-                <programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/master_creation.snip"/></textobject></programlisting>
+                <programlisting language="java"><textobject><textdata fileref="automatic_snippets/master_creation.snip"/></textobject></programlisting>
                 <para>Using this constructor, a master will be created in the current JVM, the master will share CPU
                     usage and memory with the user JVM. This master will compute tasks of type
                     <literal>A</literal>
@@ -163,16 +149,14 @@
                     objects as a results.
                 </para>
             </section>
-            <section>
-                <info>
-                    <title>Remote Master creation</title>
+            <section xml:id="RemoteMastercreation_36"><info><title>Remote Master creation</title>
                 </info>
 
                 <para>In order to create a remote master the following constructors can be used:</para>
                 
-                <programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/masterworker_constructor.snip"/></textobject></programlisting>
+                <programlisting language="java"><textobject><textdata fileref="automatic_snippets/masterworker_constructor.snip"/></textobject></programlisting>
 
-                <programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/masterworker_constructor_remote.snip"/></textobject></programlisting>
+                <programlisting language="java"><textobject><textdata fileref="automatic_snippets/masterworker_constructor_remote.snip"/></textobject></programlisting>
 
                 <para>Using either of these constructors, a master will be created in the specified remote
                     resource(JVM), the master will share CPU usage and memory with existing running applications on the
@@ -183,15 +167,13 @@
                 </para>
             </section>
             </section>
-            <section>
-                <info>
-                    <title>Adding Resources</title>
+            <section xml:id="AddingResources_36"><info><title>Adding Resources</title>
                 </info>
 
                 <para>Now that the master has been created, resources (Workers) must be added to it. The following
                     methods can be used for creating workers:
                 </para>
-                <programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/masterworker_addresources.snip"/></textobject></programlisting>
+                <programlisting language="java"><textobject><textdata fileref="automatic_snippets/masterworker_addresources.snip"/></textobject></programlisting>
                 <para>The first two methods will tell the master to create workers on already deployed ProActive
                     resources. The last two methods will ask the master to deploy resources using a ProActive descriptor
                     and to create workers on top of these resources. For a complete explanation of ProActive's
@@ -202,9 +184,7 @@
 
         </section>
 
-        <section>
-            <info>
-                <title>Tasks definition and submission</title>
+        <section xml:id="Tasksdefinitionandsubmission_360"><info><title>Tasks definition and submission</title>
             </info>
 
             <para>Tasks are submitted through classes that implement the
@@ -228,9 +208,7 @@
             </para>
 
             <para>
-                <figure>
-                    <info>
-                        <title>Tasks definition and submission</title>
+		    <figure  xml:id="Tasksdefinitionandsubmission_36"><info><title>Tasks definition and submission</title>
                     </info>
 
 
@@ -246,7 +224,7 @@
                 <literal>org.objectweb.proactive.extensions.masterworker.interfaces.Task</literal>
             </para>
 
-            <programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/masterworker_task.snip"/></textobject></programlisting>
+            <programlisting language="java"><textobject><textdata fileref="automatic_snippets/masterworker_task.snip"/></textobject></programlisting>
 
             <para>Users need to implement the
                 <literal>Task</literal>
@@ -258,7 +236,7 @@
             </para>
 		
 			<para>The tasks are submitted to the master which in turn sends them to the workers. The following method submits the tasks: </para>
-            <programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/masterworker_solve.snip"/></textobject></programlisting>
+            <programlisting language="java"><textobject><textdata fileref="automatic_snippets/masterworker_solve.snip"/></textobject></programlisting>
             <warning><para>
                 The master keeps a track of task objects that have
                 been submitted to it and which are currently computing.
@@ -271,9 +249,7 @@
 
        </section>
  
-        <section xml:id="ms_principle_gathering">
-            <info>
-                <title>Results retrieval and reception order</title>
+        <section xml:id="ms_principle_gathering"><info><title>Results retrieval and reception order</title>
             </info>
 
             <para>Results are collected by the master when the calculations are complete.</para>
@@ -284,9 +260,7 @@
             </para>
 
             <para>
-                <figure>
-                    <info>
-                        <title>Results gathering</title>
+		    <figure xml:id="Resultsgathering_36"><info><title>Results gathering</title>
                     </info>
 
                     <mediaobject>
@@ -325,7 +299,7 @@
                 <emphasis>Submission</emphasis>
                 order using the following method :
             </para>
-            <programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/masterworker_order.snip"/></textobject></programlisting>
+            <programlisting language="java"><textobject><textdata fileref="automatic_snippets/masterworker_order.snip"/></textobject></programlisting>
             <para>The default mode of the Master-Worker API is
                 <emphasis>Completion</emphasis>
                 order. The mode can be switched dynamically, which means that subsequent calls to wait methods (see
@@ -355,18 +329,16 @@
                 </itemizedlist>
             </para>
 
-            <programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/masterworker_collection.snip"/></textobject></programlisting>
+            <programlisting language="java"><textobject><textdata fileref="automatic_snippets/masterworker_collection.snip"/></textobject></programlisting>
 
         </section>
 
 
-        <section>
-            <info>
-                <title>Terminating the master</title>
+        <section xml:id="Terminatingthemaster_36"><info><title>Terminating the master</title>
             </info>
 
 
-            <programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/masterworker_terminate.snip"/></textobject></programlisting>
+            <programlisting language="java"><textobject><textdata fileref="automatic_snippets/masterworker_terminate.snip"/></textobject></programlisting>
 
             <para>One single method is used to terminate the master. A boolean parameter tells the master to free
                 resources or not (i.e. terminate remote JVMs).
@@ -376,9 +348,7 @@
     
         
 
-            <section>
-                <info>
-                    <title>Worker ping period</title>
+            <section xml:id="Workerpingperiod_36"><info><title>Worker ping period</title>
                 </info>
 
                 <para>At regular intervals, the Master sends a "ping" message to every Worker to check if they are
@@ -386,14 +356,12 @@
                     messages. The default value of this parameter is 10000 (which corresponds to 10 seconds).
                 </para>
                 <para>In order to change this default value, the method described underneath can be called :</para>
-                <programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/masterworker_ping.snip"/></textobject></programlisting>
+                <programlisting language="java"><textobject><textdata fileref="automatic_snippets/masterworker_ping.snip"/></textobject></programlisting>
                 <para>If the Master does not receive an answer for the ping it will remove the Worker from its list and
                     reassign the tasks the Worker has been assigned.
                 </para>
             </section>
-            <section>
-                <info>
-                    <title>Worker task flooding</title>
+            <section xml:id="Workertaskflooding_36"><info><title>Worker task flooding</title>
                 </info>
 
                 <para>The Master-Worker API's internal scheduling mechanism is quite simple as it is based on a pulling
@@ -408,14 +376,12 @@
                     small value (1-5).
                 </para>
                 <para>Use the following method to change the flooding parameter :</para>
-                <programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/masterworker_flood.snip"/></textobject></programlisting>
+                <programlisting language="java"><textobject><textdata fileref="automatic_snippets/masterworker_flood.snip"/></textobject></programlisting>
             </section>
             
             
             
-        <section xml:id="ms_Workermemory">
-            <info>
-                <title>Worker Memory</title>
+        <section xml:id="ms_Workermemory"><info><title>Worker Memory</title>
             </info>
 
 
@@ -435,9 +401,7 @@
                     memory, and if a worker modifies its memory, the memory of other workers will not be affected.
                 </para>
 
-                <section>
-                    <info>
-                        <title>Structure and API</title>
+                <section xml:id="StructureandAPI_36"><info><title>Structure and API</title>
                     </info>
 
                     <para>The Worker memory structure is very simple: it consists of
@@ -455,11 +419,9 @@
                         method. The user can use this interface to save, load or erase objects in the local worker's
                         memory. Below is the detailed WorkerMemory interface:
                     </para>
-                    <programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/masterworker_worker_memory.snip"/></textobject></programlisting>
+                    <programlisting language="java"><textobject><textdata fileref="automatic_snippets/masterworker_worker_memory.snip"/></textobject></programlisting>
                 </section>
-                <section>
-                    <info>
-                        <title>Storing data</title>
+                <section xml:id="Storingdata_36"><info><title>Storing data</title>
                     </info>
 
                     <para>A user can store data in the Workers' memory either when :</para>
@@ -484,9 +446,7 @@
                         store the given data.
                     </para>
                 </section>
-                <section>
-                    <info>
-                        <title>Retrieving and using the data</title>
+                <section xml:id="Retrievingandusingthedata_36"><info><title>Retrieving and using the data</title>
                     </info>
 
                     <para>Loading and using any object stored in a Worker's memory is simply done through the
@@ -501,9 +461,7 @@
                 </section>
             </section>
         
-    <section xml:id="ms_example">
-        <info>
-            <title>Monte-Carlo PI Example</title>
+    <section xml:id="ms_example"><info><title xml:id="MonteCarloPIExample_36">Monte-Carlo PI Example</title>
         </info>
 
 
@@ -519,23 +477,23 @@
             value of PI with an arbitrary precision. The more points generated the better the accuracy for PI.
         </para>
 
-        <programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/masterworker_montecarlopi.snip"/></textobject></programlisting>
+        <programlisting language="java"><textobject><textdata fileref="automatic_snippets/masterworker_montecarlopi.snip"/></textobject></programlisting>
 
         <para>In the main method the master is created and resources are added using a deployment descriptor .</para>
 
-        <programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/masterworker_montecarlopi_master_creation.snip"/></textobject></programlisting>
+        <programlisting language="java"><textobject><textdata fileref="automatic_snippets/masterworker_montecarlopi_master_creation.snip"/></textobject></programlisting>
 
         <para>After the master is created the tasks are created and submitted to the master.</para>
 
-        <programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/masterworker_montecarlopi_tasks_submit.snip"/></textobject></programlisting>
+        <programlisting language="java"><textobject><textdata fileref="automatic_snippets/masterworker_montecarlopi_tasks_submit.snip"/></textobject></programlisting>
 
         <para>After the task submission the results are gathered and displayed.</para>
 
-        <programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/masterworker_montecarlopi_results.snip"/></textobject></programlisting>
+        <programlisting language="java"><textobject><textdata fileref="automatic_snippets/masterworker_montecarlopi_results.snip"/></textobject></programlisting>
 
 
         <para>Finally, the master is terminated (all resources are freed) and the program exits.</para>
 
-        <programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/masterworker_montecarlopi_terminate.snip"/></textobject></programlisting>
+        <programlisting language="java"><textobject><textdata fileref="automatic_snippets/masterworker_montecarlopi_terminate.snip"/></textobject></programlisting>
     </section>
 </chapter>

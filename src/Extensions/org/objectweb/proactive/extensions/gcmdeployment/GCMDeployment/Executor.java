@@ -67,7 +67,7 @@ public class Executor {
         command = command.replaceAll("'", "\"");
         logger.debug("Command submited: " + command);
         try {
-            System.out.println("executing command=" + command);
+            logger.info("executing command=" + command);
 
             Process p = null;
             switch (OperatingSystem.getOperatingSystem()) {
@@ -109,6 +109,7 @@ public class Executor {
             this.stream = stream;
             this.cmd = cmd;
             setDaemon(true);
+            setName("GCM Deployment" + type.toString() + " Monitor for " + cmd.subSequence(0, 100));
         }
 
         @Override

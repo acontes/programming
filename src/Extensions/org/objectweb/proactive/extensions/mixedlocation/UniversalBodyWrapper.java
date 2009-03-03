@@ -32,6 +32,7 @@
 package org.objectweb.proactive.extensions.mixedlocation;
 
 import java.io.IOException;
+import java.net.URI;
 import java.security.AccessControlException;
 import java.security.PublicKey;
 
@@ -57,6 +58,7 @@ import org.objectweb.proactive.core.security.securityentity.Entities;
 import org.objectweb.proactive.core.security.securityentity.Entity;
 
 
+@SuppressWarnings("serial")
 public class UniversalBodyWrapper implements UniversalBody, Runnable {
 
     /**
@@ -266,8 +268,13 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
         throw new ProActiveRuntimeException("create shortcut method not implemented yet");
     }
 
+    @Deprecated
     public void register(String url) throws IOException, UnknownProtocolException {
         this.wrappedBody.register(url);
+    }
+
+    public String registerByName(String name) throws IOException {
+        return this.wrappedBody.registerByName(name);
     }
 
     public ProActiveSecurityManager getProActiveSecurityManager(Entity user)

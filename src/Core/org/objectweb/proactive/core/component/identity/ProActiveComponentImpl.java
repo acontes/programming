@@ -67,6 +67,7 @@ import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.ProActiveInterface;
+import org.objectweb.proactive.core.component.ProActiveInterfaceImpl;
 import org.objectweb.proactive.core.component.config.ComponentConfigurationHandler;
 import org.objectweb.proactive.core.component.controller.AbstractProActiveController;
 import org.objectweb.proactive.core.component.controller.MembraneController;
@@ -146,6 +147,14 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
 
         // 3. external functional interfaces
         addFunctionalInterfaces(component_is_primitive);
+
+        for (Interface itf : controlItfs.values()) {
+            // TODO Check with component controller
+            ProActiveController itfImpl = (ProActiveController) ((ProActiveInterfaceImpl) itf).getFcItfImpl();
+            if (itfImpl != null) { // due to non-functional interface implemented using component
+                itfImpl.initController();
+            }
+        }
 
         // put all in a table
         // interfaceReferences = interface_references_list.toArray(new Interface[interface_references_list.size()]);
@@ -397,6 +406,22 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
                 }
 
                 controllerClass = Class.forName((String) controllers.get(controllerItf.getName()));
+
+                //create Binding and Content controllers only if necessary
+                if (BindingController.class.isAssignableFrom(controllerClass) &&
+                    componentParameters.getHierarchicalType().equals(Constants.PRIMITIVE) &&
+                    (componentParameters.getClientInterfaceTypes().length == 0)) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Component '" + componentParameters.getName() +
+                            "' does not have any client interface, cancel the BindingController creation");
+                    }
+                    continue;
+                }
+                if (isPrimitive && ContentController.class.isAssignableFrom(controllerClass)) {
+                    // no content controller for a primitive component
+                    continue;
+                }
+
                 Constructor<?> controllerClassConstructor = controllerClass
                         .getConstructor(new Class[] { Component.class });
                 currentController = (AbstractProActiveController) controllerClassConstructor
@@ -412,7 +437,8 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
                 } else if (inputInterceptorsSignatures.contains(controllerClass.getName())) {
                     logger
                             .error(controllerClass.getName() +
-                                " was specified as input interceptor in the configuration file, but it is not an input interceptor since it does not implement the InputInterceptor interface");
+                                " was specified as input interceptor in the configuration file, but it is not an input interceptor since it does not implement the " +
+                                InputInterceptor.class.getName() + " interface");
                 }
 
                 if (OutputInterceptor.class.isAssignableFrom(controllerClass)) {
@@ -421,54 +447,25 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
                 } else if (outputInterceptorsSignatures.contains(controllerClass.getName())) {
                     logger
                             .error(controllerClass.getName() +
-                                " was specified as output interceptor in the configuration file, but it is not an output interceptor since it does not implement the OutputInterceptor interface");
+                                " was specified as output interceptor in the configuration file, but it is not an output interceptor since it does not implement the " +
+                                OutputInterceptor.class.getName() + " interface");
                 }
             } catch (Exception e) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("could not create controller", e);
-                }
-                throw new ProActiveRuntimeException("could not create controller '" +
-                    controllers.get(controllerItfName) + "' (please check your configuration file " +
+                throw new ProActiveRuntimeException("Could not create controller '" +
+                    controllers.get(controllerItfName) + "' while instantiating '" +
+                    componentParameters.getName() + "' component (please check your configuration file " +
                     componentParameters.getControllerDescription().getControllersConfigFileLocation() +
-                    " : " + e.getMessage(), e);
-            }
-
-            if (BindingController.class.isAssignableFrom(controllerClass)) {
-                if ((componentParameters.getHierarchicalType().equals(Constants.PRIMITIVE) && (componentParameters
-                        .getClientInterfaceTypes().length == 0))) {
-                    // bindingController = null;
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("user component class of '" + componentParameters.getName() +
-                            "' does not have any client interface. It will have no BindingController");
-                    }
-
-                    continue;
-                }
-            }
-
-            if (ContentController.class.isAssignableFrom(controllerClass)) {
-                if (isPrimitive) {
-                    // no content controller here
-                    continue;
-                }
+                    ") : " + e.getMessage(), e);
             }
 
             if (NameController.class.isAssignableFrom(controllerClass)) {
                 ((NameController) theController.getFcItfImpl()).setFcName(componentParameters.getName());
             }
-            /*We won't need this mecanism*/
-            //if (lastController != null) {
-            //    lastController.setNextHandler(currentController);
-            //} else {
-            //   firstControllerRequestHandler = currentController;
-            //}
-            //lastController = currentController;
+
             controlItfs.put(currentController.getFcItfName(), theController);
             nfType.add((InterfaceType) theController.getFcItfType());
         }
-        //        ProActiveInterface it = (ProActiveInterface) controlItfs
-        //                .get(Constants.COMPONENT_PARAMETERS_CONTROLLER);
-        //        Object parametersController = it.getFcItfImpl();
+
         try {//Setting the real NF type, as some controllers may not be generated
             Component boot = Fractal.getBootstrapComponent();
             TypeFactory type_factory = Fractal.getTypeFactory(boot);
@@ -480,7 +477,6 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
             logger.warn("NF type could not be set");
         }
         // add the "component" control itfs
-        //lastController.setNextHandler(this);
     }
 
     /**
@@ -658,10 +654,6 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
      */
     public ComponentParameters getComponentParameters() {
         return this.componentParameters;
-    }
-
-    public void setComponentParameters(ComponentParameters componentParameters) {
-        this.componentParameters = componentParameters;
     }
 
     /**

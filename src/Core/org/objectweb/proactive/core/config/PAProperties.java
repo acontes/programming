@@ -136,6 +136,17 @@ public enum PAProperties {
     LOG4J_DEFAULT_INIT_OVERRIDE("log4j.defaultInitOverride", PAPropertiesType.BOOLEAN),
 
     /**
+     * URI of the remote log collector
+     * 
+     */
+    PA_LOG4J_COLLECTOR("proactive.log4j.collector", PAPropertiesType.STRING),
+
+    /**
+     * Qualified name of the flushing provider to use
+     */
+    PA_LOG4J_APPENDER_PROVIDER("proactive.log4j.appender.provider", PAPropertiesType.STRING),
+
+    /**
      * Activates ProActive classloader
      */
     PA_CLASSLOADER("proactive.classloader", PAPropertiesType.BOOLEAN),
@@ -201,7 +212,8 @@ public enum PAProperties {
      * ProActive Runtime Hostname (or IP Address)
      *
      * This option can be used to set manually the Runtime IP Address. Can be
-     * useful when the Java networking stack return a bad IP address (example: multihomed machines)
+     * useful when the Java networking stack return a bad IP address (example: multihomed machines).
+     * 
      */
     PA_HOSTNAME("proactive.hostname", PAPropertiesType.STRING),
 
@@ -214,6 +226,11 @@ public enum PAProperties {
      *
      */
     PA_NET_USE_IP_ADDRESS("proactive.useIPaddress", PAPropertiesType.BOOLEAN),
+
+    /** Enable or disable IPv6 
+     * 
+     */
+    PA_NET_DISABLE_IPv6("proactive.net.disableIPv6", PAPropertiesType.BOOLEAN),
 
     /**
      * Toggle loopback IP address usage
@@ -240,6 +257,12 @@ public enum PAProperties {
      */
     PA_NET_INTERFACE("proactive.net.interface", PAPropertiesType.STRING),
 
+    /** Select the netmask to use (xxx.xxx.xxx.xxx/xx)
+     * 
+     * Does not work with IPv6 addresses
+     */
+    PA_NET_NETMASK("proactive.net.netmask", PAPropertiesType.STRING),
+
     /**
      * RMI/SSH black voodoo
      *
@@ -248,6 +271,17 @@ public enum PAProperties {
      */
     PA_NET_SECONDARYNAMES("proactive.net.secondaryNames", PAPropertiesType.STRING), SCHEMA_VALIDATION(
             "schema.validation", PAPropertiesType.BOOLEAN, true),
+
+    /** The address of the router to use. Must be set if message routing is enabled 
+     * 
+     * Can be FQDN or an IP address
+     */
+    PA_NET_ROUTER_ADDRESS("proactive.net.router.address", PAPropertiesType.STRING),
+
+    /** The port of the router to use. Must be set if message routing is enabled
+     * 
+     */
+    PA_NET_ROUTER_PORT("proactive.net.router.port", PAPropertiesType.INTEGER),
 
     /* ------------------------------------
      *  RMI
@@ -418,46 +452,6 @@ public enum PAProperties {
     PA_MASTERWORKER_COMPRESSTASKS("proactive.masterworker.compresstasks", PAPropertiesType.BOOLEAN),
 
     /* ------------------------------------
-     *  PEER TO PEER
-     */
-
-    /** Acquisition method. */
-    PA_P2P_ACQUISITION("proactive.p2p.acq", PAPropertiesType.STRING),
-
-    /** Port number. */
-    PA_P2P_PORT("proactive.p2p.port", PAPropertiesType.INTEGER),
-
-    /** NOA is in number of peers. */
-    PA_P2P_NOA("proactive.p2p.noa", PAPropertiesType.INTEGER),
-
-    /** TTU is in minutes. */
-    PA_P2P_TTU("proactive.p2p.ttu", PAPropertiesType.INTEGER),
-
-    /** TTL is in hops. */
-    PA_P2P_TTL("proactive.p2p.ttl", PAPropertiesType.INTEGER),
-
-    /** List capacity of message sequence number. */
-    PA_P2P_MSG_MEMORY("proactive.p2p.msg_capacity", PAPropertiesType.INTEGER),
-
-    /** Percentage of agree response. */
-    PA_P2P_EXPLORING_MSG("proactive.p2p.expl_msg", PAPropertiesType.INTEGER),
-
-    /** Timeout for node acquisition. */
-    PA_P2P_NODES_ACQUISITION_T0("proactive.p2p.nodes_acq_to", PAPropertiesType.INTEGER),
-
-    /** Lookup frequency for nodes. */
-    PA_P2P_LOOKUP_FREQ("proactive.p2p.lookup_freq", PAPropertiesType.INTEGER),
-
-    /** If true deploying one shared nodes by CPU, else only one node is shared. */
-    PA_P2P_MULTI_PROC_NODES("proactive.p2p.multi_proc_nodes", PAPropertiesType.BOOLEAN),
-
-    /** Path of the xml deployment descriptor, for deploying shared nodes. */
-    PA_P2P_XML_PATH("proactive.p2p.xml_path", PAPropertiesType.STRING),
-
-    /** Boolean value for disable node sharing. */
-    PA_P2P_NO_SHARING("proactive.p2p.nosharing", PAPropertiesType.BOOLEAN),
-
-    /* ------------------------------------
      *  DISTRIBUTED GARBAGE COLLECTOR
      */
 
@@ -521,6 +515,9 @@ public enum PAProperties {
      * after a functional test are found by using this property
      */
     PA_TEST("proactive.test", PAPropertiesType.BOOLEAN),
+
+    /** Duration of each performance test in ms */
+    PA_TEST_PERF_DURATION("proactive.test.perf.duration", PAPropertiesType.INTEGER),
 
     /**
      * Functional test timeout in ms

@@ -7,7 +7,7 @@
     <secondary>definition</secondary>
   </indexterm>
 
-  <section xml:id="Descriptor_html_objectives"><info><title>Objectives</title></info>
+  <section xml:id="Descriptor_html_objectives"><info><title xml:id="Objectives_1">Objectives</title></info>
     
 
     <para>Parameters tied to the deployment of an application should be
@@ -102,7 +102,7 @@
     source code</para>
   </section>
 
-  <section xml:id="Descriptor_Principles"><info><title>Principles</title></info>
+  <section xml:id="Descriptor_Principles"><info><title xml:id="Principles_1">Principles</title></info>
     
 
     <itemizedlist>
@@ -110,7 +110,7 @@
         <para><emphasis role="bold">Within a ProActive program, active objects
         are still created on Nodes</emphasis></para>
 
-        <para><programlisting xml:lang="java"> newActive(String, Object[], Node); </programlisting></para>
+        <para><programlisting language="java"> newActive(String, Object[], Node); </programlisting></para>
       </listitem>
     </itemizedlist>
 
@@ -176,7 +176,7 @@
         Object(member of the group) is created on each nodes mapped to the
         VirtualNode given as parameter</emphasis></para>
 
-        <para><programlisting xml:lang="java">       newActiveAsGroup(String, Object[], VirtualNode);
+        <para><programlisting language="java">       newActiveAsGroup(String, Object[], VirtualNode);
        turnActiveAsGroup(Object, String, VirtualNode); </programlisting></para>
       </listitem>
     </itemizedlist>
@@ -211,7 +211,7 @@
             </listitem>
 
             <listitem>
-              <para>fault tolerance, P2P, security</para>
+              <para>fault tolerance, security</para>
             </listitem>
           </itemizedlist></para>
       </listitem>
@@ -221,7 +221,7 @@
       <listitem>
         <para><emphasis role="bold">Example:</emphasis></para>
 
-        <para><programlisting xml:lang="xml"> &lt;ProActiveDescriptor
+        <para><programlisting language="xml"> &lt;ProActiveDescriptor
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:noNamespaceSchemaLocation='DescriptorSchema.xsd'&gt;                            
   &lt;componentDefinition&gt;
@@ -294,17 +294,17 @@
     get nodes associated to VirtualNodes.</para>
   </section>
 
-  <section xml:id="Descriptor_html_vn"><info><title>Different types of VirtualNodes</title></info>
+  <section xml:id="Descriptor_html_vn"><info><title xml:id="DifferenttypesofVirtualNodes_1">Different types of VirtualNodes</title></info>
     
 
-    <section><info><title>VirtualNodes Definition</title></info>
+    <section xml:id="VirtualNodesDefinition_1"><info><title>VirtualNodes Definition</title></info>
       
 
       <para><itemizedlist>
           <listitem>
             <para>Mapping one to one: 1 VN --&gt; 1 JVM</para>
 
-            <para><programlisting xml:lang="xml"> &lt;virtualNodesDefinition&gt;                                  
+            <para><programlisting language="xml"> &lt;virtualNodesDefinition&gt;
   &lt;virtualNode name='<emphasis role="bold">Dispatcher</emphasis>'/&gt;
  &lt;/virtualNodesDefinition&gt;
  &lt;deployment&gt;
@@ -471,7 +471,7 @@
         </itemizedlist></para>
     </section>
 
-    <section><info><title>VirtualNodes Acquisition</title></info>
+    <section xml:id="VirtualNodesAcquisition_1"><info><title>VirtualNodes Acquisition</title></info>
       
 
       <indexterm>
@@ -514,7 +514,7 @@
       org.objectweb.proactive.core.descriptor.data.VirtualNode to update the
       value and to perform the lookup. Typical example of code:</para>
 
-      <programlisting xml:lang="java">ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(String xmlFileLocation);          </programlisting>
+      <programlisting language="java">ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(String xmlFileLocation);          </programlisting>
 
       <para>//----------- Returns a ProActiveDescriptor object from the xml
       file</para>
@@ -541,21 +541,21 @@
       tags in the descriptor as well as programmatically using static methods
       provided in org.objectweb.Proactive class:</para>
 
-      <programlisting xml:lang="java">PADeployment.registerVirtualNode(
+      <programlisting language="java">PADeployment.registerVirtualNode(
         VirtualNode virtualNode, 
         String registrationProtocol, 
         boolean replacePreviousBinding );          </programlisting>
 
-      <programlisting xml:lang="java">PADeployment.lookupVirtualNode(String url, String protocol);          </programlisting>
+      <programlisting language="java">PADeployment.lookupVirtualNode(String url, String protocol);          </programlisting>
 
-      <programlisting xml:lang="java">PADeployment.unregisterVirtualNode(VirtualNode virtualNode);          </programlisting>
+      <programlisting language="java">PADeployment.unregisterVirtualNode(VirtualNode virtualNode);          </programlisting>
     </section>
   </section>
 
-  <section xml:id="Descriptor_html_jvms"><info><title>Different types of JVMs</title></info>
+  <section xml:id="Descriptor_html_jvms"><info><title xml:id="DifferenttypesofJVMs_1">Different types of JVMs</title></info>
     
 
-    <section><info><title>Creation</title></info>
+    <section xml:id="Creation_1"><info><title>Creation</title></info>
       
 
       <para><itemizedlist>
@@ -598,7 +598,7 @@
         </itemizedlist></para>
     </section>
 
-    <section><info><title>Acquisition</title></info>
+    <section xml:id="Acquisition_1"><info><title>Acquisition</title></info>
       
 
       <indexterm>
@@ -610,7 +610,7 @@
       <para>Descriptors give the ability to acquire JVMs instead of creating
       them. To do so, it must be specified in the <emphasis role="bold">acquisition</emphasis> tag which service to use in oder to
       acquire the JVMs. Services will be described below, in the
-      infrastructure part. At this point 2 services are provided: <emphasis role="bold">RMIRegistryLookup</emphasis> and <emphasis role="bold">P2PService</emphasis> service.</para>
+      infrastructure part. At this point one service is provided: the <emphasis role="bold">RMIRegistryLookup</emphasis> service.</para>
 
       <screen> ...........................                          
  &lt;jvm name='<emphasis role="bold">jvm1</emphasis>'&gt;
@@ -628,7 +628,7 @@
     </section>
   </section>
 
-  <section xml:id="Descriptor_html_validation"><info><title>Validation against XML Schema</title></info>
+  <section xml:id="Descriptor_html_validation"><info><title xml:id="ValidationagainstXMLSchema_1">Validation against XML Schema</title></info>
     
 
     <para>To avoid mistake when building XML descriptors, ProActive provides
@@ -651,7 +651,7 @@
     as XMLSPY5.0(windows) can also be used to validate XML descriptors.</para>
   </section>
 
-  <section><info><title>Complete description and examples</title></info>
+  <section xml:id="Completedescriptionandexamples_1"><info><title>Complete description and examples</title></info>
     
 
     <para>Following XML files examples are used for the C3D application. The
@@ -659,7 +659,7 @@
     read every time a C3DUser is added. Both files contain many features
     described earlier in this document.</para>
 
-    <example><info><title>C3D_Dispatcher_Render.xml</title></info>
+    <example xml:id="C3D_Dispatcher_Renderxml_1"><info><title>C3D_Dispatcher_Render.xml</title></info>
     
       
 
@@ -739,7 +739,7 @@
     activated. <emphasis role="bold">Renderer</emphasis> is mapped to a set of
     JVMs called <emphasis role="bold">Jvm1</emphasis>, ..., <emphasis role="bold">Jvm4</emphasis>.</para>
 
-    <example><info><title>C3D_User.xml</title></info>
+    <example xml:id="C3D_Userxml_1"><info><title>C3D_User.xml</title></info>
     
       
 
@@ -799,7 +799,7 @@
     the creation tag is <emphasis role="bold">localJVM</emphasis>, there must
     be a process defined in the <emphasis role="bold">infrastructure</emphasis> with the id <emphasis role="bold">localJVM</emphasis></para>
 
-    <section><info><title>Local JVMs</title></info>
+    <section xml:id="LocalJVMs_1"><info><title>Local JVMs</title></info>
       
 
       <indexterm>
@@ -910,7 +910,7 @@
 </screen>
     </section>
 
-    <section><info><title>Remote JVMs</title></info>
+    <section xml:id="RemoteJVMs_1"><info><title>Remote JVMs</title></info>
       
 
       <para>With XML Deployment Descriptor, <emphasis role="bold">ProActive</emphasis> provides the ability to create remote
@@ -933,7 +933,7 @@
 
       <!-- This paragraph only appears in the html version  -->
 
-      <para os="html">You can find <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="../examples_legacy_descriptors/">here</link>
+      <para os="html">You can find <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="../../../descriptors/examples_legacy_descriptors/">here</link>
       several examples of supported protocols and useful combinations.</para>
 
       <!-- This paragraph only appears in the pdfversion  -->
@@ -990,7 +990,7 @@
 
           <para>The following is a complete RSH deployment example.</para>
           
-          <programlisting xml:lang="xml"><textobject><textdata fileref="examples_legacy_descriptors/RSH_Example.xml"> </textdata></textobject></programlisting>
+          <programlisting language="xml"><textobject><textdata fileref="../../descriptors/examples_legacy_descriptors/RSH_Example.xml"> </textdata></textobject></programlisting>
 
         </listitem>
 
@@ -1078,7 +1078,7 @@
 
           <para>The following is a complete SSH deployment example.</para>
           
-          <programlisting xml:lang="xml"><textobject><textdata fileref="examples_legacy_descriptors/SSH_Example.xml"/></textobject></programlisting>
+          <programlisting language="xml"><textobject><textdata fileref="../../descriptors/examples_legacy_descriptors/SSH_Example.xml"/></textobject></programlisting>
         </listitem>
 
         <listitem xml:id="Descriptor_html_processlist" xreflabel="Process list">
@@ -1188,9 +1188,9 @@
 
           <para>The following are example of SSH deployment using lists of hosts.</para>
           
-          <programlisting xml:lang="xml"><textobject><textdata fileref="examples_legacy_descriptors/SSHList_example.xml"/></textobject></programlisting>
+          <programlisting language="xml"><textobject><textdata fileref="../../descriptors/examples_legacy_descriptors/SSHList_example.xml"/></textobject></programlisting>
            <para>and</para>
-           <programlisting xml:lang="xml"><textobject><textdata fileref="examples_legacy_descriptors/SSHListbyHost_Example.xml"/></textobject></programlisting>
+           <programlisting language="xml"><textobject><textdata fileref="../../descriptors/examples_legacy_descriptors/SSHListbyHost_Example.xml"/></textobject></programlisting>
           
         </listitem>
 
@@ -1312,7 +1312,7 @@
           in the bsub command: interactive mode, and the name of the
           queue.</para>
 
-		<programlisting><textobject><textdata fileref="examples_legacy_descriptors/SSH_LSF_Example.xml"/></textobject></programlisting>
+		<programlisting><textobject><textdata fileref="../../descriptors/examples_legacy_descriptors/SSH_LSF_Example.xml"/></textobject></programlisting>
 
         </listitem>
 
@@ -1378,7 +1378,7 @@
           frontend_host of the script pbsStartRuntime.sh(default is
           /user.home/ProActive/dist/scripts/unix/cluster/pbsStartRuntime.sh).</para>
 		
-		<programlisting><textobject><textdata fileref="examples_legacy_descriptors/SSH_PBS_Example.xml"/></textobject></programlisting>
+		<programlisting><textobject><textdata fileref="../../descriptors/examples_legacy_descriptors/SSH_PBS_Example.xml"/></textobject></programlisting>
 
         </listitem>
 
@@ -1441,7 +1441,7 @@
           frontend_host of the script gridEngineStartRuntime.sh (default is
           /user.home/ProActive/dist/scripts/unix/cluster/gridEngineStartRuntime.sh).</para>
 
-	<programlisting xml:lang="xml"><textobject><textdata fileref="examples_legacy_descriptors/SSH_SGE_Example.xml"/></textobject></programlisting>
+	<programlisting language="xml"><textobject><textdata fileref="../../descriptors/examples_legacy_descriptors/SSH_SGE_Example.xml"/></textobject></programlisting>
           
         </listitem>
 
@@ -1502,9 +1502,9 @@
           to the main options specified in an OAR system. <emphasis role="bold">ScriptPath</emphasis> represents the location on the
           frontend_host of the script oarStartRuntime.sh (default is
           /user.home/ProActive/dist/scripts/unix/cluster/oarStartRuntime.sh).</para>
-			<programlisting><textobject><textdata fileref="examples_legacy_descriptors/SSH_Example.xml"/></textobject></programlisting>
+			<programlisting><textobject><textdata fileref="../../descriptors/examples_legacy_descriptors/SSH_Example.xml"/></textobject></programlisting>
           <para> and </para>
-          <programlisting><textobject><textdata fileref="examples_legacy_descriptors/SSH_OARGRID_Example.xml"/></textobject></programlisting>
+          <programlisting><textobject><textdata fileref="../../descriptors/examples_legacy_descriptors/SSH_OARGRID_Example.xml"/></textobject></programlisting>
 
         </listitem>
 
@@ -1521,7 +1521,7 @@
           <literal>org.objectweb.proactive.core.process.prun.PrunSubProcess</literal>
           to use such protocol.</para>
 
-			<programlisting><textobject><textdata fileref="examples_legacy_descriptors/SSH_PRUN_Example.xml"/></textobject></programlisting>
+			<programlisting><textobject><textdata fileref="../../descriptors/examples_legacy_descriptors/SSH_PRUN_Example.xml"/></textobject></programlisting>
 
         </listitem>
 
@@ -1595,7 +1595,7 @@
           &lt;globusOption&gt; is neither manatory. Default value for
           &lt;count&gt; element is 1. It represents the number of processor
           requested.</para>
-			<programlisting><textobject><textdata fileref="examples_legacy_descriptors/Globus_Example.xml"/></textobject></programlisting>
+			<programlisting><textobject><textdata fileref="../../descriptors/examples_legacy_descriptors/Globus_Example.xml"/></textobject></programlisting>
         </listitem>
 
         <listitem>
@@ -1604,7 +1604,7 @@
           <para>ProActive provides
           <literal>org.objectweb.proactive.core.process.unicore.UnicoreProcess</literal>
           to use such protocol.</para>
-			<programlisting><textobject><textdata fileref="examples_legacy_descriptors/Unicore_Example.xml"/></textobject></programlisting>
+			<programlisting><textobject><textdata fileref="../../descriptors/examples_legacy_descriptors/Unicore_Example.xml"/></textobject></programlisting>
 
         </listitem>
 
@@ -1617,7 +1617,7 @@
 
           <para>To use ARC you will need to download the <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://ftp.nordugrid.org/download/index.html">ARC
           Client</link></para>
-			<programlisting><textobject><textdata fileref="examples_legacy_descriptors/NorduGrid_Example.xml"/></textobject></programlisting>
+			<programlisting><textobject><textdata fileref="../../descriptors/examples_legacy_descriptors/NorduGrid_Example.xml"/></textobject></programlisting>
 
         </listitem>
 
@@ -1635,7 +1635,7 @@
           to use such protocol.</para>
 
 
-          <programlisting><textobject><textdata fileref="examples_legacy_descriptors/SSH_GLite_Example.xml"/></textobject></programlisting>
+          <programlisting><textobject><textdata fileref="../../descriptors/examples_legacy_descriptors/SSH_GLite_Example.xml"/></textobject></programlisting>
         </listitem>
 
         <listitem>
@@ -1646,7 +1646,7 @@
           to use such protocol. You have to couple this process with the
           DependentListProcessDecorator explained below.</para>
 			
-			<programlisting><textobject><textdata fileref="examples_legacy_descriptors/SSH_MPI_Example.xml"/></textobject></programlisting>
+			<programlisting><textobject><textdata fileref="../../descriptors/examples_legacy_descriptors/SSH_MPI_Example.xml"/></textobject></programlisting>
 
 
           <para><screen>
@@ -1848,7 +1848,7 @@
       If you are not familiar with ssh, see <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://www.openssh.org">openSSH</link></para>
     </section>
 
-    <section><info><title>DependentListProcessDecorator</title></info>
+    <section xml:id="DependentListProcessDecorator_1"><info><title>DependentListProcessDecorator</title></info>
       
 
       <para>This process is used when a process is dependent on an another
@@ -1856,7 +1856,7 @@
       one must be a DependentProcess thus has to implement the
       org.objectweb.proactive.core.process.DependentProcess interface.</para>
 
-		<programlisting><textobject><textdata fileref="examples_legacy_descriptors/SSH_MPI_Example.xml"/></textobject></programlisting>
+		<programlisting><textobject><textdata fileref="../../descriptors/examples_legacy_descriptors/SSH_MPI_Example.xml"/></textobject></programlisting>
      
       <para><screen>   &lt;processDefinition id='<emphasis role="bold">dependentProcessSequence</emphasis>'&gt;
     &lt;dependentProcessSequence class='<emphasis role="bold">org.objectweb.proactive.core.process.DependentListProcessDecorator</emphasis>'&gt;
@@ -1872,18 +1872,17 @@
     </section>
   </section>
 
-  <section xml:id="Descriptor_html_services"><info><title>Infrastructure and services</title></info>
+  <section xml:id="Descriptor_html_services"><info><title xml:id="Infrastructureandservices_1">Infrastructure and services</title></info>
     
 
     <para>As mentionned previously, instead of creating jvms, ProActive gives
     the possibility to acquire existing jvms. To do so, as shown in the
-    example below, a service must be referenced in the <emphasis role="bold">acquisition</emphasis> tag. At this point two services are
+    example below, a service must be referenced in the <emphasis role="bold">acquisition</emphasis> tag. At this point one service is
     implemented: <emphasis role="bold">RMIRegistryLookup</emphasis>: this
     service performs a lookup in an RMIRegistry at the <emphasis role="bold">url specified in the service definition</emphasis> to find a
-    ProActiveRuntime(a jvm) with the given name. <emphasis role="bold">P2PService</emphasis> service allows when using ProActive's
-    P2P infrastructure to get as many jvms as desired.</para>
+    ProActiveRuntime(a jvm) with the given name.</para>
 
-    <programlisting xml:lang="xml"> &lt;?xml version='1.0' encoding='UTF-8'?&gt;                      
+    <programlisting language="xml"> &lt;?xml version='1.0' encoding='UTF-8'?&gt;
  &lt;ProActiveDescriptor
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:noNamespaceSchemaLocation='DescriptorSchema.xsd'&gt;
@@ -1898,7 +1897,6 @@
     &lt;map virtualNode='<emphasis role="bold">VnTest</emphasis>'&gt;
      &lt;jvmSet&gt;
       &lt;vmName value='<emphasis role="bold">Jvm1</emphasis>'/&gt;
-      &lt;vmName value='<emphasis role="bold">Jvm2</emphasis>'/&gt;
      &lt;/jvmSet&gt;
     &lt;/map&gt;
    &lt;/mapping&gt;
@@ -1908,11 +1906,6 @@
       &lt;<emphasis role="bold">serviceReference</emphasis> refid='<emphasis role="bold">lookupRMI</emphasis>'/&gt;
      &lt;/<emphasis role="bold">acquisition</emphasis>&gt;
     &lt;/jvm&gt;
-    &lt;jvm name='<emphasis role="bold">Jvm2</emphasis>'&gt;
-     &lt;<emphasis role="bold">acquisition</emphasis>&gt;
-      &lt;<emphasis role="bold">serviceReference</emphasis> refid='<emphasis role="bold">lookupP2P</emphasis>'/&gt;
-     &lt;/<emphasis role="bold">acquisition</emphasis>&gt;
-    &lt;/jvm&gt;
    &lt;/jvms&gt;
   &lt;/deployment&gt;
   &lt;infrastructure&gt;
@@ -1920,39 +1913,22 @@
     &lt;serviceDefinition id='<emphasis role="bold">lookupRMI</emphasis>'&gt;
      &lt;<emphasis role="bold">RMIRegistryLookup</emphasis> url='//localhost:2020/PA_JVM1'/&gt;
     &lt;/serviceDefinition&gt;
-    &lt;serviceDefinition id='<emphasis role="bold">lookupP2P</emphasis>'&gt;
-     &lt;<emphasis role="bold">P2PService</emphasis> nodesAsked='2'acq='rmi' port='2410' NOA='10' TTU='60000' TTL='10'&gt;
-      &lt;peerSet&gt;
-       &lt;peer&gt;rmi://localhost:3000&lt;/peer&gt;
-      &lt;/peerSet&gt;
-     &lt;/P2PService&gt;
-    &lt;/serviceDefinition&gt;
    &lt;/services&gt;
   &lt;/infrastructure&gt;
  &lt;/ProActiveDescriptor&gt;</programlisting>
 
     <para>The <emphasis role="bold">RMIRegistryLookup</emphasis> service needs
-    only an <emphasis role="bold">url</emphasis> to perform the lookup. Many
-    options exist for the <emphasis role="bold">P2PService</emphasis> service:
-    <emphasis role="bold">nodesAsked</emphasis> represents the number of JVMs
-    to acquire, the <emphasis role="bold">peer</emphasis> element represents
-    an entry point in the P2P system, many peers can be specified. Elements
-    <emphasis role="bold">acq</emphasis> and <emphasis role="bold">port</emphasis> represent the communication protocol and the
-    listening port for the P2P Service, if a P2P Service is already running
-    with this configuration the descriptor will use this one else a new one is
-    started. <xref linkend="p2p"/> provides more information.</para>
+    only an <emphasis role="bold">url</emphasis> to perform the lookup. </para>
 
-    <para>The example above shows a VirtualNode <emphasis role="bold">VnTest</emphasis>, that is mapped with two jvms, <emphasis role="bold">Jvm1 and Jvm2</emphasis>. <emphasis role="bold">Jvm1</emphasis> represents one jvm that will be acquired using
-    an RMI Lookup, <emphasis role="bold">Jvm2</emphasis> represents two jvms
-    that will be found in the P2P infrastructure, so at the end 3 acquired
-    jvms are expected.</para>
+    <para>The example above shows a VirtualNode <emphasis role="bold">VnTest</emphasis>, that is mapped with one jvms, <emphasis role="bold">Jvm1</emphasis>. <emphasis role="bold">Jvm1</emphasis> represents one jvm that will be acquired using
+    an RMI Lookup.</para>
 
     <para>Fault Tolerance can also be defined at the service level. See <xref linkend="faultTolerance"/> for more information.</para>
 
     <para/>
   </section>
 
-  <section><info><title>How to terminate a ProActive application</title></info>
+  <section xml:id="HowtoterminateaProActiveapplication_1"><info><title>How to terminate a ProActive application</title></info>
     
 
     <indexterm>
@@ -1960,7 +1936,7 @@
 
       <secondary>Nodes</secondary>
     </indexterm>
-	<section><info><title>Destroying active objects</title></info>
+	<section xml:id="Destroyingactiveobjects_1"><info><title>Destroying active objects</title></info>
 		
 		<para>In the master slave paradigm, the master should wait for all of
 		its slaves to be known. Then all active objects can be destroyed by
@@ -2003,7 +1979,7 @@
 		termination (letting the DGC call it) trigger the calling of the potentially
 		overloaded endActivity() method in the terminated active object.</para>
 	</section>
-	<section><info><title>Killing JVMs</title></info>
+	<section xml:id="KillingJVMs_1"><info><title>Killing JVMs</title></info>
 		
 		<para>Once active objects are destroyed, JVMs must be killed in order
 		to complete the cleanup. Alternatively, one can focus on killing the
@@ -2015,7 +1991,7 @@
     
     <programlisting><textobject><textdata fileref="automatic_snippets/proactivedescriptor.snip"/></textobject></programlisting>
 
-    <para><programlisting xml:lang="java">ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(String xmlFileLocation);
+    <para><programlisting language="java">ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(String xmlFileLocation);
 //----------- Returns a ProActiveDescriptor object from the xml file
 pad.activateMappings();
 
@@ -2036,7 +2012,7 @@ pad.killall(false);
     </section>
   </section>
 
-  <section><info><title>Processes</title></info>
+  <section xml:id="Processes_1"><info><title>Processes</title></info>
     
 
     <para>There is the possiblity to use only the infrastructure part in order

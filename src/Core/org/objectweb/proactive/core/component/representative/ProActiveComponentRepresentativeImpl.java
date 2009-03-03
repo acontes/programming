@@ -492,7 +492,7 @@ public class ProActiveComponentRepresentativeImpl implements ProActiveComponentR
         try {
             result = proxy.reify(MethodCall.getMethodCall(Class.forName(Object.class.getName())
                     .getDeclaredMethod("hashCode", new Class<?>[] {}), new Object[] {},
-                    (Map<TypeVariable, Class<?>>) null));
+                    (Map<TypeVariable<?>, Class<?>>) null));
             return ((Integer) result).intValue();
         } catch (SecurityException e) {
             throw new ProActiveRuntimeException(e.toString());
@@ -592,10 +592,6 @@ public class ProActiveComponentRepresentativeImpl implements ProActiveComponentR
 
     public ComponentParameters getComponentParameters() {
         return this.componentParameters;
-    }
-
-    public void setComponentParameters(ComponentParameters componentParameters) {
-        this.componentParameters = componentParameters;
     }
 
     public void setImmediateServices() {

@@ -33,6 +33,7 @@ package org.objectweb.proactive.api;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.lang.reflect.Modifier;
 import java.net.URI;
 import java.util.Vector;
 import java.util.concurrent.ExecutorService;
@@ -73,7 +74,6 @@ import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 import org.objectweb.proactive.core.util.NonFunctionalServices;
 import org.objectweb.proactive.core.util.ProcessForAoCreation;
-import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.profiling.Profiling;
@@ -112,7 +112,7 @@ public class PAActiveObject {
      * Creates a new ActiveObject based on classname attached to a default node in the local JVM.
      * 
      * @param classname
-     *            the name of the class to instanciate as active
+     *            the name of the class to instantiate as active
      * @param constructorParameters
      *            the parameters of the constructor.
      * @return a reference (possibly remote) on a Stub of the newly created active object
@@ -232,7 +232,7 @@ public class PAActiveObject {
      * in the local JVM if the given node is null.
      * 
      * @param classname
-     *            the name of the class to instanciate as active
+     *            the name of the class to instantiate as active
      * @param genericParameters
      *            parameterizing types (of class
      * @param classname)
@@ -288,6 +288,7 @@ public class PAActiveObject {
     public static Object newActive(String classname, Class<?>[] genericParameters,
             Object[] constructorParameters, Node node, Active activity, MetaObjectFactory factory)
             throws ActiveObjectCreationException, NodeException {
+
         if (factory == null) {
             factory = ProActiveMetaObjectFactory.newInstance();
             if (factory.getProActiveSecurityManager() == null) {
@@ -338,11 +339,18 @@ public class PAActiveObject {
         }
 
         try {
-            // create stub object
-            Object stub = MOP.createStubObject(classname, genericParameters, constructorParameters, node,
-                    activity, clonedFactory);
-
-            return stub;
+            // PROACTIVE-277
+            Class activatedClass = Class.forName(classname);
+            if (activatedClass.isMemberClass() && !Modifier.isStatic(activatedClass.getModifiers())) {
+                // the activated class is an internal member class (not static, i.e. not nested top level).
+                throw new ActiveObjectCreationException(
+                    "Cannot create an active object from a non static member class.");
+            } else {
+                // create stub object
+                Object stub = MOP.createStubObject(classname, genericParameters, constructorParameters, node,
+                        activity, clonedFactory);
+                return stub;
+            }
         } catch (MOPException e) {
             Throwable t = e;
 
@@ -351,24 +359,27 @@ public class PAActiveObject {
             }
 
             throw new ActiveObjectCreationException(t);
+        } catch (ClassNotFoundException e) {
+            // class cannot be loaded
+            throw new ActiveObjectCreationException(e);
         }
     }
 
     /**
      * <p>
-     * Create a set of active objects with given construtor parameters. The object activation is
+     * Create a set of active objects with given constructor parameters. The object activation is
      * optimized by a thread pool.
      * </p>
      * <p>
      * The total of active objects created is equal to the number of nodes and to the total of
-     * constructor paramaters also.
+     * constructor parameters also.
      * </p>
      * <p>
      * The condition to use this method is that: <b>constructorParameters.length == nodes.length</b>
      * </p>
      * 
      * @param className
-     *            the name of the class to instanciate as active.
+     *            the name of the class to instantiate as active.
      * @param constructorParameters
      *            the array that contains the parameters used to build the active objects. All
      *            active objects have the same constructor parameters.
@@ -386,19 +397,19 @@ public class PAActiveObject {
 
     /**
      * <p>
-     * Create a set of active objects with given construtor parameters. The object activation is
+     * Create a set of active objects with given constructor parameters. The object activation is
      * optimized by a thread pool.
      * </p>
      * <p>
      * The total of active objects created is equal to the number of nodes and to the total of
-     * constructor paramaters also.
+     * constructor parameters also.
      * </p>
      * <p>
      * The condition to use this method is that: <b>constructorParameters.length == nodes.length</b>
      * </p>
      * 
      * @param className
-     *            the name of the class to instanciate as active.
+     *            the name of the class to instantiate as active.
      * @param genericParameters
      *            genericParameters parameterizing types
      * @param constructorParameters
@@ -420,7 +431,7 @@ public class PAActiveObject {
 
         ExecutorService threadPool = Executors.newCachedThreadPool();
 
-        Vector result = new Vector();
+        Vector<Object> result = new Vector<Object>();
 
         // TODO execute tasks
         // The Virtual Node is already activate
@@ -890,6 +901,7 @@ public class PAActiveObject {
      * @exception java.io.IOException
      *                if the remote body cannot be registered
      */
+    @Deprecated
     public static void register(Object obj, String url) throws java.io.IOException {
         UniversalBody body = AbstractBody.getRemoteBody(obj);
 
@@ -903,6 +915,18 @@ public class PAActiveObject {
             e.printStackTrace();
             throw new IOException(e.getMessage());
         }
+    }
+
+    public static String registerByName(Object obj, String name) throws IOException {
+        UniversalBody body = AbstractBody.getRemoteBody(obj);
+
+        String url = body.registerByName(name);
+        body.setRegistered(true);
+        if (PAActiveObject.logger.isInfoEnabled()) {
+            PAActiveObject.logger.info("Success at binding url " + url);
+        }
+
+        return url;
     }
 
     /**
@@ -1098,11 +1122,11 @@ public class PAActiveObject {
     }
 
     /**
-     * Return the URL of the remote <code>activeObject</code>.
+     * Return the URL of the node of the remote <code>activeObject</code>.
      * 
      * @param activeObject
      *            the remote active object.
-     * @return the URL of <code>activeObject</code>.
+     * @return the URL of the node of the <code>activeObject</code>.
      */
     public static String getActiveObjectNodeUrl(Object activeObject) {
         UniversalBody body = AbstractBody.getRemoteBody(activeObject);
@@ -1123,9 +1147,8 @@ public class PAActiveObject {
      *                if the remote object cannot be removed from the registry
      */
     public static void unregister(String url) throws java.io.IOException {
-        String protocol = URIBuilder.getProtocol(url);
 
-        RemoteObject rmo;
+        RemoteObject<?> rmo;
         try {
             rmo = RemoteObjectHelper.lookup(URI.create(url));
             Object o = RemoteObjectHelper.generatedObjectStub(rmo);
@@ -1209,7 +1232,7 @@ public class PAActiveObject {
      *         body found
      * @exception java.io.IOException
      *                if the remote body cannot be found under the given url or if the object found
-     *                is not of type RmiRemoteBody
+     *                is not of type UniversalBody
      * @exception ActiveObjectCreationException
      *                if the stub-proxy couple cannot be created
      */
@@ -1225,6 +1248,9 @@ public class PAActiveObject {
 
             if (o instanceof UniversalBody) {
                 return MOP.createStubObject(classname, (UniversalBody) o);
+            } else {
+                throw new IOException("The remote object located at " + url +
+                    " is not an Active Object. class=" + o.getClass().getName());
             }
         } catch (ProActiveException e) {
             throw new IOException(e.getMessage());
@@ -1237,8 +1263,6 @@ public class PAActiveObject {
 
             throw new ActiveObjectCreationException("Exception occured when trying to create stub-proxy", t);
         }
-
-        return null;
     }
 
     /**

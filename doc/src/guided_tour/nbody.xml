@@ -1,10 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?><chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="nbody"><info><title>The nbody example</title></info>
+<?xml version="1.0" encoding="utf-8"?><chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="nbody"><info><title xml:id="Thenbodyexample_14">The nbody example</title></info>
     
-    <section><info><title>
-            Using facilities provided by ProActive on a complete example
-        </title></info>
+	<section xml:id="UsingfacilitiesprovidedbyProActiveonacompleteexample"><info><title>Using facilities provided by ProActive on a complete example </title></info>
         
-        <section><info><title>Rationale and overview</title></info>
+        <section xml:id="Rationaleandoverview_14"><info><title>Rationale and overview</title></info>
             
             <para>
                 This section of the guided tour goes through the
@@ -26,9 +24,7 @@
                 example running on 3 hosts with 8 bodies:
             </para>
             <para>
-                <figure><info><title>
-                        NBody screenshot, with 3 hosts and 8 bodies
-                    </title></info>
+                <figure xml:id="nbody_3_8"><info><title>NBody screenshot, with 3 hosts and 8 bodies</title></info>
                     
                     <mediaobject>
                         <imageobject>
@@ -38,10 +34,7 @@
                 </figure>
             </para>
             <para>
-                <figure><info><title>
-                        NBody screenshot, with the application GUI and
-                        Java3D installed
-                    </title></info>
+                <figure xml:id="nboyd_java3d_1"><info><title>NBody screenshot, with the application GUI and Java3D installed</title></info>
                     
                     <mediaobject>
                         <imageobject>
@@ -173,7 +166,7 @@
                 </informaltable>
             </para>
         </section>
-        <section><info><title>Usage</title></info>
+        <section xml:id="Usage_14"><info><title>Usage</title></info>
             
             <para>
                 With script located in the folder
@@ -280,10 +273,7 @@
                 </listitem>
             </itemizedlist>
         </section>
-        <section><info><title>
-                Source files:
-                ProActive/src/org/objectweb/proactive/examples/nbody
-            </title></info>
+        <section xml:id="source_files_nbody_1"><info><title>Source files: ProActive/src/org/objectweb/proactive/examples/nbody</title></info>
             
             <para>
                 This guided tour is based on the files you may find in
@@ -292,7 +282,7 @@
                 You'll find the following tree:
             </para>
             <para>
-                <figure><info><title>The nbody directory structure</title></info>
+                <figure xml:id="Thenbodydirectorystructure_14"><info><title>The nbody directory structure</title></info>
                     
                     <mediaobject>
                         <imageobject>
@@ -312,7 +302,7 @@
                 problem.
             </para>
         </section>
-        <section><info><title>Common files</title></info>
+        <section xml:id="Commonfiles_14"><info><title>Common files</title></info>
             
             <para>
                 The files contained in 'common' are those that are
@@ -355,7 +345,7 @@
                         space, with velocity and mass - the diameter
                         expresses the size to use for the display:
                     </para>
-                    <programlisting xml:lang="java">public class Planet implements Serializable{
+                    <programlisting language="java">public class Planet implements Serializable{
     public double mass;
     public double x,y,vx,vy;
     // position and velocity
@@ -378,10 +368,7 @@
                         "add" following the physics rules.
                     </para>
                     <para>
-                        <figure><info><title>
-                                The equation of the force between two
-                                bodies
-                            </title></info>
+                        <figure xml:id="equation_between_two_bodies"><info><title>The equation of the force between two bodies</title></info>
                             
                             <mediaobject>
                                 <imageobject>
@@ -408,7 +395,7 @@
                         Displayer. Before choosing which example to run,
                         it creates the nodes required by the simulation:
                     </para>
-                    <programlisting xml:lang="java">try {
+                    <programlisting language="java">try {
 	descriptorPad = PADeployment.getProactiveDescriptor(xmlFileName);
 } catch (ProActiveException e) {
     abort(e);
@@ -442,7 +429,7 @@ try {
                         <literal>Start</literal>
                         (it will be detailed later):
                     </para>
-                    <programlisting xml:lang="java">Object [] constructorParams ;
+                    <programlisting language="java">Object [] constructorParams ;
 constructorParams = {domainArray, new Integer(maxIter), killsupport} ;
 maestro = (Maestro) PAActiveObject.newActive( Maestro.class.getName(), constructorParams , nodes[0] ) ;</programlisting>
                 </listitem>
@@ -457,7 +444,7 @@ maestro = (Maestro) PAActiveObject.newActive( Maestro.class.getName(), construct
                 of the simplest implementation of the n-body problem.
             </para>
         </section>
-        <section><info><title>Simple Active Objects</title></info>
+        <section xml:id="SimpleActiveObjects_14"><info><title>Simple Active Objects</title></info>
             
             <para>
                 This is the implementation of the simplest example of
@@ -482,7 +469,7 @@ maestro = (Maestro) PAActiveObject.newActive( Maestro.class.getName(), construct
                 during the simulation. They are created in the
                 Start.java file:
             </para>
-            <programlisting xml:lang="java">Rectangle universe = new Rectangle (-100,-100,100,100);
+            <programlisting language="java">Rectangle universe = new Rectangle (-100,-100,100,100);
 Domain [] domainArray = new Domain [totalNbBodies];
 for (int  i = 0 ; i &lt; totalNbBodies ; i++)  {
     Object [] constructorParams = new Object [] {
@@ -532,17 +519,17 @@ for (int  i = 0 ; i &lt; totalNbBodies ; i++)  {
                 synchronize themselves by all pinging the maestro, with
                 the notifyFinished call:
             </para>
-            <programlisting xml:lang="java">// init workers, from the Start class
+            <programlisting language="java">// init workers, from the Start class
 for (int i=0 ; i &amp;lt; totalNbBodies ; i ++)
     domainArray[i].init(domainArray, displayer, maestro);
     // init method, defined within each worker
 </programlisting>
-            <programlisting xml:lang="java">public void init(Domain [] domainArray, Displayer dp, Maestro master) {
+            <programlisting language="java">public void init(Domain [] domainArray, Displayer dp, Maestro master) {
     this.neighbours = domainArray;
     .....
     maestro.notifyFinished();  // say we're ready to start
 }</programlisting>
-            <programlisting xml:lang="java">public void notifyFinished() {
+            <programlisting language="java">public void notifyFinished() {
     this.nbFinished ++;
     if (this.nbFinished == this.domainArray.length) {
         this.iter ++; 
@@ -581,7 +568,7 @@ for (int i=0 ; i &amp;lt; totalNbBodies ; i ++)
                 Instead of explicitly asking for information, this
                 information is automatically issued:
             </para>
-            <programlisting xml:lang="java">public void sendValueToNeighbours() {
+            <programlisting language="java">public void sendValueToNeighbours() {
     for (int i = 0 ; i &lt; this.neighbours.length ; i ++)
         if (i != this.identification) // don't notify self!
              this.neighbours[i].setValue(this.info, this.identification);
@@ -615,7 +602,7 @@ public void setValue(Planet inf, int id) {
                 .
             </para>
         </section>
-        <section><info><title>Groups of Active objects</title></info>
+        <section xml:id="GroupsofActiveobjects_14"><info><title>Groups of Active objects</title></info>
             
             <para>
                 This is a simple improvement, which results in faster
@@ -628,7 +615,7 @@ public void setValue(Planet inf, int id) {
                 <literal>Active Objects</literal>
                 ) :
             </para>
-            <programlisting xml:lang="java">// in the Start class
+            <programlisting language="java">// in the Start class
 Object [][] params = ...
 Domain  domainGroup = null;
 try {
@@ -675,7 +662,7 @@ catch ....</programlisting>
                 Then this group is passed as a parameter to all the
                 members of the Group in just one call:
             </para>
-            <programlisting xml:lang="java">// Still in the Start class
+            <programlisting language="java">// Still in the Start class
 domainGroup.init(domainGroup, displayer, maestro);</programlisting>
             <para>
                 This method sets the local field as a copy of the passed
@@ -685,7 +672,7 @@ domainGroup.init(domainGroup, displayer, maestro);</programlisting>
                 <literal>Domain</literal>
                 from the Group, to avoid having calls on self:
             </para>
-            <programlisting xml:lang="java">public void init(Domain domainGroup, Displayer dp, Maestro master) {
+            <programlisting language="java">public void init(Domain domainGroup, Displayer dp, Maestro master) {
     this.neighbours = domainGroup;
     Group g = PAGroup.getGroup(neighbours);
     g.remove(PAActiveObject.getStubOnThis()); // no need to send information to self
@@ -694,7 +681,7 @@ domainGroup.init(domainGroup, displayer, maestro);</programlisting>
                 Remember that in the previous example, the neighbours
                 where stored in an array, and each was accessed in turn:
             </para>
-            <programlisting xml:lang="java">for (int i = 0 ; i &amp;lt; this.neighbours.length ; i ++) {
+            <programlisting language="java">for (int i = 0 ; i &amp;lt; this.neighbours.length ; i ++) {
     if (i != this.identification) // don't notify self!
     this.neighbours[i].setValue(this.info, this.identification);
 }</programlisting>
@@ -725,7 +712,7 @@ domainGroup.init(domainGroup, displayer, maestro);</programlisting>
                 .
             </para>
         </section>
-        <section><info><title>Group Distribution</title></info>
+        <section xml:id="GroupDistribution_14"><info><title>Group Distribution</title></info>
             <!-- TODO title might be wrong -->
             
             <para>
@@ -745,7 +732,7 @@ domainGroup.init(domainGroup, displayer, maestro);</programlisting>
                 iteration, because it is still waiting for more results,
                 in the current iteration.
             </para>
-            <programlisting xml:lang="java">public void setValue(Planet inf, int receivedIter) {
+            <programlisting language="java">public void setValue(Planet inf, int receivedIter) {
     if (this.iter == receivedIter) {
         this.currentForce.add(info, inf);
         this.nbReceived ++ ;
@@ -777,7 +764,7 @@ domainGroup.init(domainGroup, displayer, maestro);</programlisting>
                 <literal>Domain</literal>
                 changes iteration.
             </para>
-            <programlisting xml:lang="java">public void sendValueToNeighbours()  {
+            <programlisting language="java">public void sendValueToNeighbours()  {
     reset();                  
     this.iter++;
     if (this.iter &amp;lt; this.maxIter) {                           
@@ -800,7 +787,7 @@ domainGroup.init(domainGroup, displayer, maestro);</programlisting>
                 .
             </para>
         </section>
-        <section><info><title>Object Oriented SPMD Groups</title></info>
+        <section xml:id="ObjectOrientedSPMDGroups_14"><info><title>Object Oriented SPMD Groups</title></info>
             
             <para>
                 This is another way to improve the groupcom example. It
@@ -810,7 +797,7 @@ domainGroup.init(domainGroup, displayer, maestro);</programlisting>
                 OOspmd Groups, there is a special instruction, which
                 takes the same parameters as a newGroup instruction:
             </para>
-            <programlisting xml:lang="java">Object [][] params =  ...
+            <programlisting language="java">Object [][] params =  ...
  Domain domainGroup = null;
  try {
     domainGroup = (Domain) ProSPMD.newSPMDGroup( Domain.class.getName(), params, nodes);
@@ -824,7 +811,7 @@ domainGroup.init(domainGroup, displayer, maestro);</programlisting>
                 others to have reached it, before reading its request
                 queue again.
             </para>
-            <programlisting xml:lang="java">public void sendValueToNeighbours() {
+            <programlisting language="java">public void sendValueToNeighbours() {
     this.neighbours.setValue(this.info, this.identification);       
     ProSPMD.barrier('barrier' + this.iter);
     this.iter++;
@@ -852,7 +839,7 @@ domainGroup.init(domainGroup, displayer, maestro);</programlisting>
                 .
             </para>
         </section>
-        <section><info><title>Barnes-Hut</title></info>
+        <section xml:id="BarnesHut_14"><info><title>Barnes-Hut</title></info>
             
             <para>
                 This way to construct the nbody simulation is based on a
@@ -967,7 +954,7 @@ domainGroup.init(domainGroup, displayer, maestro);</programlisting>
                 .
             </para>
         </section>
-        <section><info><title>Conclusion</title></info>
+        <section xml:id="Conclusion_14"><info><title>Conclusion</title></info>
             
             <para>
                 In this guided tour, we tried to show different

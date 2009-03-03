@@ -1,10 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?><chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="MOP"><info><title>MOP: Metaobject Protocol</title></info>
+<?xml version="1.0" encoding="utf-8"?><chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="MOP"><info><title xml:id="MOPMetaobjectProtocol_28">MOP: Metaobject Protocol</title></info>
   
 
   <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/MOP.html  -->
 
-  <section><info><title>Implementation: a Meta-Object
-    Protocol</title></info>
+  <section xml:id="ImplementationaMetaObjectProtocol"><info><title>Implementation: a Meta-Object Protocol</title></info>
     
 
     <para>ProActive is built on top of a metaobject protocol (MOP) that
@@ -22,7 +21,7 @@
     non-public method or constructor calls.</para>
   </section>
 
-  <section><info><title>Principles</title></info>
+  <section xml:id="Principles_28"><info><title>Principles</title></info>
     
 
     <para>If the programmer wants to implement a new metabehavior using our
@@ -35,7 +34,7 @@
     behavior through the method <emphasis role="bold">reify</emphasis>:</para>
 
     
-      <para><programlisting xml:lang="java"> public Object reify (MethodCall c) throws Throwable; </programlisting></para>
+      <para><programlisting language="java"> public Object reify (MethodCall c) throws Throwable; </programlisting></para>
     
 
     <para>This method takes a reified call as a parameter and returns the
@@ -59,8 +58,7 @@
     example, is implemented through this feature.</para>
   </section>
 
-  <section><info><title>Example of a different
-    metabehavior: EchoProxy</title></info>
+  <section xml:id="ExampleofadifferentmetabehaviorEchoProxy"><info><title >Example of a different metabehavior: EchoProxy</title></info>
     
 
     <para>Here's the implementation of a very simple yet useful metabehavior:
@@ -69,7 +67,7 @@
     starting point for building debugging or profiling environments.</para>
 
     
-      <para><programlisting xml:lang="java">class EchoProxy extends Object implements Proxy {
+      <para><programlisting language="java">class EchoProxy extends Object implements Proxy {
   // here are constructor and variables declaration
   // [...]
   public Object reify (MethodCall c) throws Throwable {
@@ -82,7 +80,7 @@ interface Echo extends Reflect {
 }</programlisting></para>
     
 
-    <section><info><title>Instantiating with the metabehavior</title></info>
+    <section xml:id="Instantiatingwiththemetabehavior_28"><info><title>Instantiating with the metabehavior</title></info>
       
 
       <para>Instantiating an object of any class with this metabehavior can be
@@ -95,7 +93,7 @@ interface Echo extends Reflect {
         <listitem>
           <para>Standard Java code would be:</para>
 
-          <programlisting xml:lang="java"> Vector v = new Vector(3); </programlisting>
+          <programlisting language="java"> Vector v = new Vector(3); </programlisting>
         </listitem>
 
         <listitem>
@@ -104,14 +102,14 @@ interface Echo extends Reflect {
           we do not have any additional parameter to pass to the
           proxy):</para>
 
-          <programlisting xml:lang="java">  Object[] params = {new Integer (3)};
+          <programlisting language="java">  Object[] params = {new Integer (3)};
   Vector v = (Vector) MOP.newInstance('Vector', params, 'EchoProxy', null);</programlisting>
         </listitem>
 
         <listitem>
           <para>with class-based declaration:</para>
 
-          <programlisting xml:lang="java">  public class MyVector extends Vector implements Echo {}
+          <programlisting language="java">  public class MyVector extends Vector implements Echo {}
   Object[] params = {new Integer (3)} ;
   Vector v = (Vector) MOP.newInstance('Vector', params, null);</programlisting>
         </listitem>
@@ -119,7 +117,7 @@ interface Echo extends Reflect {
         <listitem>
           <para>with object-based declaration:</para>
 
-          <programlisting xml:lang="java">  Vector v = new Vector (3);
+          <programlisting language="java">  Vector v = new Vector (3);
   v=(Vector) MOP.newWrapper('EchoProxy',v);</programlisting>
 
           <para>This is the only way to give a metabehavior to an object that
@@ -134,7 +132,7 @@ interface Echo extends Reflect {
     </section>
   </section>
 
-  <section><info><title>The Reflect interface</title></info>
+  <section xml:id="TheReflectinterface_28"><info><title>The Reflect interface</title></info>
     
 
     <para>All the interfaces used for declaring
@@ -142,7 +140,7 @@ interface Echo extends Reflect {
     <literal>Reflect</literal>. This leads to a hierarchy of metabehaviors
     such as shown in the figure below.</para>
 
-    <para><figure><info><title>Metabehavior hierarchy</title></info>
+    <para><figure xml:id="Metabehaviorhierarchy_28"><info><title>Metabehavior hierarchy</title></info>
         
 
         <mediaobject>
@@ -163,7 +161,7 @@ interface Echo extends Reflect {
     build new metabehaviors out of existing ones.</para>
   </section>
 
-  <section><info><title>Limitations</title></info>
+  <section xml:id="Limitations_28"><info><title>Limitations</title></info>
     
 
     <para>Due to its commitment to be a 100% Java library, the MOP has a few

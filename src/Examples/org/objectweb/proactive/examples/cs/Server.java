@@ -35,6 +35,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 
 
 /**
@@ -53,8 +54,9 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @since   ProActive 0.9
  *
  */
+@ActiveObject
 public class Server {
-    static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
+    private final static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     protected String messageOfTheDay;
     protected java.util.ArrayList<Client> clients;
 
@@ -107,7 +109,7 @@ public class Server {
 
             //Server theServer = (Server) org.objectweb.proactive.ProActive.newActive(Server.class.getName(), null, null);
             // Binds the server to a specific URL
-            org.objectweb.proactive.api.PAActiveObject.register(theServer, "///theServer");
+            org.objectweb.proactive.api.PAActiveObject.registerByName(theServer, "theServer");
 
             System.out.println("Server is ready.");
         } catch (Exception e) {

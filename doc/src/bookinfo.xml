@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><info xmlns="http://docbook.org/ns/docbook" version="5.0"><title>ProActive <systemitem role="VERSION"/> Documentation</title>
+<?xml version="1.0" encoding="utf-8"?><info xmlns="http://docbook.org/ns/docbook" version="5.0"><title xml:id="ProActivesystemitemroleVERSIONDocumentation_21">ProActive <systemitem role="VERSION"/> Documentation</title>
 <subtitle role="motto">An Open Source Middleware For
 Parallel, Distributed, Multicore Computing</subtitle>
 <subtitle role="main">ProActive Programming</subtitle> 
@@ -7,11 +7,6 @@ Parallel, Distributed, Multicore Computing</subtitle>
 and compile/build.xml as the date
 and version is passed as a parameter in the ant task 
 to -->
-  
- <!--if you want to change the title in the html version on
- change the subtitle tag in the  xsl/html.xsl
- 
- changing here applies only to the pdf  -->
   
 
   <author><personname><surname>The OASIS Research Team and ActiveEon Company</surname></personname></author>

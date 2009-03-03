@@ -40,6 +40,7 @@ import org.objectweb.proactive.extensions.webservicesBk.WebServices;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 
 
+@ActiveObject
 public class CMAgentService extends CMAgentInitialized {
 
     public static void main(String[] args) {

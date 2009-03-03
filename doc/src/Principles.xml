@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="Principles">
 
-<info><title>ProActive Overview</title></info>
+<info><title xml:id="ProActiveOverview_20">ProActive Overview</title></info>
   
   <para>Grid computing is now a key aspect, from scientific to business
   applications, from large scale simulations to everyday life enterprise IT.
@@ -30,34 +30,34 @@
 	</para>
 	<!--
 	<sect1>
-		<title>ProActive Parallel Suite</title>
+<title xml:id="ProActiveParallelSuite_20">ProActive Parallel Suite</title>
 		<sect2>
-			<title>Introduction</title>
+<title xml:id="Introduction_20">Introduction</title>
 			<para>//TODO</para>
 		</sect2>
 		<sect2>
-			<title>IC2D Eclipse IDE</title>
+<title xml:id="IC2DEclipseIDE_20">IC2D Eclipse IDE</title>
 			<para>//TODO</para>
 		</sect2>
 		<sect2>
-			<title>Programming and Composing</title>
+<title xml:id="ProgrammingandComposing_20">Programming and Composing</title>
 			<para>//TODO</para>
 		</sect2>
 		<sect2>
-			<title>Activating Technical Services</title>
+<title xml:id="ActivatingTechnicalServices_20">Activating Technical Services</title>
 			<para>//TODO</para>		
 		</sect2>
 		<sect2>
-			<title>Deployment And Virtualization</title>
+<title xml:id="DeploymentAndVirtualization_20">Deployment And Virtualization</title>
 			<para>//TODO</para>
 		</sect2>
 		
 	</sect1>
 	
 		-->
-   <section><info><title>ProActive Programming Frameworks</title></info>
+   <section xml:id="ProActiveProgrammingFrameworks_20"><info><title>ProActive Programming Frameworks</title></info>
   	
-		<section><info><title>Introduction</title></info>
+		<section xml:id="Introduction_20"><info><title>Introduction</title></info>
 			
 			<!--//TODO -->
 			<para/>
@@ -75,7 +75,7 @@
   	</para>
   
   
-     <para><figure><info><title>ProActive Features</title></info>
+     <para><figure xml:id="ProActiveFeatures_20"><info><title>ProActive Features</title></info>
         
 
         <mediaobject>
@@ -108,7 +108,7 @@
   </itemizedlist>
 		</section>
 
-  	<section><info><title>Active Objects Model</title></info>
+  	<section xml:id="ActiveObjectsModel_20"><info><title>Active Objects Model</title></info>
   		
   		<para>ProActive is based on the concept of an active object, which is an entity
   		with its own configurable activity.
@@ -130,7 +130,7 @@
 		  (ASP), confluence, and determinism have been
 		  proven for this programming model: <xref endterm="TDO-book.abbrev" linkend="TDO-book"/> and <xref endterm="CHSPOPL04.abbrev" linkend="CHSPOPL04"/>.</para>
 	 </section>
-	<section><info><title>Implementation Language</title></info> 
+	<section xml:id="ImplementationLanguage_20"><info><title>Implementation Language</title></info> 
 		<para>
 			Grids gather large amount of heterogeneous resources, different processor architectures 
 			and operating systems. In this context, using a language which relies on 
@@ -143,7 +143,7 @@
 		</para>
 	</section>
 	
-	<section><info><title> Communication through typed asychronous messages</title></info> 
+	<section xml:id="Communicationthroughtypedasychronousmessages_20"><info><title>Communication through typed asychronous messages</title></info> 
 		<para>
 			In ProActive, the distribution is transparent: invoking methods on remote objects
 			does not require the developer to design remote objects with an explicit remoting mechanism.
@@ -168,11 +168,11 @@
 					Synchronous invocation - the method returns a non reifiable object: primitive type or final class:
                     </para>
                     
-                    <programlisting xml:lang="java"> boolean foo() </programlisting>
+                    <programlisting language="java"> boolean foo() </programlisting>
          			<para>
         			the method declares a thrown exception: 
         			</para>
-        			<programlisting xml:lang="java">public void bar() throws AnException </programlisting>
+               <programlisting language="java">public void bar() throws AnException </programlisting>
 					<para>
 					  In this case, the caller thread is blocked until the reified invocation
 				      is effectively processed and the eventual result (or exception) is returned. 
@@ -185,7 +185,7 @@
 						One-way asynchronous invocation - the method does not throw any exception
 						and does not return any result: 
 							</para>
-							<programlisting xml:lang="java">public void gee()</programlisting>
+							<programlisting language="java">public void gee()</programlisting>
 						 <para>
 						 The invocation is asynchronous and the process flow of the caller 
 						 continues once the reified invocation has been received by the active 
@@ -197,7 +197,7 @@
 						Asynchronous invocation with future result -  the return type is a reifiable type,
 						and the method does not throw any exception:
 						</para>	
-							<programlisting xml:lang="java">public MyReifiableType baz() </programlisting>
+							<programlisting language="java">public MyReifiableType baz() </programlisting>
 						<para>
 						In this case, a future object is returned and the caller continues its execution 
 						flow. The active object will process the reified invocation according to its serving 
@@ -217,7 +217,7 @@
 		</para>
 	</section>
 	
-	<section><info><title>Programming With Components: GCM</title></info>
+	<section xml:id="ProgrammingWithComponentsGCM_20"><info><title>Programming With Components: GCM</title></info>
 	 
 	 <!-- 
 	  //******************* TODO ********************
@@ -226,13 +226,13 @@
 	</section>
 	
 	
-	<section><info><title>Library features</title></info> 
+	<section xml:id="Libraryfeatures_20"><info><title>Library features</title></info> 
 		<para>
 			ProActive uses the  <xref linkend="MOP"/> to provide flexibility and configurability: it
 			allows the addition of meta-objects for managing new required features. Moreover, the library also
 			proposes a deployment framework, which allows the deployment of active objects on various 
 			infrastructures. The MOP architecture is represented in the next figure.
-		 <figure><info><title>MOP architecture</title></info>
+		 <figure xml:id="MOParchitecture_20"><info><title>MOP architecture</title></info>
         
 
         <mediaobject>
@@ -278,10 +278,7 @@
 			Java RMI as the default protocol, SSH, HTTP, tunneled RMI. It is also possible to export active objects as Web 
 			Services, which can then be accessed using the standard SOAP protocol. A file transfer mechanism is also 
 			implemented; it allows the transfer of files between active objects, for instance to send large data input files 
-			or to retrieve results files. ProActive also provides a peer-to-peer (P2P) infrastructure that allows for starting computations
-			on P2P networks by using a dynamic overlay network of JVMs. Under this framework, peers can dynamically join the network
-			and participate in the computations.
-		</para>
+			or to retrieve results files.</para>
 		</section>
 </section>
 

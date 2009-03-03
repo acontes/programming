@@ -59,6 +59,7 @@ import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
  * @author The ProActive Team
  *
  */
+@ActiveObject
 public class PiBBP implements Serializable {
     private final static int SIMPLE = 1;
     private final static int PARALLEL = 2;
@@ -126,7 +127,7 @@ public class PiBBP implements Serializable {
      * Computes the value of PI with a group of "pi computers", deployed on a local node
      * @return the value of PI
      */
-    public String runParallel() {
+    private String runParallel() {
         try {
             // create a group of computers on the current host
             piComputer = (PiComputer) PAGroup.newGroup(PiComputer.class.getName(), new Object[][] {
@@ -382,7 +383,7 @@ public class PiBBP implements Serializable {
      * Initializes the computation with the arguments found in the args array
      * @param args The initialization arguments
      */
-    private void parseProgramArguments(String[] args) {
+    private void parseProgramArguments(String[] args) throws IllegalArgumentException {
         if (args.length == 0) {
             ws_ = true;
             deploymentDescriptorLocation_ = "LAN.xml";
@@ -398,8 +399,7 @@ public class PiBBP implements Serializable {
                     deploymentDescriptorLocation_ = "LAN.xml";
                     break;
                 case 3:
-                    deploymentDescriptorLocation_ = "sophia-infra-p2p.xml";
-                    break;
+                    throw new IllegalArgumentException("P2P is no longer supported");
                 case 4:
                     deploymentDescriptorLocation_ = "sophia-cluster.xml";
                     break;

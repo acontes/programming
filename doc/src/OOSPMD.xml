@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?><chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="OOSPMD"><info><title>OOSPMD</title></info>
+<?xml version="1.0" encoding="utf-8"?><chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="OOSPMD"><info><title xml:id="OOSPMD_39">OOSPMD</title></info>
   
 
-  <section><info><title>OOSPMD: Introduction</title></info>
+  <section xml:id="OOSPMDIntroduction_39"><info><title>OOSPMD: Introduction</title></info>
     
 
     <indexterm><primary>OOSPMD</primary><secondary>definition</secondary></indexterm>
@@ -38,12 +38,12 @@
 			
   </section>
 
-  <section><info><title>SPMD Group Creation</title></info>
+  <section xml:id="SPMDGroupCreation_39"><info><title>SPMD Group Creation</title></info>
     <para>The main class for the SPMD groups is <literal>org.objectweb.proactive.api.PASPMD</literal>.
     This class contains methods for
      creating and controlling ProActive SPMD groups.  </para>
 
-	<figure><mediaobject><imageobject><imagedata scalefit="1" width="100%" contentdepth="100%" fileref="images/PASPMD_api.png" format="PNG"/></imageobject></mediaobject></figure>
+	<figure xml:id="paspmd_figure"><info><title>PASPMD Class</title></info><mediaobject><imageobject><imagedata scalefit="1" width="100%" contentdepth="100%" fileref="images/PASPMD_api.png" format="PNG"/></imageobject></mediaobject></figure>
     
 
     <indexterm><primary>OOSPMD</primary><secondary>groups</secondary></indexterm>
@@ -56,12 +56,12 @@
 
     <para>For a standard Java class:</para>
 
-      <para><programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/spmd_typical_class.snip"/></textobject></programlisting></para>
+      <para><programlisting language="java"><textobject><textdata fileref="automatic_snippets/spmd_typical_class.snip"/></textobject></programlisting></para>
     
 
     <para>The SPMD group is built as follows:</para>
 
-      <para><programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/spmd_creation.snip"/></textobject></programlisting></para>
+      <para><programlisting language="java"><textobject><textdata fileref="automatic_snippets/spmd_creation.snip"/></textobject></programlisting></para>
     
 
     <para>Object members of an SPMD group are aware about the whole group.
@@ -71,16 +71,16 @@
     invocations. Those informations are respectively obtained using the following static
     methods  of the <literal>PASPMD</literal> class.</para>
 
-      <para><programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/spmd_group_size.snip"/></textobject></programlisting></para>
+      <para><programlisting language="java"><textobject><textdata fileref="automatic_snippets/spmd_group_size.snip"/></textobject></programlisting></para>
 
-      <para><programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/spmd_rank.snip"/></textobject></programlisting></para>
+      <para><programlisting language="java"><textobject><textdata fileref="automatic_snippets/spmd_rank.snip"/></textobject></programlisting></para>
 	<para>and</para>
-      <para><programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/spmd_mygroup.snip"/></textobject></programlisting></para>
+      <para><programlisting language="java"><textobject><textdata fileref="automatic_snippets/spmd_mygroup.snip"/></textobject></programlisting></para>
 
 	
   </section>
 
-  <section><info><title>Synchronizing activities with barriers</title></info>
+  <section xml:id="Synchronizingactivitieswithbarriers_39"><info><title>Synchronizing activities with barriers</title></info>
     
 
     <indexterm><primary>Barriers</primary><secondary>definition</secondary></indexterm>
@@ -126,7 +126,7 @@
     synchronization, as they were sent <emphasis>after
     </emphasis> the barrier instruction.</para>
         
-    <figure xml:id="oospmd_barriers_behavior"><info><title>Behaviour example of a total barrier</title></info>
+    <figure xml:id="oospmd_barriers_behavior"><info><title xml:id="Behaviourexampleofatotalbarrier_39">Behaviour example of a total barrier</title></info>
       
 
       <mediaobject>
@@ -154,11 +154,11 @@
     </itemizedlist>
     
 
-  <section><info><title>Total Barrier</title></info>
+  <section xml:id="TotalBarrier_39"><info><title>Total Barrier</title></info>
     
 
     <para>Total barrier directly involves the SPMD group. A call to 
-          <programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/spmd_total_barrier.snip"/></textobject></programlisting>
+          <programlisting language="java"><textobject><textdata fileref="automatic_snippets/spmd_total_barrier.snip"/></textobject></programlisting>
     will block until all the members in
     the SPMD group have reached and called the identical barrier primitive. 
     Such a call communicates
@@ -175,7 +175,7 @@
     barrier, here the method <emphasis role="bold">foo</emphasis>:</para>
 
     
-      <para><programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/spmd_total_barrier_call.snip"/></textobject></programlisting></para>
+      <para><programlisting language="java"><textobject><textdata fileref="automatic_snippets/spmd_total_barrier_call.snip"/></textobject></programlisting></para>
     
 
     <para>Note that usually, strings used as unique ID are more complex; they
@@ -183,7 +183,7 @@
     The SPMD group is built as follow:</para>
 
     
-      <para><programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/spmd_creation.snip"/></textobject></programlisting></para>
+      <para><programlisting language="java"><textobject><textdata fileref="automatic_snippets/spmd_creation.snip"/></textobject></programlisting></para>
     
 
     	<para>When the method <literal> start()</literal> is called on 
@@ -200,8 +200,7 @@
     members of the group may indefinitely wait.</para>
   </section>
 
-  <section><info><title>Neighbour
-    barrier</title></info>
+  <section xml:id="Neighbour_barrier"><info><title>Neighbour barrier</title></info>
     
 
     <para>The Neighbour barrier is a kind of lightweight barrier, involving
@@ -235,7 +234,7 @@
     neighbours built by the programmer. Here is an example:</para>
 
     
-      <para><programlisting xml:lang="java"><textobject><textdata fileref="automatic_snippets/spmd_neighbour_barrier.snip"/></textobject></programlisting></para>
+      <para><programlisting language="java"><textobject><textdata fileref="automatic_snippets/spmd_neighbour_barrier.snip"/></textobject></programlisting></para>
     
 
     <para>Refer to the <emphasis>Jacobi</emphasis> example to see a use-case of the
@@ -246,7 +245,7 @@
     exchanged messages.</para>
   </section>
 
-  <section><info><title>Method Barrier</title></info>
+  <section xml:id="MethodBarrier_39"><info><title>Method Barrier</title></info>
     
 
     <para>The Method barrier does no more involve extra messages to
@@ -260,14 +259,14 @@
     methods. The order of the methods does not matter. For example:</para>
 
     
-      <para><programlisting xml:lang="java"> PASPMD.methodBarrier({'foo', 'bar', 'gee'}); </programlisting></para>
+      <para><programlisting language="java"> PASPMD.methodBarrier({'foo', 'bar', 'gee'}); </programlisting></para>
     
 
     <para>The caller will stop and wait for the three methods. bar or gee can
     came first, then foo. If one wants wait for foo, then wait for bar, then
     wait for gee, three calls can be successively done:</para>
 
-    <programlisting xml:lang="java">   PASPMD.methodBarrier({'foo'});
+    <programlisting language="java">   PASPMD.methodBarrier({'foo'});
    PASPMD.methodBarrier({'bar'});
    PASPMD.methodBarrier({'gee'}); </programlisting>
     
@@ -278,10 +277,10 @@
   </section>
   </section>
   
-  <section><info><title>MPI to ProActive Summary</title></info>
+  <section xml:id="MPItoProActiveSummary_39"><info><title>MPI to ProActive Summary</title></info>
         
 
-        <informaltable xml:id="mpi_to_proactive_summary"><info><title>MPI to ProActive</title></info>
+        <informaltable xml:id="mpi_to_proactive_summary"><info><title xml:id="MPItoProActive_39">MPI to ProActive</title></info>
           
 
           <tgroup cols="2">

@@ -106,7 +106,7 @@ public interface Debugger extends Serializable {
      * @param slowMotionDelay
      *            the time in millisecond
      * @param useImmediatly
-     *            true to using slowMotion immediatly and false to wait the next
+     *            true to using slowMotion immediately and false to wait the next
      *            breakpoint
      */
     public void slowMotion(long slowMotionDelay, boolean useImmediatly);
@@ -137,10 +137,9 @@ public interface Debugger extends Serializable {
     public Map<Long, BreakpointInfo> getBreakpoints();
 
     /**
-     * set the AbstractBody target
+     * set the Body to attach the debugger to
      *
-     * @param target,
-     *            AbstractBody
+     * @param target the Body to attach the debugger to
      */
     public void setTarget(AbstractBody target);
 

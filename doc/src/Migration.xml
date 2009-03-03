@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?><chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="Migration"><info><title>Mobile Agents And Migration</title></info>
+<?xml version="1.0" encoding="utf-8"?><chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="Migration"><info><title xml:id="MobileAgentsAndMigration_77">Mobile Agents And Migration</title></info>
   
 
   <!--  File: /home/irosenbe/PA_new_doc/docbook-tuto/Migration.html  -->
 
-  <section><info><title>Migration Overview</title></info>
+  <section xml:id="MigrationOverview_77"><info><title>Migration Overview</title></info>
     
 
     <indexterm significance="preferred">
@@ -81,7 +81,7 @@
 
   </section>
 
-  <section><info><title>Using Migration</title></info>
+  <section xml:id="UsingMigration_77"><info><title>Using Migration</title></info>
     
 
     <para>Any active object has the ability to migrate. If it references some
@@ -92,7 +92,7 @@
     last one in the method, i.e the method must return immediately after. Here
     is an example of a method in an active object:</para>
 
-    <programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/migration/migration_method.txt"/></textobject></programlisting>
+    <programlisting language="java"><textobject><textdata fileref="code_snippets/migration/migration_method.txt"/></textobject></programlisting>
 
 
     <para>We don't provide any test to check if the call to migrateTo is the
@@ -101,10 +101,10 @@
     its <literal>moveTo(String)</literal> method.</para>
   </section>
 
-  <section><info><title>Complete example</title></info>
+  <section xml:id="Completeexample_77"><info><title>Complete example</title></info>
     
 	<!-- TODO code hasn't been run, check it really works -->
-    <programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/migration/migration_example.txt"/></textobject></programlisting>
+    <programlisting language="java"><textobject><textdata fileref="code_snippets/migration/migration_example.txt"/></textobject></programlisting>
 
     <para>The class SimpleAgent implements <literal>Serializable</literal> so
     the objects created will be able to migrate. We need to provide an empty
@@ -121,7 +121,7 @@
     location. For our application we pass the location of the node as runtime
     parameter to the application. </para>
     
-     <programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/migration/migration_example_main.txt"/></textobject></programlisting>
+     <programlisting language="java"><textobject><textdata fileref="code_snippets/migration/migration_example_main.txt"/></textobject></programlisting>
     
     
     <para>To see another example of migration look at the migration example in 
@@ -129,7 +129,7 @@
     </para>
   </section>
 
-  <section><info><title>Dealing with non-serializable attributes</title></info>
+  <section xml:id="Dealingwithnonserializableattributes_77"><info><title>Dealing with non-serializable attributes</title></info>
     
 
 	<para>Implementing a MigrationStrategy (specifying what to do on departure
@@ -152,7 +152,7 @@
 
     </para>
     
-    <section><info><title> Using The <literal>MigrationStrategyManager</literal> Interface</title></info>
+    <section xml:id="UsingTheliteralMigrationStrategyManagerliteralInterface_77"><info><title>Using The <literal>MigrationStrategyManager</literal> Interface</title></info>
     	
     	<para>We can  use the methods <literal>onArrival(String) </literal>
     	and <literal>onDeparture(String) </literal> to specify which methods will
@@ -165,19 +165,18 @@
     	be migrated and assign the methods to be run. For this we use the 
     	<literal> initActivity(Body)</literal> method because we only need to run
     	the creation and assignment once.</para> 
-    	<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/migration/migration_strategy_example.txt"/></textobject></programlisting>
+      <programlisting language="java"><textobject><textdata fileref="code_snippets/migration/migration_strategy_example.txt"/></textobject></programlisting>
     </section>
-    <section><info><title> Using <literal>readObject(...)</literal> and 
-    			<literal>writeObject(...)</literal></title></info>
+    <section xml:id="using_readObject_and_writeObject"><info><title> Using <literal>readObject(...)</literal> and	<literal>writeObject(...)</literal></title></info>
     	
 		    <para>Another way of dealing with unserializable attributes is 
 		    using the methods from the Serializable interface: </para>
-		    <programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/migration/serializable_methods.txt"/></textobject></programlisting>
+		    <programlisting language="java"><textobject><textdata fileref="code_snippets/migration/serializable_methods.txt"/></textobject></programlisting>
 		    <para>
 		    We override these methods to provide a way to save and restore the 
 		    non-serializable components of the active object:
 		    </para>
-    	<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/migration/migration_read_writeObject.txt"/></textobject></programlisting>
+      <programlisting language="java"><textobject><textdata fileref="code_snippets/migration/migration_read_writeObject.txt"/></textobject></programlisting>
 
     <para>To learn how to use the methods see the <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://java.sun.com/javase/6/docs/api/java/io/Serializable.html">Serializable</link> interface in the standard
     JavaDoc.</para>
@@ -185,12 +184,12 @@
     </section>
   </section>
 
-  <section><info><title>Mixed Location Migration</title></info>
+  <section xml:id="MixedLocationMigration_77"><info><title>Mixed Location Migration</title></info>
     
 
     <para/>
 
-    <section><info><title>Forwarders And Agents</title></info>
+    <section xml:id="ForwardersAndAgents_77"><info><title>Forwarders And Agents</title></info>
       
 
       <para>There are two way to communicate with an active object which has
@@ -257,7 +256,7 @@
       both performance and reliability.</para>
 
       </section>
-      <section><info><title>Forwarder And Agent Parameters</title></info>
+      <section xml:id="ForwarderAndAgentParameters_77"><info><title>Forwarder And Agent Parameters</title></info>
       	
       	<para>Forwarders and agents have several parameters which control their behaviour:</para>
       	<itemizedlist>
@@ -324,7 +323,7 @@
 
 
 
-      <section><info><title>Configuration File</title></info>
+      <section xml:id="ConfigurationFile_77"><info><title>Configuration File</title></info>
       	
             <para>As a default, ProActive uses a "Forwarder based" strategy .
              It means that the forwarders have a unlimited lifetime and the agent never updates the location server.</para>
@@ -333,11 +332,11 @@
              edit the file  <literal>
              ProActive/src/Core/org/objectweb/proactive/core/config/ProActiveConfiguration.xml</literal> and change the four values listed above.
              </para>
-        		<programlisting xml:lang="XML"><textobject><textdata fileref="../src/Core/org/objectweb/proactive/core/config/ProActiveConfiguration.xml"/></textobject></programlisting>	
+            <programlisting language="xml"><textobject><textdata fileref="../../src/Core/org/objectweb/proactive/core/config/ProActiveConfiguration.xml"/></textobject></programlisting>
     </section>
         
       
-      <section><info><title>Location Server</title></info>
+      <section xml:id="LocationServer_77"><info><title>Location Server</title></info>
       	<!-- TODO where is the script for launching the migration server? -->
         
 

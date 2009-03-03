@@ -32,6 +32,7 @@
 package org.objectweb.proactive.core.body;
 
 import java.io.IOException;
+import java.net.URI;
 import java.security.AccessControlException;
 import java.security.PublicKey;
 
@@ -58,6 +59,7 @@ import org.objectweb.proactive.core.security.securityentity.Entities;
 import org.objectweb.proactive.core.security.securityentity.Entity;
 
 
+@SuppressWarnings("serial")
 public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody> implements UniversalBody {
 
     /**
@@ -171,8 +173,13 @@ public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody> imp
         return target.receiveRequest(request);
     }
 
+    @Deprecated
     public void register(String url) throws IOException, UnknownProtocolException {
         target.register(url);
+    }
+
+    public String registerByName(String name) throws IOException {
+        return target.registerByName(name);
     }
 
     public void setRegistered(boolean registered) throws IOException {
@@ -236,4 +243,5 @@ public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody> imp
             throws SecurityNotAvailableException, AccessControlException, IOException {
         this.target.setProActiveSecurityManager(user, policyServer);
     }
+
 }

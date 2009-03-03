@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?><chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="TypedGroupCommunication"><info><title>Typed Group Communication</title></info>
+<?xml version="1.0" encoding="utf-8"?><chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="TypedGroupCommunication"><info><title xml:id="TypedGroupCommunication_66">Typed Group Communication</title></info>
   
 
-  <section xml:id="TypedGroupCommunication_html_overview"><info><title>Overview</title></info>
+  <section xml:id="TypedGroupCommunication_html_overview"><info><title xml:id="Overview_66">Overview</title></info>
     
 
     <para>Group communication is a crucial feature for high-performance and
@@ -34,7 +34,7 @@
 	 	The following diagrams contain
 	 	all the methods in the <literal>PAGroup</literal> class and <literal>Group</literal> interface.   
 	</para>     
-     	<figure><info><title>PAGroup class  and Group interface</title></info>
+     	<figure xml:id="PAGroupclassandGroupinterface_66"><info><title>PAGroup class  and Group interface</title></info>
 			
 			<mediaobject>
 				<imageobject>
@@ -44,7 +44,7 @@
 	</figure>
 
 <!-- 
-     	<figure><info><title>Group creation methods and parameters</title></info>
+     	<figure xml:id="Groupcreationmethodsandparameters_66"><info><title>Group creation methods and parameters</title></info>
 			
 			<mediaobject>
 				<imageobject>
@@ -59,11 +59,11 @@
 		For the examples  we will be using the following
 			class that can be instantiated as an active	object:
 		</para>	
-		<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/ActiveWorker.txt"/></textobject></programlisting>
+		<programlisting language="java"><textobject><textdata fileref="code_snippets/ActiveWorker.txt"/></textobject></programlisting>
 
   </section>
 
-  <section xml:id="TypedGroupCommunication_html_Creation"><info><title>Instantiation Typed Group Creation</title></info>
+  <section xml:id="TypedGroupCommunication_html_Creation"><info><title xml:id="InstantiationTypedGroupCreation_66">Instantiation Typed Group Creation</title></info>
     
 
    
@@ -80,17 +80,17 @@
     type. We will be using the <literal>Worker</literal> class specified above. </para>
 
   
-  		<programlisting xml:lang="java"><textobject><textdata fileref="code_snippets/groupInstantiationCreation.txt"/></textobject></programlisting>
+      <programlisting language="java"><textobject><textdata fileref="code_snippets/groupInstantiationCreation.txt"/></textobject></programlisting>
   
   
    
     <para>We can also specify parameters for the creation. If we have a class <literal>A</literal>
     we can specify an array of <literal>Object</literal> to hold the parameters:</para>
 
-	<programlisting xml:lang="java"><textobject><textdata fileref="./automatic_snippets/group_creation_example.snip"/></textobject></programlisting>
+	<programlisting language="java"><textobject><textdata fileref="./automatic_snippets/group_creation_example.snip"/></textobject></programlisting>
 	
 	<para>We can access the individual members of the group using <literal>get(index)</literal></para>
-	<programlisting xml:lang="java"><textobject><textdata fileref="./automatic_snippets/group_get_members.snip"/></textobject></programlisting>
+	<programlisting language="java"><textobject><textdata fileref="./automatic_snippets/group_get_members.snip"/></textobject></programlisting>
 
     <para>Elements can be included into a typed group only if their class
     equals or extends the class specified at the group creation. For example,
@@ -99,7 +99,7 @@
     be invoked on the group.</para>
   </section>
 
-  <section xml:id="TypedGroupCommunication_html_repr"><info><title>Group representation and manipulation</title></info>
+  <section xml:id="TypedGroupCommunication_html_repr"><info><title xml:id="Grouprepresentationandmanipulation_66">Group representation and manipulation</title></info>
     
 
     <para>The <emphasis role="bold">typed group representation</emphasis> we
@@ -124,7 +124,7 @@
     <para>Below is an example of when and how to use each representation of a
     group:</para>
     
-      <para><programlisting xml:lang="java">   // definition of one standard Java object
+      <para><programlisting language="java">   // definition of one standard Java object
    // and two active objects
 A a1 = new A();
 A a2 = (A) PAActiveObject.newActive('A', paramsA[], node);
@@ -150,11 +150,11 @@ ag1.foo(); // the caller of ag1.foo() may not belong to ag1
 A ag1new = (A) gA.getGroupByType();</programlisting></para>
  
  
-     	<programlisting xml:lang="java"><textobject><textdata fileref="./automatic_snippets/get_group.snip"/></textobject></programlisting>
-    
-  </section>
+      <programlisting language="java"><textobject><textdata fileref="./automatic_snippets/get_group.snip"/></textobject></programlisting>
 
-  <section xml:id="TypedGroupCommunication_html_result"><info><title>Group as result of group communications</title></info>
+</section>
+
+<section xml:id="TypedGroupCommunication_html_result"><info><title xml:id="Groupasresultofgroupcommunications_66">Group as result of group communications</title></info>
     
 
     <para>The particularity of our group communication mechanism is that the
@@ -168,7 +168,7 @@ A ag1new = (A) gA.getGroupByType();</programlisting></para>
     mechanism implemented by ProActive is used.</para>
 
     
-      <para><programlisting xml:lang="java">   // A method call on a group, returning a result
+      <para><programlisting language="java">   // A method call on a group, returning a result
 V vg = ag1.bar();
    // vg is a typed group of 'V': operation 
    // below is also a collective operation
@@ -194,7 +194,7 @@ vg.f1();</programlisting></para>
     <literal>waitAndGet</literal>. Here is an exemple:</para>
 
     
-      <para><programlisting xml:lang="java">   // A method call on a typed group
+      <para><programlisting language="java">   // A method call on a typed group
 V vg = ag1.bar(); 
    // To wait and capture the first returned 
    // member of vg
@@ -205,7 +205,7 @@ PAGroup.waitAll(vg);
     
   </section>
 
-  <section xml:id="TypedGroupCommunication_html_comms"><info><title>Broadcast vs Dispatching</title></info>
+  <section xml:id="TypedGroupCommunication_html_comms"><info><title xml:id="BroadcastvsDispatching_66">Broadcast vs Dispatching</title></info>
     
 
     <para>Regarding the parameters of a method call towards a group of
@@ -232,23 +232,23 @@ PAGroup.waitAll(vg);
     switch back to the default behaviour, the static method
     <literal>unsetScatterGroup</literal> is available.</para>
 	<para>We create a new group and a new group of parameters:</para>
-	<programlisting xml:lang="java"><textobject><textdata fileref="./automatic_snippets/group_scatter_creation.snip"/></textobject></programlisting>
+	<programlisting language="java"><textobject><textdata fileref="./automatic_snippets/group_scatter_creation.snip"/></textobject></programlisting>
 	<para>And then set the scattering, dispatch and set unscatter</para>
-	<programlisting xml:lang="java"><textobject><textdata fileref="./automatic_snippets/group_scatter_example.snip"/></textobject></programlisting>
+	<programlisting language="java"><textobject><textdata fileref="./automatic_snippets/group_scatter_example.snip"/></textobject></programlisting>
      
   </section>
   
-  <section><info><title>Access By Name</title></info>
+  <section xml:id="AccessByName_66"><info><title>Access By Name</title></info>
   <para> Group members can be accessed by name if on addition we specify the name.
   To use the named members we create the group and add members with  the <literal>addNamedElement(String key,E value)</literal> method 
   from the <literal>org.objectweb.proactive.core.group.Group</literal> interface. 
   </para>
-  	<programlisting xml:lang="java"><textobject><textdata fileref="./automatic_snippets/typed_group_name_access_creation.snip"/></textobject></programlisting>
+   <programlisting language="java"><textobject><textdata fileref="./automatic_snippets/typed_group_name_access_creation.snip"/></textobject></programlisting>
   <para>To retrieve the named members we use the <literal>getNamedElement(String) </literal> from the same interface.</para>
-  	<programlisting xml:lang="java"><textobject><textdata fileref="./automatic_snippets/typed_group_name_access_example.snip"/></textobject></programlisting>
+   <programlisting language="java"><textobject><textdata fileref="./automatic_snippets/typed_group_name_access_example.snip"/></textobject></programlisting>
   </section>
   
-  <section><info><title>Unique serialization</title></info>
+  <section xml:id="Uniqueserialization_66"><info><title>Unique serialization</title></info>
   	<para>Unique serialization is an optimization option that allows performing the serialization
   	of the arguments before streaming them. If unique serialization is activated the arguments will 
   	be transformed into a byte array once, and afterward streamed. The one time serialization is
@@ -257,7 +257,7 @@ PAGroup.waitAll(vg);
   	 can be toggled using <literal>setUniqueSerialization(Object)</literal> and
   	 <literal> unsetUniqueSerialization(Object) </literal> from the static class
   	  <literal>org.objectweb.proactive.api.PAGroup</literal></para>
-   	<programlisting xml:lang="java"><textobject><textdata fileref="./automatic_snippets/group_unique_serialization.snip"/></textobject></programlisting>
+      <programlisting language="java"><textobject><textdata fileref="./automatic_snippets/group_unique_serialization.snip"/></textobject></programlisting>
  <para>To learn more, see the 
  <!-- This url can only work in the html generated files: in pdf there's no ".." -->
  <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="../api_complete/org/objectweb/proactive/core/group/package-summary.html" os="html">JavaDoc</link> 

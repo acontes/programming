@@ -1013,7 +1013,7 @@
 
 	<!-- ************************************************************************************************** -->
 
-	<section><info><title>Extending IC2D</title></info>
+	<section xml:id="ExtendingIC2D_17"><info><title>Extending IC2D</title></info>
 		
 
 		<section xml:id="checkout"><info><title>How to checkout IC2D</title></info>
@@ -1431,7 +1431,7 @@ Eclipse-AutoStart: true
 				
 					
 					<para>
-					<programlisting xml:lang="java">
+					<programlisting language="java">
 package org.objectweb.proactive.ic2d.example;
 
 import org.eclipse.ui.plugin.*;
@@ -1806,7 +1806,7 @@ bin.includes = META-INF/,\ .
 				
 					
 					<para>
-					<programlisting xml:lang="xml">
+					<programlisting language="xml">
 &lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;?eclipse version="3.0"?&gt;
 &lt;plugin&gt;
@@ -1842,7 +1842,7 @@ bin.includes = META-INF/,\ .
 				
 					
 					<para>
-					<programlisting xml:lang="java">
+					<programlisting language="java">
 package org.objectweb.proactive.ic2d.example;
 
 import org.eclipse.ui.IPageLayout;
@@ -1996,10 +1996,10 @@ public class ExamplePerspective implements IPerspectiveFactory {
 
 	</section>
 
-	<section><info><title>How to create the IC2D stand-alone application from the sources</title></info>
+	<section xml:id="HowtocreatetheIC2Dstandaloneapplicationfromthesources"><info><title>How to create the IC2D stand-alone application from the sources</title></info>
 		
 
-		<section xml:id="Required"><info><title>Required</title></info>
+		<section xml:id="Required_17"><info><title>Required</title></info>
 			
 			<note><info><title>Required</title></info>
 			
@@ -2061,7 +2061,7 @@ public class ExamplePerspective implements IPerspectiveFactory {
 					</listitem>
 					<listitem>
 						<para>
-						 And select all (except P2P)
+						 And select all 
 						 </para>
 					</listitem>
 				</orderedlist>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="Configuration"><info><title>ProActive Basic Configuration</title></info>
   
 
-  <section><info><title>Overview</title></info>
+  <section xml:id="Overview_17"><info><title>Overview</title></info>
     
 
     <para>In order to get easier and more flexible configuration in ProActive,
@@ -14,7 +14,7 @@
   </section>
   
 
-  <section><info><title>How does it work?</title></info>
+  <section xml:id="Howdoesitwork"><info><title>How does it work?</title></info>
     
 
     <para>Using this file is very straightforward, since all lines must follow
@@ -50,11 +50,11 @@
     <para>&lt;prop <emphasis role="bold">key</emphasis>='propn' <emphasis role="bold">value</emphasis>='valuen'/&gt;</para>
   </section>
 
-  <section><info><title>Where to access this
+  <section xml:id="Wheretoaccessthis"><info><title>Where to access this
     file?</title></info>
     
 
-	<section><info><title>ProActive Default Configuration file</title></info> 
+	<section xml:id="ProActiveDefaultConfigurationfile"><info><title>ProActive Default Configuration file</title></info>
     <para>There is a default file with default ProActive options located under
     ProActive/src/org/objectweb/proactive/core/config/ProActiveConfiguration.xml.
     This file is automatically copied with the same package structure under
@@ -64,7 +64,7 @@
     org/objectweb/proactive/core/config/ProActiveConfiguration.xml (See below
     for default options).</para>
 	</section>
-	<section><info><title>User-defined ProActive Configuration file</title></info> 
+	<section xml:id="UserdefinedProActiveConfigurationfile"><info><title>User-defined ProActive Configuration file</title></info>
 	<para>
 		It is possible for an user to override the default ProActive configuration file
 		by setting properties in a file located at the following path :
@@ -73,7 +73,7 @@
 	     for windows users : $HOME\.proactive\ProActiveConfiguration.xml  </screen>
 	</para>
     </section>
-    <section><info><title>Alternate User Configuration file</title></info> 
+    <section xml:id="AlternateUserConfigurationfile"><info><title>Alternate User Configuration file</title></info>
 
     <para>People can specify their own configuration file by running their
     application with proactive.configuration option, i.e</para>
@@ -101,10 +101,10 @@
 </section>
   </section>
 
-  <section><info><title>ProActive properties</title></info>
+  <section xml:id="ProActiveproperties"><info><title>ProActive properties</title></info>
     
 
-    <section><info><title>Required</title></info>
+    <section xml:id="Required"><info><title>Required</title></info>
      
 
         <para><itemizedlist>
@@ -141,7 +141,7 @@
         programmatically with the default value.</para>
         
       </section>
-      <section><info><title>Fault-tolerance properties</title></info>
+      <section xml:id="Faulttoleranceproperties"><info><title>Fault-tolerance properties</title></info>
         
 
         <para>Note that those properties should not be altered if the
@@ -191,95 +191,8 @@
           </listitem>
         </itemizedlist>
        </section>
-       
-       <section xml:id="Configuration_html_p2p_properties"><info><title> Peer-to-Peer properties </title></info>
-        
 
-        <para><itemizedlist>
-            <listitem>
-              <para><emphasis role="bold">proactive.p2p.acq</emphasis> is the
-              communication protocol that's used to communicate with this P2P
-              Service. All ProActive communication protocols are supported:
-              rmi, http, etc. Default is rmi.</para>
-            </listitem>
-
-            <listitem>
-              <para><emphasis role="bold">proactive.p2p.port</emphasis>
-              represents the port number on which to start the P2P Service.
-              Default is 2410. The port is used by the communication
-              protocol.</para>
-            </listitem>
-
-            <listitem>
-              <para><emphasis role="bold">proactive.p2p.noa: Number Of
-              Acquaintances (NOA)</emphasis> is the minimal number of peers
-              one peer needs to know to keep up the infrastructure. By
-              default, its value is 10 peers.</para>
-            </listitem>
-
-            <listitem>
-              <para><emphasis role="bold">proactive.p2p.ttu: Time To Update
-              (TTU)</emphasis> each peer sends an heart beat to its
-              acquaintances. By default, its value is 1 minutes.</para>
-            </listitem>
-
-            <listitem>
-              <para><emphasis role="bold">proactive.p2p.ttl: Time To Live
-              (TTL)</emphasis> represents messages live time in hops of JVMs
-              (node). By default, its value is 5 hops.</para>
-            </listitem>
-
-            <listitem>
-              <para><emphasis role="bold">proactive.p2p.msg_capacity</emphasis> is the maximum
-              memory size to stock message UUID. Default value is 1000
-              messages UUID.</para>
-            </listitem>
-
-            <listitem>
-              <para><emphasis role="bold">proactive.p2p.expl_msg</emphasis> is
-              the percentage of agree response when peer is looking for
-              acquaintances. By default, its value is 66%.</para>
-            </listitem>
-
-            <listitem>
-              <para><emphasis role="bold">proactive.p2p.booking_max</emphasis>
-              uses during booking a shared node. It's the maximum time in
-              millisecond to create at less an active object in the shared
-              node. After this time and if no active objects are created the
-              shared node will leave and the peer which gets this shared node
-              will be not enable to use it more. Default is 3 minutes.</para>
-            </listitem>
-
-            <listitem>
-              <para><emphasis role="bold">proactive.p2p.nodes_acq_to</emphasis> uses with
-              descriptor file. It is the timeout in milliseconds for nodes
-              acquisition. The default value is 3 minutes.</para>
-            </listitem>
-
-            <listitem>
-              <para><emphasis role="bold">proactive.p2p.lookup_freq</emphasis>
-              also uses with descriptor file. It is the lookup frequency in
-              milliseconds for re-asking nodes. By default, it's value is 30
-              seconds.</para>
-            </listitem>
-
-            <listitem>
-              <para><emphasis role="bold">proactive.p2p.multi_proc_nodes</emphasis> if true
-              deploying one shared nodes by CPU that means the p2p service
-              which is running on a bi-pro will share 2 nodes, else only one
-              node is shared independently of the number of CPU. By default,
-              it's value is true, i.e. 1 shared node for 1 CPU.</para>
-            </listitem>
-
-            <listitem>
-              <para><emphasis role="bold">proactive.p2p.xml_path</emphasis> is
-              the XML deployment descriptor file path for sharing nodes more
-              than a single node.</para>
-            </listitem>
-          </itemizedlist></para>
-      </section>
-
-      <section><info><title>rmi ssh properties</title></info>
+      <section xml:id="rmisshproperties"><info><title>rmi ssh properties</title></info>
         
     <para>The following properties are specific to the rmissh protocol 
      (see <xref linkend="SSHTunneling"/>).</para>
@@ -360,7 +273,7 @@
       </itemizedlist></para>
     </section>
     
-    <section><info><title>Other properties</title></info>
+    <section xml:id="Otherproperties"><info><title>Other properties</title></info>
 
     
 
@@ -439,7 +352,7 @@
         </section>
   </section>
 
-  <section><info><title>Configuration file example</title></info>
+  <section xml:id="Configurationfileexample"><info><title>Configuration file example</title></info>
     
 
     <para>A configuration file could have following structure:</para>

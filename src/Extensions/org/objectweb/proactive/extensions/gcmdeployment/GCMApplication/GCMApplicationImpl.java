@@ -35,7 +35,6 @@ import static org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLogg
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,6 +47,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.descriptor.services.TechnicalService;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -58,6 +58,8 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.util.ProActiveRandom;
+import org.objectweb.proactive.core.util.TimeoutAccounter;
+import org.objectweb.proactive.core.util.log.remote.ProActiveLogCollectorDeployer;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
@@ -93,6 +95,7 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
 
     /** Defined Virtual Nodes */
     private Map<String, GCMVirtualNodeInternal> virtualNodes = null;
+    private Map<String, GCMVirtualNode> ROvirtualNodes = null;
 
     /** The Deployment Tree */
     private TopologyRootImpl deploymentTree;
@@ -118,6 +121,8 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
     private ProActiveSecurityManager proactiveApplicationSecurityManager;
 
     private VariableContractImpl vContract;
+
+    final private ProActiveLogCollectorDeployer logCollector;
 
     static public GCMApplication getLocal(long deploymentId) {
         return localDeployments.get(deploymentId);
@@ -192,19 +197,13 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
                 }
             }
 
-            // Export this GCMApplication as a remote object
-            RemoteObjectExposer<GCMApplication> roe = new RemoteObjectExposer<GCMApplication>(
-                GCMApplication.class.getName(), this, GCMApplicationRemoteObjectAdapter.class);
-            URI uri = RemoteObjectHelper.generateUrl(deploymentId + "/GCMApplication");
-            roe.createRemoteObject(uri);
-
-            // Export all VirtualNodes as remote objects
-            for (GCMVirtualNode vn : virtualNodes.values()) {
-                RemoteObjectExposer<GCMVirtualNode> vnroe = new RemoteObjectExposer<GCMVirtualNode>(
-                    GCMVirtualNode.class.getName(), vn, GCMVirtualNodeRemoteObjectAdapter.class);
-                uri = RemoteObjectHelper.generateUrl(deploymentId + "/VirtualNode/" + vn.getName());
-                vnroe.createRemoteObject(uri);
+            this.ROvirtualNodes = new HashMap<String, GCMVirtualNode>();
+            for (GCMVirtualNode vn : this.virtualNodes.values()) {
+                this.ROvirtualNodes.put(vn.getName(), vnAsRemoteObject(vn));
             }
+
+            this.logCollector = new ProActiveLogCollectorDeployer(this.deploymentId + "/logCollector");
+
         } catch (Exception e) {
             throw new ProActiveException("Failed to create GCMApplication: " + e.getMessage() +
                 ", see embded message for more details", e);
@@ -240,12 +239,26 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
         }
     }
 
+    private GCMVirtualNode vnAsRemoteObject(GCMVirtualNode vn) {
+        // Export this GCMApplication as a remote object
+        String name = this.getDeploymentId() + "/VirtualNode/" + vn.getName();
+        RemoteObjectExposer<GCMVirtualNode> roe = new RemoteObjectExposer<GCMVirtualNode>(
+            GCMVirtualNode.class.getName(), vn, GCMVirtualNodeRemoteObjectAdapter.class);
+        roe.createRemoteObject(name);
+        try {
+            return (GCMVirtualNode) RemoteObjectHelper.generatedObjectStub(roe.getRemoteObject());
+        } catch (ProActiveException e) {
+            GCMA_LOGGER.error(e);
+            return null;
+        }
+    }
+
     public GCMVirtualNode getVirtualNode(String vnName) {
-        return virtualNodes.get(vnName);
+        return this.ROvirtualNodes.get(vnName);
     }
 
     public Map<String, GCMVirtualNode> getVirtualNodes() {
-        return new HashMap<String, GCMVirtualNode>(virtualNodes);
+        return this.ROvirtualNodes;
     }
 
     public void kill() {
@@ -455,6 +468,27 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
         currentDeploymentPath.remove(currentDeploymentPath.size() - 1);
     }
 
+    public void waitReady(long timeout) throws ProActiveTimeoutException {
+        TimeoutAccounter time = TimeoutAccounter.getAccounter(timeout);
+        for (GCMVirtualNode vn : virtualNodes.values()) {
+            try {
+                vn.waitReady(time.getRemainingTimeout());
+            } catch (ProActiveTimeoutException e) {
+                if (time.isTimeoutElapsed()) { // should always be true
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("Timeout reached while waiting for all virtual nodes to be ready.");
+                    for (GCMVirtualNode v : virtualNodes.values()) {
+                        sb.append(" ");
+                        sb.append(v.getName());
+                        sb.append(": ");
+                        sb.append(v.isReady());
+                        throw new ProActiveTimeoutException(sb.toString());
+                    }
+                }
+            }
+        }
+    }
+
     public void waitReady() {
         for (GCMVirtualNode vn : virtualNodes.values()) {
             vn.waitReady();
@@ -462,7 +496,7 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
     }
 
     public Set<String> getVirtualNodeNames() {
-        return new HashSet<String>(virtualNodes.keySet());
+        return new HashSet<String>(ROvirtualNodes.keySet());
     }
 
     public ProActiveSecurityManager getProActiveApplicationSecurityManager() {
@@ -493,6 +527,10 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
                     ". Please check your network configuration", e);
             }
         }
+    }
+
+    public String getLogCollectorUrl() {
+        return this.logCollector.getCollectorURL();
     }
 
 }

@@ -136,7 +136,7 @@
 
         </section>
 
-        <section>
+        <section xml:id="LaunchingMatlabScilabGridToolBox">
             <info>
                 <title>Launching Matlab/Scilab Grid ToolBox</title>
             </info>
@@ -187,7 +187,7 @@
                 </listitem>
             </itemizedlist>
 
-            <figure>
+            <figure xml:id="Mainframe">
                 <info>
                     <title>Main frame</title>
                 </info>
@@ -201,7 +201,7 @@
             </figure>
         </section>
 
-        <section>
+        <section xml:id="Deploymentoftheapplication">
             <info>
                 <title>Deployment of the application</title>
             </info>
@@ -216,7 +216,7 @@
                 the nodes.
             </para>
 
-            <figure>
+            <figure xml:id="Deploymentoftheapplication_17">
                 <info>
                     <title>Deployment of the application</title>
                 </info>
@@ -230,7 +230,7 @@
             </figure>
         </section>
 
-        <section>
+        <section xml:id="Tasklaunching">
             <info>
                 <title>Task launching</title>
             </info>
@@ -245,7 +245,7 @@
                 creates and sends the task.
             </para>
 
-            <figure>
+            <figure xml:id="Creationofatask">
                 <info>
                     <title>Creation of a task</title>
                 </info>
@@ -259,7 +259,7 @@
             </figure>
         </section>
 
-        <section>
+        <section xml:id="Displayofresults">
             <info>
                 <title>Display of results</title>
             </info>
@@ -273,7 +273,7 @@
                 the result (with the possibility to save it in a file)
             </para>
 
-            <figure>
+            <figure xml:id="Displayaresult">
                 <info>
                     <title>Display a result</title>
                 </info>
@@ -287,7 +287,7 @@
             </figure>
         </section>
 
-        <section>
+        <section xml:id="Taskmonitoring">
             <info>
                 <title>Task monitoring</title>
             </info>
@@ -329,7 +329,7 @@
             </itemizedlist>
         </section>
 
-        <section>
+        <section xml:id="Enginemonitoring">
             <info>
                 <title>Engine monitoring</title>
             </info>
@@ -343,7 +343,7 @@
                 A rigth-click on it show a popup menu to restart it.
             </para>
 
-            <figure>
+            <figure xml:id="StateofEngines">
                 <info>
                     <title>State of Engines</title>
                 </info>
@@ -586,14 +586,14 @@
                 </info>
 
 
-                <programlisting xml:lang="java"><textobject><textdata fileref="../src/Extensions/org/objectweb/proactive/extensions/scilab/test/SciTest2.java"/></textobject></programlisting>
+                <programlisting language="java"><textobject><textdata fileref="../src/Extensions/org/objectweb/proactive/extensions/scilab/test/SciTest2.java"/></textobject></programlisting>
             </example>
             <example xml:id="sciex2">
                 <info>
                     <title>Descriptor deployment</title>
                 </info>
 
-                <programlisting xml:lang="xml"><textobject><textdata fileref="../examples/scilab/GCMA.xml"/></textobject></programlisting>
+                <programlisting language="xml"><textobject><textdata fileref="../examples/scilab/GCMA.xml"/></textobject></programlisting>
             </example>
         </section>
     </section>

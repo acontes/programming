@@ -33,6 +33,8 @@ package org.objectweb.proactive.core.body;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.URI;
+import java.net.URL;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Job;
@@ -111,9 +113,9 @@ public interface UniversalBody extends Job, Serializable, SecurityEntity {
 
     /**
      * similar to the {@link UniversalBody#updateLocation(org.objectweb.proactive.core.UniqueID, UniversalBody)} method,
-     * it allows direct communication to the target of a functional call, accross membranes of composite components.
+     * it allows direct communication to the target of a functional call, across membranes of composite components.
      * @param shortcut the shortcut to create
-     * @exception java.io.IOException if a pb occurs during this method call
+     * @exception java.io.IOException if a problem occurs during this method call
      */
     public void createShortcut(Shortcut shortcut) throws java.io.IOException;
 
@@ -131,23 +133,23 @@ public interface UniversalBody extends Job, Serializable, SecurityEntity {
 
     /**
      * Enables automatic continuation mechanism for this body
-     * @exception java.io.IOException if a pb occurs during this method call
+     * @exception java.io.IOException if a problem occurs during this method call
      */
     public void enableAC() throws java.io.IOException;
 
     /**
      * Disables automatic continuation mechanism for this body
-     * @exception java.io.IOException if a pb occurs during this method call
+     * @exception java.io.IOException if a problem occurs during this method call
      */
     public void disableAC() throws java.io.IOException;
 
     // FAULT TOLERANCE
 
     /**
-     * For sending a non fonctional message to the FTManager linked to this object.
+     * For sending a non functional message to the FTManager linked to this object.
      * @param ev the message to send
      * @return depends on the message meaning
-     * @exception java.io.IOException if a pb occurs during this method call
+     * @exception java.io.IOException if a problem occurs during this method call
      */
     public Object receiveFTMessage(FTMessage ev) throws IOException;
 
@@ -177,6 +179,9 @@ public interface UniversalBody extends Job, Serializable, SecurityEntity {
      * @throws UnknownProtocolException thrown if the protocol is not supported by
      * the current active object
      */
+    @Deprecated
     public void register(String url) throws IOException, UnknownProtocolException;
+
+    public String registerByName(String name) throws IOException;
 }
 //@snippet-end universalbody

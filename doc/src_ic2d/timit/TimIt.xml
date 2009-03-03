@@ -3,7 +3,7 @@
     <indexterm>
         <primary>TimIt</primary>
     </indexterm>
-    <section><info><title>Overview</title></info>        
+    <section xml:id="Overview"><info><title>Overview</title></info>
         <para>
             TimIt offer a complete solution to benchmark an application.
             It is an API which provide some advanced timing and event
@@ -37,7 +37,7 @@
                     <imagedata scalefit="1" width="100%" contentdepth="100%" fileref="timit/pics/chartsExamples.png" format="PNG"/>
                 </imageobject>
             </mediaobject>
-            <programlisting xml:lang="xml">&lt;timit&gt;
+            <programlisting language="xml">&lt;timit&gt;
   &lt;FinalStatistics name="Example2 4" runs="10" timeoutErrors="0"
                    date="2006-11-05 10:46:56.742"&gt;
 
@@ -81,15 +81,15 @@
 &lt;/timit&gt;</programlisting>
         </para>
     </section>
-    <section><info><title>Quick start</title></info>
+    <section xml:id="Quickstart"><info><title>Quick start</title></info>
         
-        <section><info><title>Define your TimIt configuration file</title></info>
+        <section xml:id="DefineyourTimItconfigurationfile"><info><title>Define your TimIt configuration file</title></info>
             
             <para>
                 Configuring TimIt is done through an XML configuration
                 file which is axed around four major tags :
             </para>
-            <section><info><title>Global variables definition</title></info>
+            <section xml:id="Globalvariablesdefinition"><info><title>Global variables definition</title></info>
                 
                 <para>
                     This part set variables which can be used both
@@ -132,7 +132,7 @@
                 <para>
                     For example, these two examples are equivalents :
                 </para>
-                <programlisting xml:lang="xml">&lt;timit&gt;
+                <programlisting language="xml">&lt;timit&gt;
 
   &lt;globalVariables&gt;
     &lt;descriptorVariable name="ALGO" value="Algo1,Algo2"/&gt;
@@ -184,7 +184,7 @@
                     <emphasis>benchmark</emphasis>
                     tag like this :
                 </para>
-                <programlisting xml:lang="xml">&lt;benchmark name="Test ${TEST} : algo ${ALGO} on ${NP} nodes" (...) &gt;
+                <programlisting language="xml">&lt;benchmark name="Test ${TEST} : algo ${ALGO} on ${NP} nodes" (...) &gt;
   &lt;descriptorVariable name="NBNODES" value="${NP} /&gt;
 &lt;/benchmark&gt;</programlisting>
                 <para>
@@ -198,11 +198,11 @@
                     <literal>#{...}</literal>
                     pattern :
                 </para>
-                <programlisting xml:lang="xml">&lt;benchmark name="Test ${TEST} : algo #{Algo1,Algo2} on ${NP} nodes" (...) &gt;
+                <programlisting language="xml">&lt;benchmark name="Test ${TEST} : algo #{Algo1,Algo2} on ${NP} nodes" (...) &gt;
   &lt;descriptorVariable name="NBNODES" value="${NP} /&gt;
 &lt;/benchmark&gt;</programlisting>
             </section>
-            <section><info><title>Serie</title></info>
+            <section xml:id="Serie"><info><title>Serie</title></info>
                 
                 <para>
                     A Serie represent a suite of benchmarks. For
@@ -249,7 +249,7 @@
                     </listitem>
                 </itemizedlist>
             </section>
-            <section><info><title>Chart definition</title></info>
+            <section xml:id="Chartdefinition"><info><title>Chart definition</title></info>
                 
                 <para>
                     Here you specify parameters for the charts. Those
@@ -405,7 +405,7 @@
                     </listitem>
                 </itemizedlist>
             </section>
-            <section><info><title>Benchmark suite definition</title></info>
+            <section xml:id="Benchmarksuitedefinition"><info><title>Benchmark suite definition</title></info>
                 
                 <para>
                     Define the suite of tests with different parameters.
@@ -499,7 +499,7 @@
                 </para>
                 <para>
                     Here is a complete example of a configuration file :
-                    <programlisting xml:lang="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+                    <programlisting language="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;timit&gt;       
     
   &lt;!-- GLOBAL VARIABLES DEFINITION
@@ -560,7 +560,7 @@
                 </para>
             </section>
         </section>
-        <section><info><title>
+        <section xml:id="Addtimecounter"><info><title>
                 Add time counters and event observers in your source
                 files
             </title></info>
@@ -572,7 +572,7 @@
                             Main class have to implement
                             <emphasis>Startable</emphasis>
                             interface
-                            <programlisting xml:lang="java">public class Example implements Startable {
+                            <programlisting language="java">public class Example implements Startable {
   
   /** TimIt needs a noarg constructor (can be implicit) **/
   public Example() {}
@@ -613,7 +613,7 @@
                         <para>
                             Analyzed class have to extend
                             <emphasis>Timed</emphasis>
-                            <programlisting xml:lang="java">public class Worker extends Timed {
+                            <programlisting language="java">public class Worker extends Timed {
   
   /** Declaration of all TimerCounters and EventObservers **/
   private TimerCounter T_TOTAL, T_INIT, T_WORK, T_COMM;
@@ -654,7 +654,7 @@
             </para>
         </section>
     </section>
-    <section><info><title>Usage</title></info>
+    <section xml:id="Usage"><info><title>Usage</title></info>
         
         <para>
             TimIt provide different kind of services. By combinig them,
@@ -662,7 +662,7 @@
             application. TimIt package contains few examples for using
             these services in your application.
         </para>
-        <section><info><title>Timer counters</title></info>
+        <section xml:id="Timercounters"><info><title>Timer counters</title></info>
             
             <para>
                 It will help you to time some piece of code in your
@@ -712,7 +712,7 @@
             </para>
             <para>The code associated to this example is :</para>
             <para>
-                <programlisting xml:lang="java">T_TOTAL.start();
+                <programlisting language="java">T_TOTAL.start();
 
   T_INIT.start();
     // Initialization part...
@@ -731,7 +731,7 @@
 T_TOTAL.stop();</programlisting>
             </para>
         </section>
-        <section><info><title>Event observers</title></info>
+        <section xml:id="Eventobservers_17"><info><title>Event observers</title></info>
             
             <para>
                 It will help you to keep an eye on different events that
@@ -754,7 +754,7 @@ T_TOTAL.stop();</programlisting>
                         number of performed communications.
                     </para>
                     <para>Example of usage :</para>
-                    <programlisting xml:lang="java">// Initialization
+                    <programlisting language="java">// Initialization
 int collapseOperation = DefaultEventData.SUM;
 int notifyOperation = DefaultEventData.SUM;
 EventObserver E_NBCOMMS = TimIt.add(
@@ -771,7 +771,7 @@ EventObserver E_NBCOMMS = TimIt.add(
                         determine what operation to perform between
                         Timed objects.
                     </para>
-                    <programlisting xml:lang="java">// Utilization
+                    <programlisting language="java">// Utilization
 for( int i=0; i&lt;10; i++ ) {
   TimIt.notifyObservers( new Event(E_NBCOMMS, 1) );
 }</programlisting>
@@ -794,7 +794,7 @@ for( int i=0; i&lt;10; i++ ) {
                         objects.
                     </para>
                     <para>Example of usage :</para>
-                    <programlisting xml:lang="java">// Initialization
+                    <programlisting language="java">// Initialization
 EventObserver E_COMM = TimIt.add(
          new CommEventObserver("mflops", groupSize, timedID);</programlisting>
                     <para>
@@ -807,7 +807,7 @@ EventObserver E_COMM = TimIt.add(
                         number which represent the current Timed object
                         (like the rank).
                     </para>
-                    <programlisting xml:lang="java">// Utilization
+                    <programlisting language="java">// Utilization
 int destID = (timedID + 1) % groupSize;
 TimIt.notifyObservers( new CommEvent(E_COMM, destID, 1) );</programlisting>
                     <para>
@@ -822,7 +822,7 @@ TimIt.notifyObservers( new CommEvent(E_COMM, destID, 1) );</programlisting>
                         have the receiver. Here we obtain a ring
                         topology :
                     </para>
-                    <programlisting xml:lang="java">1 0 0 0
+                    <programlisting language="java">1 0 0 0
 0 0 0 1
 0 0 1 0
 0 1 0 0</programlisting>
@@ -830,7 +830,7 @@ TimIt.notifyObservers( new CommEvent(E_COMM, destID, 1) );</programlisting>
             </itemizedlist>
         </section>
     </section>
-    <section><info><title>TimIt extension</title></info>
+    <section xml:id="TimItextension"><info><title>TimIt extension</title></info>
         
         <para>
             TimIt package can be found in
@@ -841,7 +841,7 @@ TimIt.notifyObservers( new CommEvent(E_COMM, destID, 1) );</programlisting>
             feature to this application. To do so, TimIt is organized in
             5 major points which can be extended :
         </para>
-        <section><info><title>Configuration file</title></info>
+        <section xml:id="Configurationfile"><info><title>Configuration file</title></info>
             
             <para>
                 The subpackage
@@ -891,7 +891,7 @@ TimIt.notifyObservers( new CommEvent(E_COMM, destID, 1) );</programlisting>
                 <emphasis>1</emphasis>
                 .
             </para>
-            <programlisting xml:lang="java">// Add these lines in the get method of Benchmark class
+            <programlisting language="java">// Add these lines in the get method of Benchmark class
 if (name.equals("myOption")) {
   return "1";
 }</programlisting>
@@ -900,10 +900,10 @@ if (name.equals("myOption")) {
                 <emphasis>TimIt</emphasis>
                 class:
             </para>
-            <programlisting xml:lang="java">String result = bench.get("myOption");
+            <programlisting language="java">String result = bench.get("myOption");
 // ... and do whatever you want with it...</programlisting>
         </section>
-        <section><info><title>Timer counters</title></info>
+        <section xml:id="Timercounters_17"><info><title>Timer counters</title></info>
             
             <para>
                 The subpackage
@@ -927,7 +927,7 @@ if (name.equals("myOption")) {
                 </listitem>
             </itemizedlist>
         </section>
-        <section><info><title>Event observers</title></info>
+        <section xml:id="Eventobservers"><info><title>Event observers</title></info>
             
             <para>
                 The subpackage
@@ -1081,7 +1081,7 @@ if (name.equals("myOption")) {
                 </listitem>
             </orderedlist>
         </section>
-        <section><info><title>Chart generation</title></info>
+        <section xml:id="Chartgeneration"><info><title>Chart generation</title></info>
             
             <para>
                 The subpackage

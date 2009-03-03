@@ -40,6 +40,7 @@ package org.objectweb.proactive.core.util.log;
 public interface Loggers {
     static final public String CORE = "proactive";
     static final public String CONFIGURATION = CORE + ".configuration";
+    static final public String CONFIGURATION_NETWORK = CONFIGURATION + ".network";
     static final public String CLASSLOADING = CORE + ".classloading";
     static final public String EVENTS = CORE + ".events";
     static final public String RUNTIME = CORE + ".runtime";
@@ -78,20 +79,7 @@ public interface Loggers {
     public static final String EXAMPLES = CORE + ".examples";
     public static final String HTTPSERVER = CORE + ".httpserver";
 
-    // P2P loggers
-    public static final String P2P = CORE + ".p2p";
-    public static final String P2P_STARTSERVICE = P2P + ".startservice";
-    public static final String P2P_VN = P2P + ".vn"; //descriptor
-    public static final String P2P_DESC_SERV = P2P_VN + ".service"; // threads, nodes lookup
-    public static final String P2P_SERVICE = P2P + ".service";
-    public static final String P2P_MESSAGE = P2P + ".message";
-    public static final String P2P_NODES = P2P + ".nodes"; // lookup and nodes sharing
-    public static final String P2P_ACQUAINTANCES = P2P + ".acquaintances";
-    public static final String P2P_FIRST_CONTACT = P2P + ".first_contact";
-    public static final String P2P_SKELETONS = P2P + ".skeletons";
-    public static final String P2P_SKELETONS_WORKER = P2P_SKELETONS + ".worker";
-    public static final String P2P_SKELETONS_MANAGER = P2P_SKELETONS + ".manager";
-    public static final String P2P_DAEMON = P2P + ".daemon";
+    public static final String BNB = CORE + "bnb";
 
     // Security loggers
     public static final String SECURITY = CORE + ".security";
@@ -150,10 +138,22 @@ public interface Loggers {
     static final public String JMX_MBEAN = JMX + ".mbean";
     static final public String JMX_NOTIFICATION = JMX + ".notification";
 
+    // Forwarding
+    static final public String FORWARDING = CORE + ".forwarding";
+    static final public String FORWARDING_MESSAGE = FORWARDING + ".message";
+    static final public String FORWARDING_ROUTER = FORWARDING + ".router";
+    static final public String FORWARDING_CLIENT = FORWARDING + ".client";
+    static final public String FORWARDING_CLIENT_TUNNEL = FORWARDING_CLIENT + ".tunnel";
+    static final public String FORWARDING_REMOTE_OBJECT = FORWARDING + ".remoteobject";
+
     // Exceptions
     public static final String EXCEPTIONS = CORE + ".exceptions";
     public static final String EXCEPTIONS_ONE_WAY = EXCEPTIONS + ".one_way";
     public static final String EXCEPTIONS_SEND_REPLY = EXCEPTIONS + ".send_reply";
 
     public static final String WEB_SERVICES = CORE + "webservices";
+
+    public static final String UTILS = CORE + ".utils";
+    public static final String SLEEPER = UTILS + ".sleeper";
+    public static final String WAITER = UTILS + ".waiter";
 }

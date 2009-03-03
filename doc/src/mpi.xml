@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="WrappingMpiAndLegacyCode"><info><title>Wrapping Application Legacy code</title></info>
+<?xml version="1.0" encoding="utf-8"?><chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="WrappingMpiAndLegacyCode"><info><title xml:id="WrappingApplicationLegacycode_main">Wrapping Application Legacy code</title></info>
   
 
   <para>The <emphasis role="bold">Message Passing Interface (MPI)</emphasis>
@@ -61,10 +61,10 @@
 
   <!-- ////////////////////////////////// SIMPLE WRAPPING \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ -->
 
-  <section xml:id="Simple_Wrapping"><info><title>Simple Wrapping</title></info>
+  <section xml:id="Simple_Wrapping"><info><title xml:id="SimpleWrapping_5">Simple Wrapping</title></info>
     
 
-    <section xml:id="SP_Principles"><info><title>Principles</title></info>
+    <section xml:id="SP_Principles"><info><title xml:id="Principles_1000">Principles</title></info>
       
 
       <!-- ///// PRINCIPLES \\\\ -->
@@ -80,7 +80,7 @@
       <para>One of the main principle is to specify and wrap the MPI code in
       an XML descriptor.</para>
 
-      <para><figure><info><title>File transfer and asking for resources</title></info>
+      <para><figure xml:id="Filetransferandaskingforresources_2"><info><title>File transfer and asking for resources</title></info>
           
 
           <mediaobject>
@@ -137,12 +137,12 @@
       </itemizedlist>
     </section>
 
-    <section xml:id="API_For_Deploying_MPI_Codes"><info><title>API For Deploying MPI Codes</title></info>
+    <section xml:id="API_For_Deploying_MPI_Codes"><info><title xml:id="APIForDeployingMPICodes_3">API For Deploying MPI Codes</title></info>
       
 
       <!-- ///// API \\\\ -->
 
-      <section><info><title>API Definition</title></info>
+      <section xml:id="APIDefinition_4"><info><title>API Definition</title></info>
         
 
         <!-- ///// API Definition \\\\ -->
@@ -173,7 +173,7 @@
             <para><emphasis role="bold">MPISpmd object creation
             methods</emphasis></para>
 
-            <programlisting xml:lang="java">import org.objectweb.proactive.mpi;
+            <programlisting language="java">import org.objectweb.proactive.mpi;
 
 /**
  * creates an <emphasis role="bold">MPISpmd object</emphasis> from a Virtual Node which represents the deployment of an MPI code.
@@ -191,7 +191,7 @@ static public MPISpmd <emphasis role="bold">MPI.newMPISpmd</emphasis>(VirtualNod
             <para><emphasis role="bold">MPISpmd object control
             methods</emphasis></para>
 
-            <programlisting xml:lang="java">
+            <programlisting language="java">
 /**
  * Triggers the process execution represented by the MPISpmd object on the resources previously
  * allocated. This method call is an asynchronous request, thus the call does not
@@ -205,7 +205,7 @@ static public MPISpmd <emphasis role="bold">MPI.newMPISpmd</emphasis>(VirtualNod
 
 public <emphasis role="bold">MPIResult startMPI</emphasis>();</programlisting>
 
-            <programlisting xml:lang="java">
+            <programlisting language="java">
 /**
  * Restarts the process represented by the MPISpmd object on the same resources. This process has
  * to previously been started once with the start method, otherwise the method throws an
@@ -217,7 +217,7 @@ public <emphasis role="bold">MPIResult startMPI</emphasis>();</programlisting>
 
 public <emphasis role="bold">MPIResult reStartMPI</emphasis>();</programlisting>
 
-            <programlisting xml:lang="java">
+            <programlisting language="java">
 /** 
  * Kills the process and OS MPI processes represented by the MPISpmd object. 
  * It returns true if the process was running when it has been killed, false otherwise.
@@ -225,14 +225,14 @@ public <emphasis role="bold">MPIResult reStartMPI</emphasis>();</programlisting>
 
 public boolean <emphasis role="bold">killMPI</emphasis>();</programlisting>
 
-            <programlisting xml:lang="java">
+            <programlisting language="java">
 /**
  * Returns the current status of the MPISpmd object. The different status are listed below.
  */
 
 public String <emphasis role="bold">getStatus</emphasis>();</programlisting>
 
-            <programlisting xml:lang="java">
+            <programlisting language="java">
 /**
  * Add or modify the MPI command parameters. It allows programmers to specify arguments to the MPI code.
  * This method has to be called before startMPI or reStartMPI. 
@@ -252,7 +252,7 @@ public void <emphasis role="bold">setCommandArguments</emphasis>(String argument
             meaning that the MPI program is terminated. The following method
             gets the exit value of the MPI program.</para>
 
-            <programlisting xml:lang="java">
+            <programlisting language="java">
 import org.objectweb.proactive.mpi.MPIResult; 
 
 /**
@@ -267,7 +267,7 @@ public int <emphasis role="bold">getReturnValue</emphasis>();</programlisting>
             <para><emphasis role="bold">MPISpmd object
             status</emphasis></para>
 
-            <programlisting xml:lang="java">import org.objectweb.proactive.mpi;
+            <programlisting language="java">import org.objectweb.proactive.mpi;
 
 <emphasis role="bold">MPIConstants.MPI_UNSTARTED</emphasis>; // default status - MPISpmd object creation (newMPISpmd)
 <emphasis role="bold">MPIConstants.MPI_RUNNING</emphasis>;   // MPISpmd object has been started or restarted
@@ -279,7 +279,7 @@ public int <emphasis role="bold">getReturnValue</emphasis>();</programlisting>
             control of the application in case of multiple MPISpmd
             objects.</para>
 
-            <para><figure><info><title>State transition diagram</title></info>
+            <para><figure xml:id="Statetransitiondiagram_5"><info><title>State transition diagram</title></info>
                 
 
                 <mediaobject>
@@ -293,7 +293,7 @@ public int <emphasis role="bold">getReturnValue</emphasis>();</programlisting>
       </section>
     </section>
 
-    <section xml:id="How_to_write_an_application_with_the_API"><info><title>How to write an application with the XML and the API</title></info>
+    <section xml:id="How_to_write_an_application_with_the_API"><info><title xml:id="HowtowriteanapplicationwiththeXML_6">How to write an application with the XML and the API</title></info>
       <!-- ///// How to write an application with the API \\\\ -->
 
       
@@ -323,7 +323,7 @@ public int <emphasis role="bold">getReturnValue</emphasis>();</programlisting>
       value once finished. No modification have to be made to the source
       code.</para>
 
-      <programlisting xml:lang="java">
+      <programlisting language="java">
 <emphasis role="bold">import org.objectweb.proactive.mpi.*;</emphasis>
 
 ...
@@ -357,7 +357,7 @@ logger.info(<emphasis role="bold">jacobiSpmd</emphasis>);
 	</programlisting>
     </section>
 
-    <section xml:id="Using_the_Infrastructure"><info><title>Using the Infrastructure</title></info>
+    <section xml:id="Using_the_Infrastructure"><info><title xml:id="UsingtheInfrastructure_7">Using the Infrastructure</title></info>
       <!-- ///// Using the Infrastructure \\\\ -->
 
       
@@ -376,7 +376,7 @@ logger.info(<emphasis role="bold">jacobiSpmd</emphasis>);
           <emphasis role="bold">jacobi</emphasis> is the binary of the MPI
           program. For further details about File Transfer see <xref linkend="FileTransfer_html_intro"/>.</para>
 
-          <programlisting xml:lang="xml">&lt;componentDefinition&gt;
+          <programlisting language="xml">&lt;componentDefinition&gt;
     &lt;virtualNodesDefinition&gt;
         &lt;virtualNode name="JACOBIVN" /&gt;
     &lt;/virtualNodesDefinition&gt;
@@ -394,7 +394,7 @@ logger.info(<emphasis role="bold">jacobiSpmd</emphasis>);
 
         <listitem>
           <para><emphasis role="bold">Resource allocation:</emphasis> define
-          processes for resource reservation. See <xref xml:linkend="DESCRIPTOR_Infrastructure_and_processes"/> for more
+          processes for resource reservation. See <xref linkend="DESCRIPTOR_Infrastructure_and_processes"/> for more
           details on processes.</para>
 
           <para><itemizedlist>
@@ -406,7 +406,7 @@ logger.info(<emphasis role="bold">jacobiSpmd</emphasis>);
                 the reference ID to the DependentProcessSequence process
                 explained below.</para>
 
-                <programlisting xml:lang="xml">&lt;processDefinition id="sshProcess"&gt;
+                <programlisting language="xml">&lt;processDefinition id="sshProcess"&gt;
     &lt;sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess" 
         hostname="nef.inria.fr"
         username="user"&gt;
@@ -431,7 +431,7 @@ logger.info(<emphasis role="bold">jacobiSpmd</emphasis>);
                 interface. The following lines express that the mpiProcess is
                 dependent on the resources allocated by the pbsProcess.</para>
 
-                <programlisting xml:lang="xml">
+                <programlisting language="xml">
 &lt;processDefinition id="jacobiDependentProcess"&gt;
     &lt;dependentProcessSequence class="org.objectweb.proactive.core.process.DependentListProcess"&gt;
         &lt;processReference refid="jacobiPBSProcess"/&gt;
@@ -446,7 +446,7 @@ logger.info(<emphasis role="bold">jacobiSpmd</emphasis>);
                 you can use any services defined in ProActive to allocate
                 resources instead of the PBS one.</para>
 
-                <programlisting xml:lang="xml">
+                <programlisting language="xml">
 &lt;processDefinition id="jacobiPBSProcess"&gt;
     &lt;pbsProcess class="org.objectweb.proactive.core.process.pbs.PBSSubProcess"&gt;
         &lt;processReference refid="jvmProcess" /&gt;
@@ -475,7 +475,7 @@ logger.info(<emphasis role="bold">jacobiSpmd</emphasis>);
           MPI code local path. The local path is the path from which you start
           the application.</para>
 
-          <programlisting xml:lang="xml">&lt;processDefinition id="jacobiMPIProcess"&gt;
+          <programlisting language="xml">&lt;processDefinition id="jacobiMPIProcess"&gt;
     &lt;mpiProcess class="org.objectweb.proactive.core.process.mpi.MPIDependentProcess"
         mpiFileName="jacobi"
         mpiCommandOptions="input_file.dat output_file.dat"&gt;
@@ -495,7 +495,7 @@ logger.info(<emphasis role="bold">jacobiSpmd</emphasis>);
       </itemizedlist>
     </section>
 
-    <section xml:id="Example_with_several_codes"><info><title>Example with several codes</title></info>
+    <section xml:id="Example_with_several_codes"><info><title xml:id="Examplewithseveralcodes_8">Example with several codes</title></info>
       <!-- ///// Usage example with several codes \\\\ -->
 
       
@@ -504,7 +504,7 @@ logger.info(<emphasis role="bold">jacobiSpmd</emphasis>);
       (VibroToAcous, AcousToVibro, Vibro, Acous, CheckConvergency) which are
       each a parallel MPI binary code.</para>
 
-      <programlisting xml:lang="java">
+      <programlisting language="java">
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
@@ -606,7 +606,7 @@ CheckConvergency.killAll(false);
 
   <!-- ////////////////////////////////// WRAPPING WITH CONTROL \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ -->
 
-  <section xml:id="Wrapping_with_control"><info><title>Wrapping with control</title></info>
+  <section xml:id="Wrapping_with_control"><info><title xml:id="Wrappingwithcontrol_9">Wrapping with control</title></info>
     
 
     <para>Some MPI applications may decompose naturally into components that
@@ -656,7 +656,7 @@ CheckConvergency.killAll(false);
     the class <emphasis role="bold">org.objectweb.proactive.mpi.control.ProActiveMPI</emphasis>
     gathering static method for deployment.</para>
 
-    <section xml:id="One_Active_Object_per_MPI_process"><info><title>One Active Object per MPI process</title></info>
+    <section xml:id="One_Active_Object_per_MPI_process"><info><title xml:id="OneActiveObjectperMPIprocess_10">One Active Object per MPI process</title></info>
       
 
       <!-- ///// One Active Object per MPI process \\\\ -->
@@ -686,7 +686,7 @@ CheckConvergency.killAll(false);
       programmer SPMD instance ranks will match with the MPI process
       ones.</para>
 
-      <section><info><title xml:id="MPI_control_oneactive_javaapi">Java API</title></info>
+      <section xml:id="MPI_control_oneactive_javaapi"><info><title>Java API</title></info>
         
 
         <!-- ///// Java API  \\\\ -->
@@ -699,7 +699,7 @@ CheckConvergency.killAll(false);
             <para>For more details about MPISpmd object creation, please refer
             to <xref linkend="API_For_Deploying_MPI_Codes"/>.</para>
 
-            <programlisting xml:lang="java">
+            <programlisting language="java">
 import org.objectweb.proactive.mpi;
 
 /**
@@ -712,7 +712,7 @@ import org.objectweb.proactive.mpi;
 
 public void <emphasis role="bold"> newActiveSpmd</emphasis>(String class);</programlisting>
 
-            <programlisting xml:lang="java">
+            <programlisting language="java">
 import org.objectweb.proactive.mpi;
 
 /**
@@ -725,7 +725,7 @@ import org.objectweb.proactive.mpi;
 
 public void <emphasis role="bold">newActiveSpmd</emphasis>(String class, Object[] params);</programlisting>
 
-            <programlisting xml:lang="java">
+            <programlisting language="java">
 import org.objectweb.proactive.mpi;
 
 /**
@@ -738,7 +738,7 @@ import org.objectweb.proactive.mpi;
 
 public void <emphasis role="bold">newActiveSpmd</emphasis>(String class, Object[][] params);</programlisting>
 
-            <programlisting xml:lang="java">
+            <programlisting language="java">
 import org.objectweb.proactive.mpi;
 
 /**
@@ -766,7 +766,7 @@ public void <emphasis role="bold">newActive</emphasis>(String class, Object[] pa
             The JobID of an MPI code is directly given by the rank of the
             MPISpmd Object in the ArrayList at deployment time.</para>
 
-            <para><programlisting xml:lang="java">import org.objectweb.proactive.mpi;
+            <para><programlisting language="java">import org.objectweb.proactive.mpi;
 
 /**
  * Deploys and starts (startMPI() being called) all MPISpmd objects contained in the list <emphasis role="bold">mpiSpmdObjectList</emphasis>.
@@ -778,7 +778,7 @@ static public void <emphasis role="bold">ProActiveMPI.deploy</emphasis>(ArrayLis
         </itemizedlist>
       </section>
 
-      <section><info><title>Example</title></info>
+      <section xml:id="Example_11"><info><title>Example</title></info>
         
 
         <!-- ///// Example  \\\\ -->
@@ -789,7 +789,7 @@ static public void <emphasis role="bold">ProActiveMPI.deploy</emphasis>(ArrayLis
         that for the Simple Wrapping. For more details about writing a file
         descriptor, please refer to <xref linkend="Using_the_Infrastructure"/>.</para>
 
-        <para><programlisting xml:lang="java">
+        <para><programlisting language="java">
 <emphasis role="bold">import org.objectweb.proactive.mpi.*;</emphasis>
 
 ...
@@ -826,7 +826,7 @@ ProActiveMPI.deploy(spmdList);
       </section>
     </section>
 
-    <section xml:id="MPI_to_ProActive"><info><title>MPI to ProActive Communications</title></info>
+    <section xml:id="MPI_to_ProActive"><info><title xml:id="MPItoProActiveCommunications_12">MPI to ProActive Communications</title></info>
       
 
       <!-- ///// MPI to ProActive Communications \\\\ -->
@@ -839,12 +839,12 @@ ProActiveMPI.deploy(spmdList);
       communicate through ProActive needs to call the <emphasis role="bold">ProActiveMPI_Init()</emphasis> function detailed in the
       <xref linkend="MPI_to_MPI"/></para>
 
-      <section><info><title>MPI API</title></info>
+      <section xml:id="MPIAPI_13"><info><title>MPI API</title></info>
         
 
         <!-- ///// MPI API Definition \\\\ -->
 
-        <programlisting xml:lang="java">
+        <programlisting language="java">
 <emphasis role="bold">ProActiveSend</emphasis>
     Performs a basic send from mpi side to a ProActive java class
 
@@ -864,7 +864,7 @@ ProActiveMPI.deploy(spmdList);
 </programlisting>
       </section>
 
-      <section><info><title>ProActiveMPIData Object</title></info>
+      <section xml:id="ProActiveMPIDataObject_14"><info><title>ProActiveMPIData Object</title></info>
         
 
         <para>The <emphasis role="bold">ProActiveMPIData</emphasis> class
@@ -875,7 +875,7 @@ ProActiveMPI.deploy(spmdList);
         The ProActiveMPIData object contains severals fields that can be
         useful to the programmer. The following methods are available:</para>
 
-        <programlisting xml:lang="java">import org.objectweb.proactive.mpi.control;
+        <programlisting language="java">import org.objectweb.proactive.mpi.control;
 
 /**
  * return the rank of the MPI process that sent this message
@@ -884,7 +884,7 @@ ProActiveMPI.deploy(spmdList);
 public int <emphasis role="bold">getSrc</emphasis>();
 </programlisting>
 
-        <programlisting xml:lang="java">
+        <programlisting language="java">
 /**
  * return the sender job ID
  */
@@ -892,7 +892,7 @@ public int <emphasis role="bold">getSrc</emphasis>();
 public int <emphasis role="bold">getJobID</emphasis>();
 </programlisting>
 
-        <programlisting xml:lang="java">
+        <programlisting language="java">
 /**
  * return the type of elements in the buffer data contained in the message. 
  * The type can be compared with the constants defined in the class ProActiveMPIConstants
@@ -902,7 +902,7 @@ public int <emphasis role="bold">getJobID</emphasis>();
 public int <emphasis role="bold">getDatatype</emphasis>();
 </programlisting>
 
-        <programlisting xml:lang="java">
+        <programlisting language="java">
 /**
  * return the parameters as an array of String specified in the ProActiveSend method call.
  */
@@ -910,7 +910,7 @@ public int <emphasis role="bold">getDatatype</emphasis>();
 public String [] <emphasis role="bold">getParameters</emphasis>();
 </programlisting>
 
-        <programlisting xml:lang="java">
+        <programlisting language="java">
 
 /**
  * return the data buffer as an array of primitive type byte.
@@ -919,7 +919,7 @@ public String [] <emphasis role="bold">getParameters</emphasis>();
 public byte [] <emphasis role="bold">getData</emphasis>();
 </programlisting>
 
-        <programlisting xml:lang="java">
+        <programlisting language="java">
 /**
  * return the number of elements in the buffer.
  */
@@ -929,7 +929,7 @@ public int <emphasis role="bold">getCount</emphasis>();
 </programlisting>
       </section>
 
-      <section><info><title>ProActiveMPIUtil Class</title></info>
+      <section xml:id="ProActiveMPIUtilClass_15"><info><title>ProActiveMPIUtil Class</title></info>
         
 
         <para>The <emphasis role="bold">ProActiveMPIUtil</emphasis> class in
@@ -938,7 +938,7 @@ public int <emphasis role="bold">getCount</emphasis>();
         programmer may use the following functions to convert an array of
         bytes into an array of elements with a different type:</para>
 
-        <programlisting xml:lang="java">
+        <programlisting language="java">
 /* Given a byte array, restore it as an int
  * param bytes the byte array
  * param startIndex the starting index of the place the int is stored
@@ -947,7 +947,7 @@ public int <emphasis role="bold">getCount</emphasis>();
  public static int <emphasis role="bold">bytesToInt</emphasis>(byte[] bytes, int startIndex);
 </programlisting>
 
-        <programlisting xml:lang="java">
+        <programlisting language="java">
 /* Given a byte array, restore it as a float
  * param bytes the byte array
  * param startIndex the starting index of the place the float is stored
@@ -956,7 +956,7 @@ public int <emphasis role="bold">getCount</emphasis>();
  public static float <emphasis role="bold">bytesToFloat</emphasis>(byte[] bytes, int startIndex);
 </programlisting>
 
-        <programlisting xml:lang="java">
+        <programlisting language="java">
 /* Given a byte array, restore it as a short
  * param bytes the byte array
  * param startIndex the starting index of the place the short is stored
@@ -965,7 +965,7 @@ public int <emphasis role="bold">getCount</emphasis>();
  public static short <emphasis role="bold">bytesToShort</emphasis>(byte[] bytes, int startIndex);
 </programlisting>
 
-        <programlisting xml:lang="java">
+        <programlisting language="java">
 /*
  * Given a byte array, restore a String out of it.
  * the first cell stores the length of the String
@@ -978,7 +978,7 @@ public int <emphasis role="bold">getCount</emphasis>();
  public static String<emphasis role="bold"> bytesToString</emphasis>(byte[] bytes, int startIndex);
 </programlisting>
 
-        <programlisting xml:lang="java">
+        <programlisting language="java">
 /* Given a byte array, restore it as a long
  * param bytes the byte array
  * param startIndex the starting index of the place the long is stored
@@ -987,7 +987,7 @@ public int <emphasis role="bold">getCount</emphasis>();
  public static long <emphasis role="bold">bytesToLong</emphasis>(byte[] bytes, int startIndex);
 </programlisting>
 
-        <programlisting xml:lang="java">
+        <programlisting language="java">
 /* Given a byte array, restore it as a double
  * param bytes the byte array
  * param startIndex the starting index of the place the double is stored
@@ -997,7 +997,7 @@ public int <emphasis role="bold">getCount</emphasis>();
 </programlisting>
       </section>
 
-      <section><info><title>Example</title></info>
+      <section xml:id="Example_16"><info><title>Example</title></info>
         
 
         <!-- ///// Example \\\\ -->
@@ -1007,7 +1007,7 @@ public int <emphasis role="bold">getCount</emphasis>();
             <para><emphasis role="bold"> Main program [ProActive deployment
             part]</emphasis></para>
 
-            <programlisting xml:lang="java">
+            <programlisting language="java">
 <emphasis role="bold">import org.objectweb.proactive.mpi.*;</emphasis>
 
 ...
@@ -1038,7 +1038,7 @@ ProActiveMPI.deploy(spmdList);
             <para><emphasis role="bold"> Programmer class
             definition</emphasis></para>
 
-            <programlisting xml:lang="java">
+            <programlisting language="java">
 public class MyClass{
 
     public MyClass() {
@@ -1060,7 +1060,7 @@ public class MyClass{
           <listitem>
             <para><emphasis role="bold"> MPI Side</emphasis></para>
 
-            <programlisting xml:lang="java">
+            <programlisting language="java">
 #include &lt;stdio.h&gt;
 #include "mpi.h"
 #include "ProActiveMPI.h"
@@ -1100,7 +1100,7 @@ public class MyClass{
             <para><emphasis role="bold">Snapshot of this
             example</emphasis></para>
 
-            <para><figure><info><title>MPI to ProActive communication</title></info>
+            <para><figure xml:id="MPItoProActivecommunication_17"><info><title>MPI to ProActive communication</title></info>
                 
 
                 <mediaobject>
@@ -1114,18 +1114,18 @@ public class MyClass{
       </section>
     </section>
 
-    <section xml:id="ProActive_to_MPI"><info><title>ProActive to MPI Communications</title></info>
+    <section xml:id="ProActive_to_MPI"><info><title xml:id="ProActivetoMPICommunications_18">ProActive to MPI Communications</title></info>
       
 
       <!-- ///// ProActive to MPI Communications \\\\ -->
 
       <para>The wrapping with control allows programmer to pass some messages
       from his own classes to the MPI computation. Of course these classes
-      have to be previously deployed using the API seen at <xref xml:linkend="MPI_control_oneactive_javaapi"/>. This feature could be useful
+      have to be previously deployed using the API seen at <xref linkend="MPI_control_oneactive_javaapi"/>. This feature could be useful
       for example if the programmer want to control the MPI code by sending
       some "start" or "stop" messages during computation.</para>
 
-      <section><info><title>ProActive API</title></info>
+      <section xml:id="ProActiveAPI_19"><info><title>ProActive API</title></info>
         
 
         <!-- ///// ProActive API Definition \\\\ -->
@@ -1134,7 +1134,7 @@ public class MyClass{
           <listitem>
             <para><emphasis role="bold">Send Function</emphasis></para>
 
-            <programlisting xml:lang="java">import org.objectweb.proactive.mpi.control;
+            <programlisting language="java">import org.objectweb.proactive.mpi.control;
 
 /**
  * Sends a buffer of bytes containing <emphasis role="bold">count</emphasis> elements of type <emphasis role="bold">datatype</emphasis>
@@ -1152,7 +1152,7 @@ static public void <emphasis role="bold">ProActiveMPICoupling.MPISend</emphasis>
             <para>The following constants have to be used with the <emphasis role="bold">ProActiveMPICoupling.MPISend</emphasis> method to fill
             the datatype parameter.</para>
 
-            <para><programlisting xml:lang="java">import org.objectweb.proactive.mpi.control;
+            <para><programlisting language="java">import org.objectweb.proactive.mpi.control;
 
 <emphasis role="bold">MPIConstants.MPI_CHAR</emphasis>;
 <emphasis role="bold">eMPIConstants.MPI_UNSIGNED_CHAR</emphasis>;
@@ -1172,14 +1172,14 @@ static public void <emphasis role="bold">ProActiveMPICoupling.MPISend</emphasis>
         </itemizedlist>
       </section>
 
-      <section><info><title>MPI API</title></info>
+      <section xml:id="MPIAPI_20"><info><title>MPI API</title></info>
         
 
         <!-- ///// ProActive API Definition \\\\ -->
 
         <!-- ProActiveRecv  -->
 
-        <programlisting xml:lang="java">
+        <programlisting language="java">
 <emphasis role="bold">ProActiveRecv</emphasis>
     Performs a blocking receive from mpi side to receive data from a ProActive java class
 
@@ -1200,7 +1200,7 @@ static public void <emphasis role="bold">ProActiveMPICoupling.MPISend</emphasis>
 
         <!-- ProActiveIRecv  -->
 
-        <programlisting xml:lang="java">
+        <programlisting language="java">
 <emphasis role="bold">ProActiveIRecv</emphasis>
     Performs a non blocking receive from mpi side to receive data from a ProActive java class
 
@@ -1222,7 +1222,7 @@ static public void <emphasis role="bold">ProActiveMPICoupling.MPISend</emphasis>
 
         <!-- ProActiveTest  -->
 
-        <programlisting xml:lang="java">
+        <programlisting language="java">
 <emphasis role="bold">ProActiveTest</emphasis>
     Tests for the completion of receive from a ProActive java class
 <emphasis role="bold">Synopsis</emphasis>
@@ -1238,7 +1238,7 @@ static public void <emphasis role="bold">ProActiveMPICoupling.MPISend</emphasis>
 
         <!-- ProActiveWait  -->
 
-        <programlisting xml:lang="java">
+        <programlisting language="java">
 <emphasis role="bold">ProActiveWait</emphasis>
     Waits for an MPI receive from a ProActive java class to complete
 <emphasis role="bold">Synopsis</emphasis>
@@ -1250,7 +1250,7 @@ static public void <emphasis role="bold">ProActiveMPICoupling.MPISend</emphasis>
 </programlisting>
       </section>
 
-      <section><info><title>Example</title></info>
+      <section xml:id="Example_21"><info><title>Example</title></info>
         
 
         <!-- ///// Example \\\\ -->
@@ -1263,7 +1263,7 @@ static public void <emphasis role="bold">ProActiveMPICoupling.MPISend</emphasis>
             <para><emphasis role="bold"> Main program [ProActive deployment
             part]</emphasis></para>
 
-            <programlisting xml:lang="java">
+            <programlisting language="java">
 <emphasis role="bold">import org.objectweb.proactive.mpi.*;</emphasis>
 
 ...
@@ -1301,7 +1301,7 @@ ProActiveMPI.deploy(spmdList);
             computation fails, the method sends a message to MPI side to abort
             the computation.</para>
 
-            <programlisting xml:lang="java">
+            <programlisting language="java">
 import org.objectweb.proactive.mpi.control;
 
 public class MyClass{
@@ -1338,7 +1338,7 @@ public class MyClass{
           <listitem>
             <para><emphasis role="bold"> MPI Side</emphasis></para>
 
-            <programlisting xml:lang="java">
+            <programlisting language="java">
 #include &lt;stdio.h&gt;
 #include "mpi.h"
 #include "ProActiveMPI.h"
@@ -1411,7 +1411,7 @@ public class MyClass{
             <para><emphasis role="bold">Snapshot of this
             example</emphasis></para>
 
-            <para><figure><info><title>ProActive to MPI communication</title></info>
+            <para><figure xml:id="ProActivetoMPIcommunication_22"><info><title>ProActive to MPI communication</title></info>
                 
 
                 <mediaobject>
@@ -1425,7 +1425,7 @@ public class MyClass{
       </section>
     </section>
 
-    <section xml:id="MPI_to_MPI"><info><title>MPI to MPI Communications through ProActive</title></info>
+    <section xml:id="MPI_to_MPI"><info><title xml:id="MPItoMPICommunicationsthroughProActive_23">MPI to MPI Communications through ProActive</title></info>
       
 
       <!-- ///// MPI to MPI Communications \\\\ -->
@@ -1438,7 +1438,7 @@ public class MyClass{
       respectively either the MPI API or the ProActiveMPI API defined
       below.</para>
 
-      <para><figure><info><title>File transfer and asking for resources</title></info>
+      <para><figure xml:id="Filetransferandaskingforresources_24"><info><title>File transfer and asking for resources</title></info>
           
 
           <mediaobject>
@@ -1448,14 +1448,14 @@ public class MyClass{
           </mediaobject>
         </figure></para>
 
-      <section><info><title>MPI API</title></info>
+      <section xml:id="MPIAPI_25"><info><title>MPI API</title></info>
         
 
         <!-- ///// MPI API Definition \\\\ -->
 
         <!-- ProActiveMPI_Init  -->
 
-        <programlisting xml:lang="java">
+        <programlisting language="java">
 <emphasis role="bold">ProActiveMPI_Init</emphasis>
     Initializes the MPI with ProActive execution environment
 
@@ -1469,7 +1469,7 @@ public class MyClass{
 
         <!-- ProActiveMPI_Job  -->
 
-        <programlisting xml:lang="java">
+        <programlisting language="java">
 <emphasis role="bold">ProActiveMPI_Job</emphasis>
     Initializes the job environment variable
 
@@ -1483,7 +1483,7 @@ public class MyClass{
 
         <!-- ProActiveMPI_Finalize  -->
 
-        <programlisting xml:lang="java">
+        <programlisting language="java">
 <emphasis role="bold">ProActiveMPI_Finalize</emphasis>
     Terminates MPI with ProActive execution environment
 
@@ -1494,7 +1494,7 @@ public class MyClass{
 
         <!-- ProActiveMPI_Send  -->
 
-        <programlisting xml:lang="java">
+        <programlisting language="java">
 <emphasis role="bold">ProActiveMPI_Send</emphasis>
     Performs a basic send
 
@@ -1513,7 +1513,7 @@ public class MyClass{
 
         <!-- ProActiveMPI_Recv  -->
 
-        <programlisting xml:lang="java">
+        <programlisting language="java">
 <emphasis role="bold">ProActiveMPI_Recv</emphasis>
     Performs a basic Recv
 
@@ -1534,7 +1534,7 @@ public class MyClass{
 
         <!-- ProActiveMPI_IRecv  -->
 
-        <programlisting xml:lang="java">
+        <programlisting language="java">
 <emphasis role="bold">ProActiveMPI_IRecv</emphasis>
     Performs a non blocking receive
 
@@ -1556,7 +1556,7 @@ public class MyClass{
 
         <!-- ProActiveMPI_Test  -->
 
-        <programlisting xml:lang="java">
+        <programlisting language="java">
 <emphasis role="bold">ProActiveMPI_Test</emphasis>
     Tests for the completion of receive
 <emphasis role="bold">Synopsis</emphasis>
@@ -1572,7 +1572,7 @@ public class MyClass{
 
         <!-- ProActiveMPI_Wait  -->
 
-        <programlisting xml:lang="java">
+        <programlisting language="java">
 <emphasis role="bold">ProActiveMPI_Wait</emphasis>
     Waits for an MPI receive to complete
 <emphasis role="bold">Synopsis</emphasis>
@@ -1585,7 +1585,7 @@ public class MyClass{
 
         <!-- ProActiveMPI_AllSend  -->
 
-        <programlisting xml:lang="java">
+        <programlisting language="java">
 <emphasis role="bold">ProActiveMPI_AllSend</emphasis>
     Performs a basic send to all processes of a remote job
 
@@ -1603,7 +1603,7 @@ public class MyClass{
 
         <!-- ProActiveMPI_Barrier  -->
 
-        <programlisting xml:lang="java">
+        <programlisting language="java">
 <emphasis role="bold">ProActiveMPI_Barrier</emphasis>
     Blocks until all process of the specified job have reached this routine
     No synchronization is enforced if jobID is different from current jobID, and -1 is returned.
@@ -1617,12 +1617,12 @@ public class MyClass{
 </programlisting>
       </section>
 
-      <section><info><title>Example</title></info>
+      <section xml:id="Example_26"><info><title>Example</title></info>
         
 
         <!-- ///// Example \\\\ -->
 
-        <programlisting xml:lang="java">
+        <programlisting language="java">
 #include &lt;stdio.h&gt;
 #include "mpi.h"
 #include "ProActiveMPI.h"
@@ -1663,7 +1663,7 @@ public class MyClass{
       </section>
     </section>
 
-    <section xml:id="The_Jacobi_Relaxation_example"><info><title>USER STEPS - The Jacobi Relaxation example</title></info>
+    <section xml:id="The_Jacobi_Relaxation_example"><info><title xml:id="USERSTEPSTheJacobiRelaxationexample_27">USER STEPS - The Jacobi Relaxation example</title></info>
       
 
       <!-- ///// USER STEPS with JACOBI example \\\\ -->
@@ -1684,7 +1684,7 @@ public class MyClass{
       nodes) is proportional to the number of cells in one dimension,
       N.</para>
 
-      <figure><info><title>Jacobi Relaxation - Domain Decomposition</title></info>
+      <figure xml:id="JacobiRelaxationDomainDecomposition_28"><info><title>Jacobi Relaxation - Domain Decomposition</title></info>
         
 
         <mediaobject>
@@ -1698,7 +1698,7 @@ public class MyClass{
       clusters. The domain is a 1680x1680 mesh divided in 16 sub-domains of
       1680x280 on each cluster.</para>
 
-      <section><info><title>Compiling the ProActiveMPI package</title></info>
+      <section xml:id="CompilingtheProActiveMPIpackage_29"><info><title>Compiling the ProActiveMPI package</title></info>
         
 
         <para>To compile the <emphasis role="bold">ProActiveMPI</emphasis>
@@ -1731,13 +1731,13 @@ public class MyClass{
         </itemizedlist>
       </section>
 
-      <section><info><title>Defining the infrastructure</title></info>
+      <section xml:id="Definingtheinfrastructure_30"><info><title>Defining the infrastructure</title></info>
         
 
         <para>For more details about writing a file descriptor, please refer
         to <xref linkend="Using_the_Infrastructure"/>.</para>
 
-        <programlisting xml:lang="xml"><textobject><textdata fileref="mpi_files/MPI-Jacobi-nina-nef.xml"/></textobject></programlisting>
+        <programlisting language="xml"><textobject><textdata fileref="mpi_files/MPI-Jacobi-nina-nef.xml"/></textobject></programlisting>
 
         <note>
           <para>To be interfaced with some native code, each wrapper/proxy
@@ -1747,19 +1747,19 @@ public class MyClass{
           done, use the following tag in each <emphasis role="bold">jvmProcess</emphasis> definition:</para>
         </note>
 
-        <programlisting xml:lang="java">&lt;parameter value="-Djava.library.path=${REMOTE_HOME_NEF}/MyApp" /&gt;</programlisting>
+        <programlisting language="java">&lt;parameter value="-Djava.library.path=${REMOTE_HOME_NEF}/MyApp" /&gt;</programlisting>
       </section>
 
-      <section><info><title>Writing the MPI source code</title></info>
+      <section xml:id="WritingtheMPIsourcecode_31"><info><title>Writing the MPI source code</title></info>
         
 
         <para>Place the source file in <emphasis role="bold">org/objectweb/proactive/mpi/control/config/src</emphasis>
         directory</para>
 
-        <programlisting xml:lang="java"><textobject><textdata fileref="mpi_files/jacobi.c"/></textobject></programlisting>
+        <programlisting language="java"><textobject><textdata fileref="mpi_files/jacobi.c"/></textobject></programlisting>
       </section>
 
-      <section><info><title>Compiling the MPI source code</title></info>
+      <section xml:id="CompilingtheMPIsourcecode_33"><info><title>Compiling the MPI source code</title></info>
         
 
         <para>To compile the MPI code with the added features for wrapping,
@@ -1776,19 +1776,19 @@ linux&gt; make mpicode=jacobi</screen></para>
         </note>
       </section>
 
-      <section><info><title>Writing the ProActive Main program</title></info>
+      <section xml:id="WritingtheProActiveMainprogram_34"><info><title>Writing the ProActive Main program</title></info>
         
 
-        <programlisting xml:lang="java"><textobject><textdata fileref="mpi_files/Main.java"/></textobject></programlisting>
+        <programlisting language="java"><textobject><textdata fileref="mpi_files/Main.java"/></textobject></programlisting>
       </section>
 
-      <section><info><title>Executing application</title></info>
+      <section xml:id="Executingapplication_35"><info><title>Executing application</title></info>
         
 
         <para>Deploy the ProActive main program above like any another
         ProActive application using a script like the following one:</para>
 
-        <programlisting xml:lang="java">
+        <programlisting language="java">
 #!/bin/sh
 
 echo --- ProActive/MPI JACOBI example ---------------------------------------------
@@ -1803,7 +1803,7 @@ $JAVACMD -classpath $CLASSPATH  -Djava.security.policy=$PROACTIVE/compile/proact
 </programlisting>
       </section>
 
-      <section><info><title>The Output</title></info>
+      <section xml:id="TheOutput_37"><info><title>The Output</title></info>
         
 
         <para>Reading of the file descriptor and return of 16 nodes from the
@@ -1924,7 +1924,7 @@ created VirtualNode name=Cluster_Nina
         processes trough the communication between two proxies which belongs
         to two Nodes residing on different clusters.</para>
 
-        <figure><info><title>IC2D Snapshot</title></info>
+        <figure xml:id="IC2DSnapshot_50"><info><title>IC2D Snapshot</title></info>
           
 
           <mediaobject>
@@ -1939,16 +1939,16 @@ created VirtualNode name=Cluster_Nina
 
   <!-- ////////////////////////////////// DESIGN AND IMPLEMENTATION  \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\ -->
 
-  <section xml:id="Design_and_Implementation"><info><title>Design and Implementation</title></info>
+  <section xml:id="Design_and_Implementation"><info><title xml:id="DesignandImplementation_51">Design and Implementation</title></info>
     
 
-    <section xml:id="Simple_wrapping"><info><title>Simple wrapping</title></info>
+    <section xml:id="Simple_wrapping"><info><title xml:id="Simplewrapping_52">Simple wrapping</title></info>
       
 
-      <section><info><title>Structural Design</title></info>
+      <section xml:id="StructuralDesign_53"><info><title>Structural Design</title></info>
         
 
-        <para><figure><info><title>Proxy Pattern</title></info>
+        <para><figure xml:id="ProxyPattern_54"><info><title>Proxy Pattern</title></info>
             
 
             <mediaobject>
@@ -1969,10 +1969,10 @@ created VirtualNode name=Cluster_Nina
         </itemizedlist>
       </section>
 
-      <section><info><title>Infrastructure of processes</title></info>
+      <section xml:id="Infrastructureofprocesses_55"><info><title>Infrastructure of processes</title></info>
         
 
-        <para><figure><info><title>Process Package Architecture</title></info>
+        <para><figure xml:id="ProcessPackageArchitecture_56"><info><title>Process Package Architecture</title></info>
             
 
             <mediaobject>
@@ -2018,13 +2018,13 @@ created VirtualNode name=Cluster_Nina
     </section>
   </section>
 
-  <section xml:id="Summary_of_the_API"><info><title>Summary of the API</title></info>
+  <section xml:id="Summary_of_the_API"><info><title xml:id="SummaryoftheAPI_57">Summary of the API</title></info>
     
 
-    <section xml:id="API_Simple"><info><title>Simple Wrapping and Deployment of MPI Code</title></info>
+    <section xml:id="API_Simple"><info><title xml:id="SimpleWrappingandDeploymentofMPICode_58">Simple Wrapping and Deployment of MPI Code</title></info>
       
 
-      <informaltable><info><title>Simple Wrapping of MPI Code</title></info>
+      <informaltable><info><title xml:id="SimpleWrappingofMPICode_59">Simple Wrapping of MPI Code</title></info>
         
 
         <tgroup cols="3">
@@ -2221,13 +2221,13 @@ created VirtualNode name=Cluster_Nina
       </informaltable>
     </section>
 
-    <section xml:id="API_Control"><info><title>Wrapping with Control</title></info>
+    <section xml:id="API_Control"><info><title xml:id="WrappingwithControl_60">Wrapping with Control</title></info>
       
 
-      <section><info><title>One Active Object per MPI process</title></info>
+      <section xml:id="OneActiveObjectperMPIprocess_62"><info><title>One Active Object per MPI process</title></info>
         
 
-        <informaltable><info><title>API for creating one Active Object per MPI process</title></info>
+        <informaltable><info><title xml:id="APIforcreatingoneActiveObjectperMPI_63">API for creating one Active Object per MPI process</title></info>
           
 
           <tgroup cols="3">
@@ -2335,10 +2335,10 @@ created VirtualNode name=Cluster_Nina
         </informaltable>
       </section>
 
-      <section><info><title>MPI to ProActive Communications</title></info>
+      <section xml:id="MPItoProActiveCommunications_72"><info><title>MPI to ProActive Communications</title></info>
         
 
-        <informaltable><info><title>MPI to ProActive Communications API</title></info>
+        <informaltable><info><title xml:id="MPItoProActiveCommunicationsAPI_77">MPI to ProActive Communications API</title></info>
           
 
           <tgroup cols="3">
@@ -2357,7 +2357,7 @@ created VirtualNode name=Cluster_Nina
           </tgroup>
         </informaltable>
 
-        <informaltable><info><title>Java API for MPI message conversion</title></info>
+        <informaltable><info><title xml:id="JavaAPIforMPImessageconversion_78">Java API for MPI message conversion</title></info>
           
 
           <tgroup cols="3">
@@ -2602,10 +2602,10 @@ created VirtualNode name=Cluster_Nina
         </informaltable>
       </section>
 
-      <section><info><title>ProActive to MPI Communications</title></info>
+      <section xml:id="ProActivetoMPICommunications_79"><info><title>ProActive to MPI Communications</title></info>
         
 
-        <informaltable><info><title>ProActiveMPI API for sending messages to MPI</title></info>
+        <informaltable><info><title xml:id="ProActiveMPIAPIforsendingmessagestoMPI_80">ProActiveMPI API for sending messages to MPI</title></info>
           
 
           <tgroup cols="3">
@@ -2799,7 +2799,7 @@ created VirtualNode name=Cluster_Nina
           </tgroup>
         </informaltable>
 
-        <informaltable><info><title>MPI message reception from ProActive</title></info>
+        <informaltable><info><title xml:id="MPImessagereceptionfromProActive_81">MPI message reception from ProActive</title></info>
           
 
           <tgroup cols="3">
@@ -2852,10 +2852,10 @@ created VirtualNode name=Cluster_Nina
         </informaltable>
       </section>
 
-      <section><info><title>MPI to MPI Communications through ProActive</title></info>
+      <section xml:id="MPItoMPICommunicationsthroughProActive_89"><info><title>MPI to MPI Communications through ProActive</title></info>
         
 
-        <informaltable><info><title>MPI to MPI through ProActive C API</title></info>
+        <informaltable><info><title xml:id="MPItoMPIthroughProActiveCAPI_890">MPI to MPI through ProActive C API</title></info>
           
 
           <tgroup cols="3">
@@ -2970,7 +2970,7 @@ created VirtualNode name=Cluster_Nina
         MPI_UNSIGNED, MPI_LONG, MPI_UNSIGNED_LONG, MPI_FLOAT, MPI_DOUBLE,
         MPI_LONG_DOUBLE, MPI_LONG_LONG_INT</para>
 
-        <informaltable><info><title>MPI to MPI through ProActive Fortran API</title></info>
+        <informaltable><info><title xml:id="MPItoMPIthroughProActiveFortranAPI_140">MPI to MPI through ProActive Fortran API</title></info>
           
 
           <tgroup cols="3">
