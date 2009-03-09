@@ -53,6 +53,7 @@ import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
+import javax.resource.spi.work.WorkManager;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
@@ -66,13 +67,13 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.ActiveBody;
 import org.objectweb.proactive.core.body.Context;
+import org.objectweb.proactive.core.body.J2EEBody;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.descriptor.services.TechnicalService;
@@ -123,7 +124,6 @@ import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
 
 /**
@@ -166,7 +166,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
     private static ProActiveSecurityManager runtimeSecurityManager;
 
     // map of local nodes, key is node name
-    private java.util.Hashtable<String, LocalNode> nodeMap;
+    protected java.util.Hashtable<String, LocalNode> nodeMap;
 
     //
     // -- PRIVATE MEMBERS
@@ -284,6 +284,15 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
     public static ProActiveRuntimeImpl getProActiveRuntime() {
         return proActiveRuntime;
     }
+    
+    private boolean inJ2EE = false;
+    public boolean isJ2EE() { return inJ2EE; }
+    public void setJ2EEFlag() { inJ2EE = true; }
+    
+	private WorkManager wm;
+	public void setWorkManager(WorkManager wm){
+		this.wm = wm;
+	}
 
     /**
      * If no ServerConnector has been created, a new one is created and started. Any ProActive JMX
@@ -945,6 +954,17 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
         }
 
         Body localBody = (Body) bodyConstructorCall.execute();
+        if( localBody instanceof J2EEBody) {
+        	J2EEBody jeeBody = (J2EEBody) localBody;
+    		jeeBody.setWorkManager(this.wm);
+    		jeeBody.setTargetObjectClassName(targetObjectClassName);
+    		jeeBody.setTargetObjectCodebase(targetObjectCodebase);
+    		jeeBody.startBody();
+        }
+        else if( localBody instanceof ActiveBody ){
+        	// start its thread
+        	((ActiveBody)localBody).startBody();
+        }
 
         // SECURITY
         ProActiveSecurityManager objectSecurityManager = ((AbstractBody) localBody)
@@ -1708,4 +1728,16 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
     public void setVMName(String vmName) {
         vmInformation.vmName = vmName;
     }
+
+	protected String targetObjectClassName;
+	protected String targetObjectCodebase;
+	@Override
+	public void setCodebase(String codebase) {
+		targetObjectCodebase = codebase;
+	}
+
+	@Override
+	public void setTargetClazzName(String clazzName) {
+		targetObjectClassName = clazzName;
+	}
 }

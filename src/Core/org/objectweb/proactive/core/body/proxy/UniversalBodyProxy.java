@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.body.proxy;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.rmi.server.RMIClassLoader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Vector;
@@ -44,6 +45,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.AbstractBody;
+import org.objectweb.proactive.core.body.J2EEBody;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.body.SendingQueue;
@@ -128,8 +130,8 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
                 }
             } else {
                 // instantiate the body locally or remotely
-                Class<?> bodyClass = Constants.DEFAULT_BODY_CLASS;
-                Node node = (Node) p0;
+                Node node = (Node) p0; 
+                Class<?> bodyClass =  getBodyClass(node , constructorCall.getTargetClassName()); 
 
                 // added lines--------------------------
                 // ProActiveRuntime part = node.getProActiveRuntime();
@@ -173,7 +175,34 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
         }
     }
 
-    //
+    private Class<?> getBodyClass(Node node, String targetClazzName) {
+    	
+    	ProActiveRuntime part;
+    	
+    	if(NodeFactory.isNodeLocal(node)) {
+    		part = ProActiveRuntimeImpl.getProActiveRuntime();
+    	}
+    	else {
+    		part = node.getProActiveRuntime();
+    	}
+    	
+    	if(part.isJ2EE()) {
+    		// hak!
+			try {
+				Class<?> targetClass = Class.forName(targetClazzName);
+				String targetCodebase = RMIClassLoader.getClassAnnotation(targetClass);
+				part.setCodebase(targetCodebase);
+				part.setTargetClazzName(targetClazzName);
+			} catch (ClassNotFoundException e) {
+				logger.warn("Could not load " + targetClazzName + " reason:" , e );
+			}
+    		return Constants.J2EE_BODY_CLASS;
+    	}
+    	else 
+    		return Constants.DEFAULT_BODY_CLASS;
+	}
+
+	//
     // -- PUBLIC METHODS -----------------------------------------------
     //
     @Override

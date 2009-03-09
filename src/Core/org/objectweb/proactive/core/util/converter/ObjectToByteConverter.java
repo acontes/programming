@@ -40,6 +40,7 @@ import java.lang.reflect.Method;
 
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.mop.CodebaseChangeObjectOutputStream;
 import org.objectweb.proactive.core.mop.PAObjectOutputStream;
 import org.objectweb.proactive.core.mop.SunMarshalOutputStream;
 import org.objectweb.proactive.core.util.converter.MakeDeepCopy.ConversionMode;
@@ -104,6 +105,20 @@ public class ObjectToByteConverter {
             return ObjectToByteConverter.convert(o, ConversionMode.PAOBJECT);
         }
     }
+    
+    public static class CodebaseChangeObjectStream {
+
+        /**
+         * Convert an object to a byte array using a codebase change object stream
+         * @param o The object to convert.
+         * @return The object converted to a byte array
+         * @throws IOException
+         */
+    	public static String codebase;
+        public static byte[] convert(Object o) throws IOException {
+            return ObjectToByteConverter.convert(o, ConversionMode.CODEBASE);
+        }
+    }
 
     private static byte[] convert(Object o, ConversionMode conversionMode) throws IOException {
         final String mode = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
@@ -133,7 +148,10 @@ public class ObjectToByteConverter {
                 objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
             } else if (conversionMode == ConversionMode.PAOBJECT) {
                 objectOutputStream = new PAObjectOutputStream(byteArrayOutputStream);
-            }
+            } else if (conversionMode == ConversionMode.CODEBASE) {
+                objectOutputStream = new CodebaseChangeObjectOutputStream(byteArrayOutputStream,
+                		CodebaseChangeObjectStream.codebase);
+            } 
 
             ObjectToByteConverter.writeToStream(objectOutputStream, o);
             return byteArrayOutputStream.toByteArray();

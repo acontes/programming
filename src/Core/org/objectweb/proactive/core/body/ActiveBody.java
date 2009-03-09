@@ -155,7 +155,6 @@ public class ActiveBody extends ComponentBodyImpl implements Runnable, java.io.S
             this.endActive = null;
         }
 
-        startBody();
     }
 
     //

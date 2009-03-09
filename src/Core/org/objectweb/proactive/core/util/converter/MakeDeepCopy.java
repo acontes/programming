@@ -34,6 +34,7 @@ package org.objectweb.proactive.core.util.converter;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.converter.ObjectToByteConverter.CodebaseChangeObjectStream;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -42,7 +43,7 @@ public class MakeDeepCopy {
     public static Logger logger = ProActiveLogger.getLogger(Loggers.RUNTIME);
 
     protected enum ConversionMode {
-        MARSHALL, OBJECT, PAOBJECT;
+        MARSHALL, OBJECT, PAOBJECT, CODEBASE;
     }
 
     public static class WithMarshallStream {
@@ -87,6 +88,22 @@ public class MakeDeepCopy {
         public static Object makeDeepCopy(Object o) throws IOException, ClassNotFoundException {
             byte[] array = ObjectToByteConverter.ProActiveObjectStream.convert(o);
             return ByteToObjectConverter.ProActiveObjectStream.convert(array);
+        }
+    }
+    
+    public static class WithCodebaseChangeObjectStream {
+    	/**
+         * Perform a deep copy of an object using a codebase change object stream.
+         * @param o The object to be deep copied
+         * @return the copy.
+         * @throws IOException
+         * @throws ClassNotFoundException
+         */
+    	public static String codebase;
+        public static Object makeDeepCopy(Object o) throws IOException, ClassNotFoundException {
+        	CodebaseChangeObjectStream.codebase = codebase; 
+            byte[] array = ObjectToByteConverter.CodebaseChangeObjectStream.convert(o);
+            return ByteToObjectConverter.CodebaseChangeObjectStream.convert(array);
         }
     }
 }

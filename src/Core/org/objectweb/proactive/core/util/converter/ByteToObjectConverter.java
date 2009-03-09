@@ -42,6 +42,7 @@ import java.lang.reflect.Method;
 
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.mop.CodebaseChangeObjectInputStream;
 import org.objectweb.proactive.core.mop.PAObjectInputStream;
 import org.objectweb.proactive.core.mop.SunMarshalInputStream;
 
@@ -114,6 +115,20 @@ public class ByteToObjectConverter {
             return ByteToObjectConverter.convert(byteArray, MakeDeepCopy.ConversionMode.PAOBJECT, null);
         }
     }
+    
+    public static class CodebaseChangeObjectStream {
+
+        /**
+         * Convert to an object using a codebase change object stream;
+         * @param byteArray the byte array to convert
+         * @return the unserialized object
+         * @throws IOException
+         * @throws ClassNotFoundException
+         */
+        public static Object convert(byte[] byteArray) throws IOException, ClassNotFoundException {
+            return ByteToObjectConverter.convert(byteArray, MakeDeepCopy.ConversionMode.CODEBASE, null);
+        }
+    }
 
     private static Object convert(byte[] byteArray, MakeDeepCopy.ConversionMode conversionMode, ClassLoader cl)
             throws IOException, ClassNotFoundException {
@@ -143,6 +158,8 @@ public class ByteToObjectConverter {
                 objectInputStream = new SunMarshalInputStream(byteArrayInputStream);
             } else if (conversionMode == MakeDeepCopy.ConversionMode.PAOBJECT) {
                 objectInputStream = new PAObjectInputStream(byteArrayInputStream);
+            } else if (conversionMode == MakeDeepCopy.ConversionMode.CODEBASE) {
+                objectInputStream = new CodebaseChangeObjectInputStream(byteArrayInputStream);
             } else /*(conversionMode == ObjectToByteConverter.ConversionMode.OBJECT)*/
             {
                 // if a classloader is specified, use it !
