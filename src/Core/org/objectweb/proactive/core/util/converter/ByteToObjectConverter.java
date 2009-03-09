@@ -115,7 +115,7 @@ public class ByteToObjectConverter {
             return ByteToObjectConverter.convert(byteArray, MakeDeepCopy.ConversionMode.PAOBJECT, null);
         }
     }
-    
+
     public static class CodebaseChangeObjectStream {
 
         /**

@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.mop;
 import java.io.IOException;
 import java.io.InputStream;
 
+
 /**
  * @author fabratu
  * @version %G%, %I%
@@ -40,7 +41,7 @@ import java.io.InputStream;
  */
 public class CodebaseChangeObjectInputStream extends SunMarshalInputStream {
 
-	public CodebaseChangeObjectInputStream(InputStream in) throws IOException {
-       super(in);
+    public CodebaseChangeObjectInputStream(InputStream in) throws IOException {
+        super(in);
     }
 }

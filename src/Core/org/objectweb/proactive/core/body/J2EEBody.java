@@ -51,6 +51,7 @@ import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.Utils;
 
+
 /**
  * This class provides a different method to start
  * the body's activity thread, according to the J2EE specs
@@ -58,129 +59,129 @@ import org.objectweb.proactive.core.mop.Utils;
  * @version %G%, %I%
  * @since ProActive 4.10
  */
-public class J2EEBody extends ActiveBody implements Work{
-	
-	public J2EEBody(ConstructorCall c, String nodeURL, Active activity, MetaObjectFactory factory,
+public class J2EEBody extends ActiveBody implements Work {
+
+    public J2EEBody(ConstructorCall c, String nodeURL, Active activity, MetaObjectFactory factory,
             String jobID) throws java.lang.reflect.InvocationTargetException,
             ConstructorCallExecutionFailedException, ActiveObjectCreationException {
-		super(c,nodeURL,activity,factory,jobID);
-	}
-	
-	private transient WorkManager wm;
-	
-	public void setWorkManager(WorkManager wm){
-		this.wm = wm;
-	}
-	
-	@Override
-	public void release() {
-		
-	}
-	
-	private String targetObjectClassName;
-	private String targetObjectCodebase;
-	
-	public void setTargetObjectClassName(String targetObjectClassName) {
-		this.targetObjectClassName = targetObjectClassName;
-	}
+        super(c, nodeURL, activity, factory, jobID);
+    }
 
-	public void setTargetObjectCodebase(String targetObjectCodebase) {
-		this.targetObjectCodebase = targetObjectCodebase;
-	}
+    private transient WorkManager wm;
 
-	@Override
-	public void serve(Request request) {
-		// load the class
-		try {
-			Class<?> targetCl = RMIClassLoader.loadClass(targetObjectCodebase, targetObjectClassName);
-			Request newReq = rebuildRequest( targetCl , request);
-			super.serve(newReq);
-			return;
-		} catch (MalformedURLException e) {
-			logger.warn("Cannot load class " + targetObjectClassName + " reason:", e);
-		} catch (ClassNotFoundException e) {
-			logger.warn("Cannot load class " + targetObjectClassName + " reason:", e);
-		} catch (SecurityException e) {
-			logger.warn("Cannot rebuild request " + request + " reason:", e);
-		} catch (NoSuchMethodException e) {
-			logger.warn("Cannot rebuild request " + request + " reason:", e);
-		} catch (IOException e) {
-			logger.warn("Cannot rebuild request " + request + " reason:", e);
-		}
-		
-		// serve!
-		super.serve(request);
-	}
-	
-	private Request rebuildRequest(Class<?> targetClazz , Request request) 
-			throws SecurityException, NoSuchMethodException, IOException {
-		Request ret;
-		MethodCall oldmc = request.getMethodCall();
-		Method oldm = oldmc.getReifiedMethod();
-		
-		Method newm;
-		Object[] newEffectiveArguments;
-		try {
-			newm = targetClazz.getMethod(oldm.getName(), oldm.getParameterTypes());
-			newEffectiveArguments = oldmc.getEffectiveArguments();
-		} catch(NoSuchMethodException e) {
-			// now it will get really nasty!
-			newm = getMethod( targetClazz , oldm );
-			// "adjust" classes of the effective arguments
-			newEffectiveArguments = Utils.makeJ2EEDeepCopy(oldmc.getEffectiveArguments(), newm.getParameterTypes());
-		}
+    public void setWorkManager(WorkManager wm) {
+        this.wm = wm;
+    }
 
-		MethodCall mc = MethodCall.getMethodCall(newm, oldmc.getGenericTypesMapping(), 
-				newEffectiveArguments, oldmc.getExceptionContext());
-			
-		ret = new RequestImpl( mc , request.getSender(),
-				request.isOneWay(),request.getSequenceNumber());
-		return ret;
-	}
+    @Override
+    public void release() {
 
-	private Method getMethod(Class<?> targetClazz, Method oldm) throws NoSuchMethodException {
-		for( Method m : targetClazz.getMethods()) {
-			if(m.getName().equals(oldm.getName()) && sameParams( m, oldm ) ){
-				return m;
-			}
-		}
-		throw new NoSuchMethodException(oldm.toString());
-	}
+    }
 
-	private boolean sameParams(Method m, Method oldm) {
-		Class<?>[] p = m.getParameterTypes();
-		Class<?>[] oldp = oldm.getParameterTypes();
-		if(oldp.length!=p.length)
-			return false;
-		for( int i=0 ; i<p.length ; i++ ){
-			Class<?> c = p[i];
-			Class<?> oldc = oldp[i];
-			if(!c.getName().equals(oldc.getName()))
-				return false;
-		}
-		return true;
-	}
-	
-	@Override
-	public void startBody() {
-		if (logger.isDebugEnabled()) {
-			logger.debug("Starting J2EE Body");
-		}
+    private String targetObjectClassName;
+    private String targetObjectCodebase;
 
-		String bodyName = shortClassName(getName()) + " on " + getNodeURL();
+    public void setTargetObjectClassName(String targetObjectClassName) {
+        this.targetObjectClassName = targetObjectClassName;
+    }
 
-		synchronized (this) {
-			try {
-				wm.startWork(this, Long.MAX_VALUE, new ExecutionContext(), new BodyWorkListener(bodyName));
-				this.wait();
-			} catch (InterruptedException e) {
-				logger.warn(e.getMessage(), e);
-			} catch (WorkException e) {
-				logger.error("Unable to start the J2EE body thread:" , e);
-			}
-		}
-	}
-	
+    public void setTargetObjectCodebase(String targetObjectCodebase) {
+        this.targetObjectCodebase = targetObjectCodebase;
+    }
+
+    @Override
+    public void serve(Request request) {
+        // load the class
+        try {
+            Class<?> targetCl = RMIClassLoader.loadClass(targetObjectCodebase, targetObjectClassName);
+            Request newReq = rebuildRequest(targetCl, request);
+            super.serve(newReq);
+            return;
+        } catch (MalformedURLException e) {
+            logger.warn("Cannot load class " + targetObjectClassName + " reason:", e);
+        } catch (ClassNotFoundException e) {
+            logger.warn("Cannot load class " + targetObjectClassName + " reason:", e);
+        } catch (SecurityException e) {
+            logger.warn("Cannot rebuild request " + request + " reason:", e);
+        } catch (NoSuchMethodException e) {
+            logger.warn("Cannot rebuild request " + request + " reason:", e);
+        } catch (IOException e) {
+            logger.warn("Cannot rebuild request " + request + " reason:", e);
+        }
+
+        // serve!
+        super.serve(request);
+    }
+
+    private Request rebuildRequest(Class<?> targetClazz, Request request) throws SecurityException,
+            NoSuchMethodException, IOException {
+        Request ret;
+        MethodCall oldmc = request.getMethodCall();
+        Method oldm = oldmc.getReifiedMethod();
+
+        Method newm;
+        Object[] newEffectiveArguments;
+        try {
+            newm = targetClazz.getMethod(oldm.getName(), oldm.getParameterTypes());
+            newEffectiveArguments = oldmc.getEffectiveArguments();
+        } catch (NoSuchMethodException e) {
+            // now it will get really nasty!
+            newm = getMethod(targetClazz, oldm);
+            // "adjust" classes of the effective arguments
+            newEffectiveArguments = Utils.makeJ2EEDeepCopy(oldmc.getEffectiveArguments(), newm
+                    .getParameterTypes());
+        }
+
+        MethodCall mc = MethodCall.getMethodCall(newm, oldmc.getGenericTypesMapping(), newEffectiveArguments,
+                oldmc.getExceptionContext());
+
+        ret = new RequestImpl(mc, request.getSender(), request.isOneWay(), request.getSequenceNumber());
+        return ret;
+    }
+
+    private Method getMethod(Class<?> targetClazz, Method oldm) throws NoSuchMethodException {
+        for (Method m : targetClazz.getMethods()) {
+            if (m.getName().equals(oldm.getName()) && sameParams(m, oldm)) {
+                return m;
+            }
+        }
+        throw new NoSuchMethodException(oldm.toString());
+    }
+
+    private boolean sameParams(Method m, Method oldm) {
+        Class<?>[] p = m.getParameterTypes();
+        Class<?>[] oldp = oldm.getParameterTypes();
+        if (oldp.length != p.length)
+            return false;
+        for (int i = 0; i < p.length; i++) {
+            Class<?> c = p[i];
+            Class<?> oldc = oldp[i];
+            if (!c.getName().equals(oldc.getName()))
+                return false;
+        }
+        return true;
+    }
+
+    @Override
+    public void startBody() {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Starting J2EE Body");
+        }
+
+        String bodyName = shortClassName(getName()) + " on " + getNodeURL();
+
+        synchronized (this) {
+            try {
+                wm.startWork(this, Long.MAX_VALUE, new ExecutionContext(), new BodyWorkListener(bodyName));
+                this.wait();
+            } catch (InterruptedException e) {
+                logger.warn(e.getMessage(), e);
+            } catch (WorkException e) {
+                logger.error("Unable to start the J2EE body thread:", e);
+            }
+        }
+    }
+
     private String shortClassName(String fqn) {
         int n = fqn.lastIndexOf('.');
         if ((n == -1) || (n == (fqn.length() - 1))) {
@@ -188,36 +189,37 @@ public class J2EEBody extends ActiveBody implements Work{
         }
         return fqn.substring(n + 1);
     }
-    
+
     class BodyWorkListener implements WorkListener {
-    	
-    	private String bodyName;
-    	
-    	public BodyWorkListener(String bodyName) {
-    		this.bodyName = bodyName;
-		}
 
-		// TODO actually use these events!
-		@Override
-		public void workAccepted(WorkEvent arg0) {
-			logger.debug("Thread for body " + bodyName + " accepted by the AS scheduler!");
-		}
+        private String bodyName;
 
-		@Override
-		public void workCompleted(WorkEvent arg0) {
-			logger.warn("Thread for body " + bodyName + " completed!");
-		}
+        public BodyWorkListener(String bodyName) {
+            this.bodyName = bodyName;
+        }
 
-		@Override
-		public void workRejected(WorkEvent arg0) {
-			logger.warn("Thread for body " + bodyName +  " rejected for scheduling by the AS! this is not good..");
-		}
+        // TODO actually use these events!
+        @Override
+        public void workAccepted(WorkEvent arg0) {
+            logger.debug("Thread for body " + bodyName + " accepted by the AS scheduler!");
+        }
 
-		@Override
-		public void workStarted(WorkEvent arg0) {
-			logger.warn("Work has been started on body " + bodyName);
-		}
-    	
+        @Override
+        public void workCompleted(WorkEvent arg0) {
+            logger.warn("Thread for body " + bodyName + " completed!");
+        }
+
+        @Override
+        public void workRejected(WorkEvent arg0) {
+            logger.warn("Thread for body " + bodyName +
+                " rejected for scheduling by the AS! this is not good..");
+        }
+
+        @Override
+        public void workStarted(WorkEvent arg0) {
+            logger.warn("Work has been started on body " + bodyName);
+        }
+
     }
 
 }

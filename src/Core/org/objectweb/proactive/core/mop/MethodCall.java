@@ -371,71 +371,71 @@ public class MethodCall implements java.io.Serializable, Cloneable {
             this.serializedEffectiveArguments = null;
         }
         try {
-        	if (logger.isDebugEnabled()) {
-        		printMethodExecutionDebugInfo(targetObject);
-        	}
-        	// basic parameter compatibility check
-        	// not quite working...
-        	// checkMethodExecutionParameters(); 
+            if (logger.isDebugEnabled()) {
+                printMethodExecutionDebugInfo(targetObject);
+            }
+            // basic parameter compatibility check
+            // not quite working...
+            // checkMethodExecutionParameters(); 
 
-        	if (this.reifiedMethod.getParameterTypes().length > 0) {
-        		this.reifiedMethod.setAccessible(true);
-        	}
+            if (this.reifiedMethod.getParameterTypes().length > 0) {
+                this.reifiedMethod.setAccessible(true);
+            }
 
-
-        	targetObject = PAFuture.getFutureValue(targetObject);
-        	// In order to call from this class protected methods of the Active Object,
-        	// we need to bypass the Java Runtime security. 
-        	this.reifiedMethod.setAccessible(true);
-        	return this.reifiedMethod.invoke(targetObject, this.effectiveArguments);
+            targetObject = PAFuture.getFutureValue(targetObject);
+            // In order to call from this class protected methods of the Active Object,
+            // we need to bypass the Java Runtime security. 
+            this.reifiedMethod.setAccessible(true);
+            return this.reifiedMethod.invoke(targetObject, this.effectiveArguments);
         } catch (IllegalAccessException e) {
             throw new MethodCallExecutionFailedException("Access rights to the method denied: " + e);
         } catch (IllegalArgumentException e) {
-        	logger.error(" Target object is " + targetObject + "\n Class info for the target object:" + getClassIdentity(targetObject.getClass()), e);
+            logger.error(" Target object is " + targetObject + "\n Class info for the target object:" +
+                getClassIdentity(targetObject.getClass()), e);
             throw new MethodCallExecutionFailedException("Arguments for the method " + this.getName() +
-                " are invalid: " , e );        
-            }
+                " are invalid: ", e);
+        }
     }
-    
+
     /*
      * check done before executing a method invocation using reflection
      * it does some type checking on the parameters of the method
      */
     private void checkMethodExecutionParameters() throws IllegalArgumentException {
-    	Class<?>[] methodFormalParameters = this.reifiedMethod.getParameterTypes();
+        Class<?>[] methodFormalParameters = this.reifiedMethod.getParameterTypes();
         // must have the same number of actual parameters
-    	if( this.effectiveArguments.length != methodFormalParameters.length ) {
-        	throw new IllegalArgumentException( "Trying to invoke the method " + this.getName() + " which has " 
-        			+ methodFormalParameters.length + " using " + this.effectiveArguments.length + " actual parameters." );
+        if (this.effectiveArguments.length != methodFormalParameters.length) {
+            throw new IllegalArgumentException("Trying to invoke the method " + this.getName() +
+                " which has " + methodFormalParameters.length + " using " + this.effectiveArguments.length +
+                " actual parameters.");
         }
         // the parameters must be compatible
         for (int i = 0; i < this.effectiveArguments.length; i++) {
-        	//special cases
-        	if( this.effectiveArguments[i] == null ) {
-        		// nothing to do...
-        		continue;
-        	}
-			Class<?> formalParameter = methodFormalParameters[i];
-			Class<?> actualParameter = this.effectiveArguments[i].getClass();
-			if( formalParameter.isPrimitive() || actualParameter.isPrimitive() ){
-				// lame test
-				if(!formalParameter.getSimpleName().toLowerCase().equals(actualParameter.getSimpleName().toLowerCase()))
-					throw new IllegalArgumentException( "Error on the argument #" + i + " of the method " + this.getName()
-							+ "; the actual parameter type " + actualParameter.getName() 
-							+ " is not compatible with the formal parameter type " + formalParameter.getName() 
-							);
-				else
-					continue;
-			}
-			// verify if the type of the actual parameter can be used as the type of the formal parameter
-			if( !formalParameter.isAssignableFrom(actualParameter) ) {
-				throw new IllegalArgumentException( "Error on the argument #" + i + " of the method " + this.getName()
-						+ "; the actual parameter type " + actualParameter.getName() 
-						+ " is not compatible with the formal parameter type " + formalParameter.getName() 
-						);
-			}
-		}
-        
+            //special cases
+            if (this.effectiveArguments[i] == null) {
+                // nothing to do...
+                continue;
+            }
+            Class<?> formalParameter = methodFormalParameters[i];
+            Class<?> actualParameter = this.effectiveArguments[i].getClass();
+            if (formalParameter.isPrimitive() || actualParameter.isPrimitive()) {
+                // lame test
+                if (!formalParameter.getSimpleName().toLowerCase().equals(
+                        actualParameter.getSimpleName().toLowerCase()))
+                    throw new IllegalArgumentException("Error on the argument #" + i + " of the method " +
+                        this.getName() + "; the actual parameter type " + actualParameter.getName() +
+                        " is not compatible with the formal parameter type " + formalParameter.getName());
+                else
+                    continue;
+            }
+            // verify if the type of the actual parameter can be used as the type of the formal parameter
+            if (!formalParameter.isAssignableFrom(actualParameter)) {
+                throw new IllegalArgumentException("Error on the argument #" + i + " of the method " +
+                    this.getName() + "; the actual parameter type " + actualParameter.getName() +
+                    " is not compatible with the formal parameter type " + formalParameter.getName());
+            }
+        }
+
     }
 
     /*
@@ -447,43 +447,44 @@ public class MethodCall implements java.io.Serializable, Cloneable {
         logger.debug("MethodCall.execute() reifiedMethod.getDeclaringClass() = " +
             getClassIdentity(this.reifiedMethod.getDeclaringClass()));
         logger.debug("MethodCall.execute() targetObject class" + getClassIdentity(targetObject.getClass()));
-        logger.debug("MethodCall.execute() effective arguments:" + (this.effectiveArguments.length==0 ? "none" : "") );
+        logger.debug("MethodCall.execute() effective arguments:" +
+            (this.effectiveArguments.length == 0 ? "none" : ""));
         for (int i = 0; i < this.effectiveArguments.length; i++) {
-        	Object argument = this.effectiveArguments[i];
-        	logger.debug("MethodCall.execute() effective argument #" + i + "=" 
-        				+ argument + ";" + ( argument != null ? argument.getClass() : "null" )
-        			);
-		}
-        logger.debug("MethodCall.execute() formal arguments:" + (this.effectiveArguments.length==0 ? "none" : "") );
+            Object argument = this.effectiveArguments[i];
+            logger.debug("MethodCall.execute() effective argument #" + i + "=" + argument + ";" +
+                (argument != null ? argument.getClass() : "null"));
+        }
+        logger.debug("MethodCall.execute() formal arguments:" +
+            (this.effectiveArguments.length == 0 ? "none" : ""));
         Class<?>[] methodFormalParameters = this.reifiedMethod.getParameterTypes();
         for (int i = 0; i < methodFormalParameters.length; i++) {
-        	Object argument = methodFormalParameters[i];
-        	logger.debug("MethodCall.execute() formal argument #" + i + "=" + argument );
+            Object argument = methodFormalParameters[i];
+            logger.debug("MethodCall.execute() formal argument #" + i + "=" + argument);
         }
-	}
-    
+    }
+
     /*
      * Prints info that uniquely identify the class given as parameter
      * This info is the pair <name,classloader>
      */
     private String getClassIdentity(Class<?> clazz) {
-    	StringBuffer result = new StringBuffer();
-    	
-    	ClassLoader cl = clazz.getClassLoader();
-    	result.append( clazz.getName() + "(" + 
-    	               Integer.toHexString(clazz.hashCode()) + ").ClassLoader=" + cl + "\n");
-    	
-    	CodeSource clazzCS = clazz.getProtectionDomain().getCodeSource();
-    	if (clazzCS != null) {
-    	    result.append("++++CodeSource: "+clazzCS + "\n");
-    	} else {
-    	    result.append("++++Null CodeSource"+ "\n");
-    	}
-    	
-    	return result.toString();
+        StringBuffer result = new StringBuffer();
+
+        ClassLoader cl = clazz.getClassLoader();
+        result.append(clazz.getName() + "(" + Integer.toHexString(clazz.hashCode()) + ").ClassLoader=" + cl +
+            "\n");
+
+        CodeSource clazzCS = clazz.getProtectionDomain().getCodeSource();
+        if (clazzCS != null) {
+            result.append("++++CodeSource: " + clazzCS + "\n");
+        } else {
+            result.append("++++Null CodeSource" + "\n");
+        }
+
+        return result.toString();
     }
 
-	@Override
+    @Override
     protected void finalize() {
         MethodCall.setMethodCall(this);
     }

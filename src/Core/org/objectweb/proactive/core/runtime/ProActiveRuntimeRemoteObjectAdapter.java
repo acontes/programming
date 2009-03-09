@@ -332,18 +332,18 @@ public class ProActiveRuntimeRemoteObjectAdapter extends Adapter<ProActiveRuntim
         return target.createGCMNode(nodeSecurityManager, vnName, jobId, tsList);
     }
 
-	@Override
-	public boolean isJ2EE() {
-		return target.isJ2EE();
-	}
+    @Override
+    public boolean isJ2EE() {
+        return target.isJ2EE();
+    }
 
-	@Override
-	public void setCodebase(String codebase) {
-		target.setCodebase(codebase);
-	}
+    @Override
+    public void setCodebase(String codebase) {
+        target.setCodebase(codebase);
+    }
 
-	@Override
-	public void setTargetClazzName(String clazzName) {
-		target.setTargetClazzName(clazzName);
-	}
+    @Override
+    public void setTargetClazzName(String clazzName) {
+        target.setTargetClazzName(clazzName);
+    }
 }

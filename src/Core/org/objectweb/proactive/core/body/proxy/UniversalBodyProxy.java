@@ -130,8 +130,8 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
                 }
             } else {
                 // instantiate the body locally or remotely
-                Node node = (Node) p0; 
-                Class<?> bodyClass =  getBodyClass(node , constructorCall.getTargetClassName()); 
+                Node node = (Node) p0;
+                Class<?> bodyClass = getBodyClass(node, constructorCall.getTargetClassName());
 
                 // added lines--------------------------
                 // ProActiveRuntime part = node.getProActiveRuntime();
@@ -176,33 +176,31 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
     }
 
     private Class<?> getBodyClass(Node node, String targetClazzName) {
-    	
-    	ProActiveRuntime part;
-    	
-    	if(NodeFactory.isNodeLocal(node)) {
-    		part = ProActiveRuntimeImpl.getProActiveRuntime();
-    	}
-    	else {
-    		part = node.getProActiveRuntime();
-    	}
-    	
-    	if(part.isJ2EE()) {
-    		// hak!
-			try {
-				Class<?> targetClass = Class.forName(targetClazzName);
-				String targetCodebase = RMIClassLoader.getClassAnnotation(targetClass);
-				part.setCodebase(targetCodebase);
-				part.setTargetClazzName(targetClazzName);
-			} catch (ClassNotFoundException e) {
-				logger.warn("Could not load " + targetClazzName + " reason:" , e );
-			}
-    		return Constants.J2EE_BODY_CLASS;
-    	}
-    	else 
-    		return Constants.DEFAULT_BODY_CLASS;
-	}
 
-	//
+        ProActiveRuntime part;
+
+        if (NodeFactory.isNodeLocal(node)) {
+            part = ProActiveRuntimeImpl.getProActiveRuntime();
+        } else {
+            part = node.getProActiveRuntime();
+        }
+
+        if (part.isJ2EE()) {
+            // hak!
+            try {
+                Class<?> targetClass = Class.forName(targetClazzName);
+                String targetCodebase = RMIClassLoader.getClassAnnotation(targetClass);
+                part.setCodebase(targetCodebase);
+                part.setTargetClazzName(targetClazzName);
+            } catch (ClassNotFoundException e) {
+                logger.warn("Could not load " + targetClazzName + " reason:", e);
+            }
+            return Constants.J2EE_BODY_CLASS;
+        } else
+            return Constants.DEFAULT_BODY_CLASS;
+    }
+
+    //
     // -- PUBLIC METHODS -----------------------------------------------
     //
     @Override

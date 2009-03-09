@@ -495,8 +495,9 @@ public abstract class Utils extends Object {
         }
         return ret;
     }
-    
-    public static final Object[] makeJ2EEDeepCopy(final Object[] source, Class<?>[] classes) throws java.io.IOException {
+
+    public static final Object[] makeJ2EEDeepCopy(final Object[] source, Class<?>[] classes)
+            throws java.io.IOException {
         if (source == null) {
             return null;
         }
@@ -553,12 +554,11 @@ public abstract class Utils extends Object {
         return ret;
     }
 
-
     private static String getCodebase(Class<?> cl) {
-    	return cl.getProtectionDomain().getCodeSource().getLocation().toString();
-	}
+        return cl.getProtectionDomain().getCodeSource().getLocation().toString();
+    }
 
-	/**
+    /**
      * Make a deep copy of source object using a ProActiveObjectStream.
      * @param source The object to copy.
      * @return the copy.
@@ -574,14 +574,14 @@ public abstract class Utils extends Object {
             throw (IOException) new IOException(e.getMessage()).initCause(e);
         }
     }
-    
-    public static Object makeDeepCopy(Object source,String codebase) throws java.io.IOException {
+
+    public static Object makeDeepCopy(Object source, String codebase) throws java.io.IOException {
         if (source == null) {
             return null;
         }
         try {
-        	MakeDeepCopy.WithCodebaseChangeObjectStream.codebase = codebase;
-        	return MakeDeepCopy.WithCodebaseChangeObjectStream.makeDeepCopy(source);
+            MakeDeepCopy.WithCodebaseChangeObjectStream.codebase = codebase;
+            return MakeDeepCopy.WithCodebaseChangeObjectStream.makeDeepCopy(source);
         } catch (ClassNotFoundException e) {
             throw (IOException) new IOException(e.getMessage()).initCause(e);
         }

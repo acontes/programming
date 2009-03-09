@@ -90,18 +90,19 @@ public class MakeDeepCopy {
             return ByteToObjectConverter.ProActiveObjectStream.convert(array);
         }
     }
-    
+
     public static class WithCodebaseChangeObjectStream {
-    	/**
+        /**
          * Perform a deep copy of an object using a codebase change object stream.
          * @param o The object to be deep copied
          * @return the copy.
          * @throws IOException
          * @throws ClassNotFoundException
          */
-    	public static String codebase;
+        public static String codebase;
+
         public static Object makeDeepCopy(Object o) throws IOException, ClassNotFoundException {
-        	CodebaseChangeObjectStream.codebase = codebase; 
+            CodebaseChangeObjectStream.codebase = codebase;
             byte[] array = ObjectToByteConverter.CodebaseChangeObjectStream.convert(o);
             return ByteToObjectConverter.CodebaseChangeObjectStream.convert(array);
         }

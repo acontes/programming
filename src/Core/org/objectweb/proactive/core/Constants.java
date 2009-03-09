@@ -52,7 +52,7 @@ public interface Constants {
 
     /** The local body class in the case we run inside J2EE environment*/
     public static final Class<?> J2EE_BODY_CLASS = org.objectweb.proactive.core.body.J2EEBody.class;
-    
+
     /** The explicit local body default class */
     public static final Class<?> DEFAULT_BODY_INTERFACE = org.objectweb.proactive.Body.class;
 

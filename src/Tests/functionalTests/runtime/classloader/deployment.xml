@@ -39,6 +39,7 @@
                      <absolutePath value="proactive.home/dist/lib/log4j.jar"/>
                      <absolutePath value="proactive.home/dist/lib/xercesImpl.jar"/>
 				     <absolutePath value="proactive.home/dist/lib/clover.jar"/>
+					<absolutePath value="proactive.home/dist/lib/jee/j2ee.jar"/>
 				     <absolutePath value="proactive.home/classes/Tests/functionalTests/runtime/classloader/"/>
 					</classpath>
 					<jvmParameters>

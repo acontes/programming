@@ -190,7 +190,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
 
     // JMX
     /** The name under which the JMXClassLoader will be registered as a MBean */
-    public static final String JMX_CLASSLOADER_MBEAN_OBJECTNAME = "org.objectweb.proactive:type=JMXClassLoader"; 
+    public static final String JMX_CLASSLOADER_MBEAN_OBJECTNAME = "org.objectweb.proactive:type=JMXClassLoader";
     /** The Server Connector to connect remotely to the JMX server */
     private ServerConnector serverConnector;
     private Object mutex = new Object();
@@ -284,15 +284,22 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
     public static ProActiveRuntimeImpl getProActiveRuntime() {
         return proActiveRuntime;
     }
-    
+
     private boolean inJ2EE = false;
-    public boolean isJ2EE() { return inJ2EE; }
-    public void setJ2EEFlag() { inJ2EE = true; }
-    
-	private WorkManager wm;
-	public void setWorkManager(WorkManager wm){
-		this.wm = wm;
-	}
+
+    public boolean isJ2EE() {
+        return inJ2EE;
+    }
+
+    public void setJ2EEFlag() {
+        inJ2EE = true;
+    }
+
+    private WorkManager wm;
+
+    public void setWorkManager(WorkManager wm) {
+        this.wm = wm;
+    }
 
     /**
      * If no ServerConnector has been created, a new one is created and started. Any ProActive JMX
@@ -444,74 +451,76 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
             }
         }
     }
-    
+
     /**
      * Destroys the MBean associated to the ProActiveRuntime
      * practically it undoes everything that is being done in createMBean()
      */
     protected void destroyMBean() {
-    	ObjectName objectName = null;
-    	try {
-    		// send notification
-    		mbean.sendNotification(NotificationType.runtimeDestroyed);
-    		MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();            
-    		
-    		// unregister the object
-    		objectName = mbean.getObjectName();
-    		if (mbs.isRegistered(objectName)) {
-    			mbs.unregisterMBean(objectName);
-    		}
+        ObjectName objectName = null;
+        try {
+            // send notification
+            mbean.sendNotification(NotificationType.runtimeDestroyed);
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
 
-    		// unregister the JMXClassLoader
-    		objectName = new ObjectName(ProActiveRuntimeImpl.JMX_CLASSLOADER_MBEAN_OBJECTNAME);
-    		if(mbs.isRegistered(objectName)){
-    			mbs.unregisterMBean(objectName);
-    		}
-    		
-    		mbean = null;
-    		
-		} catch (MalformedObjectNameException e) {
-			jmxLogger.error( "Cannot create the objectName " + ProActiveRuntimeImpl.JMX_CLASSLOADER_MBEAN_OBJECTNAME );
-			jmxLogger.error( e.getMessage() , e );
-		} catch (NullPointerException e) {
-			jmxLogger.error( "Cannot create the objectName " + ProActiveRuntimeImpl.JMX_CLASSLOADER_MBEAN_OBJECTNAME );
-			jmxLogger.error( e.getMessage() , e );
-		} catch (InstanceNotFoundException e) {
+            // unregister the object
+            objectName = mbean.getObjectName();
+            if (mbs.isRegistered(objectName)) {
+                mbs.unregisterMBean(objectName);
+            }
+
+            // unregister the JMXClassLoader
+            objectName = new ObjectName(ProActiveRuntimeImpl.JMX_CLASSLOADER_MBEAN_OBJECTNAME);
+            if (mbs.isRegistered(objectName)) {
+                mbs.unregisterMBean(objectName);
+            }
+
+            mbean = null;
+
+        } catch (MalformedObjectNameException e) {
+            jmxLogger.error("Cannot create the objectName " +
+                ProActiveRuntimeImpl.JMX_CLASSLOADER_MBEAN_OBJECTNAME);
+            jmxLogger.error(e.getMessage(), e);
+        } catch (NullPointerException e) {
+            jmxLogger.error("Cannot create the objectName " +
+                ProActiveRuntimeImpl.JMX_CLASSLOADER_MBEAN_OBJECTNAME);
+            jmxLogger.error(e.getMessage(), e);
+        } catch (InstanceNotFoundException e) {
             jmxLogger.error("The MBean with the objectName " + objectName + " was not found", e);
         } catch (MBeanRegistrationException e) {
             jmxLogger.error("The MBean with the objectName " + objectName +
                 " can't be unregistered from the MBean server", e);
         }
     }
-    
+
     /**
      * Unregister the ProActiveRuntime object from the RMI registry
      */
-	protected void unregisterRuntime() {
-		
-		String partName = System.getProperty("proactive.runtime.name");
-		if( partName == null){
-			// then I assume there is no proactive runtime! => nothing to do
-			return;
-		}
-		
-		// unregister
-		try {
-			PARemoteObject.unregister(RemoteObjectHelper.generateUrl(partName));
-		} catch (ProActiveException e) {
-			jmxLogger.error("Could not unregister the ProActiveRuntime remote object" +
-					"with the name "+ partName + "; problem caused by: " , e );
-		}
-		
-		// also unexport
-		try {
-			roe.unexport(RemoteObjectHelper.generateUrl(partName));
-		} catch (ProActiveException e) {
-			jmxLogger.error("Could not unexport the ProActiveRuntime remote object" +
-					"with the name "+ partName + "; problem caused by: " , e );
-		}
+    protected void unregisterRuntime() {
 
-	}
+        String partName = System.getProperty("proactive.runtime.name");
+        if (partName == null) {
+            // then I assume there is no proactive runtime! => nothing to do
+            return;
+        }
+
+        // unregister
+        try {
+            PARemoteObject.unregister(RemoteObjectHelper.generateUrl(partName));
+        } catch (ProActiveException e) {
+            jmxLogger.error("Could not unregister the ProActiveRuntime remote object" + "with the name " +
+                partName + "; problem caused by: ", e);
+        }
+
+        // also unexport
+        try {
+            roe.unexport(RemoteObjectHelper.generateUrl(partName));
+        } catch (ProActiveException e) {
+            jmxLogger.error("Could not unexport the ProActiveRuntime remote object" + "with the name " +
+                partName + "; problem caused by: ", e);
+        }
+
+    }
 
     //
     // -- Implements ProActiveRuntime
@@ -776,15 +785,15 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#killRT(boolean)
      */
     public void killRT(boolean softly) {
-    	
-    	killPART();
-        
-    	if(!softly) {
-    		// exit & don't care
-    		System.exit(0);
-    	}
+
+        killPART();
+
+        if (!softly) {
+            // exit & don't care
+            System.exit(0);
+        }
     }
-    
+
     /**
      * Try to kill the ProActive Runtime, but without killing the underlying JVM
      * This is VERY useful in a J2EE environment, where most of the time
@@ -792,8 +801,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
      * runtime is destroyed 
      */
     private void killPART() {
-    	
-    	 // JMX Notification
+
+        // JMX Notification
         if (getMBean() != null) {
             getMBean().sendNotification(NotificationType.runtimeDestroyed);
         }
@@ -804,14 +813,14 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
         logger.info("terminating Runtime " + getInternalURL());
 
         // unregister from the RMI Registry
-		unregisterRuntime();
-		
-		// destroy the JMX MBean associated with this runtime
-		destroyMBean();
-		
-		// unset the properties that were set in ProActiveConfiguration static initializer
-		// see issue ProActive-433
-		// ProActiveConfiguration.getInstance().unsetProperties();
+        unregisterRuntime();
+
+        // destroy the JMX MBean associated with this runtime
+        destroyMBean();
+
+        // unset the properties that were set in ProActiveConfiguration static initializer
+        // see issue ProActive-433
+        // ProActiveConfiguration.getInstance().unsetProperties();
 
     }
 
@@ -954,16 +963,15 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
         }
 
         Body localBody = (Body) bodyConstructorCall.execute();
-        if( localBody instanceof J2EEBody) {
-        	J2EEBody jeeBody = (J2EEBody) localBody;
-    		jeeBody.setWorkManager(this.wm);
-    		jeeBody.setTargetObjectClassName(targetObjectClassName);
-    		jeeBody.setTargetObjectCodebase(targetObjectCodebase);
-    		jeeBody.startBody();
-        }
-        else if( localBody instanceof ActiveBody ){
-        	// start its thread
-        	((ActiveBody)localBody).startBody();
+        if (localBody instanceof J2EEBody) {
+            J2EEBody jeeBody = (J2EEBody) localBody;
+            jeeBody.setWorkManager(this.wm);
+            jeeBody.setTargetObjectClassName(targetObjectClassName);
+            jeeBody.setTargetObjectCodebase(targetObjectCodebase);
+            jeeBody.startBody();
+        } else if (localBody instanceof ActiveBody) {
+            // start its thread
+            ((ActiveBody) localBody).startBody();
         }
 
         // SECURITY
@@ -1729,15 +1737,16 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
         vmInformation.vmName = vmName;
     }
 
-	protected String targetObjectClassName;
-	protected String targetObjectCodebase;
-	@Override
-	public void setCodebase(String codebase) {
-		targetObjectCodebase = codebase;
-	}
+    protected String targetObjectClassName;
+    protected String targetObjectCodebase;
 
-	@Override
-	public void setTargetClazzName(String clazzName) {
-		targetObjectClassName = clazzName;
-	}
+    @Override
+    public void setCodebase(String codebase) {
+        targetObjectCodebase = codebase;
+    }
+
+    @Override
+    public void setTargetClazzName(String clazzName) {
+        targetObjectClassName = clazzName;
+    }
 }

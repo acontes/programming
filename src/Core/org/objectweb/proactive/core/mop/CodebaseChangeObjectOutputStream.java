@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.rmi.server.RMIClassLoader;
 
+
 /**
  * This oos annotates all classes with the same fixed codebase
  * @author fabratu
@@ -41,22 +42,22 @@ import java.rmi.server.RMIClassLoader;
  * @since ProActive 4.10
  */
 public class CodebaseChangeObjectOutputStream extends SunMarshalOutputStream {
-	
-	private final String codebaseAnnotation;
 
-	public CodebaseChangeObjectOutputStream(OutputStream out) throws IOException {
+    private final String codebaseAnnotation;
+
+    public CodebaseChangeObjectOutputStream(OutputStream out) throws IOException {
         super(out);
         codebaseAnnotation = RMIClassLoader.getClassAnnotation(CodebaseChangeObjectOutputStream.class);
     }
-	
-	public CodebaseChangeObjectOutputStream(OutputStream out,String codebase) throws IOException {
+
+    public CodebaseChangeObjectOutputStream(OutputStream out, String codebase) throws IOException {
         super(out);
         codebaseAnnotation = codebase;
     }
-	
-	@Override
-	protected void annotateClass(Class<?> arg0) throws IOException {
-		writeLocation(codebaseAnnotation);
-	}
-	
+
+    @Override
+    protected void annotateClass(Class<?> arg0) throws IOException {
+        writeLocation(codebaseAnnotation);
+    }
+
 }
