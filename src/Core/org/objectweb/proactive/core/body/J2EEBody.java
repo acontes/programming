@@ -136,7 +136,7 @@ public class J2EEBody extends ActiveBody implements Work {
     			// now it will get really nasty!
     			newm = getSimilarMethod(oldm);
     			// "adjust" classes of the effective arguments
-    			newEffectiveArguments = Utils.makeJ2EEDeepCopy(oldmc.getEffectiveArguments(), newm
+    			newEffectiveArguments = Utils.makeDeepCopy(oldmc.getEffectiveArguments(), newm
     					.getParameterTypes());
     		}
 
