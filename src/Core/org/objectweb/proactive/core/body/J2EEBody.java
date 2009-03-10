@@ -94,7 +94,8 @@ public class J2EEBody extends ActiveBody implements Work {
         // load the class
         try {
             Class<?> targetCl = RMIClassLoader.loadClass(targetObjectCodebase, targetObjectClassName);
-            Request newReq = rebuildRequest(targetCl, request);
+            ClassDefinitionForger cdf = new ClassDefinitionForger(targetCl);
+            Request newReq = cdf.rebuildRequest(request);
             super.serve(newReq);
             return;
         } catch (MalformedURLException e) {
@@ -112,54 +113,62 @@ public class J2EEBody extends ActiveBody implements Work {
         // serve!
         super.serve(request);
     }
+    
+    class ClassDefinitionForger {
+    	private final Class<?> targetCl;
+    	
+    	public ClassDefinitionForger(Class<?> clz) {
+    		targetCl = clz;
+		}
+    	
+    	public Request rebuildRequest(Request request) throws SecurityException,
+    	NoSuchMethodException, IOException {
+    		Request ret;
+    		MethodCall oldmc = request.getMethodCall();
+    		Method oldm = oldmc.getReifiedMethod();
 
-    private Request rebuildRequest(Class<?> targetClazz, Request request) throws SecurityException,
-            NoSuchMethodException, IOException {
-        Request ret;
-        MethodCall oldmc = request.getMethodCall();
-        Method oldm = oldmc.getReifiedMethod();
+    		Method newm;
+    		Object[] newEffectiveArguments;
+    		try {
+    			newm = targetCl.getMethod(oldm.getName(), oldm.getParameterTypes());
+    			newEffectiveArguments = oldmc.getEffectiveArguments();
+    		} catch (NoSuchMethodException e) {
+    			// now it will get really nasty!
+    			newm = getSimilarMethod(oldm);
+    			// "adjust" classes of the effective arguments
+    			newEffectiveArguments = Utils.makeJ2EEDeepCopy(oldmc.getEffectiveArguments(), newm
+    					.getParameterTypes());
+    		}
 
-        Method newm;
-        Object[] newEffectiveArguments;
-        try {
-            newm = targetClazz.getMethod(oldm.getName(), oldm.getParameterTypes());
-            newEffectiveArguments = oldmc.getEffectiveArguments();
-        } catch (NoSuchMethodException e) {
-            // now it will get really nasty!
-            newm = getMethod(targetClazz, oldm);
-            // "adjust" classes of the effective arguments
-            newEffectiveArguments = Utils.makeJ2EEDeepCopy(oldmc.getEffectiveArguments(), newm
-                    .getParameterTypes());
-        }
+    		MethodCall mc = MethodCall.getMethodCall(newm, oldmc.getGenericTypesMapping(), newEffectiveArguments,
+    				oldmc.getExceptionContext());
 
-        MethodCall mc = MethodCall.getMethodCall(newm, oldmc.getGenericTypesMapping(), newEffectiveArguments,
-                oldmc.getExceptionContext());
-
-        ret = new RequestImpl(mc, request.getSender(), request.isOneWay(), request.getSequenceNumber());
-        return ret;
-    }
-
-    private Method getMethod(Class<?> targetClazz, Method oldm) throws NoSuchMethodException {
-        for (Method m : targetClazz.getMethods()) {
-            if (m.getName().equals(oldm.getName()) && sameParams(m, oldm)) {
-                return m;
+    		ret = new RequestImpl(mc, request.getSender(), request.isOneWay(), request.getSequenceNumber());
+    		return ret;
+    	}
+    	
+        private Method getSimilarMethod(Method oldm) throws NoSuchMethodException {
+            for (Method m : targetCl.getMethods()) {
+                if (m.getName().equals(oldm.getName()) && sameParams(m, oldm)) {
+                    return m;
+                }
             }
+            throw new NoSuchMethodException(oldm.toString());
         }
-        throw new NoSuchMethodException(oldm.toString());
-    }
 
-    private boolean sameParams(Method m, Method oldm) {
-        Class<?>[] p = m.getParameterTypes();
-        Class<?>[] oldp = oldm.getParameterTypes();
-        if (oldp.length != p.length)
-            return false;
-        for (int i = 0; i < p.length; i++) {
-            Class<?> c = p[i];
-            Class<?> oldc = oldp[i];
-            if (!c.getName().equals(oldc.getName()))
+        private boolean sameParams(Method m, Method oldm) {
+            Class<?>[] p = m.getParameterTypes();
+            Class<?>[] oldp = oldm.getParameterTypes();
+            if (oldp.length != p.length)
                 return false;
+            for (int i = 0; i < p.length; i++) {
+                Class<?> c = p[i];
+                Class<?> oldc = oldp[i];
+                if (!c.getName().equals(oldc.getName()))
+                    return false;
+            }
+            return true;
         }
-        return true;
     }
 
     @Override

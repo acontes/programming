@@ -39,6 +39,7 @@ import javax.resource.spi.BootstrapContext;
 import javax.resource.spi.ResourceAdapter;
 import javax.resource.spi.ResourceAdapterInternalException;
 import javax.resource.spi.endpoint.MessageEndpointFactory;
+import javax.resource.spi.work.WorkManager;
 import javax.transaction.xa.XAResource;
 
 import org.objectweb.proactive.api.PARemoteObject;
@@ -103,20 +104,26 @@ public class ProActiveResourceAdapter extends ProActiveConnectorBean
 	@Override
 	public void start(BootstrapContext arg0)
 			throws ResourceAdapterInternalException {
+
 		//configure first
 		super.configureRA();
-		
+
 		// the PART name
 		_raLogger.debug("Set the vmName to " + _vmName);
 		PAProperties.PA_RUNTIME_NAME.setValue(PART_PREFIX + _vmName);
 
+		// getting the work manager
+		WorkManager wm = arg0.getWorkManager();
+
 		// actually create the runtime
 		_proActiveRuntime = ProActiveRuntimeImpl.getProActiveRuntime();
+		_proActiveRuntime.setJ2EEFlag();
+		_proActiveRuntime.setWorkManager(wm);
 		// this also tests the ActiveObject representing the runtime; 
 		// the getUrl is a remote call; the result will be stored locally 
 		_runtimeUrl = _proActiveRuntime.getURL();
 		_raLogger.debug("New PART created succesfully at URL:" + _runtimeUrl);
-
+		
 	}
 
 	/* 
