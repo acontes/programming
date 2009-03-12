@@ -114,7 +114,7 @@ public class ObjectToByteConverter {
          * @return The object converted to a byte array
          * @throws IOException
          */
-        public static String codebase;
+        public static Class<?> originalClass;
 
         public static byte[] convert(Object o) throws IOException {
             return ObjectToByteConverter.convert(o, ConversionMode.CODEBASE);
@@ -151,7 +151,7 @@ public class ObjectToByteConverter {
                 objectOutputStream = new PAObjectOutputStream(byteArrayOutputStream);
             } else if (conversionMode == ConversionMode.CODEBASE) {
                 objectOutputStream = new CodebaseChangeObjectOutputStream(byteArrayOutputStream,
-                    CodebaseChangeObjectStream.codebase);
+                    CodebaseChangeObjectStream.originalClass);
             }
 
             ObjectToByteConverter.writeToStream(objectOutputStream, o);

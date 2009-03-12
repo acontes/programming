@@ -30,42 +30,28 @@
  */
 package org.objectweb.proactive.core.mop;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.rmi.server.RMIClassLoader;
-
+import java.io.ObjectStreamClass;
 
 /**
- * This oos annotates all classes with the same fixed codebase
- * The codebase is the same as the class given as parameter to the constructor
- * The oos first verifies if the classes are compatible, using ClassComparator 
+ * Verifies if two classes are "the same" 
+ * The verification is done based on the serialVersionUID field
+ * We assume that the classes are serializable!
  * @author fabratu
  * @version %G%, %I%
  * @since ProActive 4.10
  */
-public class CodebaseChangeObjectOutputStream extends SunMarshalOutputStream {
+public class ClassComparator {
 
-    private final Class<?> originalClass;
-    private final String codebaseAnnotation;
-
-    public CodebaseChangeObjectOutputStream(OutputStream out, Class<?> originalClass) throws IOException {
-        super(out);
-        this.originalClass = originalClass;
-        this.codebaseAnnotation = Utils.getCodebase(originalClass);
-    }
-
-    @Override
-    protected void annotateClass(Class<?> arg0) throws IOException {
-    	try{
-    		if( ClassComparator.compare(originalClass, arg0) )
-    			// classes compatible => write the new codebase value
-    			writeLocation(codebaseAnnotation);
-    		else
-    			// go with the default
-    			super.annotateClass(arg0);
-    	} catch(IllegalArgumentException e){
-    		throw new IOException(e);
-    	}
-    }
-
+	public static boolean compare( Class<?> c1 , Class<?> c2 ) {
+		ObjectStreamClass os1 = ObjectStreamClass.lookup(c1);
+		if(os1 == null)
+			throw new IllegalArgumentException("Class " + c1.getName() + " is not serializable!");
+		
+		ObjectStreamClass os2 = ObjectStreamClass.lookup(c2);
+		if(os2 == null)
+			throw new IllegalArgumentException("Class " + c1.getName() + " is not serializable!");
+		
+		return os1.getSerialVersionUID() == os2.getSerialVersionUID();
+		
+	}
 }

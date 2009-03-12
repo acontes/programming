@@ -468,7 +468,7 @@ public abstract class Utils extends Object {
             if (((cl = obj.getClass()) != String.class) && !Utils.isWrapperClass(cl) &&
                 (!cl.isArray() || !cl.getComponentType().isPrimitive())) {
             	if(isJ2EE)
-            		return (Object[]) Utils.makeDeepCopy((Object) source, getCodebase(clazzes[i]));
+            		return (Object[]) Utils.makeDeepCopy((Object) source, clazzes[i]);
             	else
             		return (Object[]) Utils.makeDeepCopy((Object) source);
             }
@@ -510,7 +510,7 @@ public abstract class Utils extends Object {
         return ret;
     }
 
-    private static String getCodebase(Class<?> cl) {
+    public static String getCodebase(Class<?> cl) {
         return cl.getProtectionDomain().getCodeSource().getLocation().toString();
     }
     
@@ -537,12 +537,12 @@ public abstract class Utils extends Object {
      * @return the copy.
      * @throws java.io.IOException
      */
-    public static Object makeDeepCopy(Object source, String codebase) throws java.io.IOException {
+    public static Object makeDeepCopy(Object source, Class<?> realClass) throws java.io.IOException {
         if (source == null) {
             return null;
         }
         try {
-            MakeDeepCopy.WithCodebaseChangeObjectStream.codebase = codebase;
+            MakeDeepCopy.WithCodebaseChangeObjectStream.originalClass = realClass;
             return MakeDeepCopy.WithCodebaseChangeObjectStream.makeDeepCopy(source);
         } catch (ClassNotFoundException e) {
             throw (IOException) new IOException(e.getMessage()).initCause(e);

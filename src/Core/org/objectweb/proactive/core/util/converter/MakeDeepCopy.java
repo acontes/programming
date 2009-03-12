@@ -99,10 +99,10 @@ public class MakeDeepCopy {
          * @throws IOException
          * @throws ClassNotFoundException
          */
-        public static String codebase;
+        public static Class<?> originalClass;
 
         public static Object makeDeepCopy(Object o) throws IOException, ClassNotFoundException {
-            CodebaseChangeObjectStream.codebase = codebase;
+            CodebaseChangeObjectStream.originalClass = originalClass;
             byte[] array = ObjectToByteConverter.CodebaseChangeObjectStream.convert(o);
             return ByteToObjectConverter.CodebaseChangeObjectStream.convert(array);
         }
