@@ -284,16 +284,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
         return proActiveRuntime;
     }
 
-    private boolean inJ2EE = false;
-
-    public boolean isJ2EE() {
-        return inJ2EE;
-    }
-
-    public void setJ2EEFlag() {
-        inJ2EE = true;
-    }
-
     /**
      * If no ServerConnector has been created, a new one is created and started. Any ProActive JMX
      * Connector Client can connect to it remotely and manage the MBeans.

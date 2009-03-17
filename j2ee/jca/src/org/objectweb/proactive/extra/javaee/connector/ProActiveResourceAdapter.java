@@ -120,7 +120,6 @@ public class ProActiveResourceAdapter extends ProActiveConnectorBean
 
 		// actually create the runtime
 		_proActiveRuntime = ProActiveRuntimeImpl.getProActiveRuntime();
-		_proActiveRuntime.setJ2EEFlag();
 		// this also tests the ActiveObject representing the runtime; 
 		// the getUrl is a remote call; the result will be stored locally 
 		_runtimeUrl = _proActiveRuntime.getURL();

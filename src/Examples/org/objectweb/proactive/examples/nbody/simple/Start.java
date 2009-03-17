@@ -34,6 +34,8 @@ package org.objectweb.proactive.examples.nbody.simple;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.body.J2EEMetaObjectFactory;
+import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -70,12 +72,13 @@ public class Start {
         Domain[] domainArray = new Domain[totalNbBodies];
         Node[] nodes = deployer.getWorkerNodes();
 
+        MetaObjectFactory j2eeFactory = J2EEMetaObjectFactory.newInstance();
         for (int i = 0; i < totalNbBodies; i++) {
             Object[] constructorParams = new Object[] { new Integer(i), new Planet(universe) };
             try {
                 // Create all the Domains used in the simulation 
-                domainArray[i] = (Domain) PAActiveObject.newActive(Domain.class.getName(), constructorParams,
-                        nodes[(i + 1) % nodes.length]);
+            	domainArray[i] = (Domain) PAActiveObject.newActive(Domain.class.getName(), null, constructorParams,
+            			nodes[(i + 1) % nodes.length] , null, j2eeFactory);
             } catch (ActiveObjectCreationException e) {
                 deployer.abortOnError(e);
             } catch (NodeException e) {
@@ -91,8 +94,8 @@ public class Start {
         // Create a maestro, which will orchestrate the whole simulation, synchronizing the computations of the Domains
         Maestro maestro = null;
         try {
-            maestro = (Maestro) PAActiveObject.newActive(Maestro.class.getName(), new Object[] { domainArray,
-                    new Integer(maxIter), deployer }, nodes[0]);
+            maestro = (Maestro) PAActiveObject.newActive(Maestro.class.getName(), null, new Object[] { domainArray,
+                    new Integer(maxIter), deployer }, nodes[0] , null, j2eeFactory); 
         } catch (ActiveObjectCreationException e) {
             deployer.abortOnError(e);
         } catch (NodeException e) {

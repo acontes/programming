@@ -37,6 +37,7 @@ import java.net.MalformedURLException;
 import java.rmi.server.RMIClassLoader;
 
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory.RequestReceiverFactoryImpl;
 import org.objectweb.proactive.core.body.exceptions.InactiveBodyException;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestImpl;
@@ -44,6 +45,7 @@ import org.objectweb.proactive.core.body.request.RequestQueue;
 import org.objectweb.proactive.core.body.request.RequestReceiver;
 import org.objectweb.proactive.core.body.request.RequestReceiverFactory;
 import org.objectweb.proactive.core.body.request.RequestReceiverImpl;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.core.util.converter.MakeDeepCopy;
@@ -69,7 +71,7 @@ public class J2EEMetaObjectFactory extends ProActiveMetaObjectFactory implements
 	
 	@Override
 	protected RequestReceiverFactory newRequestReceiverFactorySingleton() {
-		return new J2EERequestReceiverFactory();
+		return new J2EERequestReceiverFactory(); 
 	}
 	
     @Override
@@ -95,6 +97,8 @@ public class J2EEMetaObjectFactory extends ProActiveMetaObjectFactory implements
     		
     		@Override
     		public int receiveRequest(Request req, Body bodyReceiver) {
+    			if(!PAProperties.PA_J2EE.isSet())
+    				return super.receiveRequest(req, bodyReceiver);
     			MethodCall methodCall = req.getMethodCall();
     			String targetObjectClassName = bodyReceiver.getReifiedObject().getClass().getName();
 				String targetObjectCodebase = RMIClassLoader.getClassAnnotation(bodyReceiver.getReifiedObject().getClass());
