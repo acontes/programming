@@ -154,7 +154,7 @@ public enum PAProperties {
      * this property should be used when one wants to start only a runtime without an additional main class
      */
     PA_RUNTIME_STAYALIVE("proactive.runtime.stayalive", PAPropertiesType.BOOLEAN),
-
+    
     /**
      * Terminates the Runtime when the Runtime becomes empty
      *
@@ -483,6 +483,14 @@ public enum PAProperties {
      * The size, in [KB], of the buffers to use when reading and writing a file.
      */
     PA_FILETRANSFER_MAX_BUFFER_SIZE("proactive.filetransfer.buffer_size_kb", PAPropertiesType.INTEGER),
+    
+    /* ------------------------------------
+     *  J2EE
+     */
+    /**
+     * Indicates if a Runtime is running inside the JVM of an application server
+     */
+    PA_J2EE("proactive.j2ee" , PAPropertiesType.BOOLEAN),
 
     // -------------- Misc
 

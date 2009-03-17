@@ -107,6 +107,9 @@ public class ProActiveResourceAdapter extends ProActiveConnectorBean
 
 		//configure first
 		super.configureRA();
+		
+		// this is a J2EE runtime!
+		PAProperties.PA_J2EE.setValue(true);
 
 		// the PART name
 		_raLogger.debug("Set the vmName to " + _vmName);
@@ -118,7 +121,6 @@ public class ProActiveResourceAdapter extends ProActiveConnectorBean
 		// actually create the runtime
 		_proActiveRuntime = ProActiveRuntimeImpl.getProActiveRuntime();
 		_proActiveRuntime.setJ2EEFlag();
-		_proActiveRuntime.setWorkManager(wm);
 		// this also tests the ActiveObject representing the runtime; 
 		// the getUrl is a remote call; the result will be stored locally 
 		_runtimeUrl = _proActiveRuntime.getURL();

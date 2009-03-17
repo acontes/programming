@@ -336,14 +336,4 @@ public class ProActiveRuntimeRemoteObjectAdapter extends Adapter<ProActiveRuntim
     public boolean isJ2EE() {
         return target.isJ2EE();
     }
-
-    @Override
-    public void setCodebase(String codebase) {
-        target.setCodebase(codebase);
-    }
-
-    @Override
-    public void setTargetClazzName(String clazzName) {
-        target.setTargetClazzName(clazzName);
-    }
 }

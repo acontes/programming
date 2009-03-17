@@ -431,8 +431,4 @@ public interface ProActiveRuntime extends SecurityEntity {
 
     // J2EE internal use
     public boolean isJ2EE();
-
-    public void setCodebase(String codebase);
-
-    public void setTargetClazzName(String clazzName);
 }

@@ -67,7 +67,6 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.ActiveBody;
 import org.objectweb.proactive.core.body.Context;
-import org.objectweb.proactive.core.body.J2EEBody;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
@@ -293,12 +292,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
 
     public void setJ2EEFlag() {
         inJ2EE = true;
-    }
-
-    private WorkManager wm;
-
-    public void setWorkManager(WorkManager wm) {
-        this.wm = wm;
     }
 
     /**
@@ -963,16 +956,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
         }
 
         Body localBody = (Body) bodyConstructorCall.execute();
-        if (localBody instanceof J2EEBody) {
-            J2EEBody jeeBody = (J2EEBody) localBody;
-            jeeBody.setWorkManager(this.wm);
-            jeeBody.setTargetObjectClassName(targetObjectClassName);
-            jeeBody.setTargetObjectCodebase(targetObjectCodebase);
-            jeeBody.startBody();
-        } else if (localBody instanceof ActiveBody) {
-            // start its thread
-            ((ActiveBody) localBody).startBody();
-        }
 
         // SECURITY
         ProActiveSecurityManager objectSecurityManager = ((AbstractBody) localBody)
@@ -1737,16 +1720,4 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
         vmInformation.vmName = vmName;
     }
 
-    protected String targetObjectClassName;
-    protected String targetObjectCodebase;
-
-    @Override
-    public void setCodebase(String codebase) {
-        targetObjectCodebase = codebase;
-    }
-
-    @Override
-    public void setTargetClazzName(String clazzName) {
-        targetObjectClassName = clazzName;
-    }
 }
