@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.body;
+package org.objectweb.proactive.extra.javaee;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -37,11 +37,10 @@ import java.net.MalformedURLException;
 import java.rmi.server.RMIClassLoader;
 
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory.RequestReceiverFactoryImpl;
-import org.objectweb.proactive.core.body.exceptions.InactiveBodyException;
+import org.objectweb.proactive.core.body.MetaObjectFactory;
+import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestImpl;
-import org.objectweb.proactive.core.body.request.RequestQueue;
 import org.objectweb.proactive.core.body.request.RequestReceiver;
 import org.objectweb.proactive.core.body.request.RequestReceiverFactory;
 import org.objectweb.proactive.core.body.request.RequestReceiverImpl;

@@ -34,7 +34,6 @@ package org.objectweb.proactive.examples.nbody.simple;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.body.J2EEMetaObjectFactory;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -44,6 +43,7 @@ import org.objectweb.proactive.examples.nbody.common.Cube;
 import org.objectweb.proactive.examples.nbody.common.Deployer;
 import org.objectweb.proactive.examples.nbody.common.Displayer;
 import org.objectweb.proactive.examples.nbody.common.Planet;
+import org.objectweb.proactive.extra.javaee.J2EEMetaObjectFactory;
 
 
 /**
