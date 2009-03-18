@@ -47,6 +47,7 @@ import org.objectweb.proactive.core.body.request.RequestReceiverImpl;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.Utils;
+import org.objectweb.proactive.core.util.NonFunctionalServices;
 import org.objectweb.proactive.core.util.converter.MakeDeepCopy;
 
 /**
@@ -96,11 +97,19 @@ public class J2EEMetaObjectFactory extends ProActiveMetaObjectFactory implements
     		
     		@Override
     		public int receiveRequest(Request req, Body bodyReceiver) {
+    			// if not in J2EE go by the default
     			if(!PAProperties.PA_J2EE.isSet())
     				return super.receiveRequest(req, bodyReceiver);
     			MethodCall methodCall = req.getMethodCall();
-    			String targetObjectClassName = bodyReceiver.getReifiedObject().getClass().getName();
-				String targetObjectCodebase = RMIClassLoader.getClassAnnotation(bodyReceiver.getReifiedObject().getClass());
+    			Class<?> reifiedObjectClass = bodyReceiver.getReifiedObject().getClass();
+    			// only mess around with classes which are loaded from remote locations
+				if(!remoteClassDefinition(reifiedObjectClass))
+					return super.receiveRequest(req, bodyReceiver);
+				// don't mess around with non functional services
+				if(isNonFunctionalService(methodCall))
+					return super.receiveRequest(req, bodyReceiver);
+    			String targetObjectClassName = reifiedObjectClass.getName();
+				String targetObjectCodebase = RMIClassLoader.getClassAnnotation(reifiedObjectClass);
     			try {
     				Class<?> targetCl = RMIClassLoader.loadClass(targetObjectCodebase, targetObjectClassName);
     				ClassDefinitionForger cdf = new ClassDefinitionForger(targetCl);
@@ -117,7 +126,7 @@ public class J2EEMetaObjectFactory extends ProActiveMetaObjectFactory implements
     	        } catch (SecurityException e) {
     				logger.warn("Cannot rebuild method call " + methodCall.getReifiedMethod() + " reason:", e);
     			} catch (NoSuchMethodException e) {
-    				logger.warn("Cannot rebuild method call " + methodCall.getReifiedMethod() + " reason:", e);
+   					logger.warn("Cannot rebuild method call " + methodCall.getReifiedMethod() + " reason:", e);
     			} catch (IOException e) {
     				logger.warn("Cannot rebuild method call " + methodCall.getReifiedMethod() + " reason:", e);
     			}
@@ -125,6 +134,22 @@ public class J2EEMetaObjectFactory extends ProActiveMetaObjectFactory implements
     			logger.warn("Will go for the default request processing mechanism...");
     			return super.receiveRequest(req, bodyReceiver);
     		}
+
+			private boolean isNonFunctionalService(MethodCall methodCall) {
+				return methodCall.getReifiedMethod().getDeclaringClass().getName().
+					equals(NonFunctionalServices.class.getName());
+			}
+
+			private boolean remoteClassDefinition(Class<?> reifiedObjectClass) {
+				try {
+					return reifiedObjectClass.getClassLoader().getClass().getName().equals(RMIClassLoader.getClassLoader("http://localhost").getClass().getName());
+				} catch (MalformedURLException e) {
+					// shouldn't happen, but better safe than sorry
+					return true;
+				} catch (SecurityException e) {
+					return true;
+				}
+			}
     	}
     }
 	
