@@ -31,11 +31,38 @@
  */
 package org.objectweb.proactive.examples.webservices.helloWorld;
 
-//@snippet-start helloworlditfcomponent
-public interface HelloWorldItf {
+import org.objectweb.proactive.extensions.webservices.deployer.PADeployer;
 
-    public String helloWorld(String name);
 
-    public String sayHello();
+/**
+ * A simple example to expose an active object as a web service.
+ *
+ * @author The ProActive Team
+ */
+public class UndeployComponent {
+
+    public static void main(String[] args) {
+        String url = "";
+        String componentName = "";
+        String interfaceName = "";
+        if (args.length == 2) {
+            url = "http://localhost:8080/";
+            componentName = args[0];
+            interfaceName = args[1];
+        } else if (args.length == 3) {
+            url = args[0];
+            componentName = args[1];
+            interfaceName = args[2];
+        } else {
+            System.out.println("Wrong number of arguments:");
+            System.out.println("Usage: java UndeployComponent [url] serviceName interfaceName");
+            return;
+        }
+
+        if (!url.startsWith("http://")) {
+            url = "http://" + url;
+        }
+
+        PADeployer.unDeployComponent(url, componentName, new String[] { interfaceName });
+    }
 }
-//@snippet-end helloworlditfcomponent
