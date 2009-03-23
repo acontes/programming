@@ -29,10 +29,11 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.examples.webservices.helloWorld;
+package functionalTests.component.webservices;
 
-public interface HelloNameItf {
+public interface ChooseNameItf {
 
-    public String helloName(int index);
+    public String chooseName(int index);
 
+    public String chooseRandomName();
 }
