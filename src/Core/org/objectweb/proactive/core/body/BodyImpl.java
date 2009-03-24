@@ -126,10 +126,10 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
     // -- PROTECTED MEMBERS -----------------------------------------------
     //
 
-    /** The component in charge of receiving reply */
+    /*  The component in charge of receiving reply */
     protected ReplyReceiver replyReceiver;
 
-    /** The component in charge of receiving request */
+    /*  The component in charge of receiving request */
     protected RequestReceiver requestReceiver;
 
     // already checked methods
@@ -139,22 +139,21 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
     // -- CONSTRUCTORS -----------------------------------------------
     //
 
-    /**
+    /*
      * Creates a new AbstractBody. Used for serialization.
      */
     public BodyImpl() {
     }
 
-    /**
+    /*
      * Creates a new AbstractBody for an active object attached to a given node.
      * 
-     * @param reifiedObject
-     *            the active object that body is for
-     * @param nodeURL
-     *            the URL of the node that body is attached to
-     * @param factory
-     *            the factory able to construct new factories for each type of
-     *            meta objects needed by this body
+     * @param reifiedObject the active object that body is for
+     *
+     * @param nodeURL the URL of the node that body is attached to
+     *
+     * @param factory the factory able to construct new factories for each type of meta objects
+     * needed by this body
      */
     public BodyImpl(Object reifiedObject, String nodeURL, MetaObjectFactory factory, String jobId)
             throws ActiveObjectCreationException {
@@ -250,14 +249,13 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
     // -- PROTECTED METHODS -----------------------------------------------
     //
 
-    /**
-     * Receives a request for later processing. The call to this method is non
-     * blocking unless the body cannot temporary receive the request.
+    /*
+     * Receives a request for later processing. The call to this method is non blocking unless the
+     * body cannot temporary receive the request.
+     *
+     * @param request the request to process
      * 
-     * @param request
-     *            the request to process
-     * @exception java.io.IOException
-     *                if the request cannot be accepted
+     * @exception java.io.IOException if the request cannot be accepted
      */
     @Override
     protected int internalReceiveRequest(Request request) throws java.io.IOException,
@@ -286,33 +284,32 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         return 0;
     }
 
-    /**
+    /*
      * Receives a reply in response to a former request.
      * 
-     * @param reply
-     *            the reply received
-     * @exception java.io.IOException
-     *                if the reply cannot be accepted
+     * @param reply the reply received
+     *
+     * @exception java.io.IOException if the reply cannot be accepted
      */
     @Override
     protected int internalReceiveReply(Reply reply) throws java.io.IOException {
         // JMX Notification
         if (!isProActiveInternalObject && (this.mbean != null)) {
-            this.mbean.sendNotification(NotificationType.replyReceived);
+            RequestNotificationData requestNotificationData = new RequestNotificationData(BodyImpl.this.bodyID,
+                BodyImpl.this.getNodeURL(), reply.getSourceBodyID(), this.nodeURL, reply.getMethodName(),
+                getRequestQueue().size() + 1, reply.getSequenceNumber());
+            this.mbean.sendNotification(NotificationType.replyReceived, requestNotificationData);
         }
 
         // END JMX Notification
         return replyReceiver.receiveReply(reply, this, getFuturePool());
     }
 
-    /**
-     * Signals that the activity of this body, managed by the active thread has
-     * just stopped.
+    /*
+     * Signals that the activity of this body, managed by the active thread has just stopped.
      * 
-     * @param completeACs
-     *            if true, and if there are remaining AC in the futurepool, the
-     *            AC thread is not killed now; it will be killed after the
-     *            sending of the last remaining AC.
+     * @param completeACs if true, and if there are remaining AC in the futurepool, the AC thread is
+     * not killed now; it will be killed after the sending of the last remaining AC.
      */
     @Override
     protected void activityStopped(boolean completeACs) {
@@ -413,14 +410,13 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         return false;
     }
 
-    /**
-     * Stores the given method name with the given parameters types inside our
-     * method signature cache to avoid re-testing them
+    /*
+     * Stores the given method name with the given parameters types inside our method signature
+     * cache to avoid re-testing them
+     *
+     * @param methodName name of the method
      * 
-     * @param methodName
-     *            name of the method
-     * @param parametersTypes
-     *            parameter type list
+     * @param parametersTypes parameter type list
      */
     private void storeInMethodCache(String methodName, Class<?>[] parametersTypes) {
         List<Class<?>> parameterTlist = null;
@@ -454,10 +450,10 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
     // -- inner classes -----------------------------------------------
     //
     private class ActiveLocalBodyStrategy implements LocalBodyStrategy, java.io.Serializable {
-        /** A pool future that contains the pending future objects */
+        /*  A pool future that contains the pending future objects */
         protected FuturePool futures;
 
-        /** The reified object target of the request processed by this body */
+        /*  The reified object target of the request processed by this body */
         protected Object reifiedObject;
         protected BlockingRequestQueue requestQueue;
         protected RequestFactory internalRequestFactory;
@@ -497,11 +493,10 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             return this.reifiedObject.getClass().getName();
         }
 
-        /**
-         * Serves the request. The request should be removed from the request
-         * queue before serving, which is correctly done by all methods of the
-         * Service class. However, this condition is not ensured for custom
-         * calls on serve.
+        /*
+         * Serves the request. The request should be removed from the request queue before serving,
+         * which is correctly done by all methods of the Service class. However, this condition is
+         * not ensured for custom calls on serve.
          */
         public void serve(Request request) {
             if (Profiling.TIMERS_COMPILED) {
@@ -673,7 +668,8 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                     if (!connectorID.equals(destinationBody.getID())) {
                         mbean.sendNotification(NotificationType.requestSent, new RequestNotificationData(
                             BodyImpl.this.bodyID, BodyImpl.this.getNodeURL(), destinationBody.getID(),
-                            destinationBody.getNodeURL(), methodCall.getName(), -1, request.getSequenceNumber()));
+                            destinationBody.getNodeURL(), methodCall.getName(), -1, request
+                                    .getSequenceNumber()));
                     }
                 }
             }
@@ -688,12 +684,10 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             }
         }
 
-        /**
-         * Returns a unique identifier that can be used to tag a future, a
-         * request
+        /*
+         * Returns a unique identifier that can be used to tag a future, a request
          * 
-         * @return a unique identifier that can be used to tag a future, a
-         *         request.
+         * @return a unique identifier that can be used to tag a future, a request.
          */
         public synchronized long getNextSequenceID() {
             return BodyImpl.this.bodyID.toString().hashCode() + ++this.absoluteSequenceID;
@@ -703,14 +697,13 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         // -- PROTECTED METHODS -----------------------------------------------
         //
 
-        /**
-         * Test if the MethodName of the request is "terminateAO" or
-         * "terminateAOImmediately". If true, AbstractBody.terminate() is called
+        /*
+         * Test if the MethodName of the request is "terminateAO" or "terminateAOImmediately". If
+         * true, AbstractBody.terminate() is called
+         *
+         * @param request The request to serve
          * 
-         * @param request
-         *            The request to serve
-         * @return true if the name of the method is "terminateAO" or
-         *         "terminateAOImmediately".
+         * @return true if the name of the method is "terminateAO" or "terminateAOImmediately".
          */
         private boolean isTerminateAORequest(Request request) {
             boolean terminateRequest = (request.getMethodName()).startsWith("_terminateAO");
