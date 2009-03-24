@@ -471,5 +471,22 @@ public class BodyWrapper extends NotificationBroadcasterSupport implements Seria
     public void disableBreakpointTypes(BreakpointType[] types) {
         body.getDebugger().disableBreakpointTypes(types);
     }
+    
+	// 
+	// -- EXTENDED DEBUGGER ------------------------------------------------
+	//
+    /**
+     * @see org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean#enableExtendedDebugger()
+     */
+    public void enableExtendedDebugger(){
+    	body.getDebugger().enableExtendedDebugger();
+    }
+    
+    /**
+     * @see org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean#getRumtimeInfo()
+     */
+	public String getRumtimeInfo(){
+		return body.getDebugger().getRumtimeInfo();
+	}
 
 }

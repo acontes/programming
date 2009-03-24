@@ -959,6 +959,9 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
 
             // add StepByStep breakpoint
             if (!isProActiveInternalObject) {
+            	// ExtendedDebugger
+            	debugger.blockForConnection(methodCall, destinationBody);
+            	// StepByStep
                 debugger.breakpoint(BreakpointType.SendRequest, null);
             }
 

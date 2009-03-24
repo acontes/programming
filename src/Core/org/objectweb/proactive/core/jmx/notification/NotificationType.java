@@ -98,6 +98,9 @@ public class NotificationType {
     public final static String stepByStepSlowMotionDisabled = "stepByStepSlowMotionDisabled";
     public final static String stepByStepISEnabled = "stepByStepISEnabled";
     public final static String stepByStepISDisabled = "stepByStepISDisabled";
+    
+    // ExtendedDebugger
+    public final static String sendRequest = "sendRequest";
 
     /* TODO Send this notification */
     // public final static String forwarderRuntimeRegistered = "forwarderRuntimeRegistered";

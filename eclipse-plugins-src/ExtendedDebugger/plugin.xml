@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.viewActions">
+      <viewContribution
+            id="DebuggerExtended.extendedDebuggerContribution"
+            targetID="org.eclipse.debug.ui.DebugView">
+         <action
+               class="org.eclipse.proactive.extendeddebugger.ui.actions.ExtendedAction"
+               icon="icons/icon.gif"
+               id="org.eclipse.proactive.debug.proactivefilter.ui.actions.ExtendedDebuggerAction"
+               label="ExtendedDebugger"
+               menubarPath="org.eclipse.ui.run/stepReturnGroup"
+               toolbarPath="org.eclipse.debug.ui.launchActionSet"
+               tooltip="ExtendedDebugger">
+         </action>
+      </viewContribution>
+   </extension>
+
+</plugin>

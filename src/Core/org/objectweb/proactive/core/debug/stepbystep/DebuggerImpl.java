@@ -42,10 +42,14 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ObjectForSynchro;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.BodyImpl;
+import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
+import org.objectweb.proactive.core.mop.MethodCall;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -79,6 +83,12 @@ public class DebuggerImpl implements Debugger {
 
     private AbstractBody body;
 
+	// ----- ExtendedDebugger attributes
+	private boolean extendedDebugger = false;
+	private MethodCall methodCall = null;
+	private UniversalBody destinationBody = null;
+	private ObjectForSynchro lockForConnection = new ObjectForSynchro();
+    
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -276,6 +286,54 @@ public class DebuggerImpl implements Debugger {
             }
         }
     }
+    
+	// 
+	// -- EXTENDED DEBUGGER ------------------------------------------------
+	//
+	/**
+	 * @see org.objectweb.proactive.core.debug.Debugger#blockForConnection()
+	 */
+	public void blockForConnection(MethodCall methodCall, UniversalBody destinationBody){
+		this.methodCall = methodCall;
+		this.destinationBody = destinationBody;
+		sendNotification(NotificationType.sendRequest);
+		if(extendedDebugger){
+			try {
+				synchronized (lockForConnection) {
+					lockForConnection.wait();
+				}
+			} catch (InterruptedException e) {
+				logger.warn(e);
+			}
+		}
+	}
+	
+	/**
+	 * @see org.objectweb.proactive.core.debug.Debugger#unblockConnection()
+	 */
+	public void unblockConnection() {
+		synchronized (lockForConnection) {
+			lockForConnection.notifyAll();
+		}
+	}
+	
+	public void enableExtendedDebugger(){
+		this.extendedDebugger = true;
+	}
+
+	public void disableExtendedDebugger(){
+		this.extendedDebugger = false;
+	}
+	
+	public String getRumtimeInfo(){
+		try {
+			return NodeFactory.getNode(destinationBody.getNodeURL()).getProActiveRuntime().getURL();
+		} catch (NodeException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} return "";
+	}
 
     //
     // -- GETTERS AND SETTERS -----------------------------------------------

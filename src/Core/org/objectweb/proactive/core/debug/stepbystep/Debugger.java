@@ -38,7 +38,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.objectweb.proactive.core.body.AbstractBody;
+import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.mop.MethodCall;
 
 
 public interface Debugger extends Serializable {
@@ -151,4 +153,33 @@ public interface Debugger extends Serializable {
      */
     public void setStepByStep(boolean activated);
 
+	// 
+	// -- EXTENDED DEBUGGER ------------------------------------------------
+	//
+    /**
+     * enable the extended debugger feature
+     */
+    public void enableExtendedDebugger();
+    
+    /**
+     * disable the extended debugger feature
+     */
+    public void disableExtendedDebugger();
+    
+    /**
+     * block for the debugger connection
+     */
+    public void blockForConnection(MethodCall methodCall, UniversalBody destinationBody);
+    
+    /**
+     * unblock for the debugger connection
+     */
+    public void unblockConnection();
+    
+    /**
+     * Get some informations to connect the eclipse debugger to a new runtime
+     * @return URI of the runtime
+     */
+    public String getRumtimeInfo();
+    
 }

@@ -206,4 +206,19 @@ public interface BodyWrapperMBean extends Serializable {
      */
     public void disableBreakpointTypes(BreakpointType[] types);
 
+	// 
+	// -- EXTENDED DEBUGGER ------------------------------------------------
+	//
+    /**
+     * enable the stepByStep mode on the sendRequest breakpoint for all
+     * the ActiveObjects in the runtime
+     */
+    public void enableExtendedDebugger();
+    
+    /**
+     * Get some informations to connect the eclipse debugger to a new runtime
+     * @return URI of the runtime
+     */
+    public String getRumtimeInfo();
+    
 }
