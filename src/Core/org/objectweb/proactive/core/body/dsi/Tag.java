@@ -27,8 +27,8 @@ public class Tag implements Serializable{
      * @param policy - Propagation policy
      * @param data   - User Data Content
      */
-    public Tag(UniqueID value, PropagationPolicy policy, Object data) {
-        this.value = value;
+    public Tag(PropagationPolicy policy, Object data) {
+        this.value = new UniqueID();
         this.policy = policy;
         this.data = data;
         policy.setTag(this);
@@ -40,16 +40,16 @@ public class Tag implements Serializable{
      * @param value  - Tag Value
      * @param data   - User Data Content
      */
-    public Tag(UniqueID value, Object data){
-        this(value, new PropagateDSI(), data);
+    public Tag(Object data){
+        this(new PropagateDSI(), data);
     }
 
     /**
      * Tag constructor with default policy
      * @param value - Tag Value
      */
-    public Tag(UniqueID value){
-        this(value, null);
+    public Tag(){
+        this(null);
     }
 
     /**

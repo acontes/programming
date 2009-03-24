@@ -30,33 +30,30 @@ public class RequestTags implements Serializable {
      * Set a tag for the request with a propagation policy
      * and a user data content.
      * @param id     - Name of the tag
-     * @param value  - Value of this tag
      * @param policy - Propagation Policy
      * @param data   - User data attached to the tag
      */
-    public void setTag(String id, UniqueID value, PropagationPolicy policy, Object data) {
-        this.tags.put(id, new Tag(value, policy, data));
+    public void setTag(String id,PropagationPolicy policy, Object data) {
+        this.tags.put(id, new Tag(policy, data));
     }
 
     /**
      * Set a tag for the request with default propagation policy
      * (propagate the current tag value) and a user data content.
      * @param id     - Name of the tag
-     * @param value  - Value of this tag
      * @param data   - User data attached to the tag
      */
-    public void setTag(String id, UniqueID value, Object data){
-        this.tags.put(id, new Tag(value, data));
+    public void setTag(String id, Object data){
+        this.tags.put(id, new Tag(data));
     }
 
     /**
      * Set a tag for the request with default propagation policy
      * (propagate the current tag value).
      * @param id     - Name of the tag
-     * @param value  - Value of this tag
      */
-    public void setTag(String id, UniqueID value){
-        this.tags.put(id, new Tag(value));
+    public void setTag(String id){
+        this.tags.put(id, new Tag());
     }
 
     /**
