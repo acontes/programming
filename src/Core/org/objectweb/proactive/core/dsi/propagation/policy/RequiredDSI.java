@@ -12,5 +12,9 @@ public class RequiredDSI extends PolicyDSI {
         }
     }
 
+    @Override
+    public String toString() {
+        return "Required Policy";
+    }
 
 }

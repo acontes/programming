@@ -31,12 +31,11 @@ public class Tag implements Serializable{
     }
 
     public void propagate(){
-        System.out.println("Propagation of " + this);
         this.policy.propagate();
     }
 
     public String toString() {
-        return "<TAG: policy="+policy+", data="+data+">";
+        return "<TAG: value="+value+", policy="+policy+", data="+data+">";
     }
 
     public UniqueID getValue() {

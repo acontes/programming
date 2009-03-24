@@ -14,14 +14,12 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class RequestTags implements Serializable {
-    public static Logger dsilogger = ProActiveLogger.getLogger(Loggers.DSI);
 
     /**  Map of all tags/policy-data associated with a request */
     protected Map<String, Tag> tags;
 
     public RequestTags() {
         this.tags = new HashMap<String, Tag>();
-        dsilogger.debug("Tags created");
     }
 
     public void setTag(String id, UniqueID value, PropagationPolicy policy, Object data) {
@@ -37,7 +35,6 @@ public class RequestTags implements Serializable {
     }
 
     public void propagateTags() {
-        dsilogger.debug("RequestTags.propagateTags() \n" + this);
         for (Tag t : tags.values()) {
             t.propagate();
         }
