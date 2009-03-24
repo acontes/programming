@@ -2,10 +2,17 @@ package org.objectweb.proactive.core.dsi.propagation.policy;
 
 import org.objectweb.proactive.core.UniqueID;
 
+/**
+ * Required DSI Propagation Policy
+ *
+ * If no tag value setted, create one,
+ * else propagation of the existing one.
+ */
+public class RequiredDSI extends AbstractPolicyDSI {
 
-public class RequiredDSI extends PolicyDSI {
-
-    @Override
+    /**
+     * Propagation : Create a tag value if none, else propagation of the current value
+     */
     public void propagate() {
         if(this.tag.getValue() == null){
             this.tag.setValue(new UniqueID());

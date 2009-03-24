@@ -1,20 +1,19 @@
 package org.objectweb.proactive.core.dsi.propagation.policy;
 
-import org.objectweb.proactive.core.dsi.Tag;
-import org.objectweb.proactive.core.dsi.propagation.PropagationPolicy;
+import org.objectweb.proactive.core.UniqueID;
 
-public class NewDSI implements PropagationPolicy {
+/**
+ * New DSI Propagation Policy
+ *
+ * Create a new TAG value for each call to propagate
+ */
+public class NewDSI extends AbstractPolicyDSI {
 
-    @Override
+    /**
+     * Propagation : New tag value at each propagation
+     */
     public void propagate() {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void setTag(Tag t) {
-        // TODO Auto-generated method stub
-
+        this.tag.setValue(new UniqueID());
     }
 
 }

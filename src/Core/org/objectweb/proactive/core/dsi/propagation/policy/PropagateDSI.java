@@ -1,20 +1,17 @@
 package org.objectweb.proactive.core.dsi.propagation.policy;
 
-import org.objectweb.proactive.core.dsi.Tag;
-import org.objectweb.proactive.core.dsi.propagation.PropagationPolicy;
+/**
+ * Default DSI Propagation Policy
+ *
+ * Propagate the existing TAG if existing
+ */
+public class PropagateDSI extends AbstractPolicyDSI {
 
-public class PropagateDSI implements PropagationPolicy {
-
-    @Override
+    /**
+     * Propagation : keep current tag value
+     */
     public void propagate() {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void setTag(Tag t) {
-        // TODO Auto-generated method stub
-
+        /* Do nothing => Propagation of current value of the tag */
     }
 
 }
