@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.dsi.propagation.PropagationPolicy;
+import org.objectweb.proactive.core.dsi.propagation.policy.PropagateDSI;
 
 /**
  * Tag for Request Tagging
@@ -31,6 +32,24 @@ public class Tag implements Serializable{
         this.policy = policy;
         this.data = data;
         policy.setTag(this);
+    }
+
+    /**
+     * Tag constructor with default propagation policy
+     * and a user data content.
+     * @param value  - Tag Value
+     * @param data   - User Data Content
+     */
+    public Tag(UniqueID value, Object data){
+        this(value, new PropagateDSI(), data);
+    }
+
+    /**
+     * Tag constructor with default policy
+     * @param value - Tag Value
+     */
+    public Tag(UniqueID value){
+        this(value, null);
     }
 
     /**
