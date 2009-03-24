@@ -11,7 +11,6 @@ public class CancelDSI extends AbstractPolicyDSI {
     /**
      * Propagation : Cancel propagation
      */
-    @Override
     public void propagate() {
         this.tag.setValue(null);
     }
