@@ -81,6 +81,16 @@ public class ReplyImpl extends MessageImpl implements Reply, Serializable {
     }
 
     public ReplyImpl(UniqueID senderID, long sequenceNumber, String methodName, MethodCallResult result,
+            ProActiveSecurityManager psm) {
+        this(senderID, sequenceNumber, methodName, result, psm, false, null);
+    }
+
+    public ReplyImpl(UniqueID senderID, long sequenceNumber, String methodName, MethodCallResult result,
+            ProActiveSecurityManager psm, boolean isAutomaticContinuation) {
+        this(senderID, sequenceNumber, methodName, result, psm, isAutomaticContinuation, null);
+    }
+
+    public ReplyImpl(UniqueID senderID, long sequenceNumber, String methodName, MethodCallResult result,
             ProActiveSecurityManager psm, boolean isAutomaticContinuation, RequestTags tags) {
         super(senderID, sequenceNumber, true, methodName, tags);
         this.result = result;

@@ -376,7 +376,7 @@ public class GarbageCollector {
      */
     private void terminateBody() {
         try {
-            BodyRequest br = new BodyRequest(this.body, "terminate", new Class[0], new Object[0], false, null);
+            BodyRequest br = new BodyRequest(this.body, "terminate", new Class[0], new Object[0], false);
 
             br.send(this.body);
             // this.body.terminate(); Does not wake up the AO
