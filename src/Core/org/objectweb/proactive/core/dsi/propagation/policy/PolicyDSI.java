@@ -13,4 +13,8 @@ public abstract class PolicyDSI implements PropagationPolicy{
         this.tag = t;
     }
 
+    public String toString() {
+        return this.getClass().getSimpleName();
+    }
+
 }
