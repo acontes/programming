@@ -1,7 +1,7 @@
-package org.objectweb.proactive.core.dsi.propagation.policy;
+package org.objectweb.proactive.core.body.dsi.propagation.policy;
 
-import org.objectweb.proactive.core.dsi.Tag;
-import org.objectweb.proactive.core.dsi.propagation.PropagationPolicy;
+import org.objectweb.proactive.core.body.dsi.Tag;
+import org.objectweb.proactive.core.body.dsi.propagation.PropagationPolicy;
 
 /**
  * Abstract class for commons members and methods of all policy implementation

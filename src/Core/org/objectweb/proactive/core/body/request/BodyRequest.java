@@ -37,9 +37,9 @@ import java.util.Map;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.dsi.RequestTags;
 import org.objectweb.proactive.core.body.message.MessageImpl;
 import org.objectweb.proactive.core.body.reply.Reply;
-import org.objectweb.proactive.core.dsi.RequestTags;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;

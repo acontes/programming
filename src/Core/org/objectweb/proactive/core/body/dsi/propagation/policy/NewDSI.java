@@ -1,4 +1,4 @@
-package org.objectweb.proactive.core.dsi.propagation.policy;
+package org.objectweb.proactive.core.body.dsi.propagation.policy;
 
 import org.objectweb.proactive.core.UniqueID;
 

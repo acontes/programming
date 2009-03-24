@@ -34,7 +34,7 @@ package org.objectweb.proactive.core.jmx.notification;
 import java.io.Serializable;
 
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.dsi.RequestTags;
+import org.objectweb.proactive.core.body.dsi.RequestTags;
 
 
 public class RequestNotificationData implements Serializable {

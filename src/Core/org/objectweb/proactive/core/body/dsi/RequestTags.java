@@ -1,4 +1,4 @@
-package org.objectweb.proactive.core.dsi;
+package org.objectweb.proactive.core.body.dsi;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.dsi.propagation.PropagationPolicy;
+import org.objectweb.proactive.core.body.dsi.propagation.PropagationPolicy;
 
 /**
  * RequestTags : set a map of tag on a request,

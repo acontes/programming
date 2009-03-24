@@ -32,7 +32,7 @@
 package org.objectweb.proactive.core.body.request;
 
 import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.dsi.RequestTags;
+import org.objectweb.proactive.core.body.dsi.RequestTags;
 import org.objectweb.proactive.core.mop.MethodCall;
 
 

@@ -39,6 +39,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.dsi.RequestTags;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.ft.protocols.FTManagerFactory;
 import org.objectweb.proactive.core.body.ft.protocols.cic.managers.FTManagerCIC;
@@ -63,7 +64,6 @@ import org.objectweb.proactive.core.component.request.SynchronousComponentReques
 import org.objectweb.proactive.core.debug.stepbystep.Debugger;
 import org.objectweb.proactive.core.debug.stepbystep.DebuggerFactory;
 import org.objectweb.proactive.core.debug.stepbystep.DebuggerImpl;
-import org.objectweb.proactive.core.dsi.RequestTags;
 import org.objectweb.proactive.core.group.spmd.ProActiveSPMDGroupManager;
 import org.objectweb.proactive.core.group.spmd.ProActiveSPMDGroupManagerFactory;
 import org.objectweb.proactive.core.mop.MethodCall;

@@ -1,8 +1,8 @@
-package org.objectweb.proactive.core.dsi.propagation;
+package org.objectweb.proactive.core.body.dsi.propagation;
 
 import java.io.Serializable;
 
-import org.objectweb.proactive.core.dsi.Tag;
+import org.objectweb.proactive.core.body.dsi.Tag;
 
 /**
  * Interface to set the behavior of propagation policy
