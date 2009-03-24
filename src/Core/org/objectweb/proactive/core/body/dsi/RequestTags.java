@@ -83,6 +83,15 @@ public class RequestTags implements Serializable {
     }
 
     /**
+     * To get a specifig tag value
+     * @param id - Tag identifier
+     * @return value of this tag
+     */
+    public UniqueID getTagValue(String id){
+        return tags.get(id).getValue();
+    }
+
+    /**
      * Display informations of all tags
      */
     public String toString() {
