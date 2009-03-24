@@ -260,7 +260,7 @@ public class HalfBody extends AbstractBody {
                 throws java.io.IOException, RenegotiateSessionException, CommunicationForbiddenException {
             long sequenceID = getNextSequenceID();
             Request request = this.internalRequestFactory.newRequest(methodCall, HalfBody.this,
-                    future == null, sequenceID);
+                    future == null, sequenceID, null);
 
             // COMPONENTS : generate ComponentRequest for component messages
             if (methodCall.getComponentMetadata() != null) {

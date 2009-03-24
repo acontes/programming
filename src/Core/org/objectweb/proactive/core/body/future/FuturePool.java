@@ -314,7 +314,7 @@ public class FuturePool extends Object implements java.io.Serializable {
 
                     // add the deepcopied AC
                     queueAC.addACRequest(new ACService(bodiesToContinue, new ReplyImpl(creatorID, id, null,
-                        newResult, psm, true)));
+                        newResult, psm, true, null)));
                 }
             }
             // 3) Remove futures from the futureMap
@@ -641,7 +641,7 @@ public class FuturePool extends Object implements java.io.Serializable {
                     if (remainingSends > 1) {
                         // create a new reply to keep the original copy unchanged for next sending ...
                         toSend = new ReplyImpl(reply.getSourceBodyID(), reply.getSequenceNumber(), null,
-                            reply.getResult(), psm, true);
+                            reply.getResult(), psm, true, null);
                     } else {
                         // last sending : the orignal can ben sent
                         toSend = reply;

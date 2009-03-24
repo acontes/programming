@@ -40,6 +40,7 @@ import org.objectweb.proactive.core.body.ft.message.MessageInfo;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.future.MethodCallResult;
 import org.objectweb.proactive.core.body.reply.Reply;
+import org.objectweb.proactive.core.dsi.RequestTags;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 
@@ -132,5 +133,11 @@ public class SynchronousReplyImpl implements Reply, Serializable {
 
     public void setMessageInfo(MessageInfo mi) {
         // TODO Auto-generated method stub
+    }
+
+    @Override
+    public RequestTags getTags() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

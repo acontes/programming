@@ -63,6 +63,7 @@ import org.objectweb.proactive.core.component.request.SynchronousComponentReques
 import org.objectweb.proactive.core.debug.stepbystep.Debugger;
 import org.objectweb.proactive.core.debug.stepbystep.DebuggerFactory;
 import org.objectweb.proactive.core.debug.stepbystep.DebuggerImpl;
+import org.objectweb.proactive.core.dsi.RequestTags;
 import org.objectweb.proactive.core.group.spmd.ProActiveSPMDGroupManager;
 import org.objectweb.proactive.core.group.spmd.ProActiveSPMDGroupManagerFactory;
 import org.objectweb.proactive.core.mop.MethodCall;
@@ -300,14 +301,14 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
     //  //
     protected static class RequestFactoryImpl implements RequestFactory, java.io.Serializable {
         public Request newRequest(MethodCall methodCall, UniversalBody sourceBody, boolean isOneWay,
-                long sequenceID) {
+                long sequenceID, RequestTags tags) {
             //########### exemple de code pour les nouvelles factories
             //			if(System.getProperty("migration.stategy").equals("locationserver")){
             //				  return new RequestWithLocationServer(methodCall, sourceBody,
             //                isOneWay, sequenceID, LocationServerFactory.getLocationServer());
             //			}else{
             return new org.objectweb.proactive.core.body.request.RequestImpl(methodCall, sourceBody,
-                isOneWay, sequenceID);
+                isOneWay, sequenceID, tags);
             //}
         }
     }
