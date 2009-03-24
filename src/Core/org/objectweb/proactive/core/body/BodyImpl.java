@@ -268,7 +268,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             if (!NodeFactory.isHalfBodiesNode(request.getSenderNodeURL())) {
                 RequestNotificationData requestNotificationData = new RequestNotificationData(request
                         .getSourceBodyID(), request.getSenderNodeURL(), this.bodyID, this.nodeURL, request
-                        .getMethodName(), getRequestQueue().size() + 1);
+                        .getMethodName(), getRequestQueue().size() + 1, request.getSequenceNumber());
                 this.mbean.sendNotification(NotificationType.requestReceived, requestNotificationData);
             }
         }
@@ -539,7 +539,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             if (!isProActiveInternalObject && (mbean != null)) {
                 RequestNotificationData data = new RequestNotificationData(request.getSourceBodyID(), request
                         .getSenderNodeURL(), BodyImpl.this.bodyID, BodyImpl.this.nodeURL, request
-                        .getMethodName(), getRequestQueue().size());
+                        .getMethodName(), getRequestQueue().size(), request.getSequenceNumber());
                 mbean.sendNotification(NotificationType.servingStarted, data);
             }
 
@@ -574,7 +574,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                 if (!isProActiveInternalObject && (mbean != null)) {
                     RequestNotificationData data = new RequestNotificationData(request.getSourceBodyID(),
                         request.getSenderNodeURL(), BodyImpl.this.bodyID, BodyImpl.this.nodeURL, request
-                                .getMethodName(), getRequestQueue().size());
+                                .getMethodName(), getRequestQueue().size(), request.getSequenceNumber());
                     mbean.sendNotification(NotificationType.voidRequestServed, data);
                 }
 
@@ -590,7 +590,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             if (!isProActiveInternalObject && (mbean != null)) {
                 RequestNotificationData data = new RequestNotificationData(request.getSourceBodyID(), request
                         .getSenderNodeURL(), BodyImpl.this.bodyID, BodyImpl.this.nodeURL, request
-                        .getMethodName(), getRequestQueue().size());
+                        .getMethodName(), getRequestQueue().size(), request.getSequenceNumber());
                 mbean.sendNotification(NotificationType.replySent, data);
             }
 
@@ -673,7 +673,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                     if (!connectorID.equals(destinationBody.getID())) {
                         mbean.sendNotification(NotificationType.requestSent, new RequestNotificationData(
                             BodyImpl.this.bodyID, BodyImpl.this.getNodeURL(), destinationBody.getID(),
-                            destinationBody.getNodeURL(), methodCall.getName(), -1));
+                            destinationBody.getNodeURL(), methodCall.getName(), -1, request.getSequenceNumber()));
                     }
                 }
             }

@@ -43,6 +43,7 @@ public class RequestNotificationData implements Serializable {
     private int requestQueueLength;
     private String sourceNode;
     private String destinationNode;
+    private long sequenceNumber;
 
     /**
      * Creates a new requestData used by the JMX user data.
@@ -52,13 +53,14 @@ public class RequestNotificationData implements Serializable {
      * @param requestQueueLength The request queue length of the destination active object
      */
     public RequestNotificationData(UniqueID source, String sourceNode, UniqueID destination,
-            String destinationNode, String methodName, int requestQueueLength) {
+            String destinationNode, String methodName, int requestQueueLength, long sequenceNumber) {
         this.source = source;
         this.sourceNode = sourceNode;
         this.destination = destination;
         this.destinationNode = destinationNode;
         this.methodName = methodName;
         this.requestQueueLength = requestQueueLength;
+        this.sequenceNumber = sequenceNumber;
     }
 
     /**
@@ -113,5 +115,9 @@ public class RequestNotificationData implements Serializable {
     public String toString() {
         return "Request source: " + source + ", destination: " + destination + ", methodName: " + methodName +
             ", destination request queue length: " + requestQueueLength;
+    }
+
+    public long getSequenceNumber() {
+        return sequenceNumber;
     }
 }
