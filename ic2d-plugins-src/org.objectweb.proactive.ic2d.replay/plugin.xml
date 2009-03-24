@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+	<extension
+		point="org.eclipse.ui.views">
+		<view
+			category="org.objectweb.proactive.ic2d.replay.ReplayCategory"
+			class="org.objectweb.proactive.ic2d.replay.views.CheckpointsView"
+			icon="icons/replay_from_checkpoint.gif"
+			id="org.objectweb.proactive.ic2d.replay.CheckpointsView"
+			name="Checkpoints"
+			restorable="true" />
+		<category
+			id="org.objectweb.proactive.ic2d.replay.ReplayCategory"
+			name="Replay" />
+	</extension>
+	<extension
+		point="org.objectweb.proactive.ic2d.JMXmonitoring.actions_extension">
+		<action_class
+			class="org.objectweb.proactive.ic2d.replay.actions.EmptyAction" />
+	</extension>
+	<extension
+		point="org.objectweb.proactive.ic2d.JMXmonitoring.workbenchWindowActions_extension">
+	</extension>
+</plugin>
