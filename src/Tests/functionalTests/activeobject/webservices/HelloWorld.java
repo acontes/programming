@@ -29,7 +29,7 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.examples.webservices.helloWorld;
+package functionalTests.activeobject.webservices;
 
 import java.util.LinkedList;
 
@@ -53,15 +53,8 @@ public class HelloWorld {
     public HelloWorld() {
     }
 
-    public String helloWorld() {
-        return "Hello world !";
-    }
-
-    // This method is used to check
-    // that it is not inserted in the wsdl
-    // and not callable.
-    public String toString() {
-        return "HelloWorld";
+    public void putHelloWorld() {
+    	this.textsToSay.add("Hello world!");
     }
 
     public void putTextToSay(String textToSay) {
@@ -76,6 +69,10 @@ public class HelloWorld {
         }
     }
 
+    public Boolean contains(String textToCheck) {
+    	return new Boolean(textsToSay.contains(textToCheck));
+    }
+    
     public static void main(String[] args) {
         try {
             String url = "";
