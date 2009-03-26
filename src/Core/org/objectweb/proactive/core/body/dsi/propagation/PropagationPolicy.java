@@ -12,12 +12,6 @@ public interface PropagationPolicy extends Serializable {
     /**
      * Propagation of the tag
      */
-    public void propagate();
-
-    /**
-     * Set the tag attach to this policy
-     * @param t - The Tag
-     */
-    public void setTag(Tag t);
+    public void propagate(Tag tag);
 
 }

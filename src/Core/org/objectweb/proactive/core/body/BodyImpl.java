@@ -54,7 +54,9 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.dsi.RequestTags;
-import org.objectweb.proactive.core.body.dsi.propagation.policy.RequiredDSI;
+import org.objectweb.proactive.core.body.dsi.TagRegistry;
+import org.objectweb.proactive.core.body.dsi.UnknowTagException;
+import org.objectweb.proactive.core.body.dsi.propagation.policy.RequiredPolicy;
 import org.objectweb.proactive.core.body.exceptions.InactiveBodyException;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.ft.service.FaultToleranceTechnicalService;
@@ -743,7 +745,11 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                 return tags;
             }
             tags = new RequestTags();
-            tags.setTag("DSI", new RequiredDSI());
+            try {
+                tags.setTag("DSI");
+            } catch (UnknowTagException e) {
+                TagRegistry.getInstance().register("DSI", new RequiredPolicy());
+            }
             return tags;
         }
     }

@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.dsi.propagation.PropagationPolicy;
-import org.objectweb.proactive.core.body.dsi.propagation.policy.PropagateDSI;
+import org.objectweb.proactive.core.body.dsi.propagation.policy.PropagatePolicy;
 
 /**
  * Tag for Request Tagging
@@ -29,9 +29,8 @@ public class Tag implements Serializable{
      */
     public Tag(PropagationPolicy policy, Object data) {
         this.value = new UniqueID();
-        this.policy = policy;
         this.data = data;
-        policy.setTag(this);
+        this.policy = policy;
     }
 
     /**
@@ -41,7 +40,7 @@ public class Tag implements Serializable{
      * @param data   - User Data Content
      */
     public Tag(Object data){
-        this(new PropagateDSI(), data);
+        this(new PropagatePolicy(), data);
     }
 
     /**
@@ -80,7 +79,7 @@ public class Tag implements Serializable{
      * Propagation of the value of this tag depending on the policy setted.
      */
     public void propagate(){
-        this.policy.propagate();
+        this.policy.propagate(this);
     }
 
     /**

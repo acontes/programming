@@ -10,9 +10,7 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.dsi.propagation.PropagationPolicy;
 
 /**
- * RequestTags : set a map of tag on a request,
- * with a propagation policy of the tag's identifier
- * value
+ * RequestTags : Add a tag on a request with a tag value and its propagation policy, and an object container binded to it.
  */
 public class RequestTags implements Serializable {
 
@@ -27,9 +25,9 @@ public class RequestTags implements Serializable {
     }
 
     /**
-     * Set a tag for the request with a propagation policy
-     * and a user data content.
-     * @param id     - Name of the tag
+     * Set a tag for the request with an different propagation policy 
+     * than the one in the TagRegistry, and a user data content.
+     * @param id     - Identifier of the tag in the TagRegistry
      * @param policy - Propagation Policy
      * @param data   - User data attached to the tag
      */
@@ -38,27 +36,29 @@ public class RequestTags implements Serializable {
     }
 
     /**
-     * Set a tag for the request with default propagation policy
-     * (propagate the current tag value) and a user data content.
-     * @param id     - Name of the tag
+     * Set a tag for the request and a user data content.
+     * @param id     - Identifier of the tag in the TagRegistry
      * @param data   - User data attached to the tag
+     * @throws UnknowTagException 
      */
-    public void setTag(String id, Object data){
-        this.tags.put(id, new Tag(data));
+    public void setTag(String id, Object data) throws UnknowTagException{
+        Tag t = new Tag(TagRegistry.getInstance().getPolicy(id),data);
+        this.tags.put(id, t);
     }
 
     /**
-     * Set a tag for the request with default propagation policy
-     * (propagate the current tag value).
-     * @param id     - Name of the tag
+     * Set a tag for the request.
+     * @param id - Identifier of the tag in the TagRegistry
+     * @throws UnknowTagException 
      */
-    public void setTag(String id){
-        this.tags.put(id, new Tag());
+    public void setTag(String id) throws UnknowTagException{
+        Tag t = new Tag(TagRegistry.getInstance().getPolicy(id));
+        this.tags.put(id, t);
     }
 
     /**
      * Return the user data content attached to this tag.
-     * @param id - Tag name
+     * @param id - Identifier of the tag
      * @return User data content
      */
     public Object getData(String id) {

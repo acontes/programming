@@ -37,7 +37,9 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.dsi.RequestTags;
-import org.objectweb.proactive.core.body.dsi.propagation.policy.RequiredDSI;
+import org.objectweb.proactive.core.body.dsi.TagRegistry;
+import org.objectweb.proactive.core.body.dsi.UnknowTagException;
+import org.objectweb.proactive.core.body.dsi.propagation.policy.RequiredPolicy;
 import org.objectweb.proactive.core.body.exceptions.HalfBodyException;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.ft.service.FaultToleranceTechnicalService;
@@ -264,7 +266,11 @@ public class HalfBody extends AbstractBody {
             long sequenceID = getNextSequenceID();
             // Create DSI RequestTags
             RequestTags tags = new RequestTags();
-            tags.setTag("DSI", new RequiredDSI());
+            try {
+                tags.setTag("DSI");
+            } catch (UnknowTagException e) {
+                TagRegistry.getInstance().register("DSI", new RequiredPolicy());
+            }
 
             Request request = this.internalRequestFactory.newRequest(methodCall, HalfBody.this,
                     future == null, sequenceID, tags);
