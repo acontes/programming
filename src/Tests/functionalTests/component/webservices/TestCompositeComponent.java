@@ -72,7 +72,7 @@ public class TestCompositeComponent extends FunctionalTest {
 
     @Before
     public void deployComposite() throws Exception {
-    	// Retrieves the port number of the local Jetty server
+        // Retrieves the port number of the local Jetty server
         Class.forName("org.objectweb.proactive.extensions.webservices.WebServices");
         String port = PAProperties.PA_XMLHTTP_PORT.getValue();
         url = "http://localhost:" + port + "/";
@@ -119,12 +119,12 @@ public class TestCompositeComponent extends FunctionalTest {
         WebServices.exposeComponentAsWebService(comp, url, "composite", new String[] { "hello-world" });
 
         logger.info("Deploy a composite as a webservice service on : " + url);
-    	
+
     }
-    
+
     @org.junit.Test
     public void testComposite() throws Exception {
-    	
+
         RPCServiceClient serviceClient = new RPCServiceClient();
 
         Options options = serviceClient.getOptions();
@@ -148,9 +148,9 @@ public class TestCompositeComponent extends FunctionalTest {
         String result = (String) response[0];
         logger.info("Call to the helloName method returned: " + result);
     }
-    
+
     @After
     public void undeployComposite() throws Exception {
-        WebServices.unExposeComponentAsWebService(this.url, "composite", new String[] {"hello-world"});  
+        WebServices.unExposeComponentAsWebService(this.url, "composite", new String[] { "hello-world" });
     }
 }

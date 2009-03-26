@@ -48,34 +48,36 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.webservices.WSConstants;
 import org.objectweb.proactive.extensions.webservices.WebServices;
 
+
 public class TestHelloWorld {
-	
-	private static Logger logger = ProActiveLogger.getLogger(Loggers.WEB_SERVICES);
-	
-	private String url;
-	
-	@Before
-	public void deployHelloWorld() throws Exception {
-		
-		// Loading the WebServices class enables us to retrieve the jetty
-		// port number
-		Class.forName("org.objectweb.proactive.extensions.webservices.WebServices");
+
+    private static Logger logger = ProActiveLogger.getLogger(Loggers.WEB_SERVICES);
+
+    private String url;
+
+    @Before
+    public void deployHelloWorld() throws Exception {
+
+        // Loading the WebServices class enables us to retrieve the jetty
+        // port number
+        Class.forName("org.objectweb.proactive.extensions.webservices.WebServices");
         String port = PAProperties.PA_XMLHTTP_PORT.getValue();
         this.url = "http://localhost:" + port + "/";
-        
+
         HelloWorld hw = (HelloWorld) PAActiveObject.newActive(
-        	"functionalTests.activeobject.webservices.HelloWorld", new Object[] {});
-        WebServices.exposeAsWebService(hw, this.url, "HelloWorld", new String[] { "putHelloWorld", "putTextToSay", "sayText",
-        	"contains" });
-	}
-	
-	@org.junit.Test
-	public void testHelloWorld() throws Exception {
-		RPCServiceClient serviceClient = new RPCServiceClient();
+                "functionalTests.activeobject.webservices.HelloWorld", new Object[] {});
+        WebServices.exposeAsWebService(hw, this.url, "HelloWorld", new String[] { "putHelloWorld",
+                "putTextToSay", "sayText", "contains" });
+    }
+
+    @org.junit.Test
+    public void testHelloWorld() throws Exception {
+        RPCServiceClient serviceClient = new RPCServiceClient();
 
         Options options = serviceClient.getOptions();
 
-        EndpointReference targetEPR = new EndpointReference(this.url + WSConstants.AXIS_SERVICES_PATH + "HelloWorld");
+        EndpointReference targetEPR = new EndpointReference(this.url + WSConstants.AXIS_SERVICES_PATH +
+            "HelloWorld");
         options.setTo(targetEPR);
 
         // Call putHelloWorld
@@ -86,36 +88,35 @@ public class TestHelloWorld {
         serviceClient.invokeRobust(op, opArgs);
 
         logger.info("Called the method putHelloWorld: no argument and no return is expected");
-        
+
         // Call contains
         options.setAction("contains");
         op = new QName("contains");
-        opArgs = new Object[] {"Hello world!"};
+        opArgs = new Object[] { "Hello world!" };
         Class<?>[] returnTypes = new Class[] { boolean.class };
 
         Object[] response = serviceClient.invokeBlocking(op, opArgs, returnTypes);
 
         Boolean isListed = (Boolean) response[0];
         logger.info("Called the method contains: one argument and one return are expected");
-        
+
         if (isListed) {
-        	logger.info("'Hello world !' is in the list");
-        	logger.info("Inserting 'Good bye world!'");
-        	
+            logger.info("'Hello world !' is in the list");
+            logger.info("Inserting 'Good bye world!'");
+
             // Call putTextToSay
             options.setAction("putTextToSay");
             op = new QName("putTextToSay");
-            opArgs = new Object[] {"Good bye world!"};
+            opArgs = new Object[] { "Good bye world!" };
 
             serviceClient.invokeRobust(op, opArgs);
 
-            logger.info("Called the method putTextToSay: " +
-            		"one argument is expected but no return");
+            logger.info("Called the method putTextToSay: " + "one argument is expected but no return");
         } else {
-        	throw new ProActiveException("'Hello World!' is not in the list " +
-        			"or the contains method of the HelloWorld service does not properly");
+            throw new ProActiveException("'Hello World!' is not in the list "
+                + "or the contains method of the HelloWorld service does not properly");
         }
-        
+
         // Call sayText
         options.setAction("sayText");
         op = new QName("sayText");
@@ -127,23 +128,22 @@ public class TestHelloWorld {
         String text = (String) response[0];
         logger.info("Called the method 'sayText': one return is expected but not argument");
         logger.info("'sayText' returned " + text);
-    
-	
+
         response = serviceClient.invokeBlocking(op, opArgs, returnTypes);
 
         text = (String) response[0];
         logger.info("Called the method 'sayText': one return is expected but not argument");
         logger.info("'sayText' returned " + text);
-        
+
         response = serviceClient.invokeBlocking(op, opArgs, returnTypes);
 
         text = (String) response[0];
         logger.info("Called the method 'sayText': one return is expected but not argument");
         logger.info("'sayText' returned " + text);
-	}
-	
-	@After
-	public void undeployHelloWorld() throws Exception {
-        WebServices.unExposeAsWebService(this.url, "HelloWorld");   
-	}
+    }
+
+    @After
+    public void undeployHelloWorld() throws Exception {
+        WebServices.unExposeAsWebService(this.url, "HelloWorld");
+    }
 }
