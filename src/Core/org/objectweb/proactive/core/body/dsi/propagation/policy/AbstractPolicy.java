@@ -6,22 +6,13 @@ import org.objectweb.proactive.core.body.dsi.propagation.PropagationPolicy;
 /**
  * Abstract class for commons members and methods of all policy implementation
  */
-public abstract class AbstractPolicyDSI implements PropagationPolicy{
+public abstract class AbstractPolicy implements PropagationPolicy{
 
-    /** Tag attached to this policy */
-    protected Tag tag;
 
     /**
      * Propagation strategy implemented by each policy
      */
-    abstract public void propagate();
-
-    /**
-     * Set the tag using this policy
-     */
-    public void setTag(Tag t) {
-        this.tag = t;
-    }
+    abstract public void propagate(Tag tag);
 
     /**
      * Display the name of the policy used

@@ -1,18 +1,20 @@
 package org.objectweb.proactive.core.body.dsi.propagation.policy;
 
+import org.objectweb.proactive.core.body.dsi.Tag;
+
 
 /**
  * Cancel Propagation Policy
  *
  * Stop the propagation of the tag.
  */
-public class CancelDSI extends AbstractPolicyDSI {
+public class CancelPolicy extends AbstractPolicy {
 
     /**
      * Propagation : Cancel propagation
      */
-    public void propagate() {
-        this.tag.setValue(null);
+    public void propagate(Tag tag) {
+        tag.setValue(null);
     }
 
 }
