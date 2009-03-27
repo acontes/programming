@@ -17,6 +17,7 @@ public class ExtendDialog extends Dialog{
 	
 	private Shell shell = null;
 	private String url;
+	private String port;
 
 	public ExtendDialog(Shell parent) {
 		super(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
@@ -36,14 +37,12 @@ public class ExtendDialog extends Dialog{
 		titleLabelFormData.left = new FormAttachment(0, 0);
 		titleLabel.setLayoutData(titleLabelFormData);
 
-		String urlToolTipsText = "Enter a java regular expression to select the threads to keep";
 		final Label urlLabel = new Label(shell, SWT.NONE);
-		urlLabel.setText("Thread Regex: ");
+		urlLabel.setText("host: ");
 		FormData urllabelFormData = new FormData();
 		urllabelFormData.top = new FormAttachment(titleLabel, 10);
 		urllabelFormData.left = new FormAttachment(0, 10);
 		urlLabel.setLayoutData(urllabelFormData);
-		urlLabel.setToolTipText(urlToolTipsText);
 
 		final Text urlText = new Text(shell, SWT.BORDER);
 		FormData urltextFormData = new FormData();
@@ -51,7 +50,20 @@ public class ExtendDialog extends Dialog{
 		urltextFormData.top = new FormAttachment(titleLabel, 10);
 		urltextFormData.left = new FormAttachment(urlLabel, 15);
 		urlText.setLayoutData(urltextFormData);
-		urlText.setToolTipText(urlToolTipsText);
+		
+		final Label portLabel = new Label(shell, SWT.NONE);
+		portLabel.setText("Port: ");
+		FormData portLabelFormData = new FormData();
+		portLabelFormData.top = new FormAttachment(urlLabel, 10);
+		portLabelFormData.left = new FormAttachment(0, 10);
+		portLabel.setLayoutData(portLabelFormData);
+
+		final Text portText = new Text(shell, SWT.BORDER);
+		FormData portTextFormData = new FormData();
+		portTextFormData.width = 300;
+		portTextFormData.top = new FormAttachment(urlLabel, 10);
+		portTextFormData.left = new FormAttachment(portLabel, 15);
+		portText.setLayoutData(portTextFormData);
 		
 		// button "OK"
 		final Button okButton = new Button(shell, SWT.PUSH);
@@ -60,13 +72,14 @@ public class ExtendDialog extends Dialog{
 			public void widgetSelected(SelectionEvent e) {
 				if (e.widget == okButton) {
 					url = urlText.getText();
+					port = portText.getText();
 					shell.close();
 				}
 
 			}
 		});
 		FormData okFormData = new FormData();
-		okFormData.top = new FormAttachment(urlText, 10);
+		okFormData.top = new FormAttachment(portLabel, 10);
 		okFormData.left = new FormAttachment(30, 0);
 		okFormData.right = new FormAttachment(70, 0);
 		okButton.setLayoutData(okFormData);
@@ -84,5 +97,9 @@ public class ExtendDialog extends Dialog{
 	
 	public String getUrl() {
 		return url;
+	}
+	
+	public String getPort(){
+		return port;
 	}
 }

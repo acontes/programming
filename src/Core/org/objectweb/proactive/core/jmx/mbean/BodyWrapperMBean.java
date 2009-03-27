@@ -216,9 +216,8 @@ public interface BodyWrapperMBean extends Serializable {
     public void enableExtendedDebugger();
     
     /**
-     * Get some informations to connect the eclipse debugger to a new runtime
-     * @return URI of the runtime
+     * unblock for the debugger connection
      */
-    public String getRumtimeInfo();
+    public void unblockConnection();
     
 }

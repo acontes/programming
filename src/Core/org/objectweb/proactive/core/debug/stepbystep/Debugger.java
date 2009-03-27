@@ -176,10 +176,4 @@ public interface Debugger extends Serializable {
      */
     public void unblockConnection();
     
-    /**
-     * Get some informations to connect the eclipse debugger to a new runtime
-     * @return URI of the runtime
-     */
-    public String getRumtimeInfo();
-    
 }

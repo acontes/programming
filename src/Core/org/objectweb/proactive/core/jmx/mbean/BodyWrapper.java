@@ -483,10 +483,10 @@ public class BodyWrapper extends NotificationBroadcasterSupport implements Seria
     }
     
     /**
-     * @see org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean#getRumtimeInfo()
+     * @see org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean#unblockConnection()
      */
-	public String getRumtimeInfo(){
-		return body.getDebugger().getRumtimeInfo();
-	}
+    public void unblockConnection(){
+    	body.getDebugger().unblockConnection();
+    }
 
 }
