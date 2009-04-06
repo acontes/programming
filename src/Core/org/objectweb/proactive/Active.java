@@ -51,7 +51,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * In case of a migration, an active object stops and restarts its activity
  * automatically without invoking the init or ending phases. Only the
  * activity itself is restarted.
- * </P>
+ * </P>   
  *
  * @author The ProActive Team
  * @version 1.0,  2002/06
