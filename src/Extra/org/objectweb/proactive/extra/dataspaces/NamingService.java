@@ -3,6 +3,7 @@
  */
 package org.objectweb.proactive.extra.dataspaces;
 
+import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -11,29 +12,33 @@ import java.util.Set;
  */
 public class NamingService implements SpacesDirectory {
 
-	/*
-	 * * Registers application along with its spaces definition.
+	/**
+	 * Registers application along with its spaces definition.
 	 * 
-	 * @param appid application identifier
+	 * @param appid
+	 *            application identifier
 	 * 
-	 * @param inputSpaces bulked inputs definitions
+	 * @param inputSpaces
+	 *            bulked inputs definitions
 	 * 
-	 * @param outputSpaces bulked outputs definitions
+	 * @param outputSpaces
+	 *            bulked outputs definitions
 	 */
 	public void registerApplication(long appid, Set<SpaceInstanceInfo> inputSpaces,
 			Set<SpaceInstanceInfo> outputSpaces) {
 	}
 
-	/*
-	 * * Unregisters application under specified identifier.
+	/**
+	 * Unregisters application under specified identifier.
 	 * 
-	 * @param appid application identifier
+	 * @param appid
+	 *            application identifier
 	 */
 	public void unregisterApplication(long appid) {
 
 	}
 
-	public Set<SpaceInstanceInfo> lookupAll(SpaceURI uri) {
+	public Collection<SpaceInstanceInfo> lookupAll(SpaceURI uri) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -52,5 +57,4 @@ public class NamingService implements SpacesDirectory {
 		// TODO Auto-generated method stub
 
 	}
-
 }

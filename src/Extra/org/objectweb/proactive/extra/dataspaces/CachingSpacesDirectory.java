@@ -3,7 +3,7 @@
  */
 package org.objectweb.proactive.extra.dataspaces;
 
-import java.util.Set;
+import java.util.Collection;
 
 /**
  * 
@@ -11,27 +11,33 @@ import java.util.Set;
  */
 public class CachingSpacesDirectory implements SpacesDirectory {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.objectweb.proactive.extensions.dataspaces.SpacesDirectory#lookupAll
-	 * (org.objectweb.proactive.extensions.dataspaces.SpaceURI)
-	 */
-	public Set<SpaceInstanceInfo> lookupAll(SpaceURI uri) {
-		// TODO Auto-generated method stub
-		return null;
+	private final SpacesDirectory localDirectory;
+
+	private final SpacesDirectory remoteDirectory;
+
+	public CachingSpacesDirectory() {
+		localDirectory = new SpacesDirectoryImpl();
+		remoteDirectory = new SpacesDirectoryImpl();
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * This method call is always delegated remotely.
 	 * 
-	 * @see
-	 * org.objectweb.proactive.extensions.dataspaces.SpacesDirectory#lookupFirst
-	 * (org.objectweb.proactive.extensions.dataspaces.SpaceURI)
+	 * @see org.objectweb.proactive.extensions.dataspaces.SpacesDirectory#lookupAll
+	 *      (org.objectweb.proactive.extensions.dataspaces.SpaceURI)
+	 */
+	public Collection<SpaceInstanceInfo> lookupAll(SpaceURI uri) {
+		return remoteDirectory.lookupAll(uri);
+	}
+
+	/**
+	 * Try in cache, if not found try remotely.
+	 * 
+	 * @see org.objectweb.proactive.extensions.dataspaces.SpacesDirectory#lookupFirst
+	 *      (org.objectweb.proactive.extensions.dataspaces.SpaceURI)
 	 */
 	public SpaceInstanceInfo lookupFirst(SpaceURI uri) {
-		// TODO Auto-generated method stub
+		localDirectory.lookupFirst(uri);
 		return null;
 	}
 
