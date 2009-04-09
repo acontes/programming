@@ -3,7 +3,6 @@
  */
 package org.objectweb.proactive.extra.dataspaces;
 
-import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -38,7 +37,7 @@ public class NamingService implements SpacesDirectory {
 
 	}
 
-	public Collection<SpaceInstanceInfo> lookupAll(SpaceURI uri) {
+	public Set<SpaceInstanceInfo> lookupAll(SpaceURI uri) {
 		// TODO Auto-generated method stub
 		return null;
 	}

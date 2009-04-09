@@ -3,7 +3,7 @@
  */
 package org.objectweb.proactive.extra.dataspaces;
 
-import java.util.Collection;
+import java.util.Set;
 
 /**
  * 
@@ -26,7 +26,7 @@ public class CachingSpacesDirectory implements SpacesDirectory {
 	 * @see org.objectweb.proactive.extensions.dataspaces.SpacesDirectory#lookupAll
 	 *      (org.objectweb.proactive.extensions.dataspaces.SpaceURI)
 	 */
-	public Collection<SpaceInstanceInfo> lookupAll(SpaceURI uri) {
+	public Set<SpaceInstanceInfo> lookupAll(SpaceURI uri) {
 		return remoteDirectory.lookupAll(uri);
 	}
 

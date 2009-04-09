@@ -3,7 +3,7 @@
  */
 package org.objectweb.proactive.extra.dataspaces;
 
-import java.util.Collection;
+import java.util.Set;
 
 /**
  * resp: - stores mappings to SpaceInstanceInfos from SpaceURI - two public
@@ -17,7 +17,7 @@ public interface SpacesDirectory {
 
 	/**
 	 * Lookup for space instance info with given mounting point uri.
-	 *
+	 * 
 	 * @param uri
 	 *            mounting point uri of data space to look up
 	 * @return SpaceInstanceInfo mapping or null if not available
@@ -32,7 +32,7 @@ public interface SpacesDirectory {
 	 *            root uri to look up
 	 * @return SpaceInstanceInfo mappings or null if none is available
 	 */
-	public Collection<SpaceInstanceInfo> lookupAll(SpaceURI uri);
+	public Set<SpaceInstanceInfo> lookupAll(SpaceURI uri);
 
 	/**
 	 * Registers new space instance info. If mounting point of that space
