@@ -3,6 +3,8 @@
  */
 package org.objectweb.proactive.extra.dataspaces;
 
+import java.io.Serializable;
+
 /**
  * resp: - stores URI as fields: app id, type, name | rt and node - correctness
  * guarantee - immutable - used for lookup (comparator) - serializable (sent
@@ -10,61 +12,312 @@ package org.objectweb.proactive.extra.dataspaces;
  * instantiated during DS configuration - SpaceInstanceInfo
  * 
  */
-public class SpaceURI {
+public class SpaceURI implements Serializable, Comparable<SpaceURI> {
 
-    protected long appId;
+	public static final String VFS_SCHEME = "vfs:///";
 
-    protected SpaceType dsType;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7148704434729348732L;
 
-    protected String name;
+	public static SpaceURI createApplicationSpacesURI(long appId) {
+		return new SpaceURI(appId, null, null, null, null, null);
+	}
 
-    protected String runtimeId;
+	public static SpaceURI createScratchSpaceURI(long appId) {
+		return createScratchSpaceURI(appId, null);
+	}
 
-    protected String nodeId;
+	public static SpaceURI createScratchSpaceURI(long appId, String runtimeId) {
+		return createScratchSpaceURI(appId, runtimeId, null);
+	}
 
-    /*
-     * * Constructor for input/output dataspaces.
-     * 
-     * @param appId
-     * 
-     * @param dsType
-     * 
-     * @param name
-     */
-    public SpaceURI(long appId, SpaceType dsType, String name) {
-    }
+	public static SpaceURI createScratchSpaceURI(long appId, String runtimeId,
+			String nodeId) {
+		return createScratchSpaceURI(appId, runtimeId, nodeId, null);
+	}
 
-    /*
-     * * Constructor for scratch dataspaces.
-     * 
-     * @param appId
-     * 
-     * @param dsType
-     * 
-     * @param runtimeId
-     * 
-     * @param nodeId
-     */
-    public SpaceURI(long appId, SpaceType dsType, String runtimeId, String nodeId) {
-    }
+	public static SpaceURI createScratchSpaceURI(long appId, String runtimeId,
+			String nodeId, String path) {
+		if ((runtimeId == null && nodeId != null)
+				|| (nodeId == null && path != null)) {
+			throw new IllegalArgumentException("Illegal URI");
+		}
+		return new SpaceURI(appId, SpaceType.SCRATCH, null, runtimeId, nodeId,
+				path);
+	}
 
-    public long getAppId() {
-        return appId;
-    }
+	public static SpaceURI createInputSpaceURI(long appId) {
+		return createInputSpaceURI(appId, null);
+	}
 
-    public SpaceType getSpaceType() {
-        return dsType;
-    }
+	public static SpaceURI createInputSpaceURI(long appId, String name) {
+		return createInputSpaceURI(appId, name, null);
+	}
 
-    public String getName() {
-        return name;
-    }
+	public static SpaceURI createInputSpaceURI(long appId, String name,
+			String path) {
+		return new SpaceURI(appId, SpaceType.INPUT, name, null, null, path);
+	}
 
-    public String getRuntimeId() {
-        return runtimeId;
-    }
+	public static SpaceURI createOutputSpaceURI(long appId) {
+		return createOutputSpaceURI(appId, null);
+	}
 
-    public String getNodeId() {
-        return nodeId;
-    }
+	public static SpaceURI createOutputSpaceURI(long appId, String name) {
+		return createOutputSpaceURI(appId, name, null);
+	}
+
+	public static SpaceURI createOutputSpaceURI(long appId, String name,
+			String path) {
+		return new SpaceURI(appId, SpaceType.OUTPUT, name, null, null, path);
+	}
+
+	public static SpaceURI parseURI(String uri) {
+		// TODO
+		throw new UnsupportedOperationException("write me, pleeease");
+	}
+
+	protected final long appId;
+
+	protected final SpaceType spaceType;
+
+	protected final String name;
+
+	protected final String runtimeId;
+
+	protected final String nodeId;
+
+	protected final String path;
+
+	protected SpaceURI(long appId, SpaceType spaceType, String name,
+			String runtimeId, String nodeId, String path) {
+		if ((spaceType == null && (name != null || runtimeId != null))
+				|| (runtimeId == null && nodeId != null)
+				|| ((nodeId == null || name == null) && path != null)) {
+			throw new IllegalArgumentException(
+					"Malformed URI. Provided arguments do not meet hierarchy consistency requirement.");
+		}
+
+		if ((spaceType == SpaceType.INPUT || spaceType == SpaceType.OUTPUT)
+				&& runtimeId != null) {
+			throw new IllegalArgumentException(
+					"Malformed URI. Input/output can not have runtime id.");
+		}
+
+		if (spaceType == SpaceType.SCRATCH && name != null) {
+			throw new IllegalArgumentException(
+					"Malformed URI. Scratch can not have name.");
+		}
+
+		this.appId = appId;
+		this.spaceType = spaceType;
+		this.name = name;
+		this.runtimeId = runtimeId;
+		this.nodeId = nodeId;
+		this.path = path;
+	}
+
+	public long getAppId() {
+		return appId;
+	}
+
+	public SpaceType getSpaceType() {
+		return spaceType;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public String getRuntimeId() {
+		return runtimeId;
+	}
+
+	public String getNodeId() {
+		return nodeId;
+	}
+
+	public String getPath() {
+		return path;
+	}
+
+	public boolean isComplete() {
+		return spaceType != null
+				&& (name != null || (runtimeId != null && nodeId != null));
+	}
+
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder(VFS_SCHEME);
+
+		sb.append(Long.toString(appId));
+		sb.append('/');
+
+		if (spaceType == null) {
+			return sb.toString();
+		}
+		sb.append(spaceType.getDirectory());
+		sb.append('/');
+
+		switch (spaceType) {
+		case INPUT:
+		case OUTPUT:
+			if (name == null) {
+				return sb.toString();
+			}
+			sb.append(name);
+			break;
+		case SCRATCH:
+			if (runtimeId == null) {
+				return sb.toString();
+			}
+			sb.append(runtimeId);
+			sb.append('/');
+
+			if (nodeId == null) {
+				return sb.toString();
+			}
+			sb.append(nodeId);
+			break;
+		default:
+			assert false;
+		}
+		sb.append('/');
+
+		return sb.toString();
+	}
+
+	public int compareTo(SpaceURI other) {
+		if (this == other) {
+			return 0;
+		}
+		if (other == null) {
+			throw new NullPointerException();
+		}
+
+		if (appId != other.appId) {
+			if (appId < other.appId) {
+				return -1;
+			}
+			return 1;
+		}
+
+		if (spaceType == null) {
+			if (other.spaceType != null) {
+				return -1;
+			}
+		} else {
+			if (other.spaceType == null) {
+				return 1;
+			}
+			return spaceType.compareTo(other.spaceType);
+		}
+
+		if (name == null) {
+			if (other.name != null) {
+				return -1;
+			}
+		} else {
+			if (other.name == null) {
+				return 1;
+			}
+			return name.compareTo(other.name);
+		}
+
+		if (runtimeId == null) {
+			if (other.runtimeId != null) {
+				return -1;
+			}
+		} else {
+			if (other.runtimeId == null) {
+				return 1;
+			}
+			return runtimeId.compareTo(runtimeId);
+		}
+
+		if (nodeId == null) {
+			if (other.nodeId != null) {
+				return -1;
+			}
+		} else {
+			if (other.nodeId == null) {
+				return 1;
+			}
+			return nodeId.compareTo(nodeId);
+		}
+
+		if (path == null) {
+			if (other.path != null) {
+				return -1;
+			}
+			return 0;
+		} else {
+			if (other.path == null) {
+				return 1;
+			}
+			return path.compareTo(path);
+		}
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof SpaceURI)) {
+			return false;
+		}
+
+		SpaceURI other = (SpaceURI) obj;
+		if (appId != other.appId) {
+			return false;
+		}
+
+		if (spaceType == null) {
+			if (other.spaceType != null) {
+				return false;
+			}
+		} else if (!spaceType.equals(other.spaceType)) {
+			return false;
+		}
+
+		if (name == null) {
+			if (other.name != null) {
+				return false;
+			}
+		} else if (!name.equals(other.name)) {
+			return false;
+		}
+
+		if (nodeId == null) {
+			if (other.nodeId != null) {
+				return false;
+			}
+		} else if (!nodeId.equals(other.nodeId)) {
+			return false;
+		}
+
+		if (runtimeId == null) {
+			if (other.runtimeId != null) {
+				return false;
+			}
+		} else if (!runtimeId.equals(other.runtimeId)) {
+			return false;
+		}
+
+		if (path == null) {
+			if (other.path != null) {
+				return false;
+			}
+		} else if (!path.equals(other.path)) {
+			return false;
+		}
+
+		return true;
+	}
 }

@@ -12,7 +12,7 @@ package org.objectweb.proactive.extra.dataspaces;
  */
 public interface ApplicationScratchSpace {
 
-    public SpaceFileURI getScratchForAO(String aoid);
+    public SpaceURI getScratchForAO(String aoid);
 
     public SpaceInstanceInfo getSpaceInstanceInfo();
 

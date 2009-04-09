@@ -17,15 +17,11 @@ col:
  */
 public class SpacesMountManager {
 
-    public Object resolveFile(SpaceURI spaceURI, String path) {
+    public Object resolveFile(SpaceURI spaceURI) {
         return null;
     }
 
-    public Object resolveSpace(SpaceURI spaceURI) {
-        return null;
-    }
-
-    public Set<Object> resolveSpaceMany(SpaceURI spaceURI) {
+    public Set<Object> resolveSpaces(SpaceURI spaceURI) {
         return null;
     }
 }
