@@ -5,46 +5,55 @@ package org.objectweb.proactive.extra.dataspaces;
 
 import java.net.URL;
 
-
 /**
- * - for mapping URI -> URL - stores configuration - url, path, hostname, -
- * gives information about: type, name (impl: from mounting point) - stores
- * mounting point (SpaceURI)
- * 
+ * Stores mapping from mounting point URI to access description (like URL, path
+ * and hostname) along with mounting point information.
  */
 public class SpaceInstanceInfo {
 
-    protected URL url;
+	protected final URL url;
 
-    protected String path;
+	protected final String path;
 
-    protected String hostname;
+	protected final String hostname;
 
-    protected SpaceURI mountingPoint;
+	protected final SpaceURI mountingPoint;
 
-    public URL getUrl() {
-        return url;
-    }
+	public SpaceInstanceInfo(SpaceURI mountingPoint, SpaceConfiguration config) {
 
-    public String getPath() {
-        return path;
-    }
+		if (mountingPoint == null)
+			throw new IllegalArgumentException("Mounting point uri is null");
 
-    public String getHostname() {
-        return hostname;
-    }
+		if (config == null)
+			throw new IllegalArgumentException("Space configuration is null");
 
-    public SpaceURI getMountingPoint() {
-        return mountingPoint;
-    }
+		this.mountingPoint = mountingPoint;
+		this.url = config.getUrl();
+		this.hostname = config.getHostname();
+		this.path = config.path;
+	}
 
-    public String getName() {
-        // TODO
-        return mountingPoint.getName();
-    }
+	public URL getUrl() {
+		return url;
+	}
 
-    public SpaceType getType() {
-        // TODO
-        return mountingPoint.getSpaceType();
-    }
+	public String getPath() {
+		return path;
+	}
+
+	public String getHostname() {
+		return hostname;
+	}
+
+	public SpaceURI getMountingPoint() {
+		return mountingPoint;
+	}
+
+	public String getName() {
+		return mountingPoint.getName();
+	}
+
+	public SpaceType getType() {
+		return mountingPoint.getSpaceType();
+	}
 }
