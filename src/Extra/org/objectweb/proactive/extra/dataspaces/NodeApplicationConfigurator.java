@@ -3,7 +3,7 @@
  */
 package org.objectweb.proactive.extra.dataspaces;
 
-import org.apache.commons.vfs.FileSystemManager;
+import org.apache.commons.vfs.impl.DefaultFileSystemManager;
 
 /**
  * resp: - maintaines configuration for application - creation logic: creates
@@ -21,7 +21,7 @@ import org.apache.commons.vfs.FileSystemManager;
 public class NodeApplicationConfigurator {
 
 	public DataSpacesImpl configureApplication(long appid, String namingServiceURL,
-			FileSystemManager manager, NodeScratchSpace scratch) {
+			DefaultFileSystemManager manager, NodeScratchSpace scratch) {
 		return null;
 	}
 

@@ -3,7 +3,7 @@
  */
 package org.objectweb.proactive.extra.dataspaces;
 
-import org.apache.commons.vfs.FileSystemManager;
+import org.apache.commons.vfs.impl.DefaultFileSystemManager;
 
 /**
  * name: NodeScratchSpace resp: - initialization of rt/node config (with
@@ -34,7 +34,7 @@ public class NodeScratchSpace {
 		}
 	}
 
-	public NodeScratchSpace(SpaceConfiguration conf, FileSystemManager manager) {
+	public NodeScratchSpace(SpaceConfiguration conf, DefaultFileSystemManager manager) {
 	}
 
 	public void init() {
