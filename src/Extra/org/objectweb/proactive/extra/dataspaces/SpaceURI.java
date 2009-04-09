@@ -33,15 +33,12 @@ public final class SpaceURI implements Serializable, Comparable<SpaceURI> {
 		return createScratchSpaceURI(appId, runtimeId, null);
 	}
 
-	public static SpaceURI createScratchSpaceURI(long appId, String runtimeId,
-			String nodeId) {
+	public static SpaceURI createScratchSpaceURI(long appId, String runtimeId, String nodeId) {
 		return createScratchSpaceURI(appId, runtimeId, nodeId, null);
 	}
 
-	public static SpaceURI createScratchSpaceURI(long appId, String runtimeId,
-			String nodeId, String path) {
-		return new SpaceURI(appId, SpaceType.SCRATCH, null, runtimeId, nodeId,
-				path);
+	public static SpaceURI createScratchSpaceURI(long appId, String runtimeId, String nodeId, String path) {
+		return new SpaceURI(appId, SpaceType.SCRATCH, null, runtimeId, nodeId, path);
 	}
 
 	public static SpaceURI createInputSpaceURI(long appId) {
@@ -52,8 +49,7 @@ public final class SpaceURI implements Serializable, Comparable<SpaceURI> {
 		return createInputSpaceURI(appId, name, null);
 	}
 
-	public static SpaceURI createInputSpaceURI(long appId, String name,
-			String path) {
+	public static SpaceURI createInputSpaceURI(long appId, String name, String path) {
 		return new SpaceURI(appId, SpaceType.INPUT, name, null, null, path);
 	}
 
@@ -65,8 +61,7 @@ public final class SpaceURI implements Serializable, Comparable<SpaceURI> {
 		return createOutputSpaceURI(appId, name, null);
 	}
 
-	public static SpaceURI createOutputSpaceURI(long appId, String name,
-			String path) {
+	public static SpaceURI createOutputSpaceURI(long appId, String name, String path) {
 		return new SpaceURI(appId, SpaceType.OUTPUT, name, null, null, path);
 	}
 
@@ -87,8 +82,9 @@ public final class SpaceURI implements Serializable, Comparable<SpaceURI> {
 
 	private final String path;
 
-	private SpaceURI(long appId, SpaceType spaceType, String name,
-			String runtimeId, String nodeId, String path) {
+	private SpaceURI(long appId, SpaceType spaceType, String name, String runtimeId, String nodeId,
+			String path) {
+
 		if ((spaceType == null && (name != null || runtimeId != null))
 				|| (runtimeId == null && nodeId != null)
 				|| ((nodeId == null || name == null) && path != null)) {
@@ -96,15 +92,12 @@ public final class SpaceURI implements Serializable, Comparable<SpaceURI> {
 					"Malformed URI. Provided arguments do not meet hierarchy consistency requirement.");
 		}
 
-		if ((spaceType == SpaceType.INPUT || spaceType == SpaceType.OUTPUT)
-				&& runtimeId != null) {
-			throw new IllegalArgumentException(
-					"Malformed URI. Input/output can not have runtime id.");
+		if ((spaceType == SpaceType.INPUT || spaceType == SpaceType.OUTPUT) && runtimeId != null) {
+			throw new IllegalArgumentException("Malformed URI. Input/output can not have runtime id.");
 		}
 
 		if (spaceType == SpaceType.SCRATCH && name != null) {
-			throw new IllegalArgumentException(
-					"Malformed URI. Scratch can not have name.");
+			throw new IllegalArgumentException("Malformed URI. Scratch can not have name.");
 		}
 
 		this.appId = appId;
@@ -113,6 +106,15 @@ public final class SpaceURI implements Serializable, Comparable<SpaceURI> {
 		this.runtimeId = runtimeId;
 		this.nodeId = nodeId;
 		this.path = path;
+	}
+
+	protected SpaceURI(SpaceURI uri) {
+		this.appId = uri.appId;
+		this.spaceType = uri.spaceType;
+		this.name = uri.name;
+		this.runtimeId = uri.runtimeId;
+		this.nodeId = uri.nodeId;
+		this.path = uri.path;
 	}
 
 	public long getAppId() {
@@ -140,14 +142,12 @@ public final class SpaceURI implements Serializable, Comparable<SpaceURI> {
 	}
 
 	public boolean isComplete() {
-		return spaceType != null
-				&& (name != null || (runtimeId != null && nodeId != null));
+		return spaceType != null && (name != null || (runtimeId != null && nodeId != null));
 	}
 
 	public SpaceURI getURIWithPath(String path) {
 		if (path.length() > 0 && !isComplete()) {
-			throw new IllegalStateException(
-					"only complete URIs can have path");
+			throw new IllegalStateException("only complete URIs can have path");
 		}
 		return new SpaceURI(appId, spaceType, name, runtimeId, nodeId, path);
 	}
