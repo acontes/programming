@@ -44,11 +44,11 @@ public class DataSpacesImpl {
 		return null;
 	}
 
-	public FileObject resolveDefaultInputBlocking(long timeoutMilis) {
+	public FileObject resolveDefaultInputBlocking(long timeoutMillis) {
 		return null;
 	}
 
-	public FileObject resolveDefaultOutputBlocking(long timeoutMilis) {
+	public FileObject resolveDefaultOutputBlocking(long timeoutMillis) {
 		return null;
 	}
 
@@ -68,27 +68,19 @@ public class DataSpacesImpl {
 		return null;
 	}
 
-	public FileObject resolveInputBlocking(String name, long timeoutMilis) {
+	public FileObject resolveInputBlocking(String name, long timeoutMillis) {
 		return null;
 	}
 
-	public FileObject resolveOutputBlocking(String name, long timeoutMilis) {
+	public FileObject resolveOutputBlocking(String name, long timeoutMillis) {
 		return null;
 	}
 
-	public String addInput(String name, String path) {
+	public String addInput(String name, String path, URL url) {
 		return null;
 	}
 
-	public String addInput(URL url) {
-		return null;
-	}
-
-	public String addOutput(String name, String path) {
-		return null;
-	}
-
-	public String addOutput(URL url) {
+	public String addOutput(String name, String path, URL url) {
 		return null;
 	}
 }

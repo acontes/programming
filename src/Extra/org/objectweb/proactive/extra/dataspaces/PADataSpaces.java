@@ -46,11 +46,11 @@ public class PADataSpaces {
 		return null;
 	}
 
-	public static FileObject resolveDefaultInputBlocking(long timeoutMilis) {
+	public static FileObject resolveDefaultInputBlocking(long timeoutMillis) {
 		return null;
 	}
 
-	public static FileObject resolveDefaultOutputBlocking(long timeoutMilis) {
+	public static FileObject resolveDefaultOutputBlocking(long timeoutMillis) {
 		return null;
 	}
 
@@ -70,27 +70,21 @@ public class PADataSpaces {
 		return null;
 	}
 
-	public static FileObject resolveInputBlocking(String name, long timeoutMilis) {
+	public static FileObject resolveInputBlocking(String name,
+			long timeoutMillis) {
 		return null;
 	}
 
-	public static FileObject resolveOutputBlocking(String name, long timeoutMilis) {
+	public static FileObject resolveOutputBlocking(String name,
+			long timeoutMillis) {
 		return null;
 	}
 
-	public static String addInput(String name, String path) {
+	public static String addInput(String name, String path, URL url) {
 		return null;
 	}
 
-	public static String addInput(URL url) {
-		return null;
-	}
-
-	public static String addOutput(String name, String path) {
-		return null;
-	}
-
-	public static String addOutput(URL url) {
+	public static String addOutput(String name, String path, URL url) {
 		return null;
 	}
 
