@@ -1,8 +1,9 @@
 package org.objectweb.proactive.extensions.structuredp2p.grid2D;
 
+import java.io.File;
 import java.util.ArrayList;
-import java.io.File; //import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.PAActiveObject; //import org.objectweb.proactive.api.PALifeCycle;
+
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
@@ -10,19 +11,17 @@ import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
 public class Grid2D {
-	// nombre de ligne
-	private int lig;
-	// nombre de colonne
-	private int col;
-	// elements de la grille
-	private ArrayList<Element> elements;
+	private int nbRows;
+	private int nbCols;
+
+	private ArrayList<Object> elements;
 
 	private static GCMApplication pad;
 
-	public Grid2D(int lig, int col) {
-		this.lig = lig;
-		this.col = col;
-		elements = new ArrayList<Element>(this.lig * this.col);
+	public Grid2D(int row, int col) {
+		this.nbRows = row;
+		this.nbCols = col;
+		this.elements = new ArrayList<Object>(this.nbRows * this.nbCols);
 	}
 
 	/**
@@ -56,23 +55,23 @@ public class Grid2D {
 	 * 
 	 * @param descriptor
 	 */
-	public void newAo(String descriptor) {
+	public void createCoordinates(String descriptor) {
+		int nbElem = this.nbCols * this.nbRows;
 
-		int nbElem = this.col * this.lig;
 		try {
 			// recuperation des vn
 			ArrayList<GCMVirtualNode> listVn = this.deploy(descriptor);
 			// creation des oa
 			for (int i = 0; i < nbElem; i++) {
 
-				Element e = (Element) PAActiveObject.newActive(Element.class
+				Object e = (Object) PAActiveObject.newActive(Object.class
 						.getName(), new Object[] {}, listVn.get(
 						i % listVn.size()).getANode());
 
 				elements.add(e);
 			}
 			// initialisation des cooordonnees
-			initCord();
+			initCordinates();
 			// initialisation de la liste des voisins de chaque element
 			for (int i = 0; i < elements.size(); i++) {
 				this.initNeighbors(elements.get(i));
@@ -88,16 +87,13 @@ public class Grid2D {
 
 	}
 
-	/**
- * 	
- */
-	public void initCord() {
+	public void initCordinates() {
 		int index = 0;
 
-		for (int i = 0; i < lig; i++) { // Y
-			for (int j = 0; j < col; j++) { // X
-				elements.get(index).setX(j);
-				elements.get(index++).setY(i);
+		for (int i = 0; i < this.nbRows; i++) { // Y
+			for (int j = 0; j < nbCols; j++) { // X
+				this.elements.get(index).setX(j);
+				this.elements.get(index++).setY(i);
 			}
 		}
 	}
@@ -108,7 +104,7 @@ public class Grid2D {
 	 * @param y
 	 * @return
 	 */
-	public Element getByCord(int x, int y) {
+	public Object getByCoordinates(int x, int y) {
 		for (int i = 0; i < elements.size(); i++) {
 			if (elements.get(i).getX() == x && elements.get(i).getY() == y) {
 				return elements.get(i);
@@ -121,28 +117,27 @@ public class Grid2D {
 	 * 
 	 * @param e
 	 */
-	public void initNeighbors(Element e) {
-		
+	public void initNeighbors(Object e) {
+
 		int myX = e.getX();
 		int myY = e.getY();
 
-		if (!this.getByCord(myX + 1, myY).equals(null)) {
-			
-			e.getNeighbors().add(this.getByCord(myX + 1, myY));
+		if (!this.getByCoordinates(myX + 1, myY).equals(null)) {
+			e.add(this.getByCoordinates(myX + 1, myY));
 		}
 
-		if (!this.getByCord(myX, myY + 1).equals(null)) {
-			
-			e.getNeighbors().add(this.getByCord(myX, myY + 1));
+		if (!this.getByCoordinates(myX, myY + 1).equals(null)) {
+
+			e.add(this.getByCoordinates(myX, myY + 1));
 		}
 
-		if (!this.getByCord(myX - 1, myY).equals(null)) {
-			
-			e.getNeighbors().add(this.getByCord(myX - 1, myY));
+		if (!this.getByCoordinates(myX - 1, myY).equals(null)) {
+
+			e.add(this.getByCoordinates(myX - 1, myY));
 		}
-		if (!this.getByCord(myX, myY - 1).equals(null)) {
-			
-			e.getNeighbors().add(this.getByCord(myX, myY - 1));
+		if (!this.getByCoordinates(myX, myY - 1).equals(null)) {
+
+			e.add(this.getByCoordinates(myX, myY - 1));
 		}
 	}
 

@@ -1,23 +1,23 @@
 package org.objectweb.proactive.extensions.structuredp2p.grid2D;
 
-import java.util.ArrayList;
-
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 
-public class Element implements InitActive, RunActive, EndActive {
+public class Object implements InitActive, RunActive, EndActive {
 
 	private int x;
 	private int y;
-	private ArrayList<Element> neighbors = new ArrayList<Element>();
 
-	public Element() {
+	private Object[] neighbors = new Object[4];
+	private int index = 1;
+
+	public Object() {
 
 	}
 
-	public Element(int x, int y) {
+	public Object(int x, int y) {
 
 	}
 
@@ -55,12 +55,16 @@ public class Element implements InitActive, RunActive, EndActive {
 		this.y = y;
 	}
 
-	public ArrayList<Element> getNeighbors() {
+	public Object[] getNeighbors() {
 		return neighbors;
 	}
 
-	public void setNeighbors(ArrayList<Element> neighbors) {
+	public void setNeighbors(Object[] neighbors) {
 		this.neighbors = neighbors;
 	}
 
+	public void add(Object e) {
+		this.neighbors[this.index] = e;
+		this.index++;
+	}
 }
