@@ -108,15 +108,6 @@ public final class SpaceURI implements Serializable, Comparable<SpaceURI> {
 		this.path = path;
 	}
 
-	protected SpaceURI(SpaceURI uri) {
-		this.appId = uri.appId;
-		this.spaceType = uri.spaceType;
-		this.name = uri.name;
-		this.runtimeId = uri.runtimeId;
-		this.nodeId = uri.nodeId;
-		this.path = uri.path;
-	}
-
 	public long getAppId() {
 		return appId;
 	}
@@ -150,6 +141,43 @@ public final class SpaceURI implements Serializable, Comparable<SpaceURI> {
 			throw new IllegalStateException("only complete URIs can have path");
 		}
 		return new SpaceURI(appId, spaceType, name, runtimeId, nodeId, path);
+	}
+
+	/**
+	 * Helper method for generating next space uri key in the same path level.
+	 */
+	protected static SpaceURI nextSpaceURI(SpaceURI key) {
+		long appId = key.getAppId();
+		SpaceType spaceType = key.getSpaceType();
+		String name = key.getName();
+		String runtimeId = key.getRuntimeId();
+		String nodeId = key.getNodeId();
+
+		// case: appid/type/name/
+		// case: appid/type/rt/node/
+		if (key.isComplete())
+			throw new IllegalArgumentException("Source key uri is complete. Doesn't make sens, giving up.");
+
+		// case: appid/ - just ++
+		if (spaceType == null) {
+			appId++;
+			return new SpaceURI(appId, spaceType, name, runtimeId, nodeId, null);
+		}
+
+		// case: appid/SCRATCH/rt/ - just build next rt string
+		if (spaceType == SpaceType.SCRATCH && runtimeId != null) {
+			runtimeId = runtimeId + '\0';
+			return new SpaceURI(appId, spaceType, name, runtimeId, nodeId, null);
+		}
+
+		// case: appid/type/ - paste a next type
+		spaceType = spaceType.succ();
+
+		// case: appid/last_type/ - there was no next type?
+		if (spaceType == null)
+			appId++;
+
+		return new SpaceURI(appId, spaceType, name, runtimeId, nodeId, null);
 	}
 
 	@Override
