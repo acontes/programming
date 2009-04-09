@@ -12,7 +12,7 @@ import java.io.Serializable;
  * instantiated during DS configuration - SpaceInstanceInfo
  * 
  */
-public class SpaceURI implements Serializable, Comparable<SpaceURI> {
+public final class SpaceURI implements Serializable, Comparable<SpaceURI> {
 
 	public static final String VFS_SCHEME = "vfs:///";
 
@@ -40,10 +40,6 @@ public class SpaceURI implements Serializable, Comparable<SpaceURI> {
 
 	public static SpaceURI createScratchSpaceURI(long appId, String runtimeId,
 			String nodeId, String path) {
-		if ((runtimeId == null && nodeId != null)
-				|| (nodeId == null && path != null)) {
-			throw new IllegalArgumentException("Illegal URI");
-		}
 		return new SpaceURI(appId, SpaceType.SCRATCH, null, runtimeId, nodeId,
 				path);
 	}
@@ -79,19 +75,19 @@ public class SpaceURI implements Serializable, Comparable<SpaceURI> {
 		throw new UnsupportedOperationException("write me, pleeease");
 	}
 
-	protected final long appId;
+	private final long appId;
 
-	protected final SpaceType spaceType;
+	private final SpaceType spaceType;
 
-	protected final String name;
+	private final String name;
 
-	protected final String runtimeId;
+	private final String runtimeId;
 
-	protected final String nodeId;
+	private final String nodeId;
 
-	protected final String path;
+	private final String path;
 
-	protected SpaceURI(long appId, SpaceType spaceType, String name,
+	private SpaceURI(long appId, SpaceType spaceType, String name,
 			String runtimeId, String nodeId, String path) {
 		if ((spaceType == null && (name != null || runtimeId != null))
 				|| (runtimeId == null && nodeId != null)
@@ -148,6 +144,14 @@ public class SpaceURI implements Serializable, Comparable<SpaceURI> {
 				&& (name != null || (runtimeId != null && nodeId != null));
 	}
 
+	public SpaceURI getURIWithPath(String path) {
+		if (path.length() > 0 && !isComplete()) {
+			throw new IllegalStateException(
+					"only complete URIs can have path");
+		}
+		return new SpaceURI(appId, spaceType, name, runtimeId, nodeId, path);
+	}
+
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder(VFS_SCHEME);
@@ -158,7 +162,7 @@ public class SpaceURI implements Serializable, Comparable<SpaceURI> {
 		if (spaceType == null) {
 			return sb.toString();
 		}
-		sb.append(spaceType.getDirectory());
+		sb.append(spaceType.getDirectoryName());
 		sb.append('/');
 
 		switch (spaceType) {
@@ -208,44 +212,66 @@ public class SpaceURI implements Serializable, Comparable<SpaceURI> {
 			if (other.spaceType != null) {
 				return -1;
 			}
+			return 0;
 		} else {
 			if (other.spaceType == null) {
 				return 1;
 			}
-			return spaceType.compareTo(other.spaceType);
+			final int cmp = spaceType.compareTo(other.spaceType);
+			if (cmp != 0) {
+				return cmp;
+			}
 		}
 
-		if (name == null) {
-			if (other.name != null) {
-				return -1;
+		switch (spaceType) {
+		case INPUT:
+		case OUTPUT:
+			if (name == null) {
+				if (other.name != null) {
+					return -1;
+				}
+				return 0;
+			} else {
+				if (other.name == null) {
+					return 1;
+				}
+				final int cmp = name.compareTo(other.name);
+				if (cmp != 0) {
+					return cmp;
+				}
 			}
-		} else {
-			if (other.name == null) {
-				return 1;
+			break;
+		case SCRATCH:
+			if (runtimeId == null) {
+				if (other.runtimeId != null) {
+					return -1;
+				}
+				return 0;
+			} else {
+				if (other.runtimeId == null) {
+					return 1;
+				}
+				final int cmp = runtimeId.compareTo(other.runtimeId);
+				if (cmp != 0) {
+					return cmp;
+				}
 			}
-			return name.compareTo(other.name);
-		}
 
-		if (runtimeId == null) {
-			if (other.runtimeId != null) {
-				return -1;
+			if (nodeId == null) {
+				if (other.nodeId != null) {
+					return -1;
+				}
+				return 0;
+			} else {
+				if (other.nodeId == null) {
+					return 1;
+				}
+				final int cmp = nodeId.compareTo(other.nodeId);
+				if (cmp != 0) {
+					return cmp;
+				}
 			}
-		} else {
-			if (other.runtimeId == null) {
-				return 1;
-			}
-			return runtimeId.compareTo(runtimeId);
-		}
-
-		if (nodeId == null) {
-			if (other.nodeId != null) {
-				return -1;
-			}
-		} else {
-			if (other.nodeId == null) {
-				return 1;
-			}
-			return nodeId.compareTo(nodeId);
+			break;
 		}
 
 		if (path == null) {
@@ -263,61 +289,11 @@ public class SpaceURI implements Serializable, Comparable<SpaceURI> {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
 		if (!(obj instanceof SpaceURI)) {
 			return false;
 		}
 
 		SpaceURI other = (SpaceURI) obj;
-		if (appId != other.appId) {
-			return false;
-		}
-
-		if (spaceType == null) {
-			if (other.spaceType != null) {
-				return false;
-			}
-		} else if (!spaceType.equals(other.spaceType)) {
-			return false;
-		}
-
-		if (name == null) {
-			if (other.name != null) {
-				return false;
-			}
-		} else if (!name.equals(other.name)) {
-			return false;
-		}
-
-		if (nodeId == null) {
-			if (other.nodeId != null) {
-				return false;
-			}
-		} else if (!nodeId.equals(other.nodeId)) {
-			return false;
-		}
-
-		if (runtimeId == null) {
-			if (other.runtimeId != null) {
-				return false;
-			}
-		} else if (!runtimeId.equals(other.runtimeId)) {
-			return false;
-		}
-
-		if (path == null) {
-			if (other.path != null) {
-				return false;
-			}
-		} else if (!path.equals(other.path)) {
-			return false;
-		}
-
-		return true;
+		return compareTo(other) == 0;
 	}
 }
