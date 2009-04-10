@@ -4,17 +4,26 @@
 package org.objectweb.proactive.extra.dataspaces;
 
 /**
- * 	- returns scratch data space for AO (in form od SpaceURI) (from AO id)
-	  creates it when needed
-	- (to discuss) registers data space instance in CachingSpacesDirectory
-	  on creation; unregisters and removes directory on finalization
- *
+ * - returns scratch data space for AO (in form od SpaceURI) (from AO id)
+ * creates it when needed - (to discuss) registers data space instance in
+ * CachingSpacesDirectory on creation; unregisters and removes directory on
+ * finalization
+ * 
  */
 public interface ApplicationScratchSpace {
 
-    public SpaceURI getScratchForAO(String aoid);
+	public SpaceURI getScratchForAO(String aoid);
 
-    public SpaceInstanceInfo getSpaceInstanceInfo();
+	/**
+	 * TODO stays unchanged during application run? (hence can be called only
+	 * once)
+	 * 
+	 * @return
+	 */
+	public SpaceInstanceInfo getSpaceInstanceInfo();
 
-    public void close();
+	/**
+	 * removes scratch data space directory content
+	 */
+	public void close();
 }
