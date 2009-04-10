@@ -17,15 +17,18 @@
 				<java base="root" relpath="${java.home}/bin/java" />
 
 				<applicationClasspath>
+					<pathElement base="proactive" relpath="classes/Benchmarks" />
 					<pathElement base="proactive" relpath="classes/Core" />
-					<pathElement base="proactive" relpath="classes/Extra" />
 					<pathElement base="proactive" relpath="classes/Extensions" />
+					<pathElement base="proactive" relpath="classes/Extra" />
+					<pathElement base="proactive" relpath="classes/Examples" />
+					<pathElement base="proactive" relpath="classes/Tests" />
 					<pathElement base="proactive" relpath="classes/Utils" />
 				</applicationClasspath>
 
 			</configuration>
 
-			<virtualNode id="Grid2D" capacity="3" />
+			<virtualNode id="Grid2D" />
 		</proactive>
 	</application>
 

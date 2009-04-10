@@ -11,20 +11,29 @@ fi
 
 default_descriptor=${workingDir}/GCMA.xml
 
+if [[ $# -eq  0 ]]
+then
+        echo "Usage: $0 ROWS COLS"
+        echo "  ROWS : the number of rows for the grid"
+        echo "  COLS : the number of columns for the grid"
+        exit 1
+fi
+
 echo
 echo --- STRUCTURED P2P - 2D Active Grid ---------------------
 
-args="-descriptor $default_descriptor"
+args="-descriptor $default_descriptor $1 $2"
 
-export CLASSPATH=$CLASSPATH:./../../classes/Core
-export CLASSPATH=$CLASSPATH:./../../classes/Benchmarks
-export CLASSPATH=$CLASSPATH:./../../classes/Exemples
-export CLASSPATH=$CLASSPATH:./../../classes/Extensions
-export CLASSPATH=$CLASSPATH:./../../classes/Extra
-export CLASSPATH=$CLASSPATH:./../../classes/Tests
-export CLASSPATH=$CLASSPATH:./../../classes/Utils
+export CLASSPATH=$CLASSPATH:../../lib/*
+export CLASSPATH=$CLASSPATH:../../classes/Core
+export CLASSPATH=$CLASSPATH:../../classes/Benchmarks
+export CLASSPATH=$CLASSPATH:../../classes/Examples
+export CLASSPATH=$CLASSPATH:../../classes/Extensions
+export CLASSPATH=$CLASSPATH:../../classes/Extra
+export CLASSPATH=$CLASSPATH:../../classes/Tests
+export CLASSPATH=$CLASSPATH:../../classes/Utils
 
-$JAVACMD org.objectweb.proactive.extensions.structuredp2p.grid2D.Main $args
+$JAVACMD org.objectweb.proactive.extensions.structuredp2p.grid2D.Launcher $args
 
 echo
 echo ---------------------------------------------------------
