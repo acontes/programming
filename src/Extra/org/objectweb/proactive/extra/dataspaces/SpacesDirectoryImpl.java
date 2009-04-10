@@ -25,7 +25,6 @@ public class SpacesDirectoryImpl implements SpacesDirectory {
 	 * .objectweb.proactive.extra.dataspaces.SpaceURI)
 	 */
 	public Set<SpaceInstanceInfo> lookupAll(SpaceURI uri) {
-
 		if (uri.isComplete())
 			throw new IllegalArgumentException("Space URI must not be complete for this method call");
 
@@ -50,6 +49,12 @@ public class SpacesDirectoryImpl implements SpacesDirectory {
 	 * org.objectweb.proactive.extra.dataspaces.SpaceURI)
 	 */
 	public SpaceInstanceInfo lookupFirst(SpaceURI uri) {
+		if (!uri.isComplete())
+			throw new IllegalArgumentException("Space URI must be complete for this method call");
+
+		if (uri.getPath() != null)
+			throw new IllegalArgumentException("Space URI must not contain path for this method call");
+
 		synchronized (data) {
 			return data.get(uri);
 		}

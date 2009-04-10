@@ -21,18 +21,23 @@ public interface SpacesDirectory {
 	 * @param uri
 	 *            mounting point uri of data space to look up
 	 * @return SpaceInstanceInfo mapping or null if not available
+	 * @throws IllegalArgumentException
+	 *             when specified SpaceURI is not complete or contains path
 	 */
-	public SpaceInstanceInfo lookupFirst(SpaceURI uri);
+	public SpaceInstanceInfo lookupFirst(SpaceURI uri) throws IllegalArgumentException;
 
 	/**
 	 * Lookup for all space instance info that have specified uri as a root of
-	 * their mounting point (<code>ls -R</code> like).
+	 * their mounting point (<code>ls -R</code> like). Subsequent method calls
+	 * may return different result - the same or with new elements.
 	 * 
 	 * @param uri
 	 *            root uri to look up
 	 * @return SpaceInstanceInfo mappings or null if none is available
+	 * @throws IllegalArgumentException
+	 *             when specified uri is complete
 	 */
-	public Set<SpaceInstanceInfo> lookupAll(SpaceURI uri);
+	public Set<SpaceInstanceInfo> lookupAll(SpaceURI uri) throws IllegalArgumentException;
 
 	/**
 	 * Registers new space instance info. If mounting point of that space
