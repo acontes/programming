@@ -24,9 +24,8 @@ public class Launcher {
 		} catch (ProActiveException e) {
 			e.printStackTrace();
 		}
-
-		ActiveGrid2D grid2d = new ActiveGrid2D(Integer.parseInt(args[2]),
-				Integer.parseInt(args[3]));
+		
+		new ActiveGrid2D(Integer.parseInt(args[2]), Integer.parseInt(args[3]));
 
 		Scanner scanner = new Scanner(System.in);
 		while (scanner.hasNext()) {
