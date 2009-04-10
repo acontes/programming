@@ -56,4 +56,8 @@ public class SpaceInstanceInfo {
 	public SpaceType getType() {
 		return mountingPoint.getSpaceType();
 	}
+
+	public long getAppId() {
+		return mountingPoint.getAppId();
+	}
 }
