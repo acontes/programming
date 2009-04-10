@@ -1,54 +1,31 @@
 package org.objectweb.proactive.extensions.structuredp2p.grid2D;
 
-import java.io.File;
 import java.util.ArrayList;
 
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
-import org.objectweb.proactive.gcmdeployment.GCMApplication;
+import org.objectweb.proactive.extensions.structuredp2p.util.Deployment;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
-public class Grid2D {
+/**
+ * 
+ * @author Kilanga Fanny
+ * @author Trovato Alexandre
+ * @author Pellegrino Laurent
+ * 
+ * @version 0.1
+ */
+public class ActiveGrid2D {
 	private int nbRows;
 	private int nbCols;
 
-	private ArrayList<Object> elements;
+	private ArrayList<AwareObject> elements;
 
-	private static GCMApplication pad;
-
-	public Grid2D(int row, int col) {
+	public ActiveGrid2D(int row, int col) {
 		this.nbRows = row;
 		this.nbCols = col;
-		this.elements = new ArrayList<Object>(this.nbRows * this.nbCols);
-	}
-
-	/**
-	 * 
-	 * @param descriptor
-	 * @return
-	 * @throws NodeException
-	 * @throws ProActiveException
-	 */
-	public ArrayList<GCMVirtualNode> deploy(String descriptor)
-			throws NodeException, ProActiveException {
-
-		ArrayList<GCMVirtualNode> listVn = new ArrayList<GCMVirtualNode>();
-		// 1. Create object representation of the deployment file
-		pad = PAGCMDeployment.loadApplicationDescriptor(new File(descriptor));
-		// 2. Activate all Virtual Nodes
-		pad.startDeployment();
-		// 3. Wait for all the virtual nodes to become ready
-		pad.waitReady();
-		// 4. Get all Virtual Nodes specified in the descriptor file
-		while (!pad.getVirtualNodes().values().iterator().next().equals(null)) {
-			GCMVirtualNode vn = (GCMVirtualNode) pad.getVirtualNodes().values();
-			listVn.add(vn);
-		}
-		// GCMVirtualNode vn = pad.getVirtualNodes().values().iterator().next();
-		// 5. Return the list of virtual node
-		return listVn;
+		this.elements = new ArrayList<AwareObject>(this.nbRows * this.nbCols);
 	}
 
 	/**
@@ -59,16 +36,15 @@ public class Grid2D {
 		int nbElem = this.nbCols * this.nbRows;
 
 		try {
-			// recuperation des vn
-			ArrayList<GCMVirtualNode> listVn = this.deploy(descriptor);
-			// creation des oa
+			ArrayList<GCMVirtualNode> listVn = Deployment.getAllVirtualNodes();
+
 			for (int i = 0; i < nbElem; i++) {
 
-				Object e = (Object) PAActiveObject.newActive(Object.class
-						.getName(), new Object[] {}, listVn.get(
-						i % listVn.size()).getANode());
+				AwareObject e = (AwareObject) PAActiveObject.newActive(
+						AwareObject.class.getName(), new Object[] {}, listVn
+								.get(i % listVn.size()).getANode());
 
-				elements.add(e);
+				this.elements.add(e);
 			}
 			// initialisation des cooordonnees
 			initCordinates();
@@ -104,7 +80,7 @@ public class Grid2D {
 	 * @param y
 	 * @return
 	 */
-	public Object getByCoordinates(int x, int y) {
+	public AwareObject getByCoordinates(int x, int y) {
 		for (int i = 0; i < elements.size(); i++) {
 			if (elements.get(i).getX() == x && elements.get(i).getY() == y) {
 				return elements.get(i);
@@ -117,7 +93,7 @@ public class Grid2D {
 	 * 
 	 * @param e
 	 */
-	public void initNeighbors(Object e) {
+	public void initNeighbors(AwareObject e) {
 
 		int myX = e.getX();
 		int myY = e.getY();
