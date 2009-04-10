@@ -73,7 +73,7 @@ public class NodeApplicationConfigurator {
 
 		// create SpacesMountManager
 		// TODO
-		spacesMountManager = new SpacesMountManager();
+		spacesMountManager = new SpacesMountManager(manager, cachingDirectory);
 
 		// create implementation object connected to the application's
 		// configuration

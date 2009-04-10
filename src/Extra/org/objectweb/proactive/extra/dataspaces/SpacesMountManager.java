@@ -5,6 +5,9 @@ package org.objectweb.proactive.extra.dataspaces;
 
 import java.util.Set;
 
+import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.impl.DefaultFileSystemManager;
+
 /**
  * resp: - (internally) manages VFS junctions adding/deleting - (externally)
  * manages mounting / unmounting - creates VirtualFileSystem from instance of
@@ -12,12 +15,21 @@ import java.util.Set;
  * interface) col: - CachingSpacesDirectory (or SpaceDirectory interface)
  */
 public class SpacesMountManager {
+	private DefaultFileSystemManager vfsManager;
+	private SpacesDirectory directory;
+	private FileObject vfs;
 
-	public Object resolveFile(DataSpacesURI uri) {
+	public SpacesMountManager(DefaultFileSystemManager vfsManager, SpacesDirectory directory) {
+		this.vfsManager = vfsManager;
+		this.directory = directory;
+		// this.vfs = vfsManager.createVirtualFileSystem("vfs:///");
+	}
+
+	public FileObject resolveFile(DataSpacesURI uri) {
 		return null;
 	}
 
-	public Set<Object> resolveSpaces(DataSpacesURI uri) {
+	public Set<FileObject> resolveSpaces(DataSpacesURI uri) {
 		return null;
 	}
 
