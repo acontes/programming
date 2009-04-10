@@ -33,16 +33,13 @@ public class NamingService extends SpacesDirectoryImpl implements SpacesDirector
 	 * @throws IllegalStateException
 	 *             When specified application id is already registered.
 	 */
-	public void registerApplication(long appid, Set<SpaceInstanceInfo> inputSpaces,
+	synchronized public void registerApplication(long appid, Set<SpaceInstanceInfo> inputSpaces,
 			Set<SpaceInstanceInfo> outputSpaces) throws IllegalArgumentException {
 
-		synchronized (registeredApplications) {
-			if (isApplicationIdRegistered(appid)) {
-				throw new IllegalStateException(
-						"Application with the same application id is already registered.");
-			}
-			registeredApplications.add(appid);
+		if (isApplicationIdRegistered(appid)) {
+			throw new IllegalStateException("Application with the same application id is already registered.");
 		}
+		registeredApplications.add(appid);
 
 		final Set<SpaceInstanceInfo> spaces = new HashSet<SpaceInstanceInfo>();
 
@@ -58,12 +55,10 @@ public class NamingService extends SpacesDirectoryImpl implements SpacesDirector
 	 * @param appid
 	 *            application identifier
 	 */
-	public void unregisterApplication(long appid) {
+	synchronized public void unregisterApplication(long appid) {
 		final boolean found;
 
-		synchronized (registeredApplications) {
-			found = registeredApplications.remove(appid);
-		}
+		found = registeredApplications.remove(appid);
 
 		if (!found)
 			throw new IllegalStateException("Application with specified appid is not registered.");
@@ -85,7 +80,7 @@ public class NamingService extends SpacesDirectoryImpl implements SpacesDirector
 	 * (org.objectweb.proactive.extra.dataspaces.SpaceInstanceInfo)
 	 */
 	@Override
-	public void register(SpaceInstanceInfo spaceInstanceInfo) {
+	synchronized public void register(SpaceInstanceInfo spaceInstanceInfo) {
 		final long appid = spaceInstanceInfo.getAppId();
 
 		if (!isApplicationIdRegistered(appid))
@@ -95,10 +90,7 @@ public class NamingService extends SpacesDirectoryImpl implements SpacesDirector
 	}
 
 	private boolean isApplicationIdRegistered(long appid) {
-
-		synchronized (registeredApplications) {
-			return registeredApplications.contains(appid);
-		}
+		return registeredApplications.contains(appid);
 	}
 
 	private void processSpacesSet(long appid, Set<SpaceInstanceInfo> inSet,
