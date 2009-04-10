@@ -3,13 +3,19 @@
  */
 package org.objectweb.proactive.extra.dataspaces;
 
+import java.io.Serializable;
 import java.net.URL;
 
 /**
  * Stores mapping from mounting point URI to access description (like URL, path
  * and hostname) along with mounting point information.
  */
-public class SpaceInstanceInfo {
+public class SpaceInstanceInfo implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7402632454423044845L;
 
 	protected final URL url;
 
