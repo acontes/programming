@@ -6,18 +6,18 @@ package org.objectweb.proactive.extra.dataspaces;
 import java.util.Set;
 
 /**
- * 
- *
+ * Decorator of SpacesDirectory that caches SpaceInstanceInfo in its
+ * SpacesDirectoryImpl instance.
  */
 public class CachingSpacesDirectory implements SpacesDirectory {
 
-	private final SpacesDirectory localDirectory;
+	private final SpacesDirectoryImpl localDirectory;
 
 	private final SpacesDirectory remoteDirectory;
 
-	public CachingSpacesDirectory() {
+	public CachingSpacesDirectory(SpacesDirectory directoryToCache) {
 		localDirectory = new SpacesDirectoryImpl();
-		remoteDirectory = new SpacesDirectoryImpl();
+		remoteDirectory = directoryToCache;
 	}
 
 	/**
@@ -37,8 +37,16 @@ public class CachingSpacesDirectory implements SpacesDirectory {
 	 *      (org.objectweb.proactive.extensions.dataspaces.SpaceURI)
 	 */
 	public SpaceInstanceInfo lookupFirst(SpaceURI uri) {
-		localDirectory.lookupFirst(uri);
-		return null;
+		SpaceInstanceInfo sii = localDirectory.lookupFirst(uri);
+
+		if (sii != null)
+			return sii;
+
+		sii = remoteDirectory.lookupFirst(uri);
+
+		if (sii != null)
+			localDirectory.register(sii);
+		return sii;
 	}
 
 	/*
@@ -50,8 +58,8 @@ public class CachingSpacesDirectory implements SpacesDirectory {
 	 * org.objectweb.proactive.extensions.dataspaces.SpaceInstanceInfo)
 	 */
 	public void register(SpaceInstanceInfo spaceInstanceInfo) {
-		// TODO Auto-generated method stub
-
+		remoteDirectory.register(spaceInstanceInfo);
+		localDirectory.register(spaceInstanceInfo);
 	}
 
 	/*
@@ -62,8 +70,9 @@ public class CachingSpacesDirectory implements SpacesDirectory {
 	 * (org.objectweb.proactive.extensions.dataspaces.SpaceURI)
 	 */
 	public void unregister(SpaceURI uri) {
-		// TODO Auto-generated method stub
-
+		// TODO if unregisters can fail, check the proper order or catch
+		// exceptions or sth.
+		localDirectory.unregister(uri);
+		remoteDirectory.unregister(uri);
 	}
-
 }
