@@ -32,7 +32,6 @@ public class NamingService extends SpacesDirectoryImpl implements SpacesDirector
 	 *             cases the register operation is rolled back.
 	 * @throws IllegalStateException
 	 *             When specified application id is already registered.
-	 * 
 	 */
 	public void registerApplication(long appid, Set<SpaceInstanceInfo> inputSpaces,
 			Set<SpaceInstanceInfo> outputSpaces) throws IllegalArgumentException {
@@ -119,5 +118,4 @@ public class NamingService extends SpacesDirectoryImpl implements SpacesDirector
 						"Duplicate entry in input and output spaces sets. Rolling back.");
 		}
 	}
-
 }
