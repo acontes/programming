@@ -23,7 +23,7 @@ public class NodeScratchSpace {
 
 		}
 
-		public SpaceURI getScratchForAO(String aoid) {
+		public DataSpacesURI getScratchForAO(String aoid) {
 			// TODO Auto-generated method stub
 			return null;
 		}

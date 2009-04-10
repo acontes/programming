@@ -13,11 +13,11 @@ import java.util.Set;
  */
 public class SpacesMountManager {
 
-	public Object resolveFile(SpaceURI spaceURI) {
+	public Object resolveFile(DataSpacesURI uri) {
 		return null;
 	}
 
-	public Set<Object> resolveSpaces(SpaceURI spaceURI) {
+	public Set<Object> resolveSpaces(DataSpacesURI uri) {
 		return null;
 	}
 

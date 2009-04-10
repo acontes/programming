@@ -17,9 +17,9 @@ public class SpaceInstanceInfo {
 
 	protected final String hostname;
 
-	protected final SpaceURI mountingPoint;
+	protected final DataSpacesURI mountingPoint;
 
-	public SpaceInstanceInfo(SpaceURI mountingPoint, SpaceConfiguration config) {
+	public SpaceInstanceInfo(DataSpacesURI mountingPoint, SpaceConfiguration config) {
 
 		if (mountingPoint == null)
 			throw new IllegalArgumentException("Mounting point uri is null");
@@ -45,7 +45,7 @@ public class SpaceInstanceInfo {
 		return hostname;
 	}
 
-	public SpaceURI getMountingPoint() {
+	public DataSpacesURI getMountingPoint() {
 		return mountingPoint;
 	}
 

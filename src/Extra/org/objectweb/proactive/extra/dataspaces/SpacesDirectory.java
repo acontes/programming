@@ -6,10 +6,10 @@ package org.objectweb.proactive.extra.dataspaces;
 import java.util.Set;
 
 /**
- * Stores mappings to SpaceInstanceInfos from SpaceURI and provides methods for
+ * Stores mappings to SpaceInstanceInfos from DataSpacesURI and provides methods for
  * registering and lookup. The most common lookups are:
  * <ul>
- * <li>lookup SpaceInstanceInfo for SpaceURI</li>
+ * <li>lookup SpaceInstanceInfo for DataSpacesURI</li>
  * <li>lookup SpaceInstanceInfo for input/output name</li>
  * <li>lookup SpaceInstanceInfos for type</li>
  * </ul>
@@ -23,9 +23,9 @@ public interface SpacesDirectory {
 	 *            mounting point uri of data space to look up
 	 * @return SpaceInstanceInfo mapping or null if not available
 	 * @throws IllegalArgumentException
-	 *             when specified SpaceURI is not complete or contains path
+	 *             when specified DataSpacesURI is not complete or contains path
 	 */
-	public SpaceInstanceInfo lookupFirst(SpaceURI uri) throws IllegalArgumentException;
+	public SpaceInstanceInfo lookupFirst(DataSpacesURI uri) throws IllegalArgumentException;
 
 	/**
 	 * Lookup for all space instance info that have specified uri as a root of
@@ -38,7 +38,7 @@ public interface SpacesDirectory {
 	 * @throws IllegalArgumentException
 	 *             when specified uri is complete
 	 */
-	public Set<SpaceInstanceInfo> lookupAll(SpaceURI uri) throws IllegalArgumentException;
+	public Set<SpaceInstanceInfo> lookupAll(DataSpacesURI uri) throws IllegalArgumentException;
 
 	/**
 	 * Registers new space instance info. If mounting point of that space
@@ -55,12 +55,12 @@ public interface SpacesDirectory {
 	public void register(SpaceInstanceInfo spaceInstanceInfo) throws IllegalStateException;
 
 	/**
-	 * Unregisters space instance info specified by SpaceURI.
+	 * Unregisters space instance info specified by DataSpacesURI.
 	 * 
 	 * @param uri
 	 *            - mounting point uri that is to be unregistered
-	 * @return <code>true</code> if space instance with given SpaceURI has been
+	 * @return <code>true</code> if space instance with given DataSpacesURI has been
 	 *         found; <code>false</code> otherwise
 	 */
-	public boolean unregister(SpaceURI uri);
+	public boolean unregister(DataSpacesURI uri);
 }

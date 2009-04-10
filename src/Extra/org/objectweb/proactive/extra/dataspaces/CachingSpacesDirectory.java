@@ -24,9 +24,9 @@ public class CachingSpacesDirectory implements SpacesDirectory {
 	 * This method call is always delegated remotely.
 	 * 
 	 * @see org.objectweb.proactive.extensions.dataspaces.SpacesDirectory#lookupAll
-	 *      (org.objectweb.proactive.extensions.dataspaces.SpaceURI)
+	 *      (org.objectweb.proactive.extensions.dataspaces.DataSpacesURI)
 	 */
-	public Set<SpaceInstanceInfo> lookupAll(SpaceURI uri) {
+	public Set<SpaceInstanceInfo> lookupAll(DataSpacesURI uri) {
 
 		if (uri.isComplete())
 			throw new IllegalArgumentException("Space URI must not be complete for this method call");
@@ -38,9 +38,9 @@ public class CachingSpacesDirectory implements SpacesDirectory {
 	 * Try in cache, if not found try remotely.
 	 * 
 	 * @see org.objectweb.proactive.extensions.dataspaces.SpacesDirectory#lookupFirst
-	 *      (org.objectweb.proactive.extensions.dataspaces.SpaceURI)
+	 *      (org.objectweb.proactive.extensions.DataSpacesURI.DataSpacesURI)
 	 */
-	public SpaceInstanceInfo lookupFirst(SpaceURI uri) {
+	public SpaceInstanceInfo lookupFirst(DataSpacesURI uri) {
 
 		if (!uri.isComplete())
 			throw new IllegalArgumentException("Space URI must be complete for this method call");
@@ -65,7 +65,7 @@ public class CachingSpacesDirectory implements SpacesDirectory {
 	 * 
 	 * @see
 	 * org.objectweb.proactive.extensions.dataspaces.SpacesDirectory#register
-	 * (org.objectweb.proactive.extensions.dataspaces.SpaceURI,
+	 * (org.objectweb.proactive.extensions.dataspaces.DataSpacesURI,
 	 * org.objectweb.proactive.extensions.dataspaces.SpaceInstanceInfo)
 	 */
 	public void register(SpaceInstanceInfo spaceInstanceInfo) {
@@ -78,9 +78,9 @@ public class CachingSpacesDirectory implements SpacesDirectory {
 	 * 
 	 * @see
 	 * org.objectweb.proactive.extensions.dataspaces.SpacesDirectory#unregister
-	 * (org.objectweb.proactive.extensions.dataspaces.SpaceURI)
+	 * (org.objectweb.proactive.extensions.dataspaces.DataSpacesURI)
 	 */
-	public boolean unregister(SpaceURI uri) {
+	public boolean unregister(DataSpacesURI uri) {
 		localDirectory.unregister(uri);
 		return remoteDirectory.unregister(uri);
 	}

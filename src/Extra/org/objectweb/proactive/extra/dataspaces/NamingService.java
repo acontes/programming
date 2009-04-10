@@ -27,7 +27,7 @@ public class NamingService extends SpacesDirectoryImpl implements SpacesDirector
 	 *            bulked outputs definitions
 	 * 
 	 * @throws IllegalArgumentException
-	 *             When given appid doesn't match with one found in SpaceURI or
+	 *             When given appid doesn't match with one found in DataSpacesURI or
 	 *             found the same entry in input and output spaces set. In these
 	 *             cases the register operation is rolled back.
 	 * @throws IllegalStateException
@@ -63,8 +63,8 @@ public class NamingService extends SpacesDirectoryImpl implements SpacesDirector
 		if (!found)
 			throw new IllegalStateException("Application with specified appid is not registered.");
 
-		final Set<SpaceInstanceInfo> spaces = lookupAll(SpaceURI.createApplicationSpacesURI(appid));
-		final Set<SpaceURI> uris = new HashSet<SpaceURI>(spaces.size());
+		final Set<SpaceInstanceInfo> spaces = lookupAll(DataSpacesURI.createURI(appid));
+		final Set<DataSpacesURI> uris = new HashSet<DataSpacesURI>(spaces.size());
 
 		for (SpaceInstanceInfo sii : spaces)
 			uris.add(sii.getMountingPoint());
@@ -103,7 +103,7 @@ public class NamingService extends SpacesDirectoryImpl implements SpacesDirector
 
 			if (sii.getAppId() != appid)
 				throw new IllegalArgumentException(
-						"Specified application id doesn't match with one found in SpaceURI. Rolling back.");
+						"Specified application id doesn't match with one found in DataSpacesURI. Rolling back.");
 
 			if (!outSet.add(sii))
 				throw new IllegalArgumentException(

@@ -15,24 +15,24 @@ import java.util.TreeMap;
  */
 public class SpacesDirectoryImpl implements SpacesDirectory {
 
-	final private SortedMap<SpaceURI, SpaceInstanceInfo> data = new TreeMap<SpaceURI, SpaceInstanceInfo>();
+	final private SortedMap<DataSpacesURI, SpaceInstanceInfo> data = new TreeMap<DataSpacesURI, SpaceInstanceInfo>();
 
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
 	 * org.objectweb.proactive.extra.dataspaces.SpacesDirectory#lookupAll(org
-	 * .objectweb.proactive.extra.dataspaces.SpaceURI)
+	 * .objectweb.proactive.extra.dataspaces.DataSpacesURI)
 	 */
-	public Set<SpaceInstanceInfo> lookupAll(SpaceURI uri) {
+	public Set<SpaceInstanceInfo> lookupAll(DataSpacesURI uri) {
 		if (uri.isComplete())
 			throw new IllegalArgumentException("Space URI must not be complete for this method call");
 
-		final SpaceURI nextKey = SpaceURI.nextSpaceURI(uri);
+		final DataSpacesURI nextKey = uri.nextURI();
 		final Set<SpaceInstanceInfo> ret = new HashSet<SpaceInstanceInfo>();
 
 		synchronized (data) {
-			final SortedMap<SpaceURI, SpaceInstanceInfo> sub = data.subMap(uri, nextKey);
+			final SortedMap<DataSpacesURI, SpaceInstanceInfo> sub = data.subMap(uri, nextKey);
 
 			if (sub.size() == 0)
 				return null;
@@ -46,9 +46,9 @@ public class SpacesDirectoryImpl implements SpacesDirectory {
 	 * 
 	 * @see
 	 * org.objectweb.proactive.extra.dataspaces.SpacesDirectory#lookupFirst(
-	 * org.objectweb.proactive.extra.dataspaces.SpaceURI)
+	 * org.objectweb.proactive.extra.dataspaces.DataSpacesURI)
 	 */
-	public SpaceInstanceInfo lookupFirst(SpaceURI uri) {
+	public SpaceInstanceInfo lookupFirst(DataSpacesURI uri) {
 		if (!uri.isComplete())
 			throw new IllegalArgumentException("Space URI must be complete for this method call");
 
@@ -68,7 +68,7 @@ public class SpacesDirectoryImpl implements SpacesDirectory {
 	 * .objectweb.proactive.extra.dataspaces.SpaceInstanceInfo)
 	 */
 	public void register(SpaceInstanceInfo spaceInstanceInfo) {
-		final SpaceURI mpoint;
+		final DataSpacesURI mpoint;
 
 		// get mounting point URI that cannot be null
 		synchronized (data) {
@@ -97,9 +97,9 @@ public class SpacesDirectoryImpl implements SpacesDirectory {
 	 * 
 	 * @param uris
 	 */
-	protected void unregister(Set<SpaceURI> uris) {
+	protected void unregister(Set<DataSpacesURI> uris) {
 		synchronized (data) {
-			for (SpaceURI key : uris)
+			for (DataSpacesURI key : uris)
 				data.remove(key);
 		}
 	}
@@ -109,9 +109,9 @@ public class SpacesDirectoryImpl implements SpacesDirectory {
 	 * 
 	 * @see
 	 * org.objectweb.proactive.extra.dataspaces.SpacesDirectory#unregister(org
-	 * .objectweb.proactive.extra.dataspaces.SpaceURI)
+	 * .objectweb.proactive.extra.dataspaces.DataSpacesURI)
 	 */
-	public boolean unregister(SpaceURI uri) {
+	public boolean unregister(DataSpacesURI uri) {
 
 		synchronized (data) {
 			if (!data.containsKey(uri))
