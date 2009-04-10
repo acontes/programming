@@ -1,5 +1,7 @@
 package org.objectweb.proactive.ic2d.componentmonitoring.view;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.eclipse.gef.EditDomain;
 import org.eclipse.gef.editparts.RootTreeEditPart;
 import org.eclipse.gef.ui.parts.TreeViewer;
@@ -23,6 +25,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
  */
 public class ComponentTreeView extends ViewPart {
 
+	public Logger logger = Logger.getLogger("ComponentTreeView");
 	/**
 	 * View ID
 	 */
@@ -79,10 +82,13 @@ public class ComponentTreeView extends ViewPart {
      */
     //protected ComponentModelHolder cmh;
     
-    // There's another version of this constructor, that receives worldObject to observe
+    // There's another version of this constructor, that receives the worldObject to observe
     public ComponentTreeView() {
         super();
-        // this should be released
+        logger.setLevel(Level.DEBUG);
+        logger.debug("constructor");
+        
+        // this view has the ComponentModelHolder, which contains the list of all monitored components
         /* 
         try {
             this.CHolder = new ComponentHolderModel();
@@ -90,7 +96,8 @@ public class ComponentTreeView extends ViewPart {
             e.printStackTrace();
         }*/
 
-        this.worldObject = new WorldObject();
+        // doesn't need to create a new WorldObject. Instead, it receives one from the AO Monitoring View
+        //this.worldObject = new WorldObject();
 
         // the secondline should be released ... the first, don't know
         /*
@@ -100,7 +107,10 @@ public class ComponentTreeView extends ViewPart {
     }
     
     public void setWorldObject(WorldObject world) {
+    	logger.debug("setWorldObject: " + world.getName());
         this.worldObject = world;
+        this.setPartName("Components: "+ world.getName());
+
         /*
         this.worldObject.addHolder(this.CHolder);
         //		gcontroller = new WorldController(this.world,  null);
@@ -111,6 +121,7 @@ public class ComponentTreeView extends ViewPart {
     
 	@Override
 	public void createPartControl(Composite parent) {
+		logger.debug("createPartControl");
         this.treeViewer = new TreeViewer();
         this.treeViewer.createControl(parent);
         this.editDomain = new EditDomain();
@@ -123,15 +134,16 @@ public class ComponentTreeView extends ViewPart {
         addTreeColumn(tree, "Name", 200);
         addTreeColumn(tree, "Hierarchical", 100);
         addTreeColumn(tree, "Status", 100);
-        addTreeColumn(tree, "Mean Arrival Rate (/s)", 100);
-        addTreeColumn(tree, "Mean Departure rate (/s)", 100);
-        addTreeColumn(tree, "Mean Service rate (/s)", 100);
-        addTreeColumn(tree, "Sample Arrival Rate (/s)", 100);
-        addTreeColumn(tree, "Sample Departure Rate (/s)", 100);
-        addTreeColumn(tree, "Sample Service Rate (/s)", 100);
-        addTreeColumn(tree, "Time Arrival Rate (/s)", 100);
-        addTreeColumn(tree, "Time Departure Rate (/s)", 100);
-        addTreeColumn(tree, "Time Service Rate (/s)", 100);
+        // TODO: which of these we really want/need
+//        addTreeColumn(tree, "Mean Arrival Rate (/s)", 100);
+//        addTreeColumn(tree, "Mean Departure rate (/s)", 100);
+//        addTreeColumn(tree, "Mean Service rate (/s)", 100);
+//        addTreeColumn(tree, "Sample Arrival Rate (/s)", 100);
+//        addTreeColumn(tree, "Sample Departure Rate (/s)", 100);
+//        addTreeColumn(tree, "Sample Service Rate (/s)", 100);
+//        addTreeColumn(tree, "Time Arrival Rate (/s)", 100);
+//        addTreeColumn(tree, "Time Departure Rate (/s)", 100);
+//        addTreeColumn(tree, "Time Service Rate (/s)", 100);
 
         IToolBarManager toolBarManager = getViewSite().getActionBars().getToolBarManager();
 
