@@ -27,6 +27,7 @@ public class CachingSpacesDirectory implements SpacesDirectory {
 	 *      (org.objectweb.proactive.extensions.dataspaces.SpaceURI)
 	 */
 	public Set<SpaceInstanceInfo> lookupAll(SpaceURI uri) {
+
 		if (uri.isComplete())
 			throw new IllegalArgumentException("Space URI must not be complete for this method call");
 
@@ -40,6 +41,7 @@ public class CachingSpacesDirectory implements SpacesDirectory {
 	 *      (org.objectweb.proactive.extensions.dataspaces.SpaceURI)
 	 */
 	public SpaceInstanceInfo lookupFirst(SpaceURI uri) {
+
 		if (!uri.isComplete())
 			throw new IllegalArgumentException("Space URI must be complete for this method call");
 
@@ -78,10 +80,8 @@ public class CachingSpacesDirectory implements SpacesDirectory {
 	 * org.objectweb.proactive.extensions.dataspaces.SpacesDirectory#unregister
 	 * (org.objectweb.proactive.extensions.dataspaces.SpaceURI)
 	 */
-	public void unregister(SpaceURI uri) {
-		// TODO if unregisters can fail, check the proper order or catch
-		// exceptions or sth.
+	public boolean unregister(SpaceURI uri) {
 		localDirectory.unregister(uri);
-		remoteDirectory.unregister(uri);
+		return remoteDirectory.unregister(uri);
 	}
 }

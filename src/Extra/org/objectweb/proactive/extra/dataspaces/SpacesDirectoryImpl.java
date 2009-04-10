@@ -77,6 +77,33 @@ public class SpacesDirectoryImpl implements SpacesDirectory {
 		}
 	}
 
+	/**
+	 * Helper method for bulked registration as obtaining lock is done only
+	 * once.
+	 * 
+	 * @param ssis
+	 */
+	protected void register(Set<SpaceInstanceInfo> ssis) {
+
+		synchronized (data) {
+			for (SpaceInstanceInfo ssi : ssis)
+				data.put(ssi.getMountingPoint(), ssi);
+		}
+	}
+
+	/**
+	 * Helper method for bulked unregistration as obtaining lock is done only
+	 * once.
+	 * 
+	 * @param uris
+	 */
+	protected void unregister(Set<SpaceURI> uris) {
+		synchronized (data) {
+			for (SpaceURI key : uris)
+				data.remove(key);
+		}
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -84,9 +111,14 @@ public class SpacesDirectoryImpl implements SpacesDirectory {
 	 * org.objectweb.proactive.extra.dataspaces.SpacesDirectory#unregister(org
 	 * .objectweb.proactive.extra.dataspaces.SpaceURI)
 	 */
-	public void unregister(SpaceURI uri) {
+	public boolean unregister(SpaceURI uri) {
+
 		synchronized (data) {
+			if (!data.containsKey(uri))
+				return false;
+
 			data.remove(uri);
 		}
+		return true;
 	}
 }

@@ -6,12 +6,13 @@ package org.objectweb.proactive.extra.dataspaces;
 import java.util.Set;
 
 /**
- * resp: - stores mappings to SpaceInstanceInfos from SpaceURI - two public
- * lookup methods - lookup for one / lookup for many main use cases: - lookup
- * SpaceInstanceInfo for SpaceURI - lookup SpaceInstanceInfo for input/output
- * name - lookup SpaceInstanceInfos for type - register/unregister col: - Naming
- * Service - (local) - SpaceURI - SpaceInstanceInfo
- * 
+ * Stores mappings to SpaceInstanceInfos from SpaceURI and provides methods for
+ * registering and lookup. The most common lookups are:
+ * <ul>
+ * <li>lookup SpaceInstanceInfo for SpaceURI</li>
+ * <li>lookup SpaceInstanceInfo for input/output name</li>
+ * <li>lookup SpaceInstanceInfos for type</li>
+ * </ul>
  */
 public interface SpacesDirectory {
 
@@ -46,14 +47,20 @@ public interface SpacesDirectory {
 	 * 
 	 * @param spaceInstanceInfo
 	 *            - space instance info to register
+	 * @throws IllegalStateException
+	 *             when directory is aware of all registered applications and
+	 *             there is no such application for SpaceInstanceInfo being
+	 *             registered
 	 */
-	public void register(SpaceInstanceInfo spaceInstanceInfo);
+	public void register(SpaceInstanceInfo spaceInstanceInfo) throws IllegalStateException;
 
 	/**
-	 * Unregisters TODO: what about returning? exceptions?
+	 * Unregisters space instance info specified by SpaceURI.
 	 * 
 	 * @param uri
 	 *            - mounting point uri that is to be unregistered
+	 * @return <code>true</code> if space instance with given SpaceURI has been
+	 *         found; <code>false</code> otherwise
 	 */
-	public void unregister(SpaceURI uri);
+	public boolean unregister(SpaceURI uri);
 }

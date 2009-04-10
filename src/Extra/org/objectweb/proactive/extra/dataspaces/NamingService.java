@@ -3,13 +3,16 @@
  */
 package org.objectweb.proactive.extra.dataspaces;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Manages application register/unregister process in space directory. TODO:
- * Remote accessible.
+ * Manages application register/unregister process in space directory.
+ * Implements SpacesDirectory. TODO: Remote accessible.
  */
-public class NamingService implements SpacesDirectory {
+public class NamingService extends SpacesDirectoryImpl implements SpacesDirectory {
+
+	private final Set<Long> registeredApplications = new HashSet<Long>();
 
 	/**
 	 * Registers application along with its spaces definition.
@@ -22,9 +25,32 @@ public class NamingService implements SpacesDirectory {
 	 * 
 	 * @param outputSpaces
 	 *            bulked outputs definitions
+	 * 
+	 * @throws IllegalArgumentException
+	 *             When given appid doesn't match with one found in SpaceURI or
+	 *             found the same entry in input and output spaces set. In these
+	 *             cases the register operation is rolled back.
+	 * @throws IllegalStateException
+	 *             When specified application id is already registered.
+	 * 
 	 */
 	public void registerApplication(long appid, Set<SpaceInstanceInfo> inputSpaces,
-			Set<SpaceInstanceInfo> outputSpaces) {
+			Set<SpaceInstanceInfo> outputSpaces) throws IllegalArgumentException {
+
+		synchronized (registeredApplications) {
+			if (isApplicationIdRegistered(appid)) {
+				throw new IllegalStateException(
+						"Application with the same application id is already registered.");
+			}
+			registeredApplications.add(appid);
+		}
+
+		final Set<SpaceInstanceInfo> spaces = new HashSet<SpaceInstanceInfo>();
+
+		processSpacesSet(appid, inputSpaces, spaces);
+		processSpacesSet(appid, outputSpaces, spaces);
+
+		register(spaces);
 	}
 
 	/**
@@ -34,26 +60,64 @@ public class NamingService implements SpacesDirectory {
 	 *            application identifier
 	 */
 	public void unregisterApplication(long appid) {
+		final boolean found;
 
+		synchronized (registeredApplications) {
+			found = registeredApplications.remove(appid);
+		}
+
+		if (!found)
+			throw new IllegalStateException("Application with specified appid is not registered.");
+
+		final Set<SpaceInstanceInfo> spaces = lookupAll(SpaceURI.createApplicationSpacesURI(appid));
+		final Set<SpaceURI> uris = new HashSet<SpaceURI>(spaces.size());
+
+		for (SpaceInstanceInfo sii : spaces)
+			uris.add(sii.getMountingPoint());
+
+		unregister(uris);
 	}
 
-	public Set<SpaceInstanceInfo> lookupAll(SpaceURI uri) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public SpaceInstanceInfo lookupFirst(SpaceURI uri) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.objectweb.proactive.extra.dataspaces.SpacesDirectoryImpl#register
+	 * (org.objectweb.proactive.extra.dataspaces.SpaceInstanceInfo)
+	 */
+	@Override
 	public void register(SpaceInstanceInfo spaceInstanceInfo) {
-		// TODO Auto-generated method stub
+		final long appid = spaceInstanceInfo.getAppId();
 
+		if (!isApplicationIdRegistered(appid))
+			throw new IllegalStateException("The is no application registered with specified application id.");
+
+		super.register(spaceInstanceInfo);
 	}
 
-	public void unregister(SpaceURI uri) {
-		// TODO Auto-generated method stub
+	private boolean isApplicationIdRegistered(long appid) {
 
+		synchronized (registeredApplications) {
+			return registeredApplications.contains(appid);
+		}
 	}
+
+	private void processSpacesSet(long appid, Set<SpaceInstanceInfo> inSet,
+			final Set<SpaceInstanceInfo> outSet) {
+
+		if (inSet == null || outSet == null)
+			return;
+
+		for (SpaceInstanceInfo sii : inSet) {
+
+			if (sii.getAppId() != appid)
+				throw new IllegalArgumentException(
+						"Specified application id doesn't match with one found in SpaceURI. Rolling back.");
+
+			if (!outSet.add(sii))
+				throw new IllegalArgumentException(
+						"Duplicate entry in input and output spaces sets. Rolling back.");
+		}
+	}
+
 }
