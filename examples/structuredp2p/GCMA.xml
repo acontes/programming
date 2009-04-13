@@ -34,7 +34,7 @@
 
 	<resources>
 		<nodeProvider id="Grid2D">
-			<file path="GCMD.xml" />
+			<file path="GCMD_Local.xml" />
 		</nodeProvider>
 	</resources>
 

@@ -2,6 +2,8 @@ package org.objectweb.proactive.extensions.structuredp2p.grid2D;
 
 import java.io.Serializable;
 
+import org.objectweb.proactive.api.PAActiveObject;
+
 /**
  * An aware object is an object which is aware of his neighbors.
  * 
@@ -15,14 +17,12 @@ import java.io.Serializable;
 public class AwareObject implements Serializable {
 	private int x;
 	private int y;
+	private AwareObject stub;
 
-	/**
-	 * Neighbors of the current AwareObject. This object can have to the maximum
-	 * 4 neighbors. Where North <=> neighbors[0], East <=> neighbors[1], Sud <=>
-	 * neighbors[2], Weast <=> neighbors[3].
-	 */
-	private Object[] neighbors = new Object[4];
-	private int index = 0;
+	private AwareObject northNeighbor = null;
+	private AwareObject eastNeighbor = null;
+	private AwareObject southNeighbor = null;
+	private AwareObject westNeighbor = null;
 
 	/**
 	 * The no-argument constructor as commanded by ProActive.
@@ -42,22 +42,7 @@ public class AwareObject implements Serializable {
 	public AwareObject(int x, int y) {
 		this.x = x;
 		this.y = y;
-	}
-
-	/**
-	 * Add a new neighbor for the current object.
-	 * 
-	 * @param ao
-	 *            the neighbor to add.
-	 */
-	public void add(AwareObject ao) {
-		if (this.index == 3) {
-			throw new IllegalArgumentException(
-					"An AwareObject can't have more than 4 neighbors.");
-		}
-
-		this.neighbors[this.index] = ao;
-		this.index++;
+		this.stub = (AwareObject) PAActiveObject.getStubOnThis();
 	}
 
 	/**
@@ -83,12 +68,72 @@ public class AwareObject implements Serializable {
 	}
 
 	/**
-	 * Returns the neighbors of the current object.
+	 * Returns the stub associated to the current object.
 	 * 
-	 * @return the neighbors of the current object.
+	 * @return the stub associated to the current object.
 	 */
-	public Object[] getNeighbors() {
-		return neighbors;
+	public AwareObject getStub() {
+		return this.stub;
+	}
+
+	/**
+	 * @return the northNeighbor
+	 */
+	public AwareObject getNorthNeighbor() {
+		return northNeighbor;
+	}
+
+	/**
+	 * @return the eastNeighbor
+	 */
+	public AwareObject getEastNeighbor() {
+		return eastNeighbor;
+	}
+
+	/**
+	 * @return the southNeighbor
+	 */
+	public AwareObject getSouthNeighbor() {
+		return southNeighbor;
+	}
+
+	/**
+	 * @return the westNeighbor
+	 */
+	public AwareObject getWestNeighbor() {
+		return westNeighbor;
+	}
+
+	/**
+	 * @param northNeighbor
+	 *            the northNeighbor to set
+	 */
+	public void setNorthNeighbor(AwareObject northNeighbor) {
+		this.northNeighbor = northNeighbor;
+	}
+
+	/**
+	 * @param eastNeighbor
+	 *            the eastNeighbor to set
+	 */
+	public void setEastNeighbor(AwareObject eastNeighbor) {
+		this.eastNeighbor = eastNeighbor;
+	}
+
+	/**
+	 * @param southNeighbor
+	 *            the southNeighbor to set
+	 */
+	public void setSouthNeighbor(AwareObject southNeighbor) {
+		this.southNeighbor = southNeighbor;
+	}
+
+	/**
+	 * @param westNeighbor
+	 *            the westNeighbor to set
+	 */
+	public void setWestNeighbor(AwareObject westNeighbor) {
+		this.westNeighbor = westNeighbor;
 	}
 
 	/**
@@ -111,13 +156,14 @@ public class AwareObject implements Serializable {
 		this.y = y;
 	}
 
-	/**
-	 * Sets the neighbors of the current object.
-	 * 
-	 * @param neighbors
-	 *            the new neighbors to set.
-	 */
-	public void setNeighbors(AwareObject[] neighbors) {
-		this.neighbors = neighbors;
+	public String toString() {
+		StringBuffer buf = new StringBuffer("AwareObject x=" + this.x + ", y="
+				+ this.y + "\n");
+		buf.append("  north = " + this.northNeighbor + "\n");
+		buf.append("  east = " + this.eastNeighbor + "\n");
+		buf.append("  south = " + this.southNeighbor + "\n");
+		buf.append("  west = " + this.westNeighbor + "\n");
+
+		return buf.toString();
 	}
 }
