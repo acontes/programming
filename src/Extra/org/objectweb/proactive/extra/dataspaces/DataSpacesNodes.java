@@ -22,7 +22,7 @@ public class DataSpacesNodes {
 	/**
 	 * Returns NodeConfigurator for a specified node or creates a new one if not
 	 * already created.
-	 *
+	 * 
 	 * @param node
 	 * @return {@link NodeConfigurator}
 	 */
@@ -42,7 +42,7 @@ public class DataSpacesNodes {
 	 * This should be called after obtaining NodeConfigurator for a node with
 	 * <code>getNodeConfigurator</code>, configuring it and applying settings
 	 * for application on that node.
-	 *
+	 * 
 	 * @param node
 	 *            specified node
 	 * @return {@link DataSpacesImpl}
@@ -73,16 +73,16 @@ public class DataSpacesNodes {
 
 	/**
 	 * Helper method that configures a node. @see {@link NodeConfigurator}
-	 *
+	 * 
 	 * @param node
 	 *            Node instance to configure
 	 * @param spaceConfiguration
 	 *            Configuration of scratch data space for a specified node
-	 *
+	 * 
 	 */
 	public static void doConfigureNode(Node node, SpaceConfiguration spaceConfiguration) {
 		final NodeConfigurator nconfig = getNodeConfigurator(node);
-		nconfig.configureNode(spaceConfiguration);
+		nconfig.configureNode(spaceConfiguration, node);
 	}
 
 	/**
@@ -90,7 +90,7 @@ public class DataSpacesNodes {
 	 * node (@see {@link #doConfigureNode(Node, SpaceConfiguration)}). Created
 	 * {@link DataSpaces} can be obtained by calling
 	 * {@link #getDataSpacesImpl(Node)}.
-	 *
+	 * 
 	 * @param node
 	 *            Node instance to configure application on
 	 * @param appid
@@ -108,7 +108,7 @@ public class DataSpacesNodes {
 
 	/**
 	 * Synchronized <code>map.put</code> wrapper.
-	 *
+	 * 
 	 * @param nname
 	 * @param impl
 	 */

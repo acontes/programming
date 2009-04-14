@@ -5,6 +5,7 @@ package org.objectweb.proactive.extra.dataspaces;
 
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.impl.DefaultFileSystemManager;
+import org.objectweb.proactive.core.node.Node;
 
 /**
  * Represents immutable configuration for a node. Produces configuration for
@@ -40,10 +41,12 @@ public class NodeConfigurator {
 	 * 
 	 * @param config
 	 *            scratch data space configuration
+	 * @param node
+	 *            node instance containing node information
 	 * @throws IllegalStateException
 	 *             when trying to reconfigure the instance
 	 */
-	synchronized public void configureNode(SpaceConfiguration config) throws IllegalStateException {
+	synchronized public void configureNode(SpaceConfiguration config, Node node) throws IllegalStateException {
 		if (configured)
 			throw new IllegalStateException("This instance has been already configured");
 
@@ -55,7 +58,7 @@ public class NodeConfigurator {
 		}
 
 		scratchConfiguration = config;
-		nodeScratchSpace = new NodeScratchSpace(config, manager);
+		nodeScratchSpace = new NodeScratchSpace(config, manager, node);
 		nodeScratchSpace.init();
 
 		configured = true;
