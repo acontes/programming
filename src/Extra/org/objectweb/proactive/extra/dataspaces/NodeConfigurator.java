@@ -73,6 +73,10 @@ public class NodeConfigurator {
 		return appConfigurator.configureApplication(appid, namingServiceURL, manager, nodeScratchSpace);
 	}
 
+	/**
+	 * @return ApplicationNonfigurator or <code>null</code> if no application
+	 *         configured.
+	 */
 	public NodeApplicationConfigurator getNodeApplicationConfigurator() {
 		return appConfigurator;
 	}
