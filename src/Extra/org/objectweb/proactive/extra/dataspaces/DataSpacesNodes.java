@@ -107,6 +107,39 @@ public class DataSpacesNodes {
 	}
 
 	/**
+	 * Closes all node related configuration instances. Any subsequent call
+	 * result to node related instances may be undefined.
+	 * 
+	 * @param node
+	 */
+	public static synchronized void closeNode(Node node) {
+		final String nname = extractNodeId(node);
+
+		if (!nodeConfigurators.containsKey(nname))
+			throw new IllegalArgumentException("NodeConfigurator for given node not found.");
+
+		final NodeConfigurator nconfig = nodeConfigurators.get(nname);
+		nconfig.close();
+	}
+
+	/**
+	 * Closes all application related configuration instances. Any subsequent
+	 * call result to application related instances may be undefined.
+	 * 
+	 * @param node
+	 */
+	public static synchronized void closeNodesApplication(Node node) {
+		final String nname = extractNodeId(node);
+
+		if (!nodeConfigurators.containsKey(nname))
+			throw new IllegalArgumentException("NodeConfigurator for given node not found.");
+
+		final NodeConfigurator nconfig = nodeConfigurators.get(nname);
+		nconfig.tryCloseAppConfigurator();
+		dataSpacesImpls.remove(nname);
+	}
+
+	/**
 	 * Synchronized <code>map.put</code> wrapper.
 	 * 
 	 * @param nname
