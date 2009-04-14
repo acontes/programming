@@ -17,13 +17,10 @@
 				<java base="root" relpath="${java.home}/bin/java" />
 
 				<applicationClasspath>
-					<pathElement base="proactive" relpath="classes/Benchmarks" />
-					<pathElement base="proactive" relpath="classes/Core" />
-					<pathElement base="proactive" relpath="classes/Extensions" />
-					<pathElement base="proactive" relpath="classes/Extra" />
-					<pathElement base="proactive" relpath="classes/Examples" />
-					<pathElement base="proactive" relpath="classes/Tests" />
-					<pathElement base="proactive" relpath="classes/Utils" />
+					<pathElement base="proactive" relpath="dist/lib/ProActive_examples.jar"/>
+					<pathElement base="proactive" relpath="dist/lib/ibis-1.4.jar"/>
+					<pathElement base="proactive" relpath="dist/lib/ibis-connect-1.0.jar"/>
+					<pathElement base="proactive" relpath="dist/lib/ibis-util-1.0.jar"/>
 				</applicationClasspath>
 
 			</configuration>
