@@ -7,7 +7,14 @@ import org.apache.commons.vfs.impl.DefaultFileSystemManager;
 
 /**
  * Maintains configuration for application and its life cycle. Each instance can
- * be configured only once.
+ * be configured only once. Objects life cycle:
+ * <ol>
+ * <li>Instance initialization by default constructor.</li>
+ * <li><code>configureApplication</code> method call for passing application
+ * specific settings. This can be called only once.</li>
+ * <li>Obtaining {@link DataSpacesImpl} if needed.</li>
+ * <li>Closing all component objects by calling <code>close</code> method.</li>
+ * </ol>
  */
 public class NodeApplicationConfigurator {
 
@@ -38,25 +45,22 @@ public class NodeApplicationConfigurator {
 	 * Builds application-related objects. Can be called only once per instance.
 	 * Scenario:
 	 * <ol>
-	 * <li>Obtains NamingService stub and creates CachingSpacesDirectory for it</li>
+	 * <li>Obtains NamingService stub and creates CachingSpacesDirectory for it.
+	 * </li>
 	 * <li>Obtains ApplicationScratchSpace for a given <code>appid</code> from
 	 * existing NodeScratchSpace.</li>
 	 * <li>Obtains scratch SpaceInstanceInfo from ApplicationScratchSpace and
-	 * registers it through CachingSpacesDirectory</li>
+	 * registers it through CachingSpacesDirectory.</li>
 	 * <li>Creates SpacesMountManager with CachingSpacesDirectory and VFS
-	 * manager</li>
+	 * manager.</li>
 	 * <li>Creates DataSpacesImpl for built configuration objects.</li>
 	 * </ol>
 	 * 
-	 * @param appid
-	 * @param namingServiceURL
-	 * @param manager
-	 * @param nodeScratchSpace
-	 * @return
+	 * @return DataSpacesImpl with configuration set up for the application
 	 * @throws IllegalStateException
 	 *             when trying to reconfigure the instance.
 	 */
-	public DataSpacesImpl configureApplication(long appid, String namingServiceURL,
+	synchronized public DataSpacesImpl configureApplication(long appid, String namingServiceURL,
 			DefaultFileSystemManager manager, NodeScratchSpace nodeScratchSpace) throws IllegalStateException {
 
 		if (configured)
@@ -96,7 +100,7 @@ public class NodeApplicationConfigurator {
 	 * @throws IllegalStateException
 	 *             when instance has not been configured.
 	 */
-	public void close() throws IllegalStateException {
+	synchronized public void close() throws IllegalStateException {
 		if (!configured)
 			throw new IllegalStateException("This instance has not been configured");
 
@@ -106,7 +110,10 @@ public class NodeApplicationConfigurator {
 		applicationScratchSpace.close();
 	}
 
-	public DataSpacesImpl getDataSpaceImpl() {
+	synchronized public DataSpacesImpl getDataSpaceImpl() {
+		if (!configured)
+			throw new IllegalStateException("This instance has not been configured");
+
 		return impl;
 	}
 }
