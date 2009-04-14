@@ -81,8 +81,7 @@ public class NodeApplicationConfigurator {
 
 		// create implementation object connected to the application's
 		// configuration
-		// TODO
-		impl = new DataSpacesImpl();
+		impl = new DataSpacesImpl(spacesMountManager, cachingDirectory, applicationScratchSpace, appid);
 
 		configured = true;
 		return impl;

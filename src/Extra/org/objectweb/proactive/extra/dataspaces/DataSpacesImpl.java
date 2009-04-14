@@ -16,6 +16,21 @@ import javax.tools.FileObject;
  */
 public class DataSpacesImpl {
 
+	private final SpacesMountManager spacesMountManager;
+
+	private final SpacesDirectory spacesDirectory;
+
+	private final ApplicationScratchSpace appScratchSpace;
+
+	private final long appId;
+
+	public DataSpacesImpl(SpacesMountManager smm, SpacesDirectory sd, ApplicationScratchSpace ass, long appId) {
+		appScratchSpace = ass;
+		spacesDirectory = sd;
+		spacesMountManager = smm;
+		this.appId = appId;
+	}
+
 	public FileObject resolveDefaultInput() {
 		return null;
 	}
