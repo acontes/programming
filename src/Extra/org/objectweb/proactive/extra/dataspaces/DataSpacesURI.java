@@ -21,7 +21,7 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException
  * </pre>
  * 
  * URI is represented in meaningful way, i.e. its structure has semantic. It may
- * consists of following components forming a hierarchy:
+ * consists of following components forming a hierarchy, separated by slashes:
  * <ol>
  * <li>URI scheme, always present; always vfs:///
  * <li>identifier of application, always present; e.g. 439654</li>
@@ -61,7 +61,7 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
 	private static final long serialVersionUID = 7148704434729348732L;
 
 	private static final Pattern PATTERN = Pattern
-			.compile("^vfs:///(\\d+)/(((input|output)/(([^/])+/(.+)?)?)|scratch/(([^/])+/(([^/])+/(.+)?))?)?$");
+			.compile("^vfs:///(\\d+)(/(((input|output)(/(([^/]+)(/(.+)?)?)?)?)|scratch(/(([^/]+)((/(([^/]+)(/(.+)?)?)?)?)?)?)?)?)?$");
 
 	/**
 	 * Creates URI with only application id being specified.
@@ -88,21 +88,6 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
 	 */
 	public static DataSpacesURI createURI(long appId, SpaceType spaceType) {
 		return new DataSpacesURI(appId, spaceType, null, null, null, null);
-	}
-
-	/**
-	 * Creates URI of scratch type.
-	 * 
-	 * This is only a shortcut for
-	 * {@link #createScratchSpaceURI(long, String, String, String)} with
-	 * <code>null</code> values except appId.
-	 * 
-	 * @param appId
-	 *            application id
-	 * @return URI for that specification
-	 */
-	public static DataSpacesURI createScratchSpaceURI(long appId) {
-		return createScratchSpaceURI(appId, null);
 	}
 
 	/**
@@ -232,6 +217,10 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
 	 * valid URI string is parsable. Scheme and application need to be always
 	 * present in provided string, while other components are optional.
 	 * 
+	 * End slash after last component (except path) is allowed, but not
+	 * required. It is recommended, as it is used in URI canonical form returned
+	 * by {@link #toString()} method.
+	 * 
 	 * @param uri
 	 *            string with URI to parse
 	 * @return parsed URI
@@ -252,30 +241,31 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
 			throw new MalformedURIException("Wrong application id format", x);
 		}
 
-		if (m.group(2) == null) {
+		if (m.group(3) == null) {
 			// just vfs:///123/
 			return new DataSpacesURI(appId, null, null, null, null, null);
 		}
 
-		if (m.group(3) != null) {
+		if (m.group(4) != null) {
 			// vfs:///123/input/ OR vfs:///123/output/
 
-			final String spaceTypeString = m.group(4);
+			final String spaceTypeString = m.group(5).toUpperCase();
+			// regexp patter guarantees correct space type enum name
 			final SpaceType spaceType = SpaceType.valueOf(spaceTypeString);
 
 			// both name and path may be null,
 			// but hierarchy is guaranteed by the expression
-			final String name = m.group(6);
-			final String path = m.group(7);
+			final String name = m.group(8);
+			final String path = m.group(10);
 			return new DataSpacesURI(appId, spaceType, name, null, null, path);
 		} else {
 			// vfs://123/scratch/
 
 			// any of these can be null,
 			// but hierarchy is guaranteed by the expression
-			final String runtimeId = m.group(9);
-			final String nodeId = m.group(11);
-			final String path = m.group(12);
+			final String runtimeId = m.group(13);
+			final String nodeId = m.group(17);
+			final String path = m.group(19);
 			return new DataSpacesURI(appId, SpaceType.SCRATCH, null, runtimeId, nodeId, path);
 		}
 	}
@@ -296,8 +286,7 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
 			String path) {
 
 		if ((spaceType == null && (name != null || runtimeId != null))
-				|| (runtimeId == null && nodeId != null)
-				|| ((nodeId == null || name == null) && path != null)) {
+				|| (runtimeId == null && nodeId != null) || (nodeId == null && name == null && path != null)) {
 			throw new IllegalArgumentException(
 					"Malformed URI. Provided arguments do not meet hierarchy consistency requirement.");
 		}
@@ -387,7 +376,7 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
 	 *            Can be non-null and nonempty String if this URI is completely
 	 *            defined.
 	 * @return copy of this URI with provided path set.
-	 * @throws IllegalArgumentException
+	 * @throws IllegalStateException
 	 *             when nonempty path was requested for incomplete URI
 	 *             definition.
 	 * @see #isComplete()
@@ -407,7 +396,7 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
 	 * @throws IllegalStateException
 	 *             if this URI is complete.
 	 */
-	protected DataSpacesURI nextURI() {
+	public DataSpacesURI nextURI() {
 		long newAppId = this.appId;
 		SpaceType newSpaceType = this.spaceType;
 		String newName = this.name;
@@ -444,6 +433,9 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
 	/**
 	 * Returns string representation of this URI. This string may be directly
 	 * used by user-level code.
+	 * 
+	 * Returned URI has always end slash after last specified component, unless
+	 * last component is a path.
 	 */
 	@Override
 	public String toString() {
@@ -479,9 +471,13 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
 			sb.append(nodeId);
 			break;
 		default:
-			assert false;
+			throw new IllegalStateException("Unexpected space type");
 		}
 		sb.append('/');
+
+		if (path != null) {
+			sb.append(path);
+		}
 
 		return sb.toString();
 	}
@@ -576,7 +572,7 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
 			if (other.path == null) {
 				return 1;
 			}
-			return path.compareTo(path);
+			return path.compareTo(other.path);
 		}
 	}
 
