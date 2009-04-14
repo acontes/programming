@@ -31,7 +31,10 @@ public class CachingSpacesDirectory implements SpacesDirectory {
 		if (uri.isComplete())
 			throw new IllegalArgumentException("Space URI must not be complete for this method call");
 
-		return remoteDirectory.lookupAll(uri);
+		final Set<SpaceInstanceInfo> ret = remoteDirectory.lookupAll(uri);
+		localDirectory.register(ret);
+
+		return ret;
 	}
 
 	/**
