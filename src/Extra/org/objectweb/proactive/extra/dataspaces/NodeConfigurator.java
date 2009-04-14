@@ -89,12 +89,14 @@ public class NodeConfigurator {
 	 */
 	synchronized public void close() {
 		tryCloseAppConfigurator();
+		nodeScratchSpace.close();
+		manager.close();
 	}
 
 	/**
 	 * Helper method for closing when needed.
 	 */
-	private void tryCloseAppConfigurator() {
+	protected void tryCloseAppConfigurator() {
 		if (appConfigurator != null) {
 			appConfigurator.close();
 			appConfigurator = null;
