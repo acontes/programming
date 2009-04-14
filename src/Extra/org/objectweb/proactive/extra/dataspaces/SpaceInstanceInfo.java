@@ -4,7 +4,6 @@
 package org.objectweb.proactive.extra.dataspaces;
 
 import java.io.Serializable;
-import java.net.URL;
 
 /**
  * Stores mapping from mounting point URI to access description (like URL, path
@@ -17,7 +16,7 @@ public class SpaceInstanceInfo implements Serializable {
 	 */
 	private static final long serialVersionUID = -7402632454423044845L;
 
-	protected final URL url;
+	protected final String url;
 
 	protected final String path;
 
@@ -25,21 +24,55 @@ public class SpaceInstanceInfo implements Serializable {
 
 	protected final DataSpacesURI mountingPoint;
 
-	public SpaceInstanceInfo(DataSpacesURI mountingPoint, SpaceConfiguration config) {
-
-		if (mountingPoint == null)
-			throw new IllegalArgumentException("Mounting point uri is null");
+	/**
+	 * Creates SpaceInstanceInfo for scratch data space.
+	 * 
+	 * @param appid
+	 * @param nodeId
+	 * @param runtimeId
+	 * @param config
+	 *            valid scratch data space configuration (@see
+	 *            {@link DataSpacesURI#createScratchSpaceURI(long, String, String)}
+	 *            )
+	 */
+	public SpaceInstanceInfo(long appid, String nodeId, String runtimeId, SpaceConfiguration config) {
 
 		if (config == null)
 			throw new IllegalArgumentException("Space configuration is null");
 
-		this.mountingPoint = mountingPoint;
+		if (config.getDsType() != SpaceType.SCRATCH)
+			throw new IllegalArgumentException("This constructor must be used for scratch data space.");
+
+		this.mountingPoint = DataSpacesURI.createScratchSpaceURI(appid, runtimeId, nodeId);
 		this.url = config.getUrl();
 		this.hostname = config.getHostname();
 		this.path = config.path;
 	}
 
-	public URL getUrl() {
+	/**
+	 * Creates SpaceInstanceInfo for input/output data space.
+	 * 
+	 * @param appid
+	 * @param config
+	 *            valid input/output data space configuration (@see
+	 *            {@link DataSpacesURI#createInOutSpaceURI(long, SpaceType, String)}
+	 *            )
+	 */
+	public SpaceInstanceInfo(long appid, SpaceConfiguration config) {
+
+		if (config == null)
+			throw new IllegalArgumentException("Space configuration is null");
+
+		if (config.getDsType() == SpaceType.SCRATCH)
+			throw new IllegalArgumentException("This constructor cannot be used for scratch data space.");
+
+		this.mountingPoint = DataSpacesURI.createInOutSpaceURI(appid, config.getDsType(), config.getName());
+		this.url = config.getUrl();
+		this.hostname = config.getHostname();
+		this.path = config.path;
+	}
+
+	public String getUrl() {
 		return url;
 	}
 
