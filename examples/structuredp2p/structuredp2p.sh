@@ -24,8 +24,6 @@ echo --- STRUCTURED P2P - 2D Active Grid ---------------------
 
 args="-descriptor $default_descriptor $1 $2"
 
-
-
 $JAVACMD org.objectweb.proactive.extensions.structuredp2p.grid2D.Launcher $args
 
 echo
