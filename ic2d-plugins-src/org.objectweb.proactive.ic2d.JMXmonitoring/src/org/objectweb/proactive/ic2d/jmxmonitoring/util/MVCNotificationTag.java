@@ -208,6 +208,19 @@ public enum MVCNotificationTag {
     /**
      *
      */
-    STEP_BY_STEP_IS_DISABLE;
-
+    STEP_BY_STEP_IS_DISABLE,
+    /**
+     * Notification message sent when a new <code>ActiveObject</code> is added to the
+     * <code> org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject </code> object.
+     * Used by the <code>ComponentModelHolder</code> to look for new components.
+     * Use the key corresponding to the child as data in the MVCNotification object.
+     */
+    WORLD_OBJECT_ADD_AO,
+    /**
+     * Notification message sent when a new <code>ActiveObject</code> is removed from the
+     * <code> org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject </code> object.
+     * Used by the <code>ComponentModelHolder</code> to update the list of new components.
+     * Use the key corresponding to the child as data in the MVCNotification object. 
+     */
+    WORLD_OBJECT_REMOVE_AO;
 }

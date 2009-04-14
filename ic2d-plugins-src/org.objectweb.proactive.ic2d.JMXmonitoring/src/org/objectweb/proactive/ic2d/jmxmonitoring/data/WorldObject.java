@@ -202,6 +202,9 @@ public final class WorldObject extends AbstractData<AbstractData<?, ?>, HostObje
      */
     public void addActiveObject(final ActiveObject ao) {
         this.activeObjects.putIfAbsent(ao.getKey(), ao);
+        System.out.println("WorldObject: AO++ "+ this.countObservers() + " " + this.getKey());
+        setChanged();
+        notifyObservers(new MVCNotification(MVCNotificationTag.WORLD_OBJECT_ADD_AO, ao.getKey()));
     }
 
     /**
@@ -220,6 +223,9 @@ public final class WorldObject extends AbstractData<AbstractData<?, ?>, HostObje
      */
     public void removeActiveObject(final String key) {
         this.activeObjects.remove(key);
+        System.out.println("WorldObject: AO--");
+        setChanged();
+        notifyObservers(new MVCNotification(MVCNotificationTag.WORLD_OBJECT_REMOVE_AO, key));
     }
 
     /**

@@ -14,6 +14,7 @@ import org.eclipse.ui.part.ViewPart;
 import org.objectweb.proactive.ic2d.componentmonitoring.actions.CollapseAllAction;
 import org.objectweb.proactive.ic2d.componentmonitoring.actions.ExpandAllAction;
 import org.objectweb.proactive.ic2d.componentmonitoring.actions.NewHostAction;
+import org.objectweb.proactive.ic2d.componentmonitoring.data.ComponentModelHolder;
 import org.objectweb.proactive.ic2d.componentmonitoring.editpart.TreeEditPartFactory;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
 
@@ -80,7 +81,7 @@ public class ComponentTreeView extends ViewPart {
     /**
      * The holder of all the monitored components
      */
-    //protected ComponentModelHolder cmh;
+    protected ComponentModelHolder cmh = null;
     
     // There's another version of this constructor, that receives the worldObject to observe
     public ComponentTreeView() {
@@ -96,26 +97,32 @@ public class ComponentTreeView extends ViewPart {
             e.printStackTrace();
         }*/
 
-        // doesn't need to create a new WorldObject. Instead, it receives one from the AO Monitoring View
+        // doesn't need to create a new WorldObject. Instead, it receives one from the AO Monitoring View.
+        // Unless ... it is called by "Monitoring a New Host" from within the ComponentView, case which I won't consider yet
         //this.worldObject = new WorldObject();
 
-        // the secondline should be released ... the first, don't know
-        /*
-        //this.CHolder = (ComponentHolderModel)this.world.getHolder(HolderTypes.COMPONENT_HOLDER);
-        this.worldObject.addHolder(this.CHolder);
-        */
     }
     
     public void setWorldObject(WorldObject world) {
     	logger.debug("setWorldObject: " + world.getName());
         this.worldObject = world;
         this.setPartName("Components: "+ world.getName());
+        
+        // if it didn't exist before, the ComponentModelHolder must be created
+        // actually if there are several component views, each one should have its own holder (otherwise, this will be lost)
+        // but for the moment I think it's only one ...
+        if(cmh == null) {
+        	logger.debug("setWorldObject: creating new holder for the components");
+        	cmh = new ComponentModelHolder(world);
+        }
+        // TODO After the worldObject is changed, some other objects used for the monitoring must be updated:
+        //      the monitorThread, the list of components displayed (the components found in this world),
+        //      so, an explore command should be made over the ComponentHolder of this view.
 
-        /*
-        this.worldObject.addHolder(this.CHolder);
-        //		gcontroller = new WorldController(this.world,  null);
-        //		this.CHolder = (ComponentHolderModel)this.world.getHolder(HolderTypes.COMPONENT_HOLDER);
-        */
+        // This should be in charge of get the info of all components in the set and (re)created relationship among them
+        // TODO: Something, because now it does nothing
+        cmh.explore();
+        
     }
     
     

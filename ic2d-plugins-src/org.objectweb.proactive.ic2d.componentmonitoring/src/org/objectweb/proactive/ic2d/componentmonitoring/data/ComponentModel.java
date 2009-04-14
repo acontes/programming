@@ -2,14 +2,49 @@ package org.objectweb.proactive.ic2d.componentmonitoring.data;
 
 import javax.management.ObjectName;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 
-public class ComponentModel extends AbstractData<AbstractData<?, ?>, AbstractData<?, ?>> {
+public class ComponentModel extends AbstractData<ComponentModel, ComponentModel> {
 
+	public Logger logger = Logger.getLogger("ComponentModel");
+	
+	/**
+	 * This ComponentModel connects to the ComponentWrapperMBean to get component-related info
+	 */
+	//private ComponentWrapperMBean proxyMBean;
+	
+	
+	// Component data gathered from the mbean, for displaying in the Component View
+	/**
+	 * Name of the Component
+	 */
+	private String name;
+	
+	/**
+	 * Hierarchy. TODO Use Fractal/GCM constants for this
+	 */
+	private String hierarchy; 
+	
+	/**
+	 * Status. TODO Use Fractal/GCM constants for this
+	 */
+	private String status;
+	
+	
+	
 	public ComponentModel(ObjectName objectName) {
 		super(objectName);
-		// TODO Auto-generated constructor stub
+		logger.setLevel(Level.DEBUG);
+		logger.debug("constructor");
+		
 	}
+	
+	
+	
+	
+	
 
 	@Override
 	public void explore() {
@@ -30,7 +65,7 @@ public class ComponentModel extends AbstractData<AbstractData<?, ?>, AbstractDat
 	}
 
 	@Override
-	public AbstractData<?, ?> getParent() {
+	public ComponentModel getParent() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -40,5 +75,6 @@ public class ComponentModel extends AbstractData<AbstractData<?, ?>, AbstractDat
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 
 }
