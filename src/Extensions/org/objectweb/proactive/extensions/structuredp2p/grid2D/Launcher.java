@@ -200,10 +200,22 @@ public class Launcher {
                 Launcher.printOptions();
                 while (true) {
                     next = scanner.nextLine();
-                    if (next.equals("quit")) {
-                        Deployment.kill();
-                        break;
-                    } else if (next.matches("[0-9]+ [0-9]+")) {
+                    if (next.equals("quit"))
+                        try {
+                            {
+                                if (Launcher.entryPoint != null)
+                                    PAActiveObject.terminateActiveObject(Launcher.entryPoint, true);
+
+                                Deployment.kill();
+                                // FIXME try to quit correctly
+                                System.exit(0);
+                                break;
+                            }
+                        } catch (Exception e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    else if (next.matches("[0-9]+ [0-9]+")) {
                         String[] coordinates = next.split("\\s");
                         AwareObject founded = null;
 
