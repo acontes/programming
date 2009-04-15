@@ -20,7 +20,7 @@ then
 fi
 
 echo
-echo --- STRUCTURED P2P - 2D Active Grid ---------------------
+echo --- STRUCTURED P2P - Active Grid2D ---------------------
 
 args="-descriptor $default_descriptor $1 $2"
 

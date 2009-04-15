@@ -2,8 +2,9 @@ package org.objectweb.proactive.extensions.structuredp2p.grid2D;
 
 import java.io.Serializable;
 
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PAFuture;
 
 
 /**
@@ -16,7 +17,7 @@ import org.objectweb.proactive.api.PAFuture;
  * @version 0.1
  */
 @SuppressWarnings("serial")
-public class AwareObject implements Serializable {
+public class AwareObject implements Serializable, InitActive {
     private int x = 0;
     private int y = 0;
     private AwareObject stub;
@@ -27,13 +28,13 @@ public class AwareObject implements Serializable {
     private AwareObject westNeighbor = null;
 
     /*
-     * * The no-argument constructor as commanded by ProActive.
+     * The no-argument constructor as commanded by ProActive.
      */
     public AwareObject() {
     }
 
     /*
-     * * Initialize a new AwareObject with the specified coordinates.
+     * Initialize a new AwareObject with the specified coordinates.
      * 
      * @param x the x-coordinate in the grid2d.
      * 
@@ -42,11 +43,10 @@ public class AwareObject implements Serializable {
     public AwareObject(Integer x, Integer y) {
         this.x = x.intValue();
         this.y = y.intValue();
-        this.stub = (AwareObject) PAActiveObject.getStubOnThis();
     }
 
     /*
-     * * Lookup a {@link AwareObject} by it coordinates from the current object and returns it.
+     * Lookup a {@link AwareObject} by it coordinates from the current object and returns it.
      * 
      * @param x the x-coordinate to lookup.
      * 
@@ -55,134 +55,57 @@ public class AwareObject implements Serializable {
      * @return the AwareObject find or null.
      */
     public AwareObject find(int x, int y) {
-        /*
-         * System.out.println("this.x = " + this.x + ", x = " + x); System.out.println("this.y = " +
-         * this.y + ", y = " + y + "\n");
-         */
-
-        System.out.print("Find [from: ("+getNeighborDescription(this)+"); to: (x=" + x + ",y=" + y +
-            ")] --> ");
         if (this.x == x && this.y == y) {
-            System.out.println("current object");
             return this;
         } else if (this.x < x) {
-            System.out.println("search in east");
-            if (this.eastNeighbor == null)
+            if (this.eastNeighbor == null) {
                 return null;
+            }
 
             return this.eastNeighbor.find(x, y);
         } else if (this.x > x) {
-            System.out.println("search in west");
-            if (this.westNeighbor == null)
+            if (this.westNeighbor == null) {
                 return null;
+            }
 
             return this.westNeighbor.find(x, y);
         } else if (this.y < y) {
-            System.out.println("search in south");
-            if (this.southNeighbor == null)
+            if (this.southNeighbor == null) {
                 return null;
+            }
 
             return this.southNeighbor.find(x, y);
         } else if (this.y > y) {
-            System.out.println("search in north");
-            if (this.northNeighbor == null)
+            if (this.northNeighbor == null) {
                 return null;
+            }
 
             return this.northNeighbor.find(x, y);
         }
-        System.out.println();
 
         return null;
     }
 
     /*
-     * * Register a new peer as a neighbor.
-     * 
-     * @param peerStub the stub of the peer to register.
-     * 
-     * @throws Exception if the position is already token.
-     */
-    public void registerNewPeer(AwareObject peerStub) throws Exception {
-        int peerX = peerStub.getX();
-        int peerY = peerStub.getY();
-
-        System.out.println("REGISTER START FOR x=" + peerX + ", y=" + peerY);
-
-        if (PAFuture.getFutureValue(this.find(peerX, peerY)) != null)
-            throw new Exception("This position is already used (x=" + this.getX() + ", y=" + this.getY() +
-                ")");
-
-        AwareObject northObj = this.find(peerX, peerY - 1);
-        AwareObject eastObj = this.find(peerX + 1, peerY);
-        AwareObject southObj = this.find(peerX, peerY + 1);
-        AwareObject westObj = this.find(peerX - 1, peerY);
-        
-        System.out.print("North\t--------->");
-        PAFuture.waitFor(northObj);
-        if (PAFuture.getFutureValue(northObj) != null) {
-            System.out.print(" Neighbor founded at ("+getNeighborDescription(northObj)+")");            
-            northObj.setSouthNeighbor(peerStub);
-            peerStub.setNorthNeighbor(northObj);
-            System.out.print(" Neighbor added ("+peerStub.getNeighborDescription(peerStub.getNorthNeighbor())+")");
-        }
-        System.out.println();
-
-        System.out.print("East \t--------->");
-        PAFuture.waitFor(eastObj);
-        if (PAFuture.getFutureValue(eastObj) != null) {
-            System.out.print(" Neighbor founded at ("+getNeighborDescription(eastObj)+")");
-            eastObj.setWestNeighbor(peerStub);
-            peerStub.setEastNeighbor(eastObj);
-            System.out.print(" Neighbor added ("+peerStub.getNeighborDescription(peerStub.getEastNeighbor())+")");
-        }
-        System.out.println();
-
-        System.out.print("South\t--------->");
-        PAFuture.waitFor(southObj);
-        if (PAFuture.getFutureValue(southObj) != null) {
-            System.out.print(" Neighbor founded at ("+getNeighborDescription(southObj)+")");
-            southObj.setNorthNeighbor(peerStub);
-            peerStub.setSouthNeighbor(southObj);
-            System.out.print(" Neighbor added ("+peerStub.getNeighborDescription(peerStub.getSouthNeighbor())+")");
-        }
-        System.out.println();
-
-        System.out.print("West \t--------->");
-        PAFuture.waitFor(westObj);
-        if (PAFuture.getFutureValue(westObj) != null) {
-            System.out.print(" Neighbor founded at ("+getNeighborDescription(westObj)+")");
-            westObj.setEastNeighbor(peerStub);
-            peerStub.setWestNeighbor(westObj);
-            System.out.print(" Neighbor added ("+peerStub.getNeighborDescription(peerStub.getWestNeighbor())+")");
-        }
-        System.out.println();
-        
-        System.out.println();
-
-        System.out.println("--------- NEW AWARE-OBJECT REGISTERED ---------");
-        System.out.println(peerStub);
-    }
-
-    /*
-     * * Returns the x-coordinate of the current object for the grid to which it belongs.
+     * Returns the x-coordinate of the current object for the grid to which it belongs.
      * 
      * @return the x-coordinate of the current object for the grid to which it belongs.
      */
     public int getX() {
-        return x;
+        return this.x;
     }
 
     /*
-     * * Returns the y-coordinate of the current object for the grid to which it belongs.
+     * Returns the y-coordinate of the current object for the grid to which it belongs.
      * 
      * @return the y-coordinate of the current object for the grid to which it belongs.
      */
     public int getY() {
-        return y;
+        return this.y;
     }
 
     /*
-     * * Returns the stub associated to the current object.
+     * Returns the stub associated to the current object.
      * 
      * @return the stub associated to the current object.
      */
@@ -191,43 +114,43 @@ public class AwareObject implements Serializable {
     }
 
     /*
-     * * Returns the north neighbor of the current object.
+     * Returns the north neighbor of the current object.
      * 
      * @return the northNeighbor of the current object.
      */
     public AwareObject getNorthNeighbor() {
-        return northNeighbor;
+        return this.northNeighbor;
     }
 
     /*
-     * * Returns the east neighbor of the current object.
+     * Returns the east neighbor of the current object.
      * 
      * @return the eastNeighbor of the current object.
      */
     public AwareObject getEastNeighbor() {
-        return eastNeighbor;
+        return this.eastNeighbor;
     }
 
     /*
-     * * Returns the south neighbor of the current object.
+     * Returns the south neighbor of the current object.
      * 
      * @return the southNeighbor of the current object.
      */
     public AwareObject getSouthNeighbor() {
-        return southNeighbor;
+        return this.southNeighbor;
     }
 
     /*
-     * * Returns the west neighbor of the current object.
+     * Returns the west neighbor of the current object.
      * 
      * @return the westNeighbor of the current object.
      */
     public AwareObject getWestNeighbor() {
-        return westNeighbor;
+        return this.westNeighbor;
     }
 
     /*
-     * * Sets the north neighbor of the current object.
+     * Sets the north neighbor of the current object.
      * 
      * @param northNeighbor the new northNeighbor to set.
      */
@@ -236,7 +159,7 @@ public class AwareObject implements Serializable {
     }
 
     /*
-     * * Sets the east neighbor of the current object.
+     * Sets the east neighbor of the current object.
      * 
      * @param eastNeighbor the new eastNeighbor to set.
      */
@@ -245,7 +168,7 @@ public class AwareObject implements Serializable {
     }
 
     /*
-     * * Sets the south neighbor of the current object.
+     * Sets the south neighbor of the current object.
      * 
      * @param southNeighbor the new southNeighbor to set.
      */
@@ -254,7 +177,7 @@ public class AwareObject implements Serializable {
     }
 
     /*
-     * * Sets the west neighbor of the current object.
+     * Sets the west neighbor of the current object.
      * 
      * @param westNeighbor the new westNeighbor to set.
      */
@@ -263,7 +186,7 @@ public class AwareObject implements Serializable {
     }
 
     /*
-     * * Sets the x-coordinate.
+     * Sets the x-coordinate.
      * 
      * @param x the new x-coordinate to set.
      */
@@ -272,7 +195,7 @@ public class AwareObject implements Serializable {
     }
 
     /*
-     * * Sets the y-coordinate.
+     * Sets the y-coordinate.
      * 
      * @param y the new y-coordinate to set.
      */
@@ -281,7 +204,7 @@ public class AwareObject implements Serializable {
     }
 
     /*
-     * * Returns a description for a given neighbor.
+     * Returns a description for a given neighbor.
      * 
      * @param neighbor the neighbor we want to get description.
      * 
@@ -301,7 +224,7 @@ public class AwareObject implements Serializable {
     }
 
     /*
-     * * {@inheritDoc}
+     * {@inheritDoc}
      */
     public String toString() {
         StringBuffer buf = new StringBuffer("AwareObject x=" + this.x + ", y=" + this.y + "\n");
@@ -322,5 +245,13 @@ public class AwareObject implements Serializable {
         buf.append("\n");
 
         return buf.toString();
+    }
+
+    /*
+     * {@inheritDoc}
+     */
+    @Override
+    public void initActivity(Body arg0) {
+        this.stub = (AwareObject) PAActiveObject.getStubOnThis();
     }
 }

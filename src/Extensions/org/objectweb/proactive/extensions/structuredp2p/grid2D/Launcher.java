@@ -11,6 +11,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.structuredp2p.util.Deployment;
 
+
 /**
  * Launch a new grid of active objects which know their neighbors.
  * 
@@ -21,169 +22,210 @@ import org.objectweb.proactive.extensions.structuredp2p.util.Deployment;
  * @version 0.1
  */
 public class Launcher {
-	private int nbCols;
-	private int nbRows;
-	private static Node node;
-	private static AwareObject entryPoint;
+    private int nbCols;
+    private int nbRows;
+    private static Node node;
+    private static AwareObject entryPoint;
 
-	/**
-	 * Constructor.
-	 * 
-	 * @param rows
-	 *            the number rows for the grid 2D.
-	 * @param cols
-	 *            the number of columns for the grid 2D.
-	 */
-	public Launcher(int rows, int cols) {
-		this.nbRows = rows;
-		this.nbCols = cols;
-		System.out.println("Grid " + cols + "x" + rows);
-	}
+    /*
+     * Constructor.
+     * 
+     * @param rows the number rows for the grid 2D.
+     * 
+     * @param cols the number of columns for the grid 2D.
+     */
+    public Launcher(int rows, int cols) {
+        this.nbRows = rows;
+        this.nbCols = cols;
+    }
 
-	/**
-	 * Creates the entry point. It's the required {@link AwareObject} in order
-	 * to enter in the AwareObject grid network.
-	 */
-	public void createEntryPoint() {
-		node = Deployment.getVirtualNode("Grid2D").getANode();
-		try {
-			Launcher.entryPoint = (AwareObject) PAActiveObject.newActive(
-					AwareObject.class.getName(), new Object[] { new Integer(0),
-							new Integer(0) }, node);
+    /*
+     * Creates the entry point. It's the required {@link AwareObject} in order to enter in the
+     * AwareObject grid network.
+     */
+    public void createEntryPoint() {
+        node = Deployment.getVirtualNode("Grid2D").getANode();
+        try {
+            Launcher.entryPoint = (AwareObject) PAActiveObject.newActive(AwareObject.class.getName(),
+                    new Object[] { new Integer(0), new Integer(0) }, node);
 
-			// Binds the entry point to a specific URL on the RMI registry
-			PAActiveObject.registerByName(Launcher.entryPoint,
-					"Grid2DEntryPoint");
-		} catch (ActiveObjectCreationException e) {
-			e.printStackTrace();
-		} catch (NodeException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+            // Binds the entry point to a specific URL on the RMI registry
+            PAActiveObject.registerByName(Launcher.entryPoint, "Grid2DEntryPoint");
+        } catch (ActiveObjectCreationException e) {
+            e.printStackTrace();
+        } catch (NodeException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-	/**
-	 * Print app menu option on the standard output.
-	 */
-	private static void printOptions() {
-		System.out.println("Select one option :");
-		System.out
-				.println("  * Enter a coordinate like '0 1' in order to see neighbor of this peer");
-		System.out.println("  * Enter 'quit' in order to quit the application");
-	}
+    /*
+     * Print app menu option on the standard output.
+     */
+    private static void printOptions() {
+        System.out.println("Select one option :");
+        System.out.println("  * Enter a coordinate like '0 1' in order to see neighbor of this peer");
+        System.out.println("  * Enter 'quit' in order to quit the application");
+    }
 
-	/**
-	 * Creates <code>nbRows</code> <code>nbCols</code> AwareObjects by forming a
-	 * grid2D. Each object is inserted while using the <code>entryPoint</code>.
-	 */
-	private void createsAwareObjects() {
-		int nbAwareObjects = this.nbCols * this.nbRows;
-		int x = 0;
-		int y = 0;
+    /*
+     * Creates <code>nbRows</code> <code>nbCols</code> AwareObjects by forming a grid2D. Each object
+     * is inserted while using the <code>entryPoint</code>.
+     */
+    private void createsAwareObjects() {
+        int nbAwareObjects = this.nbCols * this.nbRows;
+        int x = 0;
+        int y = 0;
 
-		AwareObject entryPoint = null;
-		AwareObject newAwareObject = null;
+        AwareObject entryPoint = null;
+        AwareObject newAwareObject = null;
 
-		// Retrieve entryPoint
-		try {
-			entryPoint = (AwareObject) PAActiveObject.lookupActive(
-					AwareObject.class.getName(), "Grid2DEntryPoint");
-			System.out.println("EntryPoint retrieved !");
-		} catch (ActiveObjectCreationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+        // Retrieve entryPoint
+        try {
+            entryPoint = (AwareObject) PAActiveObject.lookupActive(AwareObject.class.getName(),
+                    "Grid2DEntryPoint");
+        } catch (ActiveObjectCreationException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-		for (int i = 1; i < nbAwareObjects; i++) {
-			if (i % this.nbCols == 0) {
-				x = 0;
-				y++;
-			} else {
-				x++;
-			}
+        for (int i = 1; i < nbAwareObjects; i++) {
+            if (i % this.nbCols == 0) {
+                x = 0;
+                y++;
+            } else {
+                x++;
+            }
 
-			try {
-				newAwareObject = (AwareObject) PAActiveObject
-						.newActive(AwareObject.class.getName(), new Object[] {
-								new Integer(x), new Integer(y) }, Launcher.node);
-				entryPoint.registerNewPeer(newAwareObject);
-			} catch (ActiveObjectCreationException e) {
-				e.printStackTrace();
-			} catch (NodeException e) {
-				e.printStackTrace();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-	}
+            try {
+                newAwareObject = (AwareObject) PAActiveObject.newActive(AwareObject.class.getName(),
+                        new Object[] { new Integer(x), new Integer(y) }, Launcher.node);
+                Launcher.registerNewPeer(entryPoint, newAwareObject.getStub());
+            } catch (ActiveObjectCreationException e) {
+                e.printStackTrace();
+            } catch (NodeException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
-	/**
-	 * Entry point of the application.
-	 * 
-	 * @param args
-	 *            parameters given to the application when launched.
-	 */
-	public static void main(String args[]) {
-		if (args.length != 4) {
-			System.err.println("Usage : java "
-					+ Launcher.class.getCanonicalName() + " " + args[0]
-					+ " descriptor nbRows nbCols");
-		}
+    /*
+     * Register a new peer as a neighbor.
+     * 
+     * @param entryPoint the stub of the entryPoint used in order to find the position to register.
+     * 
+     * @param peerStub the stub of the peer to register.
+     * 
+     * @throws Exception if the position is already token.
+     */
+    public static void registerNewPeer(AwareObject entryPoint, AwareObject peerStub) throws Exception {
+        int peerX = peerStub.getX();
+        int peerY = peerStub.getY();
 
-		try {
-			Deployment.deploy(args[1]);
-		} catch (NodeException e) {
-			e.printStackTrace();
-		} catch (ProActiveException e) {
-			e.printStackTrace();
-		}
+        if (PAFuture.getFutureValue(entryPoint.find(peerX, peerY)) != null) {
+            throw new Exception("This position is already used (x=" + entryPoint.getX() + ", y=" +
+                entryPoint.getY() + ")");
+        }
 
-		final int nbRows = Integer.parseInt(args[2]);
-		final int nbCols = Integer.parseInt(args[3]);
+        AwareObject northObj = entryPoint.find(peerX, peerY - 1);
+        AwareObject eastObj = entryPoint.find(peerX + 1, peerY);
+        AwareObject southObj = entryPoint.find(peerX, peerY + 1);
+        AwareObject westObj = entryPoint.find(peerX - 1, peerY);
 
-		Launcher launcher = new Launcher(nbRows, nbCols);
-		launcher.createEntryPoint();
-		launcher.createsAwareObjects();
+        if (PAFuture.getFutureValue(northObj) != null) {
+            northObj = northObj.getStub();
 
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				Scanner scanner = new Scanner(System.in);
-				String next;
+            northObj.setSouthNeighbor(peerStub);
+            peerStub.setNorthNeighbor(northObj);
+        }
 
-				Launcher.printOptions();
-				while (true) {
-					next = scanner.nextLine();
-					if (next.equals("quit")) {
-						Deployment.kill();
-						break;
-					} else if (next.matches("[0-9]+ [0-9]+")) {
-						String[] coordinates = next.split("\\s");
-						AwareObject founded = null;
+        if (PAFuture.getFutureValue(eastObj) != null) {
+            eastObj = eastObj.getStub();
 
-						int x = Integer.parseInt(coordinates[0]);
-						int y = Integer.parseInt(coordinates[1]);
+            eastObj.setWestNeighbor(peerStub);
+            peerStub.setEastNeighbor(eastObj);
+        }
 
-						if (x >= nbCols || x < 0 || y >= nbRows || y < 0) {
-							System.err.println("Error, x must be in [0,"
-									+ (int) (nbCols - 1) + "] and y in [0,"
-									+ (int) (nbRows - 1) + "]");
-						} else {
-							founded = Launcher.entryPoint.find(x, y);
-							if(PAFuture.getFutureValue(founded) != null)
-							    System.out.println(founded);
-							else
-							    System.out.println("AwareObject not found.");
-						}
-					}
+        if (PAFuture.getFutureValue(southObj) != null) {
+            southObj = southObj.getStub();
 
-					Launcher.printOptions();
-				}
-			}
+            southObj.setNorthNeighbor(peerStub);
+            peerStub.setSouthNeighbor(southObj);
+        }
 
-		}).start();
-	}
+        if (PAFuture.getFutureValue(westObj) != null) {
+            westObj = westObj.getStub();
+
+            westObj.setEastNeighbor(peerStub);
+            peerStub.setWestNeighbor(westObj);
+        }
+    }
+
+    /*
+     * Entry point of the application.
+     * 
+     * @param args parameters given to the application when launched.
+     */
+    public static void main(String args[]) {
+        if (args.length != 4) {
+            System.err.println("Usage : java " + Launcher.class.getCanonicalName() + " " + args[0] +
+                " descriptor nbRows nbCols");
+        }
+
+        try {
+            Deployment.deploy(args[1]);
+        } catch (NodeException e) {
+            e.printStackTrace();
+        } catch (ProActiveException e) {
+            e.printStackTrace();
+        }
+
+        final int nbRows = Integer.parseInt(args[2]);
+        final int nbCols = Integer.parseInt(args[3]);
+
+        Launcher launcher = new Launcher(nbRows, nbCols);
+        launcher.createEntryPoint();
+        launcher.createsAwareObjects();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Scanner scanner = new Scanner(System.in);
+                String next;
+
+                Launcher.printOptions();
+                while (true) {
+                    next = scanner.nextLine();
+                    if (next.equals("quit")) {
+                        Deployment.kill();
+                        break;
+                    } else if (next.matches("[0-9]+ [0-9]+")) {
+                        String[] coordinates = next.split("\\s");
+                        AwareObject founded = null;
+
+                        int x = Integer.parseInt(coordinates[0]);
+                        int y = Integer.parseInt(coordinates[1]);
+
+                        if (x >= nbCols || x < 0 || y >= nbRows || y < 0) {
+                            System.err.println("Error, x must be in [0," + (int) (nbCols - 1) +
+                                "] and y in [0," + (int) (nbRows - 1) + "]");
+                        } else {
+                            founded = Launcher.entryPoint.find(x, y);
+                            if (PAFuture.getFutureValue(founded) != null) {
+                                System.out.println(founded);
+                            } else {
+                                System.out.println("AwareObject not found.");
+                            }
+                        }
+                    }
+
+                    Launcher.printOptions();
+                }
+            }
+        }).start();
+    }
 }
