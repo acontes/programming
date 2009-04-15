@@ -5,6 +5,7 @@ import java.util.Scanner;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -172,7 +173,10 @@ public class Launcher {
 									+ (int) (nbRows - 1) + "]");
 						} else {
 							founded = Launcher.entryPoint.find(x, y);
-							System.out.println(founded);
+							if(PAFuture.getFutureValue(founded) != null)
+							    System.out.println(founded);
+							else
+							    System.out.println("AwareObject not found.");
 						}
 					}
 
