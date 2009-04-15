@@ -25,7 +25,8 @@ public class Launcher {
     private int nbCols;
     private int nbRows;
     private static Node node;
-    private static AwareObject entryPoint;
+    private static boolean running = true;
+    private String entryPoint = "Grid2DEntryPoint";
 
     /*
      * Constructor.
@@ -34,7 +35,8 @@ public class Launcher {
      * 
      * @param cols the number of columns for the grid 2D.
      */
-    public Launcher(int rows, int cols) {
+    public Launcher(String hostname, int rows, int cols) {
+        this.entryPoint = hostname;
         this.nbRows = rows;
         this.nbCols = cols;
     }
@@ -44,13 +46,14 @@ public class Launcher {
      * AwareObject grid network.
      */
     public void createEntryPoint() {
-        node = Deployment.getVirtualNode("Grid2D").getANode();
+        AwareObject entryPoint = null;
+        Launcher.node = Deployment.getVirtualNode("Grid2D").getANode();
         try {
-            Launcher.entryPoint = (AwareObject) PAActiveObject.newActive(AwareObject.class.getName(),
-                    new Object[] { new Integer(0), new Integer(0) }, node);
+            entryPoint = (AwareObject) PAActiveObject.newActive(AwareObject.class.getName(), new Object[] {
+                    new Integer(0), new Integer(0) }, Launcher.node);
 
             // Binds the entry point to a specific URL on the RMI registry
-            PAActiveObject.registerByName(Launcher.entryPoint, "Grid2DEntryPoint");
+            PAActiveObject.registerByName(entryPoint, "Grid2DEntryPoint");
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
         } catch (NodeException e) {
@@ -58,15 +61,6 @@ public class Launcher {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    /*
-     * Print app menu option on the standard output.
-     */
-    private static void printOptions() {
-        System.out.println("Select one option :");
-        System.out.println("  * Enter a coordinate like '0 1' in order to see neighbor of this peer");
-        System.out.println("  * Enter 'quit' in order to quit the application");
     }
 
     /*
@@ -84,7 +78,7 @@ public class Launcher {
         // Retrieve entryPoint
         try {
             entryPoint = (AwareObject) PAActiveObject.lookupActive(AwareObject.class.getName(),
-                    "Grid2DEntryPoint");
+                    this.entryPoint);
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -172,72 +166,96 @@ public class Launcher {
      */
     public static void main(String args[]) {
         if (args.length != 4) {
-            System.err.println("Usage : java " + Launcher.class.getCanonicalName() + " " + args[0] +
-                " descriptor nbRows nbCols");
+            System.err.println("Usage : java " + Launcher.class.getCanonicalName() + " " +
+                "nbRows nbCols descriptor entryPoint");
         }
 
+        String hostname = "Grid2DEntryPoint";
+
+        if (!args[3].equals("localhost")) {
+            hostname = "//" + args[3] + "/" + hostname;
+        }
+
+        final String finalHostname = hostname;
+
         try {
-            Deployment.deploy(args[1]);
+            Deployment.deploy(args[2]);
         } catch (NodeException e) {
             e.printStackTrace();
         } catch (ProActiveException e) {
             e.printStackTrace();
         }
 
-        final int nbRows = Integer.parseInt(args[2]);
-        final int nbCols = Integer.parseInt(args[3]);
+        final int nbRows = Integer.parseInt(args[0]);
+        final int nbCols = Integer.parseInt(args[1]);
 
-        Launcher launcher = new Launcher(nbRows, nbCols);
+        Launcher launcher = new Launcher(hostname, nbRows, nbCols);
+
         launcher.createEntryPoint();
         launcher.createsAwareObjects();
 
-        new Thread(new Runnable() {
+        Thread inputThread = new Thread(new Runnable() {
             @Override
             public void run() {
+                AwareObject founded;
                 Scanner scanner = new Scanner(System.in);
-                String next;
+                String inputLine;
+                String[] coordinates;
+                int x;
+                int y;
+
+                AwareObject entryPoint = null;
+                try {
+                    entryPoint = (AwareObject) PAActiveObject.lookupActive(AwareObject.class.getName(),
+                            finalHostname);
+                } catch (ActiveObjectCreationException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
                 Launcher.printOptions();
-                while (true) {
-                    next = scanner.nextLine();
-                    if (next.equals("quit"))
-                        try {
-                            {
-                                if (Launcher.entryPoint != null)
-                                    PAActiveObject.terminateActiveObject(Launcher.entryPoint, true);
+                while (Launcher.running) {
+                    inputLine = scanner.nextLine();
 
-                                Deployment.kill();
-                                // FIXME try to quit correctly
-                                System.exit(0);
-                                break;
-                            }
+                    if (inputLine.equalsIgnoreCase("quit")) {
+                        try {
+                            Deployment.kill();
+                            Launcher.running = false;
+                            break;
                         } catch (Exception e) {
-                            // TODO Auto-generated catch block
                             e.printStackTrace();
                         }
-                    else if (next.matches("[0-9]+ [0-9]+")) {
-                        String[] coordinates = next.split("\\s");
-                        AwareObject founded = null;
-
-                        int x = Integer.parseInt(coordinates[0]);
-                        int y = Integer.parseInt(coordinates[1]);
+                    } else if (inputLine.matches("[0-9]+ [0-9]+")) {
+                        coordinates = inputLine.split("\\s");
+                        x = Integer.parseInt(coordinates[0]);
+                        y = Integer.parseInt(coordinates[1]);
 
                         if (x >= nbCols || x < 0 || y >= nbRows || y < 0) {
                             System.err.println("Error, x must be in [0," + (int) (nbCols - 1) +
                                 "] and y in [0," + (int) (nbRows - 1) + "]");
                         } else {
-                            founded = Launcher.entryPoint.find(x, y);
+                            founded = entryPoint.find(x, y);
                             if (PAFuture.getFutureValue(founded) != null) {
                                 System.out.println(founded);
                             } else {
-                                System.out.println("AwareObject not found.");
+                                System.out.println("AwareObject not found in (" + x + ", " + y + ").");
                             }
                         }
                     }
-
                     Launcher.printOptions();
                 }
             }
-        }).start();
+        });
+        inputThread.start();
+    }
+
+    /*
+     * Print app menu option on the standard output.
+     */
+    private static void printOptions() {
+        System.out.println("* What you can do :");
+        System.out.println("  > Type in a coordinate like '0 1'");
+        System.out.println("  > Type in 'quit' keyword in order to quit the application");
     }
 }

@@ -10,19 +10,21 @@ fi
 . ${workingDir}/../env.sh
 
 default_descriptor=${workingDir}/GCMA.xml
+default_hostname=localhost
 
 if [[ $# -eq  0 ]]
 then
-        echo "Usage: $0 ROWS COLS"
-        echo "  ROWS : the number of rows for the grid"
-        echo "  COLS : the number of columns for the grid"
+        echo "Usage: $0 NB_ROWS NB_COLS [ENTRY_POINT]"
+        echo "  NB_ROWS : the number of rows for the grid"
+        echo "  NB_COLS : the number of columns for the grid"
+        echo "  ENTRY_POINT : the hostname of the computer which is used for entryPoint"
         exit 1
 fi
 
 echo
 echo --- STRUCTURED P2P - Active Grid2D ---------------------
 
-args="-descriptor $default_descriptor $1 $2"
+args="$1 $2 $default_descriptor ${3-$default_hostname}"
 
 export CLASSPATH=../../lib/*:$CLASSPATH
 export CLASSPATH=../../classes/Core:$CLASSPATH

@@ -8,6 +8,9 @@
 		<javaPropertyVariable name="java.home" />
 		<javaPropertyVariable name="proactive.home" />
 		<javaPropertyVariable name="user.home" />
+
+		<descriptorVariable name="hostCapacity" value="2" />
+		<descriptorVariable name="vmCapacity" value="2" />
 	</environment>
 
 	<application>
@@ -17,21 +20,21 @@
 				<java base="root" relpath="${java.home}/bin/java" />
 
 				<applicationClasspath>
-					<pathElement base="proactive" relpath="dist/lib/ProActive_examples.jar"/>
-					<pathElement base="proactive" relpath="dist/lib/ibis-1.4.jar"/>
-					<pathElement base="proactive" relpath="dist/lib/ibis-connect-1.0.jar"/>
-					<pathElement base="proactive" relpath="dist/lib/ibis-util-1.0.jar"/>
+					<pathElement base="proactive" relpath="dist/lib/ProActive_examples.jar" />
+					<pathElement base="proactive" relpath="dist/lib/ibis-1.4.jar" />
+					<pathElement base="proactive" relpath="dist/lib/ibis-connect-1.0.jar" />
+					<pathElement base="proactive" relpath="dist/lib/ibis-util-1.0.jar" />
 				</applicationClasspath>
 
 			</configuration>
 
-			<virtualNode id="Grid2D" />
+			<virtualNode id="Grid2D" capacity="1" />
 		</proactive>
 	</application>
 
 	<resources>
 		<nodeProvider id="Grid2D">
-			<file path="GCMD_Local.xml" />
+			<file path="../GCMD_Local.xml" />
 		</nodeProvider>
 	</resources>
 
