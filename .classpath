@@ -7,7 +7,7 @@
 	<classpathentry kind="src" path="src/Extra"/>
 	<classpathentry excluding="functionalTests/annotations/**/*|functionalTests/annotations/callbacks/inputs/|functionalTests/annotations/migrationsignal/inputs/|functionalTests/annotations/migrationstrategy/inputs/|functionalTests/annotations/remoteobject/inputs/" kind="src" path="src/Tests"/>
 	<classpathentry excluding="doc/PublishedAPIDoclet.java" kind="src" path="src/Utils"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.6.0_13"/>
 	<classpathentry kind="lib" path="lib/activation.jar"/>
 	<classpathentry kind="lib" path="lib/ajo.jar"/>
 	<classpathentry kind="lib" path="lib/asm-2.2.1.jar"/>

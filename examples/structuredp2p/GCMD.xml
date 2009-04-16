@@ -15,7 +15,7 @@
 
 	<infrastructure>
 		<hosts>
-			<host id="ComputeNode" os="unix">
+			<host id="ComputeNode" os="unix" hostCapacity="${hostCapacity}" vmCapacity="${vmCapacity}">
 				<homeDirectory base="root" relpath="${user.home}" />
 			</host>
 		</hosts>

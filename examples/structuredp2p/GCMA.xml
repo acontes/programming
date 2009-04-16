@@ -28,13 +28,13 @@
 
 			</configuration>
 
-			<virtualNode id="Grid2D" capacity="1" />
+			<virtualNode id="Grid2D" capacity="1"/>
 		</proactive>
 	</application>
 
 	<resources>
 		<nodeProvider id="Grid2D">
-			<file path="../GCMD_Local.xml" />
+			<file path="GCMD.xml" />
 		</nodeProvider>
 	</resources>
 

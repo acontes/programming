@@ -27,13 +27,13 @@ public class AwareObject implements Serializable, InitActive {
     private AwareObject southNeighbor = null;
     private AwareObject westNeighbor = null;
 
-    /*
+    /**
      * The no-argument constructor as commanded by ProActive.
      */
     public AwareObject() {
     }
 
-    /*
+    /**
      * Initialize a new AwareObject with the specified coordinates.
      * 
      * @param x the x-coordinate in the grid2d.
@@ -45,7 +45,7 @@ public class AwareObject implements Serializable, InitActive {
         this.y = y.intValue();
     }
 
-    /*
+    /**
      * Lookup a {@link AwareObject} by it coordinates from the current object and returns it.
      * 
      * @param x the x-coordinate to lookup.
@@ -86,7 +86,7 @@ public class AwareObject implements Serializable, InitActive {
         return null;
     }
 
-    /*
+    /**
      * Returns the x-coordinate of the current object for the grid to which it belongs.
      * 
      * @return the x-coordinate of the current object for the grid to which it belongs.
@@ -95,7 +95,7 @@ public class AwareObject implements Serializable, InitActive {
         return this.x;
     }
 
-    /*
+    /**
      * Returns the y-coordinate of the current object for the grid to which it belongs.
      * 
      * @return the y-coordinate of the current object for the grid to which it belongs.
@@ -104,7 +104,7 @@ public class AwareObject implements Serializable, InitActive {
         return this.y;
     }
 
-    /*
+    /**
      * Returns the stub associated to the current object.
      * 
      * @return the stub associated to the current object.
@@ -113,7 +113,7 @@ public class AwareObject implements Serializable, InitActive {
         return this.stub;
     }
 
-    /*
+    /**
      * Returns the north neighbor of the current object.
      * 
      * @return the northNeighbor of the current object.
@@ -122,7 +122,7 @@ public class AwareObject implements Serializable, InitActive {
         return this.northNeighbor;
     }
 
-    /*
+    /**
      * Returns the east neighbor of the current object.
      * 
      * @return the eastNeighbor of the current object.
@@ -131,7 +131,7 @@ public class AwareObject implements Serializable, InitActive {
         return this.eastNeighbor;
     }
 
-    /*
+    /**
      * Returns the south neighbor of the current object.
      * 
      * @return the southNeighbor of the current object.
@@ -140,7 +140,7 @@ public class AwareObject implements Serializable, InitActive {
         return this.southNeighbor;
     }
 
-    /*
+    /**
      * Returns the west neighbor of the current object.
      * 
      * @return the westNeighbor of the current object.
@@ -149,7 +149,7 @@ public class AwareObject implements Serializable, InitActive {
         return this.westNeighbor;
     }
 
-    /*
+    /**
      * Sets the north neighbor of the current object.
      * 
      * @param northNeighbor the new northNeighbor to set.
@@ -158,7 +158,7 @@ public class AwareObject implements Serializable, InitActive {
         this.northNeighbor = northNeighbor;
     }
 
-    /*
+    /**
      * Sets the east neighbor of the current object.
      * 
      * @param eastNeighbor the new eastNeighbor to set.
@@ -167,7 +167,7 @@ public class AwareObject implements Serializable, InitActive {
         this.eastNeighbor = eastNeighbor;
     }
 
-    /*
+    /**
      * Sets the south neighbor of the current object.
      * 
      * @param southNeighbor the new southNeighbor to set.
@@ -176,7 +176,7 @@ public class AwareObject implements Serializable, InitActive {
         this.southNeighbor = southNeighbor;
     }
 
-    /*
+    /**
      * Sets the west neighbor of the current object.
      * 
      * @param westNeighbor the new westNeighbor to set.
@@ -185,7 +185,7 @@ public class AwareObject implements Serializable, InitActive {
         this.westNeighbor = westNeighbor;
     }
 
-    /*
+    /**
      * Sets the x-coordinate.
      * 
      * @param x the new x-coordinate to set.
@@ -194,7 +194,7 @@ public class AwareObject implements Serializable, InitActive {
         this.x = x;
     }
 
-    /*
+    /**
      * Sets the y-coordinate.
      * 
      * @param y the new y-coordinate to set.
@@ -203,7 +203,7 @@ public class AwareObject implements Serializable, InitActive {
         this.y = y;
     }
 
-    /*
+    /**
      * Returns a description for a given neighbor.
      * 
      * @param neighbor the neighbor we want to get description.
@@ -223,7 +223,7 @@ public class AwareObject implements Serializable, InitActive {
         return buf.toString();
     }
 
-    /*
+    /**
      * {@inheritDoc}
      */
     public String toString() {
@@ -247,7 +247,7 @@ public class AwareObject implements Serializable, InitActive {
         return buf.toString();
     }
 
-    /*
+    /**
      * {@inheritDoc}
      */
     @Override

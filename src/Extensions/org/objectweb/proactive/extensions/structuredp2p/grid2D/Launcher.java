@@ -1,6 +1,7 @@
 package org.objectweb.proactive.extensions.structuredp2p.grid2D;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Scanner;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -24,33 +25,38 @@ import org.objectweb.proactive.extensions.structuredp2p.util.Deployment;
 public class Launcher {
     private int nbCols;
     private int nbRows;
-    private static Node node;
-    private static boolean running = true;
-    private String entryPoint = "Grid2DEntryPoint";
+    
+    private String entryPointURL = "Grid2DEntryPoint";
+    private List<Node> avaibleNodes;
 
-    /*
+    private static boolean running = true;
+    
+    /**
      * Constructor.
      * 
-     * @param rows the number rows for the grid 2D.
+     * @param rows
+     *            the number rows for the grid 2D.
      * 
-     * @param cols the number of columns for the grid 2D.
+     * @param cols
+     *            the number of columns for the grid 2D.
      */
     public Launcher(String hostname, int rows, int cols) {
-        this.entryPoint = hostname;
+        this.entryPointURL = hostname;
         this.nbRows = rows;
         this.nbCols = cols;
     }
 
-    /*
+    /**
      * Creates the entry point. It's the required {@link AwareObject} in order to enter in the
      * AwareObject grid network.
      */
     public void createEntryPoint() {
         AwareObject entryPoint = null;
-        Launcher.node = Deployment.getVirtualNode("Grid2D").getANode();
+        this.avaibleNodes = Deployment.getVirtualNode("Grid2D").getNewNodes();
+
         try {
             entryPoint = (AwareObject) PAActiveObject.newActive(AwareObject.class.getName(), new Object[] {
-                    new Integer(0), new Integer(0) }, Launcher.node);
+                    new Integer(0), new Integer(0) });
 
             // Binds the entry point to a specific URL on the RMI registry
             PAActiveObject.registerByName(entryPoint, "Grid2DEntryPoint");
@@ -63,7 +69,7 @@ public class Launcher {
         }
     }
 
-    /*
+    /**
      * Creates <code>nbRows</code> <code>nbCols</code> AwareObjects by forming a grid2D. Each object
      * is inserted while using the <code>entryPoint</code>.
      */
@@ -78,13 +84,14 @@ public class Launcher {
         // Retrieve entryPoint
         try {
             entryPoint = (AwareObject) PAActiveObject.lookupActive(AwareObject.class.getName(),
-                    this.entryPoint);
+                    this.entryPointURL);
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
+        int nodeIndex = 0;
         for (int i = 1; i < nbAwareObjects; i++) {
             if (i % this.nbCols == 0) {
                 x = 0;
@@ -95,7 +102,7 @@ public class Launcher {
 
             try {
                 newAwareObject = (AwareObject) PAActiveObject.newActive(AwareObject.class.getName(),
-                        new Object[] { new Integer(x), new Integer(y) }, Launcher.node);
+                        new Object[] { new Integer(x), new Integer(y) }, this.avaibleNodes.get(nodeIndex));
                 Launcher.registerNewPeer(entryPoint, newAwareObject.getStub());
             } catch (ActiveObjectCreationException e) {
                 e.printStackTrace();
@@ -103,18 +110,27 @@ public class Launcher {
                 e.printStackTrace();
             } catch (Exception e) {
                 e.printStackTrace();
+            } finally {
+                if (nodeIndex == (this.avaibleNodes.size() - 1)) {
+                    nodeIndex = 0;
+                } else {
+                    nodeIndex++;
+                }
             }
         }
     }
 
-    /*
+    /**
      * Register a new peer as a neighbor.
      * 
-     * @param entryPoint the stub of the entryPoint used in order to find the position to register.
+     * @param entryPoint
+     *            the stub of the entryPoint used in order to find the position to register.
      * 
-     * @param peerStub the stub of the peer to register.
+     * @param peerStub
+     *            the stub of the peer to register.
      * 
-     * @throws Exception if the position is already token.
+     * @throws Exception
+     *             if the position is already token.
      */
     public static void registerNewPeer(AwareObject entryPoint, AwareObject peerStub) throws Exception {
         int peerX = peerStub.getX();
@@ -159,10 +175,11 @@ public class Launcher {
         }
     }
 
-    /*
+    /**
      * Entry point of the application.
      * 
-     * @param args parameters given to the application when launched.
+     * @param args
+     *            parameters given to the application when launched.
      */
     public static void main(String args[]) {
         if (args.length != 4) {
@@ -250,7 +267,7 @@ public class Launcher {
         inputThread.start();
     }
 
-    /*
+    /**
      * Print app menu option on the standard output.
      */
     private static void printOptions() {
