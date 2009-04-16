@@ -17,10 +17,11 @@ import java.util.Set;
 public interface SpacesDirectory {
 
 	/**
-	 * Lookup for space instance info with given mounting point uri.
+	 * Lookup for space instance info with given mounting point URI (must be
+	 * complete).
 	 * 
 	 * @param uri
-	 *            mounting point uri of data space to look up
+	 *            mounting point URI of data space to look up
 	 * @return SpaceInstanceInfo mapping or null if not available
 	 * @throws IllegalArgumentException
 	 *             when specified DataSpacesURI is not complete or contains path
@@ -28,21 +29,21 @@ public interface SpacesDirectory {
 	public SpaceInstanceInfo lookupFirst(DataSpacesURI uri) throws IllegalArgumentException;
 
 	/**
-	 * Lookup for all space instance info that have specified uri as a root of
-	 * their mounting point (<code>ls -R</code> like). Subsequent method calls
+	 * Lookup for all SpaceInstanceInfo with root of its mounting point that
+	 * matches specified URI (<code>ls -R</code> like). Subsequent method calls
 	 * may return different result - the same or with new elements.
 	 * 
 	 * @param uri
-	 *            root uri to look up
+	 *            root URI to look up
 	 * @return SpaceInstanceInfo mappings or null if none is available
 	 * @throws IllegalArgumentException
-	 *             when specified uri is complete
+	 *             when specified URI is complete
 	 */
 	public Set<SpaceInstanceInfo> lookupAll(DataSpacesURI uri) throws IllegalArgumentException;
 
 	/**
 	 * Registers new space instance info. If mounting point of that space
-	 * instance has been already in the directory, an exception is reised as
+	 * instance has been already in the directory, an exception is raised as
 	 * directory is append-only.
 	 * 
 	 * @param spaceInstanceInfo
@@ -62,7 +63,7 @@ public interface SpacesDirectory {
 	 * Unregisters space instance info specified by DataSpacesURI.
 	 * 
 	 * @param uri
-	 *            - mounting point uri that is to be unregistered
+	 *            - mounting point URI that is to be unregistered
 	 * @return <code>true</code> if space instance with given DataSpacesURI has
 	 *         been found; <code>false</code> otherwise
 	 */
