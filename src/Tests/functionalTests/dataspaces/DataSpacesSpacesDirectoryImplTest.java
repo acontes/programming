@@ -59,6 +59,15 @@ public class DataSpacesSpacesDirectoryImplTest {
 	}
 
 	@Test
+	public void testRegister() {
+		try {
+			dir.register(spaceInstanceInfo1a);
+			fail("Exception expected");
+		} catch (Exception e) {
+		}
+	}
+
+	@Test
 	public void testLookupFirst() {
 		final DataSpacesURI query1 = DataSpacesURI.createInOutSpaceURI(1, SpaceType.INPUT, "input1");
 		final DataSpacesURI query2 = DataSpacesURI.createInOutSpaceURI(1, SpaceType.INPUT, "input2");
