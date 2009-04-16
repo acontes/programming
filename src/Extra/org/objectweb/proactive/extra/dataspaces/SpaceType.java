@@ -15,6 +15,12 @@ public enum SpaceType implements Serializable, Comparable<SpaceType> {
 		return name().toLowerCase();
 	}
 
+	public String getDefaultName() {
+		if (this == SCRATCH)
+			throw new UnsupportedOperationException("No default name for a scratch data space");
+		return "default";
+	}
+
 	public SpaceType succ() {
 		final SpaceType[] v = SpaceType.values();
 		final int n = this.ordinal() + 1;
