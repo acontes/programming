@@ -73,6 +73,9 @@ public class SpacesDirectoryImpl implements SpacesDirectory {
 		// get mounting point URI that cannot be null
 		synchronized (data) {
 			mpoint = spaceInstanceInfo.getMountingPoint();
+
+			if (data.containsKey(mpoint))
+				throw new IllegalArgumentException("Mapping for a given space URI is already registered");
 			data.put(mpoint, spaceInstanceInfo);
 		}
 	}

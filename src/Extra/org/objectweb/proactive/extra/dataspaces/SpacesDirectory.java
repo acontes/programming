@@ -6,8 +6,8 @@ package org.objectweb.proactive.extra.dataspaces;
 import java.util.Set;
 
 /**
- * Stores mappings to SpaceInstanceInfos from DataSpacesURI and provides methods for
- * registering and lookup. The most common lookups are:
+ * Stores mappings to SpaceInstanceInfos from DataSpacesURI and provides methods
+ * for registering and lookup. The most common lookups are:
  * <ul>
  * <li>lookup SpaceInstanceInfo for DataSpacesURI</li>
  * <li>lookup SpaceInstanceInfo for input/output name</li>
@@ -42,8 +42,8 @@ public interface SpacesDirectory {
 
 	/**
 	 * Registers new space instance info. If mounting point of that space
-	 * instance has been already in the directory, the old entry is replaced
-	 * with the new one.
+	 * instance has been already in the directory, an exception is reised as
+	 * directory is append-only.
 	 * 
 	 * @param spaceInstanceInfo
 	 *            - space instance info to register
@@ -51,16 +51,20 @@ public interface SpacesDirectory {
 	 *             when directory is aware of all registered applications and
 	 *             there is no such application for SpaceInstanceInfo being
 	 *             registered
+	 * @throws IllegalArgumentException
+	 *             when directory already contains any space instance under
+	 *             specified mounting point
 	 */
-	public void register(SpaceInstanceInfo spaceInstanceInfo) throws IllegalStateException;
+	public void register(SpaceInstanceInfo spaceInstanceInfo) throws IllegalStateException,
+			IllegalArgumentException;
 
 	/**
 	 * Unregisters space instance info specified by DataSpacesURI.
 	 * 
 	 * @param uri
 	 *            - mounting point uri that is to be unregistered
-	 * @return <code>true</code> if space instance with given DataSpacesURI has been
-	 *         found; <code>false</code> otherwise
+	 * @return <code>true</code> if space instance with given DataSpacesURI has
+	 *         been found; <code>false</code> otherwise
 	 */
 	public boolean unregister(DataSpacesURI uri);
 }
