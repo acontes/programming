@@ -28,17 +28,18 @@ public class SpaceInstanceInfo implements Serializable {
 	 * Creates SpaceInstanceInfo for scratch data space.
 	 * 
 	 * @param appid
-	 * @param nodeId
+	 *            application identifier
 	 * @param runtimeId
+	 *            runtime identifier
+	 * @param nodeId
+	 *            node identifier
 	 * @param config
-	 *            valid scratch data space configuration (@see
-	 *            {@link DataSpacesURI#createScratchSpaceURI(long, String, String)}
-	 *            )
+	 *            scratch data space configuration
 	 */
-	public SpaceInstanceInfo(long appid, String nodeId, String runtimeId, SpaceConfiguration config) {
+	public SpaceInstanceInfo(long appid, String runtimeId, String nodeId, SpaceConfiguration config) {
 
-		if (config == null)
-			throw new IllegalArgumentException("Space configuration is null");
+		if (runtimeId == null || nodeId == null || config == null)
+			throw new IllegalArgumentException("Configuration can not be null");
 
 		if (config.getType() != SpaceType.SCRATCH)
 			throw new IllegalArgumentException("This constructor must be used for scratch data space.");
@@ -53,10 +54,9 @@ public class SpaceInstanceInfo implements Serializable {
 	 * Creates SpaceInstanceInfo for input/output data space.
 	 * 
 	 * @param appid
+	 *            application id
 	 * @param config
-	 *            valid input/output data space configuration (@see
-	 *            {@link DataSpacesURI#createInOutSpaceURI(long, SpaceType, String)}
-	 *            )
+	 *            input or output data space configuration
 	 */
 	public SpaceInstanceInfo(long appid, SpaceConfiguration config) {
 
