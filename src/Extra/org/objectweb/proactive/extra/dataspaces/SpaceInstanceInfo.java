@@ -88,14 +88,29 @@ public class SpaceInstanceInfo implements Serializable {
 		return mountingPoint;
 	}
 
+	/**
+	 * Returns the name of a mounting point.
+	 *
+	 * @return
+	 */
 	public String getName() {
 		return mountingPoint.getName();
 	}
 
+	/**
+	 * Returns data space type of a mounting point.
+	 *
+	 * @return
+	 */
 	public SpaceType getType() {
 		return mountingPoint.getSpaceType();
 	}
 
+	/**
+	 * Returns application id of a mounting point.
+	 *
+	 * @return
+	 */
 	public long getAppId() {
 		return mountingPoint.getAppId();
 	}
