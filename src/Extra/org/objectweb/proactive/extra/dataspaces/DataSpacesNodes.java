@@ -27,7 +27,7 @@ public class DataSpacesNodes {
 	 * @return {@link NodeConfigurator}
 	 */
 	public static synchronized NodeConfigurator getNodeConfigurator(Node node) {
-		final String name = extractNodeId(node);
+		final String name = Utils.extractNodeId(node);
 
 		if (nodeConfigurators.containsKey(name))
 			return nodeConfigurators.get(name);
@@ -52,7 +52,7 @@ public class DataSpacesNodes {
 	 *             node.
 	 */
 	public static synchronized DataSpacesImpl getDataSpacesImpl(Node node) throws IllegalArgumentException {
-		final String name = extractNodeId(node);
+		final String name = Utils.extractNodeId(node);
 
 		if (dataSpacesImpls.containsKey(name))
 			return dataSpacesImpls.get(name);
@@ -101,7 +101,7 @@ public class DataSpacesNodes {
 	public static void doConfigureApplication(Node node, long appid, String namingServiceURL) {
 		final NodeConfigurator nconfig = getNodeConfigurator(node);
 		final DataSpacesImpl dsImpl = nconfig.configureApplication(appid, namingServiceURL);
-		final String nname = extractNodeId(node);
+		final String nname = Utils.extractNodeId(node);
 
 		putDataSpaceImplSynch(nname, dsImpl);
 	}
@@ -113,7 +113,7 @@ public class DataSpacesNodes {
 	 * @param node
 	 */
 	public static synchronized void closeNode(Node node) {
-		final String nname = extractNodeId(node);
+		final String nname = Utils.extractNodeId(node);
 
 		if (!nodeConfigurators.containsKey(nname))
 			throw new IllegalArgumentException("NodeConfigurator for given node not found.");
@@ -129,7 +129,7 @@ public class DataSpacesNodes {
 	 * @param node
 	 */
 	public static synchronized void closeNodesApplication(Node node) {
-		final String nname = extractNodeId(node);
+		final String nname = Utils.extractNodeId(node);
 
 		if (!nodeConfigurators.containsKey(nname))
 			throw new IllegalArgumentException("NodeConfigurator for given node not found.");
@@ -147,9 +147,5 @@ public class DataSpacesNodes {
 	 */
 	private static synchronized void putDataSpaceImplSynch(String nname, DataSpacesImpl impl) {
 		dataSpacesImpls.put(nname, impl);
-	}
-
-	private static String extractNodeId(final Node node) {
-		return node.getNodeInformation().getName();
 	}
 }
