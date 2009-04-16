@@ -40,7 +40,7 @@ public class SpaceInstanceInfo implements Serializable {
 		if (config == null)
 			throw new IllegalArgumentException("Space configuration is null");
 
-		if (config.getDsType() != SpaceType.SCRATCH)
+		if (config.getType() != SpaceType.SCRATCH)
 			throw new IllegalArgumentException("This constructor must be used for scratch data space.");
 
 		this.mountingPoint = DataSpacesURI.createScratchSpaceURI(appid, runtimeId, nodeId);
@@ -63,10 +63,10 @@ public class SpaceInstanceInfo implements Serializable {
 		if (config == null)
 			throw new IllegalArgumentException("Space configuration is null");
 
-		if (config.getDsType() == SpaceType.SCRATCH)
+		if (config.getType() == SpaceType.SCRATCH)
 			throw new IllegalArgumentException("This constructor cannot be used for scratch data space.");
 
-		this.mountingPoint = DataSpacesURI.createInOutSpaceURI(appid, config.getDsType(), config.getName());
+		this.mountingPoint = DataSpacesURI.createInOutSpaceURI(appid, config.getType(), config.getName());
 		this.url = config.getUrl();
 		this.hostname = config.getHostname();
 		this.path = config.path;

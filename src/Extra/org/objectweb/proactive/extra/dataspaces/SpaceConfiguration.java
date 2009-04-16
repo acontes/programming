@@ -12,15 +12,15 @@ public class SpaceConfiguration {
 	protected String url;
 	protected String path;
 	protected String hostname;
-	protected SpaceType dsType;
+	protected SpaceType spaceType;
 	protected String name;
 
 	// TODO change it, check semantics?
-	public SpaceConfiguration(String url, String path, String hostname, SpaceType dsType, String name) {
+	public SpaceConfiguration(String url, String path, String hostname, SpaceType spaceType, String name) {
 		this.url = url;
 		this.path = path;
 		this.hostname = hostname;
-		this.dsType = dsType;
+		this.spaceType = spaceType;
 		this.name = name;
 	}
 
@@ -36,8 +36,8 @@ public class SpaceConfiguration {
 		return hostname;
 	}
 
-	public SpaceType getDsType() {
-		return dsType;
+	public SpaceType getType() {
+		return spaceType;
 	}
 
 	public String getName() {
