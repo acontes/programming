@@ -48,7 +48,7 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException
  * 
  * <p>
  * URI instances are created through dedicated factory methods or parsing
- * factory.
+ * factory. Instances of this class are immutable, thread-safe.
  * 
  */
 public final class DataSpacesURI implements Serializable, Comparable<DataSpacesURI> {
@@ -382,6 +382,9 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
 	 * @see #isComplete()
 	 */
 	public DataSpacesURI withPath(String path) {
+		if (this.path == path || (path != null && this.path != null && path.equals(this.path))) {
+			return this;
+		}
 		if (path != null && path.length() > 0 && !isComplete()) {
 			throw new IllegalStateException("only complete URIs can have path");
 		}
