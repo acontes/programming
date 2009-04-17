@@ -15,7 +15,9 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredException;
+import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceAlreadyRegisteredException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundException;
+import org.objectweb.proactive.extra.dataspaces.exceptions.WrongApplicationIdException;
 
 // TODO what about IO exceptions?
 /**
@@ -279,11 +281,12 @@ public class DataSpacesImpl {
 	 * @param url
 	 * @param type
 	 * @return
-	 * @throws IllegalArgumentException
+	 * @throws SpaceAlreadyRegisteredException
 	 *             when specified space type is neither input nor output
+	 * @throws WrongApplicationIdException
 	 */
 	public String addInputOutput(String name, String path, String url, SpaceType type)
-			throws IllegalArgumentException {
+			throws SpaceAlreadyRegisteredException {
 
 		assertIsInputOrOutput(type);
 
@@ -294,7 +297,11 @@ public class DataSpacesImpl {
 		final SpaceConfiguration config = new SpaceConfiguration(url, path, hostname, type, name);
 		final SpaceInstanceInfo spaceInstanceInfo = new SpaceInstanceInfo(appId, config);
 
-		spacesDirectory.register(spaceInstanceInfo);
+		try {
+			spacesDirectory.register(spaceInstanceInfo);
+		} catch (WrongApplicationIdException e) {
+			throw new ProActiveRuntimeException("DataSpaces catched exception that should not occure", e);
+		}
 		return DataSpacesURI.createInOutSpaceURI(appId, type, name).toString();
 	}
 

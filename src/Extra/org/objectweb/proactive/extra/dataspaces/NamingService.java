@@ -6,6 +6,8 @@ package org.objectweb.proactive.extra.dataspaces;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.objectweb.proactive.extra.dataspaces.exceptions.ApplicationAlreadyRegisteredException;
+
 /**
  * Manages application register/unregister process in space directory.
  * Implements SpacesDirectory. TODO: Remote accessible.
@@ -27,14 +29,16 @@ public class NamingService extends SpacesDirectoryImpl implements SpacesDirector
 	 *            bulked outputs definitions
 	 * 
 	 * @throws IllegalArgumentException
-	 *             When given appid doesn't match with one found in DataSpacesURI or
-	 *             found the same entry in input and output spaces set. In these
-	 *             cases the register operation is rolled back.
-	 * @throws IllegalStateException
+	 *             When given appid doesn't match with one found in
+	 *             DataSpacesURI or found the same entry in input and output
+	 *             spaces set. In these cases the register operation is rolled
+	 *             back.
+	 * @throws ApplicationAlreadyRegisteredException
 	 *             When specified application id is already registered.
 	 */
 	synchronized public void registerApplication(long appid, Set<SpaceInstanceInfo> inputSpaces,
-			Set<SpaceInstanceInfo> outputSpaces) throws IllegalArgumentException {
+			Set<SpaceInstanceInfo> outputSpaces) throws IllegalArgumentException,
+			ApplicationAlreadyRegisteredException {
 
 		if (isApplicationIdRegistered(appid)) {
 			throw new IllegalStateException("Application with the same application id is already registered.");

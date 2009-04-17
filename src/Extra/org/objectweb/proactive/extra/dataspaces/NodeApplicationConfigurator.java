@@ -4,6 +4,9 @@
 package org.objectweb.proactive.extra.dataspaces;
 
 import org.apache.commons.vfs.impl.DefaultFileSystemManager;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceAlreadyRegisteredException;
+import org.objectweb.proactive.extra.dataspaces.exceptions.WrongApplicationIdException;
 
 /**
  * Maintains configuration for application and its life cycle. Each instance can
@@ -73,7 +76,14 @@ public class NodeApplicationConfigurator {
 		// create scratch data space for this application and register it
 		applicationScratchSpace = nodeScratchSpace.initForApplication(appid);
 		scratchInfo = applicationScratchSpace.getSpaceInstanceInfo();
-		cachingDirectory.register(scratchInfo);
+
+		try {
+			cachingDirectory.register(scratchInfo);
+		} catch (WrongApplicationIdException e) {
+			throw new ProActiveRuntimeException("DataSpaces catched exception that should not occure", e);
+		} catch (SpaceAlreadyRegisteredException e) {
+			// FIXME!? can happen?
+		}
 
 		// create SpacesMountManager
 		// TODO

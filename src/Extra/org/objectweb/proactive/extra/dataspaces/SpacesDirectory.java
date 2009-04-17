@@ -6,6 +6,7 @@ package org.objectweb.proactive.extra.dataspaces;
 import java.util.Set;
 
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceAlreadyRegisteredException;
+import org.objectweb.proactive.extra.dataspaces.exceptions.WrongApplicationIdException;
 
 /**
  * Stores mappings to SpaceInstanceInfos from DataSpacesURI and provides methods
@@ -50,7 +51,7 @@ public interface SpacesDirectory {
 	 * 
 	 * @param spaceInstanceInfo
 	 *            - space instance info to register
-	 * @throws IllegalStateException
+	 * @throws WrongApplicationIdException
 	 *             when directory is aware of all registered applications and
 	 *             there is no such application for SpaceInstanceInfo being
 	 *             registered
@@ -58,9 +59,8 @@ public interface SpacesDirectory {
 	 *             when directory already contains any space instance under
 	 *             specified mounting point
 	 */
-	public void register(SpaceInstanceInfo spaceInstanceInfo) throws IllegalStateException;
-
-	// SpaceAlreadyRegisteredException;
+	public void register(SpaceInstanceInfo spaceInstanceInfo) throws WrongApplicationIdException,
+			SpaceAlreadyRegisteredException;
 
 	/**
 	 * Unregisters space instance info specified by DataSpacesURI.

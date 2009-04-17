@@ -5,6 +5,9 @@ package org.objectweb.proactive.extra.dataspaces;
 
 import java.util.Set;
 
+import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceAlreadyRegisteredException;
+import org.objectweb.proactive.extra.dataspaces.exceptions.WrongApplicationIdException;
+
 /**
  * Decorator of SpacesDirectory that caches SpaceInstanceInfo in its
  * SpacesDirectoryImpl instance.
@@ -71,7 +74,9 @@ public class CachingSpacesDirectory implements SpacesDirectory {
 	 * (org.objectweb.proactive.extensions.dataspaces.DataSpacesURI,
 	 * org.objectweb.proactive.extensions.dataspaces.SpaceInstanceInfo)
 	 */
-	public void register(SpaceInstanceInfo spaceInstanceInfo) {
+	public void register(SpaceInstanceInfo spaceInstanceInfo) throws SpaceAlreadyRegisteredException,
+			WrongApplicationIdException {
+
 		remoteDirectory.register(spaceInstanceInfo);
 		localDirectory.register(spaceInstanceInfo);
 	}

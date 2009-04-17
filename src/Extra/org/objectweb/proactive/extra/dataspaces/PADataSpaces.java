@@ -12,13 +12,14 @@ import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.extensions.webservices.soap.ProActiveProvider;
 import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredException;
+import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceAlreadyRegisteredException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundException;
 
 // TODO fix the javadoc!
 /**
  * The ProActive Data Spaces API. (delegates method calls to DataSpacesImpl)
- *
- *
+ * 
+ * 
  * TODO This call might block for a while if there is a need to wait for start
  * up of some remote provider or it needs to be mounted.
  */
@@ -41,7 +42,7 @@ public class PADataSpaces {
 	 * 
 	 * TODO it can block when input needs to be mounted (timeout exception is
 	 * being thrown after some configurable period).
-	 *
+	 * 
 	 * @see {@link #resolveDefaultInputBlocking(long)}
 	 * @return File handle for the default input data space
 	 * @throws SpaceNotFoundException
@@ -394,11 +395,12 @@ public class PADataSpaces {
 	 * @param path
 	 * @param url
 	 * @return URI of a created input data space
+	 * @throws SpaceAlreadyRegisteredException
+	 *             if any input with specified name has been already registered
 	 */
-	public static String addInput(String name, String path, String url) {
-		// TODO exception? , i.e. if any
-		// * input with provided name is already registered, this method
-		// * throws an exception.
+	public static String addInput(String name, String path, String url)
+			throws SpaceAlreadyRegisteredException {
+
 		return DataSpacesNodes.getDataSpacesImpl().addInputOutput(name, path, url, SpaceType.INPUT);
 	}
 
@@ -432,11 +434,12 @@ public class PADataSpaces {
 	 * @param path
 	 * @param url
 	 * @return URI of a created output data space
+	 * @throws SpaceAlreadyRegisteredException
+	 *             if any input with specified name has been already registered
 	 */
-	public static String addOutput(String name, String path, String url) {
-		// TODO exception? , i.e. if any
-		// * input with provided name is already registered, this method
-		// * throws an exception.
+	public static String addOutput(String name, String path, String url)
+			throws SpaceAlreadyRegisteredException {
+
 		return DataSpacesNodes.getDataSpacesImpl().addInputOutput(name, path, url, SpaceType.OUTPUT);
 	}
 
