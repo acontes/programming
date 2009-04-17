@@ -6,7 +6,7 @@ package org.objectweb.proactive.extra.dataspaces.exceptions;
 /**
  * Represents exception caused by request for non-existing data space.
  */
-public class SpaceNotFoundException extends DataSpacesConfigurationException {
+public class SpaceNotFoundException extends DataSpacesException {
 
 	/**
 	 * 

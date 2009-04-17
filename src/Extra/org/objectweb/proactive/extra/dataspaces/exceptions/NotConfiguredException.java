@@ -3,25 +3,23 @@
  */
 package org.objectweb.proactive.extra.dataspaces.exceptions;
 
-import org.objectweb.proactive.core.ProActiveException;
-
 /**
  *
  *
  */
-public class DataSpacesConfigurationException extends ProActiveException {
+public class NotConfiguredException extends DataSpacesException {
 
 	/**
 	 *
 	 */
-	public DataSpacesConfigurationException() {
+	public NotConfiguredException() {
 		// TODO Auto-generated constructor stub
 	}
 
 	/**
 	 * @param message
 	 */
-	public DataSpacesConfigurationException(String message) {
+	public NotConfiguredException(String message) {
 		super(message);
 		// TODO Auto-generated constructor stub
 	}
@@ -30,7 +28,7 @@ public class DataSpacesConfigurationException extends ProActiveException {
 	 * @param message
 	 * @param cause
 	 */
-	public DataSpacesConfigurationException(String message, Throwable cause) {
+	public NotConfiguredException(String message, Throwable cause) {
 		super(message, cause);
 		// TODO Auto-generated constructor stub
 	}
@@ -38,7 +36,7 @@ public class DataSpacesConfigurationException extends ProActiveException {
 	/**
 	 * @param cause
 	 */
-	public DataSpacesConfigurationException(Throwable cause) {
+	public NotConfiguredException(Throwable cause) {
 		super(cause);
 		// TODO Auto-generated constructor stub
 	}

@@ -11,9 +11,10 @@ import java.util.Map.Entry;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
-import org.objectweb.proactive.extra.dataspaces.exceptions.DataSpacesConfigurationException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException;
+import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundException;
 
 // TODO what about IO exceptions?
@@ -68,19 +69,22 @@ public class DataSpacesImpl {
 	 * @see {@link PADataSpaces#resolveScratchForAO()}
 	 * @return FileObject received from SpacesMountManager instance
 	 * @throws FileSystemException
-	 * @throws DataSpacesConfigurationException
+	 * @throws NotConfiguredException
 	 *             when scratch is not configured
 	 */
-	public FileObject resolveScratchForAO() throws FileSystemException, DataSpacesConfigurationException {
+	public FileObject resolveScratchForAO() throws FileSystemException, NotConfiguredException {
 
 		if (appScratchSpace == null)
-			throw new DataSpacesConfigurationException("Scratch data space not configured on this node");
+			throw new NotConfiguredException("Scratch data space not configured on this node");
 
 		final String aoid = Utils.extractAOId();
 		final DataSpacesURI scratchURI = appScratchSpace.getScratchForAO(aoid);
-		final FileObject fo = spacesMountManager.resolveFile(scratchURI);
-
-		return fo;
+		try {
+			return spacesMountManager.resolveFile(scratchURI);
+		} catch (SpaceNotFoundException e) {
+			// TODO log?
+			throw new ProActiveRuntimeException("DataSpaces catched exception that should not occure", e);
+		}
 	}
 
 	/**
@@ -282,6 +286,9 @@ public class DataSpacesImpl {
 			throws IllegalArgumentException {
 
 		assertIsInputOrOutput(type);
+
+		if (name == null || name.equals(""))
+			name = type.getDefaultName();
 
 		final String hostname = Utils.getHostnameForThis();
 		final SpaceConfiguration config = new SpaceConfiguration(url, path, hostname, type, name);

@@ -7,7 +7,7 @@ package org.objectweb.proactive.extra.dataspaces.exceptions;
  * Represents exception caused by usage or request for Data Spaces URI with
  * wrong format.
  */
-public class MalformedURIException extends Exception {
+public class MalformedURIException extends DataSpacesException {
 
 	/**
 	 * 

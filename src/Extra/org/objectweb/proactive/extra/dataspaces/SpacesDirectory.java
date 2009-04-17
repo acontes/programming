@@ -5,6 +5,8 @@ package org.objectweb.proactive.extra.dataspaces;
 
 import java.util.Set;
 
+import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceAlreadyRegisteredException;
+
 /**
  * Stores mappings to SpaceInstanceInfos from DataSpacesURI and provides methods
  * for registering and lookup. The most common lookups are:
@@ -52,12 +54,12 @@ public interface SpacesDirectory {
 	 *             when directory is aware of all registered applications and
 	 *             there is no such application for SpaceInstanceInfo being
 	 *             registered
-	 * @throws IllegalArgumentException
+	 * @throws SpaceAlreadyRegisteredException
 	 *             when directory already contains any space instance under
 	 *             specified mounting point
 	 */
 	public void register(SpaceInstanceInfo spaceInstanceInfo) throws IllegalStateException,
-			IllegalArgumentException;
+			SpaceAlreadyRegisteredException;
 
 	/**
 	 * Unregisters space instance info specified by DataSpacesURI.

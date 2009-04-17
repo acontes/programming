@@ -4,10 +4,10 @@
 package org.objectweb.proactive.extra.dataspaces;
 
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.ProActiveInet;
-import org.objectweb.proactive.extra.dataspaces.exceptions.DataSpacesRuntimeException;
 
 /**
  * Static utilities methods.
@@ -42,7 +42,7 @@ public class Utils {
 		try {
 			return PAActiveObject.getNode();
 		} catch (NodeException e) {
-			throw new DataSpacesRuntimeException(e);
+			throw new ProActiveRuntimeException("DataSpaces catched exception that should not occure", e);
 		}
 	}
 }
