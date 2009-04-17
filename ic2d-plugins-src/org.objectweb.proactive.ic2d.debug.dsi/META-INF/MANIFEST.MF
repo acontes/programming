@@ -6,12 +6,18 @@ Bundle-Version: 1.0.0
 Bundle-Activator: org.objectweb.proactive.ic2d.debug.dsi.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- org.objectweb.proactive.ic2d.console;bundle-version="1.0.0",
+ org.eclipse.draw2d;bundle-version="3.4.2",
+ org.objectweb.proactive.ic2d.lib;bundle-version="1.0.0",
  org.objectweb.proactive.ic2d.JMXmonitoring;bundle-version="1.0.0",
- org.objectweb.proactive.ic2d.lib;bundle-version="1.0.0"
+ org.objectweb.proactive.ic2d.console;bundle-version="1.0.0",
+ org.eclipse.zest.core,
+ org.eclipse.zest.layouts,
+ org.eclipse.ui.forms
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: ProActive
 Eclipse-RegisterBuddy: org.objectweb.proactive.ic2d.lib
 Export-Package: org.objectweb.proactive.ic2d.debug.dsi,
  org.objectweb.proactive.ic2d.debug.dsi.handler,
- org.objectweb.proactive.ic2d.debug.dsi.handler.listeners
+ org.objectweb.proactive.ic2d.debug.dsi.handler.listeners,
+ org.objectweb.proactive.ic2d.debug.dsi.views
+

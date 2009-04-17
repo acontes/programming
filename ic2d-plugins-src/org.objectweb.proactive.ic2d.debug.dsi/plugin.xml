@@ -6,4 +6,18 @@
          <action_class
 		class="org.objectweb.proactive.ic2d.debug.dsi.handler.listeners.JMXListener" />
    </extension>
+   <extension
+       id="org.objectweb.proactive.ic2d.debug.views"
+       name="Debug Views"
+       point="org.eclipse.ui.views">
+       <view
+            allowMultiple="true"
+            category="org.objectweb.proactive.ic2d.debug.DebugCategory"
+            class="org.objectweb.proactive.ic2d.debug.dsi.views.CommunicationGraphView"
+            id="org.objectweb.proactive.ic2d.debug.dsi.views.CommunicationGraphView"
+            name="Communication Graph"/>
+       <category
+            id="org.objectweb.proactive.ic2d.debug.DebugCategory"
+            name="Debug"/>
+   </extension>
 </plugin>

@@ -139,6 +139,8 @@
       <plugin id="org.eclipse.update.core"/>
       <plugin id="org.eclipse.update.core.linux" fragment="true"/>
       <plugin id="org.eclipse.update.ui"/>
+      <plugin id="org.eclipse.zest.core"/>
+      <plugin id="org.eclipse.zest.layouts"/>
       <plugin id="org.mozilla.rhino"/>
       <plugin id="org.objectweb.proactive.ic2d"/>
       <plugin id="org.objectweb.proactive.ic2d.JMXmonitoring"/>
