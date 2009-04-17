@@ -34,6 +34,7 @@ package org.objectweb.proactive.extensions.mixedlocation;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.dsi.RequestTags;
 import org.objectweb.proactive.core.body.migration.MigrationManager;
 import org.objectweb.proactive.core.body.migration.MigrationManagerFactory;
 import org.objectweb.proactive.core.body.request.Request;
@@ -100,8 +101,8 @@ public class MixedLocationMetaObjectFactory extends ProActiveMetaObjectFactory {
         transient private LocationServer server = LocationServerFactory.getLocationServer();
 
         public Request newRequest(MethodCall methodCall, UniversalBody sourceBody, boolean isOneWay,
-                long sequenceID) {
-            return new RequestWithMixedLocation(methodCall, sourceBody, isOneWay, sequenceID, server);
+                long sequenceID, RequestTags tags) {
+            return new RequestWithMixedLocation(methodCall, sourceBody, isOneWay, sequenceID, server, tags);
         }
     }
 

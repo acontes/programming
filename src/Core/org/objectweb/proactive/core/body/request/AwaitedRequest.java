@@ -38,6 +38,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.dsi.RequestTags;
 import org.objectweb.proactive.core.body.ft.exception.ProtocolErrorException;
 import org.objectweb.proactive.core.body.ft.message.MessageInfo;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
@@ -77,6 +78,10 @@ public class AwaitedRequest implements Request, java.io.Serializable {
     //Non Functional Requests
     protected boolean isNFRequest = false;
     protected int nfRequestPriority;
+
+
+    // Request Tags
+    protected RequestTags tags;
 
     /**
      * Create a new awaited request.
@@ -270,5 +275,13 @@ public class AwaitedRequest implements Request, java.io.Serializable {
      */
     public String getSenderNodeURL() {
         return this.wrappedRequest.getSenderNodeURL();
+    }
+
+    /**
+     * Return the tags on this request
+     * @return tags
+     */
+    public RequestTags getTags() {
+        return tags;
     }
 }

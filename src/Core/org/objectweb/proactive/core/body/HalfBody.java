@@ -35,6 +35,11 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Job;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.dsi.RequestTags;
+import org.objectweb.proactive.core.body.dsi.TagRegistry;
+import org.objectweb.proactive.core.body.dsi.UnknowTagException;
+import org.objectweb.proactive.core.body.dsi.propagation.policy.RequiredPolicy;
 import org.objectweb.proactive.core.body.exceptions.HalfBodyException;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.ft.service.FaultToleranceTechnicalService;
@@ -259,8 +264,16 @@ public class HalfBody extends AbstractBody {
         public void sendRequest(MethodCall methodCall, Future future, UniversalBody destinationBody)
                 throws java.io.IOException, RenegotiateSessionException, CommunicationForbiddenException {
             long sequenceID = getNextSequenceID();
+            // Create DSI RequestTags
+            RequestTags tags = new RequestTags();
+            try {
+                tags.setTag("DSI");
+            } catch (UnknowTagException e) {
+                TagRegistry.getInstance().register("DSI", new RequiredPolicy());
+            }
+
             Request request = this.internalRequestFactory.newRequest(methodCall, HalfBody.this,
-                    future == null, sequenceID);
+                    future == null, sequenceID, tags);
 
             // COMPONENTS : generate ComponentRequest for component messages
             if (methodCall.getComponentMetadata() != null) {

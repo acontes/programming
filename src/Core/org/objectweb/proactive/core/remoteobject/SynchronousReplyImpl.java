@@ -36,6 +36,7 @@ import java.io.Serializable;
 
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.dsi.RequestTags;
 import org.objectweb.proactive.core.body.ft.message.MessageInfo;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.future.MethodCallResult;
@@ -132,5 +133,11 @@ public class SynchronousReplyImpl implements Reply, Serializable {
 
     public void setMessageInfo(MessageInfo mi) {
         // TODO Auto-generated method stub
+    }
+
+    @Override
+    public RequestTags getTags() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

@@ -81,6 +81,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/wsdl4j-1.5.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xercesImpl.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xml-apis.jar"/>
-	<classpathentry exported="true" kind="lib" path="ProActive.jar"/>
+	<classpathentry exported="true" kind="lib" path="ProActive.jar" sourcepath="/proactive"/>
 	<classpathentry kind="output" path=""/>
 </classpath>

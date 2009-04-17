@@ -82,6 +82,8 @@ public interface Loggers {
 
     public static final String BNB = CORE + "bnb";
 
+    public static final String DSI = CORE + ".dsi";
+
     // Security loggers
     public static final String SECURITY = CORE + ".security";
     public static final String SECURITY_NODE = SECURITY + ".node";

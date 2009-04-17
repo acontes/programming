@@ -39,6 +39,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.dsi.RequestTags;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.ft.protocols.FTManagerFactory;
 import org.objectweb.proactive.core.body.ft.protocols.cic.managers.FTManagerCIC;
@@ -300,14 +301,14 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
     //  //
     protected static class RequestFactoryImpl implements RequestFactory, java.io.Serializable {
         public Request newRequest(MethodCall methodCall, UniversalBody sourceBody, boolean isOneWay,
-                long sequenceID) {
+                long sequenceID, RequestTags tags) {
             //########### exemple de code pour les nouvelles factories
             //			if(System.getProperty("migration.stategy").equals("locationserver")){
             //				  return new RequestWithLocationServer(methodCall, sourceBody,
             //                isOneWay, sequenceID, LocationServerFactory.getLocationServer());
             //			}else{
             return new org.objectweb.proactive.core.body.request.RequestImpl(methodCall, sourceBody,
-                isOneWay, sequenceID);
+                isOneWay, sequenceID, tags);
             //}
         }
     }
