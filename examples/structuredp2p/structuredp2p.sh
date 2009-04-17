@@ -10,7 +10,7 @@ fi
 . ${workingDir}/../env.sh
 
 default_descriptor=${workingDir}/GCMA.xml
-default_hostname=localhost
+default_hostname=`hostname`
 
 if [[ $# -eq  0 ]]
 then
