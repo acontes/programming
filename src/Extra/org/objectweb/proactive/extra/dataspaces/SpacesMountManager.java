@@ -3,8 +3,6 @@
  */
 package org.objectweb.proactive.extra.dataspaces;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -30,8 +28,7 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundExceptio
 public class SpacesMountManager {
 	public static String getAccessURL(final SpaceInstanceInfo spaceInfo) {
 		final String spaceHostname = spaceInfo.getHostname();
-
-		if (spaceHostname != null && spaceHostname.equals(getLocalHostname())) {
+		if (spaceHostname != null && spaceHostname.equals(Utils.getHostnameForThis())) {
 			final String path = spaceInfo.getPath();
 			// FIXME what about relative paths and windows support?
 			if (path.startsWith("/")) {
@@ -42,18 +39,6 @@ public class SpacesMountManager {
 		}
 
 		return spaceInfo.getUrl();
-	}
-
-	private static String getLocalHostname() {
-		// FIXME cache me and made me consistent with registered hostname on
-		// scratch/locally-associated scratch space
-		// FIXME can't we get it from ProActive?
-		try {
-			return InetAddress.getLocalHost().getCanonicalHostName();
-		} catch (UnknownHostException e) {
-			// FIXME log and ignore?
-			return null;
-		}
 	}
 
 	private static String getVFSResolvePath(final DataSpacesURI uri) {

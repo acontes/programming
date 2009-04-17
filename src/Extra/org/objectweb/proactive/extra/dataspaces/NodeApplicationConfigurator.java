@@ -35,15 +35,6 @@ public class NodeApplicationConfigurator {
 
 	private boolean configured = false;
 
-	public static NamingService createNamingServiceStub(String url) {
-		// TODO
-		return new NamingService();
-	}
-
-	public static void closeNamingServiceStub(NamingService stub) {
-		// TODO Auto-generated method stub
-	}
-
 	/**
 	 * Builds application-related objects. Can be called only once per instance.
 	 * Scenario:
@@ -70,7 +61,7 @@ public class NodeApplicationConfigurator {
 			throw new IllegalStateException("This instance has been already configured");
 
 		// create naming service stub with URL and decorate it with local cache
-		namingService = NodeApplicationConfigurator.createNamingServiceStub(namingServiceURL);
+		namingService = Utils.createNamingServiceStub(namingServiceURL);
 		cachingDirectory = new CachingSpacesDirectory(namingService);
 
 		// create scratch data space for this application and register it
@@ -115,7 +106,7 @@ public class NodeApplicationConfigurator {
 
 		spacesMountManager.close();
 		cachingDirectory.unregister(scratchInfo.getMountingPoint());
-		NodeApplicationConfigurator.closeNamingServiceStub(namingService);
+		Utils.closeNamingServiceStub(namingService);
 		applicationScratchSpace.close();
 	}
 

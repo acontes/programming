@@ -45,4 +45,13 @@ public class Utils {
 			throw new ProActiveRuntimeException("DataSpaces catched exception that should not occure", e);
 		}
 	}
+
+	public static NamingService createNamingServiceStub(String url) {
+		// TODO
+		return new NamingService();
+	}
+
+	public static void closeNamingServiceStub(NamingService stub) {
+		// TODO Auto-generated method stub
+	}
 }
