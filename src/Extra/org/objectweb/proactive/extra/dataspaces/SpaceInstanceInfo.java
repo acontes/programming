@@ -9,7 +9,7 @@ import java.io.Serializable;
  * Stores mapping from mounting point URI to access description (like URL, path
  * and hostname) along with mounting point information.
  */
-public class SpaceInstanceInfo implements Serializable {
+public final class SpaceInstanceInfo implements Serializable {
 
 	/**
 	 * 
