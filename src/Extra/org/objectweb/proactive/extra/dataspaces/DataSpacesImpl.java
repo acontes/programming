@@ -204,7 +204,7 @@ public class DataSpacesImpl {
 	 * @return
 	 */
 	public String getURI(FileObject fileObject) {
-		return fileObject.getName().getFriendlyURI();
+		return fileObject.getName().getURI();
 	}
 
 	/**
