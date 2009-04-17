@@ -1,5 +1,6 @@
 package org.objectweb.proactive.ic2d.debug.dsi.views;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -9,9 +10,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.forms.ManagedForm;
 import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.zest.core.viewers.AbstractZoomableViewer;
 import org.eclipse.zest.core.viewers.GraphViewer;
@@ -20,12 +19,9 @@ import org.eclipse.zest.core.widgets.Graph;
 import org.eclipse.zest.core.widgets.GraphConnection;
 import org.eclipse.zest.core.widgets.GraphNode;
 import org.eclipse.zest.core.widgets.ZestStyles;
-import org.eclipse.zest.layouts.LayoutAlgorithm;
 import org.eclipse.zest.layouts.LayoutStyles;
-import org.eclipse.zest.layouts.algorithms.CompositeLayoutAlgorithm;
-import org.eclipse.zest.layouts.algorithms.HorizontalShift;
-import org.eclipse.zest.layouts.algorithms.RadialLayoutAlgorithm;
-import org.eclipse.zest.layouts.algorithms.TreeLayoutAlgorithm;
+import org.eclipse.zest.layouts.algorithms.ContinuousLayoutAlgorithm;
+import org.eclipse.zest.layouts.algorithms.GridLayoutAlgorithm;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.debug.dsi.Activator;
@@ -42,8 +38,8 @@ public class CommunicationGraphView extends ViewPart implements IZoomableWorkben
     private Graph g = null;
 
     private FormToolkit toolKit = null;
-    private ScrolledForm form = null;
-    private ManagedForm managedForm = null;
+//    private ScrolledForm form = null;
+//    private ManagedForm managedForm = null;
     private GraphViewer viewer;
     private VisualizationForm visualizationForm;
 
@@ -66,15 +62,10 @@ public class CommunicationGraphView extends ViewPart implements IZoomableWorkben
         toolKit = new FormToolkit(parent.getDisplay());
         visualizationForm = new VisualizationForm(parent, toolKit, this);
         viewer = visualizationForm.getGraphViewer();
-        form = visualizationForm.getForm();
-        managedForm = visualizationForm.getManagedForm();
+        //form = visualizationForm.getForm();
+        //managedForm = visualizationForm.getManagedForm();
 
         g = viewer.getGraphControl();
-
-
-        g.setLayoutAlgorithm(new CompositeLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING, new LayoutAlgorithm[] { new RadialLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING), new HorizontalShift(LayoutStyles.NO_LAYOUT_NODE_RESIZING) }),true);
-
-
 
         //        final Graph g = viewer.getGraphControl();
         //
@@ -93,7 +84,7 @@ public class CommunicationGraphView extends ViewPart implements IZoomableWorkben
 
     }
 
-    public void refresh(){
+    public Set<UniqueID> refresh(){
         Random rand = new Random();
         Map<UniqueID, Set<RequestDSI>> dsi = DSIHandler.getInstance().getDSI();
         
@@ -120,14 +111,15 @@ public class CommunicationGraphView extends ViewPart implements IZoomableWorkben
                 connection.setText(e.getKey().shortString());
             }
         }
-        g.setLayoutAlgorithm(new TreeLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING), true);        
+        //g.setLayoutAlgorithm(new TreeLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING), true);        
+        g.setLayoutAlgorithm(new GridLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING), true);
         Console.getInstance(Activator.CONSOLE_NAME).log("Rendering graph...done");
-        
+        return dsi.keySet();
     }
 
     private void createNode(UniqueID id, UniqueID dsi) {
         String name = NamesFactory.getInstance().associateName(id, "AO");
-        GraphNode n = new GraphNode(g, SWT.NONE, name + " - " + id.shortString());
+        GraphNode n = new GraphNode(g, SWT.NONE, name);
         nodes.put(id.shortString() + dsi.shortString(), n);
     }
 

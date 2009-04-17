@@ -12,12 +12,12 @@ package org.objectweb.proactive.ic2d.debug.dsi.views;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Collections;
+import java.util.Set;
 
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -34,8 +34,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.ToolBar;
-import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.IMessage;
@@ -49,6 +47,7 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.zest.core.viewers.GraphViewer;
 import org.eclipse.zest.core.widgets.Graph;
+import org.objectweb.proactive.core.UniqueID;
 
 /**
  * This class encapsulates the process of creating the form view in the PDE
@@ -59,315 +58,348 @@ import org.eclipse.zest.core.widgets.Graph;
  */
 /* package */class VisualizationForm {
 
-	/*
-	 * These are all the strings used in the form. These can probably be
-	 * abstracted for internationalization
-	 */
-	private static String Services_Flow = "Services Communication Flow";
-	private static String Controls = "Controls";
-	private static String Refresh_graph = "Refresh view";
+    /*
+     * These are all the strings used in the form. These can probably be
+     * abstracted for internationalization
+     */
+    private static String Services_Flow = "Services Communication Flow";
+    private static String Controls = "Controls";
+    private static String DSI_selection = "DSI Selection";
+    private static String Refresh_graph = "Refresh view";
 
-	/*
-	 * Some parts of the form we may need access to
-	 */
-	private ScrolledForm form;
-	private FormToolkit toolkit;
-	private ManagedForm managedForm;
-	private GraphViewer viewer;
-	private CommunicationGraphView view;
+    /*
+     * Some parts of the form we may need access to
+     */
+    private ScrolledForm form;
+    private FormToolkit toolkit;
+    private ManagedForm managedForm;
+    private GraphViewer viewer;
+    private CommunicationGraphView view;
 
-	/*
-	 * Some buttons that we need to access in local methods
-	 */
-	private Button refreshView = null;
+    /*
+     * Some buttons that we need to access in local methods
+     */
+    private Button refreshView = null;
 
-//	private String currentPathAnalysis = null;
-	private SashForm sash;
-	private Text searchBox;
-	private ToolItem cancelIcon;
-	private Label searchLabel;
+    //	private String currentPathAnalysis = null;
+    private SashForm sash;
+    private Text searchBox;
+//    private ToolItem cancelIcon;
+    private Label searchLabel;
 
-	/**
-	 * Creates the form.
-	 * 
-	 * @param toolKit
-	 * @return
-	 */
-	VisualizationForm(Composite parent, FormToolkit toolkit, CommunicationGraphView view) {
-		this.toolkit = toolkit;
-		this.view = view;
-		form = this.toolkit.createScrolledForm(parent);
-		managedForm = new ManagedForm(this.toolkit, this.form);
-		createHeaderRegion(form);
-		FillLayout layout = new FillLayout();
-		layout.marginHeight = 10;
-		layout.marginWidth = 4;
-		form.getBody().setLayout(layout);
+    private Set<UniqueID> dsiList;
+    
+    /**
+     * Creates the form.
+     * 
+     * @param toolKit
+     * @return
+     */
+    VisualizationForm(Composite parent, FormToolkit toolkit, CommunicationGraphView view) {
+        this.toolkit = toolkit;
+        this.view = view;
+        form = this.toolkit.createScrolledForm(parent);
+        managedForm = new ManagedForm(this.toolkit, this.form);
+        createHeaderRegion(form);
+        FillLayout layout = new FillLayout();
+        layout.marginHeight = 10;
+        layout.marginWidth = 4;
+        form.getBody().setLayout(layout);
 
-		this.toolkit.decorateFormHeading(this.form.getForm());
-		createSash(form.getBody());
-	}
+        this.toolkit.decorateFormHeading(this.form.getForm());
+        createSash(form.getBody());
+    }
 
-	public void setFocusedNodeName(String nodeName) {
-		form.setText(Services_Flow + ": " + nodeName);
-		searchBox.setText("");
-		form.reflow(true);
-	}
+    public void setFocusedNodeName(String nodeName) {
+        form.setText(Services_Flow + ": " + nodeName);
+        searchBox.setText("");
+        form.reflow(true);
+    }
 
-	/**
-	 * Creates the header region of the form, with the search dialog, background
-	 * and title.  It also sets up the error reporting
-	 * @param form
-	 */
-	private void createHeaderRegion(ScrolledForm form) {
-		Composite headClient = new Composite(form.getForm().getHead(), SWT.NULL);
-		GridLayout glayout = new GridLayout();
-		glayout.marginWidth = glayout.marginHeight = 0;
-		glayout.numColumns = 3;
-		headClient.setLayout(glayout);
-		headClient.setBackgroundMode(SWT.INHERIT_DEFAULT);
-		searchLabel = new Label(headClient, SWT.NONE);
-		searchLabel.setText("Search:");
-		searchBox = toolkit.createText(headClient, "");
-		GridData data = new GridData();
-		data.widthHint = 300;
-		searchBox.setLayoutData(data);
-		ToolBar cancelBar = new ToolBar(headClient, SWT.FLAT );
-		
-		cancelIcon = new ToolItem(cancelBar, SWT.NONE);
-		cancelIcon.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				searchBox.setText("");
-			}
-		});
-//		cancelIcon.setImage(Activator.getDefault().getImageRegistry().get(Activator.SEARCH_CANCEL));
-		toolkit.paintBordersFor(headClient);
-		form.setHeadClient(headClient);
-		searchBox.addModifyListener(new ModifyListener() {
+    /**
+     * Creates the header region of the form, with the search dialog, background
+     * and title.  It also sets up the error reporting
+     * @param form
+     */
+    private void createHeaderRegion(ScrolledForm form) {
+        Composite headClient = new Composite(form.getForm().getHead(), SWT.NULL);
+        GridLayout glayout = new GridLayout();
+        glayout.marginWidth = glayout.marginHeight = 0;
+        glayout.numColumns = 3;
+        headClient.setLayout(glayout);
+        headClient.setBackgroundMode(SWT.INHERIT_DEFAULT);
+        searchLabel = new Label(headClient, SWT.NONE);
+        searchLabel.setText("Search specific flow:");
+        searchBox = toolkit.createText(headClient, "");
+        GridData data = new GridData();
+        data.widthHint = 300;
+        searchBox.setLayoutData(data);
+//        ToolBar cancelBar = new ToolBar(headClient, SWT.FLAT );
 
-			public void modifyText(ModifyEvent e) {
-				if (searchBox.getText().length() > 0) {
-					cancelIcon.setEnabled(true);
-				} else {
-					cancelIcon.setEnabled(false);
-				}
-			}
-		});
-		cancelIcon.setEnabled(false);
+//        cancelIcon = new ToolItem(cancelBar, SWT.NONE);
+//        cancelIcon.addSelectionListener(new SelectionAdapter() {
+//            public void widgetSelected(SelectionEvent e) {
+//                searchBox.setText("");
+//            }
+//        });
+//        cancelIcon.setImage(Activator.getDefault().getImageRegistry().get(Activator.SEARCH_CANCEL));
+        toolkit.paintBordersFor(headClient);
+        form.setHeadClient(headClient);
+//        searchBox.addModifyListener(new ModifyListener() {
+//
+//            public void modifyText(ModifyEvent e) {
+//                if (searchBox.getText().length() > 0) {
+//                    cancelIcon.setEnabled(true);
+//                } else {
+//                    cancelIcon.setEnabled(false);
+//                }
+//            }
+//        });
+//        cancelIcon.setEnabled(false);
 
-		form.setText(Services_Flow);
-//		form.setImage(Activator.getDefault().getImageRegistry().get(Activator.REQ_PLUGIN_OBJ));
-		enableSearchBox(true);
+        form.setText(Services_Flow);
+//        form.setImage(Activator.getDefault().getImageRegistry().get(Activator.REQ_PLUGIN_OBJ));
+        enableSearchBox(true);
 
-		// Add a hyperlink listener for the messages
-		form.getForm().addMessageHyperlinkListener(new HyperlinkAdapter() {
-			public void linkActivated(org.eclipse.ui.forms.events.HyperlinkEvent e) {
-				String title = e.getLabel();
-				Object href = e.getHref();
-				if (href instanceof IMessage[] && ((IMessage[]) href).length > 1) {
-					Point hl = ((Control) e.widget).toDisplay(0, 0);
-					hl.x += 10;
-					hl.y += 10;
-					final Shell shell = new Shell(VisualizationForm.this.form.getShell(), SWT.ON_TOP | SWT.TOOL);
-					shell.setImage(getImage(VisualizationForm.this.form.getMessageType()));
-					shell.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
-					shell.setBackgroundMode(SWT.INHERIT_DEFAULT);
-					GridLayout layout = new GridLayout();
-					layout.numColumns = 1;
-					layout.verticalSpacing = 0;
-					shell.setText(title);
-					shell.setLayout(layout);
-					Link link = new Link(shell, SWT.NONE);
-					link.setText("<A>close</A>");
-					GridData data = new GridData(SWT.RIGHT, SWT.CENTER, false, false);
-					link.setLayoutData(data);
-					link.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent e) {
-							shell.close();
-						}
-					});
-					Group group = new Group(shell, SWT.NONE);
-					data = new GridData(SWT.LEFT, SWT.TOP, true, true);
-					group.setLayoutData(data);
-					group.setLayout(layout);
-					group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
-					FormText text = toolkit.createFormText(group, true);
-					configureFormText(VisualizationForm.this.form.getForm(), text);
-					if (href instanceof IMessage[]) {
-						text.setText(createFormTextContent((IMessage[]) href), true, false);
-					}
+        // Add a hyperlink listener for the messages
+        form.getForm().addMessageHyperlinkListener(new HyperlinkAdapter() {
+            public void linkActivated(org.eclipse.ui.forms.events.HyperlinkEvent e) {
+                String title = e.getLabel();
+                Object href = e.getHref();
+                if (href instanceof IMessage[] && ((IMessage[]) href).length > 1) {
+                    Point hl = ((Control) e.widget).toDisplay(0, 0);
+                    hl.x += 10;
+                    hl.y += 10;
+                    final Shell shell = new Shell(VisualizationForm.this.form.getShell(), SWT.ON_TOP | SWT.TOOL);
+                    shell.setImage(getImage(VisualizationForm.this.form.getMessageType()));
+                    shell.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
+                    shell.setBackgroundMode(SWT.INHERIT_DEFAULT);
+                    GridLayout layout = new GridLayout();
+                    layout.numColumns = 1;
+                    layout.verticalSpacing = 0;
+                    shell.setText(title);
+                    shell.setLayout(layout);
+                    Link link = new Link(shell, SWT.NONE);
+                    link.setText("<A>close</A>");
+                    GridData data = new GridData(SWT.RIGHT, SWT.CENTER, false, false);
+                    link.setLayoutData(data);
+                    link.addSelectionListener(new SelectionAdapter() {
+                        public void widgetSelected(SelectionEvent e) {
+                            shell.close();
+                        }
+                    });
+                    Group group = new Group(shell, SWT.NONE);
+                    data = new GridData(SWT.LEFT, SWT.TOP, true, true);
+                    group.setLayoutData(data);
+                    group.setLayout(layout);
+                    group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
+                    FormText text = toolkit.createFormText(group, true);
+                    configureFormText(VisualizationForm.this.form.getForm(), text);
+                    if (href instanceof IMessage[]) {
+                        text.setText(createFormTextContent((IMessage[]) href), true, false);
+                    }
 
-					shell.setLocation(hl);
-					shell.pack();
-					shell.open();
-				} else if (href instanceof IMessage[]) {
-					IMessage oneMessage = ((IMessage[]) href)[0];
-//					ErrorReporting error = (ErrorReporting) oneMessage.getData();
-//					if (error != null) {
-//						error.handleError();
-//					}
-				}
-			}
-		});
-	}
-
-	private void configureFormText(final Form form, FormText text) {
-		text.addHyperlinkListener(new HyperlinkAdapter() {
-			public void linkActivated(HyperlinkEvent e) {
-				String is = (String) e.getHref();
-				try {
-					((FormText) e.widget).getShell().dispose();
-					int index = Integer.parseInt(is);
-					IMessage[] messages = form.getChildrenMessages();
-					IMessage message = messages[index];
-//					ErrorReporting error = (ErrorReporting) message.getData();
-//					if (error != null) {
-//						error.handleError();
-//					}
-				} catch (NumberFormatException ex) {
-				}
-			}
-		});
-		text.setImage("error", getImage(IMessageProvider.ERROR));
-		text.setImage("warning", getImage(IMessageProvider.WARNING));
-		text.setImage("info", getImage(IMessageProvider.INFORMATION));
-	}
-
-	String createFormTextContent(IMessage[] messages) {
-		StringWriter sw = new StringWriter();
-		PrintWriter pw = new PrintWriter(sw);
-		pw.println("<form>");
-		for (int i = 0; i < messages.length; i++) {
-			IMessage message = messages[i];
-			pw.print("<li vspace=\"false\" style=\"image\" indent=\"16\" value=\"");
-			switch (message.getMessageType()) {
-			case IMessageProvider.ERROR:
-				pw.print("error");
-				break;
-			case IMessageProvider.WARNING:
-				pw.print("warning");
-				break;
-			case IMessageProvider.INFORMATION:
-				pw.print("info");
-				break;
-			}
-			pw.print("\"> <a href=\"");
-			pw.print(i + "");
-			pw.print("\">");
-			if (message.getPrefix() != null) {
-				pw.print(message.getPrefix());
-			}
-			pw.print(message.getMessage());
-			pw.println("</a></li>");
-		}
-		pw.println("</form>");
-		pw.flush();
-		return sw.toString();
-	}
-
-	/**
-	 * Creates the sashform to separate the graph from the controls.
-	 * 
-	 * @param parent
-	 */
-	private void createSash(Composite parent) {
-		sash = new SashForm(parent, SWT.NONE);
-		this.toolkit.paintBordersFor(parent);
-
-		createGraphSection(sash);
-		createControlsSection(sash);
-		sash.setWeights(new int[] { 10, 3 });
-	}
-
-	private class MyGraphViewer extends GraphViewer {
-		public MyGraphViewer(Composite parent, int style) {
-			super(parent, style);
-			Graph graph = new Graph(parent, style) {
-				public Point computeSize(int hint, int hint2, boolean changed) {
-					return new Point(0, 0);
-				}
-			};
-			setControl(graph);
-		}
-	}
-
-	/**
-	 * Creates the section of the form where the graph is drawn
-	 * 
-	 * @param parent
-	 */
-	private void createGraphSection(Composite parent) {
-		Section section = this.toolkit.createSection(parent, Section.TITLE_BAR);
-		viewer = new MyGraphViewer(section, SWT.NONE);
-		section.setClient(viewer.getControl());
-	}
-
-	/**
-	 * Creates the section holding the analysis controls.
-	 * 
-	 * @param parent
-	 */
-	private void createControlsSection(Composite parent) {
-		Section controls = this.toolkit.createSection(parent, Section.TITLE_BAR | Section.EXPANDED);
-		controls.setText(Controls);
-		Composite controlComposite = new Composite(controls, SWT.NONE) {
-			public Point computeSize(int hint, int hint2, boolean changed) {
-				return new Point(0, 0);
-			}
-		};
-		this.toolkit.adapt(controlComposite);
-		controlComposite.setLayout(new GridLayout());
-
-		refreshView = this.toolkit.createButton(controlComposite, Refresh_graph, SWT.PUSH);
-		refreshView.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
-		refreshView.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent e) {
-                view.refresh();
+                    shell.setLocation(hl);
+                    shell.pack();
+                    shell.open();
+                } else if (href instanceof IMessage[]) {
+                    IMessage oneMessage = ((IMessage[]) href)[0];
+                    //					ErrorReporting error = (ErrorReporting) oneMessage.getData();
+                    //					if (error != null) {
+                    //						error.handleError();
+                    //					}
+                }
             }
-		});
+        });
+    }
 
-		controls.setClient(controlComposite);
-	}
+    private void configureFormText(final Form form, FormText text) {
+        text.addHyperlinkListener(new HyperlinkAdapter() {
+            public void linkActivated(HyperlinkEvent e) {
+                String is = (String) e.getHref();
+                try {
+                    ((FormText) e.widget).getShell().dispose();
+                    int index = Integer.parseInt(is);
+                    IMessage[] messages = form.getChildrenMessages();
+                    IMessage message = messages[index];
+                    //					ErrorReporting error = (ErrorReporting) message.getData();
+                    //					if (error != null) {
+                    //						error.handleError();
+                    //					}
+                } catch (NumberFormatException ex) {
+                }
+            }
+        });
+        text.setImage("error", getImage(IMessageProvider.ERROR));
+        text.setImage("warning", getImage(IMessageProvider.WARNING));
+        text.setImage("info", getImage(IMessageProvider.INFORMATION));
+    }
 
+    String createFormTextContent(IMessage[] messages) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        pw.println("<form>");
+        for (int i = 0; i < messages.length; i++) {
+            IMessage message = messages[i];
+            pw.print("<li vspace=\"false\" style=\"image\" indent=\"16\" value=\"");
+            switch (message.getMessageType()) {
+                case IMessageProvider.ERROR:
+                    pw.print("error");
+                    break;
+                case IMessageProvider.WARNING:
+                    pw.print("warning");
+                    break;
+                case IMessageProvider.INFORMATION:
+                    pw.print("info");
+                    break;
+            }
+            pw.print("\"> <a href=\"");
+            pw.print(i + "");
+            pw.print("\">");
+            if (message.getPrefix() != null) {
+                pw.print(message.getPrefix());
+            }
+            pw.print(message.getMessage());
+            pw.println("</a></li>");
+        }
+        pw.println("</form>");
+        pw.flush();
+        return sw.toString();
+    }
 
-	/**
-	 * Gets the currentGraphViewern
-	 * 
-	 * @return
-	 */
-	public GraphViewer getGraphViewer() {
-		return viewer;
-	}
+    /**
+     * Creates the sashform to separate the graph from the controls.
+     * 
+     * @param parent
+     */
+    private void createSash(Composite parent) {
+        sash = new SashForm(parent, SWT.NONE);
+        this.toolkit.paintBordersFor(parent);
 
-	/**
-	 * Gets the form we created.
-	 */
-	public ScrolledForm getForm() {
-		return form;
-	}
+        createGraphSection(sash);
+        createControlsSection(sash);
+        sash.setWeights(new int[] { 10, 2 });
+    }
 
-	public ManagedForm getManagedForm() {
-		return managedForm;
-	}
+    private class MyGraphViewer extends GraphViewer {
+        public MyGraphViewer(Composite parent, int style) {
+            super(parent, style);
+            Graph graph = new Graph(parent, style) {
+                public Point computeSize(int hint, int hint2, boolean changed) {
+                    return new Point(0, 0);
+                }
+            };
+            setControl(graph);
+        }
+    }
 
-	public Text getSearchBox() {
-		return this.searchBox;
-	}
+    /**
+     * Creates the section of the form where the graph is drawn
+     * 
+     * @param parent
+     */
+    private void createGraphSection(Composite parent) {
+        Section section = this.toolkit.createSection(parent, Section.TITLE_BAR);
+        viewer = new MyGraphViewer(section, SWT.NONE);
+        section.setClient(viewer.getControl());
+    }
 
-	public void enableSearchBox(boolean enable) {
-		this.searchLabel.setEnabled(enable);
-		this.searchBox.setEnabled(enable);
-	}
+    /**
+     * Creates the section holding the analysis controls.
+     * 
+     * @param parent
+     */
+    private void createControlsSection(Composite parent) {
+        
+        SashForm sash = new SashForm(parent, SWT.VERTICAL);
+        this.toolkit.paintBordersFor(parent);
+        
+        Section controls = this.toolkit.createSection(sash, Section.TITLE_BAR | Section.EXPANDED);
+        final Composite dsiComposite = CreateDSISelectionSection(sash);
 
-	private Image getImage(int type) {
-		switch (type) {
-		case IMessageProvider.ERROR:
-			return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJS_ERROR_TSK);
-		case IMessageProvider.WARNING:
-			return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJS_WARN_TSK);
-		case IMessageProvider.INFORMATION:
-			return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJS_INFO_TSK);
-		}
-		return null;
-	}
+        controls.setText(Controls);
+        Composite controlComposite = new Composite(controls, SWT.NONE) {
+            public Point computeSize(int hint, int hint2, boolean changed) {
+                return new Point(0, 0);
+            }
+        };
+        this.toolkit.adapt(controlComposite);
+        controlComposite.setLayout(new GridLayout());
+        refreshView = this.toolkit.createButton(controlComposite, Refresh_graph, SWT.PUSH);
+        refreshView.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
+        refreshView.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent e) {
+                dsiList = view.refresh();
+                UpdateDSISelectionSection(dsiComposite);
+            }
+        });
+        sash.setWeights(new int[] { 1, 12 });
+        sash.pack();
+        controls.setClient(controlComposite);
+    }
+
+    private Composite CreateDSISelectionSection(Composite parent){
+        Section dsiSelect = this.toolkit.createSection(parent, Section.TITLE_BAR | Section.EXPANDED);
+        dsiSelect.setText(DSI_selection);
+        Composite dsiSelectComposite = new Composite(dsiSelect, SWT.NONE) {
+            public Point computeSize(int hint, int hint2, boolean changed) {
+                return new Point(0, 0);
+            }
+        };
+        
+        this.toolkit.adapt(dsiSelectComposite);
+        dsiSelectComposite.setLayout(new GridLayout());
+        
+        dsiSelect.setClient(dsiSelectComposite);
+        return dsiSelectComposite;
+    }
+    
+    private void UpdateDSISelectionSection(Composite parent){
+        for(UniqueID dsi : dsiList){
+            Button b = this.toolkit.createButton(parent, dsi.shortString(), SWT.CHECK);
+            b.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
+        }
+        parent.layout(true);
+    }
+
+    /**
+     * Gets the currentGraphViewern
+     * 
+     * @return
+     */
+    public GraphViewer getGraphViewer() {
+        return viewer;
+    }
+
+    /**
+     * Gets the form we created.
+     */
+    public ScrolledForm getForm() {
+        return form;
+    }
+
+    public ManagedForm getManagedForm() {
+        return managedForm;
+    }
+
+    public Text getSearchBox() {
+        return this.searchBox;
+    }
+
+    public void enableSearchBox(boolean enable) {
+        this.searchLabel.setEnabled(enable);
+        this.searchBox.setEnabled(enable);
+    }
+
+    private Image getImage(int type) {
+        switch (type) {
+            case IMessageProvider.ERROR:
+                return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJS_ERROR_TSK);
+            case IMessageProvider.WARNING:
+                return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJS_WARN_TSK);
+            case IMessageProvider.INFORMATION:
+                return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJS_INFO_TSK);
+        }
+        return null;
+    }
 }
