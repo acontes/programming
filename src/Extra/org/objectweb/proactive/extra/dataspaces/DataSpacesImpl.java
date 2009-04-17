@@ -296,7 +296,9 @@ public class DataSpacesImpl {
 		final String hostname = Utils.getHostnameForThis();
 		final SpaceConfiguration config = new SpaceConfiguration(url, path, hostname, type, name);
 		final SpaceInstanceInfo spaceInstanceInfo = new SpaceInstanceInfo(appId, config);
-
+		// FIXME add ProActive provider start up
+		// FIXME add configuration checking/initialization ?
+		
 		try {
 			spacesDirectory.register(spaceInstanceInfo);
 		} catch (WrongApplicationIdException e) {

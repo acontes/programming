@@ -5,6 +5,7 @@ package org.objectweb.proactive.extra.dataspaces;
 
 import java.io.Serializable;
 
+// FIXME: comparable or hashCode needed
 /**
  * Stores mapping from mounting point URI to access description (like URL, path
  * and hostname) along with mounting point information.

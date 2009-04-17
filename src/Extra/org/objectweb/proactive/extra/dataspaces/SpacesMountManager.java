@@ -41,6 +41,7 @@ public class SpacesMountManager {
 		return spaceInfo.getUrl();
 	}
 
+	// FIXME check these two or even merge them to one method
 	private static String getVFSResolvePath(final DataSpacesURI uri) {
 		// nasty VFS hacks
 		return uri.toString().substring(DataSpacesURI.VFS_SCHEME.length());

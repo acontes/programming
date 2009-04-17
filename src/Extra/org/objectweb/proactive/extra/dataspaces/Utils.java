@@ -9,6 +9,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.ProActiveInet;
 
+// FIXME make these methods signatures more consistent
 /**
  * Static utilities methods.
  */
@@ -39,6 +40,7 @@ public class Utils {
 	}
 
 	public static Node getNodeForThis() {
+		// FIXME what if not called from AO?
 		try {
 			return PAActiveObject.getNode();
 		} catch (NodeException e) {
