@@ -9,6 +9,7 @@ import java.util.Set;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extensions.webservices.soap.ProActiveProvider;
 import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredException;
@@ -51,7 +52,7 @@ public class PADataSpaces {
 	 *             indicates VFS related exception
 	 */
 	public static FileObject resolveDefaultInput() throws FileSystemException, SpaceNotFoundException {
-		return DataSpacesNodes.getDataSpacesImpl().resolveDefaultInputOutput(SpaceType.INPUT);
+		return getMyDataSpacesImpl().resolveDefaultInputOutput(SpaceType.INPUT);
 	}
 
 	/**
@@ -77,7 +78,7 @@ public class PADataSpaces {
 	 *             when no default output data space defined
 	 */
 	public static FileObject resolveDefaultOutput() throws FileSystemException, SpaceNotFoundException {
-		return DataSpacesNodes.getDataSpacesImpl().resolveDefaultInputOutput(SpaceType.OUTPUT);
+		return getMyDataSpacesImpl().resolveDefaultInputOutput(SpaceType.OUTPUT);
 	}
 
 	/**
@@ -99,7 +100,7 @@ public class PADataSpaces {
 	 */
 	public static FileObject resolveScratchForAO() throws FileSystemException, NotConfiguredException {
 
-		return DataSpacesNodes.getDataSpacesImpl().resolveScratchForAO();
+		return getMyDataSpacesImpl().resolveScratchForAO();
 	}
 
 	/**
@@ -122,7 +123,7 @@ public class PADataSpaces {
 	 * @return all names of inputs defined before the moment of this call
 	 */
 	public static Set<String> getAllKnownInputNames() {
-		return DataSpacesNodes.getDataSpacesImpl().getAllKnownInputOutputNames(SpaceType.INPUT);
+		return getMyDataSpacesImpl().getAllKnownInputOutputNames(SpaceType.INPUT);
 	}
 
 	/**
@@ -145,7 +146,7 @@ public class PADataSpaces {
 	 * @return all names of outputs defined before the moment of this call
 	 */
 	public static Set<String> getAllKnownOutputNames() {
-		return DataSpacesNodes.getDataSpacesImpl().getAllKnownInputOutputNames(SpaceType.OUTPUT);
+		return getMyDataSpacesImpl().getAllKnownInputOutputNames(SpaceType.OUTPUT);
 	}
 
 	/**
@@ -164,7 +165,7 @@ public class PADataSpaces {
 	 *             indicates VFS related exception
 	 */
 	public static Map<String, FileObject> resolveAllKnownInputs() throws FileSystemException {
-		return DataSpacesNodes.getDataSpacesImpl().resolveAllKnownInputsOutputs(SpaceType.INPUT);
+		return getMyDataSpacesImpl().resolveAllKnownInputsOutputs(SpaceType.INPUT);
 	}
 
 	/**
@@ -184,7 +185,7 @@ public class PADataSpaces {
 	 *             indicates VFS related exception
 	 */
 	public static Map<String, FileObject> resolveAllKnownOutputs() throws FileSystemException {
-		return DataSpacesNodes.getDataSpacesImpl().resolveAllKnownInputsOutputs(SpaceType.OUTPUT);
+		return getMyDataSpacesImpl().resolveAllKnownInputsOutputs(SpaceType.OUTPUT);
 	}
 
 	/**
@@ -205,8 +206,7 @@ public class PADataSpaces {
 	public static FileObject resolveDefaultInputBlocking(long timeoutMillis) throws IllegalArgumentException,
 			FileSystemException, ProActiveTimeoutException {
 
-		return DataSpacesNodes.getDataSpacesImpl().resolveDefaultInputOutputBlocking(timeoutMillis,
-				SpaceType.INPUT);
+		return getMyDataSpacesImpl().resolveDefaultInputOutputBlocking(timeoutMillis, SpaceType.INPUT);
 	}
 
 	/**
@@ -227,8 +227,7 @@ public class PADataSpaces {
 	public static FileObject resolveDefaultOutputBlocking(long timeoutMillis)
 			throws IllegalArgumentException, FileSystemException, ProActiveTimeoutException {
 
-		return DataSpacesNodes.getDataSpacesImpl().resolveDefaultInputOutputBlocking(timeoutMillis,
-				SpaceType.OUTPUT);
+		return getMyDataSpacesImpl().resolveDefaultInputOutputBlocking(timeoutMillis, SpaceType.OUTPUT);
 	}
 
 	/**
@@ -256,7 +255,7 @@ public class PADataSpaces {
 	public static FileObject resolveFile(String uri) throws FileSystemException, MalformedURIException,
 			SpaceNotFoundException {
 
-		return DataSpacesNodes.getDataSpacesImpl().resolveFile(uri);
+		return getMyDataSpacesImpl().resolveFile(uri);
 	}
 
 	/**
@@ -271,7 +270,7 @@ public class PADataSpaces {
 	 * @return valid URI for specified file object
 	 */
 	public static String getURI(FileObject fileObject) {
-		return DataSpacesNodes.getDataSpacesImpl().getURI(fileObject);
+		return getMyDataSpacesImpl().getURI(fileObject);
 	}
 
 	/**
@@ -292,7 +291,7 @@ public class PADataSpaces {
 	 *             when there is no input data space with specified name
 	 */
 	public static FileObject resolveInput(String name) throws FileSystemException, SpaceNotFoundException {
-		return DataSpacesNodes.getDataSpacesImpl().resolveInputOutput(name, SpaceType.INPUT);
+		return getMyDataSpacesImpl().resolveInputOutput(name, SpaceType.INPUT);
 	}
 
 	/**
@@ -314,7 +313,7 @@ public class PADataSpaces {
 	 *             when there is no output data space with specified name
 	 */
 	public static FileObject resolveOutput(String name) throws FileSystemException, SpaceNotFoundException {
-		return DataSpacesNodes.getDataSpacesImpl().resolveInputOutput(name, SpaceType.OUTPUT);
+		return getMyDataSpacesImpl().resolveInputOutput(name, SpaceType.OUTPUT);
 	}
 
 	/**
@@ -337,8 +336,7 @@ public class PADataSpaces {
 	public static FileObject resolveInputBlocking(String name, long timeoutMillis)
 			throws FileSystemException, IllegalArgumentException, ProActiveTimeoutException {
 
-		return DataSpacesNodes.getDataSpacesImpl().resolveInputOutputBlocking(name, timeoutMillis,
-				SpaceType.INPUT);
+		return getMyDataSpacesImpl().resolveInputOutputBlocking(name, timeoutMillis, SpaceType.INPUT);
 	}
 
 	/**
@@ -361,8 +359,7 @@ public class PADataSpaces {
 	public static FileObject resolveOutputBlocking(String name, long timeoutMillis)
 			throws FileSystemException, IllegalArgumentException, ProActiveTimeoutException {
 
-		return DataSpacesNodes.getDataSpacesImpl().resolveInputOutputBlocking(name, timeoutMillis,
-				SpaceType.OUTPUT);
+		return getMyDataSpacesImpl().resolveInputOutputBlocking(name, timeoutMillis, SpaceType.OUTPUT);
 	}
 
 	/**
@@ -401,7 +398,7 @@ public class PADataSpaces {
 	public static String addInput(String name, String path, String url)
 			throws SpaceAlreadyRegisteredException {
 
-		return DataSpacesNodes.getDataSpacesImpl().addInputOutput(name, path, url, SpaceType.INPUT);
+		return getMyDataSpacesImpl().addInputOutput(name, path, url, SpaceType.INPUT);
 	}
 
 	/**
@@ -440,7 +437,12 @@ public class PADataSpaces {
 	public static String addOutput(String name, String path, String url)
 			throws SpaceAlreadyRegisteredException {
 
-		return DataSpacesNodes.getDataSpacesImpl().addInputOutput(name, path, url, SpaceType.OUTPUT);
+		return getMyDataSpacesImpl().addInputOutput(name, path, url, SpaceType.OUTPUT);
+	}
+
+	private static DataSpacesImpl getMyDataSpacesImpl() {
+		final Node n = Utils.getNodeForThis();
+		return DataSpacesNodes.getDataSpacesImpl(n);
 	}
 
 	/*

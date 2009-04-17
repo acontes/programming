@@ -43,6 +43,8 @@ public class DataSpacesNodes {
 	 * <code>getNodeConfigurator</code>, configuring it and applying settings
 	 * for application on that node.
 	 * 
+	 * @param n
+	 * 
 	 * @param node
 	 *            specified node
 	 * @return {@link DataSpacesImpl}
@@ -51,8 +53,7 @@ public class DataSpacesNodes {
 	 *             node or no application has been configured for a specified
 	 *             node.
 	 */
-	public static synchronized DataSpacesImpl getDataSpacesImpl() throws IllegalArgumentException {
-		Node node = null;
+	public static synchronized DataSpacesImpl getDataSpacesImpl(Node node) throws IllegalArgumentException {
 		final String name = Utils.extractNodeId(node);
 
 		if (dataSpacesImpls.containsKey(name))
