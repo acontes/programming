@@ -50,8 +50,12 @@ public class PADataSpaces {
 	 *             when no default input data space defined
 	 * @throws FileSystemException
 	 *             indicates VFS related exception
+	 * @throws NotConfiguredException
+	 *             when caller's node is not configured for Data Spaces
+	 *             application
 	 */
-	public static FileObject resolveDefaultInput() throws FileSystemException, SpaceNotFoundException {
+	public static FileObject resolveDefaultInput() throws FileSystemException, SpaceNotFoundException,
+			NotConfiguredException {
 		return getMyDataSpacesImpl().resolveDefaultInputOutput(SpaceType.INPUT);
 	}
 
@@ -76,8 +80,12 @@ public class PADataSpaces {
 	 *             indicates VFS related exception
 	 * @throws SpaceNotFoundException
 	 *             when no default output data space defined
+	 * @throws NotConfiguredException
+	 *             when caller's node is not configured for Data Spaces
+	 *             application
 	 */
-	public static FileObject resolveDefaultOutput() throws FileSystemException, SpaceNotFoundException {
+	public static FileObject resolveDefaultOutput() throws FileSystemException, SpaceNotFoundException,
+			NotConfiguredException {
 		return getMyDataSpacesImpl().resolveDefaultInputOutput(SpaceType.OUTPUT);
 	}
 
@@ -96,7 +104,8 @@ public class PADataSpaces {
 	 * @throws FileSystemException
 	 *             indicates VFS related exception
 	 * @throws NotConfiguredException
-	 *             when scratch data space is not configured
+	 *             when scratch data space is not configured or caller's node is
+	 *             not configured for Data Spaces application
 	 */
 	public static FileObject resolveScratchForAO() throws FileSystemException, NotConfiguredException {
 
@@ -121,8 +130,11 @@ public class PADataSpaces {
 	 * </p>
 	 * 
 	 * @return all names of inputs defined before the moment of this call
+	 * @throws NotConfiguredException
+	 *             when caller's node is not configured for Data Spaces
+	 *             application
 	 */
-	public static Set<String> getAllKnownInputNames() {
+	public static Set<String> getAllKnownInputNames() throws NotConfiguredException {
 		return getMyDataSpacesImpl().getAllKnownInputOutputNames(SpaceType.INPUT);
 	}
 
@@ -144,8 +156,11 @@ public class PADataSpaces {
 	 * </p>
 	 * 
 	 * @return all names of outputs defined before the moment of this call
+	 * @throws NotConfiguredException
+	 *             when caller's node is not configured for Data Spaces
+	 *             application
 	 */
-	public static Set<String> getAllKnownOutputNames() {
+	public static Set<String> getAllKnownOutputNames() throws NotConfiguredException {
 		return getMyDataSpacesImpl().getAllKnownInputOutputNames(SpaceType.OUTPUT);
 	}
 
@@ -163,8 +178,12 @@ public class PADataSpaces {
 	 * @return
 	 * @throws FileSystemException
 	 *             indicates VFS related exception
+	 * @throws NotConfiguredException
+	 *             when caller's node is not configured for Data Spaces
+	 *             application
 	 */
-	public static Map<String, FileObject> resolveAllKnownInputs() throws FileSystemException {
+	public static Map<String, FileObject> resolveAllKnownInputs() throws FileSystemException,
+			NotConfiguredException {
 		return getMyDataSpacesImpl().resolveAllKnownInputsOutputs(SpaceType.INPUT);
 	}
 
@@ -183,8 +202,12 @@ public class PADataSpaces {
 	 * @return
 	 * @throws FileSystemException
 	 *             indicates VFS related exception
+	 * @throws NotConfiguredException
+	 *             when caller's node is not configured for Data Spaces
+	 *             application
 	 */
-	public static Map<String, FileObject> resolveAllKnownOutputs() throws FileSystemException {
+	public static Map<String, FileObject> resolveAllKnownOutputs() throws FileSystemException,
+			NotConfiguredException {
 		return getMyDataSpacesImpl().resolveAllKnownInputsOutputs(SpaceType.OUTPUT);
 	}
 
@@ -202,9 +225,12 @@ public class PADataSpaces {
 	 * @throws IllegalArgumentException
 	 *             specified timeout is not positive integer
 	 * @throws ProActiveTimeoutException
+	 * @throws NotConfiguredException
+	 *             when caller's node is not configured for Data Spaces
+	 *             application
 	 */
 	public static FileObject resolveDefaultInputBlocking(long timeoutMillis) throws IllegalArgumentException,
-			FileSystemException, ProActiveTimeoutException {
+			FileSystemException, ProActiveTimeoutException, NotConfiguredException {
 
 		return getMyDataSpacesImpl().resolveDefaultInputOutputBlocking(timeoutMillis, SpaceType.INPUT);
 	}
@@ -223,9 +249,13 @@ public class PADataSpaces {
 	 * @throws IllegalArgumentException
 	 *             specified timeout is not positive integer
 	 * @throws ProActiveTimeoutException
+	 * @throws NotConfiguredException
+	 *             when caller's node is not configured for Data Spaces
+	 *             application
 	 */
 	public static FileObject resolveDefaultOutputBlocking(long timeoutMillis)
-			throws IllegalArgumentException, FileSystemException, ProActiveTimeoutException {
+			throws IllegalArgumentException, FileSystemException, ProActiveTimeoutException,
+			NotConfiguredException {
 
 		return getMyDataSpacesImpl().resolveDefaultInputOutputBlocking(timeoutMillis, SpaceType.OUTPUT);
 	}
@@ -251,9 +281,12 @@ public class PADataSpaces {
 	 *             indicates VFS related exception
 	 * @throws SpaceNotFoundException
 	 *             specified URI points to invalid data space
+	 * @throws NotConfiguredException
+	 *             when caller's node is not configured for Data Spaces
+	 *             application
 	 */
 	public static FileObject resolveFile(String uri) throws FileSystemException, MalformedURIException,
-			SpaceNotFoundException {
+			SpaceNotFoundException, NotConfiguredException {
 
 		return getMyDataSpacesImpl().resolveFile(uri);
 	}
@@ -268,8 +301,11 @@ public class PADataSpaces {
 	 * @see {@link #resolveFile(String)}
 	 * @param fileObject
 	 * @return valid URI for specified file object
+	 * @throws NotConfiguredException
+	 *             when caller's node is not configured for Data Spaces
+	 *             application
 	 */
-	public static String getURI(FileObject fileObject) {
+	public static String getURI(FileObject fileObject) throws NotConfiguredException {
 		return getMyDataSpacesImpl().getURI(fileObject);
 	}
 
@@ -289,8 +325,12 @@ public class PADataSpaces {
 	 *             indicates VFS related exception
 	 * @throws SpaceNotFoundException
 	 *             when there is no input data space with specified name
+	 * @throws NotConfiguredException
+	 *             when caller's node is not configured for Data Spaces
+	 *             application
 	 */
-	public static FileObject resolveInput(String name) throws FileSystemException, SpaceNotFoundException {
+	public static FileObject resolveInput(String name) throws FileSystemException, SpaceNotFoundException,
+			NotConfiguredException {
 		return getMyDataSpacesImpl().resolveInputOutput(name, SpaceType.INPUT);
 	}
 
@@ -311,8 +351,12 @@ public class PADataSpaces {
 	 *             indicates VFS related exception
 	 * @throws SpaceNotFoundException
 	 *             when there is no output data space with specified name
+	 * @throws NotConfiguredException
+	 *             when caller's node is not configured for Data Spaces
+	 *             application
 	 */
-	public static FileObject resolveOutput(String name) throws FileSystemException, SpaceNotFoundException {
+	public static FileObject resolveOutput(String name) throws FileSystemException, SpaceNotFoundException,
+			NotConfiguredException {
 		return getMyDataSpacesImpl().resolveInputOutput(name, SpaceType.OUTPUT);
 	}
 
@@ -332,9 +376,13 @@ public class PADataSpaces {
 	 * @throws IllegalArgumentException
 	 *             specified timeout is not positive integer
 	 * @throws ProActiveTimeoutException
+	 * @throws NotConfiguredException
+	 *             when caller's node is not configured for Data Spaces
+	 *             application
 	 */
 	public static FileObject resolveInputBlocking(String name, long timeoutMillis)
-			throws FileSystemException, IllegalArgumentException, ProActiveTimeoutException {
+			throws FileSystemException, IllegalArgumentException, ProActiveTimeoutException,
+			NotConfiguredException {
 
 		return getMyDataSpacesImpl().resolveInputOutputBlocking(name, timeoutMillis, SpaceType.INPUT);
 	}
@@ -355,9 +403,13 @@ public class PADataSpaces {
 	 * @throws IllegalArgumentException
 	 *             specified timeout is not positive integer
 	 * @throws ProActiveTimeoutException
+	 * @throws NotConfiguredException
+	 *             when caller's node is not configured for Data Spaces
+	 *             application
 	 */
 	public static FileObject resolveOutputBlocking(String name, long timeoutMillis)
-			throws FileSystemException, IllegalArgumentException, ProActiveTimeoutException {
+			throws FileSystemException, IllegalArgumentException, ProActiveTimeoutException,
+			NotConfiguredException {
 
 		return getMyDataSpacesImpl().resolveInputOutputBlocking(name, timeoutMillis, SpaceType.OUTPUT);
 	}
@@ -394,9 +446,12 @@ public class PADataSpaces {
 	 * @return URI of a created input data space
 	 * @throws SpaceAlreadyRegisteredException
 	 *             if any input with specified name has been already registered
+	 * @throws NotConfiguredException
+	 *             when caller's node is not configured for Data Spaces
+	 *             application
 	 */
 	public static String addInput(String name, String path, String url)
-			throws SpaceAlreadyRegisteredException {
+			throws SpaceAlreadyRegisteredException, NotConfiguredException {
 
 		return getMyDataSpacesImpl().addInputOutput(name, path, url, SpaceType.INPUT);
 	}
@@ -433,14 +488,17 @@ public class PADataSpaces {
 	 * @return URI of a created output data space
 	 * @throws SpaceAlreadyRegisteredException
 	 *             if any input with specified name has been already registered
+	 * @throws NotConfiguredException
+	 *             when caller's node is not configured for Data Spaces
+	 *             application
 	 */
 	public static String addOutput(String name, String path, String url)
-			throws SpaceAlreadyRegisteredException {
+			throws SpaceAlreadyRegisteredException, NotConfiguredException {
 
 		return getMyDataSpacesImpl().addInputOutput(name, path, url, SpaceType.OUTPUT);
 	}
 
-	private static DataSpacesImpl getMyDataSpacesImpl() {
+	private static DataSpacesImpl getMyDataSpacesImpl() throws NotConfiguredException {
 		final Node n = Utils.getNodeForThis();
 		return DataSpacesNodes.getDataSpacesImpl(n);
 	}

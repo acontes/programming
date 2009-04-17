@@ -5,19 +5,31 @@ package org.objectweb.proactive.extra.dataspaces;
 
 import org.apache.commons.vfs.impl.DefaultFileSystemManager;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.extra.dataspaces.exceptions.AlreadyConfiguredException;
+import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceAlreadyRegisteredException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.WrongApplicationIdException;
 
 /**
- * Maintains configuration for application and its life cycle. Each instance can
- * be configured only once. Objects life cycle:
+ * Maintains Data Spaces application-specific node configuration and its life
+ * cycle, producing Data Spaces implementation, {@link DataSpacesImpl}.
+ * 
+ * Each instance can be configured only once. Objects life cycle is following:
  * <ol>
  * <li>Instance initialization by default constructor.</li>
- * <li><code>configureApplication</code> method call for passing application
- * specific settings. This can be called only once.</li>
- * <li>Obtaining {@link DataSpacesImpl} if needed.</li>
- * <li>Closing all component objects by calling <code>close</code> method.</li>
+ * <li>
+ * {@link #configureApplication(long, String, DefaultFileSystemManager, NodeScratchSpace)}
+ * method call for passing application specific settings. This can be called
+ * only once.</li>
+ * <li>Obtaining {@link DataSpacesImpl} when needed.</li>
+ * <li>Closing all opened resources by calling {@link #close()} method.</li>
  * </ol>
+ * 
+ * Instances of this class are thread-safe. This class is intended to be created
+ * and managed by higher-level {@link NodeConfigurator}.
+ * 
+ * @see NodeConfigurator
+ * @see DataSpacesImpl
  */
 public class NodeApplicationConfigurator {
 
@@ -33,87 +45,104 @@ public class NodeApplicationConfigurator {
 
 	private SpaceInstanceInfo scratchInfo;
 
-	private boolean configured = false;
-
 	/**
-	 * Builds application-related objects. Can be called only once per instance.
-	 * Scenario:
-	 * <ol>
-	 * <li>Obtains NamingService stub and creates CachingSpacesDirectory for it.
-	 * </li>
-	 * <li>Obtains ApplicationScratchSpace for a given <code>appid</code> from
-	 * existing NodeScratchSpace.</li>
-	 * <li>Obtains scratch SpaceInstanceInfo from ApplicationScratchSpace and
-	 * registers it through CachingSpacesDirectory.</li>
-	 * <li>Creates SpacesMountManager with CachingSpacesDirectory and VFS
-	 * manager.</li>
-	 * <li>Creates DataSpacesImpl for built configuration objects.</li>
-	 * </ol>
+	 * Configures node for application, resulting in creation of configured
+	 * {@link DataSpacesImpl}. Can be called only once per instance.
 	 * 
-	 * @return DataSpacesImpl with configuration set up for the application
-	 * @throws IllegalStateException
-	 *             when trying to reconfigure the instance.
+	 * Configuration of a node for an application involves association to
+	 * provided NamingService and registration of application scratch space for
+	 * this node, if it exists.
+	 * 
+	 * @param appid
+	 *            application id
+	 * @param namingServiceURL
+	 *            URL of naming service remote object for that application
+	 * @param manager
+	 *            VFS manager used to access data
+	 * @param nodeScratchSpace
+	 *            configured node scratch space, may be null if there is no
+	 *            scratch space configured for this node
+	 * @throws AlreadyConfiguredException
+	 *             when trying to reconfigure node already configured for
+	 *             application
 	 */
-	synchronized public DataSpacesImpl configureApplication(long appid, String namingServiceURL,
-			DefaultFileSystemManager manager, NodeScratchSpace nodeScratchSpace) throws IllegalStateException {
+	synchronized public void configureApplication(long appid, String namingServiceURL,
+			DefaultFileSystemManager manager, NodeScratchSpace nodeScratchSpace)
+			throws AlreadyConfiguredException {
 
-		if (configured)
-			throw new IllegalStateException("This instance has been already configured");
+		checkNotConfigured();
 
 		// create naming service stub with URL and decorate it with local cache
 		namingService = Utils.createNamingServiceStub(namingServiceURL);
 		cachingDirectory = new CachingSpacesDirectory(namingService);
 
 		// create scratch data space for this application and register it
-		applicationScratchSpace = nodeScratchSpace.initForApplication(appid);
-		scratchInfo = applicationScratchSpace.getSpaceInstanceInfo();
-
-		try {
-			cachingDirectory.register(scratchInfo);
-		} catch (WrongApplicationIdException e) {
-			throw new ProActiveRuntimeException("DataSpaces catched exception that should not occure", e);
-		} catch (SpaceAlreadyRegisteredException e) {
-			// FIXME!? can happen?
+		if (nodeScratchSpace != null) {
+			applicationScratchSpace = nodeScratchSpace.initForApplication(appid);
+			scratchInfo = applicationScratchSpace.getSpaceInstanceInfo();
+			try {
+				cachingDirectory.register(scratchInfo);
+			} catch (WrongApplicationIdException e) {
+				// FIXME think more about passing it
+				throw new ProActiveRuntimeException("DataSpaces catched exception that should not occure", e);
+			} catch (SpaceAlreadyRegisteredException e) {
+				// FIXME think more about passing it
+			}
 		}
 
 		// create SpacesMountManager
-		// TODO
 		spacesMountManager = new SpacesMountManager(manager, cachingDirectory);
 
 		// create implementation object connected to the application's
 		// configuration
 		impl = new DataSpacesImpl(spacesMountManager, cachingDirectory, applicationScratchSpace, appid);
-
-		configured = true;
-		return impl;
 	}
 
 	/**
-	 * Cleans up application-related objects if the have been configured:
-	 * <ol>
-	 * <li>Closes SpacesMountManager.</li>
-	 * <li>Unregisters scratch data space from the cache (and NamingService).</li>
-	 * <li>Closes NamingService stub.</li>
-	 * <li>Closes ApplicationScratchSpace.</li>
-	 * </ol>
+	 * Cleans up application-related objects if they have been configured.
 	 * 
-	 * @throws IllegalStateException
-	 *             when instance has not been configured.
+	 * That involves unregistering application scratch space from NamingService
+	 * and closing all objects configured for produced {@link DataSpacesImpl}.
+	 * {@link DataSpacesImpl} will not be usable after this call.
+	 * 
+	 * More than one call of this method may result in undefined behavior.
+	 * 
+	 * @throws NotConfiguredException
+	 *             when node has not been configured for application
 	 */
-	synchronized public void close() throws IllegalStateException {
-		if (!configured)
-			throw new IllegalStateException("This instance has not been configured");
+	synchronized public void close() throws NotConfiguredException {
+		checkConfigured();
 
 		spacesMountManager.close();
-		cachingDirectory.unregister(scratchInfo.getMountingPoint());
+		if (applicationScratchSpace != null) {
+			cachingDirectory.unregister(scratchInfo.getMountingPoint());
+			applicationScratchSpace.close();
+		}
 		Utils.closeNamingServiceStub(namingService);
-		applicationScratchSpace.close();
 	}
 
-	synchronized public DataSpacesImpl getDataSpaceImpl() {
-		if (!configured)
-			throw new IllegalStateException("This instance has not been configured");
+	/**
+	 * Returns configured Data Spaces implementation for an application.
+	 * 
+	 * This instance is valid only until {@link #close()} is called.
+	 * 
+	 * @return configured Data Spaces implementation for an application
+	 * @throws NotConfiguredException
+	 *             when node has not been configured for application
+	 */
+	synchronized public DataSpacesImpl getDataSpacesImpl() throws NotConfiguredException {
+		checkConfigured();
 
 		return impl;
+	}
+
+	private void checkConfigured() throws NotConfiguredException {
+		if (impl == null)
+			throw new NotConfiguredException("Node is not configured for Data Spaces application");
+	}
+
+	private void checkNotConfigured() throws AlreadyConfiguredException {
+		if (impl != null)
+			throw new AlreadyConfiguredException("Node is already configured for Data Spaces application");
 	}
 }

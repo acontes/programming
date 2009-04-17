@@ -6,23 +6,36 @@ package org.objectweb.proactive.extra.dataspaces;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.impl.DefaultFileSystemManager;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.extra.dataspaces.exceptions.AlreadyConfiguredException;
+import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredException;
 
 /**
- * Represents immutable configuration for a node. Produces configuration for
- * application by creating NodeApplicationConfigurator. Objects life cycle:
+ * Represents immutable Data Spaces node-specific configuration. Also produces
+ * and manages application-specific configuration -
+ * {@link NodeApplicationConfigurator}, indirectly Data Spaces implementation
+ * for application.
+ * 
+ * Objects life cycle:
  * <ol>
  * <li>Instance initialization by default constructor.</li>
- * <li><code>configureNode</code> method call for passing node-specific and
- * immutable settings. This can be called only once for each instance.</li>
- * <li><code>configureApplication</code> method call for configuring application
- * on a node. This involves creation of {@link NodeApplicationConfigurator}.</li>
- * <li>Obtaining {@link NodeApplicationConfigurator} if needed.</li>
- * <li>Closing all composite objects by <code>close</code> method call.</li>
+ * <li>{@link #configureNode(SpaceConfiguration, Node)} method call for passing
+ * node-specific and immutable settings. This can be called only once for each
+ * instance.</li>
+ * <li>{@link #configureApplication(long, String)} method call for configuring
+ * application on a node. This involves creation and configuration of
+ * {@link NodeApplicationConfigurator}.</li>
+ * <li>Obtaining {@link DataSpacesImpl} from application configuration if
+ * needed, by {@link #getDataSpacesImpl()}.</li>
+ * <li>Closing all created objects by {@link #close()} method call.</li>
  * </ol>
+ * 
+ * Instances of this class are thread-safe. Instances of this class may be
+ * managed by {@link DataSpacesNodes} static class.
+ * 
+ * @see NodeApplicationConfigurator
+ * @see DataSpacesImpl
  */
 public class NodeConfigurator {
-
-	private SpaceConfiguration scratchConfiguration;
 
 	private boolean configured = false;
 
@@ -33,73 +46,121 @@ public class NodeConfigurator {
 	private NodeApplicationConfigurator appConfigurator = null;
 
 	/**
-	 * <ol>
-	 * <li>Stores VFS manager</li>
-	 * <li>Stores scratch SpaceConfiguration</li>
-	 * <li>Initializes & tests scratch data space</li>
-	 * </ol>
+	 * Set node-specific immutable settings and initialize components. This
+	 * method must be called exactly once for each instance.
 	 * 
-	 * @param config
-	 *            scratch data space configuration
+	 * Scratch space configuration is checked and initialized.
+	 * 
+	 * @param scratchConfiguration
+	 *            scratch data space configuration, may be null if node does not
+	 *            provide scratch
 	 * @param node
-	 *            node instance containing node information
-	 * @throws IllegalStateException
-	 *             when trying to reconfigure the instance
+	 *            node to configure
+	 * @throws AlreadyConfiguredException
+	 *             when trying to reconfigure already configured instance
+	 * @throws FileSystemException
+	 *             when VFS configuration creation or scratch initialization fails
 	 */
-	synchronized public void configureNode(SpaceConfiguration config, Node node) throws IllegalStateException {
-		if (configured)
-			throw new IllegalStateException("This instance has been already configured");
+	synchronized public void configureNode(SpaceConfiguration scratchConfiguration, Node node)
+			throws AlreadyConfiguredException, FileSystemException {
+		checkNotConfigured();
 
-		try {
-			manager = VFSFactory.createDefaultFileSystemManager();
-		} catch (FileSystemException e) {
-			// TODO node cannot be used!
-			e.printStackTrace();
+		manager = VFSFactory.createDefaultFileSystemManager();
+
+		if (scratchConfiguration != null) {
+			nodeScratchSpace = new NodeScratchSpace(scratchConfiguration, manager, node);		
+			nodeScratchSpace.init();
 		}
-
-		scratchConfiguration = config;
-		nodeScratchSpace = new NodeScratchSpace(config, manager, node);
-		nodeScratchSpace.init();
 
 		configured = true;
 	}
 
 	/**
+	 * Configures node for a specific application.
+	 * 
+	 * This method may be called several times for different applications, after
+	 * node has been configured through
+	 * {@link #configureNode(SpaceConfiguration, Node)}. Subsequent calls will
+	 * close existing application-specific configuration and create a new one.
+	 * 
 	 * @param appid
+	 *            application id
 	 * @param namingServiceURL
-	 * @return
+	 *            URL of naming service remote object for that application
+	 * @throws NotConfiguredException
+	 *             when node has not been configured yet
 	 */
-	synchronized public DataSpacesImpl configureApplication(long appid, String namingServiceURL) {
+	synchronized public void configureApplication(long appid, String namingServiceURL)
+			throws NotConfiguredException {
+		checkConfigured();		
 		tryCloseAppConfigurator();
 
 		appConfigurator = new NodeApplicationConfigurator();
-		return appConfigurator.configureApplication(appid, namingServiceURL, manager, nodeScratchSpace);
+		try {
+			appConfigurator.configureApplication(appid, namingServiceURL, manager, nodeScratchSpace);
+		} catch (AlreadyConfiguredException e) {
+			// can't happen for our usage
+			throw new RuntimeException(e);
+		}
 	}
 
 	/**
-	 * @return ApplicationNonfigurator or <code>null</code> if no application
-	 *         configured.
+	 * Returns Data Spaces implementation for application, if it is configured.
+	 * 
+	 * @return configured implementation of Data Spaces for application
+	 * @throws NotConfiguredException
+	 *             when node has not been configured yet (in terms of
+	 *             node-specific or application-specific configuration)
 	 */
-	public NodeApplicationConfigurator getNodeApplicationConfigurator() {
-		return appConfigurator;
+	synchronized public DataSpacesImpl getDataSpacesImpl() throws NotConfiguredException {
+		if (appConfigurator == null)
+			throw new NotConfiguredException("Node is not configured for Data Spaces application");
+		return appConfigurator.getDataSpacesImpl();
 	}
 
 	/**
-	 * Closes all components owned by this configurator.
+	 * Closes all resources opened by this configurator, also possibly created
+	 * application configuration.
+	 * 
+	 * More than one call of this method may result in undefined behavior.
+	 * 
+	 * @throws NotConfiguredException
+	 *             when node has not been configured yet.
 	 */
-	synchronized public void close() {
+	synchronized public void close() throws NotConfiguredException {
+		checkConfigured();
 		tryCloseAppConfigurator();
-		nodeScratchSpace.close();
+		if (nodeScratchSpace != null) {
+			nodeScratchSpace.close();
+		}
 		manager.close();
 	}
 
 	/**
-	 * Helper method for closing when needed.
+	 * Closes application-specific configuration when needed (there is one
+	 * opened).
+	 * 
+	 * If no application is configured, it does nothing.
 	 */
-	protected void tryCloseAppConfigurator() {
+	public synchronized void tryCloseAppConfigurator() {
 		if (appConfigurator != null) {
-			appConfigurator.close();
+			try {
+				appConfigurator.close();
+			} catch (NotConfiguredException e) {
+				// can't happen for our usage
+				throw new RuntimeException(e);
+			}
 			appConfigurator = null;
 		}
+	}
+
+	private void checkConfigured() throws NotConfiguredException {
+		if (!configured)
+			throw new NotConfiguredException("Node is not configured for Data Spaces");
+	}
+
+	private void checkNotConfigured() throws AlreadyConfiguredException {
+		if (configured)
+			throw new AlreadyConfiguredException("Node is already configured for Data Spaces");
 	}
 }

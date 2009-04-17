@@ -6,148 +6,160 @@ package org.objectweb.proactive.extra.dataspaces;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.vfs.FileSystemException;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.extra.dataspaces.exceptions.AlreadyConfiguredException;
+import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredException;
 
 /**
- * Class that provides static method for accessing node and application specific
- * class instances. Also helps with configuring node and / or application for a
- * node.
+ * Class that provides static methods for managing and accessing node and
+ * application specific Data Spaces classes instances.
+ * 
+ * This class may be used for configuring Data Spaces nodes through
+ * {@link NodeConfigurator} and accessing configured {@link DataSpacesImpl}
+ * instances.
+ * 
+ * @see DataSpacesImpl
+ * @see NodeConfigurator
  */
 public class DataSpacesNodes {
 
 	private static Map<String, NodeConfigurator> nodeConfigurators = new HashMap<String, NodeConfigurator>();
 
-	private static Map<String, DataSpacesImpl> dataSpacesImpls = new HashMap<String, DataSpacesImpl>();
-
 	/**
-	 * Returns NodeConfigurator for a specified node or creates a new one if not
-	 * already created.
+	 * Returns DataSpacesImpl instance for a node with configured application.
+	 * 
+	 * This method is usable after setting up this node with
+	 * {@link #configureNode(Node, SpaceConfiguration)} and
+	 * {@link #configureApplication(Node, long, String)} calls.
+	 * 
+	 * Returned instance is usable while node is kept configured for the
+	 * application.
 	 * 
 	 * @param node
-	 * @return {@link NodeConfigurator}
+	 *            node that is asked for Data Spaces implementation
+	 * @return configured Data Spaces implementation for application
+	 * @throws NotConfiguredException
+	 *             when node is not configured for Data Spaces or
+	 *             application-specific Data Spaces configuration is not applied
+	 *             on this node
+	 * @see NodeConfigurator#getDataSpacesImpl()
 	 */
-	public static synchronized NodeConfigurator getNodeConfigurator(Node node) {
-		final String name = Utils.extractNodeId(node);
-
-		if (nodeConfigurators.containsKey(name))
-			return nodeConfigurators.get(name);
-
-		final NodeConfigurator configurator = new NodeConfigurator();
-		nodeConfigurators.put(name, configurator);
-		return configurator;
+	public static DataSpacesImpl getDataSpacesImpl(Node node) throws NotConfiguredException {
+		final NodeConfigurator nodeConfig = getOrFailNodeConfigurator(node);
+		return nodeConfig.getDataSpacesImpl();
 	}
 
 	/**
-	 * Returns DataSpacesImpl instances for a node with configured application.
-	 * This should be called after obtaining NodeConfigurator for a node with
-	 * <code>getNodeConfigurator</code>, configuring it and applying settings
-	 * for application on that node.
-	 * 
-	 * @param n
+	 * Configures Data Spaces on node and stores that configuration, so it can
+	 * be later configured for specific application by
+	 * {@link #configureApplication(Node, long, String)} or closed by
+	 * {@link #closeNodeConfig(Node)}.
 	 * 
 	 * @param node
-	 *            specified node
-	 * @return {@link DataSpacesImpl}
-	 * @throws IllegalArgumentException
-	 *             when NodeConfigurator has not been created for a specified
-	 *             node or no application has been configured for a specified
-	 *             node.
-	 */
-	public static synchronized DataSpacesImpl getDataSpacesImpl(Node node) throws IllegalArgumentException {
-		final String name = Utils.extractNodeId(node);
-
-		if (dataSpacesImpls.containsKey(name))
-			return dataSpacesImpls.get(name);
-
-		if (!nodeConfigurators.containsKey(name))
-			throw new IllegalArgumentException("NodeConfigurator for given node not found.");
-
-		final NodeConfigurator nodeConfigurator = nodeConfigurators.get(name);
-		final NodeApplicationConfigurator appConfigurator = nodeConfigurator.getNodeApplicationConfigurator();
-
-		if (appConfigurator == null)
-			throw new IllegalArgumentException("Specified node does not containe configured application.");
-
-		final DataSpacesImpl impl = appConfigurator.getDataSpaceImpl();
-		dataSpacesImpls.put(name, impl);
-		return impl;
-	}
-
-	/**
-	 * Helper method that configures a node. @see {@link NodeConfigurator}
-	 * 
-	 * @param node
-	 *            Node instance to configure
+	 *            node to be configured for Data Spaces
 	 * @param spaceConfiguration
-	 *            Configuration of scratch data space for a specified node
-	 * 
+	 *            configuration of scratch data space for a specified node
+	 * @throws FileSystemException
+	 *             when VFS configuration creation or scratch initialization
+	 *             fails
+	 * @see NodeConfigurator#configureNode(SpaceConfiguration, Node)
 	 */
-	public static void doConfigureNode(Node node, SpaceConfiguration spaceConfiguration) {
-		final NodeConfigurator nconfig = getNodeConfigurator(node);
-		nconfig.configureNode(spaceConfiguration, node);
+	public static void configureNode(Node node, SpaceConfiguration spaceConfiguration)
+			throws AlreadyConfiguredException, FileSystemException {
+		final NodeConfigurator nodeConfig = getOrCreateNodeConfigurator(node);
+		try {
+			nodeConfig.configureNode(spaceConfiguration, node);
+		} catch (AlreadyConfiguredException x) {
+			// it should never happen in our usage
+			throw new RuntimeException(x);
+		}
 	}
 
 	/**
-	 * Helper method that configures an application on an already configured
-	 * node (@see {@link #doConfigureNode(Node, SpaceConfiguration)}). Created
-	 * {@link DataSpaces} can be obtained by calling
-	 * {@link #getDataSpacesImpl(Node)}.
+	 * Configures Data Spaces node for a specific application and stores that
+	 * configuration together with Data Spaces implementation instance, so they
+	 * can be later accessed by {@link #getDataSpacesImpl(Node)} or closed
+	 * through {@link #closeNodeApplicationConfig(Node)} or subsequent
+	 * {@link #configureApplication(Node, long, String)}.
+	 * 
+	 * This method can be called on an already configured node (see
+	 * {@link #configureNode(Node, SpaceConfiguration)}) or even already
+	 * application-configured node - in that case previous application
+	 * configuration is closed before applying a new one.
 	 * 
 	 * @param node
-	 *            Node instance to configure application on
+	 *            node to be configured for Data Spaces application
 	 * @param appid
-	 *            Identifier of an application
+	 *            identifier of an application
 	 * @param namingServiceURL
 	 *            URL of a Naming Service to connect to
+	 * @throws NotConfiguredException
+	 *             when node has not been configured yet
+	 * @see NodeConfigurator#configureApplication(Node, long, String)
 	 */
-	public static void doConfigureApplication(Node node, long appid, String namingServiceURL) {
-		final NodeConfigurator nconfig = getNodeConfigurator(node);
-		final DataSpacesImpl dsImpl = nconfig.configureApplication(appid, namingServiceURL);
-		final String nname = Utils.extractNodeId(node);
-
-		putDataSpaceImplSynch(nname, dsImpl);
+	public static void configureApplication(Node node, long appid, String namingServiceURL)
+			throws NotConfiguredException {
+		final NodeConfigurator nodeConfig = getOrFailNodeConfigurator(node);
+		nodeConfig.configureApplication(appid, namingServiceURL);
 	}
 
 	/**
-	 * Closes all node related configuration instances. Any subsequent call
-	 * result to node related instances may be undefined.
+	 * Closes all node related configuration (possibly including application
+	 * related node configuration).
+	 * 
+	 * Subsequent calls for node that is not configured anymore may result in
+	 * undefined behavior.
 	 * 
 	 * @param node
+	 *            node to be deconfigured for Data Spaces
+	 * @throws NotConfiguredException
+	 *             when node has not been configured yet
 	 */
-	public static synchronized void closeNode(Node node) {
-		final String nname = Utils.extractNodeId(node);
-
-		if (!nodeConfigurators.containsKey(nname))
-			throw new IllegalArgumentException("NodeConfigurator for given node not found.");
-
-		final NodeConfigurator nconfig = nodeConfigurators.get(nname);
-		nconfig.close();
+	public static void closeNodeConfig(Node node) throws NotConfiguredException {
+		final NodeConfigurator nodeConfig = getOrFailNodeConfigurator(node);
+		nodeConfig.close();
 	}
 
 	/**
-	 * Closes all application related configuration instances. Any subsequent
-	 * call result to application related instances may be undefined.
+	 * Closes all application related configuration for node.
+	 * 
+	 * Subsequent calls for node that is not configured anymore may result in
+	 * undefined behavior.
 	 * 
 	 * @param node
+	 *            node to be deconfigured for Data Spaces application
+	 * @throws NotConfiguredException
+	 *             when node has not been configured yet for an application
 	 */
-	public static synchronized void closeNodesApplication(Node node) {
-		final String nname = Utils.extractNodeId(node);
-
-		if (!nodeConfigurators.containsKey(nname))
-			throw new IllegalArgumentException("NodeConfigurator for given node not found.");
-
-		final NodeConfigurator nconfig = nodeConfigurators.get(nname);
-		nconfig.tryCloseAppConfigurator();
-		dataSpacesImpls.remove(nname);
+	public static void closeNodeApplicationConfig(Node node) throws NotConfiguredException {
+		final NodeConfigurator nodeConfig = getOrFailNodeConfigurator(node);
+		nodeConfig.tryCloseAppConfigurator();
 	}
 
-	/**
-	 * Synchronized <code>map.put</code> wrapper.
-	 * 
-	 * @param nname
-	 * @param impl
-	 */
-	private static synchronized void putDataSpaceImplSynch(String nname, DataSpacesImpl impl) {
-		dataSpacesImpls.put(nname, impl);
+	private static NodeConfigurator getOrCreateNodeConfigurator(Node node) {
+		final String name = Utils.extractNodeId(node);
+
+		synchronized (nodeConfigurators) {
+			final NodeConfigurator config = nodeConfigurators.get(name);
+			if (config != null)
+				return config;
+
+			final NodeConfigurator newConfig = new NodeConfigurator();
+			nodeConfigurators.put(name, newConfig);
+			return newConfig;
+		}
+	}
+
+	private static NodeConfigurator getOrFailNodeConfigurator(Node node) throws NotConfiguredException {
+		final String name = Utils.extractNodeId(node);
+
+		synchronized (nodeConfigurators) {
+			final NodeConfigurator config = nodeConfigurators.get(name);
+			if (config == null)
+				throw new NotConfiguredException("Node is not configured");
+
+			return config;
+		}
 	}
 }
