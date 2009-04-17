@@ -14,7 +14,7 @@ import org.objectweb.proactive.extra.dataspaces.SpaceInstanceInfo;
 import org.objectweb.proactive.extra.dataspaces.SpaceType;
 import org.objectweb.proactive.extra.dataspaces.SpacesDirectoryImpl;
 
-public class DataSpacesSpacesDirectoryImplTest {
+public class SpacesDirectoryImplTest {
 
 	private SpacesDirectoryImpl dir;
 
