@@ -58,8 +58,9 @@ public interface SpacesDirectory {
 	 *             when directory already contains any space instance under
 	 *             specified mounting point
 	 */
-	public void register(SpaceInstanceInfo spaceInstanceInfo) throws IllegalStateException,
-			SpaceAlreadyRegisteredException;
+	public void register(SpaceInstanceInfo spaceInstanceInfo) throws IllegalStateException;
+
+	// SpaceAlreadyRegisteredException;
 
 	/**
 	 * Unregisters space instance info specified by DataSpacesURI.
