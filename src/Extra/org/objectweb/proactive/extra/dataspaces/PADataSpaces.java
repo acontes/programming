@@ -5,13 +5,14 @@ package org.objectweb.proactive.extra.dataspaces;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
+import org.objectweb.proactive.core.ProActiveTimeoutException;
+import org.objectweb.proactive.extra.dataspaces.exceptions.DataSpacesConfigurationException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException;
+import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundException;
 
-// TODO IllegalStateException when not configured and others
 // TODO fix the javadoc!
 /**
  * The ProActive Data Spaces API. (delegates method calls to DataSpacesImpl)
@@ -22,44 +23,73 @@ public class PADataSpaces {
 	}
 
 	/**
-	 * FileObject Returns ﬁle handle for the default input data space, as deﬁned
-	 * in applica- tion descriptor or (optionally) dynamically set through API
-	 * during appli- cation execution. This call might block for a while if
-	 * there is a need to wait for start up of input provider or input needs to
-	 * be mounted (timeout excep- tion is being thrown after some conﬁgurable
-	 * period). Returned ﬁle object handle can be directly used to perform
-	 * operations on the ﬁle/directory, regardless of the underlying protocol.
-	 * Input is expected to be readable. In case of no (default) input deﬁned,
-	 * it throws an exception (compare to resolveDefaultInputBlocking()).
+	 * <p>
+	 * Returns file handle for the <i>default input data space</i>, as defined
+	 * in application descriptor or dynamically set through API during
+	 * application execution. Returned file handle can be directly used to
+	 * perform operations on the file/directory, regardless of the underlying
+	 * protocol.
+	 * </p>
+	 * <p>
+	 * Input is expected to be readable.
+	 * </p>
 	 * 
-	 * @return
+	 * TODO it can block when input needs to be mounted (timeout exception is
+	 * being thrown after some configurable period).
+	 *
+	 * @see {@link #resolveDefaultInputBlocking(long)}
+	 * @return File handle for the default input data space
+	 * @throws SpaceNotFoundException
+	 *             when no default input data space defined
 	 * @throws FileSystemException
+	 *             indicates VFS related exception
 	 */
-	public static FileObject resolveDefaultInput() throws FileSystemException {
+	public static FileObject resolveDefaultInput() throws FileSystemException, SpaceNotFoundException {
 		return DataSpacesNodes.getDataSpacesImpl().resolveDefaultInputOutput(SpaceType.INPUT);
 	}
 
 	/**
-	 * Analogous method for accessing default output. Output is expected to be
-	 * writable from any node. Writes synchronization is a developer’s responsi-
-	 * bility.
+	 * <p>
+	 * Returns file handle for the <i>default output data space</i>, as defined
+	 * in application descriptor or dynamically set through API during
+	 * application execution. Returned file handle can be directly used to
+	 * perform operations on the file/directory, regardless of the underlying
+	 * protocol. Writes synchronization is a developer’s responsibility.
+	 * </p>
+	 * <p>
+	 * Output is expected to be writable from any node.
+	 * </p>
 	 * 
-	 * @return
+	 * @see {@link #resolveDefaultOutputBlocking(long)}
+	 * @return File handle for the default output data space
+	 * @throws SpaceNotFoundException
+	 *             when no default input data space defined
 	 * @throws FileSystemException
+	 *             indicates VFS related exception
+	 * @throws SpaceNotFoundException
 	 */
-	public static FileObject resolveDefaultOutput() throws FileSystemException {
+	public static FileObject resolveDefaultOutput() throws FileSystemException, SpaceNotFoundException {
 		return DataSpacesNodes.getDataSpacesImpl().resolveDefaultInputOutput(SpaceType.OUTPUT);
 	}
 
 	/**
-	 * Similar to resolveDefaultInput(), except that in case of no default in-
-	 * put deﬁned, method would block until such an input is deﬁned or timeout
-	 * expires.
+	 * <p>
+	 * Returns file handle for calling Active Object's <i>scratch data
+	 * space</i>. If such a scratch has not existed before, it is created in its
+	 * node scratch data space (as configured in deployment descriptor).
+	 * </p>
+	 * <p>
+	 * Returned scratch is expected to be writable by this Active Object and
+	 * readable by others.
+	 * </p>
 	 * 
 	 * @return
 	 * @throws FileSystemException
+	 * @throws DataSpacesConfigurationException
 	 */
-	public static FileObject resolveScratchForAO() throws FileSystemException {
+	public static FileObject resolveScratchForAO() throws FileSystemException,
+			DataSpacesConfigurationException {
+
 		return DataSpacesNodes.getDataSpacesImpl().resolveScratchForAO();
 	}
 
@@ -114,36 +144,40 @@ public class PADataSpaces {
 	}
 
 	/**
-	 * Similar to resolveInput(name), except that in case of no input deﬁned
-	 * with that name, method would block until such an input is deﬁned or
+	 * Blocking version of {@link #resolveDefaultInput()} for a case when no
+	 * default input is defined. Method blocks until default input is defined or
 	 * timeout expires.
 	 * 
 	 * @param timeoutMillis
-	 * @return
-	 * @throws TimeoutException
+	 * @return File handle for the default input data space
 	 * @throws FileSystemException
+	 *             indicates VFS related exception
 	 * @throws IllegalArgumentException
 	 *             specified timeout is not positive integer
+	 * @throws ProActiveTimeoutException
 	 */
 	public static FileObject resolveDefaultInputBlocking(long timeoutMillis) throws IllegalArgumentException,
-			FileSystemException, TimeoutException {
+			FileSystemException, ProActiveTimeoutException {
 
 		return DataSpacesNodes.getDataSpacesImpl().resolveDefaultInputOutputBlocking(timeoutMillis,
 				SpaceType.INPUT);
 	}
 
 	/**
-	 * Analogous blocking method for accessing output.
+	 * Blocking version of {@link #resolveDefaultOutput()} for a case when no
+	 * default output is defined. Method blocks until default input is defined
+	 * or timeout expires.
 	 * 
 	 * @param timeoutMillis
-	 * @return
-	 * @throws TimeoutException
+	 * @return File handle for the default output data space
 	 * @throws FileSystemException
+	 *             indicates VFS related exception
 	 * @throws IllegalArgumentException
 	 *             specified timeout is not positive integer
+	 * @throws ProActiveTimeoutException
 	 */
 	public static FileObject resolveDefaultOutputBlocking(long timeoutMillis)
-			throws IllegalArgumentException, FileSystemException, TimeoutException {
+			throws IllegalArgumentException, FileSystemException, ProActiveTimeoutException {
 
 		return DataSpacesNodes.getDataSpacesImpl().resolveDefaultInputOutputBlocking(timeoutMillis,
 				SpaceType.OUTPUT);
@@ -162,9 +196,10 @@ public class PADataSpaces {
 	 * @return
 	 * @throws MalformedURIException
 	 * @throws FileSystemException
+	 * @throws SpaceNotFoundException
 	 */
-	public static FileObject resolveFile(String uri) throws FileSystemException, IllegalArgumentException,
-			MalformedURIException {
+	public static FileObject resolveFile(String uri) throws FileSystemException, MalformedURIException,
+			SpaceNotFoundException {
 
 		return DataSpacesNodes.getDataSpacesImpl().resolveFile(uri);
 	}
@@ -191,8 +226,9 @@ public class PADataSpaces {
 	 * @param name
 	 * @return
 	 * @throws FileSystemException
+	 * @throws SpaceNotFoundException
 	 */
-	public static FileObject resolveInput(String name) throws FileSystemException {
+	public static FileObject resolveInput(String name) throws FileSystemException, SpaceNotFoundException {
 		return DataSpacesNodes.getDataSpacesImpl().resolveInputOutput(name, SpaceType.INPUT);
 	}
 
@@ -202,8 +238,9 @@ public class PADataSpaces {
 	 * @param name
 	 * @return
 	 * @throws FileSystemException
+	 * @throws SpaceNotFoundException
 	 */
-	public static FileObject resolveOutput(String name) throws FileSystemException, IllegalArgumentException {
+	public static FileObject resolveOutput(String name) throws FileSystemException, SpaceNotFoundException {
 		return DataSpacesNodes.getDataSpacesImpl().resolveInputOutput(name, SpaceType.OUTPUT);
 	}
 
@@ -215,13 +252,13 @@ public class PADataSpaces {
 	 * @param name
 	 * @param timeoutMillis
 	 * @return
-	 * @throws TimeoutException
+	 * @throws ProActiveTimeoutException
 	 * @throws IllegalArgumentException
 	 *             specified timeout is not positive integer
 	 * @throws FileSystemException
 	 */
 	public static FileObject resolveInputBlocking(String name, long timeoutMillis)
-			throws FileSystemException, IllegalArgumentException, TimeoutException {
+			throws FileSystemException, IllegalArgumentException, ProActiveTimeoutException {
 
 		return DataSpacesNodes.getDataSpacesImpl().resolveInputOutputBlocking(name, timeoutMillis,
 				SpaceType.INPUT);
@@ -233,13 +270,13 @@ public class PADataSpaces {
 	 * @param name
 	 * @param timeoutMillis
 	 * @return
-	 * @throws TimeoutException
+	 * @throws ProActiveTimeoutException
 	 * @throws IllegalArgumentException
 	 *             specified timeout is not positive integer
 	 * @throws FileSystemException
 	 */
 	public static FileObject resolveOutputBlocking(String name, long timeoutMillis)
-			throws FileSystemException, IllegalArgumentException, TimeoutException {
+			throws FileSystemException, IllegalArgumentException, ProActiveTimeoutException {
 
 		return DataSpacesNodes.getDataSpacesImpl().resolveInputOutputBlocking(name, timeoutMillis,
 				SpaceType.OUTPUT);

@@ -8,10 +8,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
-import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
+import org.objectweb.proactive.core.ProActiveTimeoutException;
+import org.objectweb.proactive.extra.dataspaces.exceptions.DataSpacesConfigurationException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundException;
 
@@ -49,9 +50,11 @@ public class DataSpacesImpl {
 	 * @throws IllegalArgumentException
 	 *             when specified space type is neither input nor output
 	 * @throws FileSystemException
+	 * @throws SpaceNotFoundException
+	 *             indicates VFS related exception
 	 */
 	public FileObject resolveDefaultInputOutput(SpaceType type) throws IllegalArgumentException,
-			FileSystemException {
+			FileSystemException, SpaceNotFoundException {
 		assertIsInputOrOutput(type);
 
 		final DataSpacesURI defaultInputURI = DataSpacesURI.createInOutSpaceURI(appId, type, type
@@ -65,13 +68,13 @@ public class DataSpacesImpl {
 	 * @see {@link PADataSpaces#resolveScratchForAO()}
 	 * @return FileObject received from SpacesMountManager instance
 	 * @throws FileSystemException
-	 * @throws IllegalStateException
+	 * @throws DataSpacesConfigurationException
 	 *             when scratch is not configured
 	 */
-	public FileObject resolveScratchForAO() throws FileSystemException {
+	public FileObject resolveScratchForAO() throws FileSystemException, DataSpacesConfigurationException {
 
 		if (appScratchSpace == null)
-			throw new IllegalStateException("Scratch not configured");
+			throw new DataSpacesConfigurationException("Scratch data space not configured on this node");
 
 		final String aoid = Utils.extractAOId();
 		final DataSpacesURI scratchURI = appScratchSpace.getScratchForAO(aoid);
@@ -147,10 +150,10 @@ public class DataSpacesImpl {
 	 * @throws IllegalArgumentException
 	 *             when specified space type is neither input nor output or
 	 *             specified timeout is not positive integer
-	 * @throws TimeoutException
+	 * @throws ProActiveTimeoutException
 	 */
 	public FileObject resolveDefaultInputOutputBlocking(long timeoutMillis, SpaceType type)
-			throws IllegalArgumentException, FileSystemException, TimeoutException {
+			throws IllegalArgumentException, FileSystemException, ProActiveTimeoutException {
 
 		if (timeoutMillis < 1)
 			throw new IllegalArgumentException("Specified timeout should be positive integer");
@@ -171,7 +174,7 @@ public class DataSpacesImpl {
 				currTime = System.currentTimeMillis();
 			}
 		while (currTime - startTime < timeoutMillis);
-		throw new TimeoutException();
+		throw new ProActiveTimeoutException();
 	}
 
 	/**
@@ -180,8 +183,11 @@ public class DataSpacesImpl {
 	 * @return
 	 * @throws MalformedURIException
 	 * @throws FileSystemException
+	 * @throws SpaceNotFoundException
 	 */
-	public FileObject resolveFile(String uri) throws MalformedURIException, FileSystemException {
+	public FileObject resolveFile(String uri) throws MalformedURIException, FileSystemException,
+			SpaceNotFoundException {
+
 		final DataSpacesURI spaceURI = DataSpacesURI.parseURI(uri);
 		return spacesMountManager.resolveFile(spaceURI);
 	}
@@ -207,9 +213,11 @@ public class DataSpacesImpl {
 	 * @throws FileSystemException
 	 * @throws IllegalArgumentException
 	 *             when specified space type is neither input nor output
+	 * @throws SpaceNotFoundException
 	 */
 	public FileObject resolveInputOutput(String name, SpaceType type) throws FileSystemException,
-			IllegalArgumentException {
+			IllegalArgumentException, SpaceNotFoundException {
+
 		assertIsInputOrOutput(type);
 		final DataSpacesURI uri = DataSpacesURI.createInOutSpaceURI(appId, type, name);
 
@@ -230,10 +238,10 @@ public class DataSpacesImpl {
 	 * @throws IllegalArgumentException
 	 *             when specified space type is neither input nor output or
 	 *             specified timeout is not positive integer
-	 * @throws TimeoutException
+	 * @throws ProActiveTimeoutException
 	 */
 	public FileObject resolveInputOutputBlocking(String name, long timeoutMillis, SpaceType type)
-			throws FileSystemException, IllegalArgumentException, TimeoutException {
+			throws FileSystemException, IllegalArgumentException, ProActiveTimeoutException {
 
 		if (timeoutMillis < 1)
 			throw new IllegalArgumentException("Specified timeout should be positive integer");
@@ -254,7 +262,7 @@ public class DataSpacesImpl {
 				currTime = System.currentTimeMillis();
 			}
 		while (currTime - startTime < timeoutMillis);
-		throw new TimeoutException();
+		throw new ProActiveTimeoutException();
 	}
 
 	/**

@@ -30,7 +30,7 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundExceptio
 public class SpacesMountManager {
 	public static String getAccessURL(final SpaceInstanceInfo spaceInfo) {
 		final String spaceHostname = spaceInfo.getHostname();
-	
+
 		if (spaceHostname != null && spaceHostname.equals(getLocalHostname())) {
 			final String path = spaceInfo.getPath();
 			// FIXME what about relative paths and windows support?
@@ -40,7 +40,7 @@ public class SpacesMountManager {
 				return "file:///" + path;
 			}
 		}
-	
+
 		return spaceInfo.getUrl();
 	}
 
@@ -83,7 +83,9 @@ public class SpacesMountManager {
 		}
 	}
 
-	public synchronized FileObject resolveFile(final DataSpacesURI uri) throws FileSystemException {
+	public synchronized FileObject resolveFile(final DataSpacesURI uri) throws FileSystemException,
+			SpaceNotFoundException {
+
 		if (uri.isComplete()) {
 			// If it is complete query, it is about a space.
 			final DataSpacesURI spaceURI = uri.withPath(null);
@@ -94,13 +96,19 @@ public class SpacesMountManager {
 
 	public synchronized Map<SpaceInstanceInfo, FileObject> resolveSpaces(final DataSpacesURI uri)
 			throws FileSystemException {
+
 		final Map<SpaceInstanceInfo, FileObject> result = new HashMap<SpaceInstanceInfo, FileObject>();
 
 		final Set<SpaceInstanceInfo> spaces = directory.lookupAll(uri);
-		for (final SpaceInstanceInfo space : spaces) {
-			final FileObject fo = resolveFile(space.getMountingPoint());
-			result.put(space, fo);
-		}
+		for (final SpaceInstanceInfo space : spaces)
+			try {
+				FileObject fo;
+				fo = resolveFile(space.getMountingPoint());
+				result.put(space, fo);
+			} catch (SpaceNotFoundException e) {
+				// Some race condition appeared here?
+				// FIXME log and ignore?
+			}
 		return result;
 	}
 
@@ -113,6 +121,8 @@ public class SpacesMountManager {
 			try {
 				unmountSpace(spaceUri);
 			} catch (FileSystemException e) {
+				// FIXME log and ignore?
+			} catch (SpaceNotFoundException e) {
 				// FIXME log and ignore?
 			}
 		}
@@ -141,7 +151,9 @@ public class SpacesMountManager {
 		}
 	}
 
-	private void unmountSpace(final DataSpacesURI spaceUri) throws FileSystemException {
+	private void unmountSpace(final DataSpacesURI spaceUri) throws FileSystemException,
+			SpaceNotFoundException {
+
 		final FileSystem fs = resolveFile(spaceUri).getFileSystem();
 		vfsManager.closeFileSystem(fs);
 		vfs.removeJunction(getVFSJunctionPath(spaceUri));

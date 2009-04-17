@@ -3,12 +3,10 @@
  */
 package org.objectweb.proactive.extra.dataspaces.exceptions;
 
-import org.apache.commons.vfs.FileSystemException;
-
 /**
  * Represents exception caused by request for non-existing data space.
  */
-public class SpaceNotFoundException extends FileSystemException {
+public class SpaceNotFoundException extends DataSpacesConfigurationException {
 
 	/**
 	 * 
@@ -24,11 +22,11 @@ public class SpaceNotFoundException extends FileSystemException {
 	}
 
 	public SpaceNotFoundException(String code, Object info0) {
-		super(code, info0);
+		// super(code, info0);
 	}
 
 	public SpaceNotFoundException(String code, Object[] info) {
-		super(code, info);
+		// super(code, info);
 	}
 
 	public SpaceNotFoundException(String code, Throwable throwable) {
@@ -36,10 +34,10 @@ public class SpaceNotFoundException extends FileSystemException {
 	}
 
 	public SpaceNotFoundException(String code, Object info0, Throwable throwable) {
-		super(code, info0, throwable);
+		// super(code, info0, throwable);
 	}
 
 	public SpaceNotFoundException(String code, Object[] info, Throwable throwable) {
-		super(code, info, throwable);
+		// super(code, info, throwable);
 	}
 }
