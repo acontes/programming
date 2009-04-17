@@ -5,9 +5,14 @@ package org.objectweb.proactive.extra.dataspaces;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.FileSystemException;
+import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException;
 
+// TODO IllegalStateException when not configured and others
+// TODO fix the javadoc!
 /**
  * The ProActive Data Spaces API. (delegates method calls to DataSpacesImpl)
  */
@@ -28,9 +33,10 @@ public class PADataSpaces {
 	 * it throws an exception (compare to resolveDefaultInputBlocking()).
 	 * 
 	 * @return
+	 * @throws FileSystemException
 	 */
-	public static FileObject resolveDefaultInput() {
-		return null;
+	public static FileObject resolveDefaultInput() throws FileSystemException {
+		return DataSpacesNodes.getDataSpacesImpl().resolveDefaultInputOutput(SpaceType.INPUT);
 	}
 
 	/**
@@ -39,9 +45,10 @@ public class PADataSpaces {
 	 * bility.
 	 * 
 	 * @return
+	 * @throws FileSystemException
 	 */
-	public static FileObject resolveDefaultOutput() {
-		return null;
+	public static FileObject resolveDefaultOutput() throws FileSystemException {
+		return DataSpacesNodes.getDataSpacesImpl().resolveDefaultInputOutput(SpaceType.OUTPUT);
 	}
 
 	/**
@@ -50,9 +57,10 @@ public class PADataSpaces {
 	 * expires.
 	 * 
 	 * @return
+	 * @throws FileSystemException
 	 */
-	public static FileObject resolveScratchForAO() {
-		return null;
+	public static FileObject resolveScratchForAO() throws FileSystemException {
+		return DataSpacesNodes.getDataSpacesImpl().resolveScratchForAO();
 	}
 
 	/**
@@ -68,7 +76,7 @@ public class PADataSpaces {
 	 * @return
 	 */
 	public static Set<String> getAllKnownInputNames() {
-		return null;
+		return DataSpacesNodes.getDataSpacesImpl().getAllKnownInputOutputNames(SpaceType.INPUT);
 	}
 
 	/**
@@ -77,7 +85,7 @@ public class PADataSpaces {
 	 * @return
 	 */
 	public static Set<String> getAllKnownOutputNames() {
-		return null;
+		return DataSpacesNodes.getDataSpacesImpl().getAllKnownInputOutputNames(SpaceType.OUTPUT);
 	}
 
 	/**
@@ -89,18 +97,20 @@ public class PADataSpaces {
 	 * readable.
 	 * 
 	 * @return
+	 * @throws FileSystemException
 	 */
-	public static Map<String, FileObject> resolveAllKnownInputs() {
-		return null;
+	public static Map<String, FileObject> resolveAllKnownInputs() throws FileSystemException {
+		return DataSpacesNodes.getDataSpacesImpl().resolveAllKnownInputsOutputs(SpaceType.INPUT);
 	}
 
 	/**
 	 * Analogous method for outputs.
 	 * 
 	 * @return
+	 * @throws FileSystemException
 	 */
-	public static Map<String, FileObject> resolveAllKnownOutputs() {
-		return null;
+	public static Map<String, FileObject> resolveAllKnownOutputs() throws FileSystemException {
+		return DataSpacesNodes.getDataSpacesImpl().resolveAllKnownInputsOutputs(SpaceType.OUTPUT);
 	}
 
 	/**
@@ -110,9 +120,16 @@ public class PADataSpaces {
 	 * 
 	 * @param timeoutMillis
 	 * @return
+	 * @throws TimeoutException
+	 * @throws FileSystemException
+	 * @throws IllegalArgumentException
+	 *             specified timeout is not positive integer
 	 */
-	public static FileObject resolveDefaultInputBlocking(long timeoutMillis) {
-		return null;
+	public static FileObject resolveDefaultInputBlocking(long timeoutMillis) throws IllegalArgumentException,
+			FileSystemException, TimeoutException {
+
+		return DataSpacesNodes.getDataSpacesImpl().resolveDefaultInputOutputBlocking(timeoutMillis,
+				SpaceType.INPUT);
 	}
 
 	/**
@@ -120,9 +137,16 @@ public class PADataSpaces {
 	 * 
 	 * @param timeoutMillis
 	 * @return
+	 * @throws TimeoutException
+	 * @throws FileSystemException
+	 * @throws IllegalArgumentException
+	 *             specified timeout is not positive integer
 	 */
-	public static FileObject resolveDefaultOutputBlocking(long timeoutMillis) {
-		return null;
+	public static FileObject resolveDefaultOutputBlocking(long timeoutMillis)
+			throws IllegalArgumentException, FileSystemException, TimeoutException {
+
+		return DataSpacesNodes.getDataSpacesImpl().resolveDefaultInputOutputBlocking(timeoutMillis,
+				SpaceType.OUTPUT);
 	}
 
 	/**
@@ -136,9 +160,13 @@ public class PADataSpaces {
 	 * 
 	 * @param uri
 	 * @return
+	 * @throws MalformedURIException
+	 * @throws FileSystemException
 	 */
-	public static FileObject resolveFile(String uri) {
-		return null;
+	public static FileObject resolveFile(String uri) throws FileSystemException, IllegalArgumentException,
+			MalformedURIException {
+
+		return DataSpacesNodes.getDataSpacesImpl().resolveFile(uri);
 	}
 
 	/**
@@ -150,7 +178,7 @@ public class PADataSpaces {
 	 * @return
 	 */
 	public static String getURI(FileObject fileObject) {
-		return null;
+		return DataSpacesNodes.getDataSpacesImpl().getURI(fileObject);
 	}
 
 	/**
@@ -162,9 +190,10 @@ public class PADataSpaces {
 	 * 
 	 * @param name
 	 * @return
+	 * @throws FileSystemException
 	 */
-	public static FileObject resolveInput(String name) {
-		return null;
+	public static FileObject resolveInput(String name) throws FileSystemException {
+		return DataSpacesNodes.getDataSpacesImpl().resolveInputOutput(name, SpaceType.INPUT);
 	}
 
 	/**
@@ -172,9 +201,10 @@ public class PADataSpaces {
 	 * 
 	 * @param name
 	 * @return
+	 * @throws FileSystemException
 	 */
-	public static FileObject resolveOutput(String name) {
-		return null;
+	public static FileObject resolveOutput(String name) throws FileSystemException, IllegalArgumentException {
+		return DataSpacesNodes.getDataSpacesImpl().resolveInputOutput(name, SpaceType.OUTPUT);
 	}
 
 	/**
@@ -185,9 +215,16 @@ public class PADataSpaces {
 	 * @param name
 	 * @param timeoutMillis
 	 * @return
+	 * @throws TimeoutException
+	 * @throws IllegalArgumentException
+	 *             specified timeout is not positive integer
+	 * @throws FileSystemException
 	 */
-	public static FileObject resolveInputBlocking(String name, long timeoutMillis) {
-		return null;
+	public static FileObject resolveInputBlocking(String name, long timeoutMillis)
+			throws FileSystemException, IllegalArgumentException, TimeoutException {
+
+		return DataSpacesNodes.getDataSpacesImpl().resolveInputOutputBlocking(name, timeoutMillis,
+				SpaceType.INPUT);
 	}
 
 	/**
@@ -196,9 +233,16 @@ public class PADataSpaces {
 	 * @param name
 	 * @param timeoutMillis
 	 * @return
+	 * @throws TimeoutException
+	 * @throws IllegalArgumentException
+	 *             specified timeout is not positive integer
+	 * @throws FileSystemException
 	 */
-	public static FileObject resolveOutputBlocking(String name, long timeoutMillis) {
-		return null;
+	public static FileObject resolveOutputBlocking(String name, long timeoutMillis)
+			throws FileSystemException, IllegalArgumentException, TimeoutException {
+
+		return DataSpacesNodes.getDataSpacesImpl().resolveInputOutputBlocking(name, timeoutMillis,
+				SpaceType.OUTPUT);
 	}
 
 	/**
@@ -222,7 +266,7 @@ public class PADataSpaces {
 	 * @return
 	 */
 	public static String addInput(String name, String path, String url) {
-		return null;
+		return DataSpacesNodes.getDataSpacesImpl().addInputOutput(name, path, url, SpaceType.INPUT);
 	}
 
 	/**
@@ -234,7 +278,7 @@ public class PADataSpaces {
 	 * @return
 	 */
 	public static String addOutput(String name, String path, String url) {
-		return null;
+		return DataSpacesNodes.getDataSpacesImpl().addInputOutput(name, path, url, SpaceType.OUTPUT);
 	}
 
 	/*
@@ -242,5 +286,4 @@ public class PADataSpaces {
 	 * 
 	 * }
 	 */
-
 }

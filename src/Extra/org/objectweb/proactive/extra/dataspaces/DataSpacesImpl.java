@@ -8,16 +8,21 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException;
+import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundException;
 
 // TODO what about IO exceptions?
 /**
  * Implements PADataSpaces API within a node (and an application).
  */
 public class DataSpacesImpl {
+
+	// TODO what value here?
+	private static final long HEARTBIT_LENGTH_MILLIS = 1;
 
 	private final SpacesMountManager spacesMountManager;
 
@@ -60,8 +65,14 @@ public class DataSpacesImpl {
 	 * @see {@link PADataSpaces#resolveScratchForAO()}
 	 * @return FileObject received from SpacesMountManager instance
 	 * @throws FileSystemException
+	 * @throws IllegalStateException
+	 *             when scratch is not configured
 	 */
 	public FileObject resolveScratchForAO() throws FileSystemException {
+
+		if (appScratchSpace == null)
+			throw new IllegalStateException("Scratch not configured");
+
 		final String aoid = Utils.extractAOId();
 		final DataSpacesURI scratchURI = appScratchSpace.getScratchForAO(aoid);
 		final FileObject fo = spacesMountManager.resolveFile(scratchURI);
@@ -134,13 +145,33 @@ public class DataSpacesImpl {
 	 * @return
 	 * @throws FileSystemException
 	 * @throws IllegalArgumentException
+	 *             when specified space type is neither input nor output or
+	 *             specified timeout is not positive integer
+	 * @throws TimeoutException
 	 */
 	public FileObject resolveDefaultInputOutputBlocking(long timeoutMillis, SpaceType type)
-			throws IllegalArgumentException, FileSystemException {
+			throws IllegalArgumentException, FileSystemException, TimeoutException {
+
+		if (timeoutMillis < 1)
+			throw new IllegalArgumentException("Specified timeout should be positive integer");
 
 		assertIsInputOrOutput(type);
-		// TODO FIXME it is not blocking ;-)
-		return resolveDefaultInputOutput(type);
+		long currTime;
+		final DataSpacesURI uri = DataSpacesURI.createInOutSpaceURI(appId, type, type.getDefaultName());
+		final long startTime = System.currentTimeMillis();
+
+		do
+			try {
+				return spacesMountManager.resolveFile(uri);
+			} catch (SpaceNotFoundException e) {
+				try {
+					Thread.sleep(HEARTBIT_LENGTH_MILLIS);
+				} catch (InterruptedException e1) {
+				}
+				currTime = System.currentTimeMillis();
+			}
+		while (currTime - startTime < timeoutMillis);
+		throw new TimeoutException();
 	}
 
 	/**
@@ -197,14 +228,33 @@ public class DataSpacesImpl {
 	 * @return
 	 * @throws FileSystemException
 	 * @throws IllegalArgumentException
-	 *             when specified space type is neither input nor output
+	 *             when specified space type is neither input nor output or
+	 *             specified timeout is not positive integer
+	 * @throws TimeoutException
 	 */
 	public FileObject resolveInputOutputBlocking(String name, long timeoutMillis, SpaceType type)
-			throws FileSystemException, IllegalArgumentException {
+			throws FileSystemException, IllegalArgumentException, TimeoutException {
+
+		if (timeoutMillis < 1)
+			throw new IllegalArgumentException("Specified timeout should be positive integer");
 
 		assertIsInputOrOutput(type);
-		// TODO FIXME not blocking yet
-		return resolveInputOutput(name, type);
+		final DataSpacesURI uri = DataSpacesURI.createInOutSpaceURI(appId, type, name);
+		final long startTime = System.currentTimeMillis();
+		long currTime;
+
+		do
+			try {
+				return spacesMountManager.resolveFile(uri);
+			} catch (SpaceNotFoundException e) {
+				try {
+					Thread.sleep(HEARTBIT_LENGTH_MILLIS);
+				} catch (InterruptedException e1) {
+				}
+				currTime = System.currentTimeMillis();
+			}
+		while (currTime - startTime < timeoutMillis);
+		throw new TimeoutException();
 	}
 
 	/**

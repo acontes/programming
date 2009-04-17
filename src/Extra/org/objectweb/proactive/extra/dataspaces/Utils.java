@@ -5,6 +5,7 @@ package org.objectweb.proactive.extra.dataspaces;
 
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.ProActiveInet;
 
 /**
@@ -33,6 +34,16 @@ public class Utils {
 	 */
 	public static String extractAOId() {
 		PAActiveObject.getJobId();
+		return null;
+	}
+
+	public static Node getNodeForThis() {
+		try {
+			return PAActiveObject.getNode();
+		} catch (NodeException e) {
+			// FIXME
+			e.printStackTrace();
+		}
 		return null;
 	}
 

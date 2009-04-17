@@ -51,7 +51,8 @@ public class DataSpacesNodes {
 	 *             node or no application has been configured for a specified
 	 *             node.
 	 */
-	public static synchronized DataSpacesImpl getDataSpacesImpl(Node node) throws IllegalArgumentException {
+	public static synchronized DataSpacesImpl getDataSpacesImpl() throws IllegalArgumentException {
+		Node node = null;
 		final String name = Utils.extractNodeId(node);
 
 		if (dataSpacesImpls.containsKey(name))
