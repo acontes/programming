@@ -146,6 +146,7 @@
       <plugin id="org.objectweb.proactive.ic2d.chartit"/>
       <plugin id="org.objectweb.proactive.ic2d.console"/>
       <plugin id="org.objectweb.proactive.ic2d.debug"/>
+      <plugin id="org.objectweb.proactive.ic2d.debug.dsi"/>
       <plugin id="org.objectweb.proactive.ic2d.dgc"/>
       <plugin id="org.objectweb.proactive.ic2d.jobmonitoring"/>
       <plugin id="org.objectweb.proactive.ic2d.launcher"/>

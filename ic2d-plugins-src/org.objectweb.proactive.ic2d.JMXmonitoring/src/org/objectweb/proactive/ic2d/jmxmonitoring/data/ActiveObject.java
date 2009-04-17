@@ -32,6 +32,7 @@
 package org.objectweb.proactive.ic2d.jmxmonitoring.data;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -45,6 +46,9 @@ import javax.management.NotificationListener;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
 
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtensionPoint;
+import org.eclipse.core.runtime.Platform;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.debug.stepbystep.BreakpointType;
@@ -55,6 +59,8 @@ import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.listener.ActiveObjectListener;
+import org.objectweb.proactive.ic2d.jmxmonitoring.extpoint.IJMXListenerExtPoint;
+import org.objectweb.proactive.ic2d.jmxmonitoring.extpoint.IWorkbenchWindowsActionExtPoint;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.State;
@@ -98,6 +104,7 @@ public final class ActiveObject extends AbstractData<ProActiveNodeObject, Abstra
      * JMXNotificationManager *
      */
     private final NotificationListener listener;
+    private List<NotificationListener> listenersExtension;
 
     /**
      * State of the object defined as a constant of the enum
@@ -233,6 +240,7 @@ public final class ActiveObject extends AbstractData<ProActiveNodeObject, Abstra
         this.className = className;
         this.name = NamesFactory.getInstance().associateName(this.id, this.className);
         this.listener = new ActiveObjectListener(this);
+        this.listenersExtension = new ArrayList<NotificationListener>();
         this.subscribeListener();
 
         // CopyOnWriteArrayList is used since traversal operations vastly
@@ -289,7 +297,7 @@ public final class ActiveObject extends AbstractData<ProActiveNodeObject, Abstra
                 break;
             default:
                 currentState = newState;
-                break;
+            break;
         }
         setChanged();
         notifyObservers(new MVCNotification(MVCNotificationTag.STATE_CHANGED, this.currentState));
@@ -329,7 +337,7 @@ public final class ActiveObject extends AbstractData<ProActiveNodeObject, Abstra
             this.proxyMBean.migrateTo(nodeTargetURL);
         } catch (Exception e) {
             console.err("Couldn't migrate " + this.getName() + " to " + nodeTargetURL + " Reason : " +
-                e.getMessage());
+                    e.getMessage());
             return false;
         }
         console.log("Successfully sent a request of migration of " + this + " to " + nodeTargetURL);
@@ -376,28 +384,28 @@ public final class ActiveObject extends AbstractData<ProActiveNodeObject, Abstra
         final String destHostURL = destinationRuntimeURL.substring(0,
                 destinationRuntimeURL.lastIndexOf('/') + 1);
         final HostObject destHostObject = (HostObject) this.getParent().getWorldObject()
-                .getChild(destHostURL);
+        .getChild(destHostURL);
         if (destHostObject == null) {
             console.log("Cannot finish migration of the active object : " + this.name +
-                ". Trying to migrate to an unknown host : " + destHostURL);
+                    ". Trying to migrate to an unknown host : " + destHostURL);
             return;
         }
 
         // Second locate the destination runtime by its URL
         final RuntimeObject destRuntimeObject = (RuntimeObject) destHostObject
-                .getChild(destinationRuntimeURL);
+        .getChild(destinationRuntimeURL);
         if (destRuntimeObject == null) {
             console.log("Cannot finish migration of the active object : " + this.name +
-                ". Trying to migrate to an unknown runtime : " + destinationRuntimeURL);
+                    ". Trying to migrate to an unknown runtime : " + destinationRuntimeURL);
             return;
         }
 
         // Third locate the destination node by its URL
         final ProActiveNodeObject destNodeObject = (ProActiveNodeObject) destRuntimeObject
-                .getChild(this.destNodeURLOnMigration);
+        .getChild(this.destNodeURLOnMigration);
         if (destNodeObject == null) {
             console.log("Cannot finish migration of the active object : " + this.name +
-                ". Trying to migrate to an unknown node : " + this.destNodeURLOnMigration);
+                    ". Trying to migrate to an unknown node : " + this.destNodeURLOnMigration);
             return;
         }
 
@@ -566,13 +574,13 @@ public final class ActiveObject extends AbstractData<ProActiveNodeObject, Abstra
         // Fire remove event
         this.setChanged();
         notifyObservers(new MVCNotification(
-            MVCNotificationTag.ACTIVE_OBJECT_REMOVE_ALL_OUTGOING_COMMUNICATION, null));
+                MVCNotificationTag.ACTIVE_OBJECT_REMOVE_ALL_OUTGOING_COMMUNICATION, null));
 
         this.incomingCommunications.clear();
         // Fire remove event
         this.setChanged();
         notifyObservers(new MVCNotification(
-            MVCNotificationTag.ACTIVE_OBJECT_REMOVE_ALL_INCOMING_COMMUNICATION, null));
+                MVCNotificationTag.ACTIVE_OBJECT_REMOVE_ALL_INCOMING_COMMUNICATION, null));
     }
 
     @Override
@@ -597,6 +605,26 @@ public final class ActiveObject extends AbstractData<ProActiveNodeObject, Abstra
 
     public boolean subscribeListener() {
         // Subscribe to the jmx listener
+
+        // TODO : Listener Extension
+
+        // Get all available actions defined by possibly provided
+        // extensions for the extension point jmxlistener_extension
+        try {
+            IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(
+                    Activator.PLUGIN_ID + ".jmxlistener_extension");
+            IConfigurationElement[] configs = extensionPoint.getConfigurationElements();
+            for (int x = 0; x < configs.length; x++) {
+                IJMXListenerExtPoint jmxlistener = (IJMXListenerExtPoint) configs[x]
+                                                                                  .createExecutableExtension("class");
+                listenersExtension.add(jmxlistener);
+                JMXNotificationManager.getInstance().subscribe(super.objectName, jmxlistener,
+                        this.parent.getParent().getUrl());
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
         try {
             JMXNotificationManager.getInstance().subscribe(super.objectName, this.listener,
                     this.parent.getParent().getUrl());
@@ -612,6 +640,10 @@ public final class ActiveObject extends AbstractData<ProActiveNodeObject, Abstra
         try {
             // Remove the JMX Listener
             JMXNotificationManager.getInstance().unsubscribe(super.objectName, this.listener);
+            // And the extensions 
+            for(NotificationListener l : listenersExtension){
+                JMXNotificationManager.getInstance().unsubscribe(super.objectName, l);
+            }
         } catch (Exception e) {
             Console.getInstance(Activator.CONSOLE_NAME).log(
                     "Cannot unsubscribe the JMX listener of " + getType() + " " + getName());
@@ -633,7 +665,7 @@ public final class ActiveObject extends AbstractData<ProActiveNodeObject, Abstra
         // Fire a notification
         this.setChanged();
         notifyObservers(new MVCNotification(MVCNotificationTag.ACTIVE_OBJECT_ADD_OUTGOING_COMMUNICATION,
-            outgoingCommunication));
+                outgoingCommunication));
     }
 
     /**
@@ -651,7 +683,7 @@ public final class ActiveObject extends AbstractData<ProActiveNodeObject, Abstra
         // Fire a notification
         this.setChanged();
         notifyObservers(new MVCNotification(MVCNotificationTag.ACTIVE_OBJECT_ADD_INCOMING_COMMUNICATION,
-            incomingCommunication));
+                incomingCommunication));
     }
 
     /**
@@ -668,7 +700,7 @@ public final class ActiveObject extends AbstractData<ProActiveNodeObject, Abstra
         // Fire a notification
         this.setChanged();
         notifyObservers(new MVCNotification(MVCNotificationTag.ACTIVE_OBJECT_REMOVE_OUTGOING_COMMUNICATION,
-            outgoingCommunication));
+                outgoingCommunication));
         this.outgoingCommunications.remove(outgoingCommunication);
     }
 
@@ -686,7 +718,7 @@ public final class ActiveObject extends AbstractData<ProActiveNodeObject, Abstra
         // Fire a notification
         this.setChanged();
         notifyObservers(new MVCNotification(MVCNotificationTag.ACTIVE_OBJECT_REMOVE_INCOMING_COMMUNICATION,
-            incomingCommunication));
+                incomingCommunication));
         this.incomingCommunications.remove(incomingCommunication);
     }
 
@@ -698,7 +730,7 @@ public final class ActiveObject extends AbstractData<ProActiveNodeObject, Abstra
         this.requestQueueLength++;
         setChanged();
         notifyObservers(new MVCNotification(MVCNotificationTag.ACTIVE_OBJECT_REQUEST_QUEUE_LENGHT_CHANGED,
-            requestQueueLength));
+                requestQueueLength));
     }
 
     /**
@@ -709,7 +741,7 @@ public final class ActiveObject extends AbstractData<ProActiveNodeObject, Abstra
         this.requestQueueLength--;
         setChanged();
         notifyObservers(new MVCNotification(MVCNotificationTag.ACTIVE_OBJECT_REQUEST_QUEUE_LENGHT_CHANGED,
-            requestQueueLength));
+                requestQueueLength));
     }
 
     public void setRequestQueueLength(int requestQueueLength) {
@@ -717,7 +749,7 @@ public final class ActiveObject extends AbstractData<ProActiveNodeObject, Abstra
             this.requestQueueLength = requestQueueLength;
             setChanged();
             notifyObservers(new MVCNotification(
-                MVCNotificationTag.ACTIVE_OBJECT_REQUEST_QUEUE_LENGHT_CHANGED, requestQueueLength));
+                    MVCNotificationTag.ACTIVE_OBJECT_REQUEST_QUEUE_LENGHT_CHANGED, requestQueueLength));
         }
     }
 
