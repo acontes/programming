@@ -7,6 +7,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.objectweb.proactive.extra.dataspaces.exceptions.ApplicationAlreadyRegisteredException;
+import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceAlreadyRegisteredException;
+import org.objectweb.proactive.extra.dataspaces.exceptions.WrongApplicationIdException;
 
 /**
  * Manages application register/unregister process in space directory.
@@ -28,20 +30,23 @@ public class NamingService extends SpacesDirectoryImpl implements SpacesDirector
 	 * @param outputSpaces
 	 *            bulked outputs definitions
 	 * 
-	 * @throws IllegalArgumentException
+	 * @throws WrongApplicationIdException
 	 *             When given appid doesn't match with one found in
-	 *             DataSpacesURI or found the same entry in input and output
-	 *             spaces set. In these cases the register operation is rolled
-	 *             back.
+	 *             DataSpacesURI
+	 * @throw SpaceAlreadyRegisteredException found the same entry in input and
+	 *        output spaces set. In these cases the register operation is rolled
+	 *        back.
 	 * @throws ApplicationAlreadyRegisteredException
 	 *             When specified application id is already registered.
 	 */
 	synchronized public void registerApplication(long appid, Set<SpaceInstanceInfo> inputSpaces,
 			Set<SpaceInstanceInfo> outputSpaces) throws IllegalArgumentException,
-			ApplicationAlreadyRegisteredException {
+			ApplicationAlreadyRegisteredException, WrongApplicationIdException,
+			SpaceAlreadyRegisteredException {
 
 		if (isApplicationIdRegistered(appid)) {
-			throw new IllegalStateException("Application with the same application id is already registered.");
+			throw new ApplicationAlreadyRegisteredException(
+					"Application with the same application id is already registered.");
 		}
 		registeredApplications.add(appid);
 
@@ -98,7 +103,8 @@ public class NamingService extends SpacesDirectoryImpl implements SpacesDirector
 	}
 
 	private void processSpacesSet(long appid, Set<SpaceInstanceInfo> inSet,
-			final Set<SpaceInstanceInfo> outSet) {
+			final Set<SpaceInstanceInfo> outSet) throws WrongApplicationIdException,
+			SpaceAlreadyRegisteredException {
 
 		if (inSet == null || outSet == null)
 			return;
@@ -106,11 +112,11 @@ public class NamingService extends SpacesDirectoryImpl implements SpacesDirector
 		for (SpaceInstanceInfo sii : inSet) {
 
 			if (sii.getAppId() != appid)
-				throw new IllegalArgumentException(
+				throw new WrongApplicationIdException(
 						"Specified application id doesn't match with one found in DataSpacesURI. Rolling back.");
 
 			if (!outSet.add(sii))
-				throw new IllegalArgumentException(
+				throw new SpaceAlreadyRegisteredException(
 						"Duplicate entry in input and output spaces sets. Rolling back.");
 		}
 	}
