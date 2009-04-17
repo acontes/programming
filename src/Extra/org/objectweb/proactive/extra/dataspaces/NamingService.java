@@ -14,9 +14,11 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.WrongApplicationIdExc
  * Manages application register/unregister process in space directory.
  * Implements SpacesDirectory. TODO: Remote accessible.
  */
-public class NamingService extends SpacesDirectoryImpl implements SpacesDirectory {
+public class NamingService implements SpacesDirectory {
 
 	private final Set<Long> registeredApplications = new HashSet<Long>();
+
+	private final SpacesDirectoryImpl directory = new SpacesDirectoryImpl();
 
 	/**
 	 * Registers application along with its spaces definition.
@@ -55,7 +57,7 @@ public class NamingService extends SpacesDirectoryImpl implements SpacesDirector
 		processSpacesSet(appid, inputSpaces, spaces);
 		processSpacesSet(appid, outputSpaces, spaces);
 
-		register(spaces);
+		directory.register(spaces);
 	}
 
 	/**
@@ -78,7 +80,7 @@ public class NamingService extends SpacesDirectoryImpl implements SpacesDirector
 		for (SpaceInstanceInfo sii : spaces)
 			uris.add(sii.getMountingPoint());
 
-		unregister(uris);
+		directory.unregister(uris);
 	}
 
 	/*
@@ -88,14 +90,28 @@ public class NamingService extends SpacesDirectoryImpl implements SpacesDirector
 	 * org.objectweb.proactive.extra.dataspaces.SpacesDirectoryImpl#register
 	 * (org.objectweb.proactive.extra.dataspaces.SpaceInstanceInfo)
 	 */
-	@Override
-	synchronized public void register(SpaceInstanceInfo spaceInstanceInfo) {
+	synchronized public void register(SpaceInstanceInfo spaceInstanceInfo)
+			throws WrongApplicationIdException, SpaceAlreadyRegisteredException {
+
 		final long appid = spaceInstanceInfo.getAppId();
 
 		if (!isApplicationIdRegistered(appid))
-			throw new IllegalStateException("The is no application registered with specified application id.");
+			throw new WrongApplicationIdException(
+					"The is no application registered with specified application id.");
 
-		super.register(spaceInstanceInfo);
+		directory.register(spaceInstanceInfo);
+	}
+
+	public Set<SpaceInstanceInfo> lookupAll(DataSpacesURI uri) throws IllegalArgumentException {
+		return directory.lookupAll(uri);
+	}
+
+	public SpaceInstanceInfo lookupFirst(DataSpacesURI uri) throws IllegalArgumentException {
+		return directory.lookupFirst(uri);
+	}
+
+	public boolean unregister(DataSpacesURI uri) {
+		return directory.unregister(uri);
 	}
 
 	private boolean isApplicationIdRegistered(long appid) {

@@ -8,6 +8,7 @@ import java.util.Set;
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceAlreadyRegisteredException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.WrongApplicationIdException;
 
+// FIXME synchronize this class!
 /**
  * Decorator of SpacesDirectory that caches SpaceInstanceInfo in its
  * SpacesDirectoryImpl instance.
@@ -62,7 +63,11 @@ public class CachingSpacesDirectory implements SpacesDirectory {
 		sii = remoteDirectory.lookupFirst(uri);
 
 		if (sii != null)
-			localDirectory.register(sii);
+			try {
+				localDirectory.register(sii);
+			} catch (SpaceAlreadyRegisteredException e) {
+				// TODO log, this should never happen when synchronized
+			}
 		return sii;
 	}
 

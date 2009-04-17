@@ -13,6 +13,7 @@ import org.objectweb.proactive.extra.dataspaces.SpaceConfiguration;
 import org.objectweb.proactive.extra.dataspaces.SpaceInstanceInfo;
 import org.objectweb.proactive.extra.dataspaces.SpaceType;
 import org.objectweb.proactive.extra.dataspaces.SpacesDirectoryImpl;
+import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceAlreadyRegisteredException;
 
 public class SpacesDirectoryImplTest {
 
@@ -50,12 +51,17 @@ public class SpacesDirectoryImplTest {
 		spaceInstanceInfo3 = new SpaceInstanceInfo(1, config3);
 		spaceInstanceInfo4 = new SpaceInstanceInfo(1, "node1", "rt1", config4);
 
-		dir.register(spaceInstanceInfo1a);
-		dir.register(spaceInstanceInfo1b);
-		dir.register(spaceInstanceInfo1c);
-		dir.register(spaceInstanceInfo2);
-		dir.register(spaceInstanceInfo3);
-		dir.register(spaceInstanceInfo4);
+		try {
+			dir.register(spaceInstanceInfo1a);
+			dir.register(spaceInstanceInfo1b);
+			dir.register(spaceInstanceInfo1c);
+			dir.register(spaceInstanceInfo2);
+			dir.register(spaceInstanceInfo3);
+			dir.register(spaceInstanceInfo4);
+		} catch (SpaceAlreadyRegisteredException e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Test
@@ -63,7 +69,9 @@ public class SpacesDirectoryImplTest {
 		try {
 			dir.register(spaceInstanceInfo1a);
 			fail("Exception expected");
+		} catch (SpaceAlreadyRegisteredException e) {
 		} catch (Exception e) {
+			fail("Exception of different type expected");
 		}
 	}
 

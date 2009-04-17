@@ -8,6 +8,8 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceAlreadyRegisteredException;
+
 /**
  * Implementation of SpacesDirectory interface.
  * 
@@ -67,7 +69,7 @@ public class SpacesDirectoryImpl implements SpacesDirectory {
 	 * org.objectweb.proactive.extra.dataspaces.SpacesDirectory#register(org
 	 * .objectweb.proactive.extra.dataspaces.SpaceInstanceInfo)
 	 */
-	public void register(SpaceInstanceInfo spaceInstanceInfo) {
+	public void register(SpaceInstanceInfo spaceInstanceInfo) throws SpaceAlreadyRegisteredException {
 		final DataSpacesURI mpoint;
 
 		// get mounting point URI that cannot be null
@@ -75,7 +77,8 @@ public class SpacesDirectoryImpl implements SpacesDirectory {
 			mpoint = spaceInstanceInfo.getMountingPoint();
 
 			if (data.containsKey(mpoint))
-				throw new IllegalArgumentException("Mapping for a given space URI is already registered");
+				throw new SpaceAlreadyRegisteredException(
+						"Mapping for a given space URI is already registered");
 			data.put(mpoint, spaceInstanceInfo);
 		}
 	}
