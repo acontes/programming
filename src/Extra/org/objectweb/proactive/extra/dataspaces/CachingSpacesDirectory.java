@@ -8,10 +8,11 @@ import java.util.Set;
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceAlreadyRegisteredException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.WrongApplicationIdException;
 
-// FIXME synchronize this class!
 /**
  * Decorator of SpacesDirectory that caches SpaceInstanceInfo in its
  * SpacesDirectoryImpl instance.
+ * <p>
+ * Instances of this class are thread-safe.
  */
 public class CachingSpacesDirectory implements SpacesDirectory {
 
@@ -35,10 +36,12 @@ public class CachingSpacesDirectory implements SpacesDirectory {
 		if (uri.isComplete())
 			throw new IllegalArgumentException("Space URI must not be complete for this method call");
 
-		final Set<SpaceInstanceInfo> ret = remoteDirectory.lookupAll(uri);
-		localDirectory.register(ret);
+		synchronized (this) {
+			final Set<SpaceInstanceInfo> ret = remoteDirectory.lookupAll(uri);
+			localDirectory.register(ret);
 
-		return ret;
+			return ret;
+		}
 	}
 
 	/**
@@ -55,20 +58,29 @@ public class CachingSpacesDirectory implements SpacesDirectory {
 		if (uri.getPath() != null)
 			throw new IllegalArgumentException("Space URI must not contain path for this method call");
 
+		// double-checked locking, as it would be a pity if we have to wait for
+		// remote lookups when we can answer some lookups using local directory
 		SpaceInstanceInfo sii = localDirectory.lookupFirst(uri);
-
 		if (sii != null)
 			return sii;
 
-		sii = remoteDirectory.lookupFirst(uri);
+		synchronized (this) {
+			sii = localDirectory.lookupFirst(uri);
+			if (sii != null)
+				return sii;
 
-		if (sii != null)
-			try {
-				localDirectory.register(sii);
-			} catch (SpaceAlreadyRegisteredException e) {
-				// TODO log, this should never happen when synchronized
-			}
-		return sii;
+			sii = remoteDirectory.lookupFirst(uri);
+
+			if (sii != null)
+				try {
+					localDirectory.register(sii);
+				} catch (SpaceAlreadyRegisteredException e) {
+					// this should never happen when properly synchronized
+					throw new RuntimeException(e);
+					// FIXME log instead of throwing it?
+				}
+			return sii;
+		}
 	}
 
 	/*
@@ -79,8 +91,8 @@ public class CachingSpacesDirectory implements SpacesDirectory {
 	 * (org.objectweb.proactive.extensions.dataspaces.DataSpacesURI,
 	 * org.objectweb.proactive.extensions.dataspaces.SpaceInstanceInfo)
 	 */
-	public void register(SpaceInstanceInfo spaceInstanceInfo) throws SpaceAlreadyRegisteredException,
-			WrongApplicationIdException {
+	public synchronized void register(SpaceInstanceInfo spaceInstanceInfo)
+			throws SpaceAlreadyRegisteredException, WrongApplicationIdException {
 
 		remoteDirectory.register(spaceInstanceInfo);
 		localDirectory.register(spaceInstanceInfo);
@@ -93,7 +105,7 @@ public class CachingSpacesDirectory implements SpacesDirectory {
 	 * org.objectweb.proactive.extensions.dataspaces.SpacesDirectory#unregister
 	 * (org.objectweb.proactive.extensions.dataspaces.DataSpacesURI)
 	 */
-	public boolean unregister(DataSpacesURI uri) {
+	public synchronized boolean unregister(DataSpacesURI uri) {
 		localDirectory.unregister(uri);
 		return remoteDirectory.unregister(uri);
 	}
