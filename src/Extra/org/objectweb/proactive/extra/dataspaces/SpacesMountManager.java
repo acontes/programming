@@ -17,10 +17,28 @@ import org.apache.commons.vfs.impl.VirtualFileSystem;
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundException;
 
 /**
- * resp: - (internally) manages VFS junctions adding/deleting - (externally)
- * manages mounting / unmounting - creates VirtualFileSystem from instance of
- * VFSManager - contacts CachingSpacesDirectory (or trough SpaceDirectory
- * interface) col: - CachingSpacesDirectory (or SpaceDirectory interface)
+ * Manages data spaces mountings, connecting VFS and Data Spaces worlds.
+ * <p>
+ * Manager creates and maintains VirtualFileSystem instance to provide virtual
+ * view of file system for each application. It is able to response to queries
+ * for files in data spaces or just data spaces, providing VFS FileObject
+ * interface as a result. Returned FileObject instances are applicable for user
+ * level code.
+ * <p>
+ * To be able to serve requests for files and data spaces, SpaceMountManager
+ * must use {@link SpacesDirectory} as a source of information about data
+ * spaces, their mounting points and access methods.
+ * <p>
+ * Manager maintains mountings (in VFS world: "junctions") of data spaces on VFS
+ * instance, using lazy on-request strategy in current implementation. Space is
+ * mounted only when there is request to provide FileObject for its content.
+ * Proper, local or remote access is determined using
+ * {@link #getAccessURL(SpaceInstanceInfo)} method.
+ * <p>
+ * Instances of this class are thread-safe. Each instance of manager must be
+ * closed using {@link #close()} method when it is not used anymore.
+ * 
+ * @see SpacesDirectory
  */
 // TODO more efficient synchronization
 // TODO known issue: how to disallow remote AOs (or even: other local AOs) write
@@ -58,6 +76,16 @@ public class SpacesMountManager {
 	private final VirtualFileSystem vfs;
 	private final Set<DataSpacesURI> mountedSpaces = new HashSet<DataSpacesURI>();
 
+	/**
+	 * Creates SpaceMountManager instance, that must be finally closed through
+	 * {@link #close()} method.
+	 * 
+	 * @param vfsManager
+	 *            configured VFS manager, used for mounting spaces and creating
+	 *            VirtualFileSystem instances
+	 * @param directory
+	 *            data spaces directory to use for serving requests
+	 */
 	public SpacesMountManager(DefaultFileSystemManager vfsManager, SpacesDirectory directory) {
 		this.vfsManager = vfsManager;
 		this.directory = directory;
@@ -70,20 +98,74 @@ public class SpacesMountManager {
 		}
 	}
 
-	public synchronized FileObject resolveFile(final DataSpacesURI uri) throws FileSystemException,
+	/**
+	 * Resolves query for concrete URI within Data Spaces virtual tree,
+	 * resulting in file-level access to this place.
+	 * <p>
+	 * If query URI is complete (refers to concrete data space), then returned
+	 * FileObject can be safely used to access data in that data spaces, i.e. it
+	 * conforms to all Data Spaces guarantees regarding that access.
+	 * <p>
+	 * If query URI is incomplete (for example, refers only to application id),
+	 * then returned FileObject does not provide reliable access to virtual
+	 * tree, just to the current state of mountings in that tree.
+	 * <p>
+	 * This call may block for a while, if {@link SpacesDirectory} need to be
+	 * queried for data space and/or data space may need to be mounted.
+	 * 
+	 * @param queryUri
+	 *            Data Spaces URI to get access to; URI may be complete or
+	 *            incomplete
+	 * @return VFS FileObject that can be used to access this URI content;
+	 *         returned FileObject is not opened nor attached in any way
+	 * @throws FileSystemException
+	 *             indicates VFS related exception during access, like mounting
+	 *             problems, I/O errors etc.
+	 * @throws SpaceNotFoundException
+	 *             when space with that query URI does not exists in
+	 *             SpacesDirectory
+	 */
+	public synchronized FileObject resolveFile(final DataSpacesURI queryUri) throws FileSystemException,
 			SpaceNotFoundException {
 
-		if (uri.isComplete()) {
-			// If it is complete query, it is about a space.
-			final DataSpacesURI spaceURI = uri.withPath(null);
+		if (queryUri.isComplete()) {
+			// If it is a complete URI, it is about a space.
+			final DataSpacesURI spaceURI = queryUri.withPath(null);
 			ensureSpaceIsMounted(spaceURI);
 		}
-		return resolveFileVFS(uri);
+		return resolveFileVFS(queryUri);
 	}
 
+	/**
+	 * Resolve query for incomplete URI, resulting in file-level access to all
+	 * data spaces that shares this common prefix.
+	 * <p>
+	 * For any URI query, returned set contains all spaces (URIs) that match
+	 * defined components in queried URI, allowing them to have any values for
+	 * undefined components.
+	 * <p>
+	 * e.g. for <code>vfs:///123/input/</code> query you may get
+	 * <code>vfs:///123/input/default/</code> and
+	 * <code>vfs:///123/input/abc/</code> as a result, but not
+	 * <code>vfs:///123/output/</code>
+	 * <p>
+	 * This call may block for a while, as {@link SpacesDirectory} need to be
+	 * queried for data spaces and/or some data spaces may need to be mounted.
+	 * 
+	 * @param queryUri
+	 *            Data Spaces URI to query for; must be incomplete URI, not
+	 *            pointing to any concrete data space
+	 * @return map of data spaces URIs that match the query, pointing to VFS
+	 *         FileObjects that can be used to access their content; returned
+	 *         FileObjects are not opened nor attached in any way
+	 * @throws FileSystemException
+	 *             indicates VFS related exception during access, like mounting
+	 *             problems, I/O errors etc.
+	 * @throws IllegalArgumentException
+	 *             when provided queryUri is complete
+	 */
 	public synchronized Map<DataSpacesURI, FileObject> resolveSpaces(final DataSpacesURI queryUri)
 			throws FileSystemException {
-
 		final Map<DataSpacesURI, FileObject> result = new HashMap<DataSpacesURI, FileObject>();
 
 		final Set<SpaceInstanceInfo> spaces = directory.lookupAll(queryUri);
@@ -97,8 +179,16 @@ public class SpacesMountManager {
 	}
 
 	/**
-	 * Removes all junctions, mounted file systems. Forgets about the
-	 * VirtualFileSystem instance.
+	 * Closes this manager instance.
+	 * <p>
+	 * Closing it indicates unmounting mounted data spaces and closing
+	 * VirtualFileSystem instance. Any further access to opened files within
+	 * these data spaces may result in undefined result for caller.
+	 * <p>
+	 * VFS manager instance nor SpacesDirectory instance provided at constructor
+	 * are not closed in any way.
+	 * <p>
+	 * Subsequent calls to these method may result in undefined behavior.
 	 */
 	public synchronized void close() {
 		for (final DataSpacesURI spaceUri : new ArrayList<DataSpacesURI>(mountedSpaces)) {
