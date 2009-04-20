@@ -3,6 +3,10 @@
  */
 package org.objectweb.proactive.extra.dataspaces;
 
+// TODO make two separate subclasses for input/output space configuration and scratch space configuration?
+// (they are used in different ways)
+// TODO provide setters or make it immutable with <code>withXXX</code> methods creating new instance
+// (Use case: scratch space configuration) 
 /**
  * Stores information needed to configure an instance of a data space.
  */
