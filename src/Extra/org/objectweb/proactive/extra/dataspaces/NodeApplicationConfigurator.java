@@ -13,7 +13,7 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.WrongApplicationIdExc
 /**
  * Maintains Data Spaces application-specific node configuration and its life
  * cycle, producing Data Spaces implementation, {@link DataSpacesImpl}.
- * 
+ * <p>
  * Each instance can be configured only once. Objects life cycle is following:
  * <ol>
  * <li>Instance initialization by default constructor.</li>
@@ -24,7 +24,7 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.WrongApplicationIdExc
  * <li>Obtaining {@link DataSpacesImpl} when needed.</li>
  * <li>Closing all opened resources by calling {@link #close()} method.</li>
  * </ol>
- * 
+ * <p>
  * Instances of this class are thread-safe. This class is intended to be created
  * and managed by higher-level {@link NodeConfigurator}.
  * 
@@ -48,7 +48,7 @@ public class NodeApplicationConfigurator {
 	/**
 	 * Configures node for application, resulting in creation of configured
 	 * {@link DataSpacesImpl}. Can be called only once per instance.
-	 * 
+	 * <p>
 	 * Configuration of a node for an application involves association to
 	 * provided NamingService and registration of application scratch space for
 	 * this node, if it exists.
@@ -100,11 +100,11 @@ public class NodeApplicationConfigurator {
 
 	/**
 	 * Cleans up application-related objects if they have been configured.
-	 * 
+	 * <p>
 	 * That involves unregistering application scratch space from NamingService
 	 * and closing all objects configured for produced {@link DataSpacesImpl}.
 	 * {@link DataSpacesImpl} will not be usable after this call.
-	 * 
+	 * <p>
 	 * More than one call of this method may result in undefined behavior.
 	 * 
 	 * @throws NotConfiguredException
@@ -123,7 +123,7 @@ public class NodeApplicationConfigurator {
 
 	/**
 	 * Returns configured Data Spaces implementation for an application.
-	 * 
+	 * <p>
 	 * This instance is valid only until {@link #close()} is called.
 	 * 
 	 * @return configured Data Spaces implementation for an application

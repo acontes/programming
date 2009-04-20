@@ -20,7 +20,7 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundExceptio
 
 /**
  * The ProActive Data Spaces API. (delegates method calls to DataSpacesImpl)
- * 
+ * <p>
  * Note that all <code>resolve*</code> method call might block for a while if
  * there is a need to mount a data space.
  */

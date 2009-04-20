@@ -11,7 +11,7 @@ import javax.naming.ConfigurationException;
  * Stores complete description of data space instance, i.e. mounting point URI
  * with information contained there (type, application id...), and space access
  * description (remote access URL, optional local path and hostname).
- * 
+ * <p>
  * Instances of this class are immutable, therefore thread-safe.
  * <code>hashCode</code> and <code>equals</code> methods are defined.
  */
@@ -91,7 +91,7 @@ public final class SpaceInstanceInfo implements Serializable {
 	/**
 	 * Returns local access path, that can be used for host with hostname as
 	 * returned by {@link #getHostname()}.
-	 * 
+	 * <p>
 	 * Local access path may not be defined.
 	 * 
 	 * @return local access path; <code>null</code> if local access is undefined

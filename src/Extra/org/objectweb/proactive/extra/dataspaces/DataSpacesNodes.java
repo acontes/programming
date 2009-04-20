@@ -14,7 +14,7 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredExceptio
 /**
  * Class that provides static methods for managing and accessing node and
  * application specific Data Spaces classes instances.
- * 
+ * <p>
  * This class may be used for configuring Data Spaces nodes through
  * {@link NodeConfigurator} and accessing configured {@link DataSpacesImpl}
  * instances.

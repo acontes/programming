@@ -14,7 +14,7 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredExceptio
  * and manages application-specific configuration -
  * {@link NodeApplicationConfigurator}, indirectly Data Spaces implementation
  * for application.
- * 
+ * <p>
  * Objects life cycle:
  * <ol>
  * <li>Instance initialization by default constructor.</li>
@@ -28,7 +28,7 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredExceptio
  * needed, by {@link #getDataSpacesImpl()}.</li>
  * <li>Closing all created objects by {@link #close()} method call.</li>
  * </ol>
- * 
+ * <p>
  * Instances of this class are thread-safe. Instances of this class may be
  * managed by {@link DataSpacesNodes} static class.
  * 
