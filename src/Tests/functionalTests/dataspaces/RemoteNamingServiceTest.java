@@ -8,6 +8,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,12 +19,12 @@ import org.junit.Test;
 import org.objectweb.proactive.api.PARemoteObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
-import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.extra.dataspaces.DataSpacesURI;
 import org.objectweb.proactive.extra.dataspaces.NamingService;
 import org.objectweb.proactive.extra.dataspaces.SpaceConfiguration;
 import org.objectweb.proactive.extra.dataspaces.SpaceInstanceInfo;
 import org.objectweb.proactive.extra.dataspaces.SpaceType;
+import org.objectweb.proactive.extra.dataspaces.Utils;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ApplicationAlreadyRegisteredException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceAlreadyRegisteredException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.WrongApplicationIdException;
@@ -91,15 +92,16 @@ public class RemoteNamingServiceTest extends GCMFunctionalTestDefaultNodes {
 	}
 
 	@Before
-	public void before() throws ProActiveException {
-
+	public void before() throws ProActiveException, URISyntaxException {
 		if (stub == null) {
 			NamingService ns = new NamingService();
 
-			this.roe = PARemoteObject.newRemoteObject(NamingService.class.getName(), ns);
-			this.roe.createRemoteObject(NAME);
+			roe = PARemoteObject.newRemoteObject(NamingService.class.getName(), ns);
+			roe.createRemoteObject(NAME);
+			final String url = roe.getURL();
+			stub = Utils.createNamingServiceStub(url);
 
-			stub = (NamingService) RemoteObjectHelper.generatedObjectStub(roe.getRemoteObject());
+			// RemoteObjectHelper.generatedObjectStub(roe.getRemoteObject());
 		}
 	}
 
