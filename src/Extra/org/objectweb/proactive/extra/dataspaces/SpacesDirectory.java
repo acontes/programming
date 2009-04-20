@@ -50,7 +50,8 @@ public interface SpacesDirectory {
 	 * directory is append-only.
 	 * 
 	 * @param spaceInstanceInfo
-	 *            - space instance info to register
+	 *            - space instance info to register (contract: SpaceInstanceInfo
+	 *            mounting point should be complete)
 	 * @throws WrongApplicationIdException
 	 *             when directory is aware of all registered applications and
 	 *             there is no such application for SpaceInstanceInfo being

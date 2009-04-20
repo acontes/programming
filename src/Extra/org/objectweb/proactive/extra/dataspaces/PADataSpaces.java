@@ -16,13 +16,11 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredExceptio
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceAlreadyRegisteredException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundException;
 
-// TODO fix the javadoc!
 /**
  * The ProActive Data Spaces API. (delegates method calls to DataSpacesImpl)
  * 
- * 
- * TODO This call might block for a while if there is a need to wait for start
- * up of some remote provider or it needs to be mounted.
+ * Note that all <code>resolve*</code> method call might block for a while if
+ * there is a need to mount a data space.
  */
 public class PADataSpaces {
 
