@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import javax.naming.ConfigurationException;
+
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -283,10 +285,13 @@ public class DataSpacesImpl {
 	 * @return
 	 * @throws SpaceAlreadyRegisteredException
 	 *             when specified space type is neither input nor output
+	 * @throws ConfigurationException
+	 *             when specified configuration is not sufficient and mounting
+	 *             point URI cannot be constructed
 	 * @throws WrongApplicationIdException
 	 */
 	public String addInputOutput(String name, String path, String url, SpaceType type)
-			throws SpaceAlreadyRegisteredException {
+			throws SpaceAlreadyRegisteredException, ConfigurationException {
 
 		assertIsInputOrOutput(type);
 
@@ -298,7 +303,7 @@ public class DataSpacesImpl {
 		final SpaceInstanceInfo spaceInstanceInfo = new SpaceInstanceInfo(appId, config);
 		// FIXME add ProActive provider start up
 		// FIXME add configuration checking/initialization ?
-		
+
 		try {
 			spacesDirectory.register(spaceInstanceInfo);
 		} catch (WrongApplicationIdException e) {

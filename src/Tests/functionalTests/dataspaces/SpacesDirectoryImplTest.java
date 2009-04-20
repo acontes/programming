@@ -6,6 +6,8 @@ import static org.junit.Assert.fail;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.naming.ConfigurationException;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.extra.dataspaces.DataSpacesURI;
@@ -44,14 +46,14 @@ public class SpacesDirectoryImplTest {
 		SpaceConfiguration config4 = new SpaceConfiguration("http://hostD", "/tmp", "h1", SpaceType.SCRATCH,
 				null);
 
-		spaceInstanceInfo1a = new SpaceInstanceInfo(0, config1);
-		spaceInstanceInfo1b = new SpaceInstanceInfo(1, config1);
-		spaceInstanceInfo1c = new SpaceInstanceInfo(2, config1);
-		spaceInstanceInfo2 = new SpaceInstanceInfo(1, config2);
-		spaceInstanceInfo3 = new SpaceInstanceInfo(1, config3);
-		spaceInstanceInfo4 = new SpaceInstanceInfo(1, "node1", "rt1", config4);
-
 		try {
+			spaceInstanceInfo1a = new SpaceInstanceInfo(0, config1);
+			spaceInstanceInfo1b = new SpaceInstanceInfo(1, config1);
+			spaceInstanceInfo1c = new SpaceInstanceInfo(2, config1);
+			spaceInstanceInfo2 = new SpaceInstanceInfo(1, config2);
+			spaceInstanceInfo3 = new SpaceInstanceInfo(1, config3);
+			spaceInstanceInfo4 = new SpaceInstanceInfo(1, "node1", "rt1", config4);
+
 			dir.register(spaceInstanceInfo1a);
 			dir.register(spaceInstanceInfo1b);
 			dir.register(spaceInstanceInfo1c);
@@ -59,6 +61,9 @@ public class SpacesDirectoryImplTest {
 			dir.register(spaceInstanceInfo3);
 			dir.register(spaceInstanceInfo4);
 		} catch (SpaceAlreadyRegisteredException e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		} catch (ConfigurationException e) {
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}

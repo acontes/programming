@@ -5,6 +5,8 @@ package org.objectweb.proactive.extra.dataspaces;
 
 import java.io.Serializable;
 
+import javax.naming.ConfigurationException;
+
 // FIXME: comparable or hashCode needed
 /**
  * Stores mapping from mounting point URI to access description (like URL, path
@@ -36,8 +38,11 @@ public final class SpaceInstanceInfo implements Serializable {
 	 *            node identifier
 	 * @param config
 	 *            scratch data space configuration
+	 * @throws ConfigurationException
+	 *             when cannot build complete mounting point SpaceURI
 	 */
-	public SpaceInstanceInfo(long appid, String runtimeId, String nodeId, SpaceConfiguration config) {
+	public SpaceInstanceInfo(long appid, String runtimeId, String nodeId, SpaceConfiguration config)
+			throws ConfigurationException {
 
 		if (runtimeId == null || nodeId == null || config == null)
 			throw new IllegalArgumentException("Configuration can not be null");
@@ -49,6 +54,8 @@ public final class SpaceInstanceInfo implements Serializable {
 		this.url = config.getUrl();
 		this.hostname = config.getHostname();
 		this.path = config.path;
+
+		check();
 	}
 
 	/**
@@ -58,8 +65,10 @@ public final class SpaceInstanceInfo implements Serializable {
 	 *            application id
 	 * @param config
 	 *            input or output data space configuration
+	 * @throws ConfigurationException
+	 *             when cannot build complete mounting point SpaceURI
 	 */
-	public SpaceInstanceInfo(long appid, SpaceConfiguration config) {
+	public SpaceInstanceInfo(long appid, SpaceConfiguration config) throws ConfigurationException {
 
 		if (config == null)
 			throw new IllegalArgumentException("Space configuration is null");
@@ -71,6 +80,7 @@ public final class SpaceInstanceInfo implements Serializable {
 		this.url = config.getUrl();
 		this.hostname = config.getHostname();
 		this.path = config.path;
+		check();
 	}
 
 	public String getUrl() {
@@ -91,7 +101,7 @@ public final class SpaceInstanceInfo implements Serializable {
 
 	/**
 	 * Returns the name of a mounting point.
-	 *
+	 * 
 	 * @return
 	 */
 	public String getName() {
@@ -100,7 +110,7 @@ public final class SpaceInstanceInfo implements Serializable {
 
 	/**
 	 * Returns data space type of a mounting point.
-	 *
+	 * 
 	 * @return
 	 */
 	public SpaceType getType() {
@@ -109,10 +119,16 @@ public final class SpaceInstanceInfo implements Serializable {
 
 	/**
 	 * Returns application id of a mounting point.
-	 *
+	 * 
 	 * @return
 	 */
 	public long getAppId() {
 		return mountingPoint.getAppId();
 	}
+
+	private void check() throws ConfigurationException {
+		if (!mountingPoint.isComplete())
+			throw new ConfigurationException("Constructed mounting point URI must be complete");
+	}
+
 }

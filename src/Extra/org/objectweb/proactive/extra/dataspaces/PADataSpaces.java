@@ -6,6 +6,8 @@ package org.objectweb.proactive.extra.dataspaces;
 import java.util.Map;
 import java.util.Set;
 
+import javax.naming.ConfigurationException;
+
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
@@ -447,9 +449,12 @@ public class PADataSpaces {
 	 * @throws NotConfiguredException
 	 *             when caller's node is not configured for Data Spaces
 	 *             application
+	 * @throws ConfigurationException
+	 *             when specified configuration is not sufficient and mounting
+	 *             point URI cannot be constructed
 	 */
 	public static String addInput(String name, String path, String url)
-			throws SpaceAlreadyRegisteredException, NotConfiguredException {
+			throws SpaceAlreadyRegisteredException, NotConfiguredException, ConfigurationException {
 
 		return getMyDataSpacesImpl().addInputOutput(name, path, url, SpaceType.INPUT);
 	}
@@ -489,9 +494,12 @@ public class PADataSpaces {
 	 * @throws NotConfiguredException
 	 *             when caller's node is not configured for Data Spaces
 	 *             application
+	 * @throws ConfigurationException
+	 *             when specified configuration is not sufficient and mounting
+	 *             point URI cannot be constructed
 	 */
 	public static String addOutput(String name, String path, String url)
-			throws SpaceAlreadyRegisteredException, NotConfiguredException {
+			throws SpaceAlreadyRegisteredException, NotConfiguredException, ConfigurationException {
 
 		return getMyDataSpacesImpl().addInputOutput(name, path, url, SpaceType.OUTPUT);
 	}
