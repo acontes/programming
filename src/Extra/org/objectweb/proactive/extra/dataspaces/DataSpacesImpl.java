@@ -62,8 +62,8 @@ public class DataSpacesImpl {
 			FileSystemException, SpaceNotFoundException {
 		assertIsInputOrOutput(type);
 
-		final DataSpacesURI defaultInputURI = DataSpacesURI.createInOutSpaceURI(appId, type, type
-				.getDefaultName());
+		final DataSpacesURI defaultInputURI = DataSpacesURI.createInOutSpaceURI(appId, type,
+				DataSpacesURI.DEFAULT_IN_OUT_NAME);
 
 		final FileObject fo = spacesMountManager.resolveFile(defaultInputURI);
 		return fo;
@@ -168,7 +168,8 @@ public class DataSpacesImpl {
 
 		assertIsInputOrOutput(type);
 		long currTime;
-		final DataSpacesURI uri = DataSpacesURI.createInOutSpaceURI(appId, type, type.getDefaultName());
+		final DataSpacesURI uri = DataSpacesURI.createInOutSpaceURI(appId, type,
+				DataSpacesURI.DEFAULT_IN_OUT_NAME);
 		final long startTime = System.currentTimeMillis();
 
 		do
@@ -300,7 +301,7 @@ public class DataSpacesImpl {
 		assertIsInputOrOutput(type);
 
 		if (name == null || name.equals(""))
-			name = type.getDefaultName();
+			name = DataSpacesURI.DEFAULT_IN_OUT_NAME;
 
 		final String hostname = Utils.getHostnameForThis();
 		final SpaceConfiguration config = new SpaceConfiguration(url, path, hostname, type, name);
