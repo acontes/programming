@@ -78,7 +78,7 @@ public class SpacesMountManager {
 			final DataSpacesURI spaceURI = uri.withPath(null);
 			ensureSpaceIsMounted(spaceURI);
 		}
-		return vfsManager.resolveFile(vfs.getRoot(), getVFSResolvePath(uri));
+		return resolveFileVFS(uri);
 	}
 
 	public synchronized Map<SpaceInstanceInfo, FileObject> resolveSpaces(final DataSpacesURI uri)
@@ -87,15 +87,11 @@ public class SpacesMountManager {
 		final Map<SpaceInstanceInfo, FileObject> result = new HashMap<SpaceInstanceInfo, FileObject>();
 
 		final Set<SpaceInstanceInfo> spaces = directory.lookupAll(uri);
-		for (final SpaceInstanceInfo space : spaces)
-			try {
-				FileObject fo;
-				fo = resolveFile(space.getMountingPoint());
-				result.put(space, fo);
-			} catch (SpaceNotFoundException e) {
-				// Some race condition appeared here?
-				// FIXME log and ignore?
-			}
+		for (final SpaceInstanceInfo space : spaces) {
+			ensureSpaceIsMounted(space);
+			final FileObject fo = resolveFileVFS(space.getMountingPoint());
+			result.put(space, fo);
+		}
 		return result;
 	}
 
@@ -128,6 +124,12 @@ public class SpacesMountManager {
 		}
 	}
 
+	private void ensureSpaceIsMounted(final SpaceInstanceInfo spaceInfo) throws FileSystemException {
+		if (!mountedSpaces.contains(spaceInfo.getMountingPoint())) {
+			mountSpace(spaceInfo);
+		}
+	}
+
 	private void mountSpace(final SpaceInstanceInfo spaceInfo) throws FileSystemException {
 		final DataSpacesURI mountingPoint = spaceInfo.getMountingPoint();
 		final FileObject mountedRoot = vfsManager.resolveFile(getAccessURL(spaceInfo));
@@ -145,5 +147,9 @@ public class SpacesMountManager {
 		vfsManager.closeFileSystem(fs);
 		vfs.removeJunction(getVFSJunctionPath(spaceUri));
 		mountedSpaces.remove(spaceUri);
+	}
+
+	private FileObject resolveFileVFS(final DataSpacesURI uri) throws FileSystemException {
+		return vfsManager.resolveFile(vfs.getRoot(), getVFSResolvePath(uri));
 	}
 }
