@@ -40,7 +40,6 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundExceptio
  * 
  * @see SpacesDirectory
  */
-// TODO more efficient synchronization
 // TODO known issue: how to disallow remote AOs (or even: other local AOs) write
 // access to each other scratch
 public class SpacesMountManager {
@@ -75,6 +74,28 @@ public class SpacesMountManager {
 	private final SpacesDirectory directory;
 	private final VirtualFileSystem vfs;
 	private final Set<DataSpacesURI> mountedSpaces = new HashSet<DataSpacesURI>();
+
+	/*
+	 * These two locks represent two levels of synchronization. In any execution
+	 * only readLock is acquired or both locks are acquired in constant order
+	 * (writeLock, then readLock) to avoid deadlocks.
+	 * 
+	 * readLock secures access to mountedSpaces and vfs instances. It is the
+	 * only lock used for read queries for already mounted data spaces. It is
+	 * used to avoid heavy synchronization on queries for already mounted data
+	 * spaces.
+	 * 
+	 * writeLock is responsible for potentially costly synchronization of
+	 * queries requiring mounting data spaces or on unmount. Therefore, only one
+	 * data space can be mounted or unmounted at a time.
+	 * 
+	 * Phantom read phenomena can occur for some execution paths acquiring only
+	 * readLock, for 2 times. Now it is not an issue actually, as unmount takes
+	 * place only within close() method, that is supposed to be called when
+	 * object is not used anymore.
+	 */
+	private final Object readLock = new Object();
+	private final Object writeLock = new Object();
 
 	/**
 	 * Creates SpaceMountManager instance, that must be finally closed through
@@ -131,7 +152,7 @@ public class SpacesMountManager {
 		if (queryUri.isComplete()) {
 			// If it is a complete URI, it is about a space.
 			final DataSpacesURI spaceURI = queryUri.withPath(null);
-			ensureSpaceIsMounted(spaceURI);
+			ensureSpaceIsMounted(spaceURI, null);
 		}
 		return resolveFileVFS(queryUri);
 	}
@@ -170,8 +191,13 @@ public class SpacesMountManager {
 
 		final Set<SpaceInstanceInfo> spaces = directory.lookupAll(queryUri);
 		for (final SpaceInstanceInfo space : spaces) {
-			ensureSpaceIsMounted(space);
 			final DataSpacesURI spaceUri = space.getMountingPoint();
+			try {
+				ensureSpaceIsMounted(spaceUri, space);
+			} catch (SpaceNotFoundException e) {
+				// impossible to happen for space info argument available
+				throw new RuntimeException(e);
+			}
 			final FileObject fo = resolveFileVFS(spaceUri);
 			result.put(spaceUri, fo);
 		}
@@ -182,8 +208,9 @@ public class SpacesMountManager {
 	 * Closes this manager instance.
 	 * <p>
 	 * Closing it indicates unmounting mounted data spaces and closing
-	 * VirtualFileSystem instance. Any further access to opened files within
-	 * these data spaces may result in undefined result for caller.
+	 * VirtualFileSystem instance. Any further access to already opened
+	 * FileObject within these data spaces or any call of this instance may
+	 * result in undefined behavior for caller.
 	 * <p>
 	 * VFS manager instance nor SpacesDirectory instance provided at constructor
 	 * are not closed in any way.
@@ -191,52 +218,79 @@ public class SpacesMountManager {
 	 * Subsequent calls to these method may result in undefined behavior.
 	 */
 	public synchronized void close() {
-		for (final DataSpacesURI spaceUri : new ArrayList<DataSpacesURI>(mountedSpaces)) {
-			try {
-				unmountSpace(spaceUri);
-			} catch (FileSystemException e) {
-				// FIXME log and ignore?
+		synchronized (writeLock) {
+			synchronized (readLock) {
+				for (final DataSpacesURI spaceUri : new ArrayList<DataSpacesURI>(mountedSpaces)) {
+					try {
+						unmountSpace(spaceUri);
+					} catch (FileSystemException e) {
+						// FIXME log and ignore?
+					}
+				}
+				vfs.close();
 			}
 		}
-		vfs.close();
 	}
 
-	private void ensureSpaceIsMounted(final DataSpacesURI spaceURI) throws SpaceNotFoundException,
-			FileSystemException {
-		if (!mountedSpaces.contains(spaceURI)) {
-			final SpaceInstanceInfo info = directory.lookupFirst(spaceURI);
+	private void ensureSpaceIsMounted(final DataSpacesURI spaceURI, SpaceInstanceInfo info)
+			throws SpaceNotFoundException, FileSystemException {
+		final boolean mounted;
+		synchronized (readLock) {
+			mounted = mountedSpaces.contains(spaceURI);
+		}
+
+		if (!mounted) {
+			if (info == null) {
+				info = directory.lookupFirst(spaceURI);
+			}
 			if (info == null) {
 				throw new SpaceNotFoundException(
 						"Requested data space is not registered in spaces directory.");
 			}
-			mountSpace(info);
+
+			synchronized (writeLock) {
+				// kind of double-checked lock ->
+				// check once more within writeLock
+				synchronized (readLock) {
+					if (mountedSpaces.contains(spaceURI))
+						return;
+				}
+				mountSpace(info);
+			}
 		}
 	}
 
-	private void ensureSpaceIsMounted(final SpaceInstanceInfo spaceInfo) throws FileSystemException {
-		if (!mountedSpaces.contains(spaceInfo.getMountingPoint())) {
-			mountSpace(spaceInfo);
-		}
-	}
-
+	/*
+	 * Assumed to be called within writeLock
+	 * 
+	 * TODO: support concurrent mounting of more than one data space at a time
+	 * if needed (requires a little bit more complex synchronization)
+	 */
 	private void mountSpace(final SpaceInstanceInfo spaceInfo) throws FileSystemException {
 		final DataSpacesURI mountingPoint = spaceInfo.getMountingPoint();
 		final FileObject mountedRoot = vfsManager.resolveFile(getAccessURL(spaceInfo));
 
-		vfs.addJunction(getVFSJunctionPath(mountingPoint), mountedRoot);
-		if (!mountedSpaces.add(mountingPoint)) {
-			throw new RuntimeException("Unexpected internal error - overmounting already mounted space");
+		synchronized (readLock) {
+			vfs.addJunction(getVFSJunctionPath(mountingPoint), mountedRoot);
+			if (!mountedSpaces.add(mountingPoint)) {
+				throw new RuntimeException("Unexpected internal error - overmounting already mounted space");
+			}
 		}
 	}
 
+	/*
+	 * Assumed to be called within writeLock and readLock
+	 */
 	private void unmountSpace(final DataSpacesURI spaceUri) throws FileSystemException {
 		final FileSystem fs = resolveFileVFS(spaceUri).getFileSystem();
-		vfsManager.closeFileSystem(fs);
-		vfs.removeJunction(getVFSJunctionPath(spaceUri));
 		mountedSpaces.remove(spaceUri);
+		vfs.removeJunction(getVFSJunctionPath(spaceUri));
+		vfsManager.closeFileSystem(fs);
 	}
 
 	private FileObject resolveFileVFS(final DataSpacesURI uri) throws FileSystemException {
-		return vfsManager.resolveFile(vfs.getRoot(), getVFSResolvePath(uri));
+		synchronized (readLock) {
+			return vfsManager.resolveFile(vfs.getRoot(), getVFSResolvePath(uri));
+		}
 	}
 }
