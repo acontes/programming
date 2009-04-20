@@ -657,11 +657,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                 throws IOException, RenegotiateSessionException, CommunicationForbiddenException {
             long sequenceID = getNextSequenceID();
 
-<<<<<<< HEAD:src/Core/org/objectweb/proactive/core/body/BodyImpl.java
-            RequestTags tags = propagationOfTag();
-=======
             RequestTags tags = propagationOfTags();
->>>>>>> request_tag:src/Core/org/objectweb/proactive/core/body/BodyImpl.java
 
             Request request = this.internalRequestFactory.newRequest(methodCall, BodyImpl.this,
                     future == null, sequenceID, tags); //TODO get tags from context
@@ -739,15 +735,11 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             return terminateRequest;
         }
 
-<<<<<<< HEAD:src/Core/org/objectweb/proactive/core/body/BodyImpl.java
-        private RequestTags propagationOfTag() {
-=======
         /**
          * Propagate all tags binded to the current served request.
          * @return The RequestTags after propagation
          */
         private RequestTags propagationOfTags() {
->>>>>>> request_tag:src/Core/org/objectweb/proactive/core/body/BodyImpl.java
             // Propagation of all request TAGs from current context
             Request currentreq = LocalBodyStore.getInstance().getContext().getCurrentRequest();
             RequestTags tags = null;
