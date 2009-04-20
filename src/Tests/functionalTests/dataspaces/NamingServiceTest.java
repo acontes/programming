@@ -138,6 +138,16 @@ public class NamingServiceTest extends SpacesDirectoryAbstractTest {
 	}
 
 	@Test
+	public void testUnregisterApplicationEmpty() throws ApplicationAlreadyRegisteredException,
+			WrongApplicationIdException {
+
+		Set<SpaceInstanceInfo> spaces = new HashSet<SpaceInstanceInfo>();
+
+		ns.registerApplication(MAIN_APPID, spaces);
+		ns.unregisterApplication(MAIN_APPID);
+	}
+
+	@Test
 	public void testUnregisterApplicationWrongAppid() throws ApplicationAlreadyRegisteredException,
 			WrongApplicationIdException {
 
