@@ -41,15 +41,14 @@ public class NamingServiceTest extends SpacesDirectoryAbstractTest {
 	public void testRegisterApplication1() throws ApplicationAlreadyRegisteredException,
 			WrongApplicationIdException, SpaceAlreadyRegisteredException, IllegalArgumentException {
 
-		Set<SpaceInstanceInfo> inputSpaces = new HashSet<SpaceInstanceInfo>();
-		Set<SpaceInstanceInfo> outputSpaces = new HashSet<SpaceInstanceInfo>();
+		Set<SpaceInstanceInfo> spaces = new HashSet<SpaceInstanceInfo>();
 
-		inputSpaces.add(spaceInstanceInput1);
-		inputSpaces.add(spaceInstanceInput2);
-		outputSpaces.add(spaceInstanceOutput1);
-		outputSpaces.add(spaceInstanceOutput2);
+		spaces.add(spaceInstanceInput1);
+		spaces.add(spaceInstanceInput2);
+		spaces.add(spaceInstanceOutput1);
+		spaces.add(spaceInstanceOutput2);
 
-		ns.registerApplication(MAIN_APPID, inputSpaces, outputSpaces);
+		ns.registerApplication(MAIN_APPID, spaces);
 
 		// check if everything has been registered
 		assertIsSpaceRegistered(spaceInstanceInput1);
@@ -70,7 +69,7 @@ public class NamingServiceTest extends SpacesDirectoryAbstractTest {
 	public void testRegisterApplication2() throws ApplicationAlreadyRegisteredException,
 			WrongApplicationIdException, SpaceAlreadyRegisteredException, IllegalArgumentException {
 
-		ns.registerApplication(MAIN_APPID, null, null);
+		ns.registerApplication(MAIN_APPID, null);
 		ns.register(spaceInstanceInput1);
 		ns.register(spaceInstanceOutput1);
 		assertTrue(ns.unregister(spaceInstanceInput1.getMountingPoint()));
@@ -80,10 +79,10 @@ public class NamingServiceTest extends SpacesDirectoryAbstractTest {
 	public void testRegisterApplicationAlreadyRegistered() throws ApplicationAlreadyRegisteredException,
 			WrongApplicationIdException, SpaceAlreadyRegisteredException, IllegalArgumentException {
 
-		ns.registerApplication(MAIN_APPID, null, null);
+		ns.registerApplication(MAIN_APPID, null);
 
 		try {
-			ns.registerApplication(ANOTHER_APPID1, null, null);
+			ns.registerApplication(ANOTHER_APPID1, null);
 			fail("Exception expected");
 		} catch (ApplicationAlreadyRegisteredException e) {
 		} catch (Exception e) {
@@ -102,7 +101,7 @@ public class NamingServiceTest extends SpacesDirectoryAbstractTest {
 		inputSpaces.add(spaceInstanceOutput2);
 
 		try {
-			ns.registerApplication(ANOTHER_APPID1, null, null);
+			ns.registerApplication(ANOTHER_APPID1, null);
 			fail("Exception expected");
 		} catch (WrongApplicationIdException e) {
 		} catch (Exception e) {
@@ -116,7 +115,7 @@ public class NamingServiceTest extends SpacesDirectoryAbstractTest {
 	public void testNSRegister1() throws ApplicationAlreadyRegisteredException,
 			SpaceAlreadyRegisteredException, IllegalArgumentException, WrongApplicationIdException {
 
-		ns.registerApplication(MAIN_APPID, null, null);
+		ns.registerApplication(MAIN_APPID, null);
 
 		try {
 			ns.register(spaceInstanceInput1b);
@@ -133,7 +132,7 @@ public class NamingServiceTest extends SpacesDirectoryAbstractTest {
 	public void testNSUnregister1() throws ApplicationAlreadyRegisteredException,
 			SpaceAlreadyRegisteredException, IllegalArgumentException, WrongApplicationIdException {
 
-		ns.registerApplication(MAIN_APPID, null, null);
+		ns.registerApplication(MAIN_APPID, null);
 		assertFalse(ns.unregister(spaceInstanceInput1b.getMountingPoint()));
 	}
 
@@ -146,9 +145,9 @@ public class NamingServiceTest extends SpacesDirectoryAbstractTest {
 	protected SpacesDirectory getSource() throws Exception {
 		NamingService ns = new NamingService();
 
-		ns.registerApplication(MAIN_APPID, null, null);
-		ns.registerApplication(ANOTHER_APPID1, null, null);
-		ns.registerApplication(ANOTHER_APPID2, null, null);
+		ns.registerApplication(MAIN_APPID, null);
+		ns.registerApplication(ANOTHER_APPID1, null);
+		ns.registerApplication(ANOTHER_APPID2, null);
 
 		return ns;
 	}

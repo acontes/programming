@@ -26,24 +26,17 @@ public class NamingService implements SpacesDirectory {
 	 * @param appid
 	 *            application identifier
 	 * 
-	 * @param inputSpaces
-	 *            bulked inputs definitions
-	 * 
-	 * @param outputSpaces
-	 *            bulked outputs definitions
+	 * @param spaces
+	 *            bulked input and output definitions
 	 * 
 	 * @throws WrongApplicationIdException
 	 *             When given appid doesn't match with one found in
 	 *             DataSpacesURI
-	 * @throw SpaceAlreadyRegisteredException found the same entry in input and
-	 *        output spaces set. In these cases the register operation is rolled
-	 *        back.
 	 * @throws ApplicationAlreadyRegisteredException
 	 *             When specified application id is already registered.
 	 */
-	synchronized public void registerApplication(long appid, Set<SpaceInstanceInfo> inputSpaces,
-			Set<SpaceInstanceInfo> outputSpaces) throws ApplicationAlreadyRegisteredException,
-			WrongApplicationIdException, SpaceAlreadyRegisteredException {
+	synchronized public void registerApplication(long appid, Set<SpaceInstanceInfo> spaces)
+			throws ApplicationAlreadyRegisteredException, WrongApplicationIdException {
 
 		if (isApplicationIdRegistered(appid)) {
 			throw new ApplicationAlreadyRegisteredException(
@@ -51,12 +44,10 @@ public class NamingService implements SpacesDirectory {
 		}
 		registeredApplications.add(appid);
 
-		final Set<SpaceInstanceInfo> spaces = new HashSet<SpaceInstanceInfo>();
-
-		processSpacesSet(appid, inputSpaces, spaces);
-		processSpacesSet(appid, outputSpaces, spaces);
-
-		directory.register(spaces);
+		if (spaces != null) {
+			processSpacesSet(appid, spaces);
+			directory.register(spaces);
+		}
 	}
 
 	/**
@@ -117,22 +108,14 @@ public class NamingService implements SpacesDirectory {
 		return registeredApplications.contains(appid);
 	}
 
-	private void processSpacesSet(long appid, Set<SpaceInstanceInfo> inSet,
-			final Set<SpaceInstanceInfo> outSet) throws WrongApplicationIdException,
-			SpaceAlreadyRegisteredException {
-
-		if (inSet == null || outSet == null)
-			return;
+	private void processSpacesSet(long appid, Set<SpaceInstanceInfo> inSet)
+			throws WrongApplicationIdException {
 
 		for (SpaceInstanceInfo sii : inSet) {
 
 			if (sii.getAppId() != appid)
 				throw new WrongApplicationIdException(
 						"Specified application id doesn't match with one found in DataSpacesURI. Rolling back.");
-
-			if (!outSet.add(sii))
-				throw new SpaceAlreadyRegisteredException(
-						"Duplicate entry in input and output spaces sets. Rolling back.");
 		}
 	}
 }
