@@ -3,7 +3,10 @@
  */
 package org.objectweb.proactive.extra.dataspaces;
 
+import java.net.URISyntaxException;
+
 import org.apache.commons.vfs.impl.DefaultFileSystemManager;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.AlreadyConfiguredException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredException;
@@ -62,13 +65,15 @@ public class NodeApplicationConfigurator {
 	 * @param nodeScratchSpace
 	 *            configured node scratch space, may be null if there is no
 	 *            scratch space configured for this node
-	 * @throws AlreadyConfiguredException
-	 *             when trying to reconfigure node already configured for
-	 *             application
+	 * @throws URISyntaxException
+	 *             when exception occurred on namingServiceURL parsing
+	 * @throws ProActiveException
+	 *             occurred during contacting with NamingService
+	 *
 	 */
 	synchronized public void configureApplication(long appid, String namingServiceURL,
-			DefaultFileSystemManager manager, NodeScratchSpace nodeScratchSpace)
-			throws AlreadyConfiguredException {
+			DefaultFileSystemManager manager, NodeScratchSpace nodeScratchSpace) throws ProActiveException,
+			URISyntaxException {
 
 		checkNotConfigured();
 

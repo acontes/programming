@@ -3,8 +3,11 @@
  */
 package org.objectweb.proactive.extra.dataspaces;
 
+import java.net.URISyntaxException;
+
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.impl.DefaultFileSystemManager;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.dataspaces.exceptions.AlreadyConfiguredException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredException;
@@ -59,7 +62,8 @@ public class NodeConfigurator {
 	 * @throws AlreadyConfiguredException
 	 *             when trying to reconfigure already configured instance
 	 * @throws FileSystemException
-	 *             when VFS configuration creation or scratch initialization fails
+	 *             when VFS configuration creation or scratch initialization
+	 *             fails
 	 */
 	synchronized public void configureNode(SpaceConfiguration scratchConfiguration, Node node)
 			throws AlreadyConfiguredException, FileSystemException {
@@ -68,7 +72,7 @@ public class NodeConfigurator {
 		manager = VFSFactory.createDefaultFileSystemManager();
 
 		if (scratchConfiguration != null) {
-			nodeScratchSpace = new NodeScratchSpace(scratchConfiguration, manager, node);		
+			nodeScratchSpace = new NodeScratchSpace(scratchConfiguration, manager, node);
 			nodeScratchSpace.init();
 		}
 
@@ -87,12 +91,14 @@ public class NodeConfigurator {
 	 *            application id
 	 * @param namingServiceURL
 	 *            URL of naming service remote object for that application
-	 * @throws NotConfiguredException
-	 *             when node has not been configured yet
+	 * @throws URISyntaxException
+	 *             when exception occurred on namingServiceURL parsing
+	 * @throws ProActiveException
+	 *             occurred during contacting with NamingService
 	 */
 	synchronized public void configureApplication(long appid, String namingServiceURL)
-			throws NotConfiguredException {
-		checkConfigured();		
+			throws ProActiveException, URISyntaxException {
+		checkConfigured();
 		tryCloseAppConfigurator();
 
 		appConfigurator = new NodeApplicationConfigurator();

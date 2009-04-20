@@ -3,10 +3,12 @@
  */
 package org.objectweb.proactive.extra.dataspaces;
 
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.vfs.FileSystemException;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.dataspaces.exceptions.AlreadyConfiguredException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredException;
@@ -88,18 +90,20 @@ public class DataSpacesNodes {
 	 * application-configured node - in that case previous application
 	 * configuration is closed before applying a new one.
 	 * 
+	 * @see NodeConfigurator#configureApplication(Node, long, String)
 	 * @param node
 	 *            node to be configured for Data Spaces application
 	 * @param appid
 	 *            identifier of an application
 	 * @param namingServiceURL
 	 *            URL of a Naming Service to connect to
-	 * @throws NotConfiguredException
-	 *             when node has not been configured yet
-	 * @see NodeConfigurator#configureApplication(Node, long, String)
+	 * @throws URISyntaxException
+	 *             when exception occurred on namingServiceURL parsing
+	 * @throws ProActiveException
+	 *             occurred during contacting with NamingService
 	 */
 	public static void configureApplication(Node node, long appid, String namingServiceURL)
-			throws NotConfiguredException {
+			throws ProActiveException, URISyntaxException {
 		final NodeConfigurator nodeConfig = getOrFailNodeConfigurator(node);
 		nodeConfig.configureApplication(appid, namingServiceURL);
 	}

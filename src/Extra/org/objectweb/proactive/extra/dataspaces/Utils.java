@@ -3,7 +3,12 @@
  */
 package org.objectweb.proactive.extra.dataspaces;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PARemoteObject;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -48,9 +53,12 @@ public class Utils {
 		}
 	}
 
-	public static NamingService createNamingServiceStub(String url) {
-		// TODO
-		return new NamingService();
+	public static NamingService createNamingServiceStub(String url) throws ProActiveException,
+			URISyntaxException {
+
+		NamingService stub = (NamingService) PARemoteObject.lookup(new URI(url));
+		return stub;
+		// return new NamingService();
 	}
 
 	public static void closeNamingServiceStub(NamingService stub) {
