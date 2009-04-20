@@ -135,10 +135,10 @@ public class DataSpacesImpl {
 
 		assertIsInputOrOutput(type);
 		final DataSpacesURI uri = DataSpacesURI.createURI(appId, type);
-		final Map<SpaceInstanceInfo, FileObject> spaces = spacesMountManager.resolveSpaces(uri);
+		final Map<DataSpacesURI, FileObject> spaces = spacesMountManager.resolveSpaces(uri);
 		final Map<String, FileObject> ret = new HashMap<String, FileObject>(spaces.size());
 
-		for (Entry<SpaceInstanceInfo, FileObject> entry : spaces.entrySet()) {
+		for (Entry<DataSpacesURI, FileObject> entry : spaces.entrySet()) {
 			final String name = entry.getKey().getName();
 			ret.put(name, entry.getValue());
 		}

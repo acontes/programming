@@ -81,16 +81,17 @@ public class SpacesMountManager {
 		return resolveFileVFS(uri);
 	}
 
-	public synchronized Map<SpaceInstanceInfo, FileObject> resolveSpaces(final DataSpacesURI uri)
+	public synchronized Map<DataSpacesURI, FileObject> resolveSpaces(final DataSpacesURI queryUri)
 			throws FileSystemException {
 
-		final Map<SpaceInstanceInfo, FileObject> result = new HashMap<SpaceInstanceInfo, FileObject>();
+		final Map<DataSpacesURI, FileObject> result = new HashMap<DataSpacesURI, FileObject>();
 
-		final Set<SpaceInstanceInfo> spaces = directory.lookupAll(uri);
+		final Set<SpaceInstanceInfo> spaces = directory.lookupAll(queryUri);
 		for (final SpaceInstanceInfo space : spaces) {
 			ensureSpaceIsMounted(space);
-			final FileObject fo = resolveFileVFS(space.getMountingPoint());
-			result.put(space, fo);
+			final DataSpacesURI spaceUri = space.getMountingPoint();
+			final FileObject fo = resolveFileVFS(spaceUri);
+			result.put(spaceUri, fo);
 		}
 		return result;
 	}
