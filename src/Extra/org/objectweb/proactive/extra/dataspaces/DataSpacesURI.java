@@ -53,6 +53,9 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException
  */
 public final class DataSpacesURI implements Serializable, Comparable<DataSpacesURI> {
 
+	/**
+	 * Scheme of Data Spaces URI.
+	 */
 	public static final String VFS_SCHEME = "vfs:///";
 
 	/**
