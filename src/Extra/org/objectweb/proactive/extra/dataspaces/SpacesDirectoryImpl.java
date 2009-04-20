@@ -90,7 +90,7 @@ public class SpacesDirectoryImpl implements SpacesDirectory {
 	 * @param ssis
 	 */
 	protected void register(Set<SpaceInstanceInfo> ssis) {
-
+		// FIXME test it! + exceptions
 		synchronized (data) {
 			for (SpaceInstanceInfo ssi : ssis)
 				data.put(ssi.getMountingPoint(), ssi);

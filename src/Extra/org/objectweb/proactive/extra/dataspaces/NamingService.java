@@ -42,9 +42,8 @@ public class NamingService implements SpacesDirectory {
 	 *             When specified application id is already registered.
 	 */
 	synchronized public void registerApplication(long appid, Set<SpaceInstanceInfo> inputSpaces,
-			Set<SpaceInstanceInfo> outputSpaces) throws IllegalArgumentException,
-			ApplicationAlreadyRegisteredException, WrongApplicationIdException,
-			SpaceAlreadyRegisteredException {
+			Set<SpaceInstanceInfo> outputSpaces) throws ApplicationAlreadyRegisteredException,
+			WrongApplicationIdException, SpaceAlreadyRegisteredException {
 
 		if (isApplicationIdRegistered(appid)) {
 			throw new ApplicationAlreadyRegisteredException(
