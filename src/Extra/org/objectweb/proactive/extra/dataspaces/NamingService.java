@@ -55,16 +55,22 @@ public class NamingService implements SpacesDirectory {
 	 * 
 	 * @param appid
 	 *            application identifier
+	 * @throws WrongApplicationIdException
+	 *             when specified application id is not registered
 	 */
-	synchronized public void unregisterApplication(long appid) {
+	synchronized public void unregisterApplication(long appid) throws WrongApplicationIdException {
 		final boolean found;
 
 		found = registeredApplications.remove(appid);
 
 		if (!found)
-			throw new IllegalStateException("Application with specified appid is not registered.");
+			throw new WrongApplicationIdException("Application with specified appid is not registered.");
 
 		final Set<SpaceInstanceInfo> spaces = lookupAll(DataSpacesURI.createURI(appid));
+
+		if (spaces == null)
+			return;
+
 		final Set<DataSpacesURI> uris = new HashSet<DataSpacesURI>(spaces.size());
 
 		for (SpaceInstanceInfo sii : spaces)

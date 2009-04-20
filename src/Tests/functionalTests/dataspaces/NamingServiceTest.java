@@ -5,6 +5,7 @@ package functionalTests.dataspaces;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -76,13 +77,14 @@ public class NamingServiceTest extends SpacesDirectoryAbstractTest {
 		assertTrue(ns.unregister(spaceInstanceOutput1.getMountingPoint()));
 	}
 
+	@Test
 	public void testRegisterApplicationAlreadyRegistered() throws ApplicationAlreadyRegisteredException,
 			WrongApplicationIdException, SpaceAlreadyRegisteredException, IllegalArgumentException {
 
 		ns.registerApplication(MAIN_APPID, null);
 
 		try {
-			ns.registerApplication(ANOTHER_APPID1, null);
+			ns.registerApplication(MAIN_APPID, null);
 			fail("Exception expected");
 		} catch (ApplicationAlreadyRegisteredException e) {
 		} catch (Exception e) {
@@ -90,18 +92,59 @@ public class NamingServiceTest extends SpacesDirectoryAbstractTest {
 		}
 	}
 
+	@Test
 	public void testRegisterApplicationWrongAppid() {
 
-		Set<SpaceInstanceInfo> inputSpaces = new HashSet<SpaceInstanceInfo>();
-		Set<SpaceInstanceInfo> outputSpaces = new HashSet<SpaceInstanceInfo>();
+		Set<SpaceInstanceInfo> spaces = new HashSet<SpaceInstanceInfo>();
 
-		inputSpaces.add(spaceInstanceInput1);
-		inputSpaces.add(spaceInstanceInput2);
-		inputSpaces.add(spaceInstanceOutput1);
-		inputSpaces.add(spaceInstanceOutput2);
+		spaces.add(spaceInstanceInput1);
+		spaces.add(spaceInstanceInput2);
+		spaces.add(spaceInstanceOutput1);
+		spaces.add(spaceInstanceOutput2);
 
 		try {
-			ns.registerApplication(ANOTHER_APPID1, null);
+			ns.registerApplication(ANOTHER_APPID1, spaces);
+			fail("Exception expected");
+		} catch (WrongApplicationIdException e) {
+		} catch (Exception e) {
+			fail("Exception of different type expected");
+		}
+	}
+
+	@Test
+	public void testUnregisterApplication() throws ApplicationAlreadyRegisteredException,
+			WrongApplicationIdException {
+
+		Set<SpaceInstanceInfo> spaces = new HashSet<SpaceInstanceInfo>();
+
+		spaces.add(spaceInstanceInput1);
+		spaces.add(spaceInstanceInput2);
+		spaces.add(spaceInstanceOutput1);
+		spaces.add(spaceInstanceOutput2);
+
+		ns.registerApplication(MAIN_APPID, spaces);
+
+		assertIsSpaceRegistered(spaceInstanceInput1);
+		assertIsSpaceRegistered(spaceInstanceInput2);
+		assertIsSpaceRegistered(spaceInstanceOutput1);
+		assertIsSpaceRegistered(spaceInstanceOutput2);
+
+		ns.unregisterApplication(MAIN_APPID);
+
+		assertIsSpaceUnregistered(spaceInstanceInput1);
+		assertIsSpaceUnregistered(spaceInstanceInput2);
+		assertIsSpaceUnregistered(spaceInstanceOutput1);
+		assertIsSpaceUnregistered(spaceInstanceOutput2);
+	}
+
+	@Test
+	public void testUnregisterApplicationWrongAppid() throws ApplicationAlreadyRegisteredException,
+			WrongApplicationIdException {
+
+		ns.registerApplication(MAIN_APPID, null);
+
+		try {
+			ns.unregisterApplication(ANOTHER_APPID1);
 			fail("Exception expected");
 		} catch (WrongApplicationIdException e) {
 		} catch (Exception e) {
@@ -112,10 +155,9 @@ public class NamingServiceTest extends SpacesDirectoryAbstractTest {
 	/**
 	 * Register space of not registered application
 	 */
+	@Test
 	public void testNSRegister1() throws ApplicationAlreadyRegisteredException,
 			SpaceAlreadyRegisteredException, IllegalArgumentException, WrongApplicationIdException {
-
-		ns.registerApplication(MAIN_APPID, null);
 
 		try {
 			ns.register(spaceInstanceInput1b);
@@ -129,16 +171,20 @@ public class NamingServiceTest extends SpacesDirectoryAbstractTest {
 	/**
 	 * Unregister space of not registered application
 	 */
+	@Test
 	public void testNSUnregister1() throws ApplicationAlreadyRegisteredException,
 			SpaceAlreadyRegisteredException, IllegalArgumentException, WrongApplicationIdException {
 
-		ns.registerApplication(MAIN_APPID, null);
 		assertFalse(ns.unregister(spaceInstanceInput1b.getMountingPoint()));
 	}
 
 	private void assertIsSpaceRegistered(SpaceInstanceInfo expected) {
 		SpaceInstanceInfo actual = ns.lookupFirst(expected.getMountingPoint());
 		assertEquals(actual.getMountingPoint(), expected.getMountingPoint());
+	}
+
+	private void assertIsSpaceUnregistered(SpaceInstanceInfo expected) {
+		assertNull(ns.lookupFirst(expected.getMountingPoint()));
 	}
 
 	@Override
