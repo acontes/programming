@@ -106,8 +106,6 @@ public class SpacesMountManager {
 				unmountSpace(spaceUri);
 			} catch (FileSystemException e) {
 				// FIXME log and ignore?
-			} catch (SpaceNotFoundException e) {
-				// FIXME log and ignore?
 			}
 		}
 		vfs.close();
@@ -141,10 +139,8 @@ public class SpacesMountManager {
 		}
 	}
 
-	private void unmountSpace(final DataSpacesURI spaceUri) throws FileSystemException,
-			SpaceNotFoundException {
-
-		final FileSystem fs = resolveFile(spaceUri).getFileSystem();
+	private void unmountSpace(final DataSpacesURI spaceUri) throws FileSystemException {
+		final FileSystem fs = resolveFileVFS(spaceUri).getFileSystem();
 		vfsManager.closeFileSystem(fs);
 		vfs.removeJunction(getVFSJunctionPath(spaceUri));
 		mountedSpaces.remove(spaceUri);
