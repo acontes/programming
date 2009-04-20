@@ -197,6 +197,10 @@ public class DataSpacesImpl {
 			SpaceNotFoundException {
 
 		final DataSpacesURI spaceURI = DataSpacesURI.parseURI(uri);
+
+		if (!spaceURI.isComplete())
+			throw new MalformedURIException("Specified URI must be complete");
+
 		return spacesMountManager.resolveFile(spaceURI);
 	}
 

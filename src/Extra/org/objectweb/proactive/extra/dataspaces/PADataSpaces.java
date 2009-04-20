@@ -276,7 +276,7 @@ public class PADataSpaces {
 	 *            valid URI within an existing data space
 	 * @return handle for specified file
 	 * @throws MalformedURIException
-	 *             passed URI is invalid
+	 *             passed URI is invalid or not complete
 	 * @throws FileSystemException
 	 *             indicates VFS related exception
 	 * @throws SpaceNotFoundException
