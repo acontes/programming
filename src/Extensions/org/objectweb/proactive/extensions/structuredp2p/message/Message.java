@@ -10,8 +10,8 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.Respons
  * A message is a interface for each kind of message
  * 
  * @author Kilanga Fanny
- * @author Trovato Alexandre
  * @author Pellegrino Laurent
+ * @author Trovato Alexandre
  * 
  * @version 0.1
  */

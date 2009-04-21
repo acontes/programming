@@ -9,10 +9,13 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.Respons
 
 
 /**
+ * Content-Addressable Network (CAN) as a distributed infrastructure that provides hash table-like
+ * functionality on Internet-like scales. The CAN is scalable, fault-tolerant and completely
+ * self-organizing.
  * 
  * @author Kilanga Fanny
- * @author Trovato Alexandre
  * @author Pellegrino Laurent
+ * @author Trovato Alexandre
  * 
  * @version 0.1
  */

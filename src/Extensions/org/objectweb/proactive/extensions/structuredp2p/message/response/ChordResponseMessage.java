@@ -7,8 +7,8 @@ import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
  * A chord response message gives a CHORD peer for routing.
  * 
  * @author Kilanga Fanny
- * @author Trovato Alexandre
  * @author Pellegrino Laurent
+ * @author Trovato Alexandre
  * 
  * @version 0.1
  */

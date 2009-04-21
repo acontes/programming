@@ -8,8 +8,8 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.Respons
  * Defines an abstract interface that all structured peer-to-peer protocols must implements.
  * 
  * @author Kilanga Fanny
- * @author Trovato Alexandre
  * @author Pellegrino Laurent
+ * @author Trovato Alexandre
  * 
  * @version 0.1
  */

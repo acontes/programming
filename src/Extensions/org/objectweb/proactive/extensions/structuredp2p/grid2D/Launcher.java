@@ -17,20 +17,20 @@ import org.objectweb.proactive.extensions.structuredp2p.util.Deployment;
  * Launch a new grid of active objects which know their neighbors.
  * 
  * @author Kilanga Fanny
- * @author Trovato Alexandre
  * @author Pellegrino Laurent
+ * @author Trovato Alexandre
  * 
  * @version 0.1
  */
 public class Launcher {
-    private int nbCols;
-    private int nbRows;
-    
+    private final int nbCols;
+    private final int nbRows;
+
     private String entryPointURL = "Grid2DEntryPoint";
     private List<Node> avaibleNodes;
 
     private static boolean running = true;
-    
+
     /**
      * Constructor.
      * 
@@ -249,8 +249,8 @@ public class Launcher {
                         y = Integer.parseInt(coordinates[1]);
 
                         if (x >= nbCols || x < 0 || y >= nbRows || y < 0) {
-                            System.err.println("Error, x must be in [0," + (int) (nbCols - 1) +
-                                "] and y in [0," + (int) (nbRows - 1) + "]");
+                            System.err.println("Error, x must be in [0," + (nbCols - 1) + "] and y in [0," +
+                                (nbRows - 1) + "]");
                         } else {
                             founded = entryPoint.find(x, y);
                             if (PAFuture.getFutureValue(founded) != null) {

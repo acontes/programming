@@ -1,14 +1,24 @@
 package org.objectweb.proactive.extensions.structuredp2p.core;
 
 /**
+ * An area indicates the space which is managed by a peer. The minimum is the left higher corner.
+ * The maximum is the corner lower right.
+ * 
  * @author Kilanga Fanny
- * @author Trovato Alexandre
  * @author Pellegrino Laurent
+ * @author Trovato Alexandre
  * 
  * @version 0.1
  */
 public class Area {
+
+    /**
+     * The minimum coordinates.
+     */
     private Coordinate[] coordinatesMin;
+    /**
+     * The maximum coordinates.
+     */
     private Coordinate[] coodinatesMax;
 
     public Area(Coordinate[] min, Coordinate[] max) {

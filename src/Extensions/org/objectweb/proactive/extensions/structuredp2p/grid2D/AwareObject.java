@@ -11,8 +11,8 @@ import org.objectweb.proactive.api.PAActiveObject;
  * An aware object is an object which is aware of his neighbors.
  * 
  * @author Kilanga Fanny
- * @author Trovato Alexandre
  * @author Pellegrino Laurent
+ * @author Trovato Alexandre
  * 
  * @version 0.1
  */
@@ -36,9 +36,11 @@ public class AwareObject implements Serializable, InitActive {
     /**
      * Initialize a new AwareObject with the specified coordinates.
      * 
-     * @param x the x-coordinate in the grid2d.
+     * @param x
+     *            the x-coordinate in the grid2d.
      * 
-     * @param y the y-coordinate in the grid2d.
+     * @param y
+     *            the y-coordinate in the grid2d.
      */
     public AwareObject(Integer x, Integer y) {
         this.x = x.intValue();
@@ -48,9 +50,11 @@ public class AwareObject implements Serializable, InitActive {
     /**
      * Lookup a {@link AwareObject} by it coordinates from the current object and returns it.
      * 
-     * @param x the x-coordinate to lookup.
+     * @param x
+     *            the x-coordinate to lookup.
      * 
-     * @param y the y-coordinate to lookup.
+     * @param y
+     *            the y-coordinate to lookup.
      * 
      * @return the AwareObject find or null.
      */
@@ -152,7 +156,8 @@ public class AwareObject implements Serializable, InitActive {
     /**
      * Sets the north neighbor of the current object.
      * 
-     * @param northNeighbor the new northNeighbor to set.
+     * @param northNeighbor
+     *            the new northNeighbor to set.
      */
     public void setNorthNeighbor(AwareObject northNeighbor) {
         this.northNeighbor = northNeighbor;
@@ -161,7 +166,8 @@ public class AwareObject implements Serializable, InitActive {
     /**
      * Sets the east neighbor of the current object.
      * 
-     * @param eastNeighbor the new eastNeighbor to set.
+     * @param eastNeighbor
+     *            the new eastNeighbor to set.
      */
     public void setEastNeighbor(AwareObject eastNeighbor) {
         this.eastNeighbor = eastNeighbor;
@@ -170,7 +176,8 @@ public class AwareObject implements Serializable, InitActive {
     /**
      * Sets the south neighbor of the current object.
      * 
-     * @param southNeighbor the new southNeighbor to set.
+     * @param southNeighbor
+     *            the new southNeighbor to set.
      */
     public void setSouthNeighbor(AwareObject southNeighbor) {
         this.southNeighbor = southNeighbor;
@@ -179,7 +186,8 @@ public class AwareObject implements Serializable, InitActive {
     /**
      * Sets the west neighbor of the current object.
      * 
-     * @param westNeighbor the new westNeighbor to set.
+     * @param westNeighbor
+     *            the new westNeighbor to set.
      */
     public void setWestNeighbor(AwareObject westNeighbor) {
         this.westNeighbor = westNeighbor;
@@ -188,7 +196,8 @@ public class AwareObject implements Serializable, InitActive {
     /**
      * Sets the x-coordinate.
      * 
-     * @param x the new x-coordinate to set.
+     * @param x
+     *            the new x-coordinate to set.
      */
     public void setX(int x) {
         this.x = x;
@@ -197,7 +206,8 @@ public class AwareObject implements Serializable, InitActive {
     /**
      * Sets the y-coordinate.
      * 
-     * @param y the new y-coordinate to set.
+     * @param y
+     *            the new y-coordinate to set.
      */
     public void setY(int y) {
         this.y = y;
@@ -206,7 +216,8 @@ public class AwareObject implements Serializable, InitActive {
     /**
      * Returns a description for a given neighbor.
      * 
-     * @param neighbor the neighbor we want to get description.
+     * @param neighbor
+     *            the neighbor we want to get description.
      * 
      * @return a description for a given neighbor.
      */
@@ -226,6 +237,7 @@ public class AwareObject implements Serializable, InitActive {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String toString() {
         StringBuffer buf = new StringBuffer("AwareObject x=" + this.x + ", y=" + this.y + "\n");
         buf.append("\n");

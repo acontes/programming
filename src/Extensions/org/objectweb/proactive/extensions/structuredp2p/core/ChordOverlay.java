@@ -7,11 +7,19 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.Respons
 
 
 /**
+ * Chord is a peer-to-peer lookup algorithm.
  * 
+ * It allows a distributed set of participants to agree on a single node as a rendezvous point for a
+ * given key, without any central coordination. In particular, it provides a distributed evaluation
+ * of the successor(ID) function: given the identifier of a key ID, the successor function returns
+ * the address of the node whose identifier most closely follows ID in a circular identifier space.
+ * The identifier space is typically a 160-bit number.
+ * 
+ * The Chord algorithm handles adjusting this mapping as the population of nodes changes over time.
  * 
  * @author Kilanga Fanny
- * @author Trovato Alexandre
  * @author Pellegrino Laurent
+ * @author Trovato Alexandre
  * 
  * @version 0.1
  */

@@ -5,11 +5,11 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.PingRes
 
 
 /**
- * A PingMessage is a concrete message for ping
+ * A PingMessage is a concrete message for ping.
  * 
  * @author Kilanga Fanny
- * @author Trovato Alexandre
  * @author Pellegrino Laurent
+ * @author Trovato Alexandre
  * 
  * @version 0.1
  */

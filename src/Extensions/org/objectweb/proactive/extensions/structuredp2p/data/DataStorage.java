@@ -6,14 +6,14 @@ import java.util.HashMap;
 
 /**
  * @author Kilanga Fanny
- * @author Trovato Alexandre
  * @author Pellegrino Laurent
+ * @author Trovato Alexandre
  * 
  * @version 0.1
  */
 @SuppressWarnings("serial")
 public class DataStorage implements Serializable {
-    private HashMap<String, Object> data;
+    private final HashMap<String, Object> data;
 
     public DataStorage() {
         this.data = new HashMap<String, Object>();

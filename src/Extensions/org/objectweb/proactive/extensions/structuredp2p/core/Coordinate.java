@@ -2,8 +2,8 @@ package org.objectweb.proactive.extensions.structuredp2p.core;
 
 /**
  * @author Kilanga Fanny
- * @author Trovato Alexandre
  * @author Pellegrino Laurent
+ * @author Trovato Alexandre
  * 
  * @version 0.1
  */
