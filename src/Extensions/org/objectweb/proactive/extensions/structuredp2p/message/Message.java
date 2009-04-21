@@ -1,7 +1,7 @@
 package org.objectweb.proactive.extensions.structuredp2p.message;
 
+import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.ResponseMessage;
-
 
 
 /**
@@ -13,9 +13,12 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.Respons
  * @version 0.1
  */
 public interface Message {
-    
-    public ResponseMessage handle(Peer peer);
-        
 
+    /**
+     * 
+     * @param peer
+     * @return
+     */
+    public ResponseMessage handle(Peer peer);
 
 }

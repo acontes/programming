@@ -1,5 +1,6 @@
 package org.objectweb.proactive.extensions.structuredp2p.message;
 
+import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.ChordResponseMessage;
 
 
@@ -12,17 +13,23 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.ChordRe
  * 
  * @version 0.1
  */
-public class ChordMessage implements Message{
-   
-    String id ;
-    public ChordMessage(String id){
-        
+public class ChordMessage implements Message {
+
+    String id;
+
+    /**
+     * 
+     * @param id
+     */
+    public ChordMessage(String id) {
+
     }
+
     @Override
     public ChordResponseMessage handle(Peer peer) {
         // TODO Auto-generated method stub
         return null;
-        
+
     }
 
 }
