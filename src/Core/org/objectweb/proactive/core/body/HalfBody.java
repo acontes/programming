@@ -265,7 +265,7 @@ public class HalfBody extends AbstractBody {
                 throws java.io.IOException, RenegotiateSessionException, CommunicationForbiddenException {
             long sequenceID = getNextSequenceID();
             // Create DSI RequestTags
-            RequestTags tags = new RequestTags();
+            RequestTags tags = requestTagsFactory.newRequestTags();
             try {
                 tags.setTag("DSI");
             } catch (UnknowTagException e) {

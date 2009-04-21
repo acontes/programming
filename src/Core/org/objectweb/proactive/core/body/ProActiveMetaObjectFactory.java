@@ -40,6 +40,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.dsi.RequestTags;
+import org.objectweb.proactive.core.body.dsi.RequestTagsFactory;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.ft.protocols.FTManagerFactory;
 import org.objectweb.proactive.core.body.ft.protocols.cic.managers.FTManagerCIC;
@@ -142,6 +143,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
     protected ProActiveSecurityManager proActiveSecurityManager;
     protected FTManagerFactory ftmanagerFactoryInstance;
     protected DebuggerFactory debuggerFactoryInstance;
+    protected RequestTagsFactory requestTagsFactoryInstance;
     protected Object timItReductor;
 
     //
@@ -158,6 +160,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
         this.proActiveSPMDGroupManagerFactoryInstance = newProActiveSPMDGroupManagerFactorySingleton();
         this.ftmanagerFactoryInstance = newFTManagerFactorySingleton();
         this.debuggerFactoryInstance = newDebuggerFactorySingleton();
+        this.requestTagsFactoryInstance = newRequestTagsFactorySingleton();
     }
 
     /**
@@ -181,6 +184,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
             this.proActiveSPMDGroupManagerFactoryInstance = newProActiveSPMDGroupManagerFactorySingleton();
             this.ftmanagerFactoryInstance = newFTManagerFactorySingleton();
             this.debuggerFactoryInstance = newDebuggerFactorySingleton();
+            this.requestTagsFactoryInstance = newRequestTagsFactorySingleton();
         }
     }
 
@@ -248,6 +252,10 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
     public DebuggerFactory newDebuggerFactory() {
         return this.debuggerFactoryInstance;
     }
+    
+    public RequestTagsFactory newRequestTagsFactory() {
+        return this.requestTagsFactoryInstance;
+    }
 
     //
     // -- PROTECTED METHODS -----------------------------------------------
@@ -296,6 +304,11 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
         return new DebuggerFactoryImpl();
     }
 
+    protected RequestTagsFactory newRequestTagsFactorySingleton() {
+        return new RequestTagsFactoryImpl();
+    }
+
+    
     //  //
     //  // -- INNER CLASSES -----------------------------------------------
     //  //
@@ -471,6 +484,14 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
         }
     }
 
+    // REQUEST-TAGS
+    protected static class RequestTagsFactoryImpl implements RequestTagsFactory, Serializable{
+        @Override
+        public RequestTags newRequestTags() {
+            return new RequestTags();
+        }
+    }
+    
     // SECURITY
     public void setProActiveSecurityManager(ProActiveSecurityManager psm) {
         this.proActiveSecurityManager = psm;
@@ -500,5 +521,6 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
     public Object getTimItReductor() {
         return this.timItReductor;
     }
+
 }
 //@snippet-end proactivemetaobjectfactory

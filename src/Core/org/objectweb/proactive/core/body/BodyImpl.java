@@ -748,7 +748,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                 tags.propagateTags();
                 return tags;
             }
-            tags = new RequestTags();
+            tags = requestTagsFactory.newRequestTags();
             try {
                 tags.setTag("DSI");
             } catch (UnknowTagException e) {
