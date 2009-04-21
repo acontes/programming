@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.extensions.structuredp2p.message.Message;
+import org.objectweb.proactive.extensions.structuredp2p.message.response.ResponseMessage;
 
 
 /**
@@ -73,8 +74,9 @@ public class CanOverlay implements StructuredOverlay {
      * {@inheritDoc}
      */
     @Override
-    public void sendMessageTo(Peer peer, Message msg) {
+    public ResponseMessage sendMessageTo(Peer peer, Message msg) {
         // TODO Auto-generated method stub
+        return null;
     }
 
     /**

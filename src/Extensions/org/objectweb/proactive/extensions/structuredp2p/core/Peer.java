@@ -2,6 +2,8 @@ package org.objectweb.proactive.extensions.structuredp2p.core;
 
 import java.io.Serializable;
 
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.extensions.structuredp2p.data.DataStorage;
 import org.objectweb.proactive.extensions.structuredp2p.message.Message;
 import org.objectweb.proactive.extensions.structuredp2p.message.PingMessage;
@@ -10,6 +12,9 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.Respons
 
 
 /**
+ * Defines a peer which connects itself in structured network. The network topology is one of
+ * {@link OverlayType}.
+ * 
  * @author Kilanga Fanny
  * @author Trovato Alexandre
  * @author Pellegrino Laurent
@@ -17,20 +22,38 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.Respons
  * @version 0.1
  */
 @SuppressWarnings("serial")
-public class Peer implements Serializable {
+public class Peer implements InitActive, Serializable {
+    /**
+     * The structured protocol which is used by the peer.
+     */
     private StructuredOverlay structuredOverlay;
+
+    /**
+     * The type of the overlay which is used by the peer. The type is equal to one of
+     * {@link OverlayType}.
+     */
+    private OverlayType type;
+
+    /**
+     * Contains data that are store in the peer.
+     */
     private DataStorage dataStorage;
 
+    /**
+     * The no-argument constructor as commanded by ProActive.
+     */
     public Peer() {
 
     }
 
     /**
+     * Constructor.
      * 
      * @param type
+     *            the type of the overlay which is used by the peer.
      */
-    public Peer(PeerType type) {
-        // TODO
+    public Peer(OverlayType type) {
+        this.type = type;
     }
 
     /**
@@ -90,5 +113,22 @@ public class Peer implements Serializable {
      */
     public DataStorage getDataStorage() {
         return this.dataStorage;
+    }
+
+    /**
+     * Returns the type of overlay that is used by the peer.
+     * 
+     * @return the type of overlay that is used by the peer.
+     */
+    public OverlayType getType() {
+        return this.type;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void initActivity(Body body) {
+        // TODO
     }
 }

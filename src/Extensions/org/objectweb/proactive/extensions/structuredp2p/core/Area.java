@@ -12,14 +12,18 @@ public class Area {
     private Coordinate[] coodinatesMax;
 
     /**
-     * @return the coordinatesMin
+     * Returns the minimum coordinates that indicates the area which is managed by a peer.
+     * 
+     * @return the minimum coordinates that indicates the area which is managed by a peer.
      */
     public Coordinate[] getCoordinatesMin() {
         return this.coordinatesMin;
     }
 
     /**
-     * @return the coodinatesMax
+     * Returns the maximum coordinates that indicates the area which is managed by a peer.
+     * 
+     * @return the maximum coordinates that indicates the area which is managed by a peer.
      */
     public Coordinate[] getCoodinatesMax() {
         return this.coodinatesMax;

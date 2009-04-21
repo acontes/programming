@@ -3,6 +3,7 @@ package org.objectweb.proactive.extensions.structuredp2p.core;
 import java.util.HashMap;
 
 import org.objectweb.proactive.extensions.structuredp2p.message.Message;
+import org.objectweb.proactive.extensions.structuredp2p.message.response.ResponseMessage;
 
 
 /**
@@ -46,8 +47,9 @@ public class ChordOverlay implements StructuredOverlay {
      * {@inheritDoc}
      */
     @Override
-    public void sendMessageTo(Peer peer, Message msg) {
+    public ResponseMessage sendMessageTo(Peer peer, Message msg) {
         // TODO Auto-generated method stub
+        return null;
     }
 
     /**
