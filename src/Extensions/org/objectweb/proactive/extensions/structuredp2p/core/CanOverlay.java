@@ -34,8 +34,25 @@ public class CanOverlay implements StructuredOverlay {
      * @return
      */
     public boolean contains(Coordinate[] coordinates) {
-        // TODO
-        return false;
+        // FIXME c'est bon ??
+        int i = 0;
+        boolean contains = false;
+        Coordinate[] minArea = this.area.getCoordinatesMin();
+        Coordinate[] maxArea = this.area.getCoordinatesMax();
+
+        for (Coordinate coord : coordinates) {
+            if (coord != null) {
+                // FIXME operation dordre sur String ?
+                if (minArea[i] < coord && coord < maxArea[i])
+                    contains = true;
+                else
+                    return false;
+            }
+
+            i++;
+        }
+
+        return contains;
     }
 
     /**

@@ -25,7 +25,7 @@ public class Area {
      * 
      * @return the maximum coordinates that indicates the area which is managed by a peer.
      */
-    public Coordinate[] getCoodinatesMax() {
+    public Coordinate[] getCoordinatesMax() {
         return this.coodinatesMax;
     }
 
