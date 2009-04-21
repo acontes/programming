@@ -1,4 +1,4 @@
-package functionalTests.dataspaces;
+package unitTests.dataspaces;
 
 import org.objectweb.proactive.extra.dataspaces.CachingSpacesDirectory;
 import org.objectweb.proactive.extra.dataspaces.SpacesDirectory;
