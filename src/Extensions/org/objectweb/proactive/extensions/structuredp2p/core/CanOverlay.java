@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.extensions.structuredp2p.message.Message;
+import org.objectweb.proactive.extensions.structuredp2p.message.PingMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.ResponseMessage;
 
 
@@ -16,7 +17,7 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.Respons
  * @version 0.1
  */
 public class CanOverlay implements StructuredOverlay {
-    private static final int NB_DIMENSIONS = 4;
+    private static final int NB_DIMENSIONS = 3;
 
     private Collection<Group<Peer>[]> neighbors;
     private Area area;
@@ -26,34 +27,48 @@ public class CanOverlay implements StructuredOverlay {
      * @param peer
      */
     public void split(Peer peer) {
-        // TODO
+        // FIXME comment couper la zone ?
+        ResponseMessage response = this.sendMessageTo(peer, new PingMessage());
+
+        if (response != null) {
+
+        }
     }
 
     /**
+     * Set the new area covered by the peer.
      * 
+     * @param area
+     *            the new area.
+     */
+    public void setArea(Area area) {
+        this.area = area;
+    }
+
+    /**
+     * Verify if the coordinates in arguments are in the peer area.
+     * 
+     * @param coordinates
      * @return
      */
     public boolean contains(Coordinate[] coordinates) {
         // FIXME c'est bon ??
         int i = 0;
-        boolean contains = false;
         Coordinate[] minArea = this.area.getCoordinatesMin();
         Coordinate[] maxArea = this.area.getCoordinatesMax();
 
         for (Coordinate coord : coordinates) {
             if (coord != null) {
-                // FIXME operation dordre sur String ?
-                if (minArea[i].getValue().compareTo(coord.getValue()) <= 0 &&
-                    maxArea[i].getValue().compareTo(coord.getValue()) >= 0)
-                    contains = true;
-                else
+                // If the current coordinates aren't in the peer area.  
+                if (minArea[i].getValue().compareTo(coord.getValue()) >= 0 &&
+                    maxArea[i].getValue().compareTo(coord.getValue()) <= 0)
                     return false;
             }
 
             i++;
         }
 
-        return contains;
+        return true;
     }
 
     /**
@@ -70,6 +85,7 @@ public class CanOverlay implements StructuredOverlay {
     @Override
     public void checkNeighbors() {
         // TODO Auto-generated method stub
+
     }
 
     /**
