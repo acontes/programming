@@ -226,8 +226,8 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
 	 * present in provided string, while other components are optional.
 	 * 
 	 * End slash after last component (except path) is allowed, but not
-	 * required. It is recommended, as it is used in URI canonical form returned
-	 * by {@link #toString()} method.
+	 * required. It is recommended to not use it, as it is not used in URI
+	 * canonical form returned by {@link #toString()} method.
 	 * 
 	 * @param uri
 	 *            string with URI to parse
@@ -445,21 +445,19 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
 	 * Returns string representation of this URI. This string may be directly
 	 * used by user-level code.
 	 * 
-	 * Returned URI has always end slash after last specified component, unless
-	 * last component is a path.
+	 * Returned URI does not have end slash.
 	 */
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder(VFS_SCHEME);
 
 		sb.append(Long.toString(appId));
-		sb.append('/');
 
 		if (spaceType == null) {
 			return sb.toString();
 		}
-		sb.append(spaceType.getDirectoryName());
 		sb.append('/');
+		sb.append(spaceType.getDirectoryName());
 
 		switch (spaceType) {
 		case INPUT:
@@ -467,26 +465,28 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
 			if (name == null) {
 				return sb.toString();
 			}
+			sb.append('/');
 			sb.append(name);
 			break;
 		case SCRATCH:
 			if (runtimeId == null) {
 				return sb.toString();
 			}
-			sb.append(runtimeId);
 			sb.append('/');
+			sb.append(runtimeId);
 
 			if (nodeId == null) {
 				return sb.toString();
 			}
+			sb.append('/');
 			sb.append(nodeId);
 			break;
 		default:
 			throw new IllegalStateException("Unexpected space type");
 		}
-		sb.append('/');
 
 		if (path != null) {
+			sb.append('/');
 			sb.append(path);
 		}
 

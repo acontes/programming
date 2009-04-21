@@ -384,7 +384,7 @@ public class DataSpacesURITest {
 	@Test
 	public void testToStringCompleteNoPath() {
 		uri = DataSpacesURI.createInOutSpaceURI(123, SpaceType.OUTPUT, "abc");
-		assertEquals("vfs:///123/output/abc/", uri.toString());
+		assertEquals("vfs:///123/output/abc", uri.toString());
 	}
 
 	@Test
@@ -396,31 +396,31 @@ public class DataSpacesURITest {
 	@Test
 	public void testToStringIncompleteApp() {
 		uri = DataSpacesURI.createURI(123);
-		assertEquals("vfs:///123/", uri.toString());
+		assertEquals("vfs:///123", uri.toString());
 	}
 
 	@Test
 	public void testToStringIncompleteAppType1() {
 		uri = DataSpacesURI.createURI(123, SpaceType.INPUT);
-		assertEquals("vfs:///123/input/", uri.toString());
+		assertEquals("vfs:///123/input", uri.toString());
 	}
 
 	@Test
 	public void testToStringIncompleteAppType2() {
 		uri = DataSpacesURI.createURI(123, SpaceType.SCRATCH);
-		assertEquals("vfs:///123/scratch/", uri.toString());
+		assertEquals("vfs:///123/scratch", uri.toString());
 	}
 
 	@Test
 	public void testToStringIncompleteAppTypeRuntime() {
 		uri = DataSpacesURI.createScratchSpaceURI(123, "runtimeA");
-		assertEquals("vfs:///123/scratch/runtimeA/", uri.toString());
+		assertEquals("vfs:///123/scratch/runtimeA", uri.toString());
 	}
 
 	@Test
 	public void testToStringIncompleteAppTypeRuntimeNode() {
 		uri = DataSpacesURI.createScratchSpaceURI(123, "runtimeA", "nodeB");
-		assertEquals("vfs:///123/scratch/runtimeA/nodeB/", uri.toString());
+		assertEquals("vfs:///123/scratch/runtimeA/nodeB", uri.toString());
 	}
 
 	private void assertURIGreaterThanURI2() {
