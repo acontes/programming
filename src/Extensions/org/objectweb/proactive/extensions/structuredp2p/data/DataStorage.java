@@ -5,6 +5,8 @@ import java.util.HashMap;
 
 
 /**
+ * DataStorage manages that can be stored in a peer.
+ * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent
  * @author Trovato Alexandre

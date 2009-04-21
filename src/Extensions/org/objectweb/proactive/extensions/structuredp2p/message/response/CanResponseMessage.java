@@ -16,10 +16,18 @@ import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 public class CanResponseMessage extends ResponseMessage {
     private final Peer response;
 
+    /**
+     * 
+     * @param peer
+     */
     public CanResponseMessage(Peer peer) {
         this.response = peer;
     }
 
+    /**
+     * 
+     * @return
+     */
     public Peer getResponse() {
         return response;
     }

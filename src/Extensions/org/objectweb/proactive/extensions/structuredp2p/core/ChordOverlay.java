@@ -69,34 +69,21 @@ public class ChordOverlay implements StructuredOverlay {
     }
 
     /**
-     * @return the identifier
+     * Returns the identifier associated to this overlay.
+     * 
+     * @return the identifier associated to this overlay.
      */
     public String getIdentifier() {
         return this.identifier;
     }
 
     /**
-     * @param identifier
-     *            the identifier to set
-     */
-    public void setIdentifier(String identifier) {
-        this.identifier = identifier;
-    }
-
-    /**
-     * @return the fingers
+     * Returns the fingers associated to this overlay.
+     * 
+     * @return the fingers associated to this overlay.
      */
     public HashMap<String, Peer> getFingers() {
         return this.fingers;
-    }
-
-    /**
-     * 
-     * @param fingers
-     *            the fingers to set
-     */
-    public void setFingers(HashMap<String, Peer> fingers) {
-        this.fingers = fingers;
     }
 
 }

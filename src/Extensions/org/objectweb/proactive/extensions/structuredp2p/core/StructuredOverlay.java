@@ -23,25 +23,29 @@ public interface StructuredOverlay {
     public void join(Peer peer);
 
     /**
-     * 
+     * Left the current network. Area are merged.
      */
     public void leave();
 
     /**
-     * 
-     */
-    public void update();
-
-    /**
-     * 
+     * Check neighbors list in order to see if a neighbor is died, if it is, so the list is updated.
      */
     public void checkNeighbors();
 
     /**
+     * TODO FIXME Big PROBLEM !!! parameters or not ?
+     */
+    public void update();
+
+    /**
+     * Send a message to a given peer an get a {@link ResponseMessage} in response. This function
+     * use double dispatch.
      * 
      * @param peer
+     *            the peer to which we sends the message.
      * @param msg
-     * @return
+     *            the message to send.
+     * @return the response.
      */
     public ResponseMessage sendMessageTo(Peer peer, Message msg);
 }

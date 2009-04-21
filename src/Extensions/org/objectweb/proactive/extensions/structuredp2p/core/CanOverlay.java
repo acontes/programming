@@ -1,6 +1,6 @@
 package org.objectweb.proactive.extensions.structuredp2p.core;
 
-import java.util.Collection;
+import java.util.Random;
 
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.extensions.structuredp2p.message.Message;
@@ -20,18 +20,33 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.Respons
  * @version 0.1
  */
 public class CanOverlay implements StructuredOverlay {
+    /**
+     * The number of dimensions which is equals to the number of axes.
+     */
     private static final int NB_DIMENSIONS = 3;
 
-    private Collection<Group<Peer>[]> neighbors;
+    /**
+     * Neighbors of the current area.
+     */
+    private Group<Peer[]>[] neighbors;
+
+    /**
+     * The area which is currently managed.
+     */
     private Area area;
 
+    /**
+     * Constructor.
+     */
     public CanOverlay() {
-
     }
 
     /**
+     * Splits the current area in two. The axe which is used in order to split is choose randomly
+     * with {@link #getRandomAxe()}.
      * 
      * @param peer
+     *            the new peer which want to join the area.
      */
     public void split(Peer peer) {
         // FIXME How to cut the area ?
@@ -43,10 +58,11 @@ public class CanOverlay implements StructuredOverlay {
     }
 
     /**
-     * Verify if the coordinates in arguments are in the peer area.
+     * Verify if the coordinates in arguments are in the managed area.
      * 
      * @param coordinates
-     * @return
+     *            the coordinates to check.
+     * @return true if the coordinates are in the area, else otherwise.
      */
     public boolean contains(Coordinate[] coordinates) {
         int i = 0;
@@ -55,7 +71,7 @@ public class CanOverlay implements StructuredOverlay {
 
         for (Coordinate coord : coordinates) {
             if (coord != null) {
-                // If the current coordinates aren't in the peer area.
+                // if the current coordinates aren't in the peer area.
                 if (minArea[i].getValue().compareTo(coord.getValue()) >= 0 &&
                     maxArea[i].getValue().compareTo(coord.getValue()) <= 0)
                     return false;
@@ -68,8 +84,12 @@ public class CanOverlay implements StructuredOverlay {
     }
 
     /**
+     * Merge two area when a peer leave the network. The split consists of give the data that are
+     * managed by the peer which left the network to his neighbors and after to merge this area with
+     * its closest neighbors.
      * 
      * @param peer
+     *            the peer which left the network.
      */
     public void merge(Peer peer) {
         // TODO
@@ -105,8 +125,7 @@ public class CanOverlay implements StructuredOverlay {
      */
     @Override
     public ResponseMessage sendMessageTo(Peer peer, Message msg) {
-        // TODO Auto-generated method stub
-        return null;
+        return peer.receiveMessage(msg);
     }
 
     /**
@@ -118,12 +137,31 @@ public class CanOverlay implements StructuredOverlay {
     }
 
     /**
-     * Set the new area covered by the peer.
+     * Gets a random axe number.
+     * 
+     * @return the random axe number.
+     */
+    private int getRandomAxe() {
+        Random rand = new Random();
+        return rand.nextInt(CanOverlay.NB_DIMENSIONS);
+    }
+
+    /**
+     * Set the new area covered.
      * 
      * @param area
-     *            the new area.
+     *            the new area covered.
      */
     public void setArea(Area area) {
         this.area = area;
+    }
+
+    /**
+     * Returns the neighbors of the managed area.
+     * 
+     * @return the neighbors of the managed area.
+     */
+    public Group<Peer[]>[] getNeighbors() {
+        return this.neighbors;
     }
 }

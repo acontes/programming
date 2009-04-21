@@ -1,7 +1,7 @@
 package org.objectweb.proactive.extensions.structuredp2p.core;
 
 /**
- * Defines which type of overlay are avaibles in the implementation and that can be used by peers.
+ * Defines which type of overlay are available in the implementation and that can be used by peers.
  * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent
@@ -15,7 +15,8 @@ public enum OverlayType {
      */
     CAN,
     /**
-     * CHORD (A Scalable Peer-to-peer Lookup Service for Internet Applications)
+     * CHORD (A Scalable Peer-to-peer Lookup Service for Internet Applications where topology is a
+     * ring.)
      */
     CHORD
 }

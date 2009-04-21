@@ -5,8 +5,8 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.ChordRe
 
 
 /**
- * 
- * A ChordMessage is a concrete class for Chord message.
+ * A ChordMessage is used in order to found a peer on the network. In response the caller will
+ * receive a CanResponseMessage that contains the peer that has been found.
  * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent
@@ -32,9 +32,11 @@ public class ChordMessage implements Message {
     }
 
     /**
+     * Handles message by delegation.
+     * 
      * @param a
-     *            peer to which the message will be send
-     * @return a ChordResponseMEssage for routing
+     *            peer to which the message will be sent.
+     * @return a ChordResponseMessage for routing.
      */
     public ChordResponseMessage handle(Peer peer) {
         return peer.handleChordMessage(this);
@@ -42,6 +44,7 @@ public class ChordMessage implements Message {
     }
 
     /**
+     * Returns the id searched.
      * 
      * @return the id searched.
      */

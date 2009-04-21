@@ -17,22 +17,22 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.PingRes
 public class PingMessage implements Message {
 
     /**
-     * create a PingMessage
+     * Constructor.
      */
     public PingMessage() {
 
     }
 
     /**
+     * Handles message by delegation.
+     * 
      * @param a
-     *            peer to which the message will be send
-     * @return a PingResponseMessage for routing
+     *            peer to which the message will be send.
+     * @return a PingResponseMessage for routing.
      * 
      */
     public PingResponseMessage handle(Peer peer) {
-
         return peer.handlePingMessage(this);
-
     }
 
 }
