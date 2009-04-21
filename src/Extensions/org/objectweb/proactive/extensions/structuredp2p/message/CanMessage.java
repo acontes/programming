@@ -35,7 +35,7 @@ public class CanMessage implements Message {
      *@return a CanResponseMessage for routing
      */
     public CanResponseMessage handle(Peer peer) {
-        return new CanResponseMessage(peer);
+        return peer.handleCanMessage(this);
 
     }
 

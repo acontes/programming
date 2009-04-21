@@ -34,7 +34,7 @@ public class ChordMessage implements Message {
      * @return a ChordResponseMEssage for routing
      */
     public ChordResponseMessage handle(Peer peer) {
-        return new ChordResponseMessage(peer);
+        return peer.handleChordMessage(this);
 
     }
 

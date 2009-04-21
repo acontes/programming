@@ -31,7 +31,7 @@ public class PingMessage implements Message {
      */
     public PingResponseMessage handle(Peer peer) {
 
-        return new PingResponseMessage();
+        return peer.handlePingMessage(this);
 
     }
 
