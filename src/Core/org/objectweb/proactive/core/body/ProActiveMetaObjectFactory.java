@@ -40,10 +40,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.dsi.RequestTags;
-<<<<<<< HEAD:src/Core/org/objectweb/proactive/core/body/ProActiveMetaObjectFactory.java
-=======
 import org.objectweb.proactive.core.body.dsi.RequestTagsFactory;
->>>>>>> request_tag:src/Core/org/objectweb/proactive/core/body/ProActiveMetaObjectFactory.java
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.ft.protocols.FTManagerFactory;
 import org.objectweb.proactive.core.body.ft.protocols.cic.managers.FTManagerCIC;
