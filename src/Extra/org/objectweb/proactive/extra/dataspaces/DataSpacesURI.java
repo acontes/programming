@@ -56,7 +56,7 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
 	/**
 	 * Scheme of Data Spaces URI.
 	 */
-	public static final String VFS_SCHEME = "vfs:///";
+	public static final String SCHEME = "vfs:///";
 
 	/**
 	 * Default input and output spaces name.
@@ -449,7 +449,7 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
 	 */
 	@Override
 	public String toString() {
-		final StringBuilder sb = new StringBuilder(VFS_SCHEME);
+		final StringBuilder sb = new StringBuilder(SCHEME);
 
 		sb.append(Long.toString(appId));
 

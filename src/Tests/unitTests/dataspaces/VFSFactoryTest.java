@@ -43,7 +43,7 @@ public class VFSFactoryTest {
 
 	@Test
 	public void testCreateVirtualFileSystem() throws FileSystemException {
-		manager.createVirtualFileSystem(DataSpacesURI.VFS_SCHEME);
+		manager.createVirtualFileSystem(DataSpacesURI.SCHEME);
 	}
 
 	@Test

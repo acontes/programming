@@ -43,10 +43,13 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundExceptio
 // TODO known issue: how to disallow remote AOs (or even: other local AOs) write
 // access to each other scratch
 public class SpacesMountManager {
+	// Apache VFS like these kind of games...
+	private static final String SCHEME_VFS_HACKED = DataSpacesURI.SCHEME.substring(0, DataSpacesURI.SCHEME
+			.length() - 1);
+
 	public static String getAccessURL(final SpaceInstanceInfo spaceInfo) {
 		final String spaceHostname = spaceInfo.getHostname();
-		if (spaceHostname != null && spaceHostname.equals(Utils.getHostname())
-				&& spaceInfo.getPath() != null) {
+		if (spaceHostname != null && spaceHostname.equals(Utils.getHostname()) && spaceInfo.getPath() != null) {
 			final String path = spaceInfo.getPath();
 			// FIXME what about relative paths and windows support?
 			if (path.startsWith("/")) {
@@ -59,15 +62,9 @@ public class SpacesMountManager {
 		return spaceInfo.getUrl();
 	}
 
-	// FIXME check these two or even merge them to one method
-	private static String getVFSResolvePath(final DataSpacesURI uri) {
-		// nasty VFS hacks
-		return uri.toString().substring(DataSpacesURI.VFS_SCHEME.length());
-	}
-
-	private static String getVFSJunctionPath(final DataSpacesURI spaceUri) {
-		// nasty VFS hacks
-		return spaceUri.toString().substring(DataSpacesURI.VFS_SCHEME.length());
+	private static String getVFSPath(final DataSpacesURI uri) {
+		// another nasty Apache VFS hacks
+		return uri.toString().substring(DataSpacesURI.SCHEME.length());
 	}
 
 	private final DefaultFileSystemManager vfsManager;
@@ -111,7 +108,7 @@ public class SpacesMountManager {
 		this.vfsManager = vfsManager;
 		this.directory = directory;
 		try {
-			final FileObject vfsObject = vfsManager.createVirtualFileSystem(DataSpacesURI.VFS_SCHEME);
+			final FileObject vfsObject = vfsManager.createVirtualFileSystem(SCHEME_VFS_HACKED);
 			this.vfs = (VirtualFileSystem) vfsObject.getFileSystem();
 		} catch (FileSystemException x) {
 			// that should really never happen, we know that
@@ -271,7 +268,7 @@ public class SpacesMountManager {
 		final FileObject mountedRoot = vfsManager.resolveFile(getAccessURL(spaceInfo));
 
 		synchronized (readLock) {
-			vfs.addJunction(getVFSJunctionPath(mountingPoint), mountedRoot);
+			vfs.addJunction(getVFSPath(mountingPoint), mountedRoot);
 			if (!mountedSpaces.add(mountingPoint)) {
 				throw new RuntimeException("Unexpected internal error - overmounting already mounted space");
 			}
@@ -284,13 +281,13 @@ public class SpacesMountManager {
 	private void unmountSpace(final DataSpacesURI spaceUri) throws FileSystemException {
 		final FileSystem fs = resolveFileVFS(spaceUri).getFileSystem();
 		mountedSpaces.remove(spaceUri);
-		vfs.removeJunction(getVFSJunctionPath(spaceUri));
+		vfs.removeJunction(getVFSPath(spaceUri));
 		vfsManager.closeFileSystem(fs);
 	}
 
 	private FileObject resolveFileVFS(final DataSpacesURI uri) throws FileSystemException {
 		synchronized (readLock) {
-			return vfsManager.resolveFile(vfs.getRoot(), getVFSResolvePath(uri));
+			return vfsManager.resolveFile(vfs.getRoot(), getVFSPath(uri));
 		}
 	}
 }
