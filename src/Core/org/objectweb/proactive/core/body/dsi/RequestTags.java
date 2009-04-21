@@ -25,37 +25,46 @@ public class RequestTags implements Serializable {
     }
 
     /**
-     * Set a tag for the request with an different propagation policy 
+     * Add a tag on the request with an different propagation policy 
      * than the one in the TagRegistry, and a user data content.
      * @param id     - Identifier of the tag in the TagRegistry
      * @param policy - Propagation Policy
      * @param data   - User data attached to the tag
      */
-    public void setTag(String id,PropagationPolicy policy, Object data) {
+    public void addTag(String id,PropagationPolicy policy, Object data) {
         this.tags.put(id, new Tag(policy, data));
     }
 
     /**
-     * Set a tag for the request and a user data content.
+     * Add a tag on the request and a user data content.
      * @param id     - Identifier of the tag in the TagRegistry
      * @param data   - User data attached to the tag
      * @throws UnknowTagException 
      */
-    public void setTag(String id, Object data) throws UnknowTagException{
+    public void addTag(String id, Object data) throws UnknowTagException{
         Tag t = new Tag(TagRegistry.getInstance().getPolicy(id),data);
         this.tags.put(id, t);
     }
 
     /**
-     * Set a tag for the request.
+     * Add a tag on the request.
      * @param id - Identifier of the tag in the TagRegistry
      * @throws UnknowTagException 
      */
-    public void setTag(String id) throws UnknowTagException{
+    public void addTag(String id) throws UnknowTagException{
         Tag t = new Tag(TagRegistry.getInstance().getPolicy(id));
         this.tags.put(id, t);
     }
-
+    
+    /**
+     * Remove the tag with this identifier from this request.
+     * @param id Tag identifier
+     * @return the Tag removed
+     */
+    public Tag removeTag(String id){
+        return this.tags.remove(id);
+    }
+    
     /**
      * Return the user data content attached to this tag.
      * @param id - Identifier of the tag
