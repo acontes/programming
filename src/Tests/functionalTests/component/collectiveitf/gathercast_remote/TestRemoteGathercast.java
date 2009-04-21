@@ -34,16 +34,14 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Ignore;
-import org.objectweb.fractal.adl.ADLException;
+import org.junit.After;
 import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.api.Component;
-import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.BindingController;
-import org.objectweb.fractal.api.control.IllegalBindingException;
-import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.fractal.util.Fractal;
-import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.api.PADeployment;
+import org.objectweb.proactive.core.component.adl.Registry;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.core.xml.VariableContractType;
@@ -53,79 +51,86 @@ import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import functionalTests.ComponentTest;
 import functionalTests.GCMFunctionalTest;
 import functionalTests.GCMFunctionalTestDefaultNodes;
-import functionalTests.component.descriptor.fractaladl.Test;
 
 
 public class TestRemoteGathercast extends ComponentTest {
 
+    private GCMApplication newDeploymentDescriptor = null;
+    private ProActiveDescriptor oldDeploymentDescriptor = null;
+
     @org.junit.Test
-    @Ignore
-    public void testRemoteGathercast() throws Exception {
-        try {
+    public void testRemoteGathercastPADeployement() throws Exception {
+        oldDeploymentDescriptor = PADeployment.getProactiveDescriptor(TestRemoteGathercast.class.getResource(
+                "/functionalTests/component/descriptor/deploymentDescriptor.xml").getPath(),
+                (VariableContractImpl) super.vContract.clone());
 
-            Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
-            Map<String, Object> context = new HashMap<String, Object>();
+        useRemoteGathercastItf(oldDeploymentDescriptor);
+    }
 
-            URL descriptorPath = Test.class
-                    .getResource("/functionalTests/component/descriptor/applicationDescriptor.xml");
+    @org.junit.Test
+    public void testRemoteGathercastGCMDeployement() throws Exception {
 
-            vContract.setVariableFromProgram(GCMFunctionalTest.VAR_OS, OperatingSystem.getOperatingSystem()
-                    .name(), VariableContractType.DescriptorDefaultVariable);
-            vContract.setVariableFromProgram(GCMFunctionalTestDefaultNodes.VAR_HOSTCAPACITY, Integer.valueOf(
-                    4).toString(), VariableContractType.DescriptorDefaultVariable);
-            vContract.setVariableFromProgram(GCMFunctionalTestDefaultNodes.VAR_VMCAPACITY, Integer.valueOf(1)
-                    .toString(), VariableContractType.DescriptorDefaultVariable);
+        URL descriptorPath = TestRemoteGathercast.class
+                .getResource("/functionalTests/component/descriptor/applicationDescriptor.xml");
 
-            GCMApplication newDeploymentDescriptor = PAGCMDeployment.loadApplicationDescriptor(
-                    descriptorPath, (VariableContractImpl) super.vContract.clone());
+        vContract.setVariableFromProgram(GCMFunctionalTest.VAR_OS, OperatingSystem.getOperatingSystem()
+                .name(), VariableContractType.DescriptorDefaultVariable);
+        vContract.setVariableFromProgram(GCMFunctionalTestDefaultNodes.VAR_HOSTCAPACITY, Integer.valueOf(4)
+                .toString(), VariableContractType.DescriptorDefaultVariable);
+        vContract.setVariableFromProgram(GCMFunctionalTestDefaultNodes.VAR_VMCAPACITY, Integer.valueOf(1)
+                .toString(), VariableContractType.DescriptorDefaultVariable);
 
-            newDeploymentDescriptor.startDeployment();
+        newDeploymentDescriptor = PAGCMDeployment.loadApplicationDescriptor(descriptorPath,
+                (VariableContractImpl) super.vContract.clone());
 
-            context.put("deployment-descriptor", newDeploymentDescriptor);
-            Component gatherCmpServer, gatherCmpClient;
+        newDeploymentDescriptor.startDeployment();
 
-            // instantiate components
-            System.out.println("\nInstantiate components...");
-            gatherCmpClient = (Component) f.newComponent(
-                    "functionalTests.component.collectiveitf.gathercast_remote.GatherCmp", context);
-            gatherCmpServer = (Component) f.newComponent(
-                    "functionalTests.component.collectiveitf.gathercast_remote.GatherCmp", context);
+        useRemoteGathercastItf(newDeploymentDescriptor);
+    }
 
-            // bind components
-            System.out.println("\nBind components...");
+    private void useRemoteGathercastItf(Object deploymentDesc) throws Exception {
+        Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
+        Map<String, Object> context = new HashMap<String, Object>();
 
-            // CgeneratedCCgeneratedfunctionalTestsCCPcomponentCCPcollectiveitfCCPgathercast_remoteCCPGatherItfCCOreceiverCCgathercastItfProxyCOreceiverCrepresentative
-            //     TestRemoteGathercast.class.getClassLoader().loadClass("CgeneratedCCgeneratedorgCCPobjectwebCCPproactiveCCPexamplesCCPcomponentsCCPjacobiCCPGathercastDataReceiverCCOreceiverCCgathercastItfProxyCOreceiverCrepresentative");
-            BindingController bc = Fractal.getBindingController(gatherCmpClient);
+        context.put("deployment-descriptor", deploymentDesc);
+        Component gatherCmpServer, gatherCmpClient;
 
-            // binding
-            bc.bindFc("sender", gatherCmpServer.getFcInterface("receiver"));
+        // instantiate components
+        System.out.println("\nInstantiate components...");
+        gatherCmpClient = (Component) f.newComponent(
+                "functionalTests.component.collectiveitf.gathercast_remote.GatherCmp", context);
+        gatherCmpServer = (Component) f.newComponent(
+                "functionalTests.component.collectiveitf.gathercast_remote.GatherCmp", context);
 
-            // start and launch components
-            System.out.println("\nLaunch components...");
-            ((Runnable) gatherCmpClient.getFcInterface("main")).run();
+        // bind components
+        System.out.println("\nBind components...");
 
-            System.out.println("\nStart components...");
-            Fractal.getLifeCycleController(gatherCmpClient).startFc();
-            Fractal.getLifeCycleController(gatherCmpServer).startFc();
-        } catch (ProActiveException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (ADLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (NoSuchInterfaceException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IllegalBindingException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IllegalLifeCycleException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        // CgeneratedCCgeneratedfunctionalTestsCCPcomponentCCPcollectiveitfCCPgathercast_remoteCCPGatherItfCCOreceiverCCgathercastItfProxyCOreceiverCrepresentative
+        //     TestRemoteGathercast.class.getClassLoader().loadClass("CgeneratedCCgeneratedorgCCPobjectwebCCPproactiveCCPexamplesCCPcomponentsCCPjacobiCCPGathercastDataReceiverCCOreceiverCCgathercastItfProxyCOreceiverCrepresentative");
+        BindingController bc = Fractal.getBindingController(gatherCmpClient);
+
+        // binding
+        bc.bindFc("sender", gatherCmpServer.getFcInterface("receiver"));
+
+        // start and launch components
+        System.out.println("\nLaunch components...");
+        ((Runnable) gatherCmpClient.getFcInterface("main")).run();
+
+        System.out.println("\nStart components...");
+        Fractal.getLifeCycleController(gatherCmpClient).startFc();
+        Fractal.getLifeCycleController(gatherCmpServer).startFc();
+    }
+
+    @After
+    public void endTest() throws Exception {
+        Registry.instance().clear();
+        if (newDeploymentDescriptor != null) {
+            newDeploymentDescriptor.kill();
         }
 
-        System.exit(0);
+        if (oldDeploymentDescriptor != null) {
+            oldDeploymentDescriptor.killall(false);
+        }
     }
 
 }

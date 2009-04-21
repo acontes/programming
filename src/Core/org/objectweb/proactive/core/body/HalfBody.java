@@ -267,7 +267,7 @@ public class HalfBody extends AbstractBody {
             // Create DSI RequestTags
             RequestTags tags = requestTagsFactory.newRequestTags();
             try {
-                tags.setTag("DSI");
+                tags.addTag("DSI");
             } catch (UnknowTagException e) {
                 TagRegistry.getInstance().register("DSI", new RequiredPolicy());
             }
