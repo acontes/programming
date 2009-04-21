@@ -1,6 +1,6 @@
 package org.objectweb.proactive.extensions.structuredp2p.message;
 
-import org.objectweb.proactive.extensions.structuredp2p.response.PingResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.message.response.PingResponseMessage;
 
 
 /**

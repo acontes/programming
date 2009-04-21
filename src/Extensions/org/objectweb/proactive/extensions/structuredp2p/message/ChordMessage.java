@@ -1,6 +1,6 @@
 package org.objectweb.proactive.extensions.structuredp2p.message;
 
-import org.objectweb.proactive.extensions.structuredp2p.response.ChordResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.message.response.ChordResponseMessage;
 
 
 /**
