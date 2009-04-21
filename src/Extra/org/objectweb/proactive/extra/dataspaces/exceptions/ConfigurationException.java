@@ -3,7 +3,6 @@
  */
 package org.objectweb.proactive.extra.dataspaces.exceptions;
 
-
 /**
  *
  *
@@ -14,7 +13,6 @@ public class ConfigurationException extends DataSpacesException {
 	 *
 	 */
 	public ConfigurationException() {
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -22,7 +20,6 @@ public class ConfigurationException extends DataSpacesException {
 	 */
 	public ConfigurationException(String message) {
 		super(message);
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -31,7 +28,6 @@ public class ConfigurationException extends DataSpacesException {
 	 */
 	public ConfigurationException(String message, Throwable cause) {
 		super(message, cause);
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -39,7 +35,6 @@ public class ConfigurationException extends DataSpacesException {
 	 */
 	public ConfigurationException(Throwable cause) {
 		super(cause);
-		// TODO Auto-generated constructor stub
 	}
 
 }

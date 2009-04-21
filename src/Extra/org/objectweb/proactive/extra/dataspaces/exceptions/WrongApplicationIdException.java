@@ -13,7 +13,6 @@ public class WrongApplicationIdException extends ConfigurationException {
 	 * 
 	 */
 	public WrongApplicationIdException() {
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -21,7 +20,6 @@ public class WrongApplicationIdException extends ConfigurationException {
 	 */
 	public WrongApplicationIdException(String message) {
 		super(message);
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -30,7 +28,6 @@ public class WrongApplicationIdException extends ConfigurationException {
 	 */
 	public WrongApplicationIdException(String message, Throwable cause) {
 		super(message, cause);
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -38,7 +35,6 @@ public class WrongApplicationIdException extends ConfigurationException {
 	 */
 	public WrongApplicationIdException(Throwable cause) {
 		super(cause);
-		// TODO Auto-generated constructor stub
 	}
 
 }

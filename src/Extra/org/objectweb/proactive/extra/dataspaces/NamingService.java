@@ -12,7 +12,7 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.WrongApplicationIdExc
 
 /**
  * Manages application register/unregister process in space directory.
- * Implements SpacesDirectory. TODO: Remote accessible.
+ * Implements SpacesDirectory.
  */
 public class NamingService implements SpacesDirectory {
 

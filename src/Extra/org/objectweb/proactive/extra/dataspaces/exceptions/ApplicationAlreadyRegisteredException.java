@@ -13,7 +13,6 @@ public class ApplicationAlreadyRegisteredException extends ConfigurationExceptio
 	 *
 	 */
 	public ApplicationAlreadyRegisteredException() {
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -21,7 +20,6 @@ public class ApplicationAlreadyRegisteredException extends ConfigurationExceptio
 	 */
 	public ApplicationAlreadyRegisteredException(String message) {
 		super(message);
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -30,7 +28,6 @@ public class ApplicationAlreadyRegisteredException extends ConfigurationExceptio
 	 */
 	public ApplicationAlreadyRegisteredException(String message, Throwable cause) {
 		super(message, cause);
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -38,7 +35,6 @@ public class ApplicationAlreadyRegisteredException extends ConfigurationExceptio
 	 */
 	public ApplicationAlreadyRegisteredException(Throwable cause) {
 		super(cause);
-		// TODO Auto-generated constructor stub
 	}
 
 }

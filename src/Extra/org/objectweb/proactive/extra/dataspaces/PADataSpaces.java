@@ -41,9 +41,6 @@ public class PADataSpaces {
 	 * Input is expected to be readable.
 	 * </p>
 	 * 
-	 * TODO it can block when input needs to be mounted (timeout exception is
-	 * being thrown after some configurable period).
-	 * 
 	 * @see {@link #resolveDefaultInputBlocking(long)}
 	 * @return File handle for the default input data space
 	 * @throws SpaceNotFoundException

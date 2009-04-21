@@ -15,7 +15,6 @@ public class DataSpacesException extends ProActiveException {
 	 *
 	 */
 	public DataSpacesException() {
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -23,7 +22,6 @@ public class DataSpacesException extends ProActiveException {
 	 */
 	public DataSpacesException(String message) {
 		super(message);
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -32,7 +30,6 @@ public class DataSpacesException extends ProActiveException {
 	 */
 	public DataSpacesException(String message, Throwable cause) {
 		super(message, cause);
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -40,7 +37,6 @@ public class DataSpacesException extends ProActiveException {
 	 */
 	public DataSpacesException(Throwable cause) {
 		super(cause);
-		// TODO Auto-generated constructor stub
 	}
 
 }
