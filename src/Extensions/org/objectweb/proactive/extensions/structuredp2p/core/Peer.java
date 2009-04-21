@@ -117,7 +117,14 @@ public class Peer implements InitActive, Serializable {
      * @return the ping response.
      */
     public CanResponseMessage handleCanMessage(CanMessage msg) {
-        return new CanResponseMessage(this);
+        if(((CanOverlay)this.structuredOverlay).contains(msg.getCoordinate())){
+            return new CanResponseMessage(this);
+        }else{
+            //FIXME
+          //return  this.sendMessageTo(peer, msg);   
+            return null;
+        }
+       
     }
 
     /**
@@ -128,6 +135,8 @@ public class Peer implements InitActive, Serializable {
      * @return the ping response.
      */
     public ChordResponseMessage handleChordMessage(ChordMessage msg) {
+        
+        //FIXME comment router sur un chord
         return new ChordResponseMessage(this);
     }
 

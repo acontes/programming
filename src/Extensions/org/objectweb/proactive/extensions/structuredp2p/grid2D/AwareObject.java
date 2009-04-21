@@ -1,7 +1,6 @@
 package org.objectweb.proactive.extensions.structuredp2p.grid2D;
 
 import java.io.Serializable;
-
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;

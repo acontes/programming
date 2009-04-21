@@ -18,18 +18,37 @@ public class CanMessage implements Message {
     private Coordinate coordinate[];
 
     /**
-     * 
-     * @param cord
+     * create a new CanMessage with it cordinates
+     * @param cord : cordinates of the peer to which the message will be send
      */
     public CanMessage(Coordinate cord[]) {
 
     }
 
-    @Override
+    /**
+     * @param a
+     *            peer to which the message will be send
+     * @return a CanResponseMessage for routing
+     */
     public CanResponseMessage handle(Peer peer) {
-        // TODO Auto-generated method stub
-        return null;
-
+    
+        return peer.handleCanMessage(this);
     }
+   /**
+    * return a coordinate of a peer to which the message will be send
+    * @return a coordinate 
+    */
+    public Coordinate[] getCoordinate() {
+        return coordinate;
+    }
+    /**
+     * set the coordinate
+     * @param coordinate
+     */
+    public void setCoordinate(Coordinate[] coordinate) {
+        this.coordinate = coordinate;
+    }
+    
+    
 
 }
