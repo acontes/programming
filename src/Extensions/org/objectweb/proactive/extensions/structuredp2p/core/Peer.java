@@ -7,6 +7,8 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.extensions.structuredp2p.data.DataStorage;
 import org.objectweb.proactive.extensions.structuredp2p.message.Message;
 import org.objectweb.proactive.extensions.structuredp2p.message.PingMessage;
+import org.objectweb.proactive.extensions.structuredp2p.message.response.CanResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.message.response.ChordResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.PingResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.ResponseMessage;
 
@@ -57,24 +59,29 @@ public class Peer implements InitActive, Serializable {
     }
 
     /**
+     * Sends a message to a peer.
      * 
      * @param peer
+     *            the peer we want to send.
      * @param msg
+     *            the message to send.
      */
     public void sendMessageTo(Peer peer, Message msg) {
         // TODO
     }
 
     /**
+     * Adds the current peer in the network.
      * 
      * @param peer
+     *            the peer which serves as entry point.
      */
     public void join(Peer peer) {
         this.structuredOverlay.join(peer);
     }
 
     /**
-     * 
+     * Unregister the peer from the current structured network.
      */
     public void leave() {
         this.structuredOverlay.leave();
@@ -91,9 +98,11 @@ public class Peer implements InitActive, Serializable {
     }
 
     /**
+     * Handles a ping request.
      * 
      * @param msg
-     * @return
+     *            the ping request that is receive.
+     * @return the ping response.
      */
     public PingResponseMessage handlePingMessage(PingMessage msg) {
         // TODO
@@ -101,15 +110,33 @@ public class Peer implements InitActive, Serializable {
     }
 
     /**
-     * @param dataStorage
-     *            the dataStorage to set
+     * Handles a CAN request.
+     * 
+     * @param msg
+     *            the ping request that is receive.
+     * @return the ping response.
      */
-    public void setDataStorage(DataStorage dataStorage) {
-        this.dataStorage = dataStorage;
+    public CanResponseMessage handleCanMessage(PingMessage msg) {
+        // TODO
+        return null;
     }
 
     /**
-     * @return the dataStorage
+     * Handles a CHORD request.
+     * 
+     * @param msg
+     *            the ping request that is receive.
+     * @return the ping response.
+     */
+    public ChordResponseMessage handleChordMessage(PingMessage msg) {
+        // TODO
+        return null;
+    }
+
+    /**
+     * Returns the data that are managed by the peer.
+     * 
+     * @return the data that are managed by the peer.
      */
     public DataStorage getDataStorage() {
         return this.dataStorage;
@@ -129,6 +156,15 @@ public class Peer implements InitActive, Serializable {
      */
     @Override
     public void initActivity(Body body) {
-        // TODO
+        switch (this.type) {
+            case CAN:
+                this.structuredOverlay = new CanOverlay();
+                break;
+            case CHORD:
+                this.structuredOverlay = new ChordOverlay();
+                break;
+            default:
+                throw new IllegalArgumentException("The peer type must be one of OverlayType.");
+        }
     }
 }
