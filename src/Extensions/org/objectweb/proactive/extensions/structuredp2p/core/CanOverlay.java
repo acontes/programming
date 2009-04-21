@@ -43,7 +43,8 @@ public class CanOverlay implements StructuredOverlay {
         for (Coordinate coord : coordinates) {
             if (coord != null) {
                 // FIXME operation dordre sur String ?
-                if (minArea[i] < coord && coord < maxArea[i])
+                if (minArea[i].getValue().compareTo(coord.getValue()) <= 0 &&
+                    maxArea[i].getValue().compareTo(coord.getValue()) >= 0)
                     contains = true;
                 else
                     return false;
