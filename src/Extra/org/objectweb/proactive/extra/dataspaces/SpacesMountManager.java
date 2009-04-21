@@ -146,7 +146,7 @@ public class SpacesMountManager {
 	 *             when space with that query URI does not exists in
 	 *             SpacesDirectory
 	 */
-	public synchronized FileObject resolveFile(final DataSpacesURI queryUri) throws FileSystemException,
+	public FileObject resolveFile(final DataSpacesURI queryUri) throws FileSystemException,
 			SpaceNotFoundException {
 
 		if (queryUri.isComplete()) {
@@ -185,7 +185,7 @@ public class SpacesMountManager {
 	 * @throws IllegalArgumentException
 	 *             when provided queryUri is complete
 	 */
-	public synchronized Map<DataSpacesURI, FileObject> resolveSpaces(final DataSpacesURI queryUri)
+	public Map<DataSpacesURI, FileObject> resolveSpaces(final DataSpacesURI queryUri)
 			throws FileSystemException {
 		final Map<DataSpacesURI, FileObject> result = new HashMap<DataSpacesURI, FileObject>();
 
@@ -217,7 +217,7 @@ public class SpacesMountManager {
 	 * <p>
 	 * Subsequent calls to these method may result in undefined behavior.
 	 */
-	public synchronized void close() {
+	public void close() {
 		synchronized (writeLock) {
 			synchronized (readLock) {
 				for (final DataSpacesURI spaceUri : new ArrayList<DataSpacesURI>(mountedSpaces)) {
