@@ -142,7 +142,7 @@ public class DataSpacesNodes {
 	}
 
 	private static NodeConfigurator getOrCreateNodeConfigurator(Node node) {
-		final String name = Utils.extractNodeId(node);
+		final String name = Utils.getNodeId(node);
 
 		synchronized (nodeConfigurators) {
 			final NodeConfigurator config = nodeConfigurators.get(name);
@@ -156,7 +156,7 @@ public class DataSpacesNodes {
 	}
 
 	private static NodeConfigurator getOrFailNodeConfigurator(Node node) throws NotConfiguredException {
-		final String name = Utils.extractNodeId(node);
+		final String name = Utils.getNodeId(node);
 
 		synchronized (nodeConfigurators) {
 			final NodeConfigurator config = nodeConfigurators.get(name);

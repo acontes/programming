@@ -505,7 +505,7 @@ public class PADataSpaces {
 	}
 
 	private static DataSpacesImpl getMyDataSpacesImpl() throws NotConfiguredException {
-		final Node n = Utils.getNodeForThis();
+		final Node n = Utils.getCurrentNode();
 		return DataSpacesNodes.getDataSpacesImpl(n);
 	}
 

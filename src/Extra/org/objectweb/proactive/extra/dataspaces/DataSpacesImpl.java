@@ -81,7 +81,7 @@ public class DataSpacesImpl {
 		if (appScratchSpace == null)
 			throw new NotConfiguredException("Scratch data space not configured on this node");
 
-		final String aoid = Utils.extractAOId();
+		final String aoid = Utils.getCurrentActiveObjectId();
 		final DataSpacesURI scratchURI = appScratchSpace.getScratchForAO(aoid);
 		try {
 			return spacesMountManager.resolveFile(scratchURI);
@@ -303,7 +303,7 @@ public class DataSpacesImpl {
 		if (name == null || name.equals(""))
 			name = DataSpacesURI.DEFAULT_IN_OUT_NAME;
 
-		final String hostname = Utils.getHostnameForThis();
+		final String hostname = Utils.getHostname();
 		final SpaceConfiguration config = new SpaceConfiguration(url, path, hostname, type, name);
 		final SpaceInstanceInfo spaceInstanceInfo = new SpaceInstanceInfo(appId, config);
 		// FIXME add ProActive provider start up

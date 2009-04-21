@@ -45,7 +45,7 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundExceptio
 public class SpacesMountManager {
 	public static String getAccessURL(final SpaceInstanceInfo spaceInfo) {
 		final String spaceHostname = spaceInfo.getHostname();
-		if (spaceHostname != null && spaceHostname.equals(Utils.getHostnameForThis())
+		if (spaceHostname != null && spaceHostname.equals(Utils.getHostname())
 				&& spaceInfo.getPath() != null) {
 			final String path = spaceInfo.getPath();
 			// FIXME what about relative paths and windows support?

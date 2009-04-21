@@ -10,11 +10,11 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PARemoteObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.ProActiveInet;
 
-// FIXME make these methods signatures more consistent
 /**
  * Static utilities methods.
  */
@@ -23,29 +23,52 @@ public class Utils {
 	private Utils() {
 	}
 
-	public static String getHostnameForThis() {
+	/**
+	 * @see {@link ProActiveInet#getHostname()}
+	 * @return
+	 */
+	public static String getHostname() {
 		// InetAddress.getLocalHost().getHostName();
-		return ProActiveInet.getInstance().getInetAddress().getHostName();
+		return ProActiveInet.getInstance().getHostname();
 	}
 
 	/**
+	 * Returns an identifier of specified Node.
+	 * 
 	 * @param node
 	 * @return
 	 */
-	public static String extractNodeId(final Node node) {
+	public static String getNodeId(final Node node) {
 		return node.getNodeInformation().getName();
 	}
 
 	/**
+	 * Returns identifier of an Active Object of current active thread.
+	 * 
 	 * @return
+	 * @throws ProActiveRuntimeException
+	 *             when not called from an active thread
 	 */
-	public static String extractAOId() {
-		PAActiveObject.getJobId();
-		return null;
+	public static String getCurrentActiveObjectId() throws ProActiveRuntimeException {
+		if (PAActiveObject.getStubOnThis() == null)
+			throw new ProActiveRuntimeException("This method must be called from an active thread");
+
+		UniqueID uid = PAActiveObject.getBodyOnThis().getID();
+		return uid.toString();
 	}
 
-	public static Node getNodeForThis() {
-		// FIXME what if not called from AO?
+	/**
+	 * Returns Node for current active thread.
+	 * 
+	 * @return
+	 * @throws ProActiveRuntimeException
+	 *             when internal PA exception on node acquisition or not called
+	 *             from an active thread
+	 */
+	public static Node getCurrentNode() throws ProActiveRuntimeException {
+		if (PAActiveObject.getStubOnThis() == null)
+			throw new ProActiveRuntimeException("This method must be called from an active thread");
+
 		try {
 			return PAActiveObject.getNode();
 		} catch (NodeException e) {
@@ -53,6 +76,17 @@ public class Utils {
 		}
 	}
 
+	/**
+	 * Connects to a remote NamingService object under specified URL.
+	 * 
+	 * @param url
+	 *            to connect
+	 * @return stub
+	 * @throws ProActiveException
+	 *             when PA exception occurs (communication error)
+	 * @throws URISyntaxException
+	 *             when URL cannot be parsed
+	 */
 	public static NamingService createNamingServiceStub(String url) throws ProActiveException,
 			URISyntaxException {
 
@@ -61,7 +95,12 @@ public class Utils {
 		// return new NamingService();
 	}
 
+	/**
+	 * Empty.
+	 * 
+	 * @param stub
+	 */
 	public static void closeNamingServiceStub(NamingService stub) {
-		// TODO Auto-generated method stub
+		// nothing here
 	}
 }

@@ -102,7 +102,7 @@ public final class SpaceInstanceInfo implements Serializable {
 
 	/**
 	 * Returns hostname where local access path may be used. This hostname
-	 * should be comparable to {@link Utils#getHostnameForThis()}.
+	 * should be comparable to {@link Utils#getHostname()}.
 	 * 
 	 * @return hostname where local access path may be used; <code>null</code>
 	 *         if local access is undefined
