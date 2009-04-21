@@ -9,8 +9,8 @@
 		<javaPropertyVariable name="proactive.home" />
 		<javaPropertyVariable name="user.home" />
 
-		<descriptorVariable name="hostCapacity" value="2" />
-		<descriptorVariable name="vmCapacity" value="2" />
+		<descriptorVariable name="hostCapacity" value="1" />
+		<descriptorVariable name="vmCapacity" value="1" />
 	</environment>
 
 	<application>
@@ -28,7 +28,7 @@
 
 			</configuration>
 
-			<virtualNode id="Grid2D" capacity="1"/>
+			<virtualNode id="Grid2D" capacity="3"/>
 		</proactive>
 	</application>
 
