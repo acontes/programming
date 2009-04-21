@@ -778,7 +778,6 @@ public final class ActiveObject extends AbstractData<ProActiveNodeObject, Abstra
     //
     public void enableStepByStep() {
         setChanged();
-        System.out.println("runtimeURI: " + parent.getParent().getUrl());
         proxyMBean.enableStepByStep();
     }
 

@@ -8,13 +8,23 @@
             id="DebuggerExtended.extendedDebuggerContribution"
             targetID="org.eclipse.debug.ui.DebugView">
          <action
-               class="org.eclipse.proactive.extendeddebugger.ui.actions.ExtendedAction"
-               icon="icons/icon.gif"
-               id="org.eclipse.proactive.debug.proactivefilter.ui.actions.ExtendedDebuggerAction"
-               label="ExtendedDebugger"
+               class="org.eclipse.proactive.extendeddebugger.ui.actions.TunnelingConnexionAction"
+               icon="icons/connection.png"
+               id="org.eclipse.proactive.debug.proactivefilter.ui.actions.TunnelingConnexionAction"
+               label="TunnelingConnexionAction"
                menubarPath="org.eclipse.ui.run/stepReturnGroup"
                toolbarPath="org.eclipse.debug.ui.launchActionSet"
-               tooltip="ExtendedDebugger">
+               tooltip="TunnelingConnexionAction">
+         </action>
+         <action
+               class="org.eclipse.proactive.extendeddebugger.ui.actions.ExtendedDebuggerAction"
+               icon="icons/icon.gif"
+               id="org.eclipse.proactive.debug.proactivefilter.ui.actions.ExtentedDebugger"
+               label="ExtentedDebugger"
+               menubarPath="org.eclipse.ui.run/stepReturnGroup"
+               style="radio"
+               toolbarPath="org.eclipse.debug.ui.launchActionSet"
+               tooltip="ExtentedDebugger">
          </action>
       </viewContribution>
    </extension>

@@ -37,7 +37,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Display;
-import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.debug.Activator;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
@@ -65,12 +64,13 @@ public class DebugConnectAction extends Action implements IActionExtPoint {
     public void run() {
         Display.getDefault().asyncExec(new Runnable() {
             public void run() {
-                if (dsc.hasDebuggerConnected()) {
-                    dsc.removeDebugger();
-                    Console.getInstance(Activator.CONSOLE_NAME).log("Debugger connection tunnel closed.");
-                } else {
-                    dsc.connectSocketDebugger();
-                }
+            	dsc.showRuntimeURL();
+//                if (dsc.hasDebuggerConnected()) {
+//                    dsc.removeDebugger();
+//                    Console.getInstance(Activator.CONSOLE_NAME).log("Debugger connection tunnel closed.");
+//                } else {
+//                    dsc.connectSocketDebugger();
+//                }
             }
         });
     }

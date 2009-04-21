@@ -3,18 +3,6 @@
 <plugin>
 
    <extension
-         point="org.eclipse.ui.perspectiveExtensions">
-      <perspectiveExtension
-            targetID="org.eclipse.debug.ui.DebugPerspective">
-         <actionSet
-               id="org.eclipse.proactive.debug.ProactiveFilter.actionSet">
-         </actionSet>
-         <showInPart
-               id="org.eclipse.debug.ui.DebugView">
-         </showInPart>
-      </perspectiveExtension>
-   </extension>
-   <extension
          point="org.eclipse.ui.viewActions">
       <viewContribution
             id="ProActiveFilter.filterContribution"
@@ -25,6 +13,7 @@
                id="org.eclipse.proactive.debug.proactivefilter.ui.actions.FilterAction"
                label="FIlterAction"
                menubarPath="org.eclipse.ui.run/stepReturnGroup"
+               style="radio"
                toolbarPath="org.eclipse.debug.ui.launchActionSet"
                tooltip="Proactive FIlter Action">
          </action>

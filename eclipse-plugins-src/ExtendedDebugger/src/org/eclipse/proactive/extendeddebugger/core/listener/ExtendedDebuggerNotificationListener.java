@@ -9,6 +9,7 @@ import org.eclipse.proactive.extendeddebugger.core.ExtendedDebugger;
 import org.objectweb.proactive.core.debug.stepbystep.RemoteDebugInfo;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 
+
 public class ExtendedDebuggerNotificationListener implements NotificationListener{
 
 	private ExtendedDebugger extendedDebugger;

@@ -22,22 +22,23 @@ public class FilterActionDelegate implements IViewActionDelegate {
 	private TreeViewer viewer;
 	private FilterDialog filterDialog;
 	
-	private boolean isEnable;
+	private boolean isEnable = false;
 	private ProactiveFilter pf;
 
-	/**
-	 * The constructor.
-	 */
-	public FilterActionDelegate() {
+	@Override
+	public void init(IViewPart view) {
 		pf = new ProactiveFilter();
-		isEnable = false;
+		this.window = view.getViewSite().getWorkbenchWindow();
+		this.view = (IDebugView) view;
+		this.viewer = (TreeViewer)this.view.getViewer();
 	}
-
+	
 	/**
 	 * @see IWorkbenchWindowActionDelegate#run
 	 */
 	public void run(IAction action) {
 		if(isEnable){
+			action.setChecked(false);
 			viewer.removeFilter(pf);
 			isEnable = false;
 		} else {
@@ -51,7 +52,10 @@ public class FilterActionDelegate implements IViewActionDelegate {
 					pf.addRegex(filterDialog.getThreadRegex(), filterDialog.getStackRegex());
 				}
 				viewer.addFilter(pf);
+				action.setChecked(true);
 				isEnable = true;
+			} else {
+				action.setChecked(false);
 			}
 		}
 	}
@@ -60,18 +64,5 @@ public class FilterActionDelegate implements IViewActionDelegate {
 	 * @see IWorkbenchWindowActionDelegate#selectionChanged
 	 */
 	public void selectionChanged(IAction action, ISelection selection) {
-	}
-
-	/**
-	 * @see IWorkbenchWindowActionDelegate#dispose
-	 */
-	public void dispose() {
-	}
-
-	@Override
-	public void init(IViewPart view) {
-		this.window = view.getViewSite().getWorkbenchWindow();
-		this.view = (IDebugView) view;
-		this.viewer = (TreeViewer)this.view.getViewer();
 	}
 }

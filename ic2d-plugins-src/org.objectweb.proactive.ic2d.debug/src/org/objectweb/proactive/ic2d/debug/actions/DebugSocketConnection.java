@@ -32,10 +32,13 @@
  */
 package org.objectweb.proactive.ic2d.debug.actions;
 
+import javax.management.MBeanServerInvocationHandler;
+
 import org.eclipse.ui.PlatformUI;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.debug.dconnection.DebuggerInformation;
+import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.ic2d.console.Console;
@@ -44,6 +47,7 @@ import org.objectweb.proactive.ic2d.debug.TunnelingTimeOutException;
 import org.objectweb.proactive.ic2d.debug.connection.DebuggerSocketClient;
 import org.objectweb.proactive.ic2d.debug.connection.DebuggerSocketServer;
 import org.objectweb.proactive.ic2d.debug.dialogs.DebuggerBranchInfoDialog;
+import org.objectweb.proactive.ic2d.debug.dialogs.InfoRuntimeDIalog;
 import org.objectweb.proactive.ic2d.debug.dialogs.TunnelingCreationWaitingDialog;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
 
@@ -51,7 +55,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
 public class DebugSocketConnection {
 
     public final static int NB_TRIES = 3;
-    private RuntimeObject target;
+    private ProActiveRuntimeWrapperMBean proxyMBean = null;
 
     /**
      * A variable used to avoid garbage collection of the
@@ -65,8 +69,13 @@ public class DebugSocketConnection {
      */
     private DebuggerSocketClient client = null;
 
+    public DebugSocketConnection(ProActiveRuntimeWrapperMBean proxyMBean){
+    	this.proxyMBean = proxyMBean;
+    }
+    
     public DebugSocketConnection(RuntimeObject target) {
-        this.target = target;
+    	this.proxyMBean = (ProActiveRuntimeWrapperMBean) MBeanServerInvocationHandler.newProxyInstance(
+                target.getProActiveConnection(), target.getObjectName(), ProActiveRuntimeWrapperMBean.class, false);
     }
 
     /**
@@ -83,7 +92,7 @@ public class DebugSocketConnection {
 
             while (nbOfTry++ < NB_TRIES) {
                 t.labelUp(nbOfTry); // update the popup
-                nodeInfo = target.getDebugInfo();
+                nodeInfo = proxyMBean.getDebugInfo();
                 if ((nodeInfo != null) && (nodeInfo.getDebuggerNode() != null)) {
                     break;
                 }
@@ -150,10 +159,17 @@ public class DebugSocketConnection {
             }
             server = null;
         }
-        target.removeDebugger();
+        proxyMBean.removeDebugger();
     }
 
     public boolean hasDebuggerConnected() {
-        return target.hasDebuggerConnected();
+        return proxyMBean.hasDebuggerConnected();
+    }
+    
+    //
+    // EXTENDED DEBUGGER
+    //
+    public void showRuntimeURL(){
+    	new InfoRuntimeDIalog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), proxyMBean.getURL());
     }
 }

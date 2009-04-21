@@ -88,7 +88,7 @@ public class DebuggerImpl implements Debugger {
 	private MethodCall methodCall = null;
 	private UniversalBody destinationBody = null;
 	private ObjectForSynchro lockForConnection = new ObjectForSynchro();
-//	private boolean notificationReceived = false;
+	private boolean notificationReceived = false;
 	
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
@@ -316,7 +316,9 @@ public class DebuggerImpl implements Debugger {
 		if(extendedDebugger){
 			try {
 				synchronized (lockForConnection) {
-					lockForConnection.wait();
+					if(!notificationReceived)
+						lockForConnection.wait();
+					notificationReceived = false;
 				}
 			} catch (InterruptedException e) {
 				logger.warn(e);
@@ -329,6 +331,7 @@ public class DebuggerImpl implements Debugger {
 	 */
 	public void unblockConnection() {
 		synchronized (lockForConnection) {
+			notificationReceived = true;
 			lockForConnection.notifyAll();
 		}
 	}
