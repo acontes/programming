@@ -29,18 +29,18 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.core.remoteobject.rmi;
+package performanceTests.bandwidth;
 
-import org.objectweb.proactive.core.Constants;
+import org.objectweb.proactive.core.config.PAProperties;
 
 
-/**
- * @author The ProActive Team
- *        remote object Factory for the RMI protocol
- */
-public class RmiRemoteObjectFactory extends AbstractRmiRemoteObjectFactory {
+public class TestRMISSH extends Bandwidth {
+    static {
+        PAProperties.PA_COMMUNICATION_PROTOCOL.setValue("rmissh");
+        PAProperties.PA_SSH_TUNNELING_TRY_NORMAL_FIRST.setValue(false);
+    }
 
-    public RmiRemoteObjectFactory() {
-        super(Constants.RMI_PROTOCOL_IDENTIFIER, RmiRemoteObjectImpl.class);
+    public TestRMISSH() {
+        super(TestRMISSH.class);
     }
 }
