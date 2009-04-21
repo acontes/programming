@@ -5,6 +5,8 @@ import java.io.Serializable;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.extensions.structuredp2p.data.DataStorage;
+import org.objectweb.proactive.extensions.structuredp2p.message.CanMessage;
+import org.objectweb.proactive.extensions.structuredp2p.message.ChordMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.Message;
 import org.objectweb.proactive.extensions.structuredp2p.message.PingMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.CanResponseMessage;
@@ -67,7 +69,7 @@ public class Peer implements InitActive, Serializable {
      *            the message to send.
      */
     public void sendMessageTo(Peer peer, Message msg) {
-        // TODO
+        this.structuredOverlay.sendMessageTo(peer, msg);
     }
 
     /**
@@ -93,8 +95,7 @@ public class Peer implements InitActive, Serializable {
      * @return
      */
     public ResponseMessage receiveMessage(Message msg) {
-        // TODO
-        return null;
+        return msg.handle(this);
     }
 
     /**
@@ -105,8 +106,7 @@ public class Peer implements InitActive, Serializable {
      * @return the ping response.
      */
     public PingResponseMessage handlePingMessage(PingMessage msg) {
-        // TODO
-        return null;
+        return new PingResponseMessage();
     }
 
     /**
@@ -116,9 +116,8 @@ public class Peer implements InitActive, Serializable {
      *            the ping request that is receive.
      * @return the ping response.
      */
-    public CanResponseMessage handleCanMessage(PingMessage msg) {
-        // TODO
-        return null;
+    public CanResponseMessage handleCanMessage(CanMessage msg) {
+        return new CanResponseMessage(this);
     }
 
     /**
@@ -128,9 +127,8 @@ public class Peer implements InitActive, Serializable {
      *            the ping request that is receive.
      * @return the ping response.
      */
-    public ChordResponseMessage handleChordMessage(PingMessage msg) {
-        // TODO
-        return null;
+    public ChordResponseMessage handleChordMessage(ChordMessage msg) {
+        return new ChordResponseMessage(this);
     }
 
     /**
