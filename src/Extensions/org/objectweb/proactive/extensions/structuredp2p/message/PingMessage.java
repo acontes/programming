@@ -5,7 +5,7 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.PingRes
 
 
 /**
- * 
+ * A PingMessage is a concrete message for ping
  * 
  * @author Kilanga Fanny
  * @author Trovato Alexandre
@@ -13,22 +13,25 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.PingRes
  * 
  * @version 0.1
  */
+@SuppressWarnings("serial")
 public class PingMessage implements Message {
 
     /**
-     * 
+     * create a PingMessage
      */
     public PingMessage() {
 
     }
 
     /**
+     * @param a
+     *            peer to which the message will be send
+     * @return a PingResponseMessage for routing
      * 
      */
-    @Override
     public PingResponseMessage handle(Peer peer) {
-        // TODO Auto-generated method stub
-        return null;
+
+        return new PingResponseMessage();
 
     }
 

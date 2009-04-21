@@ -6,7 +6,7 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.CanResp
 
 
 /**
- * 
+ * A CanMessage is a concrete class for Can message
  * 
  * @author Kilanga Fanny
  * @author Trovato Alexandre
@@ -14,11 +14,13 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.CanResp
  * 
  * @version 0.1
  */
+@SuppressWarnings("serial")
 public class CanMessage implements Message {
 
     private Coordinate coordinate[];
 
     /**
+     * create a new CanMessage with coordinates
      * 
      * @param cord
      */
@@ -26,11 +28,33 @@ public class CanMessage implements Message {
 
     }
 
-    @Override
+    /**
+     * 
+     *@param peer
+     *            the too which the message will be send
+     *@return a CanResponseMessage for routing
+     */
     public CanResponseMessage handle(Peer peer) {
-        // TODO Auto-generated method stub
-        return null;
+        return new CanResponseMessage(peer);
 
+    }
+
+    /**
+     * 
+     * @return a coordinate of the peer to which the message will be send
+     */
+
+    public Coordinate[] getCoordinate() {
+        return coordinate;
+    }
+
+    /**
+     * Set the coordinate of the peer
+     * 
+     * @param coordinate
+     */
+    public void setCoordinate(Coordinate[] coordinate) {
+        this.coordinate = coordinate;
     }
 
 }
