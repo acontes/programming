@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.body;
 
 import java.util.Map;
 
+import org.objectweb.proactive.core.body.dsi.RequestTagsFactory;
 import org.objectweb.proactive.core.body.ft.protocols.FTManagerFactory;
 import org.objectweb.proactive.core.body.migration.MigrationManagerFactory;
 import org.objectweb.proactive.core.body.reply.ReplyReceiverFactory;
@@ -150,6 +151,13 @@ public interface MetaObjectFactory {
 
     public Object clone() throws CloneNotSupportedException;
 
+    // REQUEST-TAGS
+    /**
+     * Create the RequestTags manager.
+     * @return the RequestTags manager
+     */
+    public RequestTagsFactory newRequestTagsFactory();
+    
     // FAULT-TOLERANCE
 
     /**

@@ -265,7 +265,11 @@ public class HalfBody extends AbstractBody {
                 throws java.io.IOException, RenegotiateSessionException, CommunicationForbiddenException {
             long sequenceID = getNextSequenceID();
             // Create DSI RequestTags
+<<<<<<< HEAD:src/Core/org/objectweb/proactive/core/body/HalfBody.java
             RequestTags tags = new RequestTags();
+=======
+            RequestTags tags = requestTagsFactory.newRequestTags();
+>>>>>>> request_tag:src/Core/org/objectweb/proactive/core/body/HalfBody.java
             try {
                 tags.setTag("DSI");
             } catch (UnknowTagException e) {

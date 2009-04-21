@@ -50,6 +50,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.dsi.RequestTagsFactory;
 import org.objectweb.proactive.core.body.exceptions.BodyTerminatedReplyException;
 import org.objectweb.proactive.core.body.exceptions.BodyTerminatedRequestException;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
@@ -170,6 +171,9 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     protected BodyWrapperMBean mbean;
     protected boolean isProActiveInternalObject = false;
 
+    // REQUEST-TAGS Factory
+    protected RequestTagsFactory requestTagsFactory;
+    
     //
     // -- PRIVATE MEMBERS -----------------------------------------------
     //
@@ -230,6 +234,9 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         this.debugger = factory.newDebuggerFactory().newDebugger();
         this.debugger.setTarget(this);
 
+        // REQUEST TAGS
+        this.requestTagsFactory = factory.newRequestTagsFactory();
+        
         // SECURITY
         if (reifiedObject instanceof Secure) {
             this.isInterfaceSecureImplemented = true;
