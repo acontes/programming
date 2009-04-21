@@ -47,7 +47,6 @@ public class Peer implements InitActive, Serializable {
      * The no-argument constructor as commanded by ProActive.
      */
     public Peer() {
-
     }
 
     /**

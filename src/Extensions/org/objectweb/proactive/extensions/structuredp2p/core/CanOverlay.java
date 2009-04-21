@@ -25,27 +25,21 @@ public class CanOverlay implements StructuredOverlay {
     private Collection<Group<Peer>[]> neighbors;
     private Area area;
 
+    public CanOverlay() {
+
+    }
+
     /**
      * 
      * @param peer
      */
     public void split(Peer peer) {
-        // FIXME comment couper la zone ?
+        // FIXME How to cut the area ?
         ResponseMessage response = this.sendMessageTo(peer, new PingMessage());
 
         if (response != null) {
 
         }
-    }
-
-    /**
-     * Set the new area covered by the peer.
-     * 
-     * @param area
-     *            the new area.
-     */
-    public void setArea(Area area) {
-        this.area = area;
     }
 
     /**
@@ -55,14 +49,13 @@ public class CanOverlay implements StructuredOverlay {
      * @return
      */
     public boolean contains(Coordinate[] coordinates) {
-        // FIXME c'est bon ??
         int i = 0;
         Coordinate[] minArea = this.area.getCoordinatesMin();
         Coordinate[] maxArea = this.area.getCoordinatesMax();
 
         for (Coordinate coord : coordinates) {
             if (coord != null) {
-                // If the current coordinates aren't in the peer area.  
+                // If the current coordinates aren't in the peer area.
                 if (minArea[i].getValue().compareTo(coord.getValue()) >= 0 &&
                     maxArea[i].getValue().compareTo(coord.getValue()) <= 0)
                     return false;
@@ -124,4 +117,13 @@ public class CanOverlay implements StructuredOverlay {
         // TODO Auto-generated method stub
     }
 
+    /**
+     * Set the new area covered by the peer.
+     * 
+     * @param area
+     *            the new area.
+     */
+    public void setArea(Area area) {
+        this.area = area;
+    }
 }

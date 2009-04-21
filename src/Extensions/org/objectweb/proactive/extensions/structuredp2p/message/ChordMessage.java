@@ -6,7 +6,7 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.ChordRe
 
 /**
  * 
- * A ChordMessage is a concrete class for Chord message
+ * A ChordMessage is a concrete class for Chord message.
  * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent
@@ -16,13 +16,16 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.ChordRe
  */
 @SuppressWarnings("serial")
 public class ChordMessage implements Message {
-    // the id of the the peer to which the message will be send
-    private String id;
+    /**
+     * The id to search.
+     */
+    private final String id;
 
     /**
-     * create a new ChordMessage with a id of the peer
+     * Create a new ChordMessage with the id to search.
      * 
      * @param id
+     *            the identifier to search.
      */
     public ChordMessage(String id) {
         this.id = id;
@@ -40,20 +43,10 @@ public class ChordMessage implements Message {
 
     /**
      * 
-     * @return the id of the peer to which the message will be send
+     * @return the id searched.
      */
 
     public String getId() {
         return id;
     }
-
-    /**
-     * set the new id of the peer
-     * 
-     * @param id
-     */
-    public void setId(String id) {
-        this.id = id;
-    }
-
 }

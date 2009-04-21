@@ -7,7 +7,8 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.Respons
 
 
 /**
- * A message is a interface for each kind of message
+ * A message is an interface which is used for each kind of message that can be sent to an another
+ * peer.
  * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent
@@ -18,6 +19,7 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.Respons
 public interface Message extends Serializable {
 
     /**
+     * Handles the message
      * 
      * @param peer
      * @return a response message
