@@ -7,7 +7,6 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationExceptio
 
 // TODO provide setters or make it immutable with <code>withXXX</code> methods creating new instance
 // (Use case: scratch space configuration) 
-// TODO check where it is created
 /**
  * Stores information needed to configure an instance of a data space.
  */
@@ -199,12 +198,11 @@ public abstract class SpaceConfiguration {
 				throw new ConfigurationException("Provide local or remote access definition");
 		}
 
-		// TODO here
-		public String getSpaceURL() {
+		public String getLocalAccessUrl() {
 			if (path != null)
 				return FILE_URI_SCHEME + this.path;
 			else
-				return this.url;
+				return getUrl();
 		}
 
 		/**
