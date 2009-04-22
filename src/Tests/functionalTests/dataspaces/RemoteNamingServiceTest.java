@@ -1,5 +1,4 @@
 /**
- * Remember to set: <code>-Dproactive.home= -Djava.security.policy=</code>
  */
 package functionalTests.dataspaces;
 
@@ -14,6 +13,7 @@ import java.util.Set;
 
 import javax.naming.ConfigurationException;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.api.PARemoteObject;
@@ -29,12 +29,11 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.ApplicationAlreadyReg
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceAlreadyRegisteredException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.WrongApplicationIdException;
 
-import functionalTests.GCMFunctionalTestDefaultNodes;
-
 /**
  * Test NamingService on the local default node.
  */
-public class RemoteNamingServiceTest extends GCMFunctionalTestDefaultNodes {
+public class RemoteNamingServiceTest {
+	// extends GCMFunctionalTestDefaultNodes {
 
 	private static final String NAME = "DSnamingservice";
 
@@ -65,7 +64,7 @@ public class RemoteNamingServiceTest extends GCMFunctionalTestDefaultNodes {
 	protected SpaceInstanceInfo spaceInstanceScratch;
 
 	public RemoteNamingServiceTest() throws ConfigurationException {
-		super(1, 1);
+		// super(1, 1);
 
 		SpaceConfiguration configInput1 = new SpaceConfiguration("http://hostA", "/tmp", "h1",
 				SpaceType.INPUT, "input1");
@@ -172,6 +171,11 @@ public class RemoteNamingServiceTest extends GCMFunctionalTestDefaultNodes {
 
 		// TEST UNREGISTER APP
 		stub.unregisterApplication(MAIN_APPID);
+	}
+
+	@After
+	public void after() throws ProActiveException {
+		roe.unregisterAll();
 	}
 
 	private void assertIsSpaceRegistered(SpaceInstanceInfo expected) {
