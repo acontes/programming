@@ -77,8 +77,6 @@ public class RemoteNamingServiceTest {
 		InputOutputSpaceConfiguration configOutput2 = SpaceConfiguration.createOutputSpaceConfiguration(
 				"http://hostA", "/tmp", "h1", "output2");
 
-		configScratch.resolveHostname();
-
 		spaceInstanceInput1 = new SpaceInstanceInfo(MAIN_APPID, configInput1);
 		spaceInstanceInput1b = new SpaceInstanceInfo(ANOTHER_APPID1, configInput1);
 		spaceInstanceInput1c = new SpaceInstanceInfo(ANOTHER_APPID2, configInput1);

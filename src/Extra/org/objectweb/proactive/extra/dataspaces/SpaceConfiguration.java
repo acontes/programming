@@ -12,8 +12,6 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationExceptio
  */
 public abstract class SpaceConfiguration {
 
-	protected final String url;
-
 	protected final String path;
 
 	protected final SpaceType spaceType;
@@ -61,21 +59,18 @@ public abstract class SpaceConfiguration {
 		return new InputOutputSpaceConfiguration(url, path, hostname, type, name);
 	}
 
-	protected SpaceConfiguration(String url, String path, SpaceType spaceType) {
-		this.url = url;
+	protected SpaceConfiguration(String path, SpaceType spaceType) {
 		this.path = path;
 		this.spaceType = spaceType;
 	}
 
-	public String getUrl() {
-		return url;
-	}
+	public abstract String getUrl();
 
 	public String getPath() {
 		return path;
 	}
 
-	public abstract String getHostname() throws ConfigurationException;
+	public abstract String getHostname();
 
 	public SpaceType getType() {
 		return spaceType;
@@ -86,6 +81,8 @@ public abstract class SpaceConfiguration {
 		protected final String hostname;
 
 		protected final String name;
+		
+		protected final String url;
 
 		/**
 		 * Note: When local path and hostname are not specified and URL is
@@ -94,14 +91,12 @@ public abstract class SpaceConfiguration {
 		 * are specified, default ProActive provider is started, hence remote
 		 * access is always possible. At least one access (remote or local) must
 		 * be defined.
-		 *
+		 * 
 		 * @param url
 		 *            Access URL to this input (output), used for accessing from
 		 *            remote nodes. URL defines which protocol is used to access
 		 *            the data from remote node, and some additional information
 		 *            for protocol like path, sometimes user name and password.
-		 *
-		 *
 		 * @param path
 		 *            Local path to input (output) data. This path is local to
 		 *            host with host name specified in <code>hostname</code>
@@ -124,7 +119,8 @@ public abstract class SpaceConfiguration {
 		private InputOutputSpaceConfiguration(String url, String path, String hostname, SpaceType spaceType,
 				String name) throws ConfigurationException {
 
-			super(url, path, spaceType);
+			super(path, spaceType);
+			this.url = url;
 			this.hostname = hostname;
 			this.name = name;
 			boolean localDefined;
@@ -154,19 +150,22 @@ public abstract class SpaceConfiguration {
 		public String getHostname() {
 			return hostname;
 		}
+		
+		@Override
+		public String getUrl() {
+			return url;
+		}
 	}
 
 	public static class ScratchSpaceConfiguration extends SpaceConfiguration {
 
-		private static final String HOSTNAME_VARIABLE_KEYWORD = "#{hostname}";
+		public static final String HOSTNAME_VARIABLE_KEYWORD = "#{hostname}";
 
 		private static final String FILE_URI_SCHEME = "file://";
 
-		private boolean isResolved = false;
-
 		private String hostname;
 
-		private String resolvedUrl;
+		private String unresolvedUrl;
 
 		/**
 		 * Note: When local path is not specified and URL is specified, protocol
@@ -192,7 +191,8 @@ public abstract class SpaceConfiguration {
 		 *             when one of above's contract condition fails
 		 */
 		private ScratchSpaceConfiguration(String url, String path) throws ConfigurationException {
-			super(url, path, SpaceType.SCRATCH);
+			super(path, SpaceType.SCRATCH);
+			this.unresolvedUrl = url;
 
 			if (url == null && path == null)
 				throw new ConfigurationException("Provide local or remote access definition");
@@ -205,48 +205,14 @@ public abstract class SpaceConfiguration {
 				return getUrl();
 		}
 
-		/**
-		 * Use hostname of a local machine to resolve any #{hostname} variable
-		 * in URL. Cannot be undone or repeated.
-		 *
-		 * @throws ConfigurationException
-		 *             when hostname has been already resolved
-		 */
-		public synchronized void resolveHostname() throws IllegalStateException, ConfigurationException {
-			if (isResolved)
-				throw new ConfigurationException("Hostname has been already resolved");
-
-			hostname = Utils.getHostname();
-			final StringBuffer sb = new StringBuffer(url);
-			final int start = sb.indexOf(HOSTNAME_VARIABLE_KEYWORD);
-
-			// not found
-			if (start == -1) {
-				resolvedUrl = url;
-				isResolved = true;
-				return;
-			}
-
-			final int end = start + HOSTNAME_VARIABLE_KEYWORD.length();
-			sb.replace(start, end, hostname);
-			resolvedUrl = sb.toString();
-			isResolved = true;
-		}
-
-		public synchronized boolean isHostnameResolved() {
-			return isResolved;
-		}
-
 		@Override
-		public synchronized String getHostname() throws ConfigurationException {
-			if (!isResolved)
-				throw new ConfigurationException("Hostname has not been resolved yet");
-			return hostname;
+		public String getHostname() {
+			return Utils.getHostname();
 		}
 
 		@Override
 		public String getUrl() {
-			return isResolved ? resolvedUrl : url;
+			return unresolvedUrl.replace(HOSTNAME_VARIABLE_KEYWORD, getHostname());
 		}
 	}
 }
