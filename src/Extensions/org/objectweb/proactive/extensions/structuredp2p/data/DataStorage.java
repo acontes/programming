@@ -3,6 +3,8 @@ package org.objectweb.proactive.extensions.structuredp2p.data;
 import java.io.Serializable;
 import java.util.HashMap;
 
+import org.objectweb.proactive.extensions.structuredp2p.core.Area;
+
 
 /**
  * DataStorage manages that can be stored in a peer.
@@ -39,6 +41,18 @@ public class DataStorage implements Serializable {
      */
     public Object getData(String key) {
         return this.data.get(key);
+    }
+
+    /**
+     * Return the data included in the area.
+     * 
+     * @param area
+     *            the area
+     * @return the data storage
+     */
+    public DataStorage getDataFromArea(Area area) {
+        // FIXME comment definir la position d'une donnee dans la zone ?
+        return null;
     }
 
     /**

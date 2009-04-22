@@ -53,8 +53,34 @@ public class CanOverlay implements StructuredOverlay {
         ResponseMessage response = this.sendMessageTo(peer, new PingMessage());
 
         if (response != null) {
-
+            // TODO How to split data ?
+            // FIXME Split the data in two parts (basic method)
+            Coordinate[] middle = this.getMiddleArea(this.getRandomDimension());
+            Area newArea = new Area(middle, this.area.getCoordinatesMax());
+            this.area = new Area(this.area.getCoordinatesMin(), middle);
         }
+    }
+
+    /**
+     * Determinate the middle of the current area following a specific dimension.
+     * 
+     * @param dimension
+     *            the axe to split
+     * @return coordinates of the middle
+     */
+    private Coordinate[] getMiddleArea(int dimension) {
+
+        return null;
+    }
+
+    /**
+     * Gets a random axe number.
+     * 
+     * @return the random axe number.
+     */
+    private int getRandomDimension() {
+        Random rand = new Random();
+        return rand.nextInt(CanOverlay.NB_DIMENSIONS);
     }
 
     /**
@@ -72,7 +98,7 @@ public class CanOverlay implements StructuredOverlay {
         for (Coordinate coord : coordinates) {
             if (coord != null) {
                 // if the current coordinates aren't in the peer area.
-                if (minArea[i].getValue().compareTo(coord.getValue()) >= 0 &&
+                if (minArea[i].getValue().compareTo(coord.getValue()) > 0 &&
                     maxArea[i].getValue().compareTo(coord.getValue()) <= 0)
                     return false;
             }
@@ -134,16 +160,6 @@ public class CanOverlay implements StructuredOverlay {
     @Override
     public void update() {
         // TODO Auto-generated method stub
-    }
-
-    /**
-     * Gets a random axe number.
-     * 
-     * @return the random axe number.
-     */
-    private int getRandomAxe() {
-        Random rand = new Random();
-        return rand.nextInt(CanOverlay.NB_DIMENSIONS);
     }
 
     /**

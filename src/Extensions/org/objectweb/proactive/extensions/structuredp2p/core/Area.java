@@ -27,7 +27,7 @@ public class Area {
      * @param min
      *            the minimum coordinates.
      * @param max
-     *            the maximum cordinates.
+     *            the maximum coordinates.
      */
     public Area(Coordinate[] min, Coordinate[] max) {
         this.coordinatesMin = min;
