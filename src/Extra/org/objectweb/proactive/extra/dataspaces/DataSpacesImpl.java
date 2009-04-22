@@ -9,12 +9,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import javax.naming.ConfigurationException;
-
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
+import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceAlreadyRegisteredException;
@@ -28,7 +27,7 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.WrongApplicationIdExc
 public class DataSpacesImpl {
 
 	// TODO what value here?
-	private static final long HEARTBIT_LENGTH_MILLIS = 1;
+	private static final long HEARTBIT_LENGTH_MILLIS = 5000;
 
 	private final SpacesMountManager spacesMountManager;
 

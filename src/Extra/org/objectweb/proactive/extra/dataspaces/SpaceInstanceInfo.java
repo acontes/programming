@@ -5,7 +5,7 @@ package org.objectweb.proactive.extra.dataspaces;
 
 import java.io.Serializable;
 
-import javax.naming.ConfigurationException;
+import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 
 /**
  * Stores complete description of data space instance, i.e. mounting point URI
@@ -47,6 +47,7 @@ public final class SpaceInstanceInfo implements Serializable {
 	 */
 	public SpaceInstanceInfo(long appid, String runtimeId, String nodeId, SpaceConfiguration config)
 			throws ConfigurationException {
+
 		if (config.getType() != SpaceType.SCRATCH)
 			throw new ConfigurationException("This constructor must be used for scratch data space.");
 
