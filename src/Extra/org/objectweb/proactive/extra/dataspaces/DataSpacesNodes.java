@@ -12,6 +12,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.dataspaces.SpaceConfiguration.ScratchSpaceConfiguration;
 import org.objectweb.proactive.extra.dataspaces.exceptions.AlreadyConfiguredException;
+import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredException;
 
 /**
@@ -59,20 +60,23 @@ public class DataSpacesNodes {
 	 * {@link #configureApplication(Node, long, String)} or closed by
 	 * {@link #closeNodeConfig(Node)}.
 	 * 
+	 * @see NodeConfigurator#configureNode(SpaceConfiguration, Node)
 	 * @param node
 	 *            node to be configured for Data Spaces
-	 * @param spaceConfiguration
+	 * @param scratchConfiguration
 	 *            configuration of scratch data space for a specified node
 	 * @throws FileSystemException
 	 *             when VFS configuration creation or scratch initialization
 	 *             fails
-	 * @see NodeConfigurator#configureNode(SpaceConfiguration, Node)
+	 * @throws ConfigurationException
+	 *             something failed during node scratch space configuration (ex.
+	 *             capabilities checking)
 	 */
-	public static void configureNode(Node node, ScratchSpaceConfiguration spaceConfiguration)
-			throws AlreadyConfiguredException, FileSystemException {
+	public static void configureNode(Node node, ScratchSpaceConfiguration scratchConfiguration)
+			throws AlreadyConfiguredException, FileSystemException, ConfigurationException {
 		final NodeConfigurator nodeConfig = getOrCreateNodeConfigurator(node);
 		try {
-			nodeConfig.configureNode(spaceConfiguration, node);
+			nodeConfig.configureNode(scratchConfiguration, node);
 		} catch (AlreadyConfiguredException x) {
 			// it should never happen in our usage
 			throw new RuntimeException(x);
@@ -102,9 +106,11 @@ public class DataSpacesNodes {
 	 *             when exception occurred on namingServiceURL parsing
 	 * @throws ProActiveException
 	 *             occurred during contacting with NamingService
+	 * @throws FileSystemException
+	 *             VFS related exception during scratch data space creation
 	 */
 	public static void configureApplication(Node node, long appid, String namingServiceURL)
-			throws ProActiveException, URISyntaxException {
+			throws ProActiveException, URISyntaxException, FileSystemException {
 		final NodeConfigurator nodeConfig = getOrFailNodeConfigurator(node);
 		nodeConfig.configureApplication(appid, namingServiceURL);
 	}
@@ -120,8 +126,10 @@ public class DataSpacesNodes {
 	 *            node to be deconfigured for Data Spaces
 	 * @throws NotConfiguredException
 	 *             when node has not been configured yet
+	 * @throws FileSystemException
+	 *             VFS related exception during scratch data space cleaning
 	 */
-	public static void closeNodeConfig(Node node) throws NotConfiguredException {
+	public static void closeNodeConfig(Node node) throws NotConfiguredException, FileSystemException {
 		final NodeConfigurator nodeConfig = getOrFailNodeConfigurator(node);
 		nodeConfig.close();
 	}
@@ -136,8 +144,11 @@ public class DataSpacesNodes {
 	 *            node to be deconfigured for Data Spaces application
 	 * @throws NotConfiguredException
 	 *             when node has not been configured yet for an application
+	 * @throws FileSystemException
+	 *             VFS related exception during scratch data space cleaning
 	 */
-	public static void closeNodeApplicationConfig(Node node) throws NotConfiguredException {
+	public static void closeNodeApplicationConfig(Node node) throws NotConfiguredException,
+			FileSystemException {
 		final NodeConfigurator nodeConfig = getOrFailNodeConfigurator(node);
 		nodeConfig.tryCloseAppConfigurator();
 	}

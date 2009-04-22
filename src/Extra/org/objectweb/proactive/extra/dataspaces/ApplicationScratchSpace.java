@@ -3,6 +3,8 @@
  */
 package org.objectweb.proactive.extra.dataspaces;
 
+import org.apache.commons.vfs.FileSystemException;
+
 /**
  * - returns scratch data space for AO (in form od DataSpacesURI) (from AO id)
  * creates it when needed - (to discuss) registers data space instance in
@@ -12,11 +14,11 @@ package org.objectweb.proactive.extra.dataspaces;
  */
 public interface ApplicationScratchSpace {
 
-	public DataSpacesURI getScratchForAO(String aoid);
+	public DataSpacesURI getScratchForAO(String aoid) throws FileSystemException;
 
 	/**
-	 * TODO stays unchanged during application run? (hence can be called only
-	 * once)
+	 * Instance stays unchanged during application run, hence can be called only
+	 * once.
 	 * 
 	 * @return
 	 */
@@ -24,6 +26,8 @@ public interface ApplicationScratchSpace {
 
 	/**
 	 * removes scratch data space directory content
+	 *
+	 * @throws FileSystemException
 	 */
-	public void close();
+	public void close() throws FileSystemException;
 }

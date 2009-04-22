@@ -11,6 +11,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.dataspaces.SpaceConfiguration.ScratchSpaceConfiguration;
 import org.objectweb.proactive.extra.dataspaces.exceptions.AlreadyConfiguredException;
+import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredException;
 
 /**
@@ -65,9 +66,12 @@ public class NodeConfigurator {
 	 * @throws FileSystemException
 	 *             when VFS configuration creation or scratch initialization
 	 *             fails
+	 * @throws ConfigurationException
+	 *             something failed during node scratch space configuration (ex.
+	 *             capabilities checking)
 	 */
 	synchronized public void configureNode(ScratchSpaceConfiguration scratchConfiguration, Node node)
-			throws AlreadyConfiguredException, FileSystemException {
+			throws AlreadyConfiguredException, FileSystemException, ConfigurationException {
 		checkNotConfigured();
 
 		manager = VFSFactory.createDefaultFileSystemManager();
@@ -95,9 +99,11 @@ public class NodeConfigurator {
 	 *             when exception occurred on namingServiceURL parsing
 	 * @throws ProActiveException
 	 *             occurred during contacting with NamingService
+	 * @throws FileSystemException
+	 *             VFS related exception during scratch space creation
 	 */
 	synchronized public void configureApplication(long appid, String namingServiceURL)
-			throws ProActiveException, URISyntaxException {
+			throws ProActiveException, URISyntaxException, FileSystemException {
 		checkConfigured();
 		tryCloseAppConfigurator();
 
@@ -132,8 +138,10 @@ public class NodeConfigurator {
 	 * 
 	 * @throws NotConfiguredException
 	 *             when node has not been configured yet.
+	 * @throws FileSystemException
+	 *             VFS related exception during scratch space cleaning
 	 */
-	synchronized public void close() throws NotConfiguredException {
+	synchronized public void close() throws NotConfiguredException, FileSystemException {
 		checkConfigured();
 		tryCloseAppConfigurator();
 		if (nodeScratchSpace != null) {
@@ -147,8 +155,11 @@ public class NodeConfigurator {
 	 * opened).
 	 * 
 	 * If no application is configured, it does nothing.
+	 *
+	 * @throws FileSystemException
+	 *             VFS related exception during scratch space cleaning
 	 */
-	public synchronized void tryCloseAppConfigurator() {
+	public synchronized void tryCloseAppConfigurator() throws FileSystemException {
 		if (appConfigurator != null) {
 			try {
 				appConfigurator.close();

@@ -5,6 +5,7 @@ package org.objectweb.proactive.extra.dataspaces;
 
 import java.net.URISyntaxException;
 
+import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.impl.DefaultFileSystemManager;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -69,11 +70,13 @@ public class NodeApplicationConfigurator {
 	 *             when exception occurred on namingServiceURL parsing
 	 * @throws ProActiveException
 	 *             occurred during contacting with NamingService
+	 * @throws FileSystemException
+	 *             VFS related exception during scratch data space creation
 	 *
 	 */
 	synchronized public void configureApplication(long appid, String namingServiceURL,
 			DefaultFileSystemManager manager, NodeScratchSpace nodeScratchSpace) throws ProActiveException,
-			URISyntaxException {
+			URISyntaxException, FileSystemException {
 
 		checkNotConfigured();
 
@@ -114,8 +117,10 @@ public class NodeApplicationConfigurator {
 	 * 
 	 * @throws NotConfiguredException
 	 *             when node has not been configured for application
+	 * @throws FileSystemException
+	 *             VFS related exception
 	 */
-	synchronized public void close() throws NotConfiguredException {
+	synchronized public void close() throws NotConfiguredException, FileSystemException {
 		checkConfigured();
 
 		spacesMountManager.close();
