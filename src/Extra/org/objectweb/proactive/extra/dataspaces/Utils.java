@@ -13,6 +13,7 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.util.ProActiveInet;
 
 /**
@@ -30,6 +31,17 @@ public class Utils {
 	public static String getHostname() {
 		// InetAddress.getLocalHost().getHostName();
 		return ProActiveInet.getInstance().getHostname();
+	}
+
+	/**
+	 * Returns an identifier of a Runtime of specified Node.
+	 *
+	 * @param node
+	 * @return
+	 */
+	public static String getRuntimeId(Node node) {
+		final ProActiveRuntime rt = node.getProActiveRuntime();
+		return rt.getVMInformation().getName();
 	}
 
 	/**
@@ -103,4 +115,5 @@ public class Utils {
 	public static void closeNamingServiceStub(NamingService stub) {
 		// nothing here
 	}
+
 }
