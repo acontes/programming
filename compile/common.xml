@@ -18,8 +18,9 @@
 	<property name="junit.dir"          value="${base.dir}/junitReports" />
 	<property name="emma.dir"           value="${base.dir}/emmaReports" />
 
-	<property name="deploy.dir"         value="${base.dir}/dist" />
+	<property name="deploy.dir"        	value="${base.dir}/dist" />
 	<property name="deploy.lib.dir"     value="${deploy.dir}/lib" />
+	<property name="deploy.lib.native.dir"     value="${deploy.lib.dir}/native" />
 	<property name="deploy.scripts.dir" value="${deploy.dir}/scripts" />
 	
 	<property name="release.dir"        value="${base.dir}/release" />
@@ -180,6 +181,7 @@
 					<appendclasspath />
 				</classpath>
 				<include name="@{package}/@{module}/**/*.java" />
+				<include name="@{package}/@{module}/**/**/*.java" />
 			</javac>
 
 			<copy todir="@{dest}" includeEmptyDirs="no">

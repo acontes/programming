@@ -138,6 +138,7 @@ public interface Loggers {
     static final public String JMX = CORE + ".jmx";
     static final public String JMX_MBEAN = JMX + ".mbean";
     static final public String JMX_NOTIFICATION = JMX + ".notification";
+    
 
     // Forwarding
     static final public String FORWARDING = CORE + ".forwarding";
@@ -146,6 +147,11 @@ public interface Loggers {
     static final public String FORWARDING_CLIENT = FORWARDING + ".client";
     static final public String FORWARDING_CLIENT_TUNNEL = FORWARDING_CLIENT + ".tunnel";
     static final public String FORWARDING_REMOTE_OBJECT = FORWARDING + ".remoteobject";
+    
+    //Native Code Wrapping
+    static final public String NATIVE = CORE + ".native";
+    static final public String NATIVE_MANAGER = NATIVE + ".manager";
+    static final public String NATIVE_COUPLING = NATIVE + ".coupling";
 
     // Exceptions
     public static final String EXCEPTIONS = CORE + ".exceptions";
