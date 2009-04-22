@@ -16,6 +16,8 @@ import org.objectweb.proactive.extra.dataspaces.SpaceConfiguration;
 import org.objectweb.proactive.extra.dataspaces.SpaceInstanceInfo;
 import org.objectweb.proactive.extra.dataspaces.SpaceType;
 import org.objectweb.proactive.extra.dataspaces.SpacesDirectory;
+import org.objectweb.proactive.extra.dataspaces.SpaceConfiguration.InputOutputSpaceConfiguration;
+import org.objectweb.proactive.extra.dataspaces.SpaceConfiguration.ScratchSpaceConfiguration;
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceAlreadyRegisteredException;
 
 /**
@@ -53,16 +55,18 @@ public abstract class SpacesDirectoryAbstractTest {
 
 		dir = getSource();
 
-		SpaceConfiguration configInput1 = new SpaceConfiguration("http://hostA", "/tmp", "h1",
-				SpaceType.INPUT, "input1");
-		SpaceConfiguration configInput2 = new SpaceConfiguration("http://hostB", "/tmp", "h1",
-				SpaceType.INPUT, "input2");
-		SpaceConfiguration configOutput1 = new SpaceConfiguration("http://hostC", "/tmp", "h1",
-				SpaceType.OUTPUT, "output1");
-		SpaceConfiguration configScratch = new SpaceConfiguration("http://hostD", "/tmp", "h1",
-				SpaceType.SCRATCH, null);
-		SpaceConfiguration configOutput2 = new SpaceConfiguration("http://hostA", "/tmp", "h1",
-				SpaceType.OUTPUT, "output2");
+		InputOutputSpaceConfiguration configInput1 = SpaceConfiguration.createInputSpaceConfiguration(
+				"http://hostA", "/tmp", "h1", "input1");
+		InputOutputSpaceConfiguration configInput2 = SpaceConfiguration.createInputSpaceConfiguration(
+				"http://hostB", "/tmp", "h1", "input2");
+		InputOutputSpaceConfiguration configOutput1 = SpaceConfiguration.createOutputSpaceConfiguration(
+				"http://hostC", "/tmp", "h1", "output1");
+		ScratchSpaceConfiguration configScratch = SpaceConfiguration.createScratchSpaceConfiguration(
+				"http://hostD", "/tmp");
+		InputOutputSpaceConfiguration configOutput2 = SpaceConfiguration.createOutputSpaceConfiguration(
+				"http://hostA", "/tmp", "h1", "output2");
+
+		configScratch.resolveHostname();
 
 		spaceInstanceInput1 = new SpaceInstanceInfo(MAIN_APPID, configInput1);
 		spaceInstanceInput1b = new SpaceInstanceInfo(ANOTHER_APPID1, configInput1);

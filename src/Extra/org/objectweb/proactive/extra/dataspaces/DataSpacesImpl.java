@@ -13,6 +13,7 @@ import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
+import org.objectweb.proactive.extra.dataspaces.SpaceConfiguration.InputOutputSpaceConfiguration;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredException;
@@ -303,15 +304,22 @@ public class DataSpacesImpl {
 			name = DataSpacesURI.DEFAULT_IN_OUT_NAME;
 
 		final String hostname = Utils.getHostname();
-		final SpaceConfiguration config = new SpaceConfiguration(url, path, hostname, type, name);
-		final SpaceInstanceInfo spaceInstanceInfo = new SpaceInstanceInfo(appId, config);
-		// FIXME add ProActive provider start up
+		final InputOutputSpaceConfiguration config = SpaceConfiguration.createInputOutputSpaceConfiguration(
+				url, path, hostname, name, type);
+
 		// FIXME add configuration checking/initialization ?
+		// FIXME add ProActive provider start up
+		// FIXME what if name already used?
+		// FIXME what if name == default here?
+		// FIXME #{deployer}
 
 		try {
+			final SpaceInstanceInfo spaceInstanceInfo = new SpaceInstanceInfo(appId, config);
 			spacesDirectory.register(spaceInstanceInfo);
 		} catch (WrongApplicationIdException e) {
 			throw new ProActiveRuntimeException("DataSpaces catched exception that should not occure", e);
+		} catch (ConfigurationException e) {
+			// FIXME
 		}
 		return DataSpacesURI.createInOutSpaceURI(appId, type, name).toString();
 	}

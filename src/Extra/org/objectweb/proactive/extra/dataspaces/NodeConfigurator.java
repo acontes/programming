@@ -9,6 +9,7 @@ import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.impl.DefaultFileSystemManager;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.extra.dataspaces.SpaceConfiguration.ScratchSpaceConfiguration;
 import org.objectweb.proactive.extra.dataspaces.exceptions.AlreadyConfiguredException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredException;
 
@@ -65,7 +66,7 @@ public class NodeConfigurator {
 	 *             when VFS configuration creation or scratch initialization
 	 *             fails
 	 */
-	synchronized public void configureNode(SpaceConfiguration scratchConfiguration, Node node)
+	synchronized public void configureNode(ScratchSpaceConfiguration scratchConfiguration, Node node)
 			throws AlreadyConfiguredException, FileSystemException {
 		checkNotConfigured();
 
@@ -75,7 +76,6 @@ public class NodeConfigurator {
 			nodeScratchSpace = new NodeScratchSpace(scratchConfiguration, manager, node);
 			nodeScratchSpace.init();
 		}
-
 		configured = true;
 	}
 

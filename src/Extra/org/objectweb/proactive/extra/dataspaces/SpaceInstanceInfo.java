@@ -5,6 +5,8 @@ package org.objectweb.proactive.extra.dataspaces;
 
 import java.io.Serializable;
 
+import org.objectweb.proactive.extra.dataspaces.SpaceConfiguration.InputOutputSpaceConfiguration;
+import org.objectweb.proactive.extra.dataspaces.SpaceConfiguration.ScratchSpaceConfiguration;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 
 /**
@@ -45,11 +47,8 @@ public final class SpaceInstanceInfo implements Serializable {
 	 *             when provided information is not enough to build a complete
 	 *             space definition (no hostname for path etc.)
 	 */
-	public SpaceInstanceInfo(long appid, String runtimeId, String nodeId, SpaceConfiguration config)
+	public SpaceInstanceInfo(long appid, String runtimeId, String nodeId, ScratchSpaceConfiguration config)
 			throws ConfigurationException {
-
-		if (config.getType() != SpaceType.SCRATCH)
-			throw new ConfigurationException("This constructor must be used for scratch data space.");
 
 		this.mountingPoint = DataSpacesURI.createScratchSpaceURI(appid, runtimeId, nodeId);
 		this.url = config.getUrl();
@@ -69,10 +68,7 @@ public final class SpaceInstanceInfo implements Serializable {
 	 *             when provided information is not enough to build a complete
 	 *             space definition (no hostname for path etc.)
 	 */
-	public SpaceInstanceInfo(long appid, SpaceConfiguration config) throws ConfigurationException {
-		if (config.getType() == SpaceType.SCRATCH)
-			throw new ConfigurationException("This constructor cannot be used for scratch data space.");
-
+	public SpaceInstanceInfo(long appid, InputOutputSpaceConfiguration config) throws ConfigurationException {
 		this.mountingPoint = DataSpacesURI.createInOutSpaceURI(appid, config.getType(), config.getName());
 		this.url = config.getUrl();
 		this.hostname = config.getHostname();

@@ -10,6 +10,7 @@ import java.util.Map;
 import org.apache.commons.vfs.FileSystemException;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.extra.dataspaces.SpaceConfiguration.ScratchSpaceConfiguration;
 import org.objectweb.proactive.extra.dataspaces.exceptions.AlreadyConfiguredException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredException;
 
@@ -67,7 +68,7 @@ public class DataSpacesNodes {
 	 *             fails
 	 * @see NodeConfigurator#configureNode(SpaceConfiguration, Node)
 	 */
-	public static void configureNode(Node node, SpaceConfiguration spaceConfiguration)
+	public static void configureNode(Node node, ScratchSpaceConfiguration spaceConfiguration)
 			throws AlreadyConfiguredException, FileSystemException {
 		final NodeConfigurator nodeConfig = getOrCreateNodeConfigurator(node);
 		try {
