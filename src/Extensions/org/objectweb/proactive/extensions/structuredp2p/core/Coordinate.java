@@ -15,6 +15,10 @@ public class Coordinate {
      * The content of the coordinate.
      */
     private String value;
+    
+    public Coordinate(String value) {
+        this.value = value;
+    }
 
     /**
      * Returns the content of the coordinate.

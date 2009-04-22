@@ -62,7 +62,6 @@ public class CanOverlay implements StructuredOverlay {
     }
 
     /**
-     * <<<<<<< .mine Check if the coordinates in arguments are in the managed area. =======
      * Determinate the middle of the current area following a specific dimension.
      * 
      * @param dimension
@@ -70,12 +69,23 @@ public class CanOverlay implements StructuredOverlay {
      * @return coordinates of the middle
      */
     private Coordinate[] getMiddleArea(int dimension) {
+        Coordinate[] middle = new Coordinate[NB_DIMENSIONS];
 
         return null;
     }
 
     /**
-     * Verify if the coordinates in arguments are in the managed area. >>>>>>> .r12148
+     * Gets a random axe number.
+     * 
+     * @return the random axe number.
+     */
+    private int getRandomDimension() {
+        Random rand = new Random();
+        return rand.nextInt(CanOverlay.NB_DIMENSIONS);
+    }
+
+    /**
+     * Verify if the coordinates in arguments are in the managed area.
      * 
      * @param coordinates
      *            the coordinates to check.
@@ -90,9 +100,8 @@ public class CanOverlay implements StructuredOverlay {
             if (coord != null) {
                 // if the current coordinates aren't in the peer area.
                 if (minArea[i].getValue().compareTo(coord.getValue()) > 0 &&
-                    maxArea[i].getValue().compareTo(coord.getValue()) <= 0) {
+                    maxArea[i].getValue().compareTo(coord.getValue()) <= 0)
                     return false;
-                }
             }
 
             i++;
@@ -176,26 +185,6 @@ public class CanOverlay implements StructuredOverlay {
     @Override
     public void update() {
         // TODO Auto-generated method stub
-    }
-
-    /**
-     * Gets a random dimension number between <em>0</em> and
-     * <em>{@link CanOverlay#NB_DIMENSIONS} - 1</em>.
-     * 
-     * @return the random dimension number.
-     */
-    private int getRandomDimension() {
-        Random rand = new Random();
-        return rand.nextInt(CanOverlay.NB_DIMENSIONS);
-    }
-
-    /**
-     * Returns the area covered.
-     * 
-     * return area the new area covered.
-     */
-    public Area getArea() {
-        return this.area;
     }
 
     /**
