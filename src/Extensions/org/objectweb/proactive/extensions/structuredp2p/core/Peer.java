@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
+import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.extensions.structuredp2p.data.DataStorage;
 import org.objectweb.proactive.extensions.structuredp2p.message.CanMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.ChordMessage;
@@ -11,6 +12,7 @@ import org.objectweb.proactive.extensions.structuredp2p.message.Message;
 import org.objectweb.proactive.extensions.structuredp2p.message.PingMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.CanResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.ChordResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.message.response.LoadBalancingResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.PingResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.ResponseMessage;
 
@@ -89,9 +91,11 @@ public class Peer implements InitActive, Serializable {
     }
 
     /**
+     * Receive a message from an another peer.
      * 
      * @param msg
-     * @return
+     *            the message to receive.
+     * @return the response in correspondence with the received message.
      */
     public ResponseMessage receiveMessage(Message msg) {
         return msg.handle(this);
@@ -116,14 +120,43 @@ public class Peer implements InitActive, Serializable {
      * @return the ping response.
      */
     public CanResponseMessage handleCanMessage(CanMessage msg) {
-        if (((CanOverlay) this.structuredOverlay).contains(msg.getCoordinates())) {
+        CanOverlay canOverlay = (CanOverlay) this.structuredOverlay;
+
+        if (canOverlay.contains(msg.getCoordinates())) {
             return new CanResponseMessage(this);
         } else {
-            // FIXME
-            // return this.sendMessageTo(peer, msg);
-            return null;
+            Group<Peer>[][] neighbors = canOverlay.getNeighbors();
+            int pos;
+            int neighborIndex;
+
+            for (Group<Peer>[] neighborsGroup : neighbors) {
+                for (int i = 0; i < CanOverlay.NB_DIMENSIONS; i++) {
+                    pos = canOverlay.contains(i, msg.getCoordinates()[i]);
+
+                    if (pos == -1) {
+                        ((Peer) neighborsGroup[0].getGroupByType()).checkForLoadBalancing();
+                        neighborIndex = neighborsGroup[0].waitOneAndGetIndex();
+                        this.sendMessageTo(neighborsGroup[0].get(neighborIndex), msg);
+                    } else if (pos == 1) {
+                        ((Peer) neighborsGroup[1].getGroupByType()).checkForLoadBalancing();
+                        neighborIndex = neighborsGroup[1].waitOneAndGetIndex();
+                        this.sendMessageTo(neighborsGroup[1].get(neighborIndex), msg);
+                    }
+                }
+            }
         }
 
+        throw new IllegalStateException("The searched position doesn't exist.");
+
+    }
+
+    /**
+     * Check for load balancing of the current peer.
+     * 
+     * @return a result containing the load of the current peer.
+     */
+    private LoadBalancingResponseMessage checkForLoadBalancing() {
+        return new LoadBalancingResponseMessage();
     }
 
     /**
@@ -134,8 +167,7 @@ public class Peer implements InitActive, Serializable {
      * @return the ping response.
      */
     public ChordResponseMessage handleChordMessage(ChordMessage msg) {
-
-        // FIXME comment router sur un chord
+        // FIXME
         return new ChordResponseMessage(this);
     }
 

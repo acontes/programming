@@ -23,12 +23,12 @@ public class CanOverlay implements StructuredOverlay {
     /**
      * The number of dimensions which is equals to the number of axes.
      */
-    private static final int NB_DIMENSIONS = 3;
+    public static final int NB_DIMENSIONS = 4;
 
     /**
-     * Neighbors of the current area.
+     * Neighbors of the current area. The neighbors are an array of ProActive groups.
      */
-    private Group<Peer[]>[] neighbors;
+    private Group<Peer>[][] neighbors;
 
     /**
      * The area which is currently managed.
@@ -62,6 +62,7 @@ public class CanOverlay implements StructuredOverlay {
     }
 
     /**
+     * <<<<<<< .mine Check if the coordinates in arguments are in the managed area. =======
      * Determinate the middle of the current area following a specific dimension.
      * 
      * @param dimension
@@ -74,17 +75,7 @@ public class CanOverlay implements StructuredOverlay {
     }
 
     /**
-     * Gets a random axe number.
-     * 
-     * @return the random axe number.
-     */
-    private int getRandomDimension() {
-        Random rand = new Random();
-        return rand.nextInt(CanOverlay.NB_DIMENSIONS);
-    }
-
-    /**
-     * Verify if the coordinates in arguments are in the managed area.
+     * Verify if the coordinates in arguments are in the managed area. >>>>>>> .r12148
      * 
      * @param coordinates
      *            the coordinates to check.
@@ -99,14 +90,39 @@ public class CanOverlay implements StructuredOverlay {
             if (coord != null) {
                 // if the current coordinates aren't in the peer area.
                 if (minArea[i].getValue().compareTo(coord.getValue()) > 0 &&
-                    maxArea[i].getValue().compareTo(coord.getValue()) <= 0)
+                    maxArea[i].getValue().compareTo(coord.getValue()) <= 0) {
                     return false;
+                }
             }
 
             i++;
         }
 
         return true;
+    }
+
+    /**
+     * Check if the axe index of the current area contains the given coordinate.
+     * 
+     * @param axeIndex
+     *            the axe index to check.
+     * @param coordinate
+     *            the coordinate to check.
+     * @return 0 if the coordinate is contained by the area on the given axe, -1 if the coordinate
+     *         is smaller than the line which is managed by the given axe, 1 otherwise.
+     */
+    public int contains(int axeIndex, Coordinate coordinate) {
+        Coordinate[] minArea = this.area.getCoordinatesMin();
+        Coordinate[] maxArea = this.area.getCoordinatesMax();
+
+        if (minArea[axeIndex].getValue().compareTo(coordinate.getValue()) >= 0 &&
+            maxArea[axeIndex].getValue().compareTo(coordinate.getValue()) <= 0) {
+            return 0;
+        } else if (minArea[axeIndex].getValue().compareTo(coordinate.getValue()) >= 0) {
+            return -1;
+        } else {
+            return 1;
+        }
     }
 
     /**
@@ -163,6 +179,26 @@ public class CanOverlay implements StructuredOverlay {
     }
 
     /**
+     * Gets a random dimension number between <em>0</em> and
+     * <em>{@link CanOverlay#NB_DIMENSIONS} - 1</em>.
+     * 
+     * @return the random dimension number.
+     */
+    private int getRandomDimension() {
+        Random rand = new Random();
+        return rand.nextInt(CanOverlay.NB_DIMENSIONS);
+    }
+
+    /**
+     * Returns the area covered.
+     * 
+     * return area the new area covered.
+     */
+    public Area getArea() {
+        return this.area;
+    }
+
+    /**
      * Set the new area covered.
      * 
      * @param area
@@ -177,7 +213,7 @@ public class CanOverlay implements StructuredOverlay {
      * 
      * @return the neighbors of the managed area.
      */
-    public Group<Peer[]>[] getNeighbors() {
+    public Group<Peer>[][] getNeighbors() {
         return this.neighbors;
     }
 }
