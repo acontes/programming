@@ -17,8 +17,7 @@ public interface ApplicationScratchSpace {
 	public DataSpacesURI getScratchForAO(String aoid) throws FileSystemException;
 
 	/**
-	 * Instance stays unchanged during application run, hence can be called only
-	 * once.
+	 * Instance stays unchanged during application run.
 	 * 
 	 * @return
 	 */

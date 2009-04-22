@@ -312,6 +312,7 @@ public class DataSpacesImpl {
 		// FIXME what if name already used?
 		// FIXME what if name == default here?
 		// FIXME #{deployer}
+		// re: deployer is rather not so usable here
 
 		try {
 			final SpaceInstanceInfo spaceInstanceInfo = new SpaceInstanceInfo(appId, config);

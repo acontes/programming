@@ -58,6 +58,7 @@ public class NodeScratchSpace {
 
 			this.fSpace = createEmptyDirectoryRelated(appIdString, fPartialSpace);
 			this.appId = appid;
+			// FIXME that's not correct space instance info
 			this.spaceInstanceInfo = new SpaceInstanceInfo(appId, runtimeId, nodeId, scratchConfiguration);
 		}
 
@@ -104,6 +105,8 @@ public class NodeScratchSpace {
 		}
 	}
 
+	// TODO: here we use Node to get nodeId and runtimeId, and in
+	// AppScratchSpace we use just aoId; let's make it consistent;
 	public NodeScratchSpace(ScratchSpaceConfiguration conf, DefaultFileSystemManager manager, Node node) {
 		this.scratchConfiguration = conf;
 		this.fileSystemManager = manager;
@@ -119,6 +122,8 @@ public class NodeScratchSpace {
 	 * @throws ConfigurationException
 	 *             when checking FS capabilities
 	 */
+	// TODO: hmm maybe we should be consistent with NodeConfigurator about
+	// passing arguments in init() ?
 	public synchronized void init() throws FileSystemException, AlreadyConfiguredException,
 			ConfigurationException {
 
@@ -133,6 +138,7 @@ public class NodeScratchSpace {
 		final FileObject fLocalAccess = fileSystemManager.resolveFile(localAccessUrl);
 		final FileObject fsObject = fileSystemManager.createVirtualFileSystem(SCRATCH_SPACE_SCHEME);
 
+		// TODO: vfs is not needed just for mounting something under root
 		vfs = (VirtualFileSystem) fsObject.getFileSystem();
 		vfs.addJunction(FileName.ROOT_PATH, fLocalAccess);
 
@@ -177,6 +183,7 @@ public class NodeScratchSpace {
 	}
 
 	private String createPartialSpacePath() {
+		// FIXME two slashes + why root?
 		final StringBuffer sb = new StringBuffer(FileName.ROOT_PATH);
 
 		sb.append(FileName.SEPARATOR_CHAR);
@@ -187,6 +194,7 @@ public class NodeScratchSpace {
 		return sb.toString();
 	}
 
+	// TODO related -> relative, java.io and ususal convention is parent first
 	private FileObject createEmptyDirectoryRelated(final String path, final FileObject parent)
 			throws FileSystemException {
 

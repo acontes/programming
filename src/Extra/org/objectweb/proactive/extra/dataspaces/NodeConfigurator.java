@@ -70,6 +70,7 @@ public class NodeConfigurator {
 	 *             something failed during node scratch space configuration (ex.
 	 *             capabilities checking)
 	 */
+	// FIXME what is the state of configurator after all these exceptions
 	synchronized public void configureNode(ScratchSpaceConfiguration scratchConfiguration, Node node)
 			throws AlreadyConfiguredException, FileSystemException, ConfigurationException {
 		checkNotConfigured();
@@ -102,6 +103,7 @@ public class NodeConfigurator {
 	 * @throws FileSystemException
 	 *             VFS related exception during scratch space creation
 	 */
+	// FIXME what is the state of configurator after all these exceptions
 	synchronized public void configureApplication(long appid, String namingServiceURL)
 			throws ProActiveException, URISyntaxException, FileSystemException {
 		checkConfigured();
@@ -141,6 +143,8 @@ public class NodeConfigurator {
 	 * @throws FileSystemException
 	 *             VFS related exception during scratch space cleaning
 	 */
+	// FIXME try to clean up as much as possible or even just log exceptions(?)
+	// FIXME what is the state of configurator after all these exceptions
 	synchronized public void close() throws NotConfiguredException, FileSystemException {
 		checkConfigured();
 		tryCloseAppConfigurator();
@@ -159,6 +163,8 @@ public class NodeConfigurator {
 	 * @throws FileSystemException
 	 *             VFS related exception during scratch space cleaning
 	 */
+	// FIXME try to clean up as much as possible or even just log exceptions(?)
+	// FIXME what is the state of configurator after all these exceptions
 	public synchronized void tryCloseAppConfigurator() throws FileSystemException {
 		if (appConfigurator != null) {
 			try {

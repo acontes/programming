@@ -6,7 +6,11 @@ package org.objectweb.proactive.extra.dataspaces;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 
 // TODO provide setters or make it immutable with <code>withXXX</code> methods creating new instance
-// (Use case: scratch space configuration) 
+// (Use case: scratch space configuration; it is needed for path and url)
+// TODO not sure if inner classes are best choice/ give any benefit here, especially if we specify
+// some additional methods in these subclasses
+// TODO (related) if we have factory methods, documentation should be directly there perhaps, not
+// referencing to private constructor  
 /**
  * Stores information needed to configure an instance of a data space.
  */
@@ -52,7 +56,8 @@ public abstract class SpaceConfiguration {
 	 */
 	public static InputOutputSpaceConfiguration createInputOutputSpaceConfiguration(String url, String path,
 			String hostname, String name, SpaceType type) throws ConfigurationException {
-
+		// FIXME: the same thing is checked in constructor... with different
+		// exception
 		if (type != SpaceType.INPUT && type != SpaceType.OUTPUT)
 			throw new IllegalArgumentException("Use input or output data space type");
 
@@ -116,6 +121,13 @@ public abstract class SpaceConfiguration {
 		 * @throws ConfigurationException
 		 *             when one of above's contract condition fails
 		 */
+		// FIXME IMO we shouldn't handle #{deployer} at this level; #{deployer}
+		// is very context-specific, it should be rather handled in
+		// deployment code on deployer side perhaps
+		// TODO: now, somebody may provide us input-output space configuration
+		// with no URL (meaning -
+		// start provider), specify valid local path and wrong hostname; may be
+		// we should have some factories for that
 		private InputOutputSpaceConfiguration(String url, String path, String hostname, SpaceType spaceType,
 				String name) throws ConfigurationException {
 
@@ -126,7 +138,7 @@ public abstract class SpaceConfiguration {
 			boolean localDefined;
 
 			if (spaceType != SpaceType.INPUT && spaceType != SpaceType.OUTPUT)
-				throw new ConfigurationException("Use input or output data space type");
+				throw new ConfigurationException("Invalid space type for InputOutputSpaceConfiguration");
 
 			if (path != null && hostname != null)
 				localDefined = true;
@@ -173,7 +185,7 @@ public abstract class SpaceConfiguration {
 		 * (URL) is not specified and only local path is specified, default
 		 * ProActive provider is started, hence remote access is always
 		 * possible. At least one access (remote or local) must be defined.
-		 *
+		 * 
 		 * @param url
 		 *            Access URL to scratch, used for accessing from remote
 		 *            nodes. URL defines which protocol is used to access the
@@ -198,6 +210,8 @@ public abstract class SpaceConfiguration {
 				throw new ConfigurationException("Provide local or remote access definition");
 		}
 
+		// TODO merge it with getLocalAccessUrl in SpaceMountManager
+		// = make Utils.getAccessURL(url, path, hostname) ?
 		public String getLocalAccessUrl() {
 			if (path != null)
 				return FILE_URI_SCHEME + this.path;

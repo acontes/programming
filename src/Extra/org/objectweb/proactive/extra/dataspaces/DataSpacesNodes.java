@@ -60,7 +60,6 @@ public class DataSpacesNodes {
 	 * {@link #configureApplication(Node, long, String)} or closed by
 	 * {@link #closeNodeConfig(Node)}.
 	 * 
-	 * @see NodeConfigurator#configureNode(SpaceConfiguration, Node)
 	 * @param node
 	 *            node to be configured for Data Spaces
 	 * @param scratchConfiguration
@@ -71,6 +70,7 @@ public class DataSpacesNodes {
 	 * @throws ConfigurationException
 	 *             something failed during node scratch space configuration (ex.
 	 *             capabilities checking)
+	 * @see NodeConfigurator#configureNode(SpaceConfiguration, Node)
 	 */
 	public static void configureNode(Node node, ScratchSpaceConfiguration scratchConfiguration)
 			throws AlreadyConfiguredException, FileSystemException, ConfigurationException {
@@ -95,7 +95,6 @@ public class DataSpacesNodes {
 	 * application-configured node - in that case previous application
 	 * configuration is closed before applying a new one.
 	 * 
-	 * @see NodeConfigurator#configureApplication(Node, long, String)
 	 * @param node
 	 *            node to be configured for Data Spaces application
 	 * @param appid
@@ -108,6 +107,7 @@ public class DataSpacesNodes {
 	 *             occurred during contacting with NamingService
 	 * @throws FileSystemException
 	 *             VFS related exception during scratch data space creation
+	 * @see NodeConfigurator#configureApplication(Node, long, String)
 	 */
 	public static void configureApplication(Node node, long appid, String namingServiceURL)
 			throws ProActiveException, URISyntaxException, FileSystemException {

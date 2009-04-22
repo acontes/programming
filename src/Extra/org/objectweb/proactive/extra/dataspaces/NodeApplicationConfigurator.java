@@ -14,6 +14,8 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredExceptio
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceAlreadyRegisteredException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.WrongApplicationIdException;
 
+// TODO making this class an inner class of NodeConfigurator would made implementation more
+// straight-forward perhaps
 /**
  * Maintains Data Spaces application-specific node configuration and its life
  * cycle, producing Data Spaces implementation, {@link DataSpacesImpl}.
@@ -72,8 +74,8 @@ public class NodeApplicationConfigurator {
 	 *             occurred during contacting with NamingService
 	 * @throws FileSystemException
 	 *             VFS related exception during scratch data space creation
-	 *
 	 */
+	// FIXME what is the state of configurator after all these exceptions
 	synchronized public void configureApplication(long appid, String namingServiceURL,
 			DefaultFileSystemManager manager, NodeScratchSpace nodeScratchSpace) throws ProActiveException,
 			URISyntaxException, FileSystemException {
@@ -120,6 +122,8 @@ public class NodeApplicationConfigurator {
 	 * @throws FileSystemException
 	 *             VFS related exception
 	 */
+	// FIXME try to clean up as much as possible or even just log exceptions(?)
+	// FIXME what is the state of configurator after all these exceptions
 	synchronized public void close() throws NotConfiguredException, FileSystemException {
 		checkConfigured();
 
