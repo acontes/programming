@@ -355,6 +355,9 @@ import org.objectweb.proactive.core.UniqueID;
     }
     
     private void UpdateDSISelectionSection(Composite parent){
+        for (Control c : parent.getChildren()){
+            c.dispose();
+        }
         for(UniqueID dsi : dsiList){
             Button b = this.toolkit.createButton(parent, dsi.shortString(), SWT.CHECK);
             b.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
