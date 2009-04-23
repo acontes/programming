@@ -49,29 +49,19 @@ public class CanOverlay implements StructuredOverlay {
      *            the new peer which want to join the area.
      */
     public void split(Peer peer) {
-        // FIXME How to cut the area ?
+        // Verify the availability of the peer.
         ResponseMessage response = this.sendMessageTo(peer, new PingMessage());
 
         if (response != null) {
             // TODO How to split data ?
             // FIXME Split the data in two parts (basic method)
-            Coordinate[] middle = this.getMiddleArea(this.getRandomDimension());
-            Area newArea = new Area(middle, this.area.getCoordinatesMax());
-            this.area = new Area(this.area.getCoordinatesMin(), middle);
+            /*
+             * Coordinate[] middle = this.getMiddleArea(this.getRandomDimension()); Area newArea =
+             * new Area(middle, this.area.getCoordinatesMax()); this.area = new
+             * Area(this.area.getCoordinatesMin(), middle);
+             */
         }
-    }
 
-    /**
-     * Determinate the middle of the current area following a specific dimension.
-     * 
-     * @param dimension
-     *            the axe to split
-     * @return coordinates of the middle
-     */
-    private Coordinate[] getMiddleArea(int dimension) {
-        Coordinate[] middle = new Coordinate[NB_DIMENSIONS];
-
-        return null;
     }
 
     /**
@@ -124,10 +114,10 @@ public class CanOverlay implements StructuredOverlay {
         Coordinate[] minArea = this.area.getCoordinatesMin();
         Coordinate[] maxArea = this.area.getCoordinatesMax();
 
-        if (minArea[axeIndex].getValue().compareTo(coordinate.getValue()) >= 0 &&
+        if (minArea[axeIndex].getValue().compareTo(coordinate.getValue()) > 0 &&
             maxArea[axeIndex].getValue().compareTo(coordinate.getValue()) <= 0) {
             return 0;
-        } else if (minArea[axeIndex].getValue().compareTo(coordinate.getValue()) >= 0) {
+        } else if (minArea[axeIndex].getValue().compareTo(coordinate.getValue()) > 0) {
             return -1;
         } else {
             return 1;
@@ -160,7 +150,10 @@ public class CanOverlay implements StructuredOverlay {
      */
     @Override
     public void join(Peer peer) {
-        // TODO Auto-generated method stub
+        // FIXME with splitting
+        int dimension = 0;
+        int order = 1;
+        this.neighbors[dimension][order].add(peer);
     }
 
     /**
