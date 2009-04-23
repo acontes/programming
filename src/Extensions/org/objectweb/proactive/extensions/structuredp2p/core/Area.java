@@ -116,4 +116,23 @@ public class Area {
 
         return new Area(null, null);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Area))
+            throw new IllegalArgumentException();
+
+        Area area = (Area) o;
+
+        int i;
+        int nbDim = this.coodinatesMax.length;
+
+        for (i = 0; i < nbDim; i++) {
+            if (this.getCoordinatesMax(i) != area.getCoordinatesMax(i) ||
+                this.getCoordinatesMin(i) != area.getCoordinatesMin(i))
+                return false;
+        }
+
+        return true;
+    }
 }
