@@ -106,13 +106,14 @@ public class Area {
      * @param a2
      *            second area
      * @return the merged area
+     * @throws AreaException
      */
-    public static Area mergeAreas(Area a1, Area a2) {
+    public static Area mergeAreas(Area a1, Area a2) throws AreaException {
         int border = a1.isBorder(a2);
 
         if (border == -1)
             throw new AreaException("Areas are not bordered.");
 
-        return new Area();
+        return new Area(null, null);
     }
 }
