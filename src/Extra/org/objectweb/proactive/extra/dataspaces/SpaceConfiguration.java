@@ -176,8 +176,6 @@ public abstract class SpaceConfiguration {
 
 		private static final String FILE_URI_SCHEME = "file://";
 
-		private String hostname;
-
 		private String unresolvedUrl;
 
 		/**
@@ -227,6 +225,8 @@ public abstract class SpaceConfiguration {
 
 		@Override
 		public String getUrl() {
+			if (unresolvedUrl == null)
+				return null;			
 			return unresolvedUrl.replace(HOSTNAME_VARIABLE_KEYWORD, getHostname());
 		}
 
