@@ -124,6 +124,11 @@ public class Peer implements InitActive, RunActive, Serializable {
         return this.dataStorage;
     }
 
+    /**
+     * FIXME
+     * 
+     * @return
+     */
     public StructuredOverlay getStructuredOverlay() {
         return this.structuredOverlay;
     }

@@ -207,6 +207,33 @@ public class CanOverlay extends StructuredOverlay {
     }
 
     /**
+     * FIXME
+     * 
+     * @param peer
+     * @return
+     */
+    public boolean hasNeighbor(Peer peer) {
+        for (Group<Peer>[] neighborsAxe : this.neighbors) {
+            for (Group<Peer> neighbor : neighborsAxe) {
+                if (neighbor.contains(peer)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * FIXME
+     * 
+     * @return
+     */
+    public Area getArea() {
+        return this.area;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
