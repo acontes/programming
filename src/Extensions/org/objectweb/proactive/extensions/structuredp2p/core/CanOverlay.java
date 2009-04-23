@@ -48,18 +48,18 @@ public class CanOverlay extends StructuredOverlay {
     }
 
     /**
-     * Splits the current area in two. The axe which is used in order to split is choose randomly
+     * Splits the current area in two. The axe which is used in order to split is randomly chosen
      * with {@link #getRandomAxe()}.
      * 
      * @param peer
      *            the new peer which want to join the area.
      */
     public void split(Peer peer) {
-        // Verify the availability of the peer.
+        // check the availability of the peer.
         ResponseMessage response = this.sendMessageTo(peer, new PingMessage());
+        int axeToSplit = this.getRandomDimension();
 
         if (!response.isNull()) {
-            // TODO How to split data ?
             // FIXME Split the data in two parts (basic method)
             /*
              * Coordinate[] middle = this.getMiddleArea(this.getRandomDimension()); Area newArea =
@@ -81,7 +81,7 @@ public class CanOverlay extends StructuredOverlay {
     }
 
     /**
-     * Verify if the coordinates in arguments are in the managed area.
+     * Check if the coordinates in arguments are in the managed area.
      * 
      * @param coordinates
      *            the coordinates to check.
@@ -96,10 +96,10 @@ public class CanOverlay extends StructuredOverlay {
             if (coord != null) {
                 // if the current coordinates aren't in the peer area.
                 if (minArea[i].getValue().compareTo(coord.getValue()) > 0 &&
-                    maxArea[i].getValue().compareTo(coord.getValue()) <= 0)
+                    maxArea[i].getValue().compareTo(coord.getValue()) <= 0) {
                     return false;
+                }
             }
-
             i++;
         }
 
@@ -131,7 +131,7 @@ public class CanOverlay extends StructuredOverlay {
     }
 
     /**
-     * Merge two area when a peer leave the network. The split consists to give the data that are
+     * Merge two area when a peer leave the network. The split consists to give data that are
      * managed by the peer which left the network to his neighbors and after to merge this area with
      * its closest neighbors.
      * 
@@ -162,6 +162,7 @@ public class CanOverlay extends StructuredOverlay {
      */
     @Override
     public void join(Peer peer) {
+        // TODO
         int dim = this.getRandomDimension();
         this.addNeighbor(peer, dim, 1);
         ((CanOverlay) peer.getStructuredOverlay()).addNeighbor(this.getPeer(), dim, 0);
@@ -172,7 +173,7 @@ public class CanOverlay extends StructuredOverlay {
      */
     @Override
     public void leave() {
-        // TODO Auto-generated method stub
+        // TODO
     }
 
     /**
@@ -227,16 +228,16 @@ public class CanOverlay extends StructuredOverlay {
     }
 
     /**
-     * FIXME
+     * Returns the area which is managed.
      * 
-     * @return
+     * @return the area which is managed.
      */
     public Area getArea() {
         return this.area;
     }
 
     /**
-     * Set the new area covered.
+     * Sets the new area covered.
      * 
      * @param area
      *            the new area covered.
@@ -269,10 +270,11 @@ public class CanOverlay extends StructuredOverlay {
     }
 
     /**
-     * FIXME
+     * Indicates if a given peer is a neighbors of the current managed area.
      * 
      * @param peer
-     * @return
+     *            the peer to check.
+     * @return true if the peer is a neighbor, false otherwise.
      */
     public boolean hasNeighbor(Peer peer) {
         for (Group<Peer>[] neighborsAxe : this.neighbors) {
@@ -286,6 +288,9 @@ public class CanOverlay extends StructuredOverlay {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public CanLookupResponseMessage handleLookupMessage(LookupMessage msg) {
         return null;
