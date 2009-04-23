@@ -214,15 +214,6 @@ public class BasicChartContainerObject {
     }
 
     /**
-     * A getter for the edit part of this model
-     * 
-     * @return The edit part
-     */
-    public BasicChartContainerEditPart getEp() {
-        return this.ep;
-    }
-
-    /**
      * This method is used to update the edit part of this model.
      * 
      * @param forceRefresh

@@ -38,8 +38,6 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FormAttachment;
@@ -246,19 +244,6 @@ public class TimItView extends ViewPart {
         parent.addControlListener(new ControlAdapter() { /* resize listener */
             public void controlResized(ControlEvent event) {
                 chartContainer.update(true); // timItViewer.getContents().refresh();
-            }
-        });
-
-        //
-        parent.addDisposeListener(new DisposeListener() {
-            public void widgetDisposed(DisposeEvent e) {
-                for (BasicChartObject o : chartContainer.getChildrenList()) {
-                    o.getEp().deactivate();
-                    o.setEp(null);
-                }
-
-                chartContainer.getEp().deactivate();
-                chartContainer.setEp(null);
             }
         });
     }
