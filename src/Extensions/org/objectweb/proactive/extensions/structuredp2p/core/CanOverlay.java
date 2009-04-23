@@ -3,8 +3,12 @@ package org.objectweb.proactive.extensions.structuredp2p.core;
 import java.util.Random;
 
 import org.objectweb.proactive.core.group.Group;
+import org.objectweb.proactive.extensions.structuredp2p.message.CanLookupMessage;
+import org.objectweb.proactive.extensions.structuredp2p.message.LoadBalancingMessage;
+import org.objectweb.proactive.extensions.structuredp2p.message.LookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.Message;
 import org.objectweb.proactive.extensions.structuredp2p.message.PingMessage;
+import org.objectweb.proactive.extensions.structuredp2p.message.response.LookupResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.ResponseMessage;
 
 
@@ -19,7 +23,7 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.Respons
  * 
  * @version 0.1
  */
-public class CanOverlay implements StructuredOverlay {
+public class CanOverlay extends StructuredOverlay {
     /**
      * The number of dimensions which is equals to the number of axes.
      */
@@ -38,7 +42,8 @@ public class CanOverlay implements StructuredOverlay {
     /**
      * Constructor.
      */
-    public CanOverlay() {
+    public CanOverlay(Peer peer) {
+        super(peer);
     }
 
     /**
@@ -52,7 +57,7 @@ public class CanOverlay implements StructuredOverlay {
         // Verify the availability of the peer.
         ResponseMessage response = this.sendMessageTo(peer, new PingMessage());
 
-        if (response != null) {
+        if (!response.isNull()) {
             // TODO How to split data ?
             // FIXME Split the data in two parts (basic method)
             /*
@@ -125,7 +130,7 @@ public class CanOverlay implements StructuredOverlay {
     }
 
     /**
-     * Merge two area when a peer leave the network. The split consists of give the data that are
+     * Merge two area when a peer leave the network. The split consists to give the data that are
      * managed by the peer which left the network to his neighbors and after to merge this area with
      * its closest neighbors.
      * 
@@ -141,8 +146,14 @@ public class CanOverlay implements StructuredOverlay {
      */
     @Override
     public void checkNeighbors() {
-        // TODO Auto-generated method stub
+        for (Group<Peer>[] groupArray : neighbors) {
+            for (Group<Peer> group : groupArray) {
+                // FIXME look res...
+                // 
+                ((Peer) group.getGroupByType()).receiveMessage(new PingMessage());
 
+            }
+        }
     }
 
     /**
@@ -150,7 +161,6 @@ public class CanOverlay implements StructuredOverlay {
      */
     @Override
     public void join(Peer peer) {
-        // FIXME with splitting
     }
 
     /**
@@ -159,6 +169,41 @@ public class CanOverlay implements StructuredOverlay {
     @Override
     public void leave() {
         // TODO Auto-generated method stub
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public LookupResponseMessage sendMessage(LookupMessage msg) {
+        CanLookupMessage msgCan = (CanLookupMessage) msg;
+        if (this.contains(msgCan.getCoordinates())) {
+            msgCan.handle(this);
+        } else {
+            Group<Peer>[][] neighbors = this.neighbors;
+            int pos;
+            int neighborIndex;
+
+            for (Group<Peer>[] neighborsGroup : neighbors) {
+                for (int i = 0; i < CanOverlay.NB_DIMENSIONS; i++) {
+                    pos = this.contains(i, msgCan.getCoordinates()[i]);
+
+                    if (pos == -1) {
+                        this.sendMessageTo(((Peer) neighborsGroup[0].getGroupByType()),
+                                new LoadBalancingMessage());
+                        neighborIndex = neighborsGroup[0].waitOneAndGetIndex();
+                        neighborsGroup[0].get(neighborIndex).sendMessage(msg);
+                    } else if (pos == 1) {
+                        this.sendMessageTo(((Peer) neighborsGroup[1].getGroupByType()),
+                                new LoadBalancingMessage());
+                        neighborIndex = neighborsGroup[1].waitOneAndGetIndex();
+                        neighborsGroup[1].get(neighborIndex).sendMessage(msg);
+                    }
+                }
+            }
+        }
+
+        throw new IllegalArgumentException("The searched position doesn't exist.");
     }
 
     /**

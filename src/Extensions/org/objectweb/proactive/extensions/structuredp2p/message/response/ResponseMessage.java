@@ -14,5 +14,27 @@ import java.io.Serializable;
  */
 @SuppressWarnings("serial")
 public abstract class ResponseMessage implements Serializable {
+    private boolean isNull = false;
 
+    public ResponseMessage() {
+
+    }
+
+    /**
+     * FIXME
+     * 
+     * @param isNull
+     */
+    public ResponseMessage(boolean isNull) {
+        this.isNull = isNull;
+    }
+
+    /**
+     * FIXME
+     * 
+     * @return
+     */
+    public boolean isNull() {
+        return this.isNull;
+    }
 }

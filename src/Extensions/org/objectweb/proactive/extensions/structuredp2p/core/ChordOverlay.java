@@ -2,7 +2,9 @@ package org.objectweb.proactive.extensions.structuredp2p.core;
 
 import java.util.HashMap;
 
+import org.objectweb.proactive.extensions.structuredp2p.message.LookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.Message;
+import org.objectweb.proactive.extensions.structuredp2p.message.response.LookupResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.ResponseMessage;
 
 
@@ -23,9 +25,18 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.Respons
  * 
  * @version 0.1
  */
-public class ChordOverlay implements StructuredOverlay {
+public class ChordOverlay extends StructuredOverlay {
     private String identifier;
     private HashMap<String, Peer> fingers;
+
+    /**
+     * FIXME
+     * 
+     * @param peer
+     */
+    public ChordOverlay(Peer peer) {
+        super(peer);
+    }
 
     /**
      * {@inheritDoc}
@@ -55,17 +66,20 @@ public class ChordOverlay implements StructuredOverlay {
      * {@inheritDoc}
      */
     @Override
-    public ResponseMessage sendMessageTo(Peer peer, Message msg) {
+    public void update() {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public LookupResponseMessage sendMessage(LookupMessage msg) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public void update() {
+    public ResponseMessage sendMessageTo(Peer peer, Message msg) {
         // TODO Auto-generated method stub
+        return null;
     }
 
     /**
@@ -85,5 +99,4 @@ public class ChordOverlay implements StructuredOverlay {
     public HashMap<String, Peer> getFingers() {
         return this.fingers;
     }
-
 }

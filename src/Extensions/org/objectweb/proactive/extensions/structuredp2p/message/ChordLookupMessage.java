@@ -1,7 +1,7 @@
 package org.objectweb.proactive.extensions.structuredp2p.message;
 
-import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
-import org.objectweb.proactive.extensions.structuredp2p.message.response.ChordResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay;
+import org.objectweb.proactive.extensions.structuredp2p.message.response.LookupResponseMessage;
 
 
 /**
@@ -15,20 +15,14 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.ChordRe
  * @version 0.1
  */
 @SuppressWarnings("serial")
-public class ChordMessage implements Message {
-    /**
-     * The id to search.
-     */
-    private final String id;
+public class ChordLookupMessage extends LookupMessage {
 
     /**
-     * Create a new ChordMessage with the id to search.
      * 
      * @param id
-     *            the identifier to search.
      */
-    public ChordMessage(String id) {
-        this.id = id;
+    public ChordLookupMessage(String id) {
+        super(new Key<String>(id));
     }
 
     /**
@@ -38,18 +32,19 @@ public class ChordMessage implements Message {
      *            peer to which the message will be sent.
      * @return a ChordResponseMessage for routing.
      */
-    public ChordResponseMessage handle(Peer peer) {
-        return peer.handleChordMessage(this);
+    @Override
+    public LookupResponseMessage handle(StructuredOverlay overlay) {
+        return overlay.handleChordMessage(this);
 
     }
 
     /**
-     * Returns the id searched.
+     * Returns the identifier.
      * 
-     * @return the id searched.
+     * @return the identifier.
      */
 
     public String getId() {
-        return id;
+        return (String) super.key.getValue();
     }
 }

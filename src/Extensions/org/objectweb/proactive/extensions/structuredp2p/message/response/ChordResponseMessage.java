@@ -1,6 +1,7 @@
 package org.objectweb.proactive.extensions.structuredp2p.message.response;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
+import org.objectweb.proactive.extensions.structuredp2p.message.Key;
 
 
 /**
@@ -13,14 +14,12 @@ import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
  * @version 0.1
  */
 @SuppressWarnings("serial")
-public class ChordResponseMessage extends ResponseMessage {
-    private final Peer response;
-
-    public ChordResponseMessage(Peer peer) {
-        this.response = peer;
+public class ChordResponseMessage extends LookupResponseMessage {
+    public ChordResponseMessage(Peer peer, String id) {
+        super(new Key<String>(id), peer);
     }
 
-    public Peer getResponse() {
-        return response;
+    public String getId() {
+        return (String) super.getKey().getValue();
     }
 }

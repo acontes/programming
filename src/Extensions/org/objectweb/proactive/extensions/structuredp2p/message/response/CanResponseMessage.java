@@ -1,6 +1,8 @@
 package org.objectweb.proactive.extensions.structuredp2p.message.response;
 
+import org.objectweb.proactive.extensions.structuredp2p.core.Coordinate;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
+import org.objectweb.proactive.extensions.structuredp2p.message.Key;
 
 
 /**
@@ -13,22 +15,29 @@ import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
  * @version 0.1
  */
 @SuppressWarnings("serial")
-public class CanResponseMessage extends ResponseMessage {
-    private final Peer response;
+public class CanResponseMessage extends LookupResponseMessage {
 
     /**
      * 
      * @param peer
      */
-    public CanResponseMessage(Peer peer) {
-        this.response = peer;
+    public CanResponseMessage(Peer peer, Coordinate[] coordinates) {
+        super(new Key<Coordinate[]>(coordinates), peer);
     }
 
     /**
+     * FIXME
+     */
+    public CanResponseMessage() {
+        super(true);
+    }
+
+    /**
+     * FIXME
      * 
      * @return
      */
-    public Peer getResponse() {
-        return response;
+    public Coordinate[] getCoordinates() {
+        return (Coordinate[]) this.getKey().getValue();
     }
 }
