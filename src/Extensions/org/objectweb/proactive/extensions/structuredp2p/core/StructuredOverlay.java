@@ -11,7 +11,7 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.Respons
 
 
 /**
- * Defines an abstract interface that all structured peer-to-peer protocols must implements.
+ * Defines an abstract class that all structured peer-to-peer protocols must extends.
  * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent
@@ -27,7 +27,7 @@ public abstract class StructuredOverlay {
     }
 
     /**
-     * Adds a peer to
+     * Adds a peer to the network.
      * 
      * @param peer
      *            the peer who wants to join at the current position.
@@ -35,7 +35,7 @@ public abstract class StructuredOverlay {
     public abstract void join(Peer peer);
 
     /**
-     * Left the current network. Area are merged.
+     * Left the current network.
      */
     public abstract void leave();
 
@@ -45,55 +45,66 @@ public abstract class StructuredOverlay {
     public abstract void checkNeighbors();
 
     /**
-     * TODO FIXME Big PROBLEM !!! parameters or not ?
+     * FIXME do what ? parameters or not ?
      */
     public abstract void update();
 
     /**
-     * Send a message to a given peer an get a {@link ResponseMessage} in response. This function
-     * use double dispatch.
+     * Sends a {@link LookupMessage} on the network from the current peer.
      * 
      * @param msg
-     *            the message to send.
-     * @return the response.
+     *            the message to send
+     * @return the response in agreement with the type of message sent.
      */
     public abstract LookupResponseMessage sendMessage(LookupMessage msg);
 
     /**
+     * Send a {@link Message} to a known {@link Peer}.
      * 
      * @param peer
+     *            the peer to which we want to send the message.
      * @param msg
-     * @return
+     *            the message to send.
+     * 
+     * @return the response in agreement with the type of message sent.
      */
     public abstract ResponseMessage sendMessageTo(Peer peer, Message msg);
 
     /**
-     * Handles a ping request.
+     * Handles a {@link PingMessage}.
      * 
      * @param msg
-     *            the ping request that is receive.
-     * @return the ping response.
+     *            the message that is handled.
+     * @return the {@link PingResponseMessage} response.
      */
     public PingResponseMessage handlePingMessage(PingMessage msg) {
         return new PingResponseMessage();
     }
 
-    public abstract LookupResponseMessage handleLookupMessage(LookupMessage msg);
-
     /**
-     * FIXME
+     * Handles a {@link LoadBalancingMessage}.
      * 
      * @param msg
-     * @return
+     *            the message that is handled.
+     * @return the {@link LoadBalancingResponseMessage} response.
      */
     public LoadBalancingResponseMessage handleLoadBalancingMessage(LoadBalancingMessage msg) {
         return null;
     }
 
     /**
-     * Returns the current peer.
+     * Handles a {@link LookupMessage}.
      * 
-     * @return the peer.
+     * @param msg
+     *            the lookup message that is handled.
+     * @return the {@link LookupResponseMessage} response.
+     */
+    public abstract LookupResponseMessage handleLookupMessage(LookupMessage msg);
+
+    /**
+     * Returns the current peer that use this overlay.
+     * 
+     * @return the current peer that use this overlay.
      */
     public Peer getPeer() {
         return this.peer;

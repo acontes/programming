@@ -72,6 +72,7 @@ public class Area {
      * managed by a peer.
      * 
      * @param dimension
+     *            the dimension on which one recovers the coordinates.
      * @return the maximum coordinates at a specified dimension that indicates the area which is
      *         managed by a peer.
      */
@@ -83,6 +84,7 @@ public class Area {
      * Search if the area in argument is bordered to the current area.
      * 
      * @param area
+     *            the area to check.
      * @return the dimension in which they are bordered, <code>-1</code> if they aren't.
      */
     public int isBorder(Area area) {
@@ -102,10 +104,10 @@ public class Area {
      * Merge two bordered areas.
      * 
      * @param a1
-     *            first area
+     *            first area.
      * @param a2
-     *            second area
-     * @return the merged area
+     *            second area.
+     * @return the merged area.
      * @throws AreaException
      */
     public static Area mergeAreas(Area a1, Area a2) throws AreaException {
@@ -118,6 +120,9 @@ public class Area {
         return new Area(null, null);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Area))

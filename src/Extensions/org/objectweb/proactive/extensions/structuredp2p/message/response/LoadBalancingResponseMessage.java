@@ -13,6 +13,7 @@ package org.objectweb.proactive.extensions.structuredp2p.message.response;
 public class LoadBalancingResponseMessage extends ResponseMessage {
 
     /**
+     * Constructor.
      * 
      * @param peer
      */

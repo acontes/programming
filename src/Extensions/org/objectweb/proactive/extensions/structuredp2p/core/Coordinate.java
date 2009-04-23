@@ -12,7 +12,7 @@ package org.objectweb.proactive.extensions.structuredp2p.core;
  */
 public class Coordinate {
     /**
-     * The max value of Unicode
+     * The max value of Unicode we managed
      */
     private static int UNICODE = 255;
     /**
@@ -67,13 +67,17 @@ public class Coordinate {
         for (i = maxL; i > 0; i--) {
             if (i > minL) {
                 // FIXME
-                // value[i] = Character.toChars((Character.getNumericValue(maxS.charAt(i - 1)) / 2));
+                // value[i] = Character.toChars((Character.getNumericValue(maxS.charAt(i - 1)) /
+                // 2));
             }
         }
 
         return new Coordinate(value.toString());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return this.getValue();

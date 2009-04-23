@@ -16,6 +16,9 @@ import java.io.Serializable;
 public abstract class ResponseMessage implements Serializable {
     private boolean isNull = false;
 
+    /**
+     * Constructor.
+     */
     public ResponseMessage() {
 
     }

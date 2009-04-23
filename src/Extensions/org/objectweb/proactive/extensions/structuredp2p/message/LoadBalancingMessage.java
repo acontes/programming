@@ -5,8 +5,6 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.Respons
 
 
 /**
- * 
- * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent
  * @author Trovato Alexandre

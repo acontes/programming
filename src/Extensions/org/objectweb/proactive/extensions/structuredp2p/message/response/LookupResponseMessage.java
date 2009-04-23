@@ -5,7 +5,11 @@ import org.objectweb.proactive.extensions.structuredp2p.message.Key;
 
 
 /**
- * FIXME
+ * @author Kilanga Fanny
+ * @author Pellegrino Laurent
+ * @author Trovato Alexandre
+ * 
+ * @version 0.1
  */
 @SuppressWarnings("serial")
 public abstract class LookupResponseMessage extends ResponseMessage {
@@ -15,12 +19,15 @@ public abstract class LookupResponseMessage extends ResponseMessage {
     private Key<?> key;
 
     /**
-     * FIXME
+     * The peer which is found for the given key.
      */
     private Peer peer;
 
     /**
-     * FIXME
+     * Constructor.
+     * 
+     * @param isNull
+     *            indicates if the response is an empty response or not.
      */
     public LookupResponseMessage(boolean isNull) {
         super(isNull);
@@ -49,9 +56,9 @@ public abstract class LookupResponseMessage extends ResponseMessage {
     }
 
     /**
-     * FIXME
+     * Returns the peer which has been found.
      * 
-     * @return
+     * @return the peer which has been found.
      */
     public Peer getPeer() {
         return this.peer;

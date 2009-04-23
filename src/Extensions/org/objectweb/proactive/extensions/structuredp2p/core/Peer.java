@@ -27,7 +27,7 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.Respons
 @SuppressWarnings("serial")
 public class Peer implements InitActive, RunActive, Serializable {
     /**
-     * The timeout to wait before check for neighbors {@link WithMarshallStream}
+     * The timeout to wait before the check of neighbors {@link WithMarshallStream}
      * {@link StructuredOverlay#checkNeighbors()}.
      */
     public static final int CHECK_NEIGHBORS_TIMEOUT = 1000;
@@ -70,19 +70,25 @@ public class Peer implements InitActive, RunActive, Serializable {
     }
 
     /**
+     * Sends a {@link LookupMessage} on the network from the current peer.
      * 
      * @param msg
-     * @return
+     *            the message to send
+     * @return the response in agreement with the type of message sent.
      */
     public LookupResponseMessage sendMessage(LookupMessage msg) {
         return this.structuredOverlay.sendMessage(msg);
     }
 
     /**
+     * Sends a {@link Message} to a known {@link Peer}.
      * 
      * @param peer
+     *            the peer to which we want to send the message.
      * @param msg
-     * @return
+     *            the message to send.
+     * 
+     * @return the response in agreement with the type of message sent.
      */
     public ResponseMessage sendMessageTo(Peer peer, Message msg) {
         return peer.receiveMessage(msg);
@@ -126,9 +132,9 @@ public class Peer implements InitActive, RunActive, Serializable {
     }
 
     /**
-     * FIXME
+     * Returns the {@link StructuredOverlay} which is used by the peer.
      * 
-     * @return
+     * @return the {@link StructuredOverlay} which is used by the peer.
      */
     public StructuredOverlay getStructuredOverlay() {
         return this.structuredOverlay;

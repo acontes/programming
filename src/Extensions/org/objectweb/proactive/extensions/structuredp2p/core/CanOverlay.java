@@ -224,7 +224,7 @@ public class CanOverlay extends StructuredOverlay {
      */
     @Override
     public void update() {
-        // TODO Auto-generated method stub
+        // TODO
     }
 
     /**

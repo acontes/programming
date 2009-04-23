@@ -18,10 +18,10 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.Respons
 public interface Message extends Serializable {
 
     /**
-     * Handles the message
+     * Handles the message.
      * 
      * @param peer
-     * @return a response message
+     * @return a response message.
      */
     public ResponseMessage handle(StructuredOverlay overlay);
 

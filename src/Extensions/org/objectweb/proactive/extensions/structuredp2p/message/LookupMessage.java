@@ -7,6 +7,12 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.Respons
 /**
  * Each lookup message contains the key used in order to found the peer on the network to which we
  * want to send the message.
+ * 
+ * @author Kilanga Fanny
+ * @author Pellegrino Laurent
+ * @author Trovato Alexandre
+ * 
+ * @version 0.1
  */
 @SuppressWarnings("serial")
 public abstract class LookupMessage implements Message {

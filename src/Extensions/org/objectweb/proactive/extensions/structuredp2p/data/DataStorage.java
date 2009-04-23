@@ -19,6 +19,9 @@ import org.objectweb.proactive.extensions.structuredp2p.core.Area;
 public class DataStorage implements Serializable {
     private final HashMap<String, Object> data;
 
+    /**
+     * Constructor.
+     */
     public DataStorage() {
         this.data = new HashMap<String, Object>();
     }
