@@ -116,4 +116,35 @@ public class Utils {
 		// nothing here
 	}
 
+	/**
+	 * Determines local access URL for accessing some data, basing on provided
+	 * remote access URL, local access path and hostname specification.
+	 * <p>
+	 * If local access path is provided among with hostname, they are preferred
+	 * over remote access URL if local hostname determined by
+	 * {@link #getHostname()} matches provided one.
+	 * 
+	 * @param url
+	 *            mandatory remote access URL
+	 * @param path
+	 *            path for local access on host with hostname as specified in
+	 *            hostname argument; may be <code>null</code> when local access
+	 *            path is unspecified
+	 * @param hostname
+	 *            hostname where local access path is valid; can be
+	 *            <code>null</code> only when local access path is unspecified
+	 * @return local access URL that should be used for this host
+	 */
+	public static String getLocalAccessURL(final String url, final String path, final String hostname) {
+		if (hostname != null && hostname.equals(getHostname()) && path != null) {
+			// FIXME what about relative paths and windows support?
+			if (path.startsWith("/")) {
+				return "file://" + path;
+			} else {
+				return "file:///" + path;
+			}
+		}
+		return url;
+	}
+
 }

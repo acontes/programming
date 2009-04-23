@@ -174,8 +174,6 @@ public abstract class SpaceConfiguration {
 
 		public static final String HOSTNAME_VARIABLE_KEYWORD = "#{hostname}";
 
-		private static final String FILE_URI_SCHEME = "file://";
-
 		private String unresolvedUrl;
 
 		/**
@@ -207,15 +205,6 @@ public abstract class SpaceConfiguration {
 
 			if (url == null && path == null)
 				throw new ConfigurationException("Provide local or remote access definition");
-		}
-
-		// TODO merge it with getLocalAccessUrl in SpaceMountManager
-		// = make Utils.getAccessURL(url, path, hostname) ?
-		public String getLocalAccessUrl() {
-			if (path != null)
-				return FILE_URI_SCHEME + this.path;
-			else
-				return getUrl();
 		}
 
 		@Override

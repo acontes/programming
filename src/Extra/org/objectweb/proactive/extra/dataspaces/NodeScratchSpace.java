@@ -127,7 +127,8 @@ public class NodeScratchSpace {
 		nodeId = Utils.getNodeId(node);
 		runtimeId = Utils.getRuntimeId(node);
 
-		final String localAccessUrl = scratchConfiguration.getLocalAccessUrl();
+		final String localAccessUrl = Utils.getLocalAccessURL(scratchConfiguration.getUrl(),
+				scratchConfiguration.getPath(), scratchConfiguration.getHostname());
 		final String partialSpacePath = scratchConfiguration.appendBasePath(localAccessUrl, runtimeId,
 				nodeId, null);
 

@@ -33,7 +33,7 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundExceptio
  * instance, using lazy on-request strategy in current implementation. Space is
  * mounted only when there is request to provide FileObject for its content.
  * Proper, local or remote access is determined using
- * {@link #getAccessURL(SpaceInstanceInfo)} method.
+ * {@link Utils#getLocalAccessURL(String, String, String)} method.
  * <p>
  * Instances of this class are thread-safe. Each instance of manager must be
  * closed using {@link #close()} method when it is not used anymore.
@@ -46,21 +46,6 @@ public class SpacesMountManager {
 	// Apache VFS like these kind of games...
 	private static final String SCHEME_VFS_HACKED = DataSpacesURI.SCHEME.substring(0, DataSpacesURI.SCHEME
 			.length() - 1);
-
-	public static String getAccessURL(final SpaceInstanceInfo spaceInfo) {
-		final String spaceHostname = spaceInfo.getHostname();
-		if (spaceHostname != null && spaceHostname.equals(Utils.getHostname()) && spaceInfo.getPath() != null) {
-			final String path = spaceInfo.getPath();
-			// FIXME what about relative paths and windows support?
-			if (path.startsWith("/")) {
-				return "file://" + path;
-			} else {
-				return "file:///" + path;
-			}
-		}
-
-		return spaceInfo.getUrl();
-	}
 
 	private static String getVFSPath(final DataSpacesURI uri) {
 		// another nasty Apache VFS hacks
@@ -265,7 +250,9 @@ public class SpacesMountManager {
 	 */
 	private void mountSpace(final SpaceInstanceInfo spaceInfo) throws FileSystemException {
 		final DataSpacesURI mountingPoint = spaceInfo.getMountingPoint();
-		final FileObject mountedRoot = vfsManager.resolveFile(getAccessURL(spaceInfo));
+		final String accessUrl = Utils.getLocalAccessURL(spaceInfo.getUrl(), spaceInfo.getPath(), spaceInfo
+				.getHostname());
+		final FileObject mountedRoot = vfsManager.resolveFile(accessUrl);
 
 		synchronized (readLock) {
 			vfs.addJunction(getVFSPath(mountingPoint), mountedRoot);

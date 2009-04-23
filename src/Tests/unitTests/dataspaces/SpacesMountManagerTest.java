@@ -24,10 +24,8 @@ import org.objectweb.proactive.extra.dataspaces.SpaceInstanceInfo;
 import org.objectweb.proactive.extra.dataspaces.SpacesDirectory;
 import org.objectweb.proactive.extra.dataspaces.SpacesDirectoryImpl;
 import org.objectweb.proactive.extra.dataspaces.SpacesMountManager;
-import org.objectweb.proactive.extra.dataspaces.Utils;
 import org.objectweb.proactive.extra.dataspaces.VFSFactory;
 import org.objectweb.proactive.extra.dataspaces.SpaceConfiguration.InputOutputSpaceConfiguration;
-import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundException;
 
 /**
@@ -72,33 +70,6 @@ public class SpacesMountManagerTest {
 		manager.close();
 		assertTrue(spaceFile.delete());
 		assertTrue(spaceDir.delete());
-	}
-
-	@Test
-	public void testGetAccessURLMatchingHostname()
-			throws org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException {
-		final String hostname = Utils.getHostname();
-		final InputOutputSpaceConfiguration spaceConf = SpaceConfiguration.createInputSpaceConfiguration(
-				"http://remote/", "/local", hostname, "some_name");
-		final SpaceInstanceInfo spaceInfo = new SpaceInstanceInfo(123, spaceConf);
-		assertEquals("file:///local", SpacesMountManager.getAccessURL(spaceInfo));
-	}
-
-	@Test
-	public void testGetAccessURLNonMatchingHostname() throws ConfigurationException {
-		final String hostname = Utils.getHostname() + "haha";
-		final InputOutputSpaceConfiguration spaceConf = SpaceConfiguration.createInputSpaceConfiguration(
-				"http://remote/", "/local", hostname, "some_name");
-		final SpaceInstanceInfo spaceInfo = new SpaceInstanceInfo(123, spaceConf);
-		assertEquals("http://remote/", SpacesMountManager.getAccessURL(spaceInfo));
-	}
-
-	@Test
-	public void testGetAccessURLNoLocalPath() throws ConfigurationException {
-		final InputOutputSpaceConfiguration spaceConf = SpaceConfiguration.createInputSpaceConfiguration(
-				"http://remote/", null, null, "some_name");
-		final SpaceInstanceInfo spaceInfo = new SpaceInstanceInfo(123, spaceConf);
-		assertEquals("http://remote/", SpacesMountManager.getAccessURL(spaceInfo));
 	}
 
 	@Test
