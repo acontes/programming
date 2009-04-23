@@ -8,6 +8,7 @@ import org.objectweb.proactive.extensions.structuredp2p.message.LoadBalancingMes
 import org.objectweb.proactive.extensions.structuredp2p.message.LookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.Message;
 import org.objectweb.proactive.extensions.structuredp2p.message.PingMessage;
+import org.objectweb.proactive.extensions.structuredp2p.message.response.CanLookupResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.LookupResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.ResponseMessage;
 
@@ -266,5 +267,10 @@ public class CanOverlay extends StructuredOverlay {
      */
     public Group<Peer>[][] getNeighbors() {
         return this.neighbors;
+    }
+
+    @Override
+    public CanLookupResponseMessage handleLookupMessage(LookupMessage msg) {
+        return null;
     }
 }

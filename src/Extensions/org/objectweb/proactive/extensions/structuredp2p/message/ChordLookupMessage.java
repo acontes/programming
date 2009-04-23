@@ -34,7 +34,7 @@ public class ChordLookupMessage extends LookupMessage {
      */
     @Override
     public LookupResponseMessage handle(StructuredOverlay overlay) {
-        return overlay.handleChordMessage(this);
+        return overlay.handleLookupMessage(this);
 
     }
 

@@ -10,6 +10,7 @@ import org.objectweb.proactive.core.util.converter.MakeDeepCopy.WithMarshallStre
 import org.objectweb.proactive.extensions.structuredp2p.data.DataStorage;
 import org.objectweb.proactive.extensions.structuredp2p.message.LookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.Message;
+import org.objectweb.proactive.extensions.structuredp2p.message.response.LookupResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.ResponseMessage;
 
 
@@ -73,7 +74,7 @@ public class Peer implements InitActive, RunActive, Serializable {
      * @param msg
      * @return
      */
-    public ResponseMessage sendMessage(LookupMessage msg) {
+    public LookupResponseMessage sendMessage(LookupMessage msg) {
         return this.structuredOverlay.sendMessage(msg);
     }
 

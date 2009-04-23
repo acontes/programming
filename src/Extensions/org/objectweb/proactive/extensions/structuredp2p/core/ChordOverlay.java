@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import org.objectweb.proactive.extensions.structuredp2p.message.LookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.Message;
+import org.objectweb.proactive.extensions.structuredp2p.message.response.ChordLookupResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.LookupResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.ResponseMessage;
 
@@ -98,5 +99,11 @@ public class ChordOverlay extends StructuredOverlay {
      */
     public HashMap<String, Peer> getFingers() {
         return this.fingers;
+    }
+
+    @Override
+    public ChordLookupResponseMessage handleLookupMessage(LookupMessage msg) {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

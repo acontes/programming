@@ -1,13 +1,9 @@
 package org.objectweb.proactive.extensions.structuredp2p.core;
 
-import org.objectweb.proactive.extensions.structuredp2p.message.CanLookupMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.ChordLookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.LoadBalancingMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.LookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.Message;
 import org.objectweb.proactive.extensions.structuredp2p.message.PingMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.response.CanLookupResponseMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.response.ChordLookupResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.LoadBalancingResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.LookupResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.PingResponseMessage;
@@ -82,27 +78,7 @@ public abstract class StructuredOverlay {
         return new PingResponseMessage();
     }
 
-    /**
-     * Handles a CAN request.
-     * 
-     * @param msg
-     *            the ping request that is receive.
-     * @return the ping response.
-     */
-    public CanLookupResponseMessage handleCanMessage(CanLookupMessage msg) {
-        return null;
-    }
-
-    /**
-     * Handles a CHORD request.
-     * 
-     * @param msg
-     *            the ping request that is receive.
-     * @return the ping response.
-     */
-    public ChordLookupResponseMessage handleChordMessage(ChordLookupMessage msg) {
-        return null;
-    }
+    public abstract LookupResponseMessage handleLookupMessage(LookupMessage msg);
 
     /**
      * FIXME
