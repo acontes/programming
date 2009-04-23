@@ -189,7 +189,7 @@ public class NodeScratchSpace {
 
 		for (int i = 0; i < expected.length; i++) {
 			final Capability capability = expected[i];
-			if (fs.hasCapability(capability))
+			if (!fs.hasCapability(capability))
 				throw new ConfigurationException("Specified file system provider does not support "
 						+ capability);
 		}
