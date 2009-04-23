@@ -10,9 +10,6 @@
  ******************************************************************************/
 package org.objectweb.proactive.ic2d.debug.dsi.views;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Collections;
 import java.util.Set;
 
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -20,7 +17,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
@@ -30,19 +26,10 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Link;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.forms.IMessage;
-import org.eclipse.ui.forms.ManagedForm;
-import org.eclipse.ui.forms.events.HyperlinkAdapter;
-import org.eclipse.ui.forms.events.HyperlinkEvent;
-import org.eclipse.ui.forms.widgets.Form;
-import org.eclipse.ui.forms.widgets.FormText;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
@@ -73,7 +60,6 @@ import org.objectweb.proactive.core.UniqueID;
      */
     private ScrolledForm form;
     private FormToolkit toolkit;
-    private ManagedForm managedForm;
     private GraphViewer viewer;
     private CommunicationGraphView view;
 
@@ -100,7 +86,6 @@ import org.objectweb.proactive.core.UniqueID;
         this.toolkit = toolkit;
         this.view = view;
         form = this.toolkit.createScrolledForm(parent);
-        managedForm = new ManagedForm(this.toolkit, this.form);
         createHeaderRegion(form);
         FillLayout layout = new FillLayout();
         layout.marginHeight = 10;
@@ -135,137 +120,10 @@ import org.objectweb.proactive.core.UniqueID;
         GridData data = new GridData();
         data.widthHint = 300;
         searchBox.setLayoutData(data);
-        //        ToolBar cancelBar = new ToolBar(headClient, SWT.FLAT );
-
-        //        cancelIcon = new ToolItem(cancelBar, SWT.NONE);
-        //        cancelIcon.addSelectionListener(new SelectionAdapter() {
-        //            public void widgetSelected(SelectionEvent e) {
-        //                searchBox.setText("");
-        //            }
-        //        });
-        //        cancelIcon.setImage(Activator.getDefault().getImageRegistry().get(Activator.SEARCH_CANCEL));
         toolkit.paintBordersFor(headClient);
         form.setHeadClient(headClient);
-        //        searchBox.addModifyListener(new ModifyListener() {
-        //
-        //            public void modifyText(ModifyEvent e) {
-        //                if (searchBox.getText().length() > 0) {
-        //                    cancelIcon.setEnabled(true);
-        //                } else {
-        //                    cancelIcon.setEnabled(false);
-        //                }
-        //            }
-        //        });
-        //        cancelIcon.setEnabled(false);
-
         form.setText(Services_Flow);
-        //        form.setImage(Activator.getDefault().getImageRegistry().get(Activator.REQ_PLUGIN_OBJ));
-        enableSearchBox(true);
-
-        // Add a hyperlink listener for the messages
-        form.getForm().addMessageHyperlinkListener(new HyperlinkAdapter() {
-            public void linkActivated(org.eclipse.ui.forms.events.HyperlinkEvent e) {
-                String title = e.getLabel();
-                Object href = e.getHref();
-                if (href instanceof IMessage[] && ((IMessage[]) href).length > 1) {
-                    Point hl = ((Control) e.widget).toDisplay(0, 0);
-                    hl.x += 10;
-                    hl.y += 10;
-                    final Shell shell = new Shell(VisualizationForm.this.form.getShell(), SWT.ON_TOP | SWT.TOOL);
-                    shell.setImage(getImage(VisualizationForm.this.form.getMessageType()));
-                    shell.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
-                    shell.setBackgroundMode(SWT.INHERIT_DEFAULT);
-                    GridLayout layout = new GridLayout();
-                    layout.numColumns = 1;
-                    layout.verticalSpacing = 0;
-                    shell.setText(title);
-                    shell.setLayout(layout);
-                    Link link = new Link(shell, SWT.NONE);
-                    link.setText("<A>close</A>");
-                    GridData data = new GridData(SWT.RIGHT, SWT.CENTER, false, false);
-                    link.setLayoutData(data);
-                    link.addSelectionListener(new SelectionAdapter() {
-                        public void widgetSelected(SelectionEvent e) {
-                            shell.close();
-                        }
-                    });
-                    Group group = new Group(shell, SWT.NONE);
-                    data = new GridData(SWT.LEFT, SWT.TOP, true, true);
-                    group.setLayoutData(data);
-                    group.setLayout(layout);
-                    group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
-                    FormText text = toolkit.createFormText(group, true);
-                    configureFormText(VisualizationForm.this.form.getForm(), text);
-                    if (href instanceof IMessage[]) {
-                        text.setText(createFormTextContent((IMessage[]) href), true, false);
-                    }
-
-                    shell.setLocation(hl);
-                    shell.pack();
-                    shell.open();
-                } else if (href instanceof IMessage[]) {
-                    IMessage oneMessage = ((IMessage[]) href)[0];
-                    //					ErrorReporting error = (ErrorReporting) oneMessage.getData();
-                    //					if (error != null) {
-                    //						error.handleError();
-                    //					}
-                }
-            }
-        });
-    }
-
-    private void configureFormText(final Form form, FormText text) {
-        text.addHyperlinkListener(new HyperlinkAdapter() {
-            public void linkActivated(HyperlinkEvent e) {
-                String is = (String) e.getHref();
-                try {
-                    ((FormText) e.widget).getShell().dispose();
-                    int index = Integer.parseInt(is);
-                    IMessage[] messages = form.getChildrenMessages();
-                    IMessage message = messages[index];
-                    //					ErrorReporting error = (ErrorReporting) message.getData();
-                    //					if (error != null) {
-                    //						error.handleError();
-                    //					}
-                } catch (NumberFormatException ex) {
-                }
-            }
-        });
-        text.setImage("error", getImage(IMessageProvider.ERROR));
-        text.setImage("warning", getImage(IMessageProvider.WARNING));
-        text.setImage("info", getImage(IMessageProvider.INFORMATION));
-    }
-
-    String createFormTextContent(IMessage[] messages) {
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        pw.println("<form>");
-        for (int i = 0; i < messages.length; i++) {
-            IMessage message = messages[i];
-            pw.print("<li vspace=\"false\" style=\"image\" indent=\"16\" value=\"");
-            switch (message.getMessageType()) {
-                case IMessageProvider.ERROR:
-                    pw.print("error");
-                    break;
-                case IMessageProvider.WARNING:
-                    pw.print("warning");
-                    break;
-                case IMessageProvider.INFORMATION:
-                    pw.print("info");
-                    break;
-            }
-            pw.print("\"> <a href=\"");
-            pw.print(i + "");
-            pw.print("\">");
-            if (message.getPrefix() != null) {
-                pw.print(message.getPrefix());
-            }
-            pw.print(message.getMessage());
-            pw.println("</a></li>");
-        }
-        pw.println("</form>");
-        pw.flush();
-        return sw.toString();
+        enableSearchBox(false);
     }
 
     /**
@@ -334,6 +192,7 @@ import org.objectweb.proactive.core.UniqueID;
                     public void run() {
                         dsiList = view.refresh();
                         UpdateDSISelectionSection(dsiComposite);
+                        enableSearchBox(true);
                     }
                 });
             }
@@ -394,13 +253,6 @@ import org.objectweb.proactive.core.UniqueID;
         return form;
     }
 
-    public ManagedForm getManagedForm() {
-        return managedForm;
-    }
-
-    public Text getSearchBox() {
-        return this.searchBox;
-    }
 
     public void enableSearchBox(boolean enable) {
         this.searchLabel.setEnabled(enable);
