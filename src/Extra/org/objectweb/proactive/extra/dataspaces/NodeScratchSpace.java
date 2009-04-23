@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.vfs.Capability;
+import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystem;
 import org.apache.commons.vfs.FileSystemException;
@@ -24,7 +25,7 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredExceptio
 // FIXME leave data or remove all directories?
 public class NodeScratchSpace {
 
-	private final ScratchSpaceConfiguration scratchConfiguration;
+	private final BaseScratchSpaceConfiguration baseScratchConfiguration;
 
 	private boolean configured = false;
 
@@ -39,16 +40,15 @@ public class NodeScratchSpace {
 
 		private final Map<String, DataSpacesURI> scratches = new HashMap<String, DataSpacesURI>();
 
-		private final long appId;
-
 		private final SpaceInstanceInfo spaceInstanceInfo;
 
-		private AppScratchSpaceImpl(long appid) throws FileSystemException, ConfigurationException {
-			final String appIdString = new Long(appid).toString();
+		private AppScratchSpaceImpl(long appId) throws FileSystemException, ConfigurationException {
+			final String appIdString = new Long(appId).toString();
 			this.fSpace = createEmptyDirectoryRelative(fPartialSpace, appIdString);
 			// or change it and use absolute configuration-created path
-			this.appId = appid;
-			this.spaceInstanceInfo = new SpaceInstanceInfo(appId, runtimeId, nodeId, scratchConfiguration);
+			this.spaceInstanceInfo = new SpaceInstanceInfo(appId, runtimeId, nodeId, baseScratchConfiguration
+					.createScratchSpaceConfiguration(runtimeId + FileName.SEPARATOR_CHAR + nodeId
+							+ FileName.SEPARATOR_CHAR + appId));
 		}
 
 		/*
@@ -74,7 +74,7 @@ public class NodeScratchSpace {
 
 			if (!scratches.containsKey(aoid)) {
 				createEmptyDirectoryRelative(fSpace, aoid);
-				uri = DataSpacesURI.createScratchSpaceURI(appId, runtimeId, nodeId, aoid);
+				uri = spaceInstanceInfo.getMountingPoint().withPath(aoid);
 				scratches.put(aoid, uri);
 			} else
 				uri = scratches.get(aoid);
@@ -96,8 +96,8 @@ public class NodeScratchSpace {
 
 	// TODO: here we use Node to get nodeId and runtimeId, and in
 	// AppScratchSpace we use just aoId; let's make it consistent;
-	public NodeScratchSpace(ScratchSpaceConfiguration conf) {
-		this.scratchConfiguration = conf;
+	public NodeScratchSpace(BaseScratchSpaceConfiguration conf) {
+		this.baseScratchConfiguration = conf;
 	}
 
 	// TODO check "other stuff" like os permitions in more explicit way?
@@ -118,10 +118,10 @@ public class NodeScratchSpace {
 		nodeId = Utils.getNodeId(node);
 		runtimeId = Utils.getRuntimeId(node);
 
-		final String localAccessUrl = Utils.getLocalAccessURL(scratchConfiguration.getUrl(),
-				scratchConfiguration.getPath(), scratchConfiguration.getHostname());
-		final String partialSpacePath = scratchConfiguration.appendBasePath(localAccessUrl, runtimeId,
-				nodeId, null);
+		final String localAccessUrl = Utils.getLocalAccessURL(baseScratchConfiguration.getUrl(),
+				baseScratchConfiguration.getPath(), Utils.getHostname());
+		final String subDir = runtimeId + FileName.SEPARATOR_CHAR + nodeId;
+		final String partialSpacePath = BaseScratchSpaceConfiguration.appendSubDir(localAccessUrl, subDir);
 
 		fPartialSpace = fileSystemManager.resolveFile(partialSpacePath);
 		checkCapabilities(fPartialSpace.getFileSystem());

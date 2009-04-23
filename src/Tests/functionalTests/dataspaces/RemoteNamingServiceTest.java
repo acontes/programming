@@ -65,16 +65,15 @@ public class RemoteNamingServiceTest {
 	public RemoteNamingServiceTest() throws ConfigurationException {
 		// super(1, 1);
 
-		InputOutputSpaceConfiguration configInput1 = InputOutputSpaceConfiguration.createInputSpaceConfiguration(
-				"http://hostA", "/tmp", "h1", "input1");
-		InputOutputSpaceConfiguration configInput2 = InputOutputSpaceConfiguration.createInputSpaceConfiguration(
-				"http://hostB", "/tmp", "h1", "input2");
-		InputOutputSpaceConfiguration configOutput1 = InputOutputSpaceConfiguration.createOutputSpaceConfiguration(
-				"http://hostC", "/tmp", "h1", "output1");
-		ScratchSpaceConfiguration configScratch = ScratchSpaceConfiguration.createConfiguration(
-				"http://hostD", "/tmp");
-		InputOutputSpaceConfiguration configOutput2 = InputOutputSpaceConfiguration.createOutputSpaceConfiguration(
-				"http://hostA", "/tmp", "h1", "output2");
+		InputOutputSpaceConfiguration configInput1 = InputOutputSpaceConfiguration
+				.createInputSpaceConfiguration("http://hostA", "/tmp", "h1", "input1");
+		InputOutputSpaceConfiguration configInput2 = InputOutputSpaceConfiguration
+				.createInputSpaceConfiguration("http://hostB", "/tmp", "h1", "input2");
+		InputOutputSpaceConfiguration configOutput1 = InputOutputSpaceConfiguration
+				.createOutputSpaceConfiguration("http://hostC", "/tmp", "h1", "output1");
+		ScratchSpaceConfiguration configScratch = new ScratchSpaceConfiguration("http://hostD", "/tmp", "h1");
+		InputOutputSpaceConfiguration configOutput2 = InputOutputSpaceConfiguration
+				.createOutputSpaceConfiguration("http://hostA", "/tmp", "h1", "output2");
 
 		spaceInstanceInput1 = new SpaceInstanceInfo(MAIN_APPID, configInput1);
 		spaceInstanceInput1b = new SpaceInstanceInfo(ANOTHER_APPID1, configInput1);

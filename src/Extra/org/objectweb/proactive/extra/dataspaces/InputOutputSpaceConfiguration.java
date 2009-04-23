@@ -5,6 +5,7 @@ package org.objectweb.proactive.extra.dataspaces;
 
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 
+//TODO javadocs
 public class InputOutputSpaceConfiguration extends SpaceConfiguration {
 	/**
 	 * This factory method is shorthand for
@@ -106,41 +107,24 @@ public class InputOutputSpaceConfiguration extends SpaceConfiguration {
 	 */
 	public static InputOutputSpaceConfiguration createConfiguration(String url, String path, String hostname,
 			String name, SpaceType type) throws ConfigurationException {
-		// FIXME: the same thing is checked in constructor... with different
-		// exception
-		if (type != SpaceType.INPUT && type != SpaceType.OUTPUT)
-			throw new IllegalArgumentException("Use input or output data space type");
-
 		return new InputOutputSpaceConfiguration(url, path, hostname, type, name);
 	}
 
-	protected final String hostname;
+	private final String name;
 
-	protected final String name;
-
-	protected final String url;
-
+	// FIXME IMO we shouldn't handle #{deployer} at this level; #{deployer}
+	// is very context-specific, it should be rather handled in
+	// deployment code on deployer side perhaps
+	// TODO: now, somebody may provide us input-output space configuration
+	// with no URL (meaning - start provider), specify valid local path and
+	// wrong hostname; may be we should have some factories for that
 	private InputOutputSpaceConfiguration(String url, String path, String hostname, SpaceType spaceType,
 			String name) throws ConfigurationException {
-
-		super(path, spaceType);
-		this.url = url;
-		this.hostname = hostname;
+		super(url, path, hostname, spaceType);
 		this.name = name;
-		boolean localDefined;
 
 		if (spaceType != SpaceType.INPUT && spaceType != SpaceType.OUTPUT)
-			throw new ConfigurationException("Invalid space type for InputOutputSpaceConfiguration");
-
-		if (path != null && hostname != null)
-			localDefined = true;
-		else if (path == null && hostname == null)
-			localDefined = false;
-		else
-			throw new ConfigurationException("Path and hostname must be specified together");
-
-		if (!localDefined && url == null)
-			throw new ConfigurationException("Provide local or remote access definition");
+			throw new IllegalArgumentException("Invalid space type for InputOutputSpaceConfiguration");
 
 		if (name == null)
 			throw new ConfigurationException("Name cannot be null");
@@ -148,15 +132,5 @@ public class InputOutputSpaceConfiguration extends SpaceConfiguration {
 
 	public String getName() {
 		return name;
-	}
-
-	@Override
-	public String getHostname() {
-		return hostname;
-	}
-
-	@Override
-	public String getUrl() {
-		return url;
 	}
 }

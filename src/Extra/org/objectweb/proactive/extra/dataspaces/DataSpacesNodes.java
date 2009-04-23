@@ -71,7 +71,7 @@ public class DataSpacesNodes {
 	 *             capabilities checking)
 	 * @see NodeConfigurator#configureNode(SpaceConfiguration, Node)
 	 */
-	public static void configureNode(Node node, ScratchSpaceConfiguration scratchConfiguration)
+	public static void configureNode(Node node, BaseScratchSpaceConfiguration scratchConfiguration)
 			throws AlreadyConfiguredException, FileSystemException, ConfigurationException {
 		final NodeConfigurator nodeConfig = getOrCreateNodeConfigurator(node);
 		try {

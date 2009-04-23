@@ -60,8 +60,7 @@ public abstract class SpacesDirectoryAbstractTest {
 				.createInputSpaceConfiguration("http://hostB", "/tmp", "h1", "input2");
 		InputOutputSpaceConfiguration configOutput1 = InputOutputSpaceConfiguration
 				.createOutputSpaceConfiguration("http://hostC", "/tmp", "h1", "output1");
-		ScratchSpaceConfiguration configScratch = ScratchSpaceConfiguration.createConfiguration(
-				"http://hostD", "/tmp");
+		ScratchSpaceConfiguration configScratch = new ScratchSpaceConfiguration("http://hostD", "/tmp", "h1");
 		InputOutputSpaceConfiguration configOutput2 = InputOutputSpaceConfiguration
 				.createOutputSpaceConfiguration("http://hostA", "/tmp", "h1", "output2");
 

@@ -40,19 +40,16 @@ public final class SpaceInstanceInfo implements Serializable {
 	 * @param nodeId
 	 *            node identifier
 	 * @param config
-	 *            scratch data space configuration
+	 *            scratch data space configuration; must be complete - with
+	 *            access URL specified
 	 * @throws ConfigurationException
 	 *             when provided information is not enough to build a complete
-	 *             space definition (no hostname for path etc.)
+	 *             space definition (no hostname for path, no URL etc.)
+	 * @see SpaceConfiguration#isComplete()
 	 */
 	public SpaceInstanceInfo(long appid, String runtimeId, String nodeId, ScratchSpaceConfiguration config)
 			throws ConfigurationException {
-
-		this.mountingPoint = DataSpacesURI.createScratchSpaceURI(appid, runtimeId, nodeId);
-		this.url = config.appendBasePath(config.getUrl(), runtimeId, nodeId, appid);
-		this.path = config.appendBasePath(config.getPath(), runtimeId, nodeId, appid);
-		this.hostname = config.getHostname();
-		check();
+		this(config, DataSpacesURI.createScratchSpaceURI(appid, runtimeId, nodeId));
 	}
 
 	/**
@@ -61,17 +58,29 @@ public final class SpaceInstanceInfo implements Serializable {
 	 * @param appid
 	 *            application identifier
 	 * @param config
-	 *            input or output data space configuration
+	 *            input or output data space configuration; must be complete -
+	 *            with access URL specified
 	 * @throws ConfigurationException
 	 *             when provided information is not enough to build a complete
-	 *             space definition (no hostname for path etc.)
+	 *             space definition (no hostname for path, no URL etc.)
+	 * @see SpaceConfiguration#isComplete()
 	 */
 	public SpaceInstanceInfo(long appid, InputOutputSpaceConfiguration config) throws ConfigurationException {
-		this.mountingPoint = DataSpacesURI.createInOutSpaceURI(appid, config.getType(), config.getName());
+		this(config, DataSpacesURI.createInOutSpaceURI(appid, config.getType(), config.getName()));
+	}
+
+	private SpaceInstanceInfo(final SpaceConfiguration config, final DataSpacesURI mountingPoint)
+			throws ConfigurationException {
+		if (!mountingPoint.isComplete())
+			throw new ConfigurationException("Constructed mounting point URI derived is not complete");
+		if (!config.isComplete())
+			throw new ConfigurationException(
+					"Space configuration is not complete, no remote access URL provided");
+
+		this.mountingPoint = mountingPoint;
 		this.url = config.getUrl();
 		this.hostname = config.getHostname();
 		this.path = config.getPath();
-		check();
 	}
 
 	/**
@@ -182,14 +191,5 @@ public final class SpaceInstanceInfo implements Serializable {
 		} else if (!path.equals(other.path))
 			return false;
 		return true;
-	}
-
-	private void check() throws ConfigurationException {
-		if (!mountingPoint.isComplete())
-			throw new ConfigurationException("Constructed mounting point URI must be complete");
-		if (url == null)
-			throw new ConfigurationException("No remote access URL provided");
-		if (path != null && hostname == null)
-			throw new ConfigurationException("Local path provided without hostname specified");
 	}
 }

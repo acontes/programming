@@ -71,7 +71,7 @@ public class NodeConfigurator {
 	 *             something failed during node scratch space configuration (ex.
 	 *             capabilities checking)
 	 */
-	synchronized public void configureNode(ScratchSpaceConfiguration scratchConfiguration, Node node)
+	synchronized public void configureNode(BaseScratchSpaceConfiguration scratchConfiguration, Node node)
 			throws AlreadyConfiguredException, FileSystemException, ConfigurationException {
 		checkNotConfigured();
 
