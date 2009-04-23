@@ -126,10 +126,8 @@ public class DataSpacesNodes {
 	 *            node to be deconfigured for Data Spaces
 	 * @throws NotConfiguredException
 	 *             when node has not been configured yet
-	 * @throws FileSystemException
-	 *             VFS related exception during scratch data space cleaning
 	 */
-	public static void closeNodeConfig(Node node) throws NotConfiguredException, FileSystemException {
+	public static void closeNodeConfig(Node node) throws NotConfiguredException {
 		final NodeConfigurator nodeConfig = getOrFailNodeConfigurator(node);
 		nodeConfig.close();
 	}
@@ -144,11 +142,8 @@ public class DataSpacesNodes {
 	 *            node to be deconfigured for Data Spaces application
 	 * @throws NotConfiguredException
 	 *             when node has not been configured yet for an application
-	 * @throws FileSystemException
-	 *             VFS related exception during scratch data space cleaning
 	 */
-	public static void closeNodeApplicationConfig(Node node) throws NotConfiguredException,
-			FileSystemException {
+	public static void closeNodeApplicationConfig(Node node) throws NotConfiguredException {
 		final NodeConfigurator nodeConfig = getOrFailNodeConfigurator(node);
 		nodeConfig.tryCloseAppConfigurator();
 	}

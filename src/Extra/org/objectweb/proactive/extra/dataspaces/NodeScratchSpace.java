@@ -27,10 +27,6 @@ public class NodeScratchSpace {
 
 	private final ScratchSpaceConfiguration scratchConfiguration;
 
-	private final DefaultFileSystemManager fileSystemManager;
-
-	private final Node node;
-
 	private boolean configured = false;
 
 	private FileObject fPartialSpace;
@@ -101,25 +97,21 @@ public class NodeScratchSpace {
 
 	// TODO: here we use Node to get nodeId and runtimeId, and in
 	// AppScratchSpace we use just aoId; let's make it consistent;
-	public NodeScratchSpace(ScratchSpaceConfiguration conf, DefaultFileSystemManager manager, Node node) {
+	public NodeScratchSpace(ScratchSpaceConfiguration conf) {
 		this.scratchConfiguration = conf;
-		this.fileSystemManager = manager;
-		this.node = node;
 	}
 
-	// TODO check "other stuff" like os permitions in more explicit way? Cleanup
-	// after failing back?
+	// TODO check "other stuff" like os permitions in more explicit way?
 	/**
-	 * @throws ConfigurationException
-	 * @throws FileSystemException
 	 * @throws AlreadyConfiguredException
+	 *             when instance has been already configured
+	 * @throws FileSystemException
+	 *             occurred during VFS operation
 	 * @throws ConfigurationException
 	 *             when checking FS capabilities
 	 */
-	// TODO: hmm maybe we should be consistent with NodeConfigurator about
-	// passing arguments in init() ?
-	public synchronized void init() throws FileSystemException, AlreadyConfiguredException,
-			ConfigurationException {
+	public synchronized void init(DefaultFileSystemManager fileSystemManager, Node node)
+			throws AlreadyConfiguredException, FileSystemException, ConfigurationException {
 
 		if (configured)
 			throw new AlreadyConfiguredException();

@@ -56,6 +56,8 @@ public class NodeConfigurator {
 	 * 
 	 * Scratch space configuration is checked and initialized.
 	 * 
+	 * State of an instance remains not configured as exception appears.
+	 *
 	 * @param scratchConfiguration
 	 *            scratch data space configuration, may be null if node does not
 	 *            provide scratch
@@ -70,7 +72,6 @@ public class NodeConfigurator {
 	 *             something failed during node scratch space configuration (ex.
 	 *             capabilities checking)
 	 */
-	// FIXME what is the state of configurator after all these exceptions
 	synchronized public void configureNode(ScratchSpaceConfiguration scratchConfiguration, Node node)
 			throws AlreadyConfiguredException, FileSystemException, ConfigurationException {
 		checkNotConfigured();
@@ -78,8 +79,8 @@ public class NodeConfigurator {
 		manager = VFSFactory.createDefaultFileSystemManager();
 
 		if (scratchConfiguration != null) {
-			nodeScratchSpace = new NodeScratchSpace(scratchConfiguration, manager, node);
-			nodeScratchSpace.init();
+			nodeScratchSpace = new NodeScratchSpace(scratchConfiguration);
+			nodeScratchSpace.init(manager, node);
 		}
 		configured = true;
 	}
@@ -92,6 +93,9 @@ public class NodeConfigurator {
 	 * {@link #configureNode(SpaceConfiguration, Node)}. Subsequent calls will
 	 * close existing application-specific configuration and create a new one.
 	 * 
+	 * If configuration fails any subsequent {@link #getDataSpaceImpl()} call
+	 * will throw {@link NotConfiguredException} until successful configuration.
+	 *
 	 * @param appid
 	 *            application id
 	 * @param namingServiceURL
@@ -99,19 +103,19 @@ public class NodeConfigurator {
 	 * @throws URISyntaxException
 	 *             when exception occurred on namingServiceURL parsing
 	 * @throws ProActiveException
-	 *             occurred during contacting with NamingService
+	 *             occurred during contacting the NamingService
 	 * @throws FileSystemException
 	 *             VFS related exception during scratch space creation
 	 */
-	// FIXME what is the state of configurator after all these exceptions
 	synchronized public void configureApplication(long appid, String namingServiceURL)
-			throws ProActiveException, URISyntaxException, FileSystemException {
+			throws FileSystemException, ProActiveException, URISyntaxException {
 		checkConfigured();
 		tryCloseAppConfigurator();
 
-		appConfigurator = new NodeApplicationConfigurator();
+		NodeApplicationConfigurator conf = new NodeApplicationConfigurator();
 		try {
 			appConfigurator.configureApplication(appid, namingServiceURL, manager, nodeScratchSpace);
+			appConfigurator = conf;
 		} catch (AlreadyConfiguredException e) {
 			// can't happen for our usage
 			throw new RuntimeException(e);
@@ -119,7 +123,8 @@ public class NodeConfigurator {
 	}
 
 	/**
-	 * Returns Data Spaces implementation for application, if it is configured.
+	 * Returns Data Spaces implementation for application, if it has been
+	 * successfully configured.
 	 * 
 	 * @return configured implementation of Data Spaces for application
 	 * @throws NotConfiguredException
@@ -136,20 +141,21 @@ public class NodeConfigurator {
 	 * Closes all resources opened by this configurator, also possibly created
 	 * application configuration.
 	 * 
-	 * More than one call of this method may result in undefined behavior.
-	 * 
-	 * @throws NotConfiguredException
-	 *             when node has not been configured yet.
-	 * @throws FileSystemException
-	 *             VFS related exception during scratch space cleaning
+	 * More than one call of this method may result in undefined behavior. Any
+	 * subsequent call to node configuration-specific objects may be undefined.
 	 */
-	// FIXME try to clean up as much as possible or even just log exceptions(?)
-	// FIXME what is the state of configurator after all these exceptions
-	synchronized public void close() throws NotConfiguredException, FileSystemException {
-		checkConfigured();
+	synchronized public void close() {
 		tryCloseAppConfigurator();
-		if (nodeScratchSpace != null) {
-			nodeScratchSpace.close();
+
+		try {
+			if (nodeScratchSpace != null) {
+				nodeScratchSpace.close();
+			}
+		} catch (NotConfiguredException e) {
+			// can't happen for our usage
+			// TODO log or throw
+		} catch (FileSystemException e) {
+			// TODO log or throw
 		}
 		manager.close();
 	}
@@ -158,22 +164,25 @@ public class NodeConfigurator {
 	 * Closes application-specific configuration when needed (there is one
 	 * opened).
 	 * 
-	 * If no application is configured, it does nothing.
+	 * If no application is configured, it does nothing. If closing fails,
+	 * application-specific configuration will be silently deleted.
 	 *
 	 * @throws FileSystemException
 	 *             VFS related exception during scratch space cleaning
 	 */
-	// FIXME try to clean up as much as possible or even just log exceptions(?)
-	// FIXME what is the state of configurator after all these exceptions
-	public synchronized void tryCloseAppConfigurator() throws FileSystemException {
+	public synchronized void tryCloseAppConfigurator() {
 		if (appConfigurator != null) {
 			try {
 				appConfigurator.close();
 			} catch (NotConfiguredException e) {
 				// can't happen for our usage
+				// TODO log or throw
 				throw new RuntimeException(e);
+			} catch (FileSystemException e) {
+				// TODO log
+			} finally {
+				appConfigurator = null;
 			}
-			appConfigurator = null;
 		}
 	}
 
