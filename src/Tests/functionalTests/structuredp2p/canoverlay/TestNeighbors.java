@@ -11,7 +11,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.structuredp2p.core.OverlayType;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.message.CanMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.response.CanResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.message.response.CanLookupResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.util.Deployment;
 
 
@@ -42,9 +42,9 @@ public class TestNeighbors {
         CanMessage msgToEntryPoint = new CanMessage(this.entryPoint.getCoordinates());
         CanMessage msgToNeighbor = new CanMessage(this.neighbor.getCoordinates());
 
-        Assert.assertEquals(((CanResponseMessage) this.neighbor.sendMessageTo(msgToEntryPoint)).getPeer(),
+        Assert.assertEquals(((CanLookupResponseMessage) this.neighbor.sendMessageTo(msgToEntryPoint)).getPeer(),
                 this.entryPoint);
-        Assert.assertEquals(((CanResponseMessage) this.entryPoint.sendMessageTo(msgToNeighbor)).getPeer(),
+        Assert.assertEquals(((CanLookupResponseMessage) this.entryPoint.sendMessageTo(msgToNeighbor)).getPeer(),
                 this.neighbor);
 
         // TODO tests with split !

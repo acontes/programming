@@ -15,20 +15,20 @@ import org.objectweb.proactive.extensions.structuredp2p.message.Key;
  * @version 0.1
  */
 @SuppressWarnings("serial")
-public class CanResponseMessage extends LookupResponseMessage {
+public class CanLookupResponseMessage extends LookupResponseMessage {
 
     /**
      * 
      * @param peer
      */
-    public CanResponseMessage(Peer peer, Coordinate[] coordinates) {
+    public CanLookupResponseMessage(Peer peer, Coordinate[] coordinates) {
         super(new Key<Coordinate[]>(coordinates), peer);
     }
 
     /**
      * FIXME
      */
-    public CanResponseMessage() {
+    public CanLookupResponseMessage() {
         super(true);
     }
 

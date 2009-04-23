@@ -2,7 +2,7 @@ package org.objectweb.proactive.extensions.structuredp2p.message;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.Coordinate;
 import org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay;
-import org.objectweb.proactive.extensions.structuredp2p.message.response.CanResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.message.response.CanLookupResponseMessage;
 
 
 /**
@@ -44,7 +44,7 @@ public class CanLookupMessage extends LookupMessage {
      * @return a CanResponseMessage for routing.
      */
     @Override
-    public CanResponseMessage handle(StructuredOverlay overlay) {
+    public CanLookupResponseMessage handle(StructuredOverlay overlay) {
         return overlay.handleCanMessage(this);
     }
 
