@@ -1,7 +1,9 @@
 package org.objectweb.proactive.ic2d.debug.dsi.views;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -35,6 +37,7 @@ public class CommunicationGraphView extends ViewPart implements IZoomableWorkben
     public static final String ID = "org.objectweb.proactive.ic2d.debug.dsi.views.CommunicationGraphView";
 
     private Map<String, GraphNode> nodes = new HashMap<String, GraphNode>();
+    private Map<String, List<GraphNode>> dsiNodes = new HashMap<String, List<GraphNode>>();
     private Graph g = null;
 
     private FormToolkit toolKit = null;
@@ -43,10 +46,8 @@ public class CommunicationGraphView extends ViewPart implements IZoomableWorkben
     private GraphViewer viewer;
     private VisualizationForm visualizationForm;
 
-    private Color colors[] = { new Color(Display.getDefault(), 216, 228, 248),
+    private Color colors[] = { 
             new Color(Display.getDefault(), 1, 70, 122), new Color(Display.getDefault(), 139, 150, 171),
-            new Color(Display.getDefault(), 213, 243, 255), new Color(Display.getDefault(), 255, 255, 206),
-            new Color(Display.getDefault(), 128, 128, 128), new Color(Display.getDefault(), 220, 220, 220),
             new Color(Display.getDefault(), 0, 0, 0), new Color(Display.getDefault(), 255, 0, 0),
             new Color(Display.getDefault(), 127, 0, 0), new Color(Display.getDefault(), 255, 196, 0),
             new Color(Display.getDefault(), 255, 255, 0), new Color(Display.getDefault(), 0, 255, 0),
@@ -84,6 +85,18 @@ public class CommunicationGraphView extends ViewPart implements IZoomableWorkben
 
     }
 
+    private void createNode(UniqueID id, UniqueID dsi) {
+        String name = NamesFactory.getInstance().associateName(id, "AO");
+        GraphNode n = new GraphNode(g, SWT.NONE, name);
+        List<GraphNode> gn = dsiNodes.get(dsi.shortString());
+        if(gn == null){
+            gn = new ArrayList<GraphNode>();
+        }       
+        gn.add(n);
+        dsiNodes.put(dsi.shortString(),gn);
+        nodes.put(id.shortString() + dsi.shortString(), n);
+    }
+
     public Set<UniqueID> refresh(){
         Random rand = new Random();
         Map<UniqueID, Set<RequestDSI>> dsi = DSIHandler.getInstance().getDSI();
@@ -108,7 +121,7 @@ public class CommunicationGraphView extends ViewPart implements IZoomableWorkben
                 connection.setLineColor(color);
                 connection.setLineWidth(2);
                 connection.setData(Boolean.FALSE);
-                connection.setText(e.getKey().shortString());
+                connection.setText(r.getMethodName());
             }
         }
         //g.setLayoutAlgorithm(new TreeLayoutAlgorithm(LayoutStyles.NO_LAYOUT_NODE_RESIZING), true);        
@@ -117,11 +130,16 @@ public class CommunicationGraphView extends ViewPart implements IZoomableWorkben
         return dsi.keySet();
     }
 
-    private void createNode(UniqueID id, UniqueID dsi) {
-        String name = NamesFactory.getInstance().associateName(id, "AO");
-        GraphNode n = new GraphNode(g, SWT.NONE, name);
-        nodes.put(id.shortString() + dsi.shortString(), n);
+    public void highlightDSI(String dsiID, boolean active){
+        List<GraphNode> ns = dsiNodes.get(dsiID); 
+        for(GraphNode n : ns){
+            if(active)
+                n.highlight();
+            else
+                n.unhighlight();
+        }
     }
+    
 
     public AbstractZoomableViewer getZoomableViewer() {
         // TODO Auto-generated method stub

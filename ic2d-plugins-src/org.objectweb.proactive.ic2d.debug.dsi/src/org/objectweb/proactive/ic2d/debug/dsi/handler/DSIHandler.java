@@ -77,7 +77,7 @@ public class DSIHandler implements Serializable {
                     if (res.get(dsi) == null) {
                         res.put(dsi, new HashSet<RequestDSI>());
                     }
-                    res.get(dsi).add(new RequestDSI(m.sender, m.destinator));
+                    res.get(dsi).add(new RequestDSI(m.sender, m.destinator,m.method));
                 }
             }
         }

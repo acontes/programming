@@ -20,6 +20,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
@@ -84,11 +85,11 @@ import org.objectweb.proactive.core.UniqueID;
     //	private String currentPathAnalysis = null;
     private SashForm sash;
     private Text searchBox;
-//    private ToolItem cancelIcon;
+    //    private ToolItem cancelIcon;
     private Label searchLabel;
 
     private Set<UniqueID> dsiList;
-    
+
     /**
      * Creates the form.
      * 
@@ -134,31 +135,31 @@ import org.objectweb.proactive.core.UniqueID;
         GridData data = new GridData();
         data.widthHint = 300;
         searchBox.setLayoutData(data);
-//        ToolBar cancelBar = new ToolBar(headClient, SWT.FLAT );
+        //        ToolBar cancelBar = new ToolBar(headClient, SWT.FLAT );
 
-//        cancelIcon = new ToolItem(cancelBar, SWT.NONE);
-//        cancelIcon.addSelectionListener(new SelectionAdapter() {
-//            public void widgetSelected(SelectionEvent e) {
-//                searchBox.setText("");
-//            }
-//        });
-//        cancelIcon.setImage(Activator.getDefault().getImageRegistry().get(Activator.SEARCH_CANCEL));
+        //        cancelIcon = new ToolItem(cancelBar, SWT.NONE);
+        //        cancelIcon.addSelectionListener(new SelectionAdapter() {
+        //            public void widgetSelected(SelectionEvent e) {
+        //                searchBox.setText("");
+        //            }
+        //        });
+        //        cancelIcon.setImage(Activator.getDefault().getImageRegistry().get(Activator.SEARCH_CANCEL));
         toolkit.paintBordersFor(headClient);
         form.setHeadClient(headClient);
-//        searchBox.addModifyListener(new ModifyListener() {
-//
-//            public void modifyText(ModifyEvent e) {
-//                if (searchBox.getText().length() > 0) {
-//                    cancelIcon.setEnabled(true);
-//                } else {
-//                    cancelIcon.setEnabled(false);
-//                }
-//            }
-//        });
-//        cancelIcon.setEnabled(false);
+        //        searchBox.addModifyListener(new ModifyListener() {
+        //
+        //            public void modifyText(ModifyEvent e) {
+        //                if (searchBox.getText().length() > 0) {
+        //                    cancelIcon.setEnabled(true);
+        //                } else {
+        //                    cancelIcon.setEnabled(false);
+        //                }
+        //            }
+        //        });
+        //        cancelIcon.setEnabled(false);
 
         form.setText(Services_Flow);
-//        form.setImage(Activator.getDefault().getImageRegistry().get(Activator.REQ_PLUGIN_OBJ));
+        //        form.setImage(Activator.getDefault().getImageRegistry().get(Activator.REQ_PLUGIN_OBJ));
         enableSearchBox(true);
 
         // Add a hyperlink listener for the messages
@@ -310,10 +311,10 @@ import org.objectweb.proactive.core.UniqueID;
      * @param parent
      */
     private void createControlsSection(Composite parent) {
-        
+
         SashForm sash = new SashForm(parent, SWT.VERTICAL);
         this.toolkit.paintBordersFor(parent);
-        
+
         Section controls = this.toolkit.createSection(sash, Section.TITLE_BAR | Section.EXPANDED);
         final Composite dsiComposite = CreateDSISelectionSection(sash);
 
@@ -329,8 +330,12 @@ import org.objectweb.proactive.core.UniqueID;
         refreshView.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
         refreshView.addSelectionListener(new SelectionAdapter() {
             public void widgetSelected(SelectionEvent e) {
-                dsiList = view.refresh();
-                UpdateDSISelectionSection(dsiComposite);
+                Display.getDefault().asyncExec(new Runnable() {
+                    public void run() {
+                        dsiList = view.refresh();
+                        UpdateDSISelectionSection(dsiComposite);
+                    }
+                });
             }
         });
         sash.setWeights(new int[] { 1, 12 });
@@ -346,21 +351,29 @@ import org.objectweb.proactive.core.UniqueID;
                 return new Point(0, 0);
             }
         };
-        
+
         this.toolkit.adapt(dsiSelectComposite);
         dsiSelectComposite.setLayout(new GridLayout());
-        
+
         dsiSelect.setClient(dsiSelectComposite);
         return dsiSelectComposite;
     }
-    
+
     private void UpdateDSISelectionSection(Composite parent){
         for (Control c : parent.getChildren()){
             c.dispose();
         }
         for(UniqueID dsi : dsiList){
-            Button b = this.toolkit.createButton(parent, dsi.shortString(), SWT.CHECK);
+            final Button b = this.toolkit.createButton(parent, dsi.shortString(), SWT.CHECK);
             b.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
+            b.addSelectionListener(new SelectionAdapter() {
+                private boolean highlighted = false;
+                
+                public void widgetSelected(SelectionEvent e) {
+                    highlighted = !highlighted;
+                    view.highlightDSI(b.getText(),highlighted);
+                }
+            });
         }
         parent.layout(true);
     }

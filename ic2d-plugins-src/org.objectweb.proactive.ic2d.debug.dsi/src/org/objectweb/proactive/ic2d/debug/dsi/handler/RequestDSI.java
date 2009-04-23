@@ -7,10 +7,12 @@ public class RequestDSI {
 
     private UniqueID sender;
     private UniqueID destinator;
+    private String  methodName;
     
-    public RequestDSI(UniqueID sender, UniqueID destinator) {
+    public RequestDSI(UniqueID sender, UniqueID destinator,String methodName) {
         this.sender = sender;
         this.destinator = destinator;
+        this.methodName = methodName;
     }
 
     public UniqueID getSender() {
@@ -21,5 +23,8 @@ public class RequestDSI {
         return destinator;
     }
 
+    public String getMethodName() {
+        return methodName;
+    }
     
 }
