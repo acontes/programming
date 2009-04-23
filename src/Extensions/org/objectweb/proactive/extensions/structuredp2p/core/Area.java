@@ -1,5 +1,8 @@
 package org.objectweb.proactive.extensions.structuredp2p.core;
 
+import org.objectweb.proactive.extensions.structuredp2p.core.exception.AreaException;
+
+
 /**
  * An area indicates the space which is managed by a peer. The minimum coordinates are the left
  * higher corner. The maximum coordinates are the corner lower right.
@@ -52,4 +55,64 @@ public class Area {
         return this.coodinatesMax;
     }
 
+    /**
+     * Returns the minimum coordinates at a specified dimension that indicates the area which is
+     * managed by a peer.
+     * 
+     * @param dimension
+     * @return the minimum coordinates at the specified dimension that indicates the area which is
+     *         managed by a peer.
+     */
+    public Coordinate getCoordinatesMin(int dimension) {
+        return this.coordinatesMin[dimension];
+    }
+
+    /**
+     * Returns the maximum coordinates at a specified dimension that indicates the area which is
+     * managed by a peer.
+     * 
+     * @param dimension
+     * @return the maximum coordinates at a specified dimension that indicates the area which is
+     *         managed by a peer.
+     */
+    public Coordinate getCoordinatesMax(int dimension) {
+        return this.coodinatesMax[dimension];
+    }
+
+    /**
+     * Search if the area in argument is bordered to the current area.
+     * 
+     * @param area
+     * @return the dimension in which they are bordered, <code>-1</code> if they aren't.
+     */
+    public int isBorder(Area area) {
+        int i;
+        int nbDim = this.coodinatesMax.length;
+
+        for (i = 0; i < nbDim; i++) {
+            if (this.getCoordinatesMax(i) == area.getCoordinatesMin(i) ||
+                this.getCoordinatesMin(i) == area.getCoordinatesMax(i))
+                return i;
+        }
+
+        return -1;
+    }
+
+    /**
+     * Merge two bordered areas.
+     * 
+     * @param a1
+     *            first area
+     * @param a2
+     *            second area
+     * @return the merged area
+     */
+    public static Area mergeAreas(Area a1, Area a2) {
+        int border = a1.isBorder(a2);
+
+        if (border == -1)
+            throw new AreaException("Areas are not bordered.");
+
+        return new Area();
+    }
 }
