@@ -12,12 +12,11 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.extra.dataspaces.DataSpacesURI;
-import org.objectweb.proactive.extra.dataspaces.SpaceConfiguration;
+import org.objectweb.proactive.extra.dataspaces.InputOutputSpaceConfiguration;
+import org.objectweb.proactive.extra.dataspaces.ScratchSpaceConfiguration;
 import org.objectweb.proactive.extra.dataspaces.SpaceInstanceInfo;
 import org.objectweb.proactive.extra.dataspaces.SpaceType;
 import org.objectweb.proactive.extra.dataspaces.SpacesDirectory;
-import org.objectweb.proactive.extra.dataspaces.SpaceConfiguration.InputOutputSpaceConfiguration;
-import org.objectweb.proactive.extra.dataspaces.SpaceConfiguration.ScratchSpaceConfiguration;
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceAlreadyRegisteredException;
 
 /**
@@ -55,16 +54,16 @@ public abstract class SpacesDirectoryAbstractTest {
 
 		dir = getSource();
 
-		InputOutputSpaceConfiguration configInput1 = SpaceConfiguration.createInputSpaceConfiguration(
-				"http://hostA", "/tmp", "h1", "input1");
-		InputOutputSpaceConfiguration configInput2 = SpaceConfiguration.createInputSpaceConfiguration(
-				"http://hostB", "/tmp", "h1", "input2");
-		InputOutputSpaceConfiguration configOutput1 = SpaceConfiguration.createOutputSpaceConfiguration(
-				"http://hostC", "/tmp", "h1", "output1");
-		ScratchSpaceConfiguration configScratch = SpaceConfiguration.createScratchSpaceConfiguration(
+		InputOutputSpaceConfiguration configInput1 = InputOutputSpaceConfiguration
+				.createInputSpaceConfiguration("http://hostA", "/tmp", "h1", "input1");
+		InputOutputSpaceConfiguration configInput2 = InputOutputSpaceConfiguration
+				.createInputSpaceConfiguration("http://hostB", "/tmp", "h1", "input2");
+		InputOutputSpaceConfiguration configOutput1 = InputOutputSpaceConfiguration
+				.createOutputSpaceConfiguration("http://hostC", "/tmp", "h1", "output1");
+		ScratchSpaceConfiguration configScratch = ScratchSpaceConfiguration.createConfiguration(
 				"http://hostD", "/tmp");
-		InputOutputSpaceConfiguration configOutput2 = SpaceConfiguration.createOutputSpaceConfiguration(
-				"http://hostA", "/tmp", "h1", "output2");
+		InputOutputSpaceConfiguration configOutput2 = InputOutputSpaceConfiguration
+				.createOutputSpaceConfiguration("http://hostA", "/tmp", "h1", "output2");
 
 		spaceInstanceInput1 = new SpaceInstanceInfo(MAIN_APPID, configInput1);
 		spaceInstanceInput1b = new SpaceInstanceInfo(ANOTHER_APPID1, configInput1);

@@ -18,12 +18,11 @@ import org.objectweb.proactive.api.PARemoteObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.extra.dataspaces.DataSpacesURI;
+import org.objectweb.proactive.extra.dataspaces.InputOutputSpaceConfiguration;
 import org.objectweb.proactive.extra.dataspaces.NamingService;
-import org.objectweb.proactive.extra.dataspaces.SpaceConfiguration;
+import org.objectweb.proactive.extra.dataspaces.ScratchSpaceConfiguration;
 import org.objectweb.proactive.extra.dataspaces.SpaceInstanceInfo;
 import org.objectweb.proactive.extra.dataspaces.Utils;
-import org.objectweb.proactive.extra.dataspaces.SpaceConfiguration.InputOutputSpaceConfiguration;
-import org.objectweb.proactive.extra.dataspaces.SpaceConfiguration.ScratchSpaceConfiguration;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ApplicationAlreadyRegisteredException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceAlreadyRegisteredException;
@@ -66,15 +65,15 @@ public class RemoteNamingServiceTest {
 	public RemoteNamingServiceTest() throws ConfigurationException {
 		// super(1, 1);
 
-		InputOutputSpaceConfiguration configInput1 = SpaceConfiguration.createInputSpaceConfiguration(
+		InputOutputSpaceConfiguration configInput1 = InputOutputSpaceConfiguration.createInputSpaceConfiguration(
 				"http://hostA", "/tmp", "h1", "input1");
-		InputOutputSpaceConfiguration configInput2 = SpaceConfiguration.createInputSpaceConfiguration(
+		InputOutputSpaceConfiguration configInput2 = InputOutputSpaceConfiguration.createInputSpaceConfiguration(
 				"http://hostB", "/tmp", "h1", "input2");
-		InputOutputSpaceConfiguration configOutput1 = SpaceConfiguration.createOutputSpaceConfiguration(
+		InputOutputSpaceConfiguration configOutput1 = InputOutputSpaceConfiguration.createOutputSpaceConfiguration(
 				"http://hostC", "/tmp", "h1", "output1");
-		ScratchSpaceConfiguration configScratch = SpaceConfiguration.createScratchSpaceConfiguration(
+		ScratchSpaceConfiguration configScratch = ScratchSpaceConfiguration.createConfiguration(
 				"http://hostD", "/tmp");
-		InputOutputSpaceConfiguration configOutput2 = SpaceConfiguration.createOutputSpaceConfiguration(
+		InputOutputSpaceConfiguration configOutput2 = InputOutputSpaceConfiguration.createOutputSpaceConfiguration(
 				"http://hostA", "/tmp", "h1", "output2");
 
 		spaceInstanceInput1 = new SpaceInstanceInfo(MAIN_APPID, configInput1);

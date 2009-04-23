@@ -5,8 +5,6 @@ package org.objectweb.proactive.extra.dataspaces;
 
 import java.io.Serializable;
 
-import org.objectweb.proactive.extra.dataspaces.SpaceConfiguration.InputOutputSpaceConfiguration;
-import org.objectweb.proactive.extra.dataspaces.SpaceConfiguration.ScratchSpaceConfiguration;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 
 /**

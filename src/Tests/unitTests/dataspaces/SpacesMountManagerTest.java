@@ -19,13 +19,12 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.extra.dataspaces.DataSpacesURI;
-import org.objectweb.proactive.extra.dataspaces.SpaceConfiguration;
+import org.objectweb.proactive.extra.dataspaces.InputOutputSpaceConfiguration;
 import org.objectweb.proactive.extra.dataspaces.SpaceInstanceInfo;
 import org.objectweb.proactive.extra.dataspaces.SpacesDirectory;
 import org.objectweb.proactive.extra.dataspaces.SpacesDirectoryImpl;
 import org.objectweb.proactive.extra.dataspaces.SpacesMountManager;
 import org.objectweb.proactive.extra.dataspaces.VFSFactory;
-import org.objectweb.proactive.extra.dataspaces.SpaceConfiguration.InputOutputSpaceConfiguration;
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundException;
 
 /**
@@ -54,8 +53,8 @@ public class SpacesMountManagerTest {
 		osw.close();
 
 		final String spaceUrl = "file:///" + spaceDir.getCanonicalPath().replaceFirst("^/", "");
-		final InputOutputSpaceConfiguration spaceConf = SpaceConfiguration.createInputSpaceConfiguration(
-				spaceUrl, null, null, "some_name");
+		final InputOutputSpaceConfiguration spaceConf = InputOutputSpaceConfiguration
+				.createInputSpaceConfiguration(spaceUrl, null, null, "some_name");
 		final SpaceInstanceInfo spaceInfo = new SpaceInstanceInfo(123, spaceConf);
 		spaceUri = spaceInfo.getMountingPoint();
 

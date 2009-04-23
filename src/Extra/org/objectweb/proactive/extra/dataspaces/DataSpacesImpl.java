@@ -13,7 +13,6 @@ import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
-import org.objectweb.proactive.extra.dataspaces.SpaceConfiguration.InputOutputSpaceConfiguration;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredException;
@@ -304,7 +303,7 @@ public class DataSpacesImpl {
 			name = DataSpacesURI.DEFAULT_IN_OUT_NAME;
 
 		final String hostname = Utils.getHostname();
-		final InputOutputSpaceConfiguration config = SpaceConfiguration.createInputOutputSpaceConfiguration(
+		final InputOutputSpaceConfiguration config = InputOutputSpaceConfiguration.createConfiguration(
 				url, path, hostname, name, type);
 
 		// FIXME add configuration checking/initialization ?
