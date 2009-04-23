@@ -89,4 +89,13 @@ public abstract class StructuredOverlay {
     public LoadBalancingResponseMessage handleLoadBalancingMessage(LoadBalancingMessage msg) {
         return null;
     }
+
+    /**
+     * Returns the current peer.
+     * 
+     * @return the peer.
+     */
+    public Peer getPeer() {
+        return this.peer;
+    }
 }

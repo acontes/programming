@@ -114,6 +114,7 @@ public class Area {
         if (border == -1)
             throw new AreaException("Areas are not bordered.");
 
+        // TODO how to split ??
         return new Area(null, null);
     }
 

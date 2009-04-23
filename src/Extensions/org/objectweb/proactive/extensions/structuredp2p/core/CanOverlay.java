@@ -162,6 +162,9 @@ public class CanOverlay extends StructuredOverlay {
      */
     @Override
     public void join(Peer peer) {
+        int dim = this.getRandomDimension();
+        this.addNeighbor(peer, dim, 1);
+        ((CanOverlay) peer.getStructuredOverlay()).addNeighbor(this.getPeer(), dim, 0);
     }
 
     /**
@@ -208,33 +211,6 @@ public class CanOverlay extends StructuredOverlay {
     }
 
     /**
-     * FIXME
-     * 
-     * @param peer
-     * @return
-     */
-    public boolean hasNeighbor(Peer peer) {
-        for (Group<Peer>[] neighborsAxe : this.neighbors) {
-            for (Group<Peer> neighbor : neighborsAxe) {
-                if (neighbor.contains(peer)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * FIXME
-     * 
-     * @return
-     */
-    public Area getArea() {
-        return this.area;
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
@@ -248,6 +224,15 @@ public class CanOverlay extends StructuredOverlay {
     @Override
     public void update() {
         // TODO Auto-generated method stub
+    }
+
+    /**
+     * FIXME
+     * 
+     * @return
+     */
+    public Area getArea() {
+        return this.area;
     }
 
     /**
@@ -267,6 +252,38 @@ public class CanOverlay extends StructuredOverlay {
      */
     public Group<Peer>[][] getNeighbors() {
         return this.neighbors;
+    }
+
+    /**
+     * Add a new neighbor with a dimension and an order.
+     * 
+     * @param peer
+     *            the new neighbor.
+     * @param dimension
+     *            the dimension.
+     * @param order
+     *            the order.
+     */
+    public void addNeighbor(Peer peer, int dimension, int order) {
+        this.neighbors[dimension][order].add(peer);
+    }
+
+    /**
+     * FIXME
+     * 
+     * @param peer
+     * @return
+     */
+    public boolean hasNeighbor(Peer peer) {
+        for (Group<Peer>[] neighborsAxe : this.neighbors) {
+            for (Group<Peer> neighbor : neighborsAxe) {
+                if (neighbor.contains(peer)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     @Override

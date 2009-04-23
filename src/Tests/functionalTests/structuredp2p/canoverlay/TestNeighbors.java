@@ -13,7 +13,6 @@ import org.objectweb.proactive.extensions.structuredp2p.core.OverlayType;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.message.CanLookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.CanLookupResponseMessage;
-import org.objectweb.proactive.extensions.structuredp2p.util.Deployment;
 
 
 public class TestNeighbors {
@@ -25,7 +24,7 @@ public class TestNeighbors {
         this.entryPoint = (Peer) PAActiveObject.newActive(Peer.class.getName(),
                 new Object[] { OverlayType.CAN });
         this.neighbor = (Peer) PAActiveObject.newActive(Peer.class.getName(),
-                new Object[] { OverlayType.CAN }, Deployment.getVirtualNode("StructuredP2P").getANode());
+                new Object[] { OverlayType.CAN });
     }
 
     @Test
@@ -86,7 +85,6 @@ public class TestNeighbors {
     public void stopTest() {
         PAActiveObject.terminateActiveObject(this.neighbor, true);
         PAActiveObject.terminateActiveObject(this.entryPoint, true);
-        Deployment.kill();
     }
 
 }
