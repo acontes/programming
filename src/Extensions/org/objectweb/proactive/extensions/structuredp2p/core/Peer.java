@@ -56,7 +56,6 @@ public class Peer implements InitActive, RunActive, Serializable {
      * The no-argument constructor as commanded by ProActive.
      */
     public Peer() {
-
     }
 
     /**
@@ -123,6 +122,10 @@ public class Peer implements InitActive, RunActive, Serializable {
      */
     public DataStorage getDataStorage() {
         return this.dataStorage;
+    }
+
+    public StructuredOverlay getStructuredOverlay() {
+        return this.structuredOverlay;
     }
 
     /**
