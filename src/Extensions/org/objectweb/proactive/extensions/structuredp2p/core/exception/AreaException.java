@@ -9,6 +9,7 @@ package org.objectweb.proactive.extensions.structuredp2p.core.exception;
  * 
  * @version 0.1
  */
+@SuppressWarnings("serial")
 public class AreaException extends Exception {
 
     public AreaException() {
