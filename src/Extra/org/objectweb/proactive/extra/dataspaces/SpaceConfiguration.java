@@ -28,7 +28,7 @@ public abstract class SpaceConfiguration {
 	public static ScratchSpaceConfiguration createScratchSpaceConfiguration(String url, String path)
 			throws ConfigurationException {
 
-		return new ScratchSpaceConfiguration(path, path);
+		return new ScratchSpaceConfiguration(url, path);
 	}
 
 	/**
