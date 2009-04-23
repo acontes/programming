@@ -3,6 +3,7 @@
  */
 package org.objectweb.proactive.extra.dataspaces;
 
+import org.apache.commons.vfs.FileName;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 
 // TODO provide setters or make it immutable with <code>withXXX</code> methods creating new instance
@@ -86,7 +87,7 @@ public abstract class SpaceConfiguration {
 		protected final String hostname;
 
 		protected final String name;
-		
+
 		protected final String url;
 
 		/**
@@ -162,7 +163,7 @@ public abstract class SpaceConfiguration {
 		public String getHostname() {
 			return hostname;
 		}
-		
+
 		@Override
 		public String getUrl() {
 			return url;
@@ -227,6 +228,24 @@ public abstract class SpaceConfiguration {
 		@Override
 		public String getUrl() {
 			return unresolvedUrl.replace(HOSTNAME_VARIABLE_KEYWORD, getHostname());
+		}
+
+		public String appendBasePath(String basePath, String runtimeId, String nodeId, Long appid) {
+			final StringBuffer sb = new StringBuffer(basePath);
+
+			if (!basePath.endsWith(FileName.SEPARATOR))
+				sb.append(FileName.SEPARATOR_CHAR);
+
+			if (runtimeId != null)
+				sb.append(runtimeId).append(FileName.SEPARATOR_CHAR);
+
+			if (nodeId != null)
+				sb.append(nodeId).append(FileName.SEPARATOR_CHAR);
+
+			if (appid != null)
+				sb.append(appid);
+
+			return sb.toString();
 		}
 	}
 }

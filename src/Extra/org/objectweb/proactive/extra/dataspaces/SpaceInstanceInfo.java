@@ -51,9 +51,9 @@ public final class SpaceInstanceInfo implements Serializable {
 			throws ConfigurationException {
 
 		this.mountingPoint = DataSpacesURI.createScratchSpaceURI(appid, runtimeId, nodeId);
-		this.url = config.getUrl();
+		this.url = config.appendBasePath(config.getUrl(), runtimeId, nodeId, appid);
+		this.path = config.appendBasePath(config.getPath(), runtimeId, nodeId, appid);
 		this.hostname = config.getHostname();
-		this.path = config.getPath();
 		check();
 	}
 

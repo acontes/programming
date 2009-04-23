@@ -7,12 +7,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.vfs.Capability;
-import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.FileSystem;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.Selectors;
 import org.apache.commons.vfs.impl.DefaultFileSystemManager;
-import org.apache.commons.vfs.impl.VirtualFileSystem;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.dataspaces.SpaceConfiguration.ScratchSpaceConfiguration;
 import org.objectweb.proactive.extra.dataspaces.exceptions.AlreadyConfiguredException;
@@ -26,8 +25,6 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredExceptio
 // FIXME leave data or remove all directories?
 public class NodeScratchSpace {
 
-	private static final String SCRATCH_SPACE_SCHEME = "scratch://";
-
 	private final ScratchSpaceConfiguration scratchConfiguration;
 
 	private final DefaultFileSystemManager fileSystemManager;
@@ -35,8 +32,6 @@ public class NodeScratchSpace {
 	private final Node node;
 
 	private boolean configured = false;
-
-	private VirtualFileSystem vfs;
 
 	private FileObject fPartialSpace;
 
@@ -55,16 +50,15 @@ public class NodeScratchSpace {
 
 		private AppScratchSpaceImpl(long appid) throws FileSystemException, ConfigurationException {
 			final String appIdString = new Long(appid).toString();
-
-			this.fSpace = createEmptyDirectoryRelated(appIdString, fPartialSpace);
+			this.fSpace = createEmptyDirectoryRelative(fPartialSpace, appIdString);
+			// or change it and use absolute configuration-created path
 			this.appId = appid;
-			// FIXME that's not correct space instance info
 			this.spaceInstanceInfo = new SpaceInstanceInfo(appId, runtimeId, nodeId, scratchConfiguration);
 		}
 
 		/*
 		 * (non-Javadoc)
-		 *
+		 * 
 		 * @see
 		 * org.objectweb.proactive.extra.dataspaces.ApplicationScratchSpace#
 		 * close()
@@ -75,7 +69,7 @@ public class NodeScratchSpace {
 
 		/*
 		 * (non-Javadoc)
-		 *
+		 * 
 		 * @see
 		 * org.objectweb.proactive.extra.dataspaces.ApplicationScratchSpace#
 		 * getScratchForAO(java.lang.String)
@@ -84,7 +78,7 @@ public class NodeScratchSpace {
 			DataSpacesURI uri;
 
 			if (!scratches.containsKey(aoid)) {
-				createEmptyDirectoryRelated(aoid, fSpace);
+				createEmptyDirectoryRelative(fSpace, aoid);
 				uri = DataSpacesURI.createScratchSpaceURI(appId, runtimeId, nodeId, aoid);
 				scratches.put(aoid, uri);
 			} else
@@ -95,7 +89,7 @@ public class NodeScratchSpace {
 
 		/*
 		 * (non-Javadoc)
-		 *
+		 * 
 		 * @see
 		 * org.objectweb.proactive.extra.dataspaces.ApplicationScratchSpace#
 		 * getSpaceInstanceInfo()
@@ -133,18 +127,14 @@ public class NodeScratchSpace {
 		nodeId = Utils.getNodeId(node);
 		runtimeId = Utils.getRuntimeId(node);
 
-		final String partialSpacePath = createPartialSpacePath();
 		final String localAccessUrl = scratchConfiguration.getLocalAccessUrl();
-		final FileObject fLocalAccess = fileSystemManager.resolveFile(localAccessUrl);
-		final FileObject fsObject = fileSystemManager.createVirtualFileSystem(SCRATCH_SPACE_SCHEME);
+		final String partialSpacePath = scratchConfiguration.appendBasePath(localAccessUrl, runtimeId,
+				nodeId, null);
 
-		// TODO: vfs is not needed just for mounting something under root
-		vfs = (VirtualFileSystem) fsObject.getFileSystem();
-		vfs.addJunction(FileName.ROOT_PATH, fLocalAccess);
-
-		checkCapabilities();
-
-		fPartialSpace = createEmptyDirectoryRelated(partialSpacePath, vfs.getRoot());
+		fPartialSpace = fileSystemManager.resolveFile(partialSpacePath);
+		checkCapabilities(fPartialSpace.getFileSystem());
+		fPartialSpace.delete(Selectors.EXCLUDE_SELF);
+		fPartialSpace.createFolder();
 		configured = true;
 	}
 
@@ -166,7 +156,7 @@ public class NodeScratchSpace {
 
 	/**
 	 * Removes initialized directory on finalization.
-	 *
+	 * 
 	 * @throws FileSystemException
 	 * @throws NotConfiguredException
 	 */
@@ -182,20 +172,7 @@ public class NodeScratchSpace {
 		fRuntime.delete();
 	}
 
-	private String createPartialSpacePath() {
-		// FIXME two slashes + why root?
-		final StringBuffer sb = new StringBuffer(FileName.ROOT_PATH);
-
-		sb.append(FileName.SEPARATOR_CHAR);
-		sb.append(runtimeId);
-		sb.append(FileName.SEPARATOR_CHAR);
-		sb.append(nodeId);
-		sb.append(FileName.SEPARATOR_CHAR);
-		return sb.toString();
-	}
-
-	// TODO related -> relative, java.io and ususal convention is parent first
-	private FileObject createEmptyDirectoryRelated(final String path, final FileObject parent)
+	private FileObject createEmptyDirectoryRelative(final FileObject parent, final String path)
 			throws FileSystemException {
 
 		FileObject f = parent.resolveFile(path);
@@ -204,14 +181,14 @@ public class NodeScratchSpace {
 		return f;
 	}
 
-	private void checkCapabilities() throws ConfigurationException {
+	private void checkCapabilities(FileSystem fs) throws ConfigurationException {
 		final Capability[] expected = new Capability[] { Capability.CREATE, Capability.DELETE,
 				Capability.GET_TYPE, Capability.LIST_CHILDREN, Capability.READ_CONTENT,
 				Capability.WRITE_CONTENT };
 
 		for (int i = 0; i < expected.length; i++) {
 			final Capability capability = expected[i];
-			if (vfs.hasCapability(capability))
+			if (fs.hasCapability(capability))
 				throw new ConfigurationException("Specified file system provider does not support "
 						+ capability);
 		}
