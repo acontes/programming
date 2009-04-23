@@ -67,7 +67,7 @@ public class Coordinate {
         for (i = maxL; i > 0; i--) {
             if (i > minL) {
                 // FIXME
-                value[i] = Character.toChars((Character.getNumericValue(maxS.charAt(i - 1)) / 2));
+                // value[i] = Character.toChars((Character.getNumericValue(maxS.charAt(i - 1)) / 2));
             }
         }
 

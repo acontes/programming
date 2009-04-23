@@ -151,9 +151,6 @@ public class CanOverlay implements StructuredOverlay {
     @Override
     public void join(Peer peer) {
         // FIXME with splitting
-        int dimension = 0;
-        int order = 1;
-        this.neighbors[dimension][order].add(peer);
     }
 
     /**

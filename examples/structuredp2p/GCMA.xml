@@ -29,11 +29,15 @@
 			</configuration>
 
 			<virtualNode id="Grid2D" capacity="3"/>
+			<virtualNode id="StructuredP2P" capacity="3"/>
 		</proactive>
 	</application>
 
 	<resources>
 		<nodeProvider id="Grid2D">
+			<file path="GCMD.xml" />
+		</nodeProvider>
+		<nodeProvider id="StructuredP2P">
 			<file path="GCMD.xml" />
 		</nodeProvider>
 	</resources>
