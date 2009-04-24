@@ -3,6 +3,8 @@
  */
 package org.objectweb.proactive.extra.dataspaces;
 
+import java.io.Serializable;
+
 import org.apache.commons.vfs.FileName;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 
@@ -20,7 +22,12 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationExceptio
  * 
  * @see ScratchSpaceConfiguration
  */
-public class BaseScratchSpaceConfiguration {
+public class BaseScratchSpaceConfiguration implements Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 3878304428956402856L;
+
     public static final String HOSTNAME_VARIABLE_KEYWORD = "#{hostname}";
 
     /**
