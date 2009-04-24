@@ -2,7 +2,9 @@ package org.objectweb.proactive.extensions.structuredp2p.core;
 
 import java.util.Random;
 
+import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.group.Group;
+import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.extensions.structuredp2p.message.CanLookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.LoadBalancingMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.LookupMessage;
@@ -45,21 +47,36 @@ public class CanOverlay extends StructuredOverlay {
      */
     public CanOverlay(Peer peer) {
         super(peer);
+        this.neighbors = new Group[NB_DIMENSIONS][2];
+
+        try {
+            int i;
+            for (i = 0; i < NB_DIMENSIONS; i++) {
+                this.neighbors[i][0] = PAGroup.getGroup((Peer) PAGroup.newGroup(Peer.class.getName()));
+                this.neighbors[i][1] = PAGroup.getGroup((Peer) PAGroup.newGroup(Peer.class.getName()));
+            }
+        } catch (ClassNotReifiableException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     /**
-     * Splits the current area in two. The axe which is used in order to split is randomly chosen
+     * Splits the current area in two. The axe which is used in order to split is choose randomly
      * with {@link #getRandomAxe()}.
      * 
      * @param peer
      *            the new peer which want to join the area.
      */
     public void split(Peer peer) {
-        // check the availability of the peer.
+        // Verify the availability of the peer.
         ResponseMessage response = this.sendMessageTo(peer, new PingMessage());
-        int axeToSplit = this.getRandomDimension();
 
         if (!response.isNull()) {
+            // TODO How to split data ?
             // FIXME Split the data in two parts (basic method)
             /*
              * Coordinate[] middle = this.getMiddleArea(this.getRandomDimension()); Area newArea =
@@ -81,7 +98,7 @@ public class CanOverlay extends StructuredOverlay {
     }
 
     /**
-     * Check if the coordinates in arguments are in the managed area.
+     * Verify if the coordinates in arguments are in the managed area.
      * 
      * @param coordinates
      *            the coordinates to check.
@@ -96,10 +113,10 @@ public class CanOverlay extends StructuredOverlay {
             if (coord != null) {
                 // if the current coordinates aren't in the peer area.
                 if (minArea[i].getValue().compareTo(coord.getValue()) > 0 &&
-                    maxArea[i].getValue().compareTo(coord.getValue()) <= 0) {
+                    maxArea[i].getValue().compareTo(coord.getValue()) <= 0)
                     return false;
-                }
             }
+
             i++;
         }
 
@@ -131,7 +148,7 @@ public class CanOverlay extends StructuredOverlay {
     }
 
     /**
-     * Merge two area when a peer leave the network. The split consists to give data that are
+     * Merge two area when a peer leave the network. The split consists to give the data that are
      * managed by the peer which left the network to his neighbors and after to merge this area with
      * its closest neighbors.
      * 
@@ -162,10 +179,11 @@ public class CanOverlay extends StructuredOverlay {
      */
     @Override
     public void join(Peer peer) {
-        // TODO
         int dim = this.getRandomDimension();
         this.addNeighbor(peer, dim, 1);
+
         ((CanOverlay) peer.getStructuredOverlay()).addNeighbor(this.getPeer(), dim, 0);
+        System.out.println("qqqqqqqqqqqqq");
     }
 
     /**
@@ -173,7 +191,7 @@ public class CanOverlay extends StructuredOverlay {
      */
     @Override
     public void leave() {
-        // TODO
+        // TODO Auto-generated method stub
     }
 
     /**
@@ -224,20 +242,20 @@ public class CanOverlay extends StructuredOverlay {
      */
     @Override
     public void update() {
-        // TODO
+        // TODO Auto-generated method stub
     }
 
     /**
-     * Returns the area which is managed.
+     * FIXME
      * 
-     * @return the area which is managed.
+     * @return
      */
     public Area getArea() {
         return this.area;
     }
 
     /**
-     * Sets the new area covered.
+     * Set the new area covered.
      * 
      * @param area
      *            the new area covered.
@@ -270,11 +288,10 @@ public class CanOverlay extends StructuredOverlay {
     }
 
     /**
-     * Indicates if a given peer is a neighbors of the current managed area.
+     * FIXME
      * 
      * @param peer
-     *            the peer to check.
-     * @return true if the peer is a neighbor, false otherwise.
+     * @return
      */
     public boolean hasNeighbor(Peer peer) {
         for (Group<Peer>[] neighborsAxe : this.neighbors) {
@@ -288,9 +305,6 @@ public class CanOverlay extends StructuredOverlay {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public CanLookupResponseMessage handleLookupMessage(LookupMessage msg) {
         return null;
