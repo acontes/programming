@@ -164,6 +164,8 @@ public class Peer implements InitActive, RunActive, Serializable {
             default:
                 throw new IllegalArgumentException("The peer type must be one of OverlayType.");
         }
+
+        this.lastRequestDuration = System.currentTimeMillis();
     }
 
     /**

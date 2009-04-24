@@ -1,5 +1,7 @@
 package org.objectweb.proactive.extensions.structuredp2p.core;
 
+import java.io.Serializable;
+
 import org.objectweb.proactive.extensions.structuredp2p.message.LoadBalancingMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.LookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.Message;
@@ -19,7 +21,8 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.Respons
  * 
  * @version 0.1
  */
-public abstract class StructuredOverlay {
+@SuppressWarnings("serial")
+public abstract class StructuredOverlay implements Serializable {
     private final Peer peer;
 
     public StructuredOverlay(Peer peer) {
