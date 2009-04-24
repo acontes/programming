@@ -33,6 +33,7 @@
 package functionalTests.activeobject.webservices;
 
 import javax.xml.namespace.QName;
+import java.lang.reflect.Array;
 
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
@@ -151,6 +152,23 @@ public class TestHelloWorld {
         text = (String) response[0];
         logger.info("Called the method 'sayHello': inherited method");
         logger.info("'sayHello' returned " + text);
+
+
+        // Call getHelloTable
+        options.setAction("getTable");
+        op = new QName("getTable");
+        opArgs = new Object[] {};
+		System.out.println("type =" + Array.newInstance(ClassTest.class,2).getClass().getName());
+        returnTypes = new Class[] { Array.newInstance(ClassTest.class,2).getClass() };
+        response = serviceClient.invokeBlocking(op, opArgs, returnTypes);
+
+        ClassTest[] table = (ClassTest[]) response[0];
+		ClassTest test1 = table[0];
+		ClassTest test2 = table[1];
+		  
+        logger.info("Called the method 'getTable': return Table of ClassTest");
+        logger.info("test1 = " + test1.getStr1() + ", " + test1.getMyInt());
+        logger.info("test2 = " + test2.getStr1() + ", " + test2.getMyInt());
     }
 
     @After
