@@ -14,11 +14,11 @@ import org.objectweb.proactive.extensions.structuredp2p.core.exception.AreaExcep
  * @version 0.1
  */
 public class Area {
-
     /**
      * The minimum coordinates.
      */
     private final Coordinate[] coordinatesMin;
+
     /**
      * The maximum coordinates.
      */

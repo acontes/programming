@@ -15,11 +15,18 @@ public class Coordinate {
      * The max value of Unicode we managed
      */
     private static int UNICODE = 255;
+
     /**
      * The content of the coordinate.
      */
-    private String value;
+    private final String value;
 
+    /**
+     * Constructor.
+     * 
+     * @param value
+     *            the value used in order to initialized the coordinate.
+     */
     public Coordinate(String value) {
         this.value = value;
     }
@@ -37,10 +44,10 @@ public class Coordinate {
      * Determinate the middle between two coordinates.
      * 
      * @param min
-     *            the coordinate min
+     *            the coordinate min.
      * @param max
-     *            the coordinate max
-     * @return coordinates of the middle
+     *            the coordinate max.
+     * @return coordinates of the middle.
      */
     public static Coordinate getMiddle(Coordinate min, Coordinate max) {
         // FIXME voir les bords !

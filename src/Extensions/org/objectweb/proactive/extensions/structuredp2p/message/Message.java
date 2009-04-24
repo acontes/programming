@@ -20,8 +20,9 @@ public interface Message extends Serializable {
     /**
      * Handles the message.
      * 
-     * @param peer
-     * @return a response message.
+     * @param overlay
+     *            the overlay which handles the message.
+     * @return the response in agreement with the type of message sent.
      */
     public ResponseMessage handle(StructuredOverlay overlay);
 

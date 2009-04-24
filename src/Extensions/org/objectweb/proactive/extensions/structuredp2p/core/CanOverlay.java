@@ -1,5 +1,6 @@
 package org.objectweb.proactive.extensions.structuredp2p.core;
 
+import java.util.Iterator;
 import java.util.Random;
 
 import org.objectweb.proactive.api.PAGroup;
@@ -26,6 +27,7 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.Respons
  * 
  * @version 0.1
  */
+@SuppressWarnings("serial")
 public class CanOverlay extends StructuredOverlay {
     /**
      * The number of dimensions which is equals to the number of axes.
@@ -35,7 +37,7 @@ public class CanOverlay extends StructuredOverlay {
     /**
      * Neighbors of the current area. The neighbors are an array of ProActive groups.
      */
-    private Group<Peer>[][] neighbors;
+    private final Group<Peer>[][] neighbors;
 
     /**
      * The area which is currently managed.
@@ -166,9 +168,18 @@ public class CanOverlay extends StructuredOverlay {
     public void checkNeighbors() {
         for (Group<Peer>[] groupArray : neighbors) {
             for (Group<Peer> group : groupArray) {
-                // FIXME look res...
-                // 
-                ((Peer) group.getGroupByType()).receiveMessage(new PingMessage());
+                Group<ResponseMessage> groupFutures = (Group<ResponseMessage>) ((Peer) group.getGroupByType())
+                        .receiveMessage(new PingMessage());
+                PAGroup.waitAll(groupFutures);
+                Iterator<ResponseMessage> it = groupFutures.listIterator();
+
+                while (it.hasNext()) {
+                    try {
+                        // FIXME
+                    } catch (Exception e) {
+                        // FIXME
+                    }
+                }
 
             }
         }
@@ -288,10 +299,11 @@ public class CanOverlay extends StructuredOverlay {
     }
 
     /**
-     * FIXME
+     * Indicates if the given peer is the neighbor of the current area.
      * 
      * @param peer
-     * @return
+     *            the peer which is used to check.
+     * @return true if the peer is a neighbor, false otherwise.
      */
     public boolean hasNeighbor(Peer peer) {
         for (Group<Peer>[] neighborsAxe : this.neighbors) {
@@ -305,8 +317,11 @@ public class CanOverlay extends StructuredOverlay {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public CanLookupResponseMessage handleLookupMessage(LookupMessage msg) {
-        return null;
+        return new CanLookupResponseMessage(this.getPeer(), ((CanLookupMessage) msg).getCoordinates());
     }
 }

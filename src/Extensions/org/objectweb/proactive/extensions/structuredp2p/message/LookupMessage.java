@@ -42,5 +42,11 @@ public abstract class LookupMessage implements Message {
         return this.key;
     }
 
+    /**
+     * Handles a {@link LookupMessage} by double dispatch.
+     * 
+     * @param overlay
+     *            the overlay which handle the message.
+     */
     public abstract ResponseMessage handle(StructuredOverlay overlay);
 }

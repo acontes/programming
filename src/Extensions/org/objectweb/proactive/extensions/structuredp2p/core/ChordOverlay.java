@@ -2,6 +2,7 @@ package org.objectweb.proactive.extensions.structuredp2p.core;
 
 import java.util.HashMap;
 
+import org.objectweb.proactive.extensions.structuredp2p.message.ChordLookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.LookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.Message;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.ChordLookupResponseMessage;
@@ -26,14 +27,16 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.Respons
  * 
  * @version 0.1
  */
+@SuppressWarnings("serial")
 public class ChordOverlay extends StructuredOverlay {
     private String identifier;
     private HashMap<String, Peer> fingers;
 
     /**
-     * FIXME
+     * Constructor.
      * 
      * @param peer
+     *            the peer which is used in order to join the network.
      */
     public ChordOverlay(Peer peer) {
         super(peer);
@@ -71,12 +74,18 @@ public class ChordOverlay extends StructuredOverlay {
         // TODO Auto-generated method stub
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public LookupResponseMessage sendMessage(LookupMessage msg) {
         // TODO Auto-generated method stub
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ResponseMessage sendMessageTo(Peer peer, Message msg) {
         // TODO Auto-generated method stub
@@ -101,9 +110,11 @@ public class ChordOverlay extends StructuredOverlay {
         return this.fingers;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public ChordLookupResponseMessage handleLookupMessage(LookupMessage msg) {
-        // TODO Auto-generated method stub
-        return null;
+        return new ChordLookupResponseMessage(this.getPeer(), ((ChordLookupMessage) msg).getId());
     }
 }

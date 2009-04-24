@@ -18,6 +18,7 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.LookupR
 public class ChordLookupMessage extends LookupMessage {
 
     /**
+     * Constructor.
      * 
      * @param id
      */
@@ -28,8 +29,8 @@ public class ChordLookupMessage extends LookupMessage {
     /**
      * Handles message by delegation.
      * 
-     * @param a
-     *            peer to which the message will be sent.
+     * @param peer
+     *            to which the message will be sent.
      * @return a ChordResponseMessage for routing.
      */
     @Override

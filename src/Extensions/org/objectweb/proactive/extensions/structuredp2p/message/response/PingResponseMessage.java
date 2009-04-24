@@ -1,7 +1,9 @@
 package org.objectweb.proactive.extensions.structuredp2p.message.response;
 
 /**
- * A ping response message is the appropriate answer to a ping message.
+ * A ping response message is the appropriate answer to a ping message. It returns the latency
+ * between the creation of the message and the time when we call for the first time
+ * {@link #getLatency()}.
  * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent
@@ -11,14 +13,27 @@ package org.objectweb.proactive.extensions.structuredp2p.message.response;
  */
 @SuppressWarnings("serial")
 public class PingResponseMessage extends ResponseMessage {
-    // FIXME peut-etre ne pas mettre la latence mais le timestamp de depart du message.
-    private final int latency = 0;
+    private final long startLatency = System.currentTimeMillis();
+    private int latency = 0;
 
+    /**
+     * Constructor.
+     */
     public PingResponseMessage() {
-
     }
 
+    /**
+     * Returns the latency between the creation of the message and when we call for th first time
+     * this function.
+     * 
+     * @return the latency between the creation of the message and when we call for th first time
+     *         this function.
+     */
     public int getLatency() {
-        return latency;
+        if (latency == 0) {
+            this.latency = (int) (System.currentTimeMillis() - this.startLatency);
+        }
+
+        return this.latency;
     }
 }
