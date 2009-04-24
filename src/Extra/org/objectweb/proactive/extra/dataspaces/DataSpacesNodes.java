@@ -81,8 +81,9 @@ public class DataSpacesNodes {
     /**
      * Configures Data Spaces node for a specific application and stores that configuration together
      * with Data Spaces implementation instance, so they can be later accessed by
-     * {@link #getDataSpacesImpl(Node)} or closed through {@link #closeNodeApplicationConfig(Node)}
-     * or subsequent {@link #configureApplication(Node, long, String)}.
+     * {@link #getDataSpacesImpl(Node)} or closed through
+     * {@link #tryCloseNodeApplicationConfig(Node)} or subsequent
+     * {@link #configureApplication(Node, long, String)}.
      * 
      * This method can be called on an already configured node (see
      * {@link #configureNode(Node, SpaceConfiguration)}) or even already application-configured node
@@ -120,23 +121,28 @@ public class DataSpacesNodes {
      *             when node has not been configured yet
      */
     public static void closeNodeConfig(Node node) throws NotConfiguredException {
-        final NodeConfigurator nodeConfig = getOrFailNodeConfigurator(node);
+        final NodeConfigurator nodeConfig = removeOrFailNodeConfigurator(node);
         nodeConfig.close();
     }
 
     /**
-     * Closes all application related configuration for node.
-     * 
-     * Subsequent calls for node that is not configured anymore may result in undefined behavior.
+     * Closes all application related configuration for node if there is one.
      * 
      * @param node
      *            node to be deconfigured for Data Spaces application
-     * @throws NotConfiguredException
-     *             when node has not been configured yet for an application
      */
-    public static void closeNodeApplicationConfig(Node node) throws NotConfiguredException {
-        final NodeConfigurator nodeConfig = getOrFailNodeConfigurator(node);
-        nodeConfig.tryCloseAppConfigurator();
+    public static void tryCloseNodeApplicationConfig(Node node) {
+        final NodeConfigurator nodeConfig = getNodeConfigurator(node);
+        if (nodeConfig != null)
+            nodeConfig.tryCloseAppConfigurator();
+    }
+
+    private static NodeConfigurator getNodeConfigurator(Node node) {
+        final String name = Utils.getNodeId(node);
+
+        synchronized (nodeConfigurators) {
+            return nodeConfigurators.get(name);
+        }
     }
 
     private static NodeConfigurator getOrCreateNodeConfigurator(Node node) {
@@ -158,6 +164,18 @@ public class DataSpacesNodes {
 
         synchronized (nodeConfigurators) {
             final NodeConfigurator config = nodeConfigurators.get(name);
+            if (config == null)
+                throw new NotConfiguredException("Node is not configured");
+
+            return config;
+        }
+    }
+
+    private static NodeConfigurator removeOrFailNodeConfigurator(Node node) throws NotConfiguredException {
+        final String name = Utils.getNodeId(node);
+
+        synchronized (nodeConfigurators) {
+            final NodeConfigurator config = nodeConfigurators.remove(name);
             if (config == null)
                 throw new NotConfiguredException("Node is not configured");
 
