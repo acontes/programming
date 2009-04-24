@@ -29,30 +29,21 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.examples.webservices.c3dWS.prim;
+package org.objectweb.proactive.examples.webservices.c3dWS;
 
-import org.objectweb.proactive.examples.webservices.c3dWS.geom.Vec;
+import org.objectweb.proactive.examples.c3d.geom.Scene;
 
 
-public class Surface implements java.io.Serializable {
-    public Vec color;
-    public double kd;
-    public double ks;
-    public double shine;
-    public double kt;
-    public double ior;
+/** Methods proposed by Objects which can render scenes */
+public interface RenderingEngine {
 
-    public Surface() {
-        color = new Vec(1, 0, 0);
-        kd = 1.0;
-        ks = 0.0;
-        shine = 0.0;
-        kt = 0.0;
-        ior = 1.0;
-    }
+    /** Creates the local objects used in the rendering */
+    public abstract void setScene(Scene scene);
 
-    @Override
-    public String toString() {
-        return "Surface { color=" + color + "}";
-    }
+    /** Draw the scene and send back the result to the dispatcher. <i>Heavily optimized!!!</i>
+     * @return the partial Image that was asked for */
+    public abstract Image2D render(int engineNb, Interval interval);
+
+    /** A textual representation of the renderer */
+    public abstract String toString();
 }

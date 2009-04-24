@@ -31,7 +31,10 @@
  */
 package org.objectweb.proactive.extensions.webservices;
 
+import java.io.File;
+
 import org.apache.axis2.transport.http.AxisServlet;
+import org.apache.log4j.Logger;
 import org.mortbay.jetty.servlet.ServletHolder;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.proactive.annotation.PublicAPI;
@@ -42,13 +45,15 @@ import org.objectweb.proactive.extensions.webservices.deployer.PADeployer;
 
 
 /**
- * @author The ProActive Team
+ * Deploy and undeploy active objects and components. Methods of this class
+ * just call methods of the PADeployer class.
  * 
- * Deploy and undeploy Active Object and components. Methods of this class
- * just call methods of the PADeployer class.  
+ * @author The ProActive Team
  */
 @PublicAPI
 public final class WebServices extends WSConstants {
+
+    static private Logger logger = ProActiveLogger.getLogger(Loggers.WEB_SERVICES);
 
     static {
 
@@ -57,7 +62,9 @@ public final class WebServices extends WSConstants {
         HTTPServer httpServer = HTTPServer.get();
 
         // Create an Axis servlet
-        ServletHolder axisServletHolder = new ServletHolder(new AxisServlet());
+        AxisServlet axisServlet = new AxisServlet();
+
+        ServletHolder axisServletHolder = new ServletHolder(axisServlet);
 
         // Define axis2 configuration file and repository where services and modules
         // are stored. The repository path is mandatory since it contains the ServiceDeployer
@@ -68,15 +75,34 @@ public final class WebServices extends WSConstants {
         // Register the Axis Servlet to Jetty
         httpServer.registerServlet(axisServletHolder, WSConstants.AXIS_SERVLET);
 
-        ProActiveLogger.getLogger(Loggers.WEB_SERVICES).info(
-                "Deployed axis servlet on the local Jetty server");
+        logger.info("Erasing temporary files created by axis2 servlet...");
+        File f = new File((File) axisServlet.getServletContext()
+                .getAttribute("javax.servlet.context.tempdir"), "_axis2");
+        if (f.isDirectory()) {
+            File[] files = f.listFiles();
+            for (File child : files) {
+                if (child.delete()) {
+                    logger.info("   - " + child.getAbsolutePath() + " has been deleted");
+                } else {
+                    logger.info("   - " + child.getAbsolutePath() + " has not been deleted");
+                }
+            }
+
+            if (f.delete()) {
+                logger.info("   - " + f.getAbsolutePath() + " has been deleted");
+            } else {
+                logger.info("   - " + f.getAbsolutePath() + " has not been deleted");
+            }
+        }
+
+        logger.info("Deployed axis servlet on the local Jetty server");
     }
 
     /**
-     * Expose an active object as a web service
+     * Expose an active object as a web service with the methods specified in <code>methods</code> 
      * 
      * @param o The object to expose as a web service
-     * @param url The url of the host where the object will be deployed  (typically http://localhost:8080)
+     * @param url The url of the host where the object will be deployed  (typically http://localhost:8080/)
      * @param urn The name of the object
      * @param methods The methods that will be exposed as web services functionalities
      *					 If null, then all methods will be exposed
@@ -89,7 +115,7 @@ public final class WebServices extends WSConstants {
      * Expose an active object with all its methods as a web service
      * 
      * @param o The object to expose as a web service
-     * @param url The url of the host where the object will be deployed  (typically http://localhost:8080)
+     * @param url The url of the host where the object will be deployed  (typically http://localhost:8080/)
      * @param urn The name of the object
      */
     public static void exposeAsWebService(Object o, String url, String urn) {
@@ -97,8 +123,8 @@ public final class WebServices extends WSConstants {
     }
 
     /**
-     * Delete the service on a web server
-      *
+     * Undeploy a service
+     *
      * @param urn The name of the object
      * @param url The url of the web server
      */
@@ -107,28 +133,25 @@ public final class WebServices extends WSConstants {
     }
 
     /**
-     * Expose a component as web service. Each server and controller
-     * interface of the component will be accessible by  the urn
-     * [componentName]_[interfaceName]in order to identify the component an
-     * interface belongs to.
-     * Only the interfaces public methods of the specified interfaces will be exposed.
+     * Expose a component as web service. Each server interface of the component 
+     * will be accessible by  the urn [componentName]_[interfaceName].
+     * Only the interfaces public methods of the specified interfaces in 
+     * <code>interfaceNames</code> will be exposed.
      *
      * @param component The component owning the interfaces that will be deployed as web services.
      * @param url  Web server url  where to deploy the service - typically "http://localhost:8080"
      * @param componentName Name of the component
-     * @param interfacesName Names of the interfaces we want to deploy.
+     * @param interfaceNames Names of the interfaces we want to deploy.
       *							  If null, then all the interfaces will be deployed
      */
     public static void exposeComponentAsWebService(Component component, String url, String componentName,
-            String[] interfacesName) {
-        PADeployer.deployComponent(component, url, componentName, interfacesName);
+            String[] interfaceNames) {
+        PADeployer.deployComponent(component, url, componentName, interfaceNames);
     }
 
     /**
-     * Expose a component as web service. Each server and controller
-     * interface of the component will be accessible by  the urn
-     * [componentName]_[interfaceName]in order to identify the component an
-     * interface belongs to.
+     * Expose a component as web service. Each server interface of the component 
+     * will be accessible by  the urn [componentName]_[interfaceName].
      * All the interfaces public methods of all interfaces will be exposed.
      *
      * @param component The component owning the interfaces that will be deployed as web services.

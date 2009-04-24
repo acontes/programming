@@ -26,13 +26,13 @@ import org.objectweb.proactive.extensions.webservices.WSConstants;
 
 
 /**
- * @author The ProActive Team
- * 
  * When ServiceDeployer create a service for an active object or a component, 
  * it specifies a custom message receiver which is in charge of unmarshalling 
  * the object representing the service and to invoke the asked method.
  * This class implements this custom message receiver for in-only methods and
- * is strongly based on the RPCInOnlyMessageReceiver class of axis2. 
+ * is strongly based on the RPCInOnlyMessageReceiver class of axis2.
+ * 
+ * @author The ProActive Team
  */
 public class PAInOnlyMessageReceiver extends AbstractInMessageReceiver {
 

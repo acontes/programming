@@ -79,9 +79,7 @@ public class HelloWorldComponent implements HelloWorldItf, GoodByeWorldItf {
         } else {
             url = args[0];
         }
-        if (!url.startsWith("http://")) {
-            url = "http://" + url;
-        }
+
         Component boot = null;
         Component comp = null;
         try {
@@ -109,8 +107,6 @@ public class HelloWorldComponent implements HelloWorldItf, GoodByeWorldItf {
         } catch (IllegalLifeCycleException e) {
             e.printStackTrace();
         }
-
-        System.out.println("Deploy an hello world service on : " + url);
 
         WebServices.exposeComponentAsWebService(comp, url, "server", new String[] { "hello-world",
                 "goodbye-world" });

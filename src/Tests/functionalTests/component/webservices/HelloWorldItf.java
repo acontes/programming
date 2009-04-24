@@ -1,6 +1,6 @@
 package functionalTests.component.webservices;
 
-public interface HelloWorldItf {
+public interface HelloWorldItf extends HelloWorldItfSuperInterface {
 
     public void putHelloWorld();
 

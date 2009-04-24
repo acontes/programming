@@ -63,17 +63,16 @@ public class WSClient {
                 url = "http://" + url;
             }
 
+            if (!url.endsWith("/")) {
+                url = url + "/";
+            }
+
             RPCServiceClient serviceClient = new RPCServiceClient();
 
             Options options = serviceClient.getOptions();
 
-            EndpointReference targetEPR;
-
-            if (args.length == 0) {
-                targetEPR = new EndpointReference(url + WSConstants.AXIS_SERVICES_PATH + "HelloWorld");
-            } else {
-                targetEPR = new EndpointReference(url + WSConstants.AXIS_SERVICES_PATH + "HelloWorld");
-            }
+            EndpointReference targetEPR = new EndpointReference(url + WSConstants.AXIS_SERVICES_PATH +
+                "HelloWorld");
 
             options.setTo(targetEPR);
 

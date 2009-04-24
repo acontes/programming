@@ -31,44 +31,34 @@
  */
 package org.objectweb.proactive.examples.webservices.c3dWS;
 
-public class PAUser implements User {
-    private String name;
-    private C3DUser c3duser;
+/**
+ * This interface describes methods which are accessible by classes
+ * internal to the Dispatcher functionality, for example DispatcherGUI.
+ * These methods have to be exposed as public to be accessible, but not by
+ * classes which use the Dispatcher for its rendering and chatting capabilities.
+ * So this interface is created, to avoid errors in using the class C3DDispatcher
+ * directly, which is way too permissive.
+ */
+public interface DispatcherLogic {
 
-    public PAUser(String name, C3DUser c3duser) {
-        this.name = name;
-        this.c3duser = c3duser;
-    }
+    /** Sends a [log] message to given user */
+    public void userLog(int i_user, String s_message);
 
-    public String getName() {
-        return name;
-    }
+    /** Ask users & dispatcher to log s_message, except one  */
+    public void allLogExcept(int i_user, String s_message);
 
-    public Object getObject() {
-        return c3duser;
-    }
+    /** Ask all users & dispatcher to log s_message */
+    public void allLog(String s_message);
 
-    public void setPixels(int[] newPix, Interval inter) {
-        this.c3duser.setPixels(newPix, inter);
-    }
+    /** Shut down everything, send warning messages to users */
+    public void exit();
 
-    public void showMessage(String s) {
-        this.c3duser.showMessage(s);
-    }
+    /** See how well the simulation improves with more renderers */
+    public void doBenchmarks();
 
-    public void showUserMessage(String s) {
-        this.c3duser.showUserMessage(s);
-    }
+    /** Makes the engine participate in the computation of images */
+    public void turnOnEngine(String engineName);
 
-    public void dialogMessage(String subject, String msg) {
-        this.c3duser.dialogMessage(subject, msg);
-    }
-
-    public void informNewUser(int i, String name) {
-        this.c3duser.informNewUser(i, name);
-    }
-
-    public void informUserLeft(String name) {
-        this.c3duser.informUserLeft(name);
-    }
+    /** Stops the engine from participating in the computation of images*/
+    public void turnOffEngine(String engineName);
 }

@@ -4,10 +4,6 @@ import java.lang.IllegalAccessException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import javax.naming.event.ObjectChangeListener;
-
-import javassist.expr.Cast;
-
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
@@ -28,30 +24,58 @@ import org.apache.axis2.rpc.receivers.RPCUtil;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.log4j.Logger;
 
-import org.objectweb.proactive.Service;
-import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.body.future.FutureProxy;
-import org.objectweb.proactive.core.body.proxy.BodyProxy;
 import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.remoteobject.http.util.HttpMarshaller;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.core.util.wrapper.*;
 import org.objectweb.proactive.extensions.webservices.WSConstants;
 
 
 /**
- * @author The ProActive Team
- * 
  * When ServiceDeployer create a service for an active object or a component, 
  * it specifies a custom message receiver which is in charge of unmarshalling 
  * the object representing the service and to invoke the asked method.
  * This class implements this custom message receiver for in-out methods and
  * is strongly based on the RPCMessageReceiver class of axis2. 
+ * 
+ * @author The ProActive Team
  */
 public class PAInOutMessageReceiver extends AbstractInOutMessageReceiver {
 
     private static Logger logger = ProActiveLogger.getLogger(Loggers.WEB_SERVICES);
+
+    /**
+     * if resObject is of a type belonging to a ProActive Wrapper type,
+     * this will transform resObject to the corresponding primitive type.
+     * Otherwise, it will leave resObject unchanged.
+     * 
+     * @param o
+     * @return the corresponding primitive type if possible
+     */
+    private Object getPrimitiveType(Object o) {
+        if (o instanceof BooleanWrapper) {
+            return ((BooleanWrapper) o).booleanValue();
+        }
+        if (o instanceof FloatWrapper) {
+            return ((FloatWrapper) o).floatValue();
+        }
+        if (o instanceof IntWrapper) {
+            return ((IntWrapper) o).intValue();
+        }
+        if (o instanceof DoubleWrapper) {
+            return ((DoubleWrapper) o).doubleValue();
+        }
+        if (o instanceof LongWrapper) {
+            return ((LongWrapper) o).longValue();
+        }
+        if (o instanceof StringWrapper) {
+            return ((StringWrapper) o).stringValue();
+        }
+        return o;
+    }
 
     /**
       * This method is a adaptation of the invokeBusinessLogic method of the class RPCMessageReceiver	
@@ -142,6 +166,8 @@ public class PAInOutMessageReceiver extends AbstractInOutMessageReceiver {
                 resObject = RPCUtil.invokeServiceClass(inAxisMessage, method, targetObject, messageNameSpace,
                         methodElement, inMessageContext);
             }
+
+            resObject = this.getPrimitiveType(resObject);
 
             // Handling the response
             SOAPFactory fac = getSOAPFactory(inMessageContext);

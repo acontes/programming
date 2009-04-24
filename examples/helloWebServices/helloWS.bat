@@ -1,7 +1,6 @@
 @echo off
 echo.
 echo --- Hello World Web Service ---------------------------------------------
-echo --- (this example needs Tomcat Web Server installed and running) --------
 
 goto doit
 

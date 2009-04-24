@@ -31,15 +31,32 @@
  */
 package org.objectweb.proactive.examples.webservices.c3dWS;
 
-import org.objectweb.proactive.examples.webservices.c3dWS.geom.Vec;
+import org.objectweb.proactive.examples.c3d.geom.Vec;
 
 
-@SuppressWarnings("serial")
-public class View implements java.io.Serializable {
-    public Vec from;
-    public Vec at;
-    public Vec up;
-    public double dist;
-    public double angle;
-    public double aspect;
-};
+/** These are the methods accessible by the User Gui classes, which somewhat control the User active
+ * object. The implementation will often simply forward the call to the dispatcher */
+public interface UserLogic {
+
+    /** Exit the application */
+    public void terminate();
+
+    /** Displays the list of users connected to the dispatcher */
+    public void getUserList();
+
+    /** Ask the dispatcher to revert to original scene*/
+    public void resetScene();
+
+    /** Ask the dispatcher to add a sphere*/
+    public void addSphere();
+
+    /**  Send a mesage to a given other user, or to all */
+    public void sendMessage(String message, String recipientName);
+
+    /**
+     * ask for the scene to be rotated by some angle
+     * @param rotationAngle = <x y z> means rotate x radians along the x axis,
+     *         then y radians along the y axis, and finally  z radians along the z axis
+     */
+    public void rotateScene(Vec rotationAngle);
+}
