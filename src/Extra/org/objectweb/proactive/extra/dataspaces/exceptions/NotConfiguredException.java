@@ -9,32 +9,32 @@ package org.objectweb.proactive.extra.dataspaces.exceptions;
  */
 public class NotConfiguredException extends DataSpacesException {
 
-	/**
-	 *
-	 */
-	public NotConfiguredException() {
-	}
+    /**
+     *
+     */
+    public NotConfiguredException() {
+    }
 
-	/**
-	 * @param message
-	 */
-	public NotConfiguredException(String message) {
-		super(message);
-	}
+    /**
+     * @param message
+     */
+    public NotConfiguredException(String message) {
+        super(message);
+    }
 
-	/**
-	 * @param message
-	 * @param cause
-	 */
-	public NotConfiguredException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    /**
+     * @param message
+     * @param cause
+     */
+    public NotConfiguredException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-	/**
-	 * @param cause
-	 */
-	public NotConfiguredException(Throwable cause) {
-		super(cause);
-	}
+    /**
+     * @param cause
+     */
+    public NotConfiguredException(Throwable cause) {
+        super(cause);
+    }
 
 }

@@ -9,40 +9,40 @@ package org.objectweb.proactive.extra.dataspaces.exceptions;
  */
 public class MalformedURIException extends DataSpacesException {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 3678271228087635694L;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 3678271228087635694L;
 
-	/**
-	 * Empty constructor with no information.
-	 */
-	public MalformedURIException() {
-	}
+    /**
+     * Empty constructor with no information.
+     */
+    public MalformedURIException() {
+    }
 
-	/**
-	 * @param message
-	 *            message describing source of problem
-	 */
-	public MalformedURIException(String message) {
-		super(message);
-	}
+    /**
+     * @param message
+     *            message describing source of problem
+     */
+    public MalformedURIException(String message) {
+        super(message);
+    }
 
-	/**
-	 * @param cause
-	 *            underlying cause of the exception
-	 */
-	public MalformedURIException(Throwable cause) {
-		super(cause);
-	}
+    /**
+     * @param cause
+     *            underlying cause of the exception
+     */
+    public MalformedURIException(Throwable cause) {
+        super(cause);
+    }
 
-	/**
-	 * @param message
-	 *            message describing source of problem
-	 * @param cause
-	 *            underlying cause of the exception
-	 */
-	public MalformedURIException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    /**
+     * @param message
+     *            message describing source of problem
+     * @param cause
+     *            underlying cause of the exception
+     */
+    public MalformedURIException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

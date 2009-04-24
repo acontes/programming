@@ -11,12 +11,13 @@ import org.apache.commons.vfs.provider.local.DefaultLocalFileProvider;
 import org.apache.commons.vfs.provider.sftp.SftpFileProvider;
 import org.apache.commons.vfs.provider.url.UrlFileProvider;
 
+
 // TODO set logger?
 /**
  * Factory class for creating configured VFS DefaultFileSystemManager instances.
  * <p>
- * Instances of managers created through this factory are guaranteed to have
- * providers for following protocols:
+ * Instances of managers created through this factory are guaranteed to have providers for following
+ * protocols:
  * <ul>
  * <li>local files, scheme <code>file:</code></li>
  * <li>HTTP, scheme <code>http:</code></li>
@@ -29,32 +30,32 @@ import org.apache.commons.vfs.provider.url.UrlFileProvider;
  * Configured replicator and temporary storage are also guaranteed.
  */
 public class VFSFactory {
-	/**
-	 * Creates new DefaultSystemManager instance with configured providers,
-	 * replicator and temporary storage - as described in class description.
-	 * <p>
-	 * Returned instance is initialized and it is a caller responsibility to
-	 * close it to release resources.
-	 * 
-	 * @return configured and initialized DefaultFileSystemManager instance
-	 * @throws FileSystemException
-	 *             when initialization or configuration process fails
-	 */
-	public static DefaultFileSystemManager createDefaultFileSystemManager() throws FileSystemException {
-		final DefaultFileSystemManager manager = new DefaultFileSystemManager();
+    /**
+     * Creates new DefaultSystemManager instance with configured providers, replicator and temporary
+     * storage - as described in class description.
+     * <p>
+     * Returned instance is initialized and it is a caller responsibility to close it to release
+     * resources.
+     * 
+     * @return configured and initialized DefaultFileSystemManager instance
+     * @throws FileSystemException
+     *             when initialization or configuration process fails
+     */
+    public static DefaultFileSystemManager createDefaultFileSystemManager() throws FileSystemException {
+        final DefaultFileSystemManager manager = new DefaultFileSystemManager();
 
-		final DefaultFileReplicator replicator = new DefaultFileReplicator();
-		manager.setReplicator(new PrivilegedFileReplicator(replicator));
-		manager.setTemporaryFileStore(replicator);
+        final DefaultFileReplicator replicator = new DefaultFileReplicator();
+        manager.setReplicator(new PrivilegedFileReplicator(replicator));
+        manager.setTemporaryFileStore(replicator);
 
-		manager.addProvider("file", new DefaultLocalFileProvider());
-		manager.addProvider("http", new HttpFileProvider());
-		manager.addProvider("https", new HttpsFileProvider());
-		manager.addProvider("ftp", new FtpFileProvider());
-		manager.addProvider("sftp", new SftpFileProvider());
-		manager.setDefaultProvider(new UrlFileProvider());
+        manager.addProvider("file", new DefaultLocalFileProvider());
+        manager.addProvider("http", new HttpFileProvider());
+        manager.addProvider("https", new HttpsFileProvider());
+        manager.addProvider("ftp", new FtpFileProvider());
+        manager.addProvider("sftp", new SftpFileProvider());
+        manager.setDefaultProvider(new UrlFileProvider());
 
-		manager.init();
-		return manager;
-	}
+        manager.init();
+        return manager;
+    }
 }

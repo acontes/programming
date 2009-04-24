@@ -5,38 +5,39 @@ package org.objectweb.proactive.extra.dataspaces.exceptions;
 
 import org.objectweb.proactive.core.ProActiveException;
 
+
 /**
  *
  *
  */
 public class DataSpacesException extends ProActiveException {
 
-	/**
-	 *
-	 */
-	public DataSpacesException() {
-	}
+    /**
+     *
+     */
+    public DataSpacesException() {
+    }
 
-	/**
-	 * @param message
-	 */
-	public DataSpacesException(String message) {
-		super(message);
-	}
+    /**
+     * @param message
+     */
+    public DataSpacesException(String message) {
+        super(message);
+    }
 
-	/**
-	 * @param message
-	 * @param cause
-	 */
-	public DataSpacesException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    /**
+     * @param message
+     * @param cause
+     */
+    public DataSpacesException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-	/**
-	 * @param cause
-	 */
-	public DataSpacesException(Throwable cause) {
-		super(cause);
-	}
+    /**
+     * @param cause
+     */
+    public DataSpacesException(Throwable cause) {
+        super(cause);
+    }
 
 }
