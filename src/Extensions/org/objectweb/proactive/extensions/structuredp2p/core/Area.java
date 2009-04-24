@@ -1,5 +1,7 @@
 package org.objectweb.proactive.extensions.structuredp2p.core;
 
+import java.io.Serializable;
+
 import org.objectweb.proactive.extensions.structuredp2p.core.exception.AreaException;
 
 
@@ -13,7 +15,8 @@ import org.objectweb.proactive.extensions.structuredp2p.core.exception.AreaExcep
  * 
  * @version 0.1
  */
-public class Area {
+@SuppressWarnings("serial")
+public class Area implements Serializable{
     /**
      * The minimum coordinates.
      */
