@@ -157,4 +157,7 @@ public interface Loggers {
     public static final String UTILS = CORE + ".utils";
     public static final String SLEEPER = UTILS + ".sleeper";
     public static final String WAITER = UTILS + ".waiter";
+    
+    // Data Spaces
+    public static final String DATASPACES = CORE + ".dataspaces";
 }
