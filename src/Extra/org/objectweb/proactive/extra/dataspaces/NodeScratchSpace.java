@@ -51,21 +51,10 @@ public class NodeScratchSpace {
             this.spaceInstanceInfo = new SpaceInstanceInfo(appId, runtimeId, nodeId, scratchSpaceConf);
         }
 
-        /*
-         * (non-Javadoc)
-         * 
-         * @see org.objectweb.proactive.extra.dataspaces.ApplicationScratchSpace# close()
-         */
         public void close() throws FileSystemException {
             fSpace.delete(Selectors.SELECT_ALL);
         }
 
-        /*
-         * (non-Javadoc)
-         * 
-         * @see org.objectweb.proactive.extra.dataspaces.ApplicationScratchSpace#
-         * getScratchForAO(java.lang.String)
-         */
         public synchronized DataSpacesURI getScratchForAO(String aoid) throws FileSystemException {
             DataSpacesURI uri;
 
@@ -79,14 +68,13 @@ public class NodeScratchSpace {
             return uri;
         }
 
-        /*
-         * (non-Javadoc)
-         * 
-         * @see org.objectweb.proactive.extra.dataspaces.ApplicationScratchSpace#
-         * getSpaceInstanceInfo()
-         */
         public SpaceInstanceInfo getSpaceInstanceInfo() {
             return spaceInstanceInfo;
+        }
+        
+
+        public DataSpacesURI getSpaceMountingPoint() {
+            return spaceInstanceInfo.getMountingPoint();
         }
     }
 

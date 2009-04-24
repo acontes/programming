@@ -22,6 +22,13 @@ public interface ApplicationScratchSpace {
      * @return
      */
     public SpaceInstanceInfo getSpaceInstanceInfo();
+    
+    /**
+     * Mounting point stays unchanged during application run.
+     * 
+     * @return
+     */
+    public DataSpacesURI getSpaceMountingPoint();
 
     /**
      * removes scratch data space directory content
