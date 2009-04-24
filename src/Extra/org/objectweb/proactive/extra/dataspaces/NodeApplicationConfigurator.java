@@ -77,21 +77,21 @@ public class NodeApplicationConfigurator {
 	 */
 	// FIXME what is the state of configurator after all these exceptions
 	synchronized public void configureApplication(long appid, String namingServiceURL,
-			DefaultFileSystemManager manager, NodeScratchSpace nodeScratchSpace) throws ProActiveException,
-			URISyntaxException, FileSystemException {
+			DefaultFileSystemManager manager, NodeScratchSpace nodeScratchSpace) throws FileSystemException,
+			ProActiveException, URISyntaxException {
 
 		checkNotConfigured();
 
 		// create naming service stub with URL and decorate it with local cache
-		namingService = Utils.createNamingServiceStub(namingServiceURL);
-		cachingDirectory = new CachingSpacesDirectory(namingService);
+		NamingService ns = Utils.createNamingServiceStub(namingServiceURL);
+		CachingSpacesDirectory cd = new CachingSpacesDirectory(ns);
 
 		// create scratch data space for this application and register it
 		if (nodeScratchSpace != null) {
 			applicationScratchSpace = nodeScratchSpace.initForApplication(appid);
 			scratchInfo = applicationScratchSpace.getSpaceInstanceInfo();
 			try {
-				cachingDirectory.register(scratchInfo);
+				cd.register(scratchInfo);
 			} catch (WrongApplicationIdException e) {
 				// FIXME think more about passing it
 				throw new ProActiveRuntimeException("DataSpaces catched exception that should not occure", e);
@@ -99,6 +99,10 @@ public class NodeApplicationConfigurator {
 				// FIXME think more about passing it
 			}
 		}
+		// FIXME that if ns and cd are null? (what if failed)
+		// as no exception can be throwed
+		namingService = ns;
+		cachingDirectory = cd;
 
 		// create SpacesMountManager
 		spacesMountManager = new SpacesMountManager(manager, cachingDirectory);
