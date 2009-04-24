@@ -288,6 +288,7 @@ public class DataSpacesImpl {
 	 * @param type
 	 * @return
 	 * @throws SpaceAlreadyRegisteredException
+	 * @throws IllegalArgumentException
 	 *             when specified space type is neither input nor output
 	 * @throws ConfigurationException
 	 *             when specified configuration is not sufficient and mounting
@@ -295,23 +296,20 @@ public class DataSpacesImpl {
 	 * @throws WrongApplicationIdException
 	 */
 	public String addInputOutput(String name, String path, String url, SpaceType type)
-			throws SpaceAlreadyRegisteredException, ConfigurationException {
+			throws SpaceAlreadyRegisteredException, ConfigurationException, IllegalArgumentException {
 
 		assertIsInputOrOutput(type);
+		// FIXME add configuration checking/initialization ?
 
 		if (name == null || name.equals(""))
 			name = DataSpacesURI.DEFAULT_IN_OUT_NAME;
 
 		final String hostname = Utils.getHostname();
-		final InputOutputSpaceConfiguration config = InputOutputSpaceConfiguration.createConfiguration(
-				url, path, hostname, name, type);
+		final InputOutputSpaceConfiguration config = InputOutputSpaceConfiguration.createConfiguration(url,
+				path, hostname, name, type);
 
-		// FIXME add configuration checking/initialization ?
-		// FIXME add ProActive provider start up
-		// FIXME what if name already used?
-		// FIXME what if name == default here?
-		// FIXME #{deployer}
-		// re: deployer is rather not so usable here
+		if (url == null)
+			throw new RuntimeException("ProActive provider is not implemented yet.");
 
 		try {
 			final SpaceInstanceInfo spaceInstanceInfo = new SpaceInstanceInfo(appId, config);
