@@ -1,5 +1,8 @@
 package org.objectweb.proactive.extensions.structuredp2p.core;
 
+import java.io.Serializable;
+
+
 /**
  * Coordinate is used in a CAN network in order to specify the position of a given peer in the
  * space.
@@ -10,7 +13,8 @@ package org.objectweb.proactive.extensions.structuredp2p.core;
  * 
  * @version 0.1
  */
-public class Coordinate {
+@SuppressWarnings("serial")
+public class Coordinate implements Serializable {
     /**
      * The max value of Unicode we managed
      */
@@ -88,6 +92,11 @@ public class Coordinate {
     @Override
     public String toString() {
         return this.getValue();
+    }
+
+    public boolean equals(Object o) {
+        Coordinate cord = (Coordinate) o;
+        return this.value.equals(cord.value);
     }
 
 }
