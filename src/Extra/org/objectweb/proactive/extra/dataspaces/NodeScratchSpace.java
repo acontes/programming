@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.vfs.Capability;
-import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystem;
 import org.apache.commons.vfs.FileSystemException;
@@ -43,12 +42,12 @@ public class NodeScratchSpace {
 		private final SpaceInstanceInfo spaceInstanceInfo;
 
 		private AppScratchSpaceImpl(long appId) throws FileSystemException, ConfigurationException {
-			final String appIdString = new Long(appId).toString();
+			final String appIdString = Long.toString(appId);
 			this.fSpace = createEmptyDirectoryRelative(fPartialSpace, appIdString);
 			// or change it and use absolute configuration-created path
-			this.spaceInstanceInfo = new SpaceInstanceInfo(appId, runtimeId, nodeId, baseScratchConfiguration
-					.createScratchSpaceConfiguration(runtimeId + FileName.SEPARATOR_CHAR + nodeId
-							+ FileName.SEPARATOR_CHAR + appId));
+			final ScratchSpaceConfiguration scratchSpaceConf = baseScratchConfiguration
+					.createScratchSpaceConfiguration(runtimeId, nodeId, appIdString);
+			this.spaceInstanceInfo = new SpaceInstanceInfo(appId, runtimeId, nodeId, scratchSpaceConf);
 		}
 
 		/*
@@ -120,8 +119,8 @@ public class NodeScratchSpace {
 
 		final String localAccessUrl = Utils.getLocalAccessURL(baseScratchConfiguration.getUrl(),
 				baseScratchConfiguration.getPath(), Utils.getHostname());
-		final String subDir = runtimeId + FileName.SEPARATOR_CHAR + nodeId;
-		final String partialSpacePath = BaseScratchSpaceConfiguration.appendSubDir(localAccessUrl, subDir);
+		final String partialSpacePath = BaseScratchSpaceConfiguration.appendSubDir(localAccessUrl, runtimeId,
+				nodeId);
 
 		fPartialSpace = fileSystemManager.resolveFile(partialSpacePath);
 		checkCapabilities(fPartialSpace.getFileSystem());

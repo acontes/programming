@@ -10,12 +10,20 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationExceptio
 public class BaseScratchSpaceConfiguration {
 	public static final String HOSTNAME_VARIABLE_KEYWORD = "#{hostname}";
 
-	public static String appendSubDir(final String basePath, final String subDir) {
+	public static String appendSubDir(final String basePath, final String... subDirs) {
 		if (basePath == null)
 			return null;
-		if (!basePath.endsWith(FileName.SEPARATOR))
-			return basePath + FileName.SEPARATOR_CHAR + subDir;
-		return basePath + subDir;
+
+		final StringBuilder sb = new StringBuilder(basePath);
+		boolean skipFirst = basePath.charAt(basePath.length() - 1) == FileName.SEPARATOR_CHAR;
+		for (final String subDir : subDirs) {
+			if (skipFirst)
+				skipFirst = false;
+			else
+				sb.append(FileName.SEPARATOR_CHAR);
+			sb.append(subDir);
+		}
+		return sb.toString();
 	}
 
 	private String url;
@@ -62,10 +70,10 @@ public class BaseScratchSpaceConfiguration {
 		return path;
 	}
 
-	public ScratchSpaceConfiguration createScratchSpaceConfiguration(final String subDir)
+	public ScratchSpaceConfiguration createScratchSpaceConfiguration(final String... subDirs)
 			throws ConfigurationException {
-		final String newUrl = appendSubDir(getUrl(), subDir);
-		final String newPath = appendSubDir(getPath(), subDir);
+		final String newUrl = appendSubDir(getUrl(), subDirs);
+		final String newPath = appendSubDir(getPath(), subDirs);
 		return new ScratchSpaceConfiguration(newUrl, newPath, Utils.getHostname());
 	}
 }
