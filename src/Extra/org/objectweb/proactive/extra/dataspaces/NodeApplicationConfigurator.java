@@ -58,6 +58,8 @@ public class NodeApplicationConfigurator {
 	 * Configuration of a node for an application involves association to
 	 * provided NamingService and registration of application scratch space for
 	 * this node, if it exists.
+	 * <p>
+	 * If this method call fails, instance remains in not configured state.
 	 * 
 	 * @param appid
 	 *            application id
@@ -75,7 +77,6 @@ public class NodeApplicationConfigurator {
 	 * @throws FileSystemException
 	 *             VFS related exception during scratch data space creation
 	 */
-	// FIXME what is the state of configurator after all these exceptions
 	synchronized public void configureApplication(long appid, String namingServiceURL,
 			DefaultFileSystemManager manager, NodeScratchSpace nodeScratchSpace) throws FileSystemException,
 			ProActiveException, URISyntaxException {
@@ -83,6 +84,7 @@ public class NodeApplicationConfigurator {
 		checkNotConfigured();
 
 		// create naming service stub with URL and decorate it with local cache
+		// use local variables so GC can collect them if something fails
 		NamingService ns = Utils.createNamingServiceStub(namingServiceURL);
 		CachingSpacesDirectory cd = new CachingSpacesDirectory(ns);
 
@@ -99,8 +101,7 @@ public class NodeApplicationConfigurator {
 				// FIXME think more about passing it
 			}
 		}
-		// FIXME that if ns and cd are null? (what if failed)
-		// as no exception can be throwed
+		// as no exception can be thrown since now
 		namingService = ns;
 		cachingDirectory = cd;
 
@@ -120,23 +121,27 @@ public class NodeApplicationConfigurator {
 	 * {@link DataSpacesImpl} will not be usable after this call.
 	 * <p>
 	 * More than one call of this method may result in undefined behavior.
+	 * Further calls of application configuration-related objects may be
+	 * undefined.
 	 * 
 	 * @throws NotConfiguredException
 	 *             when node has not been configured for application
 	 * @throws FileSystemException
 	 *             VFS related exception
 	 */
-	// FIXME try to clean up as much as possible or even just log exceptions(?)
-	// FIXME what is the state of configurator after all these exceptions
-	synchronized public void close() throws NotConfiguredException, FileSystemException {
+	synchronized public void close() throws FileSystemException, NotConfiguredException {
 		checkConfigured();
 
 		spacesMountManager.close();
 		if (applicationScratchSpace != null) {
 			cachingDirectory.unregister(scratchInfo.getMountingPoint());
-			applicationScratchSpace.close();
+			try {
+				applicationScratchSpace.close();
+			} finally {
+				applicationScratchSpace = null;
+				// Utils.closeNamingServiceStub(namingService);
+			}
 		}
-		Utils.closeNamingServiceStub(namingService);
 	}
 
 	/**

@@ -35,7 +35,7 @@ public class Utils {
 
 	/**
 	 * Returns an identifier of a Runtime of specified Node.
-	 *
+	 * 
 	 * @param node
 	 * @return
 	 */
@@ -105,15 +105,6 @@ public class Utils {
 		NamingService stub = (NamingService) PARemoteObject.lookup(new URI(url));
 		return stub;
 		// return new NamingService();
-	}
-
-	/**
-	 * Empty.
-	 * 
-	 * @param stub
-	 */
-	public static void closeNamingServiceStub(NamingService stub) {
-		// nothing here
 	}
 
 	/**
