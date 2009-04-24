@@ -1,5 +1,7 @@
 package org.objectweb.proactive.extensions.structuredp2p.message;
 
+import java.io.Serializable;
+
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay;
 
@@ -14,7 +16,8 @@ import org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay;
  * 
  * @version 0.1
  */
-public class Key<T> {
+@SuppressWarnings("serial")
+public class Key<T> implements Serializable {
     /**
      * The key content.
      */
