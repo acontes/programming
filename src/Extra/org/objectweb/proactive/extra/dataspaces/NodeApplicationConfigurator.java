@@ -8,11 +8,8 @@ import java.net.URISyntaxException;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.impl.DefaultFileSystemManager;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.AlreadyConfiguredException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredException;
-import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceAlreadyRegisteredException;
-import org.objectweb.proactive.extra.dataspaces.exceptions.WrongApplicationIdException;
 
 // TODO making this class an inner class of NodeConfigurator would made implementation more
 // straight-forward perhaps
@@ -76,12 +73,16 @@ public class NodeApplicationConfigurator {
 	 *             occurred during contacting with NamingService
 	 * @throws FileSystemException
 	 *             VFS related exception during scratch data space creation
+	 * @throws ProActiveException
+	 *             on communication error while accessing NamingService or
+	 *             configuration-related exceptions
 	 */
 	synchronized public void configureApplication(long appid, String namingServiceURL,
 			DefaultFileSystemManager manager, NodeScratchSpace nodeScratchSpace) throws FileSystemException,
-			ProActiveException, URISyntaxException {
+			URISyntaxException, ProActiveException {
 
 		checkNotConfigured();
+		boolean ok = false;
 
 		// create naming service stub with URL and decorate it with local cache
 		// use local variables so GC can collect them if something fails
@@ -94,11 +95,10 @@ public class NodeApplicationConfigurator {
 			scratchInfo = applicationScratchSpace.getSpaceInstanceInfo();
 			try {
 				cd.register(scratchInfo);
-			} catch (WrongApplicationIdException e) {
-				// FIXME think more about passing it
-				throw new ProActiveRuntimeException("DataSpaces catched exception that should not occure", e);
-			} catch (SpaceAlreadyRegisteredException e) {
-				// FIXME think more about passing it
+				ok = true;
+			} finally {
+				if (!ok)
+					nodeScratchSpace.close();
 			}
 		}
 		// as no exception can be thrown since now

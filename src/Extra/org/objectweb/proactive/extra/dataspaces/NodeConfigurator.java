@@ -56,7 +56,7 @@ public class NodeConfigurator {
 	 * Scratch space configuration is checked and initialized.
 	 * 
 	 * State of an instance remains not configured as exception appears.
-	 *
+	 * 
 	 * @param scratchConfiguration
 	 *            scratch data space configuration, may be null if node does not
 	 *            provide scratch
@@ -75,13 +75,22 @@ public class NodeConfigurator {
 			throws AlreadyConfiguredException, FileSystemException, ConfigurationException {
 		checkNotConfigured();
 
+		boolean ok = false;
 		manager = VFSFactory.createDefaultFileSystemManager();
 
 		if (scratchConfiguration != null) {
 			nodeScratchSpace = new NodeScratchSpace(scratchConfiguration);
-			nodeScratchSpace.init(manager, node);
+			try {
+				nodeScratchSpace.init(manager, node);
+				ok = true;
+			} finally {
+				if (!ok) {
+					manager.close();
+					manager = null;
+				}
+			}
+			configured = true;
 		}
-		configured = true;
 	}
 
 	/**
@@ -94,7 +103,7 @@ public class NodeConfigurator {
 	 * 
 	 * If configuration fails any subsequent {@link #getDataSpaceImpl()} call
 	 * will throw {@link NotConfiguredException} until successful configuration.
-	 *
+	 * 
 	 * @param appid
 	 *            application id
 	 * @param namingServiceURL
@@ -165,7 +174,7 @@ public class NodeConfigurator {
 	 * 
 	 * If no application is configured, it does nothing. If closing fails,
 	 * application-specific configuration will be silently deleted.
-	 *
+	 * 
 	 * @throws FileSystemException
 	 *             VFS related exception during scratch space cleaning
 	 */
