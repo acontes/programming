@@ -6,6 +6,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.converter.MakeDeepCopy.WithMarshallStream;
 import org.objectweb.proactive.extensions.structuredp2p.data.DataStorage;
 import org.objectweb.proactive.extensions.structuredp2p.message.LookupMessage;
@@ -67,6 +68,18 @@ public class Peer implements InitActive, RunActive, Serializable {
      */
     public Peer(OverlayType type) {
         this.type = type;
+    }
+
+    /**
+     * Constructor.
+     * 
+     * @param entrypoint
+     *            the peer to join the overlay.
+     */
+    public Peer(Peer peer) {
+        this(peer.getType());
+        // FIXME
+        this.join(peer);
     }
 
     /**
@@ -187,5 +200,32 @@ public class Peer implements InitActive, RunActive, Serializable {
             }
 
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Peer))
+            throw new IllegalArgumentException();
+
+        Peer peer = (Peer) o;
+
+        if (this.getType() != peer.getType())
+            return false;
+
+        if (this.getType() == OverlayType.CAN) {
+            CanOverlay thisOverlay = (CanOverlay) this.getStructuredOverlay();
+            CanOverlay peerOverlay = (CanOverlay) peer.getStructuredOverlay();
+
+            return (thisOverlay.getArea().equals(peerOverlay.getArea()) && thisOverlay.getNeighbors().equals(
+                    peerOverlay.getNeighbors()));
+        } else if (this.getType() == OverlayType.CHORD) {
+            // TODO
+        }
+
+        return false;
+    }
+
+    public Peer getStub() {
+        return (Peer) PAActiveObject.getStubOnThis();
     }
 }

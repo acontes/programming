@@ -194,7 +194,6 @@ public class CanOverlay extends StructuredOverlay {
         this.addNeighbor(peer, dim, 1);
 
         ((CanOverlay) peer.getStructuredOverlay()).addNeighbor(this.getPeer(), dim, 0);
-        System.out.println("qqqqqqqqqqqqq");
     }
 
     /**
@@ -295,6 +294,8 @@ public class CanOverlay extends StructuredOverlay {
      *            the order.
      */
     public void addNeighbor(Peer peer, int dimension, int order) {
+        System.out.println(this.getPeer() + " add neighbor = " + peer + "; dim = " + dimension +
+            "; order = " + order);
         this.neighbors[dimension][order].add(peer);
     }
 
@@ -308,7 +309,7 @@ public class CanOverlay extends StructuredOverlay {
     public boolean hasNeighbor(Peer peer) {
         for (Group<Peer>[] neighborsAxe : this.neighbors) {
             for (Group<Peer> neighbor : neighborsAxe) {
-                if (neighbor.contains(peer)) {
+                if (neighbor.containsValue(peer)) {
                     return true;
                 }
             }

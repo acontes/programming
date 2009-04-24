@@ -1,11 +1,13 @@
 package functionalTests.structuredp2p.canoverlay;
 
 import junit.framework.Assert;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.structuredp2p.core.CanOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.OverlayType;
@@ -84,6 +86,7 @@ public class TestNeighbors {
     public void stopTest() {
         PAActiveObject.terminateActiveObject(this.neighbor, true);
         PAActiveObject.terminateActiveObject(this.entryPoint, true);
+        PALifeCycle.exitSuccess();
     }
 
 }
