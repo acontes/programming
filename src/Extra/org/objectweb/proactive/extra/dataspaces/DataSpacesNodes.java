@@ -61,8 +61,8 @@ public class DataSpacesNodes {
 	 * 
 	 * @param node
 	 *            node to be configured for Data Spaces
-	 * @param scratchConfiguration
-	 *            configuration of scratch data space for a specified node
+	 * @param baseScratchConfiguration
+	 *            base configuration of scratch data space for a specified node
 	 * @throws FileSystemException
 	 *             when VFS configuration creation or scratch initialization
 	 *             fails
@@ -71,11 +71,11 @@ public class DataSpacesNodes {
 	 *             capabilities checking)
 	 * @see NodeConfigurator#configureNode(SpaceConfiguration, Node)
 	 */
-	public static void configureNode(Node node, BaseScratchSpaceConfiguration scratchConfiguration)
+	public static void configureNode(Node node, BaseScratchSpaceConfiguration baseScratchConfiguration)
 			throws AlreadyConfiguredException, FileSystemException, ConfigurationException {
 		final NodeConfigurator nodeConfig = getOrCreateNodeConfigurator(node);
 		try {
-			nodeConfig.configureNode(scratchConfiguration, node);
+			nodeConfig.configureNode(baseScratchConfiguration, node);
 		} catch (AlreadyConfiguredException x) {
 			// it should never happen in our usage
 			throw new RuntimeException(x);

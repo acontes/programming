@@ -57,9 +57,9 @@ public class NodeConfigurator {
 	 * 
 	 * State of an instance remains not configured as exception appears.
 	 * 
-	 * @param scratchConfiguration
-	 *            scratch data space configuration, may be null if node does not
-	 *            provide scratch
+	 * @param baseScratchConfiguration
+	 *            base scratch data space configuration, may be null if node
+	 *            does not provide scratch
 	 * @param node
 	 *            node to configure
 	 * @throws AlreadyConfiguredException
@@ -71,15 +71,15 @@ public class NodeConfigurator {
 	 *             something failed during node scratch space configuration (ex.
 	 *             capabilities checking)
 	 */
-	synchronized public void configureNode(BaseScratchSpaceConfiguration scratchConfiguration, Node node)
+	synchronized public void configureNode(BaseScratchSpaceConfiguration baseScratchConfiguration, Node node)
 			throws AlreadyConfiguredException, FileSystemException, ConfigurationException {
 		checkNotConfigured();
 
 		boolean ok = false;
 		manager = VFSFactory.createDefaultFileSystemManager();
 
-		if (scratchConfiguration != null) {
-			nodeScratchSpace = new NodeScratchSpace(scratchConfiguration);
+		if (baseScratchConfiguration != null) {
+			nodeScratchSpace = new NodeScratchSpace(baseScratchConfiguration);
 			try {
 				nodeScratchSpace.init(manager, node);
 				ok = true;
