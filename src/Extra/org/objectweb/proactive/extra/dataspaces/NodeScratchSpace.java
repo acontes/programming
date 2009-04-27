@@ -102,8 +102,7 @@ public class NodeScratchSpace {
         final String runtimeId = Utils.getRuntimeId(node);
         final String localAccessUrl = Utils.getLocalAccessURL(baseScratchConfiguration.getUrl(),
                 baseScratchConfiguration.getPath(), Utils.getHostname());
-        final String partialSpacePath = BaseScratchSpaceConfiguration.appendSubDirs(localAccessUrl,
-                runtimeId, nodeId);
+        final String partialSpacePath = Utils.appendSubDirs(localAccessUrl, runtimeId, nodeId);
 
         fPartialSpace = fileSystemManager.resolveFile(partialSpacePath);
         checkCapabilities(fPartialSpace.getFileSystem());

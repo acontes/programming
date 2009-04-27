@@ -5,7 +5,6 @@ package org.objectweb.proactive.extra.dataspaces;
 
 import java.io.Serializable;
 
-import org.apache.commons.vfs.FileName;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 
 
@@ -29,36 +28,6 @@ public class BaseScratchSpaceConfiguration implements Serializable {
     private static final long serialVersionUID = 3878304428956402856L;
 
     public static final String HOSTNAME_VARIABLE_KEYWORD = "#{hostname}";
-
-    /**
-     * Appends subdirectories to provided base location (path or URL), managing file separators
-     * (slashes) in appropriate way.
-     * 
-     * @param baseLocation
-     *            Base location (path or URL) which is the root for appended subdirectories. Can be
-     *            <code>null</code>.
-     * @param subDirs
-     *            Any number of subdirectories to be appended to provided location. Order of
-     *            subdirectories responds to directories hierarchy and result path. None of it can
-     *            be <code>null</code> .
-     * @return location with appended subdirectories with appropriate slashes (separators).
-     *         <code>null</code> if <code>basePath</code> is <code>null</code>.
-     */
-    public static String appendSubDirs(final String baseLocation, final String... subDirs) {
-        if (baseLocation == null)
-            return null;
-
-        final StringBuilder sb = new StringBuilder(baseLocation);
-        boolean skipFirst = baseLocation.charAt(baseLocation.length() - 1) == FileName.SEPARATOR_CHAR;
-        for (final String subDir : subDirs) {
-            if (skipFirst)
-                skipFirst = false;
-            else
-                sb.append(FileName.SEPARATOR_CHAR);
-            sb.append(subDir);
-        }
-        return sb.toString();
-    }
 
     private String url;
 
@@ -131,8 +100,8 @@ public class BaseScratchSpaceConfiguration implements Serializable {
      */
     public ScratchSpaceConfiguration createScratchSpaceConfiguration(final String... subDirs)
             throws ConfigurationException {
-        final String newUrl = appendSubDirs(getUrl(), subDirs);
-        final String newPath = appendSubDirs(getPath(), subDirs);
+        final String newUrl = Utils.appendSubDirs(getUrl(), subDirs);
+        final String newPath = Utils.appendSubDirs(getPath(), subDirs);
         return new ScratchSpaceConfiguration(newUrl, newPath, Utils.getHostname());
     }
 }
