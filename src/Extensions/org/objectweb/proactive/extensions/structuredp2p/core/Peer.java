@@ -153,6 +153,10 @@ public class Peer implements InitActive, RunActive, Serializable {
         return this.structuredOverlay;
     }
 
+    public void setStructuredOverlay(StructuredOverlay structuredOverlay) {
+        this.structuredOverlay = structuredOverlay;
+    }
+
     /**
      * Returns the type of overlay that is used by the peer.
      * 

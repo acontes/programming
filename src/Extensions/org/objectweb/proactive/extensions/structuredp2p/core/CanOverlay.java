@@ -34,7 +34,7 @@ public class CanOverlay extends StructuredOverlay {
     /**
      * The number of dimensions which is equals to the number of axes.
      */
-    public static final int NB_DIMENSIONS = 4;
+    public static final int NB_DIMENSIONS = 2;
 
     /**
      * Neighbors of the current area. The neighbors are an array of ProActive groups.
@@ -111,14 +111,16 @@ public class CanOverlay extends StructuredOverlay {
     public boolean contains(Coordinate[] coordinates) {
         int i = 0;
         Coordinate[] minArea = this.area.getCoordinatesMin();
+     
         Coordinate[] maxArea = this.area.getCoordinatesMax();
 
         for (Coordinate coord : coordinates) {
             if (coord != null) {
                 // if the current coordinates aren't in the peer area.
-                if (minArea[i].getValue().compareTo(coord.getValue()) > 0 &&
-                    maxArea[i].getValue().compareTo(coord.getValue()) <= 0)
+                if (minArea[i].getValue().compareTo(coord.getValue()) <= 0 &&
+                    maxArea[i].getValue().compareTo(coord.getValue()) > 0)
                     return false;
+                
             }
 
             i++;
@@ -215,8 +217,9 @@ public class CanOverlay extends StructuredOverlay {
     public LookupResponseMessage sendMessage(LookupMessage msg) {
         CanLookupMessage msgCan = (CanLookupMessage) msg;
         if (this.contains(msgCan.getCoordinates())) {
-            msgCan.handle(this);
+            return msgCan.handle(this);
         } else {
+          
             Group<Peer>[][] neighbors = this.neighbors;
             int pos;
             int neighborIndex;
@@ -229,12 +232,12 @@ public class CanOverlay extends StructuredOverlay {
                         this.sendMessageTo(((Peer) neighborsGroup[0].getGroupByType()),
                                 new LoadBalancingMessage());
                         neighborIndex = neighborsGroup[0].waitOneAndGetIndex();
-                        neighborsGroup[0].get(neighborIndex).sendMessage(msg);
+                        return neighborsGroup[0].get(neighborIndex).sendMessage(msg);
                     } else if (pos == 1) {
                         this.sendMessageTo(((Peer) neighborsGroup[1].getGroupByType()),
                                 new LoadBalancingMessage());
                         neighborIndex = neighborsGroup[1].waitOneAndGetIndex();
-                        neighborsGroup[1].get(neighborIndex).sendMessage(msg);
+                        return neighborsGroup[1].get(neighborIndex).sendMessage(msg);
                     }
                 }
             }
