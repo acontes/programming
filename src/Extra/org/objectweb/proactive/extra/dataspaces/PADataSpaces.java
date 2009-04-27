@@ -417,8 +417,7 @@ public class PADataSpaces {
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
      * @throws ConfigurationException
-     *             when specified configuration is not sufficient and mounting point URI cannot be
-     *             constructed
+     *             when specified configuration is wrong or not sufficient
      */
     public static String addInput(String name, String path, String url)
             throws SpaceAlreadyRegisteredException, NotConfiguredException, ConfigurationException {
@@ -457,8 +456,7 @@ public class PADataSpaces {
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
      * @throws ConfigurationException
-     *             when specified configuration is not sufficient and mounting point URI cannot be
-     *             constructed
+     *             when specified configuration is wrong or not sufficient
      */
     public static String addOutput(String name, String path, String url)
             throws SpaceAlreadyRegisteredException, NotConfiguredException, ConfigurationException {
