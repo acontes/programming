@@ -6,7 +6,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.structuredp2p.core.Area;
 import org.objectweb.proactive.extensions.structuredp2p.core.CanOverlay;
@@ -19,6 +18,14 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.CanLook
 import org.objectweb.proactive.extensions.structuredp2p.message.response.ResponseMessage;
 
 
+/**
+ * 
+ * @author Kilanga Fanny
+ * @author Pellegrino Laurent
+ * @author Trovato Alexandre
+ * 
+ * @version 0.1
+ */
 public class TestCanMessage {
 
     private Peer srcPeer;
@@ -35,22 +42,23 @@ public class TestCanMessage {
     private CanOverlay can;
     private CanOverlay splitCan1;
     private CanOverlay splitCan2;
-
+    private int dim;
     @Before
     public void init() throws ActiveObjectCreationException, NodeException {
         srcPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(), new Object[] { OverlayType.CAN });
 
         myPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(), new Object[] { OverlayType.CAN });
+        dim = CanOverlay.NB_DIMENSIONS;
+        messCord = new Coordinate[dim];
+        
+        messCord[0] = new Coordinate("2");
+        messCord[1] = new Coordinate("2");
 
-        messCord = new Coordinate[2];
-        messCord[0] = new Coordinate("7");
-        messCord[1] = new Coordinate("7");
-
-        minCord = new Coordinate[2];
+        minCord = new Coordinate[dim];
         minCord[0] = new Coordinate("9");
         minCord[1] = new Coordinate("9");
 
-        maxCord = new Coordinate[2];
+        maxCord = new Coordinate[dim];
         maxCord[0] = new Coordinate("0");
         maxCord[1] = new Coordinate("0");
 
@@ -76,9 +84,7 @@ public class TestCanMessage {
 
     @Test
     public void testSendMessage() {
-        // ((CanOverlay)(srcPeer.getStructuredOverlay())).setArea(new Area(minCord , maxCord));
         srcResponse = srcPeer.sendMessage(lMsg);
-        // PAFuture.waitFor(srcResponse);
         assertNotNull("the src response is not null", srcResponse);
         assertArrayEquals("routing by bootStrap succes", ((CanLookupResponseMessage) srcResponse)
                 .getCoordinates(), messCord);
@@ -91,22 +97,22 @@ public class TestCanMessage {
     @Test
     public void testJoinAndSendMessage() {
         srcPeer.join(myPeer);
-        // method split not implement
-        minCord = new Coordinate[2];
+        // method split not yet implemented
+        minCord = new Coordinate[dim];
         minCord[0] = new Coordinate("9");
         minCord[1] = new Coordinate("9");
 
-        maxCord = new Coordinate[2];
+        maxCord = new Coordinate[dim];
         maxCord[0] = new Coordinate("4");
         maxCord[1] = new Coordinate("0");
 
         areaSplit1 = new Area(minCord, maxCord);
         //
-        minCord = new Coordinate[2];
+        minCord = new Coordinate[dim];
         minCord[0] = new Coordinate("4");
         minCord[1] = new Coordinate("9");
 
-        maxCord = new Coordinate[2];
+        maxCord = new Coordinate[dim];
         maxCord[0] = new Coordinate("0");
         maxCord[1] = new Coordinate("0");
 
@@ -114,13 +120,14 @@ public class TestCanMessage {
         //
         splitCan1 = ((CanOverlay) (srcPeer.getStructuredOverlay()));
         splitCan1.setArea(areaSplit1);
-        srcPeer.setStructuredOverlay(splitCan1);
 
         splitCan2 = ((CanOverlay) (myPeer.getStructuredOverlay()));
         splitCan2.setArea(areaSplit2);
+
+        srcPeer.setStructuredOverlay(splitCan1);
         myPeer.setStructuredOverlay(splitCan2);
 
-        myResponse = srcPeer.sendMessage(lMsg);
+        myResponse = myPeer.sendMessage(lMsg);
 
         assertNotNull("the src response is not null", myResponse);
         assertEquals("first coordinate ok", ((CanOverlay) ((CanLookupResponseMessage) myResponse).getPeer()

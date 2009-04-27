@@ -220,7 +220,8 @@ public class Peer implements InitActive, RunActive, Serializable {
             CanOverlay thisOverlay = (CanOverlay) this.getStructuredOverlay();
             CanOverlay peerOverlay = (CanOverlay) peer.getStructuredOverlay();
 
-            return thisOverlay.getArea().equals(peerOverlay.getArea());
+            return (thisOverlay.getArea().equals(peerOverlay.getArea()) && thisOverlay.getNeighbors().equals(
+                    peerOverlay.getNeighbors()));
         } else if (this.getType() == OverlayType.CHORD) {
             // TODO
         }
