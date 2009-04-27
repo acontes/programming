@@ -19,7 +19,6 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException
 import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceAlreadyRegisteredException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundException;
-import org.objectweb.proactive.extra.dataspaces.exceptions.WrongApplicationIdException;
 
 
 // TODO what about IO exceptions?
@@ -289,34 +288,25 @@ public class DataSpacesImpl {
      * @throws IllegalArgumentException
      *             when specified space type is neither input nor output
      * @throws ConfigurationException
-     *             when specified configuration is not sufficient and mounting point URI cannot be
-     *             constructed
-     * @throws WrongApplicationIdException
+     *             when specified configuration is wrong or not sufficient
      */
     public String addInputOutput(String name, String path, String url, SpaceType type)
             throws SpaceAlreadyRegisteredException, ConfigurationException, IllegalArgumentException {
 
         assertIsInputOrOutput(type);
-        // FIXME add configuration checking/initialization ?
 
         if (name == null || name.equals(""))
             name = DataSpacesURI.DEFAULT_IN_OUT_NAME;
+
+        if (url == null)
+            throw new RuntimeException("ProActive provider is not implemented yet.");
 
         final String hostname = Utils.getHostname();
         final InputOutputSpaceConfiguration config = InputOutputSpaceConfiguration.createConfiguration(url,
                 path, hostname, name, type);
 
-        if (url == null)
-            throw new RuntimeException("ProActive provider is not implemented yet.");
-
-        try {
-            final SpaceInstanceInfo spaceInstanceInfo = new SpaceInstanceInfo(appId, config);
-            spacesDirectory.register(spaceInstanceInfo);
-        } catch (WrongApplicationIdException e) {
-            throw new ProActiveRuntimeException("DataSpaces catched exception that should not occure", e);
-        } catch (ConfigurationException e) {
-            // FIXME
-        }
+        final SpaceInstanceInfo spaceInstanceInfo = new SpaceInstanceInfo(appId, config);
+        spacesDirectory.register(spaceInstanceInfo);
         return DataSpacesURI.createInOutSpaceURI(appId, type, name).toString();
     }
 
