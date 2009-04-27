@@ -12,7 +12,6 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 
 
-// TODO /me have a felling that state checking (in close/configure...)is not handled in the best way
 /**
  * Represents immutable Data Spaces configuration for a node. It manages both node-specific and
  * application-specific configuration resulting in Data Spaces implementation for application (
@@ -137,16 +136,16 @@ public class NodeConfigurator {
     }
 
     /**
-     * Returns Data Spaces implementation for application, if it has been successfully configured.
+     * Returns Data Spaces implementation for an application, if it has been successfully
+     * configured.
      * 
-     * @return configured implementation of Data Spaces for application
-     * @throws IllegalStateException
-     *             when node has not been configured yet (in terms of node-specific or
-     *             application-specific configuration)
+     * @return configured implementation of Data Spaces for application or <code>null</code> when
+     *         node has not been configured yet (in terms of node-specific or application-specific
+     *         configuration)
      */
     synchronized public DataSpacesImpl getDataSpacesImpl() throws IllegalStateException {
-        checkAppConfigured();
-
+        if (appConfigurator == null)
+            return null;
         return appConfigurator.getDataSpacesImpl();
     }
 
@@ -208,11 +207,6 @@ public class NodeConfigurator {
     private void checkNotConfigured() throws IllegalStateException {
         if (configured)
             throw new IllegalStateException("Node is already configured for Data Spaces");
-    }
-
-    private void checkAppConfigured() throws IllegalStateException {
-        if (appConfigurator == null)
-            throw new IllegalStateException("Node is not configured for Data Spaces application");
     }
 
     public class NodeApplicationConfigurator {

@@ -42,13 +42,17 @@ public class DataSpacesNodes {
      *            node that is asked for Data Spaces implementation
      * @return configured Data Spaces implementation for application
      * @throws NotConfiguredException
-     *             when node is not configured for Data Spaces or application-specific Data Spaces
-     *             configuration is not applied on this node
+     *             when node is not configured for Data Spaces at all or application-specific Data
+     *             Spaces configuration is not applied on this node
      * @see NodeConfigurator#getDataSpacesImpl()
      */
     public static DataSpacesImpl getDataSpacesImpl(Node node) throws NotConfiguredException {
         final NodeConfigurator nodeConfig = getOrFailNodeConfigurator(node);
-        return nodeConfig.getDataSpacesImpl();
+
+        final DataSpacesImpl impl = nodeConfig.getDataSpacesImpl();
+        if (impl == null)
+            throw new NotConfiguredException("Node is not configured for DataSpaces application");
+        return impl;
     }
 
     /**
@@ -65,12 +69,19 @@ public class DataSpacesNodes {
      * @throws ConfigurationException
      *             something failed during node scratch space configuration (ex. capabilities
      *             checking)
+     * @throws AlreadyConfiguredException
+     *             when node is already configured for Data Spaces
      * @see NodeConfigurator#configureNode(SpaceConfiguration, Node)
      */
     public static void configureNode(Node node, BaseScratchSpaceConfiguration baseScratchConfiguration)
             throws AlreadyConfiguredException, FileSystemException, ConfigurationException {
-        final NodeConfigurator nodeConfig = getOrCreateNodeConfigurator(node);
-        nodeConfig.configureNode(baseScratchConfiguration, node);
+        final NodeConfigurator nodeConfig = createNodeConfigurator(node);
+        try {
+            nodeConfig.configureNode(baseScratchConfiguration, node);
+        } catch (IllegalStateException x) {
+            // it can occur only in case of concurrent configuration, let's wrap it
+            throw new AlreadyConfiguredException(x.getMessage(), x);
+        }
     }
 
     /**
@@ -92,15 +103,21 @@ public class DataSpacesNodes {
      *             when exception occurred on namingServiceURL parsing
      * @throws ProActiveException
      *             occurred during contacting with NamingService
+     * @throws NotConfiguredException
+     *             when node is not configured for Data Spaces
      * @throws FileSystemException
      *             VFS related exception during scratch data space creation
      * @see NodeConfigurator#configureApplication(Node, long, String)
      */
     public static void configureApplication(Node node, String namingServiceURL) throws ProActiveException,
-            URISyntaxException, FileSystemException {
-
+            NotConfiguredException, URISyntaxException, FileSystemException {
         final NodeConfigurator nodeConfig = getOrFailNodeConfigurator(node);
-        nodeConfig.configureApplication(namingServiceURL);
+        try {
+            nodeConfig.configureApplication(namingServiceURL);
+        } catch (IllegalStateException x) {
+            // it can occur only in case of concurrent configuration, let's wrap it
+            throw new NotConfiguredException(x.getMessage(), x);
+        }
     }
 
     /**
@@ -116,7 +133,12 @@ public class DataSpacesNodes {
      */
     public static void closeNodeConfig(Node node) throws NotConfiguredException {
         final NodeConfigurator nodeConfig = removeOrFailNodeConfigurator(node);
-        nodeConfig.close();
+        try {
+            nodeConfig.close();
+        } catch (IllegalStateException x) {
+            // it can occur only in case of concurrent configuration, let's wrap it
+            throw new NotConfiguredException(x.getMessage(), x);
+        }
     }
 
     /**
@@ -131,25 +153,25 @@ public class DataSpacesNodes {
             nodeConfig.tryCloseAppConfigurator();
     }
 
-    private static NodeConfigurator getNodeConfigurator(Node node) {
-        final String name = Utils.getNodeId(node);
-
-        synchronized (nodeConfigurators) {
-            return nodeConfigurators.get(name);
-        }
-    }
-
-    private static NodeConfigurator getOrCreateNodeConfigurator(Node node) {
+    private static NodeConfigurator createNodeConfigurator(Node node) throws AlreadyConfiguredException {
         final String name = Utils.getNodeId(node);
 
         synchronized (nodeConfigurators) {
             final NodeConfigurator config = nodeConfigurators.get(name);
             if (config != null)
-                return config;
+                throw new AlreadyConfiguredException("Node is already configured for Data Spaces");
 
             final NodeConfigurator newConfig = new NodeConfigurator();
             nodeConfigurators.put(name, newConfig);
             return newConfig;
+        }
+    }
+
+    private static NodeConfigurator getNodeConfigurator(Node node) {
+        final String name = Utils.getNodeId(node);
+
+        synchronized (nodeConfigurators) {
+            return nodeConfigurators.get(name);
         }
     }
 
