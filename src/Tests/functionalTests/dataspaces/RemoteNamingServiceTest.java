@@ -174,7 +174,8 @@ public class RemoteNamingServiceTest {
 
     @After
     public void after() throws ProActiveException {
-        roe.unregisterAll();
+        if (roe != null)
+            roe.unregisterAll();
     }
 
     private void assertIsSpaceRegistered(SpaceInstanceInfo expected) {
