@@ -111,9 +111,6 @@ public class InputOutputSpaceConfiguration extends SpaceConfiguration {
 
     private final String name;
 
-    // TODO: now, somebody may provide us input-output space configuration
-    // with no URL (meaning - start provider), specify valid local path and
-    // wrong hostname; may be we should have some factories for that
     private InputOutputSpaceConfiguration(final String url, final String path, final String hostname,
             final SpaceType spaceType, final String name) throws ConfigurationException {
         super(url, path, hostname, spaceType);
