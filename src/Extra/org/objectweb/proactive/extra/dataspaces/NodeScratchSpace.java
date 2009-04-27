@@ -16,11 +16,11 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 
 
-/**
- * 
- */
-
 // FIXME leave data or remove all directories?
+
+/**
+ * Manages scratch data spaces directories and supports DS scratch access logic.
+ */
 public class NodeScratchSpace {
 
     private final BaseScratchSpaceConfiguration baseScratchConfiguration;
@@ -31,6 +31,9 @@ public class NodeScratchSpace {
 
     private FileObject fPartialSpace;
 
+    /**
+     * Inner class to implement {@link ApplicationScratchSpace} interface.
+     */
     private class AppScratchSpaceImpl implements ApplicationScratchSpace {
         private final FileObject fSpace;
 
@@ -85,6 +88,12 @@ public class NodeScratchSpace {
 
     // TODO check "other stuff" like os permissions in more explicit way?
     /**
+     * Initializes instance (and all related configuration objects) on a node and performs file
+     * system configuration and accessing tests.
+     *
+     * Can be called only once.
+     *
+     * @param fileSystemManager
      * @throws IllegalStateException
      *             when instance has been already configured
      * @throws FileSystemException
@@ -112,7 +121,11 @@ public class NodeScratchSpace {
     }
 
     /**
-     * @return
+     * Initializes scratch data space for an application that is running on a Node for which
+     * NodeScratchSpace has been configured and initialized by
+     * {@link #init(DefaultFileSystemManager)}.
+     *
+     * @return instance for creating and accessing scratch of concrete AO
      * @throws FileSystemException
      * @throws IllegalStateException
      * @throws ConfigurationException
