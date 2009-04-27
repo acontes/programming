@@ -71,7 +71,6 @@ public class NodeScratchSpace {
         public SpaceInstanceInfo getSpaceInstanceInfo() {
             return spaceInstanceInfo;
         }
-        
 
         public DataSpacesURI getSpaceMountingPoint() {
             return spaceInstanceInfo.getMountingPoint();

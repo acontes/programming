@@ -22,7 +22,7 @@ public interface ApplicationScratchSpace {
      * @return
      */
     public SpaceInstanceInfo getSpaceInstanceInfo();
-    
+
     /**
      * Mounting point stays unchanged during application run.
      * 
