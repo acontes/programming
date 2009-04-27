@@ -37,7 +37,7 @@ public class InputOutputSpaceConfiguration extends SpaceConfiguration {
      *            space. Can not be <code>null</code> .
      * @throws ConfigurationException
      *             when provided arguments doesn't form correct configuration (no access, no
-     *             hostname for path)
+     *             hostname for path, wrong space type)
      */
     public static InputOutputSpaceConfiguration createInputSpaceConfiguration(String url, String path,
             String hostname, String name) throws ConfigurationException {
@@ -69,7 +69,7 @@ public class InputOutputSpaceConfiguration extends SpaceConfiguration {
      *            (output) space. Can not be <code>null</code>.
      * @throws ConfigurationException
      *             when provided arguments doesn't form correct configuration (no access, no
-     *             hostname for path)
+     *             hostname for path, wrong space type)
      */
     public static InputOutputSpaceConfiguration createOutputSpaceConfiguration(String url, String path,
             String hostname, String name) throws ConfigurationException {
@@ -102,7 +102,7 @@ public class InputOutputSpaceConfiguration extends SpaceConfiguration {
      *            output space. Can not be <code>null</code>.
      * @throws ConfigurationException
      *             when provided arguments doesn't form correct configuration (no access, no
-     *             hostname for path)
+     *             hostname for path, wrong space type)
      */
     public static InputOutputSpaceConfiguration createConfiguration(String url, String path, String hostname,
             String name, SpaceType type) throws ConfigurationException {
@@ -120,7 +120,7 @@ public class InputOutputSpaceConfiguration extends SpaceConfiguration {
         this.name = name;
 
         if (spaceType != SpaceType.INPUT && spaceType != SpaceType.OUTPUT)
-            throw new IllegalArgumentException("Invalid space type for InputOutputSpaceConfiguration");
+            throw new ConfigurationException("Invalid space type for InputOutputSpaceConfiguration");
 
         if (name == null)
             throw new ConfigurationException("Name cannot be null");
