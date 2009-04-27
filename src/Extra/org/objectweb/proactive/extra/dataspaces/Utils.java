@@ -181,6 +181,7 @@ public class Utils {
         if (baseLocation == null)
             return null;
 
+        // TODO what about windows-like paths?
         final StringBuilder sb = new StringBuilder(baseLocation);
         boolean skipFirst = baseLocation.charAt(baseLocation.length() - 1) == FileName.SEPARATOR_CHAR;
         for (final String subDir : subDirs) {

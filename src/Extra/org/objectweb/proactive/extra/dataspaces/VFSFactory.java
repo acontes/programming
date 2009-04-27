@@ -12,7 +12,6 @@ import org.apache.commons.vfs.provider.sftp.SftpFileProvider;
 import org.apache.commons.vfs.provider.url.UrlFileProvider;
 
 
-// TODO set logger?
 /**
  * Factory class for creating configured VFS DefaultFileSystemManager instances.
  * <p>
@@ -54,6 +53,8 @@ public class VFSFactory {
         manager.addProvider("ftp", new FtpFileProvider());
         manager.addProvider("sftp", new SftpFileProvider());
         manager.setDefaultProvider(new UrlFileProvider());
+        // TODO set logger?
+        // TODO set FileObject decorator to synchronize close() calls, or even some other stuff? 
 
         manager.init();
         return manager;

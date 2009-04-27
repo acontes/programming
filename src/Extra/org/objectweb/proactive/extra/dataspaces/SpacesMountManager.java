@@ -41,6 +41,7 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundExceptio
  */
 // TODO known issue: how to disallow remote AOs (or even: other local AOs) write
 // access to each other scratch
+// Maybe FileObject decorator would be enough for that? 
 public class SpacesMountManager {
     // Apache VFS like these kind of games...
     private static final String SCHEME_VFS_HACKED = DataSpacesURI.SCHEME.substring(0, DataSpacesURI.SCHEME
