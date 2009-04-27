@@ -45,7 +45,7 @@ public class TestCanMessage {
         messCord = new Coordinate[2];
         messCord[0] = new Coordinate("7");
         messCord[1] = new Coordinate("7");
-        
+
         minCord = new Coordinate[2];
         minCord[0] = new Coordinate("9");
         minCord[1] = new Coordinate("9");
@@ -81,53 +81,53 @@ public class TestCanMessage {
         // PAFuture.waitFor(srcResponse);
         assertNotNull("the src response is not null", srcResponse);
         assertArrayEquals("routing by bootStrap succes", ((CanLookupResponseMessage) srcResponse)
-                .getCoordinates(), messCord);      
+                .getCoordinates(), messCord);
         assertEquals("first coordinate ok", ((CanOverlay) ((CanLookupResponseMessage) srcResponse).getPeer()
                 .getStructuredOverlay()).contains(0, messCord[0]), 0);
         assertEquals("second coordinate ok", ((CanOverlay) ((CanLookupResponseMessage) srcResponse).getPeer()
                 .getStructuredOverlay()).contains(1, messCord[1]), 0);
     }
-    
+
     @Test
-    public void testJoinAndSendMessage(){      
-       srcPeer.join(myPeer);
-       //method split not implement 
-       minCord = new Coordinate[2];
-       minCord[0] = new Coordinate("9");
-       minCord[1] = new Coordinate("9");
+    public void testJoinAndSendMessage() {
+        srcPeer.join(myPeer);
+        // method split not implement
+        minCord = new Coordinate[2];
+        minCord[0] = new Coordinate("9");
+        minCord[1] = new Coordinate("9");
 
-       maxCord = new Coordinate[2];
-       maxCord[0] = new Coordinate("4");
-       maxCord[1] = new Coordinate("0");
-       
-       areaSplit1 = new Area(minCord , maxCord);
-       //
-       minCord = new Coordinate[2];
-       minCord[0] = new Coordinate("4");
-       minCord[1] = new Coordinate("9");
+        maxCord = new Coordinate[2];
+        maxCord[0] = new Coordinate("4");
+        maxCord[1] = new Coordinate("0");
 
-       maxCord = new Coordinate[2];
-       maxCord[0] = new Coordinate("0");
-       maxCord[1] = new Coordinate("0");
-       
-       areaSplit2 = new Area(minCord , maxCord);
-       //
-       splitCan1 = ((CanOverlay) (srcPeer.getStructuredOverlay()));
-       splitCan1.setArea(areaSplit1);
-       srcPeer.setStructuredOverlay(splitCan1);
-       
-       splitCan2 = ((CanOverlay) (myPeer.getStructuredOverlay()));
-       splitCan2.setArea(areaSplit2);
-       myPeer.setStructuredOverlay(splitCan2);
-       
-       myResponse = srcPeer.sendMessage(lMsg);
-       
-       assertNotNull("the src response is not null", myResponse);
-       assertEquals("first coordinate ok", ((CanOverlay) ((CanLookupResponseMessage) myResponse).getPeer()
-               .getStructuredOverlay()).contains(0, messCord[0]), 0);
-       assertEquals("second coordinate ok", ((CanOverlay) ((CanLookupResponseMessage) myResponse).getPeer()
-               .getStructuredOverlay()).contains(1, messCord[1]), 0);
-       
+        areaSplit1 = new Area(minCord, maxCord);
+        //
+        minCord = new Coordinate[2];
+        minCord[0] = new Coordinate("4");
+        minCord[1] = new Coordinate("9");
+
+        maxCord = new Coordinate[2];
+        maxCord[0] = new Coordinate("0");
+        maxCord[1] = new Coordinate("0");
+
+        areaSplit2 = new Area(minCord, maxCord);
+        //
+        splitCan1 = ((CanOverlay) (srcPeer.getStructuredOverlay()));
+        splitCan1.setArea(areaSplit1);
+        srcPeer.setStructuredOverlay(splitCan1);
+
+        splitCan2 = ((CanOverlay) (myPeer.getStructuredOverlay()));
+        splitCan2.setArea(areaSplit2);
+        myPeer.setStructuredOverlay(splitCan2);
+
+        myResponse = srcPeer.sendMessage(lMsg);
+
+        assertNotNull("the src response is not null", myResponse);
+        assertEquals("first coordinate ok", ((CanOverlay) ((CanLookupResponseMessage) myResponse).getPeer()
+                .getStructuredOverlay()).contains(0, messCord[0]), 0);
+        assertEquals("second coordinate ok", ((CanOverlay) ((CanLookupResponseMessage) myResponse).getPeer()
+                .getStructuredOverlay()).contains(1, messCord[1]), 0);
+
     }
 
     @After
