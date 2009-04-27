@@ -34,7 +34,7 @@ public class DataSpacesNodes {
      * 
      * This method is usable after setting up this node with
      * {@link #configureNode(Node, SpaceConfiguration)} and
-     * {@link #configureApplication(Node, long, String)} calls.
+     * {@link #configureApplication(Node, String)} calls.
      * 
      * Returned instance is usable while node is kept configured for the application.
      * 
@@ -53,7 +53,7 @@ public class DataSpacesNodes {
 
     /**
      * Configures Data Spaces on node and stores that configuration, so it can be later configured
-     * for specific application by {@link #configureApplication(Node, long, String)} or closed by
+     * for specific application by {@link #configureApplication(Node, String)} or closed by
      * {@link #closeNodeConfig(Node)}.
      * 
      * @param node
@@ -83,7 +83,7 @@ public class DataSpacesNodes {
      * with Data Spaces implementation instance, so they can be later accessed by
      * {@link #getDataSpacesImpl(Node)} or closed through
      * {@link #tryCloseNodeApplicationConfig(Node)} or subsequent
-     * {@link #configureApplication(Node, long, String)}.
+     * {@link #configureApplication(Node, String)}.
      * 
      * This method can be called on an already configured node (see
      * {@link #configureNode(Node, SpaceConfiguration)}) or even already application-configured node
@@ -91,8 +91,6 @@ public class DataSpacesNodes {
      * 
      * @param node
      *            node to be configured for Data Spaces application
-     * @param appid
-     *            identifier of an application
      * @param namingServiceURL
      *            URL of a Naming Service to connect to
      * @throws URISyntaxException
@@ -103,10 +101,11 @@ public class DataSpacesNodes {
      *             VFS related exception during scratch data space creation
      * @see NodeConfigurator#configureApplication(Node, long, String)
      */
-    public static void configureApplication(Node node, long appid, String namingServiceURL)
-            throws ProActiveException, URISyntaxException, FileSystemException {
+    public static void configureApplication(Node node, String namingServiceURL) throws ProActiveException,
+            URISyntaxException, FileSystemException {
+
         final NodeConfigurator nodeConfig = getOrFailNodeConfigurator(node);
-        nodeConfig.configureApplication(appid, namingServiceURL);
+        nodeConfig.configureApplication(namingServiceURL);
     }
 
     /**

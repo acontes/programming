@@ -27,13 +27,11 @@ public class NodeScratchSpace {
 
     private final BaseScratchSpaceConfiguration baseScratchConfiguration;
 
+    private final Node node;
+
     private boolean configured = false;
 
     private FileObject fPartialSpace;
-
-    private String runtimeId;
-
-    private String nodeId;
 
     private class AppScratchSpaceImpl implements ApplicationScratchSpace {
         private final FileObject fSpace;
@@ -42,9 +40,14 @@ public class NodeScratchSpace {
 
         private final SpaceInstanceInfo spaceInstanceInfo;
 
-        private AppScratchSpaceImpl(long appId) throws FileSystemException, ConfigurationException {
+        private AppScratchSpaceImpl() throws FileSystemException, ConfigurationException {
+            final long appId = Utils.getApplicationId(node);
             final String appIdString = Long.toString(appId);
+            final String runtimeId = Utils.getRuntimeId(node);
+            final String nodeId = Utils.getNodeId(node);
+
             this.fSpace = createEmptyDirectoryRelative(fPartialSpace, appIdString);
+
             // or change it and use absolute configuration-created path
             final ScratchSpaceConfiguration scratchSpaceConf = baseScratchConfiguration
                     .createScratchSpaceConfiguration(runtimeId, nodeId, appIdString);
@@ -77,13 +80,12 @@ public class NodeScratchSpace {
         }
     }
 
-    // TODO: here we use Node to get nodeId and runtimeId, and in
-    // AppScratchSpace we use just aoId; let's make it consistent;
-    public NodeScratchSpace(BaseScratchSpaceConfiguration conf) {
+    public NodeScratchSpace(Node node, BaseScratchSpaceConfiguration conf) {
         this.baseScratchConfiguration = conf;
+        this.node = node;
     }
 
-    // TODO check "other stuff" like os permitions in more explicit way?
+    // TODO check "other stuff" like os permissions in more explicit way?
     /**
      * @throws AlreadyConfiguredException
      *             when instance has been already configured
@@ -92,15 +94,14 @@ public class NodeScratchSpace {
      * @throws ConfigurationException
      *             when checking FS capabilities
      */
-    public synchronized void init(DefaultFileSystemManager fileSystemManager, Node node)
+    public synchronized void init(DefaultFileSystemManager fileSystemManager)
             throws AlreadyConfiguredException, FileSystemException, ConfigurationException {
 
         if (configured)
             throw new AlreadyConfiguredException();
 
-        nodeId = Utils.getNodeId(node);
-        runtimeId = Utils.getRuntimeId(node);
-
+        final String nodeId = Utils.getNodeId(node);
+        final String runtimeId = Utils.getRuntimeId(node);
         final String localAccessUrl = Utils.getLocalAccessURL(baseScratchConfiguration.getUrl(),
                 baseScratchConfiguration.getPath(), Utils.getHostname());
         final String partialSpacePath = BaseScratchSpaceConfiguration.appendSubDirs(localAccessUrl,
@@ -114,18 +115,17 @@ public class NodeScratchSpace {
     }
 
     /**
-     * @param appid
      * @return
      * @throws FileSystemException
      * @throws NotConfiguredException
      * @throws ConfigurationException
      *             when provided information is not enough to build a complete space definition
      */
-    public synchronized ApplicationScratchSpace initForApplication(long appid) throws FileSystemException,
+    public synchronized ApplicationScratchSpace initForApplication() throws FileSystemException,
             NotConfiguredException, ConfigurationException {
 
         checkIfConfigured();
-        return new AppScratchSpaceImpl(appid);
+        return new AppScratchSpaceImpl();
     }
 
     /**

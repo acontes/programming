@@ -49,6 +49,8 @@ public class NodeConfigurator {
 
     private NodeApplicationConfigurator appConfigurator;
 
+    private Node node;
+
     /**
      * Set node-specific immutable settings and initialize components. This method must be called
      * exactly once for each instance.
@@ -74,11 +76,12 @@ public class NodeConfigurator {
             throws AlreadyConfiguredException, FileSystemException, ConfigurationException {
         checkNotConfigured();
 
-        manager = VFSFactory.createDefaultFileSystemManager();
+        this.manager = VFSFactory.createDefaultFileSystemManager();
+        this.node = node;
         if (baseScratchConfiguration != null) {
-            nodeScratchSpace = new NodeScratchSpace(baseScratchConfiguration);
+            nodeScratchSpace = new NodeScratchSpace(node, baseScratchConfiguration);
             try {
-                nodeScratchSpace.init(manager, node);
+                nodeScratchSpace.init(manager);
                 configured = true;
             } finally {
                 if (!configured) {
@@ -105,8 +108,6 @@ public class NodeConfigurator {
      * subsequent {@link #getDataSpaceImpl()} call will throw {@link NotConfiguredException} until
      * successful configuration.
      * 
-     * @param appid
-     *            application id
      * @param namingServiceURL
      *            URL of naming service remote object for that application
      * @throws NotConfiguredException
@@ -121,16 +122,15 @@ public class NodeConfigurator {
      * @throws FileSystemException
      *             VFS related exception during scratch data space creation
      */
-    synchronized public void configureApplication(long appid, String namingServiceURL)
-            throws NotConfiguredException, FileSystemException, ProActiveException, ConfigurationException,
-            URISyntaxException {
+    synchronized public void configureApplication(String namingServiceURL) throws NotConfiguredException,
+            FileSystemException, ProActiveException, ConfigurationException, URISyntaxException {
         checkConfigured();
 
         tryCloseAppConfigurator();
         appConfigurator = new NodeApplicationConfigurator();
         boolean appConfigured = false;
         try {
-            appConfigurator.configureApplication(appid, namingServiceURL);
+            appConfigurator.configureApplication(namingServiceURL);
             appConfigured = true;
         } finally {
             if (!appConfigured)
@@ -230,7 +230,7 @@ public class NodeConfigurator {
 
         private DataSpacesImpl impl;
 
-        private void configureApplication(long appid, String namingServiceURL) throws FileSystemException,
+        private void configureApplication(String namingServiceURL) throws FileSystemException,
                 URISyntaxException, ProActiveException, ConfigurationException {
 
             // create naming service stub with URL and decorate it with local cache
@@ -240,7 +240,7 @@ public class NodeConfigurator {
 
             // create scratch data space for this application and register it
             if (nodeScratchSpace != null) {
-                applicationScratchSpace = nodeScratchSpace.initForApplication(appid);
+                applicationScratchSpace = nodeScratchSpace.initForApplication();
                 final SpaceInstanceInfo scratchInfo = applicationScratchSpace.getSpaceInstanceInfo();
 
                 boolean registered = false;
@@ -260,7 +260,7 @@ public class NodeConfigurator {
 
             // create implementation object connected to the application's
             // configuration
-            impl = new DataSpacesImpl(spacesMountManager, cachingDirectory, applicationScratchSpace, appid);
+            impl = new DataSpacesImpl(node, spacesMountManager, cachingDirectory, applicationScratchSpace);
         }
 
         private DataSpacesImpl getDataSpacesImpl() {

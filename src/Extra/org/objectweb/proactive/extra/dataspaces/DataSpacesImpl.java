@@ -13,6 +13,7 @@ import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredException;
@@ -38,11 +39,11 @@ public class DataSpacesImpl {
 
     private final long appId;
 
-    public DataSpacesImpl(SpacesMountManager smm, SpacesDirectory sd, ApplicationScratchSpace ass, long appId) {
+    public DataSpacesImpl(Node node, SpacesMountManager smm, SpacesDirectory sd, ApplicationScratchSpace ass) {
         appScratchSpace = ass;
         spacesDirectory = sd;
         spacesMountManager = smm;
-        this.appId = appId;
+        this.appId = Utils.getApplicationId(node);
     }
 
     /**
