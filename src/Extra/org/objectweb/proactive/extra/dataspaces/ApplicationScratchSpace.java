@@ -4,6 +4,7 @@
 package org.objectweb.proactive.extra.dataspaces;
 
 import org.apache.commons.vfs.FileSystemException;
+import org.objectweb.proactive.Body;
 
 
 /**
@@ -14,7 +15,7 @@ import org.apache.commons.vfs.FileSystemException;
  */
 public interface ApplicationScratchSpace {
 
-    public DataSpacesURI getScratchForAO(String aoid) throws FileSystemException;
+    public DataSpacesURI getScratchForAO(Body body) throws FileSystemException;
 
     /**
      * Instance stays unchanged during application run.

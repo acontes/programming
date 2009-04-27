@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
+import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.node.Node;
@@ -80,8 +81,8 @@ public class DataSpacesImpl {
         if (appScratchSpace == null)
             throw new NotConfiguredException("Scratch data space not configured on this node");
 
-        final String aoid = Utils.getCurrentActiveObjectId();
-        final DataSpacesURI scratchURI = appScratchSpace.getScratchForAO(aoid);
+        final Body body = Utils.getCurrentActiveObjectBody();
+        final DataSpacesURI scratchURI = appScratchSpace.getScratchForAO(body);
         try {
             return spacesMountManager.resolveFile(scratchURI);
         } catch (SpaceNotFoundException e) {

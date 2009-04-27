@@ -12,6 +12,7 @@ import org.apache.commons.vfs.FileSystem;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.Selectors;
 import org.apache.commons.vfs.impl.DefaultFileSystemManager;
+import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 
@@ -59,7 +60,8 @@ public class NodeScratchSpace {
             fSpace.delete(Selectors.SELECT_ALL);
         }
 
-        public synchronized DataSpacesURI getScratchForAO(String aoid) throws FileSystemException {
+        public synchronized DataSpacesURI getScratchForAO(Body body) throws FileSystemException {
+            final String aoid = Utils.getActiveObjectId(body);
             DataSpacesURI uri;
 
             if (!scratches.containsKey(aoid)) {

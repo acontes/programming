@@ -7,6 +7,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.apache.commons.vfs.FileName;
+import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PARemoteObject;
 import org.objectweb.proactive.core.ProActiveException;
@@ -57,18 +58,27 @@ public class Utils {
     }
 
     /**
-     * Returns identifier of an Active Object of current active thread.
+     * Returns identifier of an Active Object Body.
+     * 
+     * @return
+     */
+    public static String getActiveObjectId(Body body) {
+        UniqueID uid = body.getID();
+        return uid.toString();
+    }
+
+    /**
+     * Returns Body of an Active Object of a current active thread.
      * 
      * @return
      * @throws ProActiveRuntimeException
      *             when not called from an active thread
      */
-    public static String getCurrentActiveObjectId() throws ProActiveRuntimeException {
+    public static Body getCurrentActiveObjectBody() throws ProActiveRuntimeException {
         if (PAActiveObject.getStubOnThis() == null)
             throw new ProActiveRuntimeException("This method must be called from an active thread");
 
-        UniqueID uid = PAActiveObject.getBodyOnThis().getID();
-        return uid.toString();
+        return PAActiveObject.getBodyOnThis();
     }
 
     /**
@@ -92,7 +102,7 @@ public class Utils {
 
     /**
      * Returns an application id that is
-     *
+     * 
      * @return
      * @throws ProActiveRuntimeException
      *             when not called from an active thread
