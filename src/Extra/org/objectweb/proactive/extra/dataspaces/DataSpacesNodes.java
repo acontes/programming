@@ -70,12 +70,7 @@ public class DataSpacesNodes {
     public static void configureNode(Node node, BaseScratchSpaceConfiguration baseScratchConfiguration)
             throws AlreadyConfiguredException, FileSystemException, ConfigurationException {
         final NodeConfigurator nodeConfig = getOrCreateNodeConfigurator(node);
-        try {
-            nodeConfig.configureNode(baseScratchConfiguration, node);
-        } catch (AlreadyConfiguredException x) {
-            // it should never happen in our usage
-            throw new RuntimeException(x);
-        }
+        nodeConfig.configureNode(baseScratchConfiguration, node);
     }
 
     /**

@@ -9,9 +9,7 @@ import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.impl.DefaultFileSystemManager;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.extra.dataspaces.exceptions.AlreadyConfiguredException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
-import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredException;
 
 
 // TODO /me have a felling that state checking (in close/configure...)is not handled in the best way
@@ -64,7 +62,7 @@ public class NodeConfigurator {
      *            provide a scratch space
      * @param node
      *            node to configure
-     * @throws AlreadyConfiguredException
+     * @throws IllegalStateException
      *             when trying to reconfigure already configured instance
      * @throws ConfigurationException
      *             when configuration appears to be wrong during node scratch space initialization
@@ -73,7 +71,7 @@ public class NodeConfigurator {
      *             when VFS configuration creation or scratch initialization fails
      */
     synchronized public void configureNode(BaseScratchSpaceConfiguration baseScratchConfiguration, Node node)
-            throws AlreadyConfiguredException, FileSystemException, ConfigurationException {
+            throws IllegalStateException, FileSystemException, ConfigurationException {
         checkNotConfigured();
 
         this.manager = VFSFactory.createDefaultFileSystemManager();
@@ -105,12 +103,12 @@ public class NodeConfigurator {
      * close existing application-specific configuration and create a new one.
      * <p>
      * If configuration fails, instance of this class remains not configured for an application, any
-     * subsequent {@link #getDataSpaceImpl()} call will throw {@link NotConfiguredException} until
+     * subsequent {@link #getDataSpaceImpl()} call will throw {@link IllegalStateException} until
      * successful configuration.
      * 
      * @param namingServiceURL
      *            URL of naming service remote object for that application
-     * @throws NotConfiguredException
+     * @throws IllegalStateException
      *             when node has not been configured yet in terms of node-specific configuration
      * @throws URISyntaxException
      *             when exception occurred on namingServiceURL parsing
@@ -122,7 +120,7 @@ public class NodeConfigurator {
      * @throws FileSystemException
      *             VFS related exception during scratch data space creation
      */
-    synchronized public void configureApplication(String namingServiceURL) throws NotConfiguredException,
+    synchronized public void configureApplication(String namingServiceURL) throws IllegalStateException,
             FileSystemException, ProActiveException, ConfigurationException, URISyntaxException {
         checkConfigured();
 
@@ -142,11 +140,11 @@ public class NodeConfigurator {
      * Returns Data Spaces implementation for application, if it has been successfully configured.
      * 
      * @return configured implementation of Data Spaces for application
-     * @throws NotConfiguredException
+     * @throws IllegalStateException
      *             when node has not been configured yet (in terms of node-specific or
      *             application-specific configuration)
      */
-    synchronized public DataSpacesImpl getDataSpacesImpl() throws NotConfiguredException {
+    synchronized public DataSpacesImpl getDataSpacesImpl() throws IllegalStateException {
         checkAppConfigured();
 
         return appConfigurator.getDataSpacesImpl();
@@ -159,10 +157,10 @@ public class NodeConfigurator {
      * More than one call of this method may result in undefined behavior. Any subsequent call to
      * node configuration-specific objects may result in undefined behavior.
      * 
-     * @throws NotConfiguredException
+     * @throws IllegalStateException
      *             when node has not been configured yet in terms of node-specific configuration
      */
-    synchronized public void close() throws NotConfiguredException {
+    synchronized public void close() throws IllegalStateException {
         checkConfigured();
 
         tryCloseAppConfigurator();
@@ -170,9 +168,6 @@ public class NodeConfigurator {
             if (nodeScratchSpace != null) {
                 nodeScratchSpace.close();
             }
-        } catch (NotConfiguredException e) {
-            // can't happen for our usage
-            // TODO log or throw
         } catch (FileSystemException e) {
             // TODO log or throw
         }
@@ -205,19 +200,19 @@ public class NodeConfigurator {
         }
     }
 
-    private void checkConfigured() throws NotConfiguredException {
+    private void checkConfigured() throws IllegalStateException {
         if (!configured)
-            throw new NotConfiguredException("Node is not configured for Data Spaces");
+            throw new IllegalStateException("Node is not configured for Data Spaces");
     }
 
-    private void checkNotConfigured() throws AlreadyConfiguredException {
+    private void checkNotConfigured() throws IllegalStateException {
         if (configured)
-            throw new AlreadyConfiguredException("Node is already configured for Data Spaces");
+            throw new IllegalStateException("Node is already configured for Data Spaces");
     }
 
-    private void checkAppConfigured() throws NotConfiguredException {
+    private void checkAppConfigured() throws IllegalStateException {
         if (appConfigurator == null)
-            throw new NotConfiguredException("Node is not configured for Data Spaces application");
+            throw new IllegalStateException("Node is not configured for Data Spaces application");
     }
 
     public class NodeApplicationConfigurator {

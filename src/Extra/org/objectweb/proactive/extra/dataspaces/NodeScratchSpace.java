@@ -13,9 +13,7 @@ import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.Selectors;
 import org.apache.commons.vfs.impl.DefaultFileSystemManager;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.extra.dataspaces.exceptions.AlreadyConfiguredException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
-import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredException;
 
 
 /**
@@ -87,18 +85,18 @@ public class NodeScratchSpace {
 
     // TODO check "other stuff" like os permissions in more explicit way?
     /**
-     * @throws AlreadyConfiguredException
+     * @throws IllegalStateException
      *             when instance has been already configured
      * @throws FileSystemException
      *             occurred during VFS operation
      * @throws ConfigurationException
      *             when checking FS capabilities
      */
-    public synchronized void init(DefaultFileSystemManager fileSystemManager)
-            throws AlreadyConfiguredException, FileSystemException, ConfigurationException {
+    public synchronized void init(DefaultFileSystemManager fileSystemManager) throws FileSystemException,
+            ConfigurationException, IllegalStateException {
 
         if (configured)
-            throw new AlreadyConfiguredException();
+            throw new IllegalStateException("Instance already configured");
 
         final String nodeId = Utils.getNodeId(node);
         final String runtimeId = Utils.getRuntimeId(node);
@@ -117,12 +115,12 @@ public class NodeScratchSpace {
     /**
      * @return
      * @throws FileSystemException
-     * @throws NotConfiguredException
+     * @throws IllegalStateException
      * @throws ConfigurationException
      *             when provided information is not enough to build a complete space definition
      */
     public synchronized ApplicationScratchSpace initForApplication() throws FileSystemException,
-            NotConfiguredException, ConfigurationException {
+            IllegalStateException, ConfigurationException {
 
         checkIfConfigured();
         return new AppScratchSpaceImpl();
@@ -132,9 +130,9 @@ public class NodeScratchSpace {
      * Removes initialized directory on finalization.
      * 
      * @throws FileSystemException
-     * @throws NotConfiguredException
+     * @throws IllegalStateException
      */
-    public synchronized void close() throws FileSystemException, NotConfiguredException {
+    public synchronized void close() throws FileSystemException, IllegalStateException {
         checkIfConfigured();
 
         final FileObject fRuntime = fPartialSpace.getParent();
@@ -168,8 +166,8 @@ public class NodeScratchSpace {
         }
     }
 
-    private void checkIfConfigured() throws NotConfiguredException {
+    private void checkIfConfigured() throws IllegalStateException {
         if (!configured)
-            throw new NotConfiguredException();
+            throw new IllegalStateException("Instance not configured");
     }
 }
