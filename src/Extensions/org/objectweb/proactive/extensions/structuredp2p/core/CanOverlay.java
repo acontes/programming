@@ -49,8 +49,8 @@ public class CanOverlay extends StructuredOverlay {
     /**
      * Constructor.
      */
-    public CanOverlay(Peer peer) {
-        super(peer);
+    public CanOverlay(Peer localPeer) {
+        super(localPeer);
         this.neighbors = new Group[NB_DIMENSIONS][2];
 
         try {
@@ -111,7 +111,7 @@ public class CanOverlay extends StructuredOverlay {
     public boolean contains(Coordinate[] coordinates) {
         int i = 0;
         Coordinate[] minArea = this.area.getCoordinatesMin();
-     
+
         Coordinate[] maxArea = this.area.getCoordinatesMax();
 
         for (Coordinate coord : coordinates) {
@@ -120,7 +120,7 @@ public class CanOverlay extends StructuredOverlay {
                 if (minArea[i].getValue().compareTo(coord.getValue()) <= 0 &&
                     maxArea[i].getValue().compareTo(coord.getValue()) > 0)
                     return false;
-                
+
             }
 
             i++;
@@ -161,7 +161,7 @@ public class CanOverlay extends StructuredOverlay {
      * @param peer
      *            the peer which left the network.
      */
-    public void merge(Peer peer) {
+    public void merge(Peer remotePeer) {
         // TODO
     }
 
@@ -193,13 +193,13 @@ public class CanOverlay extends StructuredOverlay {
      * {@inheritDoc}
      */
     @Override
-    public void join(Peer peer) {
+    public void join(Peer remotePeer) {
         // FIXME
         int dim = this.getRandomDimension();
 
-        this.addNeighbor(peer, dim, 1);
-        this.sendMessageTo(peer, new CanJoinMessage(this.getPeer().getStub(), dim, 0));
-        //((CanOverlay) peer.getStructuredOverlay()).addNeighbor(this.getPeer(), dim, 0);
+        this.addNeighbor(remotePeer, dim, 1);
+        this.getPeer().getStub().sendMessageTo(remotePeer,
+                new CanJoinMessage(this.getPeer().getStub(), dim, 0));
     }
 
     /**
@@ -219,7 +219,7 @@ public class CanOverlay extends StructuredOverlay {
         if (this.contains(msgCan.getCoordinates())) {
             return msgCan.handle(this);
         } else {
-          
+
             Group<Peer>[][] neighbors = this.neighbors;
             int pos;
             int neighborIndex;
@@ -250,8 +250,8 @@ public class CanOverlay extends StructuredOverlay {
      * {@inheritDoc}
      */
     @Override
-    public ResponseMessage sendMessageTo(Peer peer, Message msg) {
-        return peer.receiveMessage(msg);
+    public ResponseMessage sendMessageTo(Peer remotePeer, Message msg) {
+        return remotePeer.receiveMessage(msg);
     }
 
     /**
@@ -300,10 +300,12 @@ public class CanOverlay extends StructuredOverlay {
      * @param order
      *            the order.
      */
-    public void addNeighbor(Peer peer, int dimension, int order) {
-        System.out.println(this.getPeer() + " add neighbor = " + peer + "; dim = " + dimension +
-            "; order = " + order);
-        this.neighbors[dimension][order].add(peer);
+    public void addNeighbor(Peer remotePeer, int dimension, int order) {
+        /*
+         * System.out.println(this.getPeer() + " add neighbor = " + remotePeer + "; dim = " +
+         * dimension + "; order = " + order);
+         */
+        this.neighbors[dimension][order].add(remotePeer);
     }
 
     /**
@@ -337,8 +339,9 @@ public class CanOverlay extends StructuredOverlay {
 
     public ResponseMessage handleCanJoinMessage(Message msg) {
         CanJoinMessage message = (CanJoinMessage) msg;
-        System.out.println("handle can join message");
+        System.out.println(message);
         this.addNeighbor(message.getPeer(), message.getDimesion(), message.getOrder());
+        System.out.println("Handle CanJoinMessage : hasNeighbor = " + this.hasNeighbor(message.getPeer()));
         return new CanJoinResponseMessage();
     }
 }

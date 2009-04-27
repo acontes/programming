@@ -54,4 +54,10 @@ public class CanJoinMessage implements Message {
         return this.dimension;
     }
 
+    @Override
+    public String toString() {
+        return "Send add neighbor message with (neighbor = " + this.getPeer() + ", dimension = " +
+            this.getDimesion() + ", order = " + this.getOrder() + ")";
+    }
+
 }
