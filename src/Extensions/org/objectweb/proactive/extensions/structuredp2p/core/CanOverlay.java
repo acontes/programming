@@ -6,11 +6,13 @@ import java.util.Random;
 import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
+import org.objectweb.proactive.extensions.structuredp2p.message.CanJoinMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.CanLookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.LoadBalancingMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.LookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.Message;
 import org.objectweb.proactive.extensions.structuredp2p.message.PingMessage;
+import org.objectweb.proactive.extensions.structuredp2p.message.response.CanJoinResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.CanLookupResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.LookupResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.ResponseMessage;
@@ -190,10 +192,12 @@ public class CanOverlay extends StructuredOverlay {
      */
     @Override
     public void join(Peer peer) {
+        // FIXME
         int dim = this.getRandomDimension();
-        this.addNeighbor(peer, dim, 1);
 
-        ((CanOverlay) peer.getStructuredOverlay()).addNeighbor(this.getPeer(), dim, 0);
+        this.addNeighbor(peer, dim, 1);
+        this.sendMessageTo(peer, new CanJoinMessage(this.getPeer().getStub(), dim, 0));
+        //((CanOverlay) peer.getStructuredOverlay()).addNeighbor(this.getPeer(), dim, 0);
     }
 
     /**
@@ -309,7 +313,9 @@ public class CanOverlay extends StructuredOverlay {
     public boolean hasNeighbor(Peer peer) {
         for (Group<Peer>[] neighborsAxe : this.neighbors) {
             for (Group<Peer> neighbor : neighborsAxe) {
-                if (neighbor.containsValue(peer)) {
+                if (neighbor.contains(peer)) {
+                    System.out.println("peer = " + peer + " neighbor = " +
+                        neighbor.get(neighbor.indexOf(peer)));
                     return true;
                 }
             }
@@ -324,5 +330,12 @@ public class CanOverlay extends StructuredOverlay {
     @Override
     public CanLookupResponseMessage handleLookupMessage(LookupMessage msg) {
         return new CanLookupResponseMessage(this.getPeer(), ((CanLookupMessage) msg).getCoordinates());
+    }
+
+    public ResponseMessage handleCanJoinMessage(Message msg) {
+        CanJoinMessage message = (CanJoinMessage) msg;
+        System.out.println("handle can join message");
+        this.addNeighbor(message.getPeer(), message.getDimesion(), message.getOrder());
+        return new CanJoinResponseMessage();
     }
 }

@@ -38,6 +38,11 @@ public class TestNeighbors {
         CanOverlay entryPointOverlay = (CanOverlay) this.entryPoint.getStructuredOverlay();
         CanOverlay neighborOverlay = (CanOverlay) this.neighbor.getStructuredOverlay();
 
+        /*
+         * entryPointOverlay.addNeighbor(this.neighbor, 1, 0);
+         * neighborOverlay.addNeighbor(this.entryPoint, 1, 1);
+         */
+
         // Test if the new added peer is in the neighbor list
         Assert.assertTrue(neighborOverlay.hasNeighbor(this.entryPoint));
         Assert.assertTrue(entryPointOverlay.hasNeighbor(this.neighbor));
