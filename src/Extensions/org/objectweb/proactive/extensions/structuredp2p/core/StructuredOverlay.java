@@ -24,9 +24,9 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.Respons
 @SuppressWarnings("serial")
 public abstract class StructuredOverlay implements Serializable {
     /**
-     * The peer which is associated with the overlay.
+     * The local peer which is associated with the overlay.
      */
-    private final Peer peer;
+    private final Peer localPeer;
 
     /**
      * Constructor.
@@ -35,16 +35,16 @@ public abstract class StructuredOverlay implements Serializable {
      *            the peer which is associated to the overlay.
      */
     public StructuredOverlay(Peer peer) {
-        this.peer = peer;
+        this.localPeer = peer;
     }
 
     /**
      * Adds a peer to the network.
      * 
-     * @param peer
+     * @param remotePeer
      *            the peer (entry point) which is used in order to join the network.
      */
-    public abstract void join(Peer peer);
+    public abstract void join(Peer remotePeer);
 
     /**
      * Left the current network.
@@ -119,6 +119,6 @@ public abstract class StructuredOverlay implements Serializable {
      * @return the current peer that use this overlay.
      */
     public Peer getPeer() {
-        return this.peer;
+        return this.localPeer;
     }
 }
