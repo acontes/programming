@@ -91,16 +91,14 @@ public class RemoteNamingServiceTest {
 
     @Before
     public void before() throws ProActiveException, URISyntaxException {
-        if (stub == null) {
-            NamingService ns = new NamingService();
+        NamingService ns = new NamingService();
 
-            roe = PARemoteObject.newRemoteObject(NamingService.class.getName(), ns);
-            roe.createRemoteObject(NAME);
-            final String url = roe.getURL();
-            stub = Utils.createNamingServiceStub(url);
+        roe = PARemoteObject.newRemoteObject(NamingService.class.getName(), ns);
+        roe.createRemoteObject(NAME);
+        final String url = roe.getURL();
+        stub = Utils.createNamingServiceStub(url);
 
-            // RemoteObjectHelper.generatedObjectStub(roe.getRemoteObject());
-        }
+        // RemoteObjectHelper.generatedObjectStub(roe.getRemoteObject());
     }
 
     @Test
@@ -174,8 +172,10 @@ public class RemoteNamingServiceTest {
 
     @After
     public void after() throws ProActiveException {
-        if (roe != null)
+        if (roe != null) {
             roe.unregisterAll();
+            roe = null;
+        }
     }
 
     private void assertIsSpaceRegistered(SpaceInstanceInfo expected) {

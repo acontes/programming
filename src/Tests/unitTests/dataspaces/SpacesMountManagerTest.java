@@ -67,12 +67,18 @@ public class SpacesMountManagerTest {
 
     @After
     public void tearDown() {
-        if (manager != null)
+        if (manager != null) {
             manager.close();
-        if (spaceFile != null)
-            assertTrue(spaceFile.delete());
-        if (spaceDir != null)
-            assertTrue(spaceDir.delete());
+            manager = null;
+        }
+        if (spaceFile != null) {
+            spaceFile.delete();
+            spaceFile = null;
+        }
+        if (spaceDir != null) {
+            spaceDir.delete();
+            spaceDir = null;
+        }
     }
 
     @Test

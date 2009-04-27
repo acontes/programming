@@ -38,10 +38,14 @@ public class VFSFactoryTest {
 
     @After
     public void tearDown() {
-        if (manager != null)
+        if (manager != null) {
             manager.close();
-        if (testFile != null)
+            manager = null;
+        }
+        if (testFile != null) {
             testFile.delete();
+            testFile = null;
+        }
     }
 
     @Test
