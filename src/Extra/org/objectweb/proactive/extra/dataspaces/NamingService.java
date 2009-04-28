@@ -12,9 +12,20 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.WrongApplicationIdExc
 
 
 /**
- * Manages application register/unregister process in space directory. Implements SpacesDirectory.
+ * Naming Service for Data Spaces subsystem.
+ * <p>
+ * It provides coarse-grained directory of registered applications and their data spaces with access
+ * information.
  */
 public class NamingService implements SpacesDirectory {
+    private static void checkApplicationSpaces(long appId, Set<SpaceInstanceInfo> inSet)
+            throws WrongApplicationIdException {
+        for (SpaceInstanceInfo sii : inSet) {
+            if (sii.getAppId() != appId)
+                throw new WrongApplicationIdException(
+                    "Specified application id doesn't match with one found in DataSpacesURI. Rolling back.");
+        }
+    }
 
     private final Set<Long> registeredApplications = new HashSet<Long>();
 
@@ -23,49 +34,50 @@ public class NamingService implements SpacesDirectory {
     /**
      * Registers application along with its spaces definition.
      * 
-     * @param appid
-     *            application identifier
-     * 
+     * @param appId
+     *            application identifier, must be unique
      * @param spaces
-     *            bulked input and output definitions
-     * 
+     *            bulked input and output spaces definitions for that application or
+     *            <code>null</code> if there is no input/output space
      * @throws WrongApplicationIdException
-     *             When given appid doesn't match with one found in DataSpacesURI
+     *             When given appId doesn't match one found in DataSpacesURI of spaces to register
+     *             for application.
      * @throws ApplicationAlreadyRegisteredException
      *             When specified application id is already registered.
      */
-    synchronized public void registerApplication(long appid, Set<SpaceInstanceInfo> spaces)
+    synchronized public void registerApplication(long appId, Set<SpaceInstanceInfo> spaces)
             throws ApplicationAlreadyRegisteredException, WrongApplicationIdException {
-
-        if (isApplicationIdRegistered(appid)) {
+        if (isApplicationIdRegistered(appId)) {
             throw new ApplicationAlreadyRegisteredException(
                 "Application with the same application id is already registered.");
         }
-        registeredApplications.add(appid);
 
+        if (spaces != null)
+            checkApplicationSpaces(appId, spaces);
+
+        registeredApplications.add(appId);
         if (spaces != null) {
-            processSpacesSet(appid, spaces);
             directory.register(spaces);
         }
     }
 
     /**
-     * Unregisters application under specified identifier.
+     * Unregisters application with specified identifier together with all spaces registered by this
+     * application.
      * 
-     * @param appid
+     * @param appId
      *            application identifier
      * @throws WrongApplicationIdException
      *             when specified application id is not registered
      */
-    synchronized public void unregisterApplication(long appid) throws WrongApplicationIdException {
-        final boolean found;
+    synchronized public void unregisterApplication(long appId) throws WrongApplicationIdException {
 
-        found = registeredApplications.remove(appid);
+        final boolean found = registeredApplications.remove(appId);
 
         if (!found)
             throw new WrongApplicationIdException("Application with specified appid is not registered.");
 
-        final Set<SpaceInstanceInfo> spaces = lookupAll(DataSpacesURI.createURI(appid));
+        final Set<SpaceInstanceInfo> spaces = lookupAll(DataSpacesURI.createURI(appId));
 
         if (spaces == null)
             return;
@@ -78,11 +90,23 @@ public class NamingService implements SpacesDirectory {
         directory.unregister(uris);
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * Registers provided data space instance for already registered application. If mounting point
+     * of that space instance has been already in the directory, an exception is raised as directory
+     * is append-only.
+     * <p>
+     * Note that this method has more constrained contract than
+     * {@link SpacesDirectory#register(SpaceInstanceInfo)} regarding application id.
      * 
-     * @see org.objectweb.proactive.extra.dataspaces.SpacesDirectoryImpl#register
-     * (org.objectweb.proactive.extra.dataspaces.SpaceInstanceInfo)
+     * @param spaceInstanceInfo
+     *            space instance info to register (contract: SpaceInstanceInfo mounting point should
+     *            be complete)
+     * @throws WrongApplicationIdException
+     *             when directory is aware of all registered applications and there is no such
+     *             application for SpaceInstanceInfo being registered
+     * @throws SpaceAlreadyRegisteredException
+     *             when directory already contains any space instance under specified mounting point
+     * @see SpacesDirectory#register(SpaceInstanceInfo)
      */
     synchronized public void register(SpaceInstanceInfo spaceInstanceInfo)
             throws WrongApplicationIdException, SpaceAlreadyRegisteredException {
@@ -91,7 +115,7 @@ public class NamingService implements SpacesDirectory {
 
         if (!isApplicationIdRegistered(appid))
             throw new WrongApplicationIdException(
-                "The is no application registered with specified application id.");
+                "There is no application registered with specified application id.");
 
         directory.register(spaceInstanceInfo);
     }
@@ -110,16 +134,5 @@ public class NamingService implements SpacesDirectory {
 
     private boolean isApplicationIdRegistered(long appid) {
         return registeredApplications.contains(appid);
-    }
-
-    private void processSpacesSet(long appid, Set<SpaceInstanceInfo> inSet)
-            throws WrongApplicationIdException {
-
-        for (SpaceInstanceInfo sii : inSet) {
-
-            if (sii.getAppId() != appid)
-                throw new WrongApplicationIdException(
-                    "Specified application id doesn't match with one found in DataSpacesURI. Rolling back.");
-        }
     }
 }

@@ -50,6 +50,7 @@ public class SpacesDirectoryImpl implements SpacesDirectory {
      * org.objectweb.proactive.extra.dataspaces.DataSpacesURI)
      */
     public SpaceInstanceInfo lookupFirst(DataSpacesURI uri) {
+        // TODO change this name to lookupOne() or lookup() as it has different behavior now
         if (!uri.isComplete())
             throw new IllegalArgumentException("Space URI must be complete for this method call");
 
