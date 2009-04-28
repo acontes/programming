@@ -23,9 +23,9 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.WrongApplicationIdExc
 
 
 /**
- * SpacesDirectoryAbstractTest impl and additional NamingService tests.
+ * SpacesDirectoryAbstractBase impl and additional NamingService tests.
  */
-public class NamingServiceTest extends SpacesDirectoryAbstractTest {
+public class NamingServiceTest extends SpacesDirectoryAbstractBase {
 
     private NamingService ns;
 

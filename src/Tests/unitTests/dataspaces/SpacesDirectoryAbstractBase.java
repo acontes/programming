@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.objectweb.proactive.extra.dataspaces.DataSpacesURI;
 import org.objectweb.proactive.extra.dataspaces.InputOutputSpaceConfiguration;
@@ -20,11 +21,8 @@ import org.objectweb.proactive.extra.dataspaces.SpacesDirectory;
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceAlreadyRegisteredException;
 
 
-/**
- * 
- *
- */
-public abstract class SpacesDirectoryAbstractTest {
+@Ignore
+public abstract class SpacesDirectoryAbstractBase {
 
     protected static final int MAIN_APPID = 1;
 

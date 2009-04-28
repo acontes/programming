@@ -5,7 +5,7 @@ import org.objectweb.proactive.extra.dataspaces.SpacesDirectory;
 import org.objectweb.proactive.extra.dataspaces.SpacesDirectoryImpl;
 
 
-public class CachingSpacesDirectoryTest extends SpacesDirectoryAbstractTest {
+public class CachingSpacesDirectoryTest extends SpacesDirectoryAbstractBase {
 
     @Override
     protected SpacesDirectory getSource() throws Exception {
