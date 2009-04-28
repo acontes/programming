@@ -34,7 +34,7 @@ public class CanOverlay extends StructuredOverlay {
     /**
      * The number of dimensions which is equals to the number of axes.
      */
-    public static final int NB_DIMENSIONS = 2;
+    public static final int NB_DIMENSIONS = 4;
 
     /**
      * Neighbors of the current area. The neighbors are an array of ProActive groups.
@@ -87,6 +87,19 @@ public class CanOverlay extends StructuredOverlay {
              * new Area(middle, this.area.getCoordinatesMax()); this.area = new
              * Area(this.area.getCoordinatesMin(), middle);
              */
+
+            int axe = this.getRandomDimension(); // split axe
+            Coordinate minCord[] = this.area.getCoordinatesMin();
+            Coordinate maxCord[] = this.area.getCoordinatesMax();
+            Coordinate mid1[] = this.area.getCoordinatesMax();
+            mid1[axe] = Coordinate.getMiddle(minCord[axe], maxCord[axe]);
+            Coordinate mid2[] = this.area.getCoordinatesMin();
+            mid2[axe] = Coordinate.getMiddle(minCord[axe], maxCord[axe]);
+            this.setArea(new Area(minCord, mid1));
+            CanOverlay overlay = new CanOverlay(peer);
+            overlay.setArea(new Area(mid2, maxCord));
+            peer.setStructuredOverlay(overlay);
+
         }
 
     }
