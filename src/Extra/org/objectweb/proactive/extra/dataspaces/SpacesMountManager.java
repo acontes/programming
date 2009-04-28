@@ -274,6 +274,7 @@ public class SpacesMountManager {
             } catch (FileSystemException x) {
                 logger.warn(String.format("Could not mount already accessed URL %s as %s", accessUrl,
                         mountingPoint));
+                vfsManager.closeFileSystem(mountedRoot.getFileSystem());
                 throw x;
             }
 
@@ -289,10 +290,13 @@ public class SpacesMountManager {
      * Assumed to be called within writeLock and readLock
      */
     private void unmountSpace(final DataSpacesURI spaceUri) throws FileSystemException {
-        final FileSystem fs = resolveFileVFS(spaceUri).getFileSystem();
-        mountedSpaces.remove(spaceUri);
-        vfs.removeJunction(getVFSPath(spaceUri));
-        vfsManager.closeFileSystem(fs);
+        mountedSpaces.remove(spaceUri);        
+        try {
+            vfs.removeJunction(getVFSPath(spaceUri));
+        } finally {
+            final FileSystem fs = resolveFileVFS(spaceUri).getFileSystem();
+            vfsManager.closeFileSystem(fs);
+        }
         logger.info("Unmounted space: " + spaceUri);
     }
 
