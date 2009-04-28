@@ -1,8 +1,10 @@
 package unitTests.dataspaces;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -21,6 +23,7 @@ import org.junit.Test;
 import org.objectweb.proactive.extra.dataspaces.DataSpacesURI;
 import org.objectweb.proactive.extra.dataspaces.InputOutputSpaceConfiguration;
 import org.objectweb.proactive.extra.dataspaces.SpaceInstanceInfo;
+import org.objectweb.proactive.extra.dataspaces.SpaceType;
 import org.objectweb.proactive.extra.dataspaces.SpacesDirectory;
 import org.objectweb.proactive.extra.dataspaces.SpacesDirectoryImpl;
 import org.objectweb.proactive.extra.dataspaces.SpacesMountManager;
@@ -34,7 +37,14 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundExceptio
  * {@link DataSpacesURI}.
  */
 public class SpacesMountManagerTest {
+    private static final String EXISTING_FILE = "file.txt";
+
     private static final String TEST_FILE_CONTENT = "test";
+
+    private static final String NONEXISTING_FILE = "got_you_i_do_not_exist.txt";
+
+    private static final DataSpacesURI NONEXISTING_SPACE = DataSpacesURI.createInOutSpaceURI(123,
+            SpaceType.OUTPUT, "dummy");
 
     private SpacesMountManager manager;
     private SpacesDirectory directory;
@@ -48,7 +58,7 @@ public class SpacesMountManagerTest {
         spaceDir = new File(System.getProperty("java.io.tmpdir"), "ProActive-SpaceMountManagerTest");
         assertTrue(spaceDir.mkdir());
 
-        spaceFile = new File(spaceDir, "file.txt");
+        spaceFile = new File(spaceDir, EXISTING_FILE);
         final OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(spaceFile));
         osw.write(TEST_FILE_CONTENT);
         osw.close();
@@ -99,10 +109,19 @@ public class SpacesMountManagerTest {
         testResolveFileForSpace();
     }
 
+    @Test
+    public void testResolveFileForUnexistingSpace() throws SpaceNotFoundException, IOException {
+        try {
+            manager.resolveFile(NONEXISTING_SPACE);
+            fail("Exception expected");
+        } catch (SpaceNotFoundException x) {
+        }
+    }
+
     private void assertIsSpaceDir(final FileObject fo) throws FileSystemException {
         assertTrue(fo.exists());
         // is it that directory?
-        final FileObject child = fo.getChild("file.txt");
+        final FileObject child = fo.getChild(EXISTING_FILE);
         assertNotNull(child);
         assertTrue(child.exists());
         assertEquals(spaceUri.toString(), fo.getName().getURI());
@@ -110,7 +129,7 @@ public class SpacesMountManagerTest {
 
     @Test
     public void testResolveFileForFileInSpace() throws SpaceNotFoundException, IOException {
-        final DataSpacesURI fileUri = spaceUri.withPath("file.txt");
+        final DataSpacesURI fileUri = spaceUri.withPath(EXISTING_FILE);
         final FileObject fo = manager.resolveFile(fileUri);
 
         assertTrue(fo.exists());
@@ -131,6 +150,37 @@ public class SpacesMountManagerTest {
     public void testResolveFileForFileInSpaceAlreadyMounted2() throws SpaceNotFoundException, IOException {
         testResolveFileForSpace();
         testResolveFileForFileInSpace();
+    }
+
+    @Test
+    public void testResolveFileForUnexistingFileInSpace() throws SpaceNotFoundException, IOException {
+        final DataSpacesURI fileUri = spaceUri.withPath(NONEXISTING_FILE);
+        final FileObject fo = manager.resolveFile(fileUri);
+        assertFalse(fo.exists());
+    }
+
+    @Test
+    public void testResolveFileForUnexistingFileInSpaceAlreadyMounted1() throws SpaceNotFoundException,
+            IOException {
+        testResolveFileForFileInSpace();
+        testResolveFileForUnexistingFileInSpace();
+    }
+
+    @Test
+    public void testResolveFileForUnexistingFileInSpaceAlreadyMounted2() throws SpaceNotFoundException,
+            IOException {
+        testResolveFileForSpace();
+        testResolveFileForUnexistingFileInSpace();
+    }
+
+    @Test
+    public void testResolveFileForFileInNonexistingSpace() throws SpaceNotFoundException, IOException {
+        final DataSpacesURI fileUri = NONEXISTING_SPACE.withPath(NONEXISTING_FILE);
+        try {
+            manager.resolveFile(fileUri);
+            fail("Exception expected");
+        } catch (SpaceNotFoundException x) {
+        }
     }
 
     @Test
