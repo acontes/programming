@@ -191,4 +191,24 @@ public final class SpaceInstanceInfo implements Serializable {
             return false;
         return true;
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("[VFS URI: ");
+
+        sb.append(mountingPoint);
+        sb.append("; ");
+
+        if (path == null) {
+            sb.append(" no local-specific access");
+        } else {
+            sb.append("local access path: ");
+            sb.append(path);
+            sb.append(" at host: ");
+            sb.append(hostname);
+        }
+        sb.append(']');
+
+        return sb.toString();
+    }
 }
