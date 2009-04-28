@@ -83,6 +83,14 @@ public class NodeScratchSpace {
         }
     }
 
+    /**
+     * Provided configuration should contain a remote access already defined (e.g. after starting up
+     * the PAProvider. It is not checked here explicitly, but will be thrown as an exception during
+     * {@link NodeScratchSpace#initForApplication()} method call.
+     * 
+     * @param node
+     * @param conf
+     */
     public NodeScratchSpace(Node node, BaseScratchSpaceConfiguration conf) {
         this.baseScratchConfiguration = conf;
         this.node = node;
@@ -92,9 +100,12 @@ public class NodeScratchSpace {
     /**
      * Initializes instance (and all related configuration objects) on a node and performs file
      * system configuration and accessing tests.
-     *
-     * Can be called only once.
-     *
+     * <p>
+     * Local access will be used (if is defined) for accessing scratch data space. Any existing
+     * files for this scratch Data Space will be silently deleted.
+     * <p>
+     * Can be called only once for each instance.
+     * 
      * @param fileSystemManager
      * @throws IllegalStateException
      *             when instance has been already configured
@@ -102,6 +113,7 @@ public class NodeScratchSpace {
      *             occurred during VFS operation
      * @throws ConfigurationException
      *             when checking FS capabilities
+     * @see {@link Utils#getLocalAccessURL(String, String, String)}
      */
     public synchronized void init(DefaultFileSystemManager fileSystemManager) throws FileSystemException,
             ConfigurationException, IllegalStateException {
@@ -126,12 +138,18 @@ public class NodeScratchSpace {
      * Initializes scratch data space for an application that is running on a Node for which
      * NodeScratchSpace has been configured and initialized by
      * {@link #init(DefaultFileSystemManager)}.
-     *
+     * <p>
+     * Local access will be used (if is defined) for accessing scratch data space. Any existing
+     * files for this scratch Data Space will be silently deleted. Subsequent calls for the same
+     * application will silently remove existing files.
+     * 
      * @return instance for creating and accessing scratch of concrete AO
      * @throws FileSystemException
      * @throws IllegalStateException
      * @throws ConfigurationException
      *             when provided information is not enough to build a complete space definition
+     *             (e.g. lack of remote access defined)
+     * @see {@link Utils#getLocalAccessURL(String, String, String)}
      */
     public synchronized ApplicationScratchSpace initForApplication() throws FileSystemException,
             IllegalStateException, ConfigurationException {
@@ -141,7 +159,8 @@ public class NodeScratchSpace {
     }
 
     /**
-     * Removes initialized directory on finalization.
+     * Removes initialized node-related files on finalization. If no other scratch data space
+     * remains within this runtime, runtime-related files are also removed.
      * 
      * @throws FileSystemException
      * @throws IllegalStateException
