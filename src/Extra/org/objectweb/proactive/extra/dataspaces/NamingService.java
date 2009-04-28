@@ -6,6 +6,9 @@ package org.objectweb.proactive.extra.dataspaces;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ApplicationAlreadyRegisteredException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceAlreadyRegisteredException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.WrongApplicationIdException;
@@ -18,6 +21,8 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.WrongApplicationIdExc
  * information.
  */
 public class NamingService implements SpacesDirectory {
+    private static final Logger logger = ProActiveLogger.getLogger(Loggers.DATASPACES_NAMING_SERVICE);
+
     private static void checkApplicationSpaces(long appId, Set<SpaceInstanceInfo> inSet)
             throws WrongApplicationIdException {
         for (SpaceInstanceInfo sii : inSet) {
@@ -47,6 +52,8 @@ public class NamingService implements SpacesDirectory {
      */
     synchronized public void registerApplication(long appId, Set<SpaceInstanceInfo> spaces)
             throws ApplicationAlreadyRegisteredException, WrongApplicationIdException {
+        logger.debug("Registering application with id " + appId);
+
         if (isApplicationIdRegistered(appId)) {
             throw new ApplicationAlreadyRegisteredException(
                 "Application with the same application id is already registered.");
@@ -56,8 +63,13 @@ public class NamingService implements SpacesDirectory {
             checkApplicationSpaces(appId, spaces);
 
         registeredApplications.add(appId);
+        logger.info("Registered application with id " + appId);
         if (spaces != null) {
             directory.register(spaces);
+            if (logger.isInfoEnabled()) {
+                for (final SpaceInstanceInfo info : spaces)
+                    logger.info("Registered space: " + info);
+            }
         }
     }
 
@@ -71,9 +83,9 @@ public class NamingService implements SpacesDirectory {
      *             when specified application id is not registered
      */
     synchronized public void unregisterApplication(long appId) throws WrongApplicationIdException {
+        logger.debug("Unregistering application with id " + appId);
 
         final boolean found = registeredApplications.remove(appId);
-
         if (!found)
             throw new WrongApplicationIdException("Application with specified appid is not registered.");
 
@@ -88,6 +100,11 @@ public class NamingService implements SpacesDirectory {
             uris.add(sii.getMountingPoint());
 
         directory.unregister(uris);
+        if (logger.isInfoEnabled()) {
+            for (final DataSpacesURI uri : uris)
+                logger.info("Unregistered space: " + uri);
+            logger.info("Unregistered application with id " + appId);
+        }
     }
 
     /**
@@ -110,6 +127,7 @@ public class NamingService implements SpacesDirectory {
      */
     synchronized public void register(SpaceInstanceInfo spaceInstanceInfo)
             throws WrongApplicationIdException, SpaceAlreadyRegisteredException {
+        logger.debug("Registering space: " + spaceInstanceInfo);
 
         final long appid = spaceInstanceInfo.getAppId();
 
@@ -118,18 +136,25 @@ public class NamingService implements SpacesDirectory {
                 "There is no application registered with specified application id.");
 
         directory.register(spaceInstanceInfo);
+        logger.info("Registered space: " + spaceInstanceInfo);
     }
 
     public Set<SpaceInstanceInfo> lookupAll(DataSpacesURI uri) throws IllegalArgumentException {
+        if (logger.isTraceEnabled())
+            logger.trace("LookupAll query for: " + uri);
         return directory.lookupAll(uri);
     }
 
     public SpaceInstanceInfo lookupFirst(DataSpacesURI uri) throws IllegalArgumentException {
+        if (logger.isTraceEnabled())
+            logger.trace("Lookup query for: " + uri);
         return directory.lookupFirst(uri);
     }
 
     public boolean unregister(DataSpacesURI uri) {
-        return directory.unregister(uri);
+        final boolean result = directory.unregister(uri);
+        logger.info("Unregistered space: " + uri);
+        return result;
     }
 
     private boolean isApplicationIdRegistered(long appid) {
