@@ -1,5 +1,6 @@
 package org.objectweb.proactive.extra.dataspaces;
 
+import org.apache.commons.logging.impl.Log4JLogger;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.impl.DefaultFileReplicator;
 import org.apache.commons.vfs.impl.DefaultFileSystemManager;
@@ -10,6 +11,8 @@ import org.apache.commons.vfs.provider.https.HttpsFileProvider;
 import org.apache.commons.vfs.provider.local.DefaultLocalFileProvider;
 import org.apache.commons.vfs.provider.sftp.SftpFileProvider;
 import org.apache.commons.vfs.provider.url.UrlFileProvider;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -29,6 +32,9 @@ import org.apache.commons.vfs.provider.url.UrlFileProvider;
  * Configured replicator and temporary storage are also guaranteed.
  */
 public class VFSFactory {
+    private static final Log4JLogger logger = new Log4JLogger(ProActiveLogger
+            .getLogger(Loggers.DATASPACES_VFS));
+
     /**
      * Creates new DefaultSystemManager instance with configured providers, replicator and temporary
      * storage - as described in class description.
@@ -41,7 +47,9 @@ public class VFSFactory {
      *             when initialization or configuration process fails
      */
     public static DefaultFileSystemManager createDefaultFileSystemManager() throws FileSystemException {
+        logger.debug("Creating new VFS manager");
         final DefaultFileSystemManager manager = new DefaultFileSystemManager();
+        manager.setLogger(logger);
 
         final DefaultFileReplicator replicator = new DefaultFileReplicator();
         manager.setReplicator(new PrivilegedFileReplicator(replicator));
@@ -53,10 +61,10 @@ public class VFSFactory {
         manager.addProvider("ftp", new FtpFileProvider());
         manager.addProvider("sftp", new SftpFileProvider());
         manager.setDefaultProvider(new UrlFileProvider());
-        // TODO set logger?
         // TODO set FileObject decorator to synchronize close() calls, or even some other stuff? 
 
         manager.init();
+        logger.info("Created and initialized new VFS manager");
         return manager;
     }
 }

@@ -31,6 +31,7 @@
  */
 package org.objectweb.proactive.core.util.log;
 
+
 /**
  * This interfaces centralizes the names of the loggers.
  *
@@ -160,4 +161,8 @@ public interface Loggers {
 
     // Data Spaces
     public static final String DATASPACES = CORE + ".dataspaces";
+    public static final String DATASPACES_VFS = DATASPACES + ".vfs";
+    public static final String DATASPACES_MOUNT_MANAGER = DATASPACES + ".mountmanager";
+    public static final String DATASPACES_CONFIGURATOR = DATASPACES + ".configurator";
+    public static final String DATASPACES_NAMING_SERVICE = DATASPACES + ".namingservice";
 }
