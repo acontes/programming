@@ -76,6 +76,11 @@ public class NodeConfigurator {
         this.manager = VFSFactory.createDefaultFileSystemManager();
         this.node = node;
         if (baseScratchConfiguration != null) {
+            // TODO as provider will be implemented, we can move this check elsewhere? for now it's ok.
+            if (baseScratchConfiguration.getUrl() == null)
+                throw new ConfigurationException(
+                    "Space configuration is not complete, no remote access URL provided");
+
             nodeScratchSpace = new NodeScratchSpace(node, baseScratchConfiguration);
             try {
                 nodeScratchSpace.init(manager);
