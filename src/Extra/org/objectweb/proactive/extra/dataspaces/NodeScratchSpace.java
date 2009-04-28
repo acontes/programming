@@ -141,7 +141,6 @@ public class NodeScratchSpace {
      * <p>
      * Local access will be used (if is defined) for accessing scratch data space. Any existing
      * files for this scratch Data Space will be silently deleted. Subsequent calls for the same
-     * application will silently remove existing files.
      * 
      * @return instance for creating and accessing scratch of concrete AO
      * @throws FileSystemException
