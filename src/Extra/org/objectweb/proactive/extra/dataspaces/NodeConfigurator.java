@@ -143,7 +143,7 @@ public class NodeConfigurator {
      *         node has not been configured yet (in terms of node-specific or application-specific
      *         configuration)
      */
-    synchronized public DataSpacesImpl getDataSpacesImpl() throws IllegalStateException {
+    synchronized public DataSpacesImpl getDataSpacesImpl() {
         if (appConfigurator == null)
             return null;
         return appConfigurator.getDataSpacesImpl();
@@ -182,9 +182,6 @@ public class NodeConfigurator {
      * <p>
      * If no application is configured, it does nothing. If closing fails, application-specific
      * configuration will be silently deleted.
-     * 
-     * @throws FileSystemException
-     *             VFS related exception during scratch space cleaning
      */
     public synchronized void tryCloseAppConfigurator() {
         if (appConfigurator == null)
