@@ -15,6 +15,15 @@ import org.objectweb.proactive.Body;
  */
 public interface ApplicationScratchSpace {
 
+    /**
+     * Returns DataSpacesURI for a specified body of an ActiveObject.
+     *
+     * First call of this method removes all already existing files in a scratch data space.
+     *
+     * @param body
+     * @return
+     * @throws FileSystemException
+     */
     public DataSpacesURI getScratchForAO(Body body) throws FileSystemException;
 
     /**
