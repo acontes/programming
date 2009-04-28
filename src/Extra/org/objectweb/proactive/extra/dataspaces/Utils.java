@@ -101,17 +101,13 @@ public class Utils {
     }
 
     /**
-     * Returns an application id that is
+     * Returns an application id that is registered on a node.
      * 
      * @return
-     * @throws ProActiveRuntimeException
-     *             when not called from an active thread
      */
     public static long getApplicationId(Node node) {
-        if (PAActiveObject.getStubOnThis() == null)
-            throw new ProActiveRuntimeException("This method must be called from an active thread");
 
-        // FIXME not implemented in ProActive...
+        // FIXME not implemented in ProActive... 
         return 0;
     }
 
