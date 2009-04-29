@@ -94,7 +94,8 @@ public class NamingServiceTest extends SpacesDirectoryAbstractBase {
     }
 
     @Test
-    public void testRegisterApplicationWrongAppid() {
+    public void testRegisterApplicationWrongAppid() throws ApplicationAlreadyRegisteredException,
+            WrongApplicationIdException, SpaceAlreadyRegisteredException {
 
         Set<SpaceInstanceInfo> spaces = new HashSet<SpaceInstanceInfo>();
 
@@ -110,6 +111,14 @@ public class NamingServiceTest extends SpacesDirectoryAbstractBase {
         } catch (Exception e) {
             fail("Exception of different type expected");
         }
+        // check not registered
+        assertIsSpaceUnregistered(spaceInstanceInput1);
+        assertIsSpaceUnregistered(spaceInstanceInput2);
+        assertIsSpaceUnregistered(spaceInstanceOutput1);
+        assertIsSpaceUnregistered(spaceInstanceOutput2);
+        ns.registerApplication(ANOTHER_APPID1, null);
+        ns.register(spaceInstanceInput1b);
+        assertIsSpaceRegistered(spaceInstanceInput1b);
     }
 
     @Test
