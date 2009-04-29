@@ -12,11 +12,13 @@ package org.objectweb.proactive.extensions.structuredp2p.message.response;
 @SuppressWarnings("serial")
 public class CANJoinResponseMessage extends JoinResponseMessage {
 
-    /**
-     * 
-     * @param peer
-     */
-    public CANJoinResponseMessage() {
-        super();
-    }
+	/**
+	 * Constructor.
+	 * 
+	 * @param isSuccess
+	 *            indicates if the join has succeeded.
+	 */
+	public CANJoinResponseMessage(boolean isSuccess) {
+		super(isSuccess);
+	}
 }
