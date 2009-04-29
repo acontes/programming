@@ -27,12 +27,12 @@ import org.objectweb.proactive.extra.dataspaces.Utils;
 import org.objectweb.proactive.extra.dataspaces.VFSFactory;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 
-import unitTests.dataspaces.moc.MOCNode;
+import unitTests.dataspaces.mock.MOCKNode;
 
 
 /**
- * Test for {@link NodeScratchSpaceTest} class, uses view MOC Objects for imitating integration with
- * ProActive (obtaining ID's of a node, runtime).
+ * Test for {@link NodeScratchSpaceTest} class, uses view MOCK Objects for imitating integration
+ * with ProActive (obtaining ID's of a node, runtime).
  */
 public class NodeScratchSpaceTest {
 
@@ -46,7 +46,7 @@ public class NodeScratchSpaceTest {
 
     private static DefaultFileSystemManager fileSystemManager;
     private File testDir;
-    private MOCNode node;
+    private MOCKNode node;
     private NodeScratchSpace nodeScratchSpace;
     private String testDirPath;
     private boolean configured;
@@ -73,7 +73,7 @@ public class NodeScratchSpaceTest {
         testDirPath = testDir.getCanonicalPath();
         localAccessConfig = new BaseScratchSpaceConfiguration(SCRATCH_URL, testDirPath);
 
-        node = new MOCNode(RUNTIME_ID, NODE_ID);
+        node = new MOCKNode(RUNTIME_ID, NODE_ID);
         nodeScratchSpace = new NodeScratchSpace(node, localAccessConfig);
         configured = false;
         configured2 = false;
@@ -125,7 +125,7 @@ public class NodeScratchSpaceTest {
 
     /**
      * Check if files are being created.
-     *
+     * 
      * @throws ConfigurationException
      * @throws FileSystemException
      * @throws IllegalStateException
@@ -140,7 +140,7 @@ public class NodeScratchSpaceTest {
 
     /**
      * Check if existing files are being removed.
-     *
+     * 
      * @throws ConfigurationException
      * @throws IllegalStateException
      * @throws IOException
@@ -164,7 +164,7 @@ public class NodeScratchSpaceTest {
 
     /**
      * Double initialization case checking.
-     *
+     * 
      * @throws ConfigurationException
      * @throws FileSystemException
      * @throws IllegalStateException
@@ -186,7 +186,7 @@ public class NodeScratchSpaceTest {
 
     /**
      * Initialization after close method call.
-     *
+     * 
      * @throws ConfigurationException
      * @throws FileSystemException
      * @throws IllegalStateException
@@ -211,7 +211,7 @@ public class NodeScratchSpaceTest {
 
     /**
      * Check if files are being created and not null instance returned.
-     *
+     * 
      * @throws ConfigurationException
      * @throws FileSystemException
      * @throws IllegalStateException
@@ -227,7 +227,7 @@ public class NodeScratchSpaceTest {
 
     /**
      * InitForApplication without former node initialization.
-     *
+     * 
      * @throws ConfigurationException
      * @throws FileSystemException
      * @throws IllegalStateException
@@ -250,7 +250,7 @@ public class NodeScratchSpaceTest {
 
     /**
      * Passing configuration without remote access defined.
-     *
+     * 
      * @throws ConfigurationException
      * @throws FileSystemException
      * @throws IllegalStateException
@@ -278,7 +278,7 @@ public class NodeScratchSpaceTest {
     /**
      * Check if only one data space is being removed. Note that closing is also tested on each
      * {@link #tearDown()} method call.
-     *
+     * 
      * @throws ConfigurationException
      * @throws FileSystemException
      * @throws IllegalStateException
@@ -287,7 +287,7 @@ public class NodeScratchSpaceTest {
     public void testClose() throws ConfigurationException, FileSystemException, IllegalStateException {
         final String path1 = Utils.appendSubDirs(testDirPath, RUNTIME_ID, NODE_ID);
         final String path2 = Utils.appendSubDirs(testDirPath, RUNTIME_ID, NODE_ID_2);
-        final Node node2 = new MOCNode(RUNTIME_ID, NODE_ID_2);
+        final Node node2 = new MOCKNode(RUNTIME_ID, NODE_ID_2);
         nodeScratchSpace2 = new NodeScratchSpace(node2, localAccessConfig);
 
         nodeScratchSpace.init(fileSystemManager);

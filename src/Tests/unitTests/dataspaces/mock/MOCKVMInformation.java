@@ -1,4 +1,4 @@
-package unitTests.dataspaces.moc;
+package unitTests.dataspaces.mock;
 
 import java.net.InetAddress;
 import java.rmi.dgc.VMID;
@@ -6,13 +6,13 @@ import java.rmi.dgc.VMID;
 import org.objectweb.proactive.core.runtime.VMInformation;
 
 
-public class MOCVMInformation implements VMInformation {
+public class MOCKVMInformation implements VMInformation {
 
     private static final long serialVersionUID = 8097368073406561838L;
 
     final private String name;
 
-    public MOCVMInformation(String runtimeId) {
+    public MOCKVMInformation(String runtimeId) {
         name = runtimeId;
     }
 

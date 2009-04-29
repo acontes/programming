@@ -1,4 +1,4 @@
-package unitTests.dataspaces.moc;
+package unitTests.dataspaces.mock;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -37,14 +37,14 @@ import org.objectweb.proactive.core.security.securityentity.Entities;
 import org.objectweb.proactive.core.security.securityentity.Entity;
 
 
-public class MOCProActiveRuntime implements ProActiveRuntime {
+public class MOCKProActiveRuntime implements ProActiveRuntime {
 
     private static final long serialVersionUID = -5597318234150802866L;
 
-    final private MOCVMInformation info;
+    final private MOCKVMInformation info;
 
-    public MOCProActiveRuntime(String runtimeId) {
-        info = new MOCVMInformation(runtimeId);
+    public MOCKProActiveRuntime(String runtimeId) {
+        info = new MOCKVMInformation(runtimeId);
     }
 
     public void addAcquaintance(String proActiveRuntimeName) throws ProActiveException {

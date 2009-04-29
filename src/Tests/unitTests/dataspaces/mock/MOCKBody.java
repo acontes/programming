@@ -1,4 +1,4 @@
-package unitTests.dataspaces.moc;
+package unitTests.dataspaces.mock;
 
 import java.io.IOException;
 import java.security.AccessControlException;
@@ -33,12 +33,12 @@ import org.objectweb.proactive.core.security.securityentity.Entities;
 import org.objectweb.proactive.core.security.securityentity.Entity;
 
 
-public class MOCBody implements Body {
+public class MOCKBody implements Body {
 
     private static final long serialVersionUID = -7767946700765885303L;
     private UniqueID uid;
 
-    public MOCBody() {
+    public MOCKBody() {
         uid = new UniqueID();
     }
 

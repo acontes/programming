@@ -1,10 +1,10 @@
-package unitTests.dataspaces.moc;
+package unitTests.dataspaces.mock;
 
 import org.objectweb.proactive.core.node.NodeInformation;
 import org.objectweb.proactive.core.runtime.VMInformation;
 
 
-public class MOCNodeInformation implements NodeInformation {
+public class MOCKNodeInformation implements NodeInformation {
 
     /**
      *
@@ -13,7 +13,7 @@ public class MOCNodeInformation implements NodeInformation {
 
     final private String name;
 
-    public MOCNodeInformation(String nodeId) {
+    public MOCKNodeInformation(String nodeId) {
         name = nodeId;
     }
 

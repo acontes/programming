@@ -1,4 +1,4 @@
-package unitTests.dataspaces.moc;
+package unitTests.dataspaces.mock;
 
 import java.io.IOException;
 
@@ -11,14 +11,14 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.VMInformation;
 
 
-public class MOCNode implements Node {
+public class MOCKNode implements Node {
 
-    final private MOCNodeInformation info;
-    final private MOCProActiveRuntime runtime;
+    final private MOCKNodeInformation info;
+    final private MOCKProActiveRuntime runtime;
 
-    public MOCNode(String runtimeId, String nodeId) {
-        info = new MOCNodeInformation(nodeId);
-        runtime = new MOCProActiveRuntime(runtimeId);
+    public MOCKNode(String runtimeId, String nodeId) {
+        info = new MOCKNodeInformation(nodeId);
+        runtime = new MOCKProActiveRuntime(runtimeId);
     }
 
     public Object[] getActiveObjects() throws NodeException, ActiveObjectCreationException {

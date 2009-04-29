@@ -30,8 +30,8 @@ import org.objectweb.proactive.extra.dataspaces.Utils;
 import org.objectweb.proactive.extra.dataspaces.VFSFactory;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 
-import unitTests.dataspaces.moc.MOCBody;
-import unitTests.dataspaces.moc.MOCNode;
+import unitTests.dataspaces.mock.MOCKBody;
+import unitTests.dataspaces.mock.MOCKNode;
 
 
 /**
@@ -78,8 +78,8 @@ public class ApplicationScratchSpaceTest {
         testDirPath = testDir.getCanonicalPath();
         scratchDataSpacePath = Utils.appendSubDirs(testDirPath, RUNTIME_ID, NODE_ID, APP_ID);
 
-        node = new MOCNode(RUNTIME_ID, NODE_ID);
-        body = new MOCBody();
+        node = new MOCKNode(RUNTIME_ID, NODE_ID);
+        body = new MOCKBody();
         localAccessConfig = new BaseScratchSpaceConfiguration(ACCESS_URL, testDirPath);
         nodeScratchSpace = new NodeScratchSpace(node, localAccessConfig);
 
