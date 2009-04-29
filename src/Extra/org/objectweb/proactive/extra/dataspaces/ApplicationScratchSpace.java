@@ -17,9 +17,9 @@ public interface ApplicationScratchSpace {
 
     /**
      * Returns DataSpacesURI for a specified body of an ActiveObject.
-     *
+     * 
      * First call of this method removes all already existing files in a scratch data space.
-     *
+     * 
      * @param body
      * @return
      * @throws FileSystemException
@@ -41,7 +41,8 @@ public interface ApplicationScratchSpace {
     public DataSpacesURI getSpaceMountingPoint();
 
     /**
-     * removes scratch data space directory content
+     * Removes scratch data space directory content. Any subsequent call to closed instance may have
+     * undefined results.
      * 
      * @throws FileSystemException
      */
