@@ -29,11 +29,6 @@ public abstract class StructuredOverlay implements Serializable {
     private final Peer localPeer;
 
     /**
-     * The peer stub.
-     */
-    private final Peer remotePeer;
-
-    /**
      * Constructor.
      * 
      * @param peer
@@ -41,7 +36,6 @@ public abstract class StructuredOverlay implements Serializable {
      */
     public StructuredOverlay(Peer peer) {
         this.localPeer = peer;
-        this.remotePeer = peer.getStub();
     }
 
     /**
@@ -128,12 +122,4 @@ public abstract class StructuredOverlay implements Serializable {
         return this.localPeer;
     }
 
-    /**
-     * Returns the peer stub that this overlay use.
-     * 
-     * @return the peer stub that this overlay use.
-     */
-    public Peer getRemotePeer() {
-        return this.remotePeer;
-    }
 }

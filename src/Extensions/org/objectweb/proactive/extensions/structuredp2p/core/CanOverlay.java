@@ -211,7 +211,7 @@ public class CanOverlay extends StructuredOverlay {
         int dim = this.getRandomDimension();
 
         this.addNeighbor(remotePeer, dim, 1);
-        this.getRemotePeer().sendMessageTo(remotePeer, new CanJoinMessage(this.getRemotePeer(), dim, 0));
+        this.getLocalPeer().sendMessageTo(remotePeer, new CanJoinMessage(this.getLocalPeer(), dim, 0));
     }
 
     /**
