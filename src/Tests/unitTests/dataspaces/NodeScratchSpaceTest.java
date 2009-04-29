@@ -220,17 +220,21 @@ public class NodeScratchSpaceTest {
     public void testInitForApplication() throws ConfigurationException, FileSystemException,
             IllegalStateException {
 
-        String dataSpacePath = Utils.appendSubDirs(testDirPath, RUNTIME_ID, NODE_ID, APP_ID);
         nodeScratchSpace.init(fileSystemManager);
         configured = true;
-        ApplicationScratchSpace app = nodeScratchSpace.initForApplication();
-
-        assertNotNull(app);
-        assertIsExistingEmptyDirectory(dataSpacePath);
+        checkInitForApplication();
     }
 
+    /**
+     * InitForApplication without former node initialization.
+     *
+     * @throws ConfigurationException
+     * @throws FileSystemException
+     * @throws IllegalStateException
+     */
     @Test
-    public void testInitForApplicationIllegalState() {
+    public void testInitForApplicationIllegalState() throws ConfigurationException, FileSystemException,
+            IllegalStateException {
         try {
             nodeScratchSpace.initForApplication();
             fail("Exception expected");
@@ -238,6 +242,10 @@ public class NodeScratchSpaceTest {
         } catch (Exception e) {
             fail("Wrong exception");
         }
+
+        nodeScratchSpace.init(fileSystemManager);
+        configured = true;
+        checkInitForApplication();
     }
 
     /**
@@ -263,6 +271,8 @@ public class NodeScratchSpaceTest {
         } catch (Exception e) {
             fail("Wrong exception");
         }
+
+        // nodeScratchSpace instance cannot be used anymore..
     }
 
     /**
@@ -297,5 +307,12 @@ public class NodeScratchSpaceTest {
         assertTrue(fPartialDS.exists());
         assertEquals(FileType.FOLDER, fPartialDS.getType());
         assertEquals(0, fPartialDS.getChildren().length);
+    }
+
+    private void checkInitForApplication() throws FileSystemException, ConfigurationException {
+        final String dataSpacePath = Utils.appendSubDirs(testDirPath, RUNTIME_ID, NODE_ID, APP_ID);
+        final ApplicationScratchSpace app = nodeScratchSpace.initForApplication();
+        assertNotNull(app);
+        assertIsExistingEmptyDirectory(dataSpacePath);
     }
 }
