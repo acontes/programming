@@ -15,14 +15,14 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.LookupR
  * @version 0.1
  */
 @SuppressWarnings("serial")
-public class ChordLookupMessage extends LookupMessage {
+public class CHORDLookupMessage extends LookupMessage {
 
     /**
      * Constructor.
      * 
      * @param id
      */
-    public ChordLookupMessage(String id) {
+    public CHORDLookupMessage(String id) {
         super(new Key<String>(id));
     }
 

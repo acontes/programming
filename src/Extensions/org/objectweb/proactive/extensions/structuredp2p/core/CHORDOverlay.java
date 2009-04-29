@@ -2,10 +2,10 @@ package org.objectweb.proactive.extensions.structuredp2p.core;
 
 import java.util.HashMap;
 
-import org.objectweb.proactive.extensions.structuredp2p.message.ChordLookupMessage;
+import org.objectweb.proactive.extensions.structuredp2p.message.CHORDLookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.LookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.Message;
-import org.objectweb.proactive.extensions.structuredp2p.message.response.ChordLookupResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.message.response.CHORDLookupResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.LookupResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.ResponseMessage;
 
@@ -28,7 +28,7 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.Respons
  * @version 0.1
  */
 @SuppressWarnings("serial")
-public class ChordOverlay extends StructuredOverlay {
+public class CHORDOverlay extends StructuredOverlay {
     private String identifier;
     private HashMap<String, Peer> fingers;
 
@@ -38,7 +38,7 @@ public class ChordOverlay extends StructuredOverlay {
      * @param peer
      *            the peer which is used in order to join the network.
      */
-    public ChordOverlay(Peer peer) {
+    public CHORDOverlay(Peer peer) {
         super(peer);
     }
 
@@ -54,8 +54,9 @@ public class ChordOverlay extends StructuredOverlay {
      * {@inheritDoc}
      */
     @Override
-    public void join(Peer peer) {
+    public Boolean join(Peer peer) {
         // TODO Auto-generated method stub
+        return null;
     }
 
     /**
@@ -114,7 +115,7 @@ public class ChordOverlay extends StructuredOverlay {
      * {@inheritDoc}
      */
     @Override
-    public ChordLookupResponseMessage handleLookupMessage(LookupMessage msg) {
-        return new ChordLookupResponseMessage(this.getLocalPeer(), ((ChordLookupMessage) msg).getId());
+    public CHORDLookupResponseMessage handleLookupMessage(LookupMessage msg) {
+        return new CHORDLookupResponseMessage(this.getLocalPeer(), ((CHORDLookupMessage) msg).getId());
     }
 }

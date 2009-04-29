@@ -10,11 +10,11 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.structuredp2p.core.OverlayType;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
-import org.objectweb.proactive.extensions.structuredp2p.message.ChordLookupMessage;
+import org.objectweb.proactive.extensions.structuredp2p.message.CHORDLookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.LookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.ResponseMessage;
 
-public class TestChordMessage {
+public class TestCHORDMessage {
     private Peer srcPeer;
     private Peer myPeer;
     private LookupMessage lMsg;
@@ -31,7 +31,7 @@ public class TestChordMessage {
        myPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
                new Object[] { OverlayType.CAN });
      id = "55";  
-     lMsg = new ChordLookupMessage(id);
+     lMsg = new CHORDLookupMessage(id);
    }
 
    @After

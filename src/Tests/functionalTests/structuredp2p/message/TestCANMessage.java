@@ -1,6 +1,8 @@
 package functionalTests.structuredp2p.message;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -8,14 +10,14 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.structuredp2p.core.Area;
-import org.objectweb.proactive.extensions.structuredp2p.core.CanOverlay;
+import org.objectweb.proactive.extensions.structuredp2p.core.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.Coordinate;
 import org.objectweb.proactive.extensions.structuredp2p.core.OverlayType;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
-import org.objectweb.proactive.extensions.structuredp2p.message.CanLookupMessage;
+import org.objectweb.proactive.extensions.structuredp2p.message.CANLookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.LookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.PingMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.response.CanLookupResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.message.response.CANLookupResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.ResponseMessage;
 
 
@@ -27,7 +29,7 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.Respons
  * 
  * @version 0.1
  */
-public class TestCanMessage {
+public class TestCANMessage {
 
     private Peer srcPeer;
     private Peer myPeer;
@@ -41,9 +43,9 @@ public class TestCanMessage {
     private Area area;
     private Area areaSplit1;
     private Area areaSplit2;
-    private CanOverlay can;
-    private CanOverlay splitCan1;
-    private CanOverlay splitCan2;
+    private CANOverlay can;
+    private CANOverlay splitCan1;
+    private CANOverlay splitCan2;
     private int dim;
 
     @Before
@@ -53,7 +55,7 @@ public class TestCanMessage {
         myPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(), new Object[] { OverlayType.CAN });
 
         secondPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(), new Object[] { OverlayType.CAN });
-        dim = CanOverlay.NB_DIMENSIONS;
+        dim = CANOverlay.NB_DIMENSIONS;
         messCoord = new Coordinate[dim];
 
         for (int i = 0; i < dim; i++) {
@@ -78,16 +80,16 @@ public class TestCanMessage {
 
         area = new Area(minCoord, maxCoord);
 
-        can = ((CanOverlay) (srcPeer.getStructuredOverlay()));
+        can = ((CANOverlay) (srcPeer.getStructuredOverlay()));
         can.setArea(area);
         srcPeer.setStructuredOverlay(can);
-        lMsg = new CanLookupMessage(messCoord);
+        lMsg = new CANLookupMessage(messCoord);
     }
 
     @Test
     public void testCreate() {
         assertNotNull("create a new peer", srcPeer);
-        assertNotNull("area set on the overlay", ((CanOverlay) (srcPeer.getStructuredOverlay())).getArea()
+        assertNotNull("area set on the overlay", ((CANOverlay) (srcPeer.getStructuredOverlay())).getArea()
                 .getCoordinatesMin());
         assertNotNull("get new peer", myPeer);
         assertNotNull("create a new CAN message", lMsg);
@@ -102,7 +104,7 @@ public class TestCanMessage {
         srcResponse = srcPeer.sendMessage(lMsg);
         assertNotNull("the src response is not null", srcResponse);
         for (int i = 0; i < dim; i++) {
-            assertEquals(i + "th coordinate ok", ((CanOverlay) ((CanLookupResponseMessage) srcResponse)
+            assertEquals(i + "th coordinate ok", ((CANOverlay) ((CANLookupResponseMessage) srcResponse)
                     .getPeer().getStructuredOverlay()).contains(i, messCoord[i]), 0);
         }
     }
@@ -155,10 +157,10 @@ public class TestCanMessage {
 
         areaSplit2 = new Area(minCoord, maxCoord);
         //
-        splitCan1 = ((CanOverlay) (srcPeer.getStructuredOverlay()));
+        splitCan1 = ((CANOverlay) (srcPeer.getStructuredOverlay()));
         splitCan1.setArea(areaSplit1);
 
-        splitCan2 = ((CanOverlay) (myPeer.getStructuredOverlay()));
+        splitCan2 = ((CANOverlay) (myPeer.getStructuredOverlay()));
         splitCan2.setArea(areaSplit2);
 
         srcPeer.setStructuredOverlay(splitCan1);
@@ -169,7 +171,7 @@ public class TestCanMessage {
         assertNotNull("the src response is not null", myResponse);
 
         for (int i = 0; i < dim; i++) {
-            assertEquals(i + "th coordinate ok", ((CanOverlay) ((CanLookupResponseMessage) myResponse)
+            assertEquals(i + "th coordinate ok", ((CANOverlay) ((CANLookupResponseMessage) myResponse)
                     .getPeer().getStructuredOverlay()).contains(i, messCoord[i]), 0);
 
         }

@@ -6,8 +6,8 @@ import org.objectweb.proactive.extensions.structuredp2p.core.exception.AreaExcep
 
 
 /**
- * An area indicates the space which is managed by a peer. The minimum coordinates are the left
- * higher corner. The maximum coordinates are the corner lower right.
+ * An area indicates the space which is managed by a {@link Peer}. The minimum coordinates are the
+ * left higher corner. The maximum coordinates are the corner lower right.
  * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent
@@ -90,7 +90,7 @@ public class Area implements Serializable {
      *            the area to check.
      * @return the dimension in which they are bordered, <code>-1</code> if they aren't.
      */
-    public int isBorder(Area area) {
+    public int isBordered(Area area) {
         int i;
         int nbDim = this.coodinatesMax.length;
 
@@ -114,12 +114,12 @@ public class Area implements Serializable {
      * @throws AreaException
      */
     public static Area mergeAreas(Area a1, Area a2) throws AreaException {
-        int border = a1.isBorder(a2);
+        int border = a1.isBordered(a2);
         Coordinate[] minCoord = new Coordinate[a1.getCoordinatesMax().length];
         Coordinate[] maxCoord = new Coordinate[a1.getCoordinatesMax().length];
         if (border == -1) {
             throw new AreaException("Areas are not bordered.");
-        } else if (a1.validMergingArea(a2)) {
+        } else if (a1.isValidMergingArea(a2)) {
             // FIXME test also the load balancing to choose the good area
             // merge the two areas
             for (int i = 0; i < a1.getCoordinatesMax().length; i++) {
@@ -164,13 +164,14 @@ public class Area implements Serializable {
     }
 
     /**
-     * Verify if its possible to merge the area in argument with the current area
+     * Checks if its possible to merge the area in argument with the current area
      * 
      * @param area
-     * @return return true if we can merge the area and false otherwise
+     *            the area to check.
+     * @return return true if we can merge the area, false otherwise.
      */
-    public boolean validMergingArea(Area area) {
-        int axe = this.isBorder(area);
+    public boolean isValidMergingArea(Area area) {
+        int axe = this.isBordered(area);
 
         if (axe != -1) {
             int myLength = this.coodinatesMax[axe].levenshteinDistance(this.coordinatesMin[axe]);

@@ -28,7 +28,7 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.Respons
 @SuppressWarnings("serial")
 public class Peer implements InitActive, RunActive, Serializable {
     /**
-     * The timeout to wait before the check of neighbors {@link WithMarshallStream}
+     * The timeout to wait before to check neighbors {@link WithMarshallStream}
      * {@link StructuredOverlay#checkNeighbors()}.
      */
     public static final int CHECK_NEIGHBORS_TIMEOUT = 1000;
@@ -54,6 +54,9 @@ public class Peer implements InitActive, RunActive, Serializable {
      */
     private long lastRequestDuration;
 
+    /**
+     * The stub associated to the current peer.
+     */
     private Peer stub;
 
     /**
@@ -80,7 +83,6 @@ public class Peer implements InitActive, RunActive, Serializable {
      */
     public Peer(Peer peer) {
         this(peer.getType());
-        // FIXME
         this.join(peer);
     }
 
@@ -147,16 +149,21 @@ public class Peer implements InitActive, RunActive, Serializable {
     }
 
     /**
+     * Returns the stub associated to the current peer.
+     * 
+     * @return the stub associated to the current peer.
+     */
+    public Peer getStub() {
+        return this.stub;
+    }
+
+    /**
      * Returns the {@link StructuredOverlay} which is used by the peer.
      * 
      * @return the {@link StructuredOverlay} which is used by the peer.
      */
     public StructuredOverlay getStructuredOverlay() {
         return this.structuredOverlay;
-    }
-
-    public void setStructuredOverlay(StructuredOverlay structuredOverlay) {
-        this.structuredOverlay = structuredOverlay;
     }
 
     /**
@@ -169,16 +176,26 @@ public class Peer implements InitActive, RunActive, Serializable {
     }
 
     /**
+     * Sets the overlay.
+     * 
+     * @param structuredOverlay
+     *            the new overlay to set.
+     */
+    public void setStructuredOverlay(StructuredOverlay structuredOverlay) {
+        this.structuredOverlay = structuredOverlay;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
     public void initActivity(Body body) {
         switch (this.type) {
             case CAN:
-                this.structuredOverlay = new CanOverlay(this);
+                this.structuredOverlay = new CANOverlay(this);
                 break;
             case CHORD:
-                this.structuredOverlay = new ChordOverlay(this);
+                this.structuredOverlay = new CHORDOverlay(this);
                 break;
             default:
                 throw new IllegalArgumentException("The peer type must be one of OverlayType.");
@@ -186,6 +203,7 @@ public class Peer implements InitActive, RunActive, Serializable {
 
         this.lastRequestDuration = System.currentTimeMillis();
         this.stub = (Peer) PAActiveObject.getStubOnThis();
+        System.out.println("Peer.initActivity() " + this.stub.getClass());
     }
 
     /**
@@ -194,7 +212,6 @@ public class Peer implements InitActive, RunActive, Serializable {
     @Override
     public void runActivity(Body body) {
         Service service = new Service(body);
-
         while (body.isActive()) {
             if (service.hasRequestToServe()) {
                 service.serveOldest();
@@ -209,6 +226,9 @@ public class Peer implements InitActive, RunActive, Serializable {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Peer))
@@ -220,8 +240,8 @@ public class Peer implements InitActive, RunActive, Serializable {
             return false;
 
         if (this.getType() == OverlayType.CAN) {
-            CanOverlay thisOverlay = (CanOverlay) this.getStructuredOverlay();
-            CanOverlay peerOverlay = (CanOverlay) peer.getStructuredOverlay();
+            CANOverlay thisOverlay = (CANOverlay) this.getStructuredOverlay();
+            CANOverlay peerOverlay = (CANOverlay) peer.getStructuredOverlay();
 
             return (thisOverlay.getArea().equals(peerOverlay.getArea()) && thisOverlay.getNeighbors().equals(
                     peerOverlay.getNeighbors()));
@@ -230,9 +250,5 @@ public class Peer implements InitActive, RunActive, Serializable {
         }
 
         return false;
-    }
-
-    public Peer getStub() {
-        return this.stub;
     }
 }

@@ -14,13 +14,13 @@ import org.objectweb.proactive.extensions.structuredp2p.message.Key;
  * @version 0.1
  */
 @SuppressWarnings("serial")
-public class ChordLookupResponseMessage extends LookupResponseMessage {
+public class CHORDLookupResponseMessage extends LookupResponseMessage {
     /**
      * 
      * @param peer
      * @param id
      */
-    public ChordLookupResponseMessage(Peer peer, String id) {
+    public CHORDLookupResponseMessage(Peer peer, String id) {
         super(new Key<String>(id), peer);
     }
 

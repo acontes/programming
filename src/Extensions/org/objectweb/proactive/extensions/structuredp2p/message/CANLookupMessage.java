@@ -16,7 +16,7 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.LookupR
  * @version 0.1
  */
 @SuppressWarnings("serial")
-public class CanLookupMessage extends LookupMessage {
+public class CANLookupMessage extends LookupMessage {
 
     /**
      * Constructor.
@@ -24,7 +24,7 @@ public class CanLookupMessage extends LookupMessage {
      * @param coordinates
      * 
      */
-    public CanLookupMessage(Coordinate[] coordinates) {
+    public CANLookupMessage(Coordinate[] coordinates) {
         super(new Key<Coordinate[]>(coordinates));
     }
 

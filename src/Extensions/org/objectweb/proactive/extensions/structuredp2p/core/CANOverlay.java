@@ -6,14 +6,14 @@ import java.util.Random;
 import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
-import org.objectweb.proactive.extensions.structuredp2p.message.CanJoinMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.CanLookupMessage;
+import org.objectweb.proactive.extensions.structuredp2p.message.CANJoinMessage;
+import org.objectweb.proactive.extensions.structuredp2p.message.CANLookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.LoadBalancingMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.LookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.Message;
 import org.objectweb.proactive.extensions.structuredp2p.message.PingMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.response.CanJoinResponseMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.response.CanLookupResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.message.response.CANJoinResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.message.response.CANLookupResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.LookupResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.ResponseMessage;
 
@@ -30,7 +30,7 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.Respons
  * @version 0.1
  */
 @SuppressWarnings("serial")
-public class CanOverlay extends StructuredOverlay {
+public class CANOverlay extends StructuredOverlay {
     /**
      * The number of dimensions which is equals to the number of axes.
      */
@@ -49,7 +49,7 @@ public class CanOverlay extends StructuredOverlay {
     /**
      * Constructor.
      */
-    public CanOverlay(Peer localPeer) {
+    public CANOverlay(Peer localPeer) {
         super(localPeer);
         this.neighbors = new Group[NB_DIMENSIONS][2];
 
@@ -60,10 +60,8 @@ public class CanOverlay extends StructuredOverlay {
                 this.neighbors[i][1] = PAGroup.getGroup((Peer) PAGroup.newGroup(Peer.class.getName()));
             }
         } catch (ClassNotReifiableException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
@@ -96,22 +94,12 @@ public class CanOverlay extends StructuredOverlay {
             Coordinate mid2[] = this.area.getCoordinatesMin();
             mid2[axe] = Coordinate.getMiddle(minCord[axe], maxCord[axe]);
             this.setArea(new Area(minCord, mid1));
-            CanOverlay overlay = new CanOverlay(peer);
+            CANOverlay overlay = new CANOverlay(peer);
             overlay.setArea(new Area(mid2, maxCord));
             peer.setStructuredOverlay(overlay);
 
         }
 
-    }
-
-    /**
-     * Gets a random axe number.
-     * 
-     * @return the random axe number.
-     */
-    private int getRandomDimension() {
-        Random rand = new Random();
-        return rand.nextInt(CanOverlay.NB_DIMENSIONS);
     }
 
     /**
@@ -206,12 +194,14 @@ public class CanOverlay extends StructuredOverlay {
      * {@inheritDoc}
      */
     @Override
-    public void join(Peer remotePeer) {
+    public Boolean join(Peer remotePeer) {
         // FIXME
         int dim = this.getRandomDimension();
 
         this.addNeighbor(remotePeer, dim, 1);
-        this.getLocalPeer().sendMessageTo(remotePeer, new CanJoinMessage(this.getLocalPeer(), dim, 0));
+        this.getLocalPeer().sendMessageTo(remotePeer, new CANJoinMessage(this.getRemotePeer(), dim, 0));
+
+        return new Boolean(true);
     }
 
     /**
@@ -227,7 +217,7 @@ public class CanOverlay extends StructuredOverlay {
      */
     @Override
     public LookupResponseMessage sendMessage(LookupMessage msg) {
-        CanLookupMessage msgCan = (CanLookupMessage) msg;
+        CANLookupMessage msgCan = (CANLookupMessage) msg;
         if (this.contains(msgCan.getCoordinates())) {
             return msgCan.handle(this);
         } else {
@@ -237,7 +227,7 @@ public class CanOverlay extends StructuredOverlay {
             int neighborIndex;
 
             for (Group<Peer>[] neighborsGroup : neighbors) {
-                for (int i = 0; i < CanOverlay.NB_DIMENSIONS; i++) {
+                for (int i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
                     pos = this.contains(i, msgCan.getCoordinates()[i]);
 
                     if (pos == -1) {
@@ -275,34 +265,6 @@ public class CanOverlay extends StructuredOverlay {
     }
 
     /**
-     * FIXME
-     * 
-     * @return
-     */
-    public Area getArea() {
-        return this.area;
-    }
-
-    /**
-     * Set the new area covered.
-     * 
-     * @param area
-     *            the new area covered.
-     */
-    public void setArea(Area area) {
-        this.area = area;
-    }
-
-    /**
-     * Returns the neighbors of the managed area.
-     * 
-     * @return the neighbors of the managed area.
-     */
-    public Group<Peer>[][] getNeighbors() {
-        return this.neighbors;
-    }
-
-    /**
      * Add a new neighbor with a dimension and an order.
      * 
      * @param peer
@@ -312,12 +274,8 @@ public class CanOverlay extends StructuredOverlay {
      * @param order
      *            the order.
      */
-    public void addNeighbor(Peer remotePeer, int dimension, int order) {
-        /*
-         * System.out.println(this.getPeer() + " add neighbor = " + remotePeer + "; dim = " +
-         * dimension + "; order = " + order);
-         */
-        this.neighbors[dimension][order].add(remotePeer);
+    public Boolean addNeighbor(Peer remotePeer, int dimension, int order) {
+        return this.neighbors[dimension][order].add(remotePeer);
     }
 
     /**
@@ -345,16 +303,61 @@ public class CanOverlay extends StructuredOverlay {
      * {@inheritDoc}
      */
     @Override
-    public CanLookupResponseMessage handleLookupMessage(LookupMessage msg) {
-        return new CanLookupResponseMessage(this.getLocalPeer(), ((CanLookupMessage) msg).getCoordinates());
+    public CANLookupResponseMessage handleLookupMessage(LookupMessage msg) {
+        return new CANLookupResponseMessage(this.getLocalPeer(), ((CANLookupMessage) msg).getCoordinates());
     }
 
-    public ResponseMessage handleCanJoinMessage(Message msg) {
-        CanJoinMessage message = (CanJoinMessage) msg;
+    /**
+     * Handles a {@link CANJoinMessage}.
+     * 
+     * @param msg
+     *            the message.
+     * @return the response.
+     */
+    public ResponseMessage handleCANJoinMessage(Message msg) {
+        CANJoinMessage message = (CANJoinMessage) msg;
         System.out.println(message);
         this.addNeighbor(message.getPeer(), message.getDimesion(), message.getOrder());
 
         System.out.println("Handle CanJoinMessage : hasNeighbor = " + this.hasNeighbor(message.getPeer()));
-        return new CanJoinResponseMessage();
+        return new CANJoinResponseMessage();
+    }
+
+    /**
+     * Returns the area which is managed by the overlay.
+     * 
+     * @return the area which is managed by the overlay.
+     */
+    public Area getArea() {
+        return this.area;
+    }
+
+    /**
+     * Returns the neighbors of the managed area.
+     * 
+     * @return the neighbors of the managed area.
+     */
+    public Group<Peer>[][] getNeighbors() {
+        return this.neighbors;
+    }
+
+    /**
+     * Gets a random axe number.
+     * 
+     * @return the random axe number.
+     */
+    private int getRandomDimension() {
+        Random rand = new Random();
+        return rand.nextInt(CANOverlay.NB_DIMENSIONS);
+    }
+
+    /**
+     * Set the new area covered.
+     * 
+     * @param area
+     *            the new area covered.
+     */
+    public void setArea(Area area) {
+        this.area = area;
     }
 }

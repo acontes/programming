@@ -87,23 +87,6 @@ public class Coordinate implements Serializable {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String toString() {
-        return this.getValue();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(Object o) {
-        Coordinate cord = (Coordinate) o;
-        return this.value.equals(cord.value);
-    }
-
-    /**
      * Calculates the Levenshtein distance between two strings.
      * 
      * @param str1
@@ -135,7 +118,7 @@ public class Coordinate implements Serializable {
     }
 
     /**
-     * Calculates the minimum of three int
+     * Calculates the minimum of three int.
      * 
      * @param a
      * @param b
@@ -147,7 +130,7 @@ public class Coordinate implements Serializable {
     }
 
     /**
-     * return the maximum coordinate between the current coordinate and the argument
+     * Returns the maximum coordinate between the current coordinate and the argument.
      * 
      * @param coord
      * @return
@@ -161,7 +144,7 @@ public class Coordinate implements Serializable {
     }
 
     /**
-     * return the minimum coordinate between the current coordinate and the argument
+     * Returns the minimum coordinate between the current coordinate and the argument.
      * 
      * @param coord
      * @return
@@ -181,4 +164,21 @@ public class Coordinate implements Serializable {
      * public String middle(String str1 , String str2){ int midCor = this.lenvensteinDistance(str1,
      * str2) / 2; return stringValue(str1.hashCode() + midCor); }
      */
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return this.getValue();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object o) {
+        Coordinate cord = (Coordinate) o;
+        return this.value.equals(cord.value);
+    }
 }

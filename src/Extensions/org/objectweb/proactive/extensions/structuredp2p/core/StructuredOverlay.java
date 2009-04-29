@@ -44,7 +44,7 @@ public abstract class StructuredOverlay implements Serializable {
      * @param remotePeer
      *            the peer (entry point) which is used in order to join the network.
      */
-    public abstract void join(Peer remotePeer);
+    public abstract Boolean join(Peer remotePeer);
 
     /**
      * Left the current network.
@@ -120,6 +120,15 @@ public abstract class StructuredOverlay implements Serializable {
      */
     public Peer getLocalPeer() {
         return this.localPeer;
+    }
+
+    /**
+     * Returns the stub associated to the local peer.
+     * 
+     * @return the stub associated to the local peer.
+     */
+    public Peer getRemotePeer() {
+        return this.localPeer.getStub();
     }
 
 }
