@@ -6,6 +6,7 @@ import org.objectweb.proactive.extensions.structuredp2p.message.LoadBalancingMes
 import org.objectweb.proactive.extensions.structuredp2p.message.LookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.Message;
 import org.objectweb.proactive.extensions.structuredp2p.message.PingMessage;
+import org.objectweb.proactive.extensions.structuredp2p.message.response.JoinResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.LoadBalancingResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.LookupResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.PingResponseMessage;
@@ -112,6 +113,9 @@ public abstract class StructuredOverlay implements Serializable {
      * @return the {@link LookupResponseMessage} response.
      */
     public abstract LookupResponseMessage handleLookupMessage(LookupMessage msg);
+
+    // TODO commentaires
+    public abstract JoinResponseMessage handleJoinMessage(Message msg);
 
     /**
      * Returns the current peer that use this overlay.

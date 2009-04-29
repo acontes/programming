@@ -1,8 +1,8 @@
 package org.objectweb.proactive.extensions.structuredp2p.message.response;
 
+
+
 /**
- * A chord response message gives a CAN peer for routing.
- * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent
  * @author Trovato Alexandre
@@ -10,13 +10,12 @@ package org.objectweb.proactive.extensions.structuredp2p.message.response;
  * @version 0.1
  */
 @SuppressWarnings("serial")
-public class CANJoinResponseMessage extends JoinResponseMessage {
+public abstract class JoinResponseMessage extends ResponseMessage {
 
     /**
-     * 
-     * @param peer
+     * Constructor.
      */
-    public CANJoinResponseMessage() {
+    public JoinResponseMessage() {
         super();
     }
 }

@@ -107,8 +107,8 @@ public class Peer implements InitActive, RunActive, Serializable {
      * 
      * @return the response in agreement with the type of message sent.
      */
-    public ResponseMessage sendMessageTo(Peer peer, Message msg) {
-        return peer.receiveMessage(msg);
+    public ResponseMessage sendMessageTo(Peer remotePeer, Message msg) {
+        return remotePeer.receiveMessage(msg);
     }
 
     /**
@@ -117,8 +117,8 @@ public class Peer implements InitActive, RunActive, Serializable {
      * @param peer
      *            the peer which serves as entry point.
      */
-    public void join(Peer peer) {
-        this.structuredOverlay.join(peer);
+    public void join(Peer remotePeer) {
+        this.structuredOverlay.join(remotePeer);
     }
 
     /**
@@ -203,7 +203,6 @@ public class Peer implements InitActive, RunActive, Serializable {
 
         this.lastRequestDuration = System.currentTimeMillis();
         this.stub = (Peer) PAActiveObject.getStubOnThis();
-        System.out.println("Peer.initActivity() " + this.stub.getClass());
     }
 
     /**

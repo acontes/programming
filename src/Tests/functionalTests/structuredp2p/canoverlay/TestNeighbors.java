@@ -41,6 +41,7 @@ public class TestNeighbors {
 
         this.neighbor.join(this.entryPoint);
 
+        // Test if the new added peer is in the neighbor list
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
@@ -51,13 +52,9 @@ public class TestNeighbors {
         CANOverlay neighborOverlay = (CANOverlay) this.neighbor.getStructuredOverlay();
 
         /*
-         * entryPointOverlay.addNeighbor(this.neighbor, 1, 0);
-         * neighborOverlay.addNeighbor(this.entryPoint, 1, 1);
+         * Assert.assertTrue(this.neighbor.sendMessage());
+         * Assert.assertTrue(this.entryPoint.hasNeighbor(this.neighbor.getStub()));
          */
-
-        // Test if the new added peer is in the neighbor list
-        Assert.assertTrue(neighborOverlay.hasNeighbor(this.entryPoint));
-        Assert.assertTrue(entryPointOverlay.hasNeighbor(this.neighbor));
 
         // Test if the new added peer has the good coordinates CanLookupMessage msgToEntryPoint =
         /*

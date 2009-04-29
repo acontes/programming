@@ -289,8 +289,6 @@ public class CANOverlay extends StructuredOverlay {
         for (Group<Peer>[] neighborsAxe : this.neighbors) {
             for (Group<Peer> neighbor : neighborsAxe) {
                 if (neighbor.contains(peer)) {
-                    System.out.println("peer = " + peer + " neighbor = " +
-                        neighbor.get(neighbor.indexOf(peer)));
                     return true;
                 }
             }
@@ -314,12 +312,10 @@ public class CANOverlay extends StructuredOverlay {
      *            the message.
      * @return the response.
      */
-    public ResponseMessage handleCANJoinMessage(Message msg) {
+    public CANJoinResponseMessage handleJoinMessage(Message msg) {
         CANJoinMessage message = (CANJoinMessage) msg;
-        System.out.println(message);
         this.addNeighbor(message.getPeer(), message.getDimesion(), message.getOrder());
 
-        System.out.println("Handle CanJoinMessage : hasNeighbor = " + this.hasNeighbor(message.getPeer()));
         return new CANJoinResponseMessage();
     }
 

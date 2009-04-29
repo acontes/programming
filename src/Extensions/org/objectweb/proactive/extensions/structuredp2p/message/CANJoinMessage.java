@@ -39,7 +39,7 @@ public class CANJoinMessage implements Message {
      * 
      */
     public ResponseMessage handle(StructuredOverlay overlay) {
-        return ((CANOverlay) overlay).handleCANJoinMessage(this);
+        return ((CANOverlay) overlay).handleJoinMessage(this);
     }
 
     public Peer getPeer() {
