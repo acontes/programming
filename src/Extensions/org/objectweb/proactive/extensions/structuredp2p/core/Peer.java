@@ -188,7 +188,6 @@ public class Peer implements InitActive, RunActive, Serializable {
     /**
      * {@inheritDoc}
      */
-    @Override
     public void initActivity(Body body) {
         switch (this.type) {
             case CAN:
@@ -208,7 +207,6 @@ public class Peer implements InitActive, RunActive, Serializable {
     /**
      * {@inheritDoc}
      */
-    @Override
     public void runActivity(Body body) {
         Service service = new Service(body);
         while (body.isActive()) {

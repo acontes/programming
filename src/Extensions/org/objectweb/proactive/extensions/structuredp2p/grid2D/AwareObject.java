@@ -261,7 +261,6 @@ public class AwareObject implements Serializable, InitActive {
     /**
      * {@inheritDoc}
      */
-    @Override
     public void initActivity(Body arg0) {
         this.stub = (AwareObject) PAActiveObject.getStubOnThis();
     }

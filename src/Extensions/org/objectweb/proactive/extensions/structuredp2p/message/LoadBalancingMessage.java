@@ -23,7 +23,6 @@ public class LoadBalancingMessage implements Message {
     /**
      * {@inheritDoc}
      */
-    @Override
     public ResponseMessage handle(StructuredOverlay overlay) {
         return overlay.handleLoadBalancingMessage(this);
     }

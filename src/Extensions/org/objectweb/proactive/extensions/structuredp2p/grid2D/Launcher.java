@@ -212,7 +212,6 @@ public class Launcher {
         launcher.createsAwareObjects();
 
         Thread inputThread = new Thread(new Runnable() {
-            @Override
             public void run() {
                 AwareObject founded;
                 Scanner scanner = new Scanner(System.in);
