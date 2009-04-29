@@ -23,6 +23,7 @@ import org.objectweb.proactive.extra.dataspaces.ApplicationScratchSpace;
 import org.objectweb.proactive.extra.dataspaces.BaseScratchSpaceConfiguration;
 import org.objectweb.proactive.extra.dataspaces.DataSpacesURI;
 import org.objectweb.proactive.extra.dataspaces.NodeScratchSpace;
+import org.objectweb.proactive.extra.dataspaces.SpaceInstanceInfo;
 import org.objectweb.proactive.extra.dataspaces.SpaceType;
 import org.objectweb.proactive.extra.dataspaces.Utils;
 import org.objectweb.proactive.extra.dataspaces.VFSFactory;
@@ -36,8 +37,9 @@ public class ApplicationScratchSpaceTest {
 
     private static final String NODE_ID = "node_id";
     private static final String RUNTIME_ID = "rt_id";
-    private static final String SCRATCH_URL = "/";
-    private static final String APP_ID = new Long(Utils.getApplicationId(null)).toString();
+    private static final String ACCESS_URL = "/";
+    private static final long APP_ID_LONG = Utils.getApplicationId(null);
+    private static final String APP_ID = new Long(APP_ID_LONG).toString();
 
     private File testDir;
     private Node node;
@@ -52,6 +54,7 @@ public class ApplicationScratchSpaceTest {
     private File file;
     private File dir;
     private static DefaultFileSystemManager fileSystemManager;
+    private String scratchPath;
 
     @BeforeClass
     static public void init() throws FileSystemException {
@@ -72,7 +75,7 @@ public class ApplicationScratchSpaceTest {
 
         node = new MOCNode(RUNTIME_ID, NODE_ID);
         body = new MOCBody();
-        localAccessConfig = new BaseScratchSpaceConfiguration(SCRATCH_URL, testDirPath);
+        localAccessConfig = new BaseScratchSpaceConfiguration(ACCESS_URL, testDirPath);
         nodeScratchSpace = new NodeScratchSpace(node, localAccessConfig);
 
         nodeScratchSpace.init(fileSystemManager);
@@ -83,6 +86,7 @@ public class ApplicationScratchSpaceTest {
         assertIsExistingEmptyDirectory(scratchDataSpacePath);
 
         activeObjectId = Utils.getActiveObjectId(body);
+        scratchPath = Utils.appendSubDirs(scratchDataSpacePath, activeObjectId);
     }
 
     @After
@@ -106,9 +110,8 @@ public class ApplicationScratchSpaceTest {
      */
     @Test
     public void testGetScratchForAO() throws FileSystemException {
-        final String path = Utils.appendSubDirs(testDirPath, RUNTIME_ID, NODE_ID, APP_ID, activeObjectId);
         applicationScratchSpace.getScratchForAO(body);
-        assertIsExistingEmptyDirectory(path);
+        assertIsExistingEmptyDirectory(scratchPath);
     }
 
     /**
@@ -118,15 +121,9 @@ public class ApplicationScratchSpaceTest {
      */
     @Test
     public void testGetScratchForAO1() throws FileSystemException {
-        final String path = Utils.appendSubDirs(testDirPath, RUNTIME_ID, NODE_ID, APP_ID, activeObjectId);
         final DataSpacesURI uri = applicationScratchSpace.getScratchForAO(body);
 
-        assertEquals(RUNTIME_ID, uri.getRuntimeId());
-        assertEquals(NODE_ID, uri.getNodeId());
-        assertEquals(APP_ID, new Long(uri.getAppId()).toString());
-        assertEquals(SpaceType.SCRATCH, uri.getSpaceType());
-        assertEquals(activeObjectId, uri.getPath());
-        assertNull(uri.getName());
+        assertValidDataSpacesURI(uri, activeObjectId);
     }
 
     /**
@@ -136,7 +133,6 @@ public class ApplicationScratchSpaceTest {
      */
     @Test
     public void testGetScratchForAO2() throws IOException {
-        final String scratchPath = Utils.appendSubDirs(scratchDataSpacePath, activeObjectId);
         dir = new File(scratchPath);
         file = new File(scratchPath, "test.txt");
         assertTrue(dir.mkdir());
@@ -146,11 +142,72 @@ public class ApplicationScratchSpaceTest {
         assertIsExistingEmptyDirectory(scratchPath);
     }
 
-    private void assertIsExistingEmptyDirectory(String path) throws FileSystemException {
-        FileObject fPartialDS = fileSystemManager.resolveFile(path);
+    /**
+     * Check if created files in a scratch still remain there after calling second
+     * {@link ApplicationScratchSpace#getScratchForAO}.
+     *
+     * @throws IOException
+     */
+    @Test
+    public void testGetScratchForAO3() throws IOException {
+        // first - create scratch
+        applicationScratchSpace.getScratchForAO(body);
+        assertIsExistingEmptyDirectory(scratchPath);
+
+        // secondly - create files
+        dir = new File(scratchPath);
+        file = new File(scratchPath, "test.txt");
+        assertTrue(file.createNewFile());
+
+        applicationScratchSpace.getScratchForAO(body);
+        assertTrue(dir.exists());
+        assertTrue(file.exists());
+    }
+
+    /**
+     * Check if returning space info is valid.
+     */
+    @Test
+    public void testGetInstanceInfo() {
+        final String spaceAccessURL = Utils.appendSubDirs(ACCESS_URL, RUNTIME_ID, NODE_ID, APP_ID);
+        final SpaceInstanceInfo sii = applicationScratchSpace.getSpaceInstanceInfo();
+        final String hostname = Utils.getHostname();
+
+        assertNotNull(sii);
+        assertEquals(APP_ID_LONG, sii.getAppId());
+        assertEquals(SpaceType.SCRATCH, sii.getType());
+        assertEquals(hostname, sii.getHostname());
+        assertEquals(scratchDataSpacePath, sii.getPath());
+        assertEquals(spaceAccessURL, sii.getUrl());
+        assertNull(sii.getName());
+    }
+
+    /**
+     * Check if mounting point URI is valid.
+     */
+    @Test
+    public void testGetInstanceInfo1() {
+        final SpaceInstanceInfo sii = applicationScratchSpace.getSpaceInstanceInfo();
+        final DataSpacesURI uri = sii.getMountingPoint();
+
+        assertValidDataSpacesURI(uri, null);
+    }
+
+    private void assertIsExistingEmptyDirectory(final String path) throws FileSystemException {
+        final FileObject fPartialDS = fileSystemManager.resolveFile(path);
 
         assertTrue(fPartialDS.exists());
         assertEquals(FileType.FOLDER, fPartialDS.getType());
         assertEquals(0, fPartialDS.getChildren().length);
+    }
+
+    private void assertValidDataSpacesURI(final DataSpacesURI uri, final String path) {
+        assertNotNull(uri);
+        assertEquals(RUNTIME_ID, uri.getRuntimeId());
+        assertEquals(NODE_ID, uri.getNodeId());
+        assertEquals(APP_ID_LONG, uri.getAppId());
+        assertEquals(SpaceType.SCRATCH, uri.getSpaceType());
+        assertEquals(path, uri.getPath());
+        assertNull(uri.getName());
     }
 }
