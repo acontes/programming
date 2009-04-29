@@ -1,6 +1,7 @@
 package org.objectweb.proactive.extensions.structuredp2p.core;
 
 import java.util.Iterator;
+import java.util.ListIterator;
 import java.util.Random;
 
 import org.objectweb.proactive.api.PAGroup;
@@ -173,29 +174,43 @@ public class CANOverlay extends StructuredOverlay {
 		// TODO
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void checkNeighbors() {
-		for (Group<Peer>[] groupArray : neighbors) {
-			for (Group<Peer> group : groupArray) {
-				Group<ResponseMessage> groupFutures = (Group<ResponseMessage>) ((Peer) group
-						.getGroupByType()).receiveMessage(new PingMessage());
-				PAGroup.waitAll(groupFutures);
-				Iterator<ResponseMessage> it = groupFutures.listIterator();
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void checkNeighbors() {
+        try {
+            for (Group<Peer>[] groupArray : neighbors) {
+                for (Group<Peer> group : groupArray) {
+                    Group<ResponseMessage> groupFutures;
+                    groupFutures = (Group<ResponseMessage>) PAGroup.newGroup(ResponseMessage.class.getName());
 
-				while (it.hasNext()) {
-					try {
-						// FIXME
-					} catch (Exception e) {
-						// FIXME
-					}
-				}
+                    ListIterator<Peer> peers = group.listIterator();
+                    while (peers.hasNext()) {
+                        groupFutures.add(this.sendMessageTo(peers.next(), new PingMessage()));
+                    }
 
-			}
-		}
-	}
+                    PAGroup.waitAll(groupFutures);
+                    Iterator<ResponseMessage> it = groupFutures.listIterator();
+
+                    while (it.hasNext()) {
+                        try {
+                            // FIXME
+                        } catch (Exception e) {
+                            // FIXME
+                        }
+                    }
+
+                }
+            }
+        } catch (ClassNotReifiableException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        } catch (ClassNotFoundException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+    }
 
 	/**
 	 * {@inheritDoc}
@@ -216,13 +231,46 @@ public class CANOverlay extends StructuredOverlay {
 		return new Boolean(false);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void leave() {
-		// TODO Auto-generated method stub
-	}
+    /**
+     * {@inheritDoc}
+     * 
+     * @throws ClassNotFoundException
+     * @throws ClassNotReifiableException
+     */
+    @Override
+    public void leave() {
+        try {
+            Group<Peer> groupAvailablePeer = (Group<Peer>) PAGroup.newGroup(Peer.class.getName());
+
+            // Check if there is a valid neighbor
+            for (Group<Peer>[] neighborsAxe : this.neighbors) {
+                for (Group<Peer> neighbor : neighborsAxe) {
+                    ListIterator<Peer> list = neighbor.listIterator();
+
+                    while (list.hasNext()) {
+                        Peer current = list.next();
+                        Area area = ((CANOverlay) current.getStructuredOverlay()).getArea();
+                        if (this.area.isValidMergingArea(area)) {
+                            groupAvailablePeer.add(current);
+                        }
+                    }
+                }
+            }
+
+            // Check if there is at least one
+            if (groupAvailablePeer.size() > 0) {
+                // TODO
+            }
+            // TODO Else random merge
+
+        } catch (ClassNotReifiableException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
 
 	/**
 	 * {@inheritDoc}
@@ -238,26 +286,24 @@ public class CANOverlay extends StructuredOverlay {
 			int pos;
 			int neighborIndex;
 
-			for (Group<Peer>[] neighborsGroup : neighbors) {
-				for (int i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
-					pos = this.contains(i, msgCan.getCoordinates()[i]);
+            for (Group<Peer>[] neighborsGroup : neighbors) {
+                for (int i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
+                    pos = this.contains(i, msgCan.getCoordinates()[i]);
 
-					if (pos == -1) {
-						this.sendMessageTo(((Peer) neighborsGroup[0]
-								.getGroupByType()), new LoadBalancingMessage());
-						neighborIndex = neighborsGroup[0].waitOneAndGetIndex();
-						return neighborsGroup[0].get(neighborIndex)
-								.sendMessage(msg);
-					} else if (pos == 1) {
-						this.sendMessageTo(((Peer) neighborsGroup[1]
-								.getGroupByType()), new LoadBalancingMessage());
-						neighborIndex = neighborsGroup[1].waitOneAndGetIndex();
-						return neighborsGroup[1].get(neighborIndex)
-								.sendMessage(msg);
-					}
-				}
-			}
-		}
+                    if (pos == -1) {
+                        this.sendMessageTo(((Peer) neighborsGroup[0].getGroupByType()),
+                                new LoadBalancingMessage());
+                        neighborIndex = neighborsGroup[0].waitOneAndGetIndex();
+                        return neighborsGroup[0].get(neighborIndex).sendMessage(msg);
+                    } else if (pos == 1) {
+                        this.sendMessageTo(((Peer) neighborsGroup[1].getGroupByType()),
+                                new LoadBalancingMessage());
+                        neighborIndex = neighborsGroup[1].waitOneAndGetIndex();
+                        return neighborsGroup[1].get(neighborIndex).sendMessage(msg);
+                    }
+                }
+            }
+        }
 
 		throw new IllegalArgumentException(
 				"The searched position doesn't exist.");

@@ -1,6 +1,7 @@
 package org.objectweb.proactive.extensions.structuredp2p.grid2D;
 
 import java.io.Serializable;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -236,7 +237,6 @@ public class AwareObject implements Serializable, InitActive {
     /**
      * {@inheritDoc}
      */
-    @Override
     public String toString() {
         StringBuffer buf = new StringBuffer("AwareObject x=" + this.x + ", y=" + this.y + "\n");
         buf.append("\n");
