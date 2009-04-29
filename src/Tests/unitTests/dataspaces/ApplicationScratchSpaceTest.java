@@ -1,6 +1,7 @@
 package unitTests.dataspaces;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -33,6 +34,10 @@ import unitTests.dataspaces.moc.MOCBody;
 import unitTests.dataspaces.moc.MOCNode;
 
 
+/**
+ * Tests for {@link ApplicationScratchSpace} implementation. Uses MOCK objects for Body
+ * implementation.
+ */
 public class ApplicationScratchSpaceTest {
 
     private static final String NODE_ID = "node_id";
@@ -105,7 +110,7 @@ public class ApplicationScratchSpaceTest {
 
     /**
      * Check if directory is being created.
-     *
+     * 
      * @throws FileSystemException
      */
     @Test
@@ -116,7 +121,7 @@ public class ApplicationScratchSpaceTest {
 
     /**
      * Check if returned URI is valid.
-     *
+     * 
      * @throws FileSystemException
      */
     @Test
@@ -128,7 +133,7 @@ public class ApplicationScratchSpaceTest {
 
     /**
      * Check if existing files will be removed.
-     *
+     * 
      * @throws IOException
      */
     @Test
@@ -145,7 +150,7 @@ public class ApplicationScratchSpaceTest {
     /**
      * Check if created files in a scratch still remain there after calling second
      * {@link ApplicationScratchSpace#getScratchForAO}.
-     *
+     * 
      * @throws IOException
      */
     @Test
@@ -159,6 +164,7 @@ public class ApplicationScratchSpaceTest {
         file = new File(scratchPath, "test.txt");
         assertTrue(file.createNewFile());
 
+        // re-get scratch
         applicationScratchSpace.getScratchForAO(body);
         assertTrue(dir.exists());
         assertTrue(file.exists());
@@ -191,6 +197,56 @@ public class ApplicationScratchSpaceTest {
         final DataSpacesURI uri = sii.getMountingPoint();
 
         assertValidDataSpacesURI(uri, null);
+    }
+
+    /**
+     * Check if mounting point URI is valid.
+     */
+    @Test
+    public void testGetSpaceMountingPoint() {
+        final DataSpacesURI uri = applicationScratchSpace.getSpaceMountingPoint();
+
+        assertValidDataSpacesURI(uri, null);
+    }
+
+    /**
+     * Try to close empty data space.
+     * 
+     * @throws IOException
+     */
+    @Test
+    public void testClose() throws IOException {
+        applicationScratchSpace.getScratchForAO(body);
+        assertIsExistingEmptyDirectory(scratchPath);
+        dir = new File(scratchPath);
+
+        // close data space
+        applicationScratchSpace.close();
+
+        assertFalse(dir.exists());
+    }
+
+    /**
+     * Check if all files are being removed.
+     * 
+     * @throws IOException
+     */
+    @Test
+    public void testClose1() throws IOException {
+        // first - create scratch
+        applicationScratchSpace.getScratchForAO(body);
+        assertIsExistingEmptyDirectory(scratchPath);
+
+        // secondly - create files
+        dir = new File(scratchPath);
+        file = new File(scratchPath, "test.txt");
+        assertTrue(file.createNewFile());
+
+        // close data space
+        applicationScratchSpace.close();
+
+        assertFalse(dir.exists());
+        assertFalse(file.exists());
     }
 
     private void assertIsExistingEmptyDirectory(final String path) throws FileSystemException {
