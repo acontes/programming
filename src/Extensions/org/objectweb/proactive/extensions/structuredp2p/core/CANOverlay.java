@@ -7,6 +7,7 @@ import java.util.Random;
 import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
+import org.objectweb.proactive.extensions.structuredp2p.core.exception.AreaException;
 import org.objectweb.proactive.extensions.structuredp2p.message.CANJoinMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.CANLookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.CANMergeMessage;
@@ -167,8 +168,17 @@ public class CANOverlay extends StructuredOverlay {
      *            the peer which left the network.
      */
     public boolean merge(Peer remotePeer) {
+        CANOverlay overlay = ((CANOverlay) remotePeer.getStructuredOverlay());
+        Area remoteArea = overlay.getArea();
+        try {
+            this.area.mergeAreas(remoteArea);
+            this.getLocalPeer().getDataStorage().addData(remotePeer.getDataStorage());
+        } catch (AreaException e) {
+            // TODO Rollback
+            return false;
+        }
         // TODO
-        return false;
+        return true;
     }
 
     /**
@@ -226,9 +236,6 @@ public class CANOverlay extends StructuredOverlay {
 
     /**
      * {@inheritDoc}
-     * 
-     * @throws ClassNotFoundException
-     * @throws ClassNotReifiableException
      */
     public void leave() {
         try {
@@ -251,11 +258,10 @@ public class CANOverlay extends StructuredOverlay {
 
             // Check if there is at least one
             if (groupAvailablePeer.size() > 0) {
-                // TODO
                 this.getLocalPeer().sendMessageTo(groupAvailablePeer.waitAndGetOne(),
                         new CANMergeMessage(this.getRemotePeer()));
             }
-            // TODO Else random merge
+            // TODO Else : split more before merge !
 
         } catch (ClassNotReifiableException e) {
             // TODO Auto-generated catch block

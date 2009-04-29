@@ -113,22 +113,22 @@ public class Area implements Serializable {
      * @return the merged area.
      * @throws AreaException
      */
-    public static Area mergeAreas(Area a1, Area a2) throws AreaException {
-        int border = a1.isBordered(a2);
-        Coordinate[] minCoord = new Coordinate[a1.getCoordinatesMax().length];
-        Coordinate[] maxCoord = new Coordinate[a1.getCoordinatesMax().length];
+    public Area mergeAreas(Area a) throws AreaException {
+        int border = this.isBordered(a);
+        Coordinate[] minCoord = new Coordinate[this.getCoordinatesMax().length];
+        Coordinate[] maxCoord = new Coordinate[this.getCoordinatesMax().length];
         if (border == -1) {
             throw new AreaException("Areas are not bordered.");
-        } else if (a1.isValidMergingArea(a2)) {
+        } else if (this.isValidMergingArea(a)) {
             // FIXME test also the load balancing to choose the good area
             // merge the two areas
-            for (int i = 0; i < a1.getCoordinatesMax().length; i++) {
+            for (int i = 0; i < this.getCoordinatesMax().length; i++) {
                 if (i != border) {
-                    minCoord[i] = a1.getCoordinatesMin(i);
-                    maxCoord[i] = a1.getCoordinatesMax(i);
+                    minCoord[i] = this.getCoordinatesMin(i);
+                    maxCoord[i] = this.getCoordinatesMax(i);
                 } else {
-                    minCoord[i] = a1.getCoordinatesMin(i).min(a2.getCoordinatesMin(i));
-                    maxCoord[i] = a1.getCoordinatesMax(i).max(a2.getCoordinatesMax(i));
+                    minCoord[i] = this.getCoordinatesMin(i).min(a.getCoordinatesMin(i));
+                    maxCoord[i] = this.getCoordinatesMax(i).max(a.getCoordinatesMax(i));
                 }
             }
             return new Area(minCoord, maxCoord);
