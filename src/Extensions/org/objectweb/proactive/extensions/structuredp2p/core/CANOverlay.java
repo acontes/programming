@@ -171,7 +171,7 @@ public class CANOverlay extends StructuredOverlay {
         CANOverlay overlay = ((CANOverlay) remotePeer.getStructuredOverlay());
         Area remoteArea = overlay.getArea();
         try {
-            this.area.mergeAreas(remoteArea);
+            this.area.mergeArea(remoteArea);
             this.getLocalPeer().getDataStorage().addData(remotePeer.getDataStorage());
         } catch (AreaException e) {
             // TODO Rollback

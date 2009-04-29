@@ -113,7 +113,7 @@ public class Area implements Serializable {
      * @return the merged area.
      * @throws AreaException
      */
-    public Area mergeAreas(Area a) throws AreaException {
+    public Area mergeArea(Area a) throws AreaException {
         int border = this.isBordered(a);
         Coordinate[] minCoord = new Coordinate[this.getCoordinatesMax().length];
         Coordinate[] maxCoord = new Coordinate[this.getCoordinatesMax().length];
