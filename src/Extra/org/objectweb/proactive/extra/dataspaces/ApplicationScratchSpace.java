@@ -8,10 +8,7 @@ import org.objectweb.proactive.Body;
 
 
 /**
- * - returns scratch data space for AO (in form od DataSpacesURI) (from AO id) creates it when
- * needed - (to discuss) registers data space instance in CachingSpacesDirectory on creation;
- * unregisters and removes directory on finalization
- * 
+ * Supports scratch data space. Implementations of this interface are thread-safe.
  */
 public interface ApplicationScratchSpace {
 
