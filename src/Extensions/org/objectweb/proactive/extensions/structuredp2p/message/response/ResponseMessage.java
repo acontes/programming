@@ -3,6 +3,7 @@ package org.objectweb.proactive.extensions.structuredp2p.message.response;
 import java.io.Serializable;
 
 
+//FIXME
 /**
  * A response message is the appropriate answer to the message.
  * 
