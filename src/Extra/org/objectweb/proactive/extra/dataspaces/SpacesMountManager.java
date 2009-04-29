@@ -290,7 +290,7 @@ public class SpacesMountManager {
      * Assumed to be called within writeLock and readLock
      */
     private void unmountSpace(final DataSpacesURI spaceUri) throws FileSystemException {
-        mountedSpaces.remove(spaceUri);        
+        mountedSpaces.remove(spaceUri);
         try {
             vfs.removeJunction(getVFSPath(spaceUri));
         } finally {

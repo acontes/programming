@@ -31,7 +31,6 @@
  */
 package org.objectweb.proactive.core.util.log;
 
-
 /**
  * This interfaces centralizes the names of the loggers.
  *
