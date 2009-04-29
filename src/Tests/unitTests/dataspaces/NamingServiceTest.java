@@ -199,12 +199,12 @@ public class NamingServiceTest extends SpacesDirectoryAbstractBase {
     }
 
     private void assertIsSpaceRegistered(SpaceInstanceInfo expected) {
-        SpaceInstanceInfo actual = ns.lookupFirst(expected.getMountingPoint());
+        SpaceInstanceInfo actual = ns.lookupOne(expected.getMountingPoint());
         assertEquals(actual.getMountingPoint(), expected.getMountingPoint());
     }
 
     private void assertIsSpaceUnregistered(SpaceInstanceInfo expected) {
-        assertNull(ns.lookupFirst(expected.getMountingPoint()));
+        assertNull(ns.lookupOne(expected.getMountingPoint()));
     }
 
     @Override

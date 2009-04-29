@@ -22,7 +22,6 @@ import org.objectweb.proactive.extra.dataspaces.InputOutputSpaceConfiguration;
 import org.objectweb.proactive.extra.dataspaces.NamingService;
 import org.objectweb.proactive.extra.dataspaces.ScratchSpaceConfiguration;
 import org.objectweb.proactive.extra.dataspaces.SpaceInstanceInfo;
-import org.objectweb.proactive.extra.dataspaces.Utils;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ApplicationAlreadyRegisteredException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceAlreadyRegisteredException;
@@ -96,7 +95,7 @@ public class RemoteNamingServiceTest {
         roe = PARemoteObject.newRemoteObject(NamingService.class.getName(), ns);
         roe.createRemoteObject(NAME);
         final String url = roe.getURL();
-        stub = Utils.createNamingServiceStub(url);
+        stub = NamingService.createNamingServiceStub(url);
 
         // RemoteObjectHelper.generatedObjectStub(roe.getRemoteObject());
     }
@@ -124,7 +123,7 @@ public class RemoteNamingServiceTest {
 
         // TEST LOOKUP ALL
         final DataSpacesURI query = DataSpacesURI.createURI(MAIN_APPID);
-        final Set<SpaceInstanceInfo> actual = stub.lookupAll(query);
+        final Set<SpaceInstanceInfo> actual = stub.lookupMany(query);
         assertEquals(spaces, actual);
 
         // TEST UNREGISTER
@@ -179,11 +178,11 @@ public class RemoteNamingServiceTest {
     }
 
     private void assertIsSpaceRegistered(SpaceInstanceInfo expected) {
-        SpaceInstanceInfo actual = stub.lookupFirst(expected.getMountingPoint());
+        SpaceInstanceInfo actual = stub.lookupOne(expected.getMountingPoint());
         assertEquals(actual.getMountingPoint(), expected.getMountingPoint());
     }
 
     private void assertIsSpaceUnregistered(SpaceInstanceInfo expected) {
-        assertNull(stub.lookupFirst(expected.getMountingPoint()));
+        assertNull(stub.lookupOne(expected.getMountingPoint()));
     }
 }

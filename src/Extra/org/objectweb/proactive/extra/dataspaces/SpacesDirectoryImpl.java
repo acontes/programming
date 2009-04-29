@@ -12,23 +12,30 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceAlreadyRegistere
 
 
 /**
- * Implementation of SpacesDirectory interface.
+ * In-memory implementation of {@link SpacesDirectory}.
+ * <p>
+ * Instances of this class are thread-safe.
  * 
- * @see org.objectweb.proactive.extra.dataspaces.SpacesDirectory
+ * @see SpacesDirectory
  */
 public class SpacesDirectoryImpl implements SpacesDirectory {
+    private final SortedMap<DataSpacesURI, SpaceInstanceInfo> data = new TreeMap<DataSpacesURI, SpaceInstanceInfo>();
 
-    final private SortedMap<DataSpacesURI, SpaceInstanceInfo> data = new TreeMap<DataSpacesURI, SpaceInstanceInfo>();
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.objectweb.proactive.extra.dataspaces.SpacesDirectory#lookupAll(org
-     * .objectweb.proactive.extra.dataspaces.DataSpacesURI)
-     */
-    public Set<SpaceInstanceInfo> lookupAll(DataSpacesURI uri) {
+    protected static void checkAbstractURI(DataSpacesURI uri) {
         if (uri.isComplete())
             throw new IllegalArgumentException("Space URI must not be complete for this method call");
+    }
+
+    protected static void checkMountingPointURI(DataSpacesURI uri) {
+        if (!uri.isComplete())
+            throw new IllegalArgumentException("Space URI must be complete for this method call");
+
+        if (uri.getPath() != null)
+            throw new IllegalArgumentException("Space URI must not contain path for this method call");
+    }
+
+    public Set<SpaceInstanceInfo> lookupMany(DataSpacesURI uri) {
+        checkAbstractURI(uri);
 
         final DataSpacesURI nextKey = uri.nextURI();
         final Set<SpaceInstanceInfo> ret = new HashSet<SpaceInstanceInfo>();
@@ -43,31 +50,14 @@ public class SpacesDirectoryImpl implements SpacesDirectory {
         return ret;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.objectweb.proactive.extra.dataspaces.SpacesDirectory#lookupFirst(
-     * org.objectweb.proactive.extra.dataspaces.DataSpacesURI)
-     */
-    public SpaceInstanceInfo lookupFirst(DataSpacesURI uri) {
-        // TODO change this name to lookupOne() or lookup() as it has different behavior now
-        if (!uri.isComplete())
-            throw new IllegalArgumentException("Space URI must be complete for this method call");
-
-        if (uri.getPath() != null)
-            throw new IllegalArgumentException("Space URI must not contain path for this method call");
+    public SpaceInstanceInfo lookupOne(DataSpacesURI uri) {
+        checkMountingPointURI(uri);
 
         synchronized (data) {
             return data.get(uri);
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.objectweb.proactive.extra.dataspaces.SpacesDirectory#register(org
-     * .objectweb.proactive.extra.dataspaces.SpaceInstanceInfo)
-     */
     public void register(SpaceInstanceInfo spaceInstanceInfo) throws SpaceAlreadyRegisteredException {
         final DataSpacesURI mpoint;
 
@@ -80,6 +70,18 @@ public class SpacesDirectoryImpl implements SpacesDirectory {
                     "Mapping for a given space URI is already registered");
             data.put(mpoint, spaceInstanceInfo);
         }
+    }
+
+    public boolean unregister(DataSpacesURI uri) {
+        checkMountingPointURI(uri);
+
+        synchronized (data) {
+            if (!data.containsKey(uri))
+                return false;
+
+            data.remove(uri);
+        }
+        return true;
     }
 
     /**
@@ -104,22 +106,5 @@ public class SpacesDirectoryImpl implements SpacesDirectory {
             for (DataSpacesURI key : uris)
                 data.remove(key);
         }
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.objectweb.proactive.extra.dataspaces.SpacesDirectory#unregister(org
-     * .objectweb.proactive.extra.dataspaces.DataSpacesURI)
-     */
-    public boolean unregister(DataSpacesURI uri) {
-
-        synchronized (data) {
-            if (!data.containsKey(uri))
-                return false;
-
-            data.remove(uri);
-        }
-        return true;
     }
 }

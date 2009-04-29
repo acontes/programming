@@ -5,17 +5,28 @@ package org.objectweb.proactive.extra.dataspaces;
 
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceAlreadyRegisteredException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.WrongApplicationIdException;
 
 
 /**
- * Decorator of SpacesDirectory that caches SpaceInstanceInfo in its SpacesDirectoryImpl instance.
+ * Decorator of {@link SpacesDirectory} that locally caches results from another directory instance.
+ * <p>
+ * Caching is performed assuming that in normal conditions, for spaces concerning clients of this
+ * class, source directory should work in append-only mode. Therefore, unregistering space in an
+ * original source directory, does not cause it to be removed from the cached directory. However,
+ * unregistering this space explicitly through cache directory, cause it to be unregistered in both
+ * directories.
+ * <p>
+ * Only {@link #lookupOne(DataSpacesURI)} queries are cached, while
+ * {@link #lookupMany(DataSpacesURI)} queries are never cached.
  * <p>
  * Instances of this class are thread-safe.
  */
 public class CachingSpacesDirectory implements SpacesDirectory {
-
     private final SpacesDirectoryImpl localDirectory;
 
     private final SpacesDirectory remoteDirectory;
@@ -28,16 +39,13 @@ public class CachingSpacesDirectory implements SpacesDirectory {
     /**
      * This method call is always delegated remotely.
      * 
-     * @see org.objectweb.proactive.extensions.dataspaces.SpacesDirectory#lookupAll
-     *      (org.objectweb.proactive.extensions.dataspaces.DataSpacesURI)
+     * @see SpacesDirectory#lookupMany(DataSpacesURI)
      */
-    public Set<SpaceInstanceInfo> lookupAll(DataSpacesURI uri) {
-
-        if (uri.isComplete())
-            throw new IllegalArgumentException("Space URI must not be complete for this method call");
+    public Set<SpaceInstanceInfo> lookupMany(DataSpacesURI uri) {
+        SpacesDirectoryImpl.checkAbstractURI(uri);
 
         synchronized (this) {
-            final Set<SpaceInstanceInfo> ret = remoteDirectory.lookupAll(uri);
+            final Set<SpaceInstanceInfo> ret = remoteDirectory.lookupMany(uri);
             localDirectory.register(ret);
 
             return ret;
@@ -47,49 +55,36 @@ public class CachingSpacesDirectory implements SpacesDirectory {
     /**
      * Try in cache, if not found try remotely.
      * 
-     * @see org.objectweb.proactive.extensions.dataspaces.SpacesDirectory#lookupFirst
-     *      (org.objectweb.proactive.extensions.DataSpacesURI.DataSpacesURI)
+     * @see SpacesDirectory#lookupOne(DataSpacesURI)
      */
-    public SpaceInstanceInfo lookupFirst(DataSpacesURI uri) {
-
-        if (!uri.isComplete())
-            throw new IllegalArgumentException("Space URI must be complete for this method call");
-
-        if (uri.getPath() != null)
-            throw new IllegalArgumentException("Space URI must not contain path for this method call");
+    public SpaceInstanceInfo lookupOne(DataSpacesURI uri) {
+        SpacesDirectoryImpl.checkMountingPointURI(uri);
 
         // double-checked locking, as it would be a pity if we have to wait for
         // remote lookups when we can answer some lookups using local directory
-        SpaceInstanceInfo sii = localDirectory.lookupFirst(uri);
+        SpaceInstanceInfo sii = localDirectory.lookupOne(uri);
         if (sii != null)
             return sii;
 
         synchronized (this) {
-            sii = localDirectory.lookupFirst(uri);
+            sii = localDirectory.lookupOne(uri);
             if (sii != null)
                 return sii;
 
-            sii = remoteDirectory.lookupFirst(uri);
+            sii = remoteDirectory.lookupOne(uri);
 
             if (sii != null)
                 try {
                     localDirectory.register(sii);
                 } catch (SpaceAlreadyRegisteredException e) {
-                    // this should never happen when properly synchronized
+                    final Logger logger = ProActiveLogger.getLogger(Loggers.DATASPACES);
+                    ProActiveLogger.logImpossibleException(logger, e);
                     throw new RuntimeException(e);
-                    // FIXME log instead of throwing it?
                 }
             return sii;
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.objectweb.proactive.extensions.dataspaces.SpacesDirectory#register
-     * (org.objectweb.proactive.extensions.dataspaces.DataSpacesURI,
-     * org.objectweb.proactive.extensions.dataspaces.SpaceInstanceInfo)
-     */
     public synchronized void register(SpaceInstanceInfo spaceInstanceInfo)
             throws SpaceAlreadyRegisteredException, WrongApplicationIdException {
 
@@ -97,13 +92,9 @@ public class CachingSpacesDirectory implements SpacesDirectory {
         localDirectory.register(spaceInstanceInfo);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.objectweb.proactive.extensions.dataspaces.SpacesDirectory#unregister
-     * (org.objectweb.proactive.extensions.dataspaces.DataSpacesURI)
-     */
     public synchronized boolean unregister(DataSpacesURI uri) {
+        SpacesDirectoryImpl.checkMountingPointURI(uri);
+
         localDirectory.unregister(uri);
         return remoteDirectory.unregister(uri);
     }

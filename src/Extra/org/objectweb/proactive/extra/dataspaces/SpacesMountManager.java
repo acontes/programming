@@ -177,7 +177,7 @@ public class SpacesMountManager {
             logger.debug("Spaces access request: " + queryUri);
         final Map<DataSpacesURI, FileObject> result = new HashMap<DataSpacesURI, FileObject>();
 
-        final Set<SpaceInstanceInfo> spaces = directory.lookupAll(queryUri);
+        final Set<SpaceInstanceInfo> spaces = directory.lookupMany(queryUri);
         for (final SpaceInstanceInfo space : spaces) {
             final DataSpacesURI spaceUri = space.getMountingPoint();
             try {
@@ -212,7 +212,9 @@ public class SpacesMountManager {
                     try {
                         unmountSpace(spaceUri);
                     } catch (FileSystemException e) {
-                        logger.warn(String.format("Could not properly unmount %s (ignoring)", spaceUri));
+                        final String message = String.format("Could not properly unmount %s (ignoring)",
+                                spaceUri);
+                        ProActiveLogger.logEatedException(logger, message, e);
                     }
                 }
                 vfs.close();
@@ -230,7 +232,7 @@ public class SpacesMountManager {
 
         if (!mounted) {
             if (info == null) {
-                info = directory.lookupFirst(spaceURI);
+                info = directory.lookupOne(spaceURI);
             }
             if (info == null) {
                 logger.warn("Could not find data space in spaces directory: " + spaceURI);

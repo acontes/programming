@@ -7,8 +7,11 @@ import java.net.URISyntaxException;
 
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.impl.DefaultFileSystemManager;
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 
 
@@ -37,6 +40,7 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationExceptio
  * @see DataSpacesImpl
  */
 public class NodeConfigurator {
+    private static final Logger logger = ProActiveLogger.getLogger(Loggers.DATASPACES_CONFIGURATOR);
 
     private boolean configured;
 
@@ -71,15 +75,24 @@ public class NodeConfigurator {
      */
     synchronized public void configureNode(BaseScratchSpaceConfiguration baseScratchConfiguration, Node node)
             throws IllegalStateException, FileSystemException, ConfigurationException {
+        logger.debug("Configuring node for Data Spaces");
         checkNotConfigured();
 
-        this.manager = VFSFactory.createDefaultFileSystemManager();
+        try {
+            this.manager = VFSFactory.createDefaultFileSystemManager();
+        } catch (FileSystemException x) {
+            logger.error("Could not create and configure VFS manager", x);
+            throw x;
+        }
         this.node = node;
         if (baseScratchConfiguration != null) {
             // TODO as provider will be implemented, we can move this check elsewhere? for now it's ok.
-            if (baseScratchConfiguration.getUrl() == null)
+            if (baseScratchConfiguration.getUrl() == null) {
+                logger.error("Space configuration is not complete, no remote access URL provided");
+                logger.error("ProActive provider is not implemented");
                 throw new ConfigurationException(
                     "Space configuration is not complete, no remote access URL provided");
+            }
 
             nodeScratchSpace = new NodeScratchSpace(node, baseScratchConfiguration);
             try {
@@ -93,6 +106,7 @@ public class NodeConfigurator {
                 }
             }
         }
+        logger.info("Node configured for Data Spaces");
     }
 
     /**
@@ -126,6 +140,7 @@ public class NodeConfigurator {
      */
     synchronized public void configureApplication(String namingServiceURL) throws IllegalStateException,
             FileSystemException, ProActiveException, ConfigurationException, URISyntaxException {
+        logger.debug("Configuring node for Data Spaces application");
         checkConfigured();
 
         tryCloseAppConfigurator();
@@ -138,6 +153,7 @@ public class NodeConfigurator {
             if (!appConfigured)
                 appConfigurator = null;
         }
+        logger.info("Node configured for Data Spaces application");
     }
 
     /**
@@ -149,8 +165,10 @@ public class NodeConfigurator {
      *         configuration)
      */
     synchronized public DataSpacesImpl getDataSpacesImpl() {
-        if (appConfigurator == null)
+        if (appConfigurator == null) {
+            logger.debug("Requested unavailable Data Spaces implementation for an application");
             return null;
+        }
         return appConfigurator.getDataSpacesImpl();
     }
 
@@ -165,6 +183,7 @@ public class NodeConfigurator {
      *             when node has not been configured yet in terms of node-specific configuration
      */
     synchronized public void close() throws IllegalStateException {
+        logger.debug("Closing Data Spaces node configuration");
         checkConfigured();
 
         tryCloseAppConfigurator();
@@ -176,6 +195,7 @@ public class NodeConfigurator {
             // TODO log or throw
         }
         manager.close();
+        logger.info("Data Space node configuration closed, resources released");
     }
 
     /**
@@ -192,26 +212,27 @@ public class NodeConfigurator {
         if (appConfigurator == null)
             return;
 
-        try {
-            appConfigurator.close();
-        } catch (FileSystemException e) {
-            // TODO log
-        } finally {
-            appConfigurator = null;
-        }
+        logger.debug("Closing Data Spaces application node configuration");
+        appConfigurator.close();
+        appConfigurator = null;
+        logger.info("Closed Data Spaces application node configuration");
     }
 
     private void checkConfigured() throws IllegalStateException {
-        if (!configured)
+        if (!configured) {
+            logger.error("Attempting to perform operation on not configured node");
             throw new IllegalStateException("Node is not configured for Data Spaces");
+        }
     }
 
     private void checkNotConfigured() throws IllegalStateException {
-        if (configured)
+        if (configured) {
+            logger.error("Attempting to configure already configured node");
             throw new IllegalStateException("Node is already configured for Data Spaces");
+        }
     }
 
-    public class NodeApplicationConfigurator {
+    private class NodeApplicationConfigurator {
 
         private SpacesMountManager spacesMountManager;
 
@@ -226,7 +247,16 @@ public class NodeConfigurator {
 
             // create naming service stub with URL and decorate it with local cache
             // use local variables so GC can collect them if something fails
-            final NamingService namingService = Utils.createNamingServiceStub(namingServiceURL);
+            final NamingService namingService;
+            try {
+                namingService = NamingService.createNamingServiceStub(namingServiceURL);
+            } catch (ProActiveException x) {
+                logger.error("Could not access Naming Service", x);
+                throw x;
+            } catch (URISyntaxException x) {
+                logger.error("Wrong Naming Service URI", x);
+                throw x;
+            }
             final CachingSpacesDirectory cachingDir = new CachingSpacesDirectory(namingService);
 
             // create scratch data space for this application and register it
@@ -239,8 +269,10 @@ public class NodeConfigurator {
                     cachingDir.register(scratchInfo);
                     registered = true;
                 } finally {
-                    if (!registered)
+                    if (!registered) {
+                        logger.error("Could not register application scratch space to Naming Service");
                         nodeScratchSpace.close();
+                    }
                 }
             }
             // no exception can be thrown since now
@@ -258,15 +290,17 @@ public class NodeConfigurator {
             return impl;
         }
 
-        private void close() throws FileSystemException {
+        private void close() {
             spacesMountManager.close();
             if (applicationScratchSpace != null) {
                 cachingDirectory.unregister(applicationScratchSpace.getSpaceMountingPoint());
                 try {
                     applicationScratchSpace.close();
-                } finally {
-                    applicationScratchSpace = null;
+                } catch (FileSystemException x) {
+                    ProActiveLogger.logEatedException(logger,
+                            "Could not close correctly application scratch space", x);
                 }
+                applicationScratchSpace = null;
             }
         }
     }

@@ -108,9 +108,9 @@ public abstract class SpacesDirectoryAbstractBase {
         final DataSpacesURI query3 = DataSpacesURI.createInOutSpaceURI(MAIN_APPID, SpaceType.OUTPUT,
                 "output1");
 
-        final SpaceInstanceInfo actual1 = dir.lookupFirst(query1);
-        final SpaceInstanceInfo actual2 = dir.lookupFirst(query2);
-        final SpaceInstanceInfo actual3 = dir.lookupFirst(query3);
+        final SpaceInstanceInfo actual1 = dir.lookupOne(query1);
+        final SpaceInstanceInfo actual2 = dir.lookupOne(query2);
+        final SpaceInstanceInfo actual3 = dir.lookupOne(query3);
 
         assertEquals(spaceInstanceInput1, actual1);
         assertEquals(spaceInstanceInput2, actual2);
@@ -121,7 +121,7 @@ public abstract class SpacesDirectoryAbstractBase {
     public void testLookupAllInputs1() {
         final DataSpacesURI query = DataSpacesURI.createURI(MAIN_APPID, SpaceType.INPUT);
         final Set<SpaceInstanceInfo> expected = new HashSet<SpaceInstanceInfo>();
-        final Set<SpaceInstanceInfo> actual = dir.lookupAll(query);
+        final Set<SpaceInstanceInfo> actual = dir.lookupMany(query);
 
         expected.add(spaceInstanceInput1);
         expected.add(spaceInstanceInput2);
@@ -133,7 +133,7 @@ public abstract class SpacesDirectoryAbstractBase {
     public void testLookupAllInputs0() {
         final DataSpacesURI query = DataSpacesURI.createURI(ANOTHER_APPID1, SpaceType.INPUT);
         final Set<SpaceInstanceInfo> expected = new HashSet<SpaceInstanceInfo>();
-        final Set<SpaceInstanceInfo> actual = dir.lookupAll(query);
+        final Set<SpaceInstanceInfo> actual = dir.lookupMany(query);
 
         expected.add(spaceInstanceInput1b);
 
@@ -144,7 +144,7 @@ public abstract class SpacesDirectoryAbstractBase {
     public void testLookupAllForApp1() {
         final DataSpacesURI query = DataSpacesURI.createURI(MAIN_APPID);
         final Set<SpaceInstanceInfo> expected = new HashSet<SpaceInstanceInfo>();
-        final Set<SpaceInstanceInfo> actual = dir.lookupAll(query);
+        final Set<SpaceInstanceInfo> actual = dir.lookupMany(query);
 
         expected.add(spaceInstanceInput1);
         expected.add(spaceInstanceInput2);
@@ -158,7 +158,7 @@ public abstract class SpacesDirectoryAbstractBase {
     public void testLookupAllForApp0() {
         final DataSpacesURI query = DataSpacesURI.createURI(ANOTHER_APPID1);
         final Set<SpaceInstanceInfo> expected = new HashSet<SpaceInstanceInfo>();
-        final Set<SpaceInstanceInfo> actual = dir.lookupAll(query);
+        final Set<SpaceInstanceInfo> actual = dir.lookupMany(query);
 
         expected.add(spaceInstanceInput1b);
 
@@ -169,7 +169,7 @@ public abstract class SpacesDirectoryAbstractBase {
     public void testLookupAllForApp2() {
         final DataSpacesURI query = DataSpacesURI.createURI(ANOTHER_APPID2);
         final Set<SpaceInstanceInfo> expected = new HashSet<SpaceInstanceInfo>();
-        final Set<SpaceInstanceInfo> actual = dir.lookupAll(query);
+        final Set<SpaceInstanceInfo> actual = dir.lookupMany(query);
 
         expected.add(spaceInstanceInput1c);
 
@@ -181,7 +181,7 @@ public abstract class SpacesDirectoryAbstractBase {
         final DataSpacesURI query = DataSpacesURI.createScratchSpaceURI(1, "runtime1", "node1");
 
         try {
-            dir.lookupAll(query);
+            dir.lookupMany(query);
             fail("Expected IllegalArgumentException");
         } catch (IllegalArgumentException e) {
         } catch (Exception e) {
@@ -194,7 +194,7 @@ public abstract class SpacesDirectoryAbstractBase {
         final DataSpacesURI query = DataSpacesURI.createURI(ANOTHER_APPID2);
 
         try {
-            dir.lookupFirst(query);
+            dir.lookupOne(query);
             fail("Expected IllegalArgumentException");
         } catch (IllegalArgumentException e) {
         } catch (Exception e) {
@@ -208,7 +208,7 @@ public abstract class SpacesDirectoryAbstractBase {
                 "path");
 
         try {
-            dir.lookupFirst(query);
+            dir.lookupOne(query);
             fail("Expected IllegalArgumentException");
         } catch (IllegalArgumentException e) {
         } catch (Exception e) {

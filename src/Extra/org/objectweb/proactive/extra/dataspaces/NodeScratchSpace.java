@@ -12,31 +12,36 @@ import org.apache.commons.vfs.FileSystem;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.Selectors;
 import org.apache.commons.vfs.impl.DefaultFileSystemManager;
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 
 
 // FIXME leave data or remove all directories?
+// TODO complete logs
 
 /**
  * Manages scratch data spaces directories and supports DS scratch access logic.
  */
 public class NodeScratchSpace {
+    private static final Logger logger = ProActiveLogger.getLogger(Loggers.DATASPACES_CONFIGURATOR);
 
     private final BaseScratchSpaceConfiguration baseScratchConfiguration;
 
     private final Node node;
 
-    private boolean configured = false;
+    private boolean configured;
 
-    private FileObject fPartialSpace;
+    private FileObject partialSpaceFile;
 
     /**
      * Inner class to implement {@link ApplicationScratchSpace} interface.
      */
     private class AppScratchSpaceImpl implements ApplicationScratchSpace {
-        private final FileObject fSpace;
+        private final FileObject spaceFile;
 
         private final Map<String, DataSpacesURI> scratches = new HashMap<String, DataSpacesURI>();
 
@@ -48,25 +53,49 @@ public class NodeScratchSpace {
             final String runtimeId = Utils.getRuntimeId(node);
             final String nodeId = Utils.getNodeId(node);
 
-            this.fSpace = createEmptyDirectoryRelative(fPartialSpace, appIdString);
+            try {
+                this.spaceFile = createEmptyDirectoryRelative(partialSpaceFile, appIdString);
+            } catch (FileSystemException x) {
+                logger.error("Could not create directory for application scratch space", x);
+                throw x;
+            }
 
+            // TODO: what is following comment about?
             // or change it and use absolute configuration-created path
-            final ScratchSpaceConfiguration scratchSpaceConf = baseScratchConfiguration
-                    .createScratchSpaceConfiguration(runtimeId, nodeId, appIdString);
-            this.spaceInstanceInfo = new SpaceInstanceInfo(appId, runtimeId, nodeId, scratchSpaceConf);
+            try {
+                final ScratchSpaceConfiguration scratchSpaceConf = baseScratchConfiguration
+                        .createScratchSpaceConfiguration(runtimeId, nodeId, appIdString);
+                this.spaceInstanceInfo = new SpaceInstanceInfo(appId, runtimeId, nodeId, scratchSpaceConf);
+            } catch (ConfigurationException x) {
+                logger.error("Invalid scratch space configuration", x);
+                throw x;
+            }
         }
 
         public void close() throws FileSystemException {
-            fSpace.delete(Selectors.SELECT_ALL);
+            logger.debug("Closing application scratch space");
+            spaceFile.delete(Selectors.SELECT_ALL);
+            logger.info("Closed application scratch space");
         }
 
         public synchronized DataSpacesURI getScratchForAO(Body body) throws FileSystemException {
+            // TODO performance can be improved using more fine-grained synchronization
             final String aoid = Utils.getActiveObjectId(body);
-            DataSpacesURI uri;
+            if (logger.isDebugEnabled())
+                logger.debug("Request for scratch for Active Object with id: " + aoid);
 
+            final DataSpacesURI uri;
             if (!scratches.containsKey(aoid)) {
-                createEmptyDirectoryRelative(fSpace, aoid);
+                try {
+                    createEmptyDirectoryRelative(spaceFile, aoid);
+                } catch (FileSystemException x) {
+                    logger.error(String.format(
+                            "Could not create directory for Active Object (id: %s) scratch", aoid));
+                    throw x;
+                }
                 uri = spaceInstanceInfo.getMountingPoint().withPath(aoid);
+                logger.info(String
+                        .format("Created scratch for Active Object with id: %s, URI: %s", aoid, uri));
                 scratches.put(aoid, uri);
             } else
                 uri = scratches.get(aoid);
@@ -127,10 +156,10 @@ public class NodeScratchSpace {
                 baseScratchConfiguration.getPath(), Utils.getHostname());
         final String partialSpacePath = Utils.appendSubDirs(localAccessUrl, runtimeId, nodeId);
 
-        fPartialSpace = fileSystemManager.resolveFile(partialSpacePath);
-        checkCapabilities(fPartialSpace.getFileSystem());
-        fPartialSpace.delete(Selectors.EXCLUDE_SELF);
-        fPartialSpace.createFolder();
+        partialSpaceFile = fileSystemManager.resolveFile(partialSpacePath);
+        checkCapabilities(partialSpaceFile.getFileSystem());
+        partialSpaceFile.delete(Selectors.EXCLUDE_SELF);
+        partialSpaceFile.createFolder();
         configured = true;
     }
 
@@ -167,10 +196,10 @@ public class NodeScratchSpace {
     public synchronized void close() throws FileSystemException, IllegalStateException {
         checkIfConfigured();
 
-        final FileObject fRuntime = fPartialSpace.getParent();
+        final FileObject fRuntime = partialSpaceFile.getParent();
 
         // rm -r node
-        fPartialSpace.delete(Selectors.SELECT_ALL);
+        partialSpaceFile.delete(Selectors.SELECT_ALL);
 
         // try to remove runtime file
         fRuntime.delete();

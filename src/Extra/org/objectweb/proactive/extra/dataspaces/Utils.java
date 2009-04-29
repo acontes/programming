@@ -3,14 +3,9 @@
  */
 package org.objectweb.proactive.extra.dataspaces;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import org.apache.commons.vfs.FileName;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PARemoteObject;
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.node.Node;
@@ -109,25 +104,6 @@ public class Utils {
 
         // FIXME not implemented in ProActive... 
         return 0;
-    }
-
-    /**
-     * Connects to a remote NamingService object under specified URL.
-     * 
-     * @param url
-     *            to connect
-     * @return stub
-     * @throws ProActiveException
-     *             when PA exception occurs (communication error)
-     * @throws URISyntaxException
-     *             when URL cannot be parsed
-     */
-    public static NamingService createNamingServiceStub(String url) throws ProActiveException,
-            URISyntaxException {
-
-        NamingService stub = (NamingService) PARemoteObject.lookup(new URI(url));
-        return stub;
-        // return new NamingService();
     }
 
     /**

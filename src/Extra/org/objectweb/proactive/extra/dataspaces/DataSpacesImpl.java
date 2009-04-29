@@ -96,7 +96,7 @@ public class DataSpacesImpl {
      * 
      * @see {@link PADataSpaces#getAllKnownInputNames()}
      * @see {@link PADataSpaces#getAllKnownOutputNames()}
-     * @see {@link SpacesDirectory#lookupAll(DataSpacesURI)}
+     * @see {@link SpacesDirectory#lookupMany(DataSpacesURI)}
      * 
      * @param type
      *            of data spaces (input or output)
@@ -108,7 +108,7 @@ public class DataSpacesImpl {
         assertIsInputOrOutput(type);
 
         final DataSpacesURI aURI = DataSpacesURI.createURI(appId, type);
-        final Set<SpaceInstanceInfo> infos = spacesDirectory.lookupAll(aURI);
+        final Set<SpaceInstanceInfo> infos = spacesDirectory.lookupMany(aURI);
         final Set<String> names = new HashSet<String>();
 
         for (SpaceInstanceInfo sii : infos) {
