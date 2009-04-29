@@ -61,7 +61,7 @@ public class TestNeighbors {
 
     @Test
     public void testLeave() {
-        System.out.println("test leave");
+        System.out.println("testLeave");
         Assert.assertNotNull(this.entryPoint);
         Assert.assertNotNull(this.neighbor);
 
@@ -70,7 +70,7 @@ public class TestNeighbors {
         CanOverlay entryPointOverlay = (CanOverlay) this.entryPoint.getStructuredOverlay();
         CanOverlay neighborOverlay = (CanOverlay) this.neighbor.getStructuredOverlay();
 
-        // Test if the leaved peer is no ;ore in the neighbor list
+        // Test if the leaved peer is no more in the neighbor list
         Assert.assertFalse(neighborOverlay.hasNeighbor(this.entryPoint));
         Assert.assertFalse(entryPointOverlay.hasNeighbor(this.neighbor));
 

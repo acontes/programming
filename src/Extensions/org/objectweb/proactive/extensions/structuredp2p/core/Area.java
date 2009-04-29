@@ -173,8 +173,8 @@ public class Area implements Serializable {
         int axe = this.isBorder(area);
 
         if (axe != -1) {
-            int myLength = this.coodinatesMax[axe].lenvensteinDistance(this.coordinatesMin[axe]);
-            int itLength = area.getCoordinatesMax()[axe].lenvensteinDistance(area.getCoordinatesMin()[axe]);
+            int myLength = this.coodinatesMax[axe].levenshteinDistance(this.coordinatesMin[axe]);
+            int itLength = area.getCoordinatesMax()[axe].levenshteinDistance(area.getCoordinatesMin()[axe]);
             return myLength == itLength;
         } else {
             return false;

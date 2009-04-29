@@ -54,6 +54,8 @@ public class Peer implements InitActive, RunActive, Serializable {
      */
     private long lastRequestDuration;
 
+    private Peer stub;
+
     /**
      * The no-argument constructor as commanded by ProActive.
      */
@@ -183,6 +185,7 @@ public class Peer implements InitActive, RunActive, Serializable {
         }
 
         this.lastRequestDuration = System.currentTimeMillis();
+        this.stub = (Peer) PAActiveObject.getStubOnThis();
     }
 
     /**
@@ -230,6 +233,6 @@ public class Peer implements InitActive, RunActive, Serializable {
     }
 
     public Peer getStub() {
-        return (Peer) PAActiveObject.getStubOnThis();
+        return this.stub;
     }
 }

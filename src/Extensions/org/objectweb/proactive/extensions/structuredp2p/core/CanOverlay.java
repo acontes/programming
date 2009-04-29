@@ -211,8 +211,7 @@ public class CanOverlay extends StructuredOverlay {
         int dim = this.getRandomDimension();
 
         this.addNeighbor(remotePeer, dim, 1);
-        this.getPeer().getStub().sendMessageTo(remotePeer,
-                new CanJoinMessage(this.getPeer().getStub(), dim, 0));
+        this.getRemotePeer().sendMessageTo(remotePeer, new CanJoinMessage(this.getRemotePeer(), dim, 0));
     }
 
     /**
@@ -347,13 +346,14 @@ public class CanOverlay extends StructuredOverlay {
      */
     @Override
     public CanLookupResponseMessage handleLookupMessage(LookupMessage msg) {
-        return new CanLookupResponseMessage(this.getPeer(), ((CanLookupMessage) msg).getCoordinates());
+        return new CanLookupResponseMessage(this.getLocalPeer(), ((CanLookupMessage) msg).getCoordinates());
     }
 
     public ResponseMessage handleCanJoinMessage(Message msg) {
         CanJoinMessage message = (CanJoinMessage) msg;
         System.out.println(message);
         this.addNeighbor(message.getPeer(), message.getDimesion(), message.getOrder());
+
         System.out.println("Handle CanJoinMessage : hasNeighbor = " + this.hasNeighbor(message.getPeer()));
         return new CanJoinResponseMessage();
     }

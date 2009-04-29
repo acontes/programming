@@ -115,6 +115,6 @@ public class ChordOverlay extends StructuredOverlay {
      */
     @Override
     public ChordLookupResponseMessage handleLookupMessage(LookupMessage msg) {
-        return new ChordLookupResponseMessage(this.getPeer(), ((ChordLookupMessage) msg).getId());
+        return new ChordLookupResponseMessage(this.getLocalPeer(), ((ChordLookupMessage) msg).getId());
     }
 }

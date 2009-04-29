@@ -94,19 +94,25 @@ public class Coordinate implements Serializable {
         return this.getValue();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean equals(Object o) {
         Coordinate cord = (Coordinate) o;
         return this.value.equals(cord.value);
     }
 
     /**
-     * Calculates the Levenstein distance between two strings
+     * Calculates the Levenshtein distance between two strings.
      * 
      * @param str1
+     *            string one.
      * @param str2
-     * @return the Levenstein distance between to String
+     *            string two.
+     * @return the Levenshtein distance between two strings.
      */
-    public int lenvensteinDistance(Coordinate coord) {
+    public int levenshteinDistance(Coordinate coord) {
 
         String str1 = this.value;
         String str2 = coord.getValue();
