@@ -114,7 +114,8 @@ public class NodeConfigurator {
      * {@link DataSpacesImpl}.
      * <p>
      * Configuration of a node for an application involves association to provided NamingService and
-     * registration of application scratch space for this node, if it exists.
+     * registration of application scratch space for this node, if it exists. Application identifier
+     * is grabbed from current node state.
      * <p>
      * This method may be called several times for different applications, after node has been
      * configured through {@link #configureNode(SpaceConfiguration, Node)}. Subsequent calls will
@@ -147,7 +148,7 @@ public class NodeConfigurator {
         appConfigurator = new NodeApplicationConfigurator();
         boolean appConfigured = false;
         try {
-            appConfigurator.configureApplication(namingServiceURL);
+            appConfigurator.configure(namingServiceURL);
             appConfigured = true;
         } finally {
             if (!appConfigured)
@@ -192,7 +193,7 @@ public class NodeConfigurator {
                 nodeScratchSpace.close();
             }
         } catch (FileSystemException e) {
-            // TODO log or throw
+            ProActiveLogger.logEatedException(logger, "Could not close correctly node scratch space", e);
         }
         manager.close();
         logger.info("Data Space node configuration closed, resources released");
@@ -242,8 +243,8 @@ public class NodeConfigurator {
 
         private DataSpacesImpl impl;
 
-        private void configureApplication(String namingServiceURL) throws FileSystemException,
-                URISyntaxException, ProActiveException, ConfigurationException {
+        private void configure(String namingServiceURL) throws FileSystemException, URISyntaxException,
+                ProActiveException, ConfigurationException {
 
             // create naming service stub with URL and decorate it with local cache
             // use local variables so GC can collect them if something fails
@@ -268,6 +269,7 @@ public class NodeConfigurator {
                 try {
                     cachingDir.register(scratchInfo);
                     registered = true;
+                    logger.info("Scratch space for application registered");
                 } finally {
                     if (!registered) {
                         logger.error("Could not register application scratch space to Naming Service");

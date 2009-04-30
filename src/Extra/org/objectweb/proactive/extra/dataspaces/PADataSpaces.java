@@ -17,6 +17,8 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredExceptio
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceAlreadyRegisteredException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundException;
 
+
+// TODO mention that returned FileObject need to be closed explicitly
 /**
  * The ProActive Data Spaces API.
  * <p>

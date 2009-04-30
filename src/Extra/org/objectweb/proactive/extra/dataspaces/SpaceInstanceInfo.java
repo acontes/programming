@@ -72,7 +72,7 @@ public final class SpaceInstanceInfo implements Serializable {
     private SpaceInstanceInfo(final SpaceConfiguration config, final DataSpacesURI mountingPoint)
             throws ConfigurationException {
         if (!mountingPoint.isComplete())
-            throw new ConfigurationException("Constructed mounting point URI derived is not complete");
+            throw new ConfigurationException("Constructed mounting point URI is not complete");
         if (!config.isComplete())
             throw new ConfigurationException(
                 "Space configuration is not complete, no remote access URL provided");

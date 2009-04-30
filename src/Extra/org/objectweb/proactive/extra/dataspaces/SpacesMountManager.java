@@ -44,7 +44,9 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundExceptio
  */
 // TODO known issue: how to disallow remote AOs (or even: other local AOs) write
 // access to each other scratch
-// Maybe FileObject decorator would be enough for that? 
+// Maybe FileObject decorator would be enough for that?
+// TODO check if closing FileSystem is enough, i.e. we do not need to close each FileObject?
+// it should be safer to do it?
 public class SpacesMountManager {
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.DATASPACES_MOUNT_MANAGER);
 
