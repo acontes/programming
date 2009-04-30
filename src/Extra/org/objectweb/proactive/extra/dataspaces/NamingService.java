@@ -62,9 +62,10 @@ public class NamingService implements SpacesDirectory {
     private static void checkApplicationSpaces(long appId, Set<SpaceInstanceInfo> inSet)
             throws WrongApplicationIdException {
         for (SpaceInstanceInfo sii : inSet) {
-            if (sii.getAppId() != appId)
-                throw new WrongApplicationIdException(
-                    "Specified application id doesn't match with one found in DataSpacesURI. Rolling back.");
+            if (sii.getAppId() != appId) {
+                logger.error("Application id does not match one found in its space: " + sii);
+                throw new WrongApplicationIdException("Application id does not match one found in its space");
+            }
         }
     }
 
