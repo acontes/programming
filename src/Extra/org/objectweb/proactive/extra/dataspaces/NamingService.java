@@ -43,15 +43,20 @@ public class NamingService implements SpacesDirectory {
      *            to connect
      * @return stub
      * @throws ProActiveException
-     *             when PA exception occurs (communication error)
+     *             when PA exception occurs (communication error) or when no valid NS found under
+     *             specified URL
      * @throws URISyntaxException
      *             when URL cannot be parsed
      */
     public static NamingService createNamingServiceStub(String url) throws ProActiveException,
             URISyntaxException {
-        // TODO what about checking type and throwing exception before casting?
-        NamingService stub = (NamingService) PARemoteObject.lookup(new URI(url));
-        return stub;
+
+        Object stub = PARemoteObject.lookup(new URI(url));
+
+        if (stub instanceof NamingService)
+            return (NamingService) stub;
+        else
+            throw new ProActiveException("No valid NamingService instance can be found under specified URL");
     }
 
     private static void checkApplicationSpaces(long appId, Set<SpaceInstanceInfo> inSet)
