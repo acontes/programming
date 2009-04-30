@@ -1,7 +1,6 @@
 package org.objectweb.proactive.extensions.structuredp2p.core;
 
 import java.util.Iterator;
-import java.util.ListIterator;
 import java.util.Random;
 
 import org.objectweb.proactive.api.PAActiveObject;
@@ -186,7 +185,6 @@ public class CANOverlay extends StructuredOverlay {
      * {@inheritDoc}
      */
     public void checkNeighbors() {
-        System.out.println("ok");
         for (Group<Peer>[] groupArray : neighbors) {
             for (Group<Peer> group : groupArray) {
                 ResponseMessage groupFutures = (ResponseMessage) PAFuture.getFutureValue(this.sendMessageTo(
@@ -225,20 +223,32 @@ public class CANOverlay extends StructuredOverlay {
      */
     public void leave() {
         try {
+
             Group<Peer> groupAvailablePeer = (Group<Peer>) PAGroup.newGroup(Peer.class.getName());
 
             // Check if there is a valid neighbor
             for (Group<Peer>[] neighborsAxe : this.neighbors) {
-                for (Group<Peer> neighbor : neighborsAxe) {
-                    ListIterator<Peer> list = neighbor.listIterator();
+                for (Group<Peer> group : neighborsAxe) {
+                    ResponseMessage groupFutures = (ResponseMessage) PAFuture.getFutureValue(this
+                            .sendMessageTo((Peer) group.getGroupByType(), new PingMessage()));
+                    PAGroup.waitAll(groupFutures);
 
-                    while (list.hasNext()) {
-                        Peer current = list.next();
-                        Area area = ((CANOverlay) current.getStructuredOverlay()).getArea();
-                        if (this.area.isValidMergingArea(area)) {
-                            groupAvailablePeer.add(current);
+                    Iterator<ResponseMessage> it = PAGroup.getGroup(groupFutures).listIterator();
+
+                    while (it.hasNext()) {
+                        try {
+                            // FIXME 
+                        } catch (Exception e) {
+                            // FIXME 
                         }
                     }
+                    /*
+                     * ListIterator<Peer> list = neighbor.listIterator();
+                     * 
+                     * while (list.hasNext()) { Peer current = list.next(); Area area =
+                     * ((CANOverlay) current.getStructuredOverlay()).getArea(); if
+                     * (this.area.isValidMergingArea(area)) { groupAvailablePeer.add(current); } }
+                     */
                 }
             }
 
