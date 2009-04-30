@@ -12,7 +12,7 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.Respons
  * @version 0.1
  */
 @SuppressWarnings("serial")
-public class LoadBalancingMessage implements Message {
+public class LoadBalancingMessage extends Message {
 
     /**
      * Constructor.

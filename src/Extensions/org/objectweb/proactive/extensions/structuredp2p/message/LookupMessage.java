@@ -15,7 +15,7 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.Respons
  * @version 0.1
  */
 @SuppressWarnings("serial")
-public abstract class LookupMessage implements Message {
+public abstract class LookupMessage extends Message {
     /**
      * Coordinates of the peer we lookup.
      */

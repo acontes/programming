@@ -16,7 +16,7 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.Respons
  * @version 0.1
  */
 @SuppressWarnings("serial")
-public class CANJoinMessage implements Message {
+public class CANJoinMessage extends Message {
     private final Peer peer;
     private final int dimension;
     private final int order;

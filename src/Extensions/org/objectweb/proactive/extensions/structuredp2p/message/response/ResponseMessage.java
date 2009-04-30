@@ -2,7 +2,6 @@ package org.objectweb.proactive.extensions.structuredp2p.message.response;
 
 import java.io.Serializable;
 
-
 //FIXME
 /**
  * A response message is the appropriate answer to the message.
@@ -15,30 +14,30 @@ import java.io.Serializable;
  */
 @SuppressWarnings("serial")
 public abstract class ResponseMessage implements Serializable {
-    private boolean isNull = false;
+	private boolean isNull = false;
 
-    /**
-     * Constructor.
-     */
-    public ResponseMessage() {
+	/**
+	 * Constructor.
+	 */
+	public ResponseMessage() {
 
-    }
+	}
 
-    /**
-     * FIXME
-     * 
-     * @param isNull
-     */
-    public ResponseMessage(boolean isNull) {
-        this.isNull = isNull;
-    }
+	/**
+	 * FIXME
+	 * 
+	 * @param isNull
+	 */
+	public ResponseMessage(boolean isNull) {
+		this.isNull = isNull;
+	}
 
-    /**
-     * FIXME
-     * 
-     * @return
-     */
-    public boolean isNull() {
-        return this.isNull;
-    }
+	/**
+	 * FIXME
+	 * 
+	 * @return
+	 */
+	public boolean isNull() {
+		return this.isNull;
+	}
 }

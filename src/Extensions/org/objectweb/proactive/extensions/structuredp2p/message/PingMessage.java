@@ -1,4 +1,5 @@
 package org.objectweb.proactive.extensions.structuredp2p.message;
+
 import org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.PingResponseMessage;
 
@@ -13,13 +14,11 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.PingRes
  * @version 0.1
  */
 @SuppressWarnings("serial")
-public class PingMessage implements Message {
-
+public class PingMessage extends Message {
     /**
      * Constructor.
      */
     public PingMessage() {
-
     }
 
     /**
@@ -33,5 +32,4 @@ public class PingMessage implements Message {
     public PingResponseMessage handle(StructuredOverlay overlay) {
         return overlay.handlePingMessage(this);
     }
-
 }
