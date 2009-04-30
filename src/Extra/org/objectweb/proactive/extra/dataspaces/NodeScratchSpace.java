@@ -60,8 +60,6 @@ public class NodeScratchSpace {
                 throw x;
             }
 
-            // TODO: what is following comment about?
-            // or change it and use absolute configuration-created path
             try {
                 final ScratchSpaceConfiguration scratchSpaceConf = baseScratchConfiguration
                         .createScratchSpaceConfiguration(runtimeId, nodeId, appIdString);
