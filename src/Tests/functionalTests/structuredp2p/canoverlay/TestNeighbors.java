@@ -11,7 +11,6 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.structuredp2p.core.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.OverlayType;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
-import org.objectweb.proactive.extensions.structuredp2p.message.CANLookupMessage;
 
 
 /**
@@ -51,10 +50,8 @@ public class TestNeighbors {
         CANOverlay entryPointOverlay = (CANOverlay) this.entryPoint.getStructuredOverlay();
         CANOverlay neighborOverlay = (CANOverlay) this.neighbor.getStructuredOverlay();
 
-        /*
-         * Assert.assertTrue(this.neighbor.sendMessage());
-         * Assert.assertTrue(this.entryPoint.hasNeighbor(this.neighbor.getStub()));
-         */
+        Assert.assertTrue(entryPointOverlay.hasNeighbor(this.neighbor));
+        Assert.assertTrue(neighborOverlay.hasNeighbor(this.entryPoint));
 
         // Test if the new added peer has the good coordinates CanLookupMessage msgToEntryPoint =
         /*
@@ -69,6 +66,7 @@ public class TestNeighbors {
         // TODO tests with split !
     }
 
+    @Test
     public void testLeave() {
         Assert.assertNotNull(this.entryPoint);
         Assert.assertNotNull(this.neighbor);
@@ -83,19 +81,26 @@ public class TestNeighbors {
         Assert.assertFalse(entryPointOverlay.hasNeighbor(this.neighbor));
 
         // Test if the leaved peer is no more in the overlay
-        CANLookupMessage msgToEntryPoint = new CANLookupMessage(entryPointOverlay.getArea()
-                .getCoordinatesMin());
-        CANLookupMessage msgToNeighbor = new CANLookupMessage(neighborOverlay.getArea().getCoordinatesMin());
-
-        Assert.assertNotSame(this.neighbor.sendMessage(msgToEntryPoint), this.entryPoint);
-        Assert.assertNotSame(this.entryPoint.sendMessage(msgToNeighbor), this.neighbor);
+        /*
+         * CANLookupMessage msgToEntryPoint = new CANLookupMessage(entryPointOverlay.getArea()
+         * .getCoordinatesMin()); CANLookupMessage msgToNeighbor = new
+         * CANLookupMessage(neighborOverlay.getArea().getCoordinatesMin());
+         * 
+         * Assert.assertNotSame(this.neighbor.sendMessage(msgToEntryPoint), this.entryPoint);
+         * Assert.assertNotSame(this.entryPoint.sendMessage(msgToNeighbor), this.neighbor);
+         */
 
         // TODO tests with merge !
     }
 
     @After
     public void stopTest() {
-
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        this.entryPoint.leave();
     }
 
 }

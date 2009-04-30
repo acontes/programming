@@ -31,7 +31,7 @@ public class Peer implements InitActive, RunActive, Serializable {
      * The timeout to wait before to check neighbors {@link WithMarshallStream}
      * {@link StructuredOverlay#checkNeighbors()}.
      */
-    public static final int CHECK_NEIGHBORS_TIMEOUT = 1000;
+    public static final int CHECK_NEIGHBORS_TIMEOUT = 10;
 
     /**
      * The structured protocol which is used by the peer.

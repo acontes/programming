@@ -4,6 +4,8 @@ import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.Random;
 
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
@@ -18,7 +20,6 @@ import org.objectweb.proactive.extensions.structuredp2p.message.PingMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.CANJoinResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.CANLookupResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.CANMergeResponseMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.response.JoinResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.LookupResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.ResponseMessage;
 
@@ -185,37 +186,25 @@ public class CANOverlay extends StructuredOverlay {
      * {@inheritDoc}
      */
     public void checkNeighbors() {
-        try {
-            for (Group<Peer>[] groupArray : neighbors) {
-                for (Group<Peer> group : groupArray) {
-                    Group<ResponseMessage> groupFutures;
-                    groupFutures = (Group<ResponseMessage>) PAGroup.newGroup(ResponseMessage.class.getName());
+        System.out.println("ok");
+        for (Group<Peer>[] groupArray : neighbors) {
+            for (Group<Peer> group : groupArray) {
+                ResponseMessage groupFutures = (ResponseMessage) PAFuture.getFutureValue(this.sendMessageTo(
+                        (Peer) group.getGroupByType(), new PingMessage()));
+                PAGroup.waitAll(groupFutures);
 
-                    ListIterator<Peer> peers = group.listIterator();
-                    while (peers.hasNext()) {
-                        groupFutures.add(this.sendMessageTo(peers.next(), new PingMessage()));
+                Iterator<ResponseMessage> it = PAGroup.getGroup(groupFutures).listIterator();
+
+                while (it.hasNext()) {
+                    try {
+                        // FIXME 
+                    } catch (Exception e) {
+                        // FIXME 
                     }
-
-                    PAGroup.waitAll(groupFutures);
-                    Iterator<ResponseMessage> it = groupFutures.listIterator();
-
-                    while (it.hasNext()) {
-                        try {
-                            // FIXME
-                        } catch (Exception e) {
-                            // FIXME
-                        }
-                    }
-
                 }
             }
-        } catch (ClassNotReifiableException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        } catch (ClassNotFoundException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
         }
+
     }
 
     /**
@@ -224,14 +213,11 @@ public class CANOverlay extends StructuredOverlay {
     public Boolean join(Peer remotePeer) {
         // FIXME
         int dim = this.getRandomDimension();
+        int order = 0;
 
-        if (this.addNeighbor(remotePeer, dim, 1).booleanValue() &&
-            ((JoinResponseMessage) this.getLocalPeer().sendMessageTo(remotePeer,
-                    new CANJoinMessage(this.getRemotePeer(), dim, 0))).hasSucceeded()) {
-            return new Boolean(true);
-        }
-
-        return new Boolean(false);
+        return new Boolean(this.addNeighbor(remotePeer, dim, order).booleanValue() &&
+            ((CANJoinResponseMessage) PAFuture.getFutureValue(this.getLocalPeer().sendMessageTo(remotePeer,
+                    new CANJoinMessage(this.getRemotePeer(), dim, (order + 1) % 2)))).hasSucceeded());
     }
 
     /**
@@ -263,6 +249,7 @@ public class CANOverlay extends StructuredOverlay {
             }
             // TODO Else : split more before merge !
 
+            PAActiveObject.terminateActiveObject(true);
         } catch (ClassNotReifiableException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
