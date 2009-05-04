@@ -83,7 +83,7 @@ public class ApplicationScratchSpaceTest {
         localAccessConfig = new BaseScratchSpaceConfiguration(ACCESS_URL, testDirPath);
         nodeScratchSpace = new NodeScratchSpace(node, localAccessConfig);
 
-        nodeScratchSpace.init(fileSystemManager);
+        nodeScratchSpace.init();
         configured = true;
 
         applicationScratchSpace = nodeScratchSpace.initForApplication();

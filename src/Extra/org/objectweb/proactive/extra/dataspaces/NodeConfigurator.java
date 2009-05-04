@@ -6,7 +6,6 @@ package org.objectweb.proactive.extra.dataspaces;
 import java.net.URISyntaxException;
 
 import org.apache.commons.vfs.FileSystemException;
-import org.apache.commons.vfs.impl.DefaultFileSystemManager;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
@@ -44,8 +43,6 @@ public class NodeConfigurator {
 
     private boolean configured;
 
-    private DefaultFileSystemManager manager;
-
     private NodeScratchSpace nodeScratchSpace;
 
     private NodeApplicationConfigurator appConfigurator;
@@ -71,19 +68,13 @@ public class NodeConfigurator {
      *             when configuration appears to be wrong during node scratch space initialization
      *             (e.g. capabilities checking)
      * @throws FileSystemException
-     *             when VFS configuration creation or scratch initialization fails
+     *             when VFS creation or scratch initialization fails
      */
     synchronized public void configureNode(BaseScratchSpaceConfiguration baseScratchConfiguration, Node node)
             throws IllegalStateException, FileSystemException, ConfigurationException {
         logger.debug("Configuring node for Data Spaces");
         checkNotConfigured();
 
-        try {
-            this.manager = VFSFactory.createDefaultFileSystemManager();
-        } catch (FileSystemException x) {
-            logger.error("Could not create and configure VFS manager", x);
-            throw x;
-        }
         this.node = node;
         if (baseScratchConfiguration != null) {
             // TODO as provider will be implemented, we can move this check elsewhere? for now it's ok.
@@ -96,12 +87,11 @@ public class NodeConfigurator {
 
             nodeScratchSpace = new NodeScratchSpace(node, baseScratchConfiguration);
             try {
-                nodeScratchSpace.init(manager);
+                nodeScratchSpace.init();
                 configured = true;
             } finally {
                 if (!configured) {
-                    manager.close();
-                    manager = null;
+                    // no need to close it as everything should be clean
                     nodeScratchSpace = null;
                 }
             }
@@ -195,7 +185,6 @@ public class NodeConfigurator {
         } catch (FileSystemException e) {
             ProActiveLogger.logEatedException(logger, "Could not close correctly node scratch space", e);
         }
-        manager.close();
         logger.info("Data Space node configuration closed, resources released");
     }
 
@@ -281,7 +270,7 @@ public class NodeConfigurator {
             cachingDirectory = cachingDir;
 
             // create SpacesMountManager
-            spacesMountManager = new SpacesMountManager(manager, cachingDirectory);
+            spacesMountManager = new SpacesMountManager(cachingDirectory);
 
             // create implementation object connected to the application's
             // configuration

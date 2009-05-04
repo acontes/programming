@@ -72,7 +72,7 @@ public class SpacesMountManagerTest {
         directory = new SpacesDirectoryImpl();
         directory.register(spaceInfo);
 
-        manager = new SpacesMountManager(VFSFactory.createDefaultFileSystemManager(), directory);
+        manager = new SpacesMountManager(directory);
     }
 
     @After

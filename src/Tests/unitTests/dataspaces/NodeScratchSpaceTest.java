@@ -132,7 +132,7 @@ public class NodeScratchSpaceTest {
      */
     @Test
     public void testInitNSS() throws ConfigurationException, FileSystemException, IllegalStateException {
-        nodeScratchSpace.init(fileSystemManager);
+        nodeScratchSpace.init();
         configured = true;
         String path = Utils.appendSubDirs(testDirPath, RUNTIME_ID, NODE_ID);
         assertIsExistingEmptyDirectory(path);
@@ -156,7 +156,7 @@ public class NodeScratchSpaceTest {
         osw.write(TEST_FILE_CONTENT);
         osw.close();
 
-        nodeScratchSpace.init(fileSystemManager);
+        nodeScratchSpace.init();
         configured = true;
         assertIsExistingEmptyDirectory(partialDS);
         partialDSDummyFile = null;
@@ -173,10 +173,10 @@ public class NodeScratchSpaceTest {
     public void testInitNSSIllegalState() throws ConfigurationException, FileSystemException,
             IllegalStateException {
 
-        nodeScratchSpace.init(fileSystemManager);
+        nodeScratchSpace.init();
         configured = true;
         try {
-            nodeScratchSpace.init(fileSystemManager);
+            nodeScratchSpace.init();
             fail("Exception expected");
         } catch (IllegalStateException e) {
         } catch (Exception e) {
@@ -195,13 +195,13 @@ public class NodeScratchSpaceTest {
     public void testInitNSSIllegalState2() throws ConfigurationException, FileSystemException,
             IllegalStateException {
 
-        nodeScratchSpace.init(fileSystemManager);
+        nodeScratchSpace.init();
         configured = true;
         nodeScratchSpace.close();
         configured = false;
 
         try {
-            nodeScratchSpace.init(fileSystemManager);
+            nodeScratchSpace.init();
             fail("Exception expected");
         } catch (IllegalStateException e) {
         } catch (Exception e) {
@@ -220,7 +220,7 @@ public class NodeScratchSpaceTest {
     public void testInitForApplication() throws ConfigurationException, FileSystemException,
             IllegalStateException {
 
-        nodeScratchSpace.init(fileSystemManager);
+        nodeScratchSpace.init();
         configured = true;
         checkInitForApplication();
     }
@@ -243,7 +243,7 @@ public class NodeScratchSpaceTest {
             fail("Wrong exception");
         }
 
-        nodeScratchSpace.init(fileSystemManager);
+        nodeScratchSpace.init();
         configured = true;
         checkInitForApplication();
     }
@@ -261,7 +261,7 @@ public class NodeScratchSpaceTest {
 
         BaseScratchSpaceConfiguration conf = new BaseScratchSpaceConfiguration(null, testDirPath);
         nodeScratchSpace = new NodeScratchSpace(node, conf);
-        nodeScratchSpace.init(fileSystemManager);
+        nodeScratchSpace.init();
         configured = true;
 
         try {
@@ -290,9 +290,9 @@ public class NodeScratchSpaceTest {
         final Node node2 = new MOCKNode(RUNTIME_ID, NODE_ID_2);
         nodeScratchSpace2 = new NodeScratchSpace(node2, localAccessConfig);
 
-        nodeScratchSpace.init(fileSystemManager);
+        nodeScratchSpace.init();
         configured = true;
-        nodeScratchSpace2.init(fileSystemManager);
+        nodeScratchSpace2.init();
         configured2 = true;
 
         assertIsExistingEmptyDirectory(path1);

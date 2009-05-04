@@ -87,15 +87,23 @@ public class SpacesMountManager {
     /**
      * Creates SpaceMountManager instance, that must be finally closed through {@link #close()}
      * method.
+     * <p>
+     * Instance of VFS manager is configured and used for mounting spaces and creating
+     * VirtualFileSystem instances
      * 
-     * @param vfsManager
-     *            configured VFS manager, used for mounting spaces and creating VirtualFileSystem
-     *            instances
      * @param directory
      *            data spaces directory to use for serving requests
+     * @throws FileSystemException
+     *             when VFS creation fails
      */
-    public SpacesMountManager(DefaultFileSystemManager vfsManager, SpacesDirectory directory) {
-        this.vfsManager = vfsManager;
+    public SpacesMountManager(SpacesDirectory directory) throws FileSystemException {
+        try {
+            this.vfsManager = VFSFactory.createDefaultFileSystemManager();
+        } catch (FileSystemException x) {
+            logger.error("Could not create and configure VFS manager", x);
+            throw x;
+        }
+
         this.directory = directory;
         logger.debug("Initializing spaces mount manager");
         try {
@@ -104,6 +112,7 @@ public class SpacesMountManager {
         } catch (FileSystemException x) {
             // that should really never happen, we know that
             ProActiveLogger.logImpossibleException(logger, x);
+            vfsManager.close();
             throw new RuntimeException(x);
         }
         logger.info("Mount manager initialized, VFS instance created");
@@ -220,6 +229,7 @@ public class SpacesMountManager {
                     }
                 }
                 vfs.close();
+                vfsManager.close();
             }
         }
         logger.info("Mount manager closed");

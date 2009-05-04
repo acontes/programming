@@ -42,6 +42,8 @@ public class NodeScratchSpace {
 
     private FileObject partialSpaceFile;
 
+    private DefaultFileSystemManager fileSystemManager;
+
     /**
      * Inner class to implement {@link ApplicationScratchSpace} interface.
      */
@@ -88,6 +90,7 @@ public class NodeScratchSpace {
 
         public synchronized DataSpacesURI getScratchForAO(Body body) throws FileSystemException {
             // TODO performance can be improved using more fine-grained synchronization
+            // TODO ApplicationScratchSpace can use SpacesMountManager for this, so there won't be double mounting anymore 
             final String aoid = Utils.getActiveObjectId(body);
             if (logger.isDebugEnabled())
                 logger.debug("Request for scratch for Active Object with id: " + aoid);
@@ -124,9 +127,8 @@ public class NodeScratchSpace {
 
     /**
      * Create scratch space instance, that needs to be later initialized once through
-     * {@link #init(DefaultFileSystemManager)} and configured for each application by
-     * {@link #initForApplication()}. Once initialized this instance must be closed by
-     * {@link #close()} method.
+     * {@link #init()} and configured for each application by {@link #initForApplication()}. Once
+     * initialized this instance must be closed by {@link #close()} method.
      * <p>
      * Provided configuration should have a remote access URL already defined. It is not checked
      * here explicitly, but will be thrown as an exception during
@@ -147,14 +149,15 @@ public class NodeScratchSpace {
      * Initializes instance (and all related configuration objects) on a node and performs file
      * system configuration and accessing tests.
      * <p>
-     * Local access will be used (if is defined) for accessing scratch data space. Any existing
-     * files for this scratch Data Space will be silently deleted.
+     * Instance of VFS manager is created. Local access will be used (if is defined) for accessing
+     * scratch data space. Any existing files for this scratch Data Space will be silently deleted.
      * <p>
      * Can be called only once for each instance. Once called, {@link ApplicationScratchSpace}
      * instances can be returned by {@link #initForApplication()}.
+     * <p>
+     * If fails, there is no need to close it explicitly (e.g. the DefaultFileSystemManager instance
+     * is being closed.)
      * 
-     * @param fileSystemManager
-     *            configured VFS manager, used for initializing and accessing scratch space
      * @throws IllegalStateException
      *             when instance has been already configured
      * @throws FileSystemException
@@ -163,12 +166,18 @@ public class NodeScratchSpace {
      *             when checking FS capabilities fails
      * @see {@link Utils#getLocalAccessURL(String, String, String)}
      */
-    public synchronized void init(DefaultFileSystemManager fileSystemManager) throws FileSystemException,
-            ConfigurationException, IllegalStateException {
+    public synchronized void init() throws FileSystemException, ConfigurationException, IllegalStateException {
         logger.debug("Initializing node scratch space");
         if (configured) {
             logger.error("Attempting to configure already configured node scratch space");
             throw new IllegalStateException("Instance already configured");
+        }
+
+        try {
+            fileSystemManager = VFSFactory.createDefaultFileSystemManager();
+        } catch (FileSystemException x) {
+            logger.error("Could not create and configure VFS manager", x);
+            throw x;
         }
 
         final String nodeId = Utils.getNodeId(node);
@@ -185,6 +194,7 @@ public class NodeScratchSpace {
             partialSpaceFile.createFolder();
         } catch (FileSystemException x) {
             logger.error("Could not initialize scratch space at: " + partialSpacePath);
+            fileSystemManager.close();
             throw x;
         }
         configured = true;
@@ -193,8 +203,7 @@ public class NodeScratchSpace {
 
     /**
      * Initializes scratch data space for an application that is running on a Node for which
-     * NodeScratchSpace has been configured and initialized by
-     * {@link #init(DefaultFileSystemManager)}.
+     * NodeScratchSpace has been configured and initialized by {@link #init()}.
      * <p>
      * Application identifier is grabbed from Node state.
      * <p>
@@ -241,11 +250,9 @@ public class NodeScratchSpace {
             // try to remove runtime file
             fRuntime.delete();
         } finally {
-            try {
-                fRuntime.close();
-            } finally {
-                partialSpaceFile.close();
-            }
+            // TODO check if closing FileSystem is enough, i.e. we do not need to close each FileObject?
+            // it should be safer to do it?
+            this.fileSystemManager.close();
         }
     }
 
