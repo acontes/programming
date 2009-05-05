@@ -3,7 +3,7 @@ package org.objectweb.proactive.extensions.structuredp2p.message;
 import org.objectweb.proactive.extensions.structuredp2p.core.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay;
-import org.objectweb.proactive.extensions.structuredp2p.message.response.ResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.message.response.CANJoinResponseMessage;
 
 
 /**
@@ -38,7 +38,7 @@ public class CANJoinMessage extends Message {
      * @return a PingResponseMessage for routing.
      * 
      */
-    public ResponseMessage handle(StructuredOverlay overlay) {
+    public CANJoinResponseMessage handle(StructuredOverlay overlay) {
         return ((CANOverlay) overlay).handleJoinMessage(this);
     }
 
