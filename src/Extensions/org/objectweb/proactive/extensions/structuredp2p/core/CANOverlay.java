@@ -6,6 +6,7 @@ import java.util.Random;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.api.PAGroup;
+import org.objectweb.proactive.core.group.ExceptionInGroup;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.extensions.structuredp2p.core.exception.AreaException;
@@ -59,11 +60,11 @@ public class CANOverlay extends StructuredOverlay {
      */
     public CANOverlay(Peer localPeer) {
         super(localPeer);
-        this.neighbors = new Group[NB_DIMENSIONS][2];
+        this.neighbors = new Group[CANOverlay.NB_DIMENSIONS][2];
 
         try {
             int i;
-            for (i = 0; i < NB_DIMENSIONS; i++) {
+            for (i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
                 this.neighbors[i][0] = PAGroup.getGroup((Peer) PAGroup.newGroup(Peer.class.getName()));
                 this.neighbors[i][1] = PAGroup.getGroup((Peer) PAGroup.newGroup(Peer.class.getName()));
             }
@@ -128,8 +129,9 @@ public class CANOverlay extends StructuredOverlay {
             if (coord != null) {
                 // if the current coordinates aren't in the peer area.
                 if (minArea[i].getValue().compareTo(coord.getValue()) <= 0 &&
-                    maxArea[i].getValue().compareTo(coord.getValue()) > 0)
+                    maxArea[i].getValue().compareTo(coord.getValue()) > 0) {
                     return false;
+                }
 
             }
 
@@ -191,21 +193,17 @@ public class CANOverlay extends StructuredOverlay {
      * {@inheritDoc}
      */
     public void checkNeighbors() {
-        for (Group<Peer>[] groupArray : neighbors) {
+        for (Group<Peer>[] groupArray : this.neighbors) {
             for (Group<Peer> group : groupArray) {
                 PingResponseMessage groupFutures = (PingResponseMessage) PAFuture.getFutureValue(PAGroup
                         .getGroup(this.getLocalPeer().sendMessageTo((Peer) group.getGroupByType(),
                                 new PingMessage())));
                 PAGroup.waitAll(groupFutures);
 
-                Iterator<PingResponseMessage> it = PAGroup.getGroup(groupFutures).listIterator();
+                for (ExceptionInGroup e : PAGroup.getGroup(groupFutures).getExceptionList()) {
+                    // ((Peer)e.getObject())
 
-                while (it.hasNext()) {
-                    try {
-                        // FIXME
-                    } catch (Exception e) {
-                        // FIXME
-                    }
+                    // Find neighbor from this and do a cycle, initialize timer...
                 }
             }
         }
