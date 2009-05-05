@@ -6,7 +6,6 @@ import java.util.Random;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.api.PAGroup;
-import org.objectweb.proactive.core.group.ExceptionInGroup;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.extensions.structuredp2p.core.exception.AreaException;
@@ -14,6 +13,7 @@ import org.objectweb.proactive.extensions.structuredp2p.message.CANCheckMergeMes
 import org.objectweb.proactive.extensions.structuredp2p.message.CANJoinMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.CANLookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.CANMergeMessage;
+import org.objectweb.proactive.extensions.structuredp2p.message.LeaveMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.LoadBalancingMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.LookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.Message;
@@ -22,8 +22,8 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.CANChec
 import org.objectweb.proactive.extensions.structuredp2p.message.response.CANJoinResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.CANLookupResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.CANMergeResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.message.response.EmptyResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.LookupResponseMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.response.PingResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.ResponseMessage;
 
 
@@ -195,12 +195,11 @@ public class CANOverlay extends StructuredOverlay {
     public void checkNeighbors() {
         for (Group<Peer>[] groupArray : this.neighbors) {
             for (Group<Peer> group : groupArray) {
-                PingResponseMessage groupFutures = (PingResponseMessage) PAFuture.getFutureValue(PAGroup
-                        .getGroup(this.getLocalPeer().sendMessageTo((Peer) group.getGroupByType(),
-                                new PingMessage())));
+                ResponseMessage groupFutures = (ResponseMessage) PAFuture.getFutureValue(this.getLocalPeer()
+                        .sendMessageTo((Peer) group.getGroupByType(), new PingMessage()));
                 PAGroup.waitAll(groupFutures);
 
-                Iterator<PingResponseMessage> it = PAGroup.getGroup(groupFutures).listIterator();
+                Iterator<ResponseMessage> it = PAGroup.getGroup(groupFutures).listIterator();
 
                 while (it.hasNext()) {
                     try {
@@ -232,22 +231,22 @@ public class CANOverlay extends StructuredOverlay {
      */
     public void leave() {
         try {
-            Group<CANCheckMergeResponseMessage> groupFutures = null;
+            ResponseMessage groupFutures = null;
             Group<Peer> groupAvailablePeer = PAGroup.getGroup((Peer) PAGroup.newGroup(Peer.class.getName()));
 
             // Check if there is a valid neighbor
             for (Group<Peer>[] neighborsAxe : this.neighbors) {
                 for (Group<Peer> group : neighborsAxe) {
-                    groupFutures = PAGroup.getGroup((CANCheckMergeResponseMessage) PAFuture
-                            .getFutureValue(this.getLocalPeer().sendMessageTo((Peer) group.getGroupByType(),
-                                    new CANCheckMergeMessage(this.getArea()))));
+                    groupFutures = (ResponseMessage) PAFuture.getFutureValue(this.getLocalPeer()
+                            .sendMessageTo((Peer) group.getGroupByType(),
+                                    new CANCheckMergeMessage(this.getArea())));
                     PAGroup.waitAll(groupFutures);
 
-                    Iterator<CANCheckMergeResponseMessage> it = groupFutures.listIterator();
+                    Iterator<ResponseMessage> it = PAGroup.getGroup(groupFutures).listIterator();
 
                     while (it.hasNext()) {
                         try {
-                            CANCheckMergeResponseMessage resp = it.next();
+                            CANCheckMergeResponseMessage resp = (CANCheckMergeResponseMessage) it.next();
 
                             if (resp.isMergeable()) {
                                 groupAvailablePeer.add(resp.getPeer());
@@ -268,7 +267,15 @@ public class CANOverlay extends StructuredOverlay {
                 // TODO Else : split more before merge !
             }
 
-            PAActiveObject.terminateActiveObject(true);
+            // Unset peer as neighbor
+            for (Group<Peer>[] neighborsAxe : this.neighbors) {
+                for (Group<Peer> group : neighborsAxe) {
+                    PAFuture.getFutureValue(this.getLocalPeer().sendMessageTo((Peer) group.getGroupByType(),
+                            new LeaveMessage(this.getRemotePeer())));
+                }
+            }
+
+            PAActiveObject.terminateActiveObject(false);
         } catch (ClassNotReifiableException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -339,8 +346,26 @@ public class CANOverlay extends StructuredOverlay {
      * @param order
      *            the order.
      */
-    public Boolean addNeighbor(Peer remotePeer, int dimension, int order) {
+    private Boolean addNeighbor(Peer remotePeer, int dimension, int order) {
         return this.neighbors[dimension][order].add(remotePeer);
+    }
+
+    /**
+     * Remove a neighbor.
+     * 
+     * @param peer
+     *            the new neighbor.
+     * 
+     * @return the state of deletion.
+     */
+    private void removeNeighbor(Peer peer) {
+        for (Group<Peer>[] neighborsAxe : this.neighbors) {
+            for (Group<Peer> neighbor : neighborsAxe) {
+                if (neighbor.contains(peer)) {
+                    neighbor.remove(peer);
+                }
+            }
+        }
     }
 
     /**
@@ -408,9 +433,23 @@ public class CANOverlay extends StructuredOverlay {
      */
     public CANCheckMergeResponseMessage handleCheckMergeMessage(Message msg) {
         CANCheckMergeMessage message = (CANCheckMergeMessage) msg;
-        System.out.println("CANOverlay.handleCheckMergeMessage()");
         return new CANCheckMergeResponseMessage(this.getRemotePeer(), this.area.isValidMergingArea(message
                 .getArea()));
+    }
+
+    /**
+     * Handles a {@link LeaveMessage}.
+     * 
+     * @param msg
+     *            the message.
+     * 
+     * @return the response.
+     */
+    public EmptyResponseMessage handleLeaveMessage(LeaveMessage msg) {
+        LeaveMessage message = (LeaveMessage) msg;
+        this.removeNeighbor(message.getPeer());
+
+        return new EmptyResponseMessage();
     }
 
     /**

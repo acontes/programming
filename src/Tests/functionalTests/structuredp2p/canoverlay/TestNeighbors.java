@@ -69,6 +69,11 @@ public class TestNeighbors {
         Assert.assertNotNull(TestNeighbors.entryPoint);
         Assert.assertNotNull(TestNeighbors.neighbor);
 
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         TestNeighbors.neighbor.leave();
 
         CANOverlay entryPointOverlay = (CANOverlay) TestNeighbors.entryPoint.getStructuredOverlay();
@@ -76,6 +81,14 @@ public class TestNeighbors {
 
         // Test if the leaved peer is no more in the neighbor list
         // Assert.assertFalse(neighborOverlay.hasNeighbor(this.entryPoint));
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        // TODO tests with neighbors !
+        System.out.println("neighbor : " + TestNeighbors.neighbor);
         Assert.assertFalse(entryPointOverlay.hasNeighbor(TestNeighbors.neighbor));
 
         // TODO tests with merged areas !

@@ -3,9 +3,11 @@ package org.objectweb.proactive.extensions.structuredp2p.core;
 import java.util.HashMap;
 
 import org.objectweb.proactive.extensions.structuredp2p.message.CHORDLookupMessage;
+import org.objectweb.proactive.extensions.structuredp2p.message.LeaveMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.LookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.Message;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.CHORDLookupResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.message.response.EmptyResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.JoinResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.LookupResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.ResponseMessage;
@@ -115,14 +117,17 @@ public class CHORDOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
-    @Override
     public CHORDLookupResponseMessage handleLookupMessage(LookupMessage msg) {
         return new CHORDLookupResponseMessage(this.getLocalPeer(), ((CHORDLookupMessage) msg).getId());
     }
 
-    @Override
     public JoinResponseMessage handleJoinMessage(Message msg) {
-        // TODO 
+        // TODO
+        return null;
+    }
+
+    public EmptyResponseMessage handleLeaveMessage(LeaveMessage leaveMessage) {
+        // TODO Auto-generated method stub
         return null;
     }
 }
