@@ -73,6 +73,7 @@ public class Utils {
      *             when not called from an active thread
      */
     public static Body getCurrentActiveObjectBody() throws ProActiveRuntimeException {
+        // FIXME: depends on PROACTIVE-658
         if (PAActiveObject.getStubOnThis() == null)
             throw new ProActiveRuntimeException("This method must be called from an active thread");
 
