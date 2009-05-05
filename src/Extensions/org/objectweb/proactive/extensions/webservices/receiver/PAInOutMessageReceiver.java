@@ -88,9 +88,8 @@ public class PAInOutMessageReceiver extends AbstractInOutMessageReceiver {
     public void invokeBusinessLogic(MessageContext inMessageContext, MessageContext outMessageContext)
             throws AxisFault {
         try {
-            // Display the received message to be treated
-            logger.info("Got the message ==> " +
-                inMessageContext.getEnvelope().getBody().getFirstElement().toString());
+            // Display the received soap message to be treated
+            logger.info("Got the message ==> " + inMessageContext.getEnvelope().toString());
 
             // Get the axis service corresponding to this call
             AxisService axisService = inMessageContext.getServiceContext().getAxisService();
@@ -131,8 +130,10 @@ public class PAInOutMessageReceiver extends AbstractInOutMessageReceiver {
             // Retrieve the good namespace from the service and give this value to the
             // namespace of the method element in the message context
             OMElement methodElement = inMessageContext.getEnvelope().getBody().getFirstElement();
-            OMFactory factory = OMAbstractFactory.getOMFactory();
-            methodElement.setNamespace(factory.createOMNamespace(axisService.getTargetNamespace(), null));
+            if (methodElement != null) {
+                OMFactory factory = OMAbstractFactory.getOMFactory();
+                methodElement.setNamespace(factory.createOMNamespace(axisService.getTargetNamespace(), null));
+            }
 
             AxisMessage inAxisMessage = op.getMessage(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
 
@@ -211,9 +212,8 @@ public class PAInOutMessageReceiver extends AbstractInOutMessageReceiver {
             }
             outMessageContext.setEnvelope(envelope);
 
-            // Display the returned message
-            logger.info("returned the message ==> " +
-                outMessageContext.getEnvelope().getBody().getFirstElement().toString());
+            // Display the returned soap message
+            logger.info("returned the message ==> " + outMessageContext.getEnvelope().toString());
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e) {

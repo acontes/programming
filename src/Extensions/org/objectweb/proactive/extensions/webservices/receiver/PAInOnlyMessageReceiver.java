@@ -48,8 +48,7 @@ public class PAInOnlyMessageReceiver extends AbstractInMessageReceiver {
     protected void invokeBusinessLogic(MessageContext inMessageContext) throws AxisFault {
         try {
             // Display the received message to be treated
-            logger.info("Got the message ==> " +
-                inMessageContext.getEnvelope().getBody().getFirstElement().toString());
+            logger.info("Got the message ==> " + inMessageContext.getEnvelope().toString());
 
             // Get the axis service corresponding to this call
             AxisService axisService = inMessageContext.getServiceContext().getAxisService();

@@ -861,6 +861,9 @@
 		<delete dir="${test.classes.dir}" />
 		<delete file="tests.log" />
 		<delete dir="${junit.dir}" />
+		<property name="webservices.dir" value="${src.extensions.dir}/org/objectweb/proactive/extensions/webservices/" />
+		<delete dir="${webservices.dir}/servicedeployer/build" />
+		<delete file="${src.extensions.dir}/org/objectweb/proactive/extensions/webservices/axis2/repository/services/ServiceDeployer.aar" />
 	</target>
 
 
