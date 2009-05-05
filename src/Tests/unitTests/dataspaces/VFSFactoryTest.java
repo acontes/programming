@@ -67,9 +67,7 @@ public class VFSFactoryTest {
     public void testLocalFileProvider() throws Exception {
         FileObject fo = null;
         try {
-            // TODO does it work on windows machines?
-            final String fileUrl = "file:///" + testFile.getCanonicalPath().replaceFirst("^/", "");
-            fo = manager.resolveFile(fileUrl);
+            fo = manager.resolveFile(testFile.getCanonicalPath());
             assertTrue(fo.exists());
 
             final InputStream ios = fo.getContent().getInputStream();

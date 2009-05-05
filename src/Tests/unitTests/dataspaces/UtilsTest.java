@@ -13,7 +13,7 @@ public class UtilsTest {
     public void testGetLocalAccessURLMatchingHostname()
             throws org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException {
         final String hostname = Utils.getHostname();
-        assertEquals("file:///local", Utils.getLocalAccessURL("http://remote/", "/local", hostname));
+        assertEquals("/local", Utils.getLocalAccessURL("http://remote/", "/local", hostname));
     }
 
     @Test
@@ -38,27 +38,42 @@ public class UtilsTest {
     }
 
     @Test
-    public void testAppendSubDirsBaseNoSlashNoSubDir() throws Exception {
+    public void testAppendSubDirsUnixBaseNoSlashNoSubDir() throws Exception {
         assertEquals("/abc", Utils.appendSubDirs("/abc"));
     }
 
     @Test
-    public void testAppendSubDirsBaseSlash1SubDir() throws Exception {
+    public void testAppendSubDirsWindowsBaseNoSlashNoSubDir() throws Exception {
+        assertEquals("c:\\abc", Utils.appendSubDirs("c:\\abc"));
+    }
+
+    @Test
+    public void testAppendSubDirsUnixBaseSlash1SubDir() throws Exception {
         assertEquals("/abc/1", Utils.appendSubDirs("/abc/", "1"));
     }
 
     @Test
-    public void testAppendSubDirsBaseNoSlash1SubDir() throws Exception {
+    public void testAppendSubDirsWindowsBaseSlash1SubDir() throws Exception {
+        assertEquals("c:\\abc\\1", Utils.appendSubDirs("c:\\abc\\", "1"));
+    }
+
+    @Test
+    public void testAppendSubDirsUnixBaseNoSlash1SubDir() throws Exception {
         assertEquals("/abc/1", Utils.appendSubDirs("/abc", "1"));
     }
 
     @Test
-    public void testAppendSubDirsBaseAsURL1SubDir() throws Exception {
+    public void testAppendSubDirsWindowsBaseNoSlash1SubDir() throws Exception {
+        assertEquals("c:\\abc\\1", Utils.appendSubDirs("c:\\abc", "1"));
+    }
+
+    @Test
+    public void testAppendSubDirsURLBase1SubDir() throws Exception {
         assertEquals("http://test.com/1", Utils.appendSubDirs("http://test.com/", "1"));
     }
 
     @Test
-    public void testAppendSubDirsBaseNoSlash2SubDir() throws Exception {
+    public void testAppendSubDirsUnixBaseNoSlash2SubDir() throws Exception {
         assertEquals("/abc/1/2", Utils.appendSubDirs("/abc", "1", "2"));
     }
 }

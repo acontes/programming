@@ -3,7 +3,8 @@
  */
 package org.objectweb.proactive.extra.dataspaces;
 
-import org.apache.commons.vfs.FileName;
+import java.util.regex.Pattern;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -18,6 +19,8 @@ import org.objectweb.proactive.core.util.ProActiveInet;
  * Static utilities methods.
  */
 public class Utils {
+
+    private static final Pattern WINDOWS_DRIVE_PATTERN = Pattern.compile("^[a-zA-Z]:\\\\.*");
 
     private Utils() {
     }
@@ -124,20 +127,17 @@ public class Utils {
      * @return local access URL that should be used for this host
      */
     public static String getLocalAccessURL(final String url, final String path, final String hostname) {
-        if (hostname != null && hostname.equals(getHostname()) && path != null) {
-            // FIXME what about relative paths and windows support?
-            if (path.startsWith("/")) {
-                return "file://" + path;
-            } else {
-                return "file:///" + path;
-            }
-        }
+        if (hostname != null && hostname.equals(getHostname()) && path != null)
+            return path;
         return url;
     }
 
     /**
-     * Appends subdirectories to provided base location (path or URL), handling file separators
-     * (slashes) in appropriate way.
+     * Appends subdirectories to provided base location (local path or URL), handling file
+     * separators (slashes) in appropriate way.
+     * <p>
+     * Both Unix- and Windows-like paths are supported and should be recognized by looking for
+     * Windows-like drive letter at the beginning of a path.
      * 
      * @param baseLocation
      *            Base location (path or URL) which is the root for appended subdirectories. Can be
@@ -153,16 +153,25 @@ public class Utils {
         if (baseLocation == null)
             return null;
 
-        // TODO what about windows-like paths?
+        final char separator;
+        if (isWindowsPath(baseLocation))
+            separator = '\\';
+        else
+            separator = '/';
+
         final StringBuilder sb = new StringBuilder(baseLocation);
-        boolean skipFirst = baseLocation.charAt(baseLocation.length() - 1) == FileName.SEPARATOR_CHAR;
+        boolean skipFirst = baseLocation.endsWith(Character.toString(separator));
         for (final String subDir : subDirs) {
             if (skipFirst)
                 skipFirst = false;
             else
-                sb.append(FileName.SEPARATOR_CHAR);
+                sb.append(separator);
             sb.append(subDir);
         }
         return sb.toString();
+    }
+
+    private static boolean isWindowsPath(String location) {
+        return WINDOWS_DRIVE_PATTERN.matcher(location).matches();
     }
 }
