@@ -69,6 +69,24 @@ public class DataSpacesURITest {
     }
 
     @Test
+    public void testCreateScratchSpaceURIAppWrongRuntimeNode() {
+        try {
+            DataSpacesURI.createScratchSpaceURI(123, "", "nodeB");
+            fail("expected exception");
+        } catch (IllegalArgumentException x) {
+        }
+    }
+
+    @Test
+    public void testCreateScratchSpaceURIAppRuntimeWrongNode() {
+        try {
+            DataSpacesURI.createScratchSpaceURI(123, "runtimeA", "");
+            fail("expected exception");
+        } catch (IllegalArgumentException x) {
+        }
+    }
+
+    @Test
     public void testCreateScratchSpaceURIAppNoRuntimeNodeNoPath() {
         try {
             uri = DataSpacesURI.createScratchSpaceURI(123, null, "nodeB");
@@ -141,6 +159,15 @@ public class DataSpacesURITest {
         assertNull("nodeB", uri.getNodeId());
         assertNull(uri.getPath());
         assertTrue(uri.isComplete());
+    }
+
+    @Test
+    public void testCreateInOutSpaceURIAppTypeWrongName() {
+        try {
+            DataSpacesURI.createInOutSpaceURI(123, SpaceType.INPUT, "");
+            fail("expected exception");
+        } catch (IllegalArgumentException x) {
+        }
     }
 
     @Test
@@ -291,6 +318,15 @@ public class DataSpacesURITest {
         assertNull(uri.getNodeId());
     }
 
+    @Test
+    public void testParseURIAppTypeWrongNamePath() {
+        try {
+            DataSpacesURI.parseURI("vfs:///123/input//file.txt");
+            fail("expected exception");
+        } catch (MalformedURIException x) {
+        }
+    }
+
     private void testParseURIAppTypeRuntime(boolean slash) throws MalformedURIException {
         uri = DataSpacesURI.parseURI("vfs:///123/scratch/runtimeA" + slash(slash));
 
@@ -343,6 +379,24 @@ public class DataSpacesURITest {
         assertEquals("nodeB", uri.getNodeId());
         assertEquals("file.txt", uri.getPath());
         assertNull(uri.getName());
+    }
+
+    @Test
+    public void testParseURIAppTypeWrongRuntimeNodePath() {
+        try {
+            uri = DataSpacesURI.parseURI("vfs:///123/scratch//nodeB/file.txt");
+            fail("expected exception");
+        } catch (MalformedURIException x) {
+        }
+    }
+
+    @Test
+    public void testParseURIAppTypeRuntimeWrongNodePath() {
+        try {
+            uri = DataSpacesURI.parseURI("vfs:///123/scratch/runtimeA//file.txt");
+            fail("expected exception");
+        } catch (MalformedURIException x) {
+        }
     }
 
     @Test

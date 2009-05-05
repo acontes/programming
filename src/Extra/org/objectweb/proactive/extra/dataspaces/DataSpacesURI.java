@@ -69,6 +69,10 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
     private static final Pattern PATTERN = Pattern
             .compile("^vfs:///(\\d+)(/(((input|output)(/(([^/]+)(/(.+)?)?)?)?)|scratch(/(([^/]+)((/(([^/]+)(/(.+)?)?)?)?)?)?)?)?)?$");
 
+    private static boolean checkIsNullOrNonEmpty(String component) {
+        return component == null || component.length() > 0;
+    }
+
     /**
      * Creates URI with only application id being specified.
      * 
@@ -294,6 +298,11 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
 
         if (spaceType == SpaceType.SCRATCH && name != null) {
             throw new IllegalArgumentException("Malformed URI. Scratch can not have name.");
+        }
+
+        if (!checkIsNullOrNonEmpty(name) || !checkIsNullOrNonEmpty(runtimeId) ||
+            !checkIsNullOrNonEmpty(nodeId)) {
+            throw new IllegalArgumentException("Data Spaces URI component can not be empty.");
         }
 
         this.appId = appId;
