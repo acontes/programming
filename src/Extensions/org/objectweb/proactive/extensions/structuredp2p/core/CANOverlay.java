@@ -200,10 +200,14 @@ public class CANOverlay extends StructuredOverlay {
                                 new PingMessage())));
                 PAGroup.waitAll(groupFutures);
 
-                for (ExceptionInGroup e : PAGroup.getGroup(groupFutures).getExceptionList()) {
-                    // ((Peer)e.getObject())
+                Iterator<PingResponseMessage> it = PAGroup.getGroup(groupFutures).listIterator();
 
-                    // Find neighbor from this and do a cycle, initialize timer...
+                while (it.hasNext()) {
+                    try {
+                        // FIXME
+                    } catch (Exception e) {
+                        // FIXME
+                    }
                 }
             }
         }
@@ -228,18 +232,18 @@ public class CANOverlay extends StructuredOverlay {
      */
     public void leave() {
         try {
-            CANCheckMergeResponseMessage groupFutures = null;
+            Group<CANCheckMergeResponseMessage> groupFutures = null;
             Group<Peer> groupAvailablePeer = PAGroup.getGroup((Peer) PAGroup.newGroup(Peer.class.getName()));
 
             // Check if there is a valid neighbor
             for (Group<Peer>[] neighborsAxe : this.neighbors) {
                 for (Group<Peer> group : neighborsAxe) {
-                    groupFutures = (CANCheckMergeResponseMessage) PAFuture.getFutureValue(PAGroup
-                            .getGroup(this.getLocalPeer().sendMessageTo((Peer) group.getGroupByType(),
+                    groupFutures = PAGroup.getGroup((CANCheckMergeResponseMessage) PAFuture
+                            .getFutureValue(this.getLocalPeer().sendMessageTo((Peer) group.getGroupByType(),
                                     new CANCheckMergeMessage(this.getArea()))));
                     PAGroup.waitAll(groupFutures);
 
-                    Iterator<CANCheckMergeResponseMessage> it = PAGroup.getGroup(groupFutures).listIterator();
+                    Iterator<CANCheckMergeResponseMessage> it = groupFutures.listIterator();
 
                     while (it.hasNext()) {
                         try {
@@ -404,6 +408,7 @@ public class CANOverlay extends StructuredOverlay {
      */
     public CANCheckMergeResponseMessage handleCheckMergeMessage(Message msg) {
         CANCheckMergeMessage message = (CANCheckMergeMessage) msg;
+        System.out.println("CANOverlay.handleCheckMergeMessage()");
         return new CANCheckMergeResponseMessage(this.getRemotePeer(), this.area.isValidMergingArea(message
                 .getArea()));
     }
