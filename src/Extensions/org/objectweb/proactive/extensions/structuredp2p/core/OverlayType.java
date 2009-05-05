@@ -11,6 +11,7 @@ package org.objectweb.proactive.extensions.structuredp2p.core;
  * @version 0.1
  */
 public enum OverlayType {
+
     /**
      * CAN (Content-Addressable Network)
      */

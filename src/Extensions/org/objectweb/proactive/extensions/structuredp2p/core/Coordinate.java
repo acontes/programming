@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 
 /**
- * Coordinate is used in a CAN network in order to specify the position of a given peer in the
+ * Coordinate is used in {@link CANOverlay} in order to specify the position of a given peer in the
  * space.
  * 
  * @author Kilanga Fanny
@@ -15,8 +15,9 @@ import java.io.Serializable;
  */
 @SuppressWarnings("serial")
 public class Coordinate implements Serializable {
+
     /**
-     * The max value of Unicode we managed
+     * The max value of Unicode we managed.
      */
     private static int UNICODE = 255;
 
@@ -45,7 +46,7 @@ public class Coordinate implements Serializable {
     }
 
     /**
-     * Determinate the middle between two coordinates.
+     * Determinates the middle between two coordinates.
      * 
      * @param min
      *            the coordinate min.
@@ -110,7 +111,7 @@ public class Coordinate implements Serializable {
 
         for (int i = 1; i <= str1.length(); i++) {
             for (int j = 1; j <= str2.length(); j++) {
-                distance[i][j] = minimum(distance[i - 1][j] + 1, distance[i][j - 1] + 1,
+                distance[i][j] = this.minimum(distance[i - 1][j] + 1, distance[i][j - 1] + 1,
                         distance[i - 1][j - 1] + ((str1.charAt(i - 1) == str2.charAt(j - 1)) ? 0 : 1));
             }
         }
@@ -123,7 +124,7 @@ public class Coordinate implements Serializable {
      * @param a
      * @param b
      * @param c
-     * @return the minimum
+     * @return the minimum.
      */
     private int minimum(int a, int b, int c) {
         return Math.min(Math.min(a, b), c);
@@ -133,7 +134,8 @@ public class Coordinate implements Serializable {
      * Returns the maximum coordinate between the current coordinate and the argument.
      * 
      * @param coord
-     * @return
+     *            the coordinate.
+     * @return the maximum coordinate between the current coordinate and the argument.
      */
     public Coordinate max(Coordinate coord) {
         if (coord.getValue().compareTo(this.value) >= 0) {

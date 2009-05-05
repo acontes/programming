@@ -1,7 +1,10 @@
 package org.objectweb.proactive.extensions.structuredp2p.message.response;
 
+import org.objectweb.proactive.extensions.structuredp2p.message.LoadBalancingMessage;
+
+
 /**
- * A load balancing response message indicates the load of a peer.
+ * Defines a response for the {@link LoadBalancingMessage}.
  * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent
@@ -15,8 +18,10 @@ public class LoadBalancingResponseMessage extends ResponseMessage {
     /**
      * Constructor.
      * 
-     * @param peer
+     * @param timestampCreationMessage
+     *            the timestamp indicating the time creation of the message which has been sent.
      */
-    public LoadBalancingResponseMessage() {
+    public LoadBalancingResponseMessage(long timestampCreationMessage) {
+        super(timestampCreationMessage);
     }
 }

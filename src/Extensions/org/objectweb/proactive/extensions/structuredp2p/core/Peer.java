@@ -1,13 +1,14 @@
 package org.objectweb.proactive.extensions.structuredp2p.core;
 
 import java.io.Serializable;
+import java.util.concurrent.Future;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.util.converter.MakeDeepCopy.WithMarshallStream;
+import org.objectweb.proactive.api.PAEventProgramming;
 import org.objectweb.proactive.extensions.structuredp2p.data.DataStorage;
 import org.objectweb.proactive.extensions.structuredp2p.message.LookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.Message;
@@ -27,9 +28,10 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.Respons
  */
 @SuppressWarnings("serial")
 public class Peer implements InitActive, RunActive, Serializable {
+
     /**
-     * The timeout to wait before to check neighbors {@link WithMarshallStream}
-     * {@link StructuredOverlay#checkNeighbors()}.
+     * The timeout to wait before to check neighbors via the call of
+     * {@link StructuredOverlay#checkNeighbors()} .
      */
     public static final int CHECK_NEIGHBORS_TIMEOUT = 10;
 
@@ -94,7 +96,9 @@ public class Peer implements InitActive, RunActive, Serializable {
      * @return the response in agreement with the type of message sent.
      */
     public LookupResponseMessage sendMessage(LookupMessage msg) {
-        return this.structuredOverlay.sendMessage(msg);
+        LookupResponseMessage response = this.structuredOverlay.sendMessage(msg);
+        PAEventProgramming.addActionOnFuture(response, "setResponseMessageDeliveryTime");
+        return response;
     }
 
     /**
@@ -108,7 +112,27 @@ public class Peer implements InitActive, RunActive, Serializable {
      * @return the response in agreement with the type of message sent.
      */
     public ResponseMessage sendMessageTo(Peer remotePeer, Message msg) {
-        return remotePeer.receiveMessage(msg);
+        ResponseMessage future = remotePeer.receiveMessage(msg);
+
+        // Callback on ResponseMessage
+        PAEventProgramming.addActionOnFuture(future, "setResponseMessageDeliveryTime");
+
+        return future;
+    }
+
+    /**
+     * Setup the delivery timestamp of the {@link ResponseMessage}.
+     * 
+     * @param future
+     *            the response message to initialize.
+     */
+    public void setResponseMessageDeliveryTime(Future<ResponseMessage> future) {
+        try {
+            ResponseMessage response = future.get();
+            response.setDeliveryTime();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -202,6 +226,7 @@ public class Peer implements InitActive, RunActive, Serializable {
 
         this.lastRequestDuration = System.currentTimeMillis();
         this.stub = (Peer) PAActiveObject.getStubOnThis();
+        PAActiveObject.setImmediateService("setResponseMessageDeliveryTime");
     }
 
     /**
@@ -214,12 +239,11 @@ public class Peer implements InitActive, RunActive, Serializable {
                 service.serveOldest();
                 this.lastRequestDuration = System.currentTimeMillis();
             } else {
-                if (System.currentTimeMillis() - this.lastRequestDuration >= CHECK_NEIGHBORS_TIMEOUT) {
+                if (System.currentTimeMillis() - this.lastRequestDuration >= Peer.CHECK_NEIGHBORS_TIMEOUT) {
                     this.structuredOverlay.checkNeighbors();
                 }
                 service.waitForRequest();
             }
-
         }
     }
 
@@ -228,13 +252,15 @@ public class Peer implements InitActive, RunActive, Serializable {
      */
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof Peer))
+        if (!(o instanceof Peer)) {
             throw new IllegalArgumentException();
+        }
 
         Peer peer = (Peer) o;
 
-        if (this.getType() != peer.getType())
+        if (this.getType() != peer.getType()) {
             return false;
+        }
 
         if (this.getType() == OverlayType.CAN) {
             CANOverlay thisOverlay = (CANOverlay) this.getStructuredOverlay();

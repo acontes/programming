@@ -1,6 +1,8 @@
 package org.objectweb.proactive.extensions.structuredp2p.message.response;
 
 /**
+ * Defines an abstract class for {@link JoinResponseMessage}.
+ * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent
  * @author Trovato Alexandre
@@ -9,17 +11,17 @@ package org.objectweb.proactive.extensions.structuredp2p.message.response;
  */
 @SuppressWarnings("serial")
 public abstract class JoinResponseMessage extends ResponseMessage {
-    private Boolean isSuccess = false;
+
+    private final Boolean isSuccess = false;
 
     /**
      * Constructor.
      * 
-     * @param isSuccess
-     *            indicates if the join has succeeded.
+     * @param timestampCreationMessage
+     *            the timestamp indicating the time creation of the message which has been sent.
      */
-    public JoinResponseMessage(boolean isSuccess) {
-        super();
-        this.isSuccess = isSuccess;
+    public JoinResponseMessage(long timestampCreationMessage) {
+        super(timestampCreationMessage);
     }
 
     /**

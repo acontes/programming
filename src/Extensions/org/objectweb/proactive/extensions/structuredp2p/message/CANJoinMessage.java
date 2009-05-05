@@ -7,7 +7,7 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.CANJoin
 
 
 /**
- * A PingMessage is a concrete message for ping.
+ * A {@link CANJoinMessage} is a concrete message in order to ping.
  * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent
@@ -17,6 +17,7 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.CANJoin
  */
 @SuppressWarnings("serial")
 public class CANJoinMessage extends Message {
+
     private final Peer peer;
     private final int dimension;
     private final int order;
@@ -46,7 +47,7 @@ public class CANJoinMessage extends Message {
         return this.peer;
     }
 
-    public int getOrder() {
+    public int getDirection() {
         return this.order;
     }
 

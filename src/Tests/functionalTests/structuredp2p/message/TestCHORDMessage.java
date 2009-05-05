@@ -1,8 +1,7 @@
 package functionalTests.structuredp2p.message;
 
-import static org.junit.Assert.*;
-
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -14,47 +13,46 @@ import org.objectweb.proactive.extensions.structuredp2p.message.CHORDLookupMessa
 import org.objectweb.proactive.extensions.structuredp2p.message.LookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.ResponseMessage;
 
+
 public class TestCHORDMessage {
+
     private Peer srcPeer;
     private Peer myPeer;
     private LookupMessage lMsg;
     private String id;
     private ResponseMessage response;
-    
-    
-   @Before
-   public void init() throws ActiveObjectCreationException, NodeException{
-       srcPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
-               new Object[] { OverlayType.CAN });  
-       
-       
-       myPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
-               new Object[] { OverlayType.CAN });
-     id = "55";  
-     lMsg = new CHORDLookupMessage(id);
-   }
 
-   @After
-   public void clean(){
-     srcPeer = null;
-     myPeer = null;
-     lMsg = null;
-     id = null;
-   }
-   
-   @Test   
-   public void testCreate() {     
-       assertNotNull("create a new peer", srcPeer);
-       assertNotNull("create a new CAN message",lMsg);
-       assertNotNull("create a new coordinate table",id);
-   }
-   
-   @Test
-   public void testSendMessage(){
-       
-       response = srcPeer.sendMessage(lMsg);
-       assertNotNull("the response is not null",response);
-    // TODO test a chord message
-   }
-    
+    @Before
+    public void init() throws ActiveObjectCreationException, NodeException {
+        this.srcPeer = (Peer) PAActiveObject
+                .newActive(Peer.class.getName(), new Object[] { OverlayType.CAN });
+
+        this.myPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(), new Object[] { OverlayType.CAN });
+        this.id = "55";
+        this.lMsg = new CHORDLookupMessage(this.id);
+    }
+
+    @After
+    public void clean() {
+        this.srcPeer = null;
+        this.myPeer = null;
+        this.lMsg = null;
+        this.id = null;
+    }
+
+    @Test
+    public void testCreate() {
+        Assert.assertNotNull("create a new peer", this.srcPeer);
+        Assert.assertNotNull("create a new CAN message", this.lMsg);
+        Assert.assertNotNull("create a new coordinate table", this.id);
+    }
+
+    @Test
+    public void testSendMessage() {
+
+        this.response = this.srcPeer.sendMessage(this.lMsg);
+        Assert.assertNotNull("the response is not null", this.response);
+        // TODO test a chord message
+    }
+
 }

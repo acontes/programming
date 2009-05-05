@@ -18,6 +18,7 @@ import org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay;
  */
 @SuppressWarnings("serial")
 public class Key<T> implements Serializable {
+
     /**
      * The key content.
      */

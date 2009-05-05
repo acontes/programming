@@ -7,14 +7,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.structuredp2p.core.OverlayType;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.message.Message;
 import org.objectweb.proactive.extensions.structuredp2p.message.PingMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.response.PingResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.ResponseMessage;
+
 
 /**
  * Test {@link PingMessage}.
@@ -26,46 +25,47 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.Respons
  * @version 0.1
  */
 public class TestPingMessage {
-	private Peer senderPeer;
-	private Peer receiverPeer;
-	private Message msg;
-	private ResponseMessage senderResponse;
-	private ResponseMessage receiverResponse;
 
-	@Before
-	public void init() throws ActiveObjectCreationException, NodeException {
-		this.senderPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
-				new Object[] { OverlayType.CAN });
+    private Peer senderPeer;
+    private Peer receiverPeer;
+    private Message msg;
+    private ResponseMessage senderResponse;
+    private ResponseMessage receiverResponse;
 
-		this.receiverPeer = (Peer) PAActiveObject.newActive(Peer.class
-				.getName(), new Object[] { OverlayType.CAN });
+    @Before
+    public void setUp() throws ActiveObjectCreationException, NodeException {
+        this.senderPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
+                new Object[] { OverlayType.CAN });
 
-		this.msg = new PingMessage();
-	}
+        this.receiverPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
+                new Object[] { OverlayType.CAN });
 
-	@Test
-	public void testCreate() {
-		Assert.assertNotNull(this.senderPeer);
-		Assert.assertNotNull(this.receiverPeer);
-		Assert.assertNotNull(this.msg);
-	}
+        this.msg = new PingMessage();
+    }
 
-	@Test
-	public void testSendMessageTo() {
-		this.senderResponse = senderPeer.sendMessageTo(receiverPeer, msg);
-		this.receiverResponse = receiverPeer.sendMessageTo(senderPeer, msg);
+    @Test
+    public void testCreate() {
+        Assert.assertNotNull(this.senderPeer);
+        Assert.assertNotNull(this.receiverPeer);
+        Assert.assertNotNull(this.msg);
+    }
 
-		Assert.assertTrue(((PingResponseMessage) PAFuture
-				.getFutureValue(senderResponse)).getLatency() >= 0);
-		Assert.assertTrue(((PingResponseMessage) PAFuture
-				.getFutureValue(receiverResponse)).getLatency() >= 0);
-	}
+    @Test
+    public void testSendMessageTo() {
+        this.senderResponse = this.senderPeer.sendMessageTo(this.receiverPeer, this.msg);
+        this.receiverResponse = this.receiverPeer.sendMessageTo(this.senderPeer, this.msg);
 
-	@After
-	public void clean() {
-		this.senderPeer = null;
-		this.receiverPeer = null;
-		this.msg = null;
-	}
+        Assert.assertTrue(this.senderResponse.getLatency() >= 0);
+        Assert.assertTrue(this.receiverResponse.getLatency() >= 0);
+    }
+
+    @After
+    public void tearDown() {
+        this.msg = null;
+        this.receiverResponse = null;
+        this.senderResponse = null;
+        PAActiveObject.terminateActiveObject(this.senderPeer, false);
+        PAActiveObject.terminateActiveObject(this.receiverPeer, false);
+    }
 
 }

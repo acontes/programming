@@ -16,7 +16,7 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.Respons
 
 
 /**
- * Defines an abstract class that all structured peer-to-peer protocols must extends.
+ * Defines an abstract class that all structured peer-to-peer protocols must extend.
  * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent
@@ -26,6 +26,7 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.Respons
  */
 @SuppressWarnings("serial")
 public abstract class StructuredOverlay implements Serializable {
+
     /**
      * The local peer which is associated with the overlay.
      */
@@ -93,7 +94,7 @@ public abstract class StructuredOverlay implements Serializable {
      * @return the {@link PingResponseMessage} response.
      */
     public PingResponseMessage handlePingMessage(PingMessage msg) {
-        return new PingResponseMessage(msg.getTimestamp());
+        return new PingResponseMessage(msg.getCreationTimestamp());
     }
 
     /**
@@ -104,7 +105,7 @@ public abstract class StructuredOverlay implements Serializable {
      * @return the {@link LoadBalancingResponseMessage} response.
      */
     public LoadBalancingResponseMessage handleLoadBalancingMessage(LoadBalancingMessage msg) {
-        return new LoadBalancingResponseMessage();
+        return new LoadBalancingResponseMessage(msg.getCreationTimestamp());
     }
 
     /**
@@ -116,10 +117,22 @@ public abstract class StructuredOverlay implements Serializable {
      */
     public abstract LookupResponseMessage handleLookupMessage(LookupMessage msg);
 
-    // TODO commentaires
+    /**
+     * Handles a {@link JoinResponseMessage}.
+     * 
+     * @param msg
+     *            the message that is handled.
+     * @return the {@link JoinResponseMessage} response.
+     */
     public abstract JoinResponseMessage handleJoinMessage(Message msg);
 
-    // TODO commentaires
+    /**
+     * Handles a {@link LeaveMessage}.
+     * 
+     * @param msg
+     *            the message that is handled.
+     * @return the {@link EmptyResponseMessage} response.
+     */
     public abstract EmptyResponseMessage handleLeaveMessage(LeaveMessage leaveMessage);
 
     /**

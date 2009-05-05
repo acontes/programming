@@ -17,15 +17,16 @@ import org.objectweb.proactive.extensions.structuredp2p.core.exception.AreaExcep
  */
 @SuppressWarnings("serial")
 public class Area implements Serializable {
+
     /**
      * The minimum coordinates.
      */
-    private final Coordinate[] coordinatesMin;
+    private Coordinate[] coordinatesMin;
 
     /**
      * The maximum coordinates.
      */
-    private final Coordinate[] coodinatesMax;
+    private Coordinate[] coodinatesMax;
 
     /**
      * Constructor.
@@ -63,6 +64,7 @@ public class Area implements Serializable {
      * managed by a peer.
      * 
      * @param dimension
+     *            the dimension on which we recover the coordinates.
      * @return the minimum coordinates at the specified dimension that indicates the area which is
      *         managed by a peer.
      */
@@ -75,7 +77,7 @@ public class Area implements Serializable {
      * managed by a peer.
      * 
      * @param dimension
-     *            the dimension on which one recovers the coordinates.
+     *            the dimension on which we recover the coordinates.
      * @return the maximum coordinates at a specified dimension that indicates the area which is
      *         managed by a peer.
      */
@@ -84,7 +86,7 @@ public class Area implements Serializable {
     }
 
     /**
-     * Search if the area in argument is bordered to the current area.
+     * Check if the area in argument is bordered to the current area.
      * 
      * @param area
      *            the area to check.
@@ -96,8 +98,9 @@ public class Area implements Serializable {
 
         for (i = 0; i < nbDim; i++) {
             if (this.getCoordinatesMax(i) == area.getCoordinatesMin(i) ||
-                this.getCoordinatesMin(i) == area.getCoordinatesMax(i))
+                this.getCoordinatesMin(i) == area.getCoordinatesMax(i)) {
                 return i;
+            }
         }
 
         return -1;
@@ -106,10 +109,8 @@ public class Area implements Serializable {
     /**
      * Merge two bordered areas.
      * 
-     * @param a1
-     *            first area.
-     * @param a2
-     *            second area.
+     * @param a
+     *            the Area to which we merge the current.
      * @return the merged area.
      * @throws AreaException
      */
@@ -142,29 +143,7 @@ public class Area implements Serializable {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof Area))
-            throw new IllegalArgumentException();
-
-        Area area = (Area) o;
-
-        int i;
-        int nbDim = this.coodinatesMax.length;
-
-        for (i = 0; i < nbDim; i++) {
-            if (this.getCoordinatesMax(i) != area.getCoordinatesMax(i) ||
-                this.getCoordinatesMin(i) != area.getCoordinatesMin(i))
-                return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Checks if its possible to merge the area in argument with the current area
+     * Checks if it is possible to merge the current area with the area in argument.
      * 
      * @param area
      *            the area to check.
@@ -180,5 +159,29 @@ public class Area implements Serializable {
         } else {
             return false;
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Area)) {
+            throw new IllegalArgumentException();
+        }
+
+        Area area = (Area) o;
+
+        int i;
+        int nbDim = this.coodinatesMax.length;
+
+        for (i = 0; i < nbDim; i++) {
+            if (this.getCoordinatesMax(i) != area.getCoordinatesMax(i) ||
+                this.getCoordinatesMin(i) != area.getCoordinatesMin(i)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

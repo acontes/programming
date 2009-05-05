@@ -7,7 +7,7 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.CANChec
 
 
 /**
- * A CANMergeMessage is a concrete message to merge two CAN peers.
+ * A CANMergeMessage is a concrete message in order to merge two CAN peers.
  * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent
@@ -17,6 +17,7 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.CANChec
  */
 @SuppressWarnings("serial")
 public class CANCheckMergeMessage extends Message {
+
     private final Area remoteArea;
 
     /**

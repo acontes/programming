@@ -4,7 +4,8 @@ import java.io.Serializable;
 
 
 /**
- * A response message is the appropriate answer to the message.
+ * A response message is an abstract representation of a response. It contains the round-trip time
+ * for the sent of the message for which we answer. All responses must extend this class.
  * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent
@@ -14,30 +15,52 @@ import java.io.Serializable;
  */
 @SuppressWarnings("serial")
 public abstract class ResponseMessage implements Serializable {
-    private boolean isNull = false;
+
+    /**
+     * The timestamp on which the message for which was created we create this response.
+     */
+    public long timestampMessageCreation;
+
+    /**
+     * The round trip time.
+     */
+    public int latency = 0;
 
     /**
      * Constructor.
      */
     public ResponseMessage() {
-
     }
 
     /**
-     * FIXME
+     * Constructor.
      * 
-     * @param isNull
+     * @param timestampMessageCreation
+     *            the timestamp on which the message for which was created we create this response.
      */
-    public ResponseMessage(boolean isNull) {
-        this.isNull = isNull;
+    public ResponseMessage(long timestampMessageCreation) {
+        this.timestampMessageCreation = timestampMessageCreation;
     }
 
     /**
-     * FIXME
-     * 
-     * @return
+     * Sets the delivery time of the response (ie. when the response has been receive). The latency
+     * is automatically calculated.
      */
-    public boolean isNull() {
-        return this.isNull;
+    public void setDeliveryTime() {
+        this.latency = (int) (System.currentTimeMillis() - this.timestampMessageCreation);
+    }
+
+    /**
+     * Returns the latency (in milliseconds) between the moment of the creation of the message and
+     * when the response has been received.
+     * 
+     * @return the latency between the moment of the creation of the message and when the response
+     *         has been received.
+     */
+    public int getLatency() {
+        if (this.latency == 0) {
+            throw new IllegalStateException("The response message must be initialize by the sent function !");
+        }
+        return this.latency;
     }
 }

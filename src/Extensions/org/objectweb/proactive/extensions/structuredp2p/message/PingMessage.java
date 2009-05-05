@@ -15,6 +15,7 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.PingRes
  */
 @SuppressWarnings("serial")
 public class PingMessage extends Message {
+
     /**
      * Constructor.
      */

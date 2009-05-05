@@ -1,7 +1,7 @@
 package org.objectweb.proactive.extensions.structuredp2p.message.response;
 
 /**
- * A response message is the appropriate answer to the message.
+ * Defines an empty response.
  * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent
@@ -11,5 +11,15 @@ package org.objectweb.proactive.extensions.structuredp2p.message.response;
  */
 @SuppressWarnings("serial")
 public class EmptyResponseMessage extends ResponseMessage {
+
+    /**
+     * Constructor.
+     * 
+     * @param timestampResponseMessage
+     *            the timestamp indicating the time creation of the message which has been sent.
+     */
+    public EmptyResponseMessage(long timestampResponseMessage) {
+        super(timestampResponseMessage);
+    }
 
 }

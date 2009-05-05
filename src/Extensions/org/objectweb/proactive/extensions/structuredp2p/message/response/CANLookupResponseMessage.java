@@ -2,11 +2,12 @@ package org.objectweb.proactive.extensions.structuredp2p.message.response;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.Coordinate;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
+import org.objectweb.proactive.extensions.structuredp2p.message.CANLookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.Key;
 
 
 /**
- * A chord response message gives a CAN peer for routing.
+ * Defines a response for the {@link CANLookupMessage}.
  * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent
@@ -18,24 +19,21 @@ import org.objectweb.proactive.extensions.structuredp2p.message.Key;
 public class CANLookupResponseMessage extends LookupResponseMessage {
 
     /**
+     * Constructor.
      * 
+     * @param timestampCreationMessage
+     *            the timestamp indicating the time creation of the message which has been sent.
      * @param peer
+     * @param coordinates
      */
-    public CANLookupResponseMessage(Peer peer, Coordinate[] coordinates) {
-        super(new Key<Coordinate[]>(coordinates), peer);
+    public CANLookupResponseMessage(long timestampCreationMessage, Peer peer, Coordinate[] coordinates) {
+        super(timestampCreationMessage, new Key<Coordinate[]>(coordinates), peer);
     }
 
     /**
-     * FIXME
-     */
-    public CANLookupResponseMessage() {
-        super(true);
-    }
-
-    /**
-     * FIXME
+     * Returns the coordinates used in order to find the peer.
      * 
-     * @return
+     * @return the coordinates used in order to find the peer.
      */
     public Coordinate[] getCoordinates() {
         return (Coordinate[]) this.getKey().getValue();

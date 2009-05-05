@@ -32,6 +32,7 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.Respons
  */
 @SuppressWarnings("serial")
 public class CHORDOverlay extends StructuredOverlay {
+
     private String identifier;
     private HashMap<String, Peer> fingers;
 
@@ -118,16 +119,21 @@ public class CHORDOverlay extends StructuredOverlay {
      * {@inheritDoc}
      */
     public CHORDLookupResponseMessage handleLookupMessage(LookupMessage msg) {
-        return new CHORDLookupResponseMessage(this.getLocalPeer(), ((CHORDLookupMessage) msg).getId());
+        return new CHORDLookupResponseMessage(msg.getCreationTimestamp(), this.getLocalPeer(),
+            ((CHORDLookupMessage) msg).getId());
     }
 
+    /**
+     * TODO
+     */
     public JoinResponseMessage handleJoinMessage(Message msg) {
-        // TODO
         return null;
     }
 
+    /**
+     * TODO
+     */
     public EmptyResponseMessage handleLeaveMessage(LeaveMessage leaveMessage) {
-        // TODO Auto-generated method stub
         return null;
     }
 }

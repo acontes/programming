@@ -5,9 +5,9 @@ import java.io.Serializable;
 import org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.ResponseMessage;
 
+
 /**
- * A message is used for each kind of message that can be sent to an another
- * peer.
+ * A message is used for each kind of message that can be sent to an another peer.
  * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent
@@ -17,33 +17,34 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.Respons
  */
 @SuppressWarnings("serial")
 public abstract class Message implements Serializable {
-	/**
-	 * Timestamp of the creation of the message.
-	 */
-	private final long timestamp;
 
-	/**
-	 * Constructor.
-	 */
-	public Message() {
-		this.timestamp = System.currentTimeMillis();
-	}
+    /**
+     * Timestamp of the creation of the message.
+     */
+    private long creationTimestamp;
 
-	/**
-	 * Handles the message.
-	 * 
-	 * @param overlay
-	 *            the overlay which handles the message.
-	 * @return the response in agreement with the type of message sent.
-	 */
-	public abstract ResponseMessage handle(StructuredOverlay overlay);
+    /**
+     * Constructor.
+     */
+    public Message() {
+        this.creationTimestamp = System.currentTimeMillis();
+    }
 
-	/**
-	 * Returns the timestamp of the creation of the message.
-	 * 
-	 * @return the timestamp of the creation of the message.
-	 */
-	public long getTimestamp() {
-		return this.timestamp;
-	}
+    /**
+     * Handles the message.
+     * 
+     * @param overlay
+     *            the overlay which handles the message.
+     * @return the response in agreement with the type of message sent.
+     */
+    public abstract ResponseMessage handle(StructuredOverlay overlay);
+
+    /**
+     * Returns the timestamp of the creation of the message.
+     * 
+     * @return the timestamp of the creation of the message.
+     */
+    public long getCreationTimestamp() {
+        return this.creationTimestamp;
+    }
 }

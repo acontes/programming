@@ -1,7 +1,7 @@
 package org.objectweb.proactive.extensions.structuredp2p.core.exception;
 
 /**
- * Manage area exceptions.
+ * Manage Area Exceptions.
  * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent

@@ -16,6 +16,7 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.EmptyRe
  */
 @SuppressWarnings("serial")
 public class LeaveMessage extends Message {
+
     private final Peer remotePeer;
 
     public LeaveMessage(Peer remotePeer) {

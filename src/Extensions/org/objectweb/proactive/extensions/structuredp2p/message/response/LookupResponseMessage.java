@@ -2,9 +2,12 @@ package org.objectweb.proactive.extensions.structuredp2p.message.response;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.message.Key;
+import org.objectweb.proactive.extensions.structuredp2p.message.LookupMessage;
 
 
 /**
+ * Defines a response for the {@link LookupMessage}.
+ * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent
  * @author Trovato Alexandre
@@ -13,34 +16,30 @@ import org.objectweb.proactive.extensions.structuredp2p.message.Key;
  */
 @SuppressWarnings("serial")
 public abstract class LookupResponseMessage extends ResponseMessage {
-    /**
-     * Coordinates of the peer we lookup.
-     */
-    private Key<?> key;
 
     /**
-     * The peer which is found for the given key.
+     * Key used in order to lookup the peer.
      */
-    private Peer peer;
+    private final Key<?> key;
 
     /**
-     * Constructor.
-     * 
-     * @param isNull
-     *            indicates if the response is an empty response or not.
+     * The peer which has been found for the given key.
      */
-    public LookupResponseMessage(boolean isNull) {
-        super(isNull);
-    }
+    private final Peer peer;
 
     /**
      * Constructor.
      * 
+     * @param timestampMessageCreation
+     *            the timestamp indicating the time creation of the message which has been sent.
      * @param key
      *            the key used in order to found the peer in the network to which we want to send
      *            this message.
+     * @param peer
+     *            the peer which has sent the message.
      */
-    public LookupResponseMessage(Key<?> key, Peer peer) {
+    public LookupResponseMessage(long timestampMessageCreation, Key<?> key, Peer peer) {
+        super(timestampMessageCreation);
         this.key = key;
         this.peer = peer;
     }

@@ -8,6 +8,7 @@ import java.util.Random;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.api.PAGroup;
+import org.objectweb.proactive.core.group.ExceptionInGroup;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.extensions.structuredp2p.core.exception.AreaException;
@@ -26,7 +27,6 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.CANLook
 import org.objectweb.proactive.extensions.structuredp2p.message.response.CANMergeResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.EmptyResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.LookupResponseMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.response.PingResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.ResponseMessage;
 
 
@@ -43,13 +43,18 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.Respons
  */
 @SuppressWarnings("serial")
 public class CANOverlay extends StructuredOverlay {
+
     /**
      * The number of dimensions which is equals to the number of axes.
      */
     public static final int NB_DIMENSIONS = 4;
 
     /**
-     * Neighbors of the current area. The neighbors are an array of ProActive groups.
+     * Neighbors of the current area. The neighbors are an array of ProActive groups. It is a
+     * two-dimensional array of {@link Group}. Each line corresponds to a dimension. The number of
+     * columns is always equal to two. The first column corresponds to the neighbors having a
+     * coordinate lower than the current pair on the given dimension. The second column is the
+     * reverse.
      */
     private final Group<Peer>[][] neighbors;
 
@@ -60,6 +65,8 @@ public class CANOverlay extends StructuredOverlay {
 
     /**
      * Constructor.
+     * 
+     * Initialize the neighbors array.
      */
     public CANOverlay(Peer localPeer) {
         super(localPeer);
@@ -79,53 +86,49 @@ public class CANOverlay extends StructuredOverlay {
     }
 
     /**
-     * Splits the current area in two. The axe which is used in order to split is choose randomly
-     * with {@link #getRandomAxe()}.
+     * Splits the current area in two. The dimension which is used in direction to split is choose
+     * randomly with {@link #getRandomDimension()}.
      * 
      * @param peer
      *            the new peer which want to join the area.
      */
     public void split(Peer peer) {
-        // Verify the availability of the peer.
+        // Check the availability of the peer.
         ResponseMessage response = this.sendMessageTo(peer, new PingMessage());
 
-        if (!response.isNull()) {
-            // TODO How to split data ?
-            // FIXME Split the data in two parts (basic method)
-            /*
-             * Coordinate[] middle = this.getMiddleArea(this.getRandomDimension()); Area newArea =
-             * new Area(middle, this.area.getCoordinatesMax()); this.area = new
-             * Area(this.area.getCoordinatesMin(), middle);
-             */
+        // TODO How to split data ?
+        // FIXME Split the data in two parts (basic method)
 
-            int axe = this.getRandomDimension(); // split axe
-            Coordinate minCord[] = this.area.getCoordinatesMin();
-            Coordinate maxCord[] = this.area.getCoordinatesMax();
-            Coordinate mid1[] = this.area.getCoordinatesMax();
-            mid1[axe] = Coordinate.getMiddle(minCord[axe], maxCord[axe]);
-            Coordinate mid2[] = this.area.getCoordinatesMin();
-            mid2[axe] = Coordinate.getMiddle(minCord[axe], maxCord[axe]);
-            this.setArea(new Area(minCord, mid1));
-            CANOverlay overlay = new CANOverlay(peer);
-            overlay.setArea(new Area(mid2, maxCord));
-            peer.setStructuredOverlay(overlay);
+        /*
+         * Coordinate[] middle = this.getMiddleArea(this.getRandomDimension()); Area newArea = new
+         * Area(middle, this.area.getCoordinatesMax()); this.area = new
+         * Area(this.area.getCoordinatesMin(), middle);
+         */
 
-        }
-
+        int axe = this.getRandomDimension(); // split axe
+        Coordinate minCord[] = this.area.getCoordinatesMin();
+        Coordinate maxCord[] = this.area.getCoordinatesMax();
+        Coordinate mid1[] = this.area.getCoordinatesMax();
+        mid1[axe] = Coordinate.getMiddle(minCord[axe], maxCord[axe]);
+        Coordinate mid2[] = this.area.getCoordinatesMin();
+        mid2[axe] = Coordinate.getMiddle(minCord[axe], maxCord[axe]);
+        this.setArea(new Area(minCord, mid1));
+        CANOverlay overlay = new CANOverlay(peer);
+        overlay.setArea(new Area(mid2, maxCord));
+        peer.setStructuredOverlay(overlay);
     }
 
     /**
-     * Verify if the coordinates in arguments are in the managed area.
+     * Check if the coordinates in arguments are in the managed area.
      * 
      * @param coordinates
      *            the coordinates to check.
      * 
-     * @return true if the coordinates are in the area, else otherwise.
+     * @return true if the coordinates are in the area, false otherwise.
      */
     public boolean contains(Coordinate[] coordinates) {
         int i = 0;
         Coordinate[] minArea = this.area.getCoordinatesMin();
-
         Coordinate[] maxArea = this.area.getCoordinatesMax();
 
         for (Coordinate coord : coordinates) {
@@ -145,25 +148,25 @@ public class CANOverlay extends StructuredOverlay {
     }
 
     /**
-     * Check if the axe index of the current area contains the given coordinate.
+     * Check if the dimension index of the current area contains the given coordinate.
      * 
-     * @param axeIndex
-     *            the axe index to check.
+     * @param dimensionIndex
+     *            the dimension index used for the check.
      * 
      * @param coordinate
      *            the coordinate to check.
      * 
      * @return 0 if the coordinate is contained by the area on the given axe, -1 if the coordinate
-     *         is smaller than the line which is managed by the given axe, 1 otherwise.
+     *         is smaller than the line which is managed by the given dimension, 1 otherwise.
      */
-    public int contains(int axeIndex, Coordinate coordinate) {
+    public int contains(int dimensionIndex, Coordinate coordinate) {
         Coordinate[] minArea = this.area.getCoordinatesMin();
         Coordinate[] maxArea = this.area.getCoordinatesMax();
 
-        if (minArea[axeIndex].getValue().compareTo(coordinate.getValue()) > 0 &&
-            maxArea[axeIndex].getValue().compareTo(coordinate.getValue()) <= 0) {
+        if (minArea[dimensionIndex].getValue().compareTo(coordinate.getValue()) > 0 &&
+            maxArea[dimensionIndex].getValue().compareTo(coordinate.getValue()) <= 0) {
             return 0;
-        } else if (minArea[axeIndex].getValue().compareTo(coordinate.getValue()) > 0) {
+        } else if (minArea[dimensionIndex].getValue().compareTo(coordinate.getValue()) > 0) {
             return -1;
         } else {
             return 1;
@@ -171,12 +174,14 @@ public class CANOverlay extends StructuredOverlay {
     }
 
     /**
-     * Merge two area when a peer leave the network. The split consists to give the data that are
-     * managed by the peer which left the network to his neighbors and after to merge this area with
-     * its closest neighbors.
+     * Merge two area when a peer leave the network cleanly. The split consists to give the data
+     * that are managed by the peer which left the network to his neighbors and after to merge this
+     * area with its closest neighbors.
      * 
      * @param peer
      *            the peer which left the network.
+     * 
+     * @return true if the merge has succeeded, false otherwise.
      */
     public boolean merge(Peer remotePeer) {
         CANOverlay overlay = ((CANOverlay) remotePeer.getStructuredOverlay());
@@ -198,18 +203,12 @@ public class CANOverlay extends StructuredOverlay {
     public void checkNeighbors() {
         for (Group<Peer>[] groupArray : this.neighbors) {
             for (Group<Peer> group : groupArray) {
-                Group<PingResponseMessage> groupFutures = PAGroup.getGroup((PingResponseMessage) this
-                        .getLocalPeer().sendMessageTo((Peer) group.getGroupByType(), new PingMessage()));
+                ResponseMessage groupFutures = (ResponseMessage) PAFuture.getFutureValue(this.getLocalPeer()
+                        .sendMessageTo((Peer) group.getGroupByType(), new PingMessage()));
                 PAGroup.waitAll(groupFutures);
 
-                Iterator<PingResponseMessage> it = groupFutures.listIterator();
-
-                while (it.hasNext()) {
-                    try {
-                        // FIXME
-                    } catch (Exception e) {
-                        // FIXME
-                    }
+                for (ExceptionInGroup e : PAGroup.getGroup(groupFutures).getExceptionList()) {
+                    // (Peer)e.getObject();
                 }
             }
         }
@@ -222,11 +221,11 @@ public class CANOverlay extends StructuredOverlay {
     public Boolean join(Peer remotePeer) {
         // FIXME
         int dim = this.getRandomDimension();
-        int order = 0;
+        int direction = 0;
 
-        return new Boolean(this.addNeighbor(remotePeer, dim, order).booleanValue() &&
+        return new Boolean(this.addNeighbor(remotePeer, dim, direction).booleanValue() &&
             ((CANJoinResponseMessage) PAFuture.getFutureValue(this.getLocalPeer().sendMessageTo(remotePeer,
-                    new CANJoinMessage(this.getRemotePeer(), dim, (order + 1) % 2)))).hasSucceeded());
+                    new CANJoinMessage(this.getRemotePeer(), dim, (direction + 1) % 2)))).hasSucceeded());
     }
 
     /**
@@ -338,28 +337,26 @@ public class CANOverlay extends StructuredOverlay {
     }
 
     /**
-     * Add a new neighbor with a dimension and an order.
+     * Adds a new neighbor at the specified dimension and direction.
      * 
      * @param peer
      *            the new neighbor.
      * 
      * @param dimension
-     *            the dimension.
+     *            the dimension index (must be in 0 and {@link #NB_DIMENSIONS - 1} include).
      * 
-     * @param order
-     *            the order.
+     * @param direction
+     *            the direction (0 or 1).
      */
-    private Boolean addNeighbor(Peer remotePeer, int dimension, int order) {
-        return this.neighbors[dimension][order].add(remotePeer);
+    private Boolean addNeighbor(Peer remotePeer, int dimension, int direction) {
+        return this.neighbors[dimension][direction].add(remotePeer);
     }
 
     /**
-     * Remove a neighbor.
+     * Removes a neighbor.
      * 
      * @param peer
-     *            the new neighbor.
-     * 
-     * @return the state of deletion.
+     *            the neighbor to remove.
      */
     private void removeNeighbor(Peer peer) {
         for (Group<Peer>[] neighborsAxe : this.neighbors) {
@@ -392,74 +389,11 @@ public class CANOverlay extends StructuredOverlay {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public CANLookupResponseMessage handleLookupMessage(LookupMessage msg) {
-        return new CANLookupResponseMessage(this.getLocalPeer(), ((CANLookupMessage) msg).getCoordinates());
-    }
-
-    /**
-     * Handles a {@link CANJoinMessage}.
-     * 
-     * @param msg
-     *            the message.
-     * 
-     * @return the response.
-     */
-    public CANJoinResponseMessage handleJoinMessage(Message msg) {
-        CANJoinMessage message = (CANJoinMessage) msg;
-        return new CANJoinResponseMessage(this.addNeighbor(message.getPeer(), message.getDimesion(), message
-                .getOrder()));
-
-    }
-
-    /**
-     * Handles a {@link CANMergeMessage}.
-     * 
-     * @param msg
-     *            the message.
-     * 
-     * @return the response.
-     */
-    public CANMergeResponseMessage handleMergeMessage(Message msg) {
-        CANMergeMessage message = (CANMergeMessage) msg;
-        return new CANMergeResponseMessage(this.merge(message.getPeer()));
-    }
-
-    /**
-     * Handles a {@link CANCheckMergeMessage}.
-     * 
-     * @param msg
-     *            the message.
-     * 
-     * @return the response.
-     */
-    public CANCheckMergeResponseMessage handleCheckMergeMessage(Message msg) {
-        CANCheckMergeMessage message = (CANCheckMergeMessage) msg;
-        return new CANCheckMergeResponseMessage(this.getRemotePeer(), this.area.isValidMergingArea(message
-                .getArea()));
-    }
-
-    /**
-     * Handles a {@link LeaveMessage}.
-     * 
-     * @param msg
-     *            the message.
-     * 
-     * @return the response.
-     */
-    public EmptyResponseMessage handleLeaveMessage(LeaveMessage msg) {
-        this.removeNeighbor(msg.getPeer());
-
-        return new EmptyResponseMessage();
-    }
-
-    /**
      * Returns the neighbors of the managed area with a certain organization. It returns a
-     * two-dimensional array of {@link org.objectweb.proactive.core.group.Group}. Each line
-     * corresponds to a dimension. The number of columns is always equal to two. The first column
-     * corresponds to the neighbors having a coordinate lower than the current pair on the given
-     * dimension. The second column is the reverse.
+     * two-dimensional array of {@link Group}. Each line corresponds to a dimension. The number of
+     * columns is always equal to two. The first column corresponds to the neighbors having a
+     * coordinate lower than the current pair on the given dimension. The second column is the
+     * reverse.
      * 
      * @return the neighbors of the managed area.
      */
@@ -468,9 +402,9 @@ public class CANOverlay extends StructuredOverlay {
     }
 
     /**
-     * Returns the neighbors of the managed area as a {@link Collection} without any order.
+     * Returns the neighbors of the managed area as a {@link Collection} without any direction.
      * 
-     * @return the neighbors of the managed area as a {@link Collection} without any order.
+     * @return the neighbors of the managed area as a {@link Collection} without any direction.
      */
     public Collection<Peer> getNeighborsAsCollection() {
         Collection<Peer> neighbors = new ArrayList<Peer>();
@@ -535,6 +469,61 @@ public class CANOverlay extends StructuredOverlay {
     private int getRandomDimension() {
         Random rand = new Random();
         return rand.nextInt(CANOverlay.NB_DIMENSIONS);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public CANLookupResponseMessage handleLookupMessage(LookupMessage msg) {
+        return new CANLookupResponseMessage(msg.getCreationTimestamp(), this.getLocalPeer(),
+            ((CANLookupMessage) msg).getCoordinates());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public CANJoinResponseMessage handleJoinMessage(Message msg) {
+        CANJoinMessage message = (CANJoinMessage) msg;
+        this.addNeighbor(message.getPeer(), message.getDimesion(), message.getDirection());
+        return new CANJoinResponseMessage(msg.getCreationTimestamp());
+
+    }
+
+    /**
+     * Handles a {@link CANMergeMessage}.
+     * 
+     * @param msg
+     *            the message.
+     * 
+     * @return the response.
+     */
+    public CANMergeResponseMessage handleMergeMessage(Message msg) {
+        this.merge(((CANMergeMessage) msg).getPeer());
+        return new CANMergeResponseMessage(msg.getCreationTimestamp());
+    }
+
+    /**
+     * Handles a {@link CANCheckMergeMessage}.
+     * 
+     * @param msg
+     *            the message.
+     * 
+     * @return the response.
+     */
+    public CANCheckMergeResponseMessage handleCheckMergeMessage(Message msg) {
+        CANCheckMergeMessage message = (CANCheckMergeMessage) msg;
+        return new CANCheckMergeResponseMessage(msg.getCreationTimestamp(), this.getRemotePeer(), this.area
+                .isValidMergingArea(message.getArea()));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public EmptyResponseMessage handleLeaveMessage(LeaveMessage msg) {
+        LeaveMessage message = msg;
+        this.removeNeighbor(message.getPeer());
+
+        return new EmptyResponseMessage(msg.getCreationTimestamp());
     }
 
     /**

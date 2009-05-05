@@ -17,6 +17,7 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.Respons
  */
 @SuppressWarnings("serial")
 public class CANMergeMessage extends Message {
+
     private final Peer remotePeer;
 
     /**

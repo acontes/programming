@@ -1,7 +1,10 @@
 package org.objectweb.proactive.extensions.structuredp2p.message.response;
 
+import org.objectweb.proactive.extensions.structuredp2p.message.CANMergeMessage;
+
+
 /**
- * A response message is the appropriate answer to the message.
+ * Defines a response for the {@link CANMergeMessage}.
  * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent
@@ -14,9 +17,12 @@ public class CANMergeResponseMessage extends ResponseMessage {
 
     /**
      * Constructor.
+     * 
+     * @param timestampMessageCreation
+     *            the timestamp indicating the time creation of the message which has been sent.
      */
-    public CANMergeResponseMessage(boolean merged) {
-        super(merged);
+    public CANMergeResponseMessage(long timestampMessageCreation) {
+        super(timestampMessageCreation);
     }
 
 }
