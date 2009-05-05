@@ -71,13 +71,13 @@ public class DataSpacesNodes {
      *             checking)
      * @throws AlreadyConfiguredException
      *             when node is already configured for Data Spaces
-     * @see NodeConfigurator#configureNode(SpaceConfiguration, Node)
+     * @see NodeConfigurator#configureNode(Node, SpaceConfiguration)
      */
     public static void configureNode(Node node, BaseScratchSpaceConfiguration baseScratchConfiguration)
             throws AlreadyConfiguredException, FileSystemException, ConfigurationException {
         final NodeConfigurator nodeConfig = createNodeConfigurator(node);
         try {
-            nodeConfig.configureNode(baseScratchConfiguration, node);
+            nodeConfig.configureNode(node, baseScratchConfiguration);
         } catch (IllegalStateException x) {
             // it can occur only in case of concurrent configuration, let's wrap it
             throw new AlreadyConfiguredException(x.getMessage(), x);

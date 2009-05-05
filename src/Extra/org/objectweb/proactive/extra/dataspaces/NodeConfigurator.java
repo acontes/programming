@@ -22,7 +22,7 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationExceptio
  * Objects life cycle:
  * <ol>
  * <li>Instance initialization by default constructor.</li>
- * <li>{@link #configureNode(SpaceConfiguration, Node)} method call for passing node-specific and
+ * <li>{@link #configureNode(Node, SpaceConfiguration)} method call for passing node-specific and
  * immutable settings. This can be called only once for each instance.</li>
  * <li>{@link #configureApplication(long, String)} method call for configuring application on a
  * node.</li>
@@ -57,11 +57,12 @@ public class NodeConfigurator {
      * <p>
      * State of an instance remains not configured if exception appears.
      * 
+     * @param node
+     *            node to configure
      * @param baseScratchConfiguration
      *            base scratch data space configuration, may be <code>null</code> if node does not
      *            provide a scratch space
-     * @param node
-     *            node to configure
+     * 
      * @throws IllegalStateException
      *             when trying to reconfigure already configured instance
      * @throws ConfigurationException
@@ -70,7 +71,7 @@ public class NodeConfigurator {
      * @throws FileSystemException
      *             when VFS creation or scratch initialization fails
      */
-    synchronized public void configureNode(BaseScratchSpaceConfiguration baseScratchConfiguration, Node node)
+    synchronized public void configureNode(Node node, BaseScratchSpaceConfiguration baseScratchConfiguration)
             throws IllegalStateException, FileSystemException, ConfigurationException {
         logger.debug("Configuring node for Data Spaces");
         checkNotConfigured();
@@ -108,7 +109,7 @@ public class NodeConfigurator {
      * is grabbed from current node state.
      * <p>
      * This method may be called several times for different applications, after node has been
-     * configured through {@link #configureNode(SpaceConfiguration, Node)}. Subsequent calls will
+     * configured through {@link #configureNode(Node, SpaceConfiguration)}. Subsequent calls will
      * close existing application-specific configuration and create a new one.
      * <p>
      * If configuration fails, instance of this class remains not configured for an application, any
