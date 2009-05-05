@@ -11,25 +11,43 @@ import java.util.Map.Entry;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceAlreadyRegisteredException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundException;
+import org.objectweb.proactive.extra.dataspaces.exceptions.WrongApplicationIdException;
 
 
-// TODO what about IO exceptions?
 /**
- * Implements PADataSpaces API within a node (and an application).
+ * Implements PADataSpaces API for a pair of node and application.
+ * <p>
+ * Instances of this class are thread-safe. Each instance for given node and application should
+ * remain valid as long as this node has Data Spaces configured, for this application. Therefore,
+ * instances of this class are typically managed by {@link NodeConfigurator} and
+ * {@link DataSpacesNodes} classes.
  */
 public class DataSpacesImpl {
+    private static final long RESOLVE_BLOCKING_RESEND_PERIOD_MILLIS = 5000;
 
-    // TODO what value here?
-    private static final long HEARTBIT_LENGTH_MILLIS = 5000;
+    private static final Logger logger = ProActiveLogger.getLogger(Loggers.DATASPACES);
+
+    private static void checkIsInputOrOutput(SpaceType type) {
+        if (type == SpaceType.SCRATCH)
+            throw new IllegalArgumentException("This method can be only used with input or output data space");
+    }
+
+    private static void checkIsNotNullName(String name) {
+        if (name == null)
+            throw new IllegalArgumentException("Input/data space name can not be null");
+    }
 
     private final SpacesMountManager spacesMountManager;
 
@@ -60,13 +78,96 @@ public class DataSpacesImpl {
      */
     public FileObject resolveDefaultInputOutput(SpaceType type) throws IllegalArgumentException,
             FileSystemException, SpaceNotFoundException {
-        assertIsInputOrOutput(type);
+        return resolveInputOutput(DataSpacesURI.DEFAULT_IN_OUT_NAME, type);
+    }
 
-        final DataSpacesURI defaultInputURI = DataSpacesURI.createInOutSpaceURI(appId, type,
-                DataSpacesURI.DEFAULT_IN_OUT_NAME);
+    /**
+     * Implementation (more generic) method for resolveDefaultInputBlocking and
+     * resolveDefaultOutputBlocking.
+     * 
+     * @see {@link PADataSpaces#resolveDefaultInputBlocking(long))}
+     * @see {@link PADataSpaces#resolveDefaultOutputBlocking(long))}
+     * @param timeoutMillis
+     * @param type
+     * @return
+     * @throws FileSystemException
+     * @throws IllegalArgumentException
+     *             when specified space type is neither input nor output or specified timeout is not
+     *             positive integer
+     * @throws ProActiveTimeoutException
+     */
+    public FileObject resolveDefaultInputOutputBlocking(long timeoutMillis, SpaceType type)
+            throws IllegalArgumentException, FileSystemException, ProActiveTimeoutException {
+        return resolveInputOutputBlocking(DataSpacesURI.DEFAULT_IN_OUT_NAME, timeoutMillis, type);
+    }
 
-        final FileObject fo = spacesMountManager.resolveFile(defaultInputURI);
-        return fo;
+    /**
+     * Implementation (more generic) method for resolveInput and resolveOutput.
+     * 
+     * @see {@link PADataSpaces#resolveInput(String)}
+     * @see {@link PADataSpaces#resolveOutput(String)}
+     * 
+     * @param name
+     * @param type
+     * @return
+     * @throws FileSystemException
+     * @throws IllegalArgumentException
+     *             when specified space type is neither input nor output
+     * @throws SpaceNotFoundException
+     */
+    public FileObject resolveInputOutput(String name, SpaceType type) throws FileSystemException,
+            IllegalArgumentException, SpaceNotFoundException {
+
+        checkIsInputOrOutput(type);
+        checkIsNotNullName(name);
+        final DataSpacesURI uri = DataSpacesURI.createInOutSpaceURI(appId, type, name);
+
+        return spacesMountManager.resolveFile(uri);
+    }
+
+    /**
+     * Implementation (more generic) method for resolveInputBlocking and resolveOutputBlocking.
+     * 
+     * @see {@link PADataSpaces#resolveInputBlocking(String, long)}
+     * @see {@link PADataSpaces#resolveOutputBlocking(String, long)}
+     * @param name
+     * @param timeoutMillis
+     * @param type
+     * @return
+     * @throws FileSystemException
+     * @throws IllegalArgumentException
+     *             when specified space type is neither input nor output or specified timeout is not
+     *             positive integer
+     * @throws ProActiveTimeoutException
+     */
+    public FileObject resolveInputOutputBlocking(String name, long timeoutMillis, SpaceType type)
+            throws FileSystemException, IllegalArgumentException, ProActiveTimeoutException {
+
+        checkIsInputOrOutput(type);
+        checkIsNotNullName(name);
+        if (timeoutMillis < 1)
+            throw new IllegalArgumentException("Specified timeout should be positive integer");
+
+        final DataSpacesURI uri = DataSpacesURI.createInOutSpaceURI(appId, type, name);
+
+        final long startTime = System.currentTimeMillis();
+        long currTime = startTime;
+        while (currTime < startTime + timeoutMillis) {
+            try {
+                return spacesMountManager.resolveFile(uri);
+            } catch (SpaceNotFoundException e) {
+                // request processing may have taken some time
+                currTime = System.currentTimeMillis();
+                final long sleepTime = Math.min(RESOLVE_BLOCKING_RESEND_PERIOD_MILLIS, startTime +
+                    timeoutMillis - currTime);
+                try {
+                    Thread.sleep(sleepTime);
+                } catch (InterruptedException e1) {
+                }
+                currTime = System.currentTimeMillis();
+            }
+        }
+        throw new ProActiveTimeoutException();
     }
 
     /**
@@ -86,8 +187,8 @@ public class DataSpacesImpl {
         try {
             return spacesMountManager.resolveFile(scratchURI);
         } catch (SpaceNotFoundException e) {
-            // TODO log?
-            throw new ProActiveRuntimeException("DataSpaces catched exception that should not occure", e);
+            ProActiveLogger.logImpossibleException(logger, e);
+            throw new ProActiveRuntimeException("URI of scratch for Active Object can not be resolved", e);
         }
     }
 
@@ -105,7 +206,7 @@ public class DataSpacesImpl {
      *             when specified space type is neither input nor output
      */
     public Set<String> getAllKnownInputOutputNames(SpaceType type) throws IllegalArgumentException {
-        assertIsInputOrOutput(type);
+        checkIsInputOrOutput(type);
 
         final DataSpacesURI aURI = DataSpacesURI.createURI(appId, type);
         final Set<SpaceInstanceInfo> infos = spacesDirectory.lookupMany(aURI);
@@ -131,7 +232,7 @@ public class DataSpacesImpl {
     public Map<String, FileObject> resolveAllKnownInputsOutputs(SpaceType type) throws FileSystemException,
             IllegalArgumentException {
 
-        assertIsInputOrOutput(type);
+        checkIsInputOrOutput(type);
         final DataSpacesURI uri = DataSpacesURI.createURI(appId, type);
         final Map<DataSpacesURI, FileObject> spaces = spacesMountManager.resolveSpaces(uri);
         final Map<String, FileObject> ret = new HashMap<String, FileObject>(spaces.size());
@@ -141,47 +242,6 @@ public class DataSpacesImpl {
             ret.put(name, entry.getValue());
         }
         return ret;
-    }
-
-    /**
-     * Implementation (more generic) method for resolveDefaultInputBlocking and
-     * resolveDefaultOutputBlocking.
-     * 
-     * @see {@link PADataSpaces#resolveDefaultInputBlocking(long))}
-     * @see {@link PADataSpaces#resolveDefaultOutputBlocking(long))}
-     * @param timeoutMillis
-     * @param type
-     * @return
-     * @throws FileSystemException
-     * @throws IllegalArgumentException
-     *             when specified space type is neither input nor output or specified timeout is not
-     *             positive integer
-     * @throws ProActiveTimeoutException
-     */
-    public FileObject resolveDefaultInputOutputBlocking(long timeoutMillis, SpaceType type)
-            throws IllegalArgumentException, FileSystemException, ProActiveTimeoutException {
-
-        if (timeoutMillis < 1)
-            throw new IllegalArgumentException("Specified timeout should be positive integer");
-
-        assertIsInputOrOutput(type);
-        long currTime;
-        final DataSpacesURI uri = DataSpacesURI.createInOutSpaceURI(appId, type,
-                DataSpacesURI.DEFAULT_IN_OUT_NAME);
-        final long startTime = System.currentTimeMillis();
-
-        do
-            try {
-                return spacesMountManager.resolveFile(uri);
-            } catch (SpaceNotFoundException e) {
-                try {
-                    Thread.sleep(HEARTBIT_LENGTH_MILLIS);
-                } catch (InterruptedException e1) {
-                }
-                currTime = System.currentTimeMillis();
-            }
-        while (currTime - startTime < timeoutMillis);
-        throw new ProActiveTimeoutException();
     }
 
     /**
@@ -212,67 +272,9 @@ public class DataSpacesImpl {
         return fileObject.getName().getURI();
     }
 
-    /**
-     * Implementation (more generic) method for resolveInput and resolveOutput.
-     * 
-     * @see {@link PADataSpaces#resolveInput(String)}
-     * @see {@link PADataSpaces#resolveOutput(String)}
-     * 
-     * @param name
-     * @param type
-     * @return
-     * @throws FileSystemException
-     * @throws IllegalArgumentException
-     *             when specified space type is neither input nor output
-     * @throws SpaceNotFoundException
-     */
-    public FileObject resolveInputOutput(String name, SpaceType type) throws FileSystemException,
-            IllegalArgumentException, SpaceNotFoundException {
-
-        assertIsInputOrOutput(type);
-        final DataSpacesURI uri = DataSpacesURI.createInOutSpaceURI(appId, type, name);
-
-        return spacesMountManager.resolveFile(uri);
-    }
-
-    /**
-     * Implementation (more generic) method for resolveInputBlocking and resolveOutputBlocking.
-     * 
-     * @see {@link PADataSpaces#resolveInputBlocking(String, long)}
-     * @see {@link PADataSpaces#resolveOutputBlocking(String, long)}
-     * @param name
-     * @param timeoutMillis
-     * @param type
-     * @return
-     * @throws FileSystemException
-     * @throws IllegalArgumentException
-     *             when specified space type is neither input nor output or specified timeout is not
-     *             positive integer
-     * @throws ProActiveTimeoutException
-     */
-    public FileObject resolveInputOutputBlocking(String name, long timeoutMillis, SpaceType type)
-            throws FileSystemException, IllegalArgumentException, ProActiveTimeoutException {
-
-        if (timeoutMillis < 1)
-            throw new IllegalArgumentException("Specified timeout should be positive integer");
-
-        assertIsInputOrOutput(type);
-        final DataSpacesURI uri = DataSpacesURI.createInOutSpaceURI(appId, type, name);
-        final long startTime = System.currentTimeMillis();
-        long currTime;
-
-        do
-            try {
-                return spacesMountManager.resolveFile(uri);
-            } catch (SpaceNotFoundException e) {
-                try {
-                    Thread.sleep(HEARTBIT_LENGTH_MILLIS);
-                } catch (InterruptedException e1) {
-                }
-                currTime = System.currentTimeMillis();
-            }
-        while (currTime - startTime < timeoutMillis);
-        throw new ProActiveTimeoutException();
+    public String addDefaultInputOutput(String name, String path, String url, SpaceType type)
+            throws SpaceAlreadyRegisteredException, ConfigurationException, IllegalArgumentException {
+        return addInputOutput(DataSpacesURI.DEFAULT_IN_OUT_NAME, path, url, type);
     }
 
     /**
@@ -286,33 +288,25 @@ public class DataSpacesImpl {
      * @param type
      * @return
      * @throws SpaceAlreadyRegisteredException
-     * @throws IllegalArgumentException
-     *             when specified space type is neither input nor output
      * @throws ConfigurationException
      *             when specified configuration is wrong or not sufficient
      */
     public String addInputOutput(String name, String path, String url, SpaceType type)
-            throws SpaceAlreadyRegisteredException, ConfigurationException, IllegalArgumentException {
-
-        assertIsInputOrOutput(type);
-
-        if (name == null || name.equals(""))
-            name = DataSpacesURI.DEFAULT_IN_OUT_NAME;
-
-        if (url == null)
-            throw new RuntimeException("ProActive provider is not implemented yet.");
-
+            throws SpaceAlreadyRegisteredException, ConfigurationException {
         final String hostname = Utils.getHostname();
+        // name and type are checked here 
         final InputOutputSpaceConfiguration config = InputOutputSpaceConfiguration.createConfiguration(url,
                 path, hostname, name, type);
-
+        // url is checked here        
         final SpaceInstanceInfo spaceInstanceInfo = new SpaceInstanceInfo(appId, config);
-        spacesDirectory.register(spaceInstanceInfo);
-        return DataSpacesURI.createInOutSpaceURI(appId, type, name).toString();
-    }
 
-    private void assertIsInputOrOutput(SpaceType type) {
-        if (type == SpaceType.SCRATCH)
-            throw new IllegalArgumentException("This method can be only used with input or output data space");
+        try {
+            spacesDirectory.register(spaceInstanceInfo);
+        } catch (WrongApplicationIdException x) {
+            ProActiveLogger.logImpossibleException(logger, x);
+            throw new ProActiveRuntimeException(
+                "This application id is not registered in used naming service", x);
+        }
+        return spaceInstanceInfo.getMountingPoint().toString();
     }
 }
