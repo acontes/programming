@@ -61,7 +61,6 @@ public class VFSFactory {
         manager.addProvider("ftp", new FtpFileProvider());
         manager.addProvider("sftp", new SftpFileProvider());
         manager.setDefaultProvider(new UrlFileProvider());
-        // TODO set FileObject decorator to synchronize close() calls, or even some other stuff? 
 
         manager.init();
         logger.info("Created and initialized new VFS manager");

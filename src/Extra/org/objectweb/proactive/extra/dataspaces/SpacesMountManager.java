@@ -23,10 +23,10 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundExceptio
 /**
  * Manages data spaces mountings, connecting VFS and Data Spaces worlds.
  * <p>
- * Manager creates and maintains VirtualFileSystem instance to provide virtual view of file system
- * for each application. It is able to response to queries for files in data spaces or just data
- * spaces, providing VFS FileObject interface as a result. Returned FileObject instances are
- * applicable for user level code.
+ * Manager creates and maintains Apache VFS manager together with VirtualFileSystem instance to
+ * provide virtual view of file system for each application. It is able to response to queries for
+ * files in data spaces or just data spaces, providing VFS FileObject interface as a result.
+ * Returned FileObject instances are applicable for user level code.
  * <p>
  * To be able to serve requests for files and data spaces, SpaceMountManager must use
  * {@link SpacesDirectory} as a source of information about data spaces, their mounting points and
@@ -45,8 +45,8 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundExceptio
 // TODO known issue: how to disallow remote AOs (or even: other local AOs) write
 // access to each other scratch
 // Maybe FileObject decorator would be enough for that?
-// TODO check if closing FileSystem is enough, i.e. we do not need to close each FileObject?
-// it should be safer to do it?
+// FIXME from VFS documentation: it seems that one FileObject (that can be shared among Active Objects
+// within one Node) can not have input and output streams opened at the same time! VFS limitation??
 public class SpacesMountManager {
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.DATASPACES_MOUNT_MANAGER);
 
@@ -87,16 +87,16 @@ public class SpacesMountManager {
     /**
      * Creates SpaceMountManager instance, that must be finally closed through {@link #close()}
      * method.
-     * <p>
-     * Instance of VFS manager is configured and used for mounting spaces and creating
-     * VirtualFileSystem instances
      * 
      * @param directory
      *            data spaces directory to use for serving requests
      * @throws FileSystemException
-     *             when VFS creation fails
+     *             when VFS configuration fails
      */
     public SpacesMountManager(SpacesDirectory directory) throws FileSystemException {
+        logger.debug("Initializing spaces mount manager");
+        this.directory = directory;
+
         try {
             this.vfsManager = VFSFactory.createDefaultFileSystemManager();
         } catch (FileSystemException x) {
@@ -104,13 +104,10 @@ public class SpacesMountManager {
             throw x;
         }
 
-        this.directory = directory;
-        logger.debug("Initializing spaces mount manager");
         try {
             final FileObject vfsObject = vfsManager.createVirtualFileSystem(SCHEME_VFS_HACKED);
             this.vfs = (VirtualFileSystem) vfsObject.getFileSystem();
         } catch (FileSystemException x) {
-            // that should really never happen, we know that
             ProActiveLogger.logImpossibleException(logger, x);
             vfsManager.close();
             throw new RuntimeException(x);
@@ -308,8 +305,16 @@ public class SpacesMountManager {
         try {
             vfs.removeJunction(getVFSPath(spaceUri));
         } finally {
-            final FileSystem fs = resolveFileVFS(spaceUri).getFileSystem();
-            vfsManager.closeFileSystem(fs);
+            final FileObject spaceRoot = resolveFileVFS(spaceUri);
+            try {
+                // we may not need to close FileObject, but with VFS you never know...
+                spaceRoot.close();
+            } catch (FileSystemException x) {
+                ProActiveLogger.logEatedException(logger, String.format(
+                        "Could not close data space %s root file object", spaceUri), x);
+            }
+            final FileSystem spaceFileSystem = spaceRoot.getFileSystem();
+            vfsManager.closeFileSystem(spaceFileSystem);
         }
         logger.info("Unmounted space: " + spaceUri);
     }
@@ -317,7 +322,10 @@ public class SpacesMountManager {
     private FileObject resolveFileVFS(final DataSpacesURI uri) throws FileSystemException {
         synchronized (readLock) {
             try {
-                return vfsManager.resolveFile(vfs.getRoot(), getVFSPath(uri));
+                final FileObject fo = vfsManager.resolveFile(vfs.getRoot(), getVFSPath(uri));
+                // FIXME: report VFS bug: setting FileObjectDecorator at VFS manager level
+                // makes crappy VirtualFileSystem class not working
+                return new SyncingFileObjectDectorator(fo);
             } catch (FileSystemException x) {
                 logger.warn("Could not access file that should exist (be mounted) in VFS: " + uri);
                 throw x;
