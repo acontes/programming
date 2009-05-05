@@ -53,7 +53,18 @@ import org.objectweb.proactive.extensions.webservices.WebServices;
  */
 //@snippet-start helloworldcomponent
 public class HelloWorldComponent implements HelloWorldItf, GoodByeWorldItf {
-    public HelloWorldComponent() {
+
+	private String text;
+	
+    public String sayText() {
+		return text;
+	}
+
+	public void setText(String text) {
+		this.text = text;
+	}
+
+	public HelloWorldComponent() {
     }
 
     public String helloWorld(String name) {

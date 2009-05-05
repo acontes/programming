@@ -37,5 +37,10 @@ public interface HelloWorldItf {
     public String helloWorld(String name);
 
     public String sayHello();
+    
+    public String sayText();
+
+	public void setText(String text);
+	
 }
 //@snippet-end helloworlditfcomponent
