@@ -2,8 +2,8 @@ package functionalTests.structuredp2p.canoverlay;
 
 import junit.framework.Assert;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -22,23 +22,31 @@ import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
  * @version 0.1
  */
 public class TestNeighbors {
-    private Peer entryPoint;
-    private Peer neighbor;
+    private static Peer entryPoint;
+    private static Peer neighbor;
 
-    @Before
-    public void initTest() throws ActiveObjectCreationException, NodeException {
-        this.entryPoint = (Peer) PAActiveObject.newActive(Peer.class.getName(),
-                new Object[] { OverlayType.CAN });
-        this.neighbor = (Peer) PAActiveObject.newActive(Peer.class.getName(),
-                new Object[] { OverlayType.CAN });
+    @BeforeClass
+    public static void initTest() {
+        try {
+            TestNeighbors.entryPoint = (Peer) PAActiveObject.newActive(Peer.class.getName(),
+                    new Object[] { OverlayType.CAN });
+            TestNeighbors.neighbor = (Peer) PAActiveObject.newActive(Peer.class.getName(),
+                    new Object[] { OverlayType.CAN });
+        } catch (ActiveObjectCreationException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (NodeException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     @Test
     public void testJoin() {
-        Assert.assertNotNull(this.entryPoint);
-        Assert.assertNotNull(this.neighbor);
+        Assert.assertNotNull(TestNeighbors.entryPoint);
+        Assert.assertNotNull(TestNeighbors.neighbor);
 
-        this.neighbor.join(this.entryPoint);
+        TestNeighbors.neighbor.join(TestNeighbors.entryPoint);
 
         // Test if the new added peer is in the neighbor list
         try {
@@ -47,60 +55,40 @@ public class TestNeighbors {
             e.printStackTrace();
         }
 
-        CANOverlay entryPointOverlay = (CANOverlay) this.entryPoint.getStructuredOverlay();
-        CANOverlay neighborOverlay = (CANOverlay) this.neighbor.getStructuredOverlay();
+        CANOverlay entryPointOverlay = (CANOverlay) TestNeighbors.entryPoint.getStructuredOverlay();
+        CANOverlay neighborOverlay = (CANOverlay) TestNeighbors.neighbor.getStructuredOverlay();
 
-        Assert.assertTrue(entryPointOverlay.hasNeighbor(this.neighbor));
-        Assert.assertTrue(neighborOverlay.hasNeighbor(this.entryPoint));
+        Assert.assertTrue(entryPointOverlay.hasNeighbor(TestNeighbors.neighbor));
+        Assert.assertTrue(neighborOverlay.hasNeighbor(TestNeighbors.entryPoint));
 
-        // Test if the new added peer has the good coordinates CanLookupMessage msgToEntryPoint =
-        /*
-         * new CanLookupMessage(entryPointOverlay.getArea() .getCoordinatesMin()); CanLookupMessage
-         * msgToNeighbor = new CanLookupMessage(neighborOverlay.getArea().getCoordinatesMin());
-         * 
-         * Assert.assertEquals( ((CanLookupResponseMessage)
-         * this.neighbor.sendMessage(msgToEntryPoint)).getPeer(), this.entryPoint);
-         * Assert.assertEquals( ((CanLookupResponseMessage)
-         * this.entryPoint.sendMessage(msgToNeighbor)).getPeer(), this.neighbor);
-         */
-        // TODO tests with split !
+        // TODO tests with splited areas !
     }
 
     @Test
     public void testLeave() {
-        Assert.assertNotNull(this.entryPoint);
-        Assert.assertNotNull(this.neighbor);
+        Assert.assertNotNull(TestNeighbors.entryPoint);
+        Assert.assertNotNull(TestNeighbors.neighbor);
 
-        this.neighbor.leave();
+        TestNeighbors.neighbor.leave();
 
-        CANOverlay entryPointOverlay = (CANOverlay) this.entryPoint.getStructuredOverlay();
+        CANOverlay entryPointOverlay = (CANOverlay) TestNeighbors.entryPoint.getStructuredOverlay();
         // CANOverlay neighborOverlay = (CANOverlay) this.neighbor.getStructuredOverlay();
 
         // Test if the leaved peer is no more in the neighbor list
         // Assert.assertFalse(neighborOverlay.hasNeighbor(this.entryPoint));
-        Assert.assertFalse(entryPointOverlay.hasNeighbor(this.neighbor));
+        Assert.assertFalse(entryPointOverlay.hasNeighbor(TestNeighbors.neighbor));
 
-        // Test if the leaved peer is no more in the overlay
-        /*
-         * CANLookupMessage msgToEntryPoint = new CANLookupMessage(entryPointOverlay.getArea()
-         * .getCoordinatesMin()); CANLookupMessage msgToNeighbor = new
-         * CANLookupMessage(neighborOverlay.getArea().getCoordinatesMin());
-         * 
-         * Assert.assertNotSame(this.neighbor.sendMessage(msgToEntryPoint), this.entryPoint);
-         * Assert.assertNotSame(this.entryPoint.sendMessage(msgToNeighbor), this.neighbor);
-         */
-
-        // TODO tests with merge !
+        // TODO tests with merged areas !
     }
 
-    @After
-    public void stopTest() {
+    @AfterClass
+    public static void stopTest() {
         try {
             Thread.sleep(10000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        this.entryPoint.leave();
+        TestNeighbors.entryPoint.leave();
     }
 
 }
