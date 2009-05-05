@@ -26,6 +26,7 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.CANLook
 import org.objectweb.proactive.extensions.structuredp2p.message.response.CANMergeResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.EmptyResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.LookupResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.message.response.PingResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.ResponseMessage;
 
 
@@ -48,11 +49,7 @@ public class CANOverlay extends StructuredOverlay {
     public static final int NB_DIMENSIONS = 4;
 
     /**
-     * Neighbors of the current area. The neighbors are an array of ProActive groups. It is a
-     * two-dimensional array of {@link org.objectweb.proactive.core.group.Group}. Each line
-     * corresponds to a dimension. The number of columns is always equal to two. The first column
-     * corresponds to the neighbors having a coordinate lower than the current pair on the given
-     * dimension. The second column is the reverse.
+     * Neighbors of the current area. The neighbors are an array of ProActive groups.
      */
     private final Group<Peer>[][] neighbors;
 
@@ -201,11 +198,11 @@ public class CANOverlay extends StructuredOverlay {
     public void checkNeighbors() {
         for (Group<Peer>[] groupArray : this.neighbors) {
             for (Group<Peer> group : groupArray) {
-                ResponseMessage groupFutures = (ResponseMessage) PAFuture.getFutureValue(this.getLocalPeer()
-                        .sendMessageTo((Peer) group.getGroupByType(), new PingMessage()));
+                Group<PingResponseMessage> groupFutures = PAGroup.getGroup((PingResponseMessage) this
+                        .getLocalPeer().sendMessageTo((Peer) group.getGroupByType(), new PingMessage()));
                 PAGroup.waitAll(groupFutures);
 
-                Iterator<ResponseMessage> it = PAGroup.getGroup(groupFutures).listIterator();
+                Iterator<PingResponseMessage> it = groupFutures.listIterator();
 
                 while (it.hasNext()) {
                     try {
@@ -452,8 +449,7 @@ public class CANOverlay extends StructuredOverlay {
      * @return the response.
      */
     public EmptyResponseMessage handleLeaveMessage(LeaveMessage msg) {
-        LeaveMessage message = msg;
-        this.removeNeighbor(message.getPeer());
+        this.removeNeighbor(msg.getPeer());
 
         return new EmptyResponseMessage();
     }

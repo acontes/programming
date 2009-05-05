@@ -22,13 +22,19 @@ public class OtherPeers {
         int nbPeers = 1;
         String uri = "localhost";
 
-        if (args.length > 2)
-            nbPeers = Integer.getInteger(args[0]);
+        System.out.println(args);
+        if (args.length == 0) {
+            System.err.println("Usage : java " + OtherPeers.class.getCanonicalName() + " " +
+                "descriptor [nbPeers] [entryPoint] ");
+            System.exit(1);
+        }
         if (args.length > 1)
-            uri = args[1];
+            nbPeers = Integer.parseInt(args[1]);
+        if (args.length > 2)
+            uri = args[2];
 
         try {
-            Deployment.deploy(args[2]);
+            Deployment.deploy(args[0]);
         } catch (NodeException e) {
             e.printStackTrace();
         } catch (ProActiveException e) {
