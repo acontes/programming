@@ -20,10 +20,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 
 
-// FIXME IMPORTANT - we interact with VFS through the same VFS manager as SpaceMountManager does;
-// who can/should close FileSystems then? this is actually most crappy part of this
-// NodeScratchSpace vs SpaceMountManager interactions, they go "different ways" to the same VFS.
-// FIXME do we need to close() FileObjects?
 // TODO leave data or remove all directories?
 // TODO perhaps checking for remote URL should be improved/changed when we know how do we start
 // ProActive VFS provider
@@ -55,6 +51,7 @@ public class NodeScratchSpace {
         private final SpaceInstanceInfo spaceInstanceInfo;
 
         private AppScratchSpaceImpl() throws FileSystemException, ConfigurationException {
+            logger.debug("Initializing application node scratch space");
             final long appId = Utils.getApplicationId(node);
             final String appIdString = Long.toString(appId);
             final String runtimeId = Utils.getRuntimeId(node);
@@ -62,6 +59,7 @@ public class NodeScratchSpace {
 
             try {
                 this.spaceFile = createEmptyDirectoryRelative(partialSpaceFile, appIdString);
+                spaceFile.close();
             } catch (FileSystemException x) {
                 logger.error("Could not create directory for application scratch space", x);
                 throw x;
@@ -76,6 +74,7 @@ public class NodeScratchSpace {
                 close();
                 throw x;
             }
+            logger.info("Initialized application node scratch space");
         }
 
         public void close() throws FileSystemException {
@@ -83,14 +82,14 @@ public class NodeScratchSpace {
             try {
                 spaceFile.delete(Selectors.SELECT_ALL);
             } finally {
+                // just a hint
                 spaceFile.close();
             }
             logger.info("Closed application scratch space");
         }
 
         public synchronized DataSpacesURI getScratchForAO(Body body) throws FileSystemException {
-            // TODO performance can be improved using more fine-grained synchronization
-            // TODO ApplicationScratchSpace can use SpacesMountManager for this, so there won't be double mounting anymore 
+            // TODO performance can be improved using more fine-grained synchronization 
             final String aoid = Utils.getActiveObjectId(body);
             if (logger.isDebugEnabled())
                 logger.debug("Request for scratch for Active Object with id: " + aoid);
@@ -98,9 +97,12 @@ public class NodeScratchSpace {
             final DataSpacesURI uri;
             if (!scratches.containsKey(aoid)) {
                 try {
-                    // TODO this sounds bad, as we can now see that if we omit SpacesMountManager
-                    // in this games, we unnecessarily open, close and open the same file
+                    // TODO we can use SpacesMountManager for that and return FileObject,
+                    // so we can avoid unnecessarily double mounting resulting in opening, 
+                    // closing and opening again the same file
                     createEmptyDirectoryRelative(spaceFile, aoid).close();
+                    // just a hint
+                    spaceFile.close();
                 } catch (FileSystemException x) {
                     logger.error(String.format(
                             "Could not create directory for Active Object (id: %s) scratch", aoid), x);
@@ -149,14 +151,13 @@ public class NodeScratchSpace {
      * Initializes instance (and all related configuration objects) on a node and performs file
      * system configuration and accessing tests.
      * <p>
-     * Instance of VFS manager is created. Local access will be used (if is defined) for accessing
-     * scratch data space. Any existing files for this scratch Data Space will be silently deleted.
+     * Local access will be used (if is defined) for accessing scratch data space. Any existing
+     * files for this scratch Data Space will be silently deleted.
      * <p>
      * Can be called only once for each instance. Once called, {@link ApplicationScratchSpace}
      * instances can be returned by {@link #initForApplication()}.
      * <p>
-     * If fails, there is no need to close it explicitly (e.g. the DefaultFileSystemManager instance
-     * is being closed.)
+     * If fails, there is no need to close it explicitly.
      * 
      * @throws IllegalStateException
      *             when instance has been already configured
@@ -180,25 +181,31 @@ public class NodeScratchSpace {
             throw x;
         }
 
-        final String nodeId = Utils.getNodeId(node);
-        final String runtimeId = Utils.getRuntimeId(node);
-        final String localAccessUrl = Utils.getLocalAccessURL(baseScratchConfiguration.getUrl(),
-                baseScratchConfiguration.getPath(), Utils.getHostname());
-        final String partialSpacePath = Utils.appendSubDirs(localAccessUrl, runtimeId, nodeId);
-
-        logger.debug("Accessing scratch space location: " + partialSpacePath);
         try {
-            partialSpaceFile = fileSystemManager.resolveFile(partialSpacePath);
-            checkCapabilities(partialSpaceFile.getFileSystem());
-            partialSpaceFile.delete(Selectors.EXCLUDE_SELF);
-            partialSpaceFile.createFolder();
-        } catch (FileSystemException x) {
-            logger.error("Could not initialize scratch space at: " + partialSpacePath);
-            fileSystemManager.close();
-            throw x;
+            final String nodeId = Utils.getNodeId(node);
+            final String runtimeId = Utils.getRuntimeId(node);
+            final String localAccessUrl = Utils.getLocalAccessURL(baseScratchConfiguration.getUrl(),
+                    baseScratchConfiguration.getPath(), Utils.getHostname());
+            final String partialSpacePath = Utils.appendSubDirs(localAccessUrl, runtimeId, nodeId);
+
+            logger.debug("Accessing scratch space location: " + partialSpacePath);
+            try {
+                partialSpaceFile = fileSystemManager.resolveFile(partialSpacePath);
+                checkCapabilities(partialSpaceFile.getFileSystem());
+                partialSpaceFile.delete(Selectors.EXCLUDE_SELF);
+                partialSpaceFile.createFolder();
+                // just a hint
+                partialSpaceFile.close();
+            } catch (FileSystemException x) {
+                logger.error("Could not initialize scratch space at: " + partialSpacePath);
+                throw x;
+            }
+            configured = true;
+            logger.info("Initialized node scratch space at: " + partialSpacePath);
+        } finally {
+            if (!configured)
+                fileSystemManager.close();
         }
-        configured = true;
-        logger.info("Initialized node scratch space at: " + partialSpacePath);
     }
 
     /**
@@ -232,28 +239,32 @@ public class NodeScratchSpace {
      * Removes initialized node-related files on finalization. If no other scratch data space
      * remains within this runtime, runtime-related files are also removed.
      * <p>
-     * Subsequent calls may result in undefined behavior.
+     * Subsequent calls may result in an undefined behavior.
      * 
-     * @throws FileSystemException
-     *             when VFS-level error occurred
      * @throws IllegalStateException
      *             when this instance is not initialized
      */
-    public synchronized void close() throws FileSystemException, IllegalStateException {
+    public synchronized void close() throws IllegalStateException {
+        logger.debug("Closing node scratch space");
         checkIfConfigured();
 
-        final FileObject fRuntime = partialSpaceFile.getParent();
-
         try {
+            final FileObject fRuntime = partialSpaceFile.getParent();
+
             // rm -r node
             partialSpaceFile.delete(Selectors.SELECT_ALL);
             // try to remove runtime file
             fRuntime.delete();
+
+            // it is probably not needed to close files if manager is closed, but with VFS you never know...
+            fRuntime.close();
+            partialSpaceFile.close();
+        } catch (FileSystemException x) {
+            ProActiveLogger.logEatedException(logger, "Could not close correctly node scratch space", x);
         } finally {
-            // TODO check if closing FileSystem is enough, i.e. we do not need to close each FileObject?
-            // it should be safer to do it?
             this.fileSystemManager.close();
         }
+        logger.info("Closed node scratch space");
     }
 
     private FileObject createEmptyDirectoryRelative(final FileObject parent, final String path)

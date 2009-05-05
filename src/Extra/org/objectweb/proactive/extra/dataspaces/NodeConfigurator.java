@@ -86,17 +86,12 @@ public class NodeConfigurator {
                     "Space configuration is not complete, no remote access URL provided");
             }
 
-            nodeScratchSpace = new NodeScratchSpace(node, baseScratchConfiguration);
-            try {
-                nodeScratchSpace.init();
-                configured = true;
-            } finally {
-                if (!configured) {
-                    // no need to close it as everything should be clean
-                    nodeScratchSpace = null;
-                }
-            }
+            final NodeScratchSpace configuringScratchSpace = new NodeScratchSpace(node,
+                baseScratchConfiguration);
+            configuringScratchSpace.init();
+            this.nodeScratchSpace = configuringScratchSpace;
         }
+        configured = true;
         logger.info("Node configured for Data Spaces");
     }
 
@@ -168,24 +163,21 @@ public class NodeConfigurator {
      * Closes all resources opened by this configurator, also possibly created application
      * configuration.
      * <p>
-     * More than one call of this method may result in undefined behavior. Any subsequent call to
-     * node configuration-specific objects may result in undefined behavior.
+     * Any subsequent call on node configuration-specific objects after calling this method may
+     * result in undefined behavior.
      * 
      * @throws IllegalStateException
-     *             when node has not been configured yet in terms of node-specific configuration
+     *             when node is not configured in terms of node-specific configuration
      */
     synchronized public void close() throws IllegalStateException {
         logger.debug("Closing Data Spaces node configuration");
         checkConfigured();
 
         tryCloseAppConfigurator();
-        try {
-            if (nodeScratchSpace != null) {
-                nodeScratchSpace.close();
-            }
-        } catch (FileSystemException e) {
-            ProActiveLogger.logEatedException(logger, "Could not close correctly node scratch space", e);
-        }
+        if (nodeScratchSpace != null)
+            nodeScratchSpace.close();
+        nodeScratchSpace = null;
+        configured = false;
         logger.info("Data Space node configuration closed, resources released");
     }
 
