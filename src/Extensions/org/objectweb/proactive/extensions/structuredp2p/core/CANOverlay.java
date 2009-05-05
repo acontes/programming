@@ -1,5 +1,7 @@
 package org.objectweb.proactive.extensions.structuredp2p.core;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Random;
 
@@ -46,7 +48,11 @@ public class CANOverlay extends StructuredOverlay {
     public static final int NB_DIMENSIONS = 4;
 
     /**
-     * Neighbors of the current area. The neighbors are an array of ProActive groups.
+     * Neighbors of the current area. The neighbors are an array of ProActive groups. It is a
+     * two-dimensional array of {@link org.objectweb.proactive.core.group.Group}. Each line
+     * corresponds to a dimension. The number of columns is always equal to two. The first column
+     * corresponds to the neighbors having a coordinate lower than the current pair on the given
+     * dimension. The second column is the reverse.
      */
     private final Group<Peer>[][] neighbors;
 
@@ -446,28 +452,83 @@ public class CANOverlay extends StructuredOverlay {
      * @return the response.
      */
     public EmptyResponseMessage handleLeaveMessage(LeaveMessage msg) {
-        LeaveMessage message = (LeaveMessage) msg;
+        LeaveMessage message = msg;
         this.removeNeighbor(message.getPeer());
 
         return new EmptyResponseMessage();
     }
 
     /**
-     * Returns the area which is managed by the overlay.
-     * 
-     * @return the area which is managed by the overlay.
-     */
-    public Area getArea() {
-        return this.area;
-    }
-
-    /**
-     * Returns the neighbors of the managed area.
+     * Returns the neighbors of the managed area with a certain organization. It returns a
+     * two-dimensional array of {@link org.objectweb.proactive.core.group.Group}. Each line
+     * corresponds to a dimension. The number of columns is always equal to two. The first column
+     * corresponds to the neighbors having a coordinate lower than the current pair on the given
+     * dimension. The second column is the reverse.
      * 
      * @return the neighbors of the managed area.
      */
     public Group<Peer>[][] getNeighbors() {
         return this.neighbors;
+    }
+
+    /**
+     * Returns the neighbors of the managed area as a {@link Collection} without any order.
+     * 
+     * @return the neighbors of the managed area as a {@link Collection} without any order.
+     */
+    public Collection<Peer> getNeighborsAsCollection() {
+        Collection<Peer> neighbors = new ArrayList<Peer>();
+
+        for (Group<Peer>[] neighborsAxe : this.neighbors) {
+            for (Group<Peer> neighborGroups : neighborsAxe) {
+                Iterator<Peer> it = neighborGroups.iterator();
+                while (it.hasNext()) {
+                    neighbors.add(it.next());
+                }
+            }
+        }
+
+        return neighbors;
+    }
+
+    /**
+     * Returns the neighbors of the managed area for the given dimension.
+     * 
+     * @param dim
+     *            the dimension to use (dimension start to 0 and max is defined by
+     *            {@link #NB_DIMENSIONS} - 1).
+     * @return the neighbors of the managed area for the given dimension.
+     */
+    public Group<Peer>[] getNeighborsForDimension(int dim) {
+        return this.neighbors[dim];
+    }
+
+    /**
+     * Returns the neighbors that have coordinates smaller than the current peer for the given
+     * dimension.
+     * 
+     * @param dim
+     *            the neighbors that have coordinates smaller than the current peer for the given
+     *            dimension. the dimension to use (dimension start to 0 and max is defined by
+     *            {@link #NB_DIMENSIONS} - 1).
+     * @return
+     */
+    public Group<Peer> getInferiorNeighborsForDimension(int dim) {
+        return this.neighbors[dim][0];
+    }
+
+    /**
+     * Returns the neighbors that have coordinates larger than the current peer for the given
+     * dimension.
+     * 
+     * @param dim
+     *            the dimension to use (dimension start to 0 and max is defined by
+     *            {@link #NB_DIMENSIONS} - 1).
+     * @return the neighbors that have coordinates larger than the current peer for the given
+     *         dimension.
+     */
+    public Group<Peer> getSuperiorNeighborsForDimension(int dim) {
+        return this.neighbors[dim][1];
     }
 
     /**
@@ -481,7 +542,16 @@ public class CANOverlay extends StructuredOverlay {
     }
 
     /**
-     * Set the new area covered.
+     * Returns the area which is managed by the overlay.
+     * 
+     * @return the area which is managed by the overlay.
+     */
+    public Area getArea() {
+        return this.area;
+    }
+
+    /**
+     * Sets the new area covered.
      * 
      * @param area
      *            the new area covered.
