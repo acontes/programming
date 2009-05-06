@@ -7,6 +7,9 @@ import java.util.Random;
 
 
 /**
+ * A tracker assists in the communication between peers. It is used in order to help a peer to join
+ * an existing network.
+ * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent
  * @author Trovato Alexandre
