@@ -65,7 +65,7 @@ public class Tracker implements Serializable {
                     }
                 }
             } catch (Exception e) {
-                // The remote peer we contact in order to join is died, so we retry with an anoter
+                // The remote peer we contact in order to join is died, so we retry with an another
                 this.remotePeers.remove(peerToJoin);
                 this.addOnNetwork(remotePeer);
             }
