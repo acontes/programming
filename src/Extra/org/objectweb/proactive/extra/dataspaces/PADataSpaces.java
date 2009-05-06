@@ -10,7 +10,6 @@ import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.extensions.webservices.soap.ProActiveProvider;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredException;
@@ -18,12 +17,19 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceAlreadyRegistere
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundException;
 
 
-// TODO mention that returned FileObject need to be closed explicitly
+// TODO we mention "expected to be readable/writable" - maybe we can verify it?
 /**
  * The ProActive Data Spaces API.
  * <p>
+ * The API provide ways to access existing data spaces and files within these data spaces, it also
+ * gives ability to define new data spaces. All operations performed through these API concern data
+ * spaces owned by caller's application, registered in this application Naming Service.
+ * <p>
  * Note that all <code>resolve*</code> method call might block for a while if there is a need to
- * mount a data space.
+ * mount a data space or request for access information. All these methods return FileObject
+ * instance, that should be closed by caller of this method.
+ * 
+ * @see FileObject
  */
 public class PADataSpaces {
 
@@ -31,89 +37,264 @@ public class PADataSpaces {
     }
 
     /**
-     * Returns file handle for the <i>default input data space</i>, as defined in application
-     * descriptor or dynamically set through API during application execution. Returned file handle
-     * can be directly used to perform operations on the file/directory, regardless of the
-     * underlying protocol.
+     * Returns file handle to the <i>default input data space</i>, as defined in application
+     * descriptor or dynamically set through API during application execution.
      * <p>
-     * Input is expected to be readable.
-     * </p>
+     * Returned file handle can be directly used to perform operations on the file/directory,
+     * regardless of the underlying protocol. Closing returned FileObject is a caller's
+     * responsibility.
+     * <p>
+     * Input data space content is expected to be readable from any node of this application if it
+     * was defined correctly. It is intended to provide any form of input to the application.
      * 
-     * @see {@link #resolveDefaultInputBlocking(long)}
-     * @return File handle for the default input data space
+     * @return file handle to the default input data space of caller's application
      * @throws SpaceNotFoundException
-     *             when no default input data space defined
+     *             when there is no default input data space defined
      * @throws FileSystemException
      *             indicates VFS related exception
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
+     * @see #resolveDefaultInputBlocking(long)
      */
-    public static FileObject resolveDefaultInput() throws FileSystemException, SpaceNotFoundException,
+    public static FileObject resolveDefaultInput() throws SpaceNotFoundException, FileSystemException,
             NotConfiguredException {
         return getMyDataSpacesImpl().resolveDefaultInputOutput(SpaceType.INPUT);
     }
 
     /**
-     * Returns file handle for the <i>default output data space</i>, as defined in application
-     * descriptor or dynamically set through API during application execution. Returned file handle
-     * can be directly used to perform operations on the file/directory, regardless of the
-     * underlying protocol.
+     * Returns file handle to the <i>default output data space</i>, as defined in application
+     * descriptor or dynamically set through API during application execution.
      * <p>
-     * Output is expected to be writable from any node. Writes synchronization is a developer’s
+     * Returned file handle can be directly used to perform operations on the file/directory,
+     * regardless of the underlying protocol. Closing returned FileObject is a caller's
      * responsibility.
-     * </p>
+     * <p>
+     * Output data space content is expected to be writable from any node of this application if it
+     * was defined correctly. It is intended to store globally any computation results. Writes
+     * synchronization is a developer’s responsibility.
      * 
-     * @see {@link #resolveDefaultOutputBlocking(long)}
-     * @return File handle for the default output data space
+     * @return file handle to the default output data space of caller's application
      * @throws SpaceNotFoundException
-     *             when no default input data space defined
+     *             when there is no default output data space defined
      * @throws FileSystemException
      *             indicates VFS related exception
-     * @throws SpaceNotFoundException
-     *             when no default output data space defined
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
+     * @see #resolveDefaultOutputBlocking(long)
      */
-    public static FileObject resolveDefaultOutput() throws FileSystemException, SpaceNotFoundException,
+    public static FileObject resolveDefaultOutput() throws SpaceNotFoundException, FileSystemException,
             NotConfiguredException {
         return getMyDataSpacesImpl().resolveDefaultInputOutput(SpaceType.OUTPUT);
     }
 
     /**
-     * Returns file handle for calling Active Object's <i>scratch data space</i>. If such a scratch
-     * has not existed before, it is created in its node scratch data space (as configured in
-     * deployment descriptor).
+     * Blocking version of {@link #resolveDefaultInput()} for a case when caller want to wait until
+     * default input is defined.
      * <p>
-     * Returned scratch is expected to be writable by this Active Object and readable by others.
-     * </p>
+     * This method is intended to provide simple (and possibly inefficient) way to synchronize input
+     * definition and usage. It repeatedly queries Data Spaces' Naming Service for default input
+     * space availability, so it blocks until default input is defined or specified timeout expires.
      * 
-     * @return
+     * @param timeoutMillis
+     *            timeout for blocking wait, in milliseconds
+     * @return file handle to the default input data space of caller's application
+     * @throws IllegalArgumentException
+     *             specified timeout is not positive integer
+     * @throws ProActiveTimeoutException
+     *             when timeout expired and space is still not available
      * @throws FileSystemException
      *             indicates VFS related exception
      * @throws NotConfiguredException
-     *             when scratch data space is not configured or caller's node is not configured for
-     *             Data Spaces application
+     *             when caller's node is not configured for Data Spaces application
+     * @see #resolveDefaultInput()
+     */
+    public static FileObject resolveDefaultInputBlocking(long timeoutMillis) throws IllegalArgumentException,
+            ProActiveTimeoutException, FileSystemException, NotConfiguredException {
+        return getMyDataSpacesImpl().resolveDefaultInputOutputBlocking(timeoutMillis, SpaceType.INPUT);
+    }
+
+    /**
+     * Blocking version of {@link #resolveDefaultOutput()} for a case when caller want to wait until
+     * default output is defined.
+     * <p>
+     * This method is intended to provide simple (and possibly inefficient) way to synchronize
+     * output definition and usage. It repeatedly queries Data Spaces' Naming Service for default
+     * output space availability, so it blocks until default output is defined or specified timeout
+     * expires.
+     * 
+     * @param timeoutMillis
+     *            timeout for blocking wait, in milliseconds
+     * @return file handle to the default output data space of caller's application
+     * @throws IllegalArgumentException
+     *             specified timeout is not positive integer
+     * @throws ProActiveTimeoutException
+     *             when timeout expired and space is still not available
+     * @throws FileSystemException
+     *             indicates VFS related exception
+     * @throws NotConfiguredException
+     *             when caller's node is not configured for Data Spaces application
+     */
+    public static FileObject resolveDefaultOutputBlocking(long timeoutMillis)
+            throws IllegalArgumentException, ProActiveTimeoutException, FileSystemException,
+            NotConfiguredException {
+        return getMyDataSpacesImpl().resolveDefaultInputOutputBlocking(timeoutMillis, SpaceType.OUTPUT);
+    }
+
+    /**
+     * Returns file handle to the <i>input data space</i> with specific name, as defined in
+     * application descriptor or dynamically set through API during application execution.
+     * <p>
+     * Returned file handle can be directly used to perform operations on the file/directory,
+     * regardless of the underlying protocol. Closing returned FileObject is a caller's
+     * responsibility.
+     * <p>
+     * Input data space content is expected to be readable from any node of this application if it
+     * was defined correctly. It is intended to provide any form of input to the application.
+     * 
+     * @param name
+     *            name of an input data space to resolve
+     * @return file handle to the input data space with provided name, for caller's application
+     * @throws SpaceNotFoundException
+     *             when there is no input data space defined with specified name
+     * @throws FileSystemException
+     *             indicates VFS related exception
+     * @throws NotConfiguredException
+     *             when caller's node is not configured for Data Spaces application
+     * @see #resolveInputBlocking(long)
+     */
+    public static FileObject resolveInput(String name) throws SpaceNotFoundException, FileSystemException,
+            NotConfiguredException {
+        return getMyDataSpacesImpl().resolveInputOutput(name, SpaceType.INPUT);
+    }
+
+    /**
+     * Returns file handle to the <i>output data space</i> with specific name, as defined in
+     * application descriptor or dynamically set through API during application execution.
+     * <p>
+     * Returned file handle can be directly used to perform operations on the file/directory,
+     * regardless of the underlying protocol. Closing returned FileObject is a caller's
+     * responsibility.
+     * <p>
+     * Output data space content is expected to be writable from any node of this application if it
+     * was defined correctly. It is intended to store globally any computation results. Writes
+     * synchronization is a developer’s responsibility.
+     * 
+     * @param name
+     *            name of an output data space to resolve
+     * @return file handle to the output data space with provided name, for caller's application
+     * @throws SpaceNotFoundException
+     *             when there is no output data space defined with specified name
+     * @throws FileSystemException
+     *             indicates VFS related exception
+     * @throws NotConfiguredException
+     *             when caller's node is not configured for Data Spaces application
+     * @see #resolveOutputBlocking(long)
+     */
+    public static FileObject resolveOutput(String name) throws SpaceNotFoundException, FileSystemException,
+            NotConfiguredException {
+        return getMyDataSpacesImpl().resolveInputOutput(name, SpaceType.OUTPUT);
+    }
+
+    /**
+     * Blocking version of {@link #resolveInput()} for a case when caller want to wait until input
+     * with specific name is defined.
+     * <p>
+     * This method is intended to provide simple (and possibly inefficient) way to synchronize input
+     * definition and usage. It repeatedly queries Data Spaces' Naming Service for input space with
+     * a specific name availability, so it blocks until this input is defined or specified timeout
+     * expires.
+     * 
+     * @param name
+     *            name of an input data space to resolve
+     * @param timeoutMillis
+     *            timeout for blocking wait, in milliseconds
+     * @return file handle to the input data space with specified name, for caller's application
+     * @throws IllegalArgumentException
+     *             specified timeout is not positive integer
+     * @throws ProActiveTimeoutException
+     *             when timeout expired and space is still not available
+     * @throws FileSystemException
+     *             indicates VFS related exception
+     * @throws NotConfiguredException
+     *             when caller's node is not configured for Data Spaces application
+     * @see #resolveInput()
+     */
+    public static FileObject resolveInputBlocking(String name, long timeoutMillis)
+            throws IllegalArgumentException, ProActiveTimeoutException, FileSystemException,
+            NotConfiguredException {
+        return getMyDataSpacesImpl().resolveInputOutputBlocking(name, timeoutMillis, SpaceType.INPUT);
+    }
+
+    /**
+     * Blocking version of {@link #resolveOutput()} for a case when caller want to wait until output
+     * with specific name is defined.
+     * <p>
+     * This method is intended to provide simple (and possibly inefficient) way to synchronize
+     * output definition and usage. It repeatedly queries Data Spaces' Naming Service for output
+     * space with a specific name availability, so it blocks until this output is defined or
+     * specified timeout expires.
+     * 
+     * @param name
+     *            name of an output data space to resolve
+     * @param timeoutMillis
+     *            timeout for blocking wait, in milliseconds
+     * @return file handle to the output data space with specified name, for caller's application
+     * @throws IllegalArgumentException
+     *             specified timeout is not positive integer
+     * @throws ProActiveTimeoutException
+     *             when timeout expired and space is still not available
+     * @throws FileSystemException
+     *             indicates VFS related exception
+     * @throws NotConfiguredException
+     *             when caller's node is not configured for Data Spaces application
+     * @see #resolveOutput()
+     */
+    public static FileObject resolveOutputBlocking(String name, long timeoutMillis)
+            throws IllegalArgumentException, ProActiveTimeoutException, FileSystemException,
+            NotConfiguredException {
+        return getMyDataSpacesImpl().resolveInputOutputBlocking(name, timeoutMillis, SpaceType.OUTPUT);
+    }
+
+    /**
+     * Returns file handle to calling Active Object's <i>scratch data space</i>. If such a scratch
+     * has not existed before, it is created in its node scratch data space (as configured for a
+     * node, usually in deployment descriptor).
+     * <p>
+     * Returned file handle can be directly used to perform operations on the file/directory,
+     * regardless of the underlying protocol. Closing returned FileObject is a caller's
+     * responsibility.
+     * <p>
+     * Returned scratch is expected to be writable by this Active Object and readable by other
+     * Active Objects of this application, if it was defined correctly. It is intended to store any
+     * temporary results of computation and possibly share them with other Active Objects. These
+     * results will be most probably automatically removed after application terminates.
+     * 
+     * @return file handle to the scratch for calling Active Object
+     * @throws FileSystemException
+     *             indicates VFS related exception
+     * @throws NotConfiguredException
+     *             when scratch data space is not configured on caller's node or this node is not
+     *             configured for Data Spaces application at all
      */
     public static FileObject resolveScratchForAO() throws FileSystemException, NotConfiguredException {
-
         return getMyDataSpacesImpl().resolveScratchForAO();
     }
 
     /**
-     * Returns names of every registered <i>input data space</i> known at time this method is
-     * executed.
+     * Returns names of every registered <i>input data spaces</i> for caller's application known at
+     * time this method is called.
      * <p>
      * If inputs are available at static application descriptor, every name is guaranteed to be
      * returned. Any other input's name that was successfully defined by
-     * {@link #addInput(String, String, String)} method call (that locally precedes this call or
-     * precedes it in a global real-time), is also returned.
-     * </p>
+     * {@link #addInput(String, String, String)} or {@link #addDefaultInput(String, String)} methods
+     * call (that locally precedes this call or precedes it in a global real-time), is also
+     * returned.
      * <p>
-     * This method doesn’t cause inputs to be mounted, i.e. it doesn’t cause local VFS view to be
+     * This method does not cause intputs to be mounted, i.e. it doesn’t cause local VFS view to be
      * refreshed.
-     * </p>
      * 
-     * @return all names of inputs defined before the moment of this call
+     * @return set of all names of inputs defined for caller's application before the moment of this
+     *         call; default input name is denoted as {@value DataSpacesURI#DEFAULT_IN_OUT_NAME}
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
      */
@@ -122,20 +303,21 @@ public class PADataSpaces {
     }
 
     /**
-     * Returns names of every registered <i>output data space</i> known at time this method is
-     * executed.
+     * Returns names of every registered <i>output data spaces</i> for caller's application known at
+     * time this method is called.
      * <p>
      * If outputs are available at static application descriptor, every name is guaranteed to be
      * returned. Any other output's name that was successfully defined by
-     * {@link #addOutput(String, String, String)} method call (that locally precedes this call or
-     * precedes it in a global real-time), is also returned.
-     * </p>
+     * {@link #addOutput(String, String, String)} or {@link #addDefaultOutput(String, String)}
+     * methods call (that locally precedes this call or precedes it in a global real-time), is also
+     * returned.
      * <p>
-     * This method doesn’t cause outputs to be mounted, i.e. it doesn’t cause local VFS view to be
+     * This method does not cause outputs to be mounted, i.e. it doesn’t cause local VFS view to be
      * refreshed.
-     * </p>
      * 
-     * @return all names of outputs defined before the moment of this call
+     * @return set of all names of outputs defined for caller's application before the moment of
+     *         this call; default input name is denoted as
+     *         {@value DataSpacesURI#DEFAULT_IN_OUT_NAME}
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
      */
@@ -144,19 +326,31 @@ public class PADataSpaces {
     }
 
     /**
-     * Returns mapping of input names to file handles for every <i>input data space</i> known at
-     * this time. Every input is mounted in result of this call, i.e. it does refresh local VFS
-     * view.
+     * Returns mapping of input names to file handles to every <i>input data space</i> of caller's
+     * application known at this time.
      * <p>
-     * Returned input handles are expected to be readable.
-     * </p>
+     * If inputs are available at static application descriptor, every of such input is guaranteed
+     * to be returned. Any other input's name that was successfully defined by
+     * {@link #addInput(String, String, String)} or {@link #addDefaultInput(String, String)} methods
+     * call (that locally precedes this call or precedes it in a global real-time), is also
+     * returned.
+     * <p>
+     * Returned file handles can be directly used to perform operations on the file/directory,
+     * regardless of the underlying protocol. Every input is mounted in result of this call, i.e. it
+     * does refresh local VFS view. Closing returned FileObjects is a caller's responsibility.
+     * <p>
+     * Input data spaces content is expected to be readable from any node of this application if it
+     * was defined correctly. It is intended to provide any form of input to the application. Names
+     * of input spaces are application-level contract.
      * 
-     * @see {@link #getAllKnownInputNames()}
-     * @return
+     * @return map of all names of inputs defined for caller's application before the moment of this
+     *         call to file handles to these inputs; default input name is denoted as
+     *         {@value DataSpacesURI#DEFAULT_IN_OUT_NAME}
      * @throws FileSystemException
      *             indicates VFS related exception
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
+     * @see #getAllKnownInputNames()
      */
     public static Map<String, FileObject> resolveAllKnownInputs() throws FileSystemException,
             NotConfiguredException {
@@ -164,20 +358,31 @@ public class PADataSpaces {
     }
 
     /**
-     * Returns mapping of output names to file handles for every <i>output data space</i> known at
-     * this time. Every output is mounted in result of this call, i.e. it does refresh local VFS
-     * view.
+     * Returns mapping of output names to file handles to every <i>output data space</i> of caller's
+     * application known at this time.
      * <p>
-     * Returned output handles are expected to be writable. Writes synchronization is a developer’s
-     * responsibility.
-     * </p>
+     * If outputs are available at static application descriptor, every of such output is guaranteed
+     * to be returned. Any other output's name that was successfully defined by
+     * {@link #addOutput(String, String, String)} or {@link #addDefaultOutput(String, String)}
+     * methods call (that locally precedes this call or precedes it in a global real-time), is also
+     * returned.
+     * <p>
+     * Returned file handles can be directly used to perform operations on the file/directory,
+     * regardless of the underlying protocol. Every output is mounted in result of this call, i.e.
+     * it does refresh local VFS view. Closing returned FileObjects is a caller's responsibility.
+     * <p>
+     * Output data spaces content is expected to be readable from any node of this application if it
+     * was defined correctly. It is intended to provide any form of output to the application. Names
+     * of output spaces are application-level contract.
      * 
-     * @see {@link #getAllKnownInputNames()}
-     * @return
+     * @return map of all names of outputs defined for caller's application before the moment of
+     *         this call to file handles to these outputs; default output name is denoted as
+     *         {@value DataSpacesURI#DEFAULT_IN_OUT_NAME}
      * @throws FileSystemException
      *             indicates VFS related exception
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
+     * @see #getAllKnownOutputNames()
      */
     public static Map<String, FileObject> resolveAllKnownOutputs() throws FileSystemException,
             NotConfiguredException {
@@ -185,72 +390,36 @@ public class PADataSpaces {
     }
 
     /**
-     * <p>
-     * Blocking version of {@link #resolveDefaultInput()} for a case when no default input is
-     * defined. Method blocks until default input is defined or timeout expires.
-     * </p>
-     * 
-     * @param timeoutMillis
-     * @return File handle for the default input data space
-     * @throws FileSystemException
-     *             indicates VFS related exception
-     * @throws IllegalArgumentException
-     *             specified timeout is not positive integer
-     * @throws ProActiveTimeoutException
-     * @throws NotConfiguredException
-     *             when caller's node is not configured for Data Spaces application
-     */
-    public static FileObject resolveDefaultInputBlocking(long timeoutMillis) throws IllegalArgumentException,
-            FileSystemException, ProActiveTimeoutException, NotConfiguredException {
-
-        return getMyDataSpacesImpl().resolveDefaultInputOutputBlocking(timeoutMillis, SpaceType.INPUT);
-    }
-
-    /**
-     * Blocking version of {@link #resolveDefaultOutput()} for a case when no default output is
-     * defined. Method blocks until default input is defined or timeout expires.
-     * 
-     * @param timeoutMillis
-     * @return File handle for the default output data space
-     * @throws FileSystemException
-     *             indicates VFS related exception
-     * @throws IllegalArgumentException
-     *             specified timeout is not positive integer
-     * @throws ProActiveTimeoutException
-     * @throws NotConfiguredException
-     *             when caller's node is not configured for Data Spaces application
-     */
-    public static FileObject resolveDefaultOutputBlocking(long timeoutMillis)
-            throws IllegalArgumentException, FileSystemException, ProActiveTimeoutException,
-            NotConfiguredException {
-
-        return getMyDataSpacesImpl().resolveDefaultInputOutputBlocking(timeoutMillis, SpaceType.OUTPUT);
-    }
-
-    /**
-     * Returns file handle for any valid URI within an existing data space in the application
+     * Returns file handle pointed by any valid URI within an existing data space in the application
      * (another AO’s scratch, input or output).
      * <p>
+     * Returned file handle can be directly used to perform operations on the file/directory,
+     * regardless of the underlying protocol. Closing returned FileObject is a caller's
+     * responsibility.
+     * <p>
      * Returned file handle should be readable, but not necessarily writable. This kind of
-     * capabilities checking is caller’s responsibility or it can be implied from a objects contract
-     * (e.g. data space type of a URI being passed is known).
-     * </p>
+     * capabilities checking is caller’s responsibility or it can be implied from a calling objects
+     * contract (e.g. data space type of a URI being passed is known).
+     * <p>
+     * Note that URI from another application should work if passed here if both application share
+     * some lifecycle period and they are configured to use the same Naming Service.
      * 
      * @param uri
-     *            valid URI within an existing data space
+     *            valid URI within an existing data space, as returned by
+     *            {@link #getURI(FileObject)}
      * @return handle for specified file
      * @throws MalformedURIException
      *             passed URI is invalid or not complete
-     * @throws FileSystemException
-     *             indicates VFS related exception
      * @throws SpaceNotFoundException
      *             specified URI points to invalid data space
+     * @throws FileSystemException
+     *             indicates VFS related exception
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
+     * @see #getURI(FileObject)
      */
-    public static FileObject resolveFile(String uri) throws FileSystemException, MalformedURIException,
-            SpaceNotFoundException, NotConfiguredException {
-
+    public static FileObject resolveFile(String uri) throws MalformedURIException, SpaceNotFoundException,
+            FileSystemException, NotConfiguredException {
         return getMyDataSpacesImpl().resolveFile(uri);
     }
 
@@ -258,179 +427,165 @@ public class PADataSpaces {
      * Returns URI for a given {@link FileObject}. URI remains valid in the whole application, hence
      * it can be passed to another AO and resolved there.
      * 
-     * @see {@link #resolveFile(String)}
      * @param fileObject
      * @return valid URI for specified file object
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
+     * @see {@link #resolveFile(String)}
      */
     public static String getURI(FileObject fileObject) throws NotConfiguredException {
         return getMyDataSpacesImpl().getURI(fileObject);
     }
 
     /**
-     * Returns file handle for an <i>input data space</i> with specific name. In the case of no
-     * input defined with that name, an exception is thrown.
+     * Adds <i>default input data space</i> definition, during the application execution.
      * <p>
-     * Returned input is expected to be readable.
+     * Input must have a global access URL defined, that is used to access this data space from
+     * remote nodes. Local (to caller's node) absolute access path may be used, to achieve better
+     * performance by accessing data locally on this node. Provided remote and local access ways
+     * should guarantee that input is readable from any node, Active Object.
      * <p>
+     * Returned URI of a created input data space can be safely passed to another Active Object of
+     * this application. It can be also safely access by {@link #resolveDefaultInput()} or
+     * {@link #resolveDefaultInputBlocking(long)} by any other Active Object after this method
+     * returns.
      * 
-     * @param name
-     *            of an input data space to resolve
-     * @return file handle of resolved data space
-     * @throws FileSystemException
-     *             indicates VFS related exception
-     * @throws SpaceNotFoundException
-     *             when there is no input data space with specified name
-     * @throws NotConfiguredException
-     *             when caller's node is not configured for Data Spaces application
-     */
-    public static FileObject resolveInput(String name) throws FileSystemException, SpaceNotFoundException,
-            NotConfiguredException {
-        return getMyDataSpacesImpl().resolveInputOutput(name, SpaceType.INPUT);
-    }
-
-    /**
-     * Returns file handle for an <i>output data space</i> with specific name. In the case of no
-     * output defined with that name, an exception is thrown.
-     * <p>
-     * Returned output is expected to be writable. Writes synchronization is a developer’s
-     * responsibility.
-     * </p>
-     * 
-     * @param name
-     *            of an output data space to resolve
-     * @return file handle of resolved data space
-     * @throws FileSystemException
-     *             indicates VFS related exception
-     * @throws SpaceNotFoundException
-     *             when there is no output data space with specified name
-     * @throws NotConfiguredException
-     *             when caller's node is not configured for Data Spaces application
-     */
-    public static FileObject resolveOutput(String name) throws FileSystemException, SpaceNotFoundException,
-            NotConfiguredException {
-        return getMyDataSpacesImpl().resolveInputOutput(name, SpaceType.OUTPUT);
-    }
-
-    /**
-     * Blocking version of {@link #resolveInput(String)} for a case when no input is defined with
-     * specified name. Method blocks until input with specified name is defined or timeout expires.
-     * 
-     * @param name
-     *            of an input data space to resolve
-     * @param timeoutMillis
-     * @return File handle for the input data space with specified name
-     * @throws FileSystemException
-     *             indicates VFS related exception
-     * @throws IllegalArgumentException
-     *             specified timeout is not positive integer
-     * @throws ProActiveTimeoutException
-     * @throws NotConfiguredException
-     *             when caller's node is not configured for Data Spaces application
-     */
-    public static FileObject resolveInputBlocking(String name, long timeoutMillis)
-            throws FileSystemException, IllegalArgumentException, ProActiveTimeoutException,
-            NotConfiguredException {
-
-        return getMyDataSpacesImpl().resolveInputOutputBlocking(name, timeoutMillis, SpaceType.INPUT);
-    }
-
-    /**
-     * Blocking version of {@link #resolveOutput(String)} for a case when no output is defined with
-     * specified name. Method blocks until output with specified name is defined or timeout expires.
-     * 
-     * @param name
-     *            of an output data space to resolve
-     * @param timeoutMillis
-     * @return File handle for the output data space with specified name
-     * @throws FileSystemException
-     *             indicates VFS related exception
-     * @throws IllegalArgumentException
-     *             specified timeout is not positive integer
-     * @throws ProActiveTimeoutException
-     * @throws NotConfiguredException
-     *             when caller's node is not configured for Data Spaces application
-     */
-    public static FileObject resolveOutputBlocking(String name, long timeoutMillis)
-            throws FileSystemException, IllegalArgumentException, ProActiveTimeoutException,
-            NotConfiguredException {
-
-        return getMyDataSpacesImpl().resolveInputOutputBlocking(name, timeoutMillis, SpaceType.OUTPUT);
-    }
-
-    /**
-     * Adds <i>input data space</i> definition with a provided name during the application
-     * execution. Input <b>name</b> must be unique for the application. Input with empty,
-     * <code>null</code> or <code>"default"</code> name parameter becomes the application's default
-     * input data space.
-     * <p>
-     * Input must have a local path and/or global access URL defied:
-     * <ul>
-     * <li>
-     * In the case of path-based local-only access defined, data space is exposed for remote access
-     * through VFS {@link ProActiveProvider}. <b>Path</b> given for a local access is resolved in
-     * the context of a caller’s node's local file system.</li>
-     * <li>
-     * In case of remote access defined through <b>URL</b>, local access definition is optional, it
-     * may be used internally only due to performance reasons.</li>
-     * </ul>
-     * Returned URI of a created input data space can be safely passed to another Active Object.
-     * Given input name (which might be constant in code) can also be safely used by any other
-     * Active Object after this method returns.
-     * 
-     * @param name
-     * @param path
      * @param url
+     *            Access URL to this space, used for accessing data from remote nodes. URL defines
+     *            which protocol is used to access the data from remote node, and some additional
+     *            information for protocol like path, sometimes user name and password.
+     * @param path
+     *            Local path to access input data. This path is local to caller's host. May be
+     *            <code>null</code> if there is no local access.
      * @return URI of a created input data space
-     * @throws SpaceAlreadyRegisteredException
-     *             if any input with specified name has been already registered
-     * @throws NotConfiguredException
-     *             when caller's node is not configured for Data Spaces application
      * @throws ConfigurationException
      *             when specified configuration is wrong or not sufficient
+     * @throws SpaceAlreadyRegisteredException
+     *             if default input has been already registered for this application
+     * @throws NotConfiguredException
+     *             when caller's node is not configured for Data Spaces application
+     * @see #resolveDefaultInput()
+     * @see #resolveDefaultInputBlocking(long)
      */
-    public static String addInput(String name, String path, String url)
-            throws SpaceAlreadyRegisteredException, NotConfiguredException, ConfigurationException {
-
-        return getMyDataSpacesImpl().addInputOutput(name, path, url, SpaceType.INPUT);
+    public static String addDefaultInput(String url, String path) throws ConfigurationException,
+            SpaceAlreadyRegisteredException, NotConfiguredException {
+        return getMyDataSpacesImpl().addDefaultInputOutput(url, path, SpaceType.INPUT);
     }
 
     /**
-     * Adds <i>output data space</i> definition with a provided name during the application
-     * execution. Output <b>name</b> must be unique for the application. Output with empty,
-     * <code>null</code> or <code>"default"</code> name parameter becomes the application's default
-     * output data space.
+     * Adds <i>default output data space</i> definition, during the application execution.
      * <p>
-     * Output must have a local path and/or global access URL defied:
-     * <ul>
-     * <li>
-     * In the case of path-based local-only access defined, data space is exposed for remote access
-     * through VFS {@link ProActiveProvider}. <b>Path</b> given for a local access is resolved in
-     * the context of a caller’s node's local file system.</li>
-     * <li>
-     * In case of remote access defined through <b>URL</b>, local access definition is optional, it
-     * may be used internally only due to performance reasons.</li>
-     * </ul>
-     * Returned URI of a created output data space can be safely passed to another Active Object.
-     * Given output name (which might be constant in code) can also be safely used by any other
-     * Active Object after this method returns.
+     * Output must have a global access URL defined, that is used to access this data space from
+     * remote nodes. Local (to caller's node) absolute access path may be used, to achieve better
+     * performance by accessing data locally on this node. Provided remote and local access ways
+     * should guarantee that output is readable from any node, Active Object.
+     * <p>
+     * Returned URI of a created output data space can be safely passed to another Active Object of
+     * this application. It can be also safely access by {@link #resolveDefaultOutput()} or
+     * {@link #resolveDefaultOutputBlocking(long)} by any other Active Object after this method
+     * returns.
      * 
-     * @param name
-     * @param path
      * @param url
+     *            Access URL to this space, used for accessing data from remote nodes. URL defines
+     *            which protocol is used to access the data from remote node, and some additional
+     *            information for protocol like path, sometimes user name and password.
+     * @param path
+     *            Local path to access output data. This path is local to caller's host. May be
+     *            <code>null</code> if there is no local access.
      * @return URI of a created output data space
-     * @throws SpaceAlreadyRegisteredException
-     *             if any input with specified name has been already registered
-     * @throws NotConfiguredException
-     *             when caller's node is not configured for Data Spaces application
      * @throws ConfigurationException
      *             when specified configuration is wrong or not sufficient
+     * @throws SpaceAlreadyRegisteredException
+     *             if default output has been already registered for this application
+     * @throws NotConfiguredException
+     *             when caller's node is not configured for Data Spaces application
+     * @see #resolveDefaultOutput()
+     * @see #resolveDefaultOutputBlocking(long)
      */
-    public static String addOutput(String name, String path, String url)
-            throws SpaceAlreadyRegisteredException, NotConfiguredException, ConfigurationException {
+    public static String addDefaultOutput(String url, String path) throws ConfigurationException,
+            SpaceAlreadyRegisteredException, NotConfiguredException {
+        return getMyDataSpacesImpl().addDefaultInputOutput(url, path, SpaceType.OUTPUT);
+    }
 
-        return getMyDataSpacesImpl().addInputOutput(name, path, url, SpaceType.OUTPUT);
+    /**
+     * Adds <i>input data space</i> definition with a provided name, during the application
+     * execution.
+     * <p>
+     * Input <b>name</b> must be unique for the application, while name
+     * {@value DataSpacesURI#DEFAULT_IN_OUT_NAME} is reserved for default input space.
+     * <p>
+     * Input must have a global access URL defined, that is used to access this data space from
+     * remote nodes. Local (to caller's node) absolute access path may be used, to achieve better
+     * performance by accessing data locally on this node. Provided remote and local access ways
+     * should guarantee that input is readable from any node, Active Object.
+     * <p>
+     * Returned URI of a created input data space can be safely passed to another Active Object of
+     * this application. Given input name (which might be constant in code) can also be safely used
+     * by any other Active Object after this method returns.
+     * 
+     * @param name
+     *            name of defined input, contract of application; can not be empty or contain
+     *            slashes '/'; default input name is reserved, denoted as
+     *            {@value DataSpacesURI#DEFAULT_IN_OUT_NAME}
+     * @param url
+     *            Access URL to this space, used for accessing data from remote nodes. URL defines
+     *            which protocol is used to access the data from remote node, and some additional
+     *            information for protocol like path, sometimes user name and password.
+     * @param path
+     *            Local path to access input data. This path is local to caller's host. May be
+     *            <code>null</code> if there is no local access.
+     * @return URI of a created input data space
+     * @throws ConfigurationException
+     *             when specified configuration is wrong or not sufficient
+     * @throws SpaceAlreadyRegisteredException
+     *             if any input with specified name has been already registered for this application
+     * @throws NotConfiguredException
+     *             when caller's node is not configured for Data Spaces application
+     */
+    public static String addInput(String name, String url, String path) throws ConfigurationException,
+            SpaceAlreadyRegisteredException, NotConfiguredException {
+        return getMyDataSpacesImpl().addInputOutput(name, url, path, SpaceType.INPUT);
+    }
+
+    /**
+     * Adds <i>output data space</i> definition with a provided name, during the application
+     * execution.
+     * <p>
+     * Output <b>name</b> must be unique for the application, while name
+     * {@value DataSpacesURI#DEFAULT_IN_OUT_NAME} is reserved for default output space.
+     * <p>
+     * Output must have a global access URL defined, that is used to access this data space from
+     * remote nodes. Local (to caller's node) absolute access path may be used, to achieve better
+     * performance by accessing data locally on this node. Provided remote and local access ways
+     * should guarantee that output is writable from any node, Active Object.
+     * <p>
+     * Returned URI of a created output data space can be safely passed to another Active Object of
+     * this application. Given output name (which might be constant in code) can also be safely used
+     * by any other Active Object after this method returns.
+     * 
+     * @param name
+     *            name of defined output, contract of application; can not be empty or contain
+     *            slashes '/'; default output name is reserved, denoted as
+     *            {@value DataSpacesURI#DEFAULT_IN_OUT_NAME}
+     * @param url
+     *            Access URL to this space, used for accessing data from remote nodes. URL defines
+     *            which protocol is used to access the data from remote node, and some additional
+     *            information for protocol like path, sometimes user name and password.
+     * @param path
+     *            Local path to access output data. This path is local to caller's host. May be
+     *            <code>null</code> if there is no local access.
+     * @return URI of a created output data space
+     * @throws ConfigurationException
+     *             when specified configuration is wrong or not sufficient
+     * @throws SpaceAlreadyRegisteredException
+     *             if any output with specified name has been already registered for this
+     *             application
+     * @throws NotConfiguredException
+     *             when caller's node is not configured for Data Spaces application
+     */
+    public static String addOutput(String name, String url, String path)
+            throws SpaceAlreadyRegisteredException, NotConfiguredException, ConfigurationException {
+        return getMyDataSpacesImpl().addInputOutput(name, url, path, SpaceType.OUTPUT);
     }
 
     private static DataSpacesImpl getMyDataSpacesImpl() throws NotConfiguredException {

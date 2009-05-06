@@ -27,11 +27,11 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.WrongApplicationIdExc
 
 
 /**
- * Implements PADataSpaces API for a pair of node and application.
+ * Implements {@link PADataSpaces} API for a pair of node and application.
  * <p>
  * Instances of this class are thread-safe. Each instance for given node and application should
- * remain valid as long as this node has Data Spaces configured, for this application. Therefore,
- * instances of this class are typically managed by {@link NodeConfigurator} and
+ * remain valid as long as this node has Data Spaces configured, for this application. For that
+ * reason, instances of this class are typically managed by {@link NodeConfigurator} and
  * {@link DataSpacesNodes} classes.
  */
 public class DataSpacesImpl {
@@ -57,6 +57,20 @@ public class DataSpacesImpl {
 
     private final long appId;
 
+    /**
+     * Create Data Spaces implementation instance. It remains valid as provided services remain
+     * valid.
+     * 
+     * @param node
+     *            node configured for Data Spaces application
+     * @param smm
+     *            spaces mount manager for this application
+     * @param sd
+     *            spaces directory for this application
+     * @param ass
+     *            application scratch space for this application; may be <code>null</code> if not
+     *            available
+     */
     public DataSpacesImpl(Node node, SpacesMountManager smm, SpacesDirectory sd, ApplicationScratchSpace ass) {
         appScratchSpace = ass;
         spacesDirectory = sd;
@@ -71,10 +85,8 @@ public class DataSpacesImpl {
      * @see {@link PADataSpaces#resolveDefaultOutput()}
      * @return FileObject received from SpacesMountManager instance
      * @throws IllegalArgumentException
-     *             when specified space type is neither input nor output
      * @throws FileSystemException
      * @throws SpaceNotFoundException
-     *             indicates VFS related exception
      */
     public FileObject resolveDefaultInputOutput(SpaceType type) throws IllegalArgumentException,
             FileSystemException, SpaceNotFoundException {
@@ -92,8 +104,6 @@ public class DataSpacesImpl {
      * @return
      * @throws FileSystemException
      * @throws IllegalArgumentException
-     *             when specified space type is neither input nor output or specified timeout is not
-     *             positive integer
      * @throws ProActiveTimeoutException
      */
     public FileObject resolveDefaultInputOutputBlocking(long timeoutMillis, SpaceType type)
@@ -106,18 +116,15 @@ public class DataSpacesImpl {
      * 
      * @see {@link PADataSpaces#resolveInput(String)}
      * @see {@link PADataSpaces#resolveOutput(String)}
-     * 
      * @param name
      * @param type
      * @return
      * @throws FileSystemException
      * @throws IllegalArgumentException
-     *             when specified space type is neither input nor output
      * @throws SpaceNotFoundException
      */
     public FileObject resolveInputOutput(String name, SpaceType type) throws FileSystemException,
             IllegalArgumentException, SpaceNotFoundException {
-
         checkIsInputOrOutput(type);
         checkIsNotNullName(name);
         final DataSpacesURI uri = DataSpacesURI.createInOutSpaceURI(appId, type, name);
@@ -136,18 +143,14 @@ public class DataSpacesImpl {
      * @return
      * @throws FileSystemException
      * @throws IllegalArgumentException
-     *             when specified space type is neither input nor output or specified timeout is not
-     *             positive integer
      * @throws ProActiveTimeoutException
      */
     public FileObject resolveInputOutputBlocking(String name, long timeoutMillis, SpaceType type)
             throws FileSystemException, IllegalArgumentException, ProActiveTimeoutException {
-
         checkIsInputOrOutput(type);
         checkIsNotNullName(name);
         if (timeoutMillis < 1)
             throw new IllegalArgumentException("Specified timeout should be positive integer");
-
         final DataSpacesURI uri = DataSpacesURI.createInOutSpaceURI(appId, type, name);
 
         final long startTime = System.currentTimeMillis();
@@ -172,13 +175,11 @@ public class DataSpacesImpl {
 
     /**
      * @see {@link PADataSpaces#resolveScratchForAO()}
-     * @return FileObject received from SpacesMountManager instance
+     * @return
      * @throws FileSystemException
      * @throws NotConfiguredException
-     *             when scratch is not configured
      */
     public FileObject resolveScratchForAO() throws FileSystemException, NotConfiguredException {
-
         if (appScratchSpace == null)
             throw new NotConfiguredException("Scratch data space not configured on this node");
 
@@ -197,13 +198,9 @@ public class DataSpacesImpl {
      * 
      * @see {@link PADataSpaces#getAllKnownInputNames()}
      * @see {@link PADataSpaces#getAllKnownOutputNames()}
-     * @see {@link SpacesDirectory#lookupMany(DataSpacesURI)}
-     * 
      * @param type
-     *            of data spaces (input or output)
      * @return set of known names
      * @throws IllegalArgumentException
-     *             when specified space type is neither input nor output
      */
     public Set<String> getAllKnownInputOutputNames(SpaceType type) throws IllegalArgumentException {
         checkIsInputOrOutput(type);
@@ -227,12 +224,11 @@ public class DataSpacesImpl {
      * @return
      * @throws FileSystemException
      * @throws IllegalArgumentException
-     *             when specified space type is neither input nor output
      */
     public Map<String, FileObject> resolveAllKnownInputsOutputs(SpaceType type) throws FileSystemException,
             IllegalArgumentException {
-
         checkIsInputOrOutput(type);
+
         final DataSpacesURI uri = DataSpacesURI.createURI(appId, type);
         final Map<DataSpacesURI, FileObject> spaces = spacesMountManager.resolveSpaces(uri);
         final Map<String, FileObject> ret = new HashMap<String, FileObject>(spaces.size());
@@ -254,9 +250,7 @@ public class DataSpacesImpl {
      */
     public FileObject resolveFile(String uri) throws MalformedURIException, FileSystemException,
             SpaceNotFoundException {
-
         final DataSpacesURI spaceURI = DataSpacesURI.parseURI(uri);
-
         if (!spaceURI.isComplete())
             throw new MalformedURIException("Specified URI must be complete");
 
@@ -272,9 +266,22 @@ public class DataSpacesImpl {
         return fileObject.getName().getURI();
     }
 
-    public String addDefaultInputOutput(String name, String path, String url, SpaceType type)
+    /**
+     * Implementation (more generic) method for addDefaultInput and addDefaultOutput.
+     * 
+     * @see {@link PADataSpaces#addDefaultInput(String, String, String)}
+     * @see {@link PADataSpaces#addDefaultOutput(String, String, String)}
+     * @param name
+     * @param url
+     * @param path
+     * @param type
+     * @return
+     * @throws SpaceAlreadyRegisteredException
+     * @throws ConfigurationException
+     */
+    public String addDefaultInputOutput(String url, String path, SpaceType type)
             throws SpaceAlreadyRegisteredException, ConfigurationException, IllegalArgumentException {
-        return addInputOutput(DataSpacesURI.DEFAULT_IN_OUT_NAME, path, url, type);
+        return addInputOutput(DataSpacesURI.DEFAULT_IN_OUT_NAME, url, path, type);
     }
 
     /**
@@ -283,15 +290,14 @@ public class DataSpacesImpl {
      * @see {@link PADataSpaces#addInput(String, String, String)}
      * @see {@link PADataSpaces#addOutput(String, String, String)}
      * @param name
-     * @param path
      * @param url
+     * @param path
      * @param type
      * @return
      * @throws SpaceAlreadyRegisteredException
      * @throws ConfigurationException
-     *             when specified configuration is wrong or not sufficient
      */
-    public String addInputOutput(String name, String path, String url, SpaceType type)
+    public String addInputOutput(String name, String url, String path, SpaceType type)
             throws SpaceAlreadyRegisteredException, ConfigurationException {
         final String hostname = Utils.getHostname();
         // name and type are checked here 
