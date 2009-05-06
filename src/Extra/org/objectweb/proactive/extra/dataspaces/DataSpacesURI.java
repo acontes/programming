@@ -27,7 +27,8 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException
  * <li>URI scheme, always present; always vfs:///
  * <li>identifier of application, always present; e.g. 439654</li>
  * <li>type of data space: input, output or scratch; e.g. output</li>
- * <li>name of input/output OR scratch runtime and node id; e.g. stats OR runtimeXX/nodeZZ</li>
+ * <li>name of input/output OR scratch runtime and node id; these components are non-empty strings
+ * without slashes; e.g. stats OR runtimeXX/nodeZZ</li>
  * <li>defined path within data space; e.g. some_dir/file.txt</li>
  * </ol>
  * 
@@ -106,6 +107,8 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
      * @param runtimeId
      *            runtimeId where scratch space is located. May be <code>null</code>.
      * @return URI for that specification
+     * @throws IllegalArgumentException
+     *             when runtimeId is invalid.
      */
     public static DataSpacesURI createScratchSpaceURI(long appId, String runtimeId) {
         return createScratchSpaceURI(appId, runtimeId, null);
@@ -129,7 +132,7 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
      * @return URI for that specification
      * @throws IllegalArgumentException
      *             when <code>null</code> values in arguments do not obey URI components hierarchy
-     *             requirements.
+     *             requirements or runtimeId or nodeId is invalid.
      */
     public static DataSpacesURI createScratchSpaceURI(long appId, String runtimeId, String nodeId) {
         return createScratchSpaceURI(appId, runtimeId, nodeId, null);
@@ -152,7 +155,7 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
      * @return URI for that specification
      * @throws IllegalArgumentException
      *             when <code>null</code> values in arguments do not obey URI components hierarchy
-     *             requirements.
+     *             requirements or runtimeId or nodeId is invalid.
      */
     public static DataSpacesURI createScratchSpaceURI(long appId, String runtimeId, String nodeId, String path) {
         return new DataSpacesURI(appId, SpaceType.SCRATCH, null, runtimeId, nodeId, path);
@@ -177,7 +180,7 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
      * @return URI for that specification
      * @throws IllegalArgumentException
      *             when <code>null</code> values in arguments do not obey URI components hierarchy
-     *             requirements.
+     *             requirements or name is invalid.
      */
     public static DataSpacesURI createInOutSpaceURI(long appId, SpaceType spaceType, String name) {
         return createInOutSpaceURI(appId, spaceType, name, null);
@@ -200,7 +203,7 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
      * @return URI for that specification
      * @throws IllegalArgumentException
      *             when <code>null</code> values in arguments do not obey URI components hierarchy
-     *             requirements.
+     *             requirements or name is invalid
      */
     public static DataSpacesURI createInOutSpaceURI(long appId, SpaceType spaceType, String name, String path) {
         return new DataSpacesURI(appId, spaceType, name, null, null, path);
