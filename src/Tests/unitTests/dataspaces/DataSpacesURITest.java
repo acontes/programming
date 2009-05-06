@@ -69,7 +69,7 @@ public class DataSpacesURITest {
     }
 
     @Test
-    public void testCreateScratchSpaceURIAppWrongRuntimeNode() {
+    public void testCreateScratchSpaceURIAppWrongRuntimeNode1() {
         try {
             DataSpacesURI.createScratchSpaceURI(123, "", "nodeB");
             fail("expected exception");
@@ -78,9 +78,27 @@ public class DataSpacesURITest {
     }
 
     @Test
-    public void testCreateScratchSpaceURIAppRuntimeWrongNode() {
+    public void testCreateScratchSpaceURIAppWrongRuntimeNode2() {
+        try {
+            DataSpacesURI.createScratchSpaceURI(123, "ooops/ooops", "nodeB");
+            fail("expected exception");
+        } catch (IllegalArgumentException x) {
+        }
+    }
+
+    @Test
+    public void testCreateScratchSpaceURIAppRuntimeWrongNode1() {
         try {
             DataSpacesURI.createScratchSpaceURI(123, "runtimeA", "");
+            fail("expected exception");
+        } catch (IllegalArgumentException x) {
+        }
+    }
+
+    @Test
+    public void testCreateScratchSpaceURIAppRuntimeWrongNode2() {
+        try {
+            DataSpacesURI.createScratchSpaceURI(123, "runtimeA", "ooops/ooops");
             fail("expected exception");
         } catch (IllegalArgumentException x) {
         }
@@ -162,9 +180,18 @@ public class DataSpacesURITest {
     }
 
     @Test
-    public void testCreateInOutSpaceURIAppTypeWrongName() {
+    public void testCreateInOutSpaceURIAppTypeWrongName1() {
         try {
             DataSpacesURI.createInOutSpaceURI(123, SpaceType.INPUT, "");
+            fail("expected exception");
+        } catch (IllegalArgumentException x) {
+        }
+    }
+
+    @Test
+    public void testCreateInOutSpaceURIAppTypeWrongName2() {
+        try {
+            DataSpacesURI.createInOutSpaceURI(123, SpaceType.INPUT, "ooops/ooops");
             fail("expected exception");
         } catch (IllegalArgumentException x) {
         }
