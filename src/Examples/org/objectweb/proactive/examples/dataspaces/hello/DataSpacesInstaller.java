@@ -34,6 +34,9 @@ public class DataSpacesInstaller implements Serializable {
         namingServiceURL = url;
     }
 
+    /**
+     * This method can be separated into two - configure node and then node for application.
+     */
     public ObjectForSynchro startDataSpaces(BaseScratchSpaceConfiguration baseScratchConfiguration)
             throws FileSystemException, NotConfiguredException, ProActiveException, URISyntaxException {
 
@@ -48,15 +51,6 @@ public class DataSpacesInstaller implements Serializable {
         return new ObjectForSynchro();
     }
 
-    private void buildNameForLoggers(final Node node) {
-        final String rtid = Utils.getRuntimeId(node);
-        final String nodeid = Utils.getNodeId(node);
-        final StringBuffer sb = new StringBuffer();
-
-        sb.append("DataSpacesInstaller on ").append(rtid).append(" / ").append(nodeid);
-        nameForLoggers = sb.toString();
-    }
-
     public ObjectForSynchro stopDataSpaces() throws NotConfiguredException {
         final Node node = Utils.getCurrentNode();
         final String logMsg = nameForLoggers + " stops data spaces";
@@ -68,5 +62,14 @@ public class DataSpacesInstaller implements Serializable {
 
     public void migrate(Node n) throws MigrationException {
         PAMobileAgent.migrateTo(n);
+    }
+
+    private void buildNameForLoggers(final Node node) {
+        final String rtid = Utils.getRuntimeId(node);
+        final String nodeid = Utils.getNodeId(node);
+        final StringBuffer sb = new StringBuffer();
+
+        sb.append("DataSpacesInstaller on ").append(rtid).append(" / ").append(nodeid);
+        nameForLoggers = sb.toString();
     }
 }
