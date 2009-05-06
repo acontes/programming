@@ -8,8 +8,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.vfs.FileSystemException;
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.dataspaces.exceptions.AlreadyConfiguredException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredException;
@@ -26,6 +29,8 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredExceptio
  * @see NodeConfigurator
  */
 public class DataSpacesNodes {
+
+    private final static Logger logger = ProActiveLogger.getLogger(Loggers.DATASPACES_CONFIGURATOR);
 
     private static Map<String, NodeConfigurator> nodeConfigurators = new HashMap<String, NodeConfigurator>();
 
@@ -50,8 +55,10 @@ public class DataSpacesNodes {
         final NodeConfigurator nodeConfig = getOrFailNodeConfigurator(node);
 
         final DataSpacesImpl impl = nodeConfig.getDataSpacesImpl();
-        if (impl == null)
+        if (impl == null) {
+            logger.debug("Requested Data Spaces implementation for node without DS configured");
             throw new NotConfiguredException("Node is not configured for DataSpaces application");
+        }
         return impl;
     }
 
@@ -79,6 +86,7 @@ public class DataSpacesNodes {
         try {
             nodeConfig.configureNode(node, baseScratchConfiguration);
         } catch (IllegalStateException x) {
+            logger.debug("Requested Data Spaces node configuration for already configured node");
             // it can occur only in case of concurrent configuration, let's wrap it
             throw new AlreadyConfiguredException(x.getMessage(), x);
         }
@@ -115,6 +123,7 @@ public class DataSpacesNodes {
         try {
             nodeConfig.configureApplication(namingServiceURL);
         } catch (IllegalStateException x) {
+            logger.debug("Requested Data Spaces node application configuration for not configured node");
             // it can occur only in case of concurrent configuration, let's wrap it
             throw new NotConfiguredException(x.getMessage(), x);
         }
@@ -136,6 +145,7 @@ public class DataSpacesNodes {
         try {
             nodeConfig.close();
         } catch (IllegalStateException x) {
+            logger.debug("Requested Data Spaces configuration close for not configured node");
             // it can occur only in case of concurrent configuration, let's wrap it
             throw new NotConfiguredException(x.getMessage(), x);
         }
@@ -158,8 +168,11 @@ public class DataSpacesNodes {
 
         synchronized (nodeConfigurators) {
             final NodeConfigurator config = nodeConfigurators.get(name);
-            if (config != null)
+            if (config != null) {
+                logger
+                        .debug("Attempted to create Data Spaces node configurator for already being configured node");
                 throw new AlreadyConfiguredException("Node is already configured for Data Spaces");
+            }
 
             final NodeConfigurator newConfig = new NodeConfigurator();
             nodeConfigurators.put(name, newConfig);
@@ -180,8 +193,10 @@ public class DataSpacesNodes {
 
         synchronized (nodeConfigurators) {
             final NodeConfigurator config = nodeConfigurators.get(name);
-            if (config == null)
+            if (config == null) {
+                logger.debug("Attempted to get Data Spaces node configurator for not configured node");
                 throw new NotConfiguredException("Node is not configured");
+            }
 
             return config;
         }
@@ -192,8 +207,10 @@ public class DataSpacesNodes {
 
         synchronized (nodeConfigurators) {
             final NodeConfigurator config = nodeConfigurators.remove(name);
-            if (config == null)
+            if (config == null) {
+                logger.debug("Attempted to remove Data Spaces node configurator for not configured node");
                 throw new NotConfiguredException("Node is not configured");
+            }
 
             return config;
         }

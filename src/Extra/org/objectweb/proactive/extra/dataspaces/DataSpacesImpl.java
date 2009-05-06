@@ -3,6 +3,7 @@
  */
 package org.objectweb.proactive.extra.dataspaces;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -40,13 +41,17 @@ public class DataSpacesImpl {
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.DATASPACES);
 
     private static void checkIsInputOrOutput(SpaceType type) {
-        if (type == SpaceType.SCRATCH)
+        if (type == SpaceType.SCRATCH) {
+            logger.debug("Wrong space type provided to the input/output-related method: " + type);
             throw new IllegalArgumentException("This method can be only used with input or output data space");
+        }
     }
 
     private static void checkIsNotNullName(String name) {
-        if (name == null)
+        if (name == null) {
+            logger.debug("Null name provided to the input/output-related method: " + name);
             throw new IllegalArgumentException("Input/data space name can not be null");
+        }
     }
 
     private final SpacesMountManager spacesMountManager;
@@ -125,11 +130,31 @@ public class DataSpacesImpl {
      */
     public FileObject resolveInputOutput(String name, SpaceType type) throws FileSystemException,
             IllegalArgumentException, SpaceNotFoundException {
+        if (logger.isTraceEnabled())
+            logger.trace(String.format("Resolving request for %s with name %s", type, name));
+
         checkIsInputOrOutput(type);
         checkIsNotNullName(name);
-        final DataSpacesURI uri = DataSpacesURI.createInOutSpaceURI(appId, type, name);
+        final DataSpacesURI uri;
+        try {
+            uri = DataSpacesURI.createInOutSpaceURI(appId, type, name);
+        } catch (IllegalArgumentException x) {
+            logger.debug("Illegal specification for resolve " + type, x);
+            throw x;
+        }
 
-        return spacesMountManager.resolveFile(uri);
+        try {
+            final FileObject fo = spacesMountManager.resolveFile(uri);
+            if (logger.isTraceEnabled())
+                logger.trace(String.format("Resolved request for %s with name %s (%s)", type, name, uri));
+            return fo;
+        } catch (SpaceNotFoundException x) {
+            logger.debug("Space not found for input/output space with URI: " + uri, x);
+            throw x;
+        } catch (FileSystemException x) {
+            logger.debug("VFS-level problem during resolving input/output space", x);
+            throw x;
+        }
     }
 
     /**
@@ -147,28 +172,58 @@ public class DataSpacesImpl {
      */
     public FileObject resolveInputOutputBlocking(String name, long timeoutMillis, SpaceType type)
             throws FileSystemException, IllegalArgumentException, ProActiveTimeoutException {
+        if (logger.isTraceEnabled())
+            logger.trace(String.format("Resolving blocking request for %s with name %s", type, name));
+
         checkIsInputOrOutput(type);
         checkIsNotNullName(name);
-        if (timeoutMillis < 1)
+        if (timeoutMillis < 1) {
+            logger.debug("Illegal non-positive timeout specified for blocking resolve request");
             throw new IllegalArgumentException("Specified timeout should be positive integer");
-        final DataSpacesURI uri = DataSpacesURI.createInOutSpaceURI(appId, type, name);
+        }
+        final DataSpacesURI uri;
+        try {
+            uri = DataSpacesURI.createInOutSpaceURI(appId, type, name);
+        } catch (IllegalArgumentException x) {
+            logger.debug("Illegal specification for resolve " + type, x);
+            throw x;
+        }
 
         final long startTime = System.currentTimeMillis();
         long currTime = startTime;
         while (currTime < startTime + timeoutMillis) {
             try {
-                return spacesMountManager.resolveFile(uri);
+                final FileObject fo = spacesMountManager.resolveFile(uri);
+                if (logger.isTraceEnabled()) {
+                    final String message = String.format(
+                            "Resolved blocking request for %s with name %s (%s)", type, name, uri);
+                    logger.trace(message);
+                }
+                return fo;
             } catch (SpaceNotFoundException e) {
+                logger.debug("Space not found for blocking try for input/output space with URI: " + uri, e);
+
                 // request processing may have taken some time
                 currTime = System.currentTimeMillis();
                 final long sleepTime = Math.min(RESOLVE_BLOCKING_RESEND_PERIOD_MILLIS, startTime +
                     timeoutMillis - currTime);
                 try {
+                    if (logger.isTraceEnabled())
+                        logger.trace("Going sleeping for " + sleepTime);
                     Thread.sleep(sleepTime);
                 } catch (InterruptedException e1) {
                 }
                 currTime = System.currentTimeMillis();
+            } catch (FileSystemException x) {
+                logger.debug("VFS-level problem during blocking resolving input/output space", x);
+                throw x;
             }
+        }
+
+        if (logger.isDebugEnabled()) {
+            final String message = String.format(
+                    "Timeout expired for blocking resolve for %s with name %s (%s)", type, name, uri);
+            logger.debug(message);
         }
         throw new ProActiveTimeoutException();
     }
@@ -180,16 +235,25 @@ public class DataSpacesImpl {
      * @throws NotConfiguredException
      */
     public FileObject resolveScratchForAO() throws FileSystemException, NotConfiguredException {
-        if (appScratchSpace == null)
+        logger.trace("Resolving scratch for an Active Object");
+        if (appScratchSpace == null) {
+            logger.debug("Request scratch data space for AO on node without scratch space configured");
             throw new NotConfiguredException("Scratch data space not configured on this node");
+        }
 
         final Body body = Utils.getCurrentActiveObjectBody();
-        final DataSpacesURI scratchURI = appScratchSpace.getScratchForAO(body);
         try {
-            return spacesMountManager.resolveFile(scratchURI);
+            final DataSpacesURI scratchURI = appScratchSpace.getScratchForAO(body);
+            final FileObject fo = spacesMountManager.resolveFile(scratchURI);
+            if (logger.isTraceEnabled())
+                logger.trace("Resolved scratch for an Active Object: " + scratchURI);
+            return fo;
         } catch (SpaceNotFoundException e) {
             ProActiveLogger.logImpossibleException(logger, e);
             throw new ProActiveRuntimeException("URI of scratch for Active Object can not be resolved", e);
+        } catch (FileSystemException x) {
+            logger.debug("VFS-level problem during resolving scratch fo AO: ", x);
+            throw x;
         }
     }
 
@@ -203,6 +267,8 @@ public class DataSpacesImpl {
      * @throws IllegalArgumentException
      */
     public Set<String> getAllKnownInputOutputNames(SpaceType type) throws IllegalArgumentException {
+        if (logger.isTraceEnabled())
+            logger.trace(String.format("Resolving known %s names: ", type));
         checkIsInputOrOutput(type);
 
         final DataSpacesURI aURI = DataSpacesURI.createURI(appId, type);
@@ -212,6 +278,8 @@ public class DataSpacesImpl {
         for (SpaceInstanceInfo sii : infos) {
             names.add(sii.getName());
         }
+        if (logger.isTraceEnabled())
+            logger.trace(String.format("Resolved known %s names: %s", type, new ArrayList<String>(names)));
         return names;
     }
 
@@ -227,15 +295,28 @@ public class DataSpacesImpl {
      */
     public Map<String, FileObject> resolveAllKnownInputsOutputs(SpaceType type) throws FileSystemException,
             IllegalArgumentException {
+        if (logger.isTraceEnabled())
+            logger.trace(String.format("Resolving known %s spaces: ", type));
         checkIsInputOrOutput(type);
 
         final DataSpacesURI uri = DataSpacesURI.createURI(appId, type);
-        final Map<DataSpacesURI, FileObject> spaces = spacesMountManager.resolveSpaces(uri);
-        final Map<String, FileObject> ret = new HashMap<String, FileObject>(spaces.size());
+        final Map<DataSpacesURI, FileObject> spaces;
+        try {
+            spaces = spacesMountManager.resolveSpaces(uri);
+        } catch (FileSystemException x) {
+            logger.debug(String.format("VFS-level problem during resolving known %s spaces: ", type), x);
+            throw x;
+        }
 
+        final Map<String, FileObject> ret = new HashMap<String, FileObject>(spaces.size());
         for (Entry<DataSpacesURI, FileObject> entry : spaces.entrySet()) {
             final String name = entry.getKey().getName();
             ret.put(name, entry.getValue());
+        }
+
+        if (logger.isTraceEnabled()) {
+            final ArrayList<String> namesList = new ArrayList<String>(ret.keySet());
+            logger.trace(String.format("Resolved known %s spaces: %s", type, namesList));
         }
         return ret;
     }
@@ -250,11 +331,28 @@ public class DataSpacesImpl {
      */
     public FileObject resolveFile(String uri) throws MalformedURIException, FileSystemException,
             SpaceNotFoundException {
-        final DataSpacesURI spaceURI = DataSpacesURI.parseURI(uri);
-        if (!spaceURI.isComplete())
-            throw new MalformedURIException("Specified URI must be complete");
+        if (logger.isTraceEnabled())
+            logger.trace("Resolving file: " + uri);
 
-        return spacesMountManager.resolveFile(spaceURI);
+        try {
+            final DataSpacesURI spaceURI = DataSpacesURI.parseURI(uri);
+            if (!spaceURI.isComplete())
+                throw new MalformedURIException("Specified URI must be complete");
+
+            FileObject fo = spacesMountManager.resolveFile(spaceURI);
+            if (logger.isTraceEnabled())
+                logger.trace("Resolved file: " + uri);
+            return fo;
+        } catch (MalformedURIException x) {
+            logger.debug("Can not resolve malformed URI: " + uri, x);
+            throw x;
+        } catch (SpaceNotFoundException x) {
+            logger.debug("Can not find space for URI: " + uri, x);
+            throw x;
+        } catch (FileSystemException x) {
+            logger.debug("VFS-level problem during resolving URI: " + uri, x);
+            throw x;
+        }
     }
 
     /**
@@ -299,12 +397,20 @@ public class DataSpacesImpl {
      */
     public String addInputOutput(String name, String url, String path, SpaceType type)
             throws SpaceAlreadyRegisteredException, ConfigurationException {
-        final String hostname = Utils.getHostname();
-        // name and type are checked here 
-        final InputOutputSpaceConfiguration config = InputOutputSpaceConfiguration.createConfiguration(url,
-                path, hostname, name, type);
-        // url is checked here        
-        final SpaceInstanceInfo spaceInstanceInfo = new SpaceInstanceInfo(appId, config);
+        logger.debug("Adding input/output data space");
+
+        final SpaceInstanceInfo spaceInstanceInfo;
+        try {
+            final String hostname = Utils.getHostname();
+            // name and type are checked here 
+            final InputOutputSpaceConfiguration config = InputOutputSpaceConfiguration.createConfiguration(
+                    url, path, hostname, name, type);
+            // url is checked here        
+            spaceInstanceInfo = new SpaceInstanceInfo(appId, config);
+        } catch (ConfigurationException x) {
+            logger.debug("User-added input/output has wrong configuration", x);
+            throw x;
+        }
 
         try {
             spacesDirectory.register(spaceInstanceInfo);
@@ -312,7 +418,14 @@ public class DataSpacesImpl {
             ProActiveLogger.logImpossibleException(logger, x);
             throw new ProActiveRuntimeException(
                 "This application id is not registered in used naming service", x);
+        } catch (SpaceAlreadyRegisteredException x) {
+            logger.debug(String.format("User-added space %s is already registered", spaceInstanceInfo
+                    .getMountingPoint()), x);
+            throw x;
         }
+
+        if (logger.isInfoEnabled())
+            logger.info("Added input/output data space: " + spaceInstanceInfo);
         return spaceInstanceInfo.getMountingPoint().toString();
     }
 }
