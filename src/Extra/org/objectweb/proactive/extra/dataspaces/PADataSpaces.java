@@ -33,6 +33,11 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundExceptio
  */
 public class PADataSpaces {
 
+    /**
+     * Default input and output spaces name.
+     */
+    public static final String DEFAULT_IN_OUT_NAME = "default";
+
     private PADataSpaces() {
     }
 
@@ -294,7 +299,7 @@ public class PADataSpaces {
      * refreshed.
      * 
      * @return set of all names of inputs defined for caller's application before the moment of this
-     *         call; default input name is denoted as {@value DataSpacesURI#DEFAULT_IN_OUT_NAME}
+     *         call; default input name is denoted as {@value #DEFAULT_IN_OUT_NAME}
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
      */
@@ -316,8 +321,7 @@ public class PADataSpaces {
      * refreshed.
      * 
      * @return set of all names of outputs defined for caller's application before the moment of
-     *         this call; default input name is denoted as
-     *         {@value DataSpacesURI#DEFAULT_IN_OUT_NAME}
+     *         this call; default input name is denoted as {@value #DEFAULT_IN_OUT_NAME}
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
      */
@@ -345,7 +349,7 @@ public class PADataSpaces {
      * 
      * @return map of all names of inputs defined for caller's application before the moment of this
      *         call to file handles to these inputs; default input name is denoted as
-     *         {@value DataSpacesURI#DEFAULT_IN_OUT_NAME}
+     *         {@value #DEFAULT_IN_OUT_NAME}
      * @throws FileSystemException
      *             indicates VFS related exception
      * @throws NotConfiguredException
@@ -377,7 +381,7 @@ public class PADataSpaces {
      * 
      * @return map of all names of outputs defined for caller's application before the moment of
      *         this call to file handles to these outputs; default output name is denoted as
-     *         {@value DataSpacesURI#DEFAULT_IN_OUT_NAME}
+     *         {@value #DEFAULT_IN_OUT_NAME}
      * @throws FileSystemException
      *             indicates VFS related exception
      * @throws NotConfiguredException
@@ -512,7 +516,7 @@ public class PADataSpaces {
      * execution.
      * <p>
      * Input <b>name</b> must be unique for the application, while name
-     * {@value DataSpacesURI#DEFAULT_IN_OUT_NAME} is reserved for default input space.
+     * {@value #DEFAULT_IN_OUT_NAME} is reserved for default input space.
      * <p>
      * Input must have a global access URL defined, that is used to access this data space from
      * remote nodes. Local (to caller's node) absolute access path may be used, to achieve better
@@ -526,7 +530,7 @@ public class PADataSpaces {
      * @param name
      *            name of defined input, contract of application; can not be empty or contain
      *            slashes '/'; default input name is reserved, denoted as
-     *            {@value DataSpacesURI#DEFAULT_IN_OUT_NAME}
+     *            {@value #DEFAULT_IN_OUT_NAME}
      * @param url
      *            Access URL to this space, used for accessing data from remote nodes. URL defines
      *            which protocol is used to access the data from remote node, and some additional
@@ -552,7 +556,7 @@ public class PADataSpaces {
      * execution.
      * <p>
      * Output <b>name</b> must be unique for the application, while name
-     * {@value DataSpacesURI#DEFAULT_IN_OUT_NAME} is reserved for default output space.
+     * {@value #DEFAULT_IN_OUT_NAME} is reserved for default output space.
      * <p>
      * Output must have a global access URL defined, that is used to access this data space from
      * remote nodes. Local (to caller's node) absolute access path may be used, to achieve better
@@ -566,7 +570,7 @@ public class PADataSpaces {
      * @param name
      *            name of defined output, contract of application; can not be empty or contain
      *            slashes '/'; default output name is reserved, denoted as
-     *            {@value DataSpacesURI#DEFAULT_IN_OUT_NAME}
+     *            {@value #DEFAULT_IN_OUT_NAME}
      * @param url
      *            Access URL to this space, used for accessing data from remote nodes. URL defines
      *            which protocol is used to access the data from remote node, and some additional

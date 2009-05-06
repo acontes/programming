@@ -57,11 +57,6 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
     public static final String SCHEME = "vfs:///";
 
     /**
-     * Default input and output spaces name.
-     */
-    public static final String DEFAULT_IN_OUT_NAME = "default";
-
-    /**
      * 
      */
     private static final long serialVersionUID = 7148704434729348732L;

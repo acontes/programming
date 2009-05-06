@@ -33,7 +33,7 @@ public class InputOutputSpaceConfiguration extends SpaceConfiguration {
      *            <code>null</code> only if path is <code>null</code>.
      * @param name
      *            Name of input data space to be created, unique per target application. Note that
-     *            {@value DataSpacesURI#DEFAULT_IN_OUT_NAME} value is reserved for default input
+     *            {@value PADataSpaces#DEFAULT_IN_OUT_NAME} value is reserved for default input
      *            space. Can not be <code>null</code> .
      * @throws ConfigurationException
      *             when provided arguments doesn't form correct configuration (no access, no
@@ -65,8 +65,8 @@ public class InputOutputSpaceConfiguration extends SpaceConfiguration {
      *            <code>null</code> only if path is <code>null</code>.
      * @param name
      *            Name of output data space to be created, unique per target application. Note that
-     *            {@value DataSpacesURI#DEFAULT_IN_OUT_NAME} value is used for default input
-     *            (output) space. Can not be <code>null</code>.
+     *            {@value PADataSpaces#DEFAULT_IN_OUT_NAME} value is used for default input (output)
+     *            space. Can not be <code>null</code>.
      * @throws ConfigurationException
      *             when provided arguments doesn't form correct configuration (no access, no
      *             hostname for path, wrong space type)
@@ -98,7 +98,7 @@ public class InputOutputSpaceConfiguration extends SpaceConfiguration {
      *            Input or output data space type.
      * @param name
      *            Name of input (output) data space to be created, unique per target application.
-     *            Note that {@value DataSpacesURI#DEFAULT_IN_OUT_NAME} value is used for default
+     *            Note that {@value PADataSpaces#DEFAULT_IN_OUT_NAME} value is used for default
      *            output space. Can not be <code>null</code>.
      * @throws ConfigurationException
      *             when provided arguments doesn't form correct configuration (no access, no

@@ -90,7 +90,7 @@ public class DataSpacesImpl {
      */
     public FileObject resolveDefaultInputOutput(SpaceType type) throws IllegalArgumentException,
             FileSystemException, SpaceNotFoundException {
-        return resolveInputOutput(DataSpacesURI.DEFAULT_IN_OUT_NAME, type);
+        return resolveInputOutput(PADataSpaces.DEFAULT_IN_OUT_NAME, type);
     }
 
     /**
@@ -108,7 +108,7 @@ public class DataSpacesImpl {
      */
     public FileObject resolveDefaultInputOutputBlocking(long timeoutMillis, SpaceType type)
             throws IllegalArgumentException, FileSystemException, ProActiveTimeoutException {
-        return resolveInputOutputBlocking(DataSpacesURI.DEFAULT_IN_OUT_NAME, timeoutMillis, type);
+        return resolveInputOutputBlocking(PADataSpaces.DEFAULT_IN_OUT_NAME, timeoutMillis, type);
     }
 
     /**
@@ -281,7 +281,7 @@ public class DataSpacesImpl {
      */
     public String addDefaultInputOutput(String url, String path, SpaceType type)
             throws SpaceAlreadyRegisteredException, ConfigurationException, IllegalArgumentException {
-        return addInputOutput(DataSpacesURI.DEFAULT_IN_OUT_NAME, url, path, type);
+        return addInputOutput(PADataSpaces.DEFAULT_IN_OUT_NAME, url, path, type);
     }
 
     /**
