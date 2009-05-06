@@ -55,7 +55,6 @@ public class Tracker implements Serializable {
         } else if (this.remotePeers.size() == 0) {
             this.remotePeers.add(remotePeer);
         } else {
-
             Peer peerToJoin = this.getRandomPeer();
 
             try {
