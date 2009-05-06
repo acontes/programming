@@ -151,12 +151,10 @@ public class Area implements Serializable {
      */
     public boolean isValidMergingArea(Area area) {
         int axe = this.isBordered(area);
-
         if (axe != -1) {
-            int myLength = this.coodinatesMax[axe].levenshteinDistance(this.coordinatesMin[axe]);
-            int itLength = area.getCoordinatesMax()[axe].levenshteinDistance(area.getCoordinatesMin()[axe]);
-            return myLength == itLength;
-        } else {
+        return (this.coodinatesMax[axe].equals(area.getCoordinatesMax()[axe])) &&
+        (this.coordinatesMin[axe].equals(area.getCoordinatesMin()[axe]));
+        }else{
             return false;
         }
     }
