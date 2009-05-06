@@ -229,7 +229,7 @@ public class Peer implements InitActive, RunActive, Serializable {
                 this.lastRequestDuration = System.currentTimeMillis();
             } else {
                 if (System.currentTimeMillis() - this.lastRequestDuration >= Peer.CHECK_NEIGHBORS_TIMEOUT) {
-                    this.structuredOverlay.checkNeighbors();
+                    // this.structuredOverlay.checkNeighbors();
                 }
                 service.waitForRequest();
             }
