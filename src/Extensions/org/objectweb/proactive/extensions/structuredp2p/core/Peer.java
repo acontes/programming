@@ -78,17 +78,6 @@ public class Peer implements InitActive, RunActive, Serializable {
     }
 
     /**
-     * Constructor.
-     * 
-     * @param entrypoint
-     *            the peer to join the overlay.
-     */
-    public Peer(Peer peer) {
-        this(peer.getType());
-        this.join(peer);
-    }
-
-    /**
      * Sends a {@link LookupMessage} on the network from the current peer.
      * 
      * @param msg
@@ -141,8 +130,8 @@ public class Peer implements InitActive, RunActive, Serializable {
      * @param peer
      *            the peer which serves as entry point.
      */
-    public void join(Peer remotePeer) {
-        this.structuredOverlay.join(remotePeer);
+    public boolean join(Peer remotePeer) {
+        return this.structuredOverlay.join(remotePeer);
     }
 
     /**
