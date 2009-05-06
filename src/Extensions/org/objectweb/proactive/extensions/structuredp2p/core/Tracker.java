@@ -52,21 +52,24 @@ public class Tracker implements Serializable {
         if (remotePeer.getType() != this.type) {
             throw new IllegalStateException("You can only add network of type " + this.type +
                 " by this tracker");
-        }
+        } else if (this.remotePeers.size() == 0) {
+            this.remotePeers.add(remotePeer);
+        } else {
 
-        Peer peerToJoin = this.getRandomPeer();
+            Peer peerToJoin = this.getRandomPeer();
 
-        try {
-            if (peerToJoin.join(remotePeer)) {
-                Random rand = new Random();
-                if (rand.nextInt(2) == 0) {
-                    this.remotePeers.add(remotePeer);
+            try {
+                if (peerToJoin.join(remotePeer)) {
+                    Random rand = new Random();
+                    if (rand.nextInt(2) == 0) {
+                        this.remotePeers.add(remotePeer);
+                    }
                 }
+            } catch (Exception e) {
+                // The remote peer we contact in order to join is died, so we retry with an anoter
+                this.remotePeers.remove(peerToJoin);
+                this.addOnNetwork(remotePeer);
             }
-        } catch (Exception e) {
-            // The remote peer we contact in order to join is died, so we retry with an anoter
-            this.remotePeers.remove(peerToJoin);
-            this.addOnNetwork(remotePeer);
         }
     }
 
