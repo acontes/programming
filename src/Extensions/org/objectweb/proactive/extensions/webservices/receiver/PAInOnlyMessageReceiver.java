@@ -70,19 +70,19 @@ public class PAInOnlyMessageReceiver extends AbstractInMessageReceiver {
                 int firstIndex = address.lastIndexOf(WSConstants.AXIS_SERVICES_PATH);
                 firstIndex += WSConstants.AXIS_SERVICES_PATH.length();
                 String serviceName = address.substring(firstIndex);
-                
+
                 int pointIndex = serviceName.indexOf('.');
                 if (pointIndex != -1) {
-                	serviceName = serviceName.substring(0, pointIndex);
+                    serviceName = serviceName.substring(0, pointIndex);
                 }
-                
+
                 int lastIndex = serviceName.indexOf('/');
 
                 if (lastIndex != -1) {
                     serviceName = serviceName.substring(0, lastIndex);
                 }
                 String actualName = serviceName.substring(serviceName.lastIndexOf('_') + 1);
-                
+
                 // Get the interface
                 targetObject = ((ProActiveComponentRepresentative) component).getFcInterface(actualName);
             } else {
@@ -96,10 +96,10 @@ public class PAInOnlyMessageReceiver extends AbstractInMessageReceiver {
             // namespace of the method element in the message context
             OMElement methodElement = inMessageContext.getEnvelope().getBody().getFirstElement();
             if (methodElement != null) {
-            	OMFactory factory = OMAbstractFactory.getOMFactory();
-            	methodElement.setNamespace(factory.createOMNamespace(axisService.getTargetNamespace(), null));
+                OMFactory factory = OMAbstractFactory.getOMFactory();
+                methodElement.setNamespace(factory.createOMNamespace(axisService.getTargetNamespace(), null));
             }
-            
+
             AxisMessage inAxisMessage = op.getMessage(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
 
             String messageNameSpace = null;
