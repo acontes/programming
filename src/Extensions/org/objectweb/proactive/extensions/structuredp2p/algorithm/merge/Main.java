@@ -7,7 +7,7 @@ public class Main {
     public static void main(String arv[]) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                GraphicalUserInterface g = new GraphicalUserInterface();
+                GraphicalUserInterface g = new GraphicalUserInterface(new CANPeer());
                 g.setVisible(true);
             }
         });

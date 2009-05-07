@@ -47,7 +47,7 @@ public class CANOverlay extends StructuredOverlay {
     /**
      * The number of dimensions which is equals to the number of axes.
      */
-    public static final int NB_DIMENSIONS = 4;
+    public static final int NB_DIMENSIONS = 2;
 
     /**
      * Neighbors of the current area. The neighbors are an array of ProActive groups. It is a
@@ -71,6 +71,8 @@ public class CANOverlay extends StructuredOverlay {
     public CANOverlay(Peer localPeer) {
         super(localPeer);
         this.neighbors = new Group[CANOverlay.NB_DIMENSIONS][2];
+        // FIXME area
+        this.area = new Area();
 
         try {
             int i;

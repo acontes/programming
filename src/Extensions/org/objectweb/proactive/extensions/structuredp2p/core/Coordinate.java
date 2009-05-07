@@ -50,36 +50,11 @@ public class Coordinate implements Serializable {
      * @return coordinates of the middle.
      */
     public static Coordinate getMiddle(Coordinate min, Coordinate max) {
-        // FIXME voir les bords !
-        String maxS, minS;
-        int minL = min.getValue().length();
-        int maxL = max.getValue().length();
-        char[] value = new char[maxL];
+        // FIXME check with strings
+        int minL = Integer.getInteger(min.getValue());
+        int maxL = Integer.getInteger(max.getValue());
 
-        // Take the lengthier String to modify it
-        if (minL > maxL) {
-            maxS = new String(min.getValue());
-            minS = new String(max.getValue());
-
-            int tmp = maxL;
-            maxL = minL;
-            minL = tmp;
-        } else {
-            maxS = new String(max.getValue());
-            minS = new String(min.getValue());
-        }
-
-        int i;
-        // TODO finir le calcul
-        for (i = maxL; i > 0; i--) {
-            if (i > minL) {
-                // FIXME
-                // value[i] = Character.toChars((Character.getNumericValue(maxS.charAt(i - 1)) /
-                // 2));
-            }
-        }
-
-        return new Coordinate(value.toString());
+        return new Coordinate(String.valueOf((maxL + minL) / 2));
     }
 
     /**

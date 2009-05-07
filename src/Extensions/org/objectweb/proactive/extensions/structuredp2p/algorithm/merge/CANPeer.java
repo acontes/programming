@@ -12,18 +12,14 @@ import org.objectweb.proactive.extensions.structuredp2p.core.exception.AreaExcep
 
 @SuppressWarnings("serial")
 public class CANPeer extends Peer {
-    private Area area;
     private ArrayList<int[]> splitHistory;
-    private CANOverlay overlay;
 
     public CANPeer() {
         super(OverlayType.CAN);
-        this.area = new Area();
-        this.overlay = this.getStructuredOverlay();
     }
 
     public void update(Area area, ArrayList<int[]> history) {
-        this.setArea(area);
+        this.getStructuredOverlay().setArea(area);
         this.setHistory(history);
     }
 
@@ -39,7 +35,7 @@ public class CANPeer extends Peer {
         }
 
         // Create split areas
-        Area[] newArea = this.area.split(dimension);
+        Area[] newArea = this.getStructuredOverlay().getArea().split(dimension);
 
         // Actions on remotePeer
         ArrayList<int[]> history = this.splitHistory;
@@ -47,17 +43,24 @@ public class CANPeer extends Peer {
         remotePeer.update(newArea[directionInv], history);
         remotePeer.addNeighbor(remotePeer, dimension, directionInv);
 
+        CANPeer neighbors = (CANPeer) remotePeer.getStructuredOverlay().getNeighborsForDimensionAndDirection(
+                dimension, direction).getGroupByType();
+        remotePeer.addNeighbor(neighbors, dimension, direction);
+
         // Actions on local peer
-        this.area = newArea[direction];
+        this.getStructuredOverlay().setArea(newArea[direction]);
         this.splitHistory.add(new int[] { dimension, direction });
+        this.removeNeighbor(neighbors);
         this.addNeighbor(remotePeer, dimension, direction);
+
     }
 
     public CANPeer leaveCAN() {
         int[] lastOP = this.splitHistory.get(this.splitHistory.size() - 1);
         int dimension = lastOP[0];
         int direction = lastOP[1];
-        Group<Peer> neighbors = this.overlay.getNeighborsForDimensionAndDirection(dimension, direction);
+        Group<Peer> neighbors = this.getStructuredOverlay().getNeighborsForDimensionAndDirection(dimension,
+                direction);
         int nbNeigbors = neighbors.size();
 
         // If there is just one neighbor, easy
@@ -72,21 +75,21 @@ public class CANPeer extends Peer {
         return this;
     }
 
-    public void setArea(Area newArea) {
-        this.area = newArea;
-    }
-
     public void setHistory(ArrayList<int[]> history) {
         this.splitHistory = history;
     }
 
     public void addNeighbor(CANPeer remotePeer, int dimension, int direction) {
-        this.overlay.addNeighbor(remotePeer, dimension, direction);
+        this.getStructuredOverlay().addNeighbor(remotePeer, dimension, direction);
+    }
+
+    public void removeNeighbor(CANPeer remotePeer) {
+        this.getStructuredOverlay().removeNeighbor(remotePeer);
     }
 
     public void merge(CANPeer remotePeer) {
         try {
-            this.area.merge(remotePeer.getStructuredOverlay().getArea());
+            this.getStructuredOverlay().getArea().merge(remotePeer.getStructuredOverlay().getArea());
             this.splitHistory.remove(this.splitHistory.size() - 1);
         } catch (AreaException e) {
             // TODO Auto-generated catch block
@@ -95,12 +98,12 @@ public class CANPeer extends Peer {
     }
 
     public CANOverlay getStructuredOverlay() {
-        return this.overlay;
+        return (CANOverlay) super.getStructuredOverlay();
     }
 
     public CANPeer switchWith(CANPeer remotePeer) {
-        remotePeer.update(this.overlay.getArea(), this.splitHistory);
-        this.setArea(null);
+        remotePeer.update(this.getStructuredOverlay().getArea(), this.splitHistory);
+        this.getStructuredOverlay().setArea(null);
         this.setHistory(null);
 
         return this;

@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.Random;
 
 import javax.swing.BorderFactory;
@@ -22,17 +23,25 @@ import javax.swing.JPanel;
 public class GraphicalUserInterface extends JFrame {
 
     private JComponent area;
+    private ArrayList<CANPeer> peers;
+    private CANPeer selected;
 
     private static int SPACE_WIDTH = 400;
     private static int SPACE_HEIGHT = 400;
 
-    public GraphicalUserInterface() {
+    public GraphicalUserInterface(CANPeer peer) {
+        this.peers = new ArrayList<CANPeer>();
+        this.peers.add(peer);
         this.createAndShowGUI();
     }
 
     public void createAndShowGUI() {
         this.area = new Canvas(this);
-        this.area.setSize(GraphicalUserInterface.SPACE_WIDTH, GraphicalUserInterface.SPACE_HEIGHT);
+        // this.area.setSize(GraphicalUserInterface.SPACE_WIDTH,
+        // GraphicalUserInterface.SPACE_HEIGHT);
+        this.area.setSize(Integer.getInteger(this.peers.get(0).getStructuredOverlay().getArea()
+                .getCoordinatesMax(0).getValue()), Integer.getInteger(this.peers.get(0)
+                .getStructuredOverlay().getArea().getCoordinatesMax(1).getValue()));
 
         Container contentPane = super.getContentPane();
         contentPane.add(this.createToolbar(), BorderLayout.NORTH);
@@ -52,19 +61,17 @@ public class GraphicalUserInterface extends JFrame {
         final JButton splitButton = new JButton("Split");
         final JButton mergeButton = new JButton("Merge");
 
-        splitButton.setEnabled(false);
-
         splitButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                splitButton.setEnabled(false);
-                mergeButton.setEnabled(true);
+                CANPeer newPeer = new CANPeer();
+                GraphicalUserInterface.this.peers.add(newPeer);
+                newPeer.join(GraphicalUserInterface.this.selected);
             }
         });
 
         mergeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                mergeButton.setEnabled(false);
-                splitButton.setEnabled(true);
+                GraphicalUserInterface.this.selected.leaveCAN();
             }
         });
 
