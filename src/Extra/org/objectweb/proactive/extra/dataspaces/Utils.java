@@ -106,7 +106,7 @@ public class Utils {
      */
     public static long getApplicationId(Node node) {
 
-        // FIXME not implemented in ProActive... 
+        // FIXME not implemented in ProActive... (depends on PROACTIVE-661 story)
         return 0;
     }
 
