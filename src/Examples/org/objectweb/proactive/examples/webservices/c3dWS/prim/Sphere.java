@@ -45,9 +45,9 @@ public class Sphere extends Primitive implements java.io.Serializable {
     private Vec tmp; // temporary vecs used to minimize the memory load
     private static double mindiff = 1e-6;
 
-    public Sphere () {
+    public Sphere() {
     }
-    
+
     public Sphere(Vec center, double radius) {
         c = center;
         r = radius;
@@ -99,9 +99,9 @@ public class Sphere extends Primitive implements java.io.Serializable {
     public Vec getCenter() {
         return c;
     }
-    
-    public double getRadius () {
-    	return r;
+
+    public double getRadius() {
+        return r;
     }
 
     public void setCenter(Vec c) {
@@ -121,24 +121,24 @@ public class Sphere extends Primitive implements java.io.Serializable {
         if (vec.getX() != 0) {
             phi = Math.atan2(c.getZ(), c.getY());
             l = Math.sqrt((c.getY() * c.getY()) + (c.getZ() * c.getZ()));
-            c.setY( l * Math.cos(phi + vec.getX()) );
-            c.setZ( l * Math.sin(phi + vec.getX()) );
+            c.setY(l * Math.cos(phi + vec.getX()));
+            c.setZ(l * Math.sin(phi + vec.getX()));
         }
 
         // the Y axis rotation
         if (vec.getY() != 0) {
             phi = Math.atan2(c.getZ(), c.getX());
             l = Math.sqrt((c.getX() * c.getX()) + (c.getZ() * c.getZ()));
-            c.setX( l * Math.cos(phi + vec.getY()) );
-            c.setZ( l * Math.sin(phi + vec.getY()) );
+            c.setX(l * Math.cos(phi + vec.getY()));
+            c.setZ(l * Math.sin(phi + vec.getY()));
         }
 
         // the Z axis rotation
         if (vec.getZ() != 0) {
             phi = Math.atan2(c.getX(), c.getY());
             l = Math.sqrt((c.getY() * c.getY()) + (c.getX() * c.getX()));
-            c.setY( l * Math.cos(phi + vec.getZ()) );
-            c.setX( l * Math.sin(phi + vec.getZ()) );
+            c.setY(l * Math.cos(phi + vec.getZ()));
+            c.setX(l * Math.sin(phi + vec.getZ()));
         }
     }
 }

@@ -65,11 +65,14 @@ public class Plane extends Primitive {
      */
     @Override
     public Isect intersect(Ray ray) {
-        double div = (ray.D.getX() * base.getX()) + (ray.D.getY() * base.getY()) + (ray.D.getZ() * base.getZ());
+        double div = (ray.D.getX() * base.getX()) + (ray.D.getY() * base.getY()) +
+            (ray.D.getZ() * base.getZ());
         if (div == 0) {
             return null;
         }
-        double t = (d - (base.getX() * ray.P.getX()) - (base.getY() * ray.P.getY()) - (base.getZ() * ray.P.getZ())) / div;
+        double t = (d - (base.getX() * ray.P.getX()) - (base.getY() * ray.P.getY()) - (base.getZ() * ray.P
+                .getZ())) /
+            div;
         if (t > mindiff) {
             Isect ip = new Isect();
             ip.t = t;

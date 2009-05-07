@@ -88,11 +88,10 @@ public class WSNameAndHostDialog extends JDialog implements ActionListener, Prop
 
         this.dispatcherUrl = new JTextField(localHostUrlService, 10);
         this.dispatcherUrl.addActionListener(this);
-        
+
         //Create an array of the text and components to be displayed.
         Object[] array = { "Please enter your name,", this.userTextField, "and the C3DDispatcher host",
-                this.hostNameTextField, "and the C3DDispatcher Service url",
-                this.dispatcherUrl };
+                this.hostNameTextField, "and the C3DDispatcher Service url", this.dispatcherUrl };
 
         //Create an array specifying the number of dialog buttons and their text.
         Object[] options = { this.enterButtonString, this.cancelButtonString };
@@ -234,9 +233,9 @@ public class WSNameAndHostDialog extends JDialog implements ActionListener, Prop
     public Dispatcher getValidatedDispatcher() {
         return this.c3dDispatcher;
     }
-    
+
     public String getValidatedDispatcherService() {
-    	return this.dispatcherUrl.getText();
+        return this.dispatcherUrl.getText();
     }
 
     /** Gets the name of the machine this is running on.
