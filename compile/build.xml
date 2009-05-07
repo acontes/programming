@@ -19,8 +19,8 @@
 	<property file="${user.home}/.proactive/build.properties" />
 	<import file="common.xml" />
 	
-	<import file="../doc/ic2d.xml"  optional="true" />
-	<import file="../doc/pa.xml"  optional="true" />
+	<import file="../doc/ic2d/build.xml"  optional="true" />
+	<import file="../doc/pa/build.xml"  optional="true" />
 	
 	<!-- ************
 		Taskdefs		
@@ -76,7 +76,7 @@
 				<include name="functionalTests/**/**/*Test*.class" />
 				
 				<exclude name="**/*$*.class" />
-				<!-- <exclude name="functionalTests/security/*/*.class" /> -->
+				<exclude name="functionalTests/security/*/*.class" /> <!-- TestUnlimitedCrypto declares its own testsuite -->
 				<exclude name="functionalTests/*.class" />
 				<exclude name="functionalTests/component/collectiveitf/multicast/**/*.fractal" />
 				<exclude name="functionalTests/component/collectiveitf/multicast/ClientTestItf.class" />
@@ -96,10 +96,7 @@
 
 	<fileset dir="${cl.test.dir}" id="performancesuite">
 		<include name="performanceTests/**/*Test*.class" />
-		
 		<exclude name="**/*$*.class" />
-		<exclude name="performanceTests/simple/**/*.class" />
-		<exclude name="performanceTest/throughtput/TestIbis.class" />
 	</fileset>
 
 
@@ -353,12 +350,15 @@
 		</concat>
 
 		<jar manifest="${compile.dir}/Manifest.mf" destfile="${deploy.lib.dir}/ProActive.jar" index="true">
-			<fileset dir="${cl.proactive.dir}" includes="**" />
-			<fileset dir="${cl.extensions.dir}" includes="**" />
+			<fileset dir="${cl.proactive.dir}" includes="**"/>
+			<fileset dir="${cl.extensions.dir}">
+				<include name="**"/>
+				<exclude name="org/objectweb/proactive/extensions/annotation/**/*CTree*"/>
+			</fileset>
 			<fileset dir="${cl.extra.dir}" includes="**" />
 			<fileset dir="${config.dir}" includes="ProActiveConfiguration.xml" />
 			<fileset dir="${osgi.res.dir}" includes="metadata.xml" />
-			<fileset dir="${compile.dir}" includes="META-INF/services/javax.annotation.processing.Processor"/>
+
 			<indexjars>
 				<fileset dir="${lib.dir}">
 					<include name="*.jar" />
@@ -430,14 +430,23 @@
 	</target>
 	
 	<target name="deploy.annotations.java6" depends="compile.extensions, -deploy.mkdir" description="Create a jar file which contains only the JDK 1.6 annotations">
-		<jar destfile="${deploy.lib.dir}/ProActive_annotations_CTree.jar" index="true">
-			<fileset dir="${cl.extensions.dir}">
-				<include name="org/objectweb/proactive/extensions/annotation/**"/>
-			</fileset>
-			<!-- annotations info -->
-		    <fileset dir="${compile.dir}" includes="META-INF/services/com.sun.mirror.apt.AnnotationProcessorFactory" />
-			<fileset dir="${compile.dir}" includes="META-INF/services/javax.annotation.processing.Processor"/>
-		</jar>
+		<if name="ant.java.version" value="1.5">
+			<else>
+				<jar destfile="${deploy.lib.dir}/ProActive_annotations_CTree.jar" index="true">
+					<service type="com.sun.mirror.apt.AnnotationProcessorFactory">
+						<provider classname="org.objectweb.proactive.extensions.annotation.common.ProActiveAnnotationProcessorFactory"/>
+						<provider classname="org.objectweb.proactive.extensions.annotation.common.BogusAnnotationProcessorFactory"/>
+					</service>
+					<service type="javax.annotation.processing.Processor">
+						<provider classname="org.objectweb.proactive.extensions.annotation.common.ProActiveProcessorCTree"/>
+					</service>
+
+					<fileset dir="${cl.extensions.dir}">
+						<include name="org/objectweb/proactive/extensions/annotation/**"/>
+					</fileset>
+					</jar>
+			</else>
+		</if>
 	</target>
 
 	<target name="-deploy.mkdir">
@@ -449,7 +458,7 @@
 
 	<target name="deploy.annotations.all" depends="deploy.annotations.java5, deploy.annotations.java6" />
 
-	<target name="deploy.all" depends="deploy.core, deploy.examples, deploy.tests, deploy.utils, deploy.annotations.all" description="Populate dist/ with all ProActive Programming dependencies and JARs" />
+	<target name="deploy.all" depends="deploy.core, deploy.examples, deploy.tests, deploy.utils, deploy.annotations.java6" description="Populate dist/ with all ProActive Programming dependencies and JARs" />
 
 	<target name="deploy" depends="deploy.all" description="Populate dist/ (with ProActive_examples.jar)" />
 
@@ -594,6 +603,10 @@
 
 	<target name="junit.http" depends="compile.tests, deploy.all" description="Run all non regression tests on the current host only">
 		<junitMacro communication.protocol="http" nodedescriptor="/functionalTests/descriptor/defaultnodes/NodesLocal.xml" testsuite="testsuite"/>
+	</target>
+
+	<target name="junit.rmissh" depends="compile.tests, deploy.all" description="Run all non regression tests on the current host only">
+		<junitMacro communication.protocol="rmissh" nodedescriptor="/functionalTests/descriptor/defaultnodes/NodesLocal.xml" testsuite="testsuite"/>
 	</target>
 
 	<target name="junit.rmi" depends="compile.tests, deploy.all, proActiveWar" description="Run all non regression tests on the current host only">
@@ -854,9 +867,6 @@
 		<delete dir="${classes.dir}" />
 		<delete dir="${release.dir}" />
 		<delete dir="${deploy.dir}" />
-		<delete dir="${docs.built.dir}" />
-                <delete dir="${docs.java.classes.dir}" />
-                <delete dir="${docs.tmp.dir}" />
 		<delete dir="${classlibs.dir}" />
 		<delete dir="${test.classes.dir}" />
 		<delete file="tests.log" />
@@ -864,6 +874,9 @@
 		<property name="webservices.dir" value="${src.extensions.dir}/org/objectweb/proactive/extensions/webservices/" />
 		<delete dir="${webservices.dir}/servicedeployer/build" />
 		<delete file="${src.extensions.dir}/org/objectweb/proactive/extensions/webservices/axis2/repository/services/ServiceDeployer.aar" />
+		<subant target="doc.clean" inheritall="true">
+			<fileset dir="../doc/toolchain" includes="doc.xml"/>
+		</subant>
 	</target>
 
 

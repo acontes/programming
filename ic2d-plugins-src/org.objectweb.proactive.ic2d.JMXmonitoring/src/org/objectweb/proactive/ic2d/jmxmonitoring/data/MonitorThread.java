@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -54,15 +54,22 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
  * specifically asked. This thread is used to explore new found objects in the
  * system. The time between two executions of the
  * MonitorThreadSelectiveRefresher (timeForSelectiveRefresh * 1000) should
- * allways be less that
+ * always be less that
  * 
  * @author The ProActive Team
  * 
  */
 public final class MonitorThread implements Observer {
     private static org.apache.log4j.Logger logger = ProActiveLogger.getLogger(Loggers.JMX);
+    /**
+     * Default time to refresh in seconds
+     */
     private final static int DEFAULT_TTR = 10;
-    private final static int DEFAULT_TIME_SELECTIVE_REFRESH = 10;
+
+    /**
+     * Default selective time to refresh in seconds
+     */
+    private final static int DEFAULT_TIME_SELECTIVE_REFRESH = 20;
 
     // /** Hosts will be recursively searched up to this depth */
     // private int depth;
@@ -97,10 +104,10 @@ public final class MonitorThread implements Observer {
         this.worldObj = world;
         this.objectsToRefreshSelectively = new ConcurrentHashMap<String, AbstractData<?, ?>>();
         this.refresh = false;
-        this.refresher = new Thread(new MonitorThreadRefresher(world), "Ic2d refresh thread");
+        this.refresher = new Thread(new MonitorThreadRefresher(world), "IC2D refresh thread");
         this.selectiveRefresh = true;
         this.selectiveRefresher = new Thread(new MonitorThreadSelectiveRefresher(),
-            "Ic2d selective refresh thread");
+            "IC2D selective refresh thread");
         selectiveRefresher.start();
     }
 
@@ -225,7 +232,7 @@ public final class MonitorThread implements Observer {
                 try {
                     Thread.sleep(ttr * 1000);
                 } catch (InterruptedException e) { /* Do nothing */
-                    System.out.println("Ic2d exploring thread has been interrupted.");
+                    System.out.println("IC2D exploring thread has been interrupted.");
                 }
             }
         }
@@ -243,10 +250,10 @@ public final class MonitorThread implements Observer {
                     }
                     objectsToRefreshSelectively.clear();
 
-                    Thread.sleep(timeForSelectiveRefresh * 2000);
+                    Thread.sleep(timeForSelectiveRefresh * 1000);
                 }
             } catch (InterruptedException e) {
-                System.out.println("Ic2d selective exploring thread has been interupted.");
+                System.out.println("IC2D selective exploring thread has been interrupted.");
             }
         }
     }

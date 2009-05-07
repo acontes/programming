@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -38,6 +38,7 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.widgets.Control;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.listener.WorldListener;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.IC2DThreadPool;
 import org.objectweb.proactive.ic2d.jmxmonitoring.view.MonitoringView;
 
 
@@ -53,7 +54,7 @@ public final class WorldEditPart extends AbstractMonitoringEditPart<WorldObject>
     /*
      * A repaint will be done each TIME_TO_REFRESH mls 
      */
-    private static int TIME_TO_REPAINT = 200;
+    private static int TIME_TO_REPAINT = 400;
 
     /*
      * refreshMode=FULL -> a refresh is asked for each event 
@@ -81,8 +82,7 @@ public final class WorldEditPart extends AbstractMonitoringEditPart<WorldObject>
         super(model);
         this.monitoringView = monitoringView;
 
-        new Thread() {
-            @Override
+        IC2DThreadPool.execute(new Runnable() {
             public final void run() {
                 try {
                     Control control;
@@ -91,14 +91,14 @@ public final class WorldEditPart extends AbstractMonitoringEditPart<WorldObject>
 
                         control = getViewer().getControl();
                         if (control != null) {
-                            control.getDisplay().syncExec(WorldEditPart.this.drawRunnable);
+                            control.getDisplay().asyncExec(WorldEditPart.this.drawRunnable);
                         }
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
-        }.start();
+        });
     }
 
     //

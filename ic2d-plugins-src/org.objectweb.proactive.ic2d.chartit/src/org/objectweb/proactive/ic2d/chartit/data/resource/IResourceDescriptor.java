@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -80,4 +80,12 @@ public interface IResourceDescriptor {
      * @return An array of custom data providers
      */
     public IDataProvider[] getCustomDataProviders();
+
+    /**
+     * Return the name of the configuration file that must be located in the config dir 
+     * of the ChartIt plugin.
+     * 
+     * @return The name of configuration file or null if there is no configuration file.
+     */
+    public String getConfigFilename();
 }

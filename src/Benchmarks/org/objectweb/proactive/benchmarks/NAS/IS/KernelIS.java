@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -39,7 +39,6 @@ import org.objectweb.proactive.api.PASPMD;
 import org.objectweb.proactive.benchmarks.NAS.Kernel;
 import org.objectweb.proactive.benchmarks.NAS.NASProblemClass;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProxyForGroup;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
@@ -106,9 +105,9 @@ public class KernelIS extends Kernel {
             // Get the node from the URL
             Node chosenOneNode = NodeFactory.getNode(PAActiveObject.getActiveObjectNodeUrl(chosenOne));
 
-            allBucketSize = (AllBucketSize) PAActiveObject
-                    .newActive(AllBucketSize.class.getName(), new Object[] { workers,
-                            new Integer(this.problemClass.NUM_PROCS), new Integer(arraySize) }, chosenOneNode);
+            allBucketSize = (AllBucketSize) PAActiveObject.newActive(AllBucketSize.class.getName(),
+                    new Object[] { workers, new Integer(this.problemClass.NUM_PROCS),
+                            Integer.valueOf(arraySize) }, chosenOneNode);
 
             workers.setAllBucketSize(allBucketSize);
 

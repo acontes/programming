@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -411,7 +411,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
 
         try {
             PAActiveObject.registerByName(PAActiveObject.getStubOnThis(), "Dispatcher");
-        } catch (IOException ioe) {
+        } catch (ProActiveException ioe) {
             logger.error("Coudn't register the Dispatcher! " + ioe.getMessage());
         }
     }

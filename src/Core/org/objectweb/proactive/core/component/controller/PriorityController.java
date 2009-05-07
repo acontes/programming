@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -82,7 +82,6 @@ public interface PriorityController {
      *            Name of the method on which set the priority
      * @param priority
      *            The priority
-     * @return true if success, else false
      */
     public void setPriority(String interfaceName, String methodName, RequestPriority priority);
 
@@ -98,7 +97,6 @@ public interface PriorityController {
      *            The type of the method's parameters signature
      * @param priority
      *            The priority
-     * @return true if success, else false
      */
     public void setPriority(String interfaceName, String methodName, Class<?>[] parametersTypes,
             RequestPriority priority);
@@ -112,7 +110,7 @@ public interface PriorityController {
      *            Name of the method
      * @param parametersTypes
      *            The type of the method's parameters signature
-     * @return
+     * @return The priority of the given method
      */
     public RequestPriority getPriority(String interfaceName, String methodName, Class<?>[] parametersTypes);
 }

@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -39,7 +39,6 @@ import org.objectweb.proactive.benchmarks.NAS.Kernel;
 import org.objectweb.proactive.benchmarks.NAS.NASProblemClass;
 import org.objectweb.proactive.benchmarks.NAS.util.Communicator;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -109,7 +108,7 @@ public class KernelMG extends Kernel {
 
             // Construct the communicator active object
             communicator = (Communicator) PAActiveObject.newActive(Communicator.class.getName(),
-                    new Object[] { new Integer(this.problemClass.NUM_PROCS) }, chosenOneNode);
+                    new Object[] { Integer.valueOf(this.problemClass.NUM_PROCS) }, chosenOneNode);
 
             communicator.setup();
 

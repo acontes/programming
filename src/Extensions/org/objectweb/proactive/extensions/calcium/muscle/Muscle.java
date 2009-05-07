@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -35,8 +35,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
- * This is the parent interface for muscle functions. All muscle interfaces: {@link org.objectweb.proactive.extensions.calcium.skeletons.Condition}, {@link org.objectweb.proactive.extensions.calcium.skeletons.Conquer},
- * {@link org.objectweb.proactive.extensions.calcium.skeletons.Divide}, {@link org.objectweb.proactive.extensions.calcium.skeletons.Execute} inherit from this interface.
+ * This is the parent interface for muscle functions. All muscle interfaces: {@link org.objectweb.proactive.extensions.calcium.muscle.Condition}, {@link org.objectweb.proactive.extensions.calcium.muscle.Conquer},
+ * {@link org.objectweb.proactive.extensions.calcium.muscle.Divide}, {@link org.objectweb.proactive.extensions.calcium.muscle.Execute} inherit from this interface.
  *
  * @author The ProActive Team
  */

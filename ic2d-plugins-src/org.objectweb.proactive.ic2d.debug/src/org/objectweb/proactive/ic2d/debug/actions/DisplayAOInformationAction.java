@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -33,6 +33,9 @@
 package org.objectweb.proactive.ic2d.debug.actions;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.views.IViewDescriptor;
 import org.objectweb.proactive.ic2d.debug.views.AOInformationView;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
@@ -53,9 +56,12 @@ public class DisplayAOInformationAction extends Action implements IActionExtPoin
 
     public void setActiveSelect(AbstractData<?, ?> ref) {
         if (ref instanceof ActiveObject) {
-            AOInformationView aoinfInformationView = AOInformationView.getInstance();
-            aoinfInformationView.selectItem((ActiveObject) ref);
+            AOInformationView aoinfInformationView;
+            aoinfInformationView = (AOInformationView) PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                    .getActivePage().findView(AOInformationView.ID);
+            if (aoinfInformationView != null) {
+                aoinfInformationView.selectItem((ActiveObject) ref);
+            }
         }
     }
-
 }

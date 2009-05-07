@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -52,6 +52,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.listener.RuntimeObjectListener;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.IC2DThreadPool;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
 
@@ -79,12 +80,9 @@ public final class RuntimeObject extends AbstractData<HostObject, ProActiveNodeO
             String serverName) {
         super(objectName);
         this.parent = parent;
-
         this.url = FactoryName.getCompleteUrl(runtimeUrl);
-
         this.hostUrlServer = hostUrl;
         this.serverName = serverName;
-
         this.listener = new RuntimeObjectListener(this);
     }
 
@@ -155,32 +153,29 @@ public final class RuntimeObject extends AbstractData<HostObject, ProActiveNodeO
      * Kill this runtime.
      */
     public void killRuntime() {
-        new Thread() {
-            @Override
+        IC2DThreadPool.execute(new Runnable() {
             public void run() {
                 Object[] params = {};
                 String[] signature = {};
                 invokeAsynchronous("killRuntime", params, signature);
                 runtimeKilled();
             }
-        }.start();
+        });
     }
 
     public void runtimeKilled() {
         setChanged();
         notifyObservers(new MVCNotification(MVCNotificationTag.RUNTIME_OBJECT_RUNTIME_KILLED));
-        ;
-        new Thread() {
-            @Override
+        IC2DThreadPool.execute(new Runnable() {
             public void run() {
                 try {
-                    sleep(3000);
+                    Thread.sleep(3000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
                 RuntimeObject.this.destroy();
             }
-        }.start();
+        });
     }
 
     /**
@@ -352,10 +347,53 @@ public final class RuntimeObject extends AbstractData<HostObject, ProActiveNodeO
     }
 
     public boolean hasDebuggerConnected() {
-        return proxyMBean.hasDebuggerConnected();
+        try {
+
+            final ProActiveConnection proActiveConnection = this.getProActiveConnection();
+            if (proActiveConnection == null) {
+                return false;
+            }
+
+            if (this.proxyMBean == null) {
+                this.proxyMBean = (ProActiveRuntimeWrapperMBean) MBeanServerInvocationHandler
+                        .newProxyInstance(proActiveConnection, super.objectName,
+                                ProActiveRuntimeWrapperMBean.class, false);
+            }
+
+            if (!PAActiveObject.pingActiveObject(proActiveConnection)) {
+                System.out.println("Connection to runtime closed: " + this.getName());
+                return false;
+            }
+
+            return proxyMBean.hasDebuggerConnected();
+        } catch (Throwable t) {
+            return false;
+        }
+
     }
 
     public boolean canBeDebugged() {
-        return proxyMBean.canBeDebugged();
+        try {
+
+            final ProActiveConnection proActiveConnection = this.getProActiveConnection();
+            if (proActiveConnection == null) {
+                return false;
+            }
+
+            if (this.proxyMBean == null) {
+                this.proxyMBean = (ProActiveRuntimeWrapperMBean) MBeanServerInvocationHandler
+                        .newProxyInstance(proActiveConnection, super.objectName,
+                                ProActiveRuntimeWrapperMBean.class, false);
+            }
+
+            if (!PAActiveObject.pingActiveObject(proActiveConnection)) {
+                System.out.println("Connection to runtime closed: " + this.getName());
+                return false;
+            }
+
+            return proxyMBean.canBeDebugged();
+        } catch (Throwable t) {
+            return false;
+        }
     }
 }

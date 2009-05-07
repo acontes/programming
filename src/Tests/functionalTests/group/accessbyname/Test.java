@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -35,7 +35,7 @@ import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.group.Group;
 
 import functionalTests.FunctionalTest;
-import functionalTests.GCMDeploymentReady;
+
 import functionalTests.group.A;
 import static junit.framework.Assert.assertTrue;
 
@@ -45,7 +45,7 @@ import static junit.framework.Assert.assertTrue;
  *
  * @author The ProActive Team
  */
-@GCMDeploymentReady
+
 public class Test extends FunctionalTest {
     A typedGroup;
 

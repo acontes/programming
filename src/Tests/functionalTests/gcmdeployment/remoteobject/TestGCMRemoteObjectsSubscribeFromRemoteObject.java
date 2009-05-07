@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -125,7 +125,7 @@ public class TestGCMRemoteObjectsSubscribeFromRemoteObject extends GCMFunctional
             this.vn = vn;
         }
 
-        public String createRemoteObject() {
+        public String createRemoteObject() throws ProActiveException {
             RO ro = new RO();
             RemoteObjectExposer<RO> roe = new RemoteObjectExposer<RO>(RO.class.getName(), ro);
             roe.createRemoteObject("remoteObject");

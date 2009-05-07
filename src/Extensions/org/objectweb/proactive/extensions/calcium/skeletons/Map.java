@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -58,7 +58,7 @@ public class Map<P extends java.io.Serializable, R extends java.io.Serializable>
      * The main constructor.
      *
      * @param div The custom {@link Divide} behavior.
-     * @param nested The nested {@ link Skeleton} to execute on each class.
+     * @param nested The nested {@link Skeleton} to execute on each class.
      * @param conq The custom {@link Conquer} behavior.
      */
     public <X extends Serializable, Y extends Serializable> Map(Divide<P, X> div, Skeleton<X, Y> nested,
@@ -72,7 +72,7 @@ public class Map<P extends java.io.Serializable, R extends java.io.Serializable>
      * Like the main constructor, but accepts an {@link Execute} object instead of a {@link Seq}.
      *
      * @param div The custom {@link Divide} behavior.
-     * @param msucle The muscle function that will be nested in a {@link Seq} {@link Skeleton}.
+     * @param muscle The muscle function that will be nested in a {@link Seq} {@link Skeleton}.
      * @param conq The custom {@link Conquer} behavior.
      */
     public <X extends Serializable, Y extends Serializable> Map(Divide<P, X> div, Execute<X, Y> muscle,

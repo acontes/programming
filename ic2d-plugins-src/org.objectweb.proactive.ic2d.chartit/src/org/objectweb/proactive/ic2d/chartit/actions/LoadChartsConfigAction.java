@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -61,6 +61,8 @@ public final class LoadChartsConfigAction extends Action {
     private final ChartsSectionWrapper chartsSW;
 
     /**
+     * Creates an instance of this class, the chart section wrapper is used to update the gui part once
+     * the configuration has been loaded. 
      * 
      * @param chartsSW The charts section wrapper
      */

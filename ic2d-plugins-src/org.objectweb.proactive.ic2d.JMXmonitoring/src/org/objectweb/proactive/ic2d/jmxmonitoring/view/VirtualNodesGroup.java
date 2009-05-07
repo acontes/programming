@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -123,13 +123,15 @@ public class VirtualNodesGroup implements Observer {
                 Display.getDefault().asyncExec(new Runnable() {
                     public void run() {
                         Button b = virtualNodes.get(vnRemoved);
-                        virtualNodes.remove(vnRemoved);
-                        buttons.remove(b);
-                        if (!b.isDisposed()) {
-                            b.dispose();
-                        }
-                        if (!group.isDisposed()) {
-                            group.pack();
+                        if (b != null) {
+                            virtualNodes.remove(vnRemoved);
+                            buttons.remove(b);
+                            if (!b.isDisposed()) {
+                                b.dispose();
+                            }
+                            if (!group.isDisposed()) {
+                                group.pack();
+                            }
                         }
                     }
                 });

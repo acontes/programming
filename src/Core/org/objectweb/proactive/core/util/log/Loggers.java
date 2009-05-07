@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -77,7 +77,8 @@ public interface Loggers {
     public static final String LOAD_BALANCING = CORE + ".loadbalancing";
     public static final String IC2D = CORE + ".ic2d";
     public static final String EXAMPLES = CORE + ".examples";
-    public static final String HTTPSERVER = CORE + ".httpserver";
+    public static final String HTTP_SERVER = CORE + ".http.server";
+    public static final String HTTP_CLIENT = CORE + ".http.client";
 
     public static final String BNB = CORE + "bnb";
 

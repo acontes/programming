@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -140,7 +140,7 @@ public class WorkerEP extends Timed {
         if (rank == this.reductorRank) {
             try {
                 allReduceOp = (ReduceAll) PAActiveObject.newActive(WorkerEP.ReduceSumOp.class.getName(),
-                        new Object[] { typedGroup, new Integer(groupSize) });
+                        new Object[] { typedGroup, Integer.valueOf(groupSize) });
             } catch (ActiveObjectCreationException e) {
                 e.printStackTrace();
                 return;

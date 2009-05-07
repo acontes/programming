@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -103,8 +103,9 @@ public class NodeFactory {
     //
 
     /**
-     * 
-     * @return
+     * Returns the default local Node if it already exists, otherwise it
+     * creates the local default Node and returns it.
+     * @return the default local Node
      * @throws NodeException
      */
     public static synchronized Node getDefaultNode() throws NodeException {
@@ -131,8 +132,9 @@ public class NodeFactory {
     }
 
     /**
-     * 
-     * @return
+     * Returns the halfbodies node if it already exists, otherwise it creates
+     * a halfbodies  node and returns it. 
+     * @return the Node that containes the halfbodies
      * @throws NodeException
      */
     public static synchronized Node getHalfBodiesNode() throws NodeException {
@@ -271,7 +273,7 @@ public class NodeFactory {
      *  <li>protocol://hostname[:port]/nodeName</li>
      * </ul>
      * 
-     * @param nodeName the name of the node to create
+     * @param nodeURL the URL of the node to create
      * @param replacePreviousBinding
      * @return the newly created node on the local JVM
      * @exception NodeException if the node cannot be created
@@ -282,8 +284,7 @@ public class NodeFactory {
     public static Node createNode(String nodeURL, boolean replacePreviousBinding,
             ProActiveSecurityManager psm, String vnname, String jobId) throws NodeException,
             AlreadyBoundException {
-        String nodeName = URIBuilder.getHostNameFromUrl(nodeURL);
-
+        String nodeName = URIBuilder.getNameFromURI(nodeURL);
         return createLocalNode(nodeName, replacePreviousBinding, psm, vnname, jobId);
     }
 

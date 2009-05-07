@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -119,6 +119,7 @@ public abstract class AbstractMonitoringEditPart<E extends AbstractData<?, ?>> e
     public void run() {
         try {
             refresh();
+            refreshChildren();
         } catch (Exception e) {
             System.out.println("Exception occured in AbstractMonitoringEditPart.run() : " + e +
                 " figure was : " + getFigure());
@@ -126,8 +127,8 @@ public abstract class AbstractMonitoringEditPart<E extends AbstractData<?, ?>> e
         }
     }
 
-    public void addFigureToUpdtate(IFigure figure) {
-    }
+    //    public void addFigureToUpdtate(IFigure figure) {
+    //    }
 
     /**
      * Convert the result of EditPart.getModel()
@@ -163,4 +164,5 @@ public abstract class AbstractMonitoringEditPart<E extends AbstractData<?, ?>> e
         }
         return super.getParent();
     }
+
 }

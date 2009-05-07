@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -35,8 +35,6 @@ package org.objectweb.proactive.core.debug.dconnection;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Arrays;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -60,7 +58,7 @@ public class DebuggeePortSetter {
             FileWriter writer = new FileWriter(file);
             writer.write(port);
             writer.close();
-            logger.info("Debugger JVM started");
+            logger.debug("Debugger port :" + port + " written to file " + file.getAbsolutePath());
         } catch (IOException e) {
             logger.fatal(
                     "Could not create the file where to store the debuggee port, exception message follows ",

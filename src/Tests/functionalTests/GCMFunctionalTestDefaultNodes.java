@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -33,7 +33,7 @@ package functionalTests;
 
 import java.net.URL;
 
-import org.objectweb.proactive.core.ProActiveException;
+import org.junit.Ignore;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
@@ -45,6 +45,7 @@ import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
  * @author The ProActive Team
  * 
  */
+@Ignore
 public class GCMFunctionalTestDefaultNodes extends GCMFunctionalTest {
 
     static final private URL defaultApplicationDescriptor = FunctionalTest.class
@@ -66,10 +67,10 @@ public class GCMFunctionalTestDefaultNodes extends GCMFunctionalTest {
         this.hostCapacity = hostCapacity;
         this.vmCapacity = vmCapacity;
 
-        super.vContract.setVariableFromProgram(GCMFunctionalTestDefaultNodes.VAR_HOSTCAPACITY, new Integer(
-            hostCapacity).toString(), VariableContractType.DescriptorDefaultVariable);
-        super.vContract.setVariableFromProgram(GCMFunctionalTestDefaultNodes.VAR_VMCAPACITY, new Integer(
-            vmCapacity).toString(), VariableContractType.DescriptorDefaultVariable);
+        super.vContract.setVariableFromProgram(GCMFunctionalTestDefaultNodes.VAR_HOSTCAPACITY, Integer
+                .valueOf(hostCapacity).toString(), VariableContractType.DescriptorDefaultVariable);
+        super.vContract.setVariableFromProgram(GCMFunctionalTestDefaultNodes.VAR_VMCAPACITY, Integer.valueOf(
+                vmCapacity).toString(), VariableContractType.DescriptorDefaultVariable);
 
     }
 

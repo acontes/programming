@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -100,12 +100,6 @@ public class MonitoringContextMenuProvider extends ContextMenuProvider {
 
             // Zoom Out
             actions.add(registry.getAction(GEFActionConstants.ZOOM_OUT));
-
-            // Vertical Layout
-            actions.add(registry.getAction(VerticalLayoutAction.VERTICAL_LAYOUT));
-
-            // Horizontal Layout
-            actions.add(registry.getAction(HorizontalLayoutAction.HORIZONTAL_LAYOUT));
         }
 
         for (IAction a : this.actions) {

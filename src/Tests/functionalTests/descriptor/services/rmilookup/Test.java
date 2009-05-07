@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -50,10 +50,10 @@ import functionalTests.FunctionalTest;
  * @since ProActive 2.0.1
  */
 public class Test extends FunctionalTest {
-
-    /**
-     *
+    /*
+     * Only work for RMI. There is no easy way to write this test for HTTP/IBIS/PAMR
      */
+
     private static String ONEVM_XML_LOCATION_UNIX = Test.class.getResource(
             "/functionalTests/descriptor/services/rmilookup/OneVM.xml").getPath();
     private static String LOOK_XML_LOCATION_UNIX = Test.class.getResource(

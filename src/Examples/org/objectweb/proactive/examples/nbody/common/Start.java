@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -36,10 +36,8 @@ import java.io.IOException;
 import java.io.Serializable;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
@@ -195,9 +193,9 @@ public class Start implements Serializable {
                 deployer = (Deployer) PAActiveObject.newActive(Deployer.class.getName(), new Object[] {
                         gcmad, workers });
 
-                displayer = (Displayer) PAActiveObject.newActive(Displayer.class.getName(),
-                        new Object[] { new Integer(totalNbBodies), new Boolean(displayft), deployer,
-                                new BooleanWrapper(ddd) });
+                displayer = (Displayer) PAActiveObject.newActive(Displayer.class.getName(), new Object[] {
+                        Integer.valueOf(totalNbBodies), Boolean.valueOf(displayft), deployer,
+                        new BooleanWrapper(ddd) });
             } catch (ProActiveException e) {
                 abort(e);
             }

@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -51,6 +51,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.data.ProActiveNodeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.dnd.DragAndDrop;
 import org.objectweb.proactive.ic2d.jmxmonitoring.extpoint.IActionExtPoint;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.NodeFigure;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.IC2DThreadPool;
 import org.objectweb.proactive.ic2d.jmxmonitoring.view.MonitoringView;
 
 
@@ -145,11 +146,11 @@ public final class NodeListener implements MouseListener, MouseMotionListener {
                 }
 
                 /*------------ Migration ------------*/
-                new Thread(new Runnable() {
+                IC2DThreadPool.execute(new Runnable() {
                     public void run() {
                         source.migrateTo(node);
                     }
-                }).start();
+                });
                 /*----------------------------------*/
                 this.internalCancel();
             }
@@ -164,7 +165,7 @@ public final class NodeListener implements MouseListener, MouseMotionListener {
     //---- MouseMotionListener 
     public void mouseEntered(MouseEvent me) {
         if (dnd.getSource() != null) {
-            dnd.refresh(figure);
+            //            dnd.refresh(figure);
             figure.setHighlight(ColorConstants.green);
         }
     }
@@ -173,7 +174,7 @@ public final class NodeListener implements MouseListener, MouseMotionListener {
         if (dnd.getSource() != null) {
             dnd.refresh(figure);
             figure.setHighlight(null);
-            figure.repaint();
+            //            figure.repaint();
         }
     }
 

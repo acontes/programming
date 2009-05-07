@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -172,7 +172,6 @@ public class ProActiveConfiguration {
 
         @Override
         protected void finalize() throws Throwable {
-            logger.warn("FINALIZE CALLED");
 
             for (String key : exportedKeys.keySet()) {
                 System.setProperty(key, exportedKeys.get(key));
@@ -240,15 +239,17 @@ public class ProActiveConfiguration {
     }
 
     private Properties getUserProperties() {
+        boolean defaultFile = false;
         Properties userProps = new Properties();
 
         /* Filename of the user configuration file */
         String fname = System.getProperty(PAProperties.PA_CONFIGURATION_FILE.getKey());
         if (fname == null) {
+            defaultFile = true;
             fname = PROACTIVE_USER_CONFIG_FILENAME;
         }
 
-        if (!fname.matches("^\\w+:.*$")) {
+        if (!fname.matches("^\\w{2,}+:.*$")) {
             // protocol prefix was not specified
             // using "file" protocol by default
             fname = FILE_PROTOCOL_PREFIX + fname;
@@ -261,7 +262,7 @@ public class ProActiveConfiguration {
             logger.debug("User Config File is: " + u.toExternalForm());
             userProps = ProActiveConfigurationParser.parse(u.toString(), userProps);
         } catch (Exception e) {
-            if (!fname.equals(PROACTIVE_CONFIG_FILENAME)) {
+            if (!defaultFile) {
                 logger.warn("Configuration file " + u.toExternalForm() + " not found");
             }
         }

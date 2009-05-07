@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -47,7 +47,7 @@ import functionalTests.GCMFunctionalTestDefaultNodes;
 
 public class TestOptionalNodeProvider extends GCMFunctionalTest {
 
-    String cookie = new Long(ProActiveRandom.nextLong()).toString();
+    String cookie = Long.valueOf(ProActiveRandom.nextLong()).toString();
     File tmpDir = new File(ProActiveConfiguration.getInstance().getProperty("java.io.tmpdir") +
         File.separator + this.getClass().getName() + cookie + File.separator);
 

@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -32,7 +32,6 @@
 package org.objectweb.proactive.ext.hpc;
 
 import java.io.IOException;
-import java.net.URI;
 import java.security.AccessControlException;
 import java.security.PublicKey;
 
@@ -129,7 +128,7 @@ public class DummySender implements UniversalBody {
     }
 
     @Deprecated
-    public void register(String url) throws IOException, UnknownProtocolException {
+    public void register(String url) throws UnknownProtocolException {
         // TODO Auto-generated method stub
 
     }

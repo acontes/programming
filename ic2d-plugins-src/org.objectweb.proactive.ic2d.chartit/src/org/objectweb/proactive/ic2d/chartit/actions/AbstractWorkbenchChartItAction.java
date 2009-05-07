@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -55,13 +55,13 @@ public abstract class AbstractWorkbenchChartItAction extends Action implements I
 
     public static final String WORKBENCH_CHARTIT_ACTION = "WorkbenchChartItAction";
 
-    /**
-     * The instance of the resource descriptor created by sub classes
+    /*
+     * * The instance of the resource descriptor created by sub classes
      */
     protected final IResourceDescriptor resourceDescriptor;
 
-    /**
-     * Creates a new instance of this class
+    /*
+     * * Creates a new instance of this class
      */
     public AbstractWorkbenchChartItAction() {
         super.setId(WORKBENCH_CHARTIT_ACTION);
@@ -70,8 +70,9 @@ public abstract class AbstractWorkbenchChartItAction extends Action implements I
         this.resourceDescriptor = this.createResourceDescriptor();
     }
 
-    /**
-     * Subclasses provides an instance of a concrete class that implements a resource descriptor interface.
+    /*
+     * * Subclasses provides an instance of a concrete class that implements a resource descriptor
+     * interface.
      * 
      * @return An instance of a concrete resource descriptor class
      */

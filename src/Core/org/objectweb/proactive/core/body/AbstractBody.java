@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -66,7 +66,6 @@ import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.component.representative.ItfID;
 import org.objectweb.proactive.core.component.request.Shortcut;
-import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.debug.stepbystep.BreakpointType;
 import org.objectweb.proactive.core.debug.stepbystep.Debugger;
 import org.objectweb.proactive.core.gc.GCMessage;
@@ -445,7 +444,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
 
                 // long sID = request.getSessionId();
                 if (sID != 0) {
-                    sessionID = new Long(sID);
+                    sessionID = Long.valueOf(sID);
                     if (this.openedSessions.contains(sessionID)) {
                         this.openedSessions.remove(sessionID);
                         this.internalBodySecurity.terminateSession(sID);
@@ -1194,28 +1193,6 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             throw new SecurityNotAvailableException();
         }
         this.securityManager.setProActiveSecurityManager(user, policyServer);
-    }
-
-    /**
-     * @param obj
-     * @return
-     */
-    public static UniversalBody getRemoteBody(Object obj) {
-        // Check if obj is really a reified object
-        if (!(MOP.isReifiedObject(obj))) {
-            throw new ProActiveRuntimeException("The given object " + obj + " is not a reified object");
-        }
-
-        // Find the appropriate remoteBody
-        org.objectweb.proactive.core.mop.Proxy myProxy = ((StubObject) obj).getProxy();
-
-        if (myProxy == null) {
-            throw new ProActiveRuntimeException("Cannot find a Proxy on the stub object: " + obj);
-        }
-
-        BodyProxy myBodyProxy = (BodyProxy) myProxy;
-        UniversalBody body = myBodyProxy.getBody().getRemoteAdapter();
-        return body;
     }
 
     public Debugger getDebugger() {

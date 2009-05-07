@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -30,6 +30,10 @@
  * $$PROACTIVE_INITIAL_DEV$$
  */
 package functionalTests.activeobject.request.forgetonsend;
+
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.extensions.annotation.Sterile;
+
 
 public class B {
 
@@ -70,9 +74,26 @@ public class B {
         services += "f";
     }
 
+    @Sterile
+    public void g() {
+        services += "g";
+    }
+
+    public void h(SlowlySerializableObject o) {
+        services += "h";
+    }
+
+    public void i(SlowlySerializableObject o) {
+        services += "i";
+    }
+
     public String takeFast() {
         String result = services;
         services = "";
         return result;
+    }
+
+    public void setAsImmediate(String methodName) {
+        PAActiveObject.setImmediateService(methodName);
     }
 }

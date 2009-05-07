@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -47,8 +47,8 @@ import org.objectweb.proactive.extensions.calcium.task.TaskPool;
  * To instantiate this class, an {@link org.objectweb.proactive.extensions.calcium.environment.Environment  EnvironmentFactory}  must be provided.
  * The skeleton framework can be used with different EnvironmentFactories, for example:
  * <ul>
- * <li>{@link org.objectweb.proactive.extensions.calcium.environment.multithreaded.MultiThreadedEnvironment MultiThreadedEnvironment} Executes the framework using threads on the local machine.</li>
- * <li>{@link org.objectweb.proactive.extensions.calcium.environment.proactive.ProActiveEnvironment ProActiveEnvironment} Executes the framework using ProActive.</li>
+ * <li>{@link org.objectweb.proactive.extensions.calcium.environment.multithreaded.MultiThreadedEnvironment} Executes the framework using threads on the local machine.</li>
+ * <li>{@link org.objectweb.proactive.extensions.calcium.environment.proactive.ProActiveEnvironment} Executes the framework using ProActive.</li>
  * <li>{@link org.objectweb.proactive.extra.calcium.environment.proactivescheduler.ProActiveSchedulerEnvironment ProActiveSchedulerEnvironment} Executes the framework using ProActive Scheduler.</li>
  * </ul>
  *

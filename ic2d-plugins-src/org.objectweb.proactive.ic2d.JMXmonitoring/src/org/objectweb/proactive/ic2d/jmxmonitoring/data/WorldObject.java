@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -103,7 +103,7 @@ public final class WorldObject extends AbstractData<AbstractData<?, ?>, HostObje
     // -------------------------------------------
 
     /**
-     * Create a new WorldObject 0617896139 Herve
+     * Create a new WorldObject
      * 
      * @param connection
      *            A ProActiveConnection

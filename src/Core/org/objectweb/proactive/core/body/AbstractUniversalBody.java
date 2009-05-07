@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -34,8 +34,6 @@ package org.objectweb.proactive.core.body;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -198,11 +196,11 @@ public abstract class AbstractUniversalBody implements UniversalBody, Serializab
      * @see org.objectweb.proactive.core.body.UniversalBody#register(java.lang.String)
      */
     @Deprecated
-    public void register(String url) throws IOException, UnknownProtocolException {
+    public void register(String url) throws ProActiveException {
         this.roe.createRemoteObject(RemoteObjectHelper.expandURI(URI.create(url)));
     }
 
-    public String registerByName(String name) throws IOException {
+    public String registerByName(String name) throws ProActiveException {
         this.roe.createRemoteObject(name);
         return this.roe.getURL();
     }

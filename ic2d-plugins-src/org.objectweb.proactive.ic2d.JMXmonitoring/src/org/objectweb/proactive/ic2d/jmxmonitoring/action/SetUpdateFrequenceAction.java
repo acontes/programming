@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -38,15 +38,15 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.dialog.SetUpdateFrequenceDialo
 
 
 public class SetUpdateFrequenceAction extends Action {
-    public static final String SET_UPDATE_FREQUENCE = "Set update frequence";
+    public static final String SET_UPDATE_FREQUENCE = "Set refresh rate";
     private Display display;
     private ProActiveNodeObject node;
 
     public SetUpdateFrequenceAction(Display display) {
         this.setId(SET_UPDATE_FREQUENCE);
         this.display = display;
-        this.setText("Set Update Frequence...");
-        this.setToolTipText("Set Update Frequence");
+        this.setText("Set Refresh Rate");
+        this.setToolTipText("Set Refresh Rate");
     }
 
     public void setNode(ProActiveNodeObject node) {

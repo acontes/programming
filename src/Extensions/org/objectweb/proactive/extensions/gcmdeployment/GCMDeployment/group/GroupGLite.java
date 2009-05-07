@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -95,8 +95,8 @@ public class GroupGLite extends AbstractGroup {
         List<String> ret = new ArrayList<String>();
         this.commandBuilder = commandBuilder;
         this.gcmaCommand = Helpers.escapeCommand(commandBuilder.buildCommand(hostInfo, gcma)).replaceFirst(
-                "java .* org.objectweb.proactive.extensions.gcmdeployment.core.StartRuntime",
-                "org.objectweb.proactive.extensions.gcmdeployment.core.StartRuntime");
+                "java .* org.objectweb.proactive.core.runtime.StartPARuntime",
+                "org.objectweb.proactive.core.runtime.StartPARuntime");
         List<String> commands = internalBuildCommands(null);
 
         for (String comnand : commands) {

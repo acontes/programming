@@ -5,10 +5,7 @@
 	xmlns:destination="http://xml.apache.org/fop/extensions"
 	exclude-result-prefixes="date" version="1.0">
 
-	<xsl:import
-			href="http://docbook.sourceforge.net/release/xsl/1.73.2/fo/docbook.xsl" />
-<!-- 		href="http://docbook.sourceforge.net/release/xsl-ns/1.74.0/fo/docbook.xsl"  -->
-
+ <xsl:import href="../docbook-xsl/fo/docbook.xsl" />
 	<xsl:import href="common.xsl" />
 
    <!-- Import profiled highlighting color -->
@@ -67,7 +64,7 @@
 	<xsl:param name="draft.watermark.image" />
 
 	<!-- Having long lines be broken up  -->
-	<xsl:param name="hyphenate.verbatim">yes</xsl:param>
+	<xsl:param name="hyphenate.verbatim">0</xsl:param>
 
 	<!-- Have screens written on darker background -->
 	<xsl:attribute-set name="verbatim.properties">

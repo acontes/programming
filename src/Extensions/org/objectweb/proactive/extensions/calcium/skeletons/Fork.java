@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -57,7 +57,7 @@ import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
  * Each sub-parameter will be inputed into a different nested {@link Skeleton}. (MIMD)
  *
  * The results of the nested {@link Skeleton}s will be consolidated into a single one using
- * the specified {@ Conquer} object.
+ * the specified {@link Conquer} object.
  *
  * @author The ProActive Team
  */

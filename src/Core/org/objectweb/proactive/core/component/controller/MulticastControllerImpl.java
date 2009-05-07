@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -471,10 +471,10 @@ public class MulticastControllerImpl extends AbstractCollectiveInterfaceControll
             for (int i = 0; i < serverItfs.length; i++) {
                 Interface curServerItf = serverItfs[i];
                 if (((Group<ProActiveInterface>) clientSideProxy.getDelegatee()).contains(curServerItf))
-                    return new Boolean(true);
+                    return Boolean.valueOf(true);
             }
         }
-        return new Boolean(false);
+        return Boolean.valueOf(false);
     }
 
     private boolean hasClientSideProxy(String itfName) {

@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -50,6 +50,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
 
 public class DebugSocketConnection {
 
+    public final static int NB_TRIES = 3;
     private RuntimeObject target;
 
     /**
@@ -77,28 +78,19 @@ public class DebugSocketConnection {
         // create a feedback popup
         TunnelingCreationWaitingDialog t = new TunnelingCreationWaitingDialog(PlatformUI.getWorkbench()
                 .getActiveWorkbenchWindow().getShell());
-
+        int nbOfTry = 0;
         try {
-            int nbOfTry = 1;
-            while (true) {
+
+            while (nbOfTry++ < NB_TRIES) {
                 t.labelUp(nbOfTry); // update the popup
                 nodeInfo = target.getDebugInfo();
-                System.out.println("nodeInfo: " + nodeInfo);
-
-                if (nodeInfo != null && nodeInfo.getDebuggerNode() != null)
+                if ((nodeInfo != null) && (nodeInfo.getDebuggerNode() != null)) {
                     break;
-
-                if (nbOfTry > 50) {
+                }
+                System.out.println("nodeInfo: " + nodeInfo);
+                if (nbOfTry >= NB_TRIES) {
                     throw new TunnelingTimeOutException("Reached the maximum connection attempt number (" +
                         nbOfTry + ")");
-                }
-
-                nbOfTry++;
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
                 }
             }
 
@@ -137,6 +129,7 @@ public class DebugSocketConnection {
             e.printStackTrace();
         } catch (TunnelingTimeOutException e) {
             t.showError();
+        } finally {
             t.close();
         }
     }

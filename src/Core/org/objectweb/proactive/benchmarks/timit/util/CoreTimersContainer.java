@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -378,7 +378,6 @@ public class CoreTimersContainer implements TimerProvidable {
      * Returns a the list of non-stopped timers.
      * DO NOT FORGET TO RETURN A TIME STAMP IN CASE OF A REMOTE SNAPSHOT !
      * DO NOT FORGET TO UPDATE USER COMPUTATION TIME !
-     * @param timersNames A filter of timers names.
      */
     public final BasicTimer[] getSnapshot() {
         return this.timersList.toArray(new BasicTimer[] {});
@@ -494,7 +493,7 @@ public class CoreTimersContainer implements TimerProvidable {
      * Updates all user computation timers.
      * Such as userTime = methodTime - sysTime, where sysTime = sum(SendRequest,SendReply,WaitByNecessity,GroupOneWayCall,GroupAsyncCall)
      * Warning ! The timers in the timers array must be stopped.
-     * @param timersList The array of timers
+     * @param timersArray The array of timers
      */
     public static final void updateAllUserComputationTimers(BasicTimer[] timersArray) {
         BasicTimer currentTimer;

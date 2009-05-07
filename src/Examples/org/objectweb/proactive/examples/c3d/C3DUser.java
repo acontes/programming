@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -195,7 +195,7 @@ public class C3DUser implements InitActive, java.io.Serializable, User, UserLogi
      */
     public void informNewUser(int nUser, String sName) {
         this.gui.addUser(sName);
-        this.h_users.put(sName, new Integer(nUser));
+        this.h_users.put(sName, Integer.valueOf(nUser));
     }
 
     /**

@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -37,14 +37,14 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
 
 
 public class RefreshJVMAction extends Action {
-    public static final String REFRESH_JVM = "Refresh JVM";
+    public static final String REFRESH_JVM = "Refresh Runtime";
     private RuntimeObject jvm;
 
     public RefreshJVMAction() {
         this.setId(REFRESH_JVM);
         this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "refresh.gif"));
-        this.setText("Look for new Nodes");
-        this.setToolTipText("Look for new Nodes");
+        this.setText("Refresh");
+        this.setToolTipText("Refresh Runtime state");
     }
 
     public void setJVM(RuntimeObject jvm) {

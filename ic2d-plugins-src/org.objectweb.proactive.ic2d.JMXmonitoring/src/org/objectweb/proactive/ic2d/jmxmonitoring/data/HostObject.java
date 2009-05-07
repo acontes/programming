@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -203,7 +203,7 @@ public final class HostObject extends AbstractData<WorldObject, RuntimeObject> {
 
         Map<String, RuntimeObject> childrenToRemoved = this.getMonitoredChildrenAsMap();
 
-        for (final RuntimeObject runtimeObject : runtimeObjects) {
+        for (RuntimeObject runtimeObject : runtimeObjects) {
             RuntimeObject child = (RuntimeObject) this.getChild(runtimeObject.getKey());
 
             // If this child is not yet monitored.

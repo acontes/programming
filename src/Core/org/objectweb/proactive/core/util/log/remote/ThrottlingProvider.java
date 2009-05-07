@@ -1,17 +1,55 @@
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ActiveEon Team
+ *                        http://www.activeeon.com/
+ *  Contributor(s):
+ *
+ *
+ * ################################################################
+ * $$ACTIVEEON_INITIAL_DEV$$
+ */
 package org.objectweb.proactive.core.util.log.remote;
 
 import java.io.IOException;
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Appender;
+import org.apache.log4j.Category;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Layout;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.spi.LoggingEvent;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 
 
 /**
@@ -31,10 +69,10 @@ import org.apache.log4j.spi.LoggingEvent;
  * The queue size, the threshold and the period can be configured by setting the
  * following java properties:
  * <ul>
- * <li>org.objectweb.proactive.core.util.log.remote.ThrottlingProvider.qsize
- * <li>org.objectweb.proactive.core.util.log.remote.ThrottlingProvider.threshold
+ * <li>org.objectweb.proactive.core.util.log.remote.throttlingprovider.qsize
+ * <li>org.objectweb.proactive.core.util.log.remote.throttlingprovider.threshold
  * </li>
- * <li>org.objectweb.proactive.core.util.log.remote.ThrottlingProvider. period</li>
+ * <li>org.objectweb.proactive.core.util.log.remote.throttlingprovider. period</li>
  * </ul>
  * 
  */
@@ -49,21 +87,21 @@ public final class ThrottlingProvider extends LoggingEventSenderSPI {
      * A logging event cannot be buffered more than this amount of time (in
      * milliseconds).
      */
-    final int period;
+    int period;
     final String periodProperty = "org.objectweb.proactive.core.util.log.remote.ThrottlingProvider.period";
 
     /**
      * Send the events to the collector as soon as THRESHOLD logging events are
      * available.
      */
-    final int threshold;
+    int threshold;
     final String thresholdProperty = "org.objectweb.proactive.core.util.log.remote.ThrottlingProvider.threshold";
 
     /**
      * The buffer size. If the buffer is full, clients are blocked until the
      * flushing thread is able to recover a steady state.
      */
-    final int qsize;
+    int qsize;
     final String qsizeProperty = "org.objectweb.proactive.core.util.log.remote.ThrottlingProvider.qsize";
 
     /** Logging Events to be send to the collector */
@@ -83,9 +121,39 @@ public final class ThrottlingProvider extends LoggingEventSenderSPI {
      */
     final private Object gatherAndSendMutex = new Object();
 
+    /** The log collector is unavailable since this date
+     * 
+     * Reset to null each time the collector becomes available again
+     */
+    private Date failureDate;
+    /** The first cause of log collector unavailability */
+    private Throwable failureCause;
+    /** Number of dropped messages since the collector is unavailable */
+    private long nbDroppedMsg;
+
     private FileAppender errorAppender;
 
+    public ThrottlingProvider(int period, int threshold, int qsize) {
+        this.period = period;
+        this.threshold = threshold;
+        this.qsize = qsize;
+
+        this.buffer = new ArrayBlockingQueue<LoggingEvent>(this.qsize);
+        this.terminate = new AtomicBoolean(false);
+        this.pendingEvents = new AtomicInteger();
+        this.mustNotify = new AtomicBoolean(false);
+        this.failureDate = null;
+        this.failureCause = null;
+        this.nbDroppedMsg = 0;
+
+    }
+
     public ThrottlingProvider() {
+        // Default value
+        this(DEFAULT_PERIOD, DEFAULT_THRESHOLD, DEFAULT_QSIZE);
+
+        // Use the values defined by properties if set 
+
         String prop;
         int value;
 
@@ -139,12 +207,6 @@ public final class ThrottlingProvider extends LoggingEventSenderSPI {
             }
         }
         this.qsize = value;
-
-        this.buffer = new ArrayBlockingQueue<LoggingEvent>(this.qsize);
-        this.terminate = new AtomicBoolean(false);
-        this.pendingEvents = new AtomicInteger();
-        this.mustNotify = new AtomicBoolean(false);
-
     }
 
     @Override
@@ -188,12 +250,43 @@ public final class ThrottlingProvider extends LoggingEventSenderSPI {
 
                 /* Remove events from the buffer and send them */
                 ArrayList<LoggingEvent> events = new ArrayList<LoggingEvent>(nbEvent);
+
+                if (this.failureDate != null) {
+                    String msg = this.nbDroppedMsg + " logging events dropped by " +
+                        this.getClass().getName() + "since " +
+                        DateFormat.getDateInstance().format(this.failureDate) +
+                        ". A copy of theses logging events is available in " +
+                        this.getErrorAppender().getFile() + " on " +
+                        ProActiveRuntimeImpl.getProActiveRuntime().getVMInformation().getHostName();
+                    Logger l = Logger.getLogger(this.getClass());
+                    LoggingEvent le = new LoggingEvent(Category.class.getName(), l, Level.INFO, msg,
+                        this.failureCause);
+                    events.add(le);
+                }
+
                 for (int i = 0; i < nbEvent; i++) {
                     events.add(buffer.poll());
                 }
 
-                if (events.size() != 0) {
-                    collector.sendEvent(events);
+                try {
+                    if (events.size() != 0) {
+                        collector.sendEvent(events);
+                        this.failureDate = null;
+                        this.failureCause = null;
+                        this.nbDroppedMsg = 0;
+                    }
+                } catch (Throwable t) {
+                    if (this.failureDate == null) {
+                        this.failureDate = new Date();
+                        this.failureCause = t;
+                    }
+
+                    this.nbDroppedMsg += nbEvent;
+
+                    Appender appender = this.getErrorAppender();
+                    for (LoggingEvent le : events) {
+                        appender.doAppend(le);
+                    }
                 }
             }
         }
@@ -248,11 +341,19 @@ public final class ThrottlingProvider extends LoggingEventSenderSPI {
     }
 
     /** Lazily load the error appender */
-    synchronized private Appender getErrorAppender() {
+    synchronized private FileAppender getErrorAppender() {
         if (this.errorAppender == null) {
             try {
                 Layout layout = new PatternLayout("%X{shortid@hostname} - [%p %20.20c{2}] %m%n");
-                this.errorAppender = new FileAppender(layout, "throttlingProvider.log");
+                ProActiveRuntimeImpl part = ProActiveRuntimeImpl.getProActiveRuntime();
+                String runtimeName = part.getVMInformation().getName();
+                this.errorAppender = new FileAppender(layout, "throttlingProvider-" + runtimeName + ".log");
+
+                // Add an explanatory message at the begining of the file
+                String msg = "This file has been created to prevent logging event loss when the distributed log4j framework is enabled. If a logging event is created while the provider is sending the buffered logging events to the log collector, it is dumped into this file. It prevents logging events loss and infinite loops. If you see this file, most likely, the log collector became unreachable or some low level ProActive loggers have been activated.";
+                Logger l = Logger.getLogger(this.getClass());
+                LoggingEvent le = new LoggingEvent(Category.class.getName(), l, Level.INFO, msg, null);
+                this.errorAppender.append(le);
             } catch (IOException e) {
                 System.err.println("Failed to create FileAppender");
                 e.printStackTrace();

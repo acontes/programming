@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -69,7 +69,6 @@ import org.eclipse.ui.part.ViewPart;
 import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
 import org.objectweb.proactive.ic2d.jmxmonitoring.action.ChartItAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.action.EnableDisableMonitoringAction;
-import org.objectweb.proactive.ic2d.jmxmonitoring.action.HorizontalLayoutAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.action.KillVMAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.action.MonitoringContextMenuProvider;
 import org.objectweb.proactive.ic2d.jmxmonitoring.action.NewHostAction;
@@ -83,7 +82,6 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.action.SetTTRAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.action.SetUpdateFrequenceAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.action.ShowConnectionsAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.action.StopMonitoringAction;
-import org.objectweb.proactive.ic2d.jmxmonitoring.action.VerticalLayoutAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.dnd.DragAndDrop;
 import org.objectweb.proactive.ic2d.jmxmonitoring.editpart.CommunicationEditPart;
@@ -156,23 +154,22 @@ public class MonitoringView extends ViewPart {
         world = new WorldObject();
         title = world.getName();
 
-        Thread t = new Thread() {
-            @Override
+        IC2DThreadPool.execute(new Runnable() {
             public final void run() {
-                try {
-                    while (true) {
+                while (true) {
+                    try {
                         Thread.sleep(TIME_TO_REFRESH_NUMBER_OF_MONITORED_OBJECTS);
-
                         Display.getDefault().asyncExec(updateNbOfMonitoredObjects);
+
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
                 }
             }
-        };
-        t.setPriority(Thread.MIN_PRIORITY);
-        t.setDaemon(true);
-        t.start();
+        });
+        //        t.setPriority(Thread.MIN_PRIORITY);
+        //        t.setDaemon(true);
+        //        t.start();
     }
 
     //
@@ -317,7 +314,7 @@ public class MonitoringView extends ViewPart {
 
         Group numberOfObjectsResetGroup = new Group(groupD, SWT.NONE);
         numberOfObjectsResetGroup.setText("Monitored Objects");
-        GridLayout nbObjsLayout = new org.eclipse.swt.layout.GridLayout(2, false);
+        GridLayout nbObjsLayout = new org.eclipse.swt.layout.GridLayout(3, true);
         // RowLayout nbObjsLayout = new RowLayout();
         numberOfObjectsResetGroup.setLayout(nbObjsLayout);
         aosLLabel = new Label(numberOfObjectsResetGroup, SWT.NONE);
@@ -522,9 +519,6 @@ public class MonitoringView extends ViewPart {
         registry.registerAction(new ShowConnectionsAction());
         registry.registerAction(new KillVMAction());
         registry.registerAction(new SetUpdateFrequenceAction(display));
-        registry.registerAction(new VerticalLayoutAction());
-        registry.registerAction(new HorizontalLayoutAction());
-
         // Added for ChartIt
         registry.registerAction(new ChartItAction());
 

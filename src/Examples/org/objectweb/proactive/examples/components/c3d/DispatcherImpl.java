@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -42,6 +42,7 @@ import org.objectweb.fractal.api.control.LifeCycleController;
 import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.Service;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.body.ComponentBody;
 import org.objectweb.proactive.core.component.body.ComponentRunActive;
@@ -135,9 +136,8 @@ public class DispatcherImpl extends C3DDispatcher implements Dispatcher, Dispatc
                     initActivity(body);
 
                     try {
-                        Fractive.register(Fractive.getComponentRepresentativeOnThis(), URIBuilder
-                                .buildURIFromProperties("localhost", "Dispatcher").toString());
-                    } catch (IOException e) {
+                        Fractive.registerByName(Fractive.getComponentRepresentativeOnThis(), "Dispatcher");
+                    } catch (ProActiveException e) {
                         System.err.println("HEY, couldn't register dispatcher");
                         e.printStackTrace();
                     }

@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -118,9 +118,8 @@ public interface Stats extends Serializable {
     public int getTreeSize();
 
     /**
-     * @param The muscle of interest
-     * @return The excercise of the specified muscle, or null if no
-     * statistics are available for this muscle.
+     * @param muscle The muscle of interest
+     * @return The exercise of the specified muscle, or null if no statistics are available for this muscle.
      */
     public Exercise getExcercise(Muscle muscle);
 

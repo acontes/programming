@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -35,7 +35,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
-import org.objectweb.proactive.extensions.gcmdeployment.core.StartRuntime;
+import org.objectweb.proactive.core.runtime.StartPARuntime;
 
 import functionalTests.FunctionalTest;
 
@@ -47,7 +47,7 @@ public class TestSpecifiedCapacity extends FunctionalTest {
     public void testSpecifiedCapacity() throws InterruptedException {
 
         PAProperties.PA_RUNTIME_STAYALIVE.setValue(false);
-        StartRuntime.main(new String[] { "--capacity", new Long(askedCapacity).toString() });
+        StartPARuntime.main(new String[] { "--capacity", Long.valueOf(askedCapacity).toString() });
 
         ProActiveRuntimeImpl part = ProActiveRuntimeImpl.getProActiveRuntime();
 

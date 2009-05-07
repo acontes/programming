@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -790,7 +790,7 @@ public class Diff {
             for (int i = 0; i < data.length; ++i) {
                 Integer ir = h.get(data[i]);
                 if (ir == null) {
-                    h.put(data[i], new Integer(equivs[i] = equiv_max++));
+                    h.put(data[i], Integer.valueOf(equivs[i] = equiv_max++));
                 } else {
                     equivs[i] = ir.intValue();
                 }

@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -37,6 +37,7 @@ import junit.framework.Assert;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.proxy.BodyProxy;
 import org.objectweb.proactive.core.config.PAProperties;
@@ -47,14 +48,13 @@ import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.ext.locationserver.LocationServerMetaObjectFactory;
 import org.objectweb.proactive.ext.util.SimpleLocationServer;
 
-import functionalTests.GCMDeploymentReady;
 import functionalTests.GCMFunctionalTestDefaultNodes;
 
 
 /**
  * Test migration with location server
  */
-@GCMDeploymentReady
+
 public class TestLocationServer extends GCMFunctionalTestDefaultNodes {
     A a;
     MigratableA migratableA;
@@ -62,7 +62,7 @@ public class TestLocationServer extends GCMFunctionalTestDefaultNodes {
 
     SimpleLocationServer server;
 
-    public TestLocationServer() throws ActiveObjectCreationException, NodeException, IOException {
+    public TestLocationServer() throws IOException, ProActiveException {
         super(1, 1);
 
         this.server = (SimpleLocationServer) PAActiveObject.newActive(SimpleLocationServer.class.getName(),

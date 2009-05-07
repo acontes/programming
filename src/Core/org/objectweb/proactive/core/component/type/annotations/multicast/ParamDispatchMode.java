@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -190,6 +190,7 @@ public enum ParamDispatchMode implements ParamDispatch, Serializable {
                 break;
             case RANDOM:
                 result = ROUND_ROBIN.expectedPartitionsSize(inputParameter, nbOutputReceivers);
+                break;
             default:
                 result = BROADCAST.expectedPartitionsSize(inputParameter, nbOutputReceivers);
         }

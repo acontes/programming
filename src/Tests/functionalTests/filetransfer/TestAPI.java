@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -48,14 +48,13 @@ import org.objectweb.proactive.core.filetransfer.RemoteFile;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extensions.calcium.system.SkeletonSystemImpl;
 
-import functionalTests.GCMDeploymentReady;
 import functionalTests.GCMFunctionalTestDefaultNodes;
 
 
 /**
  * Tests the two main methods of the File Transfer API
  */
-@GCMDeploymentReady
+
 public class TestAPI extends GCMFunctionalTestDefaultNodes {
 
     private static int FILE_SIZE = 16; //MB

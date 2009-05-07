@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -96,7 +96,7 @@ public class Start {
                 // all the tree's nodes
                 // useless boolean, just for pick up a different constructor
                 listOctTree.add(PAActiveObject.newActive(OctTree.class.getName(), new Object[] { lplanets,
-                        universe, new Boolean(true) }, nodes[(10 * i + 8) % nodes.length]));
+                        universe, Boolean.valueOf(true) }, nodes[(10 * i + 8) % nodes.length]));
             } catch (ActiveObjectCreationException e) {
                 deployer.abortOnError(e);
             } catch (NodeException e) {

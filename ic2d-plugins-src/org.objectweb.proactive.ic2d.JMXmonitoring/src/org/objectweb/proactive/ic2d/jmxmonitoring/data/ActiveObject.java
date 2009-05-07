@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -710,7 +710,6 @@ public final class ActiveObject extends AbstractData<ProActiveNodeObject, Abstra
         setChanged();
         notifyObservers(new MVCNotification(MVCNotificationTag.ACTIVE_OBJECT_REQUEST_QUEUE_LENGHT_CHANGED,
             requestQueueLength));
-        ;
     }
 
     public void setRequestQueueLength(int requestQueueLength) {
@@ -719,8 +718,16 @@ public final class ActiveObject extends AbstractData<ProActiveNodeObject, Abstra
             setChanged();
             notifyObservers(new MVCNotification(
                 MVCNotificationTag.ACTIVE_OBJECT_REQUEST_QUEUE_LENGHT_CHANGED, requestQueueLength));
-            ;
         }
+    }
+
+    /**
+     * Returns the length of the monitored active object request queue.
+     * 
+     * @return The length of the request queue
+     */
+    public int getRequestQueueLength() {
+        return this.requestQueueLength;
     }
 
     public String getJobId() {

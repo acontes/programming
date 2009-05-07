@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -386,7 +386,11 @@ public class JMXNotificationManager implements NotificationListener {
      * @return The ProActiveConnection used to connect to the JMX MBean Server where the MBean is located
      */
     public ProActiveConnection getConnection(String runtimeUrl) {
-        return connectionsWithRuntimeUrl.get(runtimeUrl).getConnection();
+        Connection connection = connectionsWithRuntimeUrl.get(runtimeUrl);
+        if (connection != null) {
+            return connection.getConnection();
+        }
+        return null;
     }
 
     private ProActiveConnection createProActiveConnection(String runtimeUrl) throws IOException {

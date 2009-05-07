@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -70,7 +70,7 @@ public class SetUpdateFrequenceDialog extends Dialog {
         shell.setLayout(layout);
 
         Label titleLabel = new Label(shell, SWT.NONE);
-        titleLabel.setText("Please enter the new value for the frequence of the update for");
+        titleLabel.setText("Please enter the new refresh rate");
         FormData titleLabelFormData = new FormData();
         titleLabelFormData.left = new FormAttachment(0, 0);
         titleLabel.setLayoutData(titleLabelFormData);

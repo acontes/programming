@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -315,17 +315,20 @@ public enum PAProperties {
      * 
      * You can use a SocketConnect, a BlockingChannelConnector or a SelectChannelConnector
      * You CANNOT use a SSL connector. 
-     * 
-     * {@link http://docs.codehaus.org/display/JETTY/Architecture}
+     * Click 
+     * <a  href="http://docs.codehaus.org/display/JETTY/Architecture">here</a> for more
+     * information on the Jetty architecture. 
      */
     PA_HTTP_JETTY_CONNECTOR("proactive.http.jetty.connector", PAPropertiesType.STRING),
 
     /**
      * Jetty configuration file
      * 
-     * Jetty can be configuration by providing a jetty.xml file.
-     * {@link http://docs.codehaus.org/display/JETTY/jetty.xml} 
-     * {@link http://docs.codehaus.org/display/JETTY/Syntax+Reference}
+     * Jetty can be configured by providing a 
+     * <a  href="http://docs.codehaus.org/display/JETTY/jetty.xml">jetty.xml</a>
+     * file. Click 
+     * <a  href="http://docs.codehaus.org/display/JETTY/Syntax+Reference">here </a>
+     * for the Jetty syntax reference.
      */
     PA_HTTP_JETTY_XML("proactive.http.jetty.xml", PAPropertiesType.STRING),
 
@@ -429,7 +432,7 @@ public enum PAProperties {
      *  TIMIT
      */
 
-    /** TODO vbodnart Describe this property */
+    /** this property indicates the list (comma separated) of the TimIt counters to activate */
     PA_TIMIT_ACTIVATION("proactive.timit.activation", PAPropertiesType.STRING),
 
     /* ------------------------------------
