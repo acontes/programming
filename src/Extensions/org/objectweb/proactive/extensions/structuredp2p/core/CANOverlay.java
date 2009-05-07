@@ -140,7 +140,7 @@ public class CANOverlay extends StructuredOverlay {
     /**
      * Check if the dimension index of the current area contains the given coordinate.
      * 
-     * @param dimensionIndex
+     * @param dimension
      *            the dimension index used for the check.
      * 
      * @param coordinate
@@ -149,8 +149,8 @@ public class CANOverlay extends StructuredOverlay {
      * @return 0 if the coordinate is contained by the area on the given axe, -1 if the coordinate
      *         is smaller than the line which is managed by the given dimension, 1 otherwise.
      */
-    public int contains(int dimensionIndex, Coordinate coordinate) {
-        return this.getArea().contains(dimensionIndex, coordinate);
+    public int contains(int dimension, Coordinate coordinate) {
+        return this.getArea().contains(dimension, coordinate);
     }
 
     /**
@@ -180,6 +180,7 @@ public class CANOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void checkNeighbors() {
         for (Group<Peer>[] groupArray : this.neighbors) {
             for (Group<Peer> group : groupArray) {
@@ -198,19 +199,22 @@ public class CANOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Boolean join(Peer remotePeer) {
         // FIXME
-        int dim = this.getRandomDimension();
+        int dimension = this.getRandomDimension();
         int direction = 0;
 
-        return new Boolean(this.addNeighbor(remotePeer, dim, direction).booleanValue() &&
+        return new Boolean(this.addNeighbor(remotePeer, dimension, direction).booleanValue() &&
             ((CANJoinResponseMessage) PAFuture.getFutureValue(this.getLocalPeer().sendMessageTo(remotePeer,
-                    new CANJoinMessage(this.getRemotePeer(), dim, (direction + 1) % 2)))).hasSucceeded());
+                    new CANJoinMessage(this.getRemotePeer(), dimension, (direction + 1) % 2))))
+                    .hasSucceeded());
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public void leave() {
         try {
             ResponseMessage groupFutures = null;
@@ -270,6 +274,7 @@ public class CANOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
+    @Override
     public LookupResponseMessage sendMessage(LookupMessage msg) {
         CANLookupMessage msgCan = (CANLookupMessage) msg;
         if (this.contains(msgCan.getCoordinates())) {
@@ -305,6 +310,7 @@ public class CANOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
+    @Override
     public ResponseMessage sendMessageTo(Peer remotePeer, Message msg) {
         return remotePeer.receiveMessage(msg);
     }
@@ -312,6 +318,7 @@ public class CANOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void update() {
         // TODO Auto-generated method stub
     }
@@ -328,7 +335,7 @@ public class CANOverlay extends StructuredOverlay {
      * @param direction
      *            the direction (0 or 1).
      */
-    private Boolean addNeighbor(Peer remotePeer, int dimension, int direction) {
+    public Boolean addNeighbor(Peer remotePeer, int dimension, int direction) {
         return this.neighbors[dimension][direction].add(remotePeer);
     }
 
@@ -338,7 +345,7 @@ public class CANOverlay extends StructuredOverlay {
      * @param peer
      *            the neighbor to remove.
      */
-    private void removeNeighbor(Peer peer) {
+    public void removeNeighbor(Peer peer) {
         for (Group<Peer>[] neighborsAxe : this.neighbors) {
             for (Group<Peer> neighbor : neighborsAxe) {
                 if (neighbor.contains(peer)) {
@@ -404,41 +411,55 @@ public class CANOverlay extends StructuredOverlay {
     /**
      * Returns the neighbors of the managed area for the given dimension.
      * 
-     * @param dim
+     * @param dimension
      *            the dimension to use (dimension start to 0 and max is defined by
      *            {@link #NB_DIMENSIONS} - 1).
      * @return the neighbors of the managed area for the given dimension.
      */
-    public Group<Peer>[] getNeighborsForDimension(int dim) {
-        return this.neighbors[dim];
+    public Group<Peer>[] getNeighborsForDimension(int dimension) {
+        return this.neighbors[dimension];
+    }
+
+    /**
+     * Returns the neighbors of the managed area for the given dimension and order.
+     * 
+     * @param dimension
+     *            the dimension to use (dimension start to 0 and max is defined by
+     *            {@link #NB_DIMENSIONS} - 1).
+     * @param direction
+     *            the direction (0 or 1).
+     * @return the neighbors of the managed area for the given dimension.
+     */
+    public Group<Peer> getNeighborsForDimensionAndDirection(int dimension, int direction) {
+        return this.neighbors[dimension][direction];
     }
 
     /**
      * Returns the neighbors that have coordinates smaller than the current peer for the given
      * dimension.
      * 
-     * @param dim
+     * @param dimension
      *            the neighbors that have coordinates smaller than the current peer for the given
      *            dimension. the dimension to use (dimension start to 0 and max is defined by
      *            {@link #NB_DIMENSIONS} - 1).
      * @return
      */
-    public Group<Peer> getInferiorNeighborsForDimension(int dim) {
-        return this.neighbors[dim][0];
+    public Group<Peer> getInferiorNeighborsForDimension(int dimension) {
+        return this.neighbors[dimension][0];
     }
 
     /**
      * Returns the neighbors that have coordinates larger than the current peer for the given
      * dimension.
      * 
-     * @param dim
+     * @param dimension
      *            the dimension to use (dimension start to 0 and max is defined by
      *            {@link #NB_DIMENSIONS} - 1).
      * @return the neighbors that have coordinates larger than the current peer for the given
      *         dimension.
      */
-    public Group<Peer> getSuperiorNeighborsForDimension(int dim) {
-        return this.neighbors[dim][1];
+    public Group<Peer> getSuperiorNeighborsForDimension(int dimension) {
+        return this.neighbors[dimension][1];
     }
 
     /**
@@ -454,6 +475,7 @@ public class CANOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
+    @Override
     public CANLookupResponseMessage handleLookupMessage(LookupMessage msg) {
         return new CANLookupResponseMessage(msg.getCreationTimestamp(), this.getLocalPeer(),
             ((CANLookupMessage) msg).getCoordinates());
@@ -462,6 +484,7 @@ public class CANOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
+    @Override
     public CANJoinResponseMessage handleJoinMessage(Message msg) {
         CANJoinMessage message = (CANJoinMessage) msg;
         this.addNeighbor(message.getPeer(), message.getDimesion(), message.getDirection());
@@ -499,6 +522,7 @@ public class CANOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
+    @Override
     public EmptyResponseMessage handleLeaveMessage(LeaveMessage msg) {
         LeaveMessage message = msg;
         this.removeNeighbor(message.getPeer());

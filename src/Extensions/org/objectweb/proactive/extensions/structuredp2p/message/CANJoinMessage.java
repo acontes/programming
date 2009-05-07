@@ -25,10 +25,10 @@ public class CANJoinMessage extends Message {
     /**
      * Constructor.
      */
-    public CANJoinMessage(Peer peer, int dim, int order) {
+    public CANJoinMessage(Peer peer, int dimension, int direction) {
         this.peer = peer;
-        this.dimension = dim;
-        this.order = order;
+        this.dimension = dimension;
+        this.order = direction;
     }
 
     /**
@@ -39,6 +39,7 @@ public class CANJoinMessage extends Message {
      * @return a PingResponseMessage for routing.
      * 
      */
+    @Override
     public CANJoinResponseMessage handle(StructuredOverlay overlay) {
         return ((CANOverlay) overlay).handleJoinMessage(this);
     }
