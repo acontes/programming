@@ -72,11 +72,10 @@ import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
  * Data spaces are configured as follows:
  * <ul>
  * <li>Input data spaces are defined as HTTP resources
- * <li>Scratch data spaces are located in <code>{@link #USER_HOMEDIR} + {@link #TMP_PATH}</code> directory with
- * {@link #REMOTE_ACCESS_PROTO} specific remote access defined</li>
- * <li>Output data spaces are located in
- * <code>{@link #USER_HOMEDIR} + {@link #TMP_PATH} + "/output"</code> directory on the deployer's
- * host. Remote access is defined specificly to {@link #REMOTE_ACCESS_PROTO}</li>
+ * <li>Scratch data spaces are located in <code>{@link #SCRATCH_DATA_SPACE_PATH}</code> directory
+ * with {@link #REMOTE_ACCESS_PROTO} specific remote access defined</li>
+ * <li>Output data spaces are located in <code>{@link #OUTPUT_DATA_SPACE_PATH}</code> directory on
+ * the deployer's host. Remote access is defined specificly to {@link #REMOTE_ACCESS_PROTO}</li>
  * </ul>
  */
 public class HelloExample {
@@ -89,11 +88,12 @@ public class HelloExample {
     private static final String HTTP_RESOURCE2_NAME = "wiki_grid_computing";
     private static final String HTTP_RESOURCE2_URL = "http://en.wikipedia.org/wiki/Grid_computing";
 
-    // root path for data spaces location
-    private static final String USER_HOMEDIR = System.getProperty("user.home");
+    // root path for output data space location
+    private static final String OUTPUT_DATA_SPACE_PATH = System.getProperty("user.home") + "/tmp/output/";
 
-    // path suffix for data spaces location (used also by remote access protocol
-    private static final String TMP_PATH = "/tmp";
+    // path scratch data spaces location (used also by remote access protocol)
+    private static final String SCRATCH_DATA_SPACE_PATH = System.getProperty("java.io.tmpdir") +
+        "/dataspaces";
 
     // remote access protocol specific constants
     private static final String REMOTE_ACCESS_PROTO = "sftp://";
@@ -234,10 +234,10 @@ public class HelloExample {
         }
         descriptorFile = new File(args[DESCRIPTOR_FILENAME_ARG]);
 
-        final String scratchLocalPath = USER_HOMEDIR + TMP_PATH;
+        final String scratchLocalPath = SCRATCH_DATA_SPACE_PATH;
         final String scratchAccessURL = REMOTE_ACCESS_PROTO + USERNAME + "@#{hostname}" + scratchLocalPath;
 
-        final String outputLocalPath = USER_HOMEDIR + TMP_PATH + "/output";
+        final String outputLocalPath = OUTPUT_DATA_SPACE_PATH;
         final String outputAccessURL = REMOTE_ACCESS_PROTO + USERNAME + "@" + HOSTNAME + outputLocalPath;
 
         scratchSpaceConfiguration = new BaseScratchSpaceConfiguration(scratchAccessURL, scratchLocalPath);
