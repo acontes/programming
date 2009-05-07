@@ -6,9 +6,7 @@ import java.net.URISyntaxException;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ObjectForSynchro;
-import org.objectweb.proactive.api.PAMobileAgent;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -19,6 +17,10 @@ import org.objectweb.proactive.extra.dataspaces.Utils;
 import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredException;
 
 
+/**
+ * Class that can be instantiated as an ActiveObject on a ProActive node to configure Data Spaces
+ * support on that node.
+ */
 @ActiveObject
 public class DataSpacesInstaller implements Serializable {
 
@@ -30,12 +32,23 @@ public class DataSpacesInstaller implements Serializable {
     public DataSpacesInstaller() {
     }
 
+    /**
+     * Constructor with Naming Service URL argument.
+     *
+     * @param url
+     *            valid Naming Service URL
+     */
     public DataSpacesInstaller(String url) {
         namingServiceURL = url;
     }
 
     /**
-     * This method can be separated into two - configure node and then node for application.
+     * Start Data Spaces on a current node. This method can be separated into two - configure node
+     * and then node for application.
+     *
+     * @param baseScratchConfiguration
+     *            scratch space configuration for a node
+     * @return object for synchronization
      */
     public ObjectForSynchro startDataSpaces(BaseScratchSpaceConfiguration baseScratchConfiguration)
             throws FileSystemException, NotConfiguredException, ProActiveException, URISyntaxException {
@@ -51,6 +64,11 @@ public class DataSpacesInstaller implements Serializable {
         return new ObjectForSynchro();
     }
 
+    /**
+     * Stops Data Spaces on a current node.
+     *
+     * @return object for synchronization
+     */
     public ObjectForSynchro stopDataSpaces() throws NotConfiguredException {
         final Node node = Utils.getCurrentNode();
         final String logMsg = nameForLoggers + " stops data spaces";
@@ -58,10 +76,6 @@ public class DataSpacesInstaller implements Serializable {
         DataSpacesNodes.closeNodeConfig(node);
 
         return new ObjectForSynchro();
-    }
-
-    public void migrate(Node n) throws MigrationException {
-        PAMobileAgent.migrateTo(n);
     }
 
     private void buildNameForLoggers(final Node node) {

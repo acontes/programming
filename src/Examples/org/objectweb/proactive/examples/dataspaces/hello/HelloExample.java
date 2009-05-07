@@ -30,49 +30,103 @@ import org.objectweb.proactive.extra.dataspaces.PADataSpaces;
 import org.objectweb.proactive.extra.dataspaces.SpaceInstanceInfo;
 import org.objectweb.proactive.extra.dataspaces.Utils;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
-import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException;
+import org.objectweb.proactive.extra.dataspaces.exceptions.DataSpacesException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredException;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
 
+/**
+ * Simple example of how to use Data Spaces in ProActive processing.
+ * <p>
+ * Goal of processing: count lines of documents from HTTP source (e.g. Wikipedia site) and store
+ * results in one file on the local disk.
+ * <p>
+ * Scenario:
+ * <ol>
+ * <li>HTTP resources are registered as named input data spaces. Output file is registered as a
+ * default output data space. All the registration is performed through
+ * {@link NamingService#registerApplication(long, Set)} call.</li>
+ * <li>Two ActiveObjects start their local processing
+ * {@link ExampleProcessing#computePartials(String)} in parallel:
+ * <ul>
+ * <li>Read document content from specified named input data space</li>
+ * <li>Count lines of a read document</li>
+ * <li>Store partial result in a local scratch</li>
+ * <li>Return URI of a local scratch containing file with partial results</li>
+ * </ul>
+ * </li>
+ * <li>The deployer gathers scratch URIs with partial results into a set and calls
+ * {@link ExampleProcessing#gatherPartials(Set)} method on one of the AOs. That method performs:
+ * <ul>
+ * <li>Read partial results from each specified scratch URI</li>
+ * <li>Combine partial results as one list, a final results of the processing</li>
+ * <li>Store final results in a file within the default output data space</li>
+ * </ul>
+ * </li>
+ * </ol>
+ * <p>
+ * Note: Data spaces are started manually on processing nodes through AO instances of
+ * {@link DataSpacesInstaller}.
+ * <p>
+ * Data spaces are configured as follows:
+ * <ul>
+ * <li>Input data spaces are defined as HTTP resources
+ * <li>Scratch data spaces are located in <code>{@link #USER_HOMEDIR} + {@link #TMP_PATH}</code> directory with
+ * {@link #REMOTE_ACCESS_PROTO} specific remote access defined</li>
+ * <li>Output data spaces are located in
+ * <code>{@link #USER_HOMEDIR} + {@link #TMP_PATH} + "/output"</code> directory on the deployer's
+ * host. Remote access is defined specificly to {@link #REMOTE_ACCESS_PROTO}</li>
+ * </ul>
+ */
 public class HelloExample {
 
+    private static final Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
+
+    // input data spaces - HTTP resources to process
     private static final String HTTP_RESOURCE1_NAME = "wiki_proactive";
     private static final String HTTP_RESOURCE1_URL = "http://en.wikipedia.org/wiki/ProActive";
     private static final String HTTP_RESOURCE2_NAME = "wiki_grid_computing";
     private static final String HTTP_RESOURCE2_URL = "http://en.wikipedia.org/wiki/Grid_computing";
 
+    // root path for data spaces location
+    private static final String USER_HOMEDIR = System.getProperty("user.home");
+
+    // path suffix for data spaces location (used also by remote access protocol
+    private static final String TMP_PATH = "/tmp";
+
+    // remote access protocol specific constants
+    private static final String REMOTE_ACCESS_PROTO = "scp://";
+    private static final String USERNAME = System.getProperty("user.name");
+
+    // name of a host for output data space, here: the deployer host
+    private static final String HOSTNAME = Utils.getHostname();
+
+    private static final int DESCRIPTOR_FILENAME_ARG = 0;
+
+    private static final String NAMING_SERVICE_NAME = "DSnamingservice";
+
     // FIXME ugly hack to obtain hard coded application id
     private static final long applicationId = Utils.getApplicationId(null);
 
-    private static final String USERNAME = System.getProperty("user.name");
-    private static final String USER_HOMEDIR = System.getProperty("user.home");
-    private static final String TMP_PATH = "/tmp";
-    private static final String SCRATCH_ACCESS_PROTO = "scp://";
-
-    private static final int DESCRIPTOR_FILENAME_ARG = 0;
-    private static final String NAME = "DSnamingservice";
-    private static final Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
-    private static final String HOSTNAME = Utils.getHostname();
-    private static final String OUTPUT_ACCESS_URL = "";
-
     private final Set<SpaceInstanceInfo> applicationSpaces = new HashSet<SpaceInstanceInfo>();
-    private final BaseScratchSpaceConfiguration scratchSpaceConfigurationRemote;
-    private final BaseScratchSpaceConfiguration scratchSpaceConfigurationLocal;
+
+    private final BaseScratchSpaceConfiguration scratchSpaceConfiguration;
+
     private final File descriptorFile;
 
     private NamingService namingService;
-    private DataSpacesInstaller localInstaller;
+
     private RemoteObjectExposer<NamingService> roe;
+
     private List<Node> nodesGrabbed;
+
     private Map<Node, DataSpacesInstaller> nodesDSInstallers = new HashMap<Node, DataSpacesInstaller>();
+
     private GCMApplication applicationDescriptor;
 
     private void stop() {
         try {
-            localInstaller.stopDataSpaces();
-
             for (Node node : nodesGrabbed) {
                 nodesDSInstallers.get(node).stopDataSpaces();
             }
@@ -90,18 +144,19 @@ public class HelloExample {
         }
     }
 
-    private void exampleUsage() throws ActiveObjectCreationException, NodeException, NotConfiguredException,
-            IOException, MalformedURIException {
+    private void exampleUsage() throws ActiveObjectCreationException, NodeException, IOException,
+            DataSpacesException {
 
         final Set<String> partialResults = new HashSet<String>();
         final Iterator<Node> nodes = nodesGrabbed.iterator();
         final Node nodeA = nodes.next();
+        final Node nodeB = nodes.next();
 
         final ExampleProcessing processingA = (ExampleProcessing) PAActiveObject.newActive(
                 ExampleProcessing.class.getName(), null, nodeA);
 
         final ExampleProcessing processingB = (ExampleProcessing) PAActiveObject.newActive(
-                ExampleProcessing.class.getName(), null);
+                ExampleProcessing.class.getName(), null, nodeB);
 
         partialResults.add(processingA.computePartials(HTTP_RESOURCE1_NAME).stringValue());
         partialResults.add(processingB.computePartials(HTTP_RESOURCE2_NAME).stringValue());
@@ -117,17 +172,18 @@ public class HelloExample {
         namingServiceStub.registerApplication(applicationId, applicationSpaces);
 
         applicationDescriptor = startNodes(nsURL);
-        checkEnoughRemoteNodesOrDie(1);
+        checkEnoughRemoteNodesOrDie(2);
 
-        localInstaller.startDataSpaces(scratchSpaceConfigurationLocal);
         for (Node node : nodesGrabbed) {
-            nodesDSInstallers.get(node).startDataSpaces(scratchSpaceConfigurationRemote);
+            nodesDSInstallers.get(node).startDataSpaces(scratchSpaceConfiguration);
         }
     }
 
     private void checkEnoughRemoteNodesOrDie(int i) {
-        if (nodesGrabbed.size() < i)
-            throw new RuntimeException("Not enough nodes to run example");
+        if (nodesGrabbed.size() < i) {
+            logger.error("Not enough nodes to run example");
+            System.exit(0);
+        }
     }
 
     private GCMApplication startNodes(String nsURL) throws ProActiveException {
@@ -147,10 +203,7 @@ public class HelloExample {
             nodesDSInstallers.put(n, r);
         }
 
-        localInstaller = (DataSpacesInstaller) PAActiveObject.newActive(DataSpacesInstaller.class.getName(),
-                new Object[] { nsURL });
-
-        logger.info("Nodes with data spaces installers started: " + nodesGrabbed.size() + " nodes + 1 local");
+        logger.info("Nodes with data spaces installers started: " + nodesGrabbed.size() + " nodes grabbed");
         return applicationDescriptor;
     }
 
@@ -158,7 +211,7 @@ public class HelloExample {
         namingService = new NamingService();
 
         roe = PARemoteObject.newRemoteObject(NamingService.class.getName(), namingService);
-        roe.createRemoteObject(NAME);
+        roe.createRemoteObject(NAMING_SERVICE_NAME);
 
         final String url = roe.getURL();
         logger.info("Naming Service successfully started on: " + url);
@@ -179,25 +232,27 @@ public class HelloExample {
                 " <application descriptor filename>");
             System.exit(0);
         }
+        descriptorFile = new File(args[DESCRIPTOR_FILENAME_ARG]);
 
-        final String scratchAccessURL = SCRATCH_ACCESS_PROTO + USERNAME + "@#{hostname}" + TMP_PATH;
+        final String scratchAccessURL = REMOTE_ACCESS_PROTO + USERNAME + "@#{hostname}" + TMP_PATH;
+        final String outputAccessURL = REMOTE_ACCESS_PROTO + USERNAME + "@" + HOSTNAME + TMP_PATH + "/output";
+        final String scratchLocalPath = USER_HOMEDIR + TMP_PATH;
+        final String outputLocalPath = USER_HOMEDIR + TMP_PATH + "/output";
 
-        scratchSpaceConfigurationRemote = new BaseScratchSpaceConfiguration(scratchAccessURL, USER_HOMEDIR +
-            TMP_PATH + "/remote");
-        scratchSpaceConfigurationLocal = new BaseScratchSpaceConfiguration(scratchAccessURL, USER_HOMEDIR +
-            TMP_PATH + "/local");
-
+        scratchSpaceConfiguration = new BaseScratchSpaceConfiguration(scratchAccessURL, scratchLocalPath);
         addInput(HTTP_RESOURCE1_URL, HTTP_RESOURCE1_NAME);
         addInput(HTTP_RESOURCE2_URL, HTTP_RESOURCE2_NAME);
+        addDefaultOutput(outputLocalPath, outputAccessURL);
+    }
 
-        InputOutputSpaceConfiguration localOutputConfiguration = InputOutputSpaceConfiguration
-                .createOutputSpaceConfiguration(OUTPUT_ACCESS_URL, USER_HOMEDIR + TMP_PATH + "/output",
-                        HOSTNAME, PADataSpaces.DEFAULT_IN_OUT_NAME);
+    private void addDefaultOutput(final String outputLocalPath, final String outputAccessURL)
+            throws ConfigurationException {
+        final InputOutputSpaceConfiguration localOutputConfiguration = InputOutputSpaceConfiguration
+                .createOutputSpaceConfiguration(outputAccessURL, outputLocalPath, HOSTNAME,
+                        PADataSpaces.DEFAULT_IN_OUT_NAME);
 
-        SpaceInstanceInfo localOutput = new SpaceInstanceInfo(applicationId, localOutputConfiguration);
+        final SpaceInstanceInfo localOutput = new SpaceInstanceInfo(applicationId, localOutputConfiguration);
         applicationSpaces.add(localOutput);
-
-        descriptorFile = new File(args[DESCRIPTOR_FILENAME_ARG]);
     }
 
     private void addInput(String http_resource1_url, String http_resource1_name)
@@ -213,30 +268,23 @@ public class HelloExample {
 
     /**
      * @param args
-     * @throws InterruptedException
+     * @throws URISyntaxException
+     * @throws ProActiveException
+     * @throws NotConfiguredException
+     * @throws IOException
      */
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws NotConfiguredException, ProActiveException,
+            URISyntaxException, IOException {
+
         HelloExample hw = null;
 
         try {
             hw = new HelloExample(args);
             hw.start();
             hw.exampleUsage();
-
-            // wait 30 seconds
-            Thread.sleep(1000 * 30);
-
-            hw.stop();
-        } catch (NotConfiguredException e1) {
-            e1.printStackTrace();
-        } catch (FileSystemException e1) {
-            e1.printStackTrace();
-        } catch (ProActiveException e1) {
-            e1.printStackTrace();
-        } catch (URISyntaxException e1) {
-            e1.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } finally {
+            if (hw != null)
+                hw.stop();
         }
     }
 }

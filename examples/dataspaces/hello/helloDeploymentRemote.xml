@@ -19,7 +19,7 @@
 	<infrastructure>
 
 		<hosts>
-			<host id="host" os="${os}" hostCapacity="1" vmCapacity="1">
+			<host id="host" os="${os}" hostCapacity="2" vmCapacity="1">
 				<homeDirectory base="root" relpath="${user.dir}" />
 			</host>
 

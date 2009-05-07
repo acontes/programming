@@ -22,7 +22,7 @@
 				</applicationClasspath>
 				<log4jProperties base="proactive" relpath="examples/dataspaces/hello/tests-log4j"/>
 			</configuration>
-			<virtualNode id="Hello" capacity="1">
+			<virtualNode id="Hello" capacity="2">
 				<nodeProvider refid="provider" />
 			</virtualNode>
 		</proactive>
