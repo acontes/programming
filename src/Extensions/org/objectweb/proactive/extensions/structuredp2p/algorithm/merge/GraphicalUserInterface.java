@@ -38,6 +38,9 @@ public class GraphicalUserInterface extends JFrame {
         contentPane.add(this.createToolbar(), BorderLayout.NORTH);
         contentPane.add(this.area, BorderLayout.CENTER);
 
+        super.setMinimumSize(new Dimension(GraphicalUserInterface.SPACE_WIDTH,
+            GraphicalUserInterface.SPACE_HEIGHT));
+        super.setResizable(false);
         super.setTitle("CAN Merge Algorithm");
         super.setLocationRelativeTo(null);
     }
