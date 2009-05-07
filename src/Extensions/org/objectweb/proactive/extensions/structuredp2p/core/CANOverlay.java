@@ -127,24 +127,14 @@ public class CANOverlay extends StructuredOverlay {
      * @return true if the coordinates are in the area, false otherwise.
      */
     public boolean contains(Coordinate[] coordinates) {
-        int i = 0;
-        Coordinate[] minArea = this.area.getCoordinatesMin();
-        Coordinate[] maxArea = this.area.getCoordinatesMax();
+        int i;
+        boolean res = true;
 
-        for (Coordinate coord : coordinates) {
-            if (coord != null) {
-                // if the current coordinates aren't in the peer area.
-                if (minArea[i].getValue().compareTo(coord.getValue()) <= 0 &&
-                    maxArea[i].getValue().compareTo(coord.getValue()) > 0) {
-                    return false;
-                }
-
-            }
-
-            i++;
+        for (i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
+            res &= (this.getArea().contains(i, coordinates[i]) == 0);
         }
 
-        return true;
+        return res;
     }
 
     /**
@@ -160,17 +150,7 @@ public class CANOverlay extends StructuredOverlay {
      *         is smaller than the line which is managed by the given dimension, 1 otherwise.
      */
     public int contains(int dimensionIndex, Coordinate coordinate) {
-        Coordinate[] minArea = this.area.getCoordinatesMin();
-        Coordinate[] maxArea = this.area.getCoordinatesMax();
-
-        if (minArea[dimensionIndex].getValue().compareTo(coordinate.getValue()) > 0 &&
-            maxArea[dimensionIndex].getValue().compareTo(coordinate.getValue()) <= 0) {
-            return 0;
-        } else if (minArea[dimensionIndex].getValue().compareTo(coordinate.getValue()) > 0) {
-            return -1;
-        } else {
-            return 1;
-        }
+        return this.getArea().contains(dimensionIndex, coordinate);
     }
 
     /**

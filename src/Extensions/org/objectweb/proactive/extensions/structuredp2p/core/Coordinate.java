@@ -17,11 +17,6 @@ import java.io.Serializable;
 public class Coordinate implements Serializable {
 
     /**
-     * The max value of Unicode we managed.
-     */
-    private static int UNICODE = 255;
-
-    /**
      * The content of the coordinate.
      */
     private final String value;

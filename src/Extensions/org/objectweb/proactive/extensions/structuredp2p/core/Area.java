@@ -19,6 +19,16 @@ import org.objectweb.proactive.extensions.structuredp2p.core.exception.AreaExcep
 public class Area implements Serializable {
 
     /**
+     * The minimal value we manage.
+     */
+    private static int MIN_COORD = -255;
+
+    /**
+     * The maximal value we manage.
+     */
+    private static int MAX_COORD = 255;
+
+    /**
      * The minimum coordinates.
      */
     private Coordinate[] coordinatesMin;
@@ -26,7 +36,24 @@ public class Area implements Serializable {
     /**
      * The maximum coordinates.
      */
-    private Coordinate[] coodinatesMax;
+    private Coordinate[] coordinatesMax;
+
+    /**
+     * Constructor. Create the biggest area with all coordinates.
+     */
+    public Area() {
+        Coordinate[] minCoords = new Coordinate[CANOverlay.NB_DIMENSIONS];
+        Coordinate[] maxCoords = new Coordinate[CANOverlay.NB_DIMENSIONS];
+
+        int i;
+        for (i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
+            minCoords[i] = new Coordinate(String.valueOf(MIN_COORD));
+            maxCoords[i] = new Coordinate(String.valueOf(MAX_COORD));
+        }
+
+        this.coordinatesMin = minCoords;
+        this.coordinatesMax = maxCoords;
+    }
 
     /**
      * Constructor.
@@ -38,7 +65,7 @@ public class Area implements Serializable {
      */
     public Area(Coordinate[] min, Coordinate[] max) {
         this.coordinatesMin = min;
-        this.coodinatesMax = max;
+        this.coordinatesMax = max;
     }
 
     /**
@@ -56,33 +83,33 @@ public class Area implements Serializable {
      * @return the maximum coordinates that indicates the area which is managed by a peer.
      */
     public Coordinate[] getCoordinatesMax() {
-        return this.coodinatesMax;
+        return this.coordinatesMax;
     }
 
     /**
      * Returns the minimum coordinates at a specified dimension that indicates the area which is
      * managed by a peer.
      * 
-     * @param dimension
+     * @param dimensionIndex
      *            the dimension on which we recover the coordinates.
      * @return the minimum coordinates at the specified dimension that indicates the area which is
      *         managed by a peer.
      */
-    public Coordinate getCoordinatesMin(int dimension) {
-        return this.coordinatesMin[dimension];
+    public Coordinate getCoordinatesMin(int dimensionIndex) {
+        return this.coordinatesMin[dimensionIndex];
     }
 
     /**
      * Returns the maximum coordinates at a specified dimension that indicates the area which is
      * managed by a peer.
      * 
-     * @param dimension
+     * @param dimensionIndex
      *            the dimension on which we recover the coordinates.
      * @return the maximum coordinates at a specified dimension that indicates the area which is
      *         managed by a peer.
      */
-    public Coordinate getCoordinatesMax(int dimension) {
-        return this.coodinatesMax[dimension];
+    public Coordinate getCoordinatesMax(int dimensionIndex) {
+        return this.coordinatesMax[dimensionIndex];
     }
 
     /**
@@ -94,7 +121,7 @@ public class Area implements Serializable {
      */
     public int isBordered(Area area) {
         int i;
-        int nbDim = this.coodinatesMax.length;
+        int nbDim = this.coordinatesMax.length;
 
         for (i = 0; i < nbDim; i++) {
             if (this.getCoordinatesMax(i) == area.getCoordinatesMin(i) ||
@@ -107,7 +134,7 @@ public class Area implements Serializable {
     }
 
     /**
-     * Merge two bordered areas.
+     * Merges two bordered areas.
      * 
      * @param a
      *            the Area to which we merge the current.
@@ -152,9 +179,9 @@ public class Area implements Serializable {
     public boolean isValidMergingArea(Area area) {
         int axe = this.isBordered(area);
         if (axe != -1) {
-        return (this.coodinatesMax[axe].equals(area.getCoordinatesMax()[axe])) &&
-        (this.coordinatesMin[axe].equals(area.getCoordinatesMin()[axe]));
-        }else{
+            return (this.coordinatesMax[axe].equals(area.getCoordinatesMax()[axe])) &&
+                (this.coordinatesMin[axe].equals(area.getCoordinatesMin()[axe]));
+        } else {
             return false;
         }
     }
@@ -162,7 +189,6 @@ public class Area implements Serializable {
     /**
      * {@inheritDoc}
      */
-    @Override
     public boolean equals(Object o) {
         if (!(o instanceof Area)) {
             throw new IllegalArgumentException();
@@ -171,7 +197,7 @@ public class Area implements Serializable {
         Area area = (Area) o;
 
         int i;
-        int nbDim = this.coodinatesMax.length;
+        int nbDim = this.coordinatesMax.length;
 
         for (i = 0; i < nbDim; i++) {
             if (this.getCoordinatesMax(i) != area.getCoordinatesMax(i) ||
@@ -181,5 +207,65 @@ public class Area implements Serializable {
         }
 
         return true;
+    }
+
+    /**
+     * Returns two areas representing the original one splited following a dimension.
+     * 
+     * @param dimensionIndex
+     *            the dimension.
+     * @return the two split areas.
+     */
+    public Area[] split(int dimensionIndex) {
+        return split(dimensionIndex, Coordinate.getMiddle(this.getCoordinatesMin(dimensionIndex), this
+                .getCoordinatesMax(dimensionIndex)));
+    }
+
+    /**
+     * Returns two areas representing the original one split following a dimension at the specified
+     * coordinate.
+     * 
+     * @param dimensionIndex
+     *            the dimension.
+     * @param coor
+     *            the coordinate.
+     * @return the two split areas.
+     */
+    public Area[] split(int dimensionIndex, Coordinate coordinate) {
+        Coordinate[] maxCoordLessArea = this.getCoordinatesMax();
+        maxCoordLessArea[dimensionIndex] = coordinate;
+
+        Coordinate[] minCoordGreaterArea = this.getCoordinatesMin();
+        minCoordGreaterArea[dimensionIndex] = coordinate;
+
+        return new Area[] { new Area(this.getCoordinatesMin(), maxCoordLessArea),
+                new Area(minCoordGreaterArea, this.getCoordinatesMax()) };
+    }
+
+    /**
+     * Is the coordinate in the area following a dimension ?
+     * 
+     * @param dimensionIndex
+     *            the dimension.
+     * @param coordinate
+     *            the coordinate to check.
+     * @return <code>0</code> if the current coordinate is in the area, <code>-1</code> if the
+     *         coordinate is lexicographically less than the minimal coordinate of the area and
+     *         <code>1</code> if the coordinate is lexicographically grater than the maximal
+     *         coordinate of the area and .
+     */
+    public int contains(int dimensionIndex, Coordinate coordinate) {
+        boolean isGreaterThanMin = this.getCoordinatesMin(dimensionIndex).getValue().compareTo(
+                coordinate.getValue()) <= 0;
+        boolean isLessThanMax = this.getCoordinatesMax(dimensionIndex).getValue().compareTo(
+                coordinate.getValue()) > 0;
+
+        if (!isLessThanMax) {
+            return 1;
+        } else if (!isGreaterThanMin) {
+            return -1;
+        }
+
+        return 0;
     }
 }
