@@ -2,6 +2,7 @@ package org.objectweb.proactive.extra.dataspaces;
 
 import org.apache.commons.logging.impl.Log4JLogger;
 import org.apache.commons.vfs.FileSystemException;
+import org.apache.commons.vfs.FileSystemOptions;
 import org.apache.commons.vfs.impl.DefaultFileReplicator;
 import org.apache.commons.vfs.impl.DefaultFileSystemManager;
 import org.apache.commons.vfs.impl.PrivilegedFileReplicator;
@@ -10,6 +11,7 @@ import org.apache.commons.vfs.provider.http.HttpFileProvider;
 import org.apache.commons.vfs.provider.https.HttpsFileProvider;
 import org.apache.commons.vfs.provider.local.DefaultLocalFileProvider;
 import org.apache.commons.vfs.provider.sftp.SftpFileProvider;
+import org.apache.commons.vfs.provider.sftp.SftpFileSystemConfigBuilder;
 import org.apache.commons.vfs.provider.url.UrlFileProvider;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -25,7 +27,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * <li>HTTP, scheme <code>http:</code></li>
  * <li>HTTPS, scheme <code>https:</code></li>
  * <li>FTP, scheme <code>ftp:</code></li>
- * <li>SFTP, scheme <code>sftp:</code></li>
+ * <li>SFTP, scheme <code>sftp:</code> (with strict host-key checking disabled by default if no
+ * other FileSystemOptions are provided)</li>
  * <li>default URL provider handled by Java URL class</code>
  * </ul>
  * 
@@ -48,7 +51,8 @@ public class VFSFactory {
      */
     public static DefaultFileSystemManager createDefaultFileSystemManager() throws FileSystemException {
         logger.debug("Creating new VFS manager");
-        final DefaultFileSystemManager manager = new DefaultFileSystemManager();
+        final DefaultFileSystemManager manager = new DefaultOptionsFileSystemManager(
+            createDefaultFileSystemOptions());
         manager.setLogger(logger);
 
         final DefaultFileReplicator replicator = new DefaultFileReplicator();
@@ -65,5 +69,12 @@ public class VFSFactory {
         manager.init();
         logger.info("Created and initialized new VFS manager");
         return manager;
+    }
+
+    private static FileSystemOptions createDefaultFileSystemOptions() throws FileSystemException {
+        final FileSystemOptions options = new FileSystemOptions();
+        // TODO or try to configure known hosts somehow (look for OpenSSH file etc.) 
+        SftpFileSystemConfigBuilder.getInstance().setStrictHostKeyChecking(options, "no");
+        return options;
     }
 }
