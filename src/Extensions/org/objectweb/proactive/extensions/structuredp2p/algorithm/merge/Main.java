@@ -1,5 +1,16 @@
 package org.objectweb.proactive.extensions.structuredp2p.algorithm.merge;
 
-public class Main {
+import javax.swing.SwingUtilities;
 
+
+public class Main {
+    public static void main(String arv[]) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                GraphicalUserInterface g = new GraphicalUserInterface();
+                g.setVisible(true);
+            }
+        });
+
+    }
 }
