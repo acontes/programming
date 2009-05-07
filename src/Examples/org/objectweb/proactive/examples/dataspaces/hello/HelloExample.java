@@ -96,7 +96,7 @@ public class HelloExample {
     private static final String TMP_PATH = "/tmp";
 
     // remote access protocol specific constants
-    private static final String REMOTE_ACCESS_PROTO = "scp://";
+    private static final String REMOTE_ACCESS_PROTO = "sftp://";
     private static final String USERNAME = System.getProperty("user.name");
 
     // name of a host for output data space, here: the deployer host
@@ -234,10 +234,11 @@ public class HelloExample {
         }
         descriptorFile = new File(args[DESCRIPTOR_FILENAME_ARG]);
 
-        final String scratchAccessURL = REMOTE_ACCESS_PROTO + USERNAME + "@#{hostname}" + TMP_PATH;
-        final String outputAccessURL = REMOTE_ACCESS_PROTO + USERNAME + "@" + HOSTNAME + TMP_PATH + "/output";
         final String scratchLocalPath = USER_HOMEDIR + TMP_PATH;
+        final String scratchAccessURL = REMOTE_ACCESS_PROTO + USERNAME + "@#{hostname}" + scratchLocalPath;
+
         final String outputLocalPath = USER_HOMEDIR + TMP_PATH + "/output";
+        final String outputAccessURL = REMOTE_ACCESS_PROTO + USERNAME + "@" + HOSTNAME + outputLocalPath;
 
         scratchSpaceConfiguration = new BaseScratchSpaceConfiguration(scratchAccessURL, scratchLocalPath);
         addInput(HTTP_RESOURCE1_URL, HTTP_RESOURCE1_NAME);
