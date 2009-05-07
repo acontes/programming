@@ -21,12 +21,12 @@ public class Area implements Serializable {
     /**
      * The minimal value we manage.
      */
-    private static int MIN_COORD = -255;
+    private static int MIN_COORD = 0;
 
     /**
      * The maximal value we manage.
      */
-    private static int MAX_COORD = 255;
+    private static int MAX_COORD = 256;
 
     /**
      * The minimum coordinates.
@@ -141,7 +141,7 @@ public class Area implements Serializable {
      * @return the merged area.
      * @throws AreaException
      */
-    public Area mergeArea(Area a) throws AreaException {
+    public Area merge(Area a) throws AreaException {
         int border = this.isBordered(a);
         Coordinate[] minCoord = new Coordinate[this.getCoordinatesMax().length];
         Coordinate[] maxCoord = new Coordinate[this.getCoordinatesMax().length];
@@ -258,8 +258,7 @@ public class Area implements Serializable {
     public int contains(int dimension, Coordinate coordinate) {
         boolean isGreaterThanMin = this.getCoordinatesMin(dimension).getValue().compareTo(
                 coordinate.getValue()) <= 0;
-        boolean isLessThanMax = this.getCoordinatesMax(dimension).getValue().compareTo(
-                coordinate.getValue()) > 0;
+        boolean isLessThanMax = this.getCoordinatesMax(dimension).getValue().compareTo(coordinate.getValue()) > 0;
 
         if (!isLessThanMax) {
             return 1;

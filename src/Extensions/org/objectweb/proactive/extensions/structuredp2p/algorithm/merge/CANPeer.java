@@ -7,6 +7,7 @@ import org.objectweb.proactive.extensions.structuredp2p.core.Area;
 import org.objectweb.proactive.extensions.structuredp2p.core.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.OverlayType;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
+import org.objectweb.proactive.extensions.structuredp2p.core.exception.AreaException;
 
 
 @SuppressWarnings("serial")
@@ -18,7 +19,7 @@ public class CANPeer extends Peer {
     public CANPeer() {
         super(OverlayType.CAN);
         this.area = new Area();
-        this.overlay = (CANOverlay) this.getStructuredOverlay();
+        this.overlay = this.getStructuredOverlay();
     }
 
     public void update(Area area, ArrayList<int[]> history) {
@@ -52,16 +53,23 @@ public class CANPeer extends Peer {
         this.addNeighbor(remotePeer, dimension, direction);
     }
 
-    public void leave(CANPeer remotePeer) {
+    public CANPeer leaveCAN() {
         int[] lastOP = this.splitHistory.get(this.splitHistory.size() - 1);
         int dimension = lastOP[0];
         int direction = lastOP[1];
         Group<Peer> neighbors = this.overlay.getNeighborsForDimensionAndDirection(dimension, direction);
+        int nbNeigbors = neighbors.size();
 
-        if (neighbors.size() == 1) {
-
+        // If there is just one neighbor, easy
+        if (nbNeigbors == 1) {
+            ((CANPeer) neighbors.get(0)).merge(this);
+        }
+        // Else, do the same thing recursively (it's a little heavy with data transfer)
+        else if (nbNeigbors > 1) {
+            this.switchWith(((CANPeer) neighbors.get(0)).leaveCAN());
         }
 
+        return this;
     }
 
     public void setArea(Area newArea) {
@@ -74,5 +82,27 @@ public class CANPeer extends Peer {
 
     public void addNeighbor(CANPeer remotePeer, int dimension, int direction) {
         this.overlay.addNeighbor(remotePeer, dimension, direction);
+    }
+
+    public void merge(CANPeer remotePeer) {
+        try {
+            this.area.merge(remotePeer.getStructuredOverlay().getArea());
+            this.splitHistory.remove(this.splitHistory.size() - 1);
+        } catch (AreaException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    public CANOverlay getStructuredOverlay() {
+        return this.overlay;
+    }
+
+    public CANPeer switchWith(CANPeer remotePeer) {
+        remotePeer.update(this.overlay.getArea(), this.splitHistory);
+        this.setArea(null);
+        this.setHistory(null);
+
+        return this;
     }
 }
