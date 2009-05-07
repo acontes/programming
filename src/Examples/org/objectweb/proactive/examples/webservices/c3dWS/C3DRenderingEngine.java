@@ -31,13 +31,13 @@
  */
 package org.objectweb.proactive.examples.webservices.c3dWS;
 
-import org.objectweb.proactive.examples.c3d.geom.Ray;
-import org.objectweb.proactive.examples.c3d.geom.Scene;
-import org.objectweb.proactive.examples.c3d.geom.Vec;
-import org.objectweb.proactive.examples.c3d.prim.Isect;
-import org.objectweb.proactive.examples.c3d.prim.Light;
-import org.objectweb.proactive.examples.c3d.prim.Surface;
-import org.objectweb.proactive.examples.c3d.prim.View;
+import org.objectweb.proactive.examples.webservices.c3dWS.geom.Ray;
+import org.objectweb.proactive.examples.webservices.c3dWS.geom.Scene;
+import org.objectweb.proactive.examples.webservices.c3dWS.geom.Vec;
+import org.objectweb.proactive.examples.webservices.c3dWS.prim.Isect;
+import org.objectweb.proactive.examples.webservices.c3dWS.prim.Light;
+import org.objectweb.proactive.examples.webservices.c3dWS.prim.Surface;
+import org.objectweb.proactive.examples.webservices.c3dWS.prim.View;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 
 
@@ -135,15 +135,15 @@ public class C3DRenderingEngine implements java.io.Serializable, RenderingEngine
                 col = trace(0, 1.0, r);
 
                 // computes the color of the ray
-                red = (int) (col.x * 255.0);
+                red = (int) (col.getX() * 255.0);
                 if (red > 255) {
                     red = 255;
                 }
-                green = (int) (col.y * 255.0);
+                green = (int) (col.getY() * 255.0);
                 if (green > 255) {
                     green = 255;
                 }
-                blue = (int) (col.z * 255.0);
+                blue = (int) (col.getZ() * 255.0);
                 if (blue > 255) {
                     blue = 255;
                 }
@@ -192,8 +192,8 @@ public class C3DRenderingEngine implements java.io.Serializable, RenderingEngine
 
     /** Return the Vector's transmission direction */
     private Vec transDir(Surface m1, Surface m2, Vec I, Vec N) {
-        double n1 = (m1 == null) ? 1.0 : m1.ior;
-        double n2 = (m2 == null) ? 1.0 : m2.ior;
+        double n1 = (m1 == null) ? 1.0 : m1.getIor();
+        double n2 = (m2 == null) ? 1.0 : m2.getIor();
         double eta = n1 / n2;
         double c1 = -Vec.dot(I, N);
         double cs2 = 1.0 - (eta * eta * (1.0 - (c1 * c1)));
@@ -218,7 +218,7 @@ public class C3DRenderingEngine implements java.io.Serializable, RenderingEngine
         col = new Vec();
         surf = hit.prim.getSurface();
         R = new Vec();
-        if (surf.shine > 1e-6) {
+        if (surf.getShine() > 1e-6) {
             R = specularDirection(I, N);
         }
 
@@ -235,16 +235,16 @@ public class C3DRenderingEngine implements java.io.Serializable, RenderingEngine
 
                 // Checks if there is a shadow
                 if (shadow(this.tRay, C3DRenderingEngine.INFINITE)) {
-                    diff = Vec.dot(N, this.tmpVec) * surf.kd * light.brightness;
+                    diff = Vec.dot(N, this.tmpVec) * surf.getKd() * light.brightness;
 
-                    col.adds(diff, surf.color);
-                    if (surf.shine > 1e-6) {
+                    col.adds(diff, surf.getColor());
+                    if (surf.getShine() > 1e-6) {
                         spec = Vec.dot(R, this.tmpVec);
                         if (spec > 1e-6) {
-                            spec = Math.pow(spec, surf.shine);
-                            col.x += spec;
-                            col.y += spec;
-                            col.z += spec;
+                            spec = Math.pow(spec, surf.getShine());
+                            col.setX( col.getX() + spec );
+                            col.setY( col.getY() + spec );
+                            col.setZ( col.getZ() + spec );
                         }
                     }
                 }
@@ -252,19 +252,19 @@ public class C3DRenderingEngine implements java.io.Serializable, RenderingEngine
         } // for
 
         this.tRay.P = P;
-        if ((surf.ks * weight) > 1e-3) {
+        if ((surf.getKs() * weight) > 1e-3) {
             this.tRay.D = specularDirection(I, N);
-            tcol = trace(level + 1, surf.ks * weight, this.tRay);
-            col.adds(surf.ks, tcol);
+            tcol = trace(level + 1, surf.getKs() * weight, this.tRay);
+            col.adds(surf.getKs(), tcol);
         }
-        if ((surf.kt * weight) > 1e-3) {
+        if ((surf.getKt() * weight) > 1e-3) {
             if (hit.enter) {
                 this.tRay.D = transDir(null, surf, I, N);
             } else {
                 this.tRay.D = transDir(surf, null, I, N);
             }
-            tcol = trace(level + 1, surf.kt * weight, this.tRay);
-            col.adds(surf.kt, tcol);
+            tcol = trace(level + 1, surf.getKt() * weight, this.tRay);
+            col.adds(surf.getKt(), tcol);
         }
 
         // garbaging...

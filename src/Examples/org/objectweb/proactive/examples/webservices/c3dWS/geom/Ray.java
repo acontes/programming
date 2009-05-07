@@ -29,34 +29,37 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.examples.webservices.c3dWS;
+package org.objectweb.proactive.examples.webservices.c3dWS.geom;
 
-import org.objectweb.proactive.examples.webservices.c3dWS.geom.Vec;
+/**
+ * A class for making rays (lines in 3D), which have a start point, and a direction.
+ */
+final public class Ray implements java.io.Serializable {
+    public Vec P;
+    public Vec D;
 
+    public Ray(Vec pnt, Vec dir) {
+        P = new Vec(pnt.getX(), pnt.getY(), pnt.getZ());
+        D = new Vec(dir.getX(), dir.getY(), dir.getZ());
+        D.normalize();
+    }
 
-/** These are the methods accessible by the User Gui classes, which somewhat control the User active
- * object. The implementation will often simply forward the call to the dispatcher */
-public interface UserLogic {
-
-    /** Exit the application */
-    public void terminate();
-
-    /** Displays the list of users connected to the dispatcher */
-    public void getUserList();
-
-    /** Ask the dispatcher to revert to original scene*/
-    public void resetScene();
-
-    /** Ask the dispatcher to add a sphere*/
-    public void addSphere();
-
-    /**  Send a mesage to a given other user, or to all */
-    public void sendMessage(String message, String recipientName);
+    /** This is very dangerous to use, as a 0,0 line is not a line ! */
+    public Ray() {
+        P = new Vec();
+        D = new Vec();
+    }
 
     /**
-     * ask for the scene to be rotated by some angle
-     * @param rotationAngle = <x y z> means rotate x radians along the x axis,
-     *         then y radians along the y axis, and finally  z radians along the z axis
+     * Works out the point which lies on this line, at distance t from origine.
+     * @returns V = P + D * t
      */
-    public void rotateScene(Vec rotationAngle);
+    public Vec point(double t) {
+        return new Vec(P.getX() + (D.getX() * t), P.getY() + (D.getY() * t), P.getZ() + (D.getZ() * t));
+    }
+
+    @Override
+    public String toString() {
+        return "{ Po = " + P.toString() + " dir= " + D.toString() + "}";
+    }
 }

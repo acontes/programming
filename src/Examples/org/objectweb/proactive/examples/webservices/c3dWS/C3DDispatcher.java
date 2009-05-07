@@ -50,18 +50,19 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.migration.MigrationStrategyManagerImpl;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.remoteobject.http.util.HttpMarshaller;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.StringMutableWrapper;
-import org.objectweb.proactive.examples.c3d.geom.Scene;
-import org.objectweb.proactive.examples.c3d.geom.Vec;
-import org.objectweb.proactive.examples.c3d.prim.Light;
-import org.objectweb.proactive.examples.c3d.prim.Plane;
-import org.objectweb.proactive.examples.c3d.prim.Primitive;
-import org.objectweb.proactive.examples.c3d.prim.Sphere;
-import org.objectweb.proactive.examples.c3d.prim.Surface;
-import org.objectweb.proactive.examples.c3d.prim.View;
+import org.objectweb.proactive.examples.webservices.c3dWS.geom.Scene;
+import org.objectweb.proactive.examples.webservices.c3dWS.geom.Vec;
+import org.objectweb.proactive.examples.webservices.c3dWS.prim.Light;
+import org.objectweb.proactive.examples.webservices.c3dWS.prim.Plane;
+import org.objectweb.proactive.examples.webservices.c3dWS.prim.Primitive;
+import org.objectweb.proactive.examples.webservices.c3dWS.prim.Sphere;
+import org.objectweb.proactive.examples.webservices.c3dWS.prim.Surface;
+import org.objectweb.proactive.examples.webservices.c3dWS.prim.View;
 import org.objectweb.proactive.examples.webservices.c3dWS.gui.DispatcherGUI;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
@@ -403,6 +404,10 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
         render();
     }
 
+    public void wsRotateScene(int i_user, Vec angle) {
+    	System.out.println(angle.toString());
+    	rotateScene(i_user, angle);
+    }
     /** Tells what are the operations to perform before starting the activity of the AO.
      * Here, we state that if migration asked, procedure  is : leaveHost, migrate */
     public void initActivity(Body body) {
@@ -443,6 +448,10 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
         this.userBag.getUser(i_user).message(s_message);
     }
 
+    public void wsUserWriteMessage(int i_user, String s_message) {
+    	userWriteMessage(i_user, s_message);
+    }
+    
     /** Ask users & dispatcher log s_message, except one  */
     public void allLogExcept(int i_user, String s_message) {
         log(s_message);
@@ -469,6 +478,10 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
         }
     }
 
+    public void wsUserWriteMessageExcept(int i_user, String s_message) {
+    	userWriteMessageExcept(i_user, s_message);
+    }
+    
     /** Ask all users & dispatcher to log s_message */
     public void allLog(String s_message) {
         log(s_message);
@@ -532,6 +545,12 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
         return this.lastUserID++;
     }
 
+    public int wsRegisterUser(byte[] userBytes, String userName) {
+    	User user = (User) HttpMarshaller.unmarshallObject(userBytes);
+    	return registerUser(user, userName);
+    }
+
+    
     public void registerMigratedUser(int userNumber) {
         String name = this.userBag.getName(userNumber);
         log("User " + name + "(" + userNumber + ") has migrated ");
@@ -546,6 +565,10 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
         c3duser.setPixels(new Image2D(this.localCopyOfImage, inter, 0));
     }
 
+    public void wsRegisterMigratedUser(int userNumber) {
+    	registerMigratedUser(userNumber);
+    }
+    	
     /** removes user from userList, so he cannot receive any more messages or images */
     public void unregisterConsumer(int number) {
         String nameOfUser = this.userBag.getName(number);
@@ -583,6 +606,10 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
                 break;
         }
     }
+    
+    public void wsUnregisterConsumer(int number) {
+    	unregisterConsumer(number);
+    }
 
     public void resetScene() {
         this.scene = createNewScene();
@@ -590,6 +617,10 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
         render();
     }
 
+    public void wsResetScene() {
+    	resetScene();
+    }
+    
     /**
      * Create and initialize the scene for the rendering picture.
      * @return The scene just created
@@ -652,7 +683,11 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
 
         return new StringMutableWrapper(s_list.toString());
     }
-
+    
+    public StringMutableWrapper wsGetUserList() {
+    	return getUserList();
+    }
+    	
     public void addSphere(Sphere s) {
         if ((this.election != null) && this.election.isRunning()) {
             allLog("A Sphere Cannot be added while election is running!");
@@ -664,6 +699,13 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
         allLog("A Sphere has been added\n" + s);
         render();
         log("Scene now contains " + this.scene.getNbPrimitives() + " spheres");
+    }
+    
+    public void wsAddSphere() {
+        double radius = (Math.random()) * 10.0;
+        Sphere sphere = new Sphere(Vec.random(20), radius);
+        sphere.setSurface(Surface.random());
+    	addSphere(sphere);
     }
 
     /** Shut down everything, send warning messages to users */
@@ -935,26 +977,31 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
                 throw new ProActiveException("Render virtual node is not defined");
             if (dispatcher == null)
                 throw new ProActiveException("Dispatcher virtual node is not defined");
-
+            
             Deployer deployer = (Deployer) PAActiveObject.newActive(Deployer.class.getName(), new Object[] {
                     gcmad, renderer, dispatcher });
-
+            
             Node[] rendererNodes = deployer.getRendererNodes();
             Object[] param = new Object[] { rendererNodes, deployer };
 
             Node dispatcherNode = deployer.getDispatcherNode();
 
+            System.out.println("1");
             C3DDispatcher c3dd = (C3DDispatcher) PAActiveObject.newActive(C3DDispatcher.class.getName(),
                     param, dispatcherNode);
-
+            System.out.println("2");
+            
             String url = "http://localhost:8080/";
 
             if (argv.length == 2) {
                 url = argv[1];
+                System.out.println("url of deployment = " + url);
             }
-
-            String[] methods = new String[] { "rotateUp", "rotateDown", "rotateLeft", "rotateRight",
-                    "spinLeft", "spinRight", "resetSceneByUser", "addSphereByUser", "registerWSUser" };
+            
+            String[] methods = new String[] { "wsRegisterUser","wsUnregisterConsumer", "wsResetScene", 
+            		"wsAddSphere", "wsGetUserList", "wsUserWriteMessageExcept",
+                    "wsUserWriteMessage", "wsRotateScene", "wsRegisterMigratedUser"};
+            
             WebServices.exposeAsWebService(c3dd, url, "C3DDispatcher", methods);
 
         } catch (ProActiveException e) {

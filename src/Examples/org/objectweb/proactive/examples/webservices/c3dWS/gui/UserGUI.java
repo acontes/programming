@@ -58,7 +58,7 @@ import javax.swing.border.TitledBorder;
 
 import org.objectweb.proactive.examples.webservices.c3dWS.Image2D;
 import org.objectweb.proactive.examples.webservices.c3dWS.UserLogic;
-import org.objectweb.proactive.examples.c3d.geom.Vec;
+import org.objectweb.proactive.examples.webservices.c3dWS.geom.Vec;
 
 
 /**

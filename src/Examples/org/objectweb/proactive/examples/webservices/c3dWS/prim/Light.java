@@ -29,34 +29,23 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.examples.webservices.c3dWS;
+package org.objectweb.proactive.examples.webservices.c3dWS.prim;
 
 import org.objectweb.proactive.examples.webservices.c3dWS.geom.Vec;
 
 
-/** These are the methods accessible by the User Gui classes, which somewhat control the User active
- * object. The implementation will often simply forward the call to the dispatcher */
-public interface UserLogic {
+/**
+ * Represents a punctual light source
+ */
+public class Light implements java.io.Serializable {
+    public Vec pos;
+    public double brightness;
 
-    /** Exit the application */
-    public void terminate();
+    public Light() {
+    }
 
-    /** Displays the list of users connected to the dispatcher */
-    public void getUserList();
-
-    /** Ask the dispatcher to revert to original scene*/
-    public void resetScene();
-
-    /** Ask the dispatcher to add a sphere*/
-    public void addSphere();
-
-    /**  Send a mesage to a given other user, or to all */
-    public void sendMessage(String message, String recipientName);
-
-    /**
-     * ask for the scene to be rotated by some angle
-     * @param rotationAngle = <x y z> means rotate x radians along the x axis,
-     *         then y radians along the y axis, and finally  z radians along the z axis
-     */
-    public void rotateScene(Vec rotationAngle);
+    public Light(double x, double y, double z, double brightness) {
+        this.pos = new Vec(x, y, z);
+        this.brightness = brightness;
+    }
 }

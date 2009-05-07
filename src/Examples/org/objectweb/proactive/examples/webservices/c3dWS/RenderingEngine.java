@@ -31,7 +31,7 @@
  */
 package org.objectweb.proactive.examples.webservices.c3dWS;
 
-import org.objectweb.proactive.examples.c3d.geom.Scene;
+import org.objectweb.proactive.examples.webservices.c3dWS.geom.Scene;
 
 
 /** Methods proposed by Objects which can render scenes */

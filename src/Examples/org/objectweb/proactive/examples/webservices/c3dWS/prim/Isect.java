@@ -29,34 +29,29 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.examples.webservices.c3dWS;
+package org.objectweb.proactive.examples.webservices.c3dWS.prim;
 
-import org.objectweb.proactive.examples.webservices.c3dWS.geom.Vec;
-
-
-/** These are the methods accessible by the User Gui classes, which somewhat control the User active
- * object. The implementation will often simply forward the call to the dispatcher */
-public interface UserLogic {
-
-    /** Exit the application */
-    public void terminate();
-
-    /** Displays the list of users connected to the dispatcher */
-    public void getUserList();
-
-    /** Ask the dispatcher to revert to original scene*/
-    public void resetScene();
-
-    /** Ask the dispatcher to add a sphere*/
-    public void addSphere();
-
-    /**  Send a mesage to a given other user, or to all */
-    public void sendMessage(String message, String recipientName);
+/**
+ * Representation of the intersection between a Ray and a Primitive.
+ * Would be set to null if Ray does not hit Primitive.
+ */
+public class Isect implements java.io.Serializable {
 
     /**
-     * ask for the scene to be rotated by some angle
-     * @param rotationAngle = <x y z> means rotate x radians along the x axis,
-     *         then y radians along the y axis, and finally  z radians along the z axis
+     * Remember, the ray has two vecs that define it : P and D.
+     * This t is the value so that P + tD = point of collision which Primitive
      */
-    public void rotateScene(Vec rotationAngle);
+    public double t;
+
+    /**
+     * The Primitive which was checked for intersection
+     */
+    public Primitive prim;
+
+    /**
+     * Is this a ray that comes frmo the inside of the Primitive, or from the outside?
+     * enter = true means from outside -->  inside
+     * HERM, sort of... In fact, I'm not sure what this is...
+     */
+    public boolean enter;
 }

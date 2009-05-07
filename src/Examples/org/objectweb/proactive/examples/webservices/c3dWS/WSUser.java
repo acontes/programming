@@ -35,24 +35,23 @@ import java.io.File;
 import java.util.Hashtable;
 import java.util.Map;
 
+import org.apache.axis2.AxisFault;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.migration.MigrationStrategyManagerImpl;
+import org.objectweb.proactive.core.remoteobject.http.util.HttpMarshaller;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.core.util.wrapper.StringMutableWrapper;
 import org.objectweb.proactive.examples.webservices.c3dWS.geom.Vec;
-import org.objectweb.proactive.examples.webservices.c3dWS.gui.NameAndHostDialog;
 import org.objectweb.proactive.examples.webservices.c3dWS.gui.UserGUI;
+import org.objectweb.proactive.examples.webservices.c3dWS.gui.WSNameAndHostDialog;
 import org.objectweb.proactive.examples.webservices.c3dWS.gui.WaitFrame;
-import org.objectweb.proactive.examples.webservices.c3dWS.prim.Sphere;
-import org.objectweb.proactive.examples.webservices.c3dWS.prim.Surface;
-import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
+import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
@@ -62,17 +61,24 @@ import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
  * back to UserGUI. It only handles the logic parts, ie specifies the behavior.
  */
 @ActiveObject
-public class C3DUser implements InitActive, java.io.Serializable, User, UserLogic {
+public class WSUser implements InitActive, java.io.Serializable, User, UserLogic {
 
     /** useful for showing information, if no GUI is available, or for error messages */
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
+    private static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
-    /** reference to the dispatcher logic, for image generation and message forwarding */
-    protected Dispatcher c3ddispatcher;
+    /** url of the host where the C3DDispatcher is deployed */
+    private String dispatcherUrl;
 
     /** AsyncRefto self, needed to add method on own queue */
-    protected transient User me;
+    private User me;
 
+    public User getMe() {
+		return me;
+	}
+
+	/** reference to the dispatcher logic, for image generation and message forwarding */
+    private Dispatcher c3ddispatcher;
+    
     /** The chosen name of the user */
     private String userName;
 
@@ -93,26 +99,27 @@ public class C3DUser implements InitActive, java.io.Serializable, User, UserLogi
     private String dispMachineAndOS;
 
     /** ProActive requirement : empty no-arg constructor */
-    public C3DUser() {
+    public WSUser() {
     }
 
-    public C3DUser(Dispatcher disp, String name) {
-        this.c3ddispatcher = disp;
+    public WSUser(String dispatcherUrl, String name, Dispatcher disp) {
+        this.dispatcherUrl = dispatcherUrl;
         this.userName = name;
+        this.c3ddispatcher = disp;
     }
 
     /** Returns the C3DUser constructor arguments, after a dialog has popped up */
     public static Object[] getDispatcherAndUserName() {
         // ask user through Dialog for userName & host 
-        NameAndHostDialog userAndHostNameDialog = new NameAndHostDialog();
-        Dispatcher disp = userAndHostNameDialog.getValidatedDispatcher();
+        WSNameAndHostDialog userAndHostNameDialog = new WSNameAndHostDialog();
+        String dispUrl = userAndHostNameDialog.getValidatedDispatcherService();
 
-        if (disp == null) {
+        if (dispUrl == null) {
             logger.error("Could not find a dispatcher. Closing.");
             System.exit(-1);
         }
 
-        return new Object[] { disp, userAndHostNameDialog.getValidatedUserName() };
+        return new Object[] { dispUrl, userAndHostNameDialog.getValidatedUserName(), userAndHostNameDialog.getValidatedDispatcher() };
     }
 
     /**
@@ -123,7 +130,12 @@ public class C3DUser implements InitActive, java.io.Serializable, User, UserLogi
     // shouldn't be called from outside the class. 
     public void rebuild() {
         this.me = (User) org.objectweb.proactive.api.PAActiveObject.getStubOnThis();
-        this.c3ddispatcher.registerMigratedUser(i_user);
+        try {
+			WSDispatcherCaller.call(this.dispatcherUrl, "wsRegisterMigratedUser", new Object[] {i_user});
+		} catch (AxisFault e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         createGUI();
     }
 
@@ -142,6 +154,7 @@ public class C3DUser implements InitActive, java.io.Serializable, User, UserLogi
      * Tells what are the operations to perform before starting the activity of the AO. Here, we
      * state that if migration asked, procedure is : saveData, migrate, rebuild. We also set some
      * other variables.
+     * @throws AxisFault 
      */
     public void initActivity(Body body) {
         if (body != null) { // FIXME: this is a component bug: sometimes body is null!    
@@ -156,8 +169,24 @@ public class C3DUser implements InitActive, java.io.Serializable, User, UserLogi
             "Waiting for information from Dispatcher");
         // get the stub, which is a long operation, while the wait window is displayed 
         this.me = (User) org.objectweb.proactive.api.PAActiveObject.getStubOnThis();
-
-        int user_id = this.c3ddispatcher.registerUser(this.me, this.userName);
+        
+        Object[] callReturn = null;
+		try {
+			/**
+			 * The following lines should work but it seems that there is
+			 * a bug in axis2. To get round this problem, we serialize the object and
+			 * deserialize it at the reception.
+			 */
+			callReturn = WSDispatcherCaller.call(this.dispatcherUrl, "wsRegisterUser", 
+					new Object[] { HttpMarshaller.marshallObject(this.getMe()), this.getUserName() },
+					new Class<?>[] { int.class });
+		} catch (AxisFault e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
+        int user_id = (Integer) callReturn[0];
+//        int user_id = this.c3ddispatcher.registerUser(this.me, this.userName);
         this.i_user = user_id;
 
         wait.destroy();
@@ -228,7 +257,12 @@ public class C3DUser implements InitActive, java.io.Serializable, User, UserLogi
      * Exit the application
      */
     public void terminate() {
-        this.c3ddispatcher.unregisterConsumer(i_user);
+    	try {
+			WSDispatcherCaller.call(this.dispatcherUrl, "wsUnregisterConsumer", new Object[] {i_user});
+		} catch (AxisFault e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         this.gui.trash();
         PAActiveObject.terminateActiveObject(true);
     }
@@ -251,12 +285,12 @@ public class C3DUser implements InitActive, java.io.Serializable, User, UserLogi
 
         proActiveDescriptor.startDeployment();
         GCMVirtualNode user = proActiveDescriptor.getVirtualNode("User");
-        Object[] params = C3DUser.getDispatcherAndUserName();
+        Object[] params = WSUser.getDispatcherAndUserName();
 
         try {
             //C3DUser c3duser = (C3DUser)
             user.waitReady();
-            org.objectweb.proactive.api.PAActiveObject.newActive(C3DUser.class.getName(), params, user
+            org.objectweb.proactive.api.PAActiveObject.newActive(WSUser.class.getName(), params, user
                     .getANode());
         } catch (Exception e) {
             logger.error("Problemn with C3DUser Active Object creation:");
@@ -264,38 +298,68 @@ public class C3DUser implements InitActive, java.io.Serializable, User, UserLogi
         }
     }
 
+    
+    
     /** Ask the dispatcher to revert to original scene */
     public void resetScene() {
-        this.c3ddispatcher.resetScene();
+    	try {
+			WSDispatcherCaller.call(this.dispatcherUrl, "wsResetScene", new Object[] {});
+		} catch (AxisFault e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
     /** Ask the dispatcher to add a sphere */
     public void addSphere() {
-        double radius = (Math.random()) * 10.0;
-        Sphere sphere = new Sphere(Vec.random(20), radius);
-        sphere.setSurface(Surface.random());
-        this.c3ddispatcher.addSphere(sphere);
+    	try {
+			WSDispatcherCaller.call(this.dispatcherUrl, "wsAddSphere", new Object[] {});
+		} catch (AxisFault e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
     /** Displays the list of users connected to the dispatcher */
     public void getUserList() {
-        StringMutableWrapper list = this.c3ddispatcher.getUserList();
+        Object[] callReturn = null;
+    	try {
+			callReturn = WSDispatcherCaller.call(this.dispatcherUrl, "wsGetUserList",
+					new Object[] {},
+					new Class<?>[] {String.class});
+		} catch (AxisFault e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        String list = (String) callReturn[0];
         this.gui.log("List of current users:\n" + list.toString());
     }
 
-    /** Send a mesage to a given other user, or to all */
+    /** Send a message to a given other user, or to all */
     public void sendMessage(String message, String recipientName) {
         Integer talkId = (Integer) h_users.get(recipientName);
 
         if (talkId == null) {
             // BroadCast
             gui.writeMessage("<to all> " + message + '\n');
-            this.c3ddispatcher.userWriteMessageExcept(this.i_user, "[from " + this.userName + "] " + message);
+        	try {
+    			WSDispatcherCaller.call(this.dispatcherUrl, "wsUserWriteMessageExcept", 
+    					new Object[] {this.i_user, "[from " + this.userName + "] " + message});
+    		} catch (AxisFault e) {
+    			// TODO Auto-generated catch block
+    			e.printStackTrace();
+    		}
         } else {
             // Private message
             gui.writeMessage("<to " + recipientName + "> " + message + '\n');
-            this.c3ddispatcher.userWriteMessage(talkId.intValue(), "[Private from " + this.userName + "] " +
-                message);
+        	try {
+    			WSDispatcherCaller.call(this.dispatcherUrl, "wsUserWriteMessage", 
+    					new Object[] {talkId.intValue(), "[Private from " + this.userName + "] " +
+    	                message});
+    		} catch (AxisFault e) {
+    			// TODO Auto-generated catch block
+    			e.printStackTrace();
+    		}
         }
     }
 
@@ -307,7 +371,13 @@ public class C3DUser implements InitActive, java.io.Serializable, User, UserLogi
      *            and finally z radians along the z axis
      */
     public void rotateScene(Vec rotationAngle) {
-        this.c3ddispatcher.rotateScene(i_user, rotationAngle);
+    	try {
+			WSDispatcherCaller.call(this.dispatcherUrl, "wsRotateScene", 
+					new Object[] {i_user, rotationAngle});
+		} catch (AxisFault e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
     public void setUserName(String newName) {
