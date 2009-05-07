@@ -13,7 +13,7 @@ import org.apache.commons.vfs.impl.DecoratedFileObject;
  * Partial-workaround for VFS bug - unsynchronized content-related methods. It does not resolve the
  * issue completely, just reduces the risk or problems.
  * <p>
- * FIXME: report this VFS bug and fix it there!
+ * FIXME: depends on bug VFS-253
  */
 public class SyncingFileObjectDectorator extends DecoratedFileObject {
     private final Object sync = new Object();
