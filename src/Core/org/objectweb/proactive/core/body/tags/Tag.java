@@ -1,10 +1,10 @@
-package org.objectweb.proactive.core.body.dsi;
+package org.objectweb.proactive.core.body.tags;
 
 import java.io.Serializable;
 
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.body.dsi.propagation.PropagationPolicy;
-import org.objectweb.proactive.core.body.dsi.propagation.policy.PropagatePolicy;
+import org.objectweb.proactive.core.body.tags.propagation.PropagationPolicy;
+import org.objectweb.proactive.core.body.tags.propagation.policy.PropagatePolicy;
 
 /**
  * Tag for Request Tagging

@@ -1,4 +1,4 @@
-package org.objectweb.proactive.core.body.dsi;
+package org.objectweb.proactive.core.body.tags;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.body.dsi.propagation.PropagationPolicy;
+import org.objectweb.proactive.core.body.tags.propagation.PropagationPolicy;
 
 /**
  * RequestTags : Add a tag on a request with a tag value and its propagation policy, and an object container binded to it.

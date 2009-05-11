@@ -1,6 +1,6 @@
-package org.objectweb.proactive.core.body.dsi;
+package org.objectweb.proactive.core.body.tags;
 
-import org.objectweb.proactive.core.body.dsi.propagation.policy.AbstractPolicy;
+import org.objectweb.proactive.core.body.tags.propagation.policy.AbstractPolicy;
 
 public interface RequestTagsFactory {
 

@@ -1,6 +1,6 @@
-package org.objectweb.proactive.core.body.dsi.propagation.policy;
+package org.objectweb.proactive.core.body.tags.propagation.policy;
 
-import org.objectweb.proactive.core.body.dsi.Tag;
+import org.objectweb.proactive.core.body.tags.Tag;
 
 
 /**

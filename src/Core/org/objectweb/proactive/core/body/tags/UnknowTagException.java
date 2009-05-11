@@ -1,4 +1,4 @@
-package org.objectweb.proactive.core.body.dsi;
+package org.objectweb.proactive.core.body.tags;
 
 import org.objectweb.proactive.core.ProActiveException;
 
