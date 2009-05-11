@@ -41,6 +41,8 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.dsi.RequestTags;
 import org.objectweb.proactive.core.body.dsi.RequestTagsFactory;
+import org.objectweb.proactive.core.body.dsi.TagRegistry;
+import org.objectweb.proactive.core.body.dsi.propagation.policy.AbstractPolicy;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.ft.protocols.FTManagerFactory;
 import org.objectweb.proactive.core.body.ft.protocols.cic.managers.FTManagerCIC;
@@ -489,6 +491,18 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
         @Override
         public RequestTags newRequestTags() {
             return new RequestTags();
+        }
+
+        @Override
+        public void register(String tag, AbstractPolicy policy) {
+            TagRegistry.getInstance().register(tag, policy);
+            
+        }
+        
+        @Override
+        public void register(String id) {
+            TagRegistry.getInstance().register(id);
+            
         }
     }
     

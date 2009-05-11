@@ -269,7 +269,7 @@ public class HalfBody extends AbstractBody {
             try {
                 tags.addTag("DSI");
             } catch (UnknowTagException e) {
-                TagRegistry.getInstance().register("DSI", new RequiredPolicy());
+                requestTagsFactory.register("DSI", new RequiredPolicy());
             }
 
             Request request = this.internalRequestFactory.newRequest(methodCall, HalfBody.this,
