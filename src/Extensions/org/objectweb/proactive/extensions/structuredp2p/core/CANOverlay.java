@@ -142,7 +142,9 @@ public class CANOverlay extends StructuredOverlay {
         boolean res = true;
 
         for (i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
-            res &= (this.getArea().contains(i, coordinates[i]) == 0);
+            if (!(res &= (this.getArea().contains(i, coordinates[i]) == 0))) {
+                return false;
+            }
         }
 
         return res;
