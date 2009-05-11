@@ -9,7 +9,6 @@ import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
@@ -38,7 +37,7 @@ public class ExampleProcessing implements Serializable {
 
     /**
      * Resolves AO's scratch and creates there a file with provided content.
-     *
+     * 
      * @param fname
      *            name of a file to create
      * @param content
@@ -81,7 +80,7 @@ public class ExampleProcessing implements Serializable {
     /**
      * Computes number of lines of a document from specified input data space name, and writes
      * partial results into a file in it's scratch. URI of AO's scratch data space is returned.
-     *
+     * 
      * @param inputName
      *            name of input data space containing document to process
      * @return URI of AO's scratch or <code>null</code> if any IO operation has failed.
@@ -89,7 +88,7 @@ public class ExampleProcessing implements Serializable {
      *             if specified input data space cannot be resolved
      * @throws NotConfiguredException
      *             this AO's scratch hasn't been configured
-     *
+     * 
      */
     public StringWrapper computePartials(String inputName) throws SpaceNotFoundException,
             NotConfiguredException {
@@ -132,16 +131,15 @@ public class ExampleProcessing implements Serializable {
     /**
      * Gathers all partials results from specified scratches into one output file within output data
      * space.
-     *
-     * @param partialResultsURIs
-     *            set of scratch URIs containing partial results
+     * 
+     * @param partialResults
+     *            list of scratch URIs containing partial results
      * @throws MalformedURIException
      *             when any specified URI is not correctly formed
      * @throws DataSpacesException
      *             when resolving default output has failed
      */
-    public void gatherPartials(Set<String> partialResultsURIs) throws MalformedURIException,
-            DataSpacesException {
+    public void gatherPartials(List<String> partialResults) throws MalformedURIException, DataSpacesException {
 
         FileObject outputSpace = null;
         FileObject outputFile = null;
@@ -155,7 +153,7 @@ public class ExampleProcessing implements Serializable {
 
             outputSpace = PADataSpaces.resolveDefaultOutput();
 
-            for (String uri : partialResultsURIs) {
+            for (String uri : partialResults) {
                 try {
                     scratchSpace = PADataSpaces.resolveFile(uri);
                 } catch (Exception e) {
@@ -217,7 +215,7 @@ public class ExampleProcessing implements Serializable {
 
     /**
      * Returns BufferedWriter of specified file's content.
-     *
+     * 
      * @param outputFile
      *            file of which content writer is to be returned
      * @return writer of a file's content
@@ -230,7 +228,7 @@ public class ExampleProcessing implements Serializable {
 
     /**
      * Returns BufferedReader of specified file's content.
-     *
+     * 
      * @param inputFile
      *            file of which content reader is to be returned
      * @return reader of a file's content

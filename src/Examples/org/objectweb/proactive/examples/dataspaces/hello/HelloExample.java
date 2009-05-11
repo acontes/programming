@@ -3,6 +3,7 @@ package org.objectweb.proactive.examples.dataspaces.hello;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -13,7 +14,9 @@ import java.util.Set;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.ObjectForSynchro;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.api.PARemoteObject;
 import org.objectweb.proactive.core.ProActiveException;
@@ -56,8 +59,9 @@ import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
  * <li>Return URI of a local scratch containing file with partial results</li>
  * </ul>
  * </li>
- * <li>The deployer gathers scratch URIs with partial results into a set and calls
- * {@link ExampleProcessing#gatherPartials(Set)} method on one of the AOs. That method performs:
+ * <li>The deployer gathers scratch URIs with partial results into a list and after that is
+ * completed (synchronization) calls {@link ExampleProcessing#gatherPartials(List)} method on one of
+ * the AOs. That method performs:
  * <ul>
  * <li>Read partial results from each specified scratch URI</li>
  * <li>Combine partial results as one list, a final results of the processing</li>
@@ -67,7 +71,7 @@ import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
  * </ol>
  * <p>
  * Note: Data spaces are started manually on processing nodes through AO instances of
- * {@link DataSpacesInstaller}.
+ * {@link DataSpacesInstaller}, with explicit synchronization after this process.
  * <p>
  * Data spaces are configured as follows:
  * <ul>
@@ -147,7 +151,7 @@ public class HelloExample {
     private void exampleUsage() throws ActiveObjectCreationException, NodeException, IOException,
             DataSpacesException {
 
-        final Set<String> partialResults = new HashSet<String>();
+        final List<String> partialResults = new ArrayList<String>();
         final Iterator<Node> nodes = nodesGrabbed.iterator();
         final Node nodeA = nodes.next();
         final Node nodeB = nodes.next();
@@ -160,12 +164,16 @@ public class HelloExample {
 
         partialResults.add(processingA.computePartials(HTTP_RESOURCE1_NAME).stringValue());
         partialResults.add(processingB.computePartials(HTTP_RESOURCE2_NAME).stringValue());
+
+        PAFuture.waitForAll(partialResults);
+
         processingB.gatherPartials(partialResults);
     }
 
     private void start() throws NotConfiguredException, FileSystemException, ProActiveException,
             URISyntaxException {
 
+        final List<ObjectForSynchro> synchros = new ArrayList<ObjectForSynchro>();
         final String nsURL = startNamingService();
         final NamingService namingServiceStub = NamingService.createNamingServiceStub(nsURL);
 
@@ -175,8 +183,11 @@ public class HelloExample {
         checkEnoughRemoteNodesOrDie(2);
 
         for (Node node : nodesGrabbed) {
-            nodesDSInstallers.get(node).startDataSpaces(scratchSpaceConfiguration);
+            final ObjectForSynchro synchro = nodesDSInstallers.get(node).startDataSpaces(
+                    scratchSpaceConfiguration);
+            synchros.add(synchro);
         }
+        PAFuture.waitForAll(synchros);
     }
 
     private void checkEnoughRemoteNodesOrDie(int i) {
