@@ -43,7 +43,6 @@ public class CANLookupMessage extends LookupMessage {
      *            peer to which the message will be sent.
      * @return a CanResponseMessage for routing.
      */
-    @Override
     public LookupResponseMessage handle(StructuredOverlay overlay) {
         return overlay.handleLookupMessage(this);
     }

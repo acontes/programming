@@ -133,7 +133,7 @@ public class GraphicalUserInterface extends JFrame {
                                 Integer.parseInt(max[1].getValue()));
                     }
                     /* Left click */
-                    else {
+                    else if (clickedPeer != null) {
                         if (GraphicalUserInterface.this.action == GraphicalUserInterface.Action.SPLIT) {
                             Peer newPeer = null;
                             try {
@@ -156,6 +156,9 @@ public class GraphicalUserInterface extends JFrame {
                                 clickedPeer.leave();
                             }
                         }
+                    } else {
+                        JOptionPane.showMessageDialog(GraphicalUserInterface.this, "Please clic on a peer !",
+                                "Warning", JOptionPane.WARNING_MESSAGE);
                     }
                 }
             });

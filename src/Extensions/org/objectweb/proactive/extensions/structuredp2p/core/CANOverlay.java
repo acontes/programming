@@ -313,7 +313,6 @@ public class CANOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
-    @Override
     public LookupResponseMessage sendMessage(LookupMessage msg) {
         CANLookupMessage msgCan = (CANLookupMessage) msg;
         if (this.contains(msgCan.getCoordinates())) {
@@ -349,7 +348,6 @@ public class CANOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
-    @Override
     public ResponseMessage sendMessageTo(Peer remotePeer, Message msg) {
         return remotePeer.receiveMessage(msg);
     }
@@ -357,7 +355,6 @@ public class CANOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
-    @Override
     public void update() {
         // TODO Auto-generated method stub
     }

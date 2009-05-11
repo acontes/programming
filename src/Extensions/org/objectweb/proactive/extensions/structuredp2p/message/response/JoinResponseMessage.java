@@ -22,7 +22,7 @@ public abstract class JoinResponseMessage extends ResponseMessage {
      */
     public JoinResponseMessage(long timestampCreationMessage, boolean result) {
         super(timestampCreationMessage);
-        this.isSuccess = new Boolean(true);
+        this.isSuccess = new Boolean(result);
     }
 
     /**

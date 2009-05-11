@@ -162,6 +162,8 @@ public class Coordinate implements Serializable {
         int val = Integer.parseInt(coord.getValue());
         int cur = Integer.parseInt(this.getValue());
 
+        System.out.println("cur = " + cur + "; val = " + val);
+
         return cur - val;
     }
 }

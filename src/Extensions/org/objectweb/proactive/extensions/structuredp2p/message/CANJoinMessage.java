@@ -4,10 +4,9 @@ import java.util.ArrayList;
 
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.extensions.structuredp2p.core.Area;
-import org.objectweb.proactive.extensions.structuredp2p.core.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay;
-import org.objectweb.proactive.extensions.structuredp2p.message.response.CANJoinResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.message.response.JoinResponseMessage;
 
 
 /**
@@ -43,9 +42,8 @@ public class CANJoinMessage extends Message {
      * @return a PingResponseMessage for routing.
      * 
      */
-    @Override
-    public CANJoinResponseMessage handle(StructuredOverlay overlay) {
-        return ((CANOverlay) overlay).handleJoinMessage(this);
+    public JoinResponseMessage handle(StructuredOverlay overlay) {
+        return overlay.handleJoinMessage(this);
     }
 
     public Group<Peer>[][] getNeighbors() {
