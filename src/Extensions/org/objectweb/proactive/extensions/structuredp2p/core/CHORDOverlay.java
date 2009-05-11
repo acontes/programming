@@ -7,14 +7,12 @@ import org.objectweb.proactive.extensions.structuredp2p.message.CHORDLookupMessa
 import org.objectweb.proactive.extensions.structuredp2p.message.LeaveMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.LookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.Message;
-import org.objectweb.proactive.extensions.structuredp2p.message.UpdateMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.AddNeighborResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.CHORDLookupResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.EmptyResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.JoinResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.LookupResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.ResponseMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.response.UpdateResponseMessage;
 
 
 /**
@@ -145,11 +143,6 @@ public class CHORDOverlay extends StructuredOverlay {
     /**
      * TODO
      */
-    public UpdateResponseMessage handleUpdateMessage(UpdateMessage leaveMessage) {
-        return null;
-    }
-
-    @Override
     public AddNeighborResponseMessage handleAddNeighborMessage(AddNeighborMessage msg) {
         // TODO Auto-generated method stub
         return null;

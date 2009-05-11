@@ -47,8 +47,8 @@ public class Area implements Serializable {
 
         int i;
         for (i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
-            minCoords[i] = new Coordinate(String.valueOf(Area.MIN_COORD));
-            maxCoords[i] = new Coordinate(String.valueOf(Area.MAX_COORD));
+            minCoords[i] = new Coordinate("" + Area.MIN_COORD);
+            maxCoords[i] = new Coordinate("" + Area.MAX_COORD);
         }
 
         this.coordinatesMin = minCoords;

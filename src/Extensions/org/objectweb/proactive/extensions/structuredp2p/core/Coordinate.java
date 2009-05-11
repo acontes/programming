@@ -54,7 +54,7 @@ public class Coordinate implements Serializable {
         int minL = Integer.parseInt(min.getValue());
         int maxL = Integer.parseInt(max.getValue());
 
-        return new Coordinate(String.valueOf((maxL + minL) / 2));
+        return new Coordinate("" + ((maxL + minL) / 2));
     }
 
     /**

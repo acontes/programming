@@ -1,8 +1,5 @@
 package org.objectweb.proactive.extensions.structuredp2p.message.response;
 
-import org.objectweb.proactive.extensions.structuredp2p.message.UpdateMessage;
-
-
 /**
  * Defines a response for the {@link UpdateMessage}.
  * 

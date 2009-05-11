@@ -17,20 +17,17 @@ import org.objectweb.proactive.extensions.structuredp2p.message.CANCheckMergeMes
 import org.objectweb.proactive.extensions.structuredp2p.message.CANJoinMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.CANLookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.CANMergeMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.CANUpdateMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.LeaveMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.LoadBalancingMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.LookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.Message;
 import org.objectweb.proactive.extensions.structuredp2p.message.PingMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.UpdateMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.AddNeighborResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.CANAddNeighborResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.CANCheckMergeResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.CANJoinResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.CANLookupResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.CANMergeResponseMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.response.CANUpdateResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.EmptyResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.LookupResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.ResponseMessage;
@@ -541,6 +538,16 @@ public class CANOverlay extends StructuredOverlay {
     public CANJoinResponseMessage handleJoinMessage(Message msg) {
         CANJoinMessage message = (CANJoinMessage) msg;
         this.neighbors = message.getNeighbors();
+
+        int i;
+        for (i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
+            int j;
+            for (j = 0; j < 2; j++) {
+                this.getLocalPeer().sendMessageTo((Peer) this.neighbors[i][j].getGroupByType(),
+                        new CANAddNeighborMessage(this.getRemotePeer(), i, j));
+            }
+        }
+
         this.update(message.getArea(), message.getHistory());
 
         return new CANJoinResponseMessage(msg.getCreationTimestamp(), true);
@@ -587,15 +594,10 @@ public class CANOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
-    public CANUpdateResponseMessage handleUpdateMessage(UpdateMessage msg) {
-        CANUpdateMessage message = (CANUpdateMessage) msg;
-        this.update(message.getArea(), message.getHistory());
-
-        return new CANUpdateResponseMessage(msg.getCreationTimestamp());
-    }
-
     public CANAddNeighborResponseMessage handleAddNeighborMessage(CANAddNeighborMessage msg) {
-        this.addNeighbor(msg.getPeer(), msg.getDimesion(), msg.getDirection());
+        if (!this.neighbors[msg.getDimesion()][msg.getDirection()].contains(msg.getPeer()))
+            this.addNeighbor(msg.getPeer(), msg.getDimesion(), msg.getDirection());
+
         return new CANAddNeighborResponseMessage(msg.getCreationTimestamp());
     }
 
