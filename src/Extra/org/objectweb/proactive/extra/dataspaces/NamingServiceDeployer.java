@@ -23,10 +23,19 @@ public class NamingServiceDeployer {
 
     RemoteObjectExposer<NamingService> roe;
 
+    /**
+     * Deploys locally a NamingService instance as a RemoteObject with default name.
+     */
     public NamingServiceDeployer() {
         this(NAMING_SERVICE_DEFAULT_NAME);
     }
 
+    /**
+     * Deploys locally a NamingService instance as a RemoteObject with specified name.
+     * 
+     * @param name
+     *            of deployed RemoteObject
+     */
     public NamingServiceDeployer(String name) {
         namingService = new NamingService();
 
@@ -35,13 +44,11 @@ public class NamingServiceDeployer {
         url = roe.getURL();
     }
 
-    /** Get the local log collector */
-    public NamingService getCollector() {
+    public NamingService getLocalNamingService() {
         return this.namingService;
     }
 
-    /** Get the log collector as a remote object */
-    public NamingService getRemoteObject() throws ProActiveException {
+    public NamingService getRemoteNamingService() throws ProActiveException {
         return (NamingService) RemoteObjectHelper.generatedObjectStub(this.roe.getRemoteObject());
     }
 
