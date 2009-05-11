@@ -113,7 +113,6 @@ public class TestGCMRemoteObjectsSubscribeFromRemoteObject extends GCMFunctional
 
     }
 
-    @SuppressWarnings("serial")
     static public class RemoteAO implements Serializable {
         GCMVirtualNode vn;
 
@@ -125,7 +124,7 @@ public class TestGCMRemoteObjectsSubscribeFromRemoteObject extends GCMFunctional
             this.vn = vn;
         }
 
-        public String createRemoteObject() {
+        public String createRemoteObject() throws ProActiveException {
             RO ro = new RO();
             RemoteObjectExposer<RO> roe = new RemoteObjectExposer<RO>(RO.class.getName(), ro);
             roe.createRemoteObject("remoteObject");
