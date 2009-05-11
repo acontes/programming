@@ -46,6 +46,6 @@ public class CHORDLookupMessage extends LookupMessage {
      */
 
     public String getId() {
-        return (String) super.key.getValue();
+        return (String) super.getKey().getValue();
     }
 }

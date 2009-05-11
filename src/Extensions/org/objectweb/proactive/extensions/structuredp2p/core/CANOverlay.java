@@ -277,8 +277,8 @@ public class CANOverlay extends StructuredOverlay {
             // Else, do the same thing recursively (it's a little heavy with data transfer)
             else if (nbNeigbors > 1) {
 
-                this.switchWith((Peer) ((CANSwitchResponseMessage) PAFuture.getFutureValue(this
-                        .getLocalPeer().sendMessageTo(neighbors.waitAndGetOne(),
+                this.switchWith(((CANSwitchResponseMessage) PAFuture
+                        .getFutureValue(this.getLocalPeer().sendMessageTo(neighbors.waitAndGetOne(),
                                 new CANSwitchMessage(this.getRemotePeer())))).getPeer());
             }
 
@@ -298,10 +298,10 @@ public class CANOverlay extends StructuredOverlay {
      */
     public LookupResponseMessage sendMessage(LookupMessage msg) {
         CANLookupMessage msgCan = (CANLookupMessage) msg;
+        System.out.println("CANOverlay.sendMessage()");
         if (this.contains(msgCan.getCoordinates())) {
             return msgCan.handle(this);
         } else {
-
             Group<Peer>[][] neighbors = this.neighbors;
             int pos;
             int neighborIndex;
@@ -309,16 +309,25 @@ public class CANOverlay extends StructuredOverlay {
             for (Group<Peer>[] neighborsGroup : neighbors) {
                 for (int i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
                     pos = this.contains(i, msgCan.getCoordinates()[i]);
-
+                    System.out.println("i" + i);
                     if (pos == -1) {
-                        this.sendMessageTo(((Peer) neighborsGroup[0].getGroupByType()),
-                                new LoadBalancingMessage());
-                        neighborIndex = neighborsGroup[0].waitOneAndGetIndex();
+                        // this.sendMessageTo(((Peer) neighborsGroup[0].getGroupByType()),
+                        // new LoadBalancingMessage());
+                        // neighborIndex = neighborsGroup[0].waitOneAndGetIndex();
+                        // System.out.println("index = " + neighborIndex);
+                        ResponseMessage response = ((Peer) neighborsGroup[0].getGroupByType())
+                                .receiveMessage(new LoadBalancingMessage());
+                        // neighborIndex = neighborsGroup[0].waitOneAndGetIndex();
+                        neighborIndex = PAGroup.waitOneAndGetIndex(response);
+                        System.out.println("index = " + neighborIndex);
                         return neighborsGroup[0].get(neighborIndex).sendMessage(msg);
                     } else if (pos == 1) {
-                        this.sendMessageTo(((Peer) neighborsGroup[1].getGroupByType()),
-                                new LoadBalancingMessage());
+                        // this.sendMessageTo(((Peer) neighborsGroup[1].getGroupByType()),
+                        // new LoadBalancingMessage());
+                        ResponseMessage response = ((Peer) neighborsGroup[1].getGroupByType())
+                                .receiveMessage(new LoadBalancingMessage());
                         neighborIndex = neighborsGroup[1].waitOneAndGetIndex();
+                        System.out.println("index = " + neighborIndex);
                         return neighborsGroup[1].get(neighborIndex).sendMessage(msg);
                     }
                 }

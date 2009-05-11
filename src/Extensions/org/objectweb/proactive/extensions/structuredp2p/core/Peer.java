@@ -86,8 +86,12 @@ public class Peer implements InitActive, RunActive, Serializable {
      */
     public LookupResponseMessage sendMessage(LookupMessage msg) {
         LookupResponseMessage response = this.structuredOverlay.sendMessage(msg);
-        PAEventProgramming.addActionOnFuture(response, "setResponseMessageDeliveryTime");
+        // PAEventProgramming.addActionOnFuture(response, "setResponseMessageDeliveryTime");
         return response;
+    }
+
+    public ResponseMessage sendMessageToWithoutCallback(Peer remotePeer, Message msg) {
+        return remotePeer.receiveMessage(msg);
     }
 
     /**

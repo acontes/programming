@@ -24,7 +24,7 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.Respons
  * 
  * @version 0.1
  */
-public class TestPingMessage {
+public class TestPingMessageCAN {
 
     private Peer senderPeer;
     private Peer receiverPeer;

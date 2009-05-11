@@ -21,12 +21,12 @@ public class Area implements Serializable {
     /**
      * The minimal value we manage.
      */
-    private static int MIN_COORD = 0;
+    public static int MIN_COORD = 0;
 
     /**
      * The maximal value we manage.
      */
-    private static int MAX_COORD = 100;
+    public static int MAX_COORD = 256;
 
     /**
      * The minimum coordinates.
@@ -258,5 +258,33 @@ public class Area implements Serializable {
         }
 
         return 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String toString() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("Area=(");
+
+        for (int i = 0; i < this.coordinatesMin.length; i++) {
+            buf.append(this.coordinatesMin[i].getValue());
+            if (i != this.coordinatesMin.length - 1) {
+                buf.append(",");
+            }
+        }
+
+        buf.append(")-->(");
+
+        for (int i = 0; i < this.coordinatesMax.length; i++) {
+            buf.append(this.coordinatesMax[i].getValue());
+            if (i != this.coordinatesMax.length - 1) {
+                buf.append(",");
+            }
+        }
+
+        buf.append(").");
+
+        return buf.toString();
     }
 }

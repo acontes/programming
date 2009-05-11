@@ -22,6 +22,7 @@ public class CANLookupMessage extends LookupMessage {
      * Constructor.
      * 
      * @param coordinates
+     *            the coordinates the message must reached.
      * 
      */
     public CANLookupMessage(Coordinate[] coordinates) {
@@ -29,11 +30,12 @@ public class CANLookupMessage extends LookupMessage {
     }
 
     /**
+     * Returns the coordinates that the message must reached.
      * 
-     * @return
+     * @return the coordinates that the message must reached.
      */
     public Coordinate[] getCoordinates() {
-        return (Coordinate[]) super.key.getValue();
+        return (Coordinate[]) super.getKey().getValue();
     }
 
     /**

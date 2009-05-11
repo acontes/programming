@@ -20,7 +20,7 @@ public abstract class LookupMessage extends Message {
     /**
      * Key used in order to lookup a peer.
      */
-    protected final Key<?> key;
+    private final Key<?> key;
 
     /**
      * Constructor.
@@ -30,6 +30,7 @@ public abstract class LookupMessage extends Message {
      *            this message.
      */
     public LookupMessage(Key<?> key) {
+        super();
         this.key = key;
     }
 

@@ -1,9 +1,7 @@
 package functionalTests.structuredp2p.message;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -31,9 +29,9 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.Respons
  */
 public class TestCANMessage {
 
-    private Peer srcPeer;
-    private Peer myPeer;
+    private Peer firstPeer;
     private Peer secondPeer;
+    private Peer thirdPeer;
     private LookupMessage lMsg;
     private Coordinate messCoord[];
     private Coordinate minCoord[];
@@ -50,68 +48,71 @@ public class TestCANMessage {
 
     @Before
     public void init() throws ActiveObjectCreationException, NodeException {
-        srcPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(), new Object[] { OverlayType.CAN });
+        this.firstPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
+                new Object[] { OverlayType.CAN });
+        this.secondPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
+                new Object[] { OverlayType.CAN });
+        this.thirdPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
+                new Object[] { OverlayType.CAN });
 
-        myPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(), new Object[] { OverlayType.CAN });
+        this.dim = CANOverlay.NB_DIMENSIONS;
+        this.messCoord = new Coordinate[this.dim];
 
-        secondPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(), new Object[] { OverlayType.CAN });
-        dim = CANOverlay.NB_DIMENSIONS;
-        messCoord = new Coordinate[dim];
-
-        for (int i = 0; i < dim; i++) {
+        for (int i = 0; i < this.dim; i++) {
             int random = (int) (Math.random() * (7 - 5)) + 5;
-            messCoord[i] = new Coordinate("" + random);
+            this.messCoord[i] = new Coordinate("" + random);
         }
 
-        minCoord = new Coordinate[dim];
+        this.minCoord = new Coordinate[this.dim];
 
-        for (int i = 0; i < dim; i++) {
+        for (int i = 0; i < this.dim; i++) {
             int random = (int) (Math.random() * (9 - 7)) + 7;
-            minCoord[i] = new Coordinate("" + random);
+            this.minCoord[i] = new Coordinate("" + random);
 
         }
 
-        maxCoord = new Coordinate[dim];
-        for (int i = 0; i < dim; i++) {
+        this.maxCoord = new Coordinate[this.dim];
+        for (int i = 0; i < this.dim; i++) {
             int random = (int) (Math.random() * 4);
-            maxCoord[i] = new Coordinate("" + random);
+            this.maxCoord[i] = new Coordinate("" + random);
 
         }
 
-        area = new Area(minCoord, maxCoord);
+        this.area = new Area(this.minCoord, this.maxCoord);
 
-        can = ((CANOverlay) (srcPeer.getStructuredOverlay()));
-        can.setArea(area);
-        srcPeer.setStructuredOverlay(can);
-        lMsg = new CANLookupMessage(messCoord);
+        this.can = ((CANOverlay) (this.firstPeer.getStructuredOverlay()));
+        this.can.setArea(this.area);
+        this.firstPeer.setStructuredOverlay(this.can);
+        this.lMsg = new CANLookupMessage(this.messCoord);
     }
 
     @Test
     public void testCreate() {
-        assertNotNull("create a new peer", srcPeer);
-        assertNotNull("area set on the overlay", ((CANOverlay) (srcPeer.getStructuredOverlay())).getArea()
-                .getCoordinatesMin());
-        assertNotNull("get new peer", myPeer);
-        assertNotNull("create a new CAN message", lMsg);
-        assertNotNull("create a new coordinate table", messCoord);
-        assertNotNull("create a new coordinate table", minCoord);
-        assertNotNull("create a new coordinate table", maxCoord);
+        Assert.assertNotNull("create a new peer", this.firstPeer);
+        Assert.assertNotNull("area set on the overlay",
+                ((CANOverlay) (this.firstPeer.getStructuredOverlay())).getArea().getCoordinatesMin());
+        Assert.assertNotNull("get new peer", this.secondPeer);
+        Assert.assertNotNull("create a new CAN message", this.lMsg);
+        Assert.assertNotNull("create a new coordinate table", this.messCoord);
+        Assert.assertNotNull("create a new coordinate table", this.minCoord);
+        Assert.assertNotNull("create a new coordinate table", this.maxCoord);
     }
 
     @Test
     public void testSendMessage() {
 
-        srcResponse = srcPeer.sendMessage(lMsg);
-        assertNotNull("the src response is not null", srcResponse);
-        for (int i = 0; i < dim; i++) {
-            assertEquals(i + "th coordinate ok", ((CANOverlay) ((CANLookupResponseMessage) srcResponse)
-                    .getPeer().getStructuredOverlay()).contains(i, messCoord[i]), 0);
+        this.srcResponse = this.firstPeer.sendMessage(this.lMsg);
+        Assert.assertNotNull("the src response is not null", this.srcResponse);
+        for (int i = 0; i < this.dim; i++) {
+            Assert.assertEquals(i + "th coordinate ok",
+                    ((CANOverlay) ((CANLookupResponseMessage) this.srcResponse).getPeer()
+                            .getStructuredOverlay()).contains(i, this.messCoord[i]), 0);
         }
     }
 
     @Test
     public void testJoinAndSendMessage() {
-        myPeer.join(srcPeer);
+        this.secondPeer.join(this.firstPeer);
         // assertTrue("joining neighbor", ((CanOverlay)
         // srcPeer.getStructuredOverlay()).hasNeighbor(myPeer));
         // assertTrue("joining 2", ((CanOverlay)
@@ -123,56 +124,57 @@ public class TestCANMessage {
         // ((CanOverlay)srcPeer.getStructuredOverlay()).hasNeighbor(secondPeer));
         // assertTrue("joining 2",((CanOverlay)secondPeer.getStructuredOverlay()).hasNeighbor(srcPeer));
 
-        int randAxe = (int) (Math.random() * dim);
-        minCoord = new Coordinate[dim];
+        int randAxe = (int) (Math.random() * this.dim);
+        this.minCoord = new Coordinate[this.dim];
 
-        for (int i = 0; i < dim; i++) {
-            minCoord[i] = new Coordinate("9");
+        for (int i = 0; i < this.dim; i++) {
+            this.minCoord[i] = new Coordinate("9");
         }
 
-        maxCoord = new Coordinate[dim];
-        for (int i = 0; i < dim; i++) {
+        this.maxCoord = new Coordinate[this.dim];
+        for (int i = 0; i < this.dim; i++) {
             if (i == randAxe) {
-                maxCoord[i] = new Coordinate("4");
+                this.maxCoord[i] = new Coordinate("4");
             } else {
-                maxCoord[i] = new Coordinate("0");
+                this.maxCoord[i] = new Coordinate("0");
             }
         }
 
-        areaSplit1 = new Area(minCoord, maxCoord);
+        this.areaSplit1 = new Area(this.minCoord, this.maxCoord);
         //
-        minCoord = new Coordinate[dim];
-        for (int i = 0; i < dim; i++) {
+        this.minCoord = new Coordinate[this.dim];
+        for (int i = 0; i < this.dim; i++) {
             if (i == randAxe) {
-                minCoord[i] = new Coordinate("4");
+                this.minCoord[i] = new Coordinate("4");
             } else {
-                minCoord[i] = new Coordinate("9");
+                this.minCoord[i] = new Coordinate("9");
             }
         }
 
-        maxCoord = new Coordinate[dim];
-        for (int i = 0; i < dim; i++) {
-            maxCoord[i] = new Coordinate("0");
+        this.maxCoord = new Coordinate[this.dim];
+        for (int i = 0; i < this.dim; i++) {
+            this.maxCoord[i] = new Coordinate("0");
         }
 
-        areaSplit2 = new Area(minCoord, maxCoord);
+        this.areaSplit2 = new Area(this.minCoord, this.maxCoord);
         //
-        splitCan1 = ((CANOverlay) (srcPeer.getStructuredOverlay()));
-        splitCan1.setArea(areaSplit1);
+        this.splitCan1 = ((CANOverlay) (this.firstPeer.getStructuredOverlay()));
+        this.splitCan1.setArea(this.areaSplit1);
 
-        splitCan2 = ((CANOverlay) (myPeer.getStructuredOverlay()));
-        splitCan2.setArea(areaSplit2);
+        this.splitCan2 = ((CANOverlay) (this.secondPeer.getStructuredOverlay()));
+        this.splitCan2.setArea(this.areaSplit2);
 
-        srcPeer.setStructuredOverlay(splitCan1);
-        myPeer.setStructuredOverlay(splitCan2);
+        this.firstPeer.setStructuredOverlay(this.splitCan1);
+        this.secondPeer.setStructuredOverlay(this.splitCan2);
 
-        myResponse = srcPeer.sendMessage(lMsg);
-        srcResponse = myPeer.sendMessageTo(srcPeer, new PingMessage());
-        assertNotNull("the src response is not null", myResponse);
+        this.myResponse = this.firstPeer.sendMessage(this.lMsg);
+        this.srcResponse = this.secondPeer.sendMessageTo(this.firstPeer, new PingMessage());
+        Assert.assertNotNull("the src response is not null", this.myResponse);
 
-        for (int i = 0; i < dim; i++) {
-            assertEquals(i + "th coordinate ok", ((CANOverlay) ((CANLookupResponseMessage) myResponse)
-                    .getPeer().getStructuredOverlay()).contains(i, messCoord[i]), 0);
+        for (int i = 0; i < this.dim; i++) {
+            Assert.assertEquals(i + "th coordinate ok",
+                    ((CANOverlay) ((CANLookupResponseMessage) this.myResponse).getPeer()
+                            .getStructuredOverlay()).contains(i, this.messCoord[i]), 0);
 
         }
 
@@ -180,10 +182,10 @@ public class TestCANMessage {
 
     @After
     public void clean() {
-        srcPeer = null;
-        myPeer = null;
-        lMsg = null;
-        messCoord = null;
+        this.firstPeer = null;
+        this.secondPeer = null;
+        this.lMsg = null;
+        this.messCoord = null;
     }
 
 }

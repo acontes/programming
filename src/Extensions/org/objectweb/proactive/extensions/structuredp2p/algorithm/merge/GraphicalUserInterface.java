@@ -23,6 +23,7 @@ import javax.swing.JPanel;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.extensions.structuredp2p.core.Area;
 import org.objectweb.proactive.extensions.structuredp2p.core.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.Coordinate;
 import org.objectweb.proactive.extensions.structuredp2p.core.OverlayType;
@@ -51,21 +52,18 @@ public class GraphicalUserInterface extends JFrame {
     }
 
     public void createAndShowGUI() {
-        int size = Integer.parseInt(((CANOverlay) this.peers.get(0).getStructuredOverlay()).getArea()
-                .getCoordinatesMax(0).getValue());
-        this.area = new Canvas(this, size, size);
+        this.area = new Canvas(Area.MAX_COORD, Area.MAX_COORD);
         // this.area.setSize(GraphicalUserInterface.SPACE_WIDTH,
         // GraphicalUserInterface.SPACE_HEIGHT);
 
-        this.area.setSize(size, size);
-
+        JComponent toolbar = this.createToolbar();
         Container contentPane = super.getContentPane();
-        contentPane.add(this.createToolbar(), BorderLayout.NORTH);
+        contentPane.add(toolbar, BorderLayout.NORTH);
         contentPane.add(this.area, BorderLayout.CENTER);
 
+        super.setMinimumSize(new Dimension(Area.MAX_COORD, Area.MAX_COORD + 60));
+
         super.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        super.setMinimumSize(new Dimension(GraphicalUserInterface.SPACE_WIDTH,
-            GraphicalUserInterface.SPACE_HEIGHT));
         super.setResizable(false);
         super.setTitle("CAN Merge Algorithm");
         super.setLocationRelativeTo(null);
@@ -74,6 +72,7 @@ public class GraphicalUserInterface extends JFrame {
 
     private JComponent createToolbar() {
         JPanel toolbar = new JPanel();
+        toolbar.setSize(new Dimension(0, 60));
         toolbar.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0));
 
         final JButton splitButton = new JButton("Split");
@@ -111,7 +110,7 @@ public class GraphicalUserInterface extends JFrame {
 
     public class Canvas extends JComponent {
 
-        public Canvas(JFrame frame, int height, int width) {
+        public Canvas(int height, int width) {
             super();
             super.setSize(height, width);
             super.setMinimumSize(new Dimension(height, width));
@@ -131,6 +130,8 @@ public class GraphicalUserInterface extends JFrame {
                         Canvas.this.getGraphics().drawLine(Integer.parseInt(min[0].getValue()),
                                 Integer.parseInt(max[0].getValue()), Integer.parseInt(min[1].getValue()),
                                 Integer.parseInt(max[1].getValue()));
+                        Canvas.this.repaint();
+
                     }
                     /* Left click */
                     else if (clickedPeer != null) {
@@ -153,6 +154,7 @@ public class GraphicalUserInterface extends JFrame {
                                 JOptionPane.showMessageDialog(GraphicalUserInterface.this,
                                         "You cannot merge when there is only one peer !", "Warning",
                                         JOptionPane.WARNING_MESSAGE);
+                            } else {
                                 clickedPeer.leave();
                             }
                         }
@@ -160,13 +162,23 @@ public class GraphicalUserInterface extends JFrame {
                         JOptionPane.showMessageDialog(GraphicalUserInterface.this, "Please clic on a peer !",
                                 "Warning", JOptionPane.WARNING_MESSAGE);
                     }
+                    Canvas.this.repaint();
                 }
             });
         }
 
         public void paintComponent(Graphics g) {
-            g.setColor(this.getRandomColor());
-            g.fillRect(0, 0, GraphicalUserInterface.SPACE_WIDTH, GraphicalUserInterface.SPACE_HEIGHT);
+            for (Peer p : GraphicalUserInterface.this.getPeers()) {
+                g.setColor(this.getRandomColor());
+
+                Coordinate[] min = ((CANOverlay) p.getStructuredOverlay()).getArea().getCoordinatesMin();
+                Coordinate[] max = ((CANOverlay) p.getStructuredOverlay()).getArea().getCoordinatesMax();
+
+                int width = Integer.parseInt(max[0].getValue()) - Integer.parseInt(min[0].getValue());
+                g.fillRect(Integer.parseInt(min[0].getValue()), Integer.parseInt(min[1].getValue()), width,
+                        width);
+            }
+
         }
 
         public Peer getClicked(int x, int y) {
