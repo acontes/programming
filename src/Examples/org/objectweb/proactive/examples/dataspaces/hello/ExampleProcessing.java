@@ -1,6 +1,7 @@
 package org.objectweb.proactive.examples.dataspaces.hello;
 
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -32,67 +33,102 @@ public class ExampleProcessing implements Serializable {
     private static final String FINAL_RESULTS_FILENAME = "final_results.txt";
     private static final String PARTIAL_RESULTS_FILENAME = "partial_results.txt";
 
+    /**
+     * Returns BufferedWriter of specified file's content.
+     * 
+     * @param outputFile
+     *            file of which content writer is to be returned
+     * @return writer of a file's content
+     * @throws FileSystemException
+     */
+    private static OutputStreamWriter getWriter(final FileObject outputFile) throws FileSystemException {
+        OutputStream os = outputFile.getContent().getOutputStream();
+        return new OutputStreamWriter(os);
+    }
+
+    /**
+     * Returns BufferedReader of specified file's content.
+     * 
+     * @param inputFile
+     *            file of which content reader is to be returned
+     * @return reader of a file's content
+     * @throws FileSystemException
+     */
+    private static BufferedReader getReader(final FileObject inputFile) throws FileSystemException {
+        final InputStream is = inputFile.getContent().getInputStream();
+        return new BufferedReader(new InputStreamReader(is));
+    }
+
+    private static void closeResource(Object resource) {
+        if (resource == null)
+            return;
+
+        try {
+            if (resource instanceof Closeable)
+                ((Closeable) resource).close();
+            else if (resource instanceof FileObject)
+                ((FileObject) resource).close();
+        } catch (IOException e) {
+            ProActiveLogger.logEatedException(logger, e);
+        }
+    }
+
     public ExampleProcessing() {
     }
 
     /**
-     * Resolves AO's scratch and creates there a file with provided content.
+     * Creates file within AO's scratch and writes content there.
      * 
-     * @param fname
-     *            name of a file to create
+     * @param fileName
+     *            name of a file to create within AO's scratch
      * @param content
      *            file content to write
+     * @return URI of written file
      * @throws NotConfiguredException
      *             when scratch data space hasn't been configured
+     * @throws IOException
+     *             when IO exception occurred during file writing
      */
-    public void writeIntoScratchFile(String fname, String content) throws NotConfiguredException {
-        FileObject scratch = null;
+    public String writeIntoScratchFile(String fileName, String content) throws NotConfiguredException,
+            IOException {
         FileObject file = null;
         OutputStreamWriter writer = null;
 
         try {
-            scratch = PADataSpaces.resolveScratchForAO();
-            file = scratch.resolveFile(fname);
+            file = PADataSpaces.resolveScratchForAO(fileName);
             file.createFile();
             writer = getWriter(file);
             writer.write(content);
+
+            return PADataSpaces.getURI(file);
         } catch (IOException e) {
             logger.error("Exception while IO operation", e);
+            throw e;
         } finally {
-            try {
-                if (writer != null)
-                    writer.close();
-            } catch (IOException e) {
-            }
-            try {
-                if (file != null)
-                    file.close();
-            } catch (FileSystemException e) {
-            }
-            try {
-                if (scratch != null)
-                    scratch.close();
-            } catch (FileSystemException e) {
-            }
+            closeResource(writer);
+            closeResource(file);
         }
     }
 
     /**
      * Computes number of lines of a document from specified input data space name, and writes
-     * partial results into a file in it's scratch. URI of AO's scratch data space is returned.
+     * partial results into a file in it's scratch. URI of file within AO's scratch data space is
+     * returned.
      * 
      * @param inputName
      *            name of input data space containing document to process
-     * @return URI of AO's scratch or <code>null</code> if any IO operation has failed.
+     * @return URI of file with partial results
      * @throws SpaceNotFoundException
      *             if specified input data space cannot be resolved
      * @throws NotConfiguredException
      *             this AO's scratch hasn't been configured
-     * 
+     * @throws IOException
+     *             when IO exception occurred during writing partial results
      */
     public StringWrapper computePartials(String inputName) throws SpaceNotFoundException,
-            NotConfiguredException {
+            NotConfiguredException, IOException {
 
+        logger.info("Processing input " + inputName);
         FileObject inputFile = null;
         BufferedReader reader = null;
         int lines = 0;
@@ -106,26 +142,17 @@ public class ExampleProcessing implements Serializable {
 
             StringBuffer sb = new StringBuffer();
             sb.append(inputName).append(": ").append(lines).append('\n');
-            writeIntoScratchFile(PARTIAL_RESULTS_FILENAME, sb.toString());
+            String fileUri = writeIntoScratchFile(PARTIAL_RESULTS_FILENAME, sb.toString());
             logger.info("partial results written: " + sb.toString());
 
-            return new StringWrapper(PADataSpaces.getURI(PADataSpaces.resolveScratchForAO()));
-
+            return new StringWrapper(fileUri);
         } catch (IOException e) {
             logger.error("Exception while IO operation", e);
+            throw e;
         } finally {
-            try {
-                if (reader != null)
-                    reader.close();
-            } catch (IOException e) {
-            }
-            try {
-                if (inputFile != null)
-                    inputFile.close();
-            } catch (FileSystemException e) {
-            }
+            closeResource(reader);
+            closeResource(inputFile);
         }
-        return null;
     }
 
     /**
@@ -133,46 +160,39 @@ public class ExampleProcessing implements Serializable {
      * space.
      * 
      * @param partialResults
-     *            list of scratch URIs containing partial results
+     *            list of file URIs containing partial results
      * @throws MalformedURIException
      *             when any specified URI is not correctly formed
      * @throws DataSpacesException
      *             when resolving default output has failed
+     * @throws IOException
+     *             when IO exception occurred during writing final results (failures in reading
+     *             partial results are ignored)
      */
-    public void gatherPartials(List<String> partialResults) throws MalformedURIException, DataSpacesException {
+    public void gatherPartials(List<StringWrapper> partialResults) throws MalformedURIException,
+            DataSpacesException, IOException {
+        logger.info("Gathering and aggregating partial results");
 
-        FileObject outputSpace = null;
-        FileObject outputFile = null;
-        FileObject scratchSpace = null;
-        FileObject partialResultsFile = null;
-        OutputStreamWriter writer = null;
-        BufferedReader reader = null;
-
-        try {
-            final List<String> results = new ArrayList<String>();
-
-            outputSpace = PADataSpaces.resolveDefaultOutput();
-
-            for (String uri : partialResults) {
-                try {
-                    scratchSpace = PADataSpaces.resolveFile(uri);
-                } catch (Exception e) {
-                    logger.error("Resolving one's scratch has failed, trying to continue", e);
-                    continue;
-                }
-                partialResultsFile = scratchSpace.resolveFile(PARTIAL_RESULTS_FILENAME);
-
+        final List<String> results = new ArrayList<String>();
+        for (StringWrapper uriWrapped : partialResults) {
+            FileObject partialResultsFile = null;
+            BufferedReader reader = null;
+            try {
+                partialResultsFile = PADataSpaces.resolveFile(uriWrapped.stringValue());
                 reader = getReader(partialResultsFile);
-                try {
-                    results.add(reader.readLine());
-                } catch (Exception x) {
-                    logger.error("Partial results reading error", x);
-                } finally {
-                    reader.close();
-                }
+                results.add(reader.readLine());
+            } catch (IOException x) {
+                logger.error("Reading one's partial result file failed, trying to continue", x);
+            } finally {
+                closeResource(reader);
+                closeResource(partialResultsFile);
             }
+        }
 
-            outputFile = outputSpace.resolveFile(FINAL_RESULTS_FILENAME);
+        FileObject outputFile = null;
+        OutputStreamWriter writer = null;
+        try {
+            outputFile = PADataSpaces.resolveDefaultOutput(FINAL_RESULTS_FILENAME);
             outputFile.createFile();
             writer = getWriter(outputFile);
 
@@ -181,61 +201,13 @@ public class ExampleProcessing implements Serializable {
                     writer.write(line);
                     writer.write('\n');
                 }
-            logger.info("Results gathered, partial results count: " + results.size());
+            logger.info("Results gathered, partial results number: " + results.size());
         } catch (IOException e) {
             logger.error("Exception while IO operation", e);
+            throw e;
         } finally {
-            try {
-                if (writer != null)
-                    writer.close();
-            } catch (IOException e) {
-            }
-            try {
-                if (outputFile != null)
-                    outputFile.close();
-            } catch (FileSystemException e3) {
-            }
-            try {
-                if (outputSpace != null)
-                    outputSpace.close();
-            } catch (FileSystemException e2) {
-            }
-            try {
-                if (scratchSpace != null)
-                    scratchSpace.close();
-            } catch (FileSystemException e1) {
-            }
-            try {
-                if (partialResultsFile != null)
-                    partialResultsFile.close();
-            } catch (FileSystemException e) {
-            }
+            closeResource(writer);
+            closeResource(outputFile);
         }
-    }
-
-    /**
-     * Returns BufferedWriter of specified file's content.
-     * 
-     * @param outputFile
-     *            file of which content writer is to be returned
-     * @return writer of a file's content
-     * @throws FileSystemException
-     */
-    private OutputStreamWriter getWriter(final FileObject outputFile) throws FileSystemException {
-        OutputStream os = outputFile.getContent().getOutputStream();
-        return new OutputStreamWriter(os);
-    }
-
-    /**
-     * Returns BufferedReader of specified file's content.
-     * 
-     * @param inputFile
-     *            file of which content reader is to be returned
-     * @return reader of a file's content
-     * @throws FileSystemException
-     */
-    private BufferedReader getReader(final FileObject inputFile) throws FileSystemException {
-        final InputStream is = inputFile.getContent().getInputStream();
-        return new BufferedReader(new InputStreamReader(is));
     }
 }
