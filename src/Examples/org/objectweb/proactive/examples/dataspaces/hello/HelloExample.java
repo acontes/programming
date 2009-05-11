@@ -151,6 +151,7 @@ public class HelloExample {
     private void exampleUsage() throws ActiveObjectCreationException, NodeException, IOException,
             DataSpacesException {
 
+        // This can be turned into Set as PROACTIVE-663 will be resolved
         final List<String> partialResults = new ArrayList<String>();
         final Iterator<Node> nodes = nodesGrabbed.iterator();
         final Node nodeA = nodes.next();
