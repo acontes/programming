@@ -119,7 +119,7 @@ public class GraphicalUserInterface extends JFrame {
             this.addMouseListener(new MouseAdapter() {
                 public void mouseClicked(MouseEvent e) {
                     Peer clickedPeer = Canvas.this.getClicked(e.getX(), e.getY());
-
+                    System.out.println("clicked in x=" + e.getX() + ", y= " + e.getY());
                     /* Right click */
                     if (e.getButton() == MouseEvent.BUTTON3) {
                         System.out.println("val = " + (clickedPeer));

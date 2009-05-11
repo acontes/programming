@@ -26,7 +26,7 @@ public class Area implements Serializable {
     /**
      * The maximal value we manage.
      */
-    private static int MAX_COORD = 100;
+    private static int MAX_COORD = 512;
 
     /**
      * The minimum coordinates.
@@ -256,9 +256,12 @@ public class Area implements Serializable {
      *         coordinate of the area and .
      */
     public int contains(int dimension, Coordinate coordinate) {
-        boolean isGreaterThanMin = this.getCoordinatesMin(dimension).getValue().compareTo(
-                coordinate.getValue()) <= 0;
-        boolean isLessThanMax = this.getCoordinatesMax(dimension).getValue().compareTo(coordinate.getValue()) > 0;
+        boolean isGreaterThanMin = this.getCoordinatesMin(dimension).compareTo(coordinate) <= 0;
+        boolean isLessThanMax = this.getCoordinatesMax(dimension).compareTo(coordinate) > 0;
+
+        if (isLessThanMax && isGreaterThanMin) {
+            return 0;
+        }
 
         if (!isLessThanMax) {
             return 1;

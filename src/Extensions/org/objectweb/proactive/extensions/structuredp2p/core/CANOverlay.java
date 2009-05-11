@@ -194,7 +194,6 @@ public class CANOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
-    @Override
     public void checkNeighbors() {
         for (Group<Peer>[] groupArray : this.neighbors) {
             for (Group<Peer> group : groupArray) {
@@ -213,7 +212,6 @@ public class CANOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
-    @Override
     public Boolean join(Peer remotePeer) {
         int dimension = this.getRandomDimension();
         int direction = 0;
@@ -260,7 +258,6 @@ public class CANOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
-    @Override
     public Peer leave() {
         /*
          * try { ResponseMessage groupFutures = null; Group<Peer> groupAvailablePeer =
@@ -597,8 +594,9 @@ public class CANOverlay extends StructuredOverlay {
      * {@inheritDoc}
      */
     public CANAddNeighborResponseMessage handleAddNeighborMessage(CANAddNeighborMessage msg) {
-        if (!this.neighbors[msg.getDimesion()][msg.getDirection()].contains(msg.getPeer()))
+        if (!this.neighbors[msg.getDimesion()][msg.getDirection()].contains(msg.getPeer())) {
             this.addNeighbor(msg.getPeer(), msg.getDimesion(), msg.getDirection());
+        }
 
         return new CANAddNeighborResponseMessage(msg.getCreationTimestamp());
     }
