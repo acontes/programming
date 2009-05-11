@@ -56,6 +56,7 @@ public class GraphicalUserInterface extends JFrame {
         contentPane.add(this.createToolbar(), BorderLayout.NORTH);
         contentPane.add(this.area, BorderLayout.CENTER);
 
+        super.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         super.setMinimumSize(new Dimension(GraphicalUserInterface.SPACE_WIDTH,
             GraphicalUserInterface.SPACE_HEIGHT));
         super.setResizable(false);
@@ -121,7 +122,16 @@ public class GraphicalUserInterface extends JFrame {
 
         public Color getRandomColor() {
             Random rand = new Random();
-            return new Color(rand.nextInt(256), rand.nextInt(256), rand.nextInt(256));
+
+            int r = rand.nextInt(256);
+            int v = rand.nextInt(256);
+            int b = rand.nextInt(256);
+
+            if (r + v + b < 477) {
+                return this.getRandomColor();
+            }
+
+            return new Color(r, v, b);
         }
     }
 }
