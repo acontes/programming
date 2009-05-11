@@ -12,7 +12,7 @@ package org.objectweb.proactive.extensions.structuredp2p.message.response;
 @SuppressWarnings("serial")
 public abstract class JoinResponseMessage extends ResponseMessage {
 
-    private final Boolean isSuccess = false;
+    private Boolean isSuccess = false;
 
     /**
      * Constructor.
@@ -20,8 +20,9 @@ public abstract class JoinResponseMessage extends ResponseMessage {
      * @param timestampCreationMessage
      *            the timestamp indicating the time creation of the message which has been sent.
      */
-    public JoinResponseMessage(long timestampCreationMessage) {
+    public JoinResponseMessage(long timestampCreationMessage, boolean result) {
         super(timestampCreationMessage);
+        this.isSuccess = new Boolean(true);
     }
 
     /**

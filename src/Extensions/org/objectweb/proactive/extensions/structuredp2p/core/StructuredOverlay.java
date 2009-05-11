@@ -2,17 +2,21 @@ package org.objectweb.proactive.extensions.structuredp2p.core;
 
 import java.io.Serializable;
 
+import org.objectweb.proactive.extensions.structuredp2p.message.AddNeighborMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.LeaveMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.LoadBalancingMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.LookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.Message;
 import org.objectweb.proactive.extensions.structuredp2p.message.PingMessage;
+import org.objectweb.proactive.extensions.structuredp2p.message.UpdateMessage;
+import org.objectweb.proactive.extensions.structuredp2p.message.response.AddNeighborResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.EmptyResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.JoinResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.LoadBalancingResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.LookupResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.PingResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.ResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.message.response.UpdateResponseMessage;
 
 
 /**
@@ -134,6 +138,24 @@ public abstract class StructuredOverlay implements Serializable {
      * @return the {@link EmptyResponseMessage} response.
      */
     public abstract EmptyResponseMessage handleLeaveMessage(LeaveMessage leaveMessage);
+
+    /**
+     * Handles a {@link UpdateMessage}.
+     * 
+     * @param msg
+     *            the message that is handled.
+     * @return the {@link UpdateResponseMessage} response.
+     */
+    public abstract UpdateResponseMessage handleUpdateMessage(UpdateMessage msg);
+
+    /**
+     * Handles a {@link AddNeighborMessage}.
+     * 
+     * @param msg
+     *            the message that is handled.
+     * @return the {@link AddNeighborResponseMessage} response.
+     */
+    public abstract AddNeighborResponseMessage handleAddNeighborMessage(AddNeighborMessage msg);
 
     /**
      * Returns the current peer that use this overlay.

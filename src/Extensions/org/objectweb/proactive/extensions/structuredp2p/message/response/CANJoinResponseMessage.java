@@ -21,7 +21,7 @@ public class CANJoinResponseMessage extends JoinResponseMessage {
      * @param timestampCreationMessage
      *            the timestamp indicating the time creation of the message which has been sent.
      */
-    public CANJoinResponseMessage(long timestampCreationMessage) {
-        super(timestampCreationMessage);
+    public CANJoinResponseMessage(long timestampCreationMessage, boolean result) {
+        super(timestampCreationMessage, result);
     }
 }

@@ -69,27 +69,14 @@ public class TestNeighbors {
         Assert.assertNotNull(TestNeighbors.entryPoint);
         Assert.assertNotNull(TestNeighbors.neighbor);
 
-        try {
-            Thread.sleep(10000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        CANOverlay entryPointOverlay = (CANOverlay) TestNeighbors.entryPoint.getStructuredOverlay();
+
+        int nbNeighbors = entryPointOverlay.getNeighborsAsCollection().size();
+        System.out.println(nbNeighbors);
+
         TestNeighbors.neighbor.leave();
 
-        CANOverlay entryPointOverlay = (CANOverlay) TestNeighbors.entryPoint.getStructuredOverlay();
-        // CANOverlay neighborOverlay = (CANOverlay) this.neighbor.getStructuredOverlay();
-
-        // Test if the leaved peer is no more in the neighbor list
-        // Assert.assertFalse(neighborOverlay.hasNeighbor(this.entryPoint));
-        try {
-            Thread.sleep(10000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        // TODO tests with neighbors !
-        System.out.println("neighbor : " + TestNeighbors.neighbor);
-        Assert.assertFalse(entryPointOverlay.hasNeighbor(TestNeighbors.neighbor));
+        Assert.assertEquals(nbNeighbors - 1, entryPointOverlay.getNeighborsAsCollection().size());
 
         // TODO tests with merged areas !
     }
