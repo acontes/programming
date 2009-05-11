@@ -412,7 +412,7 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
         // case: appid/ - just ++
         if (newSpaceType == null) {
             newAppId++;
-            return new DataSpacesURI(newAppId, newSpaceType, newName, newRuntimeId, newNodeId, null);
+            return new DataSpacesURI(newAppId, null, newName, newRuntimeId, newNodeId, null);
         }
 
         // case: appid/SCRATCH/rt/ - just build next rt string

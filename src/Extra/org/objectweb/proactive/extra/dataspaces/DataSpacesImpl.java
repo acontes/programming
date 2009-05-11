@@ -49,7 +49,7 @@ public class DataSpacesImpl {
 
     private static void checkIsNotNullName(String name) {
         if (name == null) {
-            logger.debug("Null name provided to the input/output-related method: " + name);
+            logger.debug("Null name provided to the input/output-related method");
             throw new IllegalArgumentException("Input/data space name can not be null");
         }
     }
