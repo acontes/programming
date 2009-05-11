@@ -14,12 +14,12 @@ import java.util.Set;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.objectweb.proactive.api.PARemoteObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.extra.dataspaces.DataSpacesURI;
 import org.objectweb.proactive.extra.dataspaces.InputOutputSpaceConfiguration;
 import org.objectweb.proactive.extra.dataspaces.NamingService;
+import org.objectweb.proactive.extra.dataspaces.NamingServiceDeployer;
 import org.objectweb.proactive.extra.dataspaces.ScratchSpaceConfiguration;
 import org.objectweb.proactive.extra.dataspaces.SpaceInstanceInfo;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ApplicationAlreadyRegisteredException;
@@ -62,6 +62,8 @@ public class RemoteNamingServiceTest {
 
     protected SpaceInstanceInfo spaceInstanceScratch;
 
+    private NamingServiceDeployer remoteObjectDeployer;
+
     public RemoteNamingServiceTest() throws ConfigurationException {
         // super(1, 1);
 
@@ -90,14 +92,10 @@ public class RemoteNamingServiceTest {
 
     @Before
     public void before() throws ProActiveException, URISyntaxException {
-        NamingService ns = new NamingService();
+        remoteObjectDeployer = new NamingServiceDeployer();
 
-        roe = PARemoteObject.newRemoteObject(NamingService.class.getName(), ns);
-        roe.createRemoteObject(NAME);
-        final String url = roe.getURL();
+        final String url = remoteObjectDeployer.getNamingServiceURL();
         stub = NamingService.createNamingServiceStub(url);
-
-        // RemoteObjectHelper.generatedObjectStub(roe.getRemoteObject());
     }
 
     @Test
@@ -171,9 +169,10 @@ public class RemoteNamingServiceTest {
 
     @After
     public void after() throws ProActiveException {
-        if (roe != null) {
-            roe.unregisterAll();
-            roe = null;
+        if (remoteObjectDeployer != null) {
+            remoteObjectDeployer.terminate();
+            remoteObjectDeployer = null;
+            stub = null;
         }
     }
 
