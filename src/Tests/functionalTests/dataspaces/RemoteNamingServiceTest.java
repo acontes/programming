@@ -15,7 +15,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.extra.dataspaces.DataSpacesURI;
 import org.objectweb.proactive.extra.dataspaces.InputOutputSpaceConfiguration;
 import org.objectweb.proactive.extra.dataspaces.NamingService;
@@ -37,8 +36,6 @@ public class RemoteNamingServiceTest {
     private static final String NAME = "DSnamingservice";
 
     private NamingService stub;
-
-    private RemoteObjectExposer<NamingService> roe;
 
     protected static final int MAIN_APPID = 1;
 
