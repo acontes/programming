@@ -101,33 +101,32 @@ public class Coordinate implements Serializable {
     }
 
     /**
-     * Returns the maximum coordinate between the current coordinate and the argument.
+     * Returns the maximum coordinate between the coordinates.
      * 
      * @param coord
      *            the coordinate.
-     * @return the maximum coordinate between the current coordinate and the argument.
+     * @return the maximum coordinate between the coordinates.
      */
-    public Coordinate max(Coordinate coord) {
-        if (coord.getValue().compareTo(this.value) >= 0) {
-            return this;
+    public static Coordinate max(Coordinate coord1, Coordinate coord2) {
+        if (coord1.compareTo(coord2) > 0) {
+            return coord1;
         } else {
-            return coord;
+            return coord2;
         }
     }
 
     /**
-     * Returns the minimum coordinate between the current coordinate and the argument.
+     * Returns the minimum coordinate between the coordinates.
      * 
      * @param coord
-     * @return
+     * @return the minimum coordinate between the coordinates.
      */
-    public Coordinate min(Coordinate coord) {
-        if (coord.getValue().compareTo(this.value) <= 0) {
-            return this;
+    public static Coordinate min(Coordinate coord1, Coordinate coord2) {
+        if (coord1.compareTo(coord2) < 0) {
+            return coord1;
         } else {
-            return coord;
+            return coord2;
         }
-
     }
 
     /*
@@ -148,21 +147,27 @@ public class Coordinate implements Serializable {
      * {@inheritDoc}
      */
     public boolean equals(Object o) {
-        Coordinate cord = (Coordinate) o;
-        return this.value.equals(cord.value);
+        if (!(o instanceof Coordinate)) {
+            throw new IllegalArgumentException();
+        }
+
+        Coordinate coord = (Coordinate) o;
+        return this.value.equals(coord.value);
     }
 
     /**
-     * Compares two coordinates. The value <code>0</code> if the argument coordinate is equal to
-     * this coordinate; a value less than <code>0</code> if this coordinate is lexicographically
-     * less than the coordinate argument; and a value greater than <code>0</code> if this coordinate
-     * is lexicographically greater than the coordinate argument.
+     * Compares two coordinates.
+     * 
+     * @param coord
+     *            the value to compare with.
+     * @return The value <code>0</code> if the argument coordinate is equal to this coordinate; a
+     *         value less than <code>0</code> if this coordinate is lexicographically less than the
+     *         coordinate argument; and a value greater than <code>0</code> if this coordinate is
+     *         lexicographically greater than the coordinate argument.
      */
     public int compareTo(Coordinate coord) {
         int val = Integer.parseInt(coord.getValue());
         int cur = Integer.parseInt(this.getValue());
-
-        System.out.println("cur = " + cur + "; val = " + val);
 
         return cur - val;
     }

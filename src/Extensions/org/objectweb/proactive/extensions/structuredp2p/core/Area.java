@@ -124,8 +124,8 @@ public class Area implements Serializable {
         int nbDim = this.coordinatesMax.length;
 
         for (i = 0; i < nbDim; i++) {
-            if (this.getCoordinatesMax(i) == area.getCoordinatesMin(i) ||
-                this.getCoordinatesMin(i) == area.getCoordinatesMax(i)) {
+            if (this.getCoordinatesMax(i).equals(area.getCoordinatesMin(i)) ||
+                this.getCoordinatesMin(i).equals(area.getCoordinatesMax(i))) {
                 return i;
             }
         }
@@ -143,27 +143,19 @@ public class Area implements Serializable {
      */
     public Area merge(Area a) throws AreaException {
         int border = this.isBordered(a);
-        Coordinate[] minCoord = new Coordinate[this.getCoordinatesMax().length];
-        Coordinate[] maxCoord = new Coordinate[this.getCoordinatesMax().length];
+
         if (border == -1) {
             throw new AreaException("Areas are not bordered.");
-        } else if (this.isValidMergingArea(a)) {
+        } else {
             // FIXME test also the load balancing to choose the good area
             // merge the two areas
-            for (int i = 0; i < this.getCoordinatesMax().length; i++) {
-                if (i != border) {
-                    minCoord[i] = this.getCoordinatesMin(i);
-                    maxCoord[i] = this.getCoordinatesMax(i);
-                } else {
-                    minCoord[i] = this.getCoordinatesMin(i).min(a.getCoordinatesMin(i));
-                    maxCoord[i] = this.getCoordinatesMax(i).max(a.getCoordinatesMax(i));
-                }
-            }
-            return new Area(minCoord, maxCoord);
+            Coordinate[] minCoord = this.coordinatesMin.clone();
+            Coordinate[] maxCoord = this.coordinatesMax.clone();
 
-        } else {
-            // FIXME is it necessary to throw a exception here ??
-            throw new AreaException("Areas cant be merged");
+            minCoord[border] = Coordinate.min(this.getCoordinatesMin(border), a.getCoordinatesMin(border));
+            maxCoord[border] = Coordinate.max(this.getCoordinatesMax(border), a.getCoordinatesMax(border));
+
+            return new Area(minCoord, maxCoord);
         }
         // TODO how to split ??
         // return new Area(null, null);
@@ -177,10 +169,10 @@ public class Area implements Serializable {
      * @return return true if we can merge the area, false otherwise.
      */
     public boolean isValidMergingArea(Area area) {
-        int axe = this.isBordered(area);
-        if (axe != -1) {
-            return (this.coordinatesMax[axe].equals(area.getCoordinatesMax()[axe])) &&
-                (this.coordinatesMin[axe].equals(area.getCoordinatesMin()[axe]));
+        int dimension = this.isBordered(area);
+        if (dimension != -1) {
+            return (this.coordinatesMax[dimension].equals(area.getCoordinatesMax(dimension))) &&
+                (this.coordinatesMin[dimension].equals(area.getCoordinatesMin(dimension)));
         } else {
             return false;
         }
@@ -201,8 +193,8 @@ public class Area implements Serializable {
         int nbDim = this.coordinatesMax.length;
 
         for (i = 0; i < nbDim; i++) {
-            if (this.getCoordinatesMax(i) != area.getCoordinatesMax(i) ||
-                this.getCoordinatesMin(i) != area.getCoordinatesMin(i)) {
+            if (!this.getCoordinatesMax(i).equals(area.getCoordinatesMax(i)) ||
+                !this.getCoordinatesMin(i).equals(area.getCoordinatesMin(i))) {
                 return false;
             }
         }
@@ -233,10 +225,10 @@ public class Area implements Serializable {
      * @return the two split areas.
      */
     public Area[] split(int dimension, Coordinate coordinate) {
-        Coordinate[] maxCoordLessArea = this.getCoordinatesMax();
+        Coordinate[] maxCoordLessArea = this.getCoordinatesMax().clone();
         maxCoordLessArea[dimension] = coordinate;
 
-        Coordinate[] minCoordGreaterArea = this.getCoordinatesMin();
+        Coordinate[] minCoordGreaterArea = this.getCoordinatesMin().clone();
         minCoordGreaterArea[dimension] = coordinate;
 
         return new Area[] { new Area(this.getCoordinatesMin(), maxCoordLessArea),

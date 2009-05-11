@@ -17,17 +17,18 @@ import org.objectweb.proactive.extensions.structuredp2p.message.CANCheckMergeMes
 import org.objectweb.proactive.extensions.structuredp2p.message.CANJoinMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.CANLookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.CANMergeMessage;
+import org.objectweb.proactive.extensions.structuredp2p.message.CANSwitchMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.LeaveMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.LoadBalancingMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.LookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.Message;
 import org.objectweb.proactive.extensions.structuredp2p.message.PingMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.response.AddNeighborResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.CANAddNeighborResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.CANCheckMergeResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.CANJoinResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.CANLookupResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.CANMergeResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.message.response.CANSwitchResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.EmptyResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.LookupResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.response.ResponseMessage;
@@ -213,6 +214,8 @@ public class CANOverlay extends StructuredOverlay {
      * {@inheritDoc}
      */
     public Boolean join(Peer remotePeer) {
+        // FIXME lookup message si peer pas bon
+
         int dimension = this.getRandomDimension();
         int direction = 0;
         int directionInv = (direction + 1) % 2;
@@ -259,37 +262,6 @@ public class CANOverlay extends StructuredOverlay {
      * {@inheritDoc}
      */
     public Peer leave() {
-        /*
-         * try { ResponseMessage groupFutures = null; Group<Peer> groupAvailablePeer =
-         * PAGroup.getGroup((Peer) PAGroup.newGroup(Peer.class.getName()));
-         * 
-         * // Check if there is a valid neighbor for (Group<Peer>[] neighborsAxe : this.neighbors) {
-         * for (Group<Peer> group : neighborsAxe) { groupFutures = (ResponseMessage)
-         * PAFuture.getFutureValue(this.getLocalPeer() .sendMessageTo((Peer) group.getGroupByType(),
-         * new CANCheckMergeMessage(this.getArea()))); PAGroup.waitAll(groupFutures);
-         * 
-         * Iterator<ResponseMessage> it = PAGroup.getGroup(groupFutures).listIterator();
-         * 
-         * while (it.hasNext()) { try { CANCheckMergeResponseMessage resp =
-         * (CANCheckMergeResponseMessage) it.next();
-         * 
-         * if (resp.isMergeable()) { groupAvailablePeer.add(resp.getPeer()); } } catch (Exception e)
-         * { // FIXME } } } }
-         * 
-         * // Check if there is at least one if (groupFutures != null) { if
-         * (groupAvailablePeer.size() > 0) {
-         * this.getLocalPeer().sendMessageTo(groupAvailablePeer.waitAndGetOne(), new
-         * CANMergeMessage(this.getRemotePeer())); } // TODO Else : split more before merge ! }
-         * 
-         * // Unset peer as neighbor for (Group<Peer>[] neighborsAxe : this.neighbors) { for
-         * (Group<Peer> group : neighborsAxe) {
-         * PAFuture.getFutureValue(this.getLocalPeer().sendMessageTo((Peer) group.getGroupByType(),
-         * new LeaveMessage(this.getRemotePeer()))); } }
-         * 
-         * PAActiveObject.terminateActiveObject(false); } catch (ClassNotReifiableException e) { //
-         * TODO Auto-generated catch block e.printStackTrace(); } catch (ClassNotFoundException e) {
-         * // TODO Auto-generated catch block e.printStackTrace(); }
-         */
         if (this.splitHistory.size() > 0) {
             int[] lastOP = this.splitHistory.get(this.splitHistory.size() - 1);
             int dimension = lastOP[0];
@@ -299,13 +271,24 @@ public class CANOverlay extends StructuredOverlay {
 
             // If there is just one neighbor, easy
             if (nbNeigbors == 1) {
-                ((CANOverlay) (neighbors.get(0)).getStructuredOverlay()).merge(this.getRemotePeer());
+                this.getLocalPeer().sendMessageTo(neighbors.waitAndGetOne(),
+                        new CANMergeMessage(this.getRemotePeer()));
             }
             // Else, do the same thing recursively (it's a little heavy with data transfer)
             else if (nbNeigbors > 1) {
-                this.switchWith(((CANOverlay) (neighbors.get(0)).getStructuredOverlay()).leave());
+
+                this.switchWith((Peer) ((CANSwitchResponseMessage) PAFuture.getFutureValue(this
+                        .getLocalPeer().sendMessageTo(neighbors.waitAndGetOne(),
+                                new CANSwitchMessage(this.getRemotePeer())))).getPeer());
             }
+
         }
+
+        PAFuture.getFutureValue(this.getLocalPeer().sendMessageTo(this.getNeighbors(),
+                new LeaveMessage(this.getRemotePeer())));
+
+        // FIXME how to set non active with recursivity ??
+        // PAActiveObject.terminateActiveObject(false);
 
         return this.getRemotePeer();
     }
@@ -590,12 +573,27 @@ public class CANOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
-    public CANAddNeighborResponseMessage handleAddNeighborMessage(CANAddNeighborMessage msg) {
-        if (!this.neighbors[msg.getDimesion()][msg.getDirection()].contains(msg.getPeer())) {
-            this.addNeighbor(msg.getPeer(), msg.getDimesion(), msg.getDirection());
+    public CANAddNeighborResponseMessage handleAddNeighborMessage(AddNeighborMessage msg) {
+        CANAddNeighborMessage message = (CANAddNeighborMessage) msg;
+
+        if (!this.neighbors[message.getDimesion()][message.getDirection()].contains(message.getPeer())) {
+            this.addNeighbor(message.getPeer(), message.getDimesion(), message.getDirection());
         }
 
         return new CANAddNeighborResponseMessage(msg.getCreationTimestamp());
+    }
+
+    /**
+     * Handles a {@link CANSwitchMessage}.
+     * 
+     * @param msg
+     *            the message.
+     * 
+     * @return the response.
+     */
+    public CANSwitchResponseMessage handleSwitchMessage(CANSwitchMessage msg) {
+        this.switchWith(msg.getPeer());
+        return new CANSwitchResponseMessage(msg.getCreationTimestamp(), this.getRemotePeer());
     }
 
     /**
@@ -632,11 +630,5 @@ public class CANOverlay extends StructuredOverlay {
         this.setHistory(null);
 
         return this.getRemotePeer();
-    }
-
-    @Override
-    public AddNeighborResponseMessage handleAddNeighborMessage(AddNeighborMessage msg) {
-        // TODO Auto-generated method stub
-        return null;
     }
 }

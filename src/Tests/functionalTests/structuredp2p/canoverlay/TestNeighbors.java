@@ -8,9 +8,11 @@ import org.junit.Test;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.extensions.structuredp2p.core.Area;
 import org.objectweb.proactive.extensions.structuredp2p.core.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.OverlayType;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
+import org.objectweb.proactive.extensions.structuredp2p.core.exception.AreaException;
 
 
 /**
@@ -61,7 +63,14 @@ public class TestNeighbors {
         Assert.assertTrue(entryPointOverlay.hasNeighbor(TestNeighbors.neighbor));
         Assert.assertTrue(neighborOverlay.hasNeighbor(TestNeighbors.entryPoint));
 
-        // TODO tests with splited areas !
+        // tests with split areas !
+        try {
+            Assert
+                    .assertTrue(new Area().equals(entryPointOverlay.getArea()
+                            .merge(neighborOverlay.getArea())));
+        } catch (AreaException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
@@ -72,7 +81,6 @@ public class TestNeighbors {
         CANOverlay entryPointOverlay = (CANOverlay) TestNeighbors.entryPoint.getStructuredOverlay();
 
         int nbNeighbors = entryPointOverlay.getNeighborsAsCollection().size();
-        System.out.println(nbNeighbors);
 
         TestNeighbors.neighbor.leave();
 

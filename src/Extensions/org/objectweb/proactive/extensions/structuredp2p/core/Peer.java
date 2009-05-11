@@ -104,7 +104,7 @@ public class Peer implements InitActive, RunActive, Serializable {
         ResponseMessage future = remotePeer.receiveMessage(msg);
 
         // Callback on ResponseMessage
-        PAEventProgramming.addActionOnFuture(future, "setResponseMessageDeliveryTime");
+        // PAEventProgramming.addActionOnFuture(future, "setResponseMessageDeliveryTime");
 
         return future;
     }
