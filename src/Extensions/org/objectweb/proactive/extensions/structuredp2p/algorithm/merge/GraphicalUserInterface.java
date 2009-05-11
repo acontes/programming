@@ -39,6 +39,7 @@ public class GraphicalUserInterface extends JFrame {
         this.area = new Canvas(this);
         // this.area.setSize(GraphicalUserInterface.SPACE_WIDTH,
         // GraphicalUserInterface.SPACE_HEIGHT);
+        System.err.println("val = " + this.peers.get(0).getStructuredOverlay());
         this.area.setSize(Integer.getInteger(this.peers.get(0).getStructuredOverlay().getArea()
                 .getCoordinatesMax(0).getValue()), Integer.getInteger(this.peers.get(0)
                 .getStructuredOverlay().getArea().getCoordinatesMax(1).getValue()));

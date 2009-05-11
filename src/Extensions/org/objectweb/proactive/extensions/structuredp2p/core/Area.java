@@ -26,7 +26,7 @@ public class Area implements Serializable {
     /**
      * The maximal value we manage.
      */
-    private static int MAX_COORD = 256;
+    private static int MAX_COORD = 512;
 
     /**
      * The minimum coordinates.
@@ -47,8 +47,8 @@ public class Area implements Serializable {
 
         int i;
         for (i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
-            minCoords[i] = new Coordinate(String.valueOf(MIN_COORD));
-            maxCoords[i] = new Coordinate(String.valueOf(MAX_COORD));
+            minCoords[i] = new Coordinate(String.valueOf(Area.MIN_COORD));
+            maxCoords[i] = new Coordinate(String.valueOf(Area.MAX_COORD));
         }
 
         this.coordinatesMin = minCoords;

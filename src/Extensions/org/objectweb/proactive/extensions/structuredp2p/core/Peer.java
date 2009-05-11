@@ -47,12 +47,12 @@ public class Peer implements InitActive, RunActive, Serializable {
     private OverlayType type;
 
     /**
-     * Contains data that are store in the peer.
+     * Contains data that are stored in the peer.
      */
     private DataStorage dataStorage;
 
     /**
-     * Time when the last request has been served.
+     * Timestamp when the last request has been served.
      */
     private long lastRequestDuration;
 
@@ -213,9 +213,9 @@ public class Peer implements InitActive, RunActive, Serializable {
                 throw new IllegalArgumentException("The peer type must be one of OverlayType.");
         }
 
+        PAActiveObject.setImmediateService("setResponseMessageDeliveryTime");
         this.lastRequestDuration = System.currentTimeMillis();
         this.stub = (Peer) PAActiveObject.getStubOnThis();
-        PAActiveObject.setImmediateService("setResponseMessageDeliveryTime");
     }
 
     /**
