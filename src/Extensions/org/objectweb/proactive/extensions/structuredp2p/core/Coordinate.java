@@ -140,7 +140,6 @@ public class Coordinate implements Serializable {
     /**
      * {@inheritDoc}
      */
-    @Override
     public String toString() {
         return this.getValue();
     }
@@ -148,9 +147,21 @@ public class Coordinate implements Serializable {
     /**
      * {@inheritDoc}
      */
-    @Override
     public boolean equals(Object o) {
         Coordinate cord = (Coordinate) o;
         return this.value.equals(cord.value);
+    }
+
+    /**
+     * Compares two coordinates. The value <code>0</code> if the argument coordinate is equal to
+     * this coordinate; a value less than <code>0</code> if this coordinate is lexicographically
+     * less than the coordinate argument; and a value greater than <code>0</code> if this coordinate
+     * is lexicographically greater than the coordinate argument.
+     */
+    public int compareTo(Coordinate coord) {
+        int val = Integer.parseInt(coord.getValue());
+        int cur = Integer.parseInt(this.getValue());
+
+        return cur - val;
     }
 }

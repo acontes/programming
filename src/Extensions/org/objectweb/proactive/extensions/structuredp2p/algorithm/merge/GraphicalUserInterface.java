@@ -51,13 +51,13 @@ public class GraphicalUserInterface extends JFrame {
     }
 
     public void createAndShowGUI() {
-        this.area = new Canvas(this);
+        int size = Integer.parseInt(((CANOverlay) this.peers.get(0).getStructuredOverlay()).getArea()
+                .getCoordinatesMax(0).getValue());
+        this.area = new Canvas(this, size, size);
         // this.area.setSize(GraphicalUserInterface.SPACE_WIDTH,
         // GraphicalUserInterface.SPACE_HEIGHT);
 
-        this.area.setSize(Integer.parseInt(((CANOverlay) this.peers.get(0).getStructuredOverlay()).getArea()
-                .getCoordinatesMax(0).getValue()), Integer.parseInt(((CANOverlay) this.peers.get(0)
-                .getStructuredOverlay()).getArea().getCoordinatesMax(1).getValue()));
+        this.area.setSize(size, size);
 
         Container contentPane = super.getContentPane();
         contentPane.add(this.createToolbar(), BorderLayout.NORTH);
@@ -111,11 +111,10 @@ public class GraphicalUserInterface extends JFrame {
 
     public class Canvas extends JComponent {
 
-        public Canvas(JFrame frame) {
+        public Canvas(JFrame frame, int height, int width) {
             super();
-            super.setSize(GraphicalUserInterface.SPACE_WIDTH, GraphicalUserInterface.SPACE_HEIGHT);
-            super.setMinimumSize(new Dimension(GraphicalUserInterface.SPACE_WIDTH,
-                GraphicalUserInterface.SPACE_HEIGHT));
+            super.setSize(height, width);
+            super.setMinimumSize(new Dimension(height, width));
 
             this.addMouseListener(new MouseAdapter() {
                 public void mouseClicked(MouseEvent e) {

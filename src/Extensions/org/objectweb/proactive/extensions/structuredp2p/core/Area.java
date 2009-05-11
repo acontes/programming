@@ -26,7 +26,7 @@ public class Area implements Serializable {
     /**
      * The maximal value we manage.
      */
-    private static int MAX_COORD = 512;
+    private static int MAX_COORD = 100;
 
     /**
      * The minimum coordinates.
