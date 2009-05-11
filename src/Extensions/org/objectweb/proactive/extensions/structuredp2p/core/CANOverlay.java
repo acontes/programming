@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Random;
 
-import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.group.ExceptionInGroup;
@@ -64,12 +63,18 @@ public class CANOverlay extends StructuredOverlay {
     private Area area;
 
     /**
+     * The history of area changes.
+     */
+    private ArrayList<int[]> splitHistory;
+
+    /**
      * Constructor.
      * 
      * Initialize the neighbors array.
      */
     public CANOverlay(Peer localPeer) {
         super(localPeer);
+        this.splitHistory = new ArrayList<int[]>();
         this.neighbors = new Group[CANOverlay.NB_DIMENSIONS][2];
         // FIXME area
         this.area = new Area();
@@ -171,6 +176,7 @@ public class CANOverlay extends StructuredOverlay {
         try {
             this.area.merge(remoteArea);
             this.getLocalPeer().getDataStorage().addData(remotePeer.getDataStorage());
+            this.splitHistory.remove(this.splitHistory.size() - 1);
         } catch (AreaException e) {
             // TODO Rollback
             return false;
@@ -217,60 +223,56 @@ public class CANOverlay extends StructuredOverlay {
      * {@inheritDoc}
      */
     @Override
-    public void leave() {
-        try {
-            ResponseMessage groupFutures = null;
-            Group<Peer> groupAvailablePeer = PAGroup.getGroup((Peer) PAGroup.newGroup(Peer.class.getName()));
+    public Peer leave() {
+        /*
+         * try { ResponseMessage groupFutures = null; Group<Peer> groupAvailablePeer =
+         * PAGroup.getGroup((Peer) PAGroup.newGroup(Peer.class.getName()));
+         * 
+         * // Check if there is a valid neighbor for (Group<Peer>[] neighborsAxe : this.neighbors) {
+         * for (Group<Peer> group : neighborsAxe) { groupFutures = (ResponseMessage)
+         * PAFuture.getFutureValue(this.getLocalPeer() .sendMessageTo((Peer) group.getGroupByType(),
+         * new CANCheckMergeMessage(this.getArea()))); PAGroup.waitAll(groupFutures);
+         * 
+         * Iterator<ResponseMessage> it = PAGroup.getGroup(groupFutures).listIterator();
+         * 
+         * while (it.hasNext()) { try { CANCheckMergeResponseMessage resp =
+         * (CANCheckMergeResponseMessage) it.next();
+         * 
+         * if (resp.isMergeable()) { groupAvailablePeer.add(resp.getPeer()); } } catch (Exception e)
+         * { // FIXME } } } }
+         * 
+         * // Check if there is at least one if (groupFutures != null) { if
+         * (groupAvailablePeer.size() > 0) {
+         * this.getLocalPeer().sendMessageTo(groupAvailablePeer.waitAndGetOne(), new
+         * CANMergeMessage(this.getRemotePeer())); } // TODO Else : split more before merge ! }
+         * 
+         * // Unset peer as neighbor for (Group<Peer>[] neighborsAxe : this.neighbors) { for
+         * (Group<Peer> group : neighborsAxe) {
+         * PAFuture.getFutureValue(this.getLocalPeer().sendMessageTo((Peer) group.getGroupByType(),
+         * new LeaveMessage(this.getRemotePeer()))); } }
+         * 
+         * PAActiveObject.terminateActiveObject(false); } catch (ClassNotReifiableException e) { //
+         * TODO Auto-generated catch block e.printStackTrace(); } catch (ClassNotFoundException e) {
+         * // TODO Auto-generated catch block e.printStackTrace(); }
+         */
+        if (this.splitHistory.size() > 0) {
+            int[] lastOP = this.splitHistory.get(this.splitHistory.size() - 1);
+            int dimension = lastOP[0];
+            int direction = lastOP[1];
+            Group<Peer> neighbors = this.getNeighborsForDimensionAndDirection(dimension, direction);
+            int nbNeigbors = neighbors.size();
 
-            // Check if there is a valid neighbor
-            for (Group<Peer>[] neighborsAxe : this.neighbors) {
-                for (Group<Peer> group : neighborsAxe) {
-                    groupFutures = (ResponseMessage) PAFuture.getFutureValue(this.getLocalPeer()
-                            .sendMessageTo((Peer) group.getGroupByType(),
-                                    new CANCheckMergeMessage(this.getArea())));
-                    PAGroup.waitAll(groupFutures);
-
-                    Iterator<ResponseMessage> it = PAGroup.getGroup(groupFutures).listIterator();
-
-                    while (it.hasNext()) {
-                        try {
-                            CANCheckMergeResponseMessage resp = (CANCheckMergeResponseMessage) it.next();
-
-                            if (resp.isMergeable()) {
-                                groupAvailablePeer.add(resp.getPeer());
-                            }
-                        } catch (Exception e) {
-                            // FIXME
-                        }
-                    }
-                }
+            // If there is just one neighbor, easy
+            if (nbNeigbors == 1) {
+                ((CANOverlay) (neighbors.get(0)).getStructuredOverlay()).merge(this.getRemotePeer());
             }
-
-            // Check if there is at least one
-            if (groupFutures != null) {
-                if (groupAvailablePeer.size() > 0) {
-                    this.getLocalPeer().sendMessageTo(groupAvailablePeer.waitAndGetOne(),
-                            new CANMergeMessage(this.getRemotePeer()));
-                }
-                // TODO Else : split more before merge !
+            // Else, do the same thing recursively (it's a little heavy with data transfer)
+            else if (nbNeigbors > 1) {
+                this.switchWith(((CANOverlay) (neighbors.get(0)).getStructuredOverlay()).leave());
             }
-
-            // Unset peer as neighbor
-            for (Group<Peer>[] neighborsAxe : this.neighbors) {
-                for (Group<Peer> group : neighborsAxe) {
-                    PAFuture.getFutureValue(this.getLocalPeer().sendMessageTo((Peer) group.getGroupByType(),
-                            new LeaveMessage(this.getRemotePeer())));
-                }
-            }
-
-            PAActiveObject.terminateActiveObject(false);
-        } catch (ClassNotReifiableException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         }
+
+        return this.getRemotePeer();
     }
 
     /**
@@ -549,5 +551,22 @@ public class CANOverlay extends StructuredOverlay {
      */
     public void setArea(Area area) {
         this.area = area;
+    }
+
+    public void update(Area area, ArrayList<int[]> history) {
+        this.setArea(area);
+        this.setHistory(history);
+    }
+
+    public void setHistory(ArrayList<int[]> history) {
+        this.splitHistory = history;
+    }
+
+    public Peer switchWith(Peer remotePeer) {
+        ((CANOverlay) remotePeer.getStructuredOverlay()).update(this.getArea(), this.splitHistory);
+        this.setArea(null);
+        this.setHistory(null);
+
+        return this.getRemotePeer();
     }
 }

@@ -51,8 +51,8 @@ public class Coordinate implements Serializable {
      */
     public static Coordinate getMiddle(Coordinate min, Coordinate max) {
         // FIXME check with strings
-        int minL = Integer.getInteger(min.getValue());
-        int maxL = Integer.getInteger(max.getValue());
+        int minL = Integer.parseInt(min.getValue());
+        int maxL = Integer.parseInt(max.getValue());
 
         return new Coordinate(String.valueOf((maxL + minL) / 2));
     }

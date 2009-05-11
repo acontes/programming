@@ -18,20 +18,28 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.extensions.structuredp2p.core.CANOverlay;
+import org.objectweb.proactive.extensions.structuredp2p.core.OverlayType;
+import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
+
 
 @SuppressWarnings("serial")
 public class GraphicalUserInterface extends JFrame {
 
     private JComponent area;
-    private ArrayList<CANPeer> peers;
-    private CANPeer selected;
+    private ArrayList<Peer> peers;
+    private Peer selected;
 
     private static int SPACE_WIDTH = 400;
     private static int SPACE_HEIGHT = 400;
 
-    public GraphicalUserInterface(CANPeer peer) {
-        this.peers = new ArrayList<CANPeer>();
+    public GraphicalUserInterface(Peer peer) {
+        this.peers = new ArrayList<Peer>();
         this.peers.add(peer);
+        this.selected = peer;
         this.createAndShowGUI();
     }
 
@@ -40,9 +48,9 @@ public class GraphicalUserInterface extends JFrame {
         // this.area.setSize(GraphicalUserInterface.SPACE_WIDTH,
         // GraphicalUserInterface.SPACE_HEIGHT);
 
-        this.area.setSize(Integer.parseInt(this.peers.get(0).getStructuredOverlay().getArea()
-                .getCoordinatesMax(0).getValue()), Integer.parseInt(this.peers.get(0).getStructuredOverlay()
-                .getArea().getCoordinatesMax(1).getValue()));
+        this.area.setSize(Integer.parseInt(((CANOverlay) this.peers.get(0).getStructuredOverlay()).getArea()
+                .getCoordinatesMax(0).getValue()), Integer.parseInt(((CANOverlay) this.peers.get(0)
+                .getStructuredOverlay()).getArea().getCoordinatesMax(1).getValue()));
 
         Container contentPane = super.getContentPane();
         contentPane.add(this.createToolbar(), BorderLayout.NORTH);
@@ -53,6 +61,7 @@ public class GraphicalUserInterface extends JFrame {
         super.setResizable(false);
         super.setTitle("CAN Merge Algorithm");
         super.setLocationRelativeTo(null);
+        this.pack();
     }
 
     private JComponent createToolbar() {
@@ -64,15 +73,25 @@ public class GraphicalUserInterface extends JFrame {
 
         splitButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                CANPeer newPeer = new CANPeer();
-                GraphicalUserInterface.this.peers.add(newPeer);
-                newPeer.join(GraphicalUserInterface.this.selected);
+                Peer newPeer;
+                try {
+                    newPeer = (Peer) PAActiveObject.newActive(Peer.class.getCanonicalName(),
+                            new Object[] { OverlayType.CAN });
+                    GraphicalUserInterface.this.peers.add(newPeer);
+                    newPeer.join(GraphicalUserInterface.this.selected);
+                } catch (ActiveObjectCreationException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                } catch (NodeException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
             }
         });
 
         mergeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                GraphicalUserInterface.this.selected.leaveCAN();
+                GraphicalUserInterface.this.selected.leave();
             }
         });
 

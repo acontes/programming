@@ -5,16 +5,18 @@ import javax.swing.SwingUtilities;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.extensions.structuredp2p.core.OverlayType;
+import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 
 
 public class Main {
     public static void main(String arv[]) {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                CANPeer peer = null;
+                Peer peer = null;
                 try {
-                    peer = (CANPeer) PAActiveObject.newActive(CANPeer.class.getCanonicalName(),
-                            new Object[] {});
+                    peer = (Peer) PAActiveObject.newActive(Peer.class.getCanonicalName(),
+                            new Object[] { OverlayType.CAN });
                 } catch (ActiveObjectCreationException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();

@@ -67,8 +67,9 @@ public class CHORDOverlay extends StructuredOverlay {
      * {@inheritDoc}
      */
     @Override
-    public void leave() {
+    public Peer leave() {
         // TODO Auto-generated method stub
+        return null;
     }
 
     /**
