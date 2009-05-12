@@ -35,7 +35,7 @@ public class Zone {
         int directionInv = (direction + 1) % 2;
 
         // Get the next dimension to split onto
-        if (this.splitHistory != null && this.splitHistory.size() > 0) {
+        if (this.splitHistory.size() > 0) {
             System.out.println(this.splitHistory.get(this.splitHistory.size() - 1)[0]);
             dimension = (this.splitHistory.get(this.splitHistory.size() - 1)[0] + 1) % 2;
         }
@@ -160,6 +160,15 @@ public class Zone {
         }
 
         return new Color(r, v, b);
+    }
+
+    public static void main(String argv[]) {
+        Zone zone1 = new Zone();
+        Zone zone2 = new Zone();
+        Zone zone3 = new Zone();
+
+        zone2.join(zone1);
+        zone3.join(zone2);
     }
 
     public String toString() {
