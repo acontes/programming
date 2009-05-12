@@ -180,7 +180,7 @@ public class Zone {
         int v = rand.nextInt(256);
         int b = rand.nextInt(256);
 
-        if (r + v + b < 477) {
+        if (r + v + b < 420) {
             return this.getRandomColor();
         }
 

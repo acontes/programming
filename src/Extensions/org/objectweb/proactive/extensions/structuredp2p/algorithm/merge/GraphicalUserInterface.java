@@ -27,7 +27,6 @@ public class GraphicalUserInterface extends JFrame {
     private JComponent area;
     private ArrayList<Zone> zones;
     private Action action = Action.SPLIT;
-    public int ratio = 1;
 
     private enum Action {
         SPLIT, MERGE
@@ -51,7 +50,7 @@ public class GraphicalUserInterface extends JFrame {
         super.setSize(500, 560);
         super.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         super.setResizable(false);
-        super.setTitle("CAN Merge Algorithm");
+        super.setTitle("CAN Split/Merge Algorithm");
         super.setLocationRelativeTo(null);
     }
 
@@ -148,8 +147,9 @@ public class GraphicalUserInterface extends JFrame {
                 for (ArrayList<Zone>[] zoneTab : this.zoneClicked.neighbors) {
                     for (ArrayList<Zone> zones : zoneTab) {
                         for (Zone zone : zones) {
-                            g2d.drawString("Neighbor", zone.xMin + 10, zone.yMax - 10);
-                            // g2d.drawLine(, zone.yMin, zone.xMax, zone.yMax);
+                            g2d.drawString("N", zone.xMin - 4 + (zone.xMax - zone.xMin) / 2, zone.yMin + 5 +
+                                (zone.yMax - zone.yMin) / 2);
+
                         }
                     }
                 }
