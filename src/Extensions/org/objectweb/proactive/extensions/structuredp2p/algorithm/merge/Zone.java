@@ -35,9 +35,9 @@ public class Zone {
         int directionInv = (direction + 1) % 2;
 
         // Get the next dimension to split onto
-        if (this.splitHistory.size() > 0) {
-            System.out.println(this.splitHistory.get(this.splitHistory.size() - 1)[0]);
-            dimension = (this.splitHistory.get(this.splitHistory.size() - 1)[0] + 1) % 2;
+        if (zone.splitHistory.size() > 0) {
+            System.out.println(zone.splitHistory.get(zone.splitHistory.size() - 1)[0]);
+            dimension = (zone.splitHistory.get(zone.splitHistory.size() - 1)[0] + 1) % 2;
         }
 
         // New zone
