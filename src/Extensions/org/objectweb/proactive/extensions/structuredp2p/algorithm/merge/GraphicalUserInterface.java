@@ -1,9 +1,12 @@
 package org.objectweb.proactive.extensions.structuredp2p.algorithm.merge;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -37,22 +40,19 @@ public class GraphicalUserInterface extends JFrame {
     }
 
     public void createAndShowGUI() {
-        this.area = new Canvas(512, 512);
-        // this.area.setSize(GraphicalUserInterface.SPACE_WIDTH,
-        // GraphicalUserInterface.SPACE_HEIGHT);
+        this.area = new Canvas(500, 500);
 
         JComponent toolbar = this.createToolbar();
         Container contentPane = super.getContentPane();
+
         contentPane.add(toolbar, BorderLayout.NORTH);
         contentPane.add(this.area, BorderLayout.CENTER);
 
-        super.setMinimumSize(new Dimension(512, 512 + 60));
-
+        super.setSize(500, 560);
         super.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        super.setResizable(true);
+        super.setResizable(false);
         super.setTitle("CAN Merge Algorithm");
         super.setLocationRelativeTo(null);
-        this.pack();
     }
 
     private JComponent createToolbar() {
@@ -90,11 +90,12 @@ public class GraphicalUserInterface extends JFrame {
     }
 
     public class Canvas extends JComponent {
+        public Zone zoneClicked = null;
 
         public Canvas(int height, int width) {
             super();
             super.setSize(height, width);
-            super.setMinimumSize(new Dimension(height, width));
+            super.setPreferredSize(new Dimension(height, width));
 
             this.addMouseListener(new MouseAdapter() {
                 public void mouseClicked(MouseEvent e) {
@@ -103,8 +104,8 @@ public class GraphicalUserInterface extends JFrame {
                     System.out.println("clicked in x=" + e.getX() + ", y= " + e.getY());
                     /* Right click */
                     if (e.getButton() == MouseEvent.BUTTON3) {
-                        System.out.println("val = " + (clickedZone));
-
+                        Canvas.this.zoneClicked = clickedZone;
+                        Canvas.this.repaint();
                     } else if (e.getButton() == MouseEvent.BUTTON1) {
                         /* Left click */
                         if (clickedZone != null) {
@@ -132,14 +133,32 @@ public class GraphicalUserInterface extends JFrame {
         }
 
         public void paintComponent(Graphics g) {
+            Graphics2D g2d = (Graphics2D) g;
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
             for (Zone zone : GraphicalUserInterface.this.zones) {
                 System.out.println("zone --->");
                 System.out.println("xMin=" + zone.xMin + "xMax=" + zone.xMax + "yMin=" + zone.yMin + "yMax=" +
                     zone.yMax);
 
-                g.setColor(zone.color);
-                g.fillRect(zone.xMin, zone.yMin, zone.xMax - zone.xMin, zone.yMax - zone.yMin);
+                g2d.setColor(zone.color);
+                g2d.fillRect(zone.xMin, zone.yMin, zone.xMax - zone.xMin, zone.yMax - zone.yMin);
+            }
+
+            if (this.zoneClicked != null) {
+                g2d.setColor(Color.black);
+                g2d.drawLine(this.zoneClicked.xMin, this.zoneClicked.yMin, this.zoneClicked.xMax,
+                        this.zoneClicked.yMax);
+
+                for (ArrayList<Zone>[] zoneTab : this.zoneClicked.neighbors) {
+                    for (ArrayList<Zone> zones : zoneTab) {
+                        for (Zone zone : zones) {
+                            g2d.drawString("Neighbor", zone.xMin + 10, zone.yMax - 10);
+                            // g2d.drawLine(, zone.yMin, zone.xMax, zone.yMax);
+                        }
+                    }
+                }
+                this.zoneClicked = null;
             }
 
         }
