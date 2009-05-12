@@ -117,7 +117,7 @@ public abstract class StructuredOverlay implements Serializable {
      *            the lookup message that is handled.
      * @return the {@link LookupResponseMessage} response.
      */
-    public abstract LookupResponseMessage handleLookupMessage(LookupMessage msg);
+    protected abstract LookupResponseMessage handleLookupMessage(LookupMessage msg);
 
     /**
      * Handles a {@link JoinResponseMessage}.
@@ -126,7 +126,7 @@ public abstract class StructuredOverlay implements Serializable {
      *            the message that is handled.
      * @return the {@link JoinResponseMessage} response.
      */
-    public abstract JoinResponseMessage handleJoinMessage(Message msg);
+    protected abstract JoinResponseMessage handleJoinMessage(Message msg);
 
     /**
      * Handles a {@link LeaveMessage}.
@@ -135,7 +135,7 @@ public abstract class StructuredOverlay implements Serializable {
      *            the message that is handled.
      * @return the {@link EmptyResponseMessage} response.
      */
-    public abstract EmptyResponseMessage handleLeaveMessage(LeaveMessage leaveMessage);
+    protected abstract EmptyResponseMessage handleLeaveMessage(LeaveMessage leaveMessage);
 
     /**
      * Handles a {@link LeaveMessage}.
@@ -144,7 +144,7 @@ public abstract class StructuredOverlay implements Serializable {
      *            the message that is handled.
      * @return the {@link EmptyResponseMessage} response.
      */
-    public abstract AddNeighborResponseMessage handleAddNeighborMessage(AddNeighborMessage msg);
+    protected abstract AddNeighborResponseMessage handleAddNeighborMessage(AddNeighborMessage msg);
 
     /**
      * Returns the current peer that use this overlay.
@@ -163,5 +163,4 @@ public abstract class StructuredOverlay implements Serializable {
     public Peer getRemotePeer() {
         return this.localPeer.getStub();
     }
-
 }
