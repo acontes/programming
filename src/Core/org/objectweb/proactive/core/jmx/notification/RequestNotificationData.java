@@ -53,6 +53,8 @@ public class RequestNotificationData implements Serializable {
      * @param destination The destination of the request
      * @param methodName The name of the method called
      * @param requestQueueLength The request queue length of the destination active object
+     * @param sequenceNumber The Sequence Number of the JMX Notification
+     * @param tags The tags binded to the request
      */
     public RequestNotificationData(UniqueID source, String sourceNode, UniqueID destination,
             String destinationNode, String methodName, int requestQueueLength, long sequenceNumber,
