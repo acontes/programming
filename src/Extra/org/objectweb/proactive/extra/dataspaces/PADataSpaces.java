@@ -46,7 +46,7 @@ public class PADataSpaces {
     /**
      * Returns file handle to the <i>default input data space</i>. This method call is equal to
      * {@link #resolveDefaultInput(String)} with null path argument.
-     *
+     * 
      * @return file handle to the default input data space of caller's application
      * @throws SpaceNotFoundException
      *             when there is no default input data space defined
@@ -76,7 +76,8 @@ public class PADataSpaces {
      * was defined correctly. It is intended to provide any form of input to the application.
      * 
      * @param path
-     *            path of a file in the default input data space
+     *            path of a file in the default input data space; <code>null</code> denotes request
+     *            for data space root
      * @return file handle to file specified by path in the default input data space of caller's
      *         application
      * @throws SpaceNotFoundException
@@ -95,7 +96,7 @@ public class PADataSpaces {
     /**
      * Returns file handle to the <i>default output data space</i>. This method call is equal to
      * {@link #resolveDefaultOutput(String)} with null path argument.
-     *
+     * 
      * @return file handle to the default output data space of caller's application
      * @throws SpaceNotFoundException
      *             when there is no default output data space defined
@@ -126,7 +127,8 @@ public class PADataSpaces {
      * synchronization is a developer’s responsibility.
      * 
      * @param path
-     *            path of a file in the default input data space
+     *            path of a file in the default output data space; <code>null</code> denotes request
+     *            for data space root
      * @return file handle to file specified by path in the default output data space of caller's
      *         application
      * @throws SpaceNotFoundException
@@ -175,11 +177,12 @@ public class PADataSpaces {
      * This method is intended to provide simple (and possibly inefficient) way to synchronize input
      * definition and usage. It repeatedly queries Data Spaces' Naming Service for default input
      * space availability, so it blocks until default input is defined or specified timeout expires.
-     *
+     * 
+     * @param path
+     *            path of a file in the default input data space; <code>null</code> denotes request
+     *            for data space root
      * @param timeoutMillis
      *            timeout for blocking wait, in milliseconds
-     * @param path
-     *            path of a file in the default input data space
      * @return file handle to file specified by path in the default input data space of caller's
      *         application
      * @throws IllegalArgumentException
@@ -233,11 +236,12 @@ public class PADataSpaces {
      * output definition and usage. It repeatedly queries Data Spaces' Naming Service for default
      * output space availability, so it blocks until default output is defined or specified timeout
      * expires.
-     *
+     * 
+     * @param path
+     *            path of a file in the default output data space; <code>null</code> denotes request
+     *            for data space root
      * @param timeoutMillis
      *            timeout for blocking wait, in milliseconds
-     * @param path
-     *            path of a file in the default input data space
      * @return file handle to file specified by path in the default output data space of caller's
      *         application
      * @throws IllegalArgumentException
@@ -288,11 +292,12 @@ public class PADataSpaces {
      * <p>
      * Input data space content is expected to be readable from any node of this application if it
      * was defined correctly. It is intended to provide any form of input to the application.
-     *
+     * 
      * @param name
      *            name of an input data space to resolve
      * @param path
-     *            path of a file in the named input data space
+     *            path of a file in the named input data space; <code>null</code> denotes request
+     *            for data space root
      * @return file handle to file specified by path in the input data space with provided name, for
      *         caller's application
      * @throws SpaceNotFoundException
@@ -342,11 +347,12 @@ public class PADataSpaces {
      * Output data space content is expected to be writable from any node of this application if it
      * was defined correctly. It is intended to store globally any computation results. Writes
      * synchronization is a developer’s responsibility.
-     *
+     * 
      * @param name
      *            name of an output data space to resolve
      * @param path
-     *            path of a file in the named output data space
+     *            path of a file in the named output data space; <code>null</code> denotes request
+     *            for data space root
      * @return file handle to file specified by path in the output data space with provided name,
      *         for caller's application
      * @throws SpaceNotFoundException
@@ -400,13 +406,14 @@ public class PADataSpaces {
      * definition and usage. It repeatedly queries Data Spaces' Naming Service for input space with
      * a specific name availability, so it blocks until this input is defined or specified timeout
      * expires.
-     *
+     * 
      * @param name
      *            name of an input data space to resolve
+     * @param path
+     *            path of a file in the named input data space; <code>null</code> denotes request
+     *            for data space root
      * @param timeoutMillis
      *            timeout for blocking wait, in milliseconds
-     * @param path
-     *            path of a file in the named input data space
      * @return file handle to file specified by path in the input data space with provided name, for
      *         caller's application
      * @throws IllegalArgumentException
@@ -463,13 +470,14 @@ public class PADataSpaces {
      * output definition and usage. It repeatedly queries Data Spaces' Naming Service for output
      * space with a specific name availability, so it blocks until this output is defined or
      * specified timeout expires.
-     *
+     * 
      * @param name
      *            name of an output data space to resolve
+     * @param path
+     *            path of a file in the named output data space; <code>null</code> denotes request
+     *            for data space root
      * @param timeoutMillis
      *            timeout for blocking wait, in milliseconds
-     * @param path
-     *            path of a file in the named output data space
      * @return file handle to file specified by path in the output data space with provided name,
      *         for caller's application
      * @throws IllegalArgumentException
@@ -491,7 +499,7 @@ public class PADataSpaces {
     /**
      * Returns file handle to calling Active Object's <i>scratch data space</i>. This method call is
      * equal to {@link #resolveScratchForAO(String)} with null path argument.
-     *
+     * 
      * @return file handle to the scratch for calling Active Object
      * @throws FileSystemException
      *             indicates VFS related exception
@@ -520,7 +528,8 @@ public class PADataSpaces {
      * results will be most probably automatically removed after application terminates.
      * 
      * @param path
-     *            path of a file in the scratch for calling Active Object
+     *            path of a file in the scratch for calling Active Object; <code>null</code> denotes
+     *            request for data space root
      * @return file handle to file specified by path in the scratch for calling Active Object
      * @throws FileSystemException
      *             indicates VFS related exception
