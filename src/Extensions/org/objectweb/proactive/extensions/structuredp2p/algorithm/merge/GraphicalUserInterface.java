@@ -49,7 +49,7 @@ public class GraphicalUserInterface extends JFrame {
         super.setMinimumSize(new Dimension(512, 512 + 60));
 
         super.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        super.setResizable(false);
+        super.setResizable(true);
         super.setTitle("CAN Merge Algorithm");
         super.setLocationRelativeTo(null);
         this.pack();
@@ -134,8 +134,7 @@ public class GraphicalUserInterface extends JFrame {
             for (Zone zone : GraphicalUserInterface.this.zones) {
                 g.setColor(zone.color);
 
-                int width = zone.xMax - zone.xMin;
-                g.fillRect(zone.xMin, zone.yMin, width, width);
+                g.fillRect(zone.xMin, zone.yMin, zone.xMax - zone.xMin, zone.yMax - zone.yMin);
             }
 
         }

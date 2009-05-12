@@ -36,6 +36,7 @@ public class Zone {
 
         // Get the next dimension to split onto
         if (this.splitHistory != null && this.splitHistory.size() > 0) {
+            System.out.println(this.splitHistory.get(this.splitHistory.size() - 1)[0]);
             dimension = (this.splitHistory.get(this.splitHistory.size() - 1)[0] + 1) % 2;
         }
 
@@ -51,15 +52,20 @@ public class Zone {
             return false;
         }
 
-        zone.splitHistory = this.splitHistory;
+        zone.splitHistory = (ArrayList<int[]>) this.splitHistory.clone();
         zone.splitHistory.add(new int[] { dimension, directionInv });
         zone.neighbors = this.neighbors;
         zone.neighbors[dimension][directionInv].clear();
         zone.neighbors[dimension][directionInv].add(this);
 
-        this.splitHistory.add(new int[] { dimension, directionInv });
+        this.splitHistory.add(new int[] { dimension, direction });
         this.neighbors[dimension][direction].clear();
         this.neighbors[dimension][direction].add(zone);
+
+        System.out.println("Join method [dimension=" + dimension + "; direction=" + direction +
+            "; splitHistorySize=" + this.splitHistory.size() + "]");
+        System.out.println(this);
+        this.sysoutHistory();
 
         return true;
     }
@@ -154,5 +160,19 @@ public class Zone {
         }
 
         return new Color(r, v, b);
+    }
+
+    public String toString() {
+        String value = "Zone: min=[x=" + this.xMin + "; y=" + this.yMin + "] max=[x=" + this.xMax + "; y=" +
+            this.yMax + "]";
+        return value;
+    }
+
+    public void sysoutHistory() {
+        System.out.println("SplitHistory [");
+        for (int[] tab : this.splitHistory) {
+            System.out.println("\t[dim=" + tab[0] + "; dir=" + tab[1] + "]");
+        }
+        System.out.println("]");
     }
 }
