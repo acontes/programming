@@ -47,6 +47,9 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundExceptio
 // Maybe FileObject decorator would be enough for that?
 // FIXME from VFS documentation: it seems that one FileObject (that can be shared among Active Objects
 // within one Node) can not have input and output streams opened at the same time! VFS limitation??
+// that would cause different behavior for sharing file within 1 node and 2 different nodes.
+// one workaround is to provide separate SpacesMountManagers per each AO. (it would also resolve
+// FileObject synchronization problems, as reported in VFS-253 and described in SyncingFileObjectDecorator)  
 public class SpacesMountManager {
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.DATASPACES_MOUNT_MANAGER);
 
