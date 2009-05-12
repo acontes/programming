@@ -40,14 +40,21 @@ public class Zone {
             dimension = (zone.splitHistory.get(zone.splitHistory.size() - 1)[0] + 1) % 2;
         }
 
+        this.xMin = zone.xMin;
+        this.xMax = zone.xMax;
+        this.yMin = zone.yMin;
+        this.yMax = zone.yMax;
+
         // New zone
         // Update x dimension
         if (dimension == 0) {
-            zone.xMin = (this.xMin + this.xMax) / 2;
-            this.xMax = (this.xMin + this.xMax) / 2;
+            int x = zone.xMin + ((zone.xMax - zone.xMin) / 2);
+            zone.xMin = x;
+            this.xMax = x;
         } else if (dimension == 1) {
-            zone.yMin = (this.yMin + this.yMax) / 2;
-            this.yMax = (this.yMin + this.yMax) / 2;
+            int y = zone.yMin + ((zone.yMax - zone.yMin) / 2);
+            zone.yMin = y;
+            this.yMax = y;
         } else {
             return false;
         }
