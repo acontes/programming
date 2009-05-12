@@ -74,15 +74,11 @@ public class WSClientComponent {
 
             EndpointReference targetEPR;
 
-            if (args.length == 0) {
-                targetEPR = new EndpointReference(url + WSConstants.AXIS_SERVICES_PATH + "server_hello-world");
-            } else {
-                targetEPR = new EndpointReference(url + WSConstants.AXIS_SERVICES_PATH + "server_hello-world");
-            }
+            targetEPR = new EndpointReference(url + WSConstants.AXIS_SERVICES_PATH + "server_hello-world");
 
             options.setTo(targetEPR);
 
-            // Call sayText
+            // Call helloWorld
             QName op = new QName("helloWorld");
 
             Object[] opArgs = new Object[] { "ProActive Team" };
@@ -92,7 +88,41 @@ public class WSClientComponent {
 
             String result = (String) response[0];
 
-            System.out.println("Client returned " + result);
+            System.out.println("helloWorld returned: " + result);
+
+            // Call setText
+            op = new QName("setText");
+            String text = "A text has been inserted";
+            opArgs = new Object[] { text };
+
+            serviceClient.invokeRobust(op, opArgs);
+
+            System.out.println("setText(" + text + ") has been called");
+
+            // Call helloWorld
+            op = new QName("sayText");
+
+            opArgs = new Object[] {};
+            returnTypes = new Class[] { String.class };
+
+            response = serviceClient.invokeBlocking(op, opArgs, returnTypes);
+
+            result = (String) response[0];
+
+            System.out.println("sayText returned: " + result);
+
+            targetEPR = new EndpointReference(url + WSConstants.AXIS_SERVICES_PATH + "server_goodbye-world");
+            options.setTo(targetEPR);
+
+            op = new QName("goodByeWorld");
+            opArgs = new Object[] { "ProActive Team" };
+            returnTypes = new Class[] { String.class };
+
+            response = serviceClient.invokeBlocking(op, opArgs, returnTypes);
+
+            result = (String) response[0];
+
+            System.out.println("goodByeWorld returned: " + result);
         } catch (AxisFault e) {
             e.printStackTrace();
         }

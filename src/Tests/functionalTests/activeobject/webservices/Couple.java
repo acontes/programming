@@ -3,11 +3,11 @@ package functionalTests.activeobject.webservices;
 import java.io.Serializable;
 
 
-public class ClassTest implements Serializable {
+public class Couple implements Serializable {
     private String str1;
     private int myInt;
 
-    public ClassTest() {
+    public Couple() {
     }
 
     public String getStr1() {
