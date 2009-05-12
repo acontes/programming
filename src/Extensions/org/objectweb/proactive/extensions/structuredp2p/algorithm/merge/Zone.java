@@ -1,6 +1,8 @@
 package org.objectweb.proactive.extensions.structuredp2p.algorithm.merge;
 
+import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Random;
 
 
 public class Zone {
@@ -13,9 +15,18 @@ public class Zone {
     public ArrayList<Zone>[][] neighbors;
     public ArrayList<int[]> splitHistory;
 
+    public Color color;
+
     public Zone() {
         this.neighbors = new ArrayList[2][2];
+
+        for (int i = 0; i < 2; i++) {
+            this.neighbors[i][0] = new ArrayList<Zone>();
+            this.neighbors[i][1] = new ArrayList<Zone>();
+        }
+
         this.splitHistory = new ArrayList<int[]>();
+        this.color = this.getRandomColor();
     }
 
     public boolean join(Zone zone) {
@@ -28,8 +39,8 @@ public class Zone {
             dimension = (this.splitHistory.get(this.splitHistory.size() - 1)[0] + 1) % 2;
         }
 
-        // Nouvelle zone
-        // Modifications en x
+        // New zone
+        // Update x dimension
         if (dimension == 0) {
             zone.xMin = (this.xMin + this.xMax) / 2;
             this.xMax = (this.xMin + this.xMax) / 2;
@@ -122,12 +133,26 @@ public class Zone {
             for (int j = 0; j < 2; j++) {
                 for (Zone neighbor : this.neighbors[i][j]) {
                     if (neighbor.equals(zone)) {
-                        this.neighbors[i][j].remove(neighbor);
+                        return this.neighbors[i][j].remove(neighbor);
                     }
                 }
             }
         }
 
         return false;
+    }
+
+    public Color getRandomColor() {
+        Random rand = new Random();
+
+        int r = rand.nextInt(256);
+        int v = rand.nextInt(256);
+        int b = rand.nextInt(256);
+
+        if (r + v + b < 477) {
+            return this.getRandomColor();
+        }
+
+        return new Color(r, v, b);
     }
 }
