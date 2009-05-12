@@ -117,7 +117,7 @@ public abstract class StructuredOverlay implements Serializable {
      *            the lookup message that is handled.
      * @return the {@link LookupResponseMessage} response.
      */
-    protected abstract LookupResponseMessage handleLookupMessage(LookupMessage msg);
+    public abstract LookupResponseMessage handleLookupMessage(LookupMessage msg);
 
     /**
      * Handles a {@link JoinResponseMessage}.
@@ -126,7 +126,7 @@ public abstract class StructuredOverlay implements Serializable {
      *            the message that is handled.
      * @return the {@link JoinResponseMessage} response.
      */
-    protected abstract JoinResponseMessage handleJoinMessage(Message msg);
+    public abstract JoinResponseMessage handleJoinMessage(Message msg);
 
     /**
      * Handles a {@link LeaveMessage}.
@@ -135,7 +135,7 @@ public abstract class StructuredOverlay implements Serializable {
      *            the message that is handled.
      * @return the {@link EmptyResponseMessage} response.
      */
-    protected abstract EmptyResponseMessage handleLeaveMessage(LeaveMessage leaveMessage);
+    public abstract EmptyResponseMessage handleLeaveMessage(LeaveMessage leaveMessage);
 
     /**
      * Handles a {@link LeaveMessage}.
@@ -144,7 +144,7 @@ public abstract class StructuredOverlay implements Serializable {
      *            the message that is handled.
      * @return the {@link EmptyResponseMessage} response.
      */
-    protected abstract AddNeighborResponseMessage handleAddNeighborMessage(AddNeighborMessage msg);
+    public abstract AddNeighborResponseMessage handleAddNeighborMessage(AddNeighborMessage msg);
 
     /**
      * Returns the current peer that use this overlay.

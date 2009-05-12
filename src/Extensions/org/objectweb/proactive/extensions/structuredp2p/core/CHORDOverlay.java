@@ -121,7 +121,7 @@ public class CHORDOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
-    protected CHORDLookupResponseMessage handleLookupMessage(LookupMessage msg) {
+    public CHORDLookupResponseMessage handleLookupMessage(LookupMessage msg) {
         return new CHORDLookupResponseMessage(msg.getCreationTimestamp(), this.getLocalPeer(),
             ((CHORDLookupMessage) msg).getId());
     }
@@ -129,21 +129,21 @@ public class CHORDOverlay extends StructuredOverlay {
     /**
      * TODO
      */
-    protected JoinResponseMessage handleJoinMessage(Message msg) {
+    public JoinResponseMessage handleJoinMessage(Message msg) {
         return null;
     }
 
     /**
      * TODO
      */
-    protected EmptyResponseMessage handleLeaveMessage(LeaveMessage leaveMessage) {
+    public EmptyResponseMessage handleLeaveMessage(LeaveMessage leaveMessage) {
         return null;
     }
 
     /**
      * TODO
      */
-    protected AddNeighborResponseMessage handleAddNeighborMessage(AddNeighborMessage msg) {
+    public AddNeighborResponseMessage handleAddNeighborMessage(AddNeighborMessage msg) {
         // TODO Auto-generated method stub
         return null;
     }

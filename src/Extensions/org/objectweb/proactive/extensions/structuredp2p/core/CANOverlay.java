@@ -291,7 +291,7 @@ public class CANOverlay extends StructuredOverlay {
      * @param direction
      *            the direction (0 or 1).
      */
-    private Boolean addNeighbor(Peer remotePeer, int dimension, int direction) {
+    public Boolean addNeighbor(Peer remotePeer, int dimension, int direction) {
         return this.neighbors[dimension][direction].add(remotePeer);
     }
 
@@ -301,7 +301,7 @@ public class CANOverlay extends StructuredOverlay {
      * @param peer
      *            the neighbor to remove.
      */
-    private void removeNeighbor(Peer peer) {
+    public void removeNeighbor(Peer peer) {
         for (Group<Peer>[] neighborsAxe : this.neighbors) {
             for (Group<Peer> neighbor : neighborsAxe) {
                 if (neighbor.contains(peer)) {
@@ -319,7 +319,7 @@ public class CANOverlay extends StructuredOverlay {
      * @param direction
      *            the direction.
      */
-    private void removeNeighbors(int dimension, int direction) {
+    public void removeNeighbors(int dimension, int direction) {
         this.neighbors[dimension][direction].clear();
     }
 
@@ -361,7 +361,7 @@ public class CANOverlay extends StructuredOverlay {
      * 
      * @return the neighbors of the managed area as a {@link Group} without any direction.
      */
-    private Group<Peer> getNeighborsAsGroup() {
+    public Group<Peer> getNeighborsAsGroup() {
         Group<Peer> allNeighbors = null;
 
         for (Group<Peer>[] neighborsAxe : this.neighbors) {
@@ -515,7 +515,7 @@ public class CANOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
-    protected CANLookupResponseMessage handleLookupMessage(LookupMessage msg) {
+    public CANLookupResponseMessage handleLookupMessage(LookupMessage msg) {
         return new CANLookupResponseMessage(msg.getCreationTimestamp(), this.getLocalPeer(),
             ((CANLookupMessage) msg).getCoordinates());
     }
@@ -523,7 +523,7 @@ public class CANOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
-    protected CANJoinResponseMessage handleJoinMessage(Message msg) {
+    public CANJoinResponseMessage handleJoinMessage(Message msg) {
         CANJoinMessage message = (CANJoinMessage) msg;
         this.neighbors = message.getNeighbors();
 
@@ -544,7 +544,7 @@ public class CANOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
-    protected EmptyResponseMessage handleLeaveMessage(LeaveMessage msg) {
+    public EmptyResponseMessage handleLeaveMessage(LeaveMessage msg) {
         LeaveMessage message = msg;
         this.removeNeighbor(message.getPeer());
 
@@ -554,7 +554,7 @@ public class CANOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
-    protected CANAddNeighborResponseMessage handleAddNeighborMessage(AddNeighborMessage msg) {
+    public CANAddNeighborResponseMessage handleAddNeighborMessage(AddNeighborMessage msg) {
         CANAddNeighborMessage message = (CANAddNeighborMessage) msg;
 
         if (!this.neighbors[message.getDimesion()][message.getDirection()].contains(message.getPeer())) {
@@ -572,7 +572,7 @@ public class CANOverlay extends StructuredOverlay {
      * 
      * @return the response.
      */
-    protected CANMergeResponseMessage handleMergeMessage(Message msg) {
+    public CANMergeResponseMessage handleMergeMessage(Message msg) {
         this.merge(((CANMergeMessage) msg).getPeer());
         return new CANMergeResponseMessage(msg.getCreationTimestamp());
     }
@@ -585,7 +585,7 @@ public class CANOverlay extends StructuredOverlay {
      * 
      * @return the response.
      */
-    protected CANCheckMergeResponseMessage handleCheckMergeMessage(Message msg) {
+    public CANCheckMergeResponseMessage handleCheckMergeMessage(Message msg) {
         CANCheckMergeMessage message = (CANCheckMergeMessage) msg;
         return new CANCheckMergeResponseMessage(msg.getCreationTimestamp(), this.getRemotePeer(), this.area
                 .isValidMergingArea(message.getArea()));
@@ -599,7 +599,7 @@ public class CANOverlay extends StructuredOverlay {
      * 
      * @return the response.
      */
-    protected CANSwitchResponseMessage handleSwitchMessage(CANSwitchMessage msg) {
+    public CANSwitchResponseMessage handleSwitchMessage(CANSwitchMessage msg) {
         this.switchWith(msg.getPeer());
         return new CANSwitchResponseMessage(msg.getCreationTimestamp(), this.getRemotePeer());
     }
