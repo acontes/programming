@@ -32,21 +32,20 @@ public class Zone {
     public boolean join(Zone zone) {
         int dimension = 0;
         int direction = 0;
-        int directionInv = (direction + 1) % 2;
+        int directionInv = 1;
 
         // Get the next dimension to split onto
         if (zone.splitHistory.size() > 0) {
-            System.out.println(zone.splitHistory.get(zone.splitHistory.size() - 1)[0]);
             dimension = (zone.splitHistory.get(zone.splitHistory.size() - 1)[0] + 1) % 2;
         }
 
-        this.xMin = zone.xMin;
-        this.xMax = zone.xMax;
-        this.yMin = zone.yMin;
-        this.yMax = zone.yMax;
-
         // New zone
         // Update x dimension
+        this.xMax = zone.xMax;
+        this.yMax = zone.yMax;
+        this.xMin = zone.xMin;
+        this.yMin = zone.yMin;
+
         if (dimension == 0) {
             int x = zone.xMin + ((zone.xMax - zone.xMin) / 2);
             zone.xMin = x;
@@ -59,21 +58,38 @@ public class Zone {
             return false;
         }
 
-        zone.splitHistory = (ArrayList<int[]>) this.splitHistory.clone();
-        zone.splitHistory.add(new int[] { dimension, directionInv });
-        zone.neighbors = this.neighbors;
-        zone.neighbors[dimension][directionInv].clear();
-        zone.neighbors[dimension][directionInv].add(this);
+        this.splitHistory = (ArrayList<int[]>) zone.splitHistory.clone();
 
-        this.splitHistory.add(new int[] { dimension, direction });
-        this.neighbors[dimension][direction].clear();
-        this.neighbors[dimension][direction].add(zone);
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < 2; j++) {
+                this.neighbors[i][j] = (ArrayList<Zone>) zone.neighbors[i][j].clone();
+            }
+        }
 
-        System.out.println("Join method [dimension=" + dimension + "; direction=" + direction +
-            "; splitHistorySize=" + this.splitHistory.size() + "]");
-        System.out.println(this);
-        this.sysoutHistory();
+        this.splitHistory.add(new int[] { dimension, directionInv });
+        this.neighbors[dimension][directionInv].clear();
+        this.addNeighbor(zone, dimension, directionInv);
 
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < 2; j++) {
+                for (Zone z : this.neighbors[i][j]) {
+                    if (i != dimension && j != direction) {
+                        z.addNeighbor(this, i, direction);// (direction + 1) % 2);
+                    }
+                }
+            }
+        }
+
+        zone.splitHistory.add(new int[] { dimension, direction });
+        zone.neighbors[dimension][direction].clear();
+        zone.addNeighbor(this, dimension, direction);
+        /*
+         * System.out.println("Join method [dimension=" + dimension + "; direction=" + direction +
+         * "; splitHistorySize=" + this.splitHistory.size() + "]"); System.out.println(this);
+         * System.out.println(this.sysoutHistory());
+         */
+
+        System.out.println(this.neighborsToString());
         return true;
     }
 
@@ -87,7 +103,19 @@ public class Zone {
 
             // If there is just one neighbor, easy
             if (nbNeigbors == 1) {
-                this.neighbors[dimension][direction].get(0).merge(this);
+                Zone zone = this.neighbors[dimension][direction].get(0);
+
+                if (this.xMin > zone.xMin) {
+                    this.xMin = zone.xMin;
+                } else if (this.xMin < zone.xMin) {
+                    this.xMax = zone.xMax;
+                } else if (this.yMin > zone.yMin) {
+                    this.yMin = zone.yMin;
+                } else if (this.yMin < zone.yMin) {
+                    this.yMax = zone.yMax;
+                }
+
+                this.splitHistory.remove(this.splitHistory.size() - 1);
             }
             // Else, do the same thing recursively (it's a little heavy with data transfer)
             else if (nbNeigbors > 1) {
@@ -110,23 +138,12 @@ public class Zone {
             }
         }
 
+        this.xMax = -1;
+        this.yMax = -1;
+        this.xMin = -1;
+        this.yMin = -1;
+
         return this;
-    }
-
-    public boolean merge(Zone zone) {
-        if (this.xMin > zone.xMin) {
-            this.xMin = zone.xMin;
-        } else if (this.xMin < zone.xMin) {
-            this.xMax = zone.xMax;
-        } else if (this.yMin > zone.yMin) {
-            this.yMin = zone.yMin;
-        } else if (this.yMin < zone.yMin) {
-            this.yMax = zone.yMax;
-        }
-
-        this.splitHistory.remove(this.splitHistory.size() - 1);
-
-        return true;
     }
 
     public boolean contains(int x, int y) {
@@ -142,15 +159,16 @@ public class Zone {
     }
 
     public Boolean removeNeighbor(Zone zone) {
-        for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < 2; j++) {
-                for (Zone neighbor : this.neighbors[i][j]) {
-                    if (neighbor.equals(zone)) {
-                        return this.neighbors[i][j].remove(neighbor);
-                    }
-                }
+        for (ArrayList<Zone>[] firstN : this.neighbors) {
+            for (ArrayList<Zone> neighbors : firstN) {
+                return neighbors.remove(zone);
             }
         }
+        /*
+         * for (int i = 0; i < 2; i++) { for (int j = 0; j < 2; j++) { for (Zone neighbor :
+         * this.neighbors[i][j]) { if (neighbor.equals(zone)) { return
+         * this.neighbors[i][j].remove(neighbor); } } } }
+         */
 
         return false;
     }
@@ -179,16 +197,41 @@ public class Zone {
     }
 
     public String toString() {
+        int nb = 0;
+        for (ArrayList<Zone>[] firstN : this.neighbors) {
+            for (ArrayList<Zone> secondN : firstN) {
+                nb += secondN.size();
+            }
+        }
+
         String value = "Zone: min=[x=" + this.xMin + "; y=" + this.yMin + "] max=[x=" + this.xMax + "; y=" +
-            this.yMax + "]";
+            this.yMax + "] nbNeighbors=" + nb;
+        // value += "\n" + this.historyToString();
         return value;
     }
 
-    public void sysoutHistory() {
-        System.out.println("SplitHistory [");
+    public String historyToString() {
+        String value = "SplitHistory [\n";
         for (int[] tab : this.splitHistory) {
-            System.out.println("\t[dim=" + tab[0] + "; dir=" + tab[1] + "]");
+            value += "\t[dim=" + tab[0] + "; dir=" + tab[1] + "]\n";
         }
-        System.out.println("]");
+        value += "]";
+
+        return value;
+    }
+
+    public String neighborsToString() {
+        String value = "Neighbors [\n";
+
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < 2; j++) {
+                for (Zone neighbor : this.neighbors[i][j]) {
+                    value += "\t" + neighbor + "\n";
+                }
+            }
+        }
+        value += "]";
+
+        return value;
     }
 }

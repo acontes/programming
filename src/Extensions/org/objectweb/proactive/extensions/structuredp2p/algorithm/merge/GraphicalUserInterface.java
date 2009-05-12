@@ -99,7 +99,6 @@ public class GraphicalUserInterface extends JFrame {
 
             this.addMouseListener(new MouseAdapter() {
                 public void mouseClicked(MouseEvent e) {
-                    System.out.println("nb zones " + GraphicalUserInterface.this.zones.size());
                     Zone clickedZone = Canvas.this.getClicked(e.getX(), e.getY());
                     System.out.println("clicked in x=" + e.getX() + ", y= " + e.getY());
                     /* Right click */
@@ -137,10 +136,6 @@ public class GraphicalUserInterface extends JFrame {
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
             for (Zone zone : GraphicalUserInterface.this.zones) {
-                System.out.println("zone --->");
-                System.out.println("xMin=" + zone.xMin + "xMax=" + zone.xMax + "yMin=" + zone.yMin + "yMax=" +
-                    zone.yMax);
-
                 g2d.setColor(zone.color);
                 g2d.fillRect(zone.xMin, zone.yMin, zone.xMax - zone.xMin, zone.yMax - zone.yMin);
             }
