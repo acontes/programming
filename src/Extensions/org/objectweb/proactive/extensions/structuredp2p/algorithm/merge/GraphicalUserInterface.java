@@ -103,6 +103,7 @@ public class GraphicalUserInterface extends JFrame {
                     /* Right click */
                     if (e.getButton() == MouseEvent.BUTTON3) {
                         Canvas.this.zoneClicked = clickedZone;
+                        System.out.println(clickedZone);
                         Canvas.this.repaint();
                     } else if (e.getButton() == MouseEvent.BUTTON1) {
                         /* Left click */

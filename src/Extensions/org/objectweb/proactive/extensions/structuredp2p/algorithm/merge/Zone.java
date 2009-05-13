@@ -70,14 +70,18 @@ public class Zone {
         }
 
         // History
-        this.splitHistory = (ArrayList<int[]>) zone.splitHistory.clone();
-        this.splitHistory.add(new int[] { dimension, directionInv });
-        zone.splitHistory.add(new int[] { dimension, direction });
+        /*
+         * this.splitHistory = (ArrayList<int[]>) zone.splitHistory.clone();
+         * this.splitHistory.add(new int[] { dimension, directionInv }); zone.splitHistory.add(new
+         * int[] { dimension, direction });
+         */
 
         // Neighbors
         for (int i = 0; i < 2; i++) {
             for (int j = 0; j < 2; j++) {
-                this.neighbors[i][j] = (ArrayList<Zone>) zone.neighbors[i][j].clone();
+                this.neighbors[i][j] = new ArrayList<Zone>();
+                this.neighbors[i][j].addAll(zone.neighbors[i][j]);
+                System.out.println(this.neighbors[i][j].size() + " neighbors at [" + i + "][" + j + "]");
             }
         }
 
@@ -200,8 +204,9 @@ public class Zone {
             for (int j = 0; j < 2; j++) {
                 if (this.neighbors[i][j].contains(zone)) {
                     boolean ret = this.neighbors[i][j].remove(zone);
-                    System.out.println(this + " removes at [" + i + "][" + j + "] " + zone + " (exists? " +
-                        ret + ")");
+                    // System.out.println(this + " removes at [" + i + "][" + j + "] " + zone +
+                    // " (exists? " +
+                    // ret + ")");
                     return ret;
                 }
             }
@@ -212,8 +217,8 @@ public class Zone {
 
     public boolean removeNeighbor(Zone zone, int dimension, int direction) {
         boolean ret = this.neighbors[dimension][direction].remove(zone);
-        System.out.println(this + " removes at [" + dimension + "][" + direction + "] " + zone +
-            " (exists? " + ret + ")");
+        // System.out.println(this + " removes at [" + dimension + "][" + direction + "] " + zone +
+        // " (exists? " + ret + ")");
         return ret;
     }
 
