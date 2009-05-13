@@ -51,14 +51,22 @@ public class Zone {
 
         if (dimension == 0) {
             int x = zone.xMin + ((zone.xMax - zone.xMin) / 2);
-            zone.xMin = x;
-            this.xMax = x;
+            if (direction == 0) {
+                zone.xMin = x;
+                this.xMax = x;
+            } else {
+                zone.xMax = x;
+                this.xMin = x;
+            }
         } else if (dimension == 1) {
             int y = zone.yMin + ((zone.yMax - zone.yMin) / 2);
-            zone.yMin = y;
-            this.yMax = y;
-        } else {
-            return false;
+            if (direction == 0) {
+                zone.yMax = y;
+                this.yMin = y;
+            } else {
+                zone.yMin = y;
+                this.yMax = y;
+            }
         }
 
         // History
@@ -73,8 +81,8 @@ public class Zone {
             }
         }
 
-        this.update(zone, dimension, directionInv);
-        zone.update(this, dimension, direction);
+        this.addNeighbor(zone, dimension, directionInv);
+        zone.addNeighbor(this, dimension, direction);
 
         this.checkNeighbors();
         zone.checkNeighbors();
@@ -84,7 +92,7 @@ public class Zone {
 
     public void update(Zone zone, int dimension, int direction) {
         for (Zone z : this.neighbors[dimension][direction]) {
-            System.out.println(z.removeNeighbor(this));// , dimension, (direction + 1) % 2);
+            z.removeNeighbor(this, dimension, (direction + 1) % 2);
         }
 
         this.neighbors[dimension][direction].clear();
@@ -101,8 +109,8 @@ public class Zone {
                 for (int k = 0; k < size; k++) {
                     Zone zone = this.neighbors[i][j].get(k);
 
-                    if (this.isBordered(zone)) {
-                        System.out.println("Bordered : " + this + " " + zone);
+                    int d = this.getBorderDimension(zone);
+                    if (d == i) {
                         zone.addNeighbor(this, i, jInv);
                     } else {
                         zonesToRemove.add(zone);
@@ -110,8 +118,8 @@ public class Zone {
                 }
 
                 for (Zone z : zonesToRemove) {
-                    z.removeNeighbor(this, i, jInv);
-                    this.removeNeighbor(z, i, j);
+                    z.removeNeighbor(this);
+                    this.removeNeighbor(z);
                 }
             }
         }
@@ -191,7 +199,10 @@ public class Zone {
         for (int i = 0; i < 2; i++) {
             for (int j = 0; j < 2; j++) {
                 if (this.neighbors[i][j].contains(zone)) {
-                    return this.neighbors[i][j].remove(zone);
+                    boolean ret = this.neighbors[i][j].remove(zone);
+                    System.out.println(this + " removes at [" + i + "][" + j + "] " + zone + " (exists? " +
+                        ret + ")");
+                    return ret;
                 }
             }
         }
@@ -200,7 +211,10 @@ public class Zone {
     }
 
     public boolean removeNeighbor(Zone zone, int dimension, int direction) {
-        return this.neighbors[dimension][direction].remove(zone);
+        boolean ret = this.neighbors[dimension][direction].remove(zone);
+        System.out.println(this + " removes at [" + dimension + "][" + direction + "] " + zone +
+            " (exists? " + ret + ")");
+        return ret;
     }
 
     public Color getRandomColor() {
@@ -234,7 +248,7 @@ public class Zone {
         }
 
         String value = "Zone: min=[x=" + this.xMin + "; y=" + this.yMin + "] max=[x=" + this.xMax + "; y=" +
-            this.yMax + "] nbNeighbors=" + nb;
+            this.yMax + "]";// nbNeighbors=" + nb;
         // value += "\n" + this.historyToString();
         return value;
     }
@@ -264,8 +278,14 @@ public class Zone {
         return value;
     }
 
-    public boolean isBordered(Zone zone) {
-        return (this.isBordered(zone, 0) || this.isBordered(zone, 1));
+    public int getBorderDimension(Zone zone) {
+        if (this.isBordered(zone, 0)) {
+            return 0;
+        } else if (this.isBordered(zone, 1)) {
+            return 1;
+        }
+
+        return -1;
     }
 
     public boolean isBordered(Zone zone, int dimension) {
@@ -283,5 +303,11 @@ public class Zone {
 
     public boolean hasNeighbor(Zone zone, int dimension, int direction) {
         return this.neighbors[dimension][direction].contains(zone);
+    }
+
+    public boolean equals(Object o) {
+        Zone zone = (Zone) o;
+
+        return (this.xMin == zone.xMin && this.xMax == zone.xMax && this.yMin == zone.yMin && this.yMax == zone.yMax);
     }
 }
