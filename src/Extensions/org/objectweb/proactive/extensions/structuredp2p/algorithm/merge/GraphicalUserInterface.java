@@ -144,10 +144,11 @@ public class GraphicalUserInterface extends JFrame {
                 g2d.drawLine(this.zoneClicked.xMin, this.zoneClicked.yMin, this.zoneClicked.xMax,
                         this.zoneClicked.yMax);
 
-                for (ArrayList<Zone>[] zoneTab : this.zoneClicked.neighbors) {
-                    for (ArrayList<Zone> zones : zoneTab) {
-                        for (Zone zone : zones) {
-                            g2d.drawString("N", zone.xMin - 4 + (zone.xMax - zone.xMin) / 2, zone.yMin + 5 +
+                for (int i = 0; i < 2; i++) {
+                    for (int j = 0; j < 2; j++) {
+                        for (Zone zone : this.zoneClicked.neighbors[i][j]) {
+                            g2d.drawString("N#" + GraphicalUserInterface.this.zones.indexOf(zone) + " [" + i +
+                                "][" + j + "]", zone.xMin - 25 + (zone.xMax - zone.xMin) / 2, zone.yMin + 5 +
                                 (zone.yMax - zone.yMin) / 2);
 
                         }

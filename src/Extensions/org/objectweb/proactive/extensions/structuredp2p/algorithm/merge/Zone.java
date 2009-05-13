@@ -2,6 +2,7 @@ package org.objectweb.proactive.extensions.structuredp2p.algorithm.merge;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.Random;
 
 
@@ -17,6 +18,8 @@ public class Zone {
 
     public Color color;
 
+    public Random rand = new Random();
+
     public Zone() {
         this.neighbors = new ArrayList[2][2];
 
@@ -30,9 +33,9 @@ public class Zone {
     }
 
     public boolean join(Zone zone) {
-        int dimension = 0;
-        int direction = 0;
-        int directionInv = 1;
+        int dimension = this.rand.nextInt(2);
+        int direction = this.rand.nextInt(2);
+        int directionInv = (direction + 1) % 2;
 
         // Get the next dimension to split onto
         if (zone.splitHistory.size() > 0) {
@@ -40,7 +43,7 @@ public class Zone {
         }
 
         // New zone
-        // Update x dimension
+        // Update x coordinates
         this.xMax = zone.xMax;
         this.yMax = zone.yMax;
         this.xMin = zone.xMin;
@@ -58,46 +61,69 @@ public class Zone {
             return false;
         }
 
+        // History
         this.splitHistory = (ArrayList<int[]>) zone.splitHistory.clone();
+        this.splitHistory.add(new int[] { dimension, directionInv });
+        zone.splitHistory.add(new int[] { dimension, direction });
 
+        // Neighbors
         for (int i = 0; i < 2; i++) {
             for (int j = 0; j < 2; j++) {
                 this.neighbors[i][j] = (ArrayList<Zone>) zone.neighbors[i][j].clone();
             }
         }
 
-        this.splitHistory.add(new int[] { dimension, directionInv });
-        this.neighbors[dimension][directionInv].clear();
-        this.addNeighbor(zone, dimension, directionInv);
+        this.update(zone, dimension, directionInv);
+        zone.update(this, dimension, direction);
 
+        this.checkNeighbors();
+        zone.checkNeighbors();
+
+        return true;
+    }
+
+    public void update(Zone zone, int dimension, int direction) {
+        for (Zone z : this.neighbors[dimension][direction]) {
+            System.out.println(z.removeNeighbor(this));// , dimension, (direction + 1) % 2);
+        }
+
+        this.neighbors[dimension][direction].clear();
+        this.addNeighbor(zone, dimension, direction);
+    }
+
+    public void checkNeighbors() {
         for (int i = 0; i < 2; i++) {
             for (int j = 0; j < 2; j++) {
-                for (Zone z : this.neighbors[i][j]) {
-                    if (i != dimension && j != direction) {
-                        z.addNeighbor(this, i, direction);// (direction + 1) % 2);
+                int jInv = (j + 1) % 2;
+
+                int size = this.neighbors[i][j].size();
+                ArrayList<Zone> zonesToRemove = new ArrayList<Zone>();
+                for (int k = 0; k < size; k++) {
+                    Zone zone = this.neighbors[i][j].get(k);
+
+                    if (this.isBordered(zone)) {
+                        System.out.println("Bordered : " + this + " " + zone);
+                        zone.addNeighbor(this, i, jInv);
+                    } else {
+                        zonesToRemove.add(zone);
                     }
+                }
+
+                for (Zone z : zonesToRemove) {
+                    z.removeNeighbor(this, i, jInv);
+                    this.removeNeighbor(z, i, j);
                 }
             }
         }
-
-        zone.splitHistory.add(new int[] { dimension, direction });
-        zone.neighbors[dimension][direction].clear();
-        zone.addNeighbor(this, dimension, direction);
-        /*
-         * System.out.println("Join method [dimension=" + dimension + "; direction=" + direction +
-         * "; splitHistorySize=" + this.splitHistory.size() + "]"); System.out.println(this);
-         * System.out.println(this.sysoutHistory());
-         */
-
-        System.out.println(this.neighborsToString());
-        return true;
     }
 
     public Zone leave() {
         if (this.splitHistory.size() > 0) {
             int[] lastOP = this.splitHistory.get(this.splitHistory.size() - 1);
+            this.splitHistory.remove(this.splitHistory.size() - 1);
             int dimension = lastOP[0];
             int direction = lastOP[1];
+            // int direction = (lastOP[1] + 1) % 2;
 
             int nbNeigbors = this.neighbors[dimension][direction].size();
 
@@ -105,17 +131,13 @@ public class Zone {
             if (nbNeigbors == 1) {
                 Zone zone = this.neighbors[dimension][direction].get(0);
 
-                if (this.xMin > zone.xMin) {
-                    this.xMin = zone.xMin;
-                } else if (this.xMin < zone.xMin) {
-                    this.xMax = zone.xMax;
-                } else if (this.yMin > zone.yMin) {
-                    this.yMin = zone.yMin;
-                } else if (this.yMin < zone.yMin) {
-                    this.yMax = zone.yMax;
+                if (dimension == 0) {
+                    zone.xMin = Math.min(zone.xMin, this.xMin);
+                    zone.xMax = Math.max(zone.xMax, this.xMax);
+                } else if (dimension == 1) {
+                    zone.yMin = Math.min(zone.yMin, this.yMin);
+                    zone.yMax = Math.max(zone.yMax, this.yMax);
                 }
-
-                this.splitHistory.remove(this.splitHistory.size() - 1);
             }
             // Else, do the same thing recursively (it's a little heavy with data transfer)
             else if (nbNeigbors > 1) {
@@ -126,6 +148,8 @@ public class Zone {
                 zone.yMax = this.yMax;
                 zone.splitHistory = this.splitHistory;
                 zone.neighbors = this.neighbors;
+            } else {
+                System.out.println("No more peers " + this);
             }
 
         }
@@ -154,31 +178,35 @@ public class Zone {
         return false;
     }
 
-    public Boolean addNeighbor(Zone zone, int dimension, int direction) {
-        return this.neighbors[dimension][direction].add(zone);
+    public boolean addNeighbor(Zone zone, int dimension, int direction) {
+        if (this.equals(zone)) {
+            throw new ConcurrentModificationException("Can't add itself as a neighbor");
+        }
+
+        return (!zone.hasNeighbor(this, dimension, direction) && this.neighbors[dimension][direction]
+                .add(zone));
     }
 
-    public Boolean removeNeighbor(Zone zone) {
-        for (ArrayList<Zone>[] firstN : this.neighbors) {
-            for (ArrayList<Zone> neighbors : firstN) {
-                return neighbors.remove(zone);
+    public boolean removeNeighbor(Zone zone) {
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < 2; j++) {
+                if (this.neighbors[i][j].contains(zone)) {
+                    return this.neighbors[i][j].remove(zone);
+                }
             }
         }
-        /*
-         * for (int i = 0; i < 2; i++) { for (int j = 0; j < 2; j++) { for (Zone neighbor :
-         * this.neighbors[i][j]) { if (neighbor.equals(zone)) { return
-         * this.neighbors[i][j].remove(neighbor); } } } }
-         */
 
         return false;
     }
 
-    public Color getRandomColor() {
-        Random rand = new Random();
+    public boolean removeNeighbor(Zone zone, int dimension, int direction) {
+        return this.neighbors[dimension][direction].remove(zone);
+    }
 
-        int r = rand.nextInt(256);
-        int v = rand.nextInt(256);
-        int b = rand.nextInt(256);
+    public Color getRandomColor() {
+        int r = this.rand.nextInt(256);
+        int v = this.rand.nextInt(256);
+        int b = this.rand.nextInt(256);
 
         if (r + v + b < 420) {
             return this.getRandomColor();
@@ -198,9 +226,10 @@ public class Zone {
 
     public String toString() {
         int nb = 0;
-        for (ArrayList<Zone>[] firstN : this.neighbors) {
-            for (ArrayList<Zone> secondN : firstN) {
-                nb += secondN.size();
+
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < 2; j++) {
+                nb += this.neighbors[i][j].size();
             }
         }
 
@@ -233,5 +262,26 @@ public class Zone {
         value += "]";
 
         return value;
+    }
+
+    public boolean isBordered(Zone zone) {
+        return (this.isBordered(zone, 0) || this.isBordered(zone, 1));
+    }
+
+    public boolean isBordered(Zone zone, int dimension) {
+        boolean ret = false;
+        if (dimension == 0) {
+            ret = ((this.xMin == zone.xMax || this.xMax == zone.xMin) && (((this.yMin <= zone.yMin && zone.yMin < this.yMax) || (this.yMin < zone.yMax && zone.yMax <= this.yMax)) || ((zone.yMin <= this.yMin && this.yMin < zone.yMax) || (zone.yMin < this.yMax && this.yMax <= zone.yMax))));
+        } else if (dimension == 1) {
+            ret = ((this.yMin == zone.yMax || this.yMax == zone.yMin) && (((this.xMin <= zone.xMin && zone.xMin < this.xMax) || (this.xMin < zone.xMax && zone.xMax <= this.xMax)) || ((zone.xMin <= this.xMin && this.xMin < zone.xMax) || (zone.xMin < this.xMax && this.xMax <= zone.xMax))));
+        } else {
+            throw new IllegalArgumentException("The dimension must be 0 or 1.");
+        }
+
+        return ret;
+    }
+
+    public boolean hasNeighbor(Zone zone, int dimension, int direction) {
+        return this.neighbors[dimension][direction].contains(zone);
     }
 }
