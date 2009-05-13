@@ -29,18 +29,24 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.examples.jmx.remote.management.jmx.notifications;
+package functionalTests.component.collectiveitf.gathercast_remote;
 
-import java.util.Date;
+import org.objectweb.proactive.api.PADeployment;
+import org.objectweb.proactive.core.xml.VariableContractImpl;
 
 
-public class TransactionCommitedNotification extends TransactionNotification {
-    public TransactionCommitedNotification(String type, Object source, long sequenceNumber, String message,
-            long id, Date date) {
-        super(type, source, sequenceNumber, message, id, date);
+/*
+ * Define a separate test suite with the GCM deployment one since side effect (class loading) may 
+ * product false success.
+ */
+public class TestGather_PAdep extends TestGather_GCMdep {
+    @org.junit.Test
+    @Override
+    public void testRemoteGathercast() throws Exception {
+        oldDeploymentDescriptor = PADeployment.getProactiveDescriptor(TestGather_PAdep.class.getResource(
+                "/functionalTests/component/descriptor/deploymentDescriptor.xml").getPath(),
+                (VariableContractImpl) super.vContract.clone());
+
+        useRemoteGathercastItf(oldDeploymentDescriptor);
     }
-
-    /**
-     *
-     */
 }

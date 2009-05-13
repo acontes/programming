@@ -30,7 +30,7 @@
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package functionalTests.node.nodefactory;
+package functionalTests.activeobject;
 
 import java.io.Serializable;
 
@@ -38,46 +38,49 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.core.util.Sleeper;
 
-import functionalTests.GCMFunctionalTestDefaultNodes;
+import functionalTests.FunctionalTest;
 
 
-public class TestGetDefaultNode extends GCMFunctionalTestDefaultNodes {
-
-    /* Checks that two runtime don't have the same default node URI.
-     *
-     */
-    public TestGetDefaultNode() {
-        super(1, 1);
-    }
+/**
+ * Test case for PROACTIVE-652
+ */
+public class TestDelayedInitActive extends FunctionalTest {
+    static final long SLEEP = 200;
+    static final long EPSYLON = (long) (SLEEP / 10);
 
     @Test
-    public void test() throws NodeException, ActiveObjectCreationException {
-        Node dnode0;
-        Node dnode1;
-
-        dnode0 = NodeFactory.getDefaultNode();
-
-        Node node = super.getANode();
-        AO ao = (AO) PAActiveObject.newActive(AO.class.getName(), new Object[] {}, node);
-        dnode1 = ao.getDefaultNode();
-
-        String url0 = dnode0.getNodeInformation().getURL();
-        String url1 = dnode1.getNodeInformation().getURL();
-        Assert.assertFalse(url0.equals(url1));
+    public void test() throws ActiveObjectCreationException, NodeException, InterruptedException {
+        AO ao = (AO) PAActiveObject.newActive(AO.class.getName(), new Object[] {});
+        long before = System.currentTimeMillis();
+        /* Race condition: PAActiveObject.setIS() has not yet been called when ao.is() is served
+         * The request is put into the request queue instead of being served as an IS -> asynchronous call 
+         */
+        ao.is();
+        long after = System.currentTimeMillis();
+        Assert.assertTrue("Method call seems to be async but should be sync (immediate service)", after -
+            before >= SLEEP);
     }
 
-    static public class AO implements Serializable {
+    static public class AO implements Serializable, InitActive {
+        public void initActivity(Body body) {
+            // Enlarge the race condition window
+            raceConditionHelper();
 
-        public AO() {
+            PAActiveObject.setImmediateService("is");
         }
 
-        public Node getDefaultNode() throws NodeException {
-            return NodeFactory.getDefaultNode();
+        private void raceConditionHelper() {
+            new Sleeper(100).sleep();
+        }
+
+        public void is() {
+            new Sleeper(SLEEP).sleep();
         }
     }
 }
