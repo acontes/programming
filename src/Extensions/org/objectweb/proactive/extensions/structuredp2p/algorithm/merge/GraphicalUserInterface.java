@@ -12,6 +12,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Random;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -148,9 +149,10 @@ public class GraphicalUserInterface extends JFrame {
                 for (int i = 0; i < 2; i++) {
                     for (int j = 0; j < 2; j++) {
                         for (Zone zone : this.zoneClicked.neighbors[i][j]) {
+                            Random rand = new Random();
                             g2d.drawString("N#" + GraphicalUserInterface.this.zones.indexOf(zone) + " [" + i +
                                 "][" + j + "]", zone.xMin - 25 + (zone.xMax - zone.xMin) / 2, zone.yMin + 5 +
-                                (zone.yMax - zone.yMin) / 2);
+                                rand.nextInt(20) + (zone.yMax - zone.yMin) / 2);
 
                         }
                     }
