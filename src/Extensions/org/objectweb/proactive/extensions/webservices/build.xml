@@ -98,6 +98,5 @@
 			</fileset>
 		</jar>
 		<copy file="${servicedeployer.class.dir}/ServiceDeployer.aar" tofile="${axis2.class.dir}/${services.path}/ServiceDeployer.aar" overwrite="true" />
-		<copy file="${servicedeployer.class.dir}/ServiceDeployer.aar" tofile="${axis2.dir}/${services.path}/ServiceDeployer.aar" overwrite="true" />
 	</target>
 </project>
