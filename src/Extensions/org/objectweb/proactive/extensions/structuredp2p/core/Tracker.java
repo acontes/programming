@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
+
 
 /**
  * A tracker assists in the communication between peers. It is used in order to help a peer to join

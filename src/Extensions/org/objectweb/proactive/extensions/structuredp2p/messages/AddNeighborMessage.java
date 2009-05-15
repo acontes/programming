@@ -48,7 +48,7 @@ public class AddNeighborMessage extends Message {
      * 
      * @return the remote peer.
      */
-    public Peer getRemotePeer() {
+    public Peer getPeer() {
         return this.remotePeer;
     }
 }

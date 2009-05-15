@@ -148,7 +148,6 @@ public class ChordOverlay extends StructuredOverlay {
      * .objectweb.proactive.extensions.structuredp2p.core.Peer,
      * org.objectweb.proactive.extensions.structuredp2p.messages.Message)
      */
-    @Override
     public ResponseMessage sendMessageTo(Peer peer, Message msg) {
         // TODO Auto-generated method stub
         return null;
@@ -164,5 +163,4 @@ public class ChordOverlay extends StructuredOverlay {
         // TODO Auto-generated method stub
 
     }
-
 }

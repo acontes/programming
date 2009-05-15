@@ -12,31 +12,28 @@ import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.util.converter.MakeDeepCopy;
 import org.objectweb.proactive.extensions.structuredp2p.core.Area;
 import org.objectweb.proactive.extensions.structuredp2p.core.Coordinate;
+import org.objectweb.proactive.extensions.structuredp2p.core.NeighborsArray;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.exception.AreaException;
-import org.objectweb.proactive.extensions.structuredp2p.message.AddNeighborMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.LeaveMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.LookupMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.Message;
-import org.objectweb.proactive.extensions.structuredp2p.message.PingMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.RemoveNeighborMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.can.CANAddNeighborMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.can.CANCheckMergeMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.can.CANJoinMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.can.CANLookupMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.can.CANMergeMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.can.CANSwitchMessage;
-import org.objectweb.proactive.extensions.structuredp2p.response.AddNeighborResponseMessage;
-import org.objectweb.proactive.extensions.structuredp2p.response.CANJoinResponseMessage;
-import org.objectweb.proactive.extensions.structuredp2p.response.CANMergeResponseMessage;
-import org.objectweb.proactive.extensions.structuredp2p.response.CANSwitchResponseMessage;
-import org.objectweb.proactive.extensions.structuredp2p.response.EmptyResponseMessage;
-import org.objectweb.proactive.extensions.structuredp2p.response.LookupResponseMessage;
-import org.objectweb.proactive.extensions.structuredp2p.response.PingResponseMessage;
-import org.objectweb.proactive.extensions.structuredp2p.response.ResponseMessage;
-import org.objectweb.proactive.extensions.structuredp2p.response.can.CANCheckMergeResponseMessage;
-import org.objectweb.proactive.extensions.structuredp2p.response.can.CANLookupResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.AddNeighborMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.LeaveMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.LookupMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.Message;
+import org.objectweb.proactive.extensions.structuredp2p.messages.PingMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.RemoveNeighborMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANAddNeighborMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANCheckMergeMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANJoinMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANLookupMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANMergeMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANSwitchMessage;
+import org.objectweb.proactive.extensions.structuredp2p.responses.ActionResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.responses.LookupResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.responses.ResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.responses.can.CANCheckMergeResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.responses.can.CANLookupResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.responses.can.CANSwitchResponseMessage;
 
 
 /**
@@ -65,8 +62,7 @@ public class CANOverlay extends StructuredOverlay {
      * coordinate lower than the current pair on the given dimension. The second column is the
      * reverse.
      */
-    // private Group<Peer>[][] neighbors;
-    private HashMap<Peer, Area>[][] neighbors;
+    private NeighborsArray neighbors;
 
     /**
      * The area which is currently managed.
@@ -85,21 +81,16 @@ public class CANOverlay extends StructuredOverlay {
      */
     public CANOverlay(Peer localPeer) {
         super(localPeer);
-        this.splitHistory = new ArrayList<int[]>();
-        this.neighbors = new HashMap[CANOverlay.NB_DIMENSIONS][2];
         this.area = new Area();
-
-        int i;
-        for (i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
-            this.neighbors[i][0] = new HashMap<Peer, Area>();
-            this.neighbors[i][1] = new HashMap<Peer, Area>();
-        }
+        this.neighbors = new NeighborsArray();
+        this.splitHistory = new ArrayList<int[]>();
     }
 
     /**
      * {@inheritDoc}
      */
     // FIXME change this with remotePeer /!\
+    @SuppressWarnings("unchecked")
     public Boolean join(Peer remotePeer) {
         int dimension = this.getRandomDimension();
         int direction = this.getRandomDirection();
@@ -117,7 +108,7 @@ public class CANOverlay extends StructuredOverlay {
         // Set neighbors for the new peer
         HashMap<Peer, Area>[][] newNeighbors;
 
-        CANJoinResponseMessage response = null;
+        ActionResponseMessage response = null;
         try {
             newNeighbors = (HashMap<Peer, Area>[][]) MakeDeepCopy.WithProActiveObjectStream
                     .makeDeepCopy(this.neighbors);
@@ -125,23 +116,21 @@ public class CANOverlay extends StructuredOverlay {
             newNeighbors[dimension][directionInv].clear();
             newNeighbors[dimension][directionInv].put(this.getRemotePeer(), this.getArea());
 
-            // Actions on remotePeer
-            response = (CANJoinResponseMessage) this.sendMessageTo(remotePeer, new CANJoinMessage(
+            /* Actions on remote peer */
+            response = (ActionResponseMessage) this.sendMessageTo(remotePeer, new CANJoinMessage(
                 newNeighbors, this.splitHistory));
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
         if (PAFuture.getFutureValue(response) != null) {
-            // Actions on local peer
-            this.neighbors.removeNeighbors(dimension, direction);
-            this.neighbors.addNeighbor(remotePeer, dimension, direction, newArea[directionInv]);
+            /* Actions on local peer */
+            this.neighbors.remove(dimension, direction);
+            this.neighbors.add(dimension, direction, remotePeer, newArea[directionInv]);
             this.setArea(newArea[direction]);
-            this.checkNeighbors(dimension);
+            this.updateNeighbors(dimension);
             this.rememberSplit(dimension, direction);
 
             return true;
@@ -217,15 +206,15 @@ public class CANOverlay extends StructuredOverlay {
      * 
      * @param dimension
      */
-    private void checkNeighbors(int dimension) {
+    private void updateNeighbors(int dimension) {
         for (int i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
             if (i != dimension) {
                 for (int j = 0; j < 2; j++) {
-                    for (Peer neighbor : this.neighbors[i][j].keySet()) {
-                        if (this.getArea().getBorderedDimension(this.neighbors[i][j].get(neighbor)) == -1) {
+                    for (Peer neighbor : this.neighbors.getNeighbors()[i][j].keySet()) {
+                        if (this.getArea().getBorderedDimension(this.neighbors.getArea(neighbor)) == -1) {
                             this.sendMessageTo(neighbor, new RemoveNeighborMessage(this.getRemotePeer(), i,
                                 this.getOppositeDirection(j)));
-                            this.neighbors[i][j].remove(neighbor);
+                            this.neighbors.remove(i, j, neighbor);
                         } else {
                             this.sendMessageTo(neighbor, new UpdateNeighborMessage(this.getRemotePeer()),
                                     this.getArea());
@@ -274,17 +263,13 @@ public class CANOverlay extends StructuredOverlay {
      * {@inheritDoc}
      */
     public void checkNeighbors() {
-        for (HashMap<Peer, Area>[] neighborDim : this.neighbors) {
-            for (HashMap<Peer, Area> neighborDir : neighborDim) {
-                for (Peer neighbor : neighborDir.keySet()) {
-                    PingResponseMessage response = (PingResponseMessage) PAFuture.getFutureValue(this
-                            .getLocalPeer().sendMessageTo(neighbor, new PingMessage()));
-
-                    if (response == null) {
-                        // (Peer)e.getObject();
-                    }
-                }
+        for (Peer neighbor : this.neighbors) {
+            try {
+                this.sendMessageTo(neighbor, new PingMessage());
+            } catch (Exception e) {
+                // TODO
             }
+
         }
     }
 
@@ -333,15 +318,11 @@ public class CANOverlay extends StructuredOverlay {
     }
 
     /**
-     * Returns the neighbors of the managed area with a certain organization. It returns a
-     * two-dimensional array of {@link Group}. Each line corresponds to a dimension. The number of
-     * columns is always equal to two. The first column corresponds to the neighbors having a
-     * coordinate lower than the current pair on the given dimension. The second column is the
-     * reverse.
+     * Returns the neighbors of the managed area which is {@link NeighborsArray}.
      * 
      * @return the neighbors of the managed area.
      */
-    public HashMap<Peer, Area>[][] getNeighbors() {
+    public NeighborsArray getNeighbors() {
         return this.neighbors;
     }
 
@@ -357,7 +338,7 @@ public class CANOverlay extends StructuredOverlay {
             int pos;
             int neighborIndex;
 
-            for (HashMap<Peer, Area>[] remotePeers : this.neighbors) {
+            for (HashMap<Peer, Area>[] remotePeers : this.neighbors.getNeighbors()) {
                 for (int i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
                     pos = this.contains(i, msgCan.getCoordinates()[i]);
                     System.out.println("i" + i);
@@ -401,7 +382,7 @@ public class CANOverlay extends StructuredOverlay {
      * {@inheritDoc}
      */
     public ResponseMessage sendMessageTo(Peer remotePeer, Message msg) {
-        return this.getLocalPeer().sendMessageTo(remotePeer, msg);
+        return this.sendMessageTo(remotePeer, msg);
     }
 
     /**
@@ -411,7 +392,11 @@ public class CANOverlay extends StructuredOverlay {
         Collection<ResponseMessage> responses = new HashSet<ResponseMessage>(remotePeers.size());
 
         for (Peer remotePeer : remotePeers) {
-            responses.add(this.sendMessageTo(remotePeer, msg));
+            try {
+                responses.add(this.sendMessageTo(remotePeer, msg));
+            } catch (Exception e) {
+                // TODO
+            }
         }
 
         return responses;
@@ -428,46 +413,45 @@ public class CANOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
-    public CANJoinResponseMessage handleJoinMessage(Message msg) {
+    public ActionResponseMessage handleJoinMessage(Message msg) {
         CANJoinMessage message = (CANJoinMessage) msg;
-        this.neighbors = message.getNeighbors();
+        this.neighbors = new NeighborsArray(message.getNeighbors());
 
-        int i;
-        for (i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
-            int j;
-            for (j = 0; j < 2; j++) {
-                this.sendMessageTo(this.neighbors[i][j].keySet(), new CANAddNeighborMessage(this
-                        .getRemotePeer(), i, j));
+        for (int i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
+            for (int j = 0; j < 2; j++) {
+                this.sendMessageTo(this.neighbors, new CANAddNeighborMessage(this.getRemotePeer(), this
+                        .getArea(), i, j));
             }
         }
 
         this.update(message.getArea(), message.getHistory());
 
-        return new CANJoinResponseMessage(msg.getCreationTimestamp(), true);
+        return new ActionResponseMessage(msg.getCreationTimestamp(), true);
     }
 
     /**
      * {@inheritDoc}
      */
-    public EmptyResponseMessage handleLeaveMessage(LeaveMessage msg) {
-        LeaveMessage message = msg;
-        this.removeNeighbor(message.getPeer());
+    public ResponseMessage handleLeaveMessage(LeaveMessage msg) {
+        this.neighbors.remove(msg.getPeer());
 
-        return new EmptyResponseMessage(msg.getCreationTimestamp());
+        return new ResponseMessage(msg.getCreationTimestamp());
     }
 
     /**
      * {@inheritDoc}
      */
-    public AddNeighborResponseMessage handleAddNeighborMessage(AddNeighborMessage msg) {
+    public ActionResponseMessage handleAddNeighborMessage(AddNeighborMessage msg) {
         CANAddNeighborMessage message = (CANAddNeighborMessage) msg;
+        boolean condition = false;
 
-        if (!this.neighbors[message.getDimesion()][message.getDirection()].containsKey(message.getPeer())) {
-            this.addNeighbor(message.getPeer(), message.getDimesion(), message.getDirection(), message
-                    .getArea());
+        if (!this.neighbors.getNeighbors(message.getDimension(), message.getDirection()).containsKey(
+                message.getPeer())) {
+            condition = this.neighbors.add(message.getDimension(), message.getDirection(), message.getPeer(),
+                    message.getArea());
         }
 
-        return new AddNeighborResponseMessage(msg.getCreationTimestamp());
+        return new ActionResponseMessage(msg.getCreationTimestamp(), condition);
     }
 
     /**
@@ -478,9 +462,9 @@ public class CANOverlay extends StructuredOverlay {
      * 
      * @return the response.
      */
-    public CANMergeResponseMessage handleMergeMessage(Message msg) {
+    public ResponseMessage handleMergeMessage(Message msg) {
         this.merge(((CANMergeMessage) msg).getPeer());
-        return new CANMergeResponseMessage(msg.getCreationTimestamp());
+        return new ResponseMessage(msg.getCreationTimestamp());
     }
 
     /**
@@ -557,6 +541,11 @@ public class CANOverlay extends StructuredOverlay {
             return this.getRemotePeer();
         }
 
+        return null;
+    }
+
+    public ActionResponseMessage handleRemoveNeighborMessage(RemoveNeighborMessage removeNeighborMessage) {
+        // TODO Auto-generated method stub
         return null;
     }
 }

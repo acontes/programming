@@ -55,7 +55,7 @@ public class CANMergeMessage extends Message {
      * 
      * @return the area to merge with.
      */
-    public Area getRemoteArea() {
+    public Area getArea() {
         return this.remoteArea;
     }
 
@@ -64,7 +64,7 @@ public class CANMergeMessage extends Message {
      * 
      * @return the resources to merge with.
      */
-    public DataStorage getRemoteResources() {
+    public DataStorage getResources() {
         return this.remoteResources;
     }
 }

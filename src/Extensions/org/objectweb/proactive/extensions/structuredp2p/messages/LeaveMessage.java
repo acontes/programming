@@ -39,7 +39,7 @@ public class LeaveMessage extends Message {
      * 
      * @return the leaving remote peer.
      */
-    public Peer getRemotePeer() {
+    public Peer getPeer() {
         return this.remotePeer;
     }
 }

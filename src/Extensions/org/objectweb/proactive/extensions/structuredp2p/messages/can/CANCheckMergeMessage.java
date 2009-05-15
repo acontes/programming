@@ -48,7 +48,7 @@ public class CANCheckMergeMessage extends Message {
      * 
      * @return the area to merge with.
      */
-    public Area getRemoteArea() {
+    public Area getArea() {
         return this.remoteArea;
     }
 }

@@ -52,16 +52,16 @@ public class CANAddNeighborMessage extends AddNeighborMessage {
     /**
      * Returns the area of the peer to add as neighbor.
      * 
-     * @return the area.
+     * @return the area of the peer to add as neighbor.
      */
-    public Area getRemoteArea() {
+    public Area getArea() {
         return this.remoteArea;
     }
 
     /**
      * Returns the dimension to add the peer as neighbor.
      * 
-     * @return the dimension.
+     * @return the dimension to add the peer as neighbor.
      */
     public int getDimension() {
         return this.dimension;
@@ -70,7 +70,7 @@ public class CANAddNeighborMessage extends AddNeighborMessage {
     /**
      * Returns the direction to add the peer as neighbor.
      * 
-     * @return the direction.
+     * @return the direction to add the peer as neighbor.
      */
     public int getDirection() {
         return this.direction;

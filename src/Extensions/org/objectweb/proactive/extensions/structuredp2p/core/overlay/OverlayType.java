@@ -1,4 +1,4 @@
-package org.objectweb.proactive.extensions.structuredp2p.core;
+package org.objectweb.proactive.extensions.structuredp2p.core.overlay;
 
 /**
  * Defines which type of overlay which are available in the implementation and that can be used by
