@@ -5,14 +5,14 @@ package org.objectweb.proactive.extensions.structuredp2p.core.overlay;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay;
-import org.objectweb.proactive.extensions.structuredp2p.message.AddNeighborMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.LeaveMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.LookupMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.Message;
-import org.objectweb.proactive.extensions.structuredp2p.message.RemoveNeighborMessage;
-import org.objectweb.proactive.extensions.structuredp2p.response.ActionResponseMessage;
-import org.objectweb.proactive.extensions.structuredp2p.response.LookupResponseMessage;
-import org.objectweb.proactive.extensions.structuredp2p.response.ResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.AddNeighborMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.LeaveMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.LookupMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.Message;
+import org.objectweb.proactive.extensions.structuredp2p.messages.RemoveNeighborMessage;
+import org.objectweb.proactive.extensions.structuredp2p.responses.ActionResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.responses.LookupResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.responses.ResponseMessage;
 
 
 /**
@@ -43,7 +43,7 @@ public class ChordOverlay extends StructuredOverlay {
      * 
      * @see
      * org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay#handleAddNeighborMessage
-     * (org.objectweb.proactive.extensions.structuredp2p.message.AddNeighborMessage)
+     * (org.objectweb.proactive.extensions.structuredp2p.messages.AddNeighborMessage)
      */
     @Override
     public ActionResponseMessage handleAddNeighborMessage(AddNeighborMessage msg) {
@@ -56,7 +56,7 @@ public class ChordOverlay extends StructuredOverlay {
      * 
      * @see
      * org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay#handleJoinMessage
-     * (org.objectweb.proactive.extensions.structuredp2p.message.Message)
+     * (org.objectweb.proactive.extensions.structuredp2p.messages.Message)
      */
     @Override
     public ActionResponseMessage handleJoinMessage(Message msg) {
@@ -69,7 +69,7 @@ public class ChordOverlay extends StructuredOverlay {
      * 
      * @see
      * org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay#handleLeaveMessage
-     * (org.objectweb.proactive.extensions.structuredp2p.message.LeaveMessage)
+     * (org.objectweb.proactive.extensions.structuredp2p.messages.LeaveMessage)
      */
     @Override
     public ActionResponseMessage handleLeaveMessage(LeaveMessage leaveMessage) {
@@ -82,7 +82,7 @@ public class ChordOverlay extends StructuredOverlay {
      * 
      * @see
      * org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay#handleLookupMessage
-     * (org.objectweb.proactive.extensions.structuredp2p.message.LookupMessage)
+     * (org.objectweb.proactive.extensions.structuredp2p.messages.LookupMessage)
      */
     @Override
     public LookupResponseMessage handleLookupMessage(LookupMessage msg) {
@@ -95,7 +95,7 @@ public class ChordOverlay extends StructuredOverlay {
      * 
      * @seeorg.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay#
      * handleRemoveNeighborMessage
-     * (org.objectweb.proactive.extensions.structuredp2p.message.RemoveNeighborMessage)
+     * (org.objectweb.proactive.extensions.structuredp2p.messages.RemoveNeighborMessage)
      */
     @Override
     public ActionResponseMessage handleRemoveNeighborMessage(RemoveNeighborMessage removeNeighborMessage) {
@@ -146,7 +146,7 @@ public class ChordOverlay extends StructuredOverlay {
      * @see
      * org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay#sendMessageTo(org
      * .objectweb.proactive.extensions.structuredp2p.core.Peer,
-     * org.objectweb.proactive.extensions.structuredp2p.message.Message)
+     * org.objectweb.proactive.extensions.structuredp2p.messages.Message)
      */
     @Override
     public ResponseMessage sendMessageTo(Peer peer, Message msg) {

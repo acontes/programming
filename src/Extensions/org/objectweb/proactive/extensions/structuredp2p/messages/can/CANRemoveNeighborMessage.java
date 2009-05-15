@@ -1,9 +1,9 @@
-package org.objectweb.proactive.extensions.structuredp2p.message.can;
+package org.objectweb.proactive.extensions.structuredp2p.messages.can;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay;
-import org.objectweb.proactive.extensions.structuredp2p.message.RemoveNeighborMessage;
-import org.objectweb.proactive.extensions.structuredp2p.response.ActionResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.RemoveNeighborMessage;
+import org.objectweb.proactive.extensions.structuredp2p.responses.ActionResponseMessage;
 
 
 /**

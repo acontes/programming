@@ -9,9 +9,9 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.structuredp2p.core.OverlayType;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
-import org.objectweb.proactive.extensions.structuredp2p.message.LookupMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.chord.CHORDLookupMessage;
-import org.objectweb.proactive.extensions.structuredp2p.response.ResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.LookupMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.chord.CHORDLookupMessage;
+import org.objectweb.proactive.extensions.structuredp2p.responses.ResponseMessage;
 
 
 public class TestCHORDMessage {

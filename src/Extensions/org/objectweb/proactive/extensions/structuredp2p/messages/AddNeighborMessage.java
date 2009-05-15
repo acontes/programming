@@ -1,8 +1,8 @@
-package org.objectweb.proactive.extensions.structuredp2p.message;
+package org.objectweb.proactive.extensions.structuredp2p.messages;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay;
-import org.objectweb.proactive.extensions.structuredp2p.response.ActionResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.responses.ActionResponseMessage;
 
 
 /**

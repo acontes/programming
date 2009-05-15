@@ -11,10 +11,10 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.ChordOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.data.DataStorage;
-import org.objectweb.proactive.extensions.structuredp2p.message.LookupMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.Message;
-import org.objectweb.proactive.extensions.structuredp2p.response.LookupResponseMessage;
-import org.objectweb.proactive.extensions.structuredp2p.response.ResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.LookupMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.Message;
+import org.objectweb.proactive.extensions.structuredp2p.responses.LookupResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.responses.ResponseMessage;
 
 
 /**

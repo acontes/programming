@@ -60,8 +60,8 @@ public class TestNeighbors {
         CANOverlay entryPointOverlay = (CANOverlay) TestNeighbors.entryPoint.getStructuredOverlay();
         CANOverlay neighborOverlay = (CANOverlay) TestNeighbors.neighbor.getStructuredOverlay();
 
-        Assert.assertTrue(entryPointOverlay.hasNeighbor(TestNeighbors.neighbor));
-        Assert.assertTrue(neighborOverlay.hasNeighbor(TestNeighbors.entryPoint));
+        Assert.assertTrue(entryPointOverlay.getNeighbors().hasNeighbor(TestNeighbors.neighbor));
+        Assert.assertTrue(neighborOverlay.getNeighbors().hasNeighbor(TestNeighbors.entryPoint));
 
         // tests with split areas !
         try {

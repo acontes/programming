@@ -10,9 +10,9 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.structuredp2p.core.OverlayType;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
-import org.objectweb.proactive.extensions.structuredp2p.message.LoadBalancingMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.Message;
-import org.objectweb.proactive.extensions.structuredp2p.response.ResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.LoadBalancingMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.Message;
+import org.objectweb.proactive.extensions.structuredp2p.responses.ResponseMessage;
 
 public class TestLoadBalancingMessage {
     

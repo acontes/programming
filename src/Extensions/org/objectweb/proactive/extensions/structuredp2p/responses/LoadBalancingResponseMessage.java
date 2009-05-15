@@ -1,6 +1,6 @@
-package org.objectweb.proactive.extensions.structuredp2p.response;
+package org.objectweb.proactive.extensions.structuredp2p.responses;
 
-import org.objectweb.proactive.extensions.structuredp2p.message.LoadBalancingMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.LoadBalancingMessage;
 
 
 /**

@@ -1,9 +1,9 @@
-package org.objectweb.proactive.extensions.structuredp2p.message.chord;
+package org.objectweb.proactive.extensions.structuredp2p.messages.chord;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay;
-import org.objectweb.proactive.extensions.structuredp2p.message.Key;
-import org.objectweb.proactive.extensions.structuredp2p.message.LookupMessage;
-import org.objectweb.proactive.extensions.structuredp2p.response.LookupResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.Key;
+import org.objectweb.proactive.extensions.structuredp2p.messages.LookupMessage;
+import org.objectweb.proactive.extensions.structuredp2p.responses.LookupResponseMessage;
 
 
 /**

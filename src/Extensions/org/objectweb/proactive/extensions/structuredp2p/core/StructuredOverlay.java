@@ -2,18 +2,18 @@ package org.objectweb.proactive.extensions.structuredp2p.core;
 
 import java.io.Serializable;
 
-import org.objectweb.proactive.extensions.structuredp2p.message.AddNeighborMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.LeaveMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.LoadBalancingMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.LookupMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.Message;
-import org.objectweb.proactive.extensions.structuredp2p.message.PingMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.RemoveNeighborMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.can.CANRemoveNeighborMessage;
-import org.objectweb.proactive.extensions.structuredp2p.response.ActionResponseMessage;
-import org.objectweb.proactive.extensions.structuredp2p.response.LoadBalancingResponseMessage;
-import org.objectweb.proactive.extensions.structuredp2p.response.LookupResponseMessage;
-import org.objectweb.proactive.extensions.structuredp2p.response.ResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.AddNeighborMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.LeaveMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.LoadBalancingMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.LookupMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.Message;
+import org.objectweb.proactive.extensions.structuredp2p.messages.PingMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.RemoveNeighborMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANRemoveNeighborMessage;
+import org.objectweb.proactive.extensions.structuredp2p.responses.ActionResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.responses.LoadBalancingResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.responses.LookupResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.responses.ResponseMessage;
 
 
 /**

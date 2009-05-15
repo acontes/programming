@@ -1,4 +1,4 @@
-package org.objectweb.proactive.extensions.structuredp2p.response;
+package org.objectweb.proactive.extensions.structuredp2p.responses;
 
 /**
  * Defines a basic response for the {@link Message}.
@@ -15,7 +15,7 @@ public class ActionResponseMessage extends ResponseMessage {
     /**
      * Is the neighbor correctly removed.
      */
-    private final boolean success;
+    private boolean success = false;
 
     /**
      * Constructor.

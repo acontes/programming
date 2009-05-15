@@ -1,8 +1,8 @@
-package org.objectweb.proactive.extensions.structuredp2p.response.can;
+package org.objectweb.proactive.extensions.structuredp2p.responses.can;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
-import org.objectweb.proactive.extensions.structuredp2p.message.can.CANCheckMergeMessage;
-import org.objectweb.proactive.extensions.structuredp2p.response.ActionResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANCheckMergeMessage;
+import org.objectweb.proactive.extensions.structuredp2p.responses.ActionResponseMessage;
 
 
 /**

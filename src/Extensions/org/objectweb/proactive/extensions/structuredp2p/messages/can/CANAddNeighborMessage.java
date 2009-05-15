@@ -1,7 +1,8 @@
-package org.objectweb.proactive.extensions.structuredp2p.message.can;
+package org.objectweb.proactive.extensions.structuredp2p.messages.can;
 
+import org.objectweb.proactive.extensions.structuredp2p.core.Area;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
-import org.objectweb.proactive.extensions.structuredp2p.message.AddNeighborMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.AddNeighborMessage;
 
 
 /**
@@ -15,6 +16,11 @@ import org.objectweb.proactive.extensions.structuredp2p.message.AddNeighborMessa
  */
 @SuppressWarnings("serial")
 public class CANAddNeighborMessage extends AddNeighborMessage {
+
+    /**
+     * The area from the peer to add as neighbor.
+     */
+    private final Area remoteArea;
 
     /**
      * The dimension to add the peer as neighbor.
@@ -36,10 +42,20 @@ public class CANAddNeighborMessage extends AddNeighborMessage {
      * @param direction
      *            the direction of remote peer to add as neighbor.
      */
-    public CANAddNeighborMessage(Peer remotePeer, int dimension, int direction) {
+    public CANAddNeighborMessage(Peer remotePeer, Area remoteArea, int dimension, int direction) {
         super(remotePeer);
+        this.remoteArea = remoteArea;
         this.dimension = dimension;
         this.direction = direction;
+    }
+
+    /**
+     * Returns the area of the peer to add as neighbor.
+     * 
+     * @return the area.
+     */
+    public Area getRemoteArea() {
+        return this.remoteArea;
     }
 
     /**
@@ -47,7 +63,7 @@ public class CANAddNeighborMessage extends AddNeighborMessage {
      * 
      * @return the dimension.
      */
-    public int getDimesion() {
+    public int getDimension() {
         return this.dimension;
     }
 

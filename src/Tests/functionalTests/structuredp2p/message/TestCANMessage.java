@@ -12,11 +12,11 @@ import org.objectweb.proactive.extensions.structuredp2p.core.Coordinate;
 import org.objectweb.proactive.extensions.structuredp2p.core.OverlayType;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.CANOverlay;
-import org.objectweb.proactive.extensions.structuredp2p.message.LookupMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.PingMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.can.CANLookupMessage;
-import org.objectweb.proactive.extensions.structuredp2p.response.ResponseMessage;
-import org.objectweb.proactive.extensions.structuredp2p.response.can.CANLookupResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.LookupMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.PingMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANLookupMessage;
+import org.objectweb.proactive.extensions.structuredp2p.responses.ResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.responses.can.CANLookupResponseMessage;
 
 
 /**

@@ -1,10 +1,10 @@
-package org.objectweb.proactive.extensions.structuredp2p.message.can;
+package org.objectweb.proactive.extensions.structuredp2p.messages.can;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.Coordinate;
 import org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay;
-import org.objectweb.proactive.extensions.structuredp2p.message.Key;
-import org.objectweb.proactive.extensions.structuredp2p.message.LookupMessage;
-import org.objectweb.proactive.extensions.structuredp2p.response.LookupResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.Key;
+import org.objectweb.proactive.extensions.structuredp2p.messages.LookupMessage;
+import org.objectweb.proactive.extensions.structuredp2p.responses.LookupResponseMessage;
 
 
 /**

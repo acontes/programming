@@ -13,11 +13,11 @@ import org.objectweb.proactive.extensions.structuredp2p.core.Coordinate;
 import org.objectweb.proactive.extensions.structuredp2p.core.OverlayType;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.CANOverlay;
-import org.objectweb.proactive.extensions.structuredp2p.message.LookupMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.PingMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.can.CANLookupMessage;
-import org.objectweb.proactive.extensions.structuredp2p.response.ResponseMessage;
-import org.objectweb.proactive.extensions.structuredp2p.response.can.CANLookupResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.LookupMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.PingMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANLookupMessage;
+import org.objectweb.proactive.extensions.structuredp2p.responses.ResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.responses.can.CANLookupResponseMessage;
 
 
 /**
@@ -61,8 +61,8 @@ public class TestMessageCAN {
         area = new Area(coordinateMin, coordinateMax);
         overlay = (CANOverlay) this.firstPeer.getStructuredOverlay();
         overlay.setArea(area);
-        overlay.addNeighbor(this.secondPeer, 0, 1);
-        overlay.addNeighbor(this.thirdPeer, 0, 1);
+        overlay.getNeighbors().add(this.secondPeer, 0, 1);
+        overlay.getNeighbors().add(this.thirdPeer, 0, 1);
         this.firstPeer.setStructuredOverlay(overlay);
 
         /* -------- */
@@ -81,8 +81,8 @@ public class TestMessageCAN {
         area = new Area(coordinateMin, coordinateMax);
         overlay = (CANOverlay) this.firstPeer.getStructuredOverlay();
         overlay.setArea(area);
-        overlay.addNeighbor(this.thirdPeer, 1, 1);
-        overlay.addNeighbor(this.fourthPeer, 1, 1);
+        overlay.getNeighbors().add(this.thirdPeer, 1, 1);
+        overlay.getNeighbors().add(this.fourthPeer, 1, 1);
         this.secondPeer.setStructuredOverlay(overlay);
 
         /* -------- */
@@ -101,8 +101,8 @@ public class TestMessageCAN {
         area = new Area(coordinateMin, coordinateMax);
         overlay = (CANOverlay) this.firstPeer.getStructuredOverlay();
         overlay.setArea(area);
-        overlay.addNeighbor(this.secondPeer, 0, 0);
-        overlay.addNeighbor(this.fourthPeer, 0, 1);
+        overlay.getNeighbors().addNeighbor(this.secondPeer, 0, 0);
+        overlay.getNeighbors().addNeighbor(this.fourthPeer, 0, 1);
         this.thirdPeer.setStructuredOverlay(overlay);
 
         /* -------- */
@@ -121,8 +121,8 @@ public class TestMessageCAN {
         area = new Area(coordinateMin, coordinateMax);
         overlay = (CANOverlay) this.firstPeer.getStructuredOverlay();
         overlay.setArea(area);
-        overlay.addNeighbor(this.thirdPeer, 0, 0);
-        overlay.addNeighbor(this.secondPeer, 1, 0);
+        overlay.getNeighbors().addNeighbor(this.thirdPeer, 0, 0);
+        overlay.getNeighbors().addNeighbor(this.secondPeer, 1, 0);
         this.fourthPeer.setStructuredOverlay(overlay);
 
         this.msg = new CANLookupMessage(new Coordinate[] { new Coordinate("11"), new Coordinate("11") });

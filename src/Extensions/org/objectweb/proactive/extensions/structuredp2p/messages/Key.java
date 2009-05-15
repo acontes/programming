@@ -1,4 +1,4 @@
-package org.objectweb.proactive.extensions.structuredp2p.message;
+package org.objectweb.proactive.extensions.structuredp2p.messages;
 
 import java.io.Serializable;
 

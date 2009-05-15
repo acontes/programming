@@ -1,4 +1,4 @@
-package org.objectweb.proactive.extensions.structuredp2p.message.can;
+package org.objectweb.proactive.extensions.structuredp2p.messages.can;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,8 +8,8 @@ import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.data.DataStorage;
-import org.objectweb.proactive.extensions.structuredp2p.message.Message;
-import org.objectweb.proactive.extensions.structuredp2p.response.CANSwitchResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.Message;
+import org.objectweb.proactive.extensions.structuredp2p.responses.CANSwitchResponseMessage;
 
 
 /**
