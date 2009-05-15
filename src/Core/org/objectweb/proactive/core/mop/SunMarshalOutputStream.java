@@ -40,7 +40,7 @@ public class SunMarshalOutputStream extends sun.rmi.server.MarshalOutputStream {
         super(out);
     }
 
-//    protected void annotateClass(Class<?> cl) throws IOException {
-//        writeObject(System.getProperty("java.rmi.server.codebase"));
-//    }
+    //    protected void annotateClass(Class<?> cl) throws IOException {
+    //        writeObject(System.getProperty("java.rmi.server.codebase"));
+    //    }
 }
