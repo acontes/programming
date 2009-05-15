@@ -3,6 +3,7 @@ package unitTests.dataspaces;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -51,6 +52,7 @@ public class SpacesMountManagerTest {
     private File spaceDir;
     private File spaceFile;
     private DataSpacesURI spaceUri;
+    private FileObject fileObject;
 
     @Before
     public void setUp() throws Exception {
@@ -77,6 +79,14 @@ public class SpacesMountManagerTest {
 
     @After
     public void tearDown() {
+        if (fileObject != null) {
+            try {
+                fileObject.close();
+            } catch (FileSystemException x) {
+                System.err.println("Could not close file object: " + x);
+            }
+            fileObject = null;
+        }
         if (manager != null) {
             manager.close();
             manager = null;
@@ -93,8 +103,8 @@ public class SpacesMountManagerTest {
 
     @Test
     public void testResolveFileForSpace() throws FileSystemException, SpaceNotFoundException {
-        final FileObject fo = manager.resolveFile(spaceUri);
-        assertIsSpaceDir(fo);
+        fileObject = manager.resolveFile(spaceUri);
+        assertIsSpaceDir(fileObject);
     }
 
     @Test
@@ -107,6 +117,14 @@ public class SpacesMountManagerTest {
     public void testResolveFileForSpaceAlreadyMounted2() throws SpaceNotFoundException, IOException {
         testResolveFileForFileInSpace();
         testResolveFileForSpace();
+    }
+
+    @Test
+    public void testResolveFilesNotSharedFileObject() throws FileSystemException, SpaceNotFoundException {
+        final FileObject fileObject1 = manager.resolveFile(spaceUri);
+        final FileObject fileObject2 = manager.resolveFile(spaceUri);
+
+        assertNotSame(fileObject1, fileObject2);
     }
 
     @Test
@@ -130,14 +148,14 @@ public class SpacesMountManagerTest {
     @Test
     public void testResolveFileForFileInSpace() throws SpaceNotFoundException, IOException {
         final DataSpacesURI fileUri = spaceUri.withPath(EXISTING_FILE);
-        final FileObject fo = manager.resolveFile(fileUri);
+        fileObject = manager.resolveFile(fileUri);
 
-        assertTrue(fo.exists());
+        assertTrue(fileObject.exists());
         // is it that file?
-        final InputStream io = fo.getContent().getInputStream();
+        final InputStream io = fileObject.getContent().getInputStream();
         final BufferedReader reader = new BufferedReader(new InputStreamReader(io));
         assertEquals(TEST_FILE_CONTENT, reader.readLine());
-        assertEquals(fileUri.toString(), fo.getName().getURI());
+        assertEquals(fileUri.toString(), fileObject.getName().getURI());
     }
 
     @Test
@@ -155,8 +173,8 @@ public class SpacesMountManagerTest {
     @Test
     public void testResolveFileForUnexistingFileInSpace() throws SpaceNotFoundException, IOException {
         final DataSpacesURI fileUri = spaceUri.withPath(NONEXISTING_FILE);
-        final FileObject fo = manager.resolveFile(fileUri);
-        assertFalse(fo.exists());
+        fileObject = manager.resolveFile(fileUri);
+        assertFalse(fileObject.exists());
     }
 
     @Test
@@ -189,9 +207,9 @@ public class SpacesMountManagerTest {
         final Map<DataSpacesURI, FileObject> spaces = manager.resolveSpaces(queryUri);
         assertEquals(1, spaces.size());
 
-        final FileObject fo = spaces.get(spaceUri);
-        assertNotNull(fo);
-        assertIsSpaceDir(fo);
+        fileObject = spaces.get(spaceUri);
+        assertNotNull(fileObject);
+        assertIsSpaceDir(fileObject);
     }
 
     @Test
@@ -204,5 +222,19 @@ public class SpacesMountManagerTest {
     public void testResolveSpacesAlreadyMounted2() throws SpaceNotFoundException, IOException {
         testResolveFileForFileInSpace();
         testResolveSpaces();
+    }
+
+    @Test
+    public void testResolveSpacesNotSharedFileObject() throws FileSystemException {
+        final DataSpacesURI queryUri = DataSpacesURI.createURI(spaceUri.getAppId());
+
+        final Map<DataSpacesURI, FileObject> spaces1 = manager.resolveSpaces(queryUri);
+        assertEquals(1, spaces1.size());
+        final FileObject fileObject1 = spaces1.get(spaceUri);
+
+        final Map<DataSpacesURI, FileObject> spaces2 = manager.resolveSpaces(queryUri);
+        assertEquals(1, spaces2.size());
+        final FileObject fileObject2 = spaces2.get(spaceUri);
+        assertNotSame(fileObject1, fileObject2);
     }
 }

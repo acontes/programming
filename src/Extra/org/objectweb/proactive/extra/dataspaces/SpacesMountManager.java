@@ -37,19 +37,16 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundExceptio
  * to provide FileObject for its content. Proper, local or remote access is determined using
  * {@link Utils#getLocalAccessURL(String, String, String)} method.
  * <p>
- * Instances of this class are thread-safe. Each instance of manager must be closed using
- * {@link #close()} method when it is not used anymore.
+ * Instances of this class are thread-safe. Also, subsequent requests for the same file using the
+ * same manager will result in separate FileObject instances being returned, so there is no
+ * concurrency issue related to returned FileObjects. They are not shared. Each instance of manager
+ * must be closed using {@link #close()} method when it is not used anymore.
  * 
  * @see SpacesDirectory
  */
 // TODO known issue: how to disallow remote AOs (or even: other local AOs) write
 // access to each other scratch
 // Maybe FileObject decorator would be enough for that?
-// FIXME from VFS documentation: it seems that one FileObject (that can be shared among Active Objects
-// within one Node) can not have input and output streams opened at the same time! VFS limitation??
-// that would cause different behavior for sharing file within 1 node and 2 different nodes.
-// one workaround is to provide separate SpacesMountManagers per each AO. (it would also resolve
-// FileObject synchronization problems, as reported in VFS-253 and described in SyncingFileObjectDecorator)  
 public class SpacesMountManager {
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.DATASPACES_MOUNT_MANAGER);
 
@@ -101,7 +98,10 @@ public class SpacesMountManager {
         this.directory = directory;
 
         try {
-            this.vfsManager = VFSFactory.createDefaultFileSystemManager();
+            // FIXME: unless VFS-256 is fixed, this manager will always return FileObjects with broken
+            // delete(FileSelector) method. Anyway, it is rather better to do it this way, than returning
+            // shared FileObjects with broken concurrency 
+            this.vfsManager = VFSFactory.createDefaultFileSystemManager(false);
         } catch (FileSystemException x) {
             logger.error("Could not create and configure VFS manager", x);
             throw x;
@@ -136,7 +136,8 @@ public class SpacesMountManager {
      * @param queryUri
      *            Data Spaces URI to get access to; URI may be complete or incomplete
      * @return VFS FileObject that can be used to access this URI content; returned FileObject is
-     *         not opened nor attached in any way
+     *         not opened nor attached in any way; this FileObject instance will never be shared,
+     *         i.e. individual instances are returned for subsequent queries (even the same queries)
      * @throws FileSystemException
      *             indicates VFS related exception during access, like mounting problems, I/O errors
      *             etc.
@@ -175,7 +176,8 @@ public class SpacesMountManager {
      *            data space
      * @return map of data spaces URIs that match the query, pointing to VFS FileObjects that can be
      *         used to access their content; returned FileObjects are not opened nor attached in any
-     *         way
+     *         way; these FileObject instances will never be shared, i.e. another instances are
+     *         returned for subsequent queries (even the same queries)
      * @throws FileSystemException
      *             indicates VFS related exception during access, like mounting problems, I/O errors
      *             etc.
@@ -325,10 +327,7 @@ public class SpacesMountManager {
     private FileObject resolveFileVFS(final DataSpacesURI uri) throws FileSystemException {
         synchronized (readLock) {
             try {
-                final FileObject fo = vfsManager.resolveFile(vfs.getRoot(), getVFSPath(uri));
-                // FIXME: report VFS bug: setting FileObjectDecorator at VFS manager level
-                // makes crappy VirtualFileSystem class not working
-                return new SyncingFileObjectDectorator(fo);
+                return vfsManager.resolveFile(vfs.getRoot(), getVFSPath(uri));
             } catch (FileSystemException x) {
                 logger.warn("Could not access file that should exist (be mounted) in VFS: " + uri);
                 throw x;

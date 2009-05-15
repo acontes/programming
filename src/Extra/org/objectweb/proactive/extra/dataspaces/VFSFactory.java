@@ -3,6 +3,7 @@ package org.objectweb.proactive.extra.dataspaces;
 import org.apache.commons.logging.impl.Log4JLogger;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileSystemOptions;
+import org.apache.commons.vfs.cache.NullFilesCache;
 import org.apache.commons.vfs.impl.DefaultFileReplicator;
 import org.apache.commons.vfs.impl.DefaultFileSystemManager;
 import org.apache.commons.vfs.impl.PrivilegedFileReplicator;
@@ -32,15 +33,15 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * <li>default URL provider handled by Java URL class</code>
  * </ul>
  * 
- * Configured replicator and temporary storage are also guaranteed.
+ * Configured replicator, temporary storage and default files cache are also guaranteed.
  */
 public class VFSFactory {
     private static final Log4JLogger logger = new Log4JLogger(ProActiveLogger
             .getLogger(Loggers.DATASPACES_VFS));
 
     /**
-     * Creates new DefaultSystemManager instance with configured providers, replicator and temporary
-     * storage - as described in class description.
+     * Creates new DefaultSystemManager instance with configured providers, replicator, temporary
+     * storage and files cache - as described in class description.
      * <p>
      * Returned instance is initialized and it is a caller responsibility to close it to release
      * resources.
@@ -50,6 +51,26 @@ public class VFSFactory {
      *             when initialization or configuration process fails
      */
     public static DefaultFileSystemManager createDefaultFileSystemManager() throws FileSystemException {
+        return createDefaultFileSystemManager(true);
+    }
+
+    /**
+     * Creates new DefaultSystemManager instance with configured providers, replicator, temporary
+     * storage - as described in class description, and <strong>DISABLED files cache</strong>
+     * (NullFilesCache) .
+     * <p>
+     * Returned instance is initialized and it is a caller responsibility to close it to release
+     * resources.
+     * 
+     * @param enableFilesCache
+     *            when <code>true</code> DefaultFilesCache is configured for returned manager; when
+     *            <code>false</code> file caching is disabled - NullFilesCache is configured
+     * @return configured and initialized DefaultFileSystemManager instance
+     * @throws FileSystemException
+     *             when initialization or configuration process fails
+     */
+    public static DefaultFileSystemManager createDefaultFileSystemManager(boolean enableFilesCache)
+            throws FileSystemException {
         logger.debug("Creating new VFS manager");
         final DefaultFileSystemManager manager = new DefaultOptionsFileSystemManager(
             createDefaultFileSystemOptions());
@@ -58,6 +79,8 @@ public class VFSFactory {
         final DefaultFileReplicator replicator = new DefaultFileReplicator();
         manager.setReplicator(new PrivilegedFileReplicator(replicator));
         manager.setTemporaryFileStore(replicator);
+        if (!enableFilesCache)
+            manager.setFilesCache(new NullFilesCache());
 
         manager.addProvider("file", new DefaultLocalFileProvider());
         manager.addProvider("http", new HttpFileProvider());
