@@ -11,7 +11,7 @@ log4j.logger.org.mortbay = WARN
 log4j.logger.ibis= WARN
 
 ########### The following are existing categories in ProActive
-#log4j.logger.proactive = INFO
+#log4j.logger.proactive = DEBUG
 #log4j.logger.proactive.classloader = DEBUG
 #log4j.logger.proactive.events = DEBUG
 #log4j.logger.proactive.runtime = DEBUG

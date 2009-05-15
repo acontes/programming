@@ -37,11 +37,13 @@ import java.net.URL;
 import java.util.List;
 
 import org.objectweb.proactive.core.xml.VariableContractImpl;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLoggers;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationInternal;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.bridge.Bridge;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.Group;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.vm.AbstractVMM;
 
 
 public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
@@ -63,7 +65,7 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
 
         startGroups(commandBuilder, gcma);
         startBridges(commandBuilder, gcma);
-
+        startVMs(commandBuilder, gcma);
     }
 
     private void startLocal(CommandBuilder commandBuilder, GCMApplicationInternal gcma) {
@@ -102,6 +104,17 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
                 GCMD_LOGGER.debug("bridge id=" + bridge.getId() + " command= " + command);
                 Executor.getExecutor().submit(command);
             }
+        }
+    }
+
+    private void startVMs(CommandBuilder commandBuilder, GCMApplicationInternal gcma) {
+        try {
+            List<AbstractVMM> vmms = resources.getVMM();
+            for (AbstractVMM vmm : vmms) {
+                vmm.start(gcma);
+            }
+        } catch (Exception e) {
+            GCMDeploymentLoggers.GCMD_LOGGER.error("Unable to start virtual machines.", e);
         }
     }
 

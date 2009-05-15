@@ -85,6 +85,12 @@ import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.unsu
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.hostinfo.HostInfoImpl;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.hostinfo.Tool;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.vm.AbstractVMM;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.vm.VMMLibXenParser;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.vm.VMMParser;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.vm.VMMVMwareVIParser;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.vm.VMMVMwareVixParser;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.vm.VMMVirtualboxParser;
 import org.objectweb.proactive.extensions.gcmdeployment.environment.Environment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -113,6 +119,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     private static final String PA_HOST = "host";
     private static final String PA_GROUP = "group";
     private static final String PA_BRIDGE = "bridge";
+    private static final String PA_HYPERVISOR = "hypervisor";
     private static final String PA_LOOKUP = "lookup";
     private static final String PA_NODE_ASKED = "nodesAsked";
     private static final String PA_LOCAL_CLIENT = "localClient";
@@ -131,6 +138,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     private static final String XPATH_GROUPS = "dep:groups/*";
     private static final String XPATH_HOSTS = "dep:hosts/dep:host";
     private static final String XPATH_HOST = "dep:host";
+    private static final String XPATH_VMS = "dep:vms/*";
     private static final String XPATH_DESCRIPTOR_VARIABLE = "dep:descriptorVariable";
 
     protected DocumentBuilderFactory domFactory;
@@ -140,6 +148,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     protected List<String> schemas;
     protected Map<String, GroupParser> groupParserMap;
     protected Map<String, BridgeParser> bridgeParserMap;
+    protected Map<String, VMMParser> vmmParserMap;
     protected GCMDeploymentInfrastructure infrastructure;
 
     // protected GCMDeploymentEnvironment environment;
@@ -164,6 +173,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         this.acquisitions = new GCMDeploymentAcquisition();
         this.groupParserMap = new HashMap<String, GroupParser>();
         this.bridgeParserMap = new HashMap<String, BridgeParser>();
+        this.vmmParserMap = new HashMap<String, VMMParser>();
         this.variableContract = new VariableContractImpl();
         this.schemas = (userSchemas != null) ? new ArrayList<String>(userSchemas) : new ArrayList<String>();
 
@@ -173,6 +183,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         registerUserGroupParsers();
         registerDefaultBridgeParsers();
         registerUserBridgeParsers();
+        registerDefaultVMMParsers();
         try {
             InputSource processedInputSource = Environment.replaceVariables(descriptor, vContract, xpath,
                     GCM_DEPLOYMENT_NAMESPACE_PREFIX);
@@ -228,6 +239,17 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         registerBridgeParser(new BridgeRSHParser());
         registerBridgeParser(new BridgeOARSHParser());
         // TODO add other bridge parsers here
+    }
+
+    /*
+     * Register all pre-installed vm parsers
+     */
+    protected void registerDefaultVMMParsers() {
+        registerVMMParser(new VMMVMwareVIParser());
+        registerVMMParser(new VMMVMwareVixParser());
+        registerVMMParser(new VMMLibXenParser());
+        registerVMMParser(new VMMVirtualboxParser());
+        // TODO add other vmm parsers here
     }
 
     /*
@@ -391,6 +413,13 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
             }
 
             resources.setHostInfo(hostInfo);
+        } else if (nodeName.equals(PA_HYPERVISOR)) {
+            AbstractVMM vmm = getVMM(refid);
+            if (vmm == null) {
+                throw new RuntimeException("no hypervisor with refid " + refid + " has been defined");
+            }
+
+            resources.addVMM(vmm);
         }
     }
 
@@ -407,6 +436,11 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     protected Bridge getBridge(String refid) throws IOException {
         Bridge bridge = infrastructure.getBridges().get(refid);
         return (Bridge) makeDeepCopy(bridge);
+    }
+
+    protected AbstractVMM getVMM(String refid) throws IOException {
+        AbstractVMM vmm = infrastructure.getVMM().get(refid);
+        return (AbstractVMM) makeDeepCopy(vmm);
     }
 
     /*
@@ -534,6 +568,23 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
             }
         }
 
+        //
+        // VMS
+        //
+        NodeList vms = (NodeList) xpath.evaluate(XPATH_VMS, infrastructureNode, XPathConstants.NODESET);
+
+        for (int i = 0; i < vms.getLength(); ++i) {
+            Node vmNode = vms.item(i);
+            VMMParser vmParser = vmmParserMap.get(vmNode.getNodeName());
+            if (vmParser == null) {
+                GCMDeploymentLoggers.GCMD_LOGGER.warn("No vm parser registered for node <" +
+                    vmNode.getNodeName() + ">");
+            } else {
+                AbstractVMM vmm = vmParser.parseVMMNode(vmNode, xpath);
+                infrastructure.addVMM(vmm);
+            }
+        }
+
         parsedInfrastructure = true;
     }
 
@@ -563,6 +614,20 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
                 "' already registered");
         }
         bridgeParserMap.put(bridgeParser.getNodeName(), bridgeParser);
+    }
+
+    /*
+     * VMMParser registration A VMMParser must be registered to be taken into account when
+     * parsing a descriptor.
+     * 
+     * @param vmmParser
+     */
+    public void registerVMMParser(VMMParser vmmParser) {
+        if (vmmParserMap.containsKey(vmmParser.getNodeName())) {
+            GCMDeploymentLoggers.GCMD_LOGGER.error("VMM parser for '" + vmmParser.getNodeName() +
+                "' already registered");
+        }
+        vmmParserMap.put(vmmParser.getNodeName(), vmmParser);
     }
 
     /*

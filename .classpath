@@ -91,5 +91,19 @@
 	<classpathentry kind="lib" path="lib/xml-apis.jar"/>
 	<classpathentry kind="lib" path="compile/lib/junit-4.3.jar"/>
 	<classpathentry kind="lib" path="compile/lib/ant.jar"/>
+	<classpathentry kind="lib" path="lib/virtualization-core-tests.jar"/>
+	<classpathentry kind="lib" path="lib/virtualization-core.jar"/>
+	<classpathentry kind="lib" path="lib/virtualization-libvirt-tests.jar"/>
+	<classpathentry kind="lib" path="lib/virtualization-libvirt.jar"/>
+	<classpathentry kind="lib" path="lib/virtualization-virtualbox-tests.jar"/>
+	<classpathentry kind="lib" path="lib/virtualization-virtualbox.jar"/>
+	<classpathentry kind="lib" path="lib/virtualization-vmware-vi-tests.jar"/>
+	<classpathentry kind="lib" path="lib/virtualization-vmware-vi.jar"/>
+	<classpathentry kind="lib" path="lib/virtualization-vmware-vix-tests.jar"/>
+	<classpathentry kind="lib" path="lib/virtualization-vmware-vix.jar"/>
+	<classpathentry kind="lib" path="lib/virtualization-xenserver-tests.jar"/>
+	<classpathentry kind="lib" path="lib/virtualization-xenserver.jar"/>
+	<classpathentry kind="lib" path="lib/vi-java.jar"/>
+	<classpathentry kind="lib" path="lib/vim.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

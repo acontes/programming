@@ -68,6 +68,8 @@ import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.GCMDeploym
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.bridge.Bridge;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.Group;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.vm.AbstractVMM;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.vm.VMBean;
 import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeImpl;
 import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeInternal;
 import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeRemoteObjectAdapter;
@@ -271,6 +273,23 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
                 // Eat the exception: Miam Miam Miam
             }
         }
+        Set<String> keys = nodeProviders.keySet();
+        for (String key : keys) {
+            NodeProvider np = nodeProviders.get(key);
+            for (GCMDeploymentDescriptor dd : np.getDescriptors()) {
+                if (dd instanceof GCMDeploymentDescriptorImpl) {
+                    try {
+                        GCMDeploymentResources resources = ((GCMDeploymentDescriptorImpl) dd).getResources();
+                        for (AbstractVMM vmm : resources.getVMM()) {
+                            vmm.stop();
+                        }
+                    } catch (Exception e) {
+                        GCMA_LOGGER
+                                .warn("GCM Deployment failed to clean the virtual machine environment.", e);
+                    }
+                }
+            }
+        }
     }
 
     public Topology getTopology() throws ProActiveException {
@@ -392,6 +411,10 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
                 for (Bridge bridge : resources.getBridges()) {
                     buildBridgeTree(rootNode, rootNode, bridge, nodeProvider, gdd);
                 }
+
+                for (AbstractVMM vmm : resources.getVMM()) {
+                    buildVMMTree(rootNode, rootNode, vmm, nodeProvider, gdd);
+                }
             }
         }
 
@@ -458,6 +481,29 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
         }
 
         popDeploymentPath();
+    }
+
+    /**
+     * To build vmm tag associated deploymentTree.
+     * @param rootNode
+     * @param rootNode2
+     * @param vmm
+     * @param nodeProvider
+     * @param gcmd
+     */
+    private void buildVMMTree(TopologyRootImpl rootNode, TopologyRootImpl rootNode2, AbstractVMM vmm,
+            NodeProvider nodeProvider, GCMDeploymentDescriptor gcmd) {
+        pushDeploymentPath(vmm.getId());
+        for (VMBean vm : vmm.getVms()) {
+            TopologyImpl node = new TopologyImpl();
+            node.setDeploymentDescriptorPath(gcmd.getDescriptorURL().toExternalForm());
+            node.setApplicationDescriptorPath(rootNode.getApplicationDescriptorPath());
+            node.setDeploymentPath(getCurrentDeploymentPath());
+            node.setNodeProvider(nodeProvider.getId());
+            topologyIdToNodeProviderMapping.put(node.getId(), nodeProvider);
+            vm.setNode(node);
+        }
+        popDeploymentPath(); // ???		
     }
 
     private boolean pushDeploymentPath(String pathElement) {
