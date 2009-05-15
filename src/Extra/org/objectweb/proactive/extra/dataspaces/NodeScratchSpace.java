@@ -259,6 +259,8 @@ public class NodeScratchSpace {
             // looking at AbstractFileObject docs suggests that it does not implement this 
             // delete-if-empty behavior! at least, it appears to be not atomic (and probably may be never atomic
             // as some protocols may not support this kind of atomic operation?)
+            // refreshing file before deleting may minimize the risk of delete-when-non-empty behavior 
+            fRuntime.refresh();
             fRuntime.delete();
 
             // it is probably not needed to close files if manager is closed, but with VFS you never know...
