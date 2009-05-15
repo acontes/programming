@@ -1,8 +1,8 @@
 package org.objectweb.proactive.extensions.structuredp2p.message;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
-import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.extensions.structuredp2p.core.Area;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay;
@@ -21,16 +21,18 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.JoinRes
 @SuppressWarnings("serial")
 public class CANJoinMessage extends Message {
 
-    private final Group<Peer>[][] neighbors;
-    private final Area area;
+    private final HashMap<Peer, Area>[][] neighbors;
     private final ArrayList<int[]> history;
 
     /**
      * Constructor.
+     * 
+     * @param directionInv
+     * @param dimension
+     * @param peer
      */
-    public CANJoinMessage(Group<Peer>[][] neighbors, Area area, ArrayList<int[]> history) {
+    public CANJoinMessage(HashMap<Peer, Area>[][] neighbors, ArrayList<int[]> history) {
         this.neighbors = neighbors;
-        this.area = area;
         this.history = history;
     }
 
@@ -46,12 +48,8 @@ public class CANJoinMessage extends Message {
         return overlay.handleJoinMessage(this);
     }
 
-    public Group<Peer>[][] getNeighbors() {
+    public HashMap<Peer, Area>[][] getNeighbors() {
         return this.neighbors;
-    }
-
-    public Area getArea() {
-        return this.area;
     }
 
     public ArrayList<int[]> getHistory() {

@@ -171,4 +171,16 @@ public class Coordinate implements Serializable {
 
         return cur - val;
     }
+
+    /**
+     * Says if the this coordinate is between twice in argument.
+     * 
+     * @param coord1
+     *            a coordinate
+     * @param coord2
+     *            a coordinate
+     */
+    public boolean isBetween(Coordinate coord1, Coordinate coord2) {
+        return ((coord1.compareTo(this) + coord2.compareTo(this)) == 0);
+    }
 }

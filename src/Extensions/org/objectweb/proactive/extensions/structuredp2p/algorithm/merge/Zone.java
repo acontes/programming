@@ -1,8 +1,13 @@
 package org.objectweb.proactive.extensions.structuredp2p.algorithm.merge;
 
 import java.awt.Color;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
+import java.util.HashSet;
 import java.util.Random;
 
 
@@ -13,7 +18,7 @@ public class Zone {
     public int yMin = 0;
     public int yMax = 500;
 
-    public ArrayList<Zone>[][] neighbors;
+    public HashSet<Zone>[][] neighbors;
     public ArrayList<int[]> splitHistory;
 
     public Color color;
@@ -21,11 +26,11 @@ public class Zone {
     public Random rand = new Random();
 
     public Zone() {
-        this.neighbors = new ArrayList[2][2];
+        this.neighbors = new HashSet[2][2];
 
         for (int i = 0; i < 2; i++) {
-            this.neighbors[i][0] = new ArrayList<Zone>();
-            this.neighbors[i][1] = new ArrayList<Zone>();
+            this.neighbors[i][0] = new HashSet<Zone>();
+            this.neighbors[i][1] = new HashSet<Zone>();
         }
 
         this.splitHistory = new ArrayList<int[]>();
@@ -70,18 +75,16 @@ public class Zone {
         }
 
         // History
-        /*
-         * this.splitHistory = (ArrayList<int[]>) zone.splitHistory.clone();
-         * this.splitHistory.add(new int[] { dimension, directionInv }); zone.splitHistory.add(new
-         * int[] { dimension, direction });
-         */
+        this.splitHistory = (ArrayList<int[]>) makeDeepCopy(zone.splitHistory);
+        this.splitHistory.add(new int[] { dimension, directionInv });
+        zone.splitHistory.add(new int[] { dimension, direction });
 
         // Neighbors
         for (int i = 0; i < 2; i++) {
             for (int j = 0; j < 2; j++) {
-                this.neighbors[i][j] = new ArrayList<Zone>();
                 this.neighbors[i][j].addAll(zone.neighbors[i][j]);
-                System.out.println(this.neighbors[i][j].size() + " neighbors at [" + i + "][" + j + "]");
+                // System.out.println(this.neighbors[i][j].size() + " neighbors at [" + i + "][" + j
+                // + "]");
             }
         }
 
@@ -108,10 +111,8 @@ public class Zone {
             for (int j = 0; j < 2; j++) {
                 int jInv = (j + 1) % 2;
 
-                int size = this.neighbors[i][j].size();
                 ArrayList<Zone> zonesToRemove = new ArrayList<Zone>();
-                for (int k = 0; k < size; k++) {
-                    Zone zone = this.neighbors[i][j].get(k);
+                for (Zone zone : this.neighbors[i][j]) {
 
                     int d = this.getBorderDimension(zone);
                     if (d == i) {
@@ -131,17 +132,16 @@ public class Zone {
 
     public Zone leave() {
         if (this.splitHistory.size() > 0) {
-            int[] lastOP = this.splitHistory.get(this.splitHistory.size() - 1);
-            this.splitHistory.remove(this.splitHistory.size() - 1);
+            int[] lastOP = this.splitHistory.remove(this.splitHistory.size() - 1);
             int dimension = lastOP[0];
             int direction = lastOP[1];
-            // int direction = (lastOP[1] + 1) % 2;
+            int directionInv = (lastOP[1] + 1) % 2;
 
             int nbNeigbors = this.neighbors[dimension][direction].size();
 
             // If there is just one neighbor, easy
             if (nbNeigbors == 1) {
-                Zone zone = this.neighbors[dimension][direction].get(0);
+                Zone zone = this.neighbors[dimension][direction].iterator().next();
 
                 if (dimension == 0) {
                     zone.xMin = Math.min(zone.xMin, this.xMin);
@@ -150,28 +150,54 @@ public class Zone {
                     zone.yMin = Math.min(zone.yMin, this.yMin);
                     zone.yMax = Math.max(zone.yMax, this.yMax);
                 }
+
+                for (int i = 0; i < 2; i++) {
+                    for (int j = 0; j < 2; j++) {
+                        int jInv = (j + 1) % 2;
+                        for (Zone z : this.neighbors[i][j]) {
+                            zone.addNeighbor(z, i, j);
+                            z.addNeighbor(zone, i, jInv);
+                            z.removeNeighbor(this, i, jInv);
+                        }
+                    }
+                }
+
             }
             // Else, do the same thing recursively (it's a little heavy with data transfer)
             else if (nbNeigbors > 1) {
-                Zone zone = this.neighbors[dimension][direction].get(0).leave();
+                Zone zone = this.neighbors[dimension][direction].iterator().next().leave();
+
                 zone.xMin = this.xMin;
                 zone.yMin = this.yMin;
                 zone.xMax = this.xMax;
                 zone.yMax = this.yMax;
-                zone.splitHistory = this.splitHistory;
-                zone.neighbors = this.neighbors;
+                zone.splitHistory = (ArrayList<int[]>) makeDeepCopy(this.splitHistory);
+
+                // Neighbors remove
+                for (int i = 0; i < 2; i++) {
+                    for (int j = 0; j < 2; j++) {
+                        for (Zone z : zone.neighbors[i][j]) {
+                            z.removeNeighbor(zone, i, (j + 1) % 2);
+                            zone.removeNeighbor(z, i, j);
+                        }
+                    }
+                }
+
+                // Neighbors copy
+                for (int i = 0; i < 2; i++) {
+                    for (int j = 0; j < 2; j++) {
+                        int jInv = (j + 1) % 2;
+                        for (Zone z : this.neighbors[i][j]) {
+                            z.removeNeighbor(this, i, jInv);
+                            z.addNeighbor(zone, i, jInv);
+                            zone.addNeighbor(z, i, j);
+                        }
+                    }
+                }
             } else {
                 System.out.println("No more peers " + this);
             }
 
-        }
-
-        for (ArrayList<Zone>[] firstN : this.neighbors) {
-            for (ArrayList<Zone> secondN : firstN) {
-                for (Zone zone : secondN) {
-                    zone.removeNeighbor(this);
-                }
-            }
         }
 
         this.xMax = -1;
@@ -192,11 +218,10 @@ public class Zone {
 
     public boolean addNeighbor(Zone zone, int dimension, int direction) {
         if (this.equals(zone)) {
-            throw new ConcurrentModificationException("Can't add itself as a neighbor");
+            return false;
         }
 
-        return (!zone.hasNeighbor(this, dimension, direction) && this.neighbors[dimension][direction]
-                .add(zone));
+        return this.neighbors[dimension][direction].add(zone);
     }
 
     public boolean removeNeighbor(Zone zone) {
@@ -314,5 +339,33 @@ public class Zone {
         Zone zone = (Zone) o;
 
         return (this.xMin == zone.xMin && this.xMax == zone.xMax && this.yMin == zone.yMin && this.yMax == zone.yMax);
+    }
+
+    static public Object makeDeepCopy(Object obj2DeepCopy) {
+        ObjectOutputStream outStream = null;
+        ObjectInputStream inStream = null;
+
+        try {
+            ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+            outStream = new ObjectOutputStream(byteOut);
+            outStream.writeObject(obj2DeepCopy);
+            outStream.flush();
+
+            ByteArrayInputStream byteIn = new ByteArrayInputStream(byteOut.toByteArray());
+            inStream = new ObjectInputStream(byteIn);
+            return inStream.readObject();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                outStream.close();
+                inStream.close();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+
+        return null;
     }
 }

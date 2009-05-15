@@ -78,6 +78,15 @@ public class Area implements Serializable {
     }
 
     /**
+     * Returns the coordinates of the area.
+     * 
+     * @return the coordinates of the area.
+     */
+    public Coordinate[][] getCoordinates() {
+        return new Coordinate[][] { this.getCoordinatesMin(), this.getCoordinatesMax() };
+    }
+
+    /**
      * Returns the maximum coordinates that indicates the area which is managed by a peer.
      * 
      * @return the maximum coordinates that indicates the area which is managed by a peer.
@@ -113,11 +122,45 @@ public class Area implements Serializable {
     }
 
     /**
-     * Check if the area in argument is bordered to the current area.
+     * FIXME Check if the area in argument is bordered to the current area.
      * 
      * @param area
      *            the area to check.
      * @return the dimension in which they are bordered, <code>-1</code> if they aren't.
+     */
+    public Boolean isBordered(Area area, int dimension) {
+        boolean dimRes = false;
+        boolean res = false;
+        for (int i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
+            if (i == dimension) {
+                dimRes = (this.getCoordinatesMin(dimension).equals(area.getCoordinatesMax(dimension)) || this
+                        .getCoordinatesMax(dimension).equals(area.getCoordinatesMin(dimension)));
+            } else {
+                res |= (this.getCoordinatesMin(dimension).isBetween(area.getCoordinatesMin(dimension),
+                        area.getCoordinatesMax(dimension)) || this.getCoordinatesMax(dimension).isBetween(
+                        area.getCoordinatesMin(dimension), area.getCoordinatesMax(dimension))) ||
+                    area.getCoordinatesMin(dimension).isBetween(this.getCoordinatesMin(dimension),
+                            this.getCoordinatesMax(dimension)) ||
+                    area.getCoordinatesMax(dimension).isBetween(this.getCoordinatesMin(dimension),
+                            this.getCoordinatesMax(dimension));
+            }
+        }
+
+        return dimRes && res;
+    }
+
+    /*
+     * for(int i=0; i<CANOverlay.NB_DIMENSIONS; i++) { if (this.getCoordinatesMin(dimension)[i]
+     * 
+     * (zone.xMin <= this.xMin && this.xMin < zone.xMax) || (zone.xMin < this.xMax && this.xMax <=
+     * zone.xMax) }
+     * 
+     * return ;
+     * 
+     * return ((this.yMin == zone.yMax || this.yMax == zone.yMin) && (((this.xMin <= zone.xMin &&
+     * zone.xMin < this.xMax) || (this.xMin < zone.xMax && zone.xMax <= this.xMax)) || ((zone.xMin
+     * <= this.xMin && this.xMin < zone.xMax) || (zone.xMin < this.xMax && this.xMax <=
+     * zone.xMax)))); }
      */
     public int isBordered(Area area) {
         int i;
@@ -286,5 +329,18 @@ public class Area implements Serializable {
         buf.append(").");
 
         return buf.toString();
+    }
+
+    public int getBorderedDimension(Area area) {
+        int i;
+        int nbDim = this.coordinatesMax.length;
+
+        for (i = 0; i < nbDim; i++) {
+            if (this.isBordered(area, i)) {
+                return i;
+            }
+        }
+
+        return -1;
     }
 }
