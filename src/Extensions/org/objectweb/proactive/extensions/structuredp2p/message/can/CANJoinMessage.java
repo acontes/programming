@@ -7,7 +7,7 @@ import org.objectweb.proactive.extensions.structuredp2p.core.Area;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.message.Message;
-import org.objectweb.proactive.extensions.structuredp2p.response.JoinResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.response.ResponseMessage;
 
 
 /**
@@ -49,7 +49,7 @@ public class CANJoinMessage extends Message {
     /**
      * {@inheritDoc}
      */
-    public JoinResponseMessage handle(StructuredOverlay overlay) {
+    public ResponseMessage handle(StructuredOverlay overlay) {
         return overlay.handleJoinMessage(this);
     }
 

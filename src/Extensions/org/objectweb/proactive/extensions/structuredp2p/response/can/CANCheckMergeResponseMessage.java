@@ -1,7 +1,8 @@
-package org.objectweb.proactive.extensions.structuredp2p.response;
+package org.objectweb.proactive.extensions.structuredp2p.response.can;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.message.can.CANCheckMergeMessage;
+import org.objectweb.proactive.extensions.structuredp2p.response.ActionResponseMessage;
 
 
 /**
@@ -14,10 +15,12 @@ import org.objectweb.proactive.extensions.structuredp2p.message.can.CANCheckMerg
  * @version 0.1
  */
 @SuppressWarnings("serial")
-public class CANCheckMergeResponseMessage extends ResponseMessage {
+public class CANCheckMergeResponseMessage extends ActionResponseMessage {
 
+    /**
+     * The remote peer which seems to be mergeable.
+     */
     private final Peer remotePeer;
-    private final boolean mergeable;
 
     /**
      * Constructor.
@@ -25,21 +28,13 @@ public class CANCheckMergeResponseMessage extends ResponseMessage {
      * @param creationTimestamp
      *            the timestamp indicating the time creation of the message which has been sent.
      * @param remotePeer
+     *            the remote peer.
      * @param mergeable
+     *            are peer mergeable.
      */
     public CANCheckMergeResponseMessage(long creationTimestamp, Peer remotePeer, boolean mergeable) {
-        super(creationTimestamp);
+        super(creationTimestamp, mergeable);
         this.remotePeer = remotePeer;
-        this.mergeable = mergeable;
-    }
-
-    /**
-     * Indicates if the areas are mergeable.
-     * 
-     * @return <code>true</code> if the areas are mergeable, false otherwise.
-     */
-    public boolean isMergeable() {
-        return this.mergeable;
     }
 
     /**

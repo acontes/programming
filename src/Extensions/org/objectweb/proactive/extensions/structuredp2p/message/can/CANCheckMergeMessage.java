@@ -5,7 +5,7 @@ import org.objectweb.proactive.extensions.structuredp2p.core.Area;
 import org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.message.Message;
-import org.objectweb.proactive.extensions.structuredp2p.response.CANCheckMergeResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.response.can.CANCheckMergeResponseMessage;
 
 
 /**

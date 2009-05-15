@@ -8,7 +8,6 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PAEventProgramming;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.ChordOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.data.DataStorage;
@@ -245,7 +244,6 @@ public class Peer implements InitActive, RunActive, Serializable {
     /**
      * {@inheritDoc}
      */
-    @Override
     public boolean equals(Object o) {
         if (!(o instanceof Peer)) {
             throw new IllegalArgumentException();

@@ -80,11 +80,11 @@ public class TestNeighbors {
 
         CANOverlay entryPointOverlay = (CANOverlay) TestNeighbors.entryPoint.getStructuredOverlay();
 
-        int nbNeighbors = entryPointOverlay.getNeighborsAsCollection().size();
+        int nbNeighbors = entryPointOverlay.getNeighbors().size();
 
         TestNeighbors.neighbor.leave();
 
-        Assert.assertEquals(nbNeighbors - 1, entryPointOverlay.getNeighborsAsCollection().size());
+        Assert.assertEquals(nbNeighbors - 1, entryPointOverlay.getNeighbors().size());
 
         // TODO tests with merged areas !
     }

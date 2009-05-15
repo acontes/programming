@@ -28,15 +28,15 @@ import org.objectweb.proactive.extensions.structuredp2p.message.can.CANLookupMes
 import org.objectweb.proactive.extensions.structuredp2p.message.can.CANMergeMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.can.CANSwitchMessage;
 import org.objectweb.proactive.extensions.structuredp2p.response.AddNeighborResponseMessage;
-import org.objectweb.proactive.extensions.structuredp2p.response.CANCheckMergeResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.response.CANJoinResponseMessage;
-import org.objectweb.proactive.extensions.structuredp2p.response.CANLookupResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.response.CANMergeResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.response.CANSwitchResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.response.EmptyResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.response.LookupResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.response.PingResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.response.ResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.response.can.CANCheckMergeResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.response.can.CANLookupResponseMessage;
 
 
 /**

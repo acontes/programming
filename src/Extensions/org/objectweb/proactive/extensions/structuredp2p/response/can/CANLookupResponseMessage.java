@@ -1,9 +1,10 @@
-package org.objectweb.proactive.extensions.structuredp2p.response;
+package org.objectweb.proactive.extensions.structuredp2p.response.can;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.Coordinate;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.message.Key;
 import org.objectweb.proactive.extensions.structuredp2p.message.can.CANLookupMessage;
+import org.objectweb.proactive.extensions.structuredp2p.response.LookupResponseMessage;
 
 
 /**
@@ -24,7 +25,9 @@ public class CANLookupResponseMessage extends LookupResponseMessage {
      * @param timestampCreationMessage
      *            the timestamp indicating the time creation of the message which has been sent.
      * @param peer
+     *            the searched peer.
      * @param coordinates
+     *            the searched coordinates.
      */
     public CANLookupResponseMessage(long timestampCreationMessage, Peer peer, Coordinate[] coordinates) {
         super(timestampCreationMessage, new Key<Coordinate[]>(coordinates), peer);

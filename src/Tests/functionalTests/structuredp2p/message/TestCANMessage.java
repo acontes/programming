@@ -15,8 +15,8 @@ import org.objectweb.proactive.extensions.structuredp2p.core.overlay.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.message.LookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.PingMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.can.CANLookupMessage;
-import org.objectweb.proactive.extensions.structuredp2p.response.CANLookupResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.response.ResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.response.can.CANLookupResponseMessage;
 
 
 /**

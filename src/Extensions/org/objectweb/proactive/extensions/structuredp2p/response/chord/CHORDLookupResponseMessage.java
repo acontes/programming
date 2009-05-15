@@ -1,8 +1,9 @@
-package org.objectweb.proactive.extensions.structuredp2p.response;
+package org.objectweb.proactive.extensions.structuredp2p.response.chord;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.message.Key;
 import org.objectweb.proactive.extensions.structuredp2p.message.chord.CHORDLookupMessage;
+import org.objectweb.proactive.extensions.structuredp2p.response.LookupResponseMessage;
 
 
 /**
@@ -23,7 +24,9 @@ public class CHORDLookupResponseMessage extends LookupResponseMessage {
      * @param timestampMessageCreation
      *            the timestamp indicating the time creation of the message which has been sent.
      * @param peer
+     *            the searched peer.
      * @param id
+     *            the identificator.
      */
     public CHORDLookupResponseMessage(long timestampMessageCreation, Peer peer, String id) {
         super(timestampMessageCreation, new Key<String>(id), peer);
