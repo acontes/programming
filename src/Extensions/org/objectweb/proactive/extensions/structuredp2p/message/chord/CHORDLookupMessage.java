@@ -1,7 +1,9 @@
-package org.objectweb.proactive.extensions.structuredp2p.message;
+package org.objectweb.proactive.extensions.structuredp2p.message.chord;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay;
-import org.objectweb.proactive.extensions.structuredp2p.message.response.LookupResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.message.Key;
+import org.objectweb.proactive.extensions.structuredp2p.message.LookupMessage;
+import org.objectweb.proactive.extensions.structuredp2p.response.LookupResponseMessage;
 
 
 /**
@@ -27,13 +29,8 @@ public class CHORDLookupMessage extends LookupMessage {
     }
 
     /**
-     * Handles message by delegation.
-     * 
-     * @param peer
-     *            to which the message will be sent.
-     * @return a ChordResponseMessage for routing.
+     * {@inheritDoc}
      */
-    @Override
     public LookupResponseMessage handle(StructuredOverlay overlay) {
         return overlay.handleLookupMessage(this);
 
@@ -44,7 +41,6 @@ public class CHORDLookupMessage extends LookupMessage {
      * 
      * @return the identifier.
      */
-
     public String getId() {
         return (String) super.getKey().getValue();
     }

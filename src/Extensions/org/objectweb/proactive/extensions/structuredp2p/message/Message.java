@@ -3,7 +3,7 @@ package org.objectweb.proactive.extensions.structuredp2p.message;
 import java.io.Serializable;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay;
-import org.objectweb.proactive.extensions.structuredp2p.message.response.ResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.response.ResponseMessage;
 
 
 /**

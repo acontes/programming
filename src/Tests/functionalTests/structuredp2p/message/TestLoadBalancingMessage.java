@@ -12,7 +12,7 @@ import org.objectweb.proactive.extensions.structuredp2p.core.OverlayType;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.message.LoadBalancingMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.Message;
-import org.objectweb.proactive.extensions.structuredp2p.message.response.ResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.response.ResponseMessage;
 
 public class TestLoadBalancingMessage {
     

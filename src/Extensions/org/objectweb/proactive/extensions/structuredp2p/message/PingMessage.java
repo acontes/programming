@@ -1,7 +1,7 @@
 package org.objectweb.proactive.extensions.structuredp2p.message;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay;
-import org.objectweb.proactive.extensions.structuredp2p.message.response.PingResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.response.PingResponseMessage;
 
 
 /**
@@ -20,15 +20,11 @@ public class PingMessage extends Message {
      * Constructor.
      */
     public PingMessage() {
+        super();
     }
 
     /**
-     * Handles message by delegation.
-     * 
-     * @param a
-     *            peer to which the message will be send.
-     * @return a PingResponseMessage for routing.
-     * 
+     * {@inheritDoc}
      */
     public PingResponseMessage handle(StructuredOverlay overlay) {
         return overlay.handlePingMessage(this);

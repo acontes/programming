@@ -8,13 +8,14 @@ import org.objectweb.proactive.extensions.structuredp2p.message.LoadBalancingMes
 import org.objectweb.proactive.extensions.structuredp2p.message.LookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.Message;
 import org.objectweb.proactive.extensions.structuredp2p.message.PingMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.response.AddNeighborResponseMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.response.EmptyResponseMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.response.JoinResponseMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.response.LoadBalancingResponseMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.response.LookupResponseMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.response.PingResponseMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.response.ResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.message.RemoveNeighborMessage;
+import org.objectweb.proactive.extensions.structuredp2p.response.ActionResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.response.EmptyResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.response.JoinResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.response.LoadBalancingResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.response.LookupResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.response.PingResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.response.ResponseMessage;
 
 
 /**
@@ -135,16 +136,26 @@ public abstract class StructuredOverlay implements Serializable {
      *            the message that is handled.
      * @return the {@link EmptyResponseMessage} response.
      */
-    public abstract EmptyResponseMessage handleLeaveMessage(LeaveMessage leaveMessage);
+    public abstract ActionResponseMessage handleLeaveMessage(LeaveMessage leaveMessage);
 
     /**
-     * Handles a {@link LeaveMessage}.
+     * Handles a {@link AddNeighborMessage}.
      * 
      * @param msg
      *            the message that is handled.
      * @return the {@link EmptyResponseMessage} response.
      */
-    public abstract AddNeighborResponseMessage handleAddNeighborMessage(AddNeighborMessage msg);
+    public abstract ActionResponseMessage handleAddNeighborMessage(AddNeighborMessage msg);
+
+    /**
+     * Handles a {@link CANRemoveNeighborMessage}.
+     * 
+     * @param msg
+     *            the message that is handled.
+     * @return the {@link ActionResponseMessage} response.
+     */
+    public abstract ActionResponseMessage handleRemoveNeighborMessage(
+            RemoveNeighborMessage removeNeighborMessage);
 
     /**
      * Returns the current peer that use this overlay.

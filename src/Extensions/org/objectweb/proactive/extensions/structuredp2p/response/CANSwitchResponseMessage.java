@@ -1,7 +1,7 @@
-package org.objectweb.proactive.extensions.structuredp2p.message.response;
+package org.objectweb.proactive.extensions.structuredp2p.response;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
-import org.objectweb.proactive.extensions.structuredp2p.message.CANSwitchMessage;
+import org.objectweb.proactive.extensions.structuredp2p.message.can.CANSwitchMessage;
 
 
 /**

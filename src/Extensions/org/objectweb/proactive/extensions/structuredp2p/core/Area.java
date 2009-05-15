@@ -3,6 +3,7 @@ package org.objectweb.proactive.extensions.structuredp2p.core;
 import java.io.Serializable;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.exception.AreaException;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.CANOverlay;
 
 
 /**
@@ -122,11 +123,13 @@ public class Area implements Serializable {
     }
 
     /**
-     * FIXME Check if the area in argument is bordered to the current area.
+     * Check if the area in argument is bordered to the current area at the dimension in argument.
      * 
      * @param area
      *            the area to check.
-     * @return the dimension in which they are bordered, <code>-1</code> if they aren't.
+     * @param dimension
+     *            the dimension to check.
+     * @return <code>true</code> if they are bordered, else <code>false</code>
      */
     public Boolean isBordered(Area area, int dimension) {
         boolean dimRes = false;
@@ -149,100 +152,24 @@ public class Area implements Serializable {
         return dimRes && res;
     }
 
-    /*
-     * for(int i=0; i<CANOverlay.NB_DIMENSIONS; i++) { if (this.getCoordinatesMin(dimension)[i]
+    /**
+     * Returns the border dimension between this area and the argument.
      * 
-     * (zone.xMin <= this.xMin && this.xMin < zone.xMax) || (zone.xMin < this.xMax && this.xMax <=
-     * zone.xMax) }
-     * 
-     * return ;
-     * 
-     * return ((this.yMin == zone.yMax || this.yMax == zone.yMin) && (((this.xMin <= zone.xMin &&
-     * zone.xMin < this.xMax) || (this.xMin < zone.xMax && zone.xMax <= this.xMax)) || ((zone.xMin
-     * <= this.xMin && this.xMin < zone.xMax) || (zone.xMin < this.xMax && this.xMax <=
-     * zone.xMax)))); }
+     * @param area
+     *            the area to check.
+     * @return the border dimension, <code>-1</code> if they are not bordered.
      */
-    public int isBordered(Area area) {
+    public int getBorderedDimension(Area area) {
         int i;
         int nbDim = this.coordinatesMax.length;
 
         for (i = 0; i < nbDim; i++) {
-            if (this.getCoordinatesMax(i).equals(area.getCoordinatesMin(i)) ||
-                this.getCoordinatesMin(i).equals(area.getCoordinatesMax(i))) {
+            if (this.isBordered(area, i)) {
                 return i;
             }
         }
 
         return -1;
-    }
-
-    /**
-     * Merges two bordered areas.
-     * 
-     * @param a
-     *            the Area to which we merge the current.
-     * @return the merged area.
-     * @throws AreaException
-     */
-    public Area merge(Area a) throws AreaException {
-        int border = this.isBordered(a);
-
-        if (border == -1) {
-            throw new AreaException("Areas are not bordered.");
-        } else {
-            // FIXME test also the load balancing to choose the good area
-            // merge the two areas
-            Coordinate[] minCoord = this.coordinatesMin.clone();
-            Coordinate[] maxCoord = this.coordinatesMax.clone();
-
-            minCoord[border] = Coordinate.min(this.getCoordinatesMin(border), a.getCoordinatesMin(border));
-            maxCoord[border] = Coordinate.max(this.getCoordinatesMax(border), a.getCoordinatesMax(border));
-
-            return new Area(minCoord, maxCoord);
-        }
-        // TODO how to split ??
-        // return new Area(null, null);
-    }
-
-    /**
-     * Checks if it is possible to merge the current area with the area in argument.
-     * 
-     * @param area
-     *            the area to check.
-     * @return return true if we can merge the area, false otherwise.
-     */
-    public boolean isValidMergingArea(Area area) {
-        int dimension = this.isBordered(area);
-        if (dimension != -1) {
-            return (this.coordinatesMax[dimension].equals(area.getCoordinatesMax(dimension))) &&
-                (this.coordinatesMin[dimension].equals(area.getCoordinatesMin(dimension)));
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof Area)) {
-            throw new IllegalArgumentException();
-        }
-
-        Area area = (Area) o;
-
-        int i;
-        int nbDim = this.coordinatesMax.length;
-
-        for (i = 0; i < nbDim; i++) {
-            if (!this.getCoordinatesMax(i).equals(area.getCoordinatesMax(i)) ||
-                !this.getCoordinatesMin(i).equals(area.getCoordinatesMin(i))) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     /**
@@ -279,6 +206,47 @@ public class Area implements Serializable {
     }
 
     /**
+     * Merges two bordered areas.
+     * 
+     * @param area
+     *            the area to which we merge the current.
+     * @return the merged area.
+     * @throws AreaException
+     */
+    public Area merge(Area area) throws AreaException {
+        int border = this.getBorderedDimension(area);
+
+        if (border == -1) {
+            throw new AreaException("Areas are not bordered.");
+        } else {
+            // FIXME test also the load balancing to choose the good area
+            // merge the two areas
+            Coordinate[] minCoord = this.coordinatesMin.clone();
+            Coordinate[] maxCoord = this.coordinatesMax.clone();
+
+            minCoord[border] = Coordinate.min(this.getCoordinatesMin(border), area.getCoordinatesMin(border));
+            maxCoord[border] = Coordinate.max(this.getCoordinatesMax(border), area.getCoordinatesMax(border));
+
+            return new Area(minCoord, maxCoord);
+        }
+    }
+
+    // FIXME to remove ??
+    /**
+     * Checks if it is possible to merge the current area with the area in argument.
+     * 
+     * @param area
+     *            the area to check.
+     * @return return true if we can merge the area, false otherwise.
+     * 
+     *         public boolean isValidMergingArea(Area area) { int dimension = this.isBordered(area);
+     *         if (dimension != -1) { return
+     *         (this.coordinatesMax[dimension].equals(area.getCoordinatesMax(dimension))) &&
+     *         (this.coordinatesMin[dimension].equals(area.getCoordinatesMin(dimension))); } else {
+     *         return false; } }
+     */
+
+    /**
      * Is the coordinate in the area following a dimension ?
      * 
      * @param dimension
@@ -301,6 +269,29 @@ public class Area implements Serializable {
         }
 
         return 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean equals(Object o) {
+        if (!(o instanceof Area)) {
+            throw new IllegalArgumentException();
+        }
+
+        Area area = (Area) o;
+
+        int i;
+        int nbDim = this.coordinatesMax.length;
+
+        for (i = 0; i < nbDim; i++) {
+            if (!this.getCoordinatesMax(i).equals(area.getCoordinatesMax(i)) ||
+                !this.getCoordinatesMin(i).equals(area.getCoordinatesMin(i))) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -329,18 +320,5 @@ public class Area implements Serializable {
         buf.append(").");
 
         return buf.toString();
-    }
-
-    public int getBorderedDimension(Area area) {
-        int i;
-        int nbDim = this.coordinatesMax.length;
-
-        for (i = 0; i < nbDim; i++) {
-            if (this.isBordered(area, i)) {
-                return i;
-            }
-        }
-
-        return -1;
     }
 }

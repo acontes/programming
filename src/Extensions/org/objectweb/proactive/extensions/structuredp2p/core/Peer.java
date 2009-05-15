@@ -9,11 +9,13 @@ import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAEventProgramming;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.CANOverlay;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.ChordOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.data.DataStorage;
 import org.objectweb.proactive.extensions.structuredp2p.message.LookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.message.Message;
-import org.objectweb.proactive.extensions.structuredp2p.message.response.LookupResponseMessage;
-import org.objectweb.proactive.extensions.structuredp2p.message.response.ResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.response.LookupResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.response.ResponseMessage;
 
 
 /**
@@ -211,7 +213,7 @@ public class Peer implements InitActive, RunActive, Serializable {
                 this.structuredOverlay = new CANOverlay(this);
                 break;
             case CHORD:
-                this.structuredOverlay = new CHORDOverlay(this);
+                this.structuredOverlay = new ChordOverlay(this);
                 break;
             default:
                 throw new IllegalArgumentException("The peer type must be one of OverlayType.");

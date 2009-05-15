@@ -1,9 +1,11 @@
-package org.objectweb.proactive.extensions.structuredp2p.message;
+// FIXME
+package org.objectweb.proactive.extensions.structuredp2p.message.can;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.Area;
-import org.objectweb.proactive.extensions.structuredp2p.core.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay;
-import org.objectweb.proactive.extensions.structuredp2p.message.response.CANCheckMergeResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.CANOverlay;
+import org.objectweb.proactive.extensions.structuredp2p.message.Message;
+import org.objectweb.proactive.extensions.structuredp2p.response.CANCheckMergeResponseMessage;
 
 
 /**
@@ -18,13 +20,20 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.CANChec
 @SuppressWarnings("serial")
 public class CANCheckMergeMessage extends Message {
 
+    /**
+     * The area to merge with.
+     */
     private final Area remoteArea;
 
     /**
      * Constructor.
+     * 
+     * @param remoteArea
+     *            the area to merge with.
      */
-    public CANCheckMergeMessage(Area area) {
-        this.remoteArea = area;
+    public CANCheckMergeMessage(Area remoteArea) {
+        super();
+        this.remoteArea = remoteArea;
     }
 
     /**
@@ -39,7 +48,7 @@ public class CANCheckMergeMessage extends Message {
      * 
      * @return the area to merge with.
      */
-    public Area getArea() {
+    public Area getRemoteArea() {
         return this.remoteArea;
     }
 }

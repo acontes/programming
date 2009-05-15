@@ -1,7 +1,7 @@
 package org.objectweb.proactive.extensions.structuredp2p.message;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay;
-import org.objectweb.proactive.extensions.structuredp2p.message.response.LoadBalancingResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.response.LoadBalancingResponseMessage;
 
 
 /**
@@ -18,6 +18,7 @@ public class LoadBalancingMessage extends Message {
      * Constructor.
      */
     public LoadBalancingMessage() {
+        super();
     }
 
     /**

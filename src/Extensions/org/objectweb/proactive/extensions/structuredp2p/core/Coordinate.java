@@ -2,6 +2,8 @@ package org.objectweb.proactive.extensions.structuredp2p.core;
 
 import java.io.Serializable;
 
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.CANOverlay;
+
 
 /**
  * Coordinate is used in {@link CANOverlay} in order to specify the position of a given peer in the

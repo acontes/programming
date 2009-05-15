@@ -1,7 +1,7 @@
 package org.objectweb.proactive.extensions.structuredp2p.message;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay;
-import org.objectweb.proactive.extensions.structuredp2p.message.response.ResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.response.ResponseMessage;
 
 
 /**
@@ -45,10 +45,7 @@ public abstract class LookupMessage extends Message {
     }
 
     /**
-     * Handles a {@link LookupMessage} by double dispatch.
-     * 
-     * @param overlay
-     *            the overlay which handle the message.
+     * {@inheritDoc}
      */
     public abstract ResponseMessage handle(StructuredOverlay overlay);
 }

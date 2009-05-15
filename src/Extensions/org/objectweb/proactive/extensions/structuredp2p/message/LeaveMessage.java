@@ -2,7 +2,7 @@ package org.objectweb.proactive.extensions.structuredp2p.message;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay;
-import org.objectweb.proactive.extensions.structuredp2p.message.response.EmptyResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.response.ActionResponseMessage;
 
 
 /**
@@ -17,6 +17,9 @@ import org.objectweb.proactive.extensions.structuredp2p.message.response.EmptyRe
 @SuppressWarnings("serial")
 public class LeaveMessage extends Message {
 
+    /**
+     * The leaving remote peer.
+     */
     private final Peer remotePeer;
 
     public LeaveMessage(Peer remotePeer) {
@@ -24,12 +27,19 @@ public class LeaveMessage extends Message {
         this.remotePeer = remotePeer;
     }
 
-    @Override
-    public EmptyResponseMessage handle(StructuredOverlay overlay) {
+    /**
+     * {@inheritDoc}
+     */
+    public ActionResponseMessage handle(StructuredOverlay overlay) {
         return overlay.handleLeaveMessage(this);
     }
 
-    public Peer getPeer() {
+    /**
+     * Returns to leaving remote peer.
+     * 
+     * @return the leaving remote peer.
+     */
+    public Peer getRemotePeer() {
         return this.remotePeer;
     }
 }

@@ -1,4 +1,4 @@
-package org.objectweb.proactive.extensions.structuredp2p.message.response;
+package org.objectweb.proactive.extensions.structuredp2p.response;
 
 import java.io.Serializable;
 
@@ -14,7 +14,7 @@ import java.io.Serializable;
  * @version 0.1
  */
 @SuppressWarnings("serial")
-public abstract class ResponseMessage implements Serializable {
+public class ResponseMessage implements Serializable {
 
     /**
      * The timestamp on which the message for which was created we create this response.

@@ -1,8 +1,10 @@
-package org.objectweb.proactive.extensions.structuredp2p.message;
+package org.objectweb.proactive.extensions.structuredp2p.message.can;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.Coordinate;
 import org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay;
-import org.objectweb.proactive.extensions.structuredp2p.message.response.LookupResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.message.Key;
+import org.objectweb.proactive.extensions.structuredp2p.message.LookupMessage;
+import org.objectweb.proactive.extensions.structuredp2p.response.LookupResponseMessage;
 
 
 /**
@@ -23,7 +25,6 @@ public class CANLookupMessage extends LookupMessage {
      * 
      * @param coordinates
      *            the coordinates the message must reached.
-     * 
      */
     public CANLookupMessage(Coordinate[] coordinates) {
         super(new Key<Coordinate[]>(coordinates));
@@ -39,11 +40,7 @@ public class CANLookupMessage extends LookupMessage {
     }
 
     /**
-     * Handles message by delegation.
-     * 
-     * @param a
-     *            peer to which the message will be sent.
-     * @return a CanResponseMessage for routing.
+     * {@inheritDoc}
      */
     public LookupResponseMessage handle(StructuredOverlay overlay) {
         return overlay.handleLookupMessage(this);
