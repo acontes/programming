@@ -272,6 +272,27 @@ public class Area implements Serializable {
     }
 
     /**
+     * Check if the coordinates in arguments are in the managed area.
+     * 
+     * @param coordinates
+     *            the coordinates to check.
+     * 
+     * @return true if the coordinates are in the area, false otherwise.
+     */
+    public boolean contains(Coordinate[] coordinates) {
+        int i;
+        boolean res = true;
+
+        for (i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
+            if (!(res &= (this.contains(i, coordinates[i]) == 0))) {
+                return false;
+            }
+        }
+
+        return res;
+    }
+
+    /**
      * {@inheritDoc}
      */
     public boolean equals(Object o) {

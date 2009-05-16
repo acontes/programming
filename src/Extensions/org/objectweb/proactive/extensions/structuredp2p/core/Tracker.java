@@ -48,15 +48,15 @@ public class Tracker implements Serializable {
     }
 
     /**
-     * Add on the network that the tracker know the given peer.
+     * Add on the network that the tracker manages, the given peer.
      * 
      * @param remotePeer
      *            the peer to add on the network.
      */
     public void addOnNetwork(Peer remotePeer) {
         if (remotePeer.getType() != this.type) {
-            throw new IllegalStateException("You can only add network of type " + this.type +
-                " by this tracker");
+            throw new IllegalArgumentException("Illegal Peer type. This tracker manages a " + this.type +
+                " network.");
         } else if (this.remotePeers.size() == 0) {
             this.remotePeers.add(remotePeer);
         } else {

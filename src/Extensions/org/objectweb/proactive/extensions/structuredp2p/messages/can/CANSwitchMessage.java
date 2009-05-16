@@ -3,7 +3,7 @@ package org.objectweb.proactive.extensions.structuredp2p.messages.can;
 import java.util.ArrayList;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.Area;
-import org.objectweb.proactive.extensions.structuredp2p.core.NeighborsArray;
+import org.objectweb.proactive.extensions.structuredp2p.core.NeighborsDataStructure;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.CANOverlay;
@@ -26,7 +26,7 @@ public class CANSwitchMessage extends Message {
     /**
      * The neighbors from the peer to switch with.
      */
-    private final NeighborsArray neighbors;
+    private final NeighborsDataStructure neighbors;
 
     /**
      * The area from the peer to switch with.
@@ -55,7 +55,7 @@ public class CANSwitchMessage extends Message {
      * @param splitHistory
      *            split history from the peer to switch with.
      */
-    public CANSwitchMessage(NeighborsArray neighbors, Area area, DataStorage resources,
+    public CANSwitchMessage(NeighborsDataStructure neighbors, Area area, DataStorage resources,
             ArrayList<int[]> splitHistory) {
         super();
         this.neighbors = neighbors;
@@ -76,7 +76,7 @@ public class CANSwitchMessage extends Message {
      * 
      * @return the neighbors from the peer to switch with.
      */
-    public NeighborsArray getNeighbors() {
+    public NeighborsDataStructure getNeighbors() {
         return this.neighbors;
     }
 

@@ -24,12 +24,12 @@ public class CANMergeMessage extends Message {
     /**
      * The area to merge with.
      */
-    private final Area remoteArea;
+    private final Area area;
 
     /**
      * The resources to merge with.
      */
-    private final DataStorage remoteResources;
+    private final DataStorage resources;
 
     /**
      * Constructor.
@@ -40,8 +40,8 @@ public class CANMergeMessage extends Message {
      *            the resources to merge with.
      */
     public CANMergeMessage(Area remoteArea, DataStorage remoteResources) {
-        this.remoteArea = remoteArea;
-        this.remoteResources = remoteResources;
+        this.area = remoteArea;
+        this.resources = remoteResources;
     }
 
     /**
@@ -57,7 +57,7 @@ public class CANMergeMessage extends Message {
      * @return the area to merge with.
      */
     public Area getArea() {
-        return this.remoteArea;
+        return this.area;
     }
 
     /**
@@ -66,6 +66,6 @@ public class CANMergeMessage extends Message {
      * @return the resources to merge with.
      */
     public DataStorage getResources() {
-        return this.remoteResources;
+        return this.resources;
     }
 }

@@ -15,7 +15,7 @@ import org.objectweb.proactive.extensions.structuredp2p.responses.ActionResponse
  * @version 0.1
  */
 @SuppressWarnings("serial")
-public class AddNeighborMessage extends Message {
+public abstract class AddNeighborMessage extends Message {
 
     /**
      * The peer to add as neighbor.

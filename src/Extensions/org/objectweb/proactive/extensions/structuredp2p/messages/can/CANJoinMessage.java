@@ -1,9 +1,9 @@
 package org.objectweb.proactive.extensions.structuredp2p.messages.can;
 
-import java.util.ArrayList;
+import java.util.Stack;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.Area;
-import org.objectweb.proactive.extensions.structuredp2p.core.NeighborsArray;
+import org.objectweb.proactive.extensions.structuredp2p.core.NeighborsDataStructure;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.messages.Message;
@@ -26,7 +26,7 @@ public class CANJoinMessage extends Message {
     /**
      * The neighbors of the sender.
      */
-    private final NeighborsArray neighbors;
+    private final NeighborsDataStructure neighbors;
 
     /**
      * Area associated to the sender.
@@ -36,7 +36,7 @@ public class CANJoinMessage extends Message {
     /**
      * Splits history of the sender.
      */
-    private final ArrayList<int[]> splitHistory;
+    private final Stack<int[]> splitHistory;
 
     /**
      * Constructor.
@@ -46,7 +46,7 @@ public class CANJoinMessage extends Message {
      * @param history
      *            the split history.
      */
-    public CANJoinMessage(NeighborsArray neighbors, Area area, ArrayList<int[]> splitHistory) {
+    public CANJoinMessage(NeighborsDataStructure neighbors, Area area, Stack<int[]> splitHistory) {
         super();
         this.neighbors = neighbors;
         this.area = area;
@@ -74,7 +74,7 @@ public class CANJoinMessage extends Message {
      * 
      * @return the neighbors of the peer which has sent the message.
      */
-    public NeighborsArray getNeighbors() {
+    public NeighborsDataStructure getNeighbors() {
         return this.neighbors;
     }
 
@@ -83,7 +83,7 @@ public class CANJoinMessage extends Message {
      * 
      * @return splits history of the peer which has sent the message.
      */
-    public ArrayList<int[]> getSplitHistory() {
+    public Stack<int[]> getSplitHistory() {
         return this.splitHistory;
     }
 }

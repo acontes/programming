@@ -13,7 +13,7 @@ package org.objectweb.proactive.extensions.structuredp2p.responses;
 public class ActionResponseMessage extends ResponseMessage {
 
     /**
-     * Is the neighbor correctly removed.
+     * Indicates the status of the action : succeeded or not.
      */
     private boolean success = false;
 
@@ -31,11 +31,11 @@ public class ActionResponseMessage extends ResponseMessage {
     }
 
     /**
-     * Is the neighbor correctly removed.
+     * Indicates if the action has succeeded.
      * 
-     * @return the remove status.
+     * @return <code>true</code> if the action has succeeded, <code>false</code> otherwise.
      */
-    public boolean hasSucceded() {
+    public boolean hasSucceeded() {
         return this.success;
     }
 
