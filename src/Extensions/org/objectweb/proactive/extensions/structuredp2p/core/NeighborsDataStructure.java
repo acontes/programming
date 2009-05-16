@@ -1,5 +1,6 @@
 package org.objectweb.proactive.extensions.structuredp2p.core;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -18,8 +19,8 @@ import org.objectweb.proactive.extensions.structuredp2p.core.overlay.CANOverlay;
  * 
  * @version 0.1
  */
-@SuppressWarnings("unchecked")
-public class NeighborsDataStructure implements Iterable<Peer> {
+@SuppressWarnings( { "unchecked", "serial" })
+public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
 
     /**
      * Inferior direction compared to a given peer.

@@ -14,13 +14,12 @@ import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
 import org.objectweb.proactive.extensions.structuredp2p.messages.LookupMessage;
-import org.objectweb.proactive.extensions.structuredp2p.messages.PingMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANLookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.can.CANLookupResponseMessage;
 
 
 /**
- * Test {@link PingMessage}.
+ * Test the framework in a 2D-CAN.
  * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent
@@ -47,6 +46,17 @@ public class TestCAN2d {
         this.firstPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
                 new Object[] { OverlayType.CAN });
 
+        this.secondPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
+                new Object[] { OverlayType.CAN });
+
+        this.thirdPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
+                new Object[] { OverlayType.CAN });
+
+        this.fourthPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
+                new Object[] { OverlayType.CAN });
+
+        /* First peer */
+
         coordinateMin = new Coordinate[2];
         coordinateMax = new Coordinate[2];
 
@@ -58,14 +68,11 @@ public class TestCAN2d {
         area = new Area(coordinateMin, coordinateMax);
         overlay = (CANOverlay) this.firstPeer.getStructuredOverlay();
         overlay.setArea(area);
-        overlay.getNeighbors().add(this.secondPeer, 0, 1);
-        overlay.getNeighbors().add(this.thirdPeer, 0, 1);
+        overlay.addNeighbor(this.secondPeer, 0, 1);
+        overlay.addNeighbor(this.thirdPeer, 0, 1);
         this.firstPeer.setStructuredOverlay(overlay);
 
-        /* -------- */
-
-        this.secondPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
-                new Object[] { OverlayType.CAN });
+        /* Second peer */
 
         coordinateMin = new Coordinate[2];
         coordinateMax = new Coordinate[2];
@@ -82,10 +89,7 @@ public class TestCAN2d {
         overlay.addNeighbor(this.fourthPeer, 1, 1);
         this.secondPeer.setStructuredOverlay(overlay);
 
-        /* -------- */
-
-        this.thirdPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
-                new Object[] { OverlayType.CAN });
+        /* Third peer */
 
         coordinateMin = new Coordinate[2];
         coordinateMax = new Coordinate[2];
@@ -102,10 +106,7 @@ public class TestCAN2d {
         overlay.addNeighbor(this.fourthPeer, 0, 1);
         this.thirdPeer.setStructuredOverlay(overlay);
 
-        /* -------- */
-
-        this.fourthPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
-                new Object[] { OverlayType.CAN });
+        /* Fourth peer */
 
         coordinateMin = new Coordinate[2];
         coordinateMax = new Coordinate[2];
