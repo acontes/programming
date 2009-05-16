@@ -6,7 +6,8 @@ import org.objectweb.proactive.extensions.structuredp2p.messages.AddNeighborMess
 
 
 /**
- * A CANAddNeighborMessage is a concrete message to add a neighbor to a CAN peer.
+ * A {@link CANAddNeighborMessage} is used in order to add a neighbor to {@link Peer} on the
+ * network.
  * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent
@@ -23,12 +24,12 @@ public class CANAddNeighborMessage extends AddNeighborMessage {
     private final Area remoteArea;
 
     /**
-     * The dimension to add the peer as neighbor.
+     * The dimension on which we add the peer as neighbor.
      */
     private final int dimension;
 
     /**
-     * The direction to add the peer as neighbor.
+     * The direction on which we add the peer as neighbor.
      */
     private final int direction;
 
@@ -38,9 +39,9 @@ public class CANAddNeighborMessage extends AddNeighborMessage {
      * @param remotePeer
      *            the remote peer to add as neighbor.
      * @param dimension
-     *            the dimension of remote peer to add as neighbor.
+     *            the dimension on which the peer must be add as neighbor.
      * @param direction
-     *            the direction of remote peer to add as neighbor.
+     *            the direction on which the peer must be add as neighbor.
      */
     public CANAddNeighborMessage(Peer remotePeer, Area remoteArea, int dimension, int direction) {
         super(remotePeer);
@@ -50,27 +51,27 @@ public class CANAddNeighborMessage extends AddNeighborMessage {
     }
 
     /**
-     * Returns the area of the peer to add as neighbor.
+     * Returns the area of the sender of the message.
      * 
-     * @return the area of the peer to add as neighbor.
+     * @return the area of the sender of the message.
      */
     public Area getArea() {
         return this.remoteArea;
     }
 
     /**
-     * Returns the dimension to add the peer as neighbor.
+     * Returns the dimension on which the peer must be add as neighbor.
      * 
-     * @return the dimension to add the peer as neighbor.
+     * @return the dimension on which the peer must be add as neighbor.
      */
     public int getDimension() {
         return this.dimension;
     }
 
     /**
-     * Returns the direction to add the peer as neighbor.
+     * Returns the direction on which the peer must be add as neighbor.
      * 
-     * @return the direction to add the peer as neighbor.
+     * @return the direction on which the peer must be add as neighbor.
      */
     public int getDirection() {
         return this.direction;

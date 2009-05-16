@@ -1,6 +1,7 @@
 package org.objectweb.proactive.extensions.structuredp2p.messages.can;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.Coordinate;
+import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.messages.Key;
 import org.objectweb.proactive.extensions.structuredp2p.messages.LookupMessage;
@@ -8,8 +9,8 @@ import org.objectweb.proactive.extensions.structuredp2p.responses.LookupResponse
 
 
 /**
- * A CAN Message is used in order to find a peer on a network. In response the caller will receive a
- * CanResponseMessage that contains the peer that has been found.
+ * A {@link CANLookupMessage} is used in order to find a peer on a network. In response the caller
+ * will receive a {@link LookupResponseMessage} that contains the {@link Peer} that has been found.
  * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent

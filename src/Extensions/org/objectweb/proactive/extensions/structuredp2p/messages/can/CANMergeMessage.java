@@ -1,6 +1,7 @@
 package org.objectweb.proactive.extensions.structuredp2p.messages.can;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.Area;
+import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.data.DataStorage;
@@ -9,7 +10,7 @@ import org.objectweb.proactive.extensions.structuredp2p.responses.ResponseMessag
 
 
 /**
- * A CANMergeMessage is a concrete message to merge two CAN peers.
+ * A {@link CANMergeMessage} is used when a {@link Peer} must merge with an another {@link Peer}.
  * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent

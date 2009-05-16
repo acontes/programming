@@ -1,9 +1,9 @@
 package org.objectweb.proactive.extensions.structuredp2p.messages.can;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.Area;
+import org.objectweb.proactive.extensions.structuredp2p.core.NeighborsArray;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.CANOverlay;
@@ -13,7 +13,7 @@ import org.objectweb.proactive.extensions.structuredp2p.responses.can.CANSwitchR
 
 
 /**
- * A CANSwitchMessage is a concrete message to switch two CAN peers.
+ * A {@link CANSwitchMessage} is used in order to switch two {@link Peer}.
  * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent
@@ -23,11 +23,10 @@ import org.objectweb.proactive.extensions.structuredp2p.responses.can.CANSwitchR
  */
 @SuppressWarnings("serial")
 public class CANSwitchMessage extends Message {
-
     /**
      * The neighbors from the peer to switch with.
      */
-    private final HashMap<Peer, Area>[][] neighbors;
+    private final NeighborsArray neighbors;
 
     /**
      * The area from the peer to switch with.
@@ -56,7 +55,7 @@ public class CANSwitchMessage extends Message {
      * @param splitHistory
      *            split history from the peer to switch with.
      */
-    public CANSwitchMessage(HashMap<Peer, Area>[][] neighbors, Area area, DataStorage resources,
+    public CANSwitchMessage(NeighborsArray neighbors, Area area, DataStorage resources,
             ArrayList<int[]> splitHistory) {
         super();
         this.neighbors = neighbors;
@@ -75,9 +74,9 @@ public class CANSwitchMessage extends Message {
     /**
      * The neighbors from the peer to switch with.
      * 
-     * @return the neighbors.
+     * @return the neighbors from the peer to switch with.
      */
-    public HashMap<Peer, Area>[][] getNeighbors() {
+    public NeighborsArray getNeighbors() {
         return this.neighbors;
     }
 

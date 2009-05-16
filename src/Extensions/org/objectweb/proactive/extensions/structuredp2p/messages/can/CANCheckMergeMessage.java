@@ -1,6 +1,7 @@
 package org.objectweb.proactive.extensions.structuredp2p.messages.can;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.Area;
+import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.messages.Message;
@@ -8,7 +9,8 @@ import org.objectweb.proactive.extensions.structuredp2p.responses.can.CANCheckMe
 
 
 /**
- * A CANMergeMessage is a concrete message in order to merge two CAN peers.
+ * A {@link CANMergeMessage} is used when a {@link Peer} must check if it can merge with an another
+ * {@link Peer}.
  * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent
@@ -20,7 +22,7 @@ import org.objectweb.proactive.extensions.structuredp2p.responses.can.CANCheckMe
 public class CANCheckMergeMessage extends Message {
 
     /**
-     * The area to merge with.
+     * The area of the sender.
      */
     private final Area remoteArea;
 
@@ -43,9 +45,9 @@ public class CANCheckMergeMessage extends Message {
     }
 
     /**
-     * Returns the area to merge with.
+     * Returns the area of the sender of the message.
      * 
-     * @return the area to merge with.
+     * @return the area of the sender of the message.
      */
     public Area getArea() {
         return this.remoteArea;
