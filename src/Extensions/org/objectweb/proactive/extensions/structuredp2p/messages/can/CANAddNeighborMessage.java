@@ -6,7 +6,7 @@ import org.objectweb.proactive.extensions.structuredp2p.messages.AddNeighborMess
 
 
 /**
- * A {@link CANAddNeighborMessage} is used in order to add a neighbor to {@link Peer} on the
+ * A {@code CANAddNeighborMessage} is used in order to add a neighbor to {@link Peer} on the
  * network.
  * 
  * @author Kilanga Fanny

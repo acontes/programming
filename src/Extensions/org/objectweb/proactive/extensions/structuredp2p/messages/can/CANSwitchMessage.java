@@ -13,7 +13,7 @@ import org.objectweb.proactive.extensions.structuredp2p.responses.can.CANSwitchR
 
 
 /**
- * A {@link CANSwitchMessage} is used in order to switch two {@link Peer}.
+ * A {@code CANSwitchMessage} is used in order to switch two {@link Peer}.
  * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent

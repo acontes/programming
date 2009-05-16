@@ -9,7 +9,7 @@ import org.objectweb.proactive.extensions.structuredp2p.responses.can.CANCheckMe
 
 
 /**
- * A {@link CANMergeMessage} is used when a {@link Peer} must check if it can merge with an another
+ * A {@code CANMergeMessage} is used when a {@link Peer} must check if it can merge with an another
  * {@link Peer}.
  * 
  * @author Kilanga Fanny

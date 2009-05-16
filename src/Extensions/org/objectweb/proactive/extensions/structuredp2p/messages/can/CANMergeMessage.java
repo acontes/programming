@@ -10,7 +10,7 @@ import org.objectweb.proactive.extensions.structuredp2p.responses.ResponseMessag
 
 
 /**
- * A {@link CANMergeMessage} is used when a {@link Peer} must merge with an another {@link Peer}.
+ * A {@code CANMergeMessage} is used when a {@link Peer} must merge with an another {@link Peer}.
  * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent

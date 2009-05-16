@@ -7,7 +7,7 @@ import org.objectweb.proactive.extensions.structuredp2p.responses.ActionResponse
 
 
 /**
- * A {@link CANRemoveNeighborMessage} is used in order to remove from a {@link Peer} one of its
+ * A {@code CANRemoveNeighborMessage} is used in order to remove from a {@link Peer} one of its
  * neighbors.
  * 
  * @author Kilanga Fanny

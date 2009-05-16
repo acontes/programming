@@ -11,7 +11,7 @@ import org.objectweb.proactive.extensions.structuredp2p.responses.ActionResponse
 
 
 /**
- * A {@link CANJoinMessage} is used when a {@link Peer} want to join an another {@link Peer} which
+ * A {@code CANJoinMessage} is used when a {@link Peer} want to join an another {@link Peer} which
  * is already on the network.
  * 
  * @author Kilanga Fanny

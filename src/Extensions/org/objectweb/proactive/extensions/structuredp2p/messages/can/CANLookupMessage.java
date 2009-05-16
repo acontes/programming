@@ -9,7 +9,7 @@ import org.objectweb.proactive.extensions.structuredp2p.responses.LookupResponse
 
 
 /**
- * A {@link CANLookupMessage} is used in order to find a peer on a network. In response the caller
+ * A {@code CANLookupMessage} is used in order to find a peer on a network. In response the caller
  * will receive a {@link LookupResponseMessage} that contains the {@link Peer} that has been found.
  * 
  * @author Kilanga Fanny

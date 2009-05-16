@@ -62,7 +62,7 @@ public class CANOverlay extends StructuredOverlay {
      * Neighbors of the current area. The neighbors are an array of ProActive groups. It is a
      * two-dimensional array of {@link Group}. Each line corresponds to a dimension. The number of
      * columns is always equal to two. The first column corresponds to the neighbors having a
-     * coordinate lower than the current pair on the given dimension. The second column is the
+     * coordinate lower than the current pair on a specified dimension. The second column is the
      * reverse.
      */
     private NeighborsDataStructure neighbors;
@@ -205,7 +205,7 @@ public class CANOverlay extends StructuredOverlay {
 
     /**
      * Add a new neighbor at the specified <code>dimension</code>, <code>direction</code>. Warning,
-     * the {@link Area} contained by the peer which is given in parameters must be initialized.
+     * the {@link Area} contained by the peer which is specified in parameters must be initialized.
      * 
      * @param remotePeer
      *            the remote peer to add as neighbor.
@@ -213,7 +213,7 @@ public class CANOverlay extends StructuredOverlay {
      *            the dimension index (must be in 0 and {@link #NB_DIMENSIONS - 1} include).
      * @param direction
      *            the direction ({@link #INFERIOR_DIRECTION} or {@link #SUPERIOR_DIRECTION}).
-     * @return true if the neighbor has been add, false if not or if the given peer is already
+     * @return true if the neighbor has been add, false if not or if the specified peer is already
      *         neighbor.
      */
     public boolean addNeighbor(Peer remotePeer, int dimension, int direction) {
@@ -448,7 +448,7 @@ public class CANOverlay extends StructuredOverlay {
     }
 
     /**
-     * Check if the dimension index of the current area contains the given coordinate.
+     * Check if the dimension index of the current area contains the specified coordinate.
      * 
      * @param dimension
      *            the dimension index used for the check.
@@ -456,9 +456,9 @@ public class CANOverlay extends StructuredOverlay {
      * @param coordinate
      *            the coordinate to check.
      * 
-     * @return <code>0</code> if the coordinate is contained by the area on the given axe,
+     * @return <code>0</code> if the coordinate is contained by the area on the specified axe,
      *         <code>-1</code> if the coordinate is smaller than the line which is managed by the
-     *         given dimension, <code>1</code> otherwise.
+     *         specified dimension, <code>1</code> otherwise.
      */
     public int contains(int dimension, Coordinate coordinate) {
         return this.getArea().contains(dimension, coordinate);

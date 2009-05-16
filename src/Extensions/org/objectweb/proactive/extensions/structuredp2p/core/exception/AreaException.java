@@ -1,7 +1,7 @@
 package org.objectweb.proactive.extensions.structuredp2p.core.exception;
 
 /**
- * Manage Area Exceptions.
+ * An {@code AreaException} is thrown by certain methods of the {@link Area} class.
  * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent
@@ -12,23 +12,44 @@ package org.objectweb.proactive.extensions.structuredp2p.core.exception;
 @SuppressWarnings("serial")
 public class AreaException extends Exception {
 
+    /**
+     * Constructs an {@code AreaException} with no detail message.
+     */
     public AreaException() {
-        // TODO Auto-generated constructor stub
+        super();
     }
 
+    /**
+     * Constructs an {@code AreaException} with the specified detail message. A detail message is a
+     * {@link String} that describes this particular exception.
+     * 
+     * @param message
+     *            the detail message.
+     */
     public AreaException(String message) {
         super(message);
-        // TODO Auto-generated constructor stub
     }
 
+    /**
+     * Constructs an {@code AreaException} with the specified cause.
+     * 
+     * @param cause
+     *            the cause.
+     */
     public AreaException(Throwable cause) {
         super(cause);
-        // TODO Auto-generated constructor stub
     }
 
+    /**
+     * Constructs an {@code AreaException} with the specified detail message and cause.
+     * 
+     * @param message
+     *            the detail message.
+     * @param cause
+     *            the cause.
+     */
     public AreaException(String message, Throwable cause) {
         super(message, cause);
-        // TODO Auto-generated constructor stub
     }
 
 }
