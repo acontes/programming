@@ -1,4 +1,3 @@
-// FIXME
 package org.objectweb.proactive.extensions.structuredp2p.messages.can;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.Area;
