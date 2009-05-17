@@ -1,4 +1,4 @@
-package functionalTests.structuredp2p.message;
+package functionalTests.structuredp2p.can;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -27,7 +27,7 @@ import org.objectweb.proactive.extensions.structuredp2p.responses.can.CANLookupR
  * 
  * @version 0.1
  */
-public class TestCANMessage {
+public class TestMessagesND {
 
     private Peer firstPeer;
     private Peer secondPeer;

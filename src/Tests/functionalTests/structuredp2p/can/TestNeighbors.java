@@ -1,4 +1,4 @@
-package functionalTests.structuredp2p.canoverlay;
+package functionalTests.structuredp2p.can;
 
 import junit.framework.Assert;
 

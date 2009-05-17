@@ -1,4 +1,4 @@
-package functionalTests.structuredp2p.message;
+package functionalTests.structuredp2p.can;
 
 import junit.framework.Assert;
 
@@ -20,7 +20,7 @@ import org.objectweb.proactive.extensions.structuredp2p.responses.can.CANLookupR
 
 
 /**
- * Test the framework in a 2D-CAN.
+ * Test the {@link CANOverlay} in a 2D-CAN.
  * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent
@@ -28,7 +28,7 @@ import org.objectweb.proactive.extensions.structuredp2p.responses.can.CANLookupR
  * 
  * @version 0.1
  */
-public class TestCAN2d {
+public class TestOverlay2D {
 
     private Peer firstPeer;
     private Peer secondPeer;
@@ -123,9 +123,6 @@ public class TestCAN2d {
         overlay.addNeighbor(this.thirdPeer, 0, 0);
         overlay.addNeighbor(this.secondPeer, 1, 0);
         this.fourthPeer.setStructuredOverlay(overlay);
-
-        System.out.println("neighbors peer 1 = " +
-            ((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighbors());
 
         this.msg = new CANLookupMessage(new Coordinate[] { new Coordinate("11"), new Coordinate("11") });
     }

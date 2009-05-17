@@ -1,4 +1,4 @@
-package functionalTests.structuredp2p.message;
+package functionalTests.structuredp2p.can;
 
 import junit.framework.Assert;
 
@@ -23,7 +23,7 @@ import org.objectweb.proactive.extensions.structuredp2p.responses.ResponseMessag
  * 
  * @version 0.1
  */
-public class TestPingMessageCAN {
+public class TestMessagesCAN {
 
 	private Peer senderPeer;
 	private Peer receiverPeer;
