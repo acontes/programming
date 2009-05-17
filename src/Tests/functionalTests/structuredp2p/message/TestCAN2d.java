@@ -4,6 +4,7 @@ import junit.framework.Assert;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -83,7 +84,7 @@ public class TestCAN2d {
         coordinateMax[1] = new Coordinate("6");
 
         area = new Area(coordinateMin, coordinateMax);
-        overlay = (CANOverlay) this.firstPeer.getStructuredOverlay();
+        overlay = (CANOverlay) this.secondPeer.getStructuredOverlay();
         overlay.setArea(area);
         overlay.addNeighbor(this.thirdPeer, 1, 1);
         overlay.addNeighbor(this.fourthPeer, 1, 1);
@@ -100,7 +101,7 @@ public class TestCAN2d {
         coordinateMax[1] = new Coordinate("12");
 
         area = new Area(coordinateMin, coordinateMax);
-        overlay = (CANOverlay) this.firstPeer.getStructuredOverlay();
+        overlay = (CANOverlay) this.thirdPeer.getStructuredOverlay();
         overlay.setArea(area);
         overlay.addNeighbor(this.secondPeer, 0, 0);
         overlay.addNeighbor(this.fourthPeer, 0, 1);
@@ -117,11 +118,14 @@ public class TestCAN2d {
         coordinateMax[1] = new Coordinate("12");
 
         area = new Area(coordinateMin, coordinateMax);
-        overlay = (CANOverlay) this.firstPeer.getStructuredOverlay();
+        overlay = (CANOverlay) this.fourthPeer.getStructuredOverlay();
         overlay.setArea(area);
         overlay.addNeighbor(this.thirdPeer, 0, 0);
         overlay.addNeighbor(this.secondPeer, 1, 0);
         this.fourthPeer.setStructuredOverlay(overlay);
+
+        System.out.println("neighbors peer 1 = " +
+            ((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighbors());
 
         this.msg = new CANLookupMessage(new Coordinate[] { new Coordinate("11"), new Coordinate("11") });
     }
@@ -136,23 +140,37 @@ public class TestCAN2d {
     }
 
     @Test
-    public void testSendMessage() {
-        System.out.println(((CANOverlay) this.firstPeer.getStructuredOverlay()).getArea());
-        System.out.println(((CANOverlay) this.secondPeer.getStructuredOverlay()).getArea());
-        System.out.println(((CANOverlay) this.thirdPeer.getStructuredOverlay()).getArea());
-        System.out.println(((CANOverlay) this.fourthPeer.getStructuredOverlay()).getArea());
+    public void testContains() {
+        Assert.assertTrue(((CANOverlay) this.firstPeer.getStructuredOverlay()).contains(new Coordinate[] {
+                new Coordinate("2"), new Coordinate("2") }));
+        Assert.assertTrue(((CANOverlay) this.secondPeer.getStructuredOverlay()).contains(new Coordinate[] {
+                new Coordinate("6"), new Coordinate("0") }));
+        Assert.assertFalse(((CANOverlay) this.secondPeer.getStructuredOverlay()).contains(new Coordinate[] {
+                new Coordinate("12"), new Coordinate("6") }));
+        Assert.assertTrue(((CANOverlay) this.fourthPeer.getStructuredOverlay()).contains(new Coordinate[] {
+                new Coordinate("11"), new Coordinate("11") }));
+    }
 
+    @Ignore
+    public void testGetNearestNeighborFrom() {
+        Assert.assertTrue(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighbors()
+                .getNearestNeighborFrom(new Coordinate("11"), 0, 1).equals(this.thirdPeer));
+    }
+
+    @Test
+    public void testSendMessage() {
         // Lookup for peer which manages (11, 11)
         CANLookupResponseMessage response = (CANLookupResponseMessage) this.firstPeer.sendMessage(this.msg);
+        Assert.assertEquals(this.fourthPeer, response.getPeer());
     }
 
     @After
     public void tearDown() {
         this.msg = null;
-        // PAActiveObject.terminateActiveObject(this.firstPeer, false);
-        // PAActiveObject.terminateActiveObject(this.secondPeer, false);
-        // PAActiveObject.terminateActiveObject(this.thirdPeer, false);
-        // PAActiveObject.terminateActiveObject(this.fourthPeer, false);
+        PAActiveObject.terminateActiveObject(this.firstPeer, false);
+        PAActiveObject.terminateActiveObject(this.secondPeer, false);
+        PAActiveObject.terminateActiveObject(this.thirdPeer, false);
+        PAActiveObject.terminateActiveObject(this.fourthPeer, false);
     }
 
 }

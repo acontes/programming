@@ -268,6 +268,34 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
     }
 
     /**
+     * Returns the neighbor which is the nearest of the given {@link Coordinate} for the specified
+     * <code>dimension</code>, <code>direction</code>.
+     * 
+     * @param coordinate
+     *            the coordinate to check.
+     * @param dim
+     *            the dimension.
+     * @param direction
+     *            the direction.
+     */
+    public Peer getNearestNeighborFrom(Coordinate coordinate, int dim, int direction) {
+        Area nearest = null;
+        int distance;
+        int minDistance = Integer.MAX_VALUE;
+
+        for (Area area : this.associatedAreas[dim][direction]) {
+            if ((distance = Integer.parseInt(coordinate.getValue()) -
+                Integer.parseInt(area.getCoordinateMax(dim + 1).getValue())) < minDistance) {
+                minDistance = distance;
+                nearest = area;
+                System.out.println("area = " + area);
+            }
+        }
+
+        return this.neighbors[dim][direction].get(this.associatedAreas[dim][direction].indexOf(nearest));
+    }
+
+    /**
      * {@inheritDoc}
      */
     public Iterator<Peer> iterator() {
@@ -280,5 +308,22 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
         }
 
         return list.iterator();
+    }
+
+    public String toString() {
+        String buf = "";
+
+        for (int dim = 0; dim < CANOverlay.NB_DIMENSIONS; dim++) {
+            for (int direction = 0; direction < 2; direction++) {
+                buf += "[";
+
+                for (Peer peer : this.neighbors[dim][direction]) {
+                    buf += ((CANOverlay) peer.getStructuredOverlay()).getArea() + ",";
+                }
+                buf += "] " + dim + " ";
+            }
+            buf += "\n";
+        }
+        return buf;
     }
 }

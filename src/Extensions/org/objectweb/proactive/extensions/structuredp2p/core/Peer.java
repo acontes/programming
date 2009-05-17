@@ -8,6 +8,7 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAEventProgramming;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredOverlay;
@@ -88,12 +89,20 @@ public class Peer implements InitActive, RunActive, Serializable {
      */
     public LookupResponseMessage sendMessage(LookupMessage msg) {
         LookupResponseMessage response = this.structuredOverlay.sendMessage(msg);
-        // PAEventProgramming.addActionOnFuture(response, "setResponseMessageDeliveryTime");
+        response.setDeliveryTime();
         return response;
     }
 
-    public ResponseMessage sendMessageToWithoutCallback(Peer remotePeer, Message msg) {
-        return remotePeer.receiveMessage(msg);
+    /**
+     * Sends a {@link LookupMessage} on the network from the current peer without callback. Whitout
+     * callback, the latency will not be initialized.
+     * 
+     * @param msg
+     *            the message to send
+     * @return the response in agreement with the type of message sent.
+     */
+    public LookupResponseMessage sendMessageWithoutCallback(LookupMessage msg) {
+        return this.structuredOverlay.sendMessage(msg);
     }
 
     /**
@@ -110,7 +119,7 @@ public class Peer implements InitActive, RunActive, Serializable {
         ResponseMessage future = remotePeer.receiveMessage(msg);
 
         // Callback on ResponseMessage
-        // PAEventProgramming.addActionOnFuture(future, "setResponseMessageDeliveryTime");
+        PAEventProgramming.addActionOnFuture(future, "setResponseMessageDeliveryTime");
 
         return future;
     }

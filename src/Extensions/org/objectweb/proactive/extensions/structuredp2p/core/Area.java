@@ -97,28 +97,28 @@ public class Area implements Serializable {
     }
 
     /**
-     * Returns the minimum coordinates at a specified dimension that indicates the area which is
+     * Returns the minimum coordinate at a specified dimension that indicates the area which is
      * managed by a peer.
      * 
      * @param dimension
      *            the dimension on which we recover the coordinates.
-     * @return the minimum coordinates at the specified dimension that indicates the area which is
+     * @return the minimum coordinate at the specified dimension that indicates the area which is
      *         managed by a peer.
      */
-    public Coordinate getCoordinatesMin(int dimension) {
+    public Coordinate getCoordinateMin(int dimension) {
         return this.coordinatesMin[dimension];
     }
 
     /**
-     * Returns the maximum coordinates at a specified dimension that indicates the area which is
+     * Returns the maximum coordinate at a specified dimension that indicates the area which is
      * managed by a peer.
      * 
      * @param dimension
      *            the dimension on which we recover the coordinates.
-     * @return the maximum coordinates at a specified dimension that indicates the area which is
+     * @return the maximum coordinate at a specified dimension that indicates the area which is
      *         managed by a peer.
      */
-    public Coordinate getCoordinatesMax(int dimension) {
+    public Coordinate getCoordinateMax(int dimension) {
         return this.coordinatesMax[dimension];
     }
 
@@ -136,16 +136,16 @@ public class Area implements Serializable {
         boolean res = false;
         for (int i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
             if (i == dimension) {
-                dimRes = (this.getCoordinatesMin(dimension).equals(area.getCoordinatesMax(dimension)) || this
-                        .getCoordinatesMax(dimension).equals(area.getCoordinatesMin(dimension)));
+                dimRes = (this.getCoordinateMin(dimension).equals(area.getCoordinateMax(dimension)) || this
+                        .getCoordinateMax(dimension).equals(area.getCoordinateMin(dimension)));
             } else {
-                res |= (this.getCoordinatesMin(dimension).isBetween(area.getCoordinatesMin(dimension),
-                        area.getCoordinatesMax(dimension)) || this.getCoordinatesMax(dimension).isBetween(
-                        area.getCoordinatesMin(dimension), area.getCoordinatesMax(dimension))) ||
-                    area.getCoordinatesMin(dimension).isBetween(this.getCoordinatesMin(dimension),
-                            this.getCoordinatesMax(dimension)) ||
-                    area.getCoordinatesMax(dimension).isBetween(this.getCoordinatesMin(dimension),
-                            this.getCoordinatesMax(dimension));
+                res |= (this.getCoordinateMin(dimension).isBetween(area.getCoordinateMin(dimension),
+                        area.getCoordinateMax(dimension)) || this.getCoordinateMax(dimension).isBetween(
+                        area.getCoordinateMin(dimension), area.getCoordinateMax(dimension))) ||
+                    area.getCoordinateMin(dimension).isBetween(this.getCoordinateMin(dimension),
+                            this.getCoordinateMax(dimension)) ||
+                    area.getCoordinateMax(dimension).isBetween(this.getCoordinateMin(dimension),
+                            this.getCoordinateMax(dimension));
             }
         }
 
@@ -180,8 +180,8 @@ public class Area implements Serializable {
      * @return the two split areas.
      */
     public Area[] split(int dimension) {
-        return this.split(dimension, Coordinate.getMiddle(this.getCoordinatesMin(dimension), this
-                .getCoordinatesMax(dimension)));
+        return this.split(dimension, Coordinate.getMiddle(this.getCoordinateMin(dimension), this
+                .getCoordinateMax(dimension)));
     }
 
     /**
@@ -224,8 +224,8 @@ public class Area implements Serializable {
             Coordinate[] minCoord = this.coordinatesMin.clone();
             Coordinate[] maxCoord = this.coordinatesMax.clone();
 
-            minCoord[border] = Coordinate.min(this.getCoordinatesMin(border), area.getCoordinatesMin(border));
-            maxCoord[border] = Coordinate.max(this.getCoordinatesMax(border), area.getCoordinatesMax(border));
+            minCoord[border] = Coordinate.min(this.getCoordinateMin(border), area.getCoordinateMin(border));
+            maxCoord[border] = Coordinate.max(this.getCoordinateMax(border), area.getCoordinateMax(border));
 
             return new Area(minCoord, maxCoord);
         }
@@ -259,8 +259,8 @@ public class Area implements Serializable {
      *         coordinate of the area and .
      */
     public int contains(int dimension, Coordinate coordinate) {
-        boolean isGreaterThanMin = this.getCoordinatesMin(dimension).compareTo(coordinate) <= 0;
-        boolean isLessThanMax = this.getCoordinatesMax(dimension).compareTo(coordinate) > 0;
+        boolean isGreaterThanMin = this.getCoordinateMin(dimension).compareTo(coordinate) <= 0;
+        boolean isLessThanMax = this.getCoordinateMax(dimension).compareTo(coordinate) > 0;
 
         if (!isLessThanMax) {
             return 1;
@@ -306,8 +306,8 @@ public class Area implements Serializable {
         int nbDim = this.coordinatesMax.length;
 
         for (i = 0; i < nbDim; i++) {
-            if (!this.getCoordinatesMax(i).equals(area.getCoordinatesMax(i)) ||
-                !this.getCoordinatesMin(i).equals(area.getCoordinatesMin(i))) {
+            if (!this.getCoordinateMax(i).equals(area.getCoordinateMax(i)) ||
+                !this.getCoordinateMin(i).equals(area.getCoordinateMin(i))) {
                 return false;
             }
         }

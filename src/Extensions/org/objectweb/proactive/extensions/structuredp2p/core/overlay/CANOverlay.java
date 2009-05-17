@@ -320,65 +320,44 @@ public class CANOverlay extends StructuredOverlay {
      * {@inheritDoc}
      */
     public LookupResponseMessage sendMessage(LookupMessage msg) {
+        System.out.println("CANOverlay.sendMessage() --> " + this.area);
+
         CANLookupMessage lookupMessage = (CANLookupMessage) msg;
 
         if (this.contains(lookupMessage.getCoordinates())) {
+            System.out.println("contains");
             return lookupMessage.handle(this);
         } else {
             int pos;
-            int neighborIndex;
 
-            for (Peer neighbor : this.neighbors) {
-                for (int i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
-                    pos = this.contains(i, lookupMessage.getCoordinates()[i]);
+            for (int dim = 0; dim < CANOverlay.NB_DIMENSIONS; dim++) {
+                int direction = NeighborsDataStructure.SUPERIOR_DIRECTION;
+                pos = this.contains(dim, lookupMessage.getCoordinates()[dim]);
 
-                    if (pos == -1) {
+                if (pos == -1) {
+                    direction = NeighborsDataStructure.INFERIOR_DIRECTION;
+                }
 
-                        // this.sendMessageTo(((Peer)
-                        // neighborsGroup[0].getGroupByType()),
-                        // new LoadBalancingMessage());
-                        // neighborIndex =
-                        // neighborsGroup[0].waitOneAndGetIndex();
-                        // System.out.println("index = " + neighborIndex);
-                        /*
-                         * ResponseMessage response = ((Peer) neighborsGroup[0].getGroupByType())
-                         * .receiveMessage(new LoadBalancingMessage());
-                         */
-                        // neighborIndex =
-                        // neighborsGroup[0].waitOneAndGetIndex();
-                        return null;
+                if (pos != 0) {
+                    List<Peer> neighbors = this.neighbors.getNeighbors(dim, direction);
 
-                        /*
-                         * neighborIndex = PAGroup.waitOneAndGetIndex(response);
-                         * System.out.println("index = " + neighborIndex); return
-                         * neighborsGroup[0].get(neighborIndex).sendMessage (msg);
-                         */
-                    } else if (pos == 1) {
-                        List<Peer> nearestNeighbors = this.neighbors.getNeighbors(i,
-                                NeighborsDataStructure.SUPERIOR_DIRECTION);
-                        if (nearestNeighbors.size() > 1) {
+                    if (neighbors.size() > 1 && dim < CANOverlay.NB_DIMENSIONS - 1) {
 
-                        } else {
-
-                        }
-
-                        // this.sendMessageTo(((Peer)
-                        // neighborsGroup[1].getGroupByType()),
-                        // new LoadBalancingMessage());
-                        /*
-                         * ResponseMessage response = ((Peer) neighborsGroup[1].getGroupByType())
-                         * .receiveMessage(new LoadBalancingMessage()); neighborIndex =
-                         * neighborsGroup[1].waitOneAndGetIndex(); System.out.println("index = " +
-                         * neighborIndex); return neighborsGroup[1].get(neighborIndex).sendMessage
-                         * (msg);
-                         */
-                        return null;
+                        Peer nearest = this.neighbors.getNearestNeighborFrom(
+                                lookupMessage.getCoordinates()[dim + 1], dim, direction);
+                        System.out.println("nearest == " +
+                            ((CANOverlay) nearest.getStructuredOverlay()).getArea());
+                        return nearest.sendMessageWithoutCallback(msg);
+                    } else {
+                        return neighbors.get(0).sendMessageWithoutCallback(msg);
                     }
+                } else {
+                    System.out.println("dim contains the searched coordinate");
                 }
             }
         }
 
-        throw new IllegalArgumentException("The searched position doesn't exist.");
+        throw new IllegalStateException("The searched position doesn't exist.");
     }
 
     /**
@@ -532,7 +511,7 @@ public class CANOverlay extends StructuredOverlay {
      * {@inheritDoc}
      */
     public CANLookupResponseMessage handleLookupMessage(LookupMessage msg) {
-        return new CANLookupResponseMessage(msg.getCreationTimestamp(), this.getLocalPeer(),
+        return new CANLookupResponseMessage(msg.getCreationTimestamp(), this.getRemotePeer(),
             ((CANLookupMessage) msg).getCoordinates());
     }
 
