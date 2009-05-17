@@ -1,4 +1,4 @@
-package org.objectweb.proactive.extensions.structuredp2p.examples.canoverlay;
+package org.objectweb.proactive.extensions.structuredp2p.examples.can;
 
 import java.io.IOException;
 import java.util.List;

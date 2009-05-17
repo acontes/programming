@@ -1,4 +1,4 @@
-package org.objectweb.proactive.extensions.structuredp2p.algorithm.merge;
+package org.objectweb.proactive.extensions.structuredp2p.examples.algorithms;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

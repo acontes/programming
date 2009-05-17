@@ -4,7 +4,6 @@
 package org.objectweb.proactive.extensions.structuredp2p.core.overlay;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
-import org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.messages.AddNeighborMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.LeaveMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.LookupMessage;

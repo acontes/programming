@@ -1,4 +1,4 @@
-package org.objectweb.proactive.extensions.structuredp2p.examples.canoverlay;
+package org.objectweb.proactive.extensions.structuredp2p.examples.can;
 
 public class Launcher {
     public static void main(String[] args) {
