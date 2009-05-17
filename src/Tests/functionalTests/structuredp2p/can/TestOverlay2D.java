@@ -22,6 +22,8 @@ import org.objectweb.proactive.extensions.structuredp2p.responses.can.CANLookupR
 /**
  * Test the {@link CANOverlay} in a 2D-CAN.
  * 
+ * Warning : the constant {@link CANOverlay#NB_DIMENSIONS} must be set to 2.
+ * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent
  * @author Trovato Alexandre
@@ -44,19 +46,10 @@ public class TestOverlay2D {
         Coordinate[] coordinateMax;
         Area area;
 
+        /* First peer */
+
         this.firstPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
                 new Object[] { OverlayType.CAN });
-
-        this.secondPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
-                new Object[] { OverlayType.CAN });
-
-        this.thirdPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
-                new Object[] { OverlayType.CAN });
-
-        this.fourthPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
-                new Object[] { OverlayType.CAN });
-
-        /* First peer */
 
         coordinateMin = new Coordinate[2];
         coordinateMax = new Coordinate[2];
@@ -69,11 +62,12 @@ public class TestOverlay2D {
         area = new Area(coordinateMin, coordinateMax);
         overlay = (CANOverlay) this.firstPeer.getStructuredOverlay();
         overlay.setArea(area);
-        overlay.addNeighbor(this.secondPeer, 0, 1);
-        overlay.addNeighbor(this.thirdPeer, 0, 1);
         this.firstPeer.setStructuredOverlay(overlay);
 
         /* Second peer */
+
+        this.secondPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
+                new Object[] { OverlayType.CAN });
 
         coordinateMin = new Coordinate[2];
         coordinateMax = new Coordinate[2];
@@ -86,11 +80,12 @@ public class TestOverlay2D {
         area = new Area(coordinateMin, coordinateMax);
         overlay = (CANOverlay) this.secondPeer.getStructuredOverlay();
         overlay.setArea(area);
-        overlay.addNeighbor(this.thirdPeer, 1, 1);
-        overlay.addNeighbor(this.fourthPeer, 1, 1);
         this.secondPeer.setStructuredOverlay(overlay);
 
         /* Third peer */
+
+        this.thirdPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
+                new Object[] { OverlayType.CAN });
 
         coordinateMin = new Coordinate[2];
         coordinateMax = new Coordinate[2];
@@ -102,12 +97,12 @@ public class TestOverlay2D {
 
         area = new Area(coordinateMin, coordinateMax);
         overlay = (CANOverlay) this.thirdPeer.getStructuredOverlay();
-        overlay.setArea(area);
-        overlay.addNeighbor(this.secondPeer, 0, 0);
-        overlay.addNeighbor(this.fourthPeer, 0, 1);
         this.thirdPeer.setStructuredOverlay(overlay);
 
         /* Fourth peer */
+
+        this.fourthPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
+                new Object[] { OverlayType.CAN });
 
         coordinateMin = new Coordinate[2];
         coordinateMax = new Coordinate[2];
@@ -120,6 +115,28 @@ public class TestOverlay2D {
         area = new Area(coordinateMin, coordinateMax);
         overlay = (CANOverlay) this.fourthPeer.getStructuredOverlay();
         overlay.setArea(area);
+        this.fourthPeer.setStructuredOverlay(overlay);
+
+        /* Add neighbors to peers */
+
+        overlay = (CANOverlay) this.firstPeer.getStructuredOverlay();
+        overlay.addNeighbor(this.secondPeer, 0, 1);
+        overlay.addNeighbor(this.thirdPeer, 0, 1);
+        this.firstPeer.setStructuredOverlay(overlay);
+
+        overlay = (CANOverlay) this.secondPeer.getStructuredOverlay();
+        overlay.addNeighbor(this.firstPeer, 0, 0);
+        overlay.addNeighbor(this.thirdPeer, 1, 1);
+        overlay.addNeighbor(this.fourthPeer, 1, 1);
+        this.secondPeer.setStructuredOverlay(overlay);
+
+        overlay = (CANOverlay) this.thirdPeer.getStructuredOverlay();
+        overlay.addNeighbor(this.firstPeer, 0, 0);
+        overlay.addNeighbor(this.secondPeer, 1, 0);
+        overlay.addNeighbor(this.fourthPeer, 0, 1);
+        this.thirdPeer.setStructuredOverlay(overlay);
+
+        overlay = (CANOverlay) this.fourthPeer.getStructuredOverlay();
         overlay.addNeighbor(this.thirdPeer, 0, 0);
         overlay.addNeighbor(this.secondPeer, 1, 0);
         this.fourthPeer.setStructuredOverlay(overlay);

@@ -16,6 +16,8 @@ import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType
 
 
 /**
+ * Test basic operations in a CAN network like {@link CANOverlay#join(Peer)},
+ * {@link CANOverlay#leave()}.
  * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent
@@ -23,16 +25,16 @@ import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType
  * 
  * @version 0.1
  */
-public class TestNeighbors {
+public class TestBasicOperations {
     private static Peer entryPoint;
     private static Peer neighbor;
 
     @BeforeClass
     public static void initTest() {
         try {
-            TestNeighbors.entryPoint = (Peer) PAActiveObject.newActive(Peer.class.getName(),
+            TestBasicOperations.entryPoint = (Peer) PAActiveObject.newActive(Peer.class.getName(),
                     new Object[] { OverlayType.CAN });
-            TestNeighbors.neighbor = (Peer) PAActiveObject.newActive(Peer.class.getName(),
+            TestBasicOperations.neighbor = (Peer) PAActiveObject.newActive(Peer.class.getName(),
                     new Object[] { OverlayType.CAN });
         } catch (ActiveObjectCreationException e) {
             // TODO Auto-generated catch block
@@ -45,10 +47,10 @@ public class TestNeighbors {
 
     @Test
     public void testJoin() {
-        Assert.assertNotNull(TestNeighbors.entryPoint);
-        Assert.assertNotNull(TestNeighbors.neighbor);
+        Assert.assertNotNull(TestBasicOperations.entryPoint);
+        Assert.assertNotNull(TestBasicOperations.neighbor);
 
-        TestNeighbors.neighbor.join(TestNeighbors.entryPoint);
+        TestBasicOperations.neighbor.join(TestBasicOperations.entryPoint);
 
         // Test if the new added peer is in the neighbor list
         try {
@@ -57,11 +59,11 @@ public class TestNeighbors {
             e.printStackTrace();
         }
 
-        CANOverlay entryPointOverlay = (CANOverlay) TestNeighbors.entryPoint.getStructuredOverlay();
-        CANOverlay neighborOverlay = (CANOverlay) TestNeighbors.neighbor.getStructuredOverlay();
+        CANOverlay entryPointOverlay = (CANOverlay) TestBasicOperations.entryPoint.getStructuredOverlay();
+        CANOverlay neighborOverlay = (CANOverlay) TestBasicOperations.neighbor.getStructuredOverlay();
 
-        Assert.assertTrue(entryPointOverlay.getNeighbors().hasNeighbor(TestNeighbors.neighbor));
-        Assert.assertTrue(neighborOverlay.getNeighbors().hasNeighbor(TestNeighbors.entryPoint));
+        Assert.assertTrue(entryPointOverlay.getNeighbors().hasNeighbor(TestBasicOperations.neighbor));
+        Assert.assertTrue(neighborOverlay.getNeighbors().hasNeighbor(TestBasicOperations.entryPoint));
 
         // tests with split areas !
         try {
@@ -75,14 +77,14 @@ public class TestNeighbors {
 
     @Test
     public void testLeave() {
-        Assert.assertNotNull(TestNeighbors.entryPoint);
-        Assert.assertNotNull(TestNeighbors.neighbor);
+        Assert.assertNotNull(TestBasicOperations.entryPoint);
+        Assert.assertNotNull(TestBasicOperations.neighbor);
 
-        CANOverlay entryPointOverlay = (CANOverlay) TestNeighbors.entryPoint.getStructuredOverlay();
+        CANOverlay entryPointOverlay = (CANOverlay) TestBasicOperations.entryPoint.getStructuredOverlay();
 
         int nbNeighbors = entryPointOverlay.getNeighbors().size();
 
-        TestNeighbors.neighbor.leave();
+        TestBasicOperations.neighbor.leave();
 
         Assert.assertEquals(nbNeighbors - 1, entryPointOverlay.getNeighbors().size());
 
@@ -96,7 +98,7 @@ public class TestNeighbors {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        TestNeighbors.entryPoint.leave();
+        TestBasicOperations.entryPoint.leave();
     }
 
 }

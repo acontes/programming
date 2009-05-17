@@ -4,8 +4,8 @@ import java.io.Serializable;
 
 
 /**
- * A response message is an abstract representation of a response. It contains the round-trip time
- * for the sent of the message for which we answer. All responses must extend this class.
+ * A response message is a representation of an empty response. It contains the round-trip time for
+ * the sent of the message for which we answer. All responses must extend this class.
  * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent
@@ -59,7 +59,7 @@ public class ResponseMessage implements Serializable {
      */
     public int getLatency() {
         if (this.latency == 0) {
-            throw new IllegalStateException("The response message must be initialize by the sent function !");
+            throw new IllegalStateException("The response message has not been initialized by callback.");
         }
         return this.latency;
     }

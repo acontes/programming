@@ -286,9 +286,12 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
         for (Area area : this.associatedAreas[dim][direction]) {
             if ((distance = Integer.parseInt(coordinate.getValue()) -
                 Integer.parseInt(area.getCoordinateMax(dim + 1).getValue())) < minDistance) {
-                minDistance = distance;
+                if (distance < minDistance) {
+                    minDistance = distance;
+                }
                 nearest = area;
-                System.out.println("area = " + area);
+                System.out.println("mindistance = " + minDistance + ", distance = " + distance + " area = " +
+                    area);
             }
         }
 
@@ -310,6 +313,9 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
         return list.iterator();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String toString() {
         String buf = "";
 
