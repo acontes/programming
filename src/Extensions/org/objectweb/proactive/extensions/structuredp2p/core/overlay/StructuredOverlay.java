@@ -5,14 +5,12 @@ import java.io.Serializable;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.messages.AddNeighborMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.LeaveMessage;
-import org.objectweb.proactive.extensions.structuredp2p.messages.LoadBalancingMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.LookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.Message;
 import org.objectweb.proactive.extensions.structuredp2p.messages.PingMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.RemoveNeighborMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANRemoveNeighborMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.ActionResponseMessage;
-import org.objectweb.proactive.extensions.structuredp2p.responses.LoadBalancingResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.LookupResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.ResponseMessage;
 
@@ -89,38 +87,16 @@ public abstract class StructuredOverlay implements Serializable {
     public abstract ResponseMessage sendMessageTo(Peer peer, Message msg);
 
     /**
-     * Handles a {@link PingMessage}.
+     * Handles a {@link AddNeighborMessage}.
      * 
      * @param msg
      *            the message that is handled.
-     * @return the {@link PingResponseMessage} response.
+     * @return the {@link EmptyResponseMessage} response.
      */
-    public ResponseMessage handleMessage(PingMessage msg) {
-        return new ResponseMessage(msg.getCreationTimestamp());
-    }
+    public abstract ActionResponseMessage handleAddNeighborMessage(AddNeighborMessage msg);
 
     /**
-     * Handles a {@link LoadBalancingMessage}.
-     * 
-     * @param msg
-     *            the message that is handled.
-     * @return the {@link LoadBalancingResponseMessage} response.
-     */
-    public LoadBalancingResponseMessage handleLoadBalancingMessage(LoadBalancingMessage msg) {
-        return new LoadBalancingResponseMessage(msg.getCreationTimestamp());
-    }
-
-    /**
-     * Handles a {@link LookupMessage}.
-     * 
-     * @param msg
-     *            the lookup message that is handled.
-     * @return the {@link LookupResponseMessage} response.
-     */
-    public abstract LookupResponseMessage handleLookupMessage(LookupMessage msg);
-
-    /**
-     * Handles a {@link JoinResponseMessage}.
+     * Handles a {@code JoinMessage}.
      * 
      * @param msg
      *            the message that is handled.
@@ -138,13 +114,24 @@ public abstract class StructuredOverlay implements Serializable {
     public abstract ActionResponseMessage handleLeaveMessage(LeaveMessage leaveMessage);
 
     /**
-     * Handles a {@link AddNeighborMessage}.
+     * Handles a {@link LookupMessage}.
+     * 
+     * @param msg
+     *            the lookup message that is handled.
+     * @return the {@link LookupResponseMessage} response.
+     */
+    public abstract LookupResponseMessage handleLookupMessage(LookupMessage msg);
+
+    /**
+     * Handles a {@link PingMessage}.
      * 
      * @param msg
      *            the message that is handled.
-     * @return the {@link EmptyResponseMessage} response.
+     * @return the {@link PingResponseMessage} response.
      */
-    public abstract ActionResponseMessage handleAddNeighborMessage(AddNeighborMessage msg);
+    public ResponseMessage handleMessage(PingMessage msg) {
+        return new ResponseMessage(msg.getCreationTimestamp());
+    }
 
     /**
      * Handles a {@link CANRemoveNeighborMessage}.

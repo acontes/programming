@@ -29,7 +29,6 @@ import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANJoinMess
 import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANLookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANMergeMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANRemoveNeighborMessage;
-import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANSwitchMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.ActionResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.LookupResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.ResponseMessage;
@@ -468,12 +467,7 @@ public class CANOverlay extends StructuredOverlay {
     }
 
     /**
-     * Handles a {@link CANCheckMergeMessage}.
-     * 
-     * @param msg
-     *            the message.
-     * 
-     * @return the response.
+     * {@inheritDoc}
      */
     public CANCheckMergeResponseMessage handleCheckMergeMessage(Message msg) {
         CANCheckMergeMessage message = (CANCheckMergeMessage) msg;
@@ -516,12 +510,7 @@ public class CANOverlay extends StructuredOverlay {
     }
 
     /**
-     * Handles a {@link CANMergeMessage}.
-     * 
-     * @param msg
-     *            the message.
-     * 
-     * @return the response.
+     * {@inheritDoc}
      */
     public ResponseMessage handleMergeMessage(Message msg) {
         this.merge(((CANMergeMessage) msg).getPeer());
@@ -529,24 +518,17 @@ public class CANOverlay extends StructuredOverlay {
     }
 
     /**
-     * @param removeNeighborMessage
-     * 
-     * @return
+     * {@inheritDoc}
      */
-    public ActionResponseMessage handleRemoveNeighborMessage(RemoveNeighborMessage removeNeighborMessage) {
+    public ActionResponseMessage handleRemoveNeighborMessage(RemoveNeighborMessage msg) {
         // TODO Auto-generated method stub
         return null;
     }
 
     /**
-     * Handles a {@link CANSwitchMessage}.
-     * 
-     * @param msg
-     *            the message.
-     * 
-     * @return the response.
+     * {@inheritDoc}
      */
-    public CANSwitchResponseMessage handleSwitchMessage(CANSwitchMessage msg) {
+    public CANSwitchResponseMessage handleSwitchMessage(Message msg) {
         this.switchWith(msg.getPeer());
         return new CANSwitchResponseMessage(msg.getCreationTimestamp(), this.getRemotePeer());
     }
