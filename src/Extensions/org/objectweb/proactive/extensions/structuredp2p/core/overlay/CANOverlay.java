@@ -3,8 +3,8 @@ package org.objectweb.proactive.extensions.structuredp2p.core.overlay;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
 import java.util.Stack;
 
@@ -72,7 +72,7 @@ public class CANOverlay extends StructuredOverlay {
     private Area area;
 
     /**
-     * The history of area changes.
+     * The history of area splits.
      */
     private Stack<int[]> splitHistory;
 
@@ -229,7 +229,7 @@ public class CANOverlay extends StructuredOverlay {
         for (int i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
             if (i != dimension) {
                 for (int j = 0; j < 2; j++) {
-                    for (Peer neighbor : this.neighbors.getNeighbors()[i][j].keySet()) {
+                    for (Peer neighbor : this.neighbors.getNeighbors(i, j)) {
                         if (this.getArea().getBorderedDimension(this.neighbors.getArea(neighbor)) == -1) {
                             // FIXME
                             this.sendMessageTo(neighbor, new CANRemoveNeighborMessage(this.getRemotePeer(),
@@ -320,19 +320,20 @@ public class CANOverlay extends StructuredOverlay {
      * {@inheritDoc}
      */
     public LookupResponseMessage sendMessage(LookupMessage msg) {
-        CANLookupMessage msgCan = (CANLookupMessage) msg;
-        System.out.println("CANOverlay.sendMessage()");
-        if (this.contains(msgCan.getCoordinates())) {
-            return msgCan.handle(this);
+        CANLookupMessage lookupMessage = (CANLookupMessage) msg;
+
+        if (this.contains(lookupMessage.getCoordinates())) {
+            return lookupMessage.handle(this);
         } else {
             int pos;
             int neighborIndex;
 
-            for (HashMap<Peer, Area>[] remotePeers : this.neighbors.getNeighbors()) {
+            for (Peer neighbor : this.neighbors) {
                 for (int i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
-                    pos = this.contains(i, msgCan.getCoordinates()[i]);
-                    System.out.println("i" + i);
+                    pos = this.contains(i, lookupMessage.getCoordinates()[i]);
+
                     if (pos == -1) {
+
                         // this.sendMessageTo(((Peer)
                         // neighborsGroup[0].getGroupByType()),
                         // new LoadBalancingMessage());
@@ -353,6 +354,14 @@ public class CANOverlay extends StructuredOverlay {
                          * neighborsGroup[0].get(neighborIndex).sendMessage (msg);
                          */
                     } else if (pos == 1) {
+                        List<Peer> nearestNeighbors = this.neighbors.getNeighbors(i,
+                                NeighborsDataStructure.SUPERIOR_DIRECTION);
+                        if (nearestNeighbors.size() > 1) {
+
+                        } else {
+
+                        }
+
                         // this.sendMessageTo(((Peer)
                         // neighborsGroup[1].getGroupByType()),
                         // new LoadBalancingMessage());
@@ -470,7 +479,7 @@ public class CANOverlay extends StructuredOverlay {
         CANAddNeighborMessage message = (CANAddNeighborMessage) msg;
         boolean condition = false;
 
-        if (!this.neighbors.getNeighbors(message.getDimension(), message.getDirection()).containsKey(
+        if (!this.neighbors.getNeighbors(message.getDimension(), message.getDirection()).contains(
                 message.getPeer())) {
             condition = this.neighbors.add(message.getPeer(), message.getArea(), message.getDimension(),
                     message.getDirection());

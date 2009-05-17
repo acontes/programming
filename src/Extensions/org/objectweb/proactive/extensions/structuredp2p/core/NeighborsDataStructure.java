@@ -4,8 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Set;
-import java.util.Map.Entry;
+import java.util.List;
+import java.util.Vector;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.CANOverlay;
 
@@ -38,15 +38,22 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
      * always equal to two. The first column corresponds to the neighbors having a coordinate lower
      * than the current pair on the given dimension. The second column is the reverse.
      */
-    private HashMap<Peer, Area>[][] neighbors = new HashMap[CANOverlay.NB_DIMENSIONS][2];
+    private Vector<Peer>[][] neighbors = new Vector[CANOverlay.NB_DIMENSIONS][2];
+
+    /**
+     * The areas associated to the neighbors
+     */
+    private Vector<Area>[][] associatedAreas = new Vector[CANOverlay.NB_DIMENSIONS][2];
 
     /**
      * Constructor
      */
     public NeighborsDataStructure() {
         for (int i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
-            this.neighbors[i][NeighborsDataStructure.INFERIOR_DIRECTION] = new HashMap<Peer, Area>();
-            this.neighbors[i][NeighborsDataStructure.SUPERIOR_DIRECTION] = new HashMap<Peer, Area>();
+            this.neighbors[i][NeighborsDataStructure.INFERIOR_DIRECTION] = new Vector<Peer>();
+            this.neighbors[i][NeighborsDataStructure.SUPERIOR_DIRECTION] = new Vector<Peer>();
+            this.associatedAreas[i][NeighborsDataStructure.INFERIOR_DIRECTION] = new Vector<Area>();
+            this.associatedAreas[i][NeighborsDataStructure.SUPERIOR_DIRECTION] = new Vector<Area>();
         }
     }
 
@@ -56,7 +63,7 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
      * @param neighbors
      *            the neighbors to set.
      */
-    public NeighborsDataStructure(HashMap<Peer, Area>[][] neighbors) {
+    public NeighborsDataStructure(Vector[][] neighbors, Vector[][] associatedAreas) {
         this.neighbors = neighbors;
     }
 
@@ -67,19 +74,16 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
      * @param remotePeer
      *            the remote peer to add as neighbor.
      * @param dimension
-     *            the dimension index (must be in 0 and {@link #NB_DIMENSIONS - 1} include).
+     *            the dimension index (must be in <code>0</code> and {@link #NB_DIMENSIONS - 1}
+     *            include).
      * @param direction
      *            the direction ({@link #INFERIOR_DIRECTION} or {@link #SUPERIOR_DIRECTION}).
-     * @return true if the neighbor has been add, false if not or if the given peer is already
-     *         neighbor.
+     * @return <code>true</code> if the neighbor has been add, <code>false</code> otherwise.
      */
     public boolean add(Peer remotePeer, int dimension, int direction) {
-        if (this.neighbors[dimension][direction].put(remotePeer, ((CANOverlay) remotePeer
-                .getStructuredOverlay()).getArea()) == null) {
-            return true;
-        }
-
-        return false;
+        return this.neighbors[dimension][direction].add(remotePeer) &&
+            this.associatedAreas[dimension][direction].add(((CANOverlay) remotePeer.getStructuredOverlay())
+                    .getArea());
     }
 
     /**
@@ -89,33 +93,34 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
      * @param remotePeer
      *            the remote peer to add as neighbor.
      * @param area
-     *            the area associated to the peer.
+     *            the area associated to the peer specified.
      * @param dimension
-     *            the dimension index (must be in 0 and {@link #NB_DIMENSIONS - 1} include).
+     *            the dimension index (must be in <code>0</code> and {@link #NB_DIMENSIONS - 1}
+     *            include).
      * @param direction
      *            the direction ({@link #INFERIOR_DIRECTION} or {@link #SUPERIOR_DIRECTION}).
-     * @return true if the neighbor has been add, false if not or if the given peer is already
-     *         neighbor.
+     * @return <code>true</code> if the neighbor has been add, <code>false</code> otherwise.
      */
     public boolean add(Peer remotePeer, Area area, int dimension, int direction) {
-        if (this.neighbors[dimension][direction].put(remotePeer, area) == null) {
-            return true;
-        }
-
-        return false;
+        return this.neighbors[dimension][direction].add(remotePeer) &&
+            this.associatedAreas[dimension][direction].add(area);
     }
 
     /**
-     * Remove the given {@link Peer} on the chosen <code>dimension</code>, <code>direction</code>.
+     * Remove the specified {@link Peer} if it is contained by the data structure.
      * 
      * @param remotePeer
      *            the remote peer to remove.
-     * @return true if the neighbor has been removed, false otherwise.
+     * @return <code>true</code> if the neighbor has been removed, <code>false</code> otherwise.
      */
     public boolean remove(Peer remotePeer) {
-        for (HashMap<Peer, Area>[] neighborsArray : this.neighbors) {
-            for (HashMap<Peer, Area> neighbors : neighborsArray) {
-                if (neighbors.remove(remotePeer) != null) {
+        for (int dim = 0; dim < CANOverlay.NB_DIMENSIONS; dim++) {
+            for (int direction = 0; direction < 2; direction++) {
+                int index = -1;
+
+                if ((index = this.neighbors[dim][direction].indexOf(remotePeer)) != -1) {
+                    this.neighbors[dim][direction].remove(index);
+                    this.associatedAreas[dim][direction].remove(index);
                     return true;
                 }
             }
@@ -125,18 +130,24 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
     }
 
     /**
-     * Remove the given {@link Peer} on the chosen <code>dimension</code>, <code>direction</code>.
+     * Remove the given {@link Peer} on the specified <code>dimension</code>, <code>direction</code>
+     * .
      * 
      * @param remotePeer
-     *            the remote peer to remove.
+     *            the peer to remove.
      * @param dimension
-     *            the dimension index (must be in 0 and {@link #NB_DIMENSIONS - 1} include).
+     *            the dimension index (must be in <code>0</code> and {@link #NB_DIMENSIONS - 1}
+     *            include).
      * @param direction
      *            the direction ({@link #INFERIOR_DIRECTION} or {@link #SUPERIOR_DIRECTION}).
-     * @return true if the neighbor has been removed, false otherwise.
+     * @return <code>true</code> if the neighbor has been removed, <code>false</code> otherwise.
      */
     public boolean remove(Peer remotePeer, int dimension, int direction) {
-        if (this.neighbors[dimension][direction].remove(remotePeer) != null) {
+        int index = -1;
+
+        if ((index = this.neighbors[dimension][direction].indexOf(remotePeer)) != -1) {
+            this.neighbors[dimension][direction].remove(index);
+            this.associatedAreas[dimension][direction].remove(index);
             return true;
         }
 
@@ -147,26 +158,28 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
      * Remove all neighbors for a given <code>dimension</code>, <code>direction</code>.
      * 
      * @param dimension
-     *            the dimension index (must be in 0 and {@link #NB_DIMENSIONS - 1} include).
+     *            the dimension index (must be in <code>0</code> and {@link #NB_DIMENSIONS - 1}
+     *            include).
      * @param direction
      *            the direction ({@link #INFERIOR_DIRECTION} or {@link #SUPERIOR_DIRECTION}).
      */
     public void removeAll(int dimension, int direction) {
         this.neighbors[dimension][direction].clear();
+        this.associatedAreas[dimension][direction].clear();
     }
 
     /**
-     * Indicates if the data structure contains a given {@link Peer} as neighbor.
+     * Indicates if the data structure contains the specified {@link Peer} as neighbor.
      * 
      * @param remotePeer
-     *            the neighbor to check
+     *            the neighbor to check.
      * @return <code>true</code> if the data structure contains the peer as neighbor,
      *         <code>false</code> otherwise.
      */
     public boolean hasNeighbor(Peer remotePeer) {
-        for (HashMap<Peer, Area>[] neighborsArray : this.neighbors) {
-            for (HashMap<Peer, Area> neighbors : neighborsArray) {
-                if (neighbors.get(remotePeer) != null) {
+        for (int dim = 0; dim < CANOverlay.NB_DIMENSIONS; dim++) {
+            for (int direction = 0; direction < 2; direction++) {
+                if (this.neighbors[dim][direction].contains(remotePeer)) {
                     return true;
                 }
             }
@@ -180,15 +193,15 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
      * 
      * @param remotePeer
      *            the criteria used in order to find the area
-     * @return the area found or null.
+     * @return the area found or <code>null</code>.
      */
     public Area getArea(Peer remotePeer) {
-        Area areaFound = null;
-        for (HashMap<Peer, Area>[] neighborsArray : this.neighbors) {
-            for (HashMap<Peer, Area> neighbors : neighborsArray) {
-                areaFound = neighbors.get(remotePeer);
-                if (areaFound != null) {
-                    return areaFound;
+        for (int dim = 0; dim < CANOverlay.NB_DIMENSIONS; dim++) {
+            for (int direction = 0; direction < 2; direction++) {
+                int index = -1;
+
+                if ((index = this.neighbors[dim][direction].indexOf(remotePeer)) != -1) {
+                    return this.associatedAreas[dim][direction].get(index);
                 }
             }
         }
@@ -200,15 +213,31 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
      * Returns a {@link Peer} from its managed {@link Area} if it is in the neighbors collection.
      * 
      * @param dimension
-     *            the dimension index (must be in 0 and {@link #NB_DIMENSIONS - 1} include).
+     *            the dimension index (must be in <code>0</code> and {@link #NB_DIMENSIONS - 1}
+     *            include).
      * @param direction
      *            the direction ({@link #INFERIOR_DIRECTION} or {@link #SUPERIOR_DIRECTION}).
      * @param area
      *            the criteria used in order to find the peer.
-     * @return the peer found or null.
+     * @return the peer found or <code>null</code>.
      */
     public Peer getPeer(int dimension, int direction, Area area) {
-        return this.findAreaByPeer(this.neighbors[dimension][direction], area);
+        int index = -1;
+
+        if ((index = this.associatedAreas[dimension][direction].indexOf(area)) != -1) {
+            return this.neighbors[dimension][direction].get(index);
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns the neighbors data structure.
+     * 
+     * @return the neighbors data structure.
+     */
+    public List[][] getNeighbors() {
+        return this.neighbors;
     }
 
     /**
@@ -217,54 +246,25 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
      * @param dimension
      *            the dimension to use (dimension start to 0 and max is defined by
      *            {@link #NB_DIMENSIONS} - 1).
-     * @return the neighbors of the managed area for the given dimension.
+     * @return the neighbors of the managed area for the specified dimension.
      */
-    public HashMap<Peer, Area>[] getNeighbors(int dimension) {
+    public List[] getNeighbors(int dimension) {
         return this.neighbors[dimension];
     }
 
     /**
-     * Returns the neighbors of the managed area for the given dimension and order.
+     * Returns the neighbors of the managed area for the specified <code>dimension</code> and
+     * <code>direction</code>.
      * 
      * @param dimension
-     *            the dimension to use (dimension start to 0 and max is defined by
+     *            the dimension to use (dimension start to <code>0</code> and max is defined by
      *            {@link #NB_DIMENSIONS} - 1).
      * @param direction
      *            the direction ({@link #INFERIOR_DIRECTION} or {@link #SUPERIOR_DIRECTION}).
-     * @return the neighbors of the managed area for the given dimension.
+     * @return the neighbors of the managed area for the specified dimension.
      */
-    public Set<Peer> getNeighbors(int dimension, int direction) {
-        return this.neighbors[dimension][direction].keySet();
-    }
-
-    /**
-     * Returns the neighbors data structure.
-     * 
-     * @return the neighbors data structure.
-     */
-    public HashMap<Peer, Area>[][] getNeighbors() {
-        return this.neighbors;
-    }
-
-    /**
-     * Returns a {@link Peer} from its managed {@link Area} if it is in the neighbors collection.
-     * 
-     * @param map
-     *            the map to iterate.
-     * @param area
-     *            the criteria used in order to find the peer.
-     * @return the peer found or null.
-     */
-    public Peer findAreaByPeer(HashMap<Peer, Area> map, Area area) {
-        Iterator<Entry<Peer, Area>> it = map.entrySet().iterator();
-        Entry<Peer, Area> find;
-        while (it.hasNext()) {
-            find = it.next();
-            if (find.getValue() == area) {
-                return find.getKey();
-            }
-        }
-        return null;
+    public List<Peer> getNeighbors(int dimension, int direction) {
+        return this.neighbors[dimension][direction];
     }
 
     /**
@@ -273,11 +273,9 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
     public Iterator<Peer> iterator() {
         ArrayList<Peer> list = new ArrayList<Peer>();
 
-        for (HashMap<Peer, Area>[] neighborsArray : this.neighbors) {
-            for (HashMap<Peer, Area> neighbors : neighborsArray) {
-                for (Peer peer : neighbors.keySet()) {
-                    list.add(peer);
-                }
+        for (int dim = 0; dim < CANOverlay.NB_DIMENSIONS; dim++) {
+            for (int direction = 0; direction < 2; direction++) {
+                list.addAll(this.neighbors[dim][direction]);
             }
         }
 
