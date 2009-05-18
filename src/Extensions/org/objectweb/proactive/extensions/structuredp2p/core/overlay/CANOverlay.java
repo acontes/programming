@@ -111,8 +111,8 @@ public class CANOverlay extends StructuredOverlay {
             newNeighbors.add(this.getRemotePeer(), this.getArea(), dimension, directionInv);
 
             /* Actions on remote peer */
-            response = (ActionResponseMessage) this.sendMessageTo(remotePeerExisting, new CANJoinMessage(
-                newNeighbors, this.area, this.splitHistory));
+            response = (ActionResponseMessage) PAFuture.getFutureValue(this.sendMessageTo(remotePeerExisting,
+                    new CANJoinMessage(newNeighbors, newArea[directionInv], this.splitHistory)));
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
@@ -323,7 +323,7 @@ public class CANOverlay extends StructuredOverlay {
      * {@inheritDoc}
      */
     public ResponseMessage sendMessageTo(Peer remotePeer, Message msg) {
-        return this.sendMessageTo(remotePeer, msg);
+        return this.getLocalPeer().sendMessageTo(remotePeer, msg);
     }
 
     /**

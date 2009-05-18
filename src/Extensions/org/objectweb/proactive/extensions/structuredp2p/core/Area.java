@@ -134,6 +134,7 @@ public class Area implements Serializable {
     public Boolean isBordered(Area area, int dimension) {
         boolean dimRes = false;
         boolean res = false;
+
         for (int i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
             if (i == dimension) {
                 dimRes = (this.getCoordinateMin(dimension).equals(area.getCoordinateMax(dimension)) || this
