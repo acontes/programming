@@ -67,6 +67,7 @@ public class TestTracker {
 
     @AfterClass
     public static void tearDown() throws Exception {
+        PAActiveObject.terminateActiveObject(TestTracker.peer, false);
         PAActiveObject.terminateActiveObject(TestTracker.tracker, false);
     }
 }
