@@ -9,7 +9,6 @@ import java.util.Random;
 import java.util.Stack;
 
 import org.objectweb.proactive.api.PAFuture;
-import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.util.converter.MakeDeepCopy;
 import org.objectweb.proactive.extensions.structuredp2p.core.Area;
 import org.objectweb.proactive.extensions.structuredp2p.core.Coordinate;
@@ -57,11 +56,7 @@ public class CANOverlay extends StructuredOverlay {
     public static final int NB_DIMENSIONS = 2;
 
     /**
-     * Neighbors of the current area. The neighbors are an array of ProActive groups. It is a
-     * two-dimensional array of {@link Group}. Each line corresponds to a dimension. The number of
-     * columns is always equal to two. The first column corresponds to the neighbors having a
-     * coordinate lower than the current pair on a specified dimension. The second column is the
-     * reverse.
+     * Neighbors of the {@link Area} which is managed.
      */
     private NeighborsDataStructure neighbors;
 
@@ -90,9 +85,8 @@ public class CANOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
-    /* TODO /!\ Change this with remotePeer */
     @SuppressWarnings("unchecked")
-    public Boolean join(Peer remotePeer) {
+    public Boolean join(Peer remotePeerExisting) {
         int dimension = this.getRandomDimension();
         int direction = this.getRandomDirection();
         int directionInv = this.getOppositeDirection(direction);
@@ -105,7 +99,6 @@ public class CANOverlay extends StructuredOverlay {
 
         // Create split areas
         Area[] newArea = this.getArea().split(dimension);
-
         // Set neighbors for the new peer
         NeighborsDataStructure newNeighbors;
 
@@ -118,7 +111,7 @@ public class CANOverlay extends StructuredOverlay {
             newNeighbors.add(this.getRemotePeer(), this.getArea(), dimension, directionInv);
 
             /* Actions on remote peer */
-            response = (ActionResponseMessage) this.sendMessageTo(remotePeer, new CANJoinMessage(
+            response = (ActionResponseMessage) this.sendMessageTo(remotePeerExisting, new CANJoinMessage(
                 newNeighbors, this.area, this.splitHistory));
         } catch (IOException e) {
             e.printStackTrace();
@@ -126,10 +119,10 @@ public class CANOverlay extends StructuredOverlay {
             e.printStackTrace();
         }
 
-        if (PAFuture.getFutureValue(response) != null) {
+        if (response.hasSucceeded()) {
             /* Actions on local peer */
             this.neighbors.removeAll(dimension, direction);
-            this.neighbors.add(remotePeer, newArea[directionInv], dimension, direction);
+            this.neighbors.add(remotePeerExisting, newArea[directionInv], dimension, direction);
             this.setArea(newArea[direction]);
             this.updateNeighbors(dimension);
             this.saveSplit(dimension, direction);
@@ -173,35 +166,6 @@ public class CANOverlay extends StructuredOverlay {
     }
 
     /**
-     * Gets a random dimension number.
-     * 
-     * @return the random dimension number.
-     */
-    private int getRandomDimension() {
-        Random rand = new Random();
-        return rand.nextInt(CANOverlay.NB_DIMENSIONS);
-    }
-
-    /**
-     * Gets a random direction number.
-     * 
-     * @return the random direction number.
-     */
-    private int getRandomDirection() {
-        Random rand = new Random();
-        return rand.nextInt(2);
-    }
-
-    /**
-     * Gets the opposite direction number.
-     * 
-     * @return the opposite direction number.
-     */
-    private int getOppositeDirection(int direction) {
-        return (direction + 1) % 2;
-    }
-
-    /**
      * Add a new neighbor at the specified <code>dimension</code>, <code>direction</code>. Warning,
      * the {@link Area} contained by the peer which is specified in parameters must be initialized.
      * 
@@ -211,8 +175,8 @@ public class CANOverlay extends StructuredOverlay {
      *            the dimension index (must be in 0 and {@link #NB_DIMENSIONS - 1} include).
      * @param direction
      *            the direction ({@link #INFERIOR_DIRECTION} or {@link #SUPERIOR_DIRECTION}).
-     * @return true if the neighbor has been add, false if not or if the specified peer is already
-     *         neighbor.
+     * @return <code>true</code> if the neighbor has been add, <code>false</code> if not or if the
+     *         specified peer is already neighbor.
      */
     public boolean addNeighbor(Peer remotePeer, int dimension, int direction) {
         return this.neighbors.add(remotePeer, dimension, direction);
@@ -223,20 +187,25 @@ public class CANOverlay extends StructuredOverlay {
      * not, it is removed from its neighbors.
      * 
      * @param dimension
+     *            the dimension to not check.
      */
     private void updateNeighbors(int dimension) {
+        int direction;
+
         for (int i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
             if (i != dimension) {
                 for (int j = 0; j < 2; j++) {
                     for (Peer neighbor : this.neighbors.getNeighbors(i, j)) {
+                        direction = this.getOppositeDirection(j);
+
                         if (this.getArea().getBorderedDimension(this.neighbors.getArea(neighbor)) == -1) {
-                            // FIXME
-                            this.sendMessageTo(neighbor, new CANRemoveNeighborMessage(this.getRemotePeer(),
-                                i, this.getOppositeDirection(j)));
-                            this.neighbors.remove(neighbor, i, j);
-                        } else {
-                            this.sendMessageTo(neighbor, new CANRemoveNeighborMessage(this.getRemotePeer(),
-                                i, this.getOppositeDirection(j)));
+                            direction = j;
+                        }
+
+                        if (((ActionResponseMessage) this.sendMessageTo(neighbor,
+                                new CANRemoveNeighborMessage(this.getRemotePeer(), i, this
+                                        .getOppositeDirection(j)))).hasSucceeded()) {
+                            this.neighbors.remove(neighbor, i, direction);
                         }
                     }
                 }
@@ -513,8 +482,9 @@ public class CANOverlay extends StructuredOverlay {
      * {@inheritDoc}
      */
     public ActionResponseMessage handleRemoveNeighborMessage(RemoveNeighborMessage msg) {
-        // TODO Auto-generated method stub
-        return null;
+        CANRemoveNeighborMessage message = ((CANRemoveNeighborMessage) msg);
+        return new ActionResponseMessage(msg.getCreationTimestamp(), this.neighbors.remove(message
+                .getRemotePeer(), message.getDimension(), message.getDirection()));
     }
 
     /**
@@ -523,6 +493,35 @@ public class CANOverlay extends StructuredOverlay {
     public CANSwitchResponseMessage handleSwitchMessage(Message msg) {
         this.switchWith(msg.getPeer());
         return new CANSwitchResponseMessage(msg.getCreationTimestamp(), this.getRemotePeer());
+    }
+
+    /**
+     * Gets a random dimension number.
+     * 
+     * @return the random dimension number.
+     */
+    private int getRandomDimension() {
+        Random rand = new Random();
+        return rand.nextInt(CANOverlay.NB_DIMENSIONS);
+    }
+
+    /**
+     * Gets a random direction number.
+     * 
+     * @return the random direction number.
+     */
+    private int getRandomDirection() {
+        Random rand = new Random();
+        return rand.nextInt(2);
+    }
+
+    /**
+     * Gets the opposite direction number.
+     * 
+     * @return the opposite direction number.
+     */
+    private int getOppositeDirection(int direction) {
+        return (direction + 1) % 2;
     }
 
     /**

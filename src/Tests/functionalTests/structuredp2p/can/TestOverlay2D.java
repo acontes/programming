@@ -176,6 +176,7 @@ public class TestOverlay2D {
         // Lookup for peer which manages (11, 11)
         CANLookupResponseMessage response = (CANLookupResponseMessage) this.firstPeer.sendMessage(this.msg);
         Assert.assertEquals(this.fourthPeer, response.getPeer());
+        Assert.assertTrue(response.getLatency() > 0);
     }
 
     @After

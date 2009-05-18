@@ -2,7 +2,6 @@ package org.objectweb.proactive.extensions.structuredp2p.core;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -34,7 +33,7 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
 
     /**
      * Neighbors of a {@link Peer} for the managed {@link Area}. The neighbors are a two-dimensional
-     * array of {@link HashMap}. Each line corresponds to a dimension. The number of columns is
+     * array of {@link Vector}. Each line corresponds to a dimension. The number of columns is
      * always equal to two. The first column corresponds to the neighbors having a coordinate lower
      * than the current pair on the given dimension. The second column is the reverse.
      */
