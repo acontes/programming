@@ -75,7 +75,7 @@ public class Zone {
         }
 
         // History
-        this.splitHistory = (ArrayList<int[]>) makeDeepCopy(zone.splitHistory);
+        this.splitHistory = (ArrayList<int[]>) Zone.makeDeepCopy(zone.splitHistory);
         this.splitHistory.add(new int[] { dimension, directionInv });
         zone.splitHistory.add(new int[] { dimension, direction });
 
@@ -171,7 +171,7 @@ public class Zone {
                 zone.yMin = this.yMin;
                 zone.xMax = this.xMax;
                 zone.yMax = this.yMax;
-                zone.splitHistory = (ArrayList<int[]>) makeDeepCopy(this.splitHistory);
+                zone.splitHistory = (ArrayList<int[]>) Zone.makeDeepCopy(this.splitHistory);
 
                 // Neighbors remove
                 for (int i = 0; i < 2; i++) {

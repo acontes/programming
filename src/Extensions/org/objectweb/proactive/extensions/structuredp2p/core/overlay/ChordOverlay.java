@@ -1,7 +1,6 @@
-/**
- * 
- */
 package org.objectweb.proactive.extensions.structuredp2p.core.overlay;
+
+import java.util.HashMap;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.messages.AddNeighborMessage;
@@ -15,21 +14,56 @@ import org.objectweb.proactive.extensions.structuredp2p.responses.ResponseMessag
 
 
 /**
- * @author Alex
+ * Chord is a peer-to-peer lookup algorithm.
  * 
+ * It allows a distributed set of participants to agree on a single node as a rendezvous point for a
+ * given key, without any central coordination. In particular, it provides a distributed evaluation
+ * of the successor(ID) function: given the identifier of a key ID, the successor function returns
+ * the address of the node whose identifier most closely follows ID in a circular identifier space.
+ * The identifier space is typically a 160-bit number.
+ * 
+ * The Chord algorithm handles adjusting this mapping as the population of nodes changes over time.
+ * 
+ * @author Kilanga Fanny
+ * @author Pellegrino Laurent
+ * @author Trovato Alexandre
+ * 
+ * @version 0.1
  */
 @SuppressWarnings("serial")
 public class ChordOverlay extends StructuredOverlay {
+    private String identifier;
+    private HashMap<String, Peer> fingers;
 
+    /**
+     * Constructor.
+     * 
+     * @param peer
+     */
     public ChordOverlay(Peer peer) {
         super(peer);
-        // TODO Auto-generated constructor stub
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * Returns the identifier associated to this overlay.
      * 
-     * @see org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay#checkNeighbors()
+     * @return the identifier associated to this overlay.
+     */
+    public String getIdentifier() {
+        return this.identifier;
+    }
+
+    /**
+     * Returns the fingers associated to this overlay.
+     * 
+     * @return the fingers associated to this overlay.
+     */
+    public HashMap<String, Peer> getFingers() {
+        return this.fingers;
+    }
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     public void checkNeighbors() {
@@ -37,77 +71,8 @@ public class ChordOverlay extends StructuredOverlay {
 
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay#handleAddNeighborMessage
-     * (org.objectweb.proactive.extensions.structuredp2p.messages.AddNeighborMessage)
-     */
-    @Override
-    public ActionResponseMessage handleAddNeighborMessage(AddNeighborMessage msg) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay#handleJoinMessage
-     * (org.objectweb.proactive.extensions.structuredp2p.messages.Message)
-     */
-    @Override
-    public ActionResponseMessage handleJoinMessage(Message msg) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay#handleLeaveMessage
-     * (org.objectweb.proactive.extensions.structuredp2p.messages.LeaveMessage)
-     */
-    @Override
-    public ActionResponseMessage handleLeaveMessage(LeaveMessage leaveMessage) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay#handleLookupMessage
-     * (org.objectweb.proactive.extensions.structuredp2p.messages.LookupMessage)
-     */
-    @Override
-    public LookupResponseMessage handleLookupMessage(LookupMessage msg) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @seeorg.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay#
-     * handleRemoveNeighborMessage
-     * (org.objectweb.proactive.extensions.structuredp2p.messages.RemoveNeighborMessage)
-     */
-    @Override
-    public ActionResponseMessage handleRemoveNeighborMessage(RemoveNeighborMessage removeNeighborMessage) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay#join(org.objectweb
-     * .proactive.extensions.structuredp2p.core.Peer)
+    /**
+     * {@inheritDoc}
      */
     @Override
     public Boolean join(Peer remotePeer) {
@@ -115,10 +80,8 @@ public class ChordOverlay extends StructuredOverlay {
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay#leave()
+    /**
+     * {@inheritDoc}
      */
     @Override
     public Peer leave() {
@@ -126,12 +89,8 @@ public class ChordOverlay extends StructuredOverlay {
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay#sendMessage(org.objectweb
-     * .proactive.extensions.structuredp2p.message.LookupMessage)
+    /**
+     * {@inheritDoc}
      */
     @Override
     public LookupResponseMessage sendMessage(LookupMessage msg) {
@@ -139,27 +98,67 @@ public class ChordOverlay extends StructuredOverlay {
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay#sendMessageTo(org
-     * .objectweb.proactive.extensions.structuredp2p.core.Peer,
-     * org.objectweb.proactive.extensions.structuredp2p.messages.Message)
+    /**
+     * {@inheritDoc}
      */
+    @Override
     public ResponseMessage sendMessageTo(Peer peer, Message msg) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.objectweb.proactive.extensions.structuredp2p.core.StructuredOverlay#update()
+    /**
+     * {@inheritDoc}
      */
     @Override
     public void update() {
         // TODO Auto-generated method stub
 
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ActionResponseMessage handleAddNeighborMessage(AddNeighborMessage msg) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ActionResponseMessage handleJoinMessage(Message msg) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ActionResponseMessage handleLeaveMessage(LeaveMessage leaveMessage) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public LookupResponseMessage handleLookupMessage(LookupMessage msg) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ActionResponseMessage handleRemoveNeighborMessage(RemoveNeighborMessage removeNeighborMessage) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }
