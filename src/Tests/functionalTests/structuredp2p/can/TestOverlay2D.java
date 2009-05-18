@@ -4,7 +4,6 @@ import junit.framework.Assert;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -97,6 +96,7 @@ public class TestOverlay2D {
 
         area = new Area(coordinateMin, coordinateMax);
         overlay = (CANOverlay) this.thirdPeer.getStructuredOverlay();
+        overlay.setArea(area);
         this.thirdPeer.setStructuredOverlay(overlay);
 
         /* Fourth peer */
@@ -165,7 +165,7 @@ public class TestOverlay2D {
                 new Coordinate("11"), new Coordinate("11") }));
     }
 
-    @Ignore
+    @Test
     public void testGetNearestNeighborFrom() {
         Assert.assertTrue(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighbors()
                 .getNearestNeighborFrom(new Coordinate("11"), 0, 1).equals(this.thirdPeer));

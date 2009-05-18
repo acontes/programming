@@ -319,8 +319,6 @@ public class CANOverlay extends StructuredOverlay {
      * {@inheritDoc}
      */
     public LookupResponseMessage sendMessage(LookupMessage msg) {
-        System.out.println("CANOverlay.sendMessage() --> " + this.area);
-
         CANLookupMessage lookupMessage = (CANLookupMessage) msg;
 
         if (this.contains(lookupMessage.getCoordinates())) {
@@ -341,17 +339,11 @@ public class CANOverlay extends StructuredOverlay {
                     List<Peer> neighbors = this.neighbors.getNeighbors(dim, direction);
 
                     if (neighbors.size() > 1 && dim < CANOverlay.NB_DIMENSIONS - 1) {
-
-                        Peer nearest = this.neighbors.getNearestNeighborFrom(
-                                lookupMessage.getCoordinates()[dim + 1], dim, direction);
-                        System.out.println("nearest == " +
-                            ((CANOverlay) nearest.getStructuredOverlay()).getArea());
-                        return nearest.sendMessageWithoutCallback(msg);
+                        return this.neighbors.getNearestNeighborFrom(lookupMessage.getCoordinates()[dim + 1],
+                                dim, direction).sendMessageWithoutCallback(msg);
                     } else {
                         return neighbors.get(0).sendMessageWithoutCallback(msg);
                     }
-                } else {
-                    System.out.println("dim contains the searched coordinate");
                 }
             }
         }

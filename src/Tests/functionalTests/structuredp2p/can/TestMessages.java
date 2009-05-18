@@ -23,7 +23,7 @@ import org.objectweb.proactive.extensions.structuredp2p.responses.ResponseMessag
  * 
  * @version 0.1
  */
-public class TestMessagesCAN {
+public class TestMessages {
 
 	private Peer senderPeer;
 	private Peer receiverPeer;

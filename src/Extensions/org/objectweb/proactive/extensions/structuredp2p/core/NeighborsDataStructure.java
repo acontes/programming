@@ -290,8 +290,6 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
                     minDistance = distance;
                 }
                 nearest = area;
-                System.out.println("mindistance = " + minDistance + ", distance = " + distance + " area = " +
-                    area);
             }
         }
 
