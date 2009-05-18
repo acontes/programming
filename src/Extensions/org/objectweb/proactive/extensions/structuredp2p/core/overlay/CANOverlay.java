@@ -28,6 +28,7 @@ import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANJoinMess
 import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANLookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANMergeMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANRemoveNeighborMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANSwitchMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.ActionResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.LookupResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.ResponseMessage;
@@ -85,7 +86,6 @@ public class CANOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
-    @SuppressWarnings("unchecked")
     public Boolean join(Peer remotePeerExisting) {
         int dimension = this.getRandomDimension();
         int direction = this.getRandomDirection();
@@ -227,9 +227,9 @@ public class CANOverlay extends StructuredOverlay {
     }
 
     /**
-     * Merge two area when a peer leave the network cleanly. The split consists to give the data
-     * that are managed by the peer which left the network to his neighbors and after to merge this
-     * area with its closest neighbors.
+     * Merge two area when a peer leave the network cleanly. The split consists in giving the data
+     * that are managed by the peer which leaves the network to his neighbors and after that to
+     * merge this area with its closest neighbors.
      * 
      * @param peer
      *            the peer which left the network.
@@ -291,7 +291,6 @@ public class CANOverlay extends StructuredOverlay {
         CANLookupMessage lookupMessage = (CANLookupMessage) msg;
 
         if (this.contains(lookupMessage.getCoordinates())) {
-            System.out.println("contains");
             return lookupMessage.handle(this);
         } else {
             int pos;
@@ -474,7 +473,7 @@ public class CANOverlay extends StructuredOverlay {
      * {@inheritDoc}
      */
     public ResponseMessage handleMergeMessage(Message msg) {
-        this.merge(((CANMergeMessage) msg).getPeer());
+        this.merge(((CANMergeMessage) msg).getArea(), ((CANMergeMessage) msg).getResources());
         return new ResponseMessage(msg.getCreationTimestamp());
     }
 
@@ -491,7 +490,7 @@ public class CANOverlay extends StructuredOverlay {
      * {@inheritDoc}
      */
     public CANSwitchResponseMessage handleSwitchMessage(Message msg) {
-        this.switchWith(msg.getPeer());
+        this.switchWith(((CANSwitchMessage) msg).getPeer());
         return new CANSwitchResponseMessage(msg.getCreationTimestamp(), this.getRemotePeer());
     }
 

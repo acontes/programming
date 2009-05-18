@@ -342,4 +342,15 @@ public class Area implements Serializable {
 
         return buf.toString();
     }
+
+    /**
+     * TODO
+     * 
+     * @param area
+     * @return
+     */
+    public boolean isValidMergingArea(Area area) {
+        // TODO Auto-generated method stub
+        return false;
+    }
 }

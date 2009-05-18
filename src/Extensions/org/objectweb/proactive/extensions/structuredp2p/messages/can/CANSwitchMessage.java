@@ -29,6 +29,11 @@ public class CANSwitchMessage extends Message {
     private final NeighborsDataStructure neighbors;
 
     /**
+     * The peer to switch with.
+     */
+    private final Peer remotePeer;
+
+    /**
      * The area from the peer to switch with.
      */
     private final Area area;
@@ -55,10 +60,11 @@ public class CANSwitchMessage extends Message {
      * @param splitHistory
      *            split history from the peer to switch with.
      */
-    public CANSwitchMessage(NeighborsDataStructure neighbors, Area area, DataStorage resources,
+    public CANSwitchMessage(NeighborsDataStructure neighbors, Peer peer, Area area, DataStorage resources,
             ArrayList<int[]> splitHistory) {
         super();
         this.neighbors = neighbors;
+        this.remotePeer = peer;
         this.area = area;
         this.resources = resources;
         this.splitHistory = splitHistory;
@@ -72,7 +78,7 @@ public class CANSwitchMessage extends Message {
     }
 
     /**
-     * The neighbors from the peer to switch with.
+     * Returns the neighbors from the peer to switch with.
      * 
      * @return the neighbors from the peer to switch with.
      */
@@ -81,27 +87,36 @@ public class CANSwitchMessage extends Message {
     }
 
     /**
-     * The area from the peer to switch with.
+     * Returns the peer to switch with.
      * 
-     * @return the area.
+     * @return the peer to switch with.
+     */
+    public Peer getPeer() {
+        return this.remotePeer;
+    }
+
+    /**
+     * Returns the area from the peer to switch with.
+     * 
+     * @return the area from the peer to switch with.
      */
     public Area getArea() {
         return this.area;
     }
 
     /**
-     * The resources from the peer to switch with.
+     * Returns the resources from the peer to switch with.
      * 
-     * @return the resources.
+     * @return the resources from the peer to switch with.
      */
     public DataStorage getResources() {
         return this.resources;
     }
 
     /**
-     * The split history from the peer to switch with.
+     * Returns the split history from the peer to switch with.
      * 
-     * @return the splitHistory
+     * @return the split history from the peer to switch with.
      */
     public ArrayList<int[]> getSplitHistory() {
         return this.splitHistory;
