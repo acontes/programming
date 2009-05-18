@@ -296,6 +296,22 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
     }
 
     /**
+     * Returns the number of neighbors the data structure manages.
+     * 
+     * @return the number of neighbors the data structure manages.
+     */
+    public int size() {
+        int size = 0;
+
+        for (int dim = 0; dim < CANOverlay.NB_DIMENSIONS; dim++) {
+            for (int direction = 0; direction < 2; direction++) {
+                size += this.neighbors[dim][direction].size();
+            }
+        }
+        return size;
+    }
+
+    /**
      * {@inheritDoc}
      */
     public Iterator<Peer> iterator() {
