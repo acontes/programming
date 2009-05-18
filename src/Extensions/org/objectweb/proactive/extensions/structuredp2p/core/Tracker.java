@@ -53,7 +53,7 @@ public class Tracker implements Serializable {
      * @param remotePeer
      *            the peer to add on the network.
      */
-    public void addOnNetwork(Peer remotePeer) {
+    public void addOnNetwork(Peer remotePeer) throws IllegalArgumentException {
         if (remotePeer.getType() != this.type) {
             throw new IllegalArgumentException("Illegal Peer type. This tracker manages a " + this.type +
                 " network.");
@@ -83,7 +83,20 @@ public class Tracker implements Serializable {
      * @return a random peer from the local list.
      */
     public Peer getRandomPeer() {
+        if (this.remotePeers.size() == 0) {
+            return null;
+        }
+
         Random rand = new Random();
         return this.remotePeers.get(rand.nextInt(this.remotePeers.size()));
+    }
+
+    /**
+     * Returns the number of peers that the tracker manages.
+     * 
+     * @return the number of peers that the tracker manages.
+     */
+    public int getNumberOfManagedPeers() {
+        return this.remotePeers.size();
     }
 }
