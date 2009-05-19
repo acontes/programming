@@ -86,6 +86,25 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
     }
 
     /**
+     * Add all the neighbors of the given <code>NeighborsDataStructure</code>.
+     * 
+     * @param neighbors
+     *            the neighbors to add.
+     * @return <code>true</code> if the add has succeeded, <code>false</code> otherwise.
+     */
+    public boolean addAll(NeighborsDataStructure neighbors) {
+        boolean res = true;
+        for (int dim = 0; dim < CANOverlay.NB_DIMENSIONS; dim++) {
+            for (int direction = 0; direction < 2; direction++) {
+                for (Peer peer : neighbors.getNeighbors(dim, direction)) {
+                    res &= this.add(peer, dim, direction);
+                }
+            }
+        }
+        return res;
+    }
+
+    /**
      * Add a new neighbor at the specified <code>dimension</code>, <code>direction</code>. Warning,
      * the {@link Area} contained by the peer which is given in parameters must be initialized.
      * 
