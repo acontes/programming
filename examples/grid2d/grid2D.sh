@@ -22,7 +22,7 @@ then
 fi
 
 echo
-echo --- STRUCTURED P2P - Active Grid2D ---------------------
+echo ---------- Active Grid2D ----------
 
 args="$1 $2 $default_descriptor ${3-$default_hostname}"
 

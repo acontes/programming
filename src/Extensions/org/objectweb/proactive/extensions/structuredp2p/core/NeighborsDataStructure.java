@@ -35,7 +35,8 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
      * Neighbors of a {@link Peer} for the managed {@link Area}. The neighbors are a two-dimensional
      * array of {@link Vector}. Each line corresponds to a dimension. The number of columns is
      * always equal to two. The first column corresponds to the neighbors having a coordinate lower
-     * than the current pair on the given dimension. The second column is the reverse.
+     * than the current pair on the given dimension. The second column is the reverse. The neighbors
+     * are ordered coordinate on a given dimension.
      */
     private Vector<Peer>[][] neighbors = new Vector[CANOverlay.NB_DIMENSIONS][2];
 
@@ -80,9 +81,8 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
      * @return <code>true</code> if the neighbor has been add, <code>false</code> otherwise.
      */
     public boolean add(Peer remotePeer, int dimension, int direction) {
-        return this.neighbors[dimension][direction].add(remotePeer) &&
-            this.associatedAreas[dimension][direction].add(((CANOverlay) remotePeer.getStructuredOverlay())
-                    .getArea());
+        return this.add(remotePeer, ((CANOverlay) remotePeer.getStructuredOverlay()).getArea(), dimension,
+                direction);
     }
 
     /**
@@ -101,8 +101,19 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
      * @return <code>true</code> if the neighbor has been add, <code>false</code> otherwise.
      */
     public boolean add(Peer remotePeer, Area area, int dimension, int direction) {
-        return this.neighbors[dimension][direction].add(remotePeer) &&
-            this.associatedAreas[dimension][direction].add(area);
+        int index = 0;
+
+        for (Area selectedArea : this.associatedAreas[dimension][direction]) {
+            if (area.getCoordinateMin(dimension).compareTo(selectedArea.getCoordinateMin(dimension)) < 0) {
+                this.associatedAreas[dimension][direction].add(index, area);
+                this.neighbors[dimension][direction].add(index, remotePeer);
+                return true;
+            }
+            index++;
+        }
+
+        return this.associatedAreas[dimension][direction].add(area) &&
+            this.neighbors[dimension][direction].add(remotePeer);
     }
 
     /**

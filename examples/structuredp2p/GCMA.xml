@@ -28,8 +28,8 @@
 
 			</configuration>
 
-			<virtualNode id="Grid2D" capacity="3"/>
-			<virtualNode id="StructuredP2P" capacity="3"/>
+			<virtualNode id="Grid2D" capacity="3" />
+			<virtualNode id="StructuredP2P" capacity="3" />
 		</proactive>
 	</application>
 
