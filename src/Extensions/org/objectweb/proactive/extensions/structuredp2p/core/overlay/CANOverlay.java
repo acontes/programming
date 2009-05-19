@@ -147,6 +147,7 @@ public class CANOverlay extends StructuredOverlay {
             Collection<ActionResponseMessage> responses = new ArrayList<ActionResponseMessage>();
             for (Peer neighbor : this.neighbors.getNeighbors(dimension, direction)) {
                 Coordinate border = this.neighbors.getArea(neighbor).getCoordinateMax(dimension);
+                System.out.println(border);
                 Area[] newAreas = tmpArea.split(dimension, border);
 
                 CANMergeMessage message = new CANMergeMessage(this.getRemotePeer(), dimension, directionInv,

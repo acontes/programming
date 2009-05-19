@@ -1,0 +1,69 @@
+package functionalTests.structuredp2p;
+
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.objectweb.proactive.extensions.structuredp2p.core.Area;
+import org.objectweb.proactive.extensions.structuredp2p.core.Coordinate;
+import org.objectweb.proactive.extensions.structuredp2p.core.Tracker;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.CANOverlay;
+
+
+/**
+ * Test the class {@link Tracker}.
+ */
+public class TestArea {
+
+    private static Area area;
+
+    @BeforeClass
+    public static void setUp() throws Exception {
+        TestArea.area = new Area();
+    }
+
+    @Test
+    public void testArea() {
+        Coordinate[] coords = new Coordinate[CANOverlay.NB_DIMENSIONS];
+
+        for (int i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
+            coords[i] = new Coordinate("" + Area.MIN_COORD);
+        }
+        Assert.assertArrayEquals(TestArea.area.getCoordinatesMin(), coords);
+
+        for (int i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
+            coords[i] = new Coordinate("" + Area.MAX_COORD);
+        }
+        Assert.assertArrayEquals(TestArea.area.getCoordinatesMax(), coords);
+    }
+
+    @Test
+    public void testSplit() {
+        Area[] newAreas = TestArea.area.split(0);
+        Coordinate[] coords = new Coordinate[CANOverlay.NB_DIMENSIONS];
+
+        for (int i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
+            coords[i] = new Coordinate("" + Area.MIN_COORD);
+        }
+        Assert.assertArrayEquals(newAreas[0].getCoordinatesMin(), coords);
+
+        coords[0] = new Coordinate("" + 128);
+        for (int i = 1; i < CANOverlay.NB_DIMENSIONS; i++) {
+            coords[i] = new Coordinate("" + Area.MAX_COORD);
+        }
+        Assert.assertArrayEquals(newAreas[0].getCoordinatesMax(), coords);
+
+        coords[0] = new Coordinate("" + 128);
+        for (int i = 1; i < CANOverlay.NB_DIMENSIONS; i++) {
+            coords[i] = new Coordinate("" + Area.MIN_COORD);
+        }
+        Assert.assertArrayEquals(newAreas[1].getCoordinatesMin(), coords);
+
+        for (int i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
+            coords[i] = new Coordinate("" + Area.MAX_COORD);
+        }
+        Assert.assertArrayEquals(newAreas[1].getCoordinatesMax(), coords);
+
+        Assert.assertEquals(newAreas[0].getBorderedDimension(newAreas[1]), 0);
+        Assert.assertTrue(newAreas[0].isBordered(newAreas[1], 0));
+    }
+}
