@@ -63,6 +63,11 @@ public class DataSpacesImpl {
         }
     }
 
+    private static FileObject decorateFileObject(final FileObject fo) {
+        final String aoId = Utils.getActiveObjectId(Utils.getCurrentActiveObjectBody());
+        return new DataSpacesWriteLimitingFileObject(fo, aoId);
+    }
+
     private final SpacesMountManager spacesMountManager;
 
     private final SpacesDirectory spacesDirectory;
@@ -159,7 +164,7 @@ public class DataSpacesImpl {
         }
 
         try {
-            final FileObject fo = spacesMountManager.resolveFile(uri);
+            final FileObject fo = decorateFileObject(spacesMountManager.resolveFile(uri));
             if (logger.isTraceEnabled())
                 logger.trace(String.format("Resolved request for %s with name %s (%s)", type, name, uri));
             return fo;
@@ -210,7 +215,7 @@ public class DataSpacesImpl {
         long currTime = startTime;
         while (currTime < startTime + timeoutMillis) {
             try {
-                final FileObject fo = spacesMountManager.resolveFile(uri);
+                final FileObject fo = decorateFileObject(spacesMountManager.resolveFile(uri));
                 if (logger.isTraceEnabled()) {
                     final String message = String.format(
                             "Resolved blocking request for %s with name %s (%s)", type, name, uri);
@@ -264,7 +269,7 @@ public class DataSpacesImpl {
         try {
             final DataSpacesURI scratchURI = appScratchSpace.getScratchForAO(body);
             final DataSpacesURI queryURI = scratchURI.withPath(path);
-            final FileObject fo = spacesMountManager.resolveFile(queryURI);
+            final FileObject fo = decorateFileObject(spacesMountManager.resolveFile(queryURI));
             if (logger.isTraceEnabled())
                 logger.trace("Resolved scratch for an Active Object: " + queryURI);
             return fo;
@@ -331,7 +336,8 @@ public class DataSpacesImpl {
         final Map<String, FileObject> ret = new HashMap<String, FileObject>(spaces.size());
         for (Entry<DataSpacesURI, FileObject> entry : spaces.entrySet()) {
             final String name = entry.getKey().getName();
-            ret.put(name, entry.getValue());
+            final FileObject fo = decorateFileObject(entry.getValue());
+            ret.put(name, fo);
         }
 
         if (logger.isTraceEnabled()) {
@@ -359,7 +365,7 @@ public class DataSpacesImpl {
             if (!spaceURI.isComplete())
                 throw new MalformedURIException("Specified URI must be complete");
 
-            FileObject fo = spacesMountManager.resolveFile(spaceURI);
+            FileObject fo = decorateFileObject(spacesMountManager.resolveFile(spaceURI));
             if (logger.isTraceEnabled())
                 logger.trace("Resolved file: " + uri);
             return fo;

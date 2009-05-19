@@ -26,7 +26,8 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundExceptio
  * Manager creates and maintains Apache VFS manager together with VirtualFileSystem instance to
  * provide virtual view of file system for each application. It is able to response to queries for
  * files in data spaces or just data spaces, providing VFS FileObject interface as a result.
- * Returned FileObject instances are applicable for user level code.
+ * Returned FileObject instances are applicable for user level code, although some write-limiting
+ * may be required for them.
  * <p>
  * To be able to serve requests for files and data spaces, SpaceMountManager must use
  * {@link SpacesDirectory} as a source of information about data spaces, their mounting points and
@@ -35,7 +36,9 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundExceptio
  * Manager maintains mountings (in VFS world: "junctions") of data spaces on VFS instance, using
  * lazy on-request strategy in current implementation. Space is mounted only when there is request
  * to provide FileObject for its content. Proper, local or remote access is determined using
- * {@link Utils#getLocalAccessURL(String, String, String)} method.
+ * {@link Utils#getLocalAccessURL(String, String, String)} method. Write-capabilities of returned
+ * FileObjects are induced from used protocols' providers - SpacesMountManager does not apply any
+ * limitation decorators like {@link BaseWriteLimitingFileObject} on its own.
  * <p>
  * Instances of this class are thread-safe. Also, subsequent requests for the same file using the
  * same manager will result in separate FileObject instances being returned, so there is no
@@ -44,9 +47,6 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundExceptio
  * 
  * @see SpacesDirectory
  */
-// TODO known issue: how to disallow remote AOs (or even: other local AOs) write
-// access to each other scratch
-// Maybe FileObject decorator would be enough for that?
 public class SpacesMountManager {
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.DATASPACES_MOUNT_MANAGER);
 
