@@ -40,6 +40,15 @@ public class DataSpacesImpl {
 
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.DATASPACES);
 
+    /**
+     * @param fileObject
+     * @return
+     * @see {@link PADataSpaces#getURI(FileObject)}
+     */
+    public static String getURI(FileObject fileObject) {
+        return fileObject.getName().getURI();
+    }
+
     private static void checkIsInputOrOutput(SpaceType type) {
         if (type == SpaceType.SCRATCH) {
             logger.debug("Wrong space type provided to the input/output-related method: " + type);
@@ -364,15 +373,6 @@ public class DataSpacesImpl {
             logger.debug("VFS-level problem during resolving URI: " + uri, x);
             throw x;
         }
-    }
-
-    /**
-     * @param fileObject
-     * @return
-     * @see {@link PADataSpaces#getURI(FileObject)}
-     */
-    public String getURI(FileObject fileObject) {
-        return fileObject.getName().getURI();
     }
 
     /**

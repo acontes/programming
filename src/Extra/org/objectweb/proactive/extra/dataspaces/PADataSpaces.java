@@ -690,12 +690,10 @@ public class PADataSpaces {
      * 
      * @param fileObject
      * @return valid URI for specified file object
-     * @throws NotConfiguredException
-     *             when caller's node is not configured for Data Spaces application
      * @see {@link #resolveFile(String)}
      */
-    public static String getURI(FileObject fileObject) throws NotConfiguredException {
-        return getMyDataSpacesImpl().getURI(fileObject);
+    public static String getURI(FileObject fileObject) {
+        return DataSpacesImpl.getURI(fileObject);
     }
 
     /**
