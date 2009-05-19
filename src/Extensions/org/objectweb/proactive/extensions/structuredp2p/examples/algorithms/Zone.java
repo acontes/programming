@@ -83,8 +83,6 @@ public class Zone {
         for (int i = 0; i < 2; i++) {
             for (int j = 0; j < 2; j++) {
                 this.neighbors[i][j].addAll(zone.neighbors[i][j]);
-                // System.out.println(this.neighbors[i][j].size() + " neighbors at [" + i + "][" + j
-                // + "]");
             }
         }
 
@@ -135,40 +133,11 @@ public class Zone {
             int[] lastOP = this.splitHistory.remove(this.splitHistory.size() - 1);
             int dimension = lastOP[0];
             int direction = lastOP[1];
-            int directionInv = (direction + 1) % 2;
 
             int nbNeigbors = this.neighbors[dimension][direction].size();
 
             // If there is just one neighbor, easy
-            if (nbNeigbors == 1) {
-                Zone zone = this.neighbors[dimension][direction].iterator().next();
-
-                if (dimension == 0) {
-                    zone.xMin = Math.min(zone.xMin, this.xMin);
-                    zone.xMax = Math.max(zone.xMax, this.xMax);
-                } else if (dimension == 1) {
-                    zone.yMin = Math.min(zone.yMin, this.yMin);
-                    zone.yMax = Math.max(zone.yMax, this.yMax);
-                }
-
-                for (int i = 0; i < 2; i++) {
-                    for (int j = 0; j < 2; j++) {
-                        zone.neighbors[i][j].addAll(this.neighbors[i][j]);
-
-                        for (Zone n : this.neighbors[i][j]) {
-                            n.removeNeighbor(this, dimension, direction);
-                            n.addNeighbor(zone, dimension, direction);
-                            zone.addNeighbor(n, dimension, directionInv);
-                        }
-                    }
-                }
-
-                zone.removeNeighbor(this, dimension, directionInv);
-                zone.checkNeighbors();
-            } else if (nbNeigbors > 1) {
-                // Merging areas with neighbors
-                HashSet<Zone> mergedNeighbors = new HashSet<Zone>();
-
+            if (nbNeigbors > 0) {
                 for (Zone zone : this.neighbors[dimension][direction]) {
                     if (dimension == 0) {
                         zone.xMin = Math.min(this.xMin, zone.xMin);
@@ -178,19 +147,30 @@ public class Zone {
                         zone.yMax = Math.max(this.yMax, zone.yMax);
                     }
 
-                    zone.removeNeighbor(this, dimension, directionInv);
-                    mergedNeighbors.add(zone);
-                }
+                    int index = -1, t = 0;
+                    for (int[] h : zone.splitHistory) {
+                        if (h[0] == dimension && h[1] == (direction + 1) % 2) {
+                            index = t;
+                        }
+                        t++;
+                    }
 
-                for (Zone zone : mergedNeighbors) {
+                    System.out.println(index);
+                    if (index >= 0) {
+                        zone.splitHistory.remove(index);
+                    }
+
+                    zone.removeNeighbor(this, dimension, (direction + 1) % 2);
+
                     for (int i = 0; i < 2; i++) {
                         for (int j = 0; j < 2; j++) {
-                            zone.neighbors[i][j].addAll(this.neighbors[i][j]);
-
                             for (Zone n : this.neighbors[i][j]) {
-                                n.removeNeighbor(this, i, j);
-                                n.addNeighbor(zone, i, j);
-                                zone.addNeighbor(n, i, (j + 1) % 2);
+                                n.removeNeighbor(this, i, (j + 1) % 2);
+
+                                if (!(i == dimension && j == direction)) {
+                                    n.addNeighbor(zone, i, (j + 1) % 2);
+                                    zone.addNeighbor(n, i, j);
+                                }
                             }
                         }
                     }
@@ -200,6 +180,8 @@ public class Zone {
             }
         }
 
+        this.neighbors = new HashSet[2][2];
+        this.splitHistory = new ArrayList<int[]>();
         this.xMin = -1;
         this.yMin = -1;
         this.xMax = -1;
