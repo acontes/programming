@@ -111,7 +111,7 @@ public class Zone {
             for (int j = 0; j < 2; j++) {
                 int jInv = (j + 1) % 2;
 
-                ArrayList<Zone> zonesToRemove = new ArrayList<Zone>();
+                HashSet<Zone> zonesToRemove = new HashSet<Zone>();
                 for (Zone zone : this.neighbors[i][j]) {
 
                     int d = this.getBorderDimension(zone);
@@ -151,16 +151,24 @@ public class Zone {
                     zone.yMax = Math.max(zone.yMax, this.yMax);
                 }
 
-                zone.removeNeighbor(this, dimension, directionInv);
+                for (int i = 0; i < 2; i++) {
+                    for (int j = 0; j < 2; j++) {
+                        zone.neighbors[i][j].addAll(this.neighbors[i][j]);
 
-                for (Zone n : this.neighbors[dimension][directionInv]) {
-                    n.removeNeighbor(this, dimension, direction);
-                    n.addNeighbor(zone, dimension, direction);
-                    zone.addNeighbor(n, dimension, directionInv);
+                        for (Zone n : this.neighbors[i][j]) {
+                            n.removeNeighbor(this, dimension, direction);
+                            n.addNeighbor(zone, dimension, direction);
+                            zone.addNeighbor(n, dimension, directionInv);
+                        }
+                    }
                 }
-            } else if (nbNeigbors > 1) {
 
-                ArrayList<Zone> toRemove = new ArrayList<Zone>();
+                zone.removeNeighbor(this, dimension, directionInv);
+                zone.checkNeighbors();
+            } else if (nbNeigbors > 1) {
+                // Merging areas with neighbors
+                HashSet<Zone> mergedNeighbors = new HashSet<Zone>();
+
                 for (Zone zone : this.neighbors[dimension][direction]) {
                     if (dimension == 0) {
                         zone.xMin = Math.min(this.xMin, zone.xMin);
@@ -171,18 +179,24 @@ public class Zone {
                     }
 
                     zone.removeNeighbor(this, dimension, directionInv);
-                    for (Zone n : this.neighbors[dimension][directionInv]) {
-                        n.addNeighbor(zone, dimension, direction);
-                        zone.addNeighbor(n, dimension, directionInv);
+                    mergedNeighbors.add(zone);
+                }
+
+                for (Zone zone : mergedNeighbors) {
+                    for (int i = 0; i < 2; i++) {
+                        for (int j = 0; j < 2; j++) {
+                            zone.neighbors[i][j].addAll(this.neighbors[i][j]);
+
+                            for (Zone n : this.neighbors[i][j]) {
+                                n.removeNeighbor(this, i, j);
+                                n.addNeighbor(zone, i, j);
+                                zone.addNeighbor(n, i, (j + 1) % 2);
+                            }
+                        }
                     }
 
-                    toRemove.add(zone);
+                    zone.checkNeighbors();
                 }
-
-                for (Zone zone : toRemove) {
-                    this.removeNeighbor(zone, dimension, direction);
-                }
-
             }
         }
 
