@@ -121,9 +121,10 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
      */
     public boolean add(Peer remotePeer, Area area, int dimension, int direction) {
         int index = 0;
+        int nextDimension = NeighborsDataStructure.getNextDimension(dimension);
 
         for (Area selectedArea : this.associatedAreas[dimension][direction]) {
-            if (area.getCoordinateMin(dimension).compareTo(selectedArea.getCoordinateMin(dimension)) < 0) {
+            if (area.getCoordinateMin(nextDimension).compareTo(selectedArea.getCoordinateMin(nextDimension)) < 0) {
                 this.associatedAreas[dimension][direction].add(index, area);
                 this.neighbors[dimension][direction].add(index, remotePeer);
                 return true;
@@ -323,6 +324,17 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
         }
 
         return this.neighbors[dim][direction].get(this.associatedAreas[dim][direction].indexOf(nearest));
+    }
+
+    /**
+     * Returns the next dimension following the specified dimension.
+     * 
+     * @param dimension
+     *            the specified dimension.
+     * @return the next dimension following the specified dimension.
+     */
+    public static int getNextDimension(int dimension) {
+        return (dimension + 1) % 2;
     }
 
     /**

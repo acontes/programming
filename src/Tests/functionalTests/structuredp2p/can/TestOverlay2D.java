@@ -1,5 +1,7 @@
 package functionalTests.structuredp2p.can;
 
+import java.util.List;
+
 import junit.framework.Assert;
 
 import org.junit.After;
@@ -10,6 +12,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.structuredp2p.core.Area;
 import org.objectweb.proactive.extensions.structuredp2p.core.Coordinate;
+import org.objectweb.proactive.extensions.structuredp2p.core.NeighborsDataStructure;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
@@ -120,8 +123,8 @@ public class TestOverlay2D {
         /* Add neighbors to peers */
 
         overlay = (CANOverlay) this.firstPeer.getStructuredOverlay();
-        overlay.addNeighbor(this.secondPeer, 0, 1);
         overlay.addNeighbor(this.thirdPeer, 0, 1);
+        overlay.addNeighbor(this.secondPeer, 0, 1);
         this.firstPeer.setStructuredOverlay(overlay);
 
         overlay = (CANOverlay) this.secondPeer.getStructuredOverlay();
@@ -177,6 +180,18 @@ public class TestOverlay2D {
         CANLookupResponseMessage response = (CANLookupResponseMessage) this.firstPeer.sendMessage(this.msg);
         Assert.assertEquals(this.fourthPeer, response.getPeer());
         Assert.assertTrue(response.getLatency() > 0);
+    }
+
+    @Test
+    public void testNeighborsDataStructureOrder() {
+        List<Peer> neighbors = ((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighbors()
+                .getNeighbors(0, NeighborsDataStructure.SUPERIOR_DIRECTION);
+
+        Assert
+                .assertTrue(((CANOverlay) neighbors.get(0).getStructuredOverlay()).getArea()
+                        .getCoordinateMax(1).compareTo(
+                                ((CANOverlay) neighbors.get(1).getStructuredOverlay()).getArea()
+                                        .getCoordinateMax(1)) < 0);
     }
 
     @After

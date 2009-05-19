@@ -17,7 +17,7 @@ import org.objectweb.proactive.extensions.structuredp2p.core.overlay.CANOverlay;
  * @version 0.1
  */
 @SuppressWarnings("serial")
-public class Area implements Comparable<Area>, Serializable {
+public class Area implements Serializable {
 
     /**
      * The minimal value we manage.
@@ -342,11 +342,5 @@ public class Area implements Comparable<Area>, Serializable {
         buf.append(").");
 
         return buf.toString();
-    }
-
-    @Override
-    public int compareTo(Area area) {
-        return 0;
-
     }
 }
