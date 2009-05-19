@@ -1,12 +1,13 @@
 package org.objectweb.proactive.extensions.structuredp2p.messages.can;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.Area;
+import org.objectweb.proactive.extensions.structuredp2p.core.NeighborsDataStructure;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.data.DataStorage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.Message;
-import org.objectweb.proactive.extensions.structuredp2p.responses.ResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.responses.ActionResponseMessage;
 
 
 /**
@@ -22,6 +23,26 @@ import org.objectweb.proactive.extensions.structuredp2p.responses.ResponseMessag
 public class CANMergeMessage extends Message {
 
     /**
+     * The peer which is leaving.
+     */
+    private final Peer remotePeer;
+
+    /**
+     * The current dimension of the leaving peer.
+     */
+    private final int dimension;
+
+    /**
+     * The current direction of the leaving peer.
+     */
+    private final int direction;
+
+    /**
+     * The neighbors of the leaving peer.
+     */
+    private final NeighborsDataStructure neighbors;
+
+    /**
      * The area to merge with.
      */
     private final Area area;
@@ -34,12 +55,25 @@ public class CANMergeMessage extends Message {
     /**
      * Constructor.
      * 
+     * @param remotePeer
+     *            the peer which is leaving.
+     * @param dimension
+     *            the current dimension of the leaving peer.
+     * @param directionInv
+     *            the current direction of the leaving peer.
+     * @param neighbors
+     *            the neighbors of the leaving peer.
      * @param remoteArea
      *            the area to merge with.
      * @param remoteResources
      *            the resources to merge with.
      */
-    public CANMergeMessage(Area remoteArea, DataStorage remoteResources) {
+    public CANMergeMessage(Peer remotePeer, int dimension, int direction, NeighborsDataStructure neighbors,
+            Area remoteArea, DataStorage remoteResources) {
+        this.remotePeer = remotePeer;
+        this.dimension = dimension;
+        this.direction = direction;
+        this.neighbors = neighbors;
         this.area = remoteArea;
         this.resources = remoteResources;
     }
@@ -47,8 +81,44 @@ public class CANMergeMessage extends Message {
     /**
      * {@inheritDoc}
      */
-    public ResponseMessage handle(StructuredOverlay overlay) {
+    public ActionResponseMessage handle(StructuredOverlay overlay) {
         return ((CANOverlay) overlay).handleMergeMessage(this);
+    }
+
+    /**
+     * Returns the leaving remote peer.
+     * 
+     * @return the remote peer.
+     */
+    public Peer getRemotePeer() {
+        return this.remotePeer;
+    }
+
+    /**
+     * Returns the dimension of leaving.
+     * 
+     * @return the dimension.
+     */
+    public int getDimension() {
+        return this.dimension;
+    }
+
+    /**
+     * Returns the dimension of leaving.
+     * 
+     * @return the direction
+     */
+    public int getDirection() {
+        return this.direction;
+    }
+
+    /**
+     * Returns the neighbors of the leaving peer.
+     * 
+     * @return the neighbors.
+     */
+    public NeighborsDataStructure getNeighbors() {
+        return this.neighbors;
     }
 
     /**

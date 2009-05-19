@@ -52,8 +52,9 @@ public abstract class StructuredOverlay implements Serializable {
 
     /**
      * Left the current network.
+     * @return TODO
      */
-    public abstract Peer leave();
+    public abstract Boolean leave();
 
     /**
      * Check neighbors list in order to see if a neighbor is died, if it is, so the list is updated.

@@ -74,7 +74,6 @@ public class ChordOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
-    @Override
     public Boolean join(Peer remotePeer) {
         // TODO Auto-generated method stub
         return null;
@@ -83,16 +82,14 @@ public class ChordOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public Peer leave() {
+    public Boolean leave() {
         // TODO Auto-generated method stub
-        return null;
+        return false;
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override
     public LookupResponseMessage sendMessage(LookupMessage msg) {
         // TODO Auto-generated method stub
         return null;
@@ -101,7 +98,6 @@ public class ChordOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
-    @Override
     public ResponseMessage sendMessageTo(Peer peer, Message msg) {
         // TODO Auto-generated method stub
         return null;
@@ -110,7 +106,6 @@ public class ChordOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
-    @Override
     public void update() {
         // TODO Auto-generated method stub
 
@@ -119,7 +114,6 @@ public class ChordOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
-    @Override
     public ActionResponseMessage handleAddNeighborMessage(AddNeighborMessage msg) {
         // TODO Auto-generated method stub
         return null;
@@ -128,7 +122,6 @@ public class ChordOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
-    @Override
     public ActionResponseMessage handleJoinMessage(Message msg) {
         // TODO Auto-generated method stub
         return null;
@@ -137,7 +130,6 @@ public class ChordOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
-    @Override
     public ActionResponseMessage handleLeaveMessage(LeaveMessage leaveMessage) {
         // TODO Auto-generated method stub
         return null;
@@ -146,7 +138,6 @@ public class ChordOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
-    @Override
     public LookupResponseMessage handleLookupMessage(LookupMessage msg) {
         // TODO Auto-generated method stub
         return null;
@@ -155,10 +146,8 @@ public class ChordOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
-    @Override
     public ActionResponseMessage handleRemoveNeighborMessage(RemoveNeighborMessage removeNeighborMessage) {
         // TODO Auto-generated method stub
         return null;
     }
-
 }

@@ -77,6 +77,7 @@ public class TestBasicOperations {
         int nbNeighbors = entryPointOverlay.getNeighbors().size();
 
         TestBasicOperations.neighbor.leave();
+
         Assert.assertEquals(nbNeighbors - 1, entryPointOverlay.getNeighbors().size());
 
         // TODO tests with merged areas !

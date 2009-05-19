@@ -79,6 +79,7 @@ public class Peer implements InitActive, RunActive, Serializable {
      */
     public Peer(OverlayType type) {
         this.type = type;
+        this.dataStorage = new DataStorage();
     }
 
     /**
@@ -152,11 +153,9 @@ public class Peer implements InitActive, RunActive, Serializable {
 
     /**
      * Unregister the peer from the current structured network.
-     * 
-     * @return the leaving peer
      */
-    public Peer leave() {
-        return this.structuredOverlay.leave();
+    public void leave() {
+        this.structuredOverlay.leave();
     }
 
     /**

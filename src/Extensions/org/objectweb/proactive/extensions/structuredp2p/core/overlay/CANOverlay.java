@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Stack;
 
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.util.converter.MakeDeepCopy;
 import org.objectweb.proactive.extensions.structuredp2p.core.Area;
@@ -15,7 +16,6 @@ import org.objectweb.proactive.extensions.structuredp2p.core.Coordinate;
 import org.objectweb.proactive.extensions.structuredp2p.core.NeighborsDataStructure;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.exception.AreaException;
-import org.objectweb.proactive.extensions.structuredp2p.data.DataStorage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.AddNeighborMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.LeaveMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.LookupMessage;
@@ -136,33 +136,36 @@ public class CANOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
-    public Peer leave() {
-        /*
-         * if (this.splitHistory.size() > 0) {
-         * 
-         * int[] lastOP = this.splitHistory.get(this.splitHistory.size() - 1); int dimension =
-         * lastOP[0]; int direction = lastOP[1]; Group<Peer> neighbors =
-         * this.getNeighborsForDimensionAndDirection(dimension, direction); int nbNeigbors =
-         * neighbors.size();
-         * 
-         * // If there is just one neighbor, easy if (nbNeigbors == 1) {
-         * this.getLocalPeer().sendMessageTo(neighbors.waitAndGetOne(), new
-         * CANMergeMessage(this.getRemotePeer())); } // Else, do the same thing recursively (it's a
-         * little heavy with data transfer) else if (nbNeigbors > 1) {
-         * 
-         * this.switchWith(((CANSwitchResponseMessage) PAFuture .getFutureValue(this
-         * .getLocalPeer().sendMessageTo(neighbors.waitAndGetOne(), new
-         * CANSwitchMessage(this.getRemotePeer())))).getPeer()); }
-         * 
-         * }
-         * 
-         * PAFuture.getFutureValue(this.getLocalPeer().sendMessageTo( (Peer)
-         * this.getNeighborsAsGroup().getGroupByType(), new LeaveMessage(this.getRemotePeer())));
-         * 
-         * // FIXME how to set non active with recursivity ?? //
-         * PAActiveObject.terminateActiveObject(false);
-         */
-        return this.getRemotePeer();
+    public Boolean leave() {
+        if (this.splitHistory.size() > 0) {
+            int[] lastOP = this.splitHistory.pop();
+            int dimension = lastOP[0];
+            int direction = lastOP[1];
+            int directionInv = this.getOppositeDirection(direction);
+            Area tmpArea = this.getArea();
+
+            Collection<ActionResponseMessage> responses = new ArrayList<ActionResponseMessage>();
+            for (Peer neighbor : this.neighbors.getNeighbors(dimension, direction)) {
+                Coordinate border = this.neighbors.getArea(neighbor).getCoordinateMax(dimension);
+                Area[] newAreas = tmpArea.split(dimension, border);
+
+                CANMergeMessage message = new CANMergeMessage(this.getRemotePeer(), dimension, directionInv,
+                    this.neighbors, newAreas[0], this.getLocalPeer().getDataStorage().getDataFromArea(
+                            newAreas[0]));
+
+                responses.add((ActionResponseMessage) this.sendMessageTo(this.neighbors.getNeighbors(
+                        dimension, direction), message));
+
+                tmpArea = newAreas[1];
+            }
+
+            this.setArea(null);
+            this.updateNeighbors();
+        }
+
+        PAActiveObject.terminateActiveObject(false);
+
+        return true;
     }
 
     /**
@@ -190,27 +193,33 @@ public class CANOverlay extends StructuredOverlay {
      *            the dimension to not check.
      */
     private void updateNeighbors(int dimension) {
-        int direction;
 
         for (int i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
             if (i != dimension) {
                 for (int j = 0; j < 2; j++) {
                     for (Peer neighbor : this.neighbors.getNeighbors(i, j)) {
-                        direction = this.getOppositeDirection(j);
 
-                        if (this.getArea().getBorderedDimension(this.neighbors.getArea(neighbor)) == -1) {
-                            direction = j;
-                        }
+                        if (this.getArea() == null ||
+                            this.getArea().getBorderedDimension(this.neighbors.getArea(neighbor)) == -1) {
 
-                        if (((ActionResponseMessage) this.sendMessageTo(neighbor,
-                                new CANRemoveNeighborMessage(this.getRemotePeer(), i, this
-                                        .getOppositeDirection(j)))).hasSucceeded()) {
-                            this.neighbors.remove(neighbor, i, direction);
+                            if (((ActionResponseMessage) this.sendMessageTo(neighbor,
+                                    new CANRemoveNeighborMessage(this.getRemotePeer(), i, this
+                                            .getOppositeDirection(j)))).hasSucceeded()) {
+                                this.neighbors.remove(neighbor, i, j);
+                            }
                         }
                     }
                 }
             }
         }
+    }
+
+    /**
+     * Check neighbors list following for all dimensions in order to see if a peer is always a
+     * neighbor, if not, it is removed from its neighbors.
+     */
+    private void updateNeighbors() {
+        this.updateNeighbors(-1);
     }
 
     /**
@@ -227,28 +236,13 @@ public class CANOverlay extends StructuredOverlay {
     }
 
     /**
-     * Merge two area when a peer leave the network cleanly. The split consists in giving the data
-     * that are managed by the peer which leaves the network to his neighbors and after that to
-     * merge this area with its closest neighbors.
+     * Updates the current peer with a new area and a new split history.
      * 
-     * @param peer
-     *            the peer which left the network.
-     * 
-     * @return true if the merge has succeeded, false otherwise.
+     * @param area
+     *            the new area.
+     * @param history
+     *            the new split history.
      */
-    private boolean merge(Area area, DataStorage resources) {
-        try {
-            this.area.merge(area);
-            this.getLocalPeer().getDataStorage().addData(resources);
-            this.splitHistory.pop();
-        } catch (AreaException e) {
-            // TODO Rollback
-            return false;
-        }
-        // TODO
-        return true;
-    }
-
     private void update(Area area, Stack<int[]> history) {
         this.setArea(area);
         this.setHistory(history);
@@ -329,7 +323,7 @@ public class CANOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
-    public Collection<ResponseMessage> sendMessageTo(Collection<Peer> remotePeers, Message msg) {
+    public Collection<ResponseMessage> sendMessageTo(List<Peer> remotePeers, Message msg) {
         Collection<ResponseMessage> responses = new HashSet<ResponseMessage>(remotePeers.size());
 
         for (Peer remotePeer : remotePeers) {
@@ -472,9 +466,36 @@ public class CANOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
-    public ResponseMessage handleMergeMessage(Message msg) {
-        this.merge(((CANMergeMessage) msg).getArea(), ((CANMergeMessage) msg).getResources());
-        return new ResponseMessage(msg.getCreationTimestamp());
+    public ActionResponseMessage handleMergeMessage(Message msg) {
+        CANMergeMessage message = (CANMergeMessage) msg;
+
+        try {
+            this.setArea(this.area.merge(message.getArea()));
+        } catch (AreaException e) {
+            return new ActionResponseMessage(msg.getCreationTimestamp(), false);
+        }
+
+        int dimension = message.getDimension();
+        int direction = message.getDirection();
+
+        int index = -1, t = 0;
+        for (int[] h : this.splitHistory) {
+            if (h[0] == dimension && h[1] == direction) {
+                index = t;
+            }
+            t++;
+        }
+
+        if (index >= 0) {
+            this.splitHistory.remove(index);
+        }
+
+        this.neighbors.remove(message.getRemotePeer(), dimension, direction);
+        this.neighbors.addAll(this.neighbors);
+        this.updateNeighbors();
+        this.getLocalPeer().getDataStorage().addData(message.getResources());
+
+        return new ActionResponseMessage(msg.getCreationTimestamp(), true);
     }
 
     /**

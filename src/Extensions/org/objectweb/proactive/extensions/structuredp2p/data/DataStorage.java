@@ -55,7 +55,7 @@ public class DataStorage implements Serializable {
      */
     public DataStorage getDataFromArea(Area area) {
         // FIXME comment definir la position d'une donnee dans la zone ?
-        return null;
+        return new DataStorage();
     }
 
     /**
