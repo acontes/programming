@@ -169,6 +169,16 @@ public class TestOverlay2D {
     }
 
     @Test
+    public void testHasNeighbors() {
+        Assert.assertTrue(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighbors().hasNeighbor(
+                this.secondPeer));
+        Assert.assertTrue(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighbors().hasNeighbor(
+                this.thirdPeer));
+        Assert.assertFalse(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighbors().hasNeighbor(
+                this.fourthPeer));
+    }
+
+    @Test
     public void testGetNearestNeighborFrom() {
         Assert.assertTrue(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighbors()
                 .getNearestNeighborFrom(new Coordinate("11"), 0, 1).equals(this.thirdPeer));
