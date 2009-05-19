@@ -154,8 +154,8 @@ public class Peer implements InitActive, RunActive, Serializable {
     /**
      * Unregister the peer from the current structured network.
      */
-    public void leave() {
-        this.structuredOverlay.leave();
+    public Boolean leave() {
+        return this.structuredOverlay.leave();
     }
 
     /**

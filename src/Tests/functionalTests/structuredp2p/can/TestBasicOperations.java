@@ -7,6 +7,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.structuredp2p.core.Area;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
@@ -72,13 +73,13 @@ public class TestBasicOperations {
         Assert.assertNotNull(TestBasicOperations.entryPoint);
         Assert.assertNotNull(TestBasicOperations.neighbor);
 
-        CANOverlay entryPointOverlay = (CANOverlay) TestBasicOperations.entryPoint.getStructuredOverlay();
+        int nbNeighbors = ((CANOverlay) TestBasicOperations.entryPoint.getStructuredOverlay()).getNeighbors()
+                .size();
 
-        int nbNeighbors = entryPointOverlay.getNeighbors().size();
+        PAFuture.waitFor(TestBasicOperations.neighbor.leave());
 
-        TestBasicOperations.neighbor.leave();
-
-        Assert.assertEquals(nbNeighbors - 1, entryPointOverlay.getNeighbors().size());
+        Assert.assertEquals(nbNeighbors - 1, ((CANOverlay) TestBasicOperations.entryPoint
+                .getStructuredOverlay()).getNeighbors().size());
 
         // TODO tests with merged areas !
     }
