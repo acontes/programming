@@ -193,26 +193,21 @@ public class CANOverlay extends StructuredOverlay {
      *            the dimension to not check.
      */
     private void updateNeighbors(int dimension) {
-
-        for (int i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
-            if (i != dimension) {
-                for (int j = 0; j < 2; j++) {
+        for (int dim = 0; dim < CANOverlay.NB_DIMENSIONS; dim++) {
+            if (dim != dimension) {
+                for (int dir = 0; dir < 2; dir++) {
                     ArrayList<Peer> peers = new ArrayList<Peer>();
-                    for (Peer neighbor : this.neighbors.getNeighbors(i, j)) {
-
-                        if (this.getArea() == null ||
+                    for (Peer neighbor : this.neighbors.getNeighbors(dim, dir)) {
+                        if (this.getArea() == null || this.neighbors.getArea(neighbor) == null ||
                             this.getArea().getBorderedDimension(this.neighbors.getArea(neighbor)) == -1) {
-
-                            if (((ActionResponseMessage) PAFuture.getFutureValue(this.sendMessageTo(neighbor,
-                                    new CANRemoveNeighborMessage(this.getRemotePeer(), i, this
-                                            .getOppositeDirection(j))))).hasSucceeded()) {
-                                peers.add(neighbor);
-                            }
+                            this.sendMessageTo(neighbor, new CANRemoveNeighborMessage(this.getRemotePeer(),
+                                dim, this.getOppositeDirection(dir)));
+                            peers.add(neighbor);
                         }
                     }
 
                     for (Peer peer : peers) {
-                        this.neighbors.remove(peer, i, j);
+                        this.neighbors.remove(peer, dim, dir);
                     }
                 }
             }
@@ -496,7 +491,7 @@ public class CANOverlay extends StructuredOverlay {
         }
 
         this.neighbors.remove(message.getRemotePeer(), dimension, direction);
-        this.neighbors.addAll(this.neighbors);
+        this.neighbors.addAll(message.getNeighbors());
         this.updateNeighbors();
         this.getLocalPeer().getDataStorage().addData(message.getResources());
 

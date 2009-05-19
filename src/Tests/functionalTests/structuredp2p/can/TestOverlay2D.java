@@ -1,6 +1,7 @@
 package functionalTests.structuredp2p.can;
 
 import java.util.List;
+import java.util.Stack;
 
 import junit.framework.Assert;
 
@@ -9,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.structuredp2p.core.Area;
 import org.objectweb.proactive.extensions.structuredp2p.core.Coordinate;
@@ -47,6 +49,7 @@ public class TestOverlay2D {
         Coordinate[] coordinateMin;
         Coordinate[] coordinateMax;
         Area area;
+        Stack<int[]> splitHistory;
 
         /* First peer */
 
@@ -64,6 +67,9 @@ public class TestOverlay2D {
         area = new Area(coordinateMin, coordinateMax);
         overlay = (CANOverlay) this.firstPeer.getStructuredOverlay();
         overlay.setArea(area);
+        splitHistory = new Stack<int[]>();
+        splitHistory.add(new int[] { 0, 1 });
+        overlay.setHistory(splitHistory);
         this.firstPeer.setStructuredOverlay(overlay);
 
         /* Second peer */
@@ -82,6 +88,10 @@ public class TestOverlay2D {
         area = new Area(coordinateMin, coordinateMax);
         overlay = (CANOverlay) this.secondPeer.getStructuredOverlay();
         overlay.setArea(area);
+        splitHistory = new Stack<int[]>();
+        splitHistory.add(new int[] { 0, 0 });
+        splitHistory.add(new int[] { 1, 1 });
+        overlay.setHistory(splitHistory);
         this.secondPeer.setStructuredOverlay(overlay);
 
         /* Third peer */
@@ -100,6 +110,11 @@ public class TestOverlay2D {
         area = new Area(coordinateMin, coordinateMax);
         overlay = (CANOverlay) this.thirdPeer.getStructuredOverlay();
         overlay.setArea(area);
+        splitHistory = new Stack<int[]>();
+        splitHistory.add(new int[] { 0, 0 });
+        splitHistory.add(new int[] { 1, 0 });
+        splitHistory.add(new int[] { 0, 1 });
+        overlay.setHistory(splitHistory);
         this.thirdPeer.setStructuredOverlay(overlay);
 
         /* Fourth peer */
@@ -118,6 +133,11 @@ public class TestOverlay2D {
         area = new Area(coordinateMin, coordinateMax);
         overlay = (CANOverlay) this.fourthPeer.getStructuredOverlay();
         overlay.setArea(area);
+        splitHistory = new Stack<int[]>();
+        splitHistory.add(new int[] { 0, 0 });
+        splitHistory.add(new int[] { 1, 0 });
+        splitHistory.add(new int[] { 0, 0 });
+        overlay.setHistory(splitHistory);
         this.fourthPeer.setStructuredOverlay(overlay);
 
         /* Add neighbors to peers */
@@ -204,12 +224,23 @@ public class TestOverlay2D {
                                         .getCoordinateMax(1)) < 0);
     }
 
+    @Test
+    public void testLeavingPeer() {
+        PAFuture.waitFor(this.thirdPeer.leave());
+
+        Assert.assertTrue(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighbors().hasNeighbor(
+                this.fourthPeer));
+        Assert.assertTrue(((CANOverlay) this.fourthPeer.getStructuredOverlay()).getNeighbors().hasNeighbor(
+                this.firstPeer));
+
+    }
+
     @After
     public void tearDown() {
         this.msg = null;
         PAActiveObject.terminateActiveObject(this.firstPeer, false);
         PAActiveObject.terminateActiveObject(this.secondPeer, false);
-        PAActiveObject.terminateActiveObject(this.thirdPeer, false);
+        // PAActiveObject.terminateActiveObject(this.thirdPeer, false);
         PAActiveObject.terminateActiveObject(this.fourthPeer, false);
     }
 
