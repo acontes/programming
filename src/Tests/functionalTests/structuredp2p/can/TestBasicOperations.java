@@ -37,10 +37,8 @@ public class TestBasicOperations {
             TestBasicOperations.neighbor = (Peer) PAActiveObject.newActive(Peer.class.getName(),
                     new Object[] { OverlayType.CAN });
         } catch (ActiveObjectCreationException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (NodeException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
@@ -53,19 +51,13 @@ public class TestBasicOperations {
         TestBasicOperations.neighbor.join(TestBasicOperations.entryPoint);
 
         // Test if the new added peer is in the neighbor list
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
         CANOverlay entryPointOverlay = (CANOverlay) TestBasicOperations.entryPoint.getStructuredOverlay();
         CANOverlay neighborOverlay = (CANOverlay) TestBasicOperations.neighbor.getStructuredOverlay();
 
         Assert.assertTrue(entryPointOverlay.getNeighbors().hasNeighbor(TestBasicOperations.neighbor));
         Assert.assertTrue(neighborOverlay.getNeighbors().hasNeighbor(TestBasicOperations.entryPoint));
 
-        // tests with split areas !
+        // Test with split areas !
         try {
             Assert
                     .assertTrue(new Area().equals(entryPointOverlay.getArea()
@@ -85,7 +77,6 @@ public class TestBasicOperations {
         int nbNeighbors = entryPointOverlay.getNeighbors().size();
 
         TestBasicOperations.neighbor.leave();
-
         Assert.assertEquals(nbNeighbors - 1, entryPointOverlay.getNeighbors().size());
 
         // TODO tests with merged areas !
@@ -93,11 +84,6 @@ public class TestBasicOperations {
 
     @AfterClass
     public static void stopTest() {
-        try {
-            Thread.sleep(10000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         TestBasicOperations.entryPoint.leave();
     }
 

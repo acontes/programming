@@ -13,12 +13,12 @@ package org.objectweb.proactive.extensions.structuredp2p.core.overlay;
 public enum OverlayType {
 
     /**
-     * CAN (Content-Addressable Network)
+     * CAN : Content-Addressable Network.
      */
     CAN,
     /**
-     * CHORD (A Scalable Peer-to-peer Lookup Service for Internet Applications where topology is a
-     * ring.)
+     * CHORD : a scalable peer-to-peer lookup service for internet applications where topology is a
+     * ring.
      */
     CHORD
 }
