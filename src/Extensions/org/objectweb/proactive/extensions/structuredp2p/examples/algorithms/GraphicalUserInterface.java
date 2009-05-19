@@ -120,6 +120,7 @@ public class GraphicalUserInterface extends JFrame {
                                             JOptionPane.WARNING_MESSAGE);
                                 } else {
                                     clickedZone.leave();
+                                    GraphicalUserInterface.this.zones.remove(clickedZone);
                                 }
                             }
                         } else {

@@ -432,7 +432,7 @@ public class CANOverlay extends StructuredOverlay {
     public CANCheckMergeResponseMessage handleCheckMergeMessage(Message msg) {
         CANCheckMergeMessage message = (CANCheckMergeMessage) msg;
         return new CANCheckMergeResponseMessage(msg.getCreationTimestamp(), this.getRemotePeer(), this.area
-                .isValidMergingArea(message.getArea()));
+                .getBorderedDimension(message.getArea()) == 0);
     }
 
     /**

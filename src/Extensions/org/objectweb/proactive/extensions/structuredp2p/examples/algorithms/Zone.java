@@ -135,6 +135,70 @@ public class Zone {
             int[] lastOP = this.splitHistory.remove(this.splitHistory.size() - 1);
             int dimension = lastOP[0];
             int direction = lastOP[1];
+            int directionInv = (direction + 1) % 2;
+
+            int nbNeigbors = this.neighbors[dimension][direction].size();
+
+            // If there is just one neighbor, easy
+            if (nbNeigbors == 1) {
+                Zone zone = this.neighbors[dimension][direction].iterator().next();
+
+                if (dimension == 0) {
+                    zone.xMin = Math.min(zone.xMin, this.xMin);
+                    zone.xMax = Math.max(zone.xMax, this.xMax);
+                } else if (dimension == 1) {
+                    zone.yMin = Math.min(zone.yMin, this.yMin);
+                    zone.yMax = Math.max(zone.yMax, this.yMax);
+                }
+
+                zone.removeNeighbor(this, dimension, directionInv);
+
+                for (Zone n : this.neighbors[dimension][directionInv]) {
+                    n.removeNeighbor(this, dimension, direction);
+                    n.addNeighbor(zone, dimension, direction);
+                    zone.addNeighbor(n, dimension, directionInv);
+                }
+            } else if (nbNeigbors > 1) {
+
+                ArrayList<Zone> toRemove = new ArrayList<Zone>();
+                for (Zone zone : this.neighbors[dimension][direction]) {
+                    if (dimension == 0) {
+                        zone.xMin = Math.min(this.xMin, zone.xMin);
+                        zone.xMax = Math.max(this.xMax, zone.xMax);
+                    } else if (dimension == 1) {
+                        zone.yMin = Math.min(this.yMin, zone.yMin);
+                        zone.yMax = Math.max(this.yMax, zone.yMax);
+                    }
+
+                    zone.removeNeighbor(this, dimension, directionInv);
+                    for (Zone n : this.neighbors[dimension][directionInv]) {
+                        n.addNeighbor(zone, dimension, direction);
+                        zone.addNeighbor(n, dimension, directionInv);
+                    }
+
+                    toRemove.add(zone);
+                }
+
+                for (Zone zone : toRemove) {
+                    this.removeNeighbor(zone, dimension, direction);
+                }
+
+            }
+        }
+
+        this.xMin = -1;
+        this.yMin = -1;
+        this.xMax = -1;
+        this.yMax = -1;
+
+        return this;
+    }
+
+    public Zone leave2() {
+        if (this.splitHistory.size() > 0) {
+            int[] lastOP = this.splitHistory.remove(this.splitHistory.size() - 1);
+            int dimension = lastOP[0];
+            int direction = lastOP[1];
             int directionInv = (lastOP[1] + 1) % 2;
 
             int nbNeigbors = this.neighbors[dimension][direction].size();
