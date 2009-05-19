@@ -46,6 +46,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.TechnicalServicesProperties;
+import org.objectweb.proactive.extra.dataspaces.service.DataSpacesTechnicalService;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -260,4 +261,14 @@ public class GCMParserHelper implements GCMParserConstants {
         return prefixNS + ":" + element;
     }
 
+    public static TechnicalServicesProperties parseData(XPath xpath, Node dataNode) {
+        final HashMap<String, HashMap<String, String>> dataSpacesTechService = new HashMap<String, HashMap<String, String>>();
+        final HashMap<String, String> properties = new HashMap<String, String>();
+        // FIXME add parsing........
+        final String namingServiceURL = "change me!";
+        
+        properties.put(DataSpacesTechnicalService.PROPERTY_NAMING_SERVICE_URL, namingServiceURL);
+        dataSpacesTechService.put(DataSpacesTechnicalService.class.getName(), properties);
+        return new TechnicalServicesProperties(dataSpacesTechService);
+    }
 }
