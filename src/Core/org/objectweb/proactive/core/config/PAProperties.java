@@ -508,6 +508,20 @@ public enum PAProperties {
      */
     PA_FILETRANSFER_MAX_BUFFER_SIZE("proactive.filetransfer.buffer_size_kb", PAPropertiesType.INTEGER),
 
+    // -------------- DATA SPACES
+
+    /**
+     * This property indicates an access URL of the scratch data space. Mandatory if scratch is to
+     * be allowed on a node.
+     */
+    PA_DATASPACES_SCRATCH_URL("proactive.dataspaces.scratch_url", PAPropertiesType.STRING),
+
+    /**
+     * This property indicates a location of the scratch data space. Mandatory if scratch is to be
+     * allowed on a node.
+     */
+    PA_DATASPACES_SCRATCH_PATH("proactive.dataspaces.scratch_path", PAPropertiesType.STRING),
+
     // -------------- Misc
 
     /**
