@@ -20,6 +20,8 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundExceptio
 // TODO we mention "expected to be readable/writable" - maybe we can verify it?
 // TODO add docs about data sharing - do not pass FileObject, only URI!
 // or add general docs about various ways of accessing and sharing data through this API
+// TODO add docs about calling from active object's thread. what about returned FileObjects? it should be ok
+// to call them from other thread, if it is not another active objects' thread
 /**
  * The ProActive Data Spaces API.
  * <p>
