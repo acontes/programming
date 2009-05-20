@@ -2,7 +2,6 @@ package org.objectweb.proactive.extensions.structuredp2p.core.overlay;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 import java.util.Stack;
@@ -135,6 +134,7 @@ public class CANOverlay extends StructuredOverlay {
      * {@inheritDoc}
      */
     public Boolean leave() {
+        System.out.println("CANOverlay.leave() - before");
         if (this.splitHistory.size() > 0) {
             int[] lastOP = this.splitHistory.pop();
             int dimension = lastOP[0];
@@ -142,7 +142,8 @@ public class CANOverlay extends StructuredOverlay {
             int directionInv = this.getOppositeDirection(direction);
             Area tmpArea = this.getArea();
 
-            Collection<ActionResponseMessage> responses = new ArrayList<ActionResponseMessage>();
+            System.out.println("CANOverlay.leave() - during");
+            List<ActionResponseMessage> responses = new ArrayList<ActionResponseMessage>();
             for (Peer neighbor : this.neighbors.getNeighbors(dimension, direction)) {
                 Coordinate border = this.neighbors.getArea(neighbor).getCoordinateMax(dimension);
                 Area[] newAreas = tmpArea.split(dimension, border);
@@ -157,16 +158,16 @@ public class CANOverlay extends StructuredOverlay {
                 tmpArea = newAreas[1];
             }
 
+            PAFuture.waitForAll(responses);
+
             this.setArea(null);
-            for (int dim = 0; dim < CANOverlay.NB_DIMENSIONS; dim++) {
-                for (int dir = 0; dir < 2; dir++) {
-                    PAFuture.waitForAll(this.sendMessageTo(this.getNeighbors().getNeighbors(dim, dir),
-                            new CANAddNeighborMessage(this.getRemotePeer(), this.getArea(), dim, this
-                                    .getOppositeDirection(dir))));
-                }
-            }
+
+            PAFuture.waitForAll(this.sendMessageTo(this.getNeighbors(),
+                    new LeaveMessage(this.getRemotePeer())));
+
         }
 
+        System.out.println("CANOverlay.leave() - after");
         return true;
     }
 

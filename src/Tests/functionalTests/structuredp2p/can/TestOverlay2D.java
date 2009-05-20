@@ -10,7 +10,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.structuredp2p.core.Area;
 import org.objectweb.proactive.extensions.structuredp2p.core.Coordinate;
@@ -209,9 +208,9 @@ public class TestOverlay2D {
     @Test
     public void testIsBordered() {
         Assert.assertTrue(((CANOverlay) this.firstPeer.getStructuredOverlay()).getArea().isBordered(
-                ((CANOverlay) this.secondPeer.getStructuredOverlay()).getArea(), 1));
+                ((CANOverlay) this.secondPeer.getStructuredOverlay()).getArea(), 0));
         Assert.assertTrue(((CANOverlay) this.firstPeer.getStructuredOverlay()).getArea().isBordered(
-                ((CANOverlay) this.thirdPeer.getStructuredOverlay()).getArea(), 1));
+                ((CANOverlay) this.thirdPeer.getStructuredOverlay()).getArea(), 0));
     }
 
     @Test
@@ -241,7 +240,7 @@ public class TestOverlay2D {
         System.out.println("3 : " + ((CANOverlay) this.thirdPeer.getStructuredOverlay()).getNeighbors());
         System.out.println("4 : " + ((CANOverlay) this.fourthPeer.getStructuredOverlay()).getNeighbors());
 
-        PAFuture.waitFor(this.thirdPeer.leave());
+        this.thirdPeer.leave();
 
         System.out.println("1 : " + ((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighbors());
         System.out.println("2 : " + ((CANOverlay) this.secondPeer.getStructuredOverlay()).getNeighbors());
