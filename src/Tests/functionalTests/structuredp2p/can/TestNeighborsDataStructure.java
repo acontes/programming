@@ -8,40 +8,55 @@ import org.junit.Test;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.extensions.structuredp2p.core.NeighborsDataStructure;
-import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
-import org.objectweb.proactive.extensions.structuredp2p.core.overlay.CANOverlay;
+import org.objectweb.proactive.extensions.structuredp2p.core.can.CANOverlay;
+import org.objectweb.proactive.extensions.structuredp2p.core.can.CANPeer;
+import org.objectweb.proactive.extensions.structuredp2p.core.can.NeighborsDataStructure;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
 
 
 public class TestNeighborsDataStructure {
 
-    private Peer peer;
+    private CANPeer peer;
+    private CANPeer firstNeighbor;
+    private CANPeer secondNeighbor;
 
     @Before
     public void setUp() throws Exception {
-        this.peer = (Peer) PAActiveObject.newActive(Peer.class.getName(), new Object[] { OverlayType.CAN });
+        this.peer = (CANPeer) PAActiveObject.newActive(CANPeer.class.getName(),
+                new Object[] { OverlayType.CAN });
+        this.firstNeighbor = (CANPeer) PAActiveObject.newActive(CANPeer.class.getName(),
+                new Object[] { OverlayType.CAN });
+        this.secondNeighbor = (CANPeer) PAActiveObject.newActive(CANPeer.class.getName(),
+                new Object[] { OverlayType.CAN });
+        // Overlay overlay
+        // this.peer.setStructuredOverlay(((CANOverlay)
+        // this.peer.getStructuredOverlay()).addNeighbor(
+        // this.firstNeighbor, 0, 1));
+        // this.peer.setStructuredOverlay(((CANOverlay)
+        // this.peer.getStructuredOverlay()).addNeighbor(
+        // this.secondNeighbor, 0, 0));
     }
 
     @Test
     public void testAddAll() throws ActiveObjectCreationException, NodeException {
         NeighborsDataStructure neighbors = new NeighborsDataStructure();
-        Peer peer1 = (Peer) PAActiveObject.newActive(Peer.class.getName(), new Object[] { OverlayType.CAN });
-        Peer peer2 = (Peer) PAActiveObject.newActive(Peer.class.getName(), new Object[] { OverlayType.CAN });
-        neighbors.add(peer1, 0, 1);
-        neighbors.add(peer2, 0, 0);
 
-        Assert.assertTrue(neighbors.hasNeighbor(peer1, 0, 1));
-        Assert.assertTrue(neighbors.hasNeighbor(peer2, 0, 0));
+        Assert.assertTrue(neighbors.hasNeighbor(this.firstNeighbor, 0, 1));
+        Assert.assertTrue(neighbors.hasNeighbor(this.secondNeighbor, 0, 0));
 
-        CANOverlay overlay = ((CANOverlay) this.peer.getStructuredOverlay());
+        CANOverlay overlay = (this.peer.getStructuredOverlay());
         overlay.addNeighbor(neighbors);
         this.peer.setStructuredOverlay(overlay);
 
-        Assert.assertTrue(((CANOverlay) this.peer.getStructuredOverlay()).getNeighbors().hasNeighbor(peer1,
+        Assert.assertTrue((this.peer.getStructuredOverlay()).getNeighbors().hasNeighbor(this.firstNeighbor,
                 0, 1));
-        Assert.assertTrue(((CANOverlay) this.peer.getStructuredOverlay()).getNeighbors().hasNeighbor(peer2,
+        Assert.assertTrue((this.peer.getStructuredOverlay()).getNeighbors().hasNeighbor(this.secondNeighbor,
                 0, 0));
+    }
+
+    @Test
+    public void testUpdateArea() {
+
     }
 
     @After

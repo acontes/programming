@@ -2,9 +2,9 @@ package org.objectweb.proactive.extensions.structuredp2p.messages.can;
 
 import java.util.Stack;
 
-import org.objectweb.proactive.extensions.structuredp2p.core.Area;
-import org.objectweb.proactive.extensions.structuredp2p.core.NeighborsDataStructure;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
+import org.objectweb.proactive.extensions.structuredp2p.core.can.Area;
+import org.objectweb.proactive.extensions.structuredp2p.core.can.NeighborsDataStructure;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.messages.Message;
 import org.objectweb.proactive.extensions.structuredp2p.responses.ActionResponseMessage;

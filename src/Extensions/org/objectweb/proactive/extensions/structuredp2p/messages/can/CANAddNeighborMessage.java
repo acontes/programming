@@ -1,7 +1,7 @@
 package org.objectweb.proactive.extensions.structuredp2p.messages.can;
 
-import org.objectweb.proactive.extensions.structuredp2p.core.Area;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
+import org.objectweb.proactive.extensions.structuredp2p.core.can.Area;
 import org.objectweb.proactive.extensions.structuredp2p.messages.AddNeighborMessage;
 
 

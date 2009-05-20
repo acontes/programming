@@ -1,9 +1,10 @@
-package org.objectweb.proactive.extensions.structuredp2p.core;
+package org.objectweb.proactive.extensions.structuredp2p.core.can;
 
 import java.io.Serializable;
 
+import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
+import org.objectweb.proactive.extensions.structuredp2p.core.can.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.exception.AreaException;
-import org.objectweb.proactive.extensions.structuredp2p.core.overlay.CANOverlay;
 
 
 /**

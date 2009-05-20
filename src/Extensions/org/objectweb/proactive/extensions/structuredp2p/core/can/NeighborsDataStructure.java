@@ -1,4 +1,4 @@
-package org.objectweb.proactive.extensions.structuredp2p.core;
+package org.objectweb.proactive.extensions.structuredp2p.core.can;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -6,7 +6,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
-import org.objectweb.proactive.extensions.structuredp2p.core.overlay.CANOverlay;
+import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
+import org.objectweb.proactive.extensions.structuredp2p.core.can.CANOverlay;
 
 
 /**

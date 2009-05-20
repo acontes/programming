@@ -4,7 +4,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.objectweb.proactive.extensions.structuredp2p.core.Coordinate;
+import org.objectweb.proactive.extensions.structuredp2p.core.can.Coordinate;
 
 
 /**

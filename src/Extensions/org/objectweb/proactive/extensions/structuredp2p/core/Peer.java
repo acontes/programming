@@ -9,8 +9,8 @@ import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAEventProgramming;
-import org.objectweb.proactive.extensions.structuredp2p.core.overlay.CANOverlay;
-import org.objectweb.proactive.extensions.structuredp2p.core.overlay.ChordOverlay;
+import org.objectweb.proactive.extensions.structuredp2p.core.can.CANOverlay;
+import org.objectweb.proactive.extensions.structuredp2p.core.chord.ChordOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.data.DataStorage;
@@ -31,7 +31,7 @@ import org.objectweb.proactive.extensions.structuredp2p.responses.ResponseMessag
  * @version 0.1
  */
 @SuppressWarnings("serial")
-public class Peer implements InitActive, RunActive, Serializable {
+public abstract class Peer implements InitActive, RunActive, Serializable {
 
     /**
      * The timeout to wait before to check neighbors via the call of
