@@ -34,6 +34,7 @@ package org.objectweb.proactive.core.body;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -55,15 +56,15 @@ import org.objectweb.proactive.core.body.request.RequestFactory;
 import org.objectweb.proactive.core.body.request.RequestQueueFactory;
 import org.objectweb.proactive.core.body.request.RequestReceiver;
 import org.objectweb.proactive.core.body.request.RequestReceiverFactory;
-import org.objectweb.proactive.core.body.tags.RequestTags;
-import org.objectweb.proactive.core.body.tags.RequestTagsFactory;
-import org.objectweb.proactive.core.body.tags.TagRegistry;
-import org.objectweb.proactive.core.body.tags.propagation.policy.AbstractPolicy;
+import org.objectweb.proactive.core.body.tags.LocalMemoryTag;
+import org.objectweb.proactive.core.body.tags.MessageTags;
+import org.objectweb.proactive.core.body.tags.MessageTagsFactory;
 import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.identity.ProActiveComponentFactory;
 import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
 import org.objectweb.proactive.core.component.request.SynchronousComponentRequestReceiver;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.debug.stepbystep.Debugger;
 import org.objectweb.proactive.core.debug.stepbystep.DebuggerFactory;
 import org.objectweb.proactive.core.debug.stepbystep.DebuggerImpl;
@@ -145,7 +146,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
     protected ProActiveSecurityManager proActiveSecurityManager;
     protected FTManagerFactory ftmanagerFactoryInstance;
     protected DebuggerFactory debuggerFactoryInstance;
-    protected RequestTagsFactory requestTagsFactoryInstance;
+    protected MessageTagsFactory requestTagsFactoryInstance;
     protected Object timItReductor;
 
     //
@@ -174,7 +175,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
         this.parameters = parameters;
         if (parameters.containsKey(COMPONENT_PARAMETERS_KEY)) {
             ComponentParameters initialComponentParameters = (ComponentParameters) parameters
-                    .get(COMPONENT_PARAMETERS_KEY);
+            .get(COMPONENT_PARAMETERS_KEY);
             this.componentFactoryInstance = newComponentFactorySingleton(initialComponentParameters);
             this.requestFactoryInstance = newRequestFactorySingleton();
             this.replyReceiverFactoryInstance = newReplyReceiverFactorySingleton();
@@ -254,8 +255,8 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
     public DebuggerFactory newDebuggerFactory() {
         return this.debuggerFactoryInstance;
     }
-    
-    public RequestTagsFactory newRequestTagsFactory() {
+
+    public MessageTagsFactory newRequestTagsFactory() {
         return this.requestTagsFactoryInstance;
     }
 
@@ -306,24 +307,24 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
         return new DebuggerFactoryImpl();
     }
 
-    protected RequestTagsFactory newRequestTagsFactorySingleton() {
-        return new RequestTagsFactoryImpl();
+    protected MessageTagsFactory newRequestTagsFactorySingleton() {
+        return new MessageTagsFactoryImpl();
     }
 
-    
+
     //  //
     //  // -- INNER CLASSES -----------------------------------------------
     //  //
     protected static class RequestFactoryImpl implements RequestFactory, java.io.Serializable {
         public Request newRequest(MethodCall methodCall, UniversalBody sourceBody, boolean isOneWay,
-                long sequenceID, RequestTags tags) {
+                long sequenceID, MessageTags tags) {
             //########### exemple de code pour les nouvelles factories
             //			if(System.getProperty("migration.stategy").equals("locationserver")){
             //				  return new RequestWithLocationServer(methodCall, sourceBody,
             //                isOneWay, sequenceID, LocationServerFactory.getLocationServer());
             //			}else{
             return new org.objectweb.proactive.core.body.request.RequestImpl(methodCall, sourceBody,
-                isOneWay, sequenceID, tags);
+                    isOneWay, sequenceID, tags);
             //}
         }
     }
@@ -339,8 +340,8 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
     protected class RequestReceiverFactoryImpl implements RequestReceiverFactory, java.io.Serializable {
         public RequestReceiver newRequestReceiver() {
             if (ProActiveMetaObjectFactory.this.parameters.containsKey(SYNCHRONOUS_COMPOSITE_COMPONENT_KEY) &&
-                ((Boolean) ProActiveMetaObjectFactory.this.parameters
-                        .get(ProActiveMetaObjectFactory.SYNCHRONOUS_COMPOSITE_COMPONENT_KEY)).booleanValue()) {
+                    ((Boolean) ProActiveMetaObjectFactory.this.parameters
+                            .get(ProActiveMetaObjectFactory.SYNCHRONOUS_COMPOSITE_COMPONENT_KEY)).booleanValue()) {
                 return new SynchronousComponentRequestReceiver();
             }
             return new org.objectweb.proactive.core.body.request.RequestReceiverImpl();
@@ -367,7 +368,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
 
     // end inner class RequestQueueFactoryImpl
     protected static class MigrationManagerFactoryImpl implements MigrationManagerFactory,
-            java.io.Serializable {
+    java.io.Serializable {
         public MigrationManager newMigrationManager() {
             //########### example de code pour les nouvelles factories
             //			if(System.getProperty("migration.stategy").equals("locationserver")){
@@ -431,7 +432,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
 
     // end inner class ThreadStoreFactoryImpl
     protected static class ProActiveSPMDGroupManagerFactoryImpl implements ProActiveSPMDGroupManagerFactory,
-            java.io.Serializable {
+    java.io.Serializable {
         public ProActiveSPMDGroupManager newProActiveSPMDGroupManager() {
             return new ProActiveSPMDGroupManager();
         }
@@ -461,8 +462,8 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
                     return new FTManagerPMLRB();
                 default:
                     logger.error("Error while creating fault-tolerance manager : " +
-                        "no protocol is associated to selector value " + protocolSelector);
-                    return null;
+                            "no protocol is associated to selector value " + protocolSelector);
+                return null;
             }
         }
 
@@ -474,8 +475,8 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
                     return new HalfFTManagerPMLRB();
                 default:
                     logger.error("Error while creating fault-tolerance manager : " +
-                        "no protocol is associated to selector value " + protocolSelector);
-                    return null;
+                            "no protocol is associated to selector value " + protocolSelector);
+                return null;
             }
         }
     }
@@ -487,25 +488,67 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
     }
 
     // REQUEST-TAGS
-    protected static class RequestTagsFactoryImpl implements RequestTagsFactory, Serializable{
-        @Override
-        public RequestTags newRequestTags() {
-            return new RequestTags();
+    protected static class MessageTagsFactoryImpl implements MessageTagsFactory, Serializable{
+        
+        private boolean running = true;
+
+        private static boolean leaseCheckingRunning = false;
+        
+        /**
+         * @see MessageTagsFactory#newMessageTags()
+         */
+        public MessageTags newMessageTags() {
+            return new MessageTags();
         }
 
-        @Override
-        public void register(String tag, AbstractPolicy policy) {
-            TagRegistry.getInstance().register(tag, policy);
-            
+        /**
+         * @see MessageTagsFactory#startLeaseChecking()
+         */
+        public synchronized void startLeaseChecking(){
+            System.err.println("START THREAD");
+            MessageTagsFactoryImpl.leaseCheckingRunning = true;
+            final int period = PAProperties.PA_MEMORY_TAG_LEASE_PERIOD.getValueAsInt();
+            new Thread(new Runnable(){
+                public void run() {
+                    while(running){
+                        try {
+                            Thread.sleep(period * 1000);
+                        } catch (InterruptedException e) {
+                        }
+                        Iterator<UniversalBody> iter = LocalBodyStore.getInstance().getLocalBodies().bodiesIterator();
+                        while(iter.hasNext()){
+                            UniversalBody body = iter.next();
+                            if (body instanceof AbstractBody){
+                                Map<String, LocalMemoryTag> memories = ((AbstractBody) body).getLocalMemoryTags();
+                                for(LocalMemoryTag memory : memories.values()){
+                                    memory.decCurrentLease(period);
+                                    if (memory.leaseExceeded()){
+                                        memories.remove(memory.getTagIDReferer());
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+            }).start();
         }
         
-        @Override
-        public void register(String id) {
-            TagRegistry.getInstance().register(id);
-            
+        /**
+         * @see MessageTagsFactory#stopLeaseChecking()
+         */
+        public void stopLeaseChecking(){
+            this.running = false;
+        }
+        
+        /**
+         * @see MessageTagsFactory#isLeaseCheckingRunning()
+         */
+        public boolean isLeaseCheckingRunning(){
+            return leaseCheckingRunning;
         }
     }
-    
+
     // SECURITY
     public void setProActiveSecurityManager(ProActiveSecurityManager psm) {
         this.proActiveSecurityManager = psm;

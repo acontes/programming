@@ -34,7 +34,7 @@ package org.objectweb.proactive.core.body.message;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.ft.message.MessageInfo;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
-import org.objectweb.proactive.core.body.tags.RequestTags;
+import org.objectweb.proactive.core.body.tags.MessageTags;
 
 
 /**
@@ -120,9 +120,11 @@ public interface Message {
      * @return the FTManager that have to treat this message
      */
     public FTManager getFTManager();
-
-
-
-    public RequestTags getTags();
+    
+    /**
+     * Return the MessageTags attached to this message
+     * @return the MessageTags attached to this message
+     */
+    public MessageTags getTags();
 
 }

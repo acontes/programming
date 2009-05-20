@@ -47,10 +47,8 @@ import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFactory;
 import org.objectweb.proactive.core.body.request.RequestQueue;
-import org.objectweb.proactive.core.body.tags.RequestTags;
-import org.objectweb.proactive.core.body.tags.TagRegistry;
-import org.objectweb.proactive.core.body.tags.UnknowTagException;
-import org.objectweb.proactive.core.body.tags.propagation.policy.RequiredPolicy;
+import org.objectweb.proactive.core.body.tags.MessageTags;
+import org.objectweb.proactive.core.body.tags.Tag;
 import org.objectweb.proactive.core.component.request.ComponentRequestImpl;
 import org.objectweb.proactive.core.gc.HalfBodies;
 import org.objectweb.proactive.core.mop.MethodCall;
@@ -264,13 +262,13 @@ public class HalfBody extends AbstractBody {
         public void sendRequest(MethodCall methodCall, Future future, UniversalBody destinationBody)
                 throws java.io.IOException, RenegotiateSessionException, CommunicationForbiddenException {
             long sequenceID = getNextSequenceID();
-            // Create DSI RequestTags
-            RequestTags tags = requestTagsFactory.newRequestTags();
-            try {
-                tags.addTag("DSI");
-            } catch (UnknowTagException e) {
-                requestTagsFactory.register("DSI", new RequiredPolicy());
-            }
+            // Create DSI MessageTag
+            MessageTags tags = messageTagsFactory.newMessageTags();
+            tags.addTag(new Tag("DSI", new UniqueID()){
+                public Tag apply() {
+                    return this;
+                }
+            });
 
             Request request = this.internalRequestFactory.newRequest(methodCall, HalfBody.this,
                     future == null, sequenceID, tags);

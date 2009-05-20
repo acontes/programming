@@ -2,69 +2,98 @@ package org.objectweb.proactive.core.body.tags;
 
 import java.io.Serializable;
 
-import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.body.tags.propagation.PropagationPolicy;
-import org.objectweb.proactive.core.body.tags.propagation.policy.PropagatePolicy;
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.body.AbstractBody;
+import org.objectweb.proactive.core.body.BodyImpl;
+import org.objectweb.proactive.core.config.PAProperties;
 
 /**
  * Tag for Request Tagging
  */
-public class Tag implements Serializable{
+public abstract class Tag implements Serializable{
 
-    /** Value of the tag */
-    protected UniqueID value;
-
-    /** Propagation policy of the value of this tag */
-    protected PropagationPolicy policy;
+    /** Identifier of the tag */
+    protected String id;
 
     /** User Data attached to this tag */
     protected Object data;
-
-
+    
     /**
      * Tag constructor
-     * @param value  - Value of the tag
-     * @param policy - Propagation policy
+     * @param id     - Identifier of the tag
      * @param data   - User Data Content
      */
-    public Tag(PropagationPolicy policy, Object data) {
-        this.value = new UniqueID();
+    public Tag(String id, Object data) {
+        this.id = id;
         this.data = data;
-        this.policy = policy;
+    }
+    
+    /**
+     * Tag constructor
+     * @param id     - Identifier of the tag
+     */
+    public Tag(String id) {
+        this(id, null);
     }
 
     /**
-     * Tag constructor with default propagation policy
-     * and a user data content.
-     * @param value  - Tag Value
-     * @param data   - User Data Content
+     * Do the current Tag Jobs
+     * @return the new TAG for the next propagation
      */
-    public Tag(Object data){
-        this(new PropagatePolicy(), data);
+    abstract public Tag apply();
+
+    /**
+     * Return the local memory space of this Tag on the current Active Object
+     * @return the LocaLMemoryTag of this tag on the current ActiveObject
+     */
+    final public LocalMemoryTag getLocalMemory(){
+        Body body = PAActiveObject.getBodyOnThis();
+        if ( body instanceof BodyImpl) {
+            return ((BodyImpl)body).getLocalMemoryTag(this.id);
+        } //else
+        return null;
     }
 
     /**
-     * Tag constructor with default policy
-     * @param value - Tag Value
+     * Create a local memory space for this Tag on the current Active Object
+     * with the specified lease period if inferior to the max lease period of
+     * the PAProperties.
+     * @param lease - Lease Period
+     * @return the LocaLMemoryTag of this tag on the current ActiveObject
      */
-    public Tag(){
-        this(null);
+    final public LocalMemoryTag createLocalMemory(int lease){
+        Body body = PAActiveObject.getBodyOnThis();
+        if ( body instanceof BodyImpl) {
+            return ((BodyImpl)body).createLocalMemoryTag(this.id, lease);
+        } //else
+        return null;
     }
-
+       
     /**
-     * Set a propagation policy to this tag
-     * @param policy - a Propagation policy
+     * Clear the local memory attached to this tag
      */
-    public void setPolicy(PropagationPolicy policy) {
-        this.policy = policy;
+    final public void clearLocalMemory(){
+        Body body = PAActiveObject.getBodyOnThis();
+        if ( body instanceof BodyImpl) {
+            ((AbstractBody)body).clearLocalMemoryTag(this.id);
+        }
     }
-
+    
+    /**
+     * To get the Id of this tag
+     * @return Tag Id
+     */
+    public String getId(){
+        return this.id;
+    }
+    
     /**
      * Return the User Data attached to this tag
      * @return - User Data
      */
     public Object getData() {
-        return data;
+        return this.data;
     }
 
     /**
@@ -76,33 +105,10 @@ public class Tag implements Serializable{
     }
 
     /**
-     * Propagation of the value of this tag depending on the policy setted.
-     */
-    public void propagate(){
-        this.policy.propagate(this);
-    }
-
-    /**
      * Display Tag Information
      */
     public String toString() {
-        return "<TAG: value="+value+", policy="+policy+", data="+data+">";
-    }
-
-    /**
-     * Return the Value of this TAG
-     * @return UniqueID
-     */
-    public UniqueID getValue() {
-        return value;
-    }
-
-    /**
-     * Set the value of the Tag
-     * @param value - new tag value
-     */
-    public void setValue(UniqueID value) {
-        this.value = value;
+        return "<TAG: id="+id+", data="+data+">";
     }
 
 }

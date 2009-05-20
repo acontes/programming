@@ -41,7 +41,7 @@ import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.RequestImpl;
-import org.objectweb.proactive.core.body.tags.RequestTags;
+import org.objectweb.proactive.core.body.tags.MessageTags;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -59,7 +59,7 @@ public class RequestWithLocationServer extends RequestImpl implements java.io.Se
     private transient LocationServer server;
 
     public RequestWithLocationServer(MethodCall methodCall, UniversalBody sender, boolean isOneWay,
-            long nextSequenceID, LocationServer server, RequestTags tags) {
+            long nextSequenceID, LocationServer server, MessageTags tags) {
         super(methodCall, sender, isOneWay, nextSequenceID);
         this.server = server;
     }

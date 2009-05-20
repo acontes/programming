@@ -483,6 +483,14 @@ public enum PAProperties {
     PA_DEBUG("proactive.debug", PAPropertiesType.BOOLEAN),
 
     /* ------------------------------------
+     *  MESSAGE TAGGING 
+     */
+    /** Set the max period for LocalMemoryTag lease time */
+    PA_MAX_MEMORY_TAG_LEASE("proactive.tagmemory.maxlease", PAPropertiesType.INTEGER),
+    
+    PA_MEMORY_TAG_LEASE_PERIOD("proactive.tagmemory.lease.period", PAPropertiesType.INTEGER),
+    
+    /* ------------------------------------
      *  FILE TRANSFER
      */
 

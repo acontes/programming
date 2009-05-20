@@ -45,7 +45,7 @@ import org.objectweb.proactive.core.body.future.MethodCallResult;
 import org.objectweb.proactive.core.body.message.MessageImpl;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.reply.ReplyImpl;
-import org.objectweb.proactive.core.body.tags.RequestTags;
+import org.objectweb.proactive.core.body.tags.MessageTags;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
@@ -103,7 +103,7 @@ public class RequestImpl extends MessageImpl implements Request, java.io.Seriali
         this(methodCall, sender, isOneWay, nextSequenceID, false, null);
     }
 
-    public RequestImpl(MethodCall methodCall, UniversalBody sender, boolean isOneWay, long nextSequenceID, RequestTags tags) {
+    public RequestImpl(MethodCall methodCall, UniversalBody sender, boolean isOneWay, long nextSequenceID, MessageTags tags) {
         this(methodCall, sender, isOneWay, nextSequenceID, false, tags);
     }
 
@@ -114,13 +114,13 @@ public class RequestImpl extends MessageImpl implements Request, java.io.Seriali
     }
 
     public RequestImpl(MethodCall methodCall, UniversalBody sender, boolean isOneWay, long nextSequenceID,
-            boolean isNFRequest, RequestTags tags) {
+            boolean isNFRequest, MessageTags tags) {
         this(methodCall, sender, isOneWay, nextSequenceID, false, Request.NFREQUEST_NO_PRIORITY, tags);
     }
 
     // Constructor of non functional requests with priority
     public RequestImpl(MethodCall methodCall, UniversalBody sender, boolean isOneWay, long nextSequenceID,
-            boolean isNFRequest, int nfRequestPriority, RequestTags tags) {
+            boolean isNFRequest, int nfRequestPriority, MessageTags tags) {
         super(sender.getID(), nextSequenceID, isOneWay, methodCall.getName(), tags);
         this.methodCall = methodCall;
         this.sender = sender;
@@ -148,7 +148,7 @@ public class RequestImpl extends MessageImpl implements Request, java.io.Seriali
     }
 
     // Constructor of synchronous requests
-    public RequestImpl(MethodCall methodCall, boolean isOneWay, RequestTags tags) {
+    public RequestImpl(MethodCall methodCall, boolean isOneWay, MessageTags tags) {
         super(null, 0, isOneWay, methodCall.getName(), tags);
         this.methodCall = methodCall;
         this.senderNodeURI = "";
@@ -259,7 +259,7 @@ public class RequestImpl extends MessageImpl implements Request, java.io.Seriali
                 .getProActiveSecurityManager();
         // Get request TAGs from current context
         Request currentreq = LocalBodyStore.getInstance().getContext().getCurrentRequest();
-        RequestTags tags = null;
+        MessageTags tags = null;
 
         if (currentreq != null)
             tags  =  currentreq.getTags();

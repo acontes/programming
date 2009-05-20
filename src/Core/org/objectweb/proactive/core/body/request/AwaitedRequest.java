@@ -42,7 +42,7 @@ import org.objectweb.proactive.core.body.ft.exception.ProtocolErrorException;
 import org.objectweb.proactive.core.body.ft.message.MessageInfo;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.reply.Reply;
-import org.objectweb.proactive.core.body.tags.RequestTags;
+import org.objectweb.proactive.core.body.tags.MessageTags;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityEntity;
@@ -81,7 +81,7 @@ public class AwaitedRequest implements Request, java.io.Serializable {
 
 
     // Request Tags
-    protected RequestTags tags;
+    protected MessageTags tags;
 
     /**
      * Create a new awaited request.
@@ -281,7 +281,7 @@ public class AwaitedRequest implements Request, java.io.Serializable {
      * Return the tags on this request
      * @return tags
      */
-    public RequestTags getTags() {
+    public MessageTags getTags() {
         return tags;
     }
 }

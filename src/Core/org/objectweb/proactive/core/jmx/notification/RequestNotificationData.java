@@ -34,7 +34,6 @@ package org.objectweb.proactive.core.jmx.notification;
 import java.io.Serializable;
 
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.body.tags.RequestTags;
 
 
 public class RequestNotificationData implements Serializable {
@@ -45,7 +44,7 @@ public class RequestNotificationData implements Serializable {
     private String sourceNode;
     private String destinationNode;
     private long sequenceNumber;
-    private RequestTags tags;
+    private String tags;
 
     /**
      * Creates a new requestData used by the JMX user data.
@@ -58,7 +57,7 @@ public class RequestNotificationData implements Serializable {
      */
     public RequestNotificationData(UniqueID source, String sourceNode, UniqueID destination,
             String destinationNode, String methodName, int requestQueueLength, long sequenceNumber,
-            RequestTags tags) {
+            String tags) {
         this.source = source;
         this.sourceNode = sourceNode;
         this.destination = destination;
@@ -127,7 +126,7 @@ public class RequestNotificationData implements Serializable {
         return sequenceNumber;
     }
 
-    public RequestTags getTags(){
+    public String getTags(){
         return tags;
     }
 }

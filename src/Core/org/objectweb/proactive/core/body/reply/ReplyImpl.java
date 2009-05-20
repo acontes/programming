@@ -39,7 +39,7 @@ import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.future.MethodCallResult;
 import org.objectweb.proactive.core.body.message.MessageImpl;
-import org.objectweb.proactive.core.body.tags.RequestTags;
+import org.objectweb.proactive.core.body.tags.MessageTags;
 import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.crypto.Session;
@@ -76,7 +76,7 @@ public class ReplyImpl extends MessageImpl implements Reply, Serializable {
     protected transient ProActiveSecurityManager psm = null;
 
     public ReplyImpl(UniqueID senderID, long sequenceNumber, String methodName, MethodCallResult result,
-            ProActiveSecurityManager psm, RequestTags tags) {
+            ProActiveSecurityManager psm, MessageTags tags) {
         this(senderID, sequenceNumber, methodName, result, psm, false, tags);
     }
 
@@ -91,7 +91,7 @@ public class ReplyImpl extends MessageImpl implements Reply, Serializable {
     }
 
     public ReplyImpl(UniqueID senderID, long sequenceNumber, String methodName, MethodCallResult result,
-            ProActiveSecurityManager psm, boolean isAutomaticContinuation, RequestTags tags) {
+            ProActiveSecurityManager psm, boolean isAutomaticContinuation, MessageTags tags) {
         super(senderID, sequenceNumber, true, methodName, tags);
         this.result = result;
         this.psm = psm;

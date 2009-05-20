@@ -34,7 +34,7 @@ package org.objectweb.proactive.core.body.message;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.ft.message.MessageInfo;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
-import org.objectweb.proactive.core.body.tags.RequestTags;
+import org.objectweb.proactive.core.body.tags.MessageTags;
 
 
 /**
@@ -76,7 +76,7 @@ public class MessageImpl implements Message, java.io.Serializable {
     protected transient FTManager ftm;
 
     // DSI
-    protected RequestTags tags;
+    protected MessageTags tags;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -92,7 +92,7 @@ public class MessageImpl implements Message, java.io.Serializable {
      * @param isOneWay <code>true</code> if oneWay
      * @param methodName the method name of the method call
      */
-    public MessageImpl(UniqueID sourceID, long sequenceNumber, boolean isOneWay, String methodName, RequestTags tags) {
+    public MessageImpl(UniqueID sourceID, long sequenceNumber, boolean isOneWay, String methodName, MessageTags tags) {
         this.sourceID = sourceID;
         this.sequenceNumber = sequenceNumber;
         this.timeStamp = System.currentTimeMillis();
@@ -166,7 +166,7 @@ public class MessageImpl implements Message, java.io.Serializable {
         return this.ftm;
     }
 
-    public RequestTags getTags() {
+    public MessageTags getTags() {
         //if (tags == null)
         //    tags = new RequestTags();
         return tags;

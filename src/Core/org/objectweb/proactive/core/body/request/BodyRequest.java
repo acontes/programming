@@ -39,7 +39,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.message.MessageImpl;
 import org.objectweb.proactive.core.body.reply.Reply;
-import org.objectweb.proactive.core.body.tags.RequestTags;
+import org.objectweb.proactive.core.body.tags.MessageTags;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
@@ -56,7 +56,7 @@ public class BodyRequest extends MessageImpl implements Request, java.io.Seriali
     // -- CONSTRUCTORS -----------------------------------------------
     //
 
-    protected BodyRequest(Body targetBody, RequestTags tags, String methodName, Class<?>[] paramClasses, Object[] params)
+    protected BodyRequest(Body targetBody, MessageTags tags, String methodName, Class<?>[] paramClasses, Object[] params)
             throws NoSuchMethodException {
         super(null, 0, true, methodName, tags);
         if (paramClasses == null) {
@@ -70,7 +70,7 @@ public class BodyRequest extends MessageImpl implements Request, java.io.Seriali
     }
 
     public BodyRequest(Body targetBody, String methodName, Class<?>[] paramClasses, Object[] params,
-            boolean isPriority, RequestTags tags) throws NoSuchMethodException {
+            boolean isPriority, MessageTags tags) throws NoSuchMethodException {
         this(targetBody, tags, methodName, paramClasses, params);
         this.isPriority = isPriority;
     }
@@ -82,7 +82,7 @@ public class BodyRequest extends MessageImpl implements Request, java.io.Seriali
     }
 
     //Non functional BodyRequests constructor
-    public BodyRequest(Body targetBody,RequestTags tags, String methodName, Class<?>[] paramClasses, Object[] params,
+    public BodyRequest(Body targetBody,MessageTags tags, String methodName, Class<?>[] paramClasses, Object[] params,
             boolean isNFRequest, int nfRequestPriority) throws NoSuchMethodException {
         this(targetBody, tags, methodName, paramClasses, params);
         this.isNFRequest = isNFRequest;

@@ -38,7 +38,7 @@ import org.objectweb.proactive.core.body.migration.MigrationManager;
 import org.objectweb.proactive.core.body.migration.MigrationManagerFactory;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFactory;
-import org.objectweb.proactive.core.body.tags.RequestTags;
+import org.objectweb.proactive.core.body.tags.MessageTags;
 import org.objectweb.proactive.core.mop.MethodCall;
 
 
@@ -99,7 +99,7 @@ public class LocationServerMetaObjectFactory extends ProActiveMetaObjectFactory 
         transient private LocationServer server = LocationServerFactory.getLocationServer();
 
         public Request newRequest(MethodCall methodCall, UniversalBody sourceBody, boolean isOneWay,
-                long sequenceID, RequestTags tags) {
+                long sequenceID, MessageTags tags) {
             return new RequestWithLocationServer(methodCall, sourceBody, isOneWay, sequenceID, server, tags);
         }
     }

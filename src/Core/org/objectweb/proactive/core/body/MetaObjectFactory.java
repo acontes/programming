@@ -39,7 +39,7 @@ import org.objectweb.proactive.core.body.reply.ReplyReceiverFactory;
 import org.objectweb.proactive.core.body.request.RequestFactory;
 import org.objectweb.proactive.core.body.request.RequestQueueFactory;
 import org.objectweb.proactive.core.body.request.RequestReceiverFactory;
-import org.objectweb.proactive.core.body.tags.RequestTagsFactory;
+import org.objectweb.proactive.core.body.tags.MessageTagsFactory;
 import org.objectweb.proactive.core.component.identity.ProActiveComponentFactory;
 import org.objectweb.proactive.core.debug.stepbystep.DebuggerFactory;
 import org.objectweb.proactive.core.group.spmd.ProActiveSPMDGroupManagerFactory;
@@ -156,7 +156,7 @@ public interface MetaObjectFactory {
      * Create the RequestTags manager.
      * @return the RequestTags manager
      */
-    public RequestTagsFactory newRequestTagsFactory();
+    public MessageTagsFactory newRequestTagsFactory();
     
     // FAULT-TOLERANCE
 

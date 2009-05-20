@@ -38,6 +38,8 @@ import java.security.AccessControlException;
 import java.security.PublicKey;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanRegistrationException;
@@ -48,8 +50,8 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAGroup;
-import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory.MessageTagsFactoryImpl;
 import org.objectweb.proactive.core.body.exceptions.BodyTerminatedReplyException;
 import org.objectweb.proactive.core.body.exceptions.BodyTerminatedRequestException;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
@@ -59,14 +61,15 @@ import org.objectweb.proactive.core.body.ft.servers.faultdetection.FaultDetector
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FuturePool;
 import org.objectweb.proactive.core.body.future.MethodCallResult;
-import org.objectweb.proactive.core.body.proxy.BodyProxy;
 import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.core.body.tags.RequestTagsFactory;
+import org.objectweb.proactive.core.body.tags.LocalMemoryTag;
+import org.objectweb.proactive.core.body.tags.MessageTagsFactory;
 import org.objectweb.proactive.core.component.representative.ItfID;
 import org.objectweb.proactive.core.component.request.Shortcut;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.debug.stepbystep.BreakpointType;
 import org.objectweb.proactive.core.debug.stepbystep.Debugger;
 import org.objectweb.proactive.core.gc.GCMessage;
@@ -74,9 +77,7 @@ import org.objectweb.proactive.core.gc.GCResponse;
 import org.objectweb.proactive.core.gc.GarbageCollector;
 import org.objectweb.proactive.core.group.spmd.ProActiveSPMDGroupManager;
 import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
-import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.MethodCall;
-import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.security.DefaultProActiveSecurityManager;
 import org.objectweb.proactive.core.security.InternalBodySecurity;
@@ -171,8 +172,9 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     protected BodyWrapperMBean mbean;
     protected boolean isProActiveInternalObject = false;
 
-    // REQUEST-TAGS Factory
-    protected RequestTagsFactory requestTagsFactory;
+    // MESSAGE-TAGS Factory
+    protected MessageTagsFactory messageTagsFactory;
+    protected Map<String, LocalMemoryTag> localMemoryTags;
     
     //
     // -- PRIVATE MEMBERS -----------------------------------------------
@@ -234,8 +236,9 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         this.debugger = factory.newDebuggerFactory().newDebugger();
         this.debugger.setTarget(this);
 
-        // REQUEST TAGS
-        this.requestTagsFactory = factory.newRequestTagsFactory();
+        // MESSAGE TAGS
+        this.messageTagsFactory = factory.newRequestTagsFactory();
+        this.localMemoryTags = new ConcurrentHashMap<String, LocalMemoryTag>();
         
         // SECURITY
         if (reifiedObject instanceof Secure) {
@@ -1149,6 +1152,48 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         return this.gc.receiveGCMessage(msg);
     }
 
+    // MESSAGE TAGS MEMORY
+    /**
+     * Create a local memory for the specified tag for a lease period inferior to 
+     * the max lease period defined in properties.
+     * @param id    - Tag Identifier
+     * @param lease - Lease period of the memroy
+     * @return The LocalMemoryTag 
+     */
+    public LocalMemoryTag createLocalMemoryTag(String id, int lease){
+        int maxLease = PAProperties.PA_MAX_MEMORY_TAG_LEASE.getValueAsInt();
+        lease = (lease > maxLease) ? maxLease : lease;
+        this.localMemoryTags.put(id, new LocalMemoryTag(id, lease));
+        if( !messageTagsFactory.isLeaseCheckingRunning() )
+            messageTagsFactory.startLeaseChecking();
+        return this.localMemoryTags.get(id);
+    }
+    
+    /**
+     * Return the local memory of the specified Tag
+     * @param id - Tag identifer
+     * @return the LocalMemoryTag of the specified Tag
+     */
+    public LocalMemoryTag getLocalMemoryTag(String id){
+        return this.localMemoryTags.get(id);
+    }
+    
+    /**
+     * Clear the local memory of the specified Tag
+     * @param id - Tag identifier
+     */
+    public void clearLocalMemoryTag(String id){
+        this.localMemoryTags.remove(id);
+    }
+    
+    /**
+     * To get the localMemoryTag Map of the body
+     * @return Map<String, {@link LocalMemoryTag}> the LocalMemoryTags
+     */
+    public Map<String, LocalMemoryTag> getLocalMemoryTags(){
+        return this.localMemoryTags;
+    }
+    
     /**
      * Returns true if an immediate service request is being served now.
      */

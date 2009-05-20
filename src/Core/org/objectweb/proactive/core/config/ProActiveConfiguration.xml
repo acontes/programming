@@ -33,7 +33,8 @@
 		<!-- <prop key="proactive.ssh.port" value="22"/> -->
 		<!-- <prop key="proactive.ssh.username" value="mlacage"/> -->
         <prop key="components.creation.timeout" value="10000" /> <!-- timeout in seconds for parallel creation of components -->
-
+		<prop key="proactive.tagmemory.maxlease" value="60" />
+		<prop key="proactive.tagmemory.lease.period" value="21" />
 		
 		<!-- ***************************************************** -->
 		<!-- MASTER/WORKER PROPERTIES VALUE -->
