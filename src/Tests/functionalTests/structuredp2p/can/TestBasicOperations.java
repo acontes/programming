@@ -12,7 +12,6 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.Area;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.CANOverlay;
-import org.objectweb.proactive.extensions.structuredp2p.core.can.CANPeer;
 import org.objectweb.proactive.extensions.structuredp2p.core.exception.AreaException;
 
 
@@ -27,14 +26,13 @@ import org.objectweb.proactive.extensions.structuredp2p.core.exception.AreaExcep
  * @version 0.1
  */
 public class TestBasicOperations {
-    private static CANPeer entryPoint;
-    private static CANPeer neighbor;
+    private static Peer entryPoint;
+    private static Peer neighbor;
 
     @BeforeClass
     public static void initTest() {
         try {
-            TestBasicOperations.entryPoint = (CANPeer) PAActiveObject
-                    .newActive(CANPeer.class.getName(), null);
+            TestBasicOperations.entryPoint = PAActiveObject.newActive(CANPeer.class.getName(), null);
             TestBasicOperations.neighbor = (CANPeer) PAActiveObject.newActive(CANPeer.class.getName(), null);
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
