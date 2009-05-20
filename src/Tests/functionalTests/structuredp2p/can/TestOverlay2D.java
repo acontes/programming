@@ -14,9 +14,9 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.Area;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.CANOverlay;
+import org.objectweb.proactive.extensions.structuredp2p.core.can.CANPeer;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.Coordinate;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.NeighborsDataStructure;
-import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
 import org.objectweb.proactive.extensions.structuredp2p.messages.LookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANLookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.can.CANLookupResponseMessage;
@@ -35,10 +35,10 @@ import org.objectweb.proactive.extensions.structuredp2p.responses.can.CANLookupR
  */
 public class TestOverlay2D {
 
-    private Peer firstPeer;
-    private Peer secondPeer;
-    private Peer thirdPeer;
-    private Peer fourthPeer;
+    private CANPeer firstPeer;
+    private CANPeer secondPeer;
+    private CANPeer thirdPeer;
+    private CANPeer fourthPeer;
 
     private LookupMessage msg;
 
@@ -52,8 +52,7 @@ public class TestOverlay2D {
 
         /* First peer */
 
-        this.firstPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
-                new Object[] { OverlayType.CAN });
+        this.firstPeer = (CANPeer) PAActiveObject.newActive(CANPeer.class.getName(), null);
 
         coordinateMin = new Coordinate[2];
         coordinateMax = new Coordinate[2];
@@ -64,7 +63,7 @@ public class TestOverlay2D {
         coordinateMax[1] = new Coordinate("12");
 
         area = new Area(coordinateMin, coordinateMax);
-        overlay = (CANOverlay) this.firstPeer.getStructuredOverlay();
+        overlay = this.firstPeer.getStructuredOverlay();
         overlay.setArea(area);
         splitHistory = new Stack<int[]>();
         splitHistory.add(new int[] { 0, 1 });
@@ -73,8 +72,7 @@ public class TestOverlay2D {
 
         /* Second peer */
 
-        this.secondPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
-                new Object[] { OverlayType.CAN });
+        this.secondPeer = (CANPeer) PAActiveObject.newActive(CANPeer.class.getName(), null);
 
         coordinateMin = new Coordinate[2];
         coordinateMax = new Coordinate[2];
@@ -85,7 +83,7 @@ public class TestOverlay2D {
         coordinateMax[1] = new Coordinate("6");
 
         area = new Area(coordinateMin, coordinateMax);
-        overlay = (CANOverlay) this.secondPeer.getStructuredOverlay();
+        overlay = this.secondPeer.getStructuredOverlay();
         overlay.setArea(area);
         splitHistory = new Stack<int[]>();
         splitHistory.add(new int[] { 0, 0 });
@@ -95,8 +93,7 @@ public class TestOverlay2D {
 
         /* Third peer */
 
-        this.thirdPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
-                new Object[] { OverlayType.CAN });
+        this.thirdPeer = (CANPeer) PAActiveObject.newActive(CANPeer.class.getName(), null);
 
         coordinateMin = new Coordinate[2];
         coordinateMax = new Coordinate[2];
@@ -107,7 +104,7 @@ public class TestOverlay2D {
         coordinateMax[1] = new Coordinate("12");
 
         area = new Area(coordinateMin, coordinateMax);
-        overlay = (CANOverlay) this.thirdPeer.getStructuredOverlay();
+        overlay = this.thirdPeer.getStructuredOverlay();
         overlay.setArea(area);
         splitHistory = new Stack<int[]>();
         splitHistory.add(new int[] { 0, 0 });
@@ -118,8 +115,7 @@ public class TestOverlay2D {
 
         /* Fourth peer */
 
-        this.fourthPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
-                new Object[] { OverlayType.CAN });
+        this.fourthPeer = (CANPeer) PAActiveObject.newActive(CANPeer.class.getName(), null);
 
         coordinateMin = new Coordinate[2];
         coordinateMax = new Coordinate[2];
@@ -130,7 +126,7 @@ public class TestOverlay2D {
         coordinateMax[1] = new Coordinate("12");
 
         area = new Area(coordinateMin, coordinateMax);
-        overlay = (CANOverlay) this.fourthPeer.getStructuredOverlay();
+        overlay = this.fourthPeer.getStructuredOverlay();
         overlay.setArea(area);
         splitHistory = new Stack<int[]>();
         splitHistory.add(new int[] { 0, 0 });
@@ -141,24 +137,24 @@ public class TestOverlay2D {
 
         /* Add neighbors to peers */
 
-        overlay = (CANOverlay) this.firstPeer.getStructuredOverlay();
+        overlay = this.firstPeer.getStructuredOverlay();
         overlay.addNeighbor(this.thirdPeer, 0, 1);
         overlay.addNeighbor(this.secondPeer, 0, 1);
         this.firstPeer.setStructuredOverlay(overlay);
 
-        overlay = (CANOverlay) this.secondPeer.getStructuredOverlay();
+        overlay = this.secondPeer.getStructuredOverlay();
         overlay.addNeighbor(this.firstPeer, 0, 0);
         overlay.addNeighbor(this.thirdPeer, 1, 1);
         overlay.addNeighbor(this.fourthPeer, 1, 1);
         this.secondPeer.setStructuredOverlay(overlay);
 
-        overlay = (CANOverlay) this.thirdPeer.getStructuredOverlay();
+        overlay = this.thirdPeer.getStructuredOverlay();
         overlay.addNeighbor(this.firstPeer, 0, 0);
         overlay.addNeighbor(this.secondPeer, 1, 0);
         overlay.addNeighbor(this.fourthPeer, 0, 1);
         this.thirdPeer.setStructuredOverlay(overlay);
 
-        overlay = (CANOverlay) this.fourthPeer.getStructuredOverlay();
+        overlay = this.fourthPeer.getStructuredOverlay();
         overlay.addNeighbor(this.thirdPeer, 0, 0);
         overlay.addNeighbor(this.secondPeer, 1, 0);
         this.fourthPeer.setStructuredOverlay(overlay);
@@ -177,41 +173,42 @@ public class TestOverlay2D {
 
     @Test
     public void testContains() {
-        Assert.assertTrue(((CANOverlay) this.firstPeer.getStructuredOverlay()).contains(new Coordinate[] {
+        Assert.assertTrue((this.firstPeer.getStructuredOverlay()).contains(new Coordinate[] {
                 new Coordinate("2"), new Coordinate("2") }));
-        Assert.assertTrue(((CANOverlay) this.secondPeer.getStructuredOverlay()).contains(new Coordinate[] {
+        Assert.assertTrue((this.secondPeer.getStructuredOverlay()).contains(new Coordinate[] {
                 new Coordinate("6"), new Coordinate("0") }));
-        Assert.assertFalse(((CANOverlay) this.secondPeer.getStructuredOverlay()).contains(new Coordinate[] {
+        Assert.assertFalse((this.secondPeer.getStructuredOverlay()).contains(new Coordinate[] {
                 new Coordinate("12"), new Coordinate("6") }));
-        Assert.assertTrue(((CANOverlay) this.fourthPeer.getStructuredOverlay()).contains(new Coordinate[] {
+        Assert.assertTrue((this.fourthPeer.getStructuredOverlay()).contains(new Coordinate[] {
                 new Coordinate("11"), new Coordinate("11") }));
     }
 
     @Test
     public void testHasNeighbor() {
-        Assert.assertTrue(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighbors().hasNeighbor(
-                this.secondPeer));
-        Assert.assertTrue(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighbors().hasNeighbor(
-                this.thirdPeer));
-        Assert.assertFalse(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighbors().hasNeighbor(
-                this.fourthPeer));
-        Assert.assertFalse(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighbors().hasNeighbor(
-                this.firstPeer));
+        Assert
+                .assertTrue((this.firstPeer.getStructuredOverlay()).getNeighbors().hasNeighbor(
+                        this.secondPeer));
+        Assert.assertTrue((this.firstPeer.getStructuredOverlay()).getNeighbors().hasNeighbor(this.thirdPeer));
+        Assert.assertFalse((this.firstPeer.getStructuredOverlay()).getNeighbors()
+                .hasNeighbor(this.fourthPeer));
+        Assert
+                .assertFalse((this.firstPeer.getStructuredOverlay()).getNeighbors().hasNeighbor(
+                        this.firstPeer));
     }
 
     @Test
     public void testGetNearestNeighborFrom() {
-        Assert.assertTrue(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighbors()
-                .getNearestNeighborFrom(new Coordinate("11"), 0, 1).equals(this.thirdPeer));
+        Assert.assertTrue((this.firstPeer.getStructuredOverlay()).getNeighbors().getNearestNeighborFrom(
+                new Coordinate("11"), 0, 1).equals(this.thirdPeer));
     }
 
     @Test
     public void testIsBordered() {
-        System.out.println("==> " + ((CANOverlay) this.firstPeer.getStructuredOverlay()).getArea());
-        Assert.assertTrue(((CANOverlay) this.firstPeer.getStructuredOverlay()).getArea().isBordered(
-                ((CANOverlay) this.secondPeer.getStructuredOverlay()).getArea(), 0));
-        Assert.assertTrue(((CANOverlay) this.firstPeer.getStructuredOverlay()).getArea().isBordered(
-                ((CANOverlay) this.thirdPeer.getStructuredOverlay()).getArea(), 0));
+        System.out.println("==> " + (this.firstPeer.getStructuredOverlay()).getArea());
+        Assert.assertTrue((this.firstPeer.getStructuredOverlay()).getArea().isBordered(
+                (this.secondPeer.getStructuredOverlay()).getArea(), 0));
+        Assert.assertTrue((this.firstPeer.getStructuredOverlay()).getArea().isBordered(
+                (this.thirdPeer.getStructuredOverlay()).getArea(), 0));
     }
 
     @Test
@@ -224,8 +221,8 @@ public class TestOverlay2D {
 
     @Test
     public void testNeighborsDataStructureOrder() {
-        List<Peer> neighbors = ((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighbors()
-                .getNeighbors(0, NeighborsDataStructure.SUPERIOR_DIRECTION);
+        List<Peer> neighbors = (this.firstPeer.getStructuredOverlay()).getNeighbors().getNeighbors(0,
+                NeighborsDataStructure.SUPERIOR_DIRECTION);
 
         Assert
                 .assertTrue(((CANOverlay) neighbors.get(0).getStructuredOverlay()).getArea()
@@ -236,23 +233,25 @@ public class TestOverlay2D {
 
     @Test
     public void testLeavingPeer() {
-        System.out.println("1 : " + ((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighbors());
-        System.out.println("2 : " + ((CANOverlay) this.secondPeer.getStructuredOverlay()).getNeighbors());
-        System.out.println("3 : " + ((CANOverlay) this.thirdPeer.getStructuredOverlay()).getNeighbors());
-        System.out.println("4 : " + ((CANOverlay) this.fourthPeer.getStructuredOverlay()).getNeighbors());
+        System.out.println("1 : " + (this.firstPeer.getStructuredOverlay()).getNeighbors());
+        System.out.println("2 : " + (this.secondPeer.getStructuredOverlay()).getNeighbors());
+        System.out.println("3 : " + (this.thirdPeer.getStructuredOverlay()).getNeighbors());
+        System.out.println("4 : " + (this.fourthPeer.getStructuredOverlay()).getNeighbors());
 
         this.thirdPeer.leave();
 
-        System.out.println("1 : " + ((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighbors());
-        System.out.println("2 : " + ((CANOverlay) this.secondPeer.getStructuredOverlay()).getNeighbors());
+        System.out.println("1 : " + (this.firstPeer.getStructuredOverlay()).getNeighbors());
+        System.out.println("2 : " + (this.secondPeer.getStructuredOverlay()).getNeighbors());
         // System.out.println("3 : " + ((CANOverlay)
         // this.thirdPeer.getStructuredOverlay()).getNeighbors());
-        System.out.println("4 : " + ((CANOverlay) this.fourthPeer.getStructuredOverlay()).getNeighbors());
+        System.out.println("4 : " + (this.fourthPeer.getStructuredOverlay()).getNeighbors());
 
-        Assert.assertTrue(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighbors().hasNeighbor(
-                this.fourthPeer));
-        Assert.assertTrue(((CANOverlay) this.fourthPeer.getStructuredOverlay()).getNeighbors().hasNeighbor(
-                this.firstPeer));
+        Assert
+                .assertTrue((this.firstPeer.getStructuredOverlay()).getNeighbors().hasNeighbor(
+                        this.fourthPeer));
+        Assert
+                .assertTrue((this.fourthPeer.getStructuredOverlay()).getNeighbors().hasNeighbor(
+                        this.firstPeer));
 
     }
 

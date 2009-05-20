@@ -11,7 +11,6 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.CANPeer;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.NeighborsDataStructure;
-import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
 
 
 public class TestNeighborsDataStructure {
@@ -22,12 +21,9 @@ public class TestNeighborsDataStructure {
 
     @Before
     public void setUp() throws Exception {
-        this.peer = (CANPeer) PAActiveObject.newActive(CANPeer.class.getName(),
-                new Object[] { OverlayType.CAN });
-        this.firstNeighbor = (CANPeer) PAActiveObject.newActive(CANPeer.class.getName(),
-                new Object[] { OverlayType.CAN });
-        this.secondNeighbor = (CANPeer) PAActiveObject.newActive(CANPeer.class.getName(),
-                new Object[] { OverlayType.CAN });
+        this.peer = (CANPeer) PAActiveObject.newActive(CANPeer.class.getName(), null);
+        this.firstNeighbor = (CANPeer) PAActiveObject.newActive(CANPeer.class.getName(), null);
+        this.secondNeighbor = (CANPeer) PAActiveObject.newActive(CANPeer.class.getName(), null);
         // Overlay overlay
         // this.peer.setStructuredOverlay(((CANOverlay)
         // this.peer.getStructuredOverlay()).addNeighbor(
@@ -40,11 +36,13 @@ public class TestNeighborsDataStructure {
     @Test
     public void testAddAll() throws ActiveObjectCreationException, NodeException {
         NeighborsDataStructure neighbors = new NeighborsDataStructure();
+        neighbors.add(this.firstNeighbor, 0, 1);
+        neighbors.add(this.secondNeighbor, 0, 0);
 
         Assert.assertTrue(neighbors.hasNeighbor(this.firstNeighbor, 0, 1));
         Assert.assertTrue(neighbors.hasNeighbor(this.secondNeighbor, 0, 0));
 
-        CANOverlay overlay = (this.peer.getStructuredOverlay());
+        CANOverlay overlay = this.peer.getStructuredOverlay();
         overlay.addNeighbor(neighbors);
         this.peer.setStructuredOverlay(overlay);
 

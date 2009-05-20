@@ -1,11 +1,11 @@
-package org.objectweb.proactive.extensions.structuredp2p.core.can;
+package org.objectweb.proactive.extensions.structuredp2p.core.chord;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
 
 
 /**
- * Peer of type CAN.
+ * Peer of type CHORD.
  * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent
@@ -14,13 +14,13 @@ import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType
  * @version 0.1
  */
 @SuppressWarnings("serial")
-public class CANPeer extends Peer {
+public class ChordPeer extends Peer {
 
     /**
      * Constructor.
      */
-    public CANPeer() {
-        super(OverlayType.CAN);
+    public ChordPeer() {
+        super(OverlayType.CHORD);
     }
 
     /**
@@ -28,7 +28,7 @@ public class CANPeer extends Peer {
      * 
      * @return the structured overlay associated to this peer.
      */
-    public CANOverlay getStructuredOverlay() {
-        return (CANOverlay) super.getStructuredOverlay();
+    public ChordOverlay getStructuredOverlay() {
+        return (ChordOverlay) super.getStructuredOverlay();
     }
 }

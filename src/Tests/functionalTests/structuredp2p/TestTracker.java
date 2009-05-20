@@ -10,8 +10,9 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.Tracker;
+import org.objectweb.proactive.extensions.structuredp2p.core.can.CANPeer;
+import org.objectweb.proactive.extensions.structuredp2p.core.chord.ChordPeer;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
 
 
@@ -21,7 +22,7 @@ import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType
 public class TestTracker {
 
     private static Tracker tracker;
-    private static Peer peer;
+    private static CANPeer peer;
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -41,7 +42,7 @@ public class TestTracker {
 
     @Test(expected = java.lang.IllegalArgumentException.class)
     public void testAddOnNetworkWithWrongPeerType() throws ActiveObjectCreationException, NodeException {
-        Peer peer = (Peer) PAActiveObject.newActive(Peer.class.getName(), new Object[] { OverlayType.CHORD });
+        ChordPeer peer = (ChordPeer) PAActiveObject.newActive(ChordPeer.class.getName(), null);
         TestTracker.tracker.addOnNetwork(peer.getStub());
     }
 
@@ -53,8 +54,7 @@ public class TestTracker {
 
     @Test
     public void testAddOnNetworkWithCorrectPeerType() throws ActiveObjectCreationException, NodeException {
-        TestTracker.peer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
-                new Object[] { OverlayType.CAN });
+        TestTracker.peer = (CANPeer) PAActiveObject.newActive(CANPeer.class.getName(), null);
         TestTracker.tracker.addOnNetwork(TestTracker.peer.getStub());
 
         Assert.assertEquals(1, TestTracker.tracker.getNumberOfManagedPeers());
