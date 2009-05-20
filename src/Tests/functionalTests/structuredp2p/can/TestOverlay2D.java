@@ -226,7 +226,18 @@ public class TestOverlay2D {
 
     @Test
     public void testLeavingPeer() {
+        System.out.println("1 : " + ((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighbors());
+        System.out.println("2 : " + ((CANOverlay) this.secondPeer.getStructuredOverlay()).getNeighbors());
+        System.out.println("3 : " + ((CANOverlay) this.thirdPeer.getStructuredOverlay()).getNeighbors());
+        System.out.println("4 : " + ((CANOverlay) this.fourthPeer.getStructuredOverlay()).getNeighbors());
+
         PAFuture.waitFor(this.thirdPeer.leave());
+
+        System.out.println("1 : " + ((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighbors());
+        System.out.println("2 : " + ((CANOverlay) this.secondPeer.getStructuredOverlay()).getNeighbors());
+        // System.out.println("3 : " + ((CANOverlay)
+        // this.thirdPeer.getStructuredOverlay()).getNeighbors());
+        System.out.println("4 : " + ((CANOverlay) this.fourthPeer.getStructuredOverlay()).getNeighbors());
 
         Assert.assertTrue(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighbors().hasNeighbor(
                 this.fourthPeer));

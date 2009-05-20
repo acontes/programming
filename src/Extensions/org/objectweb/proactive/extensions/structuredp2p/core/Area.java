@@ -133,24 +133,24 @@ public class Area implements Serializable {
      */
     public Boolean isBordered(Area area, int dimension) {
         boolean dimRes = false;
-        boolean res = false;
+        boolean borderRes = false;
 
-        for (int i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
-            if (i == dimension) {
-                dimRes = (this.getCoordinateMin(dimension).equals(area.getCoordinateMax(dimension)) || this
-                        .getCoordinateMax(dimension).equals(area.getCoordinateMin(dimension)));
+        for (int dim = 0; dim < CANOverlay.NB_DIMENSIONS; dim++) {
+            if (dim == dimension) {
+                dimRes = (this.getCoordinateMin(dim).equals(area.getCoordinateMax(dim)) || this
+                        .getCoordinateMax(dim).equals(area.getCoordinateMin(dim)));
             } else {
-                res |= (this.getCoordinateMin(dimension).isBetween(area.getCoordinateMin(dimension),
-                        area.getCoordinateMax(dimension)) || this.getCoordinateMax(dimension).isBetween(
-                        area.getCoordinateMin(dimension), area.getCoordinateMax(dimension))) ||
-                    area.getCoordinateMin(dimension).isBetween(this.getCoordinateMin(dimension),
-                            this.getCoordinateMax(dimension)) ||
-                    area.getCoordinateMax(dimension).isBetween(this.getCoordinateMin(dimension),
-                            this.getCoordinateMax(dimension));
+                borderRes |= (this.getCoordinateMin(dim).isBetween(area.getCoordinateMin(dim),
+                        area.getCoordinateMax(dim)) || this.getCoordinateMax(dim).isBetween(
+                        area.getCoordinateMin(dim), area.getCoordinateMax(dim))) ||
+                    area.getCoordinateMin(dim).isBetween(this.getCoordinateMin(dim),
+                            this.getCoordinateMax(dim)) ||
+                    area.getCoordinateMax(dim).isBetween(this.getCoordinateMin(dim),
+                            this.getCoordinateMax(dim));
             }
         }
 
-        return dimRes && res;
+        return dimRes && borderRes;
     }
 
     /**

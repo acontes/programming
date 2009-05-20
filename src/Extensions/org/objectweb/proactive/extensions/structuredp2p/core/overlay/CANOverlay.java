@@ -3,12 +3,10 @@ package org.objectweb.proactive.extensions.structuredp2p.core.overlay;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Stack;
 
-import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.util.converter.MakeDeepCopy;
 import org.objectweb.proactive.extensions.structuredp2p.core.Area;
@@ -147,7 +145,6 @@ public class CANOverlay extends StructuredOverlay {
             Collection<ActionResponseMessage> responses = new ArrayList<ActionResponseMessage>();
             for (Peer neighbor : this.neighbors.getNeighbors(dimension, direction)) {
                 Coordinate border = this.neighbors.getArea(neighbor).getCoordinateMax(dimension);
-                System.out.println(border);
                 Area[] newAreas = tmpArea.split(dimension, border);
 
                 CANMergeMessage message = new CANMergeMessage(this.getRemotePeer(), dimension, directionInv,
@@ -161,10 +158,14 @@ public class CANOverlay extends StructuredOverlay {
             }
 
             this.setArea(null);
-            this.updateNeighbors();
+            for (int dim = 0; dim < CANOverlay.NB_DIMENSIONS; dim++) {
+                for (int dir = 0; dir < 2; dir++) {
+                    PAFuture.waitForAll(this.sendMessageTo(this.getNeighbors().getNeighbors(dim, dir),
+                            new CANAddNeighborMessage(this.getRemotePeer(), this.getArea(), dim, this
+                                    .getOppositeDirection(dir))));
+                }
+            }
         }
-
-        PAActiveObject.terminateActiveObject(false);
 
         return true;
     }
@@ -324,8 +325,8 @@ public class CANOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
-    public Collection<ResponseMessage> sendMessageTo(List<Peer> remotePeers, Message msg) {
-        Collection<ResponseMessage> responses = new HashSet<ResponseMessage>(remotePeers.size());
+    public List<ResponseMessage> sendMessageTo(List<Peer> remotePeers, Message msg) {
+        List<ResponseMessage> responses = new ArrayList<ResponseMessage>(remotePeers.size());
 
         for (Peer remotePeer : remotePeers) {
             try {
@@ -341,8 +342,8 @@ public class CANOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
-    public Collection<ResponseMessage> sendMessageTo(NeighborsDataStructure remotePeers, Message msg) {
-        Collection<ResponseMessage> responses = new ArrayList<ResponseMessage>();
+    public List<ResponseMessage> sendMessageTo(NeighborsDataStructure remotePeers, Message msg) {
+        List<ResponseMessage> responses = new ArrayList<ResponseMessage>();
 
         for (Peer remotePeer : remotePeers) {
             try {

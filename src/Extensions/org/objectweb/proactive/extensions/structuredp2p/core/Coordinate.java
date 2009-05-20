@@ -183,6 +183,13 @@ public class Coordinate implements Serializable {
      *            a coordinate
      */
     public boolean isBetween(Coordinate coord1, Coordinate coord2) {
-        return ((coord1.compareTo(this) + coord2.compareTo(this)) == 0);
+        if (coord1.compareTo(coord2) < 0) {
+            return (this.compareTo(coord1) >= 0) && (this.compareTo(coord2) < 0);
+        } else if (coord1.compareTo(coord2) > 0) {
+            return (this.compareTo(coord2) >= 0) && (this.compareTo(coord1) < 0);
+        }
+
+        return false;
+
     }
 }
