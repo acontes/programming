@@ -3,6 +3,7 @@ package org.objectweb.proactive.extensions.structuredp2p.messages.can;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.Area;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.CANOverlay;
+import org.objectweb.proactive.extensions.structuredp2p.core.can.CANPeer;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.NeighborsDataStructure;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.data.DataStorage;
@@ -25,7 +26,7 @@ public class CANMergeMessage extends Message {
     /**
      * The peer which is leaving.
      */
-    private final Peer remotePeer;
+    private final CANPeer remotePeer;
 
     /**
      * The current dimension of the leaving peer.
@@ -68,8 +69,8 @@ public class CANMergeMessage extends Message {
      * @param remoteResources
      *            the resources to merge with.
      */
-    public CANMergeMessage(Peer remotePeer, int dimension, int direction, NeighborsDataStructure neighbors,
-            Area remoteArea, DataStorage remoteResources) {
+    public CANMergeMessage(CANPeer remotePeer, int dimension, int direction,
+            NeighborsDataStructure neighbors, Area remoteArea, DataStorage remoteResources) {
         this.remotePeer = remotePeer;
         this.dimension = dimension;
         this.direction = direction;
@@ -90,7 +91,7 @@ public class CANMergeMessage extends Message {
      * 
      * @return the remote peer.
      */
-    public Peer getRemotePeer() {
+    public CANPeer getRemotePeer() {
         return this.remotePeer;
     }
 

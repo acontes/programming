@@ -11,7 +11,6 @@ import org.junit.Test;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.Area;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.CANPeer;
@@ -221,14 +220,11 @@ public class TestOverlay2D {
 
     @Test
     public void testNeighborsDataStructureOrder() {
-        List<Peer> neighbors = (this.firstPeer.getStructuredOverlay()).getNeighbors().getNeighbors(0,
+        List<CANPeer> neighbors = (this.firstPeer.getStructuredOverlay()).getNeighbors().getNeighbors(0,
                 NeighborsDataStructure.SUPERIOR_DIRECTION);
 
-        Assert
-                .assertTrue(((CANOverlay) neighbors.get(0).getStructuredOverlay()).getArea()
-                        .getCoordinateMax(1).compareTo(
-                                ((CANOverlay) neighbors.get(1).getStructuredOverlay()).getArea()
-                                        .getCoordinateMax(1)) < 0);
+        Assert.assertTrue((neighbors.get(0).getStructuredOverlay()).getArea().getCoordinateMax(1).compareTo(
+                (neighbors.get(1).getStructuredOverlay()).getArea().getCoordinateMax(1)) < 0);
     }
 
     @Test
