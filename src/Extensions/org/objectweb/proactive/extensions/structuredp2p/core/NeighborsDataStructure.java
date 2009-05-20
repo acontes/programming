@@ -390,6 +390,8 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
     /**
      * Update the area of the specified {@link Peer}.
      * 
+     * @param remotePeer
+     *            the peer to update.
      * @param area
      *            the area to set.
      * @param dimension
@@ -398,8 +400,8 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
      *            the direction.
      * @return <code>true</code> if the are has been update, <code>false</code> otherwise.
      */
-    public boolean updateArea(Area area, int dimension, int direction) {
-        int index = this.associatedAreas[dimension][direction].indexOf(area);
+    public boolean updateArea(Peer remotePeer, Area area, int dimension, int direction) {
+        int index = this.neighbors[dimension][direction].indexOf(remotePeer);
 
         if (index == -1) {
             return false;

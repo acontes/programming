@@ -423,12 +423,19 @@ public class CANOverlay extends StructuredOverlay {
      */
     public ActionResponseMessage handleAddNeighborMessage(AddNeighborMessage msg) {
         CANAddNeighborMessage message = (CANAddNeighborMessage) msg;
+        int dimension = message.getDimension();
+        int direction = message.getDirection();
+        Peer remotePeer = message.getPeer();
+        Area remoteArea = message.getArea();
+
         boolean condition = false;
 
-        if (!this.neighbors.getNeighbors(message.getDimension(), message.getDirection()).contains(
-                message.getPeer())) {
-            condition = this.neighbors.add(message.getPeer(), message.getArea(), message.getDimension(),
-                    message.getDirection());
+        System.out.println("CANOverlay.handleAddNeighborMessage()");
+
+        if (!this.neighbors.getNeighbors(dimension, direction).contains(remotePeer)) {
+            condition = this.neighbors.add(remotePeer, remoteArea, dimension, direction);
+        } else if (!this.neighbors.getArea(remotePeer, dimension, direction).equals(remoteArea)) {
+            condition = this.neighbors.updateArea(remotePeer, remoteArea, dimension, direction);
         }
 
         return new ActionResponseMessage(msg.getCreationTimestamp(), condition);
@@ -485,6 +492,7 @@ public class CANOverlay extends StructuredOverlay {
 
         try {
             this.setArea(this.area.merge(message.getArea()));
+            this.getLocalPeer().getDataStorage().addData(message.getResources());
         } catch (AreaException e) {
             return new ActionResponseMessage(msg.getCreationTimestamp(), false);
         }
@@ -504,10 +512,16 @@ public class CANOverlay extends StructuredOverlay {
             this.splitHistory.remove(index);
         }
 
+        for (int dim = 0; dim < CANOverlay.NB_DIMENSIONS; dim++) {
+            for (int dir = 0; dir < 2; dir++) {
+                PAFuture.waitForAll(this.sendMessageTo(message.getNeighbors().getNeighbors(dim, dir),
+                        new CANAddNeighborMessage(this.getRemotePeer(), this.getArea(), dim, this
+                                .getOppositeDirection(dir))));
+            }
+        }
+
         this.neighbors.remove(message.getRemotePeer(), dimension, direction);
         this.neighbors.addAll(message.getNeighbors());
-        this.updateNeighbors();
-        this.getLocalPeer().getDataStorage().addData(message.getResources());
 
         return new ActionResponseMessage(msg.getCreationTimestamp(), true);
     }
