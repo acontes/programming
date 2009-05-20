@@ -41,7 +41,6 @@ import org.objectweb.proactive.api.PARemoteObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
-import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.ow2.proactive.scheduler.common.NotificationData;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.SchedulerEventListener;
@@ -73,9 +72,9 @@ public class SchedulerListener implements SchedulerEventListener, Serializable{
 	/**
 	 * Create a remote version of this object.
 	 * @return remote reference
-	 * @throws UnknownProtocolException
+	 * @throws ProActiveException
 	 */
-	public SchedulerListener createRemoteReference() throws UnknownProtocolException {
+	public SchedulerListener createRemoteReference() throws ProActiveException {
 		remote = new RemoteManagement(this);
 		
 		return remote.create();
@@ -103,7 +102,7 @@ public class SchedulerListener implements SchedulerEventListener, Serializable{
 			uri = RemoteObjectHelper.generateUrl(SchedulerListener.class.getSimpleName());
 		}
 		
-		public SchedulerListener create() throws UnknownProtocolException {
+		public SchedulerListener create() throws ProActiveException {
 			return PARemoteObject.bind(roe, uri); 
 		}
 		

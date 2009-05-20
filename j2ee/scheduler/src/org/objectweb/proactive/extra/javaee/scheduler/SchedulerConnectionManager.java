@@ -39,7 +39,6 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.ow2.proactive.scheduler.common.SchedulerEvent;
@@ -75,11 +74,11 @@ public class SchedulerConnectionManager
 		this.username = username;
 		this.password = password;
 		this.isConnected = false;
-		logger = ProActiveLogger.getLogger(Loggers.CONNECTOR);
+		logger = ProActiveLogger.getLogger(Loggers.JMX);
 		createAO();
 	}
 	
-	private void createSchedulerListener() throws UnknownProtocolException, SchedulerException {
+	private void createSchedulerListener() throws ProActiveException, SchedulerException {
 		jobFinishedListener = new SchedulerListener();
 		SchedulerListener jobFinishedListenerRemoteRef = jobFinishedListener.createRemoteReference();
 		scm.addSchedulerEventListener(jobFinishedListenerRemoteRef, SchedulerEvent.JOB_RUNNING_TO_FINISHED);
@@ -118,7 +117,7 @@ public class SchedulerConnectionManager
 		scm.connectToScheduler();
 		try {
 			createSchedulerListener();
-		} catch (UnknownProtocolException e) {
+		} catch (ProActiveException e) {
 			throw new SchedulerException("Cannot create the remote reference for the scheduler listener, because:",e);
 		}
 		isConnected = true;
@@ -197,7 +196,7 @@ public class SchedulerConnectionManager
 			logger.error("Error while restoring the state of scm: creation of the active object failed." , e);
 		} catch (NodeException e) {
 			logger.error("Error while restoring the state of scm: creation of the active object failed." , e);
-		} catch (UnknownProtocolException e) {
+		} catch (ProActiveException e) {
 			logger.error("Error while restoring the state of scm: creation of the scheduler listener failed." , e);
 		} catch (SchedulerException e) {
 			logger.error("Error while restoring the state of scm: creation of the scheduler listener failed." , e);
