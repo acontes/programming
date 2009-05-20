@@ -220,11 +220,7 @@
 	<section xml:id="ProgrammingWithComponentsGCM_20"><info><title>Programming With Components: GCM</title></info>
 	<para>
 	ProActive programming also features a general purpose component
-<<<<<<< HEAD:doc/pa/Principles.xml
-	framework allowing architects to design their parallel applications
-=======
 	framework allowing software architects to design their parallel applications
->>>>>>> trunk-svn:doc/pa/Principles.xml
 	using a hierarchical component framework: the Grid Component Model
 	(GCM).
 	The GCM is a high level programming framework which relies on
