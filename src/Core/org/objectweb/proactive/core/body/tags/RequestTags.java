@@ -83,6 +83,15 @@ public class RequestTags implements Serializable {
     }
 
     /**
+     * Return true if the tag exist, false otherwise.
+     * @param id - Tag identifier
+     * @return true if the tag exist, false otherwise
+     */
+    public boolean check(String id){
+        return tags.get(id) != null;
+    }
+    
+    /**
      * Propagate all tags setted
      */
     public void propagateTags() {
