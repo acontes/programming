@@ -33,14 +33,15 @@ package org.objectweb.proactive.extra.javaee.scheduler;
 import javax.security.auth.login.LoginException;
 
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
+import org.ow2.proactive.scheduler.common.SchedulerAuthenticationInterface;
+import org.ow2.proactive.scheduler.common.SchedulerConnection;
+import org.ow2.proactive.scheduler.common.SchedulerEvent;
+import org.ow2.proactive.scheduler.common.SchedulerEventListener;
+import org.ow2.proactive.scheduler.common.UserSchedulerInterface;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerAuthenticationInterface;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerConnection;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerEvent;
-import org.ow2.proactive.scheduler.common.scheduler.UserSchedulerInterface;
 
 /**
  * Manages a connection to the Scheduler
@@ -100,9 +101,9 @@ public class SchedulerConnectionAO implements SchedulerConnectionInterface{
 	}
 
 	public void addSchedulerEventListener(
-			SchedulerListener jobFinishedListener,
+			SchedulerEventListener jobFinishedListener,
 			SchedulerEvent event) throws SchedulerException {
-		schedulerUI.addSchedulerEventListener(jobFinishedListener, event);
+		schedulerUI.addSchedulerEventListener(jobFinishedListener, true, event);
 	}
 	
 }

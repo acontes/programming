@@ -42,11 +42,11 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.ow2.proactive.scheduler.common.SchedulerEvent;
 import org.ow2.proactive.scheduler.common.exception.SchedulerException;
 import org.ow2.proactive.scheduler.common.job.Job;
 import org.ow2.proactive.scheduler.common.job.JobId;
 import org.ow2.proactive.scheduler.common.job.JobResult;
-import org.ow2.proactive.scheduler.common.scheduler.SchedulerEvent;
 
 /** We need this because there must be a way for the EJBs
  * to lookup the scheduler service. We use the JNDI for this
