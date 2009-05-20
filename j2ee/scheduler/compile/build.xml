@@ -158,8 +158,11 @@
 			</zipfileset>
 			<!-- Scheduler libs -->
 			<zipfileset dir="${scheduler.lib.dir}">
-				<include name="ProActive_scheduler.jar" />
-				<include name="ProActive_resource-manager.jar" />
+				<include name="ProActive_Scheduler-client.jar" />
+				<include name="ProActive_Scheduler-core.jar" />
+				<include name="ProActive_Scheduler-worker.jar" />
+				<include name="ProActive_SRM-common.jar" />
+				<include name="ProActive_ResourceManager.jar" />
 			</zipfileset>
 		</jar>
 		<delete dir="${build.dir}/${appserver}" quiet="true"/>
