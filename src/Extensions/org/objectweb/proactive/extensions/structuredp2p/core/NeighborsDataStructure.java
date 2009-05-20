@@ -199,6 +199,17 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
     }
 
     /**
+     * Remove all neighbors of the current data structure.
+     */
+    public void removeAll() {
+        for (int dim = 0; dim < CANOverlay.NB_DIMENSIONS; dim++) {
+            for (int direction = 0; direction < 2; direction++) {
+                this.removeAll(dim, direction);
+            }
+        }
+    }
+
+    /**
      * Indicates if the data structure contains the specified {@link Peer} as neighbor.
      * 
      * @param remotePeer
@@ -216,6 +227,24 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
         }
 
         return false;
+    }
+
+    /**
+     * Indicates if the data structure contains the specified {@link Peer} as neighbor at the
+     * specified <code>dimension</code> and <code>direction</code>.
+     * 
+     * @param remotePeer
+     *            the neighbor to check.
+     * @param dim
+     *            the dimension.
+     * @param direction
+     *            the direction.
+     * 
+     * @return <code>true</code> if the data structure contains the peer as neighbor,
+     *         <code>false</code> otherwise.
+     */
+    public boolean hasNeighbor(Peer remotePeer, int dim, int direction) {
+        return this.neighbors[dim][direction].contains(remotePeer);
     }
 
     /**

@@ -125,6 +125,10 @@ public class Area implements Serializable {
     /**
      * Check if the area in argument is bordered to the current area at the dimension in argument.
      * 
+     * WARNING : if an Area is bordered with an another Area on the dimension 1 of two dimension,
+     * the parameter dimension to specify is 0 because the two Area share the same Coordinate on the
+     * 0 dimension an not the dimension 1.
+     * 
      * @param area
      *            the area to check.
      * @param dimension

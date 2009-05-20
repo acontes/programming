@@ -165,6 +165,8 @@ public class CANOverlay extends StructuredOverlay {
             PAFuture.waitForAll(this.sendMessageTo(this.getNeighbors(),
                     new LeaveMessage(this.getRemotePeer())));
 
+
+            this.neighbors.removeAll();
         }
 
         System.out.println("CANOverlay.leave() - after");
