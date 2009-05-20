@@ -1,16 +1,16 @@
 package functionalTests.structuredp2p;
 
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.objectweb.proactive.extensions.structuredp2p.core.Area;
 import org.objectweb.proactive.extensions.structuredp2p.core.Coordinate;
-import org.objectweb.proactive.extensions.structuredp2p.core.Tracker;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.CANOverlay;
 
 
 /**
- * Test the class {@link Tracker}.
+ * Test the class {@link Area}.
  */
 public class TestArea {
 
@@ -65,5 +65,10 @@ public class TestArea {
 
         Assert.assertEquals(newAreas[0].getBorderedDimension(newAreas[1]), 0);
         Assert.assertTrue(newAreas[0].isBordered(newAreas[1], 0));
+    }
+
+    @AfterClass
+    public static void tearDown() {
+        TestArea.area = null;
     }
 }

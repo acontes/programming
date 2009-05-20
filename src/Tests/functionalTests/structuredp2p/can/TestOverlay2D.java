@@ -189,19 +189,29 @@ public class TestOverlay2D {
     }
 
     @Test
-    public void testHasNeighbors() {
+    public void testHasNeighbor() {
         Assert.assertTrue(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighbors().hasNeighbor(
                 this.secondPeer));
         Assert.assertTrue(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighbors().hasNeighbor(
                 this.thirdPeer));
         Assert.assertFalse(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighbors().hasNeighbor(
                 this.fourthPeer));
+        Assert.assertFalse(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighbors().hasNeighbor(
+                this.firstPeer));
     }
 
     @Test
     public void testGetNearestNeighborFrom() {
         Assert.assertTrue(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighbors()
                 .getNearestNeighborFrom(new Coordinate("11"), 0, 1).equals(this.thirdPeer));
+    }
+
+    @Test
+    public void testIsBordered() {
+        Assert.assertTrue(((CANOverlay) this.firstPeer.getStructuredOverlay()).getArea().isBordered(
+                ((CANOverlay) this.secondPeer.getStructuredOverlay()).getArea(), 1));
+        Assert.assertTrue(((CANOverlay) this.firstPeer.getStructuredOverlay()).getArea().isBordered(
+                ((CANOverlay) this.thirdPeer.getStructuredOverlay()).getArea(), 1));
     }
 
     @Test

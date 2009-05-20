@@ -10,6 +10,7 @@ import functionalTests.structuredp2p.can.TestOverlay2D;
 
 
 @RunWith(Suite.class)
-@SuiteClasses(value = { TestTracker.class, TestOverlay2D.class, TestMessages.class, TestBasicOperations.class })
+@SuiteClasses(value = { TestTracker.class, TestArea.class, TestCoordinate.class, TestOverlay2D.class,
+        TestMessages.class, TestBasicOperations.class })
 public class AllTests {
 }
