@@ -7,10 +7,11 @@ import org.junit.Test;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.Area;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.CANOverlay;
-import org.objectweb.proactive.extensions.structuredp2p.core.can.CANPeer;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.Coordinate;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
 import org.objectweb.proactive.extensions.structuredp2p.messages.LookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.PingMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANLookupMessage;
@@ -28,9 +29,9 @@ import org.objectweb.proactive.extensions.structuredp2p.responses.can.CANLookupR
  */
 public class TestMessagesND {
 
-    private CANPeer firstPeer;
-    private CANPeer secondPeer;
-    private CANPeer thirdPeer;
+    private Peer firstPeer;
+    private Peer secondPeer;
+    private Peer thirdPeer;
     private LookupMessage lMsg;
     private Coordinate messCoord[];
     private Coordinate minCoord[];
@@ -47,9 +48,12 @@ public class TestMessagesND {
 
     @Before
     public void init() throws ActiveObjectCreationException, NodeException {
-        this.firstPeer = (CANPeer) PAActiveObject.newActive(CANPeer.class.getName(), null);
-        this.secondPeer = (CANPeer) PAActiveObject.newActive(CANPeer.class.getName(), null);
-        this.thirdPeer = (CANPeer) PAActiveObject.newActive(CANPeer.class.getName(), null);
+        this.firstPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
+                new Object[] { OverlayType.CAN });
+        this.secondPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
+                new Object[] { OverlayType.CAN });
+        this.thirdPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
+                new Object[] { OverlayType.CAN });
 
         this.dim = CANOverlay.NB_DIMENSIONS;
         this.messCoord = new Coordinate[this.dim];
@@ -76,7 +80,7 @@ public class TestMessagesND {
 
         this.area = new Area(this.minCoord, this.maxCoord);
 
-        this.can = ((this.firstPeer.getStructuredOverlay()));
+        this.can = ((CANOverlay) (this.firstPeer.getStructuredOverlay()));
         this.can.setArea(this.area);
         this.firstPeer.setStructuredOverlay(this.can);
         this.lMsg = new CANLookupMessage(this.messCoord);
@@ -85,8 +89,8 @@ public class TestMessagesND {
     @Test
     public void testCreate() {
         Assert.assertNotNull("create a new peer", this.firstPeer);
-        Assert.assertNotNull("area set on the overlay", ((this.firstPeer.getStructuredOverlay())).getArea()
-                .getCoordinatesMin());
+        Assert.assertNotNull("area set on the overlay",
+                ((CANOverlay) (this.firstPeer.getStructuredOverlay())).getArea().getCoordinatesMin());
         Assert.assertNotNull("get new peer", this.secondPeer);
         Assert.assertNotNull("create a new CAN message", this.lMsg);
         Assert.assertNotNull("create a new coordinate table", this.messCoord);
@@ -154,10 +158,10 @@ public class TestMessagesND {
 
         this.areaSplit2 = new Area(this.minCoord, this.maxCoord);
         //
-        this.splitCan1 = ((this.firstPeer.getStructuredOverlay()));
+        this.splitCan1 = ((CANOverlay) (this.firstPeer.getStructuredOverlay()));
         this.splitCan1.setArea(this.areaSplit1);
 
-        this.splitCan2 = ((this.secondPeer.getStructuredOverlay()));
+        this.splitCan2 = ((CANOverlay) (this.secondPeer.getStructuredOverlay()));
         this.splitCan2.setArea(this.areaSplit2);
 
         this.firstPeer.setStructuredOverlay(this.splitCan1);

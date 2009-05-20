@@ -31,7 +31,7 @@ import org.objectweb.proactive.extensions.structuredp2p.responses.ResponseMessag
  * @version 0.1
  */
 @SuppressWarnings("serial")
-public abstract class Peer implements InitActive, RunActive, Serializable {
+public class Peer implements InitActive, RunActive, Serializable {
 
     /**
      * The timeout to wait before to check neighbors via the call of

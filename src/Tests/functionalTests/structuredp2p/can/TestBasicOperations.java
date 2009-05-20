@@ -13,6 +13,7 @@ import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.Area;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.exception.AreaException;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
 
 
 /**
@@ -32,8 +33,10 @@ public class TestBasicOperations {
     @BeforeClass
     public static void initTest() {
         try {
-            TestBasicOperations.entryPoint = PAActiveObject.newActive(CANPeer.class.getName(), null);
-            TestBasicOperations.neighbor = (CANPeer) PAActiveObject.newActive(CANPeer.class.getName(), null);
+            TestBasicOperations.entryPoint = (Peer) PAActiveObject.newActive(Peer.class.getName(),
+                    new Object[] { OverlayType.CAN });
+            TestBasicOperations.neighbor = (Peer) PAActiveObject.newActive(Peer.class.getName(),
+                    new Object[] { OverlayType.CAN });
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
         } catch (NodeException e) {
@@ -49,11 +52,11 @@ public class TestBasicOperations {
         TestBasicOperations.neighbor.join(TestBasicOperations.entryPoint);
 
         // Test if the new added peer is in the neighbor list
-        CANOverlay entryPointOverlay = TestBasicOperations.entryPoint.getStructuredOverlay();
-        CANOverlay neighborOverlay = TestBasicOperations.neighbor.getStructuredOverlay();
+        CANOverlay entryPointOverlay = (CANOverlay) TestBasicOperations.entryPoint.getStructuredOverlay();
+        CANOverlay neighborOverlay = (CANOverlay) TestBasicOperations.neighbor.getStructuredOverlay();
 
-        Assert.assertTrue(entryPointOverlay.getNeighbors().hasNeighbor(TestBasicOperations.neighbor));
-        Assert.assertTrue(neighborOverlay.getNeighbors().hasNeighbor(TestBasicOperations.entryPoint));
+        Assert.assertTrue(entryPointOverlay.hasNeighbor(TestBasicOperations.neighbor));
+        Assert.assertTrue(neighborOverlay.hasNeighbor(TestBasicOperations.entryPoint));
 
         // Test with split areas !
         try {
@@ -70,12 +73,13 @@ public class TestBasicOperations {
         Assert.assertNotNull(TestBasicOperations.entryPoint);
         Assert.assertNotNull(TestBasicOperations.neighbor);
 
-        int nbNeighbors = (TestBasicOperations.entryPoint.getStructuredOverlay()).getNeighbors().size();
+        int nbNeighbors = ((CANOverlay) TestBasicOperations.entryPoint.getStructuredOverlay()).getNeighbors()
+                .size();
 
         PAFuture.waitFor(TestBasicOperations.neighbor.leave());
 
-        Assert.assertEquals(nbNeighbors - 1, (TestBasicOperations.entryPoint.getStructuredOverlay())
-                .getNeighbors().size());
+        Assert.assertEquals(nbNeighbors - 1, ((CANOverlay) TestBasicOperations.entryPoint
+                .getStructuredOverlay()).getNeighbors().size());
 
         // TODO tests with merged areas !
     }

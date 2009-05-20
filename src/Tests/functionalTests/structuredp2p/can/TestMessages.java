@@ -8,7 +8,8 @@ import org.junit.Test;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.extensions.structuredp2p.core.can.CANPeer;
+import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
 import org.objectweb.proactive.extensions.structuredp2p.messages.Message;
 import org.objectweb.proactive.extensions.structuredp2p.messages.PingMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.ResponseMessage;
@@ -25,16 +26,20 @@ import org.objectweb.proactive.extensions.structuredp2p.responses.ResponseMessag
  */
 public class TestMessages {
 
-    private CANPeer senderPeer;
-    private CANPeer receiverPeer;
+    private Peer senderPeer;
+    private Peer receiverPeer;
     private Message msg;
     private ResponseMessage senderResponse;
     private ResponseMessage receiverResponse;
 
     @Before
     public void setUp() throws ActiveObjectCreationException, NodeException {
-        this.senderPeer = (CANPeer) PAActiveObject.newActive(CANPeer.class.getName(), null);
-        this.receiverPeer = (CANPeer) PAActiveObject.newActive(CANPeer.class.getName(), null);
+        this.senderPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
+                new Object[] { OverlayType.CAN });
+
+        this.receiverPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
+                new Object[] { OverlayType.CAN });
+
         this.msg = new PingMessage();
     }
 
