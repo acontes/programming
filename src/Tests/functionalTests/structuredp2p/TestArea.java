@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.Area;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.Coordinate;
+import org.objectweb.proactive.extensions.structuredp2p.core.exception.AreaException;
 
 
 /**
@@ -37,7 +38,7 @@ public class TestArea {
     }
 
     @Test
-    public void testSplit() {
+    public void testSplitAndMerge() throws AreaException {
         Area[] newAreas = TestArea.area.split(0);
         Coordinate[] coords = new Coordinate[CANOverlay.NB_DIMENSIONS];
 
@@ -65,6 +66,9 @@ public class TestArea {
 
         Assert.assertEquals(newAreas[0].getBorderedDimension(newAreas[1]), 0);
         Assert.assertTrue(newAreas[0].isBordered(newAreas[1], 0));
+
+        Area mergedArea = newAreas[0].merge(newAreas[1]);
+        Assert.assertEquals(mergedArea, TestArea.area);
     }
 
     @AfterClass

@@ -82,6 +82,8 @@ public class TestBasicOperations {
                 .getStructuredOverlay()).getNeighbors().size());
 
         // TODO tests with merged areas !
+        Assert.assertEquals(new Area(), ((CANOverlay) TestBasicOperations.entryPoint.getStructuredOverlay())
+                .getArea());
     }
 
     @AfterClass

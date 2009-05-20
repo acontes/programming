@@ -407,11 +407,12 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
             return false;
         }
 
-        Peer peer = this.neighbors[dimension][direction].get(index);
-        CANOverlay overlay = (CANOverlay) peer.getStructuredOverlay();
-        overlay.setArea(area);
-        peer.setStructuredOverlay(overlay);
-        this.neighbors[dimension][direction].set(index, peer);
+        /*
+         * Peer peer = this.neighbors[dimension][direction].get(index); CANOverlay overlay =
+         * (CANOverlay) peer.getStructuredOverlay(); overlay.setArea(area);
+         * peer.setStructuredOverlay(overlay); this.neighbors[dimension][direction].set(index,
+         * peer);
+         */
 
         return this.associatedAreas[dimension][direction].set(index, area) != null;
     }
