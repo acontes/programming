@@ -269,6 +269,27 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
     }
 
     /**
+     * Returns an {@link Area} from its associated {@link Peer}.
+     * 
+     * @param remotePeer
+     *            the criteria used in order to find the area
+     * @param dim
+     *            the dimension.
+     * @param direction
+     *            the direction.
+     * @return the area found or <code>null</code>.
+     */
+    public Area getArea(Peer remotePeer, int dim, int direction) {
+        int index = -1;
+
+        if ((index = this.neighbors[dim][direction].indexOf(remotePeer)) != -1) {
+            return this.associatedAreas[dim][direction].get(index);
+        }
+
+        return null;
+    }
+
+    /**
      * Returns a {@link Peer} from its managed {@link Area} if it is in the neighbors collection.
      * 
      * @param dimension
@@ -364,6 +385,33 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
      */
     public static int getNextDimension(int dimension) {
         return (dimension + 1) % 2;
+    }
+
+    /**
+     * Update the area of the specified {@link Peer}.
+     * 
+     * @param area
+     *            the area to set.
+     * @param dimension
+     *            the dimension.
+     * @param direction
+     *            the direction.
+     * @return <code>true</code> if the are has been update, <code>false</code> otherwise.
+     */
+    public boolean updateArea(Area area, int dimension, int direction) {
+        int index = this.associatedAreas[dimension][direction].indexOf(area);
+
+        if (index == -1) {
+            return false;
+        }
+
+        Peer peer = this.neighbors[dimension][direction].get(index);
+        CANOverlay overlay = (CANOverlay) peer.getStructuredOverlay();
+        overlay.setArea(area);
+        peer.setStructuredOverlay(overlay);
+        this.neighbors[dimension][direction].set(index, peer);
+
+        return this.associatedAreas[dimension][direction].set(index, area) != null;
     }
 
     /**

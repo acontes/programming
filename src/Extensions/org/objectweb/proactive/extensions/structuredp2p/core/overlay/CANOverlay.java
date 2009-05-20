@@ -165,7 +165,6 @@ public class CANOverlay extends StructuredOverlay {
             PAFuture.waitForAll(this.sendMessageTo(this.getNeighbors(),
                     new LeaveMessage(this.getRemotePeer())));
 
-
             this.neighbors.removeAll();
         }
 
@@ -183,11 +182,21 @@ public class CANOverlay extends StructuredOverlay {
      *            the dimension index (must be in 0 and {@link #NB_DIMENSIONS - 1} include).
      * @param direction
      *            the direction ({@link #INFERIOR_DIRECTION} or {@link #SUPERIOR_DIRECTION}).
-     * @return <code>true</code> if the neighbor has been add, <code>false</code> if not or if the
-     *         specified peer is already neighbor.
+     * @return <code>true</code> if the neighbor has been add, <code>false</code> if not.
      */
     public boolean addNeighbor(Peer remotePeer, int dimension, int direction) {
         return this.neighbors.add(remotePeer, dimension, direction);
+    }
+
+    /**
+     * Add all the neighbors of the specified <code>NeighborsDataStructure</code>.
+     * 
+     * @param neighbors
+     *            the neighbor datastructure used.
+     * @return <code>true</code> if the neighbors have been add, <code>false</code> if not.
+     */
+    public boolean addNeighbor(NeighborsDataStructure neighbors) {
+        return this.neighbors.addAll(neighbors);
     }
 
     /**

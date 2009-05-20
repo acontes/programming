@@ -31,9 +31,13 @@ public class TestNeighborsDataStructure {
         neighbors.add(peer1, 0, 1);
         neighbors.add(peer2, 0, 0);
 
-        System.out.println("neighbors = " + ((CANOverlay) this.peer.getStructuredOverlay()).getNeighbors());
-        ((CANOverlay) this.peer.getStructuredOverlay()).getNeighbors().addAll(neighbors);
-        System.out.println("neighbors = " + ((CANOverlay) this.peer.getStructuredOverlay()).getNeighbors());
+        Assert.assertTrue(neighbors.hasNeighbor(peer1, 0, 1));
+        Assert.assertTrue(neighbors.hasNeighbor(peer2, 0, 0));
+
+        CANOverlay overlay = ((CANOverlay) this.peer.getStructuredOverlay());
+        overlay.addNeighbor(neighbors);
+        this.peer.setStructuredOverlay(overlay);
+
         Assert.assertTrue(((CANOverlay) this.peer.getStructuredOverlay()).getNeighbors().hasNeighbor(peer1,
                 0, 1));
         Assert.assertTrue(((CANOverlay) this.peer.getStructuredOverlay()).getNeighbors().hasNeighbor(peer2,
