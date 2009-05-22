@@ -51,7 +51,6 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory.MessageTagsFactoryImpl;
 import org.objectweb.proactive.core.body.exceptions.BodyTerminatedReplyException;
 import org.objectweb.proactive.core.body.exceptions.BodyTerminatedRequestException;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
@@ -1164,8 +1163,6 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         int maxLease = PAProperties.PA_MAX_MEMORY_TAG_LEASE.getValueAsInt();
         lease = (lease > maxLease) ? maxLease : lease;
         this.localMemoryTags.put(id, new LocalMemoryTag(id, lease));
-        if( !messageTagsFactory.isLeaseCheckingRunning() )
-            messageTagsFactory.startLeaseChecking();
         return this.localMemoryTags.get(id);
     }
     

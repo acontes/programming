@@ -140,7 +140,12 @@ public interface Loggers {
     static final public String JMX = CORE + ".jmx";
     static final public String JMX_MBEAN = JMX + ".mbean";
     static final public String JMX_NOTIFICATION = JMX + ".notification";
-
+    
+    // Message Tagging
+    static final public String MESSAGE_TAGGING = CORE + ".messagetagging";
+    static final public String MESSAGE_TAGGING_LOCALMEMORY = MESSAGE_TAGGING + ".localmemory";
+    static final public String MESSAGE_TAGGING_LOCALMEMORY_LEASING = MESSAGE_TAGGING_LOCALMEMORY + ".leasing";
+    
     // Forwarding
     static final public String FORWARDING = CORE + ".forwarding";
     static final public String FORWARDING_MESSAGE = FORWARDING + ".message";

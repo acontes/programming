@@ -34,7 +34,6 @@ package org.objectweb.proactive.core.body;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -56,7 +55,7 @@ import org.objectweb.proactive.core.body.request.RequestFactory;
 import org.objectweb.proactive.core.body.request.RequestQueueFactory;
 import org.objectweb.proactive.core.body.request.RequestReceiver;
 import org.objectweb.proactive.core.body.request.RequestReceiverFactory;
-import org.objectweb.proactive.core.body.tags.LocalMemoryTag;
+import org.objectweb.proactive.core.body.tags.LocalMemoryLeaseThread;
 import org.objectweb.proactive.core.body.tags.MessageTags;
 import org.objectweb.proactive.core.body.tags.MessageTagsFactory;
 import org.objectweb.proactive.core.component.ComponentParameters;
@@ -64,7 +63,6 @@ import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.identity.ProActiveComponentFactory;
 import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
 import org.objectweb.proactive.core.component.request.SynchronousComponentRequestReceiver;
-import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.debug.stepbystep.Debugger;
 import org.objectweb.proactive.core.debug.stepbystep.DebuggerFactory;
 import org.objectweb.proactive.core.debug.stepbystep.DebuggerImpl;
@@ -490,62 +488,15 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
     // REQUEST-TAGS
     protected static class MessageTagsFactoryImpl implements MessageTagsFactory, Serializable{
         
-        private boolean running = true;
-
-        private static boolean leaseCheckingRunning = false;
+        static{
+            LocalMemoryLeaseThread.start();
+        }
         
         /**
          * @see MessageTagsFactory#newMessageTags()
          */
         public MessageTags newMessageTags() {
             return new MessageTags();
-        }
-
-        /**
-         * @see MessageTagsFactory#startLeaseChecking()
-         */
-        public synchronized void startLeaseChecking(){
-            System.err.println("START THREAD");
-            MessageTagsFactoryImpl.leaseCheckingRunning = true;
-            final int period = PAProperties.PA_MEMORY_TAG_LEASE_PERIOD.getValueAsInt();
-            new Thread(new Runnable(){
-                public void run() {
-                    while(running){
-                        try {
-                            Thread.sleep(period * 1000);
-                        } catch (InterruptedException e) {
-                        }
-                        Iterator<UniversalBody> iter = LocalBodyStore.getInstance().getLocalBodies().bodiesIterator();
-                        while(iter.hasNext()){
-                            UniversalBody body = iter.next();
-                            if (body instanceof AbstractBody){
-                                Map<String, LocalMemoryTag> memories = ((AbstractBody) body).getLocalMemoryTags();
-                                for(LocalMemoryTag memory : memories.values()){
-                                    memory.decCurrentLease(period);
-                                    if (memory.leaseExceeded()){
-                                        memories.remove(memory.getTagIDReferer());
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                
-            }).start();
-        }
-        
-        /**
-         * @see MessageTagsFactory#stopLeaseChecking()
-         */
-        public void stopLeaseChecking(){
-            this.running = false;
-        }
-        
-        /**
-         * @see MessageTagsFactory#isLeaseCheckingRunning()
-         */
-        public boolean isLeaseCheckingRunning(){
-            return leaseCheckingRunning;
         }
     }
 
