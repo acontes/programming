@@ -54,14 +54,14 @@ public class B implements Serializable, InitActive{
     
     public boolean localMemoryLeaseExceeded(){
         MessageTags tags = PAActiveObject.getContext().getCurrentRequest().getTags();
-        Tag t = tags.addTag(new Tag("TEST_TAGS_03"){
+        Tag t = tags.addTag(new Tag("TEST_TAGS_03-B"){
             public Tag apply() {
                 return this;
             }
         });
         t.createLocalMemory(15).put("MT_08", new Integer(0));
         try {
-            Thread.sleep(60000);
+            Thread.sleep(45000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }     
