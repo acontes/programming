@@ -488,10 +488,6 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
     // REQUEST-TAGS
     protected static class MessageTagsFactoryImpl implements MessageTagsFactory, Serializable{
         
-        static{
-            LocalMemoryLeaseThread.start();
-        }
-        
         /**
          * @see MessageTagsFactory#newMessageTags()
          */

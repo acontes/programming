@@ -19,6 +19,10 @@ import org.objectweb.proactive.ObjectForSynchro;
  */
 public class LocalMemoryTag implements Serializable {
     
+    static{
+        LocalMemoryLeaseThread.start();
+    }
+    
     private String tagIDReferer;
     
     private int currentlease;
