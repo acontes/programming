@@ -141,12 +141,14 @@ public class CANOverlay extends StructuredOverlay {
             List<ActionResponseMessage> responses = new ArrayList<ActionResponseMessage>();
 
             if (this.neighbors.getNeighbors(dimension, direction).size() == 1) {
+                Peer neighbor = this.neighbors.getNeighbors(dimension, direction).get(0);
+                this.neighbors.remove(neighbor, dimension, direction);
                 CANMergeMessage message = new CANMergeMessage(this.getRemotePeer(), dimension, directionInv,
                     this.getNeighbors(), this.getArea(), this.getLocalPeer().getDataStorage()
                             .getDataFromArea(this.getArea()));
 
-                responses.add((ActionResponseMessage) PAFuture.getFutureValue(this.sendMessageTo(
-                        this.neighbors.getNeighbors(dimension, direction).get(0), message)));
+                responses.add((ActionResponseMessage) PAFuture.getFutureValue(this.sendMessageTo(neighbor,
+                        message)));
             } else {
                 for (Peer neighbor : this.neighbors.getNeighbors(dimension, direction)) {
                     Coordinate border = this.neighbors.getArea(neighbor).getCoordinateMax(dimension);

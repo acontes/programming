@@ -161,8 +161,6 @@ public class Peer implements InitActive, RunActive, Serializable {
             PAActiveObject.terminateActiveObject(false);
         }
 
-        System.out.println("leaved");
-
         return res;
     }
 
