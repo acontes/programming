@@ -22,6 +22,11 @@ import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
 
     /**
+     * The peer which has these neighbors.
+     */
+    private final Peer ownerPeer;
+
+    /**
      * Inferior direction compared to a given peer.
      */
     public static final int INFERIOR_DIRECTION = 0;
@@ -48,23 +53,15 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
     /**
      * Constructor
      */
-    public NeighborsDataStructure() {
+    public NeighborsDataStructure(Peer masterPeer) {
+        this.ownerPeer = masterPeer;
+
         for (int i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
             this.neighbors[i][NeighborsDataStructure.INFERIOR_DIRECTION] = new Vector<Peer>();
             this.neighbors[i][NeighborsDataStructure.SUPERIOR_DIRECTION] = new Vector<Peer>();
             this.associatedAreas[i][NeighborsDataStructure.INFERIOR_DIRECTION] = new Vector<Area>();
             this.associatedAreas[i][NeighborsDataStructure.SUPERIOR_DIRECTION] = new Vector<Area>();
         }
-    }
-
-    /**
-     * Constructor.
-     * 
-     * @param neighbors
-     *            the neighbors to set.
-     */
-    public NeighborsDataStructure(Vector[][] neighbors, Vector[][] associatedAreas) {
-        this.neighbors = neighbors;
     }
 
     /**
@@ -97,7 +94,7 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
         for (int dim = 0; dim < CANOverlay.NB_DIMENSIONS; dim++) {
             for (int direction = 0; direction < 2; direction++) {
                 for (Peer peer : neighbors.getNeighbors(dim, direction)) {
-                    res &= this.add(peer, dim, direction);
+                    res &= this.add(peer, neighbors.getArea(peer), dim, direction);
                 }
             }
         }
@@ -120,8 +117,12 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
      * @return <code>true</code> if the neighbor has been add, <code>false</code> otherwise.
      */
     public boolean add(Peer remotePeer, Area area, int dimension, int direction) {
+        if (remotePeer.equals(this.ownerPeer) || this.neighbors[dimension][direction].contains(remotePeer)) {
+            return false;
+        }
+
         int index = 0;
-        int nextDimension = NeighborsDataStructure.getNextDimension(dimension);
+        int nextDimension = CANOverlay.getNextDimension(dimension);
 
         for (Area selectedArea : this.associatedAreas[dimension][direction]) {
             if (area.getCoordinateMin(nextDimension).compareTo(selectedArea.getCoordinateMin(nextDimension)) < 0) {
@@ -374,17 +375,6 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
         }
 
         return this.neighbors[dim][direction].get(this.associatedAreas[dim][direction].indexOf(nearest));
-    }
-
-    /**
-     * Returns the next dimension following the specified dimension.
-     * 
-     * @param dimension
-     *            the specified dimension.
-     * @return the next dimension following the specified dimension.
-     */
-    public static int getNextDimension(int dimension) {
-        return (dimension + 1) % 2;
     }
 
     /**

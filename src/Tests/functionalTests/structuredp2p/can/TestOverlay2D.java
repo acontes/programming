@@ -207,7 +207,6 @@ public class TestOverlay2D {
 
     @Test
     public void testIsBordered() {
-        System.out.println("==> " + ((CANOverlay) this.firstPeer.getStructuredOverlay()).getArea());
         Assert.assertTrue(((CANOverlay) this.firstPeer.getStructuredOverlay()).getArea().isBordered(
                 ((CANOverlay) this.secondPeer.getStructuredOverlay()).getArea(), 0));
         Assert.assertTrue(((CANOverlay) this.firstPeer.getStructuredOverlay()).getArea().isBordered(

@@ -25,9 +25,9 @@ public class TestNeighborsDataStructure {
 
     @Test
     public void testAddAll() throws ActiveObjectCreationException, NodeException {
-        NeighborsDataStructure neighbors = new NeighborsDataStructure();
         Peer peer1 = (Peer) PAActiveObject.newActive(Peer.class.getName(), new Object[] { OverlayType.CAN });
         Peer peer2 = (Peer) PAActiveObject.newActive(Peer.class.getName(), new Object[] { OverlayType.CAN });
+        NeighborsDataStructure neighbors = new NeighborsDataStructure(this.peer);
         neighbors.add(peer1, 0, 1);
         neighbors.add(peer2, 0, 0);
 
