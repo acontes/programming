@@ -137,33 +137,51 @@ public class CANOverlay extends StructuredOverlay {
             int dimension = lastOP[0];
             int direction = lastOP[1];
             int directionInv = this.getOppositeDirection(direction);
+
             Area tmpArea = this.getArea();
             List<ActionResponseMessage> responses = new ArrayList<ActionResponseMessage>();
 
-            if (this.neighbors.getNeighbors(dimension, direction).size() == 1) {
-                Peer neighbor = this.neighbors.getNeighbors(dimension, direction).get(0);
-                this.neighbors.remove(neighbor, dimension, direction);
+            for (Peer neighbor : this.neighbors.getNeighbors(dimension, direction)) {
+                Coordinate border = this.neighbors.getArea(neighbor).getCoordinateMax(dimension);
+                Area[] splitAreas = tmpArea.split(dimension, border);
+
+                NeighborsDataStructure neighbors = new NeighborsDataStructure();
+                neighbors.addAll(this.neighbors);
+                neighbors.remove(neighbor, dimension, this.getOppositeDirection(direction));
+
                 CANMergeMessage message = new CANMergeMessage(this.getRemotePeer(), dimension, directionInv,
-                    this.getNeighbors(), this.getArea(), this.getLocalPeer().getDataStorage()
-                            .getDataFromArea(this.getArea()));
+                    neighbors, splitAreas[0], this.getLocalPeer().getDataStorage().getDataFromArea(
+                            this.getArea()));
+
+                tmpArea = splitAreas[1];
 
                 responses.add((ActionResponseMessage) PAFuture.getFutureValue(this.sendMessageTo(neighbor,
                         message)));
-            } else {
-                for (Peer neighbor : this.neighbors.getNeighbors(dimension, direction)) {
-                    Coordinate border = this.neighbors.getArea(neighbor).getCoordinateMax(dimension);
-                    Area[] newAreas = tmpArea.split(dimension, border);
-
-                    CANMergeMessage message = new CANMergeMessage(this.getRemotePeer(), dimension,
-                        directionInv, this.getNeighbors(), newAreas[0], this.getLocalPeer().getDataStorage()
-                                .getDataFromArea(newAreas[0]));
-
-                    responses.add((ActionResponseMessage) PAFuture.getFutureValue(this.sendMessageTo(
-                            neighbor, message)));
-
-                    tmpArea = newAreas[1];
-                }
             }
+
+            /*
+             * if (this.neighbors.getNeighbors(dimension, direction).size() == 1) { Peer neighbor =
+             * this.neighbors.getNeighbors(dimension, direction).get(0);
+             * this.neighbors.remove(neighbor, dimension, direction); CANMergeMessage message = new
+             * CANMergeMessage(this.getRemotePeer(), dimension, directionInv, this.getNeighbors(),
+             * this.getArea(), this.getLocalPeer().getDataStorage()
+             * .getDataFromArea(this.getArea()));
+             * 
+             * responses.add((ActionResponseMessage)
+             * PAFuture.getFutureValue(this.sendMessageTo(neighbor, message))); } else { for (Peer
+             * neighbor : this.neighbors.getNeighbors(dimension, direction)) { Coordinate border =
+             * this.neighbors.getArea(neighbor).getCoordinateMax(dimension); Area[] newAreas =
+             * tmpArea.split(dimension, border);
+             * 
+             * CANMergeMessage message = new CANMergeMessage(this.getRemotePeer(), dimension,
+             * directionInv, this.getNeighbors(), newAreas[0], this.getLocalPeer().getDataStorage()
+             * .getDataFromArea(newAreas[0]));
+             * 
+             * responses.add((ActionResponseMessage) PAFuture.getFutureValue(this.sendMessageTo(
+             * neighbor, message)));
+             * 
+             * tmpArea = newAreas[1]; } }
+             */
             PAFuture.waitForAll(responses);
 
             this.setArea(null);
@@ -505,16 +523,18 @@ public class CANOverlay extends StructuredOverlay {
     public ActionResponseMessage handleMergeMessage(Message msg) {
         CANMergeMessage message = (CANMergeMessage) msg;
 
+        System.out.println("CANOverlay.handleMergeMessage()");
+
         try {
             this.setArea(this.area.merge(message.getArea()));
             this.getLocalPeer().getDataStorage().addData(message.getResources());
         } catch (AreaException e) {
+            e.printStackTrace();
             return new ActionResponseMessage(msg.getCreationTimestamp(), false);
         }
 
         int dimension = message.getDimension();
         int direction = message.getDirection();
-        message.getNeighbors().remove(this.getRemotePeer(), dimension, this.getOppositeDirection(direction));
 
         int index = -1, t = 0;
         for (int[] h : this.splitHistory) {
@@ -528,15 +548,10 @@ public class CANOverlay extends StructuredOverlay {
             this.splitHistory.remove(index);
         }
 
-        for (int dim = 0; dim < CANOverlay.NB_DIMENSIONS; dim++) {
-            for (int dir = 0; dir < 2; dir++) {
-                PAFuture.waitForAll(this.sendMessageTo(message.getNeighbors().getNeighbors(dim, dir),
-                        new CANAddNeighborMessage(this.getRemotePeer(), this.getArea(), dim, this
-                                .getOppositeDirection(dir))));
-            }
-        }
-        this.neighbors.remove(message.getRemotePeer(), dimension, direction);
         this.neighbors.addAll(message.getNeighbors());
+        this.updateNeighbors();
+
+        System.out.println("CANOverlay.handleMergeMessage()");
 
         return new ActionResponseMessage(msg.getCreationTimestamp(), true);
     }

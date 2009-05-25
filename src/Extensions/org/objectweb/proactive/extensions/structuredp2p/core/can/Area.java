@@ -3,7 +3,6 @@ package org.objectweb.proactive.extensions.structuredp2p.core.can;
 import java.io.Serializable;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
-import org.objectweb.proactive.extensions.structuredp2p.core.can.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.exception.AreaException;
 
 
@@ -140,7 +139,13 @@ public class Area implements Serializable {
         boolean dimRes = false;
         boolean borderRes = false;
 
+        System.out.println("Dimension = " + dimension);
         for (int dim = 0; dim < CANOverlay.NB_DIMENSIONS; dim++) {
+            System.out.println("this.getCoordinateMin(" + dim + ") = " + this.getCoordinateMin(dim));
+            System.out.println("this.getCoordinateMax(" + dim + ") = " + this.getCoordinateMax(dim));
+            System.out.println("area.getCoordinateMin(" + dim + ") = " + area.getCoordinateMin(dim));
+            System.out.println("area.getCoordinateMax(" + dim + ") = " + area.getCoordinateMax(dim));
+
             if (dim == dimension) {
                 dimRes = (this.getCoordinateMin(dim).equals(area.getCoordinateMax(dim)) || this
                         .getCoordinateMax(dim).equals(area.getCoordinateMin(dim)));
@@ -153,6 +158,9 @@ public class Area implements Serializable {
                     area.getCoordinateMax(dim).isBetween(this.getCoordinateMin(dim),
                             this.getCoordinateMax(dim));
             }
+
+            System.out.println("dimRes = " + dimRes);
+            System.out.println("borderRes = " + borderRes);
         }
 
         return dimRes && borderRes;
@@ -170,6 +178,8 @@ public class Area implements Serializable {
         int nbDim = this.coordinatesMax.length;
 
         for (i = 0; i < nbDim; i++) {
+            System.out.println("Area.getBorderedDimension()");
+            System.out.println(this + " isBordered(" + area + ", " + i + ") = " + this.isBordered(area, i));
             if (this.isBordered(area, i)) {
                 return i;
             }
