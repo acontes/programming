@@ -43,7 +43,7 @@ public class CANJoinMessage extends Message {
      * 
      * @param neighbors
      *            the neighbors.
-     * @param history
+     * @param splitHistory
      *            the split history.
      */
     public CANJoinMessage(NeighborsDataStructure neighbors, Area area, Stack<int[]> splitHistory) {

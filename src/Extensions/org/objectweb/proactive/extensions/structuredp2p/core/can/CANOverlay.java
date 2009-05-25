@@ -186,7 +186,8 @@ public class CANOverlay extends StructuredOverlay {
      * @param dimension
      *            the dimension index (must be in 0 and {@link #NB_DIMENSIONS - 1} include).
      * @param direction
-     *            the direction ({@link #INFERIOR_DIRECTION} or {@link #SUPERIOR_DIRECTION}).
+     *            the direction ({@link NeighborsDataStructure#INFERIOR_DIRECTION} or
+     *            {@link NeighborsDataStructure#SUPERIOR_DIRECTION}).
      * @return <code>true</code> if the neighbor has been add, <code>false</code> if not.
      */
     public boolean addNeighbor(Peer remotePeer, int dimension, int direction) {
@@ -194,10 +195,10 @@ public class CANOverlay extends StructuredOverlay {
     }
 
     /**
-     * Add all the neighbors of the specified <code>NeighborsDataStructure</code>.
+     * Add all the neighbors managed by the specified <code>NeighborsDataStructure</code>.
      * 
      * @param neighbors
-     *            the neighbor datastructure used.
+     *            the data structure used.
      * @return <code>true</code> if the neighbors have been add, <code>false</code> if not.
      */
     public boolean addNeighbor(NeighborsDataStructure neighbors) {
@@ -352,7 +353,14 @@ public class CANOverlay extends StructuredOverlay {
     }
 
     /**
-     * {@inheritDoc}
+     * Send a {@link Message} to a list {@link Peer}.
+     * 
+     * @param remotePeers
+     *            the list of peers to which to send the message.
+     * @param msg
+     *            the message to send.
+     * 
+     * @return the list of responses in agreement with the type of message sent.
      */
     public List<ResponseMessage> sendMessageTo(List<Peer> remotePeers, Message msg) {
         List<ResponseMessage> responses = new ArrayList<ResponseMessage>(remotePeers.size());
@@ -370,12 +378,19 @@ public class CANOverlay extends StructuredOverlay {
     }
 
     /**
-     * {@inheritDoc}
+     * Send a {@link Message} to a peers that are managed by the {@link NeighborsDataStructure}.
+     * 
+     * @param dataStructure
+     *            the peers managed by the data structure to which to send the message.
+     * @param msg
+     *            the message to send.
+     * 
+     * @return the list of responses in agreement with the type of message sent.
      */
-    public List<ResponseMessage> sendMessageTo(NeighborsDataStructure remotePeers, Message msg) {
+    public List<ResponseMessage> sendMessageTo(NeighborsDataStructure dataStructure, Message msg) {
         List<ResponseMessage> responses = new ArrayList<ResponseMessage>();
 
-        for (Peer remotePeer : remotePeers) {
+        for (Peer remotePeer : dataStructure) {
             try {
                 responses.add(this.sendMessageTo(remotePeer, msg));
             } catch (Exception e) {
@@ -459,7 +474,11 @@ public class CANOverlay extends StructuredOverlay {
     }
 
     /**
-     * {@inheritDoc}
+     * Handles a {@link CANCheckMergeMessage}.
+     * 
+     * @param msg
+     *            the message that is handled.
+     * @return the {@link CANCheckMergeResponseMessage} response.
      */
     public CANCheckMergeResponseMessage handleCheckMergeMessage(Message msg) {
         CANCheckMergeMessage message = (CANCheckMergeMessage) msg;
@@ -502,7 +521,11 @@ public class CANOverlay extends StructuredOverlay {
     }
 
     /**
-     * {@inheritDoc}
+     * Handles a {@link CANMergeMessage}.
+     * 
+     * @param msg
+     *            the message that is handled.
+     * @return the {@link ActionResponseMessage} response.
      */
     public ActionResponseMessage handleMergeMessage(Message msg) {
         CANMergeMessage message = (CANMergeMessage) msg;
@@ -536,7 +559,11 @@ public class CANOverlay extends StructuredOverlay {
     }
 
     /**
-     * {@inheritDoc}
+     * Handles a {@link CANRemoveNeighborMessage}.
+     * 
+     * @param msg
+     *            the message that is handled.
+     * @return the {@link ActionResponseMessage} response.
      */
     public ActionResponseMessage handleRemoveNeighborMessage(RemoveNeighborMessage msg) {
         CANRemoveNeighborMessage message = ((CANRemoveNeighborMessage) msg);
@@ -545,7 +572,11 @@ public class CANOverlay extends StructuredOverlay {
     }
 
     /**
-     * {@inheritDoc}
+     * Handles a {@link CANSwitchMessage}.
+     * 
+     * @param msg
+     *            the message that is handled.
+     * @return the {@link CANSwitchResponseMessage} response.
      */
     public CANSwitchResponseMessage handleSwitchMessage(Message msg) {
         this.switchWith(((CANSwitchMessage) msg).getPeer());
@@ -614,7 +645,7 @@ public class CANOverlay extends StructuredOverlay {
     /**
      * Sets the new split history.
      * 
-     * @param area
+     * @param history
      *            the new split history to set.
      */
     public void setHistory(Stack<int[]> history) {

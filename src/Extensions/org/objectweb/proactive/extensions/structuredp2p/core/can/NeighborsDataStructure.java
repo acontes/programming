@@ -43,15 +43,15 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
      * than the current pair on the given dimension. The second column is the reverse. The neighbors
      * are ordered coordinate on a given dimension.
      */
-    private Vector<Peer>[][] neighbors = new Vector[CANOverlay.NB_DIMENSIONS][2];
+    private List<Peer>[][] neighbors = new Vector[CANOverlay.NB_DIMENSIONS][2];
 
     /**
-     * The areas associated to the neighbors
+     * The areas associated to the neighbors.
      */
-    private Vector<Area>[][] associatedAreas = new Vector[CANOverlay.NB_DIMENSIONS][2];
+    private List<Area>[][] associatedAreas = new Vector[CANOverlay.NB_DIMENSIONS][2];
 
     /**
-     * Constructor
+     * Constructor.
      */
     public NeighborsDataStructure(Peer masterPeer) {
         this.ownerPeer = masterPeer;
@@ -71,8 +71,8 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
      * @param remotePeer
      *            the remote peer to add as neighbor.
      * @param dimension
-     *            the dimension index (must be in <code>0</code> and {@link #NB_DIMENSIONS - 1}
-     *            include).
+     *            the dimension index (must be in <code>0</code> and
+     *            {@link CANOverlay#NB_DIMENSIONS - 1} include).
      * @param direction
      *            the direction ({@link #INFERIOR_DIRECTION} or {@link #SUPERIOR_DIRECTION}).
      * @return <code>true</code> if the neighbor has been add, <code>false</code> otherwise.
@@ -110,8 +110,8 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
      * @param area
      *            the area associated to the peer specified.
      * @param dimension
-     *            the dimension index (must be in <code>0</code> and {@link #NB_DIMENSIONS - 1}
-     *            include).
+     *            the dimension index (must be in <code>0</code> and
+     *            {@link CANOverlay#NB_DIMENSIONS - 1} include).
      * @param direction
      *            the direction ({@link #INFERIOR_DIRECTION} or {@link #SUPERIOR_DIRECTION}).
      * @return <code>true</code> if the neighbor has been add, <code>false</code> otherwise.
@@ -167,8 +167,8 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
      * @param remotePeer
      *            the peer to remove.
      * @param dimension
-     *            the dimension index (must be in <code>0</code> and {@link #NB_DIMENSIONS - 1}
-     *            include).
+     *            the dimension index (must be in <code>0</code> and
+     *            {@link CANOverlay#NB_DIMENSIONS - 1} include).
      * @param direction
      *            the direction ({@link #INFERIOR_DIRECTION} or {@link #SUPERIOR_DIRECTION}).
      * @return <code>true</code> if the neighbor has been removed, <code>false</code> otherwise.
@@ -189,8 +189,8 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
      * Remove all neighbors for a given <code>dimension</code>, <code>direction</code>.
      * 
      * @param dimension
-     *            the dimension index (must be in <code>0</code> and {@link #NB_DIMENSIONS - 1}
-     *            include).
+     *            the dimension index (must be in <code>0</code> and
+     *            {@link CANOverlay#NB_DIMENSIONS - 1} include).
      * @param direction
      *            the direction ({@link #INFERIOR_DIRECTION} or {@link #SUPERIOR_DIRECTION}).
      */
@@ -294,8 +294,8 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
      * Returns a {@link Peer} from its managed {@link Area} if it is in the neighbors collection.
      * 
      * @param dimension
-     *            the dimension index (must be in <code>0</code> and {@link #NB_DIMENSIONS - 1}
-     *            include).
+     *            the dimension index (must be in <code>0</code> and
+     *            {@link CANOverlay#NB_DIMENSIONS - 1} include).
      * @param direction
      *            the direction ({@link #INFERIOR_DIRECTION} or {@link #SUPERIOR_DIRECTION}).
      * @param area
@@ -326,7 +326,7 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
      * 
      * @param dimension
      *            the dimension to use (dimension start to 0 and max is defined by
-     *            {@link #NB_DIMENSIONS} - 1).
+     *            {@link CANOverlay#NB_DIMENSIONS} - 1).
      * @return the neighbors of the managed area for the specified dimension.
      */
     public List[] getNeighbors(int dimension) {
@@ -339,7 +339,7 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
      * 
      * @param dimension
      *            the dimension to use (dimension start to <code>0</code> and max is defined by
-     *            {@link #NB_DIMENSIONS} - 1).
+     *            {@link CANOverlay#NB_DIMENSIONS} - 1).
      * @param direction
      *            the direction ({@link #INFERIOR_DIRECTION} or {@link #SUPERIOR_DIRECTION}).
      * @return the neighbors of the managed area for the specified dimension.

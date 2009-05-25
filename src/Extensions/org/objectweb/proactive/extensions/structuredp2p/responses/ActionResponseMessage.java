@@ -1,5 +1,8 @@
 package org.objectweb.proactive.extensions.structuredp2p.responses;
 
+import org.objectweb.proactive.extensions.structuredp2p.messages.Message;
+
+
 /**
  * Defines a basic response for the {@link Message}.
  * 
@@ -22,8 +25,8 @@ public class ActionResponseMessage extends ResponseMessage {
      * 
      * @param timestampMessageCreation
      *            the timestamp indicating the time creation of the message which has been sent.
-     * @param removed
-     *            is the neighbor correctly removed.
+     * @param success
+     *            Indicates if the neighbor has been correctly removed.
      */
     public ActionResponseMessage(long timestampMessageCreation, boolean success) {
         super(timestampMessageCreation);

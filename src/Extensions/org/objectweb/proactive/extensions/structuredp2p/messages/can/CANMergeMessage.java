@@ -59,7 +59,7 @@ public class CANMergeMessage extends Message {
      *            the peer which is leaving.
      * @param dimension
      *            the current dimension of the leaving peer.
-     * @param directionInv
+     * @param direction
      *            the current direction of the leaving peer.
      * @param neighbors
      *            the neighbors of the leaving peer.

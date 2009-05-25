@@ -110,7 +110,7 @@ public class Peer implements InitActive, RunActive, Serializable {
     /**
      * Sends a {@link Message} to a known {@link Peer}.
      * 
-     * @param peer
+     * @param remotePeer
      *            the peer to which we want to send the message.
      * @param msg
      *            the message to send.
@@ -144,7 +144,7 @@ public class Peer implements InitActive, RunActive, Serializable {
     /**
      * Adds the current peer in the network.
      * 
-     * @param peer
+     * @param remotePeer
      *            the peer which serves as entry point.
      */
     public Boolean join(Peer remotePeer) {

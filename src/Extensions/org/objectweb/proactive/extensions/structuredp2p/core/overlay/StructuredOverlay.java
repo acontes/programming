@@ -52,6 +52,7 @@ public abstract class StructuredOverlay implements Serializable {
 
     /**
      * Left the current network.
+     * 
      * @return TODO
      */
     public abstract Boolean leave();
@@ -112,7 +113,7 @@ public abstract class StructuredOverlay implements Serializable {
      *            the message that is handled.
      * @return the {@link EmptyResponseMessage} response.
      */
-    public abstract ActionResponseMessage handleLeaveMessage(LeaveMessage leaveMessage);
+    public abstract ActionResponseMessage handleLeaveMessage(LeaveMessage msg);
 
     /**
      * Handles a {@link LookupMessage}.
@@ -141,8 +142,7 @@ public abstract class StructuredOverlay implements Serializable {
      *            the message that is handled.
      * @return the {@link ActionResponseMessage} response.
      */
-    public abstract ActionResponseMessage handleRemoveNeighborMessage(
-            RemoveNeighborMessage removeNeighborMessage);
+    public abstract ActionResponseMessage handleRemoveNeighborMessage(RemoveNeighborMessage msg);
 
     /**
      * Returns the current peer that use this overlay.

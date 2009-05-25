@@ -2,8 +2,6 @@ package org.objectweb.proactive.extensions.structuredp2p.core.can;
 
 import java.io.Serializable;
 
-import org.objectweb.proactive.extensions.structuredp2p.core.can.CANOverlay;
-
 
 /**
  * Coordinate is used in {@link CANOverlay} in order to specify the position of a given peer in the
@@ -60,12 +58,10 @@ public class Coordinate implements Serializable {
     }
 
     /**
-     * Calculates the Levenshtein distance between two strings.
+     * Calculates the <em>Levenshtein</em> distance between two strings.
      * 
-     * @param str1
-     *            string one.
-     * @param str2
-     *            string two.
+     * @param coord
+     *            the coordinate.
      * @return the Levenshtein distance between two strings.
      */
     public int levenshteinDistance(Coordinate coord) {
@@ -103,11 +99,13 @@ public class Coordinate implements Serializable {
     }
 
     /**
-     * Returns the maximum coordinate between the coordinates.
+     * Returns the maximum coordinate between the specified coordinates.
      * 
-     * @param coord
-     *            the coordinate.
-     * @return the maximum coordinate between the coordinates.
+     * @param coord1
+     *            the first coordinate.
+     * @param coord2
+     *            the second coordinate.
+     * @return the coordinate which is the greatest between the two coordinates.
      */
     public static Coordinate max(Coordinate coord1, Coordinate coord2) {
         if (coord1.compareTo(coord2) > 0) {
@@ -118,10 +116,13 @@ public class Coordinate implements Serializable {
     }
 
     /**
-     * Returns the minimum coordinate between the coordinates.
+     * Returns the minimum coordinate between the specified coordinates.
      * 
-     * @param coord
-     * @return the minimum coordinate between the coordinates.
+     * @param coord1
+     *            the first coordinate.
+     * @param coord2
+     *            the second coordinate.
+     * @return the coordinate which is the smallest between the two coordinates.
      */
     public static Coordinate min(Coordinate coord1, Coordinate coord2) {
         if (coord1.compareTo(coord2) < 0) {
