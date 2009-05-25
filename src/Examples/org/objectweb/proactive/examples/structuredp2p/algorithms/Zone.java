@@ -1,4 +1,4 @@
-package org.objectweb.proactive.extensions.structuredp2p.examples.algorithms;
+package org.objectweb.proactive.examples.structuredp2p.algorithms;
 
 import java.awt.Color;
 import java.io.ByteArrayInputStream;

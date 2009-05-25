@@ -1,4 +1,4 @@
-package org.objectweb.proactive.extensions.structuredp2p.examples.can;
+package org.objectweb.proactive.examples.structuredp2p.can;
 
 public class Launcher {
     public static void main(String[] args) {
