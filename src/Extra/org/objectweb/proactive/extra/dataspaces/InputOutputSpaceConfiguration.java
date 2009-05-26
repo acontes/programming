@@ -129,4 +129,31 @@ public class InputOutputSpaceConfiguration extends SpaceConfiguration {
     public String getName() {
         return name;
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("[type: ");
+
+        sb.append(getType());
+        sb.append("; ");
+
+        sb.append("; name: ");
+        sb.append(name);
+
+        if (path == null) {
+            sb.append(" no local-specific access");
+        } else {
+            sb.append("local access path: ");
+            sb.append(path);
+            sb.append(" at host: ");
+            sb.append(hostname);
+        }
+        sb.append("; ");
+
+        sb.append("remote access URL: ");
+        sb.append(url);
+        sb.append(']');
+
+        return sb.toString();
+    }
 }
