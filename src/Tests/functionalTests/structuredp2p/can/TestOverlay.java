@@ -3,16 +3,19 @@
  */
 package functionalTests.structuredp2p.can;
 
+import java.util.Random;
+
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
+import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANLookupMessage;
+import org.objectweb.proactive.extensions.structuredp2p.responses.can.CANLookupResponseMessage;
 
 
 /**
@@ -30,10 +33,28 @@ public class TestOverlay {
     private static Peer secondPeer;
     private static Peer thirdPeer;
     private static Peer fourthPeer;
+    private static Peer fifthPeer;
+    private static Peer sixthPeer;
+    private static Peer seventhPeer;
+    private static Peer eighthPeer;
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
         TestOverlay.firstPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
+                new Object[] { OverlayType.CAN });
+        TestOverlay.secondPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
+                new Object[] { OverlayType.CAN });
+        TestOverlay.thirdPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
+                new Object[] { OverlayType.CAN });
+        TestOverlay.fourthPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
+                new Object[] { OverlayType.CAN });
+        TestOverlay.fifthPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
+                new Object[] { OverlayType.CAN });
+        TestOverlay.sixthPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
+                new Object[] { OverlayType.CAN });
+        TestOverlay.seventhPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
+                new Object[] { OverlayType.CAN });
+        TestOverlay.eighthPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
                 new Object[] { OverlayType.CAN });
     }
 
@@ -45,63 +66,154 @@ public class TestOverlay {
     }
 
     @Test
-    public void testJoin() {
-        try {
-            TestOverlay.secondPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
-                    new Object[] { OverlayType.CAN });
-            TestOverlay.thirdPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
-                    new Object[] { OverlayType.CAN });
-            TestOverlay.fourthPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
-                    new Object[] { OverlayType.CAN });
-        } catch (ActiveObjectCreationException e) {
-            e.printStackTrace();
-        } catch (NodeException e) {
-            e.printStackTrace();
-        }
-
+    public void testSecondPeer() {
         TestOverlay.secondPeer.join(TestOverlay.firstPeer);
+
+        // Are they neighbors ??
+        Assert.assertTrue(TestOverlay.getOverlay(TestOverlay.firstPeer).hasNeighbor(TestOverlay.secondPeer));
+        Assert.assertTrue(TestOverlay.getOverlay(TestOverlay.secondPeer).hasNeighbor(TestOverlay.firstPeer));
+
+        // Is a peer neighbor to itself ??
+        Assert.assertFalse(TestOverlay.getOverlay(TestOverlay.firstPeer).hasNeighbor(TestOverlay.firstPeer));
+        Assert
+                .assertFalse(TestOverlay.getOverlay(TestOverlay.secondPeer).hasNeighbor(
+                        TestOverlay.secondPeer));
+
+        // Are there zones bordered ??
+        Assert.assertNotSame(TestOverlay.getOverlay(TestOverlay.firstPeer).getZone().getBorderedDimension(
+                TestOverlay.getOverlay(TestOverlay.secondPeer).getZone()), -1);
+    }
+
+    @Test
+    public void testThirdPeer() {
         TestOverlay.thirdPeer.join(TestOverlay.secondPeer);
+
+        // Are they neighbors ??
+        Assert.assertTrue(TestOverlay.getOverlay(TestOverlay.firstPeer).hasNeighbor(TestOverlay.thirdPeer));
+        Assert.assertTrue(TestOverlay.getOverlay(TestOverlay.secondPeer).hasNeighbor(TestOverlay.thirdPeer));
+        Assert.assertTrue(TestOverlay.getOverlay(TestOverlay.thirdPeer).hasNeighbor(TestOverlay.firstPeer));
+        Assert.assertTrue(TestOverlay.getOverlay(TestOverlay.thirdPeer).hasNeighbor(TestOverlay.secondPeer));
+
+        // Is a peer neighbor to itself ??
+        Assert.assertFalse(TestOverlay.getOverlay(TestOverlay.firstPeer).hasNeighbor(TestOverlay.firstPeer));
+        Assert
+                .assertFalse(TestOverlay.getOverlay(TestOverlay.secondPeer).hasNeighbor(
+                        TestOverlay.secondPeer));
+        Assert.assertFalse(TestOverlay.getOverlay(TestOverlay.thirdPeer).hasNeighbor(TestOverlay.thirdPeer));
+
+        // Are there zones bordered ??
+        Assert.assertNotSame(TestOverlay.getOverlay(TestOverlay.firstPeer).getZone().getBorderedDimension(
+                TestOverlay.getOverlay(TestOverlay.thirdPeer).getZone()), -1);
+        Assert.assertNotSame(TestOverlay.getOverlay(TestOverlay.secondPeer).getZone().getBorderedDimension(
+                TestOverlay.getOverlay(TestOverlay.thirdPeer).getZone()), -1);
+    }
+
+    @Test
+    public void testFourthPeer() {
         TestOverlay.fourthPeer.join(TestOverlay.thirdPeer);
 
-        Assert.assertTrue(((CANOverlay) TestOverlay.firstPeer.getStructuredOverlay())
-                .hasNeighbor(TestOverlay.secondPeer));
+        // Are they neighbors ??
+        Assert.assertTrue(TestOverlay.getOverlay(TestOverlay.secondPeer).hasNeighbor(TestOverlay.fourthPeer));
+        Assert.assertTrue(TestOverlay.getOverlay(TestOverlay.thirdPeer).hasNeighbor(TestOverlay.fourthPeer));
+        Assert.assertTrue(TestOverlay.getOverlay(TestOverlay.fourthPeer).hasNeighbor(TestOverlay.secondPeer));
+        Assert.assertTrue(TestOverlay.getOverlay(TestOverlay.fourthPeer).hasNeighbor(TestOverlay.thirdPeer));
 
-        System.out
-                .println("peer1 : " + ((CANOverlay) TestOverlay.firstPeer.getStructuredOverlay()).getZone());
-        System.out.println("peer1 neighbors : " +
-            ((CANOverlay) TestOverlay.firstPeer.getStructuredOverlay()).getNeighbors());
-        System.out.println("peer2 : " +
-            ((CANOverlay) TestOverlay.secondPeer.getStructuredOverlay()).getZone());
-        System.out.println("peer2 neighbors : " +
-            ((CANOverlay) TestOverlay.secondPeer.getStructuredOverlay()).getNeighbors());
-        System.out
-                .println("peer3 : " + ((CANOverlay) TestOverlay.thirdPeer.getStructuredOverlay()).getZone());
-        System.out.println("peer3 neighbors : " +
-            ((CANOverlay) TestOverlay.thirdPeer.getStructuredOverlay()).getNeighbors());
-        System.out.println("peer4 : " +
-            ((CANOverlay) TestOverlay.fourthPeer.getStructuredOverlay()).getZone());
-        System.out.println("peer4 neighbors : " +
-            ((CANOverlay) TestOverlay.fourthPeer.getStructuredOverlay()).getNeighbors());
+        // Is a peer neighbor to itself ??
+        Assert.assertFalse(TestOverlay.getOverlay(TestOverlay.firstPeer).hasNeighbor(TestOverlay.firstPeer));
+        Assert
+                .assertFalse(TestOverlay.getOverlay(TestOverlay.secondPeer).hasNeighbor(
+                        TestOverlay.secondPeer));
+        Assert.assertFalse(TestOverlay.getOverlay(TestOverlay.thirdPeer).hasNeighbor(TestOverlay.thirdPeer));
+        Assert
+                .assertFalse(TestOverlay.getOverlay(TestOverlay.fourthPeer).hasNeighbor(
+                        TestOverlay.fourthPeer));
+
+        // Are there zones bordered ??
+        Assert.assertNotSame(TestOverlay.getOverlay(TestOverlay.firstPeer).getZone().getBorderedDimension(
+                TestOverlay.getOverlay(TestOverlay.thirdPeer).getZone()), -1);
+        Assert.assertNotSame(TestOverlay.getOverlay(TestOverlay.secondPeer).getZone().getBorderedDimension(
+                TestOverlay.getOverlay(TestOverlay.thirdPeer).getZone()), -1);
+        Assert.assertNotSame(TestOverlay.getOverlay(TestOverlay.secondPeer).getZone().getBorderedDimension(
+                TestOverlay.getOverlay(TestOverlay.thirdPeer).getZone()), -1);
+
+        if (TestOverlay.getOverlay(TestOverlay.firstPeer).getZone().getBorderedDimension(
+                TestOverlay.getOverlay(TestOverlay.thirdPeer).getZone()) != -1) {
+            Assert.assertTrue(TestOverlay.getOverlay(TestOverlay.firstPeer)
+                    .hasNeighbor(TestOverlay.thirdPeer));
+            Assert.assertTrue(TestOverlay.getOverlay(TestOverlay.thirdPeer)
+                    .hasNeighbor(TestOverlay.firstPeer));
+        } else {
+            Assert.assertFalse(TestOverlay.getOverlay(TestOverlay.firstPeer).hasNeighbor(
+                    TestOverlay.thirdPeer));
+            Assert.assertFalse(TestOverlay.getOverlay(TestOverlay.thirdPeer).hasNeighbor(
+                    TestOverlay.firstPeer));
+        }
+
+        if (TestOverlay.getOverlay(TestOverlay.firstPeer).getZone().getBorderedDimension(
+                TestOverlay.getOverlay(TestOverlay.fourthPeer).getZone()) != -1) {
+            Assert.assertTrue(TestOverlay.getOverlay(TestOverlay.firstPeer).hasNeighbor(
+                    TestOverlay.fourthPeer));
+            Assert.assertTrue(TestOverlay.getOverlay(TestOverlay.fourthPeer).hasNeighbor(
+                    TestOverlay.firstPeer));
+        } else {
+            Assert.assertFalse(TestOverlay.getOverlay(TestOverlay.firstPeer).hasNeighbor(
+                    TestOverlay.fourthPeer));
+            Assert.assertFalse(TestOverlay.getOverlay(TestOverlay.fourthPeer).hasNeighbor(
+                    TestOverlay.firstPeer));
+        }
     }
 
     @Test
     public void testLeave() {
+        int first = TestOverlay.getOverlay(TestOverlay.firstPeer).getNeighbors().size();
+        int second = TestOverlay.getOverlay(TestOverlay.secondPeer).getNeighbors().size();
+        int third = TestOverlay.getOverlay(TestOverlay.thirdPeer).getNeighbors().size();
+
         TestOverlay.fourthPeer.leave();
 
-        Assert.assertTrue(((CANOverlay) TestOverlay.firstPeer.getStructuredOverlay())
-                .hasNeighbor(TestOverlay.secondPeer));
+        Assert.assertEquals(first - 1, TestOverlay.getOverlay(TestOverlay.firstPeer).getNeighbors().size());
+        Assert.assertEquals(second - 1, TestOverlay.getOverlay(TestOverlay.secondPeer).getNeighbors().size());
+        Assert.assertEquals(third - 1, TestOverlay.getOverlay(TestOverlay.thirdPeer).getNeighbors().size());
 
-        System.out
-                .println("peer1 : " + ((CANOverlay) TestOverlay.firstPeer.getStructuredOverlay()).getZone());
-        System.out.println("peer1 neighbors : " +
-            ((CANOverlay) TestOverlay.firstPeer.getStructuredOverlay()).getNeighbors());
-        System.out.println("peer2 : " +
-            ((CANOverlay) TestOverlay.secondPeer.getStructuredOverlay()).getZone());
-        System.out.println("peer2 neighbors : " +
-            ((CANOverlay) TestOverlay.secondPeer.getStructuredOverlay()).getNeighbors());
-        System.out
-                .println("peer3 : " + ((CANOverlay) TestOverlay.thirdPeer.getStructuredOverlay()).getZone());
-        System.out.println("peer3 neighbors : " +
-            ((CANOverlay) TestOverlay.thirdPeer.getStructuredOverlay()).getNeighbors());
+        // Is the peer a neighbor again ??
+        Assert.assertFalse(TestOverlay.getOverlay(TestOverlay.firstPeer).hasNeighbor(TestOverlay.fourthPeer));
+        Assert
+                .assertFalse(TestOverlay.getOverlay(TestOverlay.secondPeer).hasNeighbor(
+                        TestOverlay.fourthPeer));
+        Assert.assertFalse(TestOverlay.getOverlay(TestOverlay.thirdPeer).hasNeighbor(TestOverlay.fourthPeer));
+
+        // Is a peer neighbor to itself ??
+        Assert.assertFalse(TestOverlay.getOverlay(TestOverlay.firstPeer).hasNeighbor(TestOverlay.firstPeer));
+        Assert
+                .assertFalse(TestOverlay.getOverlay(TestOverlay.secondPeer).hasNeighbor(
+                        TestOverlay.secondPeer));
+        Assert.assertFalse(TestOverlay.getOverlay(TestOverlay.thirdPeer).hasNeighbor(TestOverlay.thirdPeer));
+    }
+
+    @Test
+    public void testSendMessage() {
+        Peer[] peers = new Peer[] { TestOverlay.firstPeer, TestOverlay.secondPeer, TestOverlay.thirdPeer,
+                TestOverlay.fifthPeer, TestOverlay.sixthPeer, TestOverlay.seventhPeer, TestOverlay.eighthPeer };
+
+        Random rand = new Random();
+
+        for (int i = 3; i < peers.length; i++) {
+            PAFuture.waitFor(peers[i].join(peers[rand.nextInt(i)]));
+        }
+
+        Peer toFind = peers[rand.nextInt(peers.length)];
+        Peer sender = peers[rand.nextInt(peers.length)];
+
+        CANLookupMessage msg = new CANLookupMessage(TestOverlay.getOverlay(toFind).getZone()
+                .getCoordinatesMin());
+
+        CANLookupResponseMessage response = (CANLookupResponseMessage) sender.sendMessage(msg);
+        PAFuture.waitFor(response);
+
+        Assert.assertEquals(toFind, response.getPeer());
+    }
+
+    public static CANOverlay getOverlay(Peer peer) {
+        return ((CANOverlay) peer.getStructuredOverlay());
     }
 }

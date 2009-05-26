@@ -48,7 +48,7 @@ public class CANOverlay extends StructuredOverlay {
     /**
      * The number of dimensions which is equals to the number of axes.
      */
-    public static final int NB_DIMENSIONS = 2;
+    public static final int NB_DIMENSIONS = 3;
 
     /**
      * Neighbors of the {@link Zone} which is managed.
