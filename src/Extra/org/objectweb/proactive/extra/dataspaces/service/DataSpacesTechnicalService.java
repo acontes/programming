@@ -13,7 +13,6 @@ import javax.management.ObjectName;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.descriptor.services.TechnicalService;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
@@ -39,10 +38,6 @@ public class DataSpacesTechnicalService implements TechnicalService {
 
     public static final String PROPERTY_NAMING_SERVICE_URL = "proactive.dataspaces.naming_service_url";
 
-    private static final String LOG_MSG_CONFIGURATION1_FAILS = "Exception while applying configuration on a node, see internal message for details";
-
-    private static final String LOG_MSG_CONFIGURATION2_FAILS = "Exception while applying application specific configuration, see internal message for details";
-
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.DATASPACES_CONFIGURATOR);
 
     private String namingServiceURL;
@@ -51,7 +46,7 @@ public class DataSpacesTechnicalService implements TechnicalService {
      * Configures Data Spaces for an application on a node with configuration specified properties
      * and local ProActive's properties.
      * <p>
-     * FIXME: Data Spaces cannot be already configured not for a node nor for an application, which
+     * FIXME: Data Spaces cannot be already configured nor for a node nor for an application, which
      * is related to GCM deployment specification and lack of acquisition specification yet. After
      * this is done, reconfiguration should be allowed.
      **/
@@ -61,31 +56,39 @@ public class DataSpacesTechnicalService implements TechnicalService {
         try {
             DataSpacesNodes.configureNode(node, baseScratchConfiguration);
         } catch (AlreadyConfiguredException e) {
-            logger.error(LOG_MSG_CONFIGURATION1_FAILS, e);
+            logger
+                    .error(
+                            "Node is already configured for Data Spaces; reconfiguration/node acquisition is not supported yet.",
+                            e);
             return;
         } catch (ConfigurationException e) {
-            logger.error(LOG_MSG_CONFIGURATION1_FAILS, e);
+            logger.error("Could not configure Data Spaces on node using provided. Configuration problem?", e);
             return;
         } catch (FileSystemException e) {
-            logger.error(LOG_MSG_CONFIGURATION1_FAILS, e);
+            logger.error("Could not initialize scratch space for a node - I/O error.", e);
             return;
         }
 
         // FIXME this code depends on PROACTIVE-661 story with application id, as configureApplication assumes
-        // that application id is already set up accrodingly
+        // that application id is already set up accordingly
         try {
             DataSpacesNodes.configureApplication(node, namingServiceURL);
         } catch (NotConfiguredException e) {
-            // will not happen
+            // it should not happen as we configure it above
             ProActiveLogger.logImpossibleException(logger, e);
-            throw new ProActiveRuntimeException(e);
-        } catch (FileSystemException e) {
-            logger.error(LOG_MSG_CONFIGURATION2_FAILS, e);
-        } catch (ProActiveException e) {
-            logger.error(LOG_MSG_CONFIGURATION2_FAILS, e);
+            return;
         } catch (URISyntaxException e) {
-            logger.error(LOG_MSG_CONFIGURATION2_FAILS, e);
+            // it should not happen as we check that deployer host
+            ProActiveLogger.logImpossibleException(logger, e);
+            return;
+        } catch (FileSystemException e) {
+            logger.error("Could not initialize scratch space for an application - I/O error.", e);
+            return;
+        } catch (ProActiveException e) {
+            logger.error("Could not contact Naming Service specified by an application.", e);
+            return;
         }
+        // FIXME: close node config in case of exceptions?
         final String runtimeURL = node.getProActiveRuntime().getURL();
         final String nodeName = node.getNodeInformation().getName();
         final ObjectName mBeanObjectName = FactoryName.createNodeObjectName(runtimeURL, nodeName);
