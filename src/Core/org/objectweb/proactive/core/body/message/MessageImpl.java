@@ -167,8 +167,6 @@ public class MessageImpl implements Message, java.io.Serializable {
     }
 
     public MessageTags getTags() {
-        //if (tags == null)
-        //    tags = new RequestTags();
         return tags;
     }
 }
