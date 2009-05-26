@@ -1,7 +1,7 @@
 package org.objectweb.proactive.extensions.structuredp2p.core.exception;
 
 /**
- * An {@code AreaException} is thrown by certain methods of the {@link Area} class.
+ * An {@code AreaException} is thrown by certain methods of the {@link Zone} class.
  * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent

@@ -11,6 +11,7 @@ import org.objectweb.proactive.extensions.structuredp2p.messages.PingMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.RemoveNeighborMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANRemoveNeighborMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.ActionResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.responses.JoinResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.LookupResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.ResponseMessage;
 
@@ -104,7 +105,7 @@ public abstract class StructuredOverlay implements Serializable {
      *            the message that is handled.
      * @return the {@link JoinResponseMessage} response.
      */
-    public abstract ActionResponseMessage handleJoinMessage(Message msg);
+    public abstract JoinResponseMessage handleJoinMessage(Message msg);
 
     /**
      * Handles a {@link LeaveMessage}.

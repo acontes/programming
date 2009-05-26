@@ -1,7 +1,7 @@
 package org.objectweb.proactive.extensions.structuredp2p.messages.can;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
-import org.objectweb.proactive.extensions.structuredp2p.core.can.Area;
+import org.objectweb.proactive.extensions.structuredp2p.core.can.Zone;
 import org.objectweb.proactive.extensions.structuredp2p.messages.AddNeighborMessage;
 
 
@@ -21,7 +21,7 @@ public class CANAddNeighborMessage extends AddNeighborMessage {
     /**
      * The area from the peer to add as neighbor.
      */
-    private final Area remoteArea;
+    private final Zone remoteArea;
 
     /**
      * The dimension on which we add the peer as neighbor.
@@ -43,7 +43,7 @@ public class CANAddNeighborMessage extends AddNeighborMessage {
      * @param direction
      *            the direction on which the peer must be add as neighbor.
      */
-    public CANAddNeighborMessage(Peer remotePeer, Area remoteArea, int dimension, int direction) {
+    public CANAddNeighborMessage(Peer remotePeer, Zone remoteArea, int dimension, int direction) {
         super(remotePeer);
         this.remoteArea = remoteArea;
         this.dimension = dimension;
@@ -55,7 +55,7 @@ public class CANAddNeighborMessage extends AddNeighborMessage {
      * 
      * @return the area of the sender of the message.
      */
-    public Area getArea() {
+    public Zone getRemoteArea() {
         return this.remoteArea;
     }
 

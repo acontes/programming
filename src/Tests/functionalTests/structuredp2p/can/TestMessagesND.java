@@ -8,7 +8,7 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
-import org.objectweb.proactive.extensions.structuredp2p.core.can.Area;
+import org.objectweb.proactive.extensions.structuredp2p.core.can.Zone;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.Coordinate;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
@@ -38,9 +38,9 @@ public class TestMessagesND {
     private Coordinate maxCoord[];
     private ResponseMessage srcResponse;
     private ResponseMessage myResponse;
-    private Area area;
-    private Area areaSplit1;
-    private Area areaSplit2;
+    private Zone zone;
+    private Zone areaSplit1;
+    private Zone areaSplit2;
     private CANOverlay can;
     private CANOverlay splitCan1;
     private CANOverlay splitCan2;
@@ -78,10 +78,10 @@ public class TestMessagesND {
 
         }
 
-        this.area = new Area(this.minCoord, this.maxCoord);
+        this.zone = new Zone(this.minCoord, this.maxCoord);
 
         this.can = ((CANOverlay) (this.firstPeer.getStructuredOverlay()));
-        this.can.setArea(this.area);
+        this.can.setArea(this.zone);
         this.firstPeer.setStructuredOverlay(this.can);
         this.lMsg = new CANLookupMessage(this.messCoord);
     }
@@ -89,7 +89,7 @@ public class TestMessagesND {
     @Test
     public void testCreate() {
         Assert.assertNotNull("create a new peer", this.firstPeer);
-        Assert.assertNotNull("area set on the overlay",
+        Assert.assertNotNull("zone set on the overlay",
                 ((CANOverlay) (this.firstPeer.getStructuredOverlay())).getArea().getCoordinatesMin());
         Assert.assertNotNull("get new peer", this.secondPeer);
         Assert.assertNotNull("create a new CAN message", this.lMsg);
@@ -140,7 +140,7 @@ public class TestMessagesND {
             }
         }
 
-        this.areaSplit1 = new Area(this.minCoord, this.maxCoord);
+        this.areaSplit1 = new Zone(this.minCoord, this.maxCoord);
         //
         this.minCoord = new Coordinate[this.dim];
         for (int i = 0; i < this.dim; i++) {
@@ -156,7 +156,7 @@ public class TestMessagesND {
             this.maxCoord[i] = new Coordinate("0");
         }
 
-        this.areaSplit2 = new Area(this.minCoord, this.maxCoord);
+        this.areaSplit2 = new Zone(this.minCoord, this.maxCoord);
         //
         this.splitCan1 = ((CANOverlay) (this.firstPeer.getStructuredOverlay()));
         this.splitCan1.setArea(this.areaSplit1);

@@ -17,7 +17,7 @@ import org.objectweb.proactive.extensions.structuredp2p.core.exception.AreaExcep
  * @version 0.1
  */
 @SuppressWarnings("serial")
-public class Area implements Serializable {
+public class Zone implements Serializable {
 
     /**
      * The minimal value we manage.
@@ -42,14 +42,14 @@ public class Area implements Serializable {
     /**
      * Constructor. Create the biggest area with all coordinates.
      */
-    public Area() {
+    public Zone() {
         Coordinate[] minCoords = new Coordinate[CANOverlay.NB_DIMENSIONS];
         Coordinate[] maxCoords = new Coordinate[CANOverlay.NB_DIMENSIONS];
 
         int i;
         for (i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
-            minCoords[i] = new Coordinate("" + Area.MIN_COORD);
-            maxCoords[i] = new Coordinate("" + Area.MAX_COORD);
+            minCoords[i] = new Coordinate("" + Zone.MIN_COORD);
+            maxCoords[i] = new Coordinate("" + Zone.MAX_COORD);
         }
 
         this.coordinatesMin = minCoords;
@@ -64,7 +64,7 @@ public class Area implements Serializable {
      * @param max
      *            the maximum coordinates.
      */
-    public Area(Coordinate[] min, Coordinate[] max) {
+    public Zone(Coordinate[] min, Coordinate[] max) {
         this.coordinatesMin = min;
         this.coordinatesMax = max;
     }
@@ -125,31 +125,31 @@ public class Area implements Serializable {
     /**
      * Check if the area in argument is bordered to the current area at the dimension in argument.
      * 
-     * WARNING : if an Area is bordered with an another Area on the dimension 1 of two dimension,
-     * the parameter dimension to specify is 0 because the two Area share the same Coordinate on the
+     * WARNING : if an Zone is bordered with an another Zone on the dimension 1 of two dimension,
+     * the parameter dimension to specify is 0 because the two Zone share the same Coordinate on the
      * 0 dimension an not the dimension 1.
      * 
-     * @param area
+     * @param zone
      *            the area to check.
      * @param dimension
      *            the dimension to check.
      * @return <code>true</code> if they are bordered, else <code>false</code>
      */
-    public Boolean isBordered(Area area, int dimension) {
+    public Boolean isBordered(Zone zone, int dimension) {
         boolean dimRes = false;
         boolean borderRes = false;
 
         for (int dim = 0; dim < CANOverlay.NB_DIMENSIONS; dim++) {
             if (dim == dimension) {
-                dimRes = (this.getCoordinateMin(dim).equals(area.getCoordinateMax(dim)) || this
-                        .getCoordinateMax(dim).equals(area.getCoordinateMin(dim)));
+                dimRes = (this.getCoordinateMin(dim).equals(zone.getCoordinateMax(dim)) || this
+                        .getCoordinateMax(dim).equals(zone.getCoordinateMin(dim)));
             } else {
-                borderRes |= (this.getCoordinateMin(dim).isBetween(area.getCoordinateMin(dim),
-                        area.getCoordinateMax(dim)) || this.getCoordinateMax(dim).isBetween(
-                        area.getCoordinateMin(dim), area.getCoordinateMax(dim))) ||
-                    area.getCoordinateMin(dim).isBetween(this.getCoordinateMin(dim),
+                borderRes |= (this.getCoordinateMin(dim).isBetween(zone.getCoordinateMin(dim),
+                        zone.getCoordinateMax(dim)) || this.getCoordinateMax(dim).isBetween(
+                        zone.getCoordinateMin(dim), zone.getCoordinateMax(dim))) ||
+                    zone.getCoordinateMin(dim).isBetween(this.getCoordinateMin(dim),
                             this.getCoordinateMax(dim)) ||
-                    area.getCoordinateMax(dim).isBetween(this.getCoordinateMin(dim),
+                    zone.getCoordinateMax(dim).isBetween(this.getCoordinateMin(dim),
                             this.getCoordinateMax(dim));
             }
         }
@@ -160,16 +160,16 @@ public class Area implements Serializable {
     /**
      * Returns the border dimension between this area and the argument.
      * 
-     * @param area
+     * @param zone
      *            the area to check.
      * @return the border dimension, <code>-1</code> if they are not bordered.
      */
-    public int getBorderedDimension(Area area) {
+    public int getBorderedDimension(Zone zone) {
         int i;
         int nbDim = this.coordinatesMax.length;
 
         for (i = 0; i < nbDim; i++) {
-            if (this.isBordered(area, i)) {
+            if (this.isBordered(zone, i)) {
                 return i;
             }
         }
@@ -184,7 +184,7 @@ public class Area implements Serializable {
      *            the dimension.
      * @return the two split areas.
      */
-    public Area[] split(int dimension) {
+    public Zone[] split(int dimension) {
         return this.split(dimension, Coordinate.getMiddle(this.getCoordinateMin(dimension), this
                 .getCoordinateMax(dimension)));
     }
@@ -199,27 +199,27 @@ public class Area implements Serializable {
      *            the coordinate.
      * @return the two split areas.
      */
-    public Area[] split(int dimension, Coordinate coordinate) {
+    public Zone[] split(int dimension, Coordinate coordinate) {
         Coordinate[] maxCoordLessArea = this.getCoordinatesMax().clone();
         maxCoordLessArea[dimension] = coordinate;
 
         Coordinate[] minCoordGreaterArea = this.getCoordinatesMin().clone();
         minCoordGreaterArea[dimension] = coordinate;
 
-        return new Area[] { new Area(this.getCoordinatesMin(), maxCoordLessArea),
-                new Area(minCoordGreaterArea, this.getCoordinatesMax()) };
+        return new Zone[] { new Zone(this.getCoordinatesMin(), maxCoordLessArea),
+                new Zone(minCoordGreaterArea, this.getCoordinatesMax()) };
     }
 
     /**
      * Merges two bordered areas.
      * 
-     * @param area
+     * @param zone
      *            the area to which we merge the current.
      * @return the merged area.
      * @throws AreaException
      */
-    public Area merge(Area area) throws AreaException {
-        int border = this.getBorderedDimension(area);
+    public Zone merge(Zone zone) throws AreaException {
+        int border = this.getBorderedDimension(zone);
 
         if (border == -1) {
             throw new AreaException("Areas are not bordered.");
@@ -229,10 +229,10 @@ public class Area implements Serializable {
             Coordinate[] minCoord = this.coordinatesMin.clone();
             Coordinate[] maxCoord = this.coordinatesMax.clone();
 
-            minCoord[border] = Coordinate.min(this.getCoordinateMin(border), area.getCoordinateMin(border));
-            maxCoord[border] = Coordinate.max(this.getCoordinateMax(border), area.getCoordinateMax(border));
+            minCoord[border] = Coordinate.min(this.getCoordinateMin(border), zone.getCoordinateMin(border));
+            maxCoord[border] = Coordinate.max(this.getCoordinateMax(border), zone.getCoordinateMax(border));
 
-            return new Area(minCoord, maxCoord);
+            return new Zone(minCoord, maxCoord);
         }
     }
 
@@ -244,7 +244,7 @@ public class Area implements Serializable {
      *            the area to check.
      * @return return true if we can merge the area, false otherwise.
      * 
-     *         public boolean isValidMergingArea(Area area) { int dimension = this.isBordered(area);
+     *         public boolean isValidMergingArea(Zone area) { int dimension = this.isBordered(area);
      *         if (dimension != -1) { return
      *         (this.coordinatesMax[dimension].equals(area.getCoordinatesMax(dimension))) &&
      *         (this.coordinatesMin[dimension].equals(area.getCoordinatesMin(dimension))); } else {
@@ -301,18 +301,18 @@ public class Area implements Serializable {
      * {@inheritDoc}
      */
     public boolean equals(Object o) {
-        if (!(o instanceof Area)) {
+        if (!(o instanceof Zone)) {
             throw new IllegalArgumentException();
         }
 
-        Area area = (Area) o;
+        Zone zone = (Zone) o;
 
         int i;
         int nbDim = this.coordinatesMax.length;
 
         for (i = 0; i < nbDim; i++) {
-            if (!this.getCoordinateMax(i).equals(area.getCoordinateMax(i)) ||
-                !this.getCoordinateMin(i).equals(area.getCoordinateMin(i))) {
+            if (!this.getCoordinateMax(i).equals(zone.getCoordinateMax(i)) ||
+                !this.getCoordinateMin(i).equals(zone.getCoordinateMin(i))) {
                 return false;
             }
         }
@@ -325,7 +325,7 @@ public class Area implements Serializable {
      */
     public String toString() {
         StringBuffer buf = new StringBuffer();
-        buf.append("Area=(");
+        buf.append("Zone=(");
 
         for (int i = 0; i < this.coordinatesMin.length; i++) {
             buf.append(this.coordinatesMin[i].getValue());

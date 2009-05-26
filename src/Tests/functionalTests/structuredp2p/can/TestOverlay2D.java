@@ -12,7 +12,7 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
-import org.objectweb.proactive.extensions.structuredp2p.core.can.Area;
+import org.objectweb.proactive.extensions.structuredp2p.core.can.Zone;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.Coordinate;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.NeighborsDataStructure;
@@ -47,7 +47,7 @@ public class TestOverlay2D {
         CANOverlay overlay;
         Coordinate[] coordinateMin;
         Coordinate[] coordinateMax;
-        Area area;
+        Zone zone;
         Stack<int[]> splitHistory;
 
         /* First peer */
@@ -63,9 +63,9 @@ public class TestOverlay2D {
         coordinateMax[0] = new Coordinate("6");
         coordinateMax[1] = new Coordinate("12");
 
-        area = new Area(coordinateMin, coordinateMax);
+        zone = new Zone(coordinateMin, coordinateMax);
         overlay = (CANOverlay) this.firstPeer.getStructuredOverlay();
-        overlay.setArea(area);
+        overlay.setArea(zone);
         splitHistory = new Stack<int[]>();
         splitHistory.add(new int[] { 0, 1 });
         overlay.setHistory(splitHistory);
@@ -84,9 +84,9 @@ public class TestOverlay2D {
         coordinateMax[0] = new Coordinate("12");
         coordinateMax[1] = new Coordinate("6");
 
-        area = new Area(coordinateMin, coordinateMax);
+        zone = new Zone(coordinateMin, coordinateMax);
         overlay = (CANOverlay) this.secondPeer.getStructuredOverlay();
-        overlay.setArea(area);
+        overlay.setArea(zone);
         splitHistory = new Stack<int[]>();
         splitHistory.add(new int[] { 0, 0 });
         splitHistory.add(new int[] { 1, 1 });
@@ -106,9 +106,9 @@ public class TestOverlay2D {
         coordinateMax[0] = new Coordinate("9");
         coordinateMax[1] = new Coordinate("12");
 
-        area = new Area(coordinateMin, coordinateMax);
+        zone = new Zone(coordinateMin, coordinateMax);
         overlay = (CANOverlay) this.thirdPeer.getStructuredOverlay();
-        overlay.setArea(area);
+        overlay.setArea(zone);
         splitHistory = new Stack<int[]>();
         splitHistory.add(new int[] { 0, 0 });
         splitHistory.add(new int[] { 1, 0 });
@@ -129,9 +129,9 @@ public class TestOverlay2D {
         coordinateMax[0] = new Coordinate("12");
         coordinateMax[1] = new Coordinate("12");
 
-        area = new Area(coordinateMin, coordinateMax);
+        zone = new Zone(coordinateMin, coordinateMax);
         overlay = (CANOverlay) this.fourthPeer.getStructuredOverlay();
-        overlay.setArea(area);
+        overlay.setArea(zone);
         splitHistory = new Stack<int[]>();
         splitHistory.add(new int[] { 0, 0 });
         splitHistory.add(new int[] { 1, 0 });

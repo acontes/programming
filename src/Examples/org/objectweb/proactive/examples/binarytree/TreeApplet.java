@@ -140,7 +140,7 @@ public class TreeApplet extends org.objectweb.proactive.examples.StandardFrame {
         javax.swing.JPanel westPanel = new javax.swing.JPanel(new java.awt.BorderLayout());
         pCmd = javax.swing.Box.createVerticalBox();
 
-        // Create Area
+        // Create Zone
         javax.swing.JPanel panel = new javax.swing.JPanel();
         tNode = new javax.swing.JTextField("", 3);
         javax.swing.JButton create = new javax.swing.JButton("Create Binary Tree");
@@ -164,7 +164,7 @@ public class TreeApplet extends org.objectweb.proactive.examples.StandardFrame {
         panel.add(tNode);
         pCmd.add(panel);
 
-        // Text Area
+        // Text Zone
         panel = new javax.swing.JPanel();
         tKey = new javax.swing.JTextField("", 15);
         panel.add(new javax.swing.JLabel("Key"));

@@ -1,7 +1,7 @@
 package org.objectweb.proactive.extensions.structuredp2p.messages.can;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
-import org.objectweb.proactive.extensions.structuredp2p.core.can.Area;
+import org.objectweb.proactive.extensions.structuredp2p.core.can.Zone;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.NeighborsDataStructure;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredOverlay;
@@ -43,9 +43,9 @@ public class CANMergeMessage extends Message {
     private final NeighborsDataStructure neighbors;
 
     /**
-     * The area to merge with.
+     * The zone to merge with.
      */
-    private final Area area;
+    private final Zone zone;
 
     /**
      * The resources to merge with.
@@ -64,17 +64,17 @@ public class CANMergeMessage extends Message {
      * @param neighbors
      *            the neighbors of the leaving peer.
      * @param remoteArea
-     *            the area to merge with.
+     *            the zone to merge with.
      * @param remoteResources
      *            the resources to merge with.
      */
     public CANMergeMessage(Peer remotePeer, int dimension, int direction, NeighborsDataStructure neighbors,
-            Area remoteArea, DataStorage remoteResources) {
+            Zone remoteArea, DataStorage remoteResources) {
         this.remotePeer = remotePeer;
         this.dimension = dimension;
         this.direction = direction;
         this.neighbors = neighbors;
-        this.area = remoteArea;
+        this.zone = remoteArea;
         this.resources = remoteResources;
     }
 
@@ -122,12 +122,12 @@ public class CANMergeMessage extends Message {
     }
 
     /**
-     * Returns the area to merge with.
+     * Returns the zone to merge with.
      * 
-     * @return the area to merge with.
+     * @return the zone to merge with.
      */
-    public Area getArea() {
-        return this.area;
+    public Zone getArea() {
+        return this.zone;
     }
 
     /**

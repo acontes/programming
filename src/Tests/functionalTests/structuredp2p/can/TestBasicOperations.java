@@ -10,7 +10,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
-import org.objectweb.proactive.extensions.structuredp2p.core.can.Area;
+import org.objectweb.proactive.extensions.structuredp2p.core.can.Zone;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.exception.AreaException;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
@@ -61,7 +61,7 @@ public class TestBasicOperations {
         // Test with split areas !
         try {
             Assert
-                    .assertTrue(new Area().equals(entryPointOverlay.getArea()
+                    .assertTrue(new Zone().equals(entryPointOverlay.getArea()
                             .merge(neighborOverlay.getArea())));
         } catch (AreaException e) {
             e.printStackTrace();
@@ -82,7 +82,7 @@ public class TestBasicOperations {
                 .getStructuredOverlay()).getNeighbors().size());
 
         // TODO tests with merged areas !
-        Assert.assertEquals(new Area(), ((CANOverlay) TestBasicOperations.entryPoint.getStructuredOverlay())
+        Assert.assertEquals(new Zone(), ((CANOverlay) TestBasicOperations.entryPoint.getStructuredOverlay())
                 .getArea());
     }
 

@@ -3,7 +3,7 @@ package org.objectweb.proactive.extensions.structuredp2p.data;
 import java.io.Serializable;
 import java.util.HashMap;
 
-import org.objectweb.proactive.extensions.structuredp2p.core.can.Area;
+import org.objectweb.proactive.extensions.structuredp2p.core.can.Zone;
 
 
 /**
@@ -49,11 +49,11 @@ public class DataStorage implements Serializable {
     /**
      * Return the data included in the area.
      * 
-     * @param area
+     * @param zone
      *            the area
      * @return the data storage
      */
-    public DataStorage getDataFromArea(Area area) {
+    public DataStorage getDataFromArea(Zone zone) {
         // FIXME comment definir la position d'une donnee dans la zone ?
         return new DataStorage();
     }

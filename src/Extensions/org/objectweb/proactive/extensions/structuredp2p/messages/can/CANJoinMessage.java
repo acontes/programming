@@ -1,13 +1,9 @@
 package org.objectweb.proactive.extensions.structuredp2p.messages.can;
 
-import java.util.Stack;
-
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
-import org.objectweb.proactive.extensions.structuredp2p.core.can.Area;
-import org.objectweb.proactive.extensions.structuredp2p.core.can.NeighborsDataStructure;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.messages.Message;
-import org.objectweb.proactive.extensions.structuredp2p.responses.ActionResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.responses.can.CANJoinResponseMessage;
 
 
 /**
@@ -24,66 +20,34 @@ import org.objectweb.proactive.extensions.structuredp2p.responses.ActionResponse
 public class CANJoinMessage extends Message {
 
     /**
-     * The neighbors of the sender.
+     * The remote peer.
      */
-    private final NeighborsDataStructure neighbors;
-
-    /**
-     * Area associated to the sender.
-     */
-    private final Area area;
-
-    /**
-     * Splits history of the sender.
-     */
-    private final Stack<int[]> splitHistory;
+    private final Peer remotePeer;
 
     /**
      * Constructor.
      * 
-     * @param neighbors
-     *            the neighbors.
-     * @param splitHistory
-     *            the split history.
+     * @param directionInv
+     * @param remotePeer
      */
-    public CANJoinMessage(NeighborsDataStructure neighbors, Area area, Stack<int[]> splitHistory) {
+    public CANJoinMessage(Peer remotePeer) {
         super();
-        this.neighbors = neighbors;
-        this.area = area;
-        this.splitHistory = splitHistory;
+        this.remotePeer = remotePeer;
     }
 
     /**
      * {@inheritDoc}
      */
-    public ActionResponseMessage handle(StructuredOverlay overlay) {
-        return overlay.handleJoinMessage(this);
+    public CANJoinResponseMessage handle(StructuredOverlay overlay) {
+        return (CANJoinResponseMessage) overlay.handleJoinMessage(this);
     }
 
     /**
-     * Returns the {@link Area} associated to the peer which has sent the message.
+     * Returns the remote peer.
      * 
-     * @return the {@link Area} associated to the peer which has sent the message.
+     * @return the remotePeer
      */
-    public Area getArea() {
-        return this.area;
-    }
-
-    /**
-     * Returns the neighbors of the peer which has sent the message.
-     * 
-     * @return the neighbors of the peer which has sent the message.
-     */
-    public NeighborsDataStructure getNeighbors() {
-        return this.neighbors;
-    }
-
-    /**
-     * Returns splits history of the peer which has sent the message.
-     * 
-     * @return splits history of the peer which has sent the message.
-     */
-    public Stack<int[]> getSplitHistory() {
-        return this.splitHistory;
+    public Peer getRemotePeer() {
+        return this.remotePeer;
     }
 }

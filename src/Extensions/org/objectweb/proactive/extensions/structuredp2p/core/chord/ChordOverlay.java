@@ -10,6 +10,7 @@ import org.objectweb.proactive.extensions.structuredp2p.messages.LookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.Message;
 import org.objectweb.proactive.extensions.structuredp2p.messages.RemoveNeighborMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.ActionResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.responses.JoinResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.LookupResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.ResponseMessage;
 
@@ -123,7 +124,7 @@ public class ChordOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
-    public ActionResponseMessage handleJoinMessage(Message msg) {
+    public JoinResponseMessage handleJoinMessage(Message msg) {
         // TODO Auto-generated method stub
         return null;
     }

@@ -1,7 +1,7 @@
 package org.objectweb.proactive.extensions.structuredp2p.messages.can;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
-import org.objectweb.proactive.extensions.structuredp2p.core.can.Area;
+import org.objectweb.proactive.extensions.structuredp2p.core.can.Zone;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.messages.Message;
@@ -24,7 +24,7 @@ public class CANCheckMergeMessage extends Message {
     /**
      * The area of the sender.
      */
-    private final Area remoteArea;
+    private final Zone remoteArea;
 
     /**
      * Constructor.
@@ -32,7 +32,7 @@ public class CANCheckMergeMessage extends Message {
      * @param remoteArea
      *            the area to merge with.
      */
-    public CANCheckMergeMessage(Area remoteArea) {
+    public CANCheckMergeMessage(Zone remoteArea) {
         super();
         this.remoteArea = remoteArea;
     }
@@ -49,7 +49,7 @@ public class CANCheckMergeMessage extends Message {
      * 
      * @return the area of the sender of the message.
      */
-    public Area getArea() {
+    public Zone getArea() {
         return this.remoteArea;
     }
 }

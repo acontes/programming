@@ -23,13 +23,12 @@ import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANJoinMess
 import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANLookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANMergeMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANRemoveNeighborMessage;
-import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANSwitchMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.ActionResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.LookupResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.ResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.can.CANCheckMergeResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.responses.can.CANJoinResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.can.CANLookupResponseMessage;
-import org.objectweb.proactive.extensions.structuredp2p.responses.can.CANSwitchResponseMessage;
 
 
 /**
@@ -52,17 +51,17 @@ public class CANOverlay extends StructuredOverlay {
     public static final int NB_DIMENSIONS = 2;
 
     /**
-     * Neighbors of the {@link Area} which is managed.
+     * Neighbors of the {@link Zone} which is managed.
      */
     private NeighborsDataStructure neighbors;
 
     /**
-     * The area which is currently managed.
+     * The zone which is currently managed.
      */
-    private Area area;
+    private Zone zone;
 
     /**
-     * The history of area splits.
+     * The history of zone splits.
      */
     private Stack<int[]> splitHistory;
 
@@ -73,7 +72,7 @@ public class CANOverlay extends StructuredOverlay {
      */
     public CANOverlay(Peer localPeer) {
         super(localPeer);
-        this.area = new Area();
+        this.zone = new Zone();
         this.neighbors = new NeighborsDataStructure(this.getRemotePeer());
         this.splitHistory = new Stack<int[]>();
     }
@@ -82,50 +81,30 @@ public class CANOverlay extends StructuredOverlay {
      * {@inheritDoc}
      */
     public Boolean join(Peer remotePeerExisting) {
-        int dimension = this.getRandomDimension();
-        int direction = this.getRandomDirection();
-        int directionInv = this.getOppositeDirection(direction);
+        CANJoinResponseMessage response = (CANJoinResponseMessage) PAFuture.getFutureValue(this
+                .sendMessageTo(remotePeerExisting, new CANJoinMessage(this.getRemotePeer())));
 
-        // Get the next dimension to split onto
-        if (this.splitHistory != null && this.splitHistory.size() > 0) {
-            dimension = (this.splitHistory.get(this.splitHistory.size() - 1)[0] + 1) %
-                CANOverlay.NB_DIMENSIONS;
+        int dimension = response.getDimension();
+        int direction = response.getDirection();
+
+        /* Actions on local peer */
+        this.setArea(response.getLocalArea());
+        this.updateNeighbors(dimension);
+        this.splitHistory = response.getSplitHistory();
+        this.saveSplit(dimension, direction);
+
+        this.neighbors.removeAll(dimension, direction);
+
+        for (int i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
+            for (int j = 0; j < 2; j++) {
+                this.sendMessageTo(this.neighbors, new CANAddNeighborMessage(this.getRemotePeer(), this
+                        .getArea(), i, j));
+            }
         }
 
-        // Create split areas
-        Area[] newArea = this.getArea().split(dimension);
-        // Set neighbors for the new peer
-        NeighborsDataStructure newNeighbors;
+        this.neighbors.add(remotePeerExisting, response.getRemoteArea(), dimension, direction);
 
-        ActionResponseMessage response = null;
-        try {
-            newNeighbors = (NeighborsDataStructure) MakeDeepCopy.WithProActiveObjectStream
-                    .makeDeepCopy(this.neighbors);
-
-            newNeighbors.removeAll(dimension, directionInv);
-            newNeighbors.add(this.getRemotePeer(), this.getArea(), dimension, directionInv);
-
-            /* Actions on remote peer */
-            response = (ActionResponseMessage) PAFuture.getFutureValue(this.sendMessageTo(remotePeerExisting,
-                    new CANJoinMessage(newNeighbors, newArea[directionInv], this.splitHistory)));
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        if (response.hasSucceeded()) {
-            /* Actions on local peer */
-            this.neighbors.removeAll(dimension, direction);
-            this.neighbors.add(remotePeerExisting, newArea[directionInv], dimension, direction);
-            this.setArea(newArea[direction]);
-            this.updateNeighbors(dimension);
-            this.saveSplit(dimension, direction);
-
-            return true;
-        }
-
-        return false;
+        return true;
     }
 
     /**
@@ -138,12 +117,12 @@ public class CANOverlay extends StructuredOverlay {
             int direction = lastOP[1];
             int directionInv = this.getOppositeDirection(direction);
 
-            Area tmpArea = this.getArea();
+            Zone tmpArea = this.getArea();
             List<ActionResponseMessage> responses = new ArrayList<ActionResponseMessage>();
 
             for (Peer neighbor : this.neighbors.getNeighbors(dimension, direction)) {
                 Coordinate border = this.neighbors.getArea(neighbor).getCoordinateMax(dimension);
-                Area[] splitAreas = tmpArea.split(CANOverlay.getNextDimension(dimension), border);
+                Zone[] splitAreas = tmpArea.split(CANOverlay.getNextDimension(dimension), border);
 
                 NeighborsDataStructure neighbors = new NeighborsDataStructure(neighbor);
                 neighbors.addAll(this.neighbors);
@@ -179,7 +158,7 @@ public class CANOverlay extends StructuredOverlay {
 
     /**
      * Add a new neighbor at the specified <code>dimension</code>, <code>direction</code>. Warning,
-     * the {@link Area} contained by the peer which is specified in parameters must be initialized.
+     * the {@link Zone} contained by the peer which is specified in parameters must be initialized.
      * 
      * @param remotePeer
      *            the remote peer to add as neighbor.
@@ -268,19 +247,6 @@ public class CANOverlay extends StructuredOverlay {
     }
 
     /**
-     * Updates the current peer with a new area and a new split history.
-     * 
-     * @param area
-     *            the new area.
-     * @param history
-     *            the new split history.
-     */
-    private void update(Area area, Stack<int[]> history) {
-        this.setArea(area);
-        this.setHistory(history);
-    }
-
-    /**
      * {@inheritDoc}
      */
     public void checkNeighbors() {
@@ -302,9 +268,9 @@ public class CANOverlay extends StructuredOverlay {
     }
 
     /**
-     * Returns the neighbors of the managed area which is {@link NeighborsDataStructure} .
+     * Returns the neighbors of the managed zone which is {@link NeighborsDataStructure} .
      * 
-     * @return the neighbors of the managed area.
+     * @return the neighbors of the managed zone.
      */
     public NeighborsDataStructure getNeighbors() {
         return this.neighbors;
@@ -403,40 +369,19 @@ public class CANOverlay extends StructuredOverlay {
     }
 
     /**
-     * Switch a peer with
-     * 
-     * @param remotePeer
-     * @return
-     */
-    private Peer switchWith(Peer remotePeer) {
-        Boolean result = ((ActionResponseMessage) PAFuture.getFutureValue(this.getLocalPeer().sendMessageTo(
-                remotePeer, new CANJoinMessage(this.neighbors, this.area, this.splitHistory))))
-                .hasSucceeded();
-
-        if (result) {
-            this.setArea(null);
-            this.setHistory(null);
-
-            return super.getRemotePeer();
-        }
-
-        return null;
-    }
-
-    /**
-     * Check if the coordinates in arguments are in the managed area.
+     * Check if the coordinates in arguments are in the managed zone.
      * 
      * @param coordinates
      *            the coordinates to check.
      * 
-     * @return true if the coordinates are in the area, false otherwise.
+     * @return true if the coordinates are in the zone, false otherwise.
      */
     public boolean contains(Coordinate[] coordinates) {
-        return this.area.contains(coordinates);
+        return this.zone.contains(coordinates);
     }
 
     /**
-     * Check if the dimension index of the current area contains the specified coordinate.
+     * Check if the dimension index of the current zone contains the specified coordinate.
      * 
      * @param dimension
      *            the dimension index used for the check.
@@ -444,7 +389,7 @@ public class CANOverlay extends StructuredOverlay {
      * @param coordinate
      *            the coordinate to check.
      * 
-     * @return <code>0</code> if the coordinate is contained by the area on the specified axe,
+     * @return <code>0</code> if the coordinate is contained by the zone on the specified axe,
      *         <code>-1</code> if the coordinate is smaller than the line which is managed by the
      *         specified dimension, <code>1</code> otherwise.
      */
@@ -459,8 +404,8 @@ public class CANOverlay extends StructuredOverlay {
         CANAddNeighborMessage message = (CANAddNeighborMessage) msg;
         int dimension = message.getDimension();
         int direction = message.getDirection();
-        Peer remotePeer = message.getPeer();
-        Area remoteArea = message.getArea();
+        Peer remotePeer = message.getRemotePeer();
+        Zone remoteArea = message.getRemoteArea();
 
         boolean condition = false;
 
@@ -482,27 +427,52 @@ public class CANOverlay extends StructuredOverlay {
      */
     public CANCheckMergeResponseMessage handleCheckMergeMessage(Message msg) {
         CANCheckMergeMessage message = (CANCheckMergeMessage) msg;
-        return new CANCheckMergeResponseMessage(msg.getCreationTimestamp(), this.getRemotePeer(), this.area
+        return new CANCheckMergeResponseMessage(msg.getCreationTimestamp(), this.getRemotePeer(), this.zone
                 .getBorderedDimension(message.getArea()) == 0);
     }
 
     /**
      * {@inheritDoc}
      */
-    public ActionResponseMessage handleJoinMessage(Message msg) {
+    public CANJoinResponseMessage handleJoinMessage(Message msg) {
         CANJoinMessage message = (CANJoinMessage) msg;
-        this.neighbors = message.getNeighbors();
 
-        for (int i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
-            for (int j = 0; j < 2; j++) {
-                this.sendMessageTo(this.neighbors, new CANAddNeighborMessage(this.getRemotePeer(), this
-                        .getArea(), i, j));
-            }
+        int dimension = this.getRandomDimension();
+        int direction = this.getRandomDirection();
+        int directionInv = this.getOppositeDirection(direction);
+
+        // Get the next dimension to split onto
+        if (this.splitHistory != null && this.splitHistory.size() > 0) {
+            dimension = CANOverlay
+                    .getNextDimension(this.splitHistory.get(this.splitHistory.size() - 1)[0] + 1);
         }
 
-        this.update(message.getArea(), message.getSplitHistory());
+        // Create split areas
+        Zone[] newAreas = this.getArea().split(dimension);
+        // Set neighbors for the new peer
+        NeighborsDataStructure newNeighbors = null;
 
-        return new ActionResponseMessage(msg.getCreationTimestamp(), true);
+        ActionResponseMessage response = null;
+        try {
+            newNeighbors = (NeighborsDataStructure) MakeDeepCopy.WithProActiveObjectStream
+                    .makeDeepCopy(this.neighbors);
+
+            newNeighbors.removeAll(dimension, directionInv);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        this.neighbors.removeAll(dimension, direction);
+        this.neighbors.add(message.getRemotePeer(), newAreas[directionInv], dimension, direction);
+        this.setArea(newAreas[direction]);
+        this.updateNeighbors(dimension);
+        this.saveSplit(dimension, direction);
+
+        return new CANJoinResponseMessage(msg.getCreationTimestamp(), this.getRemotePeer(),
+            newAreas[direction], dimension, directionInv, newAreas[directionInv], newNeighbors,
+            this.splitHistory);
     }
 
     /**
@@ -530,7 +500,7 @@ public class CANOverlay extends StructuredOverlay {
     public ActionResponseMessage handleMergeMessage(Message msg) {
         CANMergeMessage message = (CANMergeMessage) msg;
         try {
-            this.setArea(this.area.merge(message.getArea()));
+            this.setArea(this.zone.merge(message.getArea()));
             this.getLocalPeer().getDataStorage().addData(message.getResources());
         } catch (AreaException e) {
             e.printStackTrace();
@@ -569,18 +539,6 @@ public class CANOverlay extends StructuredOverlay {
         CANRemoveNeighborMessage message = ((CANRemoveNeighborMessage) msg);
         return new ActionResponseMessage(msg.getCreationTimestamp(), this.neighbors.remove(message
                 .getRemotePeer(), message.getDimension(), message.getDirection()));
-    }
-
-    /**
-     * Handles a {@link CANSwitchMessage}.
-     * 
-     * @param msg
-     *            the message that is handled.
-     * @return the {@link CANSwitchResponseMessage} response.
-     */
-    public CANSwitchResponseMessage handleSwitchMessage(Message msg) {
-        this.switchWith(((CANSwitchMessage) msg).getPeer());
-        return new CANSwitchResponseMessage(msg.getCreationTimestamp(), this.getRemotePeer());
     }
 
     /**
@@ -624,22 +582,22 @@ public class CANOverlay extends StructuredOverlay {
     }
 
     /**
-     * Returns the area which is managed by the overlay.
+     * Returns the zone which is managed by the overlay.
      * 
-     * @return the area which is managed by the overlay.
+     * @return the zone which is managed by the overlay.
      */
-    public Area getArea() {
-        return this.area;
+    public Zone getArea() {
+        return this.zone;
     }
 
     /**
-     * Sets the new area covered.
+     * Sets the new zone covered.
      * 
-     * @param area
-     *            the new area covered.
+     * @param zone
+     *            the new zone covered.
      */
-    public void setArea(Area area) {
-        this.area = area;
+    public void setArea(Zone zone) {
+        this.zone = zone;
     }
 
     /**
