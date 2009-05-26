@@ -241,6 +241,11 @@ public class TestOverlay2D {
                 this.fourthPeer));
         Assert.assertTrue(((CANOverlay) this.fourthPeer.getStructuredOverlay()).getNeighbors().hasNeighbor(
                 this.firstPeer));
+
+        this.fourthPeer.leave();
+        this.secondPeer.leave();
+
+        Assert.assertTrue(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighbors().size() == 0);
     }
 
     @After
@@ -248,6 +253,7 @@ public class TestOverlay2D {
         this.msg = null;
         PAActiveObject.terminateActiveObject(this.firstPeer, false);
         PAActiveObject.terminateActiveObject(this.secondPeer, false);
+        PAActiveObject.terminateActiveObject(this.thirdPeer, false);
         PAActiveObject.terminateActiveObject(this.fourthPeer, false);
     }
 
