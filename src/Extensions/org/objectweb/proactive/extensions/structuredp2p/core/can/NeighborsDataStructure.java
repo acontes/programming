@@ -117,8 +117,10 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
      * @return <code>true</code> if the neighbor has been add, <code>false</code> otherwise.
      */
     public boolean add(Peer remotePeer, Zone zone, int dimension, int direction) {
-        if (remotePeer.equals(this.ownerPeer) || this.neighbors[dimension][direction].contains(remotePeer)) {
+        if (remotePeer.equals(this.ownerPeer)) {
             return false;
+        } else if (this.neighbors[dimension][direction].contains(remotePeer)) {
+            return this.updateZone(remotePeer, zone, dimension, direction);
         }
 
         int index = 0;

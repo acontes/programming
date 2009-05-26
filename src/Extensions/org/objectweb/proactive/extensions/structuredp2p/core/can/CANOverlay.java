@@ -89,21 +89,15 @@ public class CANOverlay extends StructuredOverlay {
 
         /* Actions on local peer */
         this.setZone(response.getLocalZone());
-        this.updateNeighbors(dimension);
         this.splitHistory = response.getSplitHistory();
         this.saveSplit(dimension, direction);
-
+        this.neighbors.addAll(response.getNeighbors());
         this.neighbors.removeAll(dimension, direction);
 
-        for (int i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
-            for (int j = 0; j < 2; j++) {
-                this.sendMessageTo(this.neighbors.getNeighbors(i, this.getOppositeDirection(j)),
-                        new CANAddNeighborMessage(this.getRemotePeer(), this.getZone(), i, j));
-            }
-        }
-
-        this.neighbors.add(response.getRemotePeer(), response.getRemoteZone(), dimension, direction);
         this.updateNeighbors();
+
+        this.neighbors.add(response.getRemotePeer(), response.getRemoteZone(), dimension, this
+                .getOppositeDirection(direction));
 
         return true;
     }
@@ -203,6 +197,9 @@ public class CANOverlay extends StructuredOverlay {
                             this.sendMessageTo(neighbor, new CANRemoveNeighborMessage(this.getRemotePeer(),
                                 dim, this.getOppositeDirection(dir)));
                             peers.add(neighbor);
+                        } else {
+                            this.sendMessageTo(neighbor, new CANAddNeighborMessage(this.getRemotePeer(), this
+                                    .getZone(), dim, this.getOppositeDirection(dir)));
                         }
                     }
 
@@ -408,15 +405,8 @@ public class CANOverlay extends StructuredOverlay {
         Peer remotePeer = message.getRemotePeer();
         Zone remoteZone = message.getRemoteZone();
 
-        boolean condition = false;
-
-        if (!this.neighbors.getNeighbors(dimension, direction).contains(remotePeer)) {
-            condition = this.neighbors.add(remotePeer, remoteZone, dimension, direction);
-        } else if (!this.neighbors.getZone(remotePeer, dimension, direction).equals(remoteZone)) {
-            condition = this.neighbors.updateZone(remotePeer, remoteZone, dimension, direction);
-        }
-
-        return new ActionResponseMessage(msg.getCreationTimestamp(), condition);
+        return new ActionResponseMessage(msg.getCreationTimestamp(), this.neighbors.add(remotePeer,
+                remoteZone, dimension, direction));
     }
 
     /**
@@ -464,10 +454,10 @@ public class CANOverlay extends StructuredOverlay {
             e.printStackTrace();
         }
 
-        this.neighbors.add(message.getRemotePeer(), newZones[directionInv], dimension, direction);
         this.setZone(newZones[direction]);
-        this.updateNeighbors();
         this.saveSplit(dimension, direction);
+        this.updateNeighbors();
+        this.neighbors.add(message.getRemotePeer(), newZones[directionInv], dimension, directionInv);
 
         return new CANJoinResponseMessage(msg.getCreationTimestamp(), this.getRemotePeer(),
             newZones[direction], dimension, directionInv, newZones[directionInv], newNeighbors, newHistory);
