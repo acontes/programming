@@ -109,8 +109,8 @@ public class CANOverlay extends StructuredOverlay {
         if (this.splitHistory.size() > 0) {
             int[] lastOP = this.splitHistory.pop();
             int dimension = lastOP[0];
-            int direction = lastOP[1];
-            int directionInv = this.getOppositeDirection(direction);
+            int directionInv = lastOP[1];
+            int direction = this.getOppositeDirection(directionInv);
 
             Zone tmpZone = this.getZone();
             List<ActionResponseMessage> responses = new ArrayList<ActionResponseMessage>();
@@ -488,7 +488,10 @@ public class CANOverlay extends StructuredOverlay {
     public ActionResponseMessage handleMergeMessage(Message msg) {
         CANMergeMessage message = (CANMergeMessage) msg;
         try {
+            System.out.println("local zone = " + this.zone);
+            System.out.println("remote zone = " + message.getZone());
             this.setZone(this.zone.merge(message.getZone()));
+            System.out.println("local merged zone = " + this.zone);
             this.getLocalPeer().getDataStorage().addData(message.getResources());
         } catch (ZoneException e) {
             e.printStackTrace();
