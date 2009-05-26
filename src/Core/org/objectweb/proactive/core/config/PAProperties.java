@@ -511,14 +511,14 @@ public enum PAProperties {
     // -------------- DATA SPACES
 
     /**
-     * This property indicates an access URL of the scratch data space. Mandatory if scratch is to
-     * be allowed on a node.
+     * This property indicates an access URL to the scratch data space. If scratch is going to be
+     * used on host, this property and/or {@link #PA_DATASPACES_SCRATCH_PATH} should be set.
      */
     PA_DATASPACES_SCRATCH_URL("proactive.dataspaces.scratch_url", PAPropertiesType.STRING),
 
     /**
-     * This property indicates a location of the scratch data space. Mandatory if scratch is to be
-     * allowed on a node.
+     * This property indicates a location of the scratch data space. If scratch is going to be used
+     * on host, this property and/or {@link #PA_DATASPACES_SCRATCH_URL} should be set.
      */
     PA_DATASPACES_SCRATCH_PATH("proactive.dataspaces.scratch_path", PAPropertiesType.STRING),
 
