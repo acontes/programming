@@ -510,6 +510,7 @@ public class CANOverlay extends StructuredOverlay {
             this.splitHistory.remove(index);
         }
 
+        this.neighbors.remove(message.getRemotePeer(), dimension, direction);
         this.neighbors.addAll(message.getNeighbors());
         this.updateNeighbors();
 
