@@ -108,14 +108,6 @@ public class ApplicationParserProactive extends AbstractApplicationParser {
             appTechnicalServicesProperties = appTechnicalServicesProperties
                     .getCombinationWith(dataSpacesTechService);
 
-            // merge with DataSpacesTechnicalService with configuration read from descriptor
-            final Node dataNode = null;
-            final TechnicalServicesProperties dataSpacesTechService = GCMParserHelper.parseData(xpath,
-                    dataNode);
-
-            appTechnicalServicesProperties = appTechnicalServicesProperties
-                    .getCombinationWith(dataSpacesTechService);
-
             // parse configuration
             //
             Node configNode = (Node) xpath.evaluate(XPATH_CONFIGURATION, paNode, XPathConstants.NODE);
