@@ -11,7 +11,7 @@ import functionalTests.structuredp2p.can.TestOverlay2D;
 
 
 @RunWith(Suite.class)
-@SuiteClasses(value = { TestTracker.class, TestArea.class, TestCoordinate.class,
+@SuiteClasses(value = { TestTracker.class, TestZone.class, TestCoordinate.class,
         TestNeighborsDataStructure.class, TestOverlay2D.class, TestMessages.class, TestBasicOperations.class })
 public class AllTests {
 }

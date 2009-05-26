@@ -1,7 +1,7 @@
 package org.objectweb.proactive.extensions.structuredp2p.core.exception;
 
 /**
- * An {@code AreaException} is thrown by certain methods of the {@link Zone} class.
+ * An {@code ZoneException} is thrown by certain methods of the {@link Zone} class.
  * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent
@@ -10,45 +10,45 @@ package org.objectweb.proactive.extensions.structuredp2p.core.exception;
  * @version 0.1
  */
 @SuppressWarnings("serial")
-public class AreaException extends Exception {
+public class ZoneException extends Exception {
 
     /**
-     * Constructs an {@code AreaException} with no detail message.
+     * Constructs an {@code ZoneException} with no detail message.
      */
-    public AreaException() {
+    public ZoneException() {
         super();
     }
 
     /**
-     * Constructs an {@code AreaException} with the specified detail message. A detail message is a
+     * Constructs an {@code ZoneException} with the specified detail message. A detail message is a
      * {@link String} that describes this particular exception.
      * 
      * @param message
      *            the detail message.
      */
-    public AreaException(String message) {
+    public ZoneException(String message) {
         super(message);
     }
 
     /**
-     * Constructs an {@code AreaException} with the specified cause.
+     * Constructs an {@code ZoneException} with the specified cause.
      * 
      * @param cause
      *            the cause.
      */
-    public AreaException(Throwable cause) {
+    public ZoneException(Throwable cause) {
         super(cause);
     }
 
     /**
-     * Constructs an {@code AreaException} with the specified detail message and cause.
+     * Constructs an {@code ZoneException} with the specified detail message and cause.
      * 
      * @param message
      *            the detail message.
      * @param cause
      *            the cause.
      */
-    public AreaException(String message, Throwable cause) {
+    public ZoneException(String message, Throwable cause) {
         super(message, cause);
     }
 

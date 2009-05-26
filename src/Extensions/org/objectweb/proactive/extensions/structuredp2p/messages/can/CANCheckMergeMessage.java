@@ -22,19 +22,19 @@ import org.objectweb.proactive.extensions.structuredp2p.responses.can.CANCheckMe
 public class CANCheckMergeMessage extends Message {
 
     /**
-     * The area of the sender.
+     * The zone of the sender.
      */
-    private final Zone remoteArea;
+    private final Zone remoteZone;
 
     /**
      * Constructor.
      * 
-     * @param remoteArea
-     *            the area to merge with.
+     * @param remoteZone
+     *            the zone to merge with.
      */
-    public CANCheckMergeMessage(Zone remoteArea) {
+    public CANCheckMergeMessage(Zone remoteZone) {
         super();
-        this.remoteArea = remoteArea;
+        this.remoteZone = remoteZone;
     }
 
     /**
@@ -45,11 +45,11 @@ public class CANCheckMergeMessage extends Message {
     }
 
     /**
-     * Returns the area of the sender of the message.
+     * Returns the zone of the sender of the message.
      * 
-     * @return the area of the sender of the message.
+     * @return the zone of the sender of the message.
      */
-    public Zone getArea() {
-        return this.remoteArea;
+    public Zone getZone() {
+        return this.remoteZone;
     }
 }

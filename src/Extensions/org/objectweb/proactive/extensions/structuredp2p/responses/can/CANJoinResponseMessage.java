@@ -3,8 +3,8 @@ package org.objectweb.proactive.extensions.structuredp2p.responses.can;
 import java.util.Stack;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
-import org.objectweb.proactive.extensions.structuredp2p.core.can.Zone;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.NeighborsDataStructure;
+import org.objectweb.proactive.extensions.structuredp2p.core.can.Zone;
 import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANJoinMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.JoinResponseMessage;
 
@@ -22,9 +22,9 @@ import org.objectweb.proactive.extensions.structuredp2p.responses.JoinResponseMe
 public class CANJoinResponseMessage extends JoinResponseMessage {
 
     /**
-     * The remote area.
+     * The remote zone.
      */
-    private final Zone remoteArea;
+    private final Zone remoteZone;
 
     /**
      * The current dimension.
@@ -37,9 +37,9 @@ public class CANJoinResponseMessage extends JoinResponseMessage {
     private final int direction;
 
     /**
-     * The current area.
+     * The current zone.
      */
-    private final Zone localArea;
+    private final Zone localZone;
 
     /**
      * The current neighbors.
@@ -62,24 +62,24 @@ public class CANJoinResponseMessage extends JoinResponseMessage {
      * @param newNeighbors
      * @param splitHistory
      */
-    public CANJoinResponseMessage(long creationTimestamp, Peer remotePeer, Zone remoteArea, int dimension,
+    public CANJoinResponseMessage(long creationTimestamp, Peer remotePeer, Zone remoteZone, int dimension,
             int directionInv, Zone zone, NeighborsDataStructure newNeighbors, Stack<int[]> splitHistory) {
         super(creationTimestamp, remotePeer);
-        this.remoteArea = remoteArea;
+        this.remoteZone = remoteZone;
         this.dimension = dimension;
         this.direction = directionInv;
-        this.localArea = zone;
+        this.localZone = zone;
         this.neighbors = newNeighbors;
         this.splitHistory = splitHistory;
     }
 
     /**
-     * Returns the remote area.
+     * Returns the remote zone.
      * 
-     * @return the remoteArea
+     * @return the remoteZone
      */
-    public Zone getRemoteArea() {
-        return this.remoteArea;
+    public Zone getRemoteZone() {
+        return this.remoteZone;
     }
 
     /**
@@ -87,7 +87,7 @@ public class CANJoinResponseMessage extends JoinResponseMessage {
      * 
      * @return the dimension.
      */
-    public int getDirection() {
+    public int getDimension() {
         return this.dimension;
     }
 
@@ -96,17 +96,17 @@ public class CANJoinResponseMessage extends JoinResponseMessage {
      * 
      * @return the direction.
      */
-    public int getDimension() {
+    public int getDirection() {
         return this.direction;
     }
 
     /**
-     * Returns the current area.
+     * Returns the current zone.
      * 
-     * @return the area.
+     * @return the zone.
      */
-    public Zone getLocalArea() {
-        return this.localArea;
+    public Zone getLocalZone() {
+        return this.localZone;
     }
 
     /**

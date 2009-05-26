@@ -65,19 +65,19 @@ public class TestOverlay {
                 .hasNeighbor(TestOverlay.secondPeer));
 
         System.out
-                .println("peer1 : " + ((CANOverlay) TestOverlay.firstPeer.getStructuredOverlay()).getArea());
+                .println("peer1 : " + ((CANOverlay) TestOverlay.firstPeer.getStructuredOverlay()).getZone());
         System.out.println("peer1 neighbors : " +
             ((CANOverlay) TestOverlay.firstPeer.getStructuredOverlay()).getNeighbors());
         System.out.println("peer2 : " +
-            ((CANOverlay) TestOverlay.secondPeer.getStructuredOverlay()).getArea());
+            ((CANOverlay) TestOverlay.secondPeer.getStructuredOverlay()).getZone());
         System.out.println("peer2 neighbors : " +
             ((CANOverlay) TestOverlay.secondPeer.getStructuredOverlay()).getNeighbors());
         System.out
-                .println("peer3 : " + ((CANOverlay) TestOverlay.thirdPeer.getStructuredOverlay()).getArea());
+                .println("peer3 : " + ((CANOverlay) TestOverlay.thirdPeer.getStructuredOverlay()).getZone());
         System.out.println("peer3 neighbors : " +
             ((CANOverlay) TestOverlay.thirdPeer.getStructuredOverlay()).getNeighbors());
         System.out.println("peer4 : " +
-            ((CANOverlay) TestOverlay.fourthPeer.getStructuredOverlay()).getArea());
+            ((CANOverlay) TestOverlay.fourthPeer.getStructuredOverlay()).getZone());
         System.out.println("peer4 neighbors : " +
             ((CANOverlay) TestOverlay.fourthPeer.getStructuredOverlay()).getNeighbors());
     }

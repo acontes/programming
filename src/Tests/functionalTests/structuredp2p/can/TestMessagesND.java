@@ -8,9 +8,9 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
-import org.objectweb.proactive.extensions.structuredp2p.core.can.Zone;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.Coordinate;
+import org.objectweb.proactive.extensions.structuredp2p.core.can.Zone;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
 import org.objectweb.proactive.extensions.structuredp2p.messages.LookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.PingMessage;
@@ -81,7 +81,7 @@ public class TestMessagesND {
         this.zone = new Zone(this.minCoord, this.maxCoord);
 
         this.can = ((CANOverlay) (this.firstPeer.getStructuredOverlay()));
-        this.can.setArea(this.zone);
+        this.can.setZone(this.zone);
         this.firstPeer.setStructuredOverlay(this.can);
         this.lMsg = new CANLookupMessage(this.messCoord);
     }
@@ -90,7 +90,7 @@ public class TestMessagesND {
     public void testCreate() {
         Assert.assertNotNull("create a new peer", this.firstPeer);
         Assert.assertNotNull("zone set on the overlay",
-                ((CANOverlay) (this.firstPeer.getStructuredOverlay())).getArea().getCoordinatesMin());
+                ((CANOverlay) (this.firstPeer.getStructuredOverlay())).getZone().getCoordinatesMin());
         Assert.assertNotNull("get new peer", this.secondPeer);
         Assert.assertNotNull("create a new CAN message", this.lMsg);
         Assert.assertNotNull("create a new coordinate table", this.messCoord);
@@ -159,10 +159,10 @@ public class TestMessagesND {
         this.areaSplit2 = new Zone(this.minCoord, this.maxCoord);
         //
         this.splitCan1 = ((CANOverlay) (this.firstPeer.getStructuredOverlay()));
-        this.splitCan1.setArea(this.areaSplit1);
+        this.splitCan1.setZone(this.areaSplit1);
 
         this.splitCan2 = ((CANOverlay) (this.secondPeer.getStructuredOverlay()));
-        this.splitCan2.setArea(this.areaSplit2);
+        this.splitCan2.setZone(this.areaSplit2);
 
         this.firstPeer.setStructuredOverlay(this.splitCan1);
         this.secondPeer.setStructuredOverlay(this.splitCan2);

@@ -47,13 +47,13 @@ public class DataStorage implements Serializable {
     }
 
     /**
-     * Return the data included in the area.
+     * Return the data included in the zone.
      * 
      * @param zone
-     *            the area
+     *            the zone
      * @return the data storage
      */
-    public DataStorage getDataFromArea(Zone zone) {
+    public DataStorage getDataFromZone(Zone zone) {
         // FIXME comment definir la position d'une donnee dans la zone ?
         return new DataStorage();
     }

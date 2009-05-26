@@ -3,11 +3,11 @@ package org.objectweb.proactive.extensions.structuredp2p.core.can;
 import java.io.Serializable;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
-import org.objectweb.proactive.extensions.structuredp2p.core.exception.AreaException;
+import org.objectweb.proactive.extensions.structuredp2p.core.exception.ZoneException;
 
 
 /**
- * An area indicates the space which is managed by a {@link Peer}. The minimum coordinates are the
+ * An zone indicates the space which is managed by a {@link Peer}. The minimum coordinates are the
  * left higher corner. The maximum coordinates are the corner lower right.
  * 
  * @author Kilanga Fanny
@@ -40,7 +40,7 @@ public class Zone implements Serializable {
     private Coordinate[] coordinatesMax;
 
     /**
-     * Constructor. Create the biggest area with all coordinates.
+     * Constructor. Create the biggest zone with all coordinates.
      */
     public Zone() {
         Coordinate[] minCoords = new Coordinate[CANOverlay.NB_DIMENSIONS];
@@ -70,39 +70,39 @@ public class Zone implements Serializable {
     }
 
     /**
-     * Returns the minimum coordinates that indicates the area which is managed by a peer.
+     * Returns the minimum coordinates that indicates the zone which is managed by a peer.
      * 
-     * @return the minimum coordinates that indicates the area which is managed by a peer.
+     * @return the minimum coordinates that indicates the zone which is managed by a peer.
      */
     public Coordinate[] getCoordinatesMin() {
         return this.coordinatesMin;
     }
 
     /**
-     * Returns the coordinates of the area.
+     * Returns the coordinates of the zone.
      * 
-     * @return the coordinates of the area.
+     * @return the coordinates of the zone.
      */
     public Coordinate[][] getCoordinates() {
         return new Coordinate[][] { this.getCoordinatesMin(), this.getCoordinatesMax() };
     }
 
     /**
-     * Returns the maximum coordinates that indicates the area which is managed by a peer.
+     * Returns the maximum coordinates that indicates the zone which is managed by a peer.
      * 
-     * @return the maximum coordinates that indicates the area which is managed by a peer.
+     * @return the maximum coordinates that indicates the zone which is managed by a peer.
      */
     public Coordinate[] getCoordinatesMax() {
         return this.coordinatesMax;
     }
 
     /**
-     * Returns the minimum coordinate at a specified dimension that indicates the area which is
+     * Returns the minimum coordinate at a specified dimension that indicates the zone which is
      * managed by a peer.
      * 
      * @param dimension
      *            the dimension on which we recover the coordinates.
-     * @return the minimum coordinate at the specified dimension that indicates the area which is
+     * @return the minimum coordinate at the specified dimension that indicates the zone which is
      *         managed by a peer.
      */
     public Coordinate getCoordinateMin(int dimension) {
@@ -110,12 +110,12 @@ public class Zone implements Serializable {
     }
 
     /**
-     * Returns the maximum coordinate at a specified dimension that indicates the area which is
+     * Returns the maximum coordinate at a specified dimension that indicates the zone which is
      * managed by a peer.
      * 
      * @param dimension
      *            the dimension on which we recover the coordinates.
-     * @return the maximum coordinate at a specified dimension that indicates the area which is
+     * @return the maximum coordinate at a specified dimension that indicates the zone which is
      *         managed by a peer.
      */
     public Coordinate getCoordinateMax(int dimension) {
@@ -123,14 +123,14 @@ public class Zone implements Serializable {
     }
 
     /**
-     * Check if the area in argument is bordered to the current area at the dimension in argument.
+     * Check if the zone in argument is bordered to the current zone at the dimension in argument.
      * 
      * WARNING : if an Zone is bordered with an another Zone on the dimension 1 of two dimension,
      * the parameter dimension to specify is 0 because the two Zone share the same Coordinate on the
      * 0 dimension an not the dimension 1.
      * 
      * @param zone
-     *            the area to check.
+     *            the zone to check.
      * @param dimension
      *            the dimension to check.
      * @return <code>true</code> if they are bordered, else <code>false</code>
@@ -158,10 +158,10 @@ public class Zone implements Serializable {
     }
 
     /**
-     * Returns the border dimension between this area and the argument.
+     * Returns the border dimension between this zone and the argument.
      * 
      * @param zone
-     *            the area to check.
+     *            the zone to check.
      * @return the border dimension, <code>-1</code> if they are not bordered.
      */
     public int getBorderedDimension(Zone zone) {
@@ -178,11 +178,11 @@ public class Zone implements Serializable {
     }
 
     /**
-     * Returns two areas representing the original one splited following a dimension.
+     * Returns two zones representing the original one splited following a dimension.
      * 
      * @param dimension
      *            the dimension.
-     * @return the two split areas.
+     * @return the two split zones.
      */
     public Zone[] split(int dimension) {
         return this.split(dimension, Coordinate.getMiddle(this.getCoordinateMin(dimension), this
@@ -190,42 +190,42 @@ public class Zone implements Serializable {
     }
 
     /**
-     * Returns two areas representing the original one split following a dimension at the specified
+     * Returns two zones representing the original one split following a dimension at the specified
      * coordinate.
      * 
      * @param dimension
      *            the dimension.
      * @param coordinate
      *            the coordinate.
-     * @return the two split areas.
+     * @return the two split zones.
      */
     public Zone[] split(int dimension, Coordinate coordinate) {
-        Coordinate[] maxCoordLessArea = this.getCoordinatesMax().clone();
-        maxCoordLessArea[dimension] = coordinate;
+        Coordinate[] maxCoordLessZone = this.getCoordinatesMax().clone();
+        maxCoordLessZone[dimension] = coordinate;
 
-        Coordinate[] minCoordGreaterArea = this.getCoordinatesMin().clone();
-        minCoordGreaterArea[dimension] = coordinate;
+        Coordinate[] minCoordGreaterZone = this.getCoordinatesMin().clone();
+        minCoordGreaterZone[dimension] = coordinate;
 
-        return new Zone[] { new Zone(this.getCoordinatesMin(), maxCoordLessArea),
-                new Zone(minCoordGreaterArea, this.getCoordinatesMax()) };
+        return new Zone[] { new Zone(this.getCoordinatesMin(), maxCoordLessZone),
+                new Zone(minCoordGreaterZone, this.getCoordinatesMax()) };
     }
 
     /**
-     * Merges two bordered areas.
+     * Merges two bordered zones.
      * 
      * @param zone
-     *            the area to which we merge the current.
-     * @return the merged area.
-     * @throws AreaException
+     *            the zone to which we merge the current.
+     * @return the merged zone.
+     * @throws ZoneException
      */
-    public Zone merge(Zone zone) throws AreaException {
+    public Zone merge(Zone zone) throws ZoneException {
         int border = this.getBorderedDimension(zone);
 
         if (border == -1) {
-            throw new AreaException("Areas are not bordered.");
+            throw new ZoneException("Zones are not bordered.");
         } else {
-            // FIXME test also the load balancing to choose the good area
-            // merge the two areas
+            // FIXME test also the load balancing to choose the good zone
+            // merge the two zones
             Coordinate[] minCoord = this.coordinatesMin.clone();
             Coordinate[] maxCoord = this.coordinatesMax.clone();
 
@@ -238,30 +238,30 @@ public class Zone implements Serializable {
 
     // FIXME to remove ??
     /**
-     * Checks if it is possible to merge the current area with the area in argument.
+     * Checks if it is possible to merge the current zone with the zone in argument.
      * 
-     * @param area
-     *            the area to check.
-     * @return return true if we can merge the area, false otherwise.
+     * @param zone
+     *            the zone to check.
+     * @return return true if we can merge the zone, false otherwise.
      * 
-     *         public boolean isValidMergingArea(Zone area) { int dimension = this.isBordered(area);
+     *         public boolean isValidMergingZone(Zone zone) { int dimension = this.isBordered(zone);
      *         if (dimension != -1) { return
-     *         (this.coordinatesMax[dimension].equals(area.getCoordinatesMax(dimension))) &&
-     *         (this.coordinatesMin[dimension].equals(area.getCoordinatesMin(dimension))); } else {
+     *         (this.coordinatesMax[dimension].equals(zone.getCoordinatesMax(dimension))) &&
+     *         (this.coordinatesMin[dimension].equals(zone.getCoordinatesMin(dimension))); } else {
      *         return false; } }
      */
 
     /**
-     * Is the coordinate in the area following a dimension ?
+     * Is the coordinate in the zone following a dimension ?
      * 
      * @param dimension
      *            the dimension.
      * @param coordinate
      *            the coordinate to check.
-     * @return <code>0</code> if the current coordinate is in the area, <code>-1</code> if the
-     *         coordinate is lexicographically less than the minimal coordinate of the area and
+     * @return <code>0</code> if the current coordinate is in the zone, <code>-1</code> if the
+     *         coordinate is lexicographically less than the minimal coordinate of the zone and
      *         <code>1</code> if the coordinate is lexicographically grater than the maximal
-     *         coordinate of the area and .
+     *         coordinate of the zone and .
      */
     public int contains(int dimension, Coordinate coordinate) {
         boolean isGreaterThanMin = this.getCoordinateMin(dimension).compareTo(coordinate) <= 0;
@@ -277,12 +277,12 @@ public class Zone implements Serializable {
     }
 
     /**
-     * Check if the coordinates in arguments are in the managed area.
+     * Check if the coordinates in arguments are in the managed zone.
      * 
      * @param coordinates
      *            the coordinates to check.
      * 
-     * @return true if the coordinates are in the area, false otherwise.
+     * @return true if the coordinates are in the zone, false otherwise.
      */
     public boolean contains(Coordinate[] coordinates) {
         int i;

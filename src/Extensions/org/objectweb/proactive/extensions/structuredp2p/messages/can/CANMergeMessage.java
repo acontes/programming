@@ -63,18 +63,18 @@ public class CANMergeMessage extends Message {
      *            the current direction of the leaving peer.
      * @param neighbors
      *            the neighbors of the leaving peer.
-     * @param remoteArea
+     * @param remoteZone
      *            the zone to merge with.
      * @param remoteResources
      *            the resources to merge with.
      */
     public CANMergeMessage(Peer remotePeer, int dimension, int direction, NeighborsDataStructure neighbors,
-            Zone remoteArea, DataStorage remoteResources) {
+            Zone remoteZone, DataStorage remoteResources) {
         this.remotePeer = remotePeer;
         this.dimension = dimension;
         this.direction = direction;
         this.neighbors = neighbors;
-        this.zone = remoteArea;
+        this.zone = remoteZone;
         this.resources = remoteResources;
     }
 
@@ -126,7 +126,7 @@ public class CANMergeMessage extends Message {
      * 
      * @return the zone to merge with.
      */
-    public Zone getArea() {
+    public Zone getZone() {
         return this.zone;
     }
 
