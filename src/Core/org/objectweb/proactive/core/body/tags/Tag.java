@@ -9,7 +9,11 @@ import org.objectweb.proactive.core.body.BodyImpl;
 import org.objectweb.proactive.core.config.PAProperties;
 
 /**
- * Tag for Request Tagging
+ * Abstract Tag class for Request Tagging
+ * 
+ * You have to create a subclass implementing the abstract
+ * method apply to create a tag doing what you want at each
+ * propagation.
  */
 public abstract class Tag implements Serializable{
 
@@ -38,14 +42,21 @@ public abstract class Tag implements Serializable{
     }
 
     /**
-     * Do the current Tag Jobs
-     * @return the new TAG for the next propagation
+     * Do the current Tag jobs and then return the Tag for the next
+     * propagation. It can be itself (this) or a new Tag or null to 
+     * cancel the tag.
+     * 
+     * @return the next propagate TAG
      */
     abstract public Tag apply();
 
     /**
      * Return the local memory space of this Tag on the current Active Object
-     * @return the LocaLMemoryTag of this tag on the current ActiveObject
+     * if the lease has not exceeded, null otherwise.
+     * 
+     * Each acces to the memory renew the lease.
+     * 
+     * @return the LocaLMemoryTag of this tag on the current ActiveObject if it exist
      */
     final public LocalMemoryTag getLocalMemory(){
         Body body = PAActiveObject.getBodyOnThis();

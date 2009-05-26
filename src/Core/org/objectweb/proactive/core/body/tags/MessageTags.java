@@ -8,7 +8,9 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 /**
- * RequestTags : Add a tag on a request with a tag value and its propagation policy, and an object container binded to it.
+ * Map of tag attached on a message. At each sendrequest, the "apply" method
+ * of each tag is called, and the tags resulting are attached to the request which
+ * will be sent.
  */
 public class MessageTags implements Serializable {
 
@@ -97,4 +99,5 @@ public class MessageTags implements Serializable {
         }
         return res;
     }
+
 }
