@@ -43,8 +43,8 @@ public final class SpaceInstanceInfo implements Serializable {
      * @param config
      *            scratch data space configuration; must be complete - with access URL specified
      * @throws ConfigurationException
-     *             when provided information is not enough to build a complete space definition (no
-     *             hostname for path, no URL etc.)
+     *             when provided information is not enough to build a complete space definition - no
+     *             remote access URL is defined
      * @see SpaceConfiguration#isComplete()
      */
     public SpaceInstanceInfo(long appid, String runtimeId, String nodeId, ScratchSpaceConfiguration config)
@@ -61,8 +61,8 @@ public final class SpaceInstanceInfo implements Serializable {
      *            input or output data space configuration; must be complete - with access URL
      *            specified
      * @throws ConfigurationException
-     *             when provided information is not enough to build a complete space definition (no
-     *             hostname for path, no URL etc.)
+     *             when provided information is not enough to build a complete space definition - no
+     *             remote access URL is defined
      * @see SpaceConfiguration#isComplete()
      */
     public SpaceInstanceInfo(long appid, InputOutputSpaceConfiguration config) throws ConfigurationException {
@@ -207,6 +207,10 @@ public final class SpaceInstanceInfo implements Serializable {
             sb.append(" at host: ");
             sb.append(hostname);
         }
+        sb.append("; ");
+
+        sb.append("remote access URL: ");
+        sb.append(url);
         sb.append(']');
 
         return sb.toString();
