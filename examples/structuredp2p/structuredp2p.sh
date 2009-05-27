@@ -34,7 +34,7 @@ export CLASSPATH=../../classes/Extra:$CLASSPATH
 export CLASSPATH=../../classes/Tests:$CLASSPATH
 export CLASSPATH=../../classes/Utils:$CLASSPATH
 
-$JAVACMD org.objectweb.proactive.extensions.structuredp2p.examples.canoverlay.Launcher $args
+$JAVACMD org.objectweb.proactive.examples.structuredp2p.can.Launcher $args
 
 echo
 echo ---------------------------------------------------------

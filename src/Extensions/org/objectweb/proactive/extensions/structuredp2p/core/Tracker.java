@@ -22,6 +22,11 @@ import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType
 public class Tracker implements Serializable {
 
     /**
+     * The probability to add a new in the tracker list.
+     */
+    private static final int PROB = 5;
+
+    /**
      * The remote peers list that the tracker maintains.
      */
     private List<Peer> remotePeers = new ArrayList<Peer>();
@@ -63,9 +68,9 @@ public class Tracker implements Serializable {
             Peer peerToJoin = this.getRandomPeer();
 
             try {
-                if (peerToJoin.join(remotePeer)) {
+                if (remotePeer.join(peerToJoin)) {
                     Random rand = new Random();
-                    if (rand.nextInt(2) == 0) {
+                    if (rand.nextInt(Tracker.PROB) == 0) {
                         this.remotePeers.add(remotePeer);
                     }
                 }
