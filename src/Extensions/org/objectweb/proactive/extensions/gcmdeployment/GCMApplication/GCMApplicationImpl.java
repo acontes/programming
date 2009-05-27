@@ -211,6 +211,8 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
             Node defaultNode = NodeFactory.getDefaultNode();
             Node halfBodiesNode = NodeFactory.getHalfBodiesNode();
             TechnicalServicesProperties appTSProperties = parser.getAppTechnicalServices();
+            // FIXME: Data Spaces Naming Service or application id are potentially not configured yet, 
+            // while we try to configure local node using them 
 
             for (Map.Entry<String, HashMap<String, String>> tsp : appTSProperties) {
 
