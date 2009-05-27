@@ -190,5 +190,5 @@
 	</xsd:complexType>
 	<xsd:complexType name="serviceWithURLType">
 		<xsd:attribute name="url" type="xsd:anyURI" use="required" />
-	</xsd:complexType> 
+	</xsd:complexType>
 </xsd:schema>

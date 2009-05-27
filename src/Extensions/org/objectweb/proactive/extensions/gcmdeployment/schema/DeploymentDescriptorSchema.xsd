@@ -148,7 +148,7 @@
 			<xsd:element name="remoteAccess" type="serviceWithURLType" minOccurs="0" />
 			<xsd:element name="path" type="pathElementType" minOccurs="0" />
 		</xsd:all>
-	</xsd:complexType> 
+	</xsd:complexType>
 
 	<xsd:complexType name="hostType">
 		<xsd:sequence>
