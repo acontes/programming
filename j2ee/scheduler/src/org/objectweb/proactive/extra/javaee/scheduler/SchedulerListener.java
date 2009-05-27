@@ -122,7 +122,7 @@ public class SchedulerListener implements SchedulerEventListener, Serializable{
 	}
 	
 	public void jobRunningToFinishedEvent(NotificationData<JobInfo> event) {
-		ConnectorJobInfo job = mapOfJobs.get(event.getData());
+		ConnectorJobInfo job = mapOfJobs.get(event.getData().getJobId());
 		// are we monitoring this job?
 		if( job == null) 
 			return;
