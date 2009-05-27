@@ -28,12 +28,12 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.WrongApplicationIdExc
 
 
 /**
- * Implements {@link PADataSpaces} API for a pair of node and application.
+ * Implements {@link PADataSpaces} API for a pair of node and application (with its identifier).
  * <p>
  * Instances of this class are thread-safe. Each instance for given node and application should
- * remain valid as long as this node has Data Spaces configured, for this application. For that
- * reason, instances of this class are typically managed by {@link NodeConfigurator} and
- * {@link DataSpacesNodes} classes.
+ * remain valid as long as this node has Data Spaces configured, for this application, with
+ * particular application identifier set on Node during that time. For that reason, instances of
+ * this class are typically managed by {@link NodeConfigurator} and {@link DataSpacesNodes} classes.
  */
 public class DataSpacesImpl {
     private static final long RESOLVE_BLOCKING_RESEND_PERIOD_MILLIS = 5000;

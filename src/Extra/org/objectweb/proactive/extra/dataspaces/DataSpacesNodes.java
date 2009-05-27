@@ -41,7 +41,8 @@ public class DataSpacesNodes {
      * {@link #configureNode(Node, SpaceConfiguration)} and
      * {@link #configureApplication(Node, String)} calls.
      * 
-     * Returned instance is usable while node is kept configured for the application.
+     * Returned instance is usable while node is kept configured for the application, with
+     * particular application identifier associated to this node during that time.
      * 
      * @param node
      *            node that is asked for Data Spaces implementation

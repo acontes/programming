@@ -34,7 +34,8 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationExceptio
  * </ol>
  * <p>
  * Instances of this class are thread-safe. They can be managed by {@link DataSpacesNodes} static
- * class or in some other way.
+ * class or in some other way. It is assumed that Node's application identifier will not change
+ * between {@link #configureApplication(String)} and {@link #tryCloseAppConfigurator()} calls.
  * 
  * @see DataSpacesImpl
  */
@@ -101,7 +102,8 @@ public class NodeConfigurator {
      * <p>
      * Configuration of a node for an application involves association to provided NamingService and
      * registration of application scratch space for this node, if it exists. Application identifier
-     * is grabbed from current node state.
+     * is grabbed from current node state. That application identifier should remain stable until
+     * {@link #tryCloseAppConfigurator()} call.
      * <p>
      * This method may be called several times for different applications, after node has been
      * configured through {@link #configureNode(Node, SpaceConfiguration)}. Subsequent calls will
