@@ -54,7 +54,7 @@ public class A implements Serializable {
                 return this;
             }
         });
-        t.createLocalMemory(30).put("MT_00", new Integer(0));
+        t.createLocalMemory(10).put("MT_00", new Integer(0));
         int res = (Integer) t.getLocalMemory().get("MT_00");
         
         // To propagate the TAG and test the apply code
@@ -90,9 +90,9 @@ public class A implements Serializable {
                 return this;
             }
         });
-        t.createLocalMemory(15).put("MT_01", new Integer(0));
+        t.createLocalMemory(7).put("MT_01", new Integer(0));
         try {
-            Thread.sleep(45000);
+            Thread.sleep(15000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }     
@@ -107,15 +107,15 @@ public class A implements Serializable {
                 return this;
             }
         });
-        t.createLocalMemory(20).put("MT_02", new Integer(0));
+        t.createLocalMemory(8).put("MT_02", new Integer(0));
         try {
-            Thread.sleep(15000);
+            Thread.sleep(5000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }    
         Integer res = (Integer)t.getLocalMemory().get("MT_02");
         try {
-            Thread.sleep(25000);
+            Thread.sleep(10000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }  

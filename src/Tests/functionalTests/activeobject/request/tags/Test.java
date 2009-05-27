@@ -4,6 +4,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.config.PAProperties;
 
 import functionalTests.FunctionalTest;
 
@@ -26,6 +27,8 @@ public class Test extends FunctionalTest {
     
     @Before
     public void action() throws Exception {
+        PAProperties.PA_MEMORY_TAG_LEASE_PERIOD.setValue(5);
+        PAProperties.PA_MAX_MEMORY_TAG_LEASE.setValue(10);
         activeA = (A) PAActiveObject.newActive(A.class.getName(), new Object[0]);
         activeA.initialize();
     }

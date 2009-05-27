@@ -60,9 +60,9 @@ public class B implements Serializable, InitActive{
                 return this;
             }
         });
-        t.createLocalMemory(15).put("MT_08", new Integer(0));
+        t.createLocalMemory(7).put("MT_08", new Integer(0));
         try {
-            Thread.sleep(45000);
+            Thread.sleep(15000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }     
