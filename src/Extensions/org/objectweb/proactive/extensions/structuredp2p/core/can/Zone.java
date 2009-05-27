@@ -24,12 +24,12 @@ public class Zone implements Serializable {
     /**
      * The minimal value we manage.
      */
-    public static float MIN_COORD = 0;
+    public static String MIN_COORD = "0";
 
     /**
      * The maximal value we manage.
      */
-    public static float MAX_COORD = 256;
+    public static String MAX_COORD = "1.0";
 
     /**
      * The minimum coordinates.
@@ -50,8 +50,8 @@ public class Zone implements Serializable {
 
         int i;
         for (i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
-            minCoords[i] = new Coordinate("" + Zone.MIN_COORD);
-            maxCoords[i] = new Coordinate("" + Zone.MAX_COORD);
+            minCoords[i] = new Coordinate(Zone.MIN_COORD);
+            maxCoords[i] = new Coordinate(Zone.MAX_COORD);
         }
 
         this.coordinatesMin = minCoords;
@@ -65,8 +65,18 @@ public class Zone implements Serializable {
      *            the minimum coordinates.
      * @param max
      *            the maximum coordinates.
+     * @throws ZoneException
+     *             this exception is generated when a zone has the coordinate min and max equals at
+     *             the same dimension.
      */
-    public Zone(Coordinate[] min, Coordinate[] max) {
+    public Zone(Coordinate[] min, Coordinate[] max) throws ZoneException {
+        int l = min.length;
+        for (int i = 0; i < l; i++) {
+            if (min[i].equals(max[i])) {
+                throw new ZoneException("Zone is not correctly formed.");
+            }
+        }
+
         this.coordinatesMin = min;
         this.coordinatesMax = max;
     }
@@ -184,7 +194,7 @@ public class Zone implements Serializable {
      * 
      * @param dimension
      *            the dimension.
-     * @return the two split zones.
+     * @return the two split zones. Uses {@link Zone#split(int, Coordinate)}
      */
     public Zone[] split(int dimension) {
         return this.split(dimension, Coordinate.getMiddle(this.getCoordinateMin(dimension), this
@@ -199,7 +209,8 @@ public class Zone implements Serializable {
      *            the dimension.
      * @param coordinate
      *            the coordinate.
-     * @return the two split zones.
+     * @return the two split zones. If a null zone is created, the first zone will be the current
+     *         zone and the second one will be <code>null</code>.
      */
     public Zone[] split(int dimension, Coordinate coordinate) {
         Coordinate[] maxCoordLessZone = null;
@@ -213,16 +224,19 @@ public class Zone implements Serializable {
             minCoordGreaterZone = (Coordinate[]) MakeDeepCopy.WithObjectStream.makeDeepCopy(this
                     .getCoordinatesMin());
             minCoordGreaterZone[dimension] = coordinate;
+
+            return new Zone[] { new Zone(this.getCoordinatesMin(), maxCoordLessZone),
+                    new Zone(minCoordGreaterZone, this.getCoordinatesMax()) };
         } catch (IOException e) {
-            // TODO Auto-generated catch block
+            // TODO IOException caused by MakeDeepCopy
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
-            // TODO Auto-generated catch block
+            // TODO ClassNotFoundException caused by MakeDeepCopy
             e.printStackTrace();
+        } catch (ZoneException e) {
         }
 
-        return new Zone[] { new Zone(this.getCoordinatesMin(), maxCoordLessZone),
-                new Zone(minCoordGreaterZone, this.getCoordinatesMax()) };
+        return new Zone[] { this, null };
     }
 
     /**
@@ -250,21 +264,6 @@ public class Zone implements Serializable {
             return new Zone(minCoord, maxCoord);
         }
     }
-
-    // FIXME to remove ??
-    /**
-     * Checks if it is possible to merge the current zone with the zone in argument.
-     * 
-     * @param zone
-     *            the zone to check.
-     * @return return true if we can merge the zone, false otherwise.
-     * 
-     *         public boolean isValidMergingZone(Zone zone) { int dimension = this.isBordered(zone);
-     *         if (dimension != -1) { return
-     *         (this.coordinatesMax[dimension].equals(zone.getCoordinatesMax(dimension))) &&
-     *         (this.coordinatesMin[dimension].equals(zone.getCoordinatesMin(dimension))); } else {
-     *         return false; } }
-     */
 
     /**
      * Is the coordinate in the zone following a dimension ?

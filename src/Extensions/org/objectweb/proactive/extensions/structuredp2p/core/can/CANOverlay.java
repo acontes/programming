@@ -83,22 +83,26 @@ public class CANOverlay extends StructuredOverlay {
         CANJoinResponseMessage response = (CANJoinResponseMessage) PAFuture.getFutureValue(this
                 .sendMessageTo(remotePeerExisting, new CANJoinMessage(this.getRemotePeer())));
 
-        int dimension = response.getDimension();
-        int direction = response.getDirection();
+        if (response.hasSucceeded()) {
+            int dimension = response.getDimension();
+            int direction = response.getDirection();
 
-        /* Actions on local peer */
-        this.setZone(response.getLocalZone());
-        this.splitHistory = response.getSplitHistory();
-        this.saveSplit(dimension, direction);
-        this.neighbors.addAll(response.getNeighbors());
-        this.neighbors.removeAll(dimension, direction);
+            /* Actions on local peer */
+            this.setZone(response.getLocalZone());
+            this.splitHistory = response.getSplitHistory();
+            this.saveSplit(dimension, direction);
+            this.neighbors.addAll(response.getNeighbors());
+            this.neighbors.removeAll(dimension, direction);
 
-        this.updateNeighbors();
+            this.updateNeighbors();
 
-        this.neighbors.add(response.getRemotePeer(), response.getRemoteZone(), dimension, this
-                .getOppositeDirection(direction));
+            this.neighbors.add(response.getRemotePeer(), response.getRemoteZone(), dimension, this
+                    .getOppositeDirection(direction));
 
-        return true;
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -124,6 +128,13 @@ public class CANOverlay extends StructuredOverlay {
                 CANMergeMessage message = new CANMergeMessage(this.getRemotePeer(), dimension, directionInv,
                     neighbors, splitZones[0], this.getLocalPeer().getDataStorage().getDataFromZone(
                             this.getZone()));
+
+                /**
+                 * TODO new leave secure algorithm
+                 * 
+                 * send a message with the information to merge wait for all responses if OK ...
+                 * else retry without the died peer
+                 */
 
                 tmpZone = splitZones[1];
 
@@ -180,7 +191,7 @@ public class CANOverlay extends StructuredOverlay {
 
     /**
      * Check neighbors list following a dimension in order to see if a peer is always a neighbor, if
-     * not, it is removed from its neighbors.
+     * it is, the neighbor is updated with the current zone, else, it is removed from its neighbors.
      * 
      * @param dimension
      *            the dimension to not check.
@@ -251,7 +262,7 @@ public class CANOverlay extends StructuredOverlay {
             try {
                 this.sendMessageTo(neighbor, new PingMessage());
             } catch (Exception e) {
-                // TODO
+                // TODO a response returns an exception
             }
 
         }
@@ -261,7 +272,7 @@ public class CANOverlay extends StructuredOverlay {
      * {@inheritDoc}
      */
     public void update() {
-        // TODO Auto-generated method stub
+        // TODO what is the update method for ?
     }
 
     /**
@@ -334,7 +345,7 @@ public class CANOverlay extends StructuredOverlay {
             try {
                 responses.add(this.sendMessageTo(remotePeer, msg));
             } catch (Exception e) {
-                // TODO
+                // TODO a response returns an exception
                 e.printStackTrace();
             }
         }
@@ -359,7 +370,7 @@ public class CANOverlay extends StructuredOverlay {
             try {
                 responses.add(this.sendMessageTo(remotePeer, msg));
             } catch (Exception e) {
-                // TODO
+                // TODO a response returns an exception
                 e.printStackTrace();
             }
         }
@@ -479,7 +490,7 @@ public class CANOverlay extends StructuredOverlay {
          * return new CANLookupResponseMessage(msg.getCreationTimestamp(), this.getRemotePeer(),
          * ((CANLookupMessage) msg).getCoordinates());
          */
-        return (CANLookupResponseMessage) this.sendMessage(msg);
+        return this.sendMessage(msg);
     }
 
     /**

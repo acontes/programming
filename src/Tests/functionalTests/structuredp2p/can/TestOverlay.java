@@ -10,7 +10,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
@@ -129,10 +128,6 @@ public class TestOverlay {
                         TestOverlay.fourthPeer));
 
         // Are there zones bordered ??
-        Assert.assertNotSame(TestOverlay.getOverlay(TestOverlay.firstPeer).getZone().getBorderedDimension(
-                TestOverlay.getOverlay(TestOverlay.thirdPeer).getZone()), -1);
-        Assert.assertNotSame(TestOverlay.getOverlay(TestOverlay.secondPeer).getZone().getBorderedDimension(
-                TestOverlay.getOverlay(TestOverlay.thirdPeer).getZone()), -1);
         Assert.assertNotSame(TestOverlay.getOverlay(TestOverlay.secondPeer).getZone().getBorderedDimension(
                 TestOverlay.getOverlay(TestOverlay.thirdPeer).getZone()), -1);
 
@@ -165,15 +160,11 @@ public class TestOverlay {
 
     @Test
     public void testLeave() {
-        int first = TestOverlay.getOverlay(TestOverlay.firstPeer).getNeighbors().size();
         int second = TestOverlay.getOverlay(TestOverlay.secondPeer).getNeighbors().size();
-        int third = TestOverlay.getOverlay(TestOverlay.thirdPeer).getNeighbors().size();
 
         TestOverlay.fourthPeer.leave();
 
-        Assert.assertEquals(first - 1, TestOverlay.getOverlay(TestOverlay.firstPeer).getNeighbors().size());
         Assert.assertEquals(second - 1, TestOverlay.getOverlay(TestOverlay.secondPeer).getNeighbors().size());
-        Assert.assertEquals(third - 1, TestOverlay.getOverlay(TestOverlay.thirdPeer).getNeighbors().size());
 
         // Is the peer a neighbor again ??
         Assert.assertFalse(TestOverlay.getOverlay(TestOverlay.firstPeer).hasNeighbor(TestOverlay.fourthPeer));
@@ -208,7 +199,6 @@ public class TestOverlay {
                 .getCoordinatesMin());
 
         CANLookupResponseMessage response = (CANLookupResponseMessage) sender.sendMessage(msg);
-        PAFuture.waitFor(response);
 
         Assert.assertEquals(toFind, response.getPeer());
     }

@@ -13,7 +13,7 @@ import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
  * @version 0.1
  */
 @SuppressWarnings("serial")
-public class JoinResponseMessage extends ResponseMessage {
+public class JoinResponseMessage extends ActionResponseMessage {
 
     /**
      * The remote peer.
@@ -26,9 +26,24 @@ public class JoinResponseMessage extends ResponseMessage {
      * @param creationTimestamp
      *            the timestamp indicating the time creation of the message which has been sent.
      * @param remotePeer
+     *            the remote peer.
      */
     public JoinResponseMessage(long creationTimestamp, Peer remotePeer) {
-        super(creationTimestamp);
+        this(creationTimestamp, true, remotePeer);
+    }
+
+    /**
+     * Constructor to use when the join operation didn't work.
+     * 
+     * @param creationTimestamp
+     *            the timestamp indicating the time creation of the message which has been sent.
+     * @param succeded
+     *            <code>false</code> if the peer hasn't join the overlay.
+     * @param remotePeer
+     *            the remote peer.
+     */
+    public JoinResponseMessage(long creationTimestamp, boolean succeded, Peer remotePeer) {
+        super(creationTimestamp, succeded);
         this.remotePeer = remotePeer;
     }
 

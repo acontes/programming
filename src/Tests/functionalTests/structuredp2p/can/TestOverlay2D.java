@@ -16,6 +16,7 @@ import org.objectweb.proactive.extensions.structuredp2p.core.can.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.Coordinate;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.NeighborsDataStructure;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.Zone;
+import org.objectweb.proactive.extensions.structuredp2p.core.exception.ZoneException;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
 import org.objectweb.proactive.extensions.structuredp2p.messages.LookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANLookupMessage;
@@ -43,7 +44,7 @@ public class TestOverlay2D {
     private LookupMessage msg;
 
     @Before
-    public void setUp() throws ActiveObjectCreationException, NodeException {
+    public void setUp() throws ActiveObjectCreationException, NodeException, ZoneException {
         CANOverlay overlay;
         Coordinate[] coordinateMin;
         Coordinate[] coordinateMax;

@@ -102,8 +102,9 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
     }
 
     /**
-     * Add a new neighbor at the specified <code>dimension</code>, <code>direction</code>. Warning,
-     * the {@link Zone} contained by the peer which is given in parameters must be initialized.
+     * Add a new neighbor at the specified <code>dimension</code>, <code>direction</code> or updates
+     * its zone if it already exists. Warning, the {@link Zone} contained by the peer which is given
+     * in parameters must be initialized.
      * 
      * @param remotePeer
      *            the remote peer to add as neighbor.

@@ -54,7 +54,7 @@ public abstract class StructuredOverlay implements Serializable {
     /**
      * Left the current network.
      * 
-     * @return TODO
+     * @return <code>true</code> if the peer has correctly leave the overlay.
      */
     public abstract Boolean leave();
 

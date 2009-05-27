@@ -1,5 +1,7 @@
 package functionalTests.structuredp2p.can;
 
+import java.util.Iterator;
+
 import junit.framework.Assert;
 
 import org.junit.After;
@@ -11,6 +13,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.NeighborsDataStructure;
+import org.objectweb.proactive.extensions.structuredp2p.core.can.Zone;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
 
 
@@ -42,6 +45,27 @@ public class TestNeighborsDataStructure {
                 0, 1));
         Assert.assertTrue(((CANOverlay) this.peer.getStructuredOverlay()).getNeighbors().hasNeighbor(peer2,
                 0, 0));
+    }
+
+    @Test
+    public void testOrder() {
+        NeighborsDataStructure neighbors = ((CANOverlay) this.peer.getStructuredOverlay()).getNeighbors();
+
+        Iterator<Peer> it = neighbors.iterator();
+
+        Peer cur = null;
+        if (it.hasNext()) {
+            cur = it.next();
+
+            while (it.hasNext()) {
+                Zone curZ = ((CANOverlay) cur.getStructuredOverlay()).getZone();
+
+                cur = it.next();
+                Zone nextZ = ((CANOverlay) cur.getStructuredOverlay()).getZone();
+
+                Assert.assertNotSame(-1, curZ.getBorderedDimension(nextZ));
+            }
+        }
     }
 
     @After

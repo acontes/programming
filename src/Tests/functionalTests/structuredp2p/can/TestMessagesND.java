@@ -11,6 +11,7 @@ import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.Coordinate;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.Zone;
+import org.objectweb.proactive.extensions.structuredp2p.core.exception.ZoneException;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
 import org.objectweb.proactive.extensions.structuredp2p.messages.LookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.PingMessage;
@@ -47,7 +48,7 @@ public class TestMessagesND {
     private int dim;
 
     @Before
-    public void init() throws ActiveObjectCreationException, NodeException {
+    public void init() throws ActiveObjectCreationException, NodeException, ZoneException {
         this.firstPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
                 new Object[] { OverlayType.CAN });
         this.secondPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
@@ -111,7 +112,7 @@ public class TestMessagesND {
     }
 
     @Test
-    public void testJoinAndSendMessage() {
+    public void testJoinAndSendMessage() throws ZoneException {
         this.secondPeer.join(this.firstPeer);
         // assertTrue("joining neighbor", ((CanOverlay)
         // srcPeer.getStructuredOverlay()).hasNeighbor(myPeer));

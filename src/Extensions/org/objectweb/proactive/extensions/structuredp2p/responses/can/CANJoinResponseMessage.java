@@ -55,22 +55,43 @@ public class CANJoinResponseMessage extends JoinResponseMessage {
      * Constructor.
      * 
      * @param creationTimestamp
+     *            the timestamp indicating the time creation of the message which has been sent.
      * @param remotePeer
+     *            the remote peer already in the overlay.
      * @param dimension
+     *            the dimension.
      * @param directionInv
+     *            the direction.
      * @param zone
+     *            the zone of the new peer.
      * @param newNeighbors
+     *            the neighbors of the remote peer.
      * @param splitHistory
+     *            the splitHistory of the remote peer.
      */
     public CANJoinResponseMessage(long creationTimestamp, Peer remotePeer, Zone remoteZone, int dimension,
             int directionInv, Zone zone, NeighborsDataStructure newNeighbors, Stack<int[]> splitHistory) {
-        super(creationTimestamp, remotePeer);
+        super(creationTimestamp, (zone != null), remotePeer);
+
         this.remoteZone = remoteZone;
         this.dimension = dimension;
         this.direction = directionInv;
         this.localZone = zone;
         this.neighbors = newNeighbors;
         this.splitHistory = splitHistory;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public CANJoinResponseMessage(long creationTimestamp, boolean succeded) {
+        super(creationTimestamp, succeded, null);
+        this.remoteZone = null;
+        this.dimension = -1;
+        this.direction = -1;
+        this.localZone = null;
+        this.neighbors = null;
+        this.splitHistory = null;
     }
 
     /**

@@ -281,7 +281,7 @@ public class Peer implements InitActive, RunActive, Serializable {
             return (thisOverlay.getZone().equals(peerOverlay.getZone()) && thisOverlay.getNeighbors().equals(
                     peerOverlay.getNeighbors()));
         } else if (this.getType() == OverlayType.CHORD) {
-            // TODO
+            // TODO Chord implementation
         }
 
         return false;
