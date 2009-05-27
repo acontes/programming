@@ -28,17 +28,17 @@
 
 			</configuration>
 
-			<virtualNode id="Grid2D" capacity="3" />
-			<virtualNode id="StructuredP2P" capacity="3" />
+			<virtualNode id="CANOverlay" capacity="3" />
+			<virtualNode id="CANTracker" capacity="3" />
 		</proactive>
 	</application>
 
 	<resources>
-		<nodeProvider id="Grid2D">
-			<file path="GCMD.xml" />
+		<nodeProvider id="CANOverlay">
+			<file path="GCMD-Peers.xml" />
 		</nodeProvider>
-		<nodeProvider id="StructuredP2P">
-			<file path="GCMD.xml" />
+		<nodeProvider id="CANTracker">
+			<file path="GCMD-Trackers.xml" />
 		</nodeProvider>
 	</resources>
 

@@ -22,7 +22,7 @@
 		</hosts>
 
 		<groups>
-			<sshGroup id="sshLan" hostList="eon[3-20]" />
+			<sshGroup id="sshLan" hostList="eon[1-2]" />
 		</groups>
 	</infrastructure>
 </GCMDeployment>

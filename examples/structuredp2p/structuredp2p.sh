@@ -23,7 +23,7 @@ fi
 echo
 echo ---------- STRUCTURED P2P ----------
 
-args="$default_descriptor ${1-$default_hostname} $2"
+args="$default_descriptor $2 ${1-$default_hostname}"
 
 export CLASSPATH=../../lib/*:$CLASSPATH
 export CLASSPATH=../../classes/Core:$CLASSPATH
