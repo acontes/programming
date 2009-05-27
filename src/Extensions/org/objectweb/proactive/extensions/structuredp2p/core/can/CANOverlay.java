@@ -24,7 +24,6 @@ import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANLookupMe
 import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANMergeMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANRemoveNeighborMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.ActionResponseMessage;
-import org.objectweb.proactive.extensions.structuredp2p.responses.LookupResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.ResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.can.CANCheckMergeResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.can.CANJoinResponseMessage;
@@ -277,11 +276,12 @@ public class CANOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
-    public LookupResponseMessage sendMessage(LookupMessage msg) {
+    public CANLookupResponseMessage sendMessage(LookupMessage msg) {
         CANLookupMessage lookupMessage = (CANLookupMessage) msg;
 
         if (this.contains(lookupMessage.getCoordinates())) {
-            return lookupMessage.handle(this);
+            return new CANLookupResponseMessage(msg.getCreationTimestamp(), this.getRemotePeer(),
+                ((CANLookupMessage) msg).getCoordinates());
         } else {
             int pos;
 
@@ -297,13 +297,12 @@ public class CANOverlay extends StructuredOverlay {
                     List<Peer> neighbors = this.neighbors.getNeighbors(dim, direction);
 
                     if (neighbors.size() > 0) {
-                        return this.neighbors.getNearestNeighborFrom(lookupMessage.getCoordinates()[dim],
-                                dim, direction).sendMessageWithoutCallback(msg);
+                        return (CANLookupResponseMessage) PAFuture.getFutureValue(this.sendMessageTo(
+                                this.neighbors.getNearestNeighborFrom(
+                                        lookupMessage.getCoordinates()[CANOverlay.getNextDimension(dim)],
+                                        dim, direction), msg));
+                        // return .sendMessageWithoutCallback(msg);
                     }
-                } else {
-                    return this.neighbors.getNearestNeighborFrom(
-                            lookupMessage.getCoordinates()[CANOverlay.getNextDimension(dim)], dim, direction)
-                            .sendMessageWithoutCallback(msg);
                 }
             }
         }
@@ -476,8 +475,11 @@ public class CANOverlay extends StructuredOverlay {
      * {@inheritDoc}
      */
     public CANLookupResponseMessage handleLookupMessage(LookupMessage msg) {
-        return new CANLookupResponseMessage(msg.getCreationTimestamp(), this.getRemotePeer(),
-            ((CANLookupMessage) msg).getCoordinates());
+        /*
+         * return new CANLookupResponseMessage(msg.getCreationTimestamp(), this.getRemotePeer(),
+         * ((CANLookupMessage) msg).getCoordinates());
+         */
+        return (CANLookupResponseMessage) this.sendMessage(msg);
     }
 
     /**

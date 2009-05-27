@@ -363,12 +363,11 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
      */
     public Peer getNearestNeighborFrom(Coordinate coordinate, int dim, int direction) {
         Zone nearest = null;
-        int distance;
-        int minDistance = Integer.MAX_VALUE;
+        float distance;
+        float minDistance = Float.MAX_VALUE;
 
         for (Zone zone : this.associatedZones[dim][direction]) {
-            if ((distance = Integer.parseInt(coordinate.getValue()) -
-                Integer.parseInt(zone.getCoordinateMax(CANOverlay.getNextDimension(dim)).getValue())) < minDistance) {
+            if ((distance = coordinate.distanceWith(zone.getCoordinateMax(CANOverlay.getNextDimension(dim)))) < minDistance) {
                 if (distance < minDistance) {
                     minDistance = distance;
                 }

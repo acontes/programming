@@ -198,7 +198,7 @@ public class TestOverlay {
         Random rand = new Random();
 
         for (int i = 3; i < peers.length; i++) {
-            PAFuture.waitFor(peers[i].join(peers[rand.nextInt(i)]));
+            peers[i].join(peers[rand.nextInt(i)]);
         }
 
         Peer toFind = peers[rand.nextInt(peers.length)];

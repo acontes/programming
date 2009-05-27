@@ -1,7 +1,9 @@
 package org.objectweb.proactive.extensions.structuredp2p.core.can;
 
+import java.io.IOException;
 import java.io.Serializable;
 
+import org.objectweb.proactive.core.util.converter.MakeDeepCopy;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.exception.ZoneException;
 
@@ -22,12 +24,12 @@ public class Zone implements Serializable {
     /**
      * The minimal value we manage.
      */
-    public static int MIN_COORD = 0;
+    public static float MIN_COORD = 0;
 
     /**
      * The maximal value we manage.
      */
-    public static int MAX_COORD = 256;
+    public static float MAX_COORD = 256;
 
     /**
      * The minimum coordinates.
@@ -200,11 +202,24 @@ public class Zone implements Serializable {
      * @return the two split zones.
      */
     public Zone[] split(int dimension, Coordinate coordinate) {
-        Coordinate[] maxCoordLessZone = this.getCoordinatesMax().clone();
-        maxCoordLessZone[dimension] = coordinate;
+        Coordinate[] maxCoordLessZone = null;
+        Coordinate[] minCoordGreaterZone = null;
+        try {
+            maxCoordLessZone = (Coordinate[]) MakeDeepCopy.WithObjectStream.makeDeepCopy(this
+                    .getCoordinatesMax());
 
-        Coordinate[] minCoordGreaterZone = this.getCoordinatesMin().clone();
-        minCoordGreaterZone[dimension] = coordinate;
+            maxCoordLessZone[dimension] = coordinate;
+
+            minCoordGreaterZone = (Coordinate[]) MakeDeepCopy.WithObjectStream.makeDeepCopy(this
+                    .getCoordinatesMin());
+            minCoordGreaterZone[dimension] = coordinate;
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
         return new Zone[] { new Zone(this.getCoordinatesMin(), maxCoordLessZone),
                 new Zone(minCoordGreaterZone, this.getCoordinatesMax()) };
@@ -222,7 +237,7 @@ public class Zone implements Serializable {
         int border = this.getBorderedDimension(zone);
 
         if (border == -1) {
-            throw new ZoneException("Zones are not bordered.");
+            throw new ZoneException("Zones are not bordered : " + this + " | " + zone + ".");
         } else {
             // FIXME test also the load balancing to choose the good zone
             // merge the two zones
@@ -343,7 +358,7 @@ public class Zone implements Serializable {
             }
         }
 
-        buf.append(").");
+        buf.append(")");
 
         return buf.toString();
     }

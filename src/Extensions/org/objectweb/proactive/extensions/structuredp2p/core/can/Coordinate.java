@@ -155,7 +155,7 @@ public class Coordinate implements Serializable {
         }
 
         Coordinate coord = (Coordinate) o;
-        return this.value.equals(coord.value);
+        return new Float(Float.parseFloat(this.value)).equals(Float.parseFloat(coord.getValue()));
     }
 
     /**
@@ -173,6 +173,20 @@ public class Coordinate implements Serializable {
         float cur = Float.parseFloat(this.getValue());
 
         return Float.compare(cur, val);
+    }
+
+    /**
+     * Returns the distance between the current coordinate and the specified coordinate.
+     * 
+     * @param coord
+     *            the specified coordinate.
+     * @return the distance between the current coordinate and the specified coordinate.
+     */
+    public float distanceWith(Coordinate coord) {
+        float val = Float.parseFloat(coord.getValue());
+        float cur = Float.parseFloat(this.getValue());
+
+        return cur - val;
     }
 
     /**
