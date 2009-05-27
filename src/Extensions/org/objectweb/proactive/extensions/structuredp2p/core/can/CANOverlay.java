@@ -296,12 +296,14 @@ public class CANOverlay extends StructuredOverlay {
                 if (pos != 0) {
                     List<Peer> neighbors = this.neighbors.getNeighbors(dim, direction);
 
-                    if (neighbors.size() > 1 && dim < CANOverlay.NB_DIMENSIONS - 1) {
-                        return this.neighbors.getNearestNeighborFrom(lookupMessage.getCoordinates()[dim + 1],
+                    if (neighbors.size() > 0) {
+                        return this.neighbors.getNearestNeighborFrom(lookupMessage.getCoordinates()[dim],
                                 dim, direction).sendMessageWithoutCallback(msg);
-                    } else {
-                        return neighbors.get(0).sendMessageWithoutCallback(msg);
                     }
+                } else {
+                    return this.neighbors.getNearestNeighborFrom(
+                            lookupMessage.getCoordinates()[CANOverlay.getNextDimension(dim)], dim, direction)
+                            .sendMessageWithoutCallback(msg);
                 }
             }
         }
@@ -558,7 +560,7 @@ public class CANOverlay extends StructuredOverlay {
      * @return the next dimension following the specified dimension.
      */
     public static int getNextDimension(int dimension) {
-        return (dimension + 1) % NB_DIMENSIONS;
+        return (dimension + 1) % CANOverlay.NB_DIMENSIONS;
     }
 
     /**

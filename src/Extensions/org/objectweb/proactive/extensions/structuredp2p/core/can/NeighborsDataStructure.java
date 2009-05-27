@@ -368,7 +368,7 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
 
         for (Zone zone : this.associatedZones[dim][direction]) {
             if ((distance = Integer.parseInt(coordinate.getValue()) -
-                Integer.parseInt(zone.getCoordinateMax(dim + 1).getValue())) < minDistance) {
+                Integer.parseInt(zone.getCoordinateMax(CANOverlay.getNextDimension(dim)).getValue())) < minDistance) {
                 if (distance < minDistance) {
                     minDistance = distance;
                 }
