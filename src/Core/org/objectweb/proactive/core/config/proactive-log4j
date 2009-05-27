@@ -80,7 +80,7 @@ log4j.logger.org.mortbay = WARN
 
 #log4j.logger.proactive.messagetagging = DEBUG    
 #log4j.logger.proactive.messagetagging.localmemory = DEBUG
-log4j.logger.proactive.messagetagging.localmemory.leasing = DEBUG
+#log4j.logger.proactive.messagetagging.localmemory.leasing = DEBUG
 
 ################ Appenders ####################
 #

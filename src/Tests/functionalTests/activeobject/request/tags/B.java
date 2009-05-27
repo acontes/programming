@@ -7,6 +7,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAMessageTagging;
 import org.objectweb.proactive.core.body.tags.MessageTags;
 import org.objectweb.proactive.core.body.tags.Tag;
 
@@ -17,7 +18,7 @@ public class B implements Serializable, InitActive{
     }
     
     public void initActivity(Body body) {
-        //body.setImmediateService("");
+        body.setImmediateService("getResult");
     }
 
     public void runActivity(Body body) {
@@ -33,7 +34,7 @@ public class B implements Serializable, InitActive{
     
     
     public int getResult(){
-        MessageTags tags = PAActiveObject.getContext().getCurrentRequest().getTags();
+        MessageTags tags = PAMessageTagging.getCurrentTags();
         Object data = tags.getData("TEST_TAGS_00");
         int result = 0;
         if (data instanceof Integer){
@@ -43,17 +44,17 @@ public class B implements Serializable, InitActive{
     }
     
     public boolean checkTag(String tagID){
-        MessageTags tags = PAActiveObject.getContext().getCurrentRequest().getTags();
+        MessageTags tags = PAMessageTagging.getCurrentTags();
         return (tags.getTag(tagID) == null);
     }
     
     public boolean checkNoLocalMemory(){
-        MessageTags tags = PAActiveObject.getContext().getCurrentRequest().getTags();
+        MessageTags tags = PAMessageTagging.getCurrentTags();
         return tags.getTag("TEST_TAGS_02").getLocalMemory() == null;
     }
     
     public boolean localMemoryLeaseExceeded(){
-        MessageTags tags = PAActiveObject.getContext().getCurrentRequest().getTags();
+        MessageTags tags = PAMessageTagging.getCurrentTags();
         Tag t = tags.addTag(new Tag("TEST_TAGS_03-B"){
             public Tag apply() {
                 return this;

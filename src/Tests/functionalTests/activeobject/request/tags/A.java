@@ -5,6 +5,7 @@ import java.io.Serializable;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAMessageTagging;
 import org.objectweb.proactive.core.body.tags.MessageTags;
 import org.objectweb.proactive.core.body.tags.Tag;
 import org.objectweb.proactive.core.config.PAProperties;
@@ -22,7 +23,7 @@ public class A implements Serializable {
     }
 
     public int propagateTag(){
-        MessageTags tags = PAActiveObject.getContext().getCurrentRequest().getTags();
+        MessageTags tags = PAMessageTagging.getCurrentTags();
         Tag t = tags.addTag(new Tag("TEST_TAGS_00"){
             public Tag apply() {
                 return this;
@@ -33,7 +34,7 @@ public class A implements Serializable {
     }
     
     public boolean stopPropagateTag(){
-        MessageTags tags = PAActiveObject.getContext().getCurrentRequest().getTags();
+        MessageTags tags = PAMessageTagging.getCurrentTags();
         Tag t = tags.addTag(new Tag("TEST_TAGS_01"){
             public Tag apply() {
                 return null;
@@ -43,7 +44,7 @@ public class A implements Serializable {
     }
     
     public Integer localMemory1(){
-        MessageTags tags = PAActiveObject.getContext().getCurrentRequest().getTags();
+        MessageTags tags = PAMessageTagging.getCurrentTags();
         Tag t = tags.addTag(new Tag("TEST_TAGS_02"){
             public Tag apply() {
                 Integer i = (Integer)getLocalMemory().get("MT_00");
@@ -63,7 +64,7 @@ public class A implements Serializable {
     }
     
     public Integer localMemory2(){
-        MessageTags tags = PAActiveObject.getContext().getCurrentRequest().getTags();
+        MessageTags tags = PAMessageTagging.getCurrentTags();
         Tag t = tags.addTag(new Tag("TEST_TAGS_02"){
             public Tag apply() {
                 return this;
@@ -73,7 +74,7 @@ public class A implements Serializable {
     }
     
     public boolean checkNoLocalMemoryOnB(){
-        MessageTags tags = PAActiveObject.getContext().getCurrentRequest().getTags();
+        MessageTags tags = PAMessageTagging.getCurrentTags();
         Tag t = tags.addTag(new Tag("TEST_TAGS_02"){
             public Tag apply() {
                 return this;
@@ -83,7 +84,7 @@ public class A implements Serializable {
     }
     
     public boolean localMemoryLeaseExceeded(){
-        MessageTags tags = PAActiveObject.getContext().getCurrentRequest().getTags();
+        MessageTags tags = PAMessageTagging.getCurrentTags();
         Tag t = tags.addTag(new Tag("TEST_TAGS_03-A"){
             public Tag apply() {
                 return this;
@@ -100,7 +101,7 @@ public class A implements Serializable {
     }
     
     public boolean localMemoryLeaseClean2(){
-        MessageTags tags = PAActiveObject.getContext().getCurrentRequest().getTags();
+        MessageTags tags = PAMessageTagging.getCurrentTags();
         Tag t = tags.addTag(new Tag("TEST_TAGS_04"){
             public Tag apply() {
                 return this;
