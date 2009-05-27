@@ -153,7 +153,7 @@
 
 	<xsd:complexType name="dataType">
 		<xsd:sequence>
-			<xsd:element minOccurs="0" maxOccurs="1" name="namingService" type="serviceWithURLType" " />
+			<xsd:element minOccurs="0" maxOccurs="1" name="namingService" type="serviceWithURLType" />
 
 			<xsd:element minOccurs="0" maxOccurs="1" name="inputDefault" type="inputDefaultType" />
 			<xsd:element minOccurs="0" maxOccurs="unbounded" name="input" type="inputType" />
