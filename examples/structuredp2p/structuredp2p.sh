@@ -15,8 +15,8 @@ default_hostname=`hostname`
 if [[ $# -eq  0 ]]
 then
         echo "Usage: $0 [TYPE_LAUNCH]"
-        echo "  ENTRY_POINT : the hostname of the computer which is used for entryPoint"
         echo "  NB_PEERS : number of peers to start"
+        echo "  ENTRY_POINT : the hostname of the computer which is used for entryPoint"
         exit 1
 fi
 

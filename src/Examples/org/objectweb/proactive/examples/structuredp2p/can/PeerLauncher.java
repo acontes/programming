@@ -23,7 +23,10 @@ import org.objectweb.proactive.extensions.structuredp2p.util.Deployment;
 
 public class PeerLauncher {
 
-    public static ArrayList<Peer> remotePeers = new ArrayList<Peer>();
+    private static final int MAX_OP = 100;
+    private static Random rand = new Random();
+    private static ArrayList<Peer> remotePeers = new ArrayList<Peer>();
+    private static Tracker tracker;
     private static boolean running = true;
 
     /**
@@ -54,10 +57,10 @@ public class PeerLauncher {
         }
 
         try {
-            Tracker tracker = (Tracker) PAActiveObject.lookupActive(Tracker.class.getName(), "//" + uri +
+            PeerLauncher.tracker = (Tracker) PAActiveObject.lookupActive(Tracker.class.getName(), "//" + uri +
                 "/CANTracker");
 
-            List<Node> avaibleNodes = Deployment.getVirtualNode("CANOverlay").getNewNodes();
+            List<Node> avaibleNodes = Deployment.getVirtualNode("CANOverlay").getCurrentNodes();
 
             int i;
             for (i = 0; i < nbPeers; i++) {
@@ -65,7 +68,7 @@ public class PeerLauncher {
                         new Object[] { OverlayType.CAN }, avaibleNodes.get(i % avaibleNodes.size()));
 
                 remotePeers.add(peer);
-                tracker.addOnNetwork(peer);
+                PeerLauncher.tracker.addOnNetwork(peer);
             }
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
@@ -78,7 +81,7 @@ public class PeerLauncher {
 
         Thread inputThread = new Thread(new Runnable() {
             public void run() {
-                Random rand = new Random();
+
                 Scanner scanner = new Scanner(System.in);
                 String inputLine;
 
@@ -97,32 +100,31 @@ public class PeerLauncher {
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
+                    } else if (inputLine.equalsIgnoreCase("add")) {
+                        PeerLauncher.addPeer();
                     } else if (inputLine.equalsIgnoreCase("leave")) {
-                        remotePeers.remove(rand.nextInt(remotePeers.size())).leave();
+                        PeerLauncher.removePeer();
                     } else if (inputLine.equalsIgnoreCase("lookup")) {
-                        int pos = rand.nextInt(remotePeers.size());
-                        Peer toFind = remotePeers.get(pos);
-                        Coordinate[] location = ((CANOverlay) toFind.getStructuredOverlay()).getZone()
-                                .getCoordinatesMin();
+                        PeerLauncher.lookupMessage();
+                    } else if (inputLine.equalsIgnoreCase("random")) {
+                        int nbOp = rand.nextInt(PeerLauncher.MAX_OP);
+                        for (int i = 0; i < nbOp; i++) {
+                            int r = rand.nextInt(3);
 
-                        String loc = "(";
-                        for (int i = 0; i < location.length; i++) {
-                            if (i != 0)
-                                loc += ",";
-                            loc += location[i];
+                            switch (r) {
+                                case 0:
+                                    PeerLauncher.addPeer();
+                                    break;
+                                case 1:
+                                    PeerLauncher.removePeer();
+                                    break;
+                                case 2:
+                                    PeerLauncher.lookupMessage();
+                                    break;
+                                default:
+                                    break;
+                            }
                         }
-                        loc += ")";
-
-                        System.out.println("Random coordinates to lookup : " + loc);
-
-                        Peer sender = remotePeers.get(rand.nextInt(remotePeers.size()));
-                        CANLookupResponseMessage response = (CANLookupResponseMessage) sender
-                                .sendMessage(new CANLookupMessage(location));
-
-                        System.out.println("Lookup from peer with area (" +
-                            ((CANOverlay) sender.getStructuredOverlay()).getZone() +
-                            ") had find the peer with area (" +
-                            ((CANOverlay) response.getPeer().getStructuredOverlay()).getZone() + ")");
                     }
                     PeerLauncher.printOptions();
                 }
@@ -136,8 +138,59 @@ public class PeerLauncher {
      */
     private static void printOptions() {
         System.out.println("* What you can do :");
+        System.out.println("  > Type in 'add' to add a new peer");
         System.out.println("  > Type in 'lookup' to send a lookup message");
         System.out.println("  > Type in 'leave' to a random peer to quit the network");
+        System.out.println("  > Type in 'random' to make maximum " + PeerLauncher.MAX_OP +
+            " random actions on the network");
         System.out.println("  > Type in 'quit' keyword in order to quit the application");
+    }
+
+    private static void addPeer() {
+        try {
+            Peer peer = (Peer) PAActiveObject.newActive(Peer.class.getCanonicalName(),
+                    new Object[] { OverlayType.CAN }, Deployment.getVirtualNode("CANOverlay").getANode(2000));
+            remotePeers.add(peer);
+            PeerLauncher.tracker.addOnNetwork(peer);
+
+            System.out.println("Add peer at zone (" + ((CANOverlay) peer.getStructuredOverlay()).getZone() +
+                ")");
+        } catch (ActiveObjectCreationException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (NodeException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    private static void removePeer() {
+        Peer p = remotePeers.remove(rand.nextInt(remotePeers.size()));
+        System.out.println("Remove peer at zone (" + ((CANOverlay) p.getStructuredOverlay()).getZone() + ")");
+        p.leave();
+    }
+
+    private static void lookupMessage() {
+        int pos = rand.nextInt(remotePeers.size());
+        Peer toFind = remotePeers.get(pos);
+        Coordinate[] location = ((CANOverlay) toFind.getStructuredOverlay()).getZone().getCoordinatesMin();
+
+        String loc = "(";
+        for (int i = 0; i < location.length; i++) {
+            if (i != 0)
+                loc += ",";
+            loc += location[i];
+        }
+        loc += ")";
+
+        System.out.println("Random coordinates to lookup : " + loc);
+
+        Peer sender = remotePeers.get(rand.nextInt(remotePeers.size()));
+        CANLookupResponseMessage response = (CANLookupResponseMessage) sender
+                .sendMessage(new CANLookupMessage(location));
+
+        System.out.println("Lookup from peer with area (" +
+            ((CANOverlay) sender.getStructuredOverlay()).getZone() + ") had find the peer with area (" +
+            ((CANOverlay) response.getPeer().getStructuredOverlay()).getZone() + ")");
     }
 }
