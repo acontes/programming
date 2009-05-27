@@ -141,6 +141,9 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
     /** URL of Data Spaces Naming Service */
     private String namingServiceURL;
 
+    /** Stub to Data Spaces Naming Service */
+    private NamingService namingService;
+
     static public GCMApplication getLocal(long deploymentId) {
         return localDeployments.get(deploymentId);
     }
@@ -295,6 +298,10 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
                 // Connection between the two runtimes will be interrupted 
                 // Eat the exception: Miam Miam Miam
             }
+        }
+
+        if (dataSpacesEnabled) {
+            stopDataSpaces();
         }
     }
 
@@ -566,7 +573,6 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
             return;
         }
 
-        final NamingService namingService;
         try {
             namingService = NamingService.createNamingServiceStub(namingServiceURL);
         } catch (ProActiveException e) {
@@ -601,5 +607,18 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
         } catch (WrongApplicationIdException e) {
             ProActiveLogger.logImpossibleException(GCMA_LOGGER, e);
         }
+    }
+    
+    private void stopDataSpaces() {
+        if (namingService != null) {
+            // FIXME: app id
+            final long appId = 0;
+            try {
+                namingService.unregisterApplication(appId);
+            } catch (WrongApplicationIdException e) {
+                ProActiveLogger.logImpossibleException(GCMA_LOGGER, e);
+            }
+        }
+        // FIXME if we started Naming Service, let stop it
     }
 }
