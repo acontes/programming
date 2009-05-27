@@ -168,11 +168,11 @@ public class Coordinate implements Serializable {
      *         coordinate argument; and a value greater than <code>0</code> if this coordinate is
      *         lexicographically greater than the coordinate argument.
      */
-    public float compareTo(Coordinate coord) {
+    public int compareTo(Coordinate coord) {
         float val = Float.parseFloat(coord.getValue());
         float cur = Float.parseFloat(this.getValue());
 
-        return cur - val;
+        return Float.compare(cur, val);
     }
 
     /**
