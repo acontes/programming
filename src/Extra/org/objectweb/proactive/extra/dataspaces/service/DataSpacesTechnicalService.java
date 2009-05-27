@@ -23,14 +23,28 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.dataspaces.BaseScratchSpaceConfiguration;
 import org.objectweb.proactive.extra.dataspaces.DataSpacesNodes;
+import org.objectweb.proactive.extra.dataspaces.PADataSpaces;
 import org.objectweb.proactive.extra.dataspaces.exceptions.AlreadyConfiguredException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredException;
 
 
 /**
- * TechnicalService that configures ProActive node to support Data Spaces on the base of specified
- * properties and local ProActive's properties.
+ * TechnicalService that configures ProActive node to support Data Spaces.
+ * <p>
+ * Configuration is read from two sources:
+ * <ul>
+ * <li>Node level configuration of scratch space is read from local runtime ProActive's properties (
+ * {@link PAProperties#PA_DATASPACES_SCRATCH_URL} and
+ * {@link PAProperties#PA_DATASPACES_SCRATCH_PATH})</li>
+ * <li>Application level configuration is read from technical service properties (
+ * {@link #PROPERTY_NAMING_SERVICE_URL}) and Node properties (application id; FIXME: when
+ * implemented).</li>
+ * </ul>
+ * <p>
+ * This implementation set up Data Spaces in {@link #apply(Node)} and clean up after Data Spaces
+ * objects when Node is being destroyed. After Data Spaces are configured, user can safely use
+ * {@link PADataSpaces} API.
  */
 public class DataSpacesTechnicalService implements TechnicalService {
 
@@ -42,27 +56,38 @@ public class DataSpacesTechnicalService implements TechnicalService {
 
     private String namingServiceURL;
 
+    private NotificationListener notificationListener;
+
+    private static void closeNodeConfigIgnoreException(final Node node) {
+        try {
+            DataSpacesNodes.closeNodeConfig(node);
+        } catch (NotConfiguredException x) {
+            ProActiveLogger.logImpossibleException(logger, x);
+        }
+    }
+
     /**
      * Configures Data Spaces for an application on a node with configuration specified properties
      * and local ProActive's properties.
      * <p>
      * FIXME: Data Spaces cannot be already configured nor for a node nor for an application, which
      * is related to GCM deployment specification and lack of acquisition specification yet. After
-     * this is done, reconfiguration should be allowed.
+     * it is implemented in GCM deployment, reconfiguration should be allowed.
      **/
     public void apply(final Node node) {
-        BaseScratchSpaceConfiguration baseScratchConfiguration = readConfigurationFromProperties();
+        if (!isProperlyInitialized())
+            return;
 
+        final BaseScratchSpaceConfiguration baseScratchConfiguration = readScratchConfiguration();
         try {
             DataSpacesNodes.configureNode(node, baseScratchConfiguration);
         } catch (AlreadyConfiguredException e) {
-            logger
-                    .error(
-                            "Node is already configured for Data Spaces; reconfiguration/node acquisition is not supported yet.",
-                            e);
+            ProActiveLogger.logImpossibleException(logger, e);
+            // FIXME: when node acquisition will be implemented - it may happen and we have to handle that
+            // in slightly better way ;) (see comment in javadoc)
             return;
         } catch (ConfigurationException e) {
-            logger.error("Could not configure Data Spaces on node using provided. Configuration problem?", e);
+            logger.error("Could not configure Data Spaces. Possible configuration problem.", e);
             return;
         } catch (FileSystemException e) {
             logger.error("Could not initialize scratch space for a node - I/O error.", e);
@@ -76,61 +101,77 @@ public class DataSpacesTechnicalService implements TechnicalService {
         } catch (NotConfiguredException e) {
             // it should not happen as we configure it above
             ProActiveLogger.logImpossibleException(logger, e);
+            closeNodeConfigIgnoreException(node);
             return;
         } catch (URISyntaxException e) {
-            // it should not happen as we check that deployer host
+            // it should not happen as we check that on deployer
             ProActiveLogger.logImpossibleException(logger, e);
+            closeNodeConfigIgnoreException(node);
             return;
         } catch (FileSystemException e) {
-            logger.error("Could not initialize scratch space for an application - I/O error.", e);
+            logger.error("Could not initialize scratch space for an application on a node - I/O error.", e);
+            closeNodeConfigIgnoreException(node);
             return;
         } catch (ProActiveException e) {
             logger.error("Could not contact Naming Service specified by an application.", e);
+            closeNodeConfigIgnoreException(node);
             return;
         }
-        // FIXME: close node config in case of exceptions?
+
+        registerNotificationListener(node);
+    }
+
+    /**
+     * Requires NamingService URL property: {@link #PROPERTY_NAMING_SERVICE_URL}.
+     **/
+    public void init(Map<String, String> argValues) {
+        namingServiceURL = argValues.get(PROPERTY_NAMING_SERVICE_URL);
+
+        if (namingServiceURL == null) {
+            logger
+                    .error("Initialization error - provided TS properties are incomplete, NamingService URL is not specified.");
+        }
+    }
+
+    private boolean isProperlyInitialized() {
+        return namingServiceURL != null;
+    }
+
+    private void registerNotificationListener(final Node node) {
         final String runtimeURL = node.getProActiveRuntime().getURL();
         final String nodeName = node.getNodeInformation().getName();
         final ObjectName mBeanObjectName = FactoryName.createNodeObjectName(runtimeURL, nodeName);
-        JMXNotificationManager.getInstance().subscribe(mBeanObjectName, new NotificationListener() {
+        notificationListener = new NotificationListener() {
 
             public void handleNotification(Notification notification, Object handback) {
                 if (!notification.getType().equals(NotificationType.nodeDestroyed))
                     return;
 
-                // TODO unsubscribe
-                try {
-                    DataSpacesNodes.closeNodeConfig(node);
-                } catch (NotConfiguredException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
+                unregisterNotificationListener(mBeanObjectName);
+                closeNodeConfigIgnoreException(node);
             }
 
-        });
+        };
+        JMXNotificationManager.getInstance().subscribe(mBeanObjectName, notificationListener);
     }
 
-    /**
-     * Requires NamingService URL property set by {@link #PROPERTY_NAMING_SERVICE_URL}.
-     **/
-    public void init(Map<String, String> argValues) {
-        namingServiceURL = argValues.get(PROPERTY_NAMING_SERVICE_URL);
-
-        if (namingServiceURL == null)
-            throw new IllegalArgumentException(
-                "Provided properties are incomplete, NamingService URL must be specified.");
+    private void unregisterNotificationListener(final ObjectName mBeanObjectName) {
+        JMXNotificationManager.getInstance().unsubscribe(mBeanObjectName, notificationListener);
+        notificationListener = null;
     }
 
-    private BaseScratchSpaceConfiguration readConfigurationFromProperties() {
+    private BaseScratchSpaceConfiguration readScratchConfiguration() {
         final String scratchURL = PAProperties.PA_DATASPACES_SCRATCH_PATH.getValue();
         final String scratchPath = PAProperties.PA_DATASPACES_SCRATCH_URL.getValue();
 
         if (scratchURL == null && scratchPath == null) {
+            logger.warn("No scratch space configuration specified for this node.");
             return null;
         }
         try {
             return new BaseScratchSpaceConfiguration(scratchURL, scratchPath);
         } catch (ConfigurationException e) {
+            // it should not happen as we check it above
             ProActiveLogger.logImpossibleException(logger, e);
             return null;
         }
