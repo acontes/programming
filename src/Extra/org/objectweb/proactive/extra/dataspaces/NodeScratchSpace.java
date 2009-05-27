@@ -20,7 +20,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 
 
-// TODO leave data or remove all directories?
 // TODO perhaps checking for remote URL should be improved/changed when we know how do we start
 // ProActive VFS provider
 
