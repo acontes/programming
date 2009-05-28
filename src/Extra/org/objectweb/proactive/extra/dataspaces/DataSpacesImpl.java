@@ -268,7 +268,8 @@ public class DataSpacesImpl {
         final Body body = Utils.getCurrentActiveObjectBody();
         try {
             final DataSpacesURI scratchURI = appScratchSpace.getScratchForAO(body);
-            final DataSpacesURI queryURI = scratchURI.withPath(path);
+            // FIXME: make aoid field of DataSpacesURI
+            final DataSpacesURI queryURI = scratchURI.withPath(scratchURI.getPath() + path);
             final FileObject fo = decorateFileObject(spacesMountManager.resolveFile(queryURI));
             if (logger.isTraceEnabled())
                 logger.trace("Resolved scratch for an Active Object: " + queryURI);
@@ -421,7 +422,7 @@ public class DataSpacesImpl {
             String hostname = null;
             if (path == null)
                 hostname = Utils.getHostname();
-            
+
             // name and type are checked here 
             final InputOutputSpaceConfiguration config = InputOutputSpaceConfiguration.createConfiguration(
                     url, path, hostname, name, type);

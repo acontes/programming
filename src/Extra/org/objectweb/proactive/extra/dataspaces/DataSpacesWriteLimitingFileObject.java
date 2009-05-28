@@ -78,7 +78,7 @@ public class DataSpacesWriteLimitingFileObject extends BaseWriteLimitingFileObje
                     final String path = uri.getPath();
                     // TODO: checking for startsWith make us dependent on scratch structure
                     // should not aoId be part of DataSpacesURI (that would be SIGNIFICANT design change) ?
-                    return path != null && path.startsWith(aoId);
+                    return path != null && !path.startsWith(aoId);
                 } else {
                     return false;
                 }
