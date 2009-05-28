@@ -86,8 +86,10 @@ public abstract class StructuredOverlay implements Serializable {
      *            the message to send.
      * 
      * @return the response in agreement with the type of message sent.
+     * @throws Exception
+     *             this exception appears when a message cannot be send to a peer.
      */
-    public abstract ResponseMessage sendMessageTo(Peer peer, Message msg);
+    public abstract ResponseMessage sendMessageTo(Peer peer, Message msg) throws Exception;
 
     /**
      * Handles a {@link AddNeighborMessage}.

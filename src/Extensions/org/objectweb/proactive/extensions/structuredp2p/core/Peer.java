@@ -116,14 +116,19 @@ public class Peer implements InitActive, RunActive, Serializable {
      *            the message to send.
      * 
      * @return the response in agreement with the type of message sent.
+     * @throws Exception
+     *             this exception appears when a message cannot be send to a peer.
      */
-    public ResponseMessage sendMessageTo(Peer remotePeer, Message msg) {
-        ResponseMessage future = remotePeer.receiveMessage(msg);
+    public ResponseMessage sendMessageTo(Peer remotePeer, Message msg) throws Exception {
+        try {
+            ResponseMessage future = remotePeer.receiveMessage(msg);
 
-        // Callback on ResponseMessage
-        PAEventProgramming.addActionOnFuture(future, "setResponseMessageDeliveryTime");
-
-        return future;
+            // Callback on ResponseMessage
+            PAEventProgramming.addActionOnFuture(future, "setResponseMessageDeliveryTime");
+            return future;
+        } catch (Exception e) {
+            throw new Exception("Error while sending a message to a peer.");
+        }
     }
 
     /**

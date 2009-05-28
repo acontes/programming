@@ -112,7 +112,7 @@ public class TestMessagesND {
     }
 
     @Test
-    public void testJoinAndSendMessage() throws ZoneException {
+    public void testJoinAndSendMessage() throws Exception {
         this.secondPeer.join(this.firstPeer);
         // assertTrue("joining neighbor", ((CanOverlay)
         // srcPeer.getStructuredOverlay()).hasNeighbor(myPeer));

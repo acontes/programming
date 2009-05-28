@@ -23,12 +23,13 @@ import org.objectweb.proactive.extensions.structuredp2p.util.Deployment;
 
 public class PeerLauncher {
 
-    private static final int MIN_OP = 20;
-    private static final int MAX_OP = 100;
+    private static final int MIN_OP = 5000;
+    private static final int MAX_OP = 10000;
     private static Random rand = new Random();
     private static ArrayList<Peer> remotePeers = new ArrayList<Peer>();
     private static Tracker tracker;
     private static boolean running = true;
+    private static List<Node> avaibleNodes;
 
     /**
      * @param args
@@ -61,7 +62,7 @@ public class PeerLauncher {
             PeerLauncher.tracker = (Tracker) PAActiveObject.lookupActive(Tracker.class.getName(), "//" + uri +
                 "/CANTracker");
 
-            List<Node> avaibleNodes = Deployment.getVirtualNode("CANOverlay").getCurrentNodes();
+            PeerLauncher.avaibleNodes = Deployment.getVirtualNode("CANOverlay").getCurrentNodes();
 
             int i;
             for (i = 0; i < nbPeers; i++) {
@@ -113,6 +114,8 @@ public class PeerLauncher {
                                     PeerLauncher.lookupMessage();
                                     break;
                                 case 2:
+                                    // TODO remove comments when leave request queue problem is
+                                    // fixed.
                                     // PeerLauncher.removePeer();
                                     break;
                                 default:
@@ -141,7 +144,7 @@ public class PeerLauncher {
     }
 
     private static void addPeer() {
-        PeerLauncher.addPeer(Deployment.getVirtualNode("CANOverlay").getANode(2000));
+        PeerLauncher.addPeer(avaibleNodes.get(rand.nextInt(avaibleNodes.size())));
     }
 
     private static void addPeer(Node n) {

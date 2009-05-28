@@ -85,26 +85,31 @@ public class CANOverlay extends StructuredOverlay {
      * {@inheritDoc}
      */
     public Boolean join(Peer remotePeerExisting) {
-        CANJoinResponseMessage response = (CANJoinResponseMessage) PAFuture.getFutureValue(this
-                .sendMessageTo(remotePeerExisting, new CANJoinMessage(this.getRemotePeer())));
+        try {
+            CANJoinResponseMessage response = (CANJoinResponseMessage) PAFuture.getFutureValue(this
+                    .sendMessageTo(remotePeerExisting, new CANJoinMessage(this.getRemotePeer())));
 
-        if (response.hasSucceeded()) {
-            int dimension = response.getDimension();
-            int direction = response.getDirection();
+            if (response.hasSucceeded()) {
+                int dimension = response.getDimension();
+                int direction = response.getDirection();
 
-            /* Actions on local peer */
-            this.setZone(response.getLocalZone());
-            this.splitHistory = response.getSplitHistory();
-            this.saveSplit(dimension, direction);
-            this.neighbors.addAll(response.getNeighbors());
-            this.neighbors.removeAll(dimension, direction);
+                /* Actions on local peer */
+                this.setZone(response.getLocalZone());
+                this.splitHistory = response.getSplitHistory();
+                this.saveSplit(dimension, direction);
+                this.neighbors.addAll(response.getNeighbors());
 
-            this.updateNeighbors();
+                this.updateNeighbors();
 
-            this.neighbors.add(response.getRemotePeer(), response.getRemoteZone(), dimension, this
-                    .getOppositeDirection(direction));
+                this.neighbors.add(response.getRemotePeer(), response.getRemoteZone(), dimension, this
+                        .getOppositeDirection(direction));
 
-            return true;
+                return true;
+            }
+
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
 
         return false;
@@ -132,7 +137,7 @@ public class CANOverlay extends StructuredOverlay {
                     splitZones = tmpZone.split(CANOverlay.getNextDimension(dimension), border);
                 } catch (NullPointerException e) {
                     // TODO: split a null zone
-                    System.err.println("Cannot split a null zone.");
+                    System.err.println("Cannot split a null zone but continue with a new leave execution.");
                     e.printStackTrace();
                     return this.leave();
                 }
@@ -169,8 +174,13 @@ public class CANOverlay extends StructuredOverlay {
 
             this.setZone(null);
 
-            PAFuture.waitForAll(this.sendMessageTo(this.getNeighbors(),
-                    new LeaveMessage(this.getRemotePeer())));
+            try {
+                PAFuture.waitForAll(this.sendMessageTo(this.getNeighbors(), new LeaveMessage(this
+                        .getRemotePeer())));
+            } catch (Exception e) {
+                // TODO: handle proactive exception on sending message / receive response
+                e.printStackTrace();
+            }
         }
 
         return true;
@@ -331,10 +341,26 @@ public class CANOverlay extends StructuredOverlay {
                     List<Peer> neighbors = this.neighbors.getNeighbors(dim, direction);
 
                     if (neighbors.size() > 0) {
-                        return (CANLookupResponseMessage) PAFuture.getFutureValue(this.sendMessageTo(
-                                this.neighbors.getNearestNeighborFrom(
-                                        lookupMessage.getCoordinates()[CANOverlay.getNextDimension(dim)],
-                                        dim, direction), msg));
+                        List<Peer> nearest = this.neighbors.getNeighbors(dim, direction);
+                        Peer nearestPeer = this.neighbors.getNearestNeighborFrom(lookupMessage
+                                .getCoordinates()[CANOverlay.getNextDimension(dim)], dim, direction);
+                        try {
+                            return (CANLookupResponseMessage) PAFuture.getFutureValue(this.sendMessageTo(
+                                    nearestPeer, msg));
+                        } catch (Exception e) {
+                            // TODO: a response returns an exception
+                            nearest.remove(nearestPeer);
+
+                            for (Peer peer : nearest) {
+                                try {
+                                    return (CANLookupResponseMessage) PAFuture.getFutureValue(this
+                                            .sendMessageTo(nearestPeer, msg));
+                                } catch (Exception ex) {
+                                    // TODO: a response returns an exception
+                                    ex.printStackTrace();
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -346,7 +372,7 @@ public class CANOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
-    public ResponseMessage sendMessageTo(Peer remotePeer, Message msg) {
+    public ResponseMessage sendMessageTo(Peer remotePeer, Message msg) throws Exception {
         return this.getLocalPeer().sendMessageTo(remotePeer, msg);
     }
 
@@ -359,17 +385,14 @@ public class CANOverlay extends StructuredOverlay {
      *            the message to send.
      * 
      * @return the list of responses in agreement with the type of message sent.
+     * @throws Exception
+     *             this exception appears when a message cannot be send to a peer.
      */
-    public List<ResponseMessage> sendMessageTo(List<Peer> remotePeers, Message msg) {
+    public List<ResponseMessage> sendMessageTo(List<Peer> remotePeers, Message msg) throws Exception {
         List<ResponseMessage> responses = new ArrayList<ResponseMessage>(remotePeers.size());
 
         for (Peer remotePeer : remotePeers) {
-            try {
-                responses.add(this.sendMessageTo(remotePeer, msg));
-            } catch (Exception e) {
-                // TODO a response returns an exception
-                e.printStackTrace();
-            }
+            responses.add(this.sendMessageTo(remotePeer, msg));
         }
 
         return responses;
@@ -384,17 +407,15 @@ public class CANOverlay extends StructuredOverlay {
      *            the message to send.
      * 
      * @return the list of responses in agreement with the type of message sent.
+     * @throws Exception
+     *             this exception appears when a message cannot be send to a peer.
      */
-    public List<ResponseMessage> sendMessageTo(NeighborsDataStructure dataStructure, Message msg) {
+    public List<ResponseMessage> sendMessageTo(NeighborsDataStructure dataStructure, Message msg)
+            throws Exception {
         List<ResponseMessage> responses = new ArrayList<ResponseMessage>();
 
         for (Peer remotePeer : dataStructure) {
-            try {
-                responses.add(this.sendMessageTo(remotePeer, msg));
-            } catch (Exception e) {
-                // TODO a response returns an exception
-                e.printStackTrace();
-            }
+            responses.add(this.sendMessageTo(remotePeer, msg));
         }
 
         return responses;

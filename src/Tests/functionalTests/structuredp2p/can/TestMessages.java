@@ -51,7 +51,7 @@ public class TestMessages {
     }
 
     @Test
-    public void testSendMessageTo() {
+    public void testSendMessageTo() throws Exception {
         this.senderResponse = this.senderPeer.sendMessageTo(this.receiverPeer, this.msg);
         this.receiverResponse = this.receiverPeer.sendMessageTo(this.senderPeer, this.msg);
 

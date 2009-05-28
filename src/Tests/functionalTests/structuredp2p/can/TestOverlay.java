@@ -144,6 +144,8 @@ public class TestOverlay {
 
         if (TestOverlay.getOverlay(TestOverlay.firstPeer).getZone().getBorderedDimension(
                 TestOverlay.getOverlay(TestOverlay.fourthPeer).getZone()) != -1) {
+            System.out.println(TestOverlay.getOverlay(TestOverlay.firstPeer).getNeighbors());
+            System.out.println(TestOverlay.getOverlay(TestOverlay.fourthPeer).getZone());
             Assert.assertTrue(TestOverlay.getOverlay(TestOverlay.firstPeer).hasNeighbor(
                     TestOverlay.fourthPeer));
             Assert.assertTrue(TestOverlay.getOverlay(TestOverlay.fourthPeer).hasNeighbor(
@@ -198,6 +200,8 @@ public class TestOverlay {
 
         CANLookupResponseMessage response = (CANLookupResponseMessage) sender.sendMessage(msg);
 
+        Assert.assertEquals(TestOverlay.getOverlay(toFind).getZone(), TestOverlay.getOverlay(
+                response.getPeer()).getZone());
         Assert.assertEquals(toFind, response.getPeer());
     }
 
