@@ -7,7 +7,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
-import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
@@ -122,14 +121,6 @@ public class GCMFunctionalTestDataSpaces extends GCMFunctionalTest {
     public void removeInputOutputSpacesContent() {
         if (rootTmpDir.exists())
             assertTrue(SkeletonSystemImpl.deleteDirectory(rootTmpDir));
-    }
-
-    public List<Node> getAllNodes() {
-        checkDeploymentState();
-
-        gcmad.waitReady();
-        GCMVirtualNode vn = gcmad.getVirtualNode(VN_NAME);
-        return vn.getCurrentNodes();
     }
 
     public Node getANode() {
