@@ -1,5 +1,6 @@
-package org.objectweb.proactive.examples.dataspaces.hello;
+package org.objectweb.proactive.extra.dataspaces.console;
 
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -14,6 +15,7 @@ import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
 import org.objectweb.proactive.api.PALifeCycle;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.extra.dataspaces.DataSpacesURI;
 import org.objectweb.proactive.extra.dataspaces.NamingService;
 import org.objectweb.proactive.extra.dataspaces.SpaceInstanceInfo;
@@ -90,17 +92,18 @@ public class NamingServiceListing {
         if (args.length == 2 && "-R".equals(args[0])) {
             recursively = true;
             namingServiceURL = args[1];
-        } else if (args.length == 1) {
+        } else if (args.length == 1 && !"--help".equals(args[0])) {
             namingServiceURL = args[0];
-        } else {
-            System.out
-                    .println("Print listing of all data spaces mounted in <naming service URL>. The -R option enables recursive listing of data space content");
-            System.out.println("Usage: java " + this.getClass().getName() + " [-R] <naming service URL>");
-            System.exit(0);
-        }
+        } else
+            throw new IllegalArgumentException();
     }
 
     public void prettyPrint() {
+
+        if (listing == null) {
+            System.out.println("<EMPTY>");
+            return;
+        }
         List<String> sorted = new ArrayList<String>(listing.size());
 
         for (SpaceInstanceInfo sii : listing) {
@@ -120,15 +123,10 @@ public class NamingServiceListing {
             System.out.println(string);
     }
 
-    public Set<SpaceInstanceInfo> execute(long applicationId) {
+    public Set<SpaceInstanceInfo> execute(long applicationId) throws ProActiveException, URISyntaxException {
         buildLSQuery(applicationId);
 
-        try {
-            namingService = NamingService.createNamingServiceStub(namingServiceURL);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            System.exit(0);
-        }
+        namingService = NamingService.createNamingServiceStub(namingServiceURL);
         listing = namingService.lookupMany(query);
 
         if (recursively)
@@ -139,11 +137,23 @@ public class NamingServiceListing {
                 recursively = false;
             }
 
-        return Collections.unmodifiableSet(listing);
+        return listing == null ? null : Collections.unmodifiableSet(listing);
     }
 
-    public static void main(String[] args) throws FileSystemException {
-        final NamingServiceListing ls = new NamingServiceListing(args);
+    public static void main(String[] args) throws FileSystemException, ProActiveException, URISyntaxException {
+        NamingServiceListing ls = null;
+
+        try {
+            ls = new NamingServiceListing(args);
+        } catch (IllegalArgumentException e) {
+            final String name = NamingServiceListing.class.getName();
+            System.out.println("Usage: java " + name + " [-R] <naming service URL>");
+            System.out.println("       java " + name + " --help");
+            System.out.println("Print listing of all data spaces mounted in <naming service URL>.");
+            System.out.println("\t-R\tenables recursive listing of data space content");
+            System.out.println("\t--help\tprints this screen");
+            return;
+        }
         ls.execute(APPLICATION_ID);
         ls.prettyPrint();
         PALifeCycle.exitSuccess();
