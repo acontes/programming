@@ -56,8 +56,8 @@ public class BodyRequest extends MessageImpl implements Request, java.io.Seriali
     // -- CONSTRUCTORS -----------------------------------------------
     //
 
-    protected BodyRequest(Body targetBody, MessageTags tags, String methodName, Class<?>[] paramClasses, Object[] params)
-            throws NoSuchMethodException {
+    protected BodyRequest(Body targetBody, MessageTags tags, String methodName, Class<?>[] paramClasses,
+            Object[] params) throws NoSuchMethodException {
         super(null, 0, true, methodName, tags);
         if (paramClasses == null) {
             paramClasses = new Class<?>[params.length];
@@ -82,8 +82,8 @@ public class BodyRequest extends MessageImpl implements Request, java.io.Seriali
     }
 
     //Non functional BodyRequests constructor
-    public BodyRequest(Body targetBody,MessageTags tags, String methodName, Class<?>[] paramClasses, Object[] params,
-            boolean isNFRequest, int nfRequestPriority) throws NoSuchMethodException {
+    public BodyRequest(Body targetBody, MessageTags tags, String methodName, Class<?>[] paramClasses,
+            Object[] params, boolean isNFRequest, int nfRequestPriority) throws NoSuchMethodException {
         this(targetBody, tags, methodName, paramClasses, params);
         this.isNFRequest = isNFRequest;
         this.nfRequestPriority = nfRequestPriority;

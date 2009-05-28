@@ -7,12 +7,20 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+
+
 /**
  * Map of tag attached on a message. At each sendrequest, the "apply" method
  * of each tag is called, and the tags resulting are attached to the request which
  * will be sent.
  */
 public class MessageTags implements Serializable {
+
+    /** Message Tagging Logger */
+    private static Logger logger = ProActiveLogger.getLogger(Loggers.MESSAGE_TAGGING);
 
     /**  Map of all tags/policy-data associated with a request */
     protected Map<String, Tag> messagestags;
@@ -34,35 +42,37 @@ public class MessageTags implements Serializable {
      */
     public Tag addTag(Tag tag) {
         this.messagestags.put(tag.getId(), tag);
+        logger.debug("Adding the tag : " + tag);
         return messagestags.get(tag.getId());
     }
-    
+
     /**
      * Remove the tag with this identifier from this request.
      * @param id Tag identifier
      * @return the Tag removed
      */
-    public Tag removeTag(String id){
+    public Tag removeTag(String id) {
+        logger.debug("Remove the tag : " + id);
         return this.messagestags.remove(id);
     }
-    
+
     /**
      * Return all the Tags 
      * @return Collection of Tags
      */
-    public Collection<Tag> getTags(){
+    public Collection<Tag> getTags() {
         return this.messagestags.values();
     }
-    
+
     /**
      * Return the Tag with the specified Id
      * @param id - Tag identifier
      * @return The Tag
      */
-    public Tag getTag(String id){
+    public Tag getTag(String id) {
         return messagestags.get(id);
     }
-    
+
     /**
      * Return the user data content attached to this tag.
      * @param id - Identifier of the tag
@@ -85,10 +95,10 @@ public class MessageTags implements Serializable {
      * @param id - Tag identifier
      * @return true if the tag exist, false otherwise
      */
-    public boolean check(String id){
+    public boolean check(String id) {
         return messagestags.get(id) != null;
     }
-    
+
     /**
      * Display informations of all tags
      */

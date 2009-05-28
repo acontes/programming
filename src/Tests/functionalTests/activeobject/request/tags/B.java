@@ -11,51 +11,49 @@ import org.objectweb.proactive.api.PAMessageTagging;
 import org.objectweb.proactive.core.body.tags.MessageTags;
 import org.objectweb.proactive.core.body.tags.Tag;
 
-public class B implements Serializable, InitActive{
 
-    
+public class B implements Serializable, InitActive {
+
     public B() {
     }
-    
+
     public void initActivity(Body body) {
         body.setImmediateService("getResult");
     }
 
     public void runActivity(Body body) {
-        
-        
+
         Service service = new Service(body);
         service.fifoServing();
     }
-    
-    public int getNumber(){
+
+    public int getNumber() {
         return new Random().nextInt(42);
     }
-    
-    
-    public int getResult(){
+
+    public int getResult() {
         MessageTags tags = PAMessageTagging.getCurrentTags();
         Object data = tags.getData("TEST_TAGS_00");
         int result = 0;
-        if (data instanceof Integer){
+        if (data instanceof Integer) {
             result = (Integer) data;
         }
         return result;
     }
-    
-    public boolean checkTag(String tagID){
+
+    public boolean checkTag(String tagID) {
         MessageTags tags = PAMessageTagging.getCurrentTags();
         return (tags.getTag(tagID) == null);
     }
-    
-    public boolean checkNoLocalMemory(){
+
+    public boolean checkNoLocalMemory() {
         MessageTags tags = PAMessageTagging.getCurrentTags();
         return tags.getTag("TEST_TAGS_02").getLocalMemory() == null;
     }
-    
-    public boolean localMemoryLeaseExceeded(){
+
+    public boolean localMemoryLeaseExceeded() {
         MessageTags tags = PAMessageTagging.getCurrentTags();
-        Tag t = tags.addTag(new Tag("TEST_TAGS_03-B"){
+        Tag t = tags.addTag(new Tag("TEST_TAGS_03-B") {
             public Tag apply() {
                 return this;
             }
@@ -65,12 +63,12 @@ public class B implements Serializable, InitActive{
             Thread.sleep(15000);
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }     
+        }
         return t.getLocalMemory() == null;
     }
-    
+
     public void exit() throws Exception {
         PAActiveObject.terminateActiveObject(true);
     }
-    
+
 }

@@ -79,7 +79,6 @@ public class AwaitedRequest implements Request, java.io.Serializable {
     protected boolean isNFRequest = false;
     protected int nfRequestPriority;
 
-
     // Request Tags
     protected MessageTags tags;
 

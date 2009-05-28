@@ -3,6 +3,7 @@ package org.objectweb.proactive.api;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.body.tags.MessageTags;
 
+
 /**
  * This class provide acces to the messages tags.
  *
@@ -19,8 +20,8 @@ public class PAMessageTagging {
      * 
      * @return the tags of the current message served.
      */
-    public static MessageTags getCurrentTags(){
+    public static MessageTags getCurrentTags() {
         return PAActiveObject.getContext().getCurrentRequest().getTags();
     }
-    
+
 }

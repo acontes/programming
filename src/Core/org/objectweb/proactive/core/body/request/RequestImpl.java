@@ -103,13 +103,14 @@ public class RequestImpl extends MessageImpl implements Request, java.io.Seriali
         this(methodCall, sender, isOneWay, nextSequenceID, false, null);
     }
 
-    public RequestImpl(MethodCall methodCall, UniversalBody sender, boolean isOneWay, long nextSequenceID, MessageTags tags) {
+    public RequestImpl(MethodCall methodCall, UniversalBody sender, boolean isOneWay, long nextSequenceID,
+            MessageTags tags) {
         this(methodCall, sender, isOneWay, nextSequenceID, false, tags);
     }
 
     // Constructor of non functional requests without priority
     public RequestImpl(MethodCall methodCall, UniversalBody sender, boolean isOneWay, long nextSequenceID,
-            boolean isNFRequest){
+            boolean isNFRequest) {
         this(methodCall, sender, isOneWay, nextSequenceID, false, Request.NFREQUEST_NO_PRIORITY, null);
     }
 
@@ -144,7 +145,7 @@ public class RequestImpl extends MessageImpl implements Request, java.io.Seriali
 
     public RequestImpl(MethodCall methodCall, UniversalBody sender, boolean isOneWay, long nextSequenceID,
             boolean isNFRequest, int nfRequestPriority) {
-        this(methodCall,sender,isOneWay, nextSequenceID, isNFRequest, nfRequestPriority, null);
+        this(methodCall, sender, isOneWay, nextSequenceID, isNFRequest, nfRequestPriority, null);
     }
 
     // Constructor of synchronous requests
@@ -162,7 +163,7 @@ public class RequestImpl extends MessageImpl implements Request, java.io.Seriali
     }
 
     public RequestImpl(MethodCall methodCall, boolean isOneWay) {
-        this(methodCall,isOneWay, null);
+        this(methodCall, isOneWay, null);
     }
 
     //
@@ -262,7 +263,7 @@ public class RequestImpl extends MessageImpl implements Request, java.io.Seriali
         MessageTags tags = null;
 
         if (currentreq != null)
-            tags  =  currentreq.getTags();
+            tags = currentreq.getTags();
 
         return new ReplyImpl(targetBody.getID(), this.sequenceNumber, this.methodName, result, psm, tags);
     }

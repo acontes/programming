@@ -173,7 +173,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
         this.parameters = parameters;
         if (parameters.containsKey(COMPONENT_PARAMETERS_KEY)) {
             ComponentParameters initialComponentParameters = (ComponentParameters) parameters
-            .get(COMPONENT_PARAMETERS_KEY);
+                    .get(COMPONENT_PARAMETERS_KEY);
             this.componentFactoryInstance = newComponentFactorySingleton(initialComponentParameters);
             this.requestFactoryInstance = newRequestFactorySingleton();
             this.replyReceiverFactoryInstance = newReplyReceiverFactorySingleton();
@@ -309,7 +309,6 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
         return new MessageTagsFactoryImpl();
     }
 
-
     //  //
     //  // -- INNER CLASSES -----------------------------------------------
     //  //
@@ -322,7 +321,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
             //                isOneWay, sequenceID, LocationServerFactory.getLocationServer());
             //			}else{
             return new org.objectweb.proactive.core.body.request.RequestImpl(methodCall, sourceBody,
-                    isOneWay, sequenceID, tags);
+                isOneWay, sequenceID, tags);
             //}
         }
     }
@@ -338,8 +337,8 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
     protected class RequestReceiverFactoryImpl implements RequestReceiverFactory, java.io.Serializable {
         public RequestReceiver newRequestReceiver() {
             if (ProActiveMetaObjectFactory.this.parameters.containsKey(SYNCHRONOUS_COMPOSITE_COMPONENT_KEY) &&
-                    ((Boolean) ProActiveMetaObjectFactory.this.parameters
-                            .get(ProActiveMetaObjectFactory.SYNCHRONOUS_COMPOSITE_COMPONENT_KEY)).booleanValue()) {
+                ((Boolean) ProActiveMetaObjectFactory.this.parameters
+                        .get(ProActiveMetaObjectFactory.SYNCHRONOUS_COMPOSITE_COMPONENT_KEY)).booleanValue()) {
                 return new SynchronousComponentRequestReceiver();
             }
             return new org.objectweb.proactive.core.body.request.RequestReceiverImpl();
@@ -366,7 +365,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
 
     // end inner class RequestQueueFactoryImpl
     protected static class MigrationManagerFactoryImpl implements MigrationManagerFactory,
-    java.io.Serializable {
+            java.io.Serializable {
         public MigrationManager newMigrationManager() {
             //########### example de code pour les nouvelles factories
             //			if(System.getProperty("migration.stategy").equals("locationserver")){
@@ -430,7 +429,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
 
     // end inner class ThreadStoreFactoryImpl
     protected static class ProActiveSPMDGroupManagerFactoryImpl implements ProActiveSPMDGroupManagerFactory,
-    java.io.Serializable {
+            java.io.Serializable {
         public ProActiveSPMDGroupManager newProActiveSPMDGroupManager() {
             return new ProActiveSPMDGroupManager();
         }
@@ -460,8 +459,8 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
                     return new FTManagerPMLRB();
                 default:
                     logger.error("Error while creating fault-tolerance manager : " +
-                            "no protocol is associated to selector value " + protocolSelector);
-                return null;
+                        "no protocol is associated to selector value " + protocolSelector);
+                    return null;
             }
         }
 
@@ -473,8 +472,8 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
                     return new HalfFTManagerPMLRB();
                 default:
                     logger.error("Error while creating fault-tolerance manager : " +
-                            "no protocol is associated to selector value " + protocolSelector);
-                return null;
+                        "no protocol is associated to selector value " + protocolSelector);
+                    return null;
             }
         }
     }
@@ -486,8 +485,8 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
     }
 
     // REQUEST-TAGS
-    protected static class MessageTagsFactoryImpl implements MessageTagsFactory, Serializable{
-        
+    protected static class MessageTagsFactoryImpl implements MessageTagsFactory, Serializable {
+
         /**
          * @see MessageTagsFactory#newMessageTags()
          */

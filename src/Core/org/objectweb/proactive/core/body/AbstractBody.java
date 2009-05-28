@@ -174,7 +174,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     // MESSAGE-TAGS Factory
     protected MessageTagsFactory messageTagsFactory;
     protected Map<String, LocalMemoryTag> localMemoryTags;
-    
+
     //
     // -- PRIVATE MEMBERS -----------------------------------------------
     //
@@ -238,7 +238,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         // MESSAGE TAGS
         this.messageTagsFactory = factory.newRequestTagsFactory();
         this.localMemoryTags = new ConcurrentHashMap<String, LocalMemoryTag>();
-        
+
         // SECURITY
         if (reifiedObject instanceof Secure) {
             this.isInterfaceSecureImplemented = true;
@@ -1159,38 +1159,38 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
      * @param lease - Lease period of the memroy
      * @return The LocalMemoryTag 
      */
-    public LocalMemoryTag createLocalMemoryTag(String id, int lease){
+    public LocalMemoryTag createLocalMemoryTag(String id, int lease) {
         int maxLease = PAProperties.PA_MAX_MEMORY_TAG_LEASE.getValueAsInt();
         lease = (lease > maxLease) ? maxLease : lease;
         this.localMemoryTags.put(id, new LocalMemoryTag(id, lease));
         return this.localMemoryTags.get(id);
     }
-    
+
     /**
      * Return the local memory of the specified Tag
      * @param id - Tag identifer
      * @return the LocalMemoryTag of the specified Tag
      */
-    public LocalMemoryTag getLocalMemoryTag(String id){
+    public LocalMemoryTag getLocalMemoryTag(String id) {
         return this.localMemoryTags.get(id);
     }
-    
+
     /**
      * Clear the local memory of the specified Tag
      * @param id - Tag identifier
      */
-    public void clearLocalMemoryTag(String id){
+    public void clearLocalMemoryTag(String id) {
         this.localMemoryTags.remove(id);
     }
-    
+
     /**
      * To get the localMemoryTag Map of the body
      * @return Map<String, {@link LocalMemoryTag}> the LocalMemoryTags
      */
-    public Map<String, LocalMemoryTag> getLocalMemoryTags(){
+    public Map<String, LocalMemoryTag> getLocalMemoryTags() {
         return this.localMemoryTags;
     }
-    
+
     /**
      * Returns true if an immediate service request is being served now.
      */

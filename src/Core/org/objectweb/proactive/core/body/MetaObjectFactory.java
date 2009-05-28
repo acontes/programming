@@ -157,7 +157,7 @@ public interface MetaObjectFactory {
      * @return the RequestTags manager
      */
     public MessageTagsFactory newRequestTagsFactory();
-    
+
     // FAULT-TOLERANCE
 
     /**

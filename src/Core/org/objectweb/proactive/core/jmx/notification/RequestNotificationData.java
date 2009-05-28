@@ -126,7 +126,7 @@ public class RequestNotificationData implements Serializable {
         return sequenceNumber;
     }
 
-    public String getTags(){
+    public String getTags() {
         return tags;
     }
 }

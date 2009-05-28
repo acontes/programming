@@ -92,7 +92,8 @@ public class MessageImpl implements Message, java.io.Serializable {
      * @param isOneWay <code>true</code> if oneWay
      * @param methodName the method name of the method call
      */
-    public MessageImpl(UniqueID sourceID, long sequenceNumber, boolean isOneWay, String methodName, MessageTags tags) {
+    public MessageImpl(UniqueID sourceID, long sequenceNumber, boolean isOneWay, String methodName,
+            MessageTags tags) {
         this.sourceID = sourceID;
         this.sequenceNumber = sequenceNumber;
         this.timeStamp = System.currentTimeMillis();

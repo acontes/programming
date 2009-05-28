@@ -487,9 +487,9 @@ public enum PAProperties {
      */
     /** Set the max period for LocalMemoryTag lease time */
     PA_MAX_MEMORY_TAG_LEASE("proactive.tagmemory.maxlease", PAPropertiesType.INTEGER),
-    
+
     PA_MEMORY_TAG_LEASE_PERIOD("proactive.tagmemory.lease.period", PAPropertiesType.INTEGER),
-    
+
     /* ------------------------------------
      *  FILE TRANSFER
      */

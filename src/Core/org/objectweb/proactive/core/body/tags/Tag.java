@@ -2,11 +2,15 @@ package org.objectweb.proactive.core.body.tags;
 
 import java.io.Serializable;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.BodyImpl;
 import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+
 
 /**
  * Abstract Tag class for Request Tagging
@@ -15,14 +19,17 @@ import org.objectweb.proactive.core.config.PAProperties;
  * method apply to create a tag doing what you want at each
  * propagation.
  */
-public abstract class Tag implements Serializable{
+public abstract class Tag implements Serializable {
+
+    /** Message Tagging Logger */
+    private static Logger logger = ProActiveLogger.getLogger(Loggers.MESSAGE_TAGGING);
 
     /** Identifier of the tag */
     protected String id;
 
     /** User Data attached to this tag */
     protected Object data;
-    
+
     /**
      * Tag constructor
      * @param id     - Identifier of the tag
@@ -31,8 +38,9 @@ public abstract class Tag implements Serializable{
     public Tag(String id, Object data) {
         this.id = id;
         this.data = data;
+        logger.debug("Creation of a new tag : " + id);
     }
-    
+
     /**
      * Tag constructor
      * @param id     - Identifier of the tag
@@ -58,10 +66,10 @@ public abstract class Tag implements Serializable{
      * 
      * @return the LocaLMemoryTag of this tag on the current ActiveObject if it exist
      */
-    final public LocalMemoryTag getLocalMemory(){
+    final public LocalMemoryTag getLocalMemory() {
         Body body = PAActiveObject.getBodyOnThis();
-        if ( body instanceof BodyImpl) {
-            return ((BodyImpl)body).getLocalMemoryTag(this.id);
+        if (body instanceof BodyImpl) {
+            return ((BodyImpl) body).getLocalMemoryTag(this.id);
         } //else
         return null;
     }
@@ -73,32 +81,32 @@ public abstract class Tag implements Serializable{
      * @param lease - Lease Period
      * @return the LocaLMemoryTag of this tag on the current ActiveObject
      */
-    final public LocalMemoryTag createLocalMemory(int lease){
+    final public LocalMemoryTag createLocalMemory(int lease) {
         Body body = PAActiveObject.getBodyOnThis();
-        if ( body instanceof BodyImpl) {
-            return ((BodyImpl)body).createLocalMemoryTag(this.id, lease);
+        if (body instanceof BodyImpl) {
+            return ((BodyImpl) body).createLocalMemoryTag(this.id, lease);
         } //else
         return null;
     }
-       
+
     /**
      * Clear the local memory attached to this tag
      */
-    final public void clearLocalMemory(){
+    final public void clearLocalMemory() {
         Body body = PAActiveObject.getBodyOnThis();
-        if ( body instanceof BodyImpl) {
-            ((AbstractBody)body).clearLocalMemoryTag(this.id);
+        if (body instanceof BodyImpl) {
+            ((AbstractBody) body).clearLocalMemoryTag(this.id);
         }
     }
-    
+
     /**
      * To get the Id of this tag
      * @return Tag Id
      */
-    public String getId(){
+    public String getId() {
         return this.id;
     }
-    
+
     /**
      * Return the User Data attached to this tag
      * @return - User Data
@@ -119,7 +127,7 @@ public abstract class Tag implements Serializable{
      * Display Tag Information
      */
     public String toString() {
-        return "<TAG: id="+id+", data="+data+">";
+        return "<TAG: id=" + id + ", data=" + data + ">";
     }
 
 }

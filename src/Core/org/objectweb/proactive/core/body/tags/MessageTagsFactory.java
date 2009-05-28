@@ -1,5 +1,8 @@
 package org.objectweb.proactive.core.body.tags;
 
+/**
+ *  MessageTags MetaObject Factory 
+ */
 public interface MessageTagsFactory {
 
     /**
@@ -7,5 +10,5 @@ public interface MessageTagsFactory {
      * @return MessageTags Object
      */
     public MessageTags newMessageTags();
-    
+
 }
