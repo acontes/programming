@@ -12,6 +12,10 @@
 		<descriptorDefaultVariable name="jvmargDefinedByTest" value=" "/>
 		<programVariable name="JVM_PARAMETERS"/>
 		<programVariable name="NAMING_SERVICE_URL"/>
+		<programVariable name="INPUT_DEFAULT_PATH"/>
+		<programVariable name="INPUT_PATH"/>
+		<programVariable name="OUTPUT_DEFAULT_PATH"/>
+		<programVariable name="OUTPUT_PATH"/>
 	</environment>
 	
 	<application>
@@ -39,9 +43,21 @@
 			</virtualNode>
 			<data>
 				<namingService url="${NAMING_SERVICE_URL}" />
+				<!-- URLs are paths here; it works for VFS, but it is like that just for local testing -->
 				<inputDefault>
-					<remoteAccess url="FIXME.com" />
+					<remoteAccess url="${INPUT_DEFAULT_PATH}" />
+					<!--  difficult to test locally:
+					<location hostname="${INPUT_DEFAULT_HOSTNAME}" url="${INPUT_DEFAULT_PATH}" />  -->
 				</inputDefault>
+				<input id="named_input">
+					<remoteAccess url="${INPUT_PATH}" />
+				</input>
+				<outputDefault>
+					<remoteAccess url="${OUTPUT_DEFAULT_PATH}" />
+				</outputDefault>
+				<output id="named_output">
+					<remoteAccess url="${OUTPUT_PATH}" />
+				</output>
 			</data>
 		</proactive>
 	</application>

@@ -1,6 +1,13 @@
 package functionalTests.dataspaces;
 
+import static org.junit.Assert.assertTrue;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
@@ -8,6 +15,7 @@ import org.junit.Ignore;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.xml.VariableContractType;
+import org.objectweb.proactive.extensions.calcium.system.SkeletonSystemImpl;
 import org.objectweb.proactive.extra.dataspaces.NamingServiceDeployer;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
@@ -22,6 +30,11 @@ public class GCMFunctionalTestDataSpaces extends GCMFunctionalTest {
             .getResource("/functionalTests/_CONFIG/JunitAppDataSpaces.xml");
 
     static public final String VN_NAME = "nodes";
+    static public final String INPUT_NAME = "named_input";
+    static public final String INPUT_FILE_NAME = "test.txt";
+    static public final String INPUT_FILE_CONTENT = "toto";
+    static public final String OUTPUT_NAME = "named_output";
+
     static public final String VAR_DEPDESCRIPTOR = "deploymentDescriptor";
     static public final String VAR_JVMARG = "jvmargDefinedByTest";
 
@@ -33,6 +46,24 @@ public class GCMFunctionalTestDataSpaces extends GCMFunctionalTest {
 
     static public final String VAR_NAMING_SERVICE_URL = "NAMING_SERVICE_URL";
     NamingServiceDeployer namingServiceDeployer;
+
+    File rootTmpDir;
+    static public final String VAR_INPUT_DEFAULT_PATH = "INPUT_DEFAULT_PATH";
+    File inputDefaultDir;
+    static public final String VAR_INPUT_PATH = "INPUT_PATH";
+    File inputDir;
+    static public final String VAR_OUTPUT_DEFAULT_PATH = "OUTPUT_DEFAULT_PATH";
+    File outputDefaultDir;
+    static public final String VAR_OUTPUT_PATH = "OUTPUT_PATH";
+    File outputDir;
+
+    private static void createInputContent(File dir) throws IOException {
+        assertTrue(dir.mkdirs());
+        final File file = new File(dir, INPUT_FILE_NAME);
+        final BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+        writer.write(INPUT_FILE_CONTENT);
+        writer.close();
+    }
 
     public GCMFunctionalTestDataSpaces(int hostCapacity, int vmCapacity) {
         super(dataSpacesApplicationDescriptor);
@@ -46,6 +77,21 @@ public class GCMFunctionalTestDataSpaces extends GCMFunctionalTest {
         // hack: need to do that here to acquire proper URL
         tryStartNamingService();
         vContract.setVariableFromProgram(VAR_NAMING_SERVICE_URL, namingServiceDeployer.getNamingServiceURL(),
+                VariableContractType.ProgramVariable);
+
+        rootTmpDir = new File(System.getProperty("java.io.tmpdir"), "ProActive-GCMFunctionalTestDataSpaces");
+        inputDefaultDir = new File(rootTmpDir, "inputDefault");
+        inputDir = new File(rootTmpDir, "input");
+        outputDefaultDir = new File(rootTmpDir, "outputDefault");
+        outputDir = new File(rootTmpDir, "output");
+
+        vContract.setVariableFromProgram(VAR_INPUT_DEFAULT_PATH, inputDefaultDir.getAbsolutePath(),
+                VariableContractType.ProgramVariable);
+        vContract.setVariableFromProgram(VAR_INPUT_PATH, inputDir.getAbsolutePath(),
+                VariableContractType.ProgramVariable);
+        vContract.setVariableFromProgram(VAR_OUTPUT_DEFAULT_PATH, outputDefaultDir.getAbsolutePath(),
+                VariableContractType.ProgramVariable);
+        vContract.setVariableFromProgram(VAR_OUTPUT_PATH, outputDir.getAbsolutePath(),
                 VariableContractType.ProgramVariable);
     }
 
@@ -64,25 +110,38 @@ public class GCMFunctionalTestDataSpaces extends GCMFunctionalTest {
     }
 
     @Before
-    public void createInputOutputSpacesContent() {
-        // TODO
+    public void createInputOutputSpacesContent() throws IOException {
+        createInputContent(inputDir);
+        createInputContent(inputDefaultDir);
+
+        assertTrue(outputDir.mkdirs());
+        assertTrue(outputDefaultDir.mkdirs());
     }
 
     @Before
     public void removeInputOutputSpacesContent() {
-        // TODO
+        if (rootTmpDir.exists())
+            assertTrue(SkeletonSystemImpl.deleteDirectory(rootTmpDir));
+    }
+
+    public List<Node> getAllNodes() {
+        checkDeploymentState();
+
+        gcmad.waitReady();
+        GCMVirtualNode vn = gcmad.getVirtualNode(VN_NAME);
+        return vn.getCurrentNodes();
     }
 
     public Node getANode() {
-        return getANodeFrom(VN_NAME);
+        checkDeploymentState();
+
+        GCMVirtualNode vn = gcmad.getVirtualNode(VN_NAME);
+        return vn.getANode();
     }
 
-    private Node getANodeFrom(String vnName) {
+    private void checkDeploymentState() {
         if (gcmad == null || !gcmad.isStarted()) {
             throw new IllegalStateException("deployment is not started");
         }
-
-        GCMVirtualNode vn = gcmad.getVirtualNode(vnName);
-        return vn.getANode();
     }
 }
