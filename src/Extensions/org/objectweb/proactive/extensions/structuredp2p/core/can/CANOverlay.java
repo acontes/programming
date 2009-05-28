@@ -65,6 +65,11 @@ public class CANOverlay extends StructuredOverlay {
     private Stack<int[]> splitHistory;
 
     /**
+     * Future state for the current peer when a neighbor leaves.
+     */
+    private CANMergeMessage futureState = null;
+
+    /**
      * Constructor.
      * 
      * Initialize the neighbors array.
@@ -117,40 +122,50 @@ public class CANOverlay extends StructuredOverlay {
 
             Zone tmpZone = this.getZone();
             List<ActionResponseMessage> responses = new ArrayList<ActionResponseMessage>();
+            List<Zone> zones = new ArrayList<Zone>();
+            List<NeighborsDataStructure> neighbors = new ArrayList<NeighborsDataStructure>();
 
             for (Peer neighbor : this.neighbors.getNeighbors(dimension, direction)) {
                 Coordinate border = this.neighbors.getZone(neighbor).getCoordinateMax(dimension);
-                Zone[] splitZones = tmpZone.split(CANOverlay.getNextDimension(dimension), border);
+                Zone[] splitZones = null;
+                try {
+                    splitZones = tmpZone.split(CANOverlay.getNextDimension(dimension), border);
+                } catch (NullPointerException e) {
+                    // TODO: split a null zone
+                    System.err.println("Cannot split a null zone.");
+                    e.printStackTrace();
+                    return this.leave();
+                }
 
-                NeighborsDataStructure neighbors = new NeighborsDataStructure(neighbor);
-                neighbors.addAll(this.neighbors);
+                NeighborsDataStructure n = new NeighborsDataStructure(neighbor);
+                n.addAll(this.neighbors);
 
                 CANMergeMessage message = new CANMergeMessage(this.getRemotePeer(), dimension, directionInv,
-                    neighbors, splitZones[0], this.getLocalPeer().getDataStorage().getDataFromZone(
-                            this.getZone()));
-
-                /**
-                 * TODO new leave secure algorithm
-                 * 
-                 * send a message with the information to merge wait for all responses if OK ...
-                 * else retry without the died peer
-                 */
+                    n, splitZones[0], this.getLocalPeer().getDataStorage().getDataFromZone(this.getZone()));
 
                 tmpZone = splitZones[1];
 
-                responses.add((ActionResponseMessage) PAFuture.getFutureValue(this.sendMessageTo(neighbor,
-                        message)));
-
-                for (int dim = 0; dim < CANOverlay.NB_DIMENSIONS; dim++) {
-                    for (int dir = 0; dir < 2; dir++) {
-                        PAFuture.waitForAll(this.sendMessageTo(neighbors.getNeighbors(dim, dir),
-                                new CANAddNeighborMessage(neighbor, splitZones[0], dim, this
-                                        .getOppositeDirection(dir))));
-                    }
+                try {
+                    responses.add((ActionResponseMessage) PAFuture.getFutureValue(this.sendMessageTo(
+                            neighbor, message)));
+                } catch (Exception e) {
+                    // TODO: handle proactive exception on sending message / receive response
+                    e.printStackTrace();
+                    return this.leave();
                 }
+
+                zones.add(splitZones[0]);
+                neighbors.add(n);
             }
 
-            PAFuture.waitForAll(responses);
+            /*
+             * // TODO maybe to move in the handleLeaveMessage method for (int i = 0; i <
+             * zones.size(); i++) { for (int dim = 0; dim < CANOverlay.NB_DIMENSIONS; dim++) { for
+             * (int dir = 0; dir < 2; dir++) {
+             * PAFuture.waitForAll(this.sendMessageTo(neighbors.get(i).getNeighbors(dim, dir), new
+             * CANAddNeighborMessage(neighbors.get(i).getOwnerPeer(), zones.get(i), dim,
+             * this.getOppositeDirection(dir)))); } } i++; }
+             */
 
             this.setZone(null);
 
@@ -202,14 +217,22 @@ public class CANOverlay extends StructuredOverlay {
                 for (int dir = 0; dir < 2; dir++) {
                     ArrayList<Peer> peers = new ArrayList<Peer>();
                     for (Peer neighbor : this.neighbors.getNeighbors(dim, dir)) {
-                        if (this.getZone() == null || this.neighbors.getZone(neighbor) == null ||
-                            this.getZone().getBorderedDimension(this.neighbors.getZone(neighbor)) == -1) {
-                            this.sendMessageTo(neighbor, new CANRemoveNeighborMessage(this.getRemotePeer(),
-                                dim, this.getOppositeDirection(dir)));
-                            peers.add(neighbor);
-                        } else {
-                            this.sendMessageTo(neighbor, new CANAddNeighborMessage(this.getRemotePeer(), this
-                                    .getZone(), dim, this.getOppositeDirection(dir)));
+                        try {
+                            ResponseMessage response = null;
+                            if (this.getZone() == null || this.neighbors.getZone(neighbor) == null ||
+                                this.getZone().getBorderedDimension(this.neighbors.getZone(neighbor)) == -1) {
+                                response = this.sendMessageTo(neighbor, new CANRemoveNeighborMessage(this
+                                        .getRemotePeer(), dim, this.getOppositeDirection(dir)));
+                                peers.add(neighbor);
+                            } else {
+                                response = this.sendMessageTo(neighbor,
+                                        new CANAddNeighborMessage(this.getRemotePeer(), this.getZone(), dim,
+                                            this.getOppositeDirection(dir)));
+                            }
+
+                            PAFuture.waitFor(response);
+                        } catch (Exception e) {
+                            // TODO a response returns an exception
                         }
                     }
 
@@ -312,7 +335,6 @@ public class CANOverlay extends StructuredOverlay {
                                 this.neighbors.getNearestNeighborFrom(
                                         lookupMessage.getCoordinates()[CANOverlay.getNextDimension(dim)],
                                         dim, direction), msg));
-                        // return .sendMessageWithoutCallback(msg);
                     }
                 }
             }
@@ -479,17 +501,49 @@ public class CANOverlay extends StructuredOverlay {
      * {@inheritDoc}
      */
     public ActionResponseMessage handleLeaveMessage(LeaveMessage msg) {
-        return new ActionResponseMessage(msg.getCreationTimestamp(), this.neighbors.remove(msg.getPeer()));
+        boolean res = true;
+
+        if (this.futureState != null) {
+            try {
+                this.setZone(this.zone.merge(this.futureState.getZone()));
+                this.getLocalPeer().getDataStorage().addData(this.futureState.getResources());
+            } catch (ZoneException e) {
+                e.printStackTrace();
+                this.futureState = null;
+                return new ActionResponseMessage(msg.getCreationTimestamp(), false);
+            }
+
+            int dimension = this.futureState.getDimension();
+            int direction = this.futureState.getDirection();
+
+            int index = -1, t = 0;
+            for (int[] h : this.splitHistory) {
+                if (h[0] == dimension && h[1] == direction) {
+                    index = t;
+                }
+                t++;
+            }
+
+            if (index >= 0) {
+                this.splitHistory.remove(index);
+            }
+
+            res &= this.neighbors.remove(this.futureState.getRemotePeer(), dimension, direction);
+            res &= this.neighbors.addAll(this.futureState.getNeighbors());
+            this.updateNeighbors();
+
+            this.futureState = null;
+        } else {
+            res = this.neighbors.remove(msg.getPeer());
+        }
+
+        return new ActionResponseMessage(msg.getCreationTimestamp(), res);
     }
 
     /**
      * {@inheritDoc}
      */
     public CANLookupResponseMessage handleLookupMessage(LookupMessage msg) {
-        /*
-         * return new CANLookupResponseMessage(msg.getCreationTimestamp(), this.getRemotePeer(),
-         * ((CANLookupMessage) msg).getCoordinates());
-         */
         return this.sendMessage(msg);
     }
 
@@ -501,34 +555,11 @@ public class CANOverlay extends StructuredOverlay {
      * @return the {@link ActionResponseMessage} response.
      */
     public ActionResponseMessage handleMergeMessage(Message msg) {
-        CANMergeMessage message = (CANMergeMessage) msg;
-        try {
-            this.setZone(this.zone.merge(message.getZone()));
-            this.getLocalPeer().getDataStorage().addData(message.getResources());
-        } catch (ZoneException e) {
-            e.printStackTrace();
+        if (this.futureState == null) {
             return new ActionResponseMessage(msg.getCreationTimestamp(), false);
         }
 
-        int dimension = message.getDimension();
-        int direction = message.getDirection();
-
-        int index = -1, t = 0;
-        for (int[] h : this.splitHistory) {
-            if (h[0] == dimension && h[1] == direction) {
-                index = t;
-            }
-            t++;
-        }
-
-        if (index >= 0) {
-            this.splitHistory.remove(index);
-        }
-
-        this.neighbors.remove(message.getRemotePeer(), dimension, direction);
-        this.neighbors.addAll(message.getNeighbors());
-        this.updateNeighbors();
-
+        this.futureState = (CANMergeMessage) msg;
         return new ActionResponseMessage(msg.getCreationTimestamp(), true);
     }
 

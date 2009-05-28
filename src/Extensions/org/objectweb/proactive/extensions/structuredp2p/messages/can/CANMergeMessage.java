@@ -1,9 +1,9 @@
 package org.objectweb.proactive.extensions.structuredp2p.messages.can;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
-import org.objectweb.proactive.extensions.structuredp2p.core.can.Zone;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.NeighborsDataStructure;
+import org.objectweb.proactive.extensions.structuredp2p.core.can.Zone;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.data.DataStorage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.Message;
@@ -76,6 +76,10 @@ public class CANMergeMessage extends Message {
         this.neighbors = neighbors;
         this.zone = remoteZone;
         this.resources = remoteResources;
+
+        if (remoteZone == null) {
+            throw new NullPointerException("Cannot merge a zone with a NULL zone.");
+        }
     }
 
     /**

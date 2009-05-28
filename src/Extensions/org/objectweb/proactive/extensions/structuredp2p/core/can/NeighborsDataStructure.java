@@ -380,6 +380,15 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
     }
 
     /**
+     * Returns the peer which have these neighbors.
+     * 
+     * @return the owner peer.
+     */
+    public Peer getOwnerPeer() {
+        return this.ownerPeer;
+    }
+
+    /**
      * Update the zone of the specified {@link Peer}.
      * 
      * @param remotePeer

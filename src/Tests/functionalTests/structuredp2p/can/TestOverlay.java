@@ -59,14 +59,12 @@ public class TestOverlay {
 
     @AfterClass
     public static void tearDownAfterClass() throws Exception {
-        TestOverlay.thirdPeer.leave();
-        TestOverlay.secondPeer.leave();
-        TestOverlay.firstPeer.leave();
+
     }
 
     @Test
     public void testSecondPeer() {
-        TestOverlay.secondPeer.join(TestOverlay.firstPeer);
+        Assert.assertTrue(TestOverlay.secondPeer.join(TestOverlay.firstPeer));
 
         // Are they neighbors ??
         Assert.assertTrue(TestOverlay.getOverlay(TestOverlay.firstPeer).hasNeighbor(TestOverlay.secondPeer));
@@ -85,7 +83,7 @@ public class TestOverlay {
 
     @Test
     public void testThirdPeer() {
-        TestOverlay.thirdPeer.join(TestOverlay.secondPeer);
+        Assert.assertTrue(TestOverlay.thirdPeer.join(TestOverlay.secondPeer));
 
         // Are they neighbors ??
         Assert.assertTrue(TestOverlay.getOverlay(TestOverlay.firstPeer).hasNeighbor(TestOverlay.thirdPeer));
@@ -109,7 +107,7 @@ public class TestOverlay {
 
     @Test
     public void testFourthPeer() {
-        TestOverlay.fourthPeer.join(TestOverlay.thirdPeer);
+        Assert.assertTrue(TestOverlay.fourthPeer.join(TestOverlay.thirdPeer));
 
         // Are they neighbors ??
         Assert.assertTrue(TestOverlay.getOverlay(TestOverlay.secondPeer).hasNeighbor(TestOverlay.fourthPeer));
@@ -162,7 +160,7 @@ public class TestOverlay {
     public void testLeave() {
         int second = TestOverlay.getOverlay(TestOverlay.secondPeer).getNeighbors().size();
 
-        TestOverlay.fourthPeer.leave();
+        Assert.assertTrue(TestOverlay.fourthPeer.leave());
 
         Assert.assertEquals(second - 1, TestOverlay.getOverlay(TestOverlay.secondPeer).getNeighbors().size());
 
@@ -201,6 +199,13 @@ public class TestOverlay {
         CANLookupResponseMessage response = (CANLookupResponseMessage) sender.sendMessage(msg);
 
         Assert.assertEquals(toFind, response.getPeer());
+    }
+
+    @Test
+    public void leaveAll() {
+        Assert.assertTrue(TestOverlay.thirdPeer.leave());
+        Assert.assertTrue(TestOverlay.secondPeer.leave());
+        Assert.assertTrue(TestOverlay.firstPeer.leave());
     }
 
     public static CANOverlay getOverlay(Peer peer) {
