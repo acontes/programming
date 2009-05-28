@@ -58,6 +58,7 @@ public class DataSpacesTechnicalService implements TechnicalService {
 
     private NotificationListener notificationListener;
 
+    // TODO What about polices determining whether to leave data in scratch or remove all directories during unexpected end of application. 
     private static void closeNodeConfigIgnoreException(final Node node) {
         try {
             DataSpacesNodes.closeNodeConfig(node);
