@@ -89,8 +89,11 @@ public class Utils {
      *             thread
      */
     public static Node getCurrentNode() throws ProActiveRuntimeException {
-        if (PAActiveObject.getStubOnThis() == null)
+        if (PAActiveObject.getStubOnThis() == null) {
+            // TODO: what about returning NodeFactory.getDefaultNode() in that case?
+            // it may be useful on deployer's node
             throw new ProActiveRuntimeException("This method must be called from an active thread");
+        }
 
         try {
             return PAActiveObject.getNode();
