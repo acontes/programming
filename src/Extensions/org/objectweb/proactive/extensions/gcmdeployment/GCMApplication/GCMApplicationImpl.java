@@ -610,7 +610,7 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
             ProActiveLogger.logImpossibleException(GCMA_LOGGER, e);
         }
     }
-    
+
     private void stopDataSpaces() {
         if (namingService != null) {
             // FIXME: app id
