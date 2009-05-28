@@ -42,7 +42,7 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredExceptio
  * implemented).</li>
  * </ul>
  * <p>
- * This implementation set up Data Spaces in {@link #apply(Node)} and clean up after Data Spaces
+ * This implementation sets up Data Spaces in {@link #apply(Node)} and cleans up after Data Spaces
  * objects when Node is being destroyed. After Data Spaces are configured, user can safely use
  * {@link PADataSpaces} API.
  */
