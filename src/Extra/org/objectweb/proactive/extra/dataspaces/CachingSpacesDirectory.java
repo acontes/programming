@@ -46,7 +46,8 @@ public class CachingSpacesDirectory implements SpacesDirectory {
 
         synchronized (this) {
             final Set<SpaceInstanceInfo> ret = remoteDirectory.lookupMany(uri);
-            localDirectory.register(ret);
+            if (ret != null)
+                localDirectory.register(ret);
 
             return ret;
         }
@@ -73,7 +74,7 @@ public class CachingSpacesDirectory implements SpacesDirectory {
 
             sii = remoteDirectory.lookupOne(uri);
 
-            if (sii != null)
+            if (sii != null) {
                 try {
                     localDirectory.register(sii);
                 } catch (SpaceAlreadyRegisteredException e) {
@@ -81,6 +82,7 @@ public class CachingSpacesDirectory implements SpacesDirectory {
                     ProActiveLogger.logImpossibleException(logger, e);
                     throw new RuntimeException(e);
                 }
+            }
             return sii;
         }
     }
