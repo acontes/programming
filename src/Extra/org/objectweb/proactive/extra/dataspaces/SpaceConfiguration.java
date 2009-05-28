@@ -55,13 +55,13 @@ public abstract class SpaceConfiguration {
         this.spaceType = spaceType;
 
         final boolean localDefined;
-        if (path != null && hostname != null)
+        if (path != null) {
+            if (hostname == null)
+                throw new ConfigurationException("Local path provided without hostname specified");
             localDefined = true;
-        else if (path == null && hostname == null)
+        } else {
             localDefined = false;
-        else
-            throw new ConfigurationException("Local path provided without hostname specified");
-
+        }
         if (!localDefined && url == null)
             throw new ConfigurationException("No access specified (neither local, nor remote)");
     }

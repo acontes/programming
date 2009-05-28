@@ -44,6 +44,12 @@ public class InputOutputSpaceConfigurationTest {
     }
 
     @Test
+    public void testCreateWithURLHostnameNameType() throws ConfigurationException {
+        // just check if it does not crash if there is no path
+        config = InputOutputSpaceConfiguration.createConfiguration(URL, null, "hostname", NAME, TYPE);
+    }
+
+    @Test
     public void testCreateWithPathHostname() throws ConfigurationException {
         config = InputOutputSpaceConfiguration.createConfiguration(null, PATH, HOSTNAME, NAME, TYPE);
         assertProperlyConfigured(null, PATH, HOSTNAME, NAME, TYPE, false);

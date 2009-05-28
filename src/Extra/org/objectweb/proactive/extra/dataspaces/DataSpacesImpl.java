@@ -418,7 +418,10 @@ public class DataSpacesImpl {
 
         final SpaceInstanceInfo spaceInstanceInfo;
         try {
-            final String hostname = Utils.getHostname();
+            String hostname = null;
+            if (path == null)
+                hostname = Utils.getHostname();
+            
             // name and type are checked here 
             final InputOutputSpaceConfiguration config = InputOutputSpaceConfiguration.createConfiguration(
                     url, path, hostname, name, type);
