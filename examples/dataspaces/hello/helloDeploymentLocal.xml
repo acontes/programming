@@ -4,7 +4,8 @@
 	xsi:schemaLocation="urn:gcm:deployment:1.0 http://proactive.inria.fr/schemas/gcm/1.0/ExtensionSchemas.xsd">
 
 	<environment>
-		<javaPropertyVariable name="user.dir" />
+		<javaPropertyVariable name="java.io.tmpdir"/> 
+		<javaPropertyVariable name="user.home" />
 		<javaPropertyDescriptorDefault name="os" value="unix" />
 	</environment>
 
@@ -16,7 +17,11 @@
 
 		<hosts>
 			<host id="hLocalhost" os="${os}" hostCapacity="2" vmCapacity="1">
-				<homeDirectory base="root" relpath="${user.dir}" />
+				<homeDirectory base="root" relpath="${user.home}" />
+				<scratch>
+					<path base="root" relpath="${java.io.tmpdir}/dataspaces" />
+					<remoteAccess url="sftp://${user.name}@#{hostname}${java.io.tmpdir}/dataspaces" />
+				</scratch>
 			</host>
 
 		</hosts>

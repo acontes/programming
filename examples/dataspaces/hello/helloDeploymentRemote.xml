@@ -7,7 +7,8 @@
 		<!-- CHANGE THIS -->
 		<descriptorVariable name="HOST" value="localhost" />
 		<javaPropertyDescriptorDefault name="os" value="unix" />
-		<javaPropertyVariable name="user.dir" />
+		<javaPropertyVariable name="user.home" />
+		<javaPropertyVariable name="java.io.tmpdir"/>
 	</environment>
 
 	<resources>
@@ -20,7 +21,12 @@
 
 		<hosts>
 			<host id="host" os="${os}" hostCapacity="2" vmCapacity="1">
-				<homeDirectory base="root" relpath="${user.dir}" />
+				<homeDirectory base="root" relpath="${user.home}" />
+				<scratch>
+					<path base="root" relpath="${java.io.tmpdir}/dataspaces" />
+					<remoteAccess
+						url="sftp://${user.name}@#{hostname}${java.io.tmpdir}/dataspaces" />
+				</scratch>
 			</host>
 
 		</hosts>
@@ -28,7 +34,6 @@
 		<groups>
 			<sshGroup id="remoteThroughSSH" hostList="${HOST}" />
 		</groups>
-
 
 	</infrastructure>
 </GCMDeployment>

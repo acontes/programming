@@ -4,16 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.ObjectForSynchro;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
@@ -21,15 +17,11 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
+import org.objectweb.proactive.core.xml.VariableContractImpl;
+import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
-import org.objectweb.proactive.extra.dataspaces.BaseScratchSpaceConfiguration;
-import org.objectweb.proactive.extra.dataspaces.InputOutputSpaceConfiguration;
-import org.objectweb.proactive.extra.dataspaces.NamingService;
 import org.objectweb.proactive.extra.dataspaces.NamingServiceDeployer;
-import org.objectweb.proactive.extra.dataspaces.PADataSpaces;
-import org.objectweb.proactive.extra.dataspaces.SpaceInstanceInfo;
 import org.objectweb.proactive.extra.dataspaces.Utils;
-import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.DataSpacesException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredException;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
@@ -85,32 +77,22 @@ public class HelloExample {
 
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
-    // ### IN TARGET IMPLEMENTATION - ALL THESE CONSTS SHOULD BE IN XML ###
+    /**
+     * Name of a host for output data space, here: the deployer host; fulfills the variable contract
+     */
+    private static final String OUTPUT_HOSTNAME = Utils.getHostname();
+    
+    private static final String VAR_OUTPUT_HOSTNAME = "OUTPUT_HOSTNAME";
 
-    // name of a host for output data space, here: the deployer host
-    private static final String HOSTNAME = Utils.getHostname();
+    /**
+     * FIXME: We need to set NamingService address through variable contract from descriptor as we
+     * don't start it automatically yet.
+     */
+    private static final String VAR_NAMING_SERVICE_URL = "NAMING_SERVICE_URL";
 
-    // remote access protocol specific constants
-    private static final String REMOTE_ACCESS_PROTO = "sftp://";
-    private static final String USERNAME = System.getProperty("user.name");
-
-    // input data spaces - HTTP resources to process
     private static final String INPUT_RESOURCE1_NAME = "wiki_proactive";
-    private static final String INPUT_RESOURCE1_URL = "http://en.wikipedia.org/wiki/ProActive";
+
     private static final String INPUT_RESOURCE2_NAME = "wiki_grid_computing";
-    private static final String INPUT_RESOURCE2_URL = "http://en.wikipedia.org/wiki/Grid_computing";
-
-    // root path for output data space location
-    private static final String OUTPUT_SPACE_PATH = System.getProperty("user.home") + "/tmp/output/";
-    private static final String OUTPUT_SPACE_URL = REMOTE_ACCESS_PROTO + USERNAME + "@" + HOSTNAME +
-        OUTPUT_SPACE_PATH;
-
-    // path scratch data spaces location (used also by remote access protocol)
-    private static final String SCRATCH_SPACE_PATH = System.getProperty("java.io.tmpdir") + "/dataspaces";
-    private static final String SCRATCH_SPACE_URL = REMOTE_ACCESS_PROTO + USERNAME + "@#{hostname}" +
-        SCRATCH_SPACE_PATH;
-
-    // ### END OF XML-LIKE CONFIGURATION ###
 
     /**
      * @param args
@@ -130,23 +112,6 @@ public class HelloExample {
         new HelloExample().run(args[0]);
     }
 
-    // in target implementation that should be job of XML parser
-    private static SpaceInstanceInfo createDefaultOutputSpaceInfo(final long appId, final String localPath,
-            final String accessURL) throws ConfigurationException {
-        final InputOutputSpaceConfiguration localOutputConfiguration = InputOutputSpaceConfiguration
-                .createOutputSpaceConfiguration(accessURL, localPath, HOSTNAME,
-                        PADataSpaces.DEFAULT_IN_OUT_NAME);
-        return new SpaceInstanceInfo(appId, localOutputConfiguration);
-    }
-
-    // in target implementation that should be job of XML parser
-    private static SpaceInstanceInfo createInputSpaceInfo(final long appId, String name, String accessUrl)
-            throws ConfigurationException {
-        final InputOutputSpaceConfiguration configuration = InputOutputSpaceConfiguration
-                .createInputSpaceConfiguration(accessUrl, null, null, name);
-        return new SpaceInstanceInfo(appId, configuration);
-    }
-
     private NamingServiceDeployer namingServiceDeployer;
 
     private List<Node> nodesDeployed;
@@ -154,6 +119,8 @@ public class HelloExample {
     private List<DataSpacesInstaller> dataSpacesInstallers = new ArrayList<DataSpacesInstaller>();
 
     private GCMApplication gcmApplication;
+
+    private VariableContractImpl vContract;
 
     /**
      * Deploys application, configures Data Spaces together with NamingService, executes example,
@@ -166,10 +133,12 @@ public class HelloExample {
      * @throws URISyntaxException
      */
     public void run(String descriptorPath) throws ProActiveException, FileSystemException, URISyntaxException {
+        setupVariables();
+        
         try {
-            startGCM(descriptorPath);
             startNamingService();
-            startDataSpaces();
+            startGCM(descriptorPath);
+            // startDataSpaces();
             exampleUsage();
         } catch (Exception x) {
             logger.error("Error: ", x);
@@ -178,15 +147,21 @@ public class HelloExample {
         }
     }
 
+    private void setupVariables() {
+        vContract = new VariableContractImpl();
+        
+        vContract.setVariableFromProgram(VAR_OUTPUT_HOSTNAME, OUTPUT_HOSTNAME,
+                VariableContractType.ProgramVariable);
+    }
+
     private void stop() {
-        stopDataSpaces();
-        stopNamingService();
         stopGCM();
+        stopNamingService();
         logger.info("Application stopped");
     }
 
     private void startGCM(String descriptorPath) throws ProActiveException {
-        gcmApplication = PAGCMDeployment.loadApplicationDescriptor(new File(descriptorPath));
+        gcmApplication = PAGCMDeployment.loadApplicationDescriptor(new File(descriptorPath), vContract);
         gcmApplication.startDeployment();
 
         final GCMVirtualNode vnode = gcmApplication.getVirtualNode("Hello");
@@ -204,52 +179,12 @@ public class HelloExample {
         PALifeCycle.exitSuccess();
     }
 
-    // in target implementation that configuration should be loaded from XML and performed 
-    // by GCM deployment engine or scheduler
-    private void startDataSpaces() throws FileSystemException, ProActiveException, URISyntaxException {
-        logger.debug("Configuring Data Spaces on deployed nodes through DataSpacesInstaller AO");
-
-        // FIXME ugly hack to obtain hard coded application id
-        final long appId = Utils.getApplicationId(null);
-
-        // XML parser or GCM role...
-        final Set<SpaceInstanceInfo> applicationSpaces = new HashSet<SpaceInstanceInfo>();
-        applicationSpaces.add(createInputSpaceInfo(appId, INPUT_RESOURCE1_NAME, INPUT_RESOURCE1_URL));
-        applicationSpaces.add(createInputSpaceInfo(appId, INPUT_RESOURCE2_NAME, INPUT_RESOURCE2_URL));
-        applicationSpaces.add(createDefaultOutputSpaceInfo(appId, OUTPUT_SPACE_PATH, OUTPUT_SPACE_URL));
-        final BaseScratchSpaceConfiguration scratchSpaceConfiguration = new BaseScratchSpaceConfiguration(
-            SCRATCH_SPACE_URL, SCRATCH_SPACE_PATH);
-
-        final String namingServiceURL = namingServiceDeployer.getNamingServiceURL();
-        final NamingService namingServiceStub = NamingService.createNamingServiceStub(namingServiceURL);
-        namingServiceStub.registerApplication(appId, applicationSpaces);
-
-        final List<ObjectForSynchro> synchros = new ArrayList<ObjectForSynchro>();
-        for (Node node : nodesDeployed) {
-            final DataSpacesInstaller installer = (DataSpacesInstaller) PAActiveObject.newActive(
-                    DataSpacesInstaller.class.getName(), null, node);
-            dataSpacesInstallers.add(installer);
-
-            final ObjectForSynchro synchro = installer.startDataSpaces(scratchSpaceConfiguration,
-                    namingServiceURL);
-            synchros.add(synchro);
-        }
-        PAFuture.waitForAll(synchros);
-        logger.info("Data Spaces configured on deployed nodes");
-    }
-
-    private void stopDataSpaces() {
-        try {
-            for (DataSpacesInstaller installer : dataSpacesInstallers)
-                installer.stopDataSpaces();
-        } catch (NotConfiguredException e) {
-            ProActiveLogger.logEatedException(logger, e);
-        }
-    }
-
-    private void startNamingService() {
+     private void startNamingService() {
         namingServiceDeployer = new NamingServiceDeployer();
-        logger.info("Naming Service successfully started on: " + namingServiceDeployer.getNamingServiceURL());
+        final String nsURL = namingServiceDeployer.getNamingServiceURL();
+        
+        vContract.setVariableFromProgram(VAR_NAMING_SERVICE_URL, nsURL, VariableContractType.ProgramVariable);
+        logger.info("Naming Service successfully started on: " + nsURL);
     }
 
     private void stopNamingService() {
