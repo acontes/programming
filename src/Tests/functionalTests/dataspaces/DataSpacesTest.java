@@ -50,7 +50,7 @@ public class DataSpacesTest extends GCMFunctionalTestDataSpaces {
         node2 = getANode();
         ao1 = (TestActiveObject) PAActiveObject.newActive(TestActiveObject.class.getName(), null, node1);
         ao2 = (TestActiveObject) PAActiveObject.newActive(TestActiveObject.class.getName(), null, node2);
-        // no need to @After, as whole GCMApp will be killed
+        // no need for @After, as whole GCMApp will be killed
     }
 
     @Test
@@ -155,11 +155,7 @@ public class DataSpacesTest extends GCMFunctionalTestDataSpaces {
         public String readDefaultInputFile(String fileName) throws SpaceNotFoundException,
                 NotConfiguredException, IOException {
             final FileObject fo = PADataSpaces.resolveDefaultInput(fileName);
-            try {
-                return readAndCloseFile(fo);
-            } finally {
-                fo.close();
-            }
+            return readAndCloseFile(fo);
         }
 
         public String readInputFile(String inputName, String fileName) throws SpaceNotFoundException,
