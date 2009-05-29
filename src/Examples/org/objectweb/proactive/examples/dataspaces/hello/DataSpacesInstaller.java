@@ -20,6 +20,8 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredExceptio
 /**
  * Class that can be instantiated as an ActiveObject on a ProActive node to support configuration of
  * Data Spaces on that node.
+ * 
+ * @deprecated Data Spaces configuration is integrated into GCM Deployment.
  */
 @ActiveObject
 public class DataSpacesInstaller implements Serializable {
