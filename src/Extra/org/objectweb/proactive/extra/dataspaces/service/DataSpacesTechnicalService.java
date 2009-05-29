@@ -56,8 +56,6 @@ public class DataSpacesTechnicalService implements TechnicalService {
 
     private String namingServiceURL;
 
-    private NotificationListener notificationListener;
-
     // TODO What about polices determining whether to leave data in scratch or remove all directories during unexpected end of application. 
     private static void closeNodeConfigIgnoreException(final Node node) {
         try {
@@ -84,7 +82,7 @@ public class DataSpacesTechnicalService implements TechnicalService {
             DataSpacesNodes.configureNode(node, baseScratchConfiguration);
         } catch (AlreadyConfiguredException e) {
             ProActiveLogger.logImpossibleException(logger, e);
-            // FIXME: when node acquisition will be implemented - it may happen and we have to handle that
+            // FIXME: it may happen when node acquisition will be implemented - and we have to handle that
             // in slightly better way ;) (see comment in javadoc)
             return;
         } catch (ConfigurationException e) {
@@ -140,25 +138,22 @@ public class DataSpacesTechnicalService implements TechnicalService {
 
     private void registerNotificationListener(final Node node) {
         final String runtimeURL = node.getProActiveRuntime().getURL();
-        final String nodeName = node.getNodeInformation().getName();
-        final ObjectName mBeanObjectName = FactoryName.createNodeObjectName(runtimeURL, nodeName);
-        notificationListener = new NotificationListener() {
+        final ObjectName mBeanObjectName = FactoryName.createRuntimeObjectName(runtimeURL);
+        final NotificationListener notificationListener = new NotificationListener() {
 
             public void handleNotification(Notification notification, Object handback) {
-                if (!notification.getType().equals(NotificationType.nodeDestroyed))
-                    return;
+                final String type = notification.getType();
+                final Object userData = notification.getUserData();
 
-                unregisterNotificationListener(mBeanObjectName);
-                closeNodeConfigIgnoreException(node);
+                if (type.equals(NotificationType.nodeDestroyed) &&
+                    userData.equals(node.getNodeInformation().getURL())) {
+                    JMXNotificationManager.getInstance().unsubscribe(mBeanObjectName, this);
+                    closeNodeConfigIgnoreException(node);
+                }
             }
 
         };
         JMXNotificationManager.getInstance().subscribe(mBeanObjectName, notificationListener);
-    }
-
-    private void unregisterNotificationListener(final ObjectName mBeanObjectName) {
-        JMXNotificationManager.getInstance().unsubscribe(mBeanObjectName, notificationListener);
-        notificationListener = null;
     }
 
     private BaseScratchSpaceConfiguration readScratchConfiguration() {
