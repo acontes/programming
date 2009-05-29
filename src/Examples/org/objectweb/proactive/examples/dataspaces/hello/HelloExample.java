@@ -60,13 +60,22 @@ import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
  * <li>As GCM application stops. The NamingService can be stopped.</li>
  * </ol>
  * <p>
- * To fulfill variable contract between the GCM descriptors and the application, following variables
- * need to be set:
+ * Example is designed to work with provided GCMA descriptor that you can find in
+ * examples/dataspaces/hello/helloApplication.xml. You can provide your GCMD descriptor (by setting
+ * gcmd Java property to its path) or use example descriptors from the same directory.
+ * <p>
+ * To fulfill contract between the GCM descriptors and the application, following variables are set
+ * from application:
  * <ul>
- * <li><code>{@link #VAR_OUTPUT_HOSTNAME}</code> name of a host that contains the output space
+ * <li><code>{@link #VAR_OUTPUT_HOSTNAME}</code> name of a host that contains the output space is
+ * being set to local hostname
  * <li><code>{@link #VAR_NAMING_SERVICE_URL}</code> URL of the NamingService that is automatically
  * started before the GCM deployment
  * </ul>
+ * Application assumes that two named input spaces are available {@value #INPUT_RESOURCE1_NAME} and
+ * {@value #INPUT_RESOURCE2_NAME} and default output for storing results. GCMD should provide at
+ * least two nodes, each of it having scratch space defined. They are accessed from GCMA virtual
+ * node {@value #VIRTUAL_NODE_NAME}.
  */
 public class HelloExample {
 
@@ -75,17 +84,19 @@ public class HelloExample {
     /**
      * Name of a host for output data space.
      */
-    private static final String VAR_OUTPUT_HOSTNAME = "OUTPUT_HOSTNAME";
+    public static final String VAR_OUTPUT_HOSTNAME = "OUTPUT_HOSTNAME";
 
     /**
      * FIXME: We need to set NamingService address through variable contract from descriptor as we
      * don't start it automatically yet.
      */
-    private static final String VAR_NAMING_SERVICE_URL = "NAMING_SERVICE_URL";
+    public static final String VAR_NAMING_SERVICE_URL = "NAMING_SERVICE_URL";
 
-    private static final String INPUT_RESOURCE1_NAME = "wiki_proactive";
+    public static final String VIRTUAL_NODE_NAME = "Hello";
 
-    private static final String INPUT_RESOURCE2_NAME = "wiki_grid_computing";
+    public static final String INPUT_RESOURCE1_NAME = "wiki_proactive";
+
+    public static final String INPUT_RESOURCE2_NAME = "wiki_grid_computing";
 
     /**
      * @param args
@@ -156,7 +167,7 @@ public class HelloExample {
         gcmApplication = PAGCMDeployment.loadApplicationDescriptor(new File(descriptorPath), vContract);
         gcmApplication.startDeployment();
 
-        final GCMVirtualNode vnode = gcmApplication.getVirtualNode("Hello");
+        final GCMVirtualNode vnode = gcmApplication.getVirtualNode(VIRTUAL_NODE_NAME);
         vnode.waitReady();
 
         // grab nodes here
