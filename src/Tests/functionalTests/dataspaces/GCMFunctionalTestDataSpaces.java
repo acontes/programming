@@ -22,6 +22,15 @@ import functionalTests.FunctionalTest;
 import functionalTests.GCMFunctionalTest;
 
 
+/**
+ * Base of functional tests for Data Spaces. This class deploys Data Spaces with Naming Service,
+ * prepares input and output spaces: default input, default output, named input (name
+ * {@value #INPUT_NAME}) and named output (name {@value #OUTPUT_NAME}). Both output spaces are
+ * empty, while both input spaces contain file {@value #INPUT_FILE_NAME} with
+ * {@value #INPUT_FILE_CONTENT}. Scratch space is also defined for each of available Node.
+ * <p>
+ * Test class uses local paths to access data spaces.
+ */
 @Ignore
 public class GCMFunctionalTestDataSpaces extends GCMFunctionalTest {
 
@@ -123,7 +132,7 @@ public class GCMFunctionalTestDataSpaces extends GCMFunctionalTest {
             assertTrue(SkeletonSystemImpl.deleteDirectory(rootTmpDir));
     }
 
-    public Node getANode() {
+    protected Node getANode() {
         checkDeploymentState();
 
         GCMVirtualNode vn = gcmad.getVirtualNode(VN_NAME);
