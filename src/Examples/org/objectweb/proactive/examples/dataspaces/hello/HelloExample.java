@@ -2,9 +2,7 @@ package org.objectweb.proactive.examples.dataspaces.hello;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.URISyntaxException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +21,7 @@ import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.extra.dataspaces.NamingServiceDeployer;
+import org.objectweb.proactive.extra.dataspaces.Utils;
 import org.objectweb.proactive.extra.dataspaces.exceptions.DataSpacesException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredException;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
@@ -115,15 +114,6 @@ public class HelloExample {
     private VariableContractImpl vContract;
 
     /**
-     * here: the deployer host, fulfills the variable contract
-     */
-    private final String deployerHostname;
-    
-    public HelloExample() throws UnknownHostException {
-        deployerHostname = InetAddress.getLocalHost().getHostName();
-    }
-
-    /**
      * Starts NamingService, deploys application, executes example, and undeploys application and
      * stops NamingService.
      * 
@@ -149,7 +139,9 @@ public class HelloExample {
 
     private void setupVariables() {
         vContract = new VariableContractImpl();
-        vContract.setVariableFromProgram(VAR_OUTPUT_HOSTNAME, deployerHostname,
+        // this way of getting hostname is not the best solution, but it makes
+        // local execution of example possible without using protocols like SFTP
+        vContract.setVariableFromProgram(VAR_OUTPUT_HOSTNAME, Utils.getHostname(),
                 VariableContractType.ProgramVariable);
     }
 
