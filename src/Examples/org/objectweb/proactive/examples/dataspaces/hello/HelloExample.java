@@ -2,7 +2,9 @@ package org.objectweb.proactive.examples.dataspaces.hello;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.URISyntaxException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +23,6 @@ import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.extra.dataspaces.NamingServiceDeployer;
-import org.objectweb.proactive.extra.dataspaces.Utils;
 import org.objectweb.proactive.extra.dataspaces.exceptions.DataSpacesException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredException;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
@@ -36,9 +37,9 @@ import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
  * <p>
  * Scenario:
  * <ol>
- * <li>GCM application is deployed, Data Spaces Naming Service is started, Data Spaces are
- * configured on deployed nodes. HTTP input resources are registered as named input data spaces.
- * Output file is registered as a default output data space.</li>
+ * <li>NamingService is started, GCM application is deployed with Data Spaces configured on deployed
+ * nodes. According to GCMA Descriptor HTTP input resources are registered as named input data
+ * spaces. Output file is registered as a default output data space.</li>
  * <li>Application-processing is delegated in {@link #exampleUsage()}. Two ActiveObjects start their
  * local processing in {@link ExampleProcessing#computePartials(String)} in parallel:
  * <ul>
@@ -57,20 +58,15 @@ import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
  * <li>Store final results in a file within the default output data space</li>
  * </ul>
  * </li>
- * <li>Data Spaces are deconfigured, GCM application stops.</li>
+ * <li>As GCM application stops. The NamingService can be stopped.</li>
  * </ol>
  * <p>
- * Note: Data spaces are started manually on processing nodes through AO instances of
- * {@link DataSpacesInstaller} and helper methods of this class, to emulate future integration with
- * deployment mechanisms like GCM.
- * <p>
- * Data spaces are configured as follows:
+ * To fulfill variable contract between the GCM descriptors and the application, following variables
+ * need to be set:
  * <ul>
- * <li>Input data spaces are defined as HTTP resources
- * <li>Scratch data spaces are located in <code>{@link #SCRATCH_SPACE_PATH}</code> directory with
- * {@link #SCRATCH_SPACE_URL} remote access defined</li>
- * <li>Output data spaces are located in <code>{@link #OUTPUT_SPACE_PATH}</code> directory on the
- * deployer's host. Remote access is defined specifically to {@link #OUTPUT_SPACE_URL}</li>
+ * <li><code>{@link #VAR_OUTPUT_HOSTNAME}</code> name of a host that contains the output space
+ * <li><code>{@link #VAR_NAMING_SERVICE_URL}</code> URL of the NamingService that is automatically
+ * started before the GCM deployment
  * </ul>
  */
 public class HelloExample {
@@ -78,10 +74,8 @@ public class HelloExample {
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
     /**
-     * Name of a host for output data space, here: the deployer host; fulfills the variable contract
+     * Name of a host for output data space.
      */
-    private static final String OUTPUT_HOSTNAME = Utils.getHostname();
-
     private static final String VAR_OUTPUT_HOSTNAME = "OUTPUT_HOSTNAME";
 
     /**
@@ -116,15 +110,22 @@ public class HelloExample {
 
     private List<Node> nodesDeployed;
 
-    private List<DataSpacesInstaller> dataSpacesInstallers = new ArrayList<DataSpacesInstaller>();
-
     private GCMApplication gcmApplication;
 
     private VariableContractImpl vContract;
 
     /**
-     * Deploys application, configures Data Spaces together with NamingService, executes example,
-     * and undeploys application and deconfigures everything.
+     * here: the deployer host, fulfills the variable contract
+     */
+    private String OUTPUT_HOSTNAME;
+    
+    public HelloExample() throws UnknownHostException {
+        InetAddress.getLocalHost().getHostName();
+    }
+
+    /**
+     * Starts NamingService, deploys application, executes example, and undeploys application and
+     * stops NamingService.
      * 
      * @param descriptorPath
      *            path to deployment descriptor
