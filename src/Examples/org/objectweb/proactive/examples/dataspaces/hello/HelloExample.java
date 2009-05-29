@@ -139,7 +139,6 @@ public class HelloExample {
         try {
             startNamingService();
             startGCM(descriptorPath);
-            // startDataSpaces();
             exampleUsage();
         } catch (Exception x) {
             logger.error("Error: ", x);
@@ -158,6 +157,7 @@ public class HelloExample {
         stopGCM();
         stopNamingService();
         logger.info("Application stopped");
+        PALifeCycle.exitSuccess();
     }
 
     private void startGCM(String descriptorPath) throws ProActiveException {
@@ -176,7 +176,6 @@ public class HelloExample {
         if (gcmApplication == null)
             return;
         gcmApplication.kill();
-        PALifeCycle.exitSuccess();
     }
 
     private void startNamingService() {
