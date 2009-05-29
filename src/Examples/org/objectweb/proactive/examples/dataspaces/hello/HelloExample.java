@@ -117,10 +117,10 @@ public class HelloExample {
     /**
      * here: the deployer host, fulfills the variable contract
      */
-    private String OUTPUT_HOSTNAME;
+    private final String deployerHostname;
     
     public HelloExample() throws UnknownHostException {
-        InetAddress.getLocalHost().getHostName();
+        deployerHostname = InetAddress.getLocalHost().getHostName();
     }
 
     /**
@@ -150,7 +150,7 @@ public class HelloExample {
 
     private void setupVariables() {
         vContract = new VariableContractImpl();
-        vContract.setVariableFromProgram(VAR_OUTPUT_HOSTNAME, OUTPUT_HOSTNAME,
+        vContract.setVariableFromProgram(VAR_OUTPUT_HOSTNAME, deployerHostname,
                 VariableContractType.ProgramVariable);
     }
 
