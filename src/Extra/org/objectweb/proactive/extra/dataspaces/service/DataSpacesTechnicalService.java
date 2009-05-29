@@ -162,8 +162,8 @@ public class DataSpacesTechnicalService implements TechnicalService {
     }
 
     private BaseScratchSpaceConfiguration readScratchConfiguration() {
-        final String scratchURL = PAProperties.PA_DATASPACES_SCRATCH_PATH.getValue();
-        final String scratchPath = PAProperties.PA_DATASPACES_SCRATCH_URL.getValue();
+        final String scratchPath = PAProperties.PA_DATASPACES_SCRATCH_PATH.getValue();
+        final String scratchURL = PAProperties.PA_DATASPACES_SCRATCH_URL.getValue();
 
         if (scratchURL == null && scratchPath == null) {
             logger.warn("No scratch space configuration specified for this node.");
