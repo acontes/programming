@@ -81,7 +81,11 @@ public class HelloExample {
      * Name of a host for output data space, here: the deployer host; fulfills the variable contract
      */
     private static final String OUTPUT_HOSTNAME = Utils.getHostname();
+<<<<<<< HEAD:src/Examples/org/objectweb/proactive/examples/dataspaces/hello/HelloExample.java
     
+=======
+
+>>>>>>> Example simplified as GCM integration is done:src/Examples/org/objectweb/proactive/examples/dataspaces/hello/HelloExample.java
     private static final String VAR_OUTPUT_HOSTNAME = "OUTPUT_HOSTNAME";
 
     /**
@@ -149,7 +153,11 @@ public class HelloExample {
 
     private void setupVariables() {
         vContract = new VariableContractImpl();
+<<<<<<< HEAD:src/Examples/org/objectweb/proactive/examples/dataspaces/hello/HelloExample.java
         
+=======
+
+>>>>>>> Example simplified as GCM integration is done:src/Examples/org/objectweb/proactive/examples/dataspaces/hello/HelloExample.java
         vContract.setVariableFromProgram(VAR_OUTPUT_HOSTNAME, OUTPUT_HOSTNAME,
                 VariableContractType.ProgramVariable);
     }
@@ -182,7 +190,11 @@ public class HelloExample {
      private void startNamingService() {
         namingServiceDeployer = new NamingServiceDeployer();
         final String nsURL = namingServiceDeployer.getNamingServiceURL();
+<<<<<<< HEAD:src/Examples/org/objectweb/proactive/examples/dataspaces/hello/HelloExample.java
         
+=======
+
+>>>>>>> Example simplified as GCM integration is done:src/Examples/org/objectweb/proactive/examples/dataspaces/hello/HelloExample.java
         vContract.setVariableFromProgram(VAR_NAMING_SERVICE_URL, nsURL, VariableContractType.ProgramVariable);
         logger.info("Naming Service successfully started on: " + nsURL);
     }
