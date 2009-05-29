@@ -16,10 +16,6 @@ public class NamingServiceStarter {
 
     private static NamingServiceDeployer namingServiceDeployer;
 
-    public NamingServiceStarter(String[] args) {
-
-    }
-
     /**
      * @param args
      */
@@ -37,7 +33,12 @@ public class NamingServiceStarter {
         }
 
         setupHook();
-        startNamingService();
+        final String serviceName;
+        if (args.length >= 1)
+            serviceName = args[0];
+        else
+            serviceName = null;
+        startNamingService(serviceName);
     }
 
     private static void parseArgs(String[] args) {
@@ -54,8 +55,11 @@ public class NamingServiceStarter {
         });
     }
 
-    private static void startNamingService() {
-        namingServiceDeployer = new NamingServiceDeployer();
+    private static void startNamingService(String name) {
+        if (name != null)
+            namingServiceDeployer = new NamingServiceDeployer(name);
+        else
+            namingServiceDeployer = new NamingServiceDeployer();
         System.out.println("Naming Service successfully started on: " +
             namingServiceDeployer.getNamingServiceURL());
     }
