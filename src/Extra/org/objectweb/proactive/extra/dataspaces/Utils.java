@@ -5,6 +5,9 @@ package org.objectweb.proactive.extra.dataspaces;
 
 import java.util.regex.Pattern;
 
+import org.apache.commons.vfs.Capability;
+import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.FileSystem;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -13,6 +16,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.util.ProActiveInet;
+import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 
 
 /**
@@ -173,6 +177,46 @@ public class Utils {
             sb.append(subDir);
         }
         return sb.toString();
+    }
+
+    /**
+     * Assert that given file system has required capabilities. Throw an ConfigurationException if
+     * it does not.
+     *
+     * @param expected
+     *            array containing expected capabilities of the specified file system.
+     * @param fs
+     *            specified file system
+     * @throws ConfigurationException
+     *             when the file system does not have one of expected capabilities
+     */
+    public static void assertCapabilitiesMatch(Capability[] expected, FileSystem fs)
+            throws ConfigurationException {
+
+        for (int i = 0; i < expected.length; i++) {
+            final Capability capability = expected[i];
+
+            if (!fs.hasCapability(capability))
+                throw new ConfigurationException(
+                    "File system used to access data does not support capability: " + capability);
+        }
+    }
+
+    /**
+     * Assert that given FileObject's file system has required capabilities. Throw an
+     * ConfigurationException if it does not.
+     *
+     * @param expected
+     *            array containing expected capabilities of the specified FileObject's file system.
+     * @param fo
+     *            specified FileObject
+     * @throws ConfigurationException
+     *             when the FileObject's file system does not have one of expected capabilities
+     */
+    public static void assertCapabilitiesMatch(Capability[] expected, FileObject fo)
+            throws ConfigurationException {
+
+        assertCapabilitiesMatch(expected, fo.getFileSystem());
     }
 
     private static boolean isWindowsPath(String location) {
