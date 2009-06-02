@@ -263,6 +263,13 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
         return this.ROvirtualNodes;
     }
 
+    /**
+     * Kills every registered PART &
+     * every launched virtual machines. It also asks every registered hypervisors
+     * to destroy cloned virtual machines to let environment as clean as it was
+     * when we launched the deployment
+     * ( see {@link AbstractVMM#stop()} ).
+     */
     public void kill() {
         isKilled = true;
         for (ProActiveRuntime part : deployedRuntimes) {

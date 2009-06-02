@@ -1,4 +1,4 @@
-package org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.vm;
+package org.objectweb.proactive.examples.vm;
 
 import java.io.Serializable;
 import java.util.Random;

@@ -24,8 +24,16 @@
 			</xs:simpleType>
 			</xs:attribute>
 		<xs:attribute name="count" type="xs:short"/>
+		<xs:attribute name="os" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="unix"/>
+					<xs:enumeration value="windows"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
 	</xs:complexType>
-	
+
 	<xs:complexType name="vmElementType">
 		<xs:complexContent>
 			<xs:extension base="abstractVMElementType">

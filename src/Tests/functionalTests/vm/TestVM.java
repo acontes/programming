@@ -8,8 +8,6 @@ import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.vm.AOCompute;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.vm.AORandom;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 

@@ -40,6 +40,7 @@ import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLoggers;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationInternal;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.CommandBuilderProActive;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.bridge.Bridge;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.Group;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
@@ -107,11 +108,19 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
         }
     }
 
+    /**
+     * Starts all registered virtual machines registered within a proprietary hypervisor tag
+     * from an associated GCMD file
+     * @param commandBuilder the commandBuilder that will be used to build the remote proactive runtime command
+     * @param gcma the gcma object tied to this application
+     */
     private void startVMs(CommandBuilder commandBuilder, GCMApplicationInternal gcma) {
         try {
             List<AbstractVMM> vmms = resources.getVMM();
             for (AbstractVMM vmm : vmms) {
-                vmm.start(gcma);
+            	//since deployment with virtualization is meaningless outside of a ProActive application
+            	//it is compulsory to downcast the commandBuilder to be able to bootstrap remote PART
+                vmm.start(commandBuilder instanceof CommandBuilderProActive?(CommandBuilderProActive)commandBuilder:null,gcma);
             }
         } catch (Exception e) {
             GCMDeploymentLoggers.GCMD_LOGGER.error("Unable to start virtual machines.", e);

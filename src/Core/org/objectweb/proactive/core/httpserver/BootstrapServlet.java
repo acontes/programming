@@ -14,16 +14,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.mortbay.jetty.servlet.ServletHolder;
 import org.objectweb.proactive.core.Constants;
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
-import org.objectweb.proactive.core.runtime.RuntimeFactory;
-import org.objectweb.proactive.core.runtime.StartPARuntime;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationInternal;
 
 
 public class BootstrapServlet extends HttpServlet {
@@ -37,6 +32,7 @@ public class BootstrapServlet extends HttpServlet {
     final static public String ROUTER_PORT = "routerPort";
     final static public String COMMUNICATION_PROTOCOL = "communicationProtocol";
     final static public String SERVER_CODEBASE = "serverCodebase";
+    final static public String PA_RT_COMMAND = "runtimeCommand";
     private Map<String, HashMap<String, String>> applis = new HashMap<String, HashMap<String, String>>();
 
     final static private Logger logger = ProActiveLogger.getLogger(Loggers.VIRTUALIZATION_BOOTSTRAP);
@@ -65,6 +61,7 @@ public class BootstrapServlet extends HttpServlet {
                 logger.warn("Serving request from " + pathInfo);
             }
             resp.setContentType("text/plain");
+            resp.setCharacterEncoding("UTF-8");
             String vmid = req.getParameter(VM_ID);
             HashMap<String, String> values = applis.get(vmid.trim());
             if (values != null) {
@@ -96,42 +93,22 @@ public class BootstrapServlet extends HttpServlet {
         return uri.toString();
     }
 
-    public boolean registerAppli(String id, GCMApplicationInternal gcma, HashMap<String, String> values) {
+    /**
+     * This method is used to register a new remote Virtual Machine runtime dedicated
+     * web page. The virtual machine will be able to connect to the given url to
+     * gather required pieces information to successfully bootstrap
+     * child ProActive Runtime.
+     * @param id A string used to register the virtual machine web page. You'll have to
+     * use it later to retrieve the associated URL.
+     * @param values A hashmap containing every information to display on the web page.
+     * @return the address where you'll be able to display required information.
+     */
+    public String registerAppli(String id, HashMap<String, String> values) {
         synchronized (get()) {
-            logger.info("BootstrapServlet is registering an App with id: " + id);
-            String deploymentIdKey = new Long(gcma.getDeploymentId()).toString();
-            String tmp = null;
-            try {
-                tmp = RuntimeFactory.getDefaultRuntime().getURL();
-            } catch (ProActiveException e) {
-                logger.error("Cannot determine the URL of this runtime. Childs will not be able to register",
-                        e);
-                logger.error("Aborting virtual machine lauching.");
-                return false;
-            }
-            String deploymentId = "-" + StartPARuntime.Params.deploymentId.shortOpt() + " " + deploymentIdKey;
-            String parentURL = "-" + StartPARuntime.Params.parent.shortOpt() + " " + tmp;
-            String communicationProtocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
-            if (communicationProtocol.equals("pamr")) {
-                String routerAddress = PAProperties.PA_NET_ROUTER_ADDRESS.getValue();
-                String routerPort = PAProperties.PA_NET_ROUTER_PORT.getValue();
-                values.put(BootstrapServlet.ROUTER_ADDRESS, routerAddress);
-                values.put(BootstrapServlet.ROUTER_PORT, routerPort);
-            } else if (communicationProtocol.equals("rmi")) {
-                String serverCodebase = "-" + StartPARuntime.Params.codebase.shortOpt() + " " +
-                    ClassServerServlet.get().getCodeBase();
-                values.put(BootstrapServlet.SERVER_CODEBASE, serverCodebase);
-            }
-            values.put(BootstrapServlet.COMMUNICATION_PROTOCOL, communicationProtocol);
-            values.put(BootstrapServlet.DEPLOYMENT_ID, deploymentId);
-            values.put(BootstrapServlet.PARENT_URL, parentURL);
-            updateClassPath(gcma, values);
             applis.put(id, values);
-            return true;
+            String res = getBaseURI() + "?" + BootstrapServlet.VM_ID + "=" + id;
+			logger.info("Bootstrap servlet registered an app on:  " + res);
+            return res;
         }
-    }
-
-    private void updateClassPath(GCMApplicationInternal gcma, HashMap<String, String> values) {
-        //TODO fill me
     }
 }

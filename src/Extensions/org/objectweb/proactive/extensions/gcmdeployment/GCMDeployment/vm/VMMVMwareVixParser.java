@@ -1,14 +1,11 @@
 package org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.vm;
 
 import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 
-import org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLoggers;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMParserHelper;
 import org.ow2.proactive.virtualizing.vmwarevix.VMwareVMM.Service;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 
 public class VMMVMwareVixParser extends AbstractVMMParser {

@@ -1,4 +1,4 @@
-package org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.vm;
+package functionalTests.vm;
 
 import java.io.Serializable;
 

@@ -58,6 +58,7 @@ public abstract class AbstractVMMParser implements VMMParser {
     static final String PA_AUTH_PWD = "pwd";
     static final String PA_HYPERVISOR_URI = "url";
     static final String PA_IMAGE_ID = "key";
+    static final String PA_IMAGE_OS = "os";
     static final String PA_IMAGE_COUNT = "count";
 
     /**
@@ -98,7 +99,8 @@ public abstract class AbstractVMMParser implements VMMParser {
             Node image = images.item(i);
             String key = GCMParserHelper.getAttributeValue(image, PA_IMAGE_ID);
             String count = GCMParserHelper.getAttributeValue(image, PA_IMAGE_COUNT);
-            vmm.addVMBean(key, count == null ? 1 : Integer.parseInt(count));
+            String os = GCMParserHelper.getAttributeValue(image, PA_IMAGE_OS);
+            vmm.addVMBean(key, count == null ? 1 : Integer.parseInt(count), os);
         }
         return vmm;
     }

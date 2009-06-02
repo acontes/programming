@@ -34,48 +34,68 @@ package org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.vm;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.httpserver.BootstrapServlet;
-import org.objectweb.proactive.core.httpserver.HTTPServer;
-import org.objectweb.proactive.core.runtime.StartPARuntime;
 import org.objectweb.proactive.core.util.ProActiveCounter;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLoggers;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationInternal;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.CommandBuilderProActive;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.hostinfo.HostInfoImpl;
 import org.ow2.proactive.virtualizing.core.error.VirtualServiceException;
 import org.ow2.proactive.virtualizing.virtualbox.VirtualboxVM;
 import org.ow2.proactive.virtualizing.virtualbox.VirtualboxVMM;
+import org.ow2.proactive.virtualizing.virtualbox.VirtualboxVM.DataKey;
 
-
+/**
+ * This class is an implementation of the {@link AbstractVMM} class for
+ * VirtualBox nonOse hypervisor. It is compulsory to run a non open source
+ * copy of VirtualBox with that implementation since we need vboxwebsrv
+ * to be started to deploy the virtual environment and vboxwebsrv is only
+ * shipped with the non open source version. Please, note that the current
+ * version of the implementation doesn't handles clones.
+ * @author jmguilla
+ *
+ */
 public class VMMVirtualbox extends AbstractVMM {
 
+	/** Every registered hypervisors */
     private ArrayList<VirtualboxVMM> vmms = new ArrayList<VirtualboxVMM>();
+    /** Every registered virtual machines */
     private ArrayList<VirtualboxVM> vms = new ArrayList<VirtualboxVM>();
 
     @Override
-    public void start(GCMApplicationInternal gcma) {
-        //contact hypervisors & setup environment
-        ArrayList<String> uris = super.getUris();
-        for (String uri : uris) {
-            try {
-                VirtualboxVMM vmm = new VirtualboxVMM(uri, getUser(), getPwd());
-                ArrayList<VMBean> vmsMap = super.getVms();
-                for (VMBean vm : vmsMap) {
-                    VirtualboxVM temp = vmm.getNewVM(vm.getId());
-                    if (!vm.isClone()) {
-                        this.vms.add(temp);
-                        virtualMachineToTopologyImplMapper.put(temp, vm.getNode());
-                    } else {
-                        GCMDeploymentLoggers.GCMD_LOGGER.error("Unsupported clone feature for virtualbox.");
-                    }
-                }
-            } catch (VirtualServiceException e) {
-                GCMDeploymentLoggers.GCMD_LOGGER.error("Unable to start virtual machine.", e);
-            }
-        }
-        for (VirtualboxVM vm : vms) {
-            startVM(vm, gcma);
-        }
-    }
+	public void start(CommandBuilderProActive comm, GCMApplicationInternal gcma) {
+		//contact hypervisors & setup environment
+		ArrayList<String> uris = super.getUris();
+		for (String uri : uris) {
+			VirtualboxVMM vmm;
+			try {
+				vmm = new VirtualboxVMM(uri, getUser(), getPwd());
+			} catch (VirtualServiceException e) {
+				GCMDeploymentLoggers.GCMD_LOGGER.error("Unable to connect to " + uri + "'s hypervisor.", e);
+				return;
+			}
+			ArrayList<VMBean> vmsMap = super.getVms();
+			for (VMBean vm : vmsMap) {
+				VirtualboxVM temp = null;
+				try {
+					temp = vmm.getNewVM(vm.getId());
+				} catch (VirtualServiceException e) {
+					GCMDeploymentLoggers.GCMD_LOGGER.error("Unable to get " + vm.getId() + " from Virtualbox hypervisor.", e);
+					continue;
+				}
+				if (vm.isClone()) {
+					GCMDeploymentLoggers.GCMD_LOGGER.error("Clone feature isn't supported for Virtualbox hypervisor.");
+					GCMDeploymentLoggers.GCMD_LOGGER.error("Trying to boot the template...");
+				}
+				try {
+					startVM(temp, gcma, comm, vm.getHostInfo());
+				} catch (Exception e) {
+					GCMDeploymentLoggers.GCMD_LOGGER.error("Unable to start " + vm.getName() + " from Virtualbox hypervisor.", e);
+				}
+				this.vms.add(temp);
+			}
+		}
+	}
 
     @Override
     public void stop() {
@@ -89,40 +109,31 @@ public class VMMVirtualbox extends AbstractVMM {
         }
     }
 
-    private void startVM(VirtualboxVM vm, GCMApplicationInternal gcma) {
-        //register appli within boostrapServlet singleton
-        BootstrapServlet bootstrapServlet = BootstrapServlet.get();
-        String deploymentIdKey = new Long(gcma.getDeploymentId()).toString();
-        long key = ProActiveCounter.getUniqID();
-        String vmKey = deploymentIdKey + ":" + key;
-        if (!bootstrapServlet.isRegistered(deploymentIdKey)) {
-            String topologyId = "-" + StartPARuntime.Params.topologyId.shortOpt() + " ";
-            topologyId += virtualMachineToTopologyImplMapper.get(vm).getId();
-            HashMap<String, String> values = new HashMap<String, String>();
-            values.put(BootstrapServlet.TOPOLOGY_ID, topologyId);
-            if (!bootstrapServlet.registerAppli(vmKey, gcma, values)) {
-                GCMDeploymentLoggers.GCMD_LOGGER
-                        .error("BootstrapServlet unable to register every needed properties to launch virtual machine " +
-                            vm.getName());
-                GCMDeploymentLoggers.GCMD_LOGGER.error("Aborting");
-            }
-
-        }
-
-        try {
-            vm.powerOn();
-            try {
-                String bootstrapAddress = bootstrapServlet.getBaseURI() + "?" + BootstrapServlet.VM_ID + "=" +
-                    vmKey;
-                GCMDeploymentLoggers.GCMD_LOGGER.info("Bootstrap servlet registered an app on:  " +
-                    bootstrapAddress);
-                vm.pushData(VirtualboxVM.DataKey.proacBootstrapURL, bootstrapAddress);
-            } catch (VirtualServiceException e) {
-                GCMDeploymentLoggers.GCMD_LOGGER.error(
-                        "Cannot pass the bootstrap URL to the virtual machine.", e);
-            }
-        } catch (VirtualServiceException e1) {
-            GCMDeploymentLoggers.GCMD_LOGGER.error("Cannot power on the virtual machine.", e1);
-        }
-    }
+    /**
+     * This method is in charge of booting the virtual machine and registering a web page
+     * ( see {@link BootstrapServlet} ) to allow remote PART to bootstrap.
+     * @param vm the virtual machine to boot
+     * @param gcma the associated GCMA object
+     * @param comm the CommandBuilderProActive used to build the command of the remote PART
+     * @param hostInfo the hostinfo used to build the command
+     * @throws VirtualServiceException if a problem occurs
+     */
+	private void startVM(VirtualboxVM vm, GCMApplicationInternal gcma, CommandBuilderProActive comm,
+			HostInfoImpl hostInfo) throws VirtualServiceException {
+		//register appli within boostrapServlet singleton
+		BootstrapServlet bootstrapServlet = BootstrapServlet.get();
+		String deploymentIdKey = new Long(gcma.getDeploymentId()).toString();
+		long key = ProActiveCounter.getUniqID();
+		String vmKey = deploymentIdKey + ":" + key;
+		HashMap<String, String> values = new HashMap<String, String>();
+		values.put(BootstrapServlet.PA_RT_COMMAND, comm.buildCommand(hostInfo, gcma));
+		String bootstrapAddress = bootstrapServlet.registerAppli(vmKey, values);
+		vm.powerOn();
+		try {
+			vm.pushData(DataKey.proacBootstrapURL, bootstrapAddress);
+		} catch (VirtualServiceException e) {
+			GCMDeploymentLoggers.GCMD_LOGGER.error(
+					"Cannot pass the bootstrap URL to the virtual machine.", e);
+		}
+	}
 }
