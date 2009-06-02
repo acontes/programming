@@ -10,12 +10,15 @@ import org.objectweb.proactive.Body;
 /**
  * Supports scratch data space. Implementations of this interface are thread-safe.
  */
+// TODO improve/complete docs
 public interface ApplicationScratchSpace {
 
     /**
      * Returns DataSpacesURI for a specified body of an ActiveObject.
      * 
      * First call of this method removes all already existing files in a scratch data space.
+     * <p>
+     * FIXME: is it really true (here) ??
      * 
      * @param body
      * @return
