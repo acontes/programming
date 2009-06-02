@@ -16,9 +16,9 @@ public class MOCKNode implements Node {
     final private MOCKNodeInformation info;
     final private MOCKProActiveRuntime runtime;
 
-    public MOCKNode(String runtimeId, String nodeId) {
+    public MOCKNode(String runtimeId, String nodeId, long deploymentId) {
         info = new MOCKNodeInformation(nodeId);
-        runtime = new MOCKProActiveRuntime(runtimeId);
+        runtime = new MOCKProActiveRuntime(runtimeId, deploymentId);
     }
 
     public Object[] getActiveObjects() throws NodeException, ActiveObjectCreationException {
@@ -48,8 +48,7 @@ public class MOCKNode implements Node {
     }
 
     public VMInformation getVMInformation() {
-
-        return null;
+        return runtime.getVMInformation();
     }
 
     public void killAllActiveObjects() throws NodeException, IOException {

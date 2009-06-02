@@ -112,9 +112,8 @@ public class Utils {
      * @return
      */
     public static long getApplicationId(Node node) {
-
-        // FIXME not implemented in ProActive... (depends on PROACTIVE-661 story)
-        return 0;
+        // FIXME depends on PROACTIVE-661 story; as a temporary solution we check it that way:
+        return node.getVMInformation().getDeploymentId();
     }
 
     /**
@@ -182,7 +181,7 @@ public class Utils {
     /**
      * Assert that given file system has required capabilities. Throw an ConfigurationException if
      * it does not.
-     *
+     * 
      * @param expected
      *            array containing expected capabilities of the specified file system.
      * @param fs
@@ -207,6 +206,7 @@ public class Utils {
      * ConfigurationException if it does not.
      * <p>
      * FIXME: this doesn't work as wish VFS-262 (or related TODO in VFS) won't be resolved..
+     * 
      * @param expected
      *            array containing expected capabilities of the specified FileObject's file system.
      * @param fo

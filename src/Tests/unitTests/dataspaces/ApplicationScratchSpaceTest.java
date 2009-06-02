@@ -43,7 +43,7 @@ public class ApplicationScratchSpaceTest {
     private static final String NODE_ID = "node_id";
     private static final String RUNTIME_ID = "rt_id";
     private static final String ACCESS_URL = "/";
-    private static final long APP_ID_LONG = Utils.getApplicationId(null);
+    private static final long APP_ID_LONG = 0;
     private static final String APP_ID = new Long(APP_ID_LONG).toString();
 
     private File testDir;
@@ -78,7 +78,7 @@ public class ApplicationScratchSpaceTest {
         testDirPath = testDir.getCanonicalPath();
         scratchDataSpacePath = Utils.appendSubDirs(testDirPath, RUNTIME_ID, NODE_ID, APP_ID);
 
-        node = new MOCKNode(RUNTIME_ID, NODE_ID);
+        node = new MOCKNode(RUNTIME_ID, NODE_ID, APP_ID_LONG);
         body = new MOCKBody();
         localAccessConfig = new BaseScratchSpaceConfiguration(ACCESS_URL, testDirPath);
         nodeScratchSpace = new NodeScratchSpace(node, localAccessConfig);

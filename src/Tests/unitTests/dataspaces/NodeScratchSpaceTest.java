@@ -41,7 +41,7 @@ public class NodeScratchSpaceTest {
     private static final String RUNTIME_ID = "rt_id";
     private static final String SCRATCH_URL = "/";
 
-    private static final String APP_ID = new Long(Utils.getApplicationId(null)).toString();
+    private static final long APP_ID = 0;
     private static final String TEST_FILE_CONTENT = "qwerty";
 
     private static DefaultFileSystemManager fileSystemManager;
@@ -73,7 +73,7 @@ public class NodeScratchSpaceTest {
         testDirPath = testDir.getCanonicalPath();
         localAccessConfig = new BaseScratchSpaceConfiguration(SCRATCH_URL, testDirPath);
 
-        node = new MOCKNode(RUNTIME_ID, NODE_ID);
+        node = new MOCKNode(RUNTIME_ID, NODE_ID, APP_ID);
         nodeScratchSpace = new NodeScratchSpace(node, localAccessConfig);
         configured = false;
         configured2 = false;
@@ -287,7 +287,7 @@ public class NodeScratchSpaceTest {
     public void testClose() throws ConfigurationException, FileSystemException, IllegalStateException {
         final String path1 = Utils.appendSubDirs(testDirPath, RUNTIME_ID, NODE_ID);
         final String path2 = Utils.appendSubDirs(testDirPath, RUNTIME_ID, NODE_ID_2);
-        final Node node2 = new MOCKNode(RUNTIME_ID, NODE_ID_2);
+        final Node node2 = new MOCKNode(RUNTIME_ID, NODE_ID_2, APP_ID);
         nodeScratchSpace2 = new NodeScratchSpace(node2, localAccessConfig);
 
         nodeScratchSpace.init();
@@ -310,7 +310,8 @@ public class NodeScratchSpaceTest {
     }
 
     private void checkInitForApplication() throws FileSystemException, ConfigurationException {
-        final String dataSpacePath = Utils.appendSubDirs(testDirPath, RUNTIME_ID, NODE_ID, APP_ID);
+        final String dataSpacePath = Utils.appendSubDirs(testDirPath, RUNTIME_ID, NODE_ID, Long
+                .toString(APP_ID));
         final ApplicationScratchSpace app = nodeScratchSpace.initForApplication();
         assertNotNull(app);
         assertIsExistingEmptyDirectory(dataSpacePath);

@@ -38,8 +38,7 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredExceptio
  * {@link PAProperties#PA_DATASPACES_SCRATCH_URL} and
  * {@link PAProperties#PA_DATASPACES_SCRATCH_PATH})</li>
  * <li>Application level configuration is read from technical service properties (
- * {@link #PROPERTY_NAMING_SERVICE_URL}) and Node properties (application id; FIXME: when
- * implemented).</li>
+ * {@link #PROPERTY_NAMING_SERVICE_URL}) and Node properties (application id).</li>
  * </ul>
  * <p>
  * This implementation sets up Data Spaces in {@link #apply(Node)} and cleans up after Data Spaces
@@ -93,8 +92,7 @@ public class DataSpacesTechnicalService implements TechnicalService {
             return;
         }
 
-        // FIXME this code depends on PROACTIVE-661 story with application id, as configureApplication assumes
-        // that application id is already set up accordingly
+        // we assume that node's application id is already set up accordingly in this moment
         try {
             DataSpacesNodes.configureApplication(node, namingServiceURL);
         } catch (NotConfiguredException e) {

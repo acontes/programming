@@ -43,8 +43,8 @@ public class MOCKProActiveRuntime implements ProActiveRuntime {
 
     final private MOCKVMInformation info;
 
-    public MOCKProActiveRuntime(String runtimeId) {
-        info = new MOCKVMInformation(runtimeId);
+    public MOCKProActiveRuntime(String runtimeId, long deploymentId) {
+        info = new MOCKVMInformation(runtimeId, deploymentId);
     }
 
     public void addAcquaintance(String proActiveRuntimeName) throws ProActiveException {

@@ -584,8 +584,8 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
             return;
         }
 
-        // FIXME: app id
-        final long appId = 0;
+        // FIXME: app id - temporary solution?
+        final long appId = deploymentId;
         GCMA_LOGGER.warn("Application id is not yet implemented in proper way, assuming id=0");
 
         Set<SpaceInstanceInfo> spacesInstances = null;
@@ -612,8 +612,8 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
 
     private void stopDataSpaces() {
         if (namingService != null) {
-            // FIXME: app id
-            final long appId = 0;
+            // FIXME: app id - temporary solution?
+            final long appId = deploymentId;
             try {
                 namingService.unregisterApplication(appId);
             } catch (WrongApplicationIdException e) {
