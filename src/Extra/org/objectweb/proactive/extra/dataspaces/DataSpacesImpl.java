@@ -183,7 +183,6 @@ public class DataSpacesImpl {
             final FileObject fo = decorateFileObject(spacesMountManager.resolveFile(uri));
             if (logger.isTraceEnabled())
                 logger.trace(String.format("Resolved request for %s with name %s (%s)", type, name, uri));
-            checkCapabilitiesOrWound(fo, type);
             return fo;
         } catch (SpaceNotFoundException x) {
             logger.debug("Space not found for input/output space with URI: " + uri, x);
@@ -238,7 +237,6 @@ public class DataSpacesImpl {
                             "Resolved blocking request for %s with name %s (%s)", type, name, uri);
                     logger.trace(message);
                 }
-                checkCapabilitiesOrWound(fo, type);
                 return fo;
             } catch (SpaceNotFoundException e) {
                 logger.debug("Space not found for blocking try for input/output space with URI: " + uri, e);
@@ -390,9 +388,7 @@ public class DataSpacesImpl {
             if (!spaceURI.isSuitableForHavingPath())
                 throw new MalformedURIException("Specified URI represents internal high-level directories");
 
-            final FileObject fo = decorateFileObject(spacesMountManager.resolveFile(spaceURI));
-            final SpaceType type = spaceURI.getSpaceType(); // as isComplete cannot be null
-
+            FileObject fo = decorateFileObject(spacesMountManager.resolveFile(spaceURI));
             if (logger.isTraceEnabled())
                 logger.trace("Resolved file: " + uri);
 

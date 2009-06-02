@@ -294,6 +294,10 @@ public class NodeScratchSpace {
     }
 
     private void checkCapabilities(FileSystem fs) throws ConfigurationException {
+        // let's have at least those capabilities that scratch space does
+        // final Capability[] expected = PADataSpaces.getCapabilitiesForSpaceType(SpaceType.SCRATCH);
+
+        // but you never know what is there.. therefore:
         final Capability[] expected = new Capability[] { Capability.CREATE, Capability.DELETE,
                 Capability.GET_TYPE, Capability.LIST_CHILDREN, Capability.READ_CONTENT,
                 Capability.WRITE_CONTENT };
