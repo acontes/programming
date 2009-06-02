@@ -1,6 +1,7 @@
 package unitTests.dataspaces;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 
@@ -97,5 +98,18 @@ public class InputOutputSpaceConfigurationTest {
             fail("exception expected");
         } catch (ConfigurationException x) {
         }
+    }
+
+    @Test
+    public void testEquals() throws ConfigurationException {
+        config = InputOutputSpaceConfiguration.createConfiguration(URL, null, "hostname", NAME, TYPE);
+        InputOutputSpaceConfiguration config2 = InputOutputSpaceConfiguration.createConfiguration(URL, null,
+                "hostname", NAME, TYPE);
+        InputOutputSpaceConfiguration config3 = InputOutputSpaceConfiguration.createConfiguration(URL, null,
+                "hostname", NAME + "x", TYPE);
+
+        assertEquals(config, config2);
+        assertFalse(config.equals(config3));
+        assertFalse(config3.equals(config));
     }
 }

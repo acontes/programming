@@ -1,6 +1,7 @@
 package unitTests.dataspaces;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
 import org.junit.Test;
@@ -58,5 +59,16 @@ public class ScratchSpaceConfigurationTest {
             fail("exception expected");
         } catch (ConfigurationException x) {
         }
+    }
+
+    @Test
+    public void testEquals() throws ConfigurationException {
+        config = new ScratchSpaceConfiguration(null, PATH, HOSTNAME);
+        ScratchSpaceConfiguration config2 = new ScratchSpaceConfiguration(null, PATH, HOSTNAME);
+        ScratchSpaceConfiguration config3 = new ScratchSpaceConfiguration(null, PATH, HOSTNAME + "x");
+
+        assertEquals(config, config2);
+        assertFalse(config.equals(config3));
+        assertFalse(config3.equals(config));
     }
 }

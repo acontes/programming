@@ -13,9 +13,11 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationExceptio
  * It is possible to have an instance of this class without remote access URL specified, but this
  * instance is said to be incomplete (see {@link #isComplete()}) - can be used only temporary during
  * configuration process until remote access URL is specified.
+ * <p>
+ * Every instances of this class should provide <code>equals()</code> and <code>hashCode()</code>
+ * methods.
  */
 public abstract class SpaceConfiguration {
-
     protected final String path;
 
     protected final SpaceType spaceType;
@@ -106,5 +108,52 @@ public abstract class SpaceConfiguration {
     public final boolean isComplete() {
         // remaining contract is guaranteed by the constructor
         return url != null;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + spaceType.hashCode();
+        result = prime * result + ((url == null) ? 0 : url.hashCode());
+        result = prime * result + ((hostname == null) ? 0 : hostname.hashCode());
+        result = prime * result + ((path == null) ? 0 : path.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof SpaceConfiguration))
+            return false;
+
+        SpaceConfiguration other = (SpaceConfiguration) obj;
+        if (!spaceType.equals(other.spaceType)) {
+            return false;
+        }
+
+        if (url == null) {
+            if (other.url != null) {
+                return false;
+            }
+        } else if (!url.equals(other.url)) {
+            return false;
+        }
+
+        if (hostname == null) {
+            if (other.hostname != null) {
+                return false;
+            }
+        } else if (!hostname.equals(other.hostname)) {
+            return false;
+        }
+
+        if (path == null) {
+            if (other.path != null) {
+                return false;
+            }
+        } else if (!path.equals(other.path)) {
+            return false;
+        }
+        return true;
     }
 }

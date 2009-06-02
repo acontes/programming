@@ -157,4 +157,21 @@ public class InputOutputSpaceConfiguration extends SpaceConfiguration {
 
         return sb.toString();
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof SpaceConfiguration))
+            return false;
+
+        if (!super.equals(obj)) {
+            return false;
+        }
+        final InputOutputSpaceConfiguration other = (InputOutputSpaceConfiguration) obj;
+        return name.equals(other.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode() * 31 + name.hashCode();
+    }
 }
