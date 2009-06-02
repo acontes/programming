@@ -3,9 +3,11 @@
  */
 package org.objectweb.proactive.extra.dataspaces;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.vfs.Capability;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
@@ -41,6 +43,24 @@ public class PADataSpaces {
      * Default input and output spaces name.
      */
     public static final String DEFAULT_IN_OUT_NAME = "default";
+
+    /**
+     * The file system's capabilities specification of each space, that must be fulfilled.
+     */
+    private static Map<SpaceType, Capability[]> capabilitesSpecification = new HashMap<SpaceType, Capability[]>();
+
+    static {
+        final Capability[] writable = new Capability[] { Capability.CREATE, Capability.DELETE,
+                Capability.GET_TYPE, Capability.LIST_CHILDREN, Capability.READ_CONTENT,
+                Capability.WRITE_CONTENT };
+
+        final Capability[] readOnly = new Capability[] { Capability.GET_TYPE, Capability.LIST_CHILDREN,
+                Capability.READ_CONTENT };
+
+        capabilitesSpecification.put(SpaceType.OUTPUT, writable);
+        capabilitesSpecification.put(SpaceType.SCRATCH, writable);
+        capabilitesSpecification.put(SpaceType.INPUT, readOnly);
+    }
 
     private PADataSpaces() {
     }
@@ -848,6 +868,29 @@ public class PADataSpaces {
     public static String addOutput(String name, String url, String path)
             throws SpaceAlreadyRegisteredException, NotConfiguredException, ConfigurationException {
         return getMyDataSpacesImpl().addInputOutput(name, url, path, SpaceType.OUTPUT);
+    }
+
+    /**
+     * Returns the file system's capabilities that are fulfilled by specified space type. Contracted
+     * by specification.
+     * <p>
+     * For {@link SpaceType#SCRATCH} space the returned capabilities refer only to an ActiveObject's
+     * site that owns that scratch, obtained previously by
+     * {@link PADataSpaces#resolveScratchForAO()} (or
+     * {@link PADataSpaces#resolveScratchForAO(String)}) method.
+     * <p>
+     * For {@link SpaceType#INPUT} and {@link SpaceType#OUTPUT} spaces the returned capabilities
+     * remains valid on all sites.
+     *
+     * @param type
+     *            space type that file system capabilities are to be returned for, cannot be
+     *            <code>null</code>
+     * @return array containing capabilities of a file system for the specified space type, cannot
+     *         be <code>null</code>
+     *
+     */
+    public static Capability[] getCapabilitiesForSpaceType(SpaceType type) {
+        return capabilitesSpecification.get(type);
     }
 
     private static DataSpacesImpl getMyDataSpacesImpl() throws NotConfiguredException {
