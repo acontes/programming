@@ -552,7 +552,6 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
         for (FakeNode fakeNode : fakeNodes) {
             try {
                 // create should not be synchronized since it's remote call
-                // FIXME: why null?
                 Node node = fakeNode.create(GCMVirtualNodeImpl.DEFAULT_VN, null);
                 synchronized (nodes) {
                     nodes.add(node);
