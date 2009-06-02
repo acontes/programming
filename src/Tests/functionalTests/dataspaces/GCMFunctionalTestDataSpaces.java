@@ -110,7 +110,16 @@ public class GCMFunctionalTestDataSpaces extends GCMFunctionalTest {
     }
 
     @After
-    public void tryStopNamingService() throws ProActiveException {
+    public void killGCMAAndNamingService() throws ProActiveException {
+        // COPIED AND MODIFIED FROM SUPERCLASS - to enforce appropriate order of actions   
+        logger.info(GCMFunctionalTest.class.getName() + " @After: killDeployment");
+        if (gcmad != null) {
+            gcmad.kill();
+            gcmad = null;
+        }
+        logger.info(GCMFunctionalTest.class.getName() + " @After: killDeployment");
+        // END OF COPIED AND MODIFIED PART
+
         if (namingServiceDeployer != null) {
             namingServiceDeployer.terminate();
             namingServiceDeployer = null;
