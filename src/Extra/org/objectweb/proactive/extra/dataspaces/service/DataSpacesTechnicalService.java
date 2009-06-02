@@ -147,7 +147,7 @@ public class DataSpacesTechnicalService implements TechnicalService {
 
                 if (type.equals(NotificationType.nodeDestroyed) &&
                     userData.equals(node.getNodeInformation().getURL())) {
-                    // FIXME: it seems that subscribe/unsubscribe is buggy and it does not work 
+                    // FIXME: it seems that subscribe/unsubscribe is buggy: depends on PROACTIVE-687 
                     JMXNotificationManager.getInstance().unsubscribe(mBeanObjectName, this);
                     closeNodeConfigIgnoreException(node);
                 }
