@@ -24,13 +24,16 @@ public class CANLookupResponseMessage extends LookupResponseMessage {
      * 
      * @param timestampCreationMessage
      *            the timestamp indicating the time creation of the message which has been sent.
+     * @param nbSteps
+     *            the number of steps that have been performed in order to reach the response.
      * @param peer
      *            the searched peer.
      * @param coordinates
      *            the searched coordinates.
      */
-    public CANLookupResponseMessage(long timestampCreationMessage, Peer peer, Coordinate[] coordinates) {
-        super(timestampCreationMessage, new Key<Coordinate[]>(coordinates), peer);
+    public CANLookupResponseMessage(long timestampCreationMessage, int nbSteps, Peer peer,
+            Coordinate[] coordinates) {
+        super(timestampCreationMessage, nbSteps, new Key<Coordinate[]>(coordinates), peer);
     }
 
     /**

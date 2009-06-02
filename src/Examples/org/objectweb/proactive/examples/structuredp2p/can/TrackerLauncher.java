@@ -16,7 +16,7 @@ public class TrackerLauncher {
             Tracker tracker = (Tracker) PAActiveObject.newActive(Tracker.class.getName(),
                     new Object[] { OverlayType.CAN });
 
-            // Binds the entry point to a specific URL on the RMI registry
+            // Binds the tracker to a specific URL on the RMI registry
             PAActiveObject.registerByName(tracker, "CANTracker");
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();

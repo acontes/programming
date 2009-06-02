@@ -19,12 +19,12 @@ public class ResponseMessage implements Serializable {
     /**
      * The timestamp on which the message for which was created we create this response.
      */
-    public long timestampMessageCreation;
+    private long timestampMessageCreation;
 
     /**
      * The round trip time.
      */
-    public int latency = 0;
+    private int latency = 0;
 
     /**
      * Constructor.

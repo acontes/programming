@@ -228,10 +228,10 @@ public class Zone implements Serializable {
             return new Zone[] { new Zone(this.getCoordinatesMin(), maxCoordLessZone),
                     new Zone(minCoordGreaterZone, this.getCoordinatesMax()) };
         } catch (IOException e) {
-            // TODO IOException caused by MakeDeepCopy
+            // IOException caused by MakeDeepCopy
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
-            // TODO ClassNotFoundException caused by MakeDeepCopy
+            // ClassNotFoundException caused by MakeDeepCopy
             e.printStackTrace();
         } catch (ZoneException e) {
         }

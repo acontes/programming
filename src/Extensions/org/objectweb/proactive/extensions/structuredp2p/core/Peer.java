@@ -90,6 +90,7 @@ public class Peer implements InitActive, RunActive, Serializable {
      * @return the response in agreement with the type of message sent.
      */
     public LookupResponseMessage sendMessage(LookupMessage msg) {
+        msg.incrementNbSteps();
         LookupResponseMessage response = this.structuredOverlay.sendMessage(msg);
         response.setDeliveryTime();
         return response;
@@ -104,6 +105,7 @@ public class Peer implements InitActive, RunActive, Serializable {
      * @return the response in agreement with the type of message sent.
      */
     public LookupResponseMessage sendMessageWithoutCallback(LookupMessage msg) {
+        msg.incrementNbSteps();
         return this.structuredOverlay.sendMessage(msg);
     }
 
@@ -128,6 +130,26 @@ public class Peer implements InitActive, RunActive, Serializable {
             return future;
         } catch (Exception e) {
             throw new Exception("Error while sending a message to a peer.");
+        }
+    }
+
+    /**
+     * Sends a {@link Message} to a known {@link Peer} without callback.
+     * 
+     * @param remotePeer
+     *            the peer to which we want to send the message.
+     * @param msg
+     *            the message to send.
+     * 
+     * @return the response in agreement with the type of message sent.
+     * @throws Exception
+     *             this exception appears when a message cannot be send to a peer.
+     */
+    public ResponseMessage sendMessageToWithoutCallback(Peer remotePeer, Message msg) throws Exception {
+        try {
+            return remotePeer.receiveMessage(msg);
+        } catch (Exception e) {
+            throw new Exception("Error while sending a message to a peer without callback.");
         }
     }
 

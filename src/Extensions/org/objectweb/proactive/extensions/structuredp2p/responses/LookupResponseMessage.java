@@ -28,20 +28,28 @@ public abstract class LookupResponseMessage extends ResponseMessage {
     private final Peer peer;
 
     /**
+     * The number of steps that have been performed in order to reach the response.
+     */
+    private int nbSteps = 0;
+
+    /**
      * Constructor.
      * 
      * @param timestampMessageCreation
      *            the timestamp indicating the time creation of the message which has been sent.
+     * @param nbSteps
+     *            the number of steps that have been performed in order to reach the response.
      * @param key
      *            the key used in order to found the peer in the network to which we want to send
      *            this message.
      * @param peer
      *            the peer which has sent the message.
      */
-    public LookupResponseMessage(long timestampMessageCreation, Key<?> key, Peer peer) {
+    public LookupResponseMessage(long timestampMessageCreation, int nbSteps, Key<?> key, Peer peer) {
         super(timestampMessageCreation);
         this.key = key;
         this.peer = peer;
+        this.nbSteps = nbSteps;
     }
 
     /**
@@ -61,5 +69,14 @@ public abstract class LookupResponseMessage extends ResponseMessage {
      */
     public Peer getPeer() {
         return this.peer;
+    }
+
+    /**
+     * Returns the number of steps that have been performed in order to reach the response.
+     * 
+     * @return the number of steps that have been performed in order to reach the response.
+     */
+    public int getNbSteps() {
+        return this.nbSteps;
     }
 }

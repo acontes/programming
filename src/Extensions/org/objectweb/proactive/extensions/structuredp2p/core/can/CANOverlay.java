@@ -137,7 +137,8 @@ public class CANOverlay extends StructuredOverlay {
                     splitZones = tmpZone.split(CANOverlay.getNextDimension(dimension), border);
                 } catch (NullPointerException e) {
                     // TODO: split a null zone
-                    System.err.println("Cannot split a null zone but continue with a new leave execution.");
+                    System.err.println("Cannot split a null zone but continue with a new leave execution." +
+                        tmpZone);
                     e.printStackTrace();
                     return this.leave();
                 }
@@ -324,8 +325,8 @@ public class CANOverlay extends StructuredOverlay {
         CANLookupMessage lookupMessage = (CANLookupMessage) msg;
 
         if (this.contains(lookupMessage.getCoordinates())) {
-            return new CANLookupResponseMessage(msg.getCreationTimestamp(), this.getRemotePeer(),
-                ((CANLookupMessage) msg).getCoordinates());
+            return new CANLookupResponseMessage(msg.getCreationTimestamp(), msg.getNbSteps(), this
+                    .getRemotePeer(), ((CANLookupMessage) msg).getCoordinates());
         } else {
             int pos;
 
@@ -353,6 +354,7 @@ public class CANOverlay extends StructuredOverlay {
 
                             for (Peer peer : nearest) {
                                 try {
+                                    msg.incrementNbSteps();
                                     return (CANLookupResponseMessage) PAFuture.getFutureValue(this
                                             .sendMessageTo(nearestPeer, msg));
                                 } catch (Exception ex) {

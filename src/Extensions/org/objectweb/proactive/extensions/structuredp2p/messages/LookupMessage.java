@@ -23,6 +23,11 @@ public abstract class LookupMessage extends Message {
     private final Key<?> key;
 
     /**
+     * The number of steps that have been performed in order to reach the response.
+     */
+    private int nbSteps = 0;
+
+    /**
      * Constructor.
      * 
      * @param key
@@ -48,4 +53,20 @@ public abstract class LookupMessage extends Message {
      * {@inheritDoc}
      */
     public abstract ResponseMessage handle(StructuredOverlay overlay);
+
+    /**
+     * Increments the number of steps by one.
+     */
+    public void incrementNbSteps() {
+        this.nbSteps++;
+    }
+
+    /**
+     * Returns the number of steps that have been performed in order to reach the response.
+     * 
+     * @return the number of steps that have been performed in order to reach the response.
+     */
+    public int getNbSteps() {
+        return this.nbSteps;
+    }
 }
