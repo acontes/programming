@@ -205,7 +205,8 @@ public class Utils {
     /**
      * Assert that given FileObject's file system has required capabilities. Throw an
      * ConfigurationException if it does not.
-     *
+     * <p>
+     * FIXME: this doesn't work as wish VFS-262 (or related TODO in VFS) won't be resolved..
      * @param expected
      *            array containing expected capabilities of the specified FileObject's file system.
      * @param fo
