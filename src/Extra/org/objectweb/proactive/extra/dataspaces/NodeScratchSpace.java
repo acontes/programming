@@ -79,7 +79,8 @@ public class NodeScratchSpace {
         public void close() throws FileSystemException {
             logger.debug("Closing application scratch space");
             try {
-                spaceFile.delete(Selectors.SELECT_ALL);
+                final int filesNumber = spaceFile.delete(Selectors.SELECT_ALL);
+                logger.debug("Deleted " + filesNumber + " files in scratch application directory");
             } finally {
                 // just a hint
                 spaceFile.close();
@@ -260,7 +261,17 @@ public class NodeScratchSpace {
             // as some protocols may not support this kind of atomic operation?)
             // refreshing file before deleting may minimize the risk of delete-when-non-empty behavior 
             fRuntime.refresh();
-            fRuntime.delete();
+            try {
+                final boolean deleted = fRuntime.delete();
+                if (deleted)
+                    logger.debug("Scratch directory for whole runtime was deleted (considered as empty)");
+                else
+                    logger
+                            .debug("Scratch directory for whole runtime was not deleted (not considered as empty)");
+            } catch (FileSystemException x) {
+                logger.debug(
+                        "Could not delete scratch directory for whole runtime - perhaps it was not empty", x);
+            }
 
             // it is probably not needed to close files if manager is closed, but with VFS you never know...
             fRuntime.close();
