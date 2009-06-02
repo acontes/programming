@@ -137,8 +137,9 @@ public class InputOutputSpaceConfiguration extends SpaceConfiguration {
         sb.append(getType());
         sb.append("; ");
 
-        sb.append("; name: ");
+        sb.append("name: ");
         sb.append(name);
+        sb.append("; ");
 
         if (path == null) {
             sb.append(" no local-specific access");
