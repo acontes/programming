@@ -13,6 +13,7 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException
  * <p>
  * Basing on file URI and Active Object id it limits write access for:
  * <ul>
+ * <li>URI without space being fully defined - for every AO</li>
  * <li>input data space - for every AO</li>
  * <li>AO's scratch space - for AO different that scratch's owner</li>
  * </ul>
@@ -68,20 +69,17 @@ public class DataSpacesWriteLimitingFileObject extends BaseWriteLimitingFileObje
             throw new RuntimeException("Could not parse self-generated URI", e);
         }
 
+        if (!uri.isSpacePartFullyDefined())
+            return true;
+
         switch (uri.getSpaceType()) {
             case INPUT:
                 return true;
             case OUTPUT:
                 return false;
             case SCRATCH:
-                if (uri.isComplete()) {
-                    final String path = uri.getPath();
-                    // TODO: checking for startsWith make us dependent on scratch structure
-                    // should not aoId be part of DataSpacesURI (that would be SIGNIFICANT design change) ?
-                    return path != null && !path.startsWith(aoId);
-                } else {
-                    return false;
-                }
+                final String uriAoId = uri.getActiveObjectId();
+                return uriAoId == null || !uriAoId.equals(aoId);
             default:
                 throw new IllegalStateException("Unexpected space type");
         }

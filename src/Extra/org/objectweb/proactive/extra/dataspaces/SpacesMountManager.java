@@ -122,19 +122,19 @@ public class SpacesMountManager {
      * Resolves query for concrete URI within Data Spaces virtual tree, resulting in file-level
      * access to this place.
      * <p>
-     * If query URI is complete (refers to concrete data space), then returned FileObject can be
-     * safely used to access data in that data spaces, i.e. it conforms to all Data Spaces
-     * guarantees regarding that access.
+     * If query URI is suitable for having path, then returned FileObject can be safely used to
+     * access data in that data spaces, i.e. it conforms to all Data Spaces guarantees regarding
+     * that access.
      * <p>
-     * If query URI is incomplete (for example, refers only to application id), then returned
-     * FileObject does not provide reliable access to virtual tree, just to the current state of
-     * mountings in that tree.
+     * If query URI is not suitable for having path (for example, refers only to application id),
+     * then returned FileObject does not provide reliable access to virtual tree, just to the
+     * current state of mountings in that tree. Such queries are not recommended.
      * <p>
      * This call may block for a while, if {@link SpacesDirectory} need to be queried for data space
      * and/or data space may need to be mounted.
      * 
      * @param queryUri
-     *            Data Spaces URI to get access to; URI may be complete or incomplete
+     *            Data Spaces URI to get access to
      * @return VFS FileObject that can be used to access this URI content; returned FileObject is
      *         not opened nor attached in any way; this FileObject instance will never be shared,
      *         i.e. individual instances are returned for subsequent queries (even the same queries)
@@ -149,17 +149,20 @@ public class SpacesMountManager {
         if (logger.isDebugEnabled())
             logger.debug("File access request: " + queryUri);
 
-        if (queryUri.isComplete()) {
-            // If it is a complete URI, it is about a space.
-            final DataSpacesURI spaceURI = queryUri.withPath(null);
+        if (queryUri.isSpacePartFullyDefined()) {
+            // it is about a concrete space, nothing abstract
+            final DataSpacesURI spaceURI = queryUri.getSpacePartOnly();
             ensureSpaceIsMounted(spaceURI, null);
+        }
+        if (!queryUri.isSuitableForHavingPath()) {
+            logger.warn("Accessing URI not usuitable for user (not suitable for having path): " + queryUri);
         }
         return resolveFileVFS(queryUri);
     }
 
     /**
-     * Resolve query for incomplete URI, resulting in file-level access to all data spaces that
-     * shares this common prefix.
+     * Resolve query for URI without space part being fully defined, resulting in file-level access
+     * to all data spaces that shares this common prefix.
      * <p>
      * For any URI query, returned set contains all spaces (URIs) that match defined components in
      * queried URI, allowing them to have any values for undefined components.
@@ -172,8 +175,8 @@ public class SpacesMountManager {
      * spaces and/or some data spaces may need to be mounted.
      * 
      * @param queryUri
-     *            Data Spaces URI to query for; must be incomplete URI, not pointing to any concrete
-     *            data space
+     *            Data Spaces URI to query for; must be URI without space part being fully defined,
+     *            i.e. not pointing to any concrete data space
      * @return map of data spaces URIs that match the query, pointing to VFS FileObjects that can be
      *         used to access their content; returned FileObjects are not opened nor attached in any
      *         way; these FileObject instances will never be shared, i.e. another instances are
@@ -182,7 +185,8 @@ public class SpacesMountManager {
      *             indicates VFS related exception during access, like mounting problems, I/O errors
      *             etc.
      * @throws IllegalArgumentException
-     *             when provided queryUri is complete
+     *             when provided queryUri has space part fully defined
+     * @see DataSpacesURI#isSpacePartFullyDefined()
      */
     public Map<DataSpacesURI, FileObject> resolveSpaces(final DataSpacesURI queryUri)
             throws FileSystemException {

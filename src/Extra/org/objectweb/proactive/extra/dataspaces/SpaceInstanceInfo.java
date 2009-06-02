@@ -44,7 +44,7 @@ public final class SpaceInstanceInfo implements Serializable {
      *            scratch data space configuration; must be complete - with access URL specified
      * @throws ConfigurationException
      *             when provided information is not enough to build a complete space definition - no
-     *             remote access URL is defined
+     *             remote access URL is defined.
      * @see SpaceConfiguration#isComplete()
      */
     public SpaceInstanceInfo(long appid, String runtimeId, String nodeId, ScratchSpaceConfiguration config)
@@ -62,7 +62,7 @@ public final class SpaceInstanceInfo implements Serializable {
      *            specified
      * @throws ConfigurationException
      *             when provided information is not enough to build a complete space definition - no
-     *             remote access URL is defined
+     *             remote access URL is defined.
      * @see SpaceConfiguration#isComplete()
      */
     public SpaceInstanceInfo(long appid, InputOutputSpaceConfiguration config) throws ConfigurationException {
@@ -71,11 +71,13 @@ public final class SpaceInstanceInfo implements Serializable {
 
     private SpaceInstanceInfo(final SpaceConfiguration config, final DataSpacesURI mountingPoint)
             throws ConfigurationException {
-        if (!mountingPoint.isComplete())
-            throw new ConfigurationException("Constructed mounting point URI is not complete");
         if (!config.isComplete())
             throw new ConfigurationException(
                 "Space configuration is not complete, no remote access URL provided");
+        if (!mountingPoint.isSpacePartFullyDefined() || !mountingPoint.isSpacePartOnly()) {
+            throw new RuntimeException(
+                "Unexpectedly constructed mounting point URI does not have space part fully defined");
+        }
 
         this.mountingPoint = mountingPoint;
         this.url = config.getUrl();
@@ -117,6 +119,8 @@ public final class SpaceInstanceInfo implements Serializable {
 
     /**
      * Returns mounting point URI of this data space.
+     * <p>
+     * Returned URI has always space part fully defined and nothing else.
      * 
      * @return mounting point URI
      */

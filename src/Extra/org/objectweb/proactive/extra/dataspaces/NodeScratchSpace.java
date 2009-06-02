@@ -107,7 +107,7 @@ public class NodeScratchSpace {
                             "Could not create directory for Active Object (id: %s) scratch", aoid), x);
                     throw x;
                 }
-                uri = spaceInstanceInfo.getMountingPoint().withPath(aoid);
+                uri = spaceInstanceInfo.getMountingPoint().withActiveObjectId(aoid);
                 logger.info(String
                         .format("Created scratch for Active Object with id: %s, URI: %s", aoid, uri));
                 scratches.put(aoid, uri);

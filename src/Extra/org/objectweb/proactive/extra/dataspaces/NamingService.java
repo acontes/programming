@@ -154,7 +154,7 @@ public class NamingService implements SpacesDirectory {
      * 
      * @param spaceInstanceInfo
      *            space instance info to register (contract: SpaceInstanceInfo mounting point should
-     *            be complete)
+     *            have space part fully defined)
      * @throws WrongApplicationIdException
      *             when directory is aware of all registered applications and there is no such
      *             application for SpaceInstanceInfo being registered

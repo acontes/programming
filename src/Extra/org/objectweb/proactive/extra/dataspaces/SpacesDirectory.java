@@ -28,26 +28,31 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.WrongApplicationIdExc
 public interface SpacesDirectory {
 
     /**
-     * Lookup for space instance info with given complete mounting point URI.
+     * Lookup for space instance info with given mounting point URI having exactly space part fully
+     * defined and nothing else.
      * 
      * @param uri
-     *            mounting point URI of data space to look up (must be complete)
+     *            mounting point URI of data space to look up (must have space part fully defined
+     *            and nothing else)
      * @return SpaceInstanceInfo for that URI or <code>null</code> if there is no such URI
      *         registered
      * @throws IllegalArgumentException
-     *             when specified DataSpacesURI is not complete or contains path
+     *             when specified DataSpacesURI does not have exactly space part defined.
+     * @see DataSpacesURI#isSpacePartFullyDefined()
+     * @see DataSpacesURI#isSpacePartOnly()
      */
     public SpaceInstanceInfo lookupOne(DataSpacesURI uri) throws IllegalArgumentException;
 
     /**
-     * Lookup for all SpaceInstanceInfo with root of its mounting point that matches specified URI (
-     * <code>ls -R</code> like).
+     * Lookup for all SpaceInstanceInfo with root of its mounting point that matches specified
+     * abstract URI without space part being fully defined ( <code>ls -R</code> like).
      * 
      * @param uri
      *            root URI to look up
      * @return SpaceInstanceInfo mappings or null if none is available
      * @throws IllegalArgumentException
-     *             when specified URI is complete
+     *             when specified URI is not abstract - has space part fully defined.
+     * @see DataSpacesURI#isSpacePartFullyDefined()
      */
     public Set<SpaceInstanceInfo> lookupMany(DataSpacesURI uri) throws IllegalArgumentException;
 
@@ -57,7 +62,7 @@ public interface SpacesDirectory {
      * 
      * @param spaceInstanceInfo
      *            space instance info to register (contract: SpaceInstanceInfo mounting point should
-     *            be complete)
+     *            have space part fully defined and nothing else)
      * @throws WrongApplicationIdException
      *             when directory is aware of all registered applications and there is no such
      *             application for SpaceInstanceInfo being registered
@@ -75,7 +80,8 @@ public interface SpacesDirectory {
      * @return <code>true</code> if space instance with given DataSpacesURI has been found;
      *         <code>false</code> otherwise
      * @throws IllegalArgumentException
-     *             when specified DataSpacesURI is not complete or contains path
+     *             when specified DataSpacesURI is not an URI with space part fully defined and
+     *             nothing else.
      */
     public boolean unregister(DataSpacesURI uri) throws IllegalArgumentException;
 }

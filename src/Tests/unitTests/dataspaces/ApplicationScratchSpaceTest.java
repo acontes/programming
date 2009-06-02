@@ -129,6 +129,9 @@ public class ApplicationScratchSpaceTest {
         final DataSpacesURI uri = applicationScratchSpace.getScratchForAO(body);
 
         assertValidDataSpacesURI(uri, activeObjectId);
+        assertTrue(uri.isSpacePartFullyDefined());
+        assertFalse(uri.isSpacePartOnly());
+        assertTrue(uri.isSuitableForHavingPath());
     }
 
     /**
@@ -197,6 +200,8 @@ public class ApplicationScratchSpaceTest {
         final DataSpacesURI uri = sii.getMountingPoint();
 
         assertValidDataSpacesURI(uri, null);
+        assertTrue(uri.isSpacePartFullyDefined());
+        assertTrue(uri.isSpacePartOnly());
     }
 
     /**
@@ -207,6 +212,8 @@ public class ApplicationScratchSpaceTest {
         final DataSpacesURI uri = applicationScratchSpace.getSpaceMountingPoint();
 
         assertValidDataSpacesURI(uri, null);
+        assertTrue(uri.isSpacePartFullyDefined());
+        assertTrue(uri.isSpacePartOnly());
     }
 
     /**
@@ -257,13 +264,14 @@ public class ApplicationScratchSpaceTest {
         assertEquals(0, fPartialDS.getChildren().length);
     }
 
-    private void assertValidDataSpacesURI(final DataSpacesURI uri, final String path) {
+    private void assertValidDataSpacesURI(final DataSpacesURI uri, final String activeObjectId) {
         assertNotNull(uri);
         assertEquals(RUNTIME_ID, uri.getRuntimeId());
         assertEquals(NODE_ID, uri.getNodeId());
         assertEquals(APP_ID_LONG, uri.getAppId());
         assertEquals(SpaceType.SCRATCH, uri.getSpaceType());
-        assertEquals(path, uri.getPath());
+        assertEquals(activeObjectId, uri.getActiveObjectId());
         assertNull(uri.getName());
+        assertNull(uri.getPath());
     }
 }

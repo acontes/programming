@@ -22,16 +22,17 @@ public class SpacesDirectoryImpl implements SpacesDirectory {
     private final SortedMap<DataSpacesURI, SpaceInstanceInfo> data = new TreeMap<DataSpacesURI, SpaceInstanceInfo>();
 
     protected static void checkAbstractURI(DataSpacesURI uri) {
-        if (uri.isComplete())
-            throw new IllegalArgumentException("Space URI must not be complete for this method call");
+        if (uri.isSpacePartFullyDefined())
+            throw new IllegalArgumentException(
+                "Space part must not be fully defined in URI for this method call");
     }
 
     protected static void checkMountingPointURI(DataSpacesURI uri) {
-        if (!uri.isComplete())
-            throw new IllegalArgumentException("Space URI must be complete for this method call");
+        if (!uri.isSpacePartFullyDefined())
+            throw new IllegalArgumentException("Space part must be fully defined in URI for this method call");
 
-        if (uri.getPath() != null)
-            throw new IllegalArgumentException("Space URI must not contain path for this method call");
+        if (!uri.isSpacePartOnly())
+            throw new IllegalArgumentException("Space URI must define only space part for this method call");
     }
 
     public Set<SpaceInstanceInfo> lookupMany(DataSpacesURI uri) {

@@ -268,8 +268,7 @@ public class DataSpacesImpl {
         final Body body = Utils.getCurrentActiveObjectBody();
         try {
             final DataSpacesURI scratchURI = appScratchSpace.getScratchForAO(body);
-            // FIXME: make aoid field of DataSpacesURI
-            final DataSpacesURI queryURI = scratchURI.withPath(scratchURI.getPath() + path);
+            final DataSpacesURI queryURI = scratchURI.withPath(path);
             final FileObject fo = decorateFileObject(spacesMountManager.resolveFile(queryURI));
             if (logger.isTraceEnabled())
                 logger.trace("Resolved scratch for an Active Object: " + queryURI);
@@ -363,8 +362,8 @@ public class DataSpacesImpl {
 
         try {
             final DataSpacesURI spaceURI = DataSpacesURI.parseURI(uri);
-            if (!spaceURI.isComplete())
-                throw new MalformedURIException("Specified URI must be complete");
+            if (!spaceURI.isSuitableForHavingPath())
+                throw new MalformedURIException("Specified URI represents internal high-level directories");
 
             FileObject fo = decorateFileObject(spacesMountManager.resolveFile(spaceURI));
             if (logger.isTraceEnabled())

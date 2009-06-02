@@ -672,7 +672,8 @@ public class PADataSpaces {
      *            {@link #getURI(FileObject)}
      * @return handle for specified file
      * @throws MalformedURIException
-     *             passed URI is invalid or not complete
+     *             passed URI is invalid or not suitable for use by user (accessing internal
+     *             high-level directories).
      * @throws SpaceNotFoundException
      *             specified URI points to invalid data space
      * @throws FileSystemException
