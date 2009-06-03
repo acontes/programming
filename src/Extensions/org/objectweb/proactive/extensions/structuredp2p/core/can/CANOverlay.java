@@ -342,7 +342,7 @@ public class CANOverlay extends StructuredOverlay {
                     List<Peer> neighbors = this.neighbors.getNeighbors(dim, direction);
 
                     if (neighbors.size() > 0) {
-                        List<Peer> nearest = this.neighbors.getNeighbors(dim, direction);
+                        msg.incrementNbSteps();
                         Peer nearestPeer = this.neighbors.getNearestNeighborFrom(lookupMessage
                                 .getCoordinates()[CANOverlay.getNextDimension(dim)], dim, direction);
                         try {
@@ -350,15 +350,15 @@ public class CANOverlay extends StructuredOverlay {
                                     nearestPeer, msg));
                         } catch (Exception e) {
                             // TODO: a response returns an exception
-                            nearest.remove(nearestPeer);
-
+                            // nearest.remove(nearestPeer);
+                            System.out.println("EXCEPTION NEAREST");
+                            List<Peer> nearest = this.neighbors.getNeighbors(dim, direction);
                             for (Peer peer : nearest) {
                                 try {
                                     msg.incrementNbSteps();
                                     return (CANLookupResponseMessage) PAFuture.getFutureValue(this
                                             .sendMessageTo(nearestPeer, msg));
                                 } catch (Exception ex) {
-                                    // TODO: a response returns an exception
                                     ex.printStackTrace();
                                 }
                             }
