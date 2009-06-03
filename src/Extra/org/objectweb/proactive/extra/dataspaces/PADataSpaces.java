@@ -54,8 +54,7 @@ public class PADataSpaces {
                 Capability.GET_TYPE, Capability.LIST_CHILDREN, Capability.READ_CONTENT,
                 Capability.WRITE_CONTENT };
 
-        final Capability[] readOnly = new Capability[] { Capability.GET_TYPE, Capability.LIST_CHILDREN,
-                Capability.READ_CONTENT };
+        final Capability[] readOnly = new Capability[] { Capability.GET_TYPE, Capability.READ_CONTENT };
 
         capabilitesSpecification.put(SpaceType.OUTPUT, writable);
         capabilitesSpecification.put(SpaceType.SCRATCH, writable);
