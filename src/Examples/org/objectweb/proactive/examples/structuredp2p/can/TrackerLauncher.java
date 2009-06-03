@@ -1,31 +1,50 @@
 package org.objectweb.proactive.examples.structuredp2p.can;
 
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.examples.structuredp2p.util.Deployment;
 import org.objectweb.proactive.extensions.structuredp2p.core.Tracker;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
+import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
 
 public class TrackerLauncher {
 
-    public static void main(String[] args) {
-        try {
-            Tracker tracker = (Tracker) PAActiveObject.newActive(Tracker.class.getName(),
-                    new Object[] { OverlayType.CAN });
+    private GCMVirtualNode trackerVirtualNode;
+    private int nbTrackers = 0;
 
-            // Binds the tracker to a specific URL on the RMI registry
-            PAActiveObject.registerByName(tracker, "CANTracker");
+    public static List<Tracker> trackers = new ArrayList<Tracker>();
+
+    public TrackerLauncher(String[] args) {
+        try {
+            Deployment.deploy(args[0]);
+        } catch (NodeException e) {
+            e.printStackTrace();
+        } catch (ProActiveException e) {
+            e.printStackTrace();
+        }
+
+        this.trackerVirtualNode = Deployment.getVirtualNode("Tracker");
+        this.nbTrackers = this.trackerVirtualNode.getCurrentNodes().size();
+
+        for (int i = 0; i < this.nbTrackers; i++) {
+            this.createNewTracker();
+        }
+    }
+
+    private void createNewTracker() {
+        try {
+            TrackerLauncher.trackers.add((Tracker) PAActiveObject.newActive(Tracker.class.getCanonicalName(),
+                    new Object[] { OverlayType.CAN }, this.trackerVirtualNode.getANode()));
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
         } catch (NodeException e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-
     }
-
 }

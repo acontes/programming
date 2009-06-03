@@ -24,7 +24,7 @@ public class ResponseMessage implements Serializable {
     /**
      * The round trip time.
      */
-    private int latency = 0;
+    private int latency = -1;
 
     /**
      * Constructor.
@@ -48,6 +48,10 @@ public class ResponseMessage implements Serializable {
      */
     public void setDeliveryTime() {
         this.latency = (int) (System.currentTimeMillis() - this.timestampMessageCreation);
+
+        if (this.latency < 0) {
+            this.latency = 0;
+        }
     }
 
     /**
@@ -58,7 +62,7 @@ public class ResponseMessage implements Serializable {
      *         has been received.
      */
     public int getLatency() {
-        if (this.latency == 0) {
+        if (this.latency < 0) {
             throw new IllegalStateException("The response message has not been initialized by callback.");
         }
         return this.latency;

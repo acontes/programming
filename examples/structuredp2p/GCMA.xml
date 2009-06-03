@@ -28,16 +28,16 @@
 
 			</configuration>
 
-			<virtualNode id="CANOverlay" capacity="3" />
-			<virtualNode id="CANTracker" capacity="3" />
+			<virtualNode id="Peer" capacity="3" />
+			<virtualNode id="Tracker" capacity="3" />
 		</proactive>
 	</application>
 
 	<resources>
-		<nodeProvider id="CANOverlay">
+		<nodeProvider id="Peer">
 			<file path="GCMD-Peers.xml" />
 		</nodeProvider>
-		<nodeProvider id="CANTracker">
+		<nodeProvider id="Tracker">
 			<file path="GCMD-Trackers.xml" />
 		</nodeProvider>
 	</resources>

@@ -1,6 +1,5 @@
 package org.objectweb.proactive.examples.structuredp2p.can;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -11,31 +10,26 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.examples.structuredp2p.util.Deployment;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
-import org.objectweb.proactive.extensions.structuredp2p.core.Tracker;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.Coordinate;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
 import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANLookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.can.CANLookupResponseMessage;
-import org.objectweb.proactive.extensions.structuredp2p.util.Deployment;
 
 
 public class PeerLauncher {
 
-    private static List<Node> avaibleNodes;
-    private static ArrayList<Peer> remotePeers = new ArrayList<Peer>();
-    private static Tracker tracker;
+    private List<Node> avaibleNodes;
+    private List<Peer> remotePeers = new ArrayList<Peer>();
+    private int trackersIndex = 0;
 
-    private static boolean running = true;
+    private String uri = "localhost";
+    private boolean running = true;
 
-    /**
-     * @param args
-     */
-    public static void main(String[] args) {
+    public PeerLauncher(String[] args) {
         int nbPeers = Integer.parseInt(args[1]);
-        ;
-        String uri = "localhost";
 
         if (args.length < 1) {
             System.err.println("Usage : java " + PeerLauncher.class.getCanonicalName() + " " +
@@ -44,7 +38,7 @@ public class PeerLauncher {
         }
 
         if (args.length > 2) {
-            uri = args[2];
+            this.uri = args[2];
         }
 
         try {
@@ -55,18 +49,10 @@ public class PeerLauncher {
             e.printStackTrace();
         }
 
-        try {
-            PeerLauncher.tracker = (Tracker) PAActiveObject.lookupActive(Tracker.class.getName(), "//" + uri +
-                "/CANTracker");
-            PeerLauncher.avaibleNodes = Deployment.getVirtualNode("CANOverlay").getCurrentNodes();
+        this.avaibleNodes = Deployment.getVirtualNode("Peer").getCurrentNodes();
 
-            for (int i = 0; i < nbPeers; i++) {
-                PeerLauncher.addPeer(PeerLauncher.avaibleNodes.get(i % PeerLauncher.avaibleNodes.size()));
-            }
-        } catch (ActiveObjectCreationException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        for (int i = 0; i < nbPeers; i++) {
+            this.addPeer();
         }
 
         Thread inputThread = new Thread(new Runnable() {
@@ -75,34 +61,28 @@ public class PeerLauncher {
                 Scanner scanner = new Scanner(System.in);
                 String inputLine;
 
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e1) {
-                    e1.printStackTrace();
-                }
-
-                PeerLauncher.printOptions();
-                while (PeerLauncher.running) {
+                PeerLauncher.this.printOptions();
+                while (PeerLauncher.this.running) {
                     inputLine = scanner.nextLine();
 
                     if (inputLine.equalsIgnoreCase("quit")) {
                         try {
-                            for (Peer p : PeerLauncher.remotePeers) {
+                            for (Peer p : PeerLauncher.this.remotePeers) {
                                 p.leave();
                             }
 
                             Deployment.kill();
-                            PeerLauncher.running = false;
+                            PeerLauncher.this.running = false;
                             break;
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
                     } else if (inputLine.equalsIgnoreCase("add")) {
-                        PeerLauncher.addPeer();
+                        PeerLauncher.this.addPeer();
                     } else if (inputLine.equalsIgnoreCase("leave")) {
-                        PeerLauncher.removePeer();
+                        PeerLauncher.this.removePeer();
                     } else if (inputLine.equalsIgnoreCase("lookup")) {
-                        PeerLauncher.lookupMessage();
+                        PeerLauncher.this.lookupMessage();
                     } else if (inputLine.startsWith("random")) {
                         int nbOperations = Integer.parseInt(inputLine.split(" ")[1]);
 
@@ -111,20 +91,20 @@ public class PeerLauncher {
                             int res = rand.nextInt(3);
                             switch (res) {
                                 case 0:
-                                    PeerLauncher.addPeer();
+                                    PeerLauncher.this.addPeer();
                                     break;
                                 case 1:
-                                    PeerLauncher.lookupMessage();
+                                    PeerLauncher.this.lookupMessage();
                                     break;
                                 case 2:
-                                    PeerLauncher.removePeer();
+                                    PeerLauncher.this.removePeer();
                                     break;
                                 default:
                                     break;
                             }
                         }
                     }
-                    PeerLauncher.printOptions();
+                    PeerLauncher.this.printOptions();
                 }
             }
         });
@@ -134,7 +114,7 @@ public class PeerLauncher {
     /**
      * Print app menu option on the standard output.
      */
-    private static void printOptions() {
+    private void printOptions() {
         System.out.println("[ Select an action to perform ]");
         System.out.println("  > Type in 'add' : add a new peer at a random position");
         System.out.println("  > Type in 'lookup' : send a lookup message to a random peer");
@@ -143,20 +123,22 @@ public class PeerLauncher {
         System.out.println("  > Type in 'quit' : quit the application");
     }
 
-    private static void addPeer() {
+    private void addPeer() {
         Random rand = new Random();
-        PeerLauncher.addPeer(PeerLauncher.avaibleNodes.get(rand.nextInt(PeerLauncher.avaibleNodes.size())));
-    }
 
-    private static void addPeer(Node n) {
         try {
             Peer peer = (Peer) PAActiveObject.newActive(Peer.class.getCanonicalName(),
-                    new Object[] { OverlayType.CAN }, n);
-            PeerLauncher.remotePeers.add(peer);
-            PeerLauncher.tracker.addOnNetwork(peer);
+                    new Object[] { OverlayType.CAN }, this.avaibleNodes.get(rand.nextInt(this.avaibleNodes
+                            .size())));
+            this.remotePeers.add(peer);
 
-            PeerLauncher.printInformation("Add peer managing " +
-                ((CANOverlay) peer.getStructuredOverlay()).getZone());
+            TrackerLauncher.trackers.get(this.trackersIndex % TrackerLauncher.trackers.size()).addOnNetwork(
+                    peer);
+            this.trackersIndex++;
+
+            this
+                    .printInformation("Add peer managing " +
+                        ((CANOverlay) peer.getStructuredOverlay()).getZone());
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
         } catch (NodeException e) {
@@ -164,7 +146,7 @@ public class PeerLauncher {
         }
     }
 
-    private static void removePeer() {
+    private void removePeer() {
         /*
          * Random rand = new Random(); Peer p =
          * PeerLauncher.remotePeers.remove(rand.nextInt(PeerLauncher.remotePeers.size()));
@@ -174,10 +156,10 @@ public class PeerLauncher {
          * p.getStructuredOverlay()).getZone());
          */
 
-        PeerLauncher.printInformation("Leave is not yet fully implemented !");
+        this.printInformation("Leave is not yet fully implemented !");
     }
 
-    private static void lookupMessage() {
+    private void lookupMessage() {
         Random rand = new Random();
 
         Coordinate[] searchedPosition = new Coordinate[CANOverlay.NB_DIMENSIONS];
@@ -192,18 +174,17 @@ public class PeerLauncher {
         }
         buf += ")";
 
-        Peer sender = PeerLauncher.remotePeers.get(rand.nextInt(PeerLauncher.remotePeers.size()));
+        Peer sender = this.remotePeers.get(rand.nextInt(this.remotePeers.size()));
 
         CANLookupResponseMessage response = (CANLookupResponseMessage) sender
                 .sendMessage(new CANLookupMessage(searchedPosition));
 
-        PeerLauncher.printInformation("Lookup for peer managing " + buf +
-            ".\n    Lookup start from peer managing " +
+        this.printInformation("Lookup for peer managing " + buf + ".\n    Lookup start from peer managing " +
             ((CANOverlay) sender.getStructuredOverlay()).getZone() + ".\n    Peer found in " +
             response.getLatency() + "ms with " + response.getNbSteps() + " steps.");
     }
 
-    private static void printInformation(String mess) {
+    private void printInformation(String mess) {
         System.out.println("*** " + mess);
         System.out.println();
     }

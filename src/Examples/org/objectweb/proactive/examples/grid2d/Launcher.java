@@ -10,7 +10,7 @@ import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.extensions.structuredp2p.util.Deployment;
+import org.objectweb.proactive.examples.structuredp2p.util.Deployment;
 
 
 /**
