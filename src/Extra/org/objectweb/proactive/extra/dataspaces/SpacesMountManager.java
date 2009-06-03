@@ -5,7 +5,6 @@ package org.objectweb.proactive.extra.dataspaces;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -62,7 +61,7 @@ public class SpacesMountManager {
     private final DefaultFileSystemManager vfsManager;
     private final SpacesDirectory directory;
     private final VirtualFileSystem vfs;
-    private final Set<DataSpacesURI> mountedSpaces = new HashSet<DataSpacesURI>();
+    private final Map<DataSpacesURI, FileObject> mountedSpaces = new HashMap<DataSpacesURI, FileObject>();
 
     /*
      * These two locks represent two levels of synchronization. In any execution only readLock is
@@ -149,15 +148,27 @@ public class SpacesMountManager {
         if (logger.isDebugEnabled())
             logger.debug("File access request: " + queryUri);
 
+        final DataSpacesURI spaceURI = queryUri.getSpacePartOnly();
         if (queryUri.isSpacePartFullyDefined()) {
             // it is about a concrete space, nothing abstract
-            final DataSpacesURI spaceURI = queryUri.getSpacePartOnly();
             ensureSpaceIsMounted(spaceURI, null);
         }
         if (!queryUri.isSuitableForHavingPath()) {
             logger.warn("Accessing URI not usuitable for user (not suitable for having path): " + queryUri);
         }
-        return resolveFileVFS(queryUri);
+
+        final FileObject file = resolveFileVFS(queryUri);
+        if (queryUri.isSpacePartFullyDefined())
+            return decorateFileWithCapabilitiesInfo(spaceURI, file);
+        else
+            return file;
+    }
+
+    private FileObject decorateFileWithCapabilitiesInfo(DataSpacesURI spaceURI, FileObject file) {
+        synchronized (readLock) {
+            final FileObject junction = mountedSpaces.get(spaceURI);
+            return new CapabilitiesInfoFileObject(file, junction.getFileSystem());
+        }
     }
 
     /**
@@ -203,6 +214,7 @@ public class SpacesMountManager {
                 ProActiveLogger.logImpossibleException(logger, e);
                 throw new RuntimeException(e);
             }
+            // TODO decorate...
             final FileObject fo = resolveFileVFS(spaceUri);
             result.put(spaceUri, fo);
         }
@@ -225,7 +237,7 @@ public class SpacesMountManager {
         logger.debug("Closing mount manager");
         synchronized (writeLock) {
             synchronized (readLock) {
-                for (final DataSpacesURI spaceUri : new ArrayList<DataSpacesURI>(mountedSpaces)) {
+                for (final DataSpacesURI spaceUri : new ArrayList<DataSpacesURI>(mountedSpaces.keySet())) {
                     try {
                         unmountSpace(spaceUri);
                     } catch (FileSystemException e) {
@@ -245,7 +257,7 @@ public class SpacesMountManager {
             throws SpaceNotFoundException, FileSystemException {
         final boolean mounted;
         synchronized (readLock) {
-            mounted = mountedSpaces.contains(spaceURI);
+            mounted = mountedSpaces.containsKey(spaceURI);
         }
 
         if (!mounted) {
@@ -262,7 +274,7 @@ public class SpacesMountManager {
                 // kind of double-checked lock ->
                 // check once more within writeLock
                 synchronized (readLock) {
-                    if (mountedSpaces.contains(spaceURI))
+                    if (mountedSpaces.containsKey(spaceURI))
                         return;
                 }
                 mountSpace(info);
@@ -298,10 +310,11 @@ public class SpacesMountManager {
                 throw x;
             }
 
-            if (!mountedSpaces.add(mountingPoint)) {
+            if (mountedSpaces.containsKey(mountingPoint)) {
                 logger.error("Internal error - overmounting already mounted space: " + mountingPoint);
                 throw new RuntimeException("Unexpected internal error - overmounting already mounted space");
             }
+            mountedSpaces.put(mountingPoint, mountedRoot);
         }
         logger.info(String.format("Mounted space: %s (access URL: %s)", mountingPoint, accessUrl));
     }
