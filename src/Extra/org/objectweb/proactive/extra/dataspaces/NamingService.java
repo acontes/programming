@@ -5,6 +5,7 @@ package org.objectweb.proactive.extra.dataspaces;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -194,7 +195,11 @@ public class NamingService implements SpacesDirectory {
         return result;
     }
 
-    private boolean isApplicationIdRegistered(long appid) {
-        return registeredApplications.contains(appid);
+    synchronized public Set<Long> getRegisteredApplications() {
+        return Collections.unmodifiableSet(registeredApplications);
+    }
+
+    synchronized public boolean isApplicationIdRegistered(long appid) {
+        return getRegisteredApplications().contains(appid);
     }
 }

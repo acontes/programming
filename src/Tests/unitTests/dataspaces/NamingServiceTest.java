@@ -36,6 +36,77 @@ public class NamingServiceTest extends SpacesDirectoryAbstractBase {
         ns = new NamingService();
     }
 
+    @Test
+    public void testIsApplicationRegistered1() throws ApplicationAlreadyRegisteredException,
+            WrongApplicationIdException {
+
+        assertFalse(ns.isApplicationIdRegistered(MAIN_APPID));
+        assertFalse(ns.isApplicationIdRegistered(ANOTHER_APPID1));
+
+        ns.registerApplication(MAIN_APPID, null);
+
+        assertFalse(ns.isApplicationIdRegistered(ANOTHER_APPID1));
+        assertTrue(ns.isApplicationIdRegistered(MAIN_APPID));
+
+        ns.unregisterApplication(MAIN_APPID);
+
+        assertFalse(ns.isApplicationIdRegistered(MAIN_APPID));
+        assertFalse(ns.isApplicationIdRegistered(ANOTHER_APPID1));
+    }
+
+    @Test
+    public void testIsApplicationRegistered2() throws ApplicationAlreadyRegisteredException,
+            WrongApplicationIdException {
+
+        Set<SpaceInstanceInfo> spaces = new HashSet<SpaceInstanceInfo>();
+
+        spaces.add(spaceInstanceInput1);
+        spaces.add(spaceInstanceInput2);
+        spaces.add(spaceInstanceOutput1);
+        spaces.add(spaceInstanceOutput2);
+
+        assertFalse(ns.isApplicationIdRegistered(MAIN_APPID));
+        assertFalse(ns.isApplicationIdRegistered(ANOTHER_APPID1));
+
+        ns.registerApplication(MAIN_APPID, spaces);
+
+        assertFalse(ns.isApplicationIdRegistered(ANOTHER_APPID1));
+        assertTrue(ns.isApplicationIdRegistered(MAIN_APPID));
+
+        ns.unregisterApplication(MAIN_APPID);
+
+        assertFalse(ns.isApplicationIdRegistered(MAIN_APPID));
+        assertFalse(ns.isApplicationIdRegistered(ANOTHER_APPID1));
+    }
+
+    @Test
+    public void testRegisteredApplicationId1() throws ApplicationAlreadyRegisteredException,
+            WrongApplicationIdException {
+
+        Set<Long> apps;
+
+        apps = ns.getRegisteredApplications();
+        assertTrue(apps.isEmpty());
+
+        ns.registerApplication(MAIN_APPID, null);
+        apps = ns.getRegisteredApplications();
+        assertFalse(apps.isEmpty());
+
+        ns.unregisterApplication(MAIN_APPID);
+        apps = ns.getRegisteredApplications();
+        assertTrue(apps.isEmpty());
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void testRegisteredApplicationId2() throws ApplicationAlreadyRegisteredException,
+            WrongApplicationIdException {
+
+        Set<Long> apps;
+        ns.registerApplication(MAIN_APPID, null);
+        apps = ns.getRegisteredApplications();
+        apps.remove(MAIN_APPID);
+    }
+
     /**
      * Normal case, two inputs, two outputs.
      */

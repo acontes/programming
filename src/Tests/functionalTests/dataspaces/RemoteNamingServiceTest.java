@@ -3,6 +3,7 @@
 package functionalTests.dataspaces;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -37,11 +38,11 @@ public class RemoteNamingServiceTest {
 
     private NamingService stub;
 
-    protected static final int MAIN_APPID = 1;
+    protected static final long MAIN_APPID = 1;
 
-    protected static final int ANOTHER_APPID1 = 0;
+    protected static final long ANOTHER_APPID1 = 0;
 
-    protected static final int ANOTHER_APPID2 = 2;
+    protected static final long ANOTHER_APPID2 = 2;
 
     protected SpaceInstanceInfo spaceInstanceInput1;
 
@@ -100,16 +101,22 @@ public class RemoteNamingServiceTest {
             SpaceAlreadyRegisteredException, IllegalArgumentException {
 
         Set<SpaceInstanceInfo> spaces = new HashSet<SpaceInstanceInfo>();
+        Set<Long> appsRegistered;
 
         spaces.add(spaceInstanceInput1);
         spaces.add(spaceInstanceInput2);
         spaces.add(spaceInstanceOutput1);
         spaces.add(spaceInstanceOutput2);
 
+        assertFalse(stub.isApplicationIdRegistered(MAIN_APPID));
         // TEST REGISTER APP
         stub.registerApplication(MAIN_APPID, spaces);
 
         // check if everything has been registered
+        assertTrue(stub.isApplicationIdRegistered(MAIN_APPID));
+        appsRegistered = stub.getRegisteredApplications();
+        appsRegistered.contains(MAIN_APPID);
+
         // TEST LOOKUP FIRST
         assertIsSpaceRegistered(spaceInstanceInput1);
         assertIsSpaceRegistered(spaceInstanceInput2);

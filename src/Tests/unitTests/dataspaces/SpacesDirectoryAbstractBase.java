@@ -24,11 +24,11 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceAlreadyRegistere
 @Ignore
 public abstract class SpacesDirectoryAbstractBase {
 
-    protected static final int MAIN_APPID = 1;
+    protected static final long MAIN_APPID = 1;
 
-    protected static final int ANOTHER_APPID1 = 0;
+    protected static final long ANOTHER_APPID1 = 0;
 
-    protected static final int ANOTHER_APPID2 = 2;
+    protected static final long ANOTHER_APPID2 = 2;
 
     private SpacesDirectory dir;
 

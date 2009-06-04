@@ -22,6 +22,7 @@ import org.objectweb.proactive.extra.dataspaces.SpaceInstanceInfo;
 import org.objectweb.proactive.extra.dataspaces.SpacesMountManager;
 
 
+// TODO: add options for listing app id's, specifying such for listing and so on..
 /**
  * Tool for printing listing of a NamingService content.
  */
