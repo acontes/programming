@@ -30,7 +30,7 @@ import org.objectweb.proactive.extra.dataspaces.VFSFactory;
  * Test for write limiting and keeping (Abstract)FileObject behavior (which is not so obvious,
  * especially regarding unusual behavior like non-existing file, null array etc.).
  */
-public class BaseWriteLimitingFileObjectTest {
+public class AbstractWriteLimitingFileObjectTest {
     private static final String CHILD_NAME = "abc";
     private FileObject realFile;
     private FileObject readOnlyFile;
