@@ -37,7 +37,7 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundExceptio
  * to provide FileObject for its content. Proper, local or remote access is determined using
  * {@link Utils#getLocalAccessURL(String, String, String)} method. Write-capabilities of returned
  * FileObjects are induced from used protocols' providers - SpacesMountManager does not apply any
- * limitation decorators like {@link BaseWriteLimitingFileObject} on its own.
+ * limitation decorators like {@link AbstractWriteLimitingFileObject} on its own.
  * <p>
  * Instances of this class are thread-safe. Also, subsequent requests for the same file using the
  * same manager will result in separate FileObject instances being returned, so there is no

@@ -22,7 +22,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.objectweb.proactive.extra.dataspaces.BaseWriteLimitingFileObject;
+import org.objectweb.proactive.extra.dataspaces.AbstractWriteLimitingFileObject;
 import org.objectweb.proactive.extra.dataspaces.VFSFactory;
 
 
@@ -138,7 +138,7 @@ public class BaseWriteLimitingFileObjectTest {
         assertFalse(readOnlyFile.canRenameTo(anotherFile));
     }
 
-    // limitation of BaseWriteLimitingFileObject
+    // limitation of AbstractWriteLimitingFileObject
     @Ignore
     @Test
     public void testReadOnlyCanRenameToFileObjectDesination() {
@@ -541,7 +541,7 @@ public class BaseWriteLimitingFileObjectTest {
         assertTrue(sameFile.isWriteable());
     }
 
-    private static class ConstantlyWriteLimitingFileObject extends BaseWriteLimitingFileObject {
+    private static class ConstantlyWriteLimitingFileObject extends AbstractWriteLimitingFileObject {
         private boolean readOnly;
 
         public ConstantlyWriteLimitingFileObject(final FileObject decoratedFileObject, final boolean readOnly) {

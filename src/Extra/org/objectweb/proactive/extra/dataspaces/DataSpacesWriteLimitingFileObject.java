@@ -18,9 +18,9 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException
  * <li>AO's scratch space - for AO different that scratch's owner</li>
  * </ul>
  * 
- * @see BaseWriteLimitingFileObject
+ * @see AbstractWriteLimitingFileObject
  */
-public class DataSpacesWriteLimitingFileObject extends BaseWriteLimitingFileObject {
+public class DataSpacesWriteLimitingFileObject extends AbstractWriteLimitingFileObject {
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.DATASPACES);
 
     private final String aoId;

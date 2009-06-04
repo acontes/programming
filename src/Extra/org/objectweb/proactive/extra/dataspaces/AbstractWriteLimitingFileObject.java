@@ -38,8 +38,8 @@ import org.apache.commons.vfs.util.RandomAccessMode;
  * some buggy providers; depends on VFS bug: VFS-258</li>
  * </ul>
  */
-public abstract class BaseWriteLimitingFileObject extends DecoratedFileObject {
-    public BaseWriteLimitingFileObject(final FileObject decoratedFileObject) {
+public abstract class AbstractWriteLimitingFileObject extends DecoratedFileObject {
+    public AbstractWriteLimitingFileObject(final FileObject decoratedFileObject) {
         super(decoratedFileObject);
     }
 
