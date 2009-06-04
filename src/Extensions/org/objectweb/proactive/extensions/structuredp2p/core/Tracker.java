@@ -22,7 +22,7 @@ import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType
 public class Tracker implements Serializable {
 
     /**
-     * The probability to add a new in the tracker list.
+     * The probability to add a new peer in the tracker list.
      */
     private static final int PROB = 5;
 

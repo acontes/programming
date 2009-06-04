@@ -58,7 +58,7 @@ public class Peer implements InitActive, RunActive, Serializable {
     /**
      * Timestamp when the last request has been served.
      */
-    private long lastRequestDuration;
+    private long lastRequestTimestamp;
 
     /**
      * The stub associated to the current peer.
@@ -265,7 +265,7 @@ public class Peer implements InitActive, RunActive, Serializable {
         }
 
         PAActiveObject.setImmediateService("setResponseMessageDeliveryTime");
-        this.lastRequestDuration = System.currentTimeMillis();
+        this.lastRequestTimestamp = System.currentTimeMillis();
         this.stub = (Peer) PAActiveObject.getStubOnThis();
     }
 
@@ -277,9 +277,9 @@ public class Peer implements InitActive, RunActive, Serializable {
         while (body.isActive()) {
             if (service.hasRequestToServe()) {
                 service.serveOldest();
-                this.lastRequestDuration = System.currentTimeMillis();
+                this.lastRequestTimestamp = System.currentTimeMillis();
             } else {
-                if (System.currentTimeMillis() - this.lastRequestDuration >= Peer.CHECK_NEIGHBORS_TIMEOUT) {
+                if (System.currentTimeMillis() - this.lastRequestTimestamp >= Peer.CHECK_NEIGHBORS_TIMEOUT) {
                     // this.structuredOverlay.checkNeighbors();
                 }
                 service.waitForRequest();
