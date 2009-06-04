@@ -402,7 +402,8 @@ public class DataSpacesImpl {
             if (logger.isTraceEnabled())
                 logger.trace("Resolved file: " + uri);
 
-            return decorateFileObject(checkCapabilitiesOrWound(fo, type));
+            // FIXME: temporal workaround as we should check if this is a scratch owned by calling thread..
+            return decorateFileObject(checkCapabilitiesOrWound(fo, SpaceType.INPUT));
         } catch (MalformedURIException x) {
             logger.debug("Can not resolve malformed URI: " + uri, x);
             throw x;
