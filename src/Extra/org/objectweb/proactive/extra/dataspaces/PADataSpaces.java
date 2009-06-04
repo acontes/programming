@@ -687,8 +687,7 @@ public class PADataSpaces {
      * some lifecycle period and they are configured to use the same Naming Service.
      * 
      * @param uri
-     *            valid URI within an existing data space, as returned by
-     *            {@link #getURI(FileObject)}
+     *            valid URI within an existing data space, returned by {@link #getURI(FileObject)}
      * @return handle for specified file
      * @throws MalformedURIException
      *             passed URI is invalid or not suitable for use by user (accessing internal
