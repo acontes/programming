@@ -1,6 +1,7 @@
 package org.objectweb.proactive.extensions.structuredp2p.core.can;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 
 /**
@@ -51,10 +52,10 @@ public class Coordinate implements Serializable {
      */
     public static Coordinate getMiddle(Coordinate min, Coordinate max) {
         // FIXME check with strings
-        float minL = Float.parseFloat(min.getValue());
-        float maxL = Float.parseFloat(max.getValue());
+        BigDecimal minL = new BigDecimal(min.getValue());
+        BigDecimal maxL = new BigDecimal(max.getValue());
 
-        return new Coordinate("" + ((maxL + minL) / 2));
+        return new Coordinate(minL.add(maxL).divide(new BigDecimal(2)).toString());
     }
 
     /**
@@ -155,7 +156,7 @@ public class Coordinate implements Serializable {
         }
 
         Coordinate coord = (Coordinate) o;
-        return new Float(Float.parseFloat(this.value)).equals(Float.parseFloat(coord.getValue()));
+        return new BigDecimal(this.value).equals(new BigDecimal(coord.getValue()));
     }
 
     /**
@@ -169,10 +170,10 @@ public class Coordinate implements Serializable {
      *         lexicographically greater than the coordinate argument.
      */
     public int compareTo(Coordinate coord) {
-        float val = Float.parseFloat(coord.getValue());
-        float cur = Float.parseFloat(this.getValue());
+        BigDecimal val = new BigDecimal(coord.getValue());
+        BigDecimal cur = new BigDecimal(this.getValue());
 
-        return Float.compare(cur, val);
+        return cur.compareTo(val);
     }
 
     /**
@@ -182,11 +183,11 @@ public class Coordinate implements Serializable {
      *            the specified coordinate.
      * @return the distance between the current coordinate and the specified coordinate.
      */
-    public float distanceWith(Coordinate coord) {
-        float val = Float.parseFloat(coord.getValue());
-        float cur = Float.parseFloat(this.getValue());
+    public BigDecimal distanceWith(Coordinate coord) {
+        BigDecimal val = new BigDecimal(coord.getValue());
+        BigDecimal cur = new BigDecimal(this.getValue());
 
-        return cur - val;
+        return cur.subtract(val);
     }
 
     /**
@@ -205,6 +206,5 @@ public class Coordinate implements Serializable {
         }
 
         return false;
-
     }
 }

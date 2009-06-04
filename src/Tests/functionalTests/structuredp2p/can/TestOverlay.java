@@ -144,8 +144,6 @@ public class TestOverlay {
 
         if (TestOverlay.getOverlay(TestOverlay.firstPeer).getZone().getBorderedDimension(
                 TestOverlay.getOverlay(TestOverlay.fourthPeer).getZone()) != -1) {
-            System.out.println(TestOverlay.getOverlay(TestOverlay.firstPeer).getNeighbors());
-            System.out.println(TestOverlay.getOverlay(TestOverlay.fourthPeer).getZone());
             Assert.assertTrue(TestOverlay.getOverlay(TestOverlay.firstPeer).hasNeighbor(
                     TestOverlay.fourthPeer));
             Assert.assertTrue(TestOverlay.getOverlay(TestOverlay.fourthPeer).hasNeighbor(

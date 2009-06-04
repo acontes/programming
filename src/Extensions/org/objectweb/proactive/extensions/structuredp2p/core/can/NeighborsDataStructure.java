@@ -1,6 +1,7 @@
 package org.objectweb.proactive.extensions.structuredp2p.core.can;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -320,7 +321,7 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
      * 
      * @return the neighbors data structure.
      */
-    public List[][] getNeighbors() {
+    public List<Peer>[][] getNeighbors() {
         return this.neighbors;
     }
 
@@ -332,7 +333,7 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
      *            {@link CANOverlay#NB_DIMENSIONS} - 1).
      * @return the neighbors of the managed zone for the specified dimension.
      */
-    public List[] getNeighbors(int dimension) {
+    public List<Peer>[] getNeighbors(int dimension) {
         return this.neighbors[dimension];
     }
 
@@ -364,14 +365,13 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
      */
     public Peer getNearestNeighborFrom(Coordinate coordinate, int dim, int direction) {
         Zone nearest = null;
-        float distance;
-        float minDistance = Float.MAX_VALUE;
+        BigDecimal distance;
+        BigDecimal minDistance = null;
 
         for (Zone zone : this.associatedZones[dim][direction]) {
-            if ((distance = coordinate.distanceWith(zone.getCoordinateMax(CANOverlay.getNextDimension(dim)))) < minDistance) {
-                if (distance < minDistance) {
-                    minDistance = distance;
-                }
+            distance = coordinate.distanceWith(zone.getCoordinateMax(CANOverlay.getNextDimension(dim)));
+            if (minDistance == null || distance.compareTo(minDistance) < 0) {
+                minDistance = distance;
                 nearest = zone;
             }
         }
