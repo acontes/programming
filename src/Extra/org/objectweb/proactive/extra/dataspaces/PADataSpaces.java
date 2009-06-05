@@ -10,6 +10,7 @@ import java.util.Set;
 import org.apache.commons.vfs.Capability;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
@@ -19,7 +20,6 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceAlreadyRegistere
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundException;
 
 
-// TODO we mention "expected to be readable/writable" - maybe we can verify it?
 // TODO add docs about data sharing - do not pass FileObject, only URI!
 // or add general docs about various ways of accessing and sharing data through this API
 // TODO add docs about calling from active object's thread. what about returned FileObjects? it should be ok
@@ -75,6 +75,9 @@ public class PADataSpaces {
      *             indicates VFS related exception
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
+     * @throws ProActiveRuntimeException
+     *             when resolved space's file system has not enough capabilities (because of wrong
+     *             configuration)
      * @see #resolveDefaultInputBlocking(long)
      * @see #resolveDefaultInput(String)
      */
@@ -93,8 +96,9 @@ public class PADataSpaces {
      * {@link FileObject#createFile()} or {@link FileObject#createFolder()} method. Closing returned
      * FileObject is a caller's responsibility.
      * <p>
-     * Input data space content is expected to be readable from any node of this application if it
-     * was defined correctly. It is intended to provide any form of input to the application.
+     * As input data space minimal capabilities are checked, its content is expected to be readable
+     * from any node of this application if it was defined correctly. It is intended to provide any
+     * form of input to the application.
      * 
      * @param path
      *            path of a file in the default input data space; <code>null</code> denotes request
@@ -107,6 +111,9 @@ public class PADataSpaces {
      *             indicates VFS related exception
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
+     * @throws ProActiveRuntimeException
+     *             when resolved space's file system has not enough capabilities (because of wrong
+     *             configuration)
      * @see #resolveDefaultInputBlocking(String, long)
      */
     public static FileObject resolveDefaultInput(String path) throws SpaceNotFoundException,
@@ -125,6 +132,9 @@ public class PADataSpaces {
      *             indicates VFS related exception
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
+     * @throws ProActiveRuntimeException
+     *             when resolved space's file system has not enough capabilities (because of wrong
+     *             configuration)
      * @see #resolveDefaultOutputBlocking(long)
      * @see #resolveDefaultOutput(String)
      */
@@ -143,9 +153,9 @@ public class PADataSpaces {
      * {@link FileObject#createFile()} or {@link FileObject#createFolder()} method. Closing returned
      * FileObject is a caller's responsibility.
      * <p>
-     * Output data space content is expected to be writable from any node of this application if it
-     * was defined correctly. It is intended to store globally any computation results. Writes
-     * synchronization is a developer’s responsibility.
+     * As output data space minimal capabilities are checked, its content is expected to be writable
+     * from any node of this application if it was defined correctly. It is intended to store
+     * globally any computation results. Writes synchronization is a developer’s responsibility.
      * 
      * @param path
      *            path of a file in the default output data space; <code>null</code> denotes request
@@ -158,6 +168,9 @@ public class PADataSpaces {
      *             indicates VFS related exception
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
+     * @throws ProActiveRuntimeException
+     *             when resolved space's file system has not enough capabilities (because of wrong
+     *             configuration)
      * @see #resolveDefaultOutputBlocking(String, long)
      */
     public static FileObject resolveDefaultOutput(String path) throws SpaceNotFoundException,
@@ -184,6 +197,9 @@ public class PADataSpaces {
      *             indicates VFS related exception
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
+     * @throws ProActiveRuntimeException
+     *             when resolved space's file system has not enough capabilities (because of wrong
+     *             configuration)
      * @see #resolveDefaultInput()
      */
     public static FileObject resolveDefaultInputBlocking(long timeoutMillis) throws IllegalArgumentException,
@@ -214,6 +230,9 @@ public class PADataSpaces {
      *             indicates VFS related exception
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
+     * @throws ProActiveRuntimeException
+     *             when resolved space's file system has not enough capabilities (because of wrong
+     *             configuration)
      * @see #resolveDefaultInput(String)
      */
     public static FileObject resolveDefaultInputBlocking(String path, long timeoutMillis)
@@ -242,6 +261,9 @@ public class PADataSpaces {
      *             indicates VFS related exception
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
+     * @throws ProActiveRuntimeException
+     *             when resolved space's file system has not enough capabilities (because of wrong
+     *             configuration)
      */
     public static FileObject resolveDefaultOutputBlocking(long timeoutMillis)
             throws IllegalArgumentException, ProActiveTimeoutException, FileSystemException,
@@ -273,6 +295,9 @@ public class PADataSpaces {
      *             indicates VFS related exception
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
+     * @throws ProActiveRuntimeException
+     *             when resolved space's file system has not enough capabilities (because of wrong
+     *             configuration)
      */
     public static FileObject resolveDefaultOutputBlocking(String path, long timeoutMillis)
             throws IllegalArgumentException, ProActiveTimeoutException, FileSystemException,
@@ -293,6 +318,9 @@ public class PADataSpaces {
      *             indicates VFS related exception
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
+     * @throws ProActiveRuntimeException
+     *             when resolved space's file system has not enough capabilities (because of wrong
+     *             configuration)
      * @see #resolveInputBlocking(long)
      * @see #resolveInput(String, String)
      */
@@ -311,8 +339,9 @@ public class PADataSpaces {
      * {@link FileObject#createFile()} or {@link FileObject#createFolder()} method. Closing returned
      * FileObject is a caller's responsibility.
      * <p>
-     * Input data space content is expected to be readable from any node of this application if it
-     * was defined correctly. It is intended to provide any form of input to the application.
+     * As input data space capabilities are checked, its content is expected to be readable from any
+     * node of this application if it was defined correctly. It is intended to provide any form of
+     * input to the application.
      * 
      * @param name
      *            name of an input data space to resolve
@@ -327,6 +356,9 @@ public class PADataSpaces {
      *             indicates VFS related exception
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
+     * @throws ProActiveRuntimeException
+     *             when resolved space's file system has not enough capabilities (because of wrong
+     *             configuration)
      * @see #resolveInputBlocking(String, String, long)
      */
     public static FileObject resolveInput(String name, String path) throws SpaceNotFoundException,
@@ -347,6 +379,9 @@ public class PADataSpaces {
      *             indicates VFS related exception
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
+     * @throws ProActiveRuntimeException
+     *             when resolved space's file system has not enough capabilities (because of wrong
+     *             configuration)
      * @see #resolveOutputBlocking(long)
      * @see #resolveOutput(String, String)
      */
@@ -382,6 +417,9 @@ public class PADataSpaces {
      *             indicates VFS related exception
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
+     * @throws ProActiveRuntimeException
+     *             when resolved space's file system has not enough capabilities (because of wrong
+     *             configuration)
      * @see #resolveOutputBlocking(String, String, long)
      */
     public static FileObject resolveOutput(String name, String path) throws SpaceNotFoundException,
@@ -411,6 +449,9 @@ public class PADataSpaces {
      *             indicates VFS related exception
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
+     * @throws ProActiveRuntimeException
+     *             when resolved space's file system has not enough capabilities (because of wrong
+     *             configuration)
      * @see #resolveInput(String)
      */
     public static FileObject resolveInputBlocking(String name, long timeoutMillis)
@@ -445,6 +486,9 @@ public class PADataSpaces {
      *             indicates VFS related exception
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
+     * @throws ProActiveRuntimeException
+     *             when resolved space's file system has not enough capabilities (because of wrong
+     *             configuration)
      * @see #resolveInput(String, String)
      */
     public static FileObject resolveInputBlocking(String name, String path, long timeoutMillis)
@@ -475,6 +519,9 @@ public class PADataSpaces {
      *             indicates VFS related exception
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
+     * @throws ProActiveRuntimeException
+     *             when resolved space's file system has not enough capabilities (because of wrong
+     *             configuration)
      * @see #resolveOutput(String)
      */
     public static FileObject resolveOutputBlocking(String name, long timeoutMillis)
@@ -509,6 +556,9 @@ public class PADataSpaces {
      *             indicates VFS related exception
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
+     * @throws ProActiveRuntimeException
+     *             when resolved space's file system has not enough capabilities (because of wrong
+     *             configuration)
      * @see #resolveOutput(String, String)
      */
     public static FileObject resolveOutputBlocking(String name, String path, long timeoutMillis)
@@ -527,6 +577,9 @@ public class PADataSpaces {
      * @throws NotConfiguredException
      *             when scratch data space is not configured on caller's node or this node is not
      *             configured for Data Spaces application at all
+     * @throws ProActiveRuntimeException
+     *             when resolved space's file system has not enough capabilities (because of wrong
+     *             configuration)
      * @see #resolveScratchForAO(String)
      */
     public static FileObject resolveScratchForAO() throws FileSystemException, NotConfiguredException {
@@ -543,10 +596,11 @@ public class PADataSpaces {
      * {@link FileObject#createFile()} or {@link FileObject#createFolder()} method. Closing returned
      * FileObject is a caller's responsibility.
      * <p>
-     * Returned scratch is expected to be writable by this Active Object and readable by other
-     * Active Objects of this application, if it was defined correctly. It is intended to store any
-     * temporary results of computation and possibly share them with other Active Objects. These
-     * results will be most probably automatically removed after application terminates.
+     * As returned scratch minimal capabilities are checked, its content is expected to be writable
+     * by this Active Object and readable by other Active Objects of this application. It is
+     * intended to store any temporary results of computation and possibly share them with other
+     * Active Objects. These results will be most probably automatically removed after application
+     * terminates.
      * 
      * @param path
      *            path of a file in the scratch for calling Active Object; <code>null</code> denotes
@@ -557,6 +611,9 @@ public class PADataSpaces {
      * @throws NotConfiguredException
      *             when scratch data space is not configured on caller's node or this node is not
      *             configured for Data Spaces application at all
+     * @throws ProActiveRuntimeException
+     *             when resolved space's file system has not enough capabilities (because of wrong
+     *             configuration)
      */
     public static FileObject resolveScratchForAO(String path) throws FileSystemException,
             NotConfiguredException {
@@ -653,9 +710,10 @@ public class PADataSpaces {
      * regardless of the underlying protocol. Every output is mounted in result of this call, i.e.
      * it does refresh local VFS view. Closing returned FileObjects is a caller's responsibility.
      * <p>
-     * Output data spaces content is expected to be readable from any node of this application if it
-     * was defined correctly. It is intended to provide any form of output to the application. Names
-     * of output spaces are application-level contract.
+     * As output data spaces minimal capabilities are checked, their content is expected to be
+     * readable from any node of this application if it was defined correctly. It is intended to
+     * provide any form of output to the application. Names of output spaces are application-level
+     * contract.
      * 
      * @return map of all names of outputs defined for caller's application before the moment of
      *         this call to file handles to these outputs; default output name is denoted as
@@ -664,6 +722,9 @@ public class PADataSpaces {
      *             indicates VFS related exception
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
+     * @throws ProActiveRuntimeException
+     *             when resolved space's file system has not enough capabilities (because of wrong
+     *             configuration)
      * @see #getAllKnownOutputNames()
      */
     public static Map<String, FileObject> resolveAllKnownOutputs() throws FileSystemException,
@@ -698,6 +759,9 @@ public class PADataSpaces {
      *             indicates VFS related exception
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
+     * @throws ProActiveRuntimeException
+     *             when resolved space's file system has not enough capabilities (because of wrong
+     *             configuration)
      * @see #getURI(FileObject)
      */
     public static FileObject resolveFile(String uri) throws MalformedURIException, SpaceNotFoundException,
@@ -869,8 +933,8 @@ public class PADataSpaces {
     }
 
     /**
-     * Returns the file system's capabilities that are fulfilled by specified space type. Contracted
-     * by specification.
+     * Returns the file system's minimal capabilities that are fulfilled by specified space type.
+     * Contracted by the specification.
      * <p>
      * For {@link SpaceType#SCRATCH} space the returned capabilities refer only to an ActiveObject's
      * site that owns that scratch, obtained previously by
@@ -879,13 +943,13 @@ public class PADataSpaces {
      * <p>
      * For {@link SpaceType#INPUT} and {@link SpaceType#OUTPUT} spaces the returned capabilities
      * remains valid on all sites.
-     *
+     * 
      * @param type
      *            space type that file system capabilities are to be returned for, cannot be
      *            <code>null</code>
      * @return array containing capabilities of a file system for the specified space type, cannot
      *         be <code>null</code>
-     *
+     * 
      */
     public static Capability[] getCapabilitiesForSpaceType(SpaceType type) {
         return capabilitesSpecification.get(type);
