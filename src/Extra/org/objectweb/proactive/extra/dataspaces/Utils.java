@@ -218,6 +218,30 @@ public class Utils {
         assertCapabilitiesMatch(expected, fo.getFileSystem());
     }
 
+    /**
+     * Checks if the calling thread is owner of specified a scratch. If specified scratch URI is not
+     * a valid one (with different type or without defined Active Object ID), <code>false</code> is
+     * returned.
+     *
+     * @param uri
+     *            of a scratch to check
+     * @return <code>true</code> if the calling thread is owner of a scratch with specified valid
+     *         URI, <code>false</code> in any other case
+     */
+    public static boolean isScratchOwnedByCallingThread(DataSpacesURI uri) {
+        if (uri.getSpaceType() != SpaceType.SCRATCH)
+            return false;
+
+        final Body body = Utils.getCurrentActiveObjectBody();
+        final String aoId = Utils.getActiveObjectId(body);
+        final String aoIdFromURI = uri.getActiveObjectId();
+
+        if (aoIdFromURI == null)
+            return false;
+
+        return aoIdFromURI.equals(aoId);
+    }
+
     private static boolean isWindowsPath(String location) {
         return WINDOWS_DRIVE_PATTERN.matcher(location).matches();
     }

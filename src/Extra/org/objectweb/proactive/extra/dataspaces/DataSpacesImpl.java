@@ -403,13 +403,16 @@ public class DataSpacesImpl {
                 throw new MalformedURIException("Specified URI represents internal high-level directories");
 
             final DataSpacesFileObjectImpl fo = spacesMountManager.resolveFile(spaceURI);
-            final SpaceType type = spaceURI.getSpaceType(); // as isComplete cannot be null
+            SpaceType type = spaceURI.getSpaceType(); // as isComplete cannot be null
 
             if (logger.isTraceEnabled())
                 logger.trace("Resolved file: " + uri);
 
-            // FIXME: temporal workaround as we should check if this is a scratch owned by calling thread..
-            checkCapabilitiesOrWound(fo, SpaceType.INPUT);
+            // CCheck if specified URI refers to scratch, and if so, who is its owner.
+            if (type == SpaceType.SCRATCH && !Utils.isScratchOwnedByCallingThread(spaceURI))
+                type = SpaceType.INPUT;
+
+            checkCapabilitiesOrWound(fo, type);
             setWriteLimitingPolicy(fo);
             return fo;
         } catch (MalformedURIException x) {
