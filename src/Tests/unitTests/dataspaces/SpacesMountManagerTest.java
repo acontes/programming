@@ -23,6 +23,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.extra.dataspaces.DataSpacesURI;
 import org.objectweb.proactive.extra.dataspaces.InputOutputSpaceConfiguration;
+import org.objectweb.proactive.extra.dataspaces.PADataSpaces;
 import org.objectweb.proactive.extra.dataspaces.SpaceInstanceInfo;
 import org.objectweb.proactive.extra.dataspaces.SpaceType;
 import org.objectweb.proactive.extra.dataspaces.SpacesDirectory;
@@ -142,7 +143,7 @@ public class SpacesMountManagerTest {
         final FileObject child = fo.getChild(EXISTING_FILE);
         assertNotNull(child);
         assertTrue(child.exists());
-        assertEquals(spaceUri.toString(), fo.getName().getURI());
+        assertEquals(spaceUri.toString(), PADataSpaces.getURI(fo));
     }
 
     @Test
@@ -155,7 +156,7 @@ public class SpacesMountManagerTest {
         final InputStream io = fileObject.getContent().getInputStream();
         final BufferedReader reader = new BufferedReader(new InputStreamReader(io));
         assertEquals(TEST_FILE_CONTENT, reader.readLine());
-        assertEquals(fileUri.toString(), fileObject.getName().getURI());
+        assertEquals(fileUri.toString(), PADataSpaces.getURI(fileObject));
     }
 
     @Test
