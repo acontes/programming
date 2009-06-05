@@ -56,7 +56,7 @@ public class DataSpacesImpl {
      * @throws ProActiveRuntimeException
      *             when expected capabilities are not fulfilled
      */
-    private static void checkCapabilitiesOrWound(DataSpacesFileObject fo, SpaceType type) {
+    private static void checkCapabilitiesOrWound(DataSpacesFileObjectImpl fo, SpaceType type) {
         Capability[] expected = PADataSpaces.getCapabilitiesForSpaceType(type);
 
         if (logger.isTraceEnabled())
@@ -85,10 +85,10 @@ public class DataSpacesImpl {
         }
     }
 
-    private static FileObject decorateFileObject(final DataSpacesFileObject fo) {
-        // TODO
+    private static void setWriteLimitingPolicy(final DataSpacesFileObjectImpl fo) {
         final String aoId = Utils.getActiveObjectId(Utils.getCurrentActiveObjectBody());
-        return new DataSpacesWriteLimitingFileObject(fo, aoId);
+        final LimitingPolicy policy = new URIBasedWriteLimitingPolicy(aoId, fo);
+        fo.setLimitingPolicy(policy);
     }
 
     private final SpacesMountManager spacesMountManager;
@@ -187,12 +187,13 @@ public class DataSpacesImpl {
         }
 
         try {
-            final DataSpacesFileObject fo = spacesMountManager.resolveFile(uri);
+            final DataSpacesFileObjectImpl fo = spacesMountManager.resolveFile(uri);
             if (logger.isTraceEnabled())
                 logger.trace(String.format("Resolved request for %s with name %s (%s)", type, name, uri));
-            checkCapabilitiesOrWound(fo, type);
 
-            return decorateFileObject(fo);
+            checkCapabilitiesOrWound(fo, type);
+            setWriteLimitingPolicy(fo);
+            return fo;
         } catch (SpaceNotFoundException x) {
             logger.debug("Space not found for input/output space with URI: " + uri, x);
             throw x;
@@ -240,15 +241,15 @@ public class DataSpacesImpl {
         long currTime = startTime;
         while (currTime < startTime + timeoutMillis) {
             try {
-                final DataSpacesFileObject fo = spacesMountManager.resolveFile(uri);
+                final DataSpacesFileObjectImpl fo = spacesMountManager.resolveFile(uri);
                 if (logger.isTraceEnabled()) {
                     final String message = String.format(
                             "Resolved blocking request for %s with name %s (%s)", type, name, uri);
                     logger.trace(message);
                 }
                 checkCapabilitiesOrWound(fo, type);
-
-                return decorateFileObject(fo);
+                setWriteLimitingPolicy(fo);
+                return fo;
             } catch (SpaceNotFoundException e) {
                 logger.debug("Space not found for blocking try for input/output space with URI: " + uri, e);
 
@@ -296,13 +297,14 @@ public class DataSpacesImpl {
         try {
             final DataSpacesURI scratchURI = appScratchSpace.getScratchForAO(body);
             final DataSpacesURI queryURI = scratchURI.withPath(path);
-            final DataSpacesFileObject fo = spacesMountManager.resolveFile(queryURI);
+            final DataSpacesFileObjectImpl fo = spacesMountManager.resolveFile(queryURI);
 
             if (logger.isTraceEnabled())
                 logger.trace("Resolved scratch for an Active Object: " + queryURI);
-            checkCapabilitiesOrWound(fo, SpaceType.SCRATCH);
 
-            return decorateFileObject(fo);
+            checkCapabilitiesOrWound(fo, SpaceType.SCRATCH);
+            setWriteLimitingPolicy(fo);
+            return fo;
         } catch (SpaceNotFoundException e) {
             ProActiveLogger.logImpossibleException(logger, e);
             throw new ProActiveRuntimeException("URI of scratch for Active Object can not be resolved", e);
@@ -355,7 +357,7 @@ public class DataSpacesImpl {
         checkIsInputOrOutput(type);
 
         final DataSpacesURI uri = DataSpacesURI.createURI(appId, type);
-        final Map<DataSpacesURI, DataSpacesFileObject> spaces;
+        final Map<DataSpacesURI, DataSpacesFileObjectImpl> spaces;
         try {
             spaces = spacesMountManager.resolveSpaces(uri);
         } catch (FileSystemException x) {
@@ -365,12 +367,13 @@ public class DataSpacesImpl {
 
         final Map<String, FileObject> ret = new HashMap<String, FileObject>(spaces.size());
 
-        for (Entry<DataSpacesURI, DataSpacesFileObject> entry : spaces.entrySet()) {
+        for (Entry<DataSpacesURI, DataSpacesFileObjectImpl> entry : spaces.entrySet()) {
             final String name = entry.getKey().getName();
-            DataSpacesFileObject fo = entry.getValue();
+            DataSpacesFileObjectImpl fo = entry.getValue();
 
             checkCapabilitiesOrWound(fo, type);
-            ret.put(name, decorateFileObject(fo));
+            setWriteLimitingPolicy(fo);
+            ret.put(name, fo);
         }
 
         if (logger.isTraceEnabled()) {
@@ -399,7 +402,7 @@ public class DataSpacesImpl {
             if (!spaceURI.isSuitableForHavingPath())
                 throw new MalformedURIException("Specified URI represents internal high-level directories");
 
-            final DataSpacesFileObject fo = spacesMountManager.resolveFile(spaceURI);
+            final DataSpacesFileObjectImpl fo = spacesMountManager.resolveFile(spaceURI);
             final SpaceType type = spaceURI.getSpaceType(); // as isComplete cannot be null
 
             if (logger.isTraceEnabled())
@@ -407,7 +410,8 @@ public class DataSpacesImpl {
 
             // FIXME: temporal workaround as we should check if this is a scratch owned by calling thread..
             checkCapabilitiesOrWound(fo, SpaceType.INPUT);
-            return decorateFileObject(fo);
+            setWriteLimitingPolicy(fo);
+            return fo;
         } catch (MalformedURIException x) {
             logger.debug("Can not resolve malformed URI: " + uri, x);
             throw x;

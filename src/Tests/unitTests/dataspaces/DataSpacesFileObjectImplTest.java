@@ -22,7 +22,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.objectweb.proactive.extra.dataspaces.AbstractWriteLimitingFileObject;
+import org.objectweb.proactive.extra.dataspaces.DataSpacesFileObject;
+import org.objectweb.proactive.extra.dataspaces.DataSpacesFileObjectImpl;
+import org.objectweb.proactive.extra.dataspaces.DataSpacesURI;
+import org.objectweb.proactive.extra.dataspaces.LimitingPolicy;
 import org.objectweb.proactive.extra.dataspaces.VFSFactory;
 
 
@@ -30,12 +33,13 @@ import org.objectweb.proactive.extra.dataspaces.VFSFactory;
  * Test for write limiting and keeping (Abstract)FileObject behavior (which is not so obvious,
  * especially regarding unusual behavior like non-existing file, null array etc.).
  */
-public class AbstractWriteLimitingFileObjectTest {
+public class DataSpacesFileObjectImplTest {
     private static final String CHILD_NAME = "abc";
+    private static final DataSpacesURI fakeUri = DataSpacesURI.createScratchSpaceURI(0, "0", "1");
     private FileObject realFile;
-    private FileObject readOnlyFile;
-    private FileObject readWriteFile;
     private FileObject anotherFile;
+    private DataSpacesFileObjectImpl readOnlyFile;
+    private DataSpacesFileObjectImpl readWriteFile;
     private DefaultFileSystemManager manager;
 
     @Before
@@ -44,8 +48,10 @@ public class AbstractWriteLimitingFileObjectTest {
         manager.addProvider("tmpfs", new TemporaryFileProvider());
 
         realFile = manager.resolveFile("tmpfs:///test1/test2");
-        readOnlyFile = new ConstantlyWriteLimitingFileObject(realFile, true);
-        readWriteFile = new ConstantlyWriteLimitingFileObject(realFile, false);
+
+        readWriteFile = new DataSpacesFileObjectImpl(realFile, fakeUri);
+        readOnlyFile = new DataSpacesFileObjectImpl(realFile, fakeUri);
+        readOnlyFile.setLimitingPolicy(new ReadOnlyPolicy());
 
         anotherFile = manager.resolveFile("tmpfs:///test2");
         anotherFile.createFile();
@@ -138,7 +144,7 @@ public class AbstractWriteLimitingFileObjectTest {
         assertFalse(readOnlyFile.canRenameTo(anotherFile));
     }
 
-    // limitation of AbstractWriteLimitingFileObject
+    // limitation of AbstractLimitingFileObject
     @Ignore
     @Test
     public void testReadOnlyCanRenameToFileObjectDesination() {
@@ -266,8 +272,12 @@ public class AbstractWriteLimitingFileObjectTest {
 
     @Test
     public void testReadOnlyGetParentForRoot() throws FileSystemException {
-        final FileObject parent = new ConstantlyWriteLimitingFileObject(readOnlyFile.getFileSystem()
-                .getRoot(), true).getParent();
+        final DataSpacesFileObjectImpl root = new DataSpacesFileObjectImpl(readOnlyFile.getFileSystem()
+                .getRoot(), fakeUri);
+
+        root.setLimitingPolicy(new ReadOnlyPolicy());
+
+        final FileObject parent = root.getParent();
         assertNull(parent);
     }
 
@@ -482,8 +492,10 @@ public class AbstractWriteLimitingFileObjectTest {
 
     @Test
     public void testReadWriteGetParentForRoot() throws FileSystemException {
-        final FileObject parent = new ConstantlyWriteLimitingFileObject(readWriteFile.getFileSystem()
-                .getRoot(), true).getParent();
+        final DataSpacesFileObjectImpl root = new DataSpacesFileObjectImpl(readOnlyFile.getFileSystem()
+                .getRoot(), fakeUri);
+
+        final FileObject parent = root.getParent();
         assertNull(parent);
     }
 
@@ -541,22 +553,13 @@ public class AbstractWriteLimitingFileObjectTest {
         assertTrue(sameFile.isWriteable());
     }
 
-    private static class ConstantlyWriteLimitingFileObject extends AbstractWriteLimitingFileObject {
-        private boolean readOnly;
-
-        public ConstantlyWriteLimitingFileObject(final FileObject decoratedFileObject, final boolean readOnly) {
-            super(decoratedFileObject);
-            this.readOnly = readOnly;
+    private static class ReadOnlyPolicy implements LimitingPolicy {
+        public boolean isReadOnly() {
+            return true;
         }
 
-        @Override
-        protected FileObject doDecorateFile(FileObject file) {
-            return new ConstantlyWriteLimitingFileObject(file, readOnly);
-        }
-
-        @Override
-        protected boolean isReadOnly() {
-            return readOnly;
+        public LimitingPolicy newInstance(DataSpacesFileObject newFileObject) {
+            return this;
         }
     }
 }

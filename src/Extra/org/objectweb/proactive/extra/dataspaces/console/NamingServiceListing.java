@@ -16,7 +16,7 @@ import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
 import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.extra.dataspaces.DataSpacesFileObject;
+import org.objectweb.proactive.extra.dataspaces.DataSpacesFileObjectImpl;
 import org.objectweb.proactive.extra.dataspaces.DataSpacesURI;
 import org.objectweb.proactive.extra.dataspaces.NamingService;
 import org.objectweb.proactive.extra.dataspaces.SpaceInstanceInfo;
@@ -76,9 +76,9 @@ public class NamingServiceListing {
         mountManager = new SpacesMountManager(namingService);
 
         // get FileObject for each space
-        final Map<DataSpacesURI, DataSpacesFileObject> files = mountManager.resolveSpaces(query);
+        final Map<DataSpacesURI, DataSpacesFileObjectImpl> files = mountManager.resolveSpaces(query);
 
-        for (Entry<DataSpacesURI, DataSpacesFileObject> space : files.entrySet()) {
+        for (Entry<DataSpacesURI, DataSpacesFileObjectImpl> space : files.entrySet()) {
             try {
                 final List<String> list = new LinkedList<String>();
 

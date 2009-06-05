@@ -19,15 +19,14 @@ import org.apache.commons.vfs.util.RandomAccessMode;
 
 
 /**
- * Abstract FileObject decorator, trying to limit any write access to the file basing on pluggable
- * rule.
+ * Abstract FileObject decorator, checking if to limit any access to the file basing on pluggable
+ * limit policy, set trough {@link #setLimitingPolicy(LimitingPolicy)} method.
  * <p>
- * Decorator limits direct write access (like deleting file, opening output stream from
+ * Decorator may limit direct write access (like deleting file, opening output stream from
  * getContent()), write checks (like isWriteable()), but also decorates every returned FileObject.
  * Way of decorating returned files is also pluggable.
  * <p>
- * Implementors should provide {@link #isReadOnly()} and {@link #doDecorateFile(FileObject)}
- * methods.
+ * Implementors should provide {@link #doDecorateFile(FileObject)} method.
  * <p>
  * <strong>Known limitations:</strong>
  * <ul>
@@ -38,15 +37,15 @@ import org.apache.commons.vfs.util.RandomAccessMode;
  * some buggy providers; depends on VFS bug: VFS-258</li>
  * </ul>
  */
-public abstract class AbstractWriteLimitingFileObject extends DecoratedFileObject {
-    public AbstractWriteLimitingFileObject(final FileObject decoratedFileObject) {
-        super(decoratedFileObject);
-    }
+public abstract class AbstractLimitingFileObject extends DecoratedFileObject {
 
-    /**
-     * @return <code>true</code> if file is read-only, <code>false</code> otherwise
-     */
-    protected abstract boolean isReadOnly();
+    private volatile LimitingPolicy limitingPolicy;
+
+    private Object policyLock = new Object();
+
+    public AbstractLimitingFileObject(final FileObject fileObject) {
+        super(fileObject);
+    }
 
     /**
      * @param file
@@ -58,6 +57,28 @@ public abstract class AbstractWriteLimitingFileObject extends DecoratedFileObjec
     private void checkIsNotReadOnly() throws FileSystemException {
         if (isReadOnly())
             throw new FileSystemException("File is read-only");
+    }
+
+    /**
+     * Delegates the isReadOnly query to the policy that has been set.
+     *
+     * @return <code>true</code> if file is read-only, <code>false</code> otherwise
+     */
+    private boolean isReadOnly() {
+        final LimitingPolicy policy = getLimitingPolicy();
+        return (policy == null) ? false : policy.isReadOnly();
+    }
+
+    public LimitingPolicy getLimitingPolicy() {
+        synchronized (policyLock) {
+            return limitingPolicy;
+        }
+    }
+
+    public void setLimitingPolicy(LimitingPolicy policy) {
+        synchronized (policyLock) {
+            limitingPolicy = policy;
+        }
     }
 
     @Override
@@ -212,7 +233,7 @@ public abstract class AbstractWriteLimitingFileObject extends DecoratedFileObjec
             // providers implementations (see HttpFileContentInfoFactory and WebdavFileContentInfoFactory).
             // They would require change to use something like FileObjectUtils.getAbstractFileObject()
             // instead of casting. Patch proposed, depends on VFS-259
-            // return decorateFile(content.getFile()); 
+            // return decorateFile(content.getFile());
             return content.getFile();
         }
 
