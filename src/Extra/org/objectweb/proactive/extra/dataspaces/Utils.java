@@ -8,7 +8,6 @@ import java.util.regex.Pattern;
 import org.apache.commons.vfs.Capability;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystem;
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -17,8 +16,6 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.util.ProActiveInet;
-import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 
 
@@ -28,8 +25,6 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationExceptio
 public class Utils {
 
     private static final Pattern WINDOWS_DRIVE_PATTERN = Pattern.compile("^[a-zA-Z]:\\\\.*");
-
-    private static final Logger logger = ProActiveLogger.getLogger(Loggers.DATASPACES);
 
     private Utils() {
     }
@@ -207,33 +202,20 @@ public class Utils {
     }
 
     /**
-     * Assert that given FileObject's file system has required capabilities. FileObject is expected
-     * to be decorated with CapabilitiesInfoFileObject. Throw an ConfigurationException if it does
-     * not.
-     * <p>
-     * FIXME: this doesn't work as wish VFS-262 (or related TODO in VFS) won't be resolved..
+     * Assert that given FileObject's file system has required capabilities. Throw an
+     * ConfigurationException if it does not.
      *
      * @param expected
      *            array containing expected capabilities of the specified FileObject's file system.
      * @param fo
      *            specified FileObject decorated with CapabilitiesInfoFileObject
-     * @return instance of FileObject without CapabilitiesInfoFileObject decorator
      * @throws ConfigurationException
      *             when the FileObject's file system does not have one of expected capabilities
-     * @see {@link CapabilitiesInfoFileObject}
      */
-    public static FileObject assertCapabilitiesMatch(Capability[] expected, FileObject fo)
+    public static void assertCapabilitiesMatch(Capability[] expected, FileObject fo)
             throws ConfigurationException {
 
-        if (!(fo instanceof CapabilitiesInfoFileObject)) {
-            logger
-                    .debug("Could not check FileObject's fs capabilities - CapabilitiesInfoFileObject decorator not found");
-            return fo;
-        }
-
-        final CapabilitiesInfoFileObject decoratedFileObject = (CapabilitiesInfoFileObject) fo;
-        decoratedFileObject.assertCapabilitiesMatch(expected);
-        return decoratedFileObject.getDecoratedFileObject();
+        assertCapabilitiesMatch(expected, fo.getFileSystem());
     }
 
     private static boolean isWindowsPath(String location) {

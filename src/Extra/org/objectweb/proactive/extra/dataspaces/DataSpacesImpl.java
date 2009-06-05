@@ -56,21 +56,19 @@ public class DataSpacesImpl {
      * @throws ProActiveRuntimeException
      *             when expected capabilities are not fulfilled
      */
-    private static FileObject checkCapabilitiesOrWound(DataSpacesFileObject fo, SpaceType type) {
+    private static void checkCapabilitiesOrWound(DataSpacesFileObject fo, SpaceType type) {
         Capability[] expected = PADataSpaces.getCapabilitiesForSpaceType(type);
 
         if (logger.isTraceEnabled())
             logger.trace(String.format("Checking FS capabilities (count: %d) for %s type", expected.length,
                     type));
 
-        FileObject ret = null;
         try {
-            ret = Utils.assertCapabilitiesMatch(expected, fo);
+            Utils.assertCapabilitiesMatch(expected, fo);
         } catch (ConfigurationException x) {
             logger.error("Resolved space's file system: " + x.getMessage());
             throw new ProActiveRuntimeException(x);
         }
-        return ret;
     }
 
     private static void checkIsInputOrOutput(SpaceType type) {
