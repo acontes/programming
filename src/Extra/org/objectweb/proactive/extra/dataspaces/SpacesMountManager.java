@@ -21,19 +21,18 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundExceptio
 /**
  * Manages data spaces mountings, connecting VFS and Data Spaces worlds.
  * <p>
- * Manager creates and maintains Apache VFS manager together with VirtualFileSystem instance to
- * provide virtual view of file system for each application. It is able to response to queries for
- * files in data spaces or just data spaces, providing VFS FileObject interface as a result.
- * Returned FileObject instances are applicable for user level code, although some write-limiting
- * may be required for them.
+ * Manager creates and maintains Apache VFS manager to pose virtual view provider of file system for
+ * each application. It is able to response to queries for files in data spaces or just data spaces,
+ * providing DataSpacesFileObject decorator as a result. Returned FileObject decorator instances are
+ * applicable for user level code, although some write-limiting may be required for them.
  * <p>
  * To be able to serve requests for files and data spaces, SpaceMountManager must use
  * {@link SpacesDirectory} as a source of information about data spaces, their mounting points and
  * access methods.
  * <p>
- * Manager maintains mountings (in VFS world: "junctions") of data spaces on VFS instance, using
- * lazy on-request strategy in current implementation. Space is mounted only when there is request
- * to provide FileObject for its content. Proper, local or remote access is determined using
+ * Manager maintains mountings of data spaces in local Map, using lazy on-request strategy in
+ * current implementation. Space is mounted only when there is request to provide FileObject for its
+ * content. Proper, local or remote access is determined using
  * {@link Utils#getLocalAccessURL(String, String, String)} method. Write-capabilities of returned
  * FileObjects are induced from used protocols' providers - SpacesMountManager does not apply any
  * limitation decorators like {@link AbstractWriteLimitingFileObject} on its own.
@@ -47,11 +46,6 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundExceptio
  */
 public class SpacesMountManager {
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.DATASPACES_MOUNT_MANAGER);
-
-    private static String getVFSPath(final DataSpacesURI uri) {
-        // another nasty Apache VFS hacks
-        return uri.toString().substring(DataSpacesURI.SCHEME.length());
-    }
 
     private final DefaultFileSystemManager vfsManager;
     private final SpacesDirectory directory;
@@ -103,18 +97,18 @@ public class SpacesMountManager {
     }
 
     /**
-     * TODO: javadoc update TODO: block abstract resolving
+     * TODO: block abstract resolving
      * <p>
      * Resolves query for concrete URI within Data Spaces virtual tree, resulting in file-level
      * access to this place.
      * <p>
-     * If query URI is suitable for having path, then returned FileObject can be safely used to
-     * access data in that data spaces, i.e. it conforms to all Data Spaces guarantees regarding
-     * that access.
+     * If query URI is suitable for having path, then returned FileObject decorator can be safely
+     * used to access data in that data spaces, i.e. it conforms to all Data Spaces guarantees
+     * regarding that access.
      * <p>
      * If query URI is not suitable for having path (for example, refers only to application id),
-     * then returned FileObject does not provide reliable access to virtual tree, just to the
-     * current state of mountings in that tree. Such queries are not recommended.
+     * then returned FileObject decorator does not provide reliable access to virtual tree, just to
+     * the current state of mountings in that tree. Such queries are not recommended.
      * <p>
      * This call may block for a while, if {@link SpacesDirectory} need to be queried for data space
      * and/or data space may need to be mounted.
@@ -149,8 +143,6 @@ public class SpacesMountManager {
     }
 
     /**
-     * TODO: update javadoc
-     * <p>
      * Resolve query for URI without space part being fully defined, resulting in file-level access
      * to all data spaces that shares this common prefix.
      * <p>
@@ -167,10 +159,10 @@ public class SpacesMountManager {
      * @param queryUri
      *            Data Spaces URI to query for; must be URI without space part being fully defined,
      *            i.e. not pointing to any concrete data space
-     * @return map of data spaces URIs that match the query, pointing to VFS FileObjects that can be
-     *         used to access their content; returned FileObjects are not opened nor attached in any
-     *         way; these FileObject instances will never be shared, i.e. another instances are
-     *         returned for subsequent queries (even the same queries)
+     * @return map of data spaces URIs that match the query, pointing to VFS FileObject decorators
+     *         that can be used to access their content; returned FileObject decorators are not
+     *         opened nor attached in any way; these FileObject instances will never be shared, i.e.
+     *         another instances are returned for subsequent queries (even the same queries)
      * @throws FileSystemException
      *             indicates VFS related exception during access, like mounting problems, I/O errors
      *             etc.
@@ -193,7 +185,6 @@ public class SpacesMountManager {
                 ProActiveLogger.logImpossibleException(logger, e);
                 throw new RuntimeException(e);
             }
-            // TODO decorate...
             final FileObject fo = resolveFileVFS(spaceUri);
             result.put(spaceUri, new DataSpacesFileObject(fo, spaceUri));
         }
@@ -203,9 +194,9 @@ public class SpacesMountManager {
     /**
      * Closes this manager instance.
      * <p>
-     * Closing it indicates unmounting mounted data spaces and closing VirtualFileSystem instance.
-     * Any further access to already opened FileObject within these data spaces or any call of this
-     * instance may result in undefined behavior for caller.
+     * Closing it indicates unmounting mounted data spaces. Any further access to already opened
+     * FileObject within these data spaces or any call of this instance may result in undefined
+     * behavior for caller.
      * <p>
      * VFS manager instance nor SpacesDirectory instance provided at constructor are not closed in
      * any way.
