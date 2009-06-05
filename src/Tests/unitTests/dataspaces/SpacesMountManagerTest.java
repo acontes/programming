@@ -21,6 +21,7 @@ import org.apache.commons.vfs.FileSystemException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.objectweb.proactive.extra.dataspaces.DataSpacesFileObject;
 import org.objectweb.proactive.extra.dataspaces.DataSpacesURI;
 import org.objectweb.proactive.extra.dataspaces.InputOutputSpaceConfiguration;
 import org.objectweb.proactive.extra.dataspaces.PADataSpaces;
@@ -205,7 +206,7 @@ public class SpacesMountManagerTest {
     @Test
     public void testResolveSpaces() throws FileSystemException {
         final DataSpacesURI queryUri = DataSpacesURI.createURI(spaceUri.getAppId());
-        final Map<DataSpacesURI, FileObject> spaces = manager.resolveSpaces(queryUri);
+        final Map<DataSpacesURI, DataSpacesFileObject> spaces = manager.resolveSpaces(queryUri);
         assertEquals(1, spaces.size());
 
         fileObject = spaces.get(spaceUri);
@@ -229,11 +230,11 @@ public class SpacesMountManagerTest {
     public void testResolveSpacesNotSharedFileObject() throws FileSystemException {
         final DataSpacesURI queryUri = DataSpacesURI.createURI(spaceUri.getAppId());
 
-        final Map<DataSpacesURI, FileObject> spaces1 = manager.resolveSpaces(queryUri);
+        final Map<DataSpacesURI, DataSpacesFileObject> spaces1 = manager.resolveSpaces(queryUri);
         assertEquals(1, spaces1.size());
         final FileObject fileObject1 = spaces1.get(spaceUri);
 
-        final Map<DataSpacesURI, FileObject> spaces2 = manager.resolveSpaces(queryUri);
+        final Map<DataSpacesURI, DataSpacesFileObject> spaces2 = manager.resolveSpaces(queryUri);
         assertEquals(1, spaces2.size());
         final FileObject fileObject2 = spaces2.get(spaceUri);
         assertNotSame(fileObject1, fileObject2);
