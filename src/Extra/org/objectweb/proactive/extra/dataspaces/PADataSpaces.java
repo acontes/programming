@@ -10,7 +10,6 @@ import java.util.Set;
 import org.apache.commons.vfs.Capability;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
-import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
@@ -75,14 +74,14 @@ public class PADataSpaces {
      *             indicates VFS related exception
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
-     * @throws ProActiveRuntimeException
+     * @throws ConfigurationException
      *             when resolved space's file system has not enough capabilities (because of wrong
      *             configuration)
      * @see #resolveDefaultInputBlocking(long)
      * @see #resolveDefaultInput(String)
      */
     public static FileObject resolveDefaultInput() throws SpaceNotFoundException, FileSystemException,
-            NotConfiguredException {
+            NotConfiguredException, ConfigurationException {
         return getMyDataSpacesImpl().resolveDefaultInputOutput(SpaceType.INPUT, null);
     }
 
@@ -111,13 +110,13 @@ public class PADataSpaces {
      *             indicates VFS related exception
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
-     * @throws ProActiveRuntimeException
+     * @throws ConfigurationException
      *             when resolved space's file system has not enough capabilities (because of wrong
      *             configuration)
      * @see #resolveDefaultInputBlocking(String, long)
      */
     public static FileObject resolveDefaultInput(String path) throws SpaceNotFoundException,
-            FileSystemException, NotConfiguredException {
+            FileSystemException, NotConfiguredException, ConfigurationException {
         return getMyDataSpacesImpl().resolveDefaultInputOutput(SpaceType.INPUT, path);
     }
 
@@ -132,14 +131,14 @@ public class PADataSpaces {
      *             indicates VFS related exception
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
-     * @throws ProActiveRuntimeException
+     * @throws ConfigurationException
      *             when resolved space's file system has not enough capabilities (because of wrong
      *             configuration)
      * @see #resolveDefaultOutputBlocking(long)
      * @see #resolveDefaultOutput(String)
      */
     public static FileObject resolveDefaultOutput() throws SpaceNotFoundException, FileSystemException,
-            NotConfiguredException {
+            NotConfiguredException, ConfigurationException {
         return getMyDataSpacesImpl().resolveDefaultInputOutput(SpaceType.OUTPUT, null);
     }
 
@@ -168,13 +167,13 @@ public class PADataSpaces {
      *             indicates VFS related exception
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
-     * @throws ProActiveRuntimeException
+     * @throws ConfigurationException
      *             when resolved space's file system has not enough capabilities (because of wrong
      *             configuration)
      * @see #resolveDefaultOutputBlocking(String, long)
      */
     public static FileObject resolveDefaultOutput(String path) throws SpaceNotFoundException,
-            FileSystemException, NotConfiguredException {
+            FileSystemException, NotConfiguredException, ConfigurationException {
         return getMyDataSpacesImpl().resolveDefaultInputOutput(SpaceType.OUTPUT, path);
     }
 
@@ -197,13 +196,14 @@ public class PADataSpaces {
      *             indicates VFS related exception
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
-     * @throws ProActiveRuntimeException
+     * @throws ConfigurationException
      *             when resolved space's file system has not enough capabilities (because of wrong
      *             configuration)
      * @see #resolveDefaultInput()
      */
-    public static FileObject resolveDefaultInputBlocking(long timeoutMillis) throws IllegalArgumentException,
-            ProActiveTimeoutException, FileSystemException, NotConfiguredException {
+    public static FileObject resolveDefaultInputBlocking(long timeoutMillis)
+            throws ProActiveTimeoutException, FileSystemException, NotConfiguredException,
+            ConfigurationException {
         return getMyDataSpacesImpl().resolveDefaultInputOutputBlocking(timeoutMillis, SpaceType.INPUT, null);
     }
 
@@ -230,14 +230,14 @@ public class PADataSpaces {
      *             indicates VFS related exception
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
-     * @throws ProActiveRuntimeException
+     * @throws ConfigurationException
      *             when resolved space's file system has not enough capabilities (because of wrong
      *             configuration)
      * @see #resolveDefaultInput(String)
      */
     public static FileObject resolveDefaultInputBlocking(String path, long timeoutMillis)
             throws IllegalArgumentException, ProActiveTimeoutException, FileSystemException,
-            NotConfiguredException {
+            NotConfiguredException, ConfigurationException {
         return getMyDataSpacesImpl().resolveDefaultInputOutputBlocking(timeoutMillis, SpaceType.INPUT, path);
     }
 
@@ -261,13 +261,13 @@ public class PADataSpaces {
      *             indicates VFS related exception
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
-     * @throws ProActiveRuntimeException
+     * @throws ConfigurationException
      *             when resolved space's file system has not enough capabilities (because of wrong
      *             configuration)
      */
     public static FileObject resolveDefaultOutputBlocking(long timeoutMillis)
             throws IllegalArgumentException, ProActiveTimeoutException, FileSystemException,
-            NotConfiguredException {
+            NotConfiguredException, ConfigurationException {
         return getMyDataSpacesImpl().resolveDefaultInputOutputBlocking(timeoutMillis, SpaceType.OUTPUT, null);
     }
 
@@ -295,13 +295,13 @@ public class PADataSpaces {
      *             indicates VFS related exception
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
-     * @throws ProActiveRuntimeException
+     * @throws ConfigurationException
      *             when resolved space's file system has not enough capabilities (because of wrong
      *             configuration)
      */
     public static FileObject resolveDefaultOutputBlocking(String path, long timeoutMillis)
             throws IllegalArgumentException, ProActiveTimeoutException, FileSystemException,
-            NotConfiguredException {
+            NotConfiguredException, ConfigurationException {
         return getMyDataSpacesImpl().resolveDefaultInputOutputBlocking(timeoutMillis, SpaceType.OUTPUT, path);
     }
 
@@ -318,14 +318,15 @@ public class PADataSpaces {
      *             indicates VFS related exception
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
-     * @throws ProActiveRuntimeException
+     * @throws IllegalArgumentException
+     * @throws ConfigurationException
      *             when resolved space's file system has not enough capabilities (because of wrong
      *             configuration)
      * @see #resolveInputBlocking(long)
      * @see #resolveInput(String, String)
      */
     public static FileObject resolveInput(String name) throws SpaceNotFoundException, FileSystemException,
-            NotConfiguredException {
+            NotConfiguredException, ConfigurationException, IllegalArgumentException {
         return getMyDataSpacesImpl().resolveInputOutput(name, SpaceType.INPUT, null);
     }
 
@@ -356,13 +357,13 @@ public class PADataSpaces {
      *             indicates VFS related exception
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
-     * @throws ProActiveRuntimeException
+     * @throws ConfigurationException
      *             when resolved space's file system has not enough capabilities (because of wrong
      *             configuration)
      * @see #resolveInputBlocking(String, String, long)
      */
     public static FileObject resolveInput(String name, String path) throws SpaceNotFoundException,
-            FileSystemException, NotConfiguredException {
+            FileSystemException, NotConfiguredException, ConfigurationException {
         return getMyDataSpacesImpl().resolveInputOutput(name, SpaceType.INPUT, path);
     }
 
@@ -379,14 +380,14 @@ public class PADataSpaces {
      *             indicates VFS related exception
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
-     * @throws ProActiveRuntimeException
+     * @throws ConfigurationException
      *             when resolved space's file system has not enough capabilities (because of wrong
      *             configuration)
      * @see #resolveOutputBlocking(long)
      * @see #resolveOutput(String, String)
      */
     public static FileObject resolveOutput(String name) throws SpaceNotFoundException, FileSystemException,
-            NotConfiguredException {
+            NotConfiguredException, ConfigurationException {
         return getMyDataSpacesImpl().resolveInputOutput(name, SpaceType.OUTPUT, null);
     }
 
@@ -417,13 +418,13 @@ public class PADataSpaces {
      *             indicates VFS related exception
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
-     * @throws ProActiveRuntimeException
+     * @throws ConfigurationException
      *             when resolved space's file system has not enough capabilities (because of wrong
      *             configuration)
      * @see #resolveOutputBlocking(String, String, long)
      */
     public static FileObject resolveOutput(String name, String path) throws SpaceNotFoundException,
-            FileSystemException, NotConfiguredException {
+            FileSystemException, NotConfiguredException, ConfigurationException {
         return getMyDataSpacesImpl().resolveInputOutput(name, SpaceType.OUTPUT, path);
     }
 
@@ -449,14 +450,14 @@ public class PADataSpaces {
      *             indicates VFS related exception
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
-     * @throws ProActiveRuntimeException
+     * @throws ConfigurationException
      *             when resolved space's file system has not enough capabilities (because of wrong
      *             configuration)
      * @see #resolveInput(String)
      */
     public static FileObject resolveInputBlocking(String name, long timeoutMillis)
             throws IllegalArgumentException, ProActiveTimeoutException, FileSystemException,
-            NotConfiguredException {
+            NotConfiguredException, ConfigurationException {
         return getMyDataSpacesImpl().resolveInputOutputBlocking(name, timeoutMillis, SpaceType.INPUT, null);
     }
 
@@ -486,14 +487,14 @@ public class PADataSpaces {
      *             indicates VFS related exception
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
-     * @throws ProActiveRuntimeException
+     * @throws ConfigurationException
      *             when resolved space's file system has not enough capabilities (because of wrong
      *             configuration)
      * @see #resolveInput(String, String)
      */
     public static FileObject resolveInputBlocking(String name, String path, long timeoutMillis)
             throws IllegalArgumentException, ProActiveTimeoutException, FileSystemException,
-            NotConfiguredException {
+            NotConfiguredException, ConfigurationException {
         return getMyDataSpacesImpl().resolveInputOutputBlocking(name, timeoutMillis, SpaceType.INPUT, path);
     }
 
@@ -519,14 +520,14 @@ public class PADataSpaces {
      *             indicates VFS related exception
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
-     * @throws ProActiveRuntimeException
+     * @throws ConfigurationException
      *             when resolved space's file system has not enough capabilities (because of wrong
      *             configuration)
      * @see #resolveOutput(String)
      */
     public static FileObject resolveOutputBlocking(String name, long timeoutMillis)
             throws IllegalArgumentException, ProActiveTimeoutException, FileSystemException,
-            NotConfiguredException {
+            NotConfiguredException, ConfigurationException {
         return getMyDataSpacesImpl().resolveInputOutputBlocking(name, timeoutMillis, SpaceType.OUTPUT, null);
     }
 
@@ -556,14 +557,14 @@ public class PADataSpaces {
      *             indicates VFS related exception
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
-     * @throws ProActiveRuntimeException
+     * @throws ConfigurationException
      *             when resolved space's file system has not enough capabilities (because of wrong
      *             configuration)
      * @see #resolveOutput(String, String)
      */
     public static FileObject resolveOutputBlocking(String name, String path, long timeoutMillis)
             throws IllegalArgumentException, ProActiveTimeoutException, FileSystemException,
-            NotConfiguredException {
+            NotConfiguredException, ConfigurationException {
         return getMyDataSpacesImpl().resolveInputOutputBlocking(name, timeoutMillis, SpaceType.OUTPUT, path);
     }
 
@@ -577,12 +578,13 @@ public class PADataSpaces {
      * @throws NotConfiguredException
      *             when scratch data space is not configured on caller's node or this node is not
      *             configured for Data Spaces application at all
-     * @throws ProActiveRuntimeException
+     * @throws ConfigurationException
      *             when resolved space's file system has not enough capabilities (because of wrong
      *             configuration)
      * @see #resolveScratchForAO(String)
      */
-    public static FileObject resolveScratchForAO() throws FileSystemException, NotConfiguredException {
+    public static FileObject resolveScratchForAO() throws FileSystemException, NotConfiguredException,
+            ConfigurationException {
         return getMyDataSpacesImpl().resolveScratchForAO(null);
     }
 
@@ -611,12 +613,12 @@ public class PADataSpaces {
      * @throws NotConfiguredException
      *             when scratch data space is not configured on caller's node or this node is not
      *             configured for Data Spaces application at all
-     * @throws ProActiveRuntimeException
+     * @throws ConfigurationException
      *             when resolved space's file system has not enough capabilities (because of wrong
      *             configuration)
      */
     public static FileObject resolveScratchForAO(String path) throws FileSystemException,
-            NotConfiguredException {
+            NotConfiguredException, ConfigurationException {
         return getMyDataSpacesImpl().resolveScratchForAO(path);
     }
 
@@ -689,10 +691,13 @@ public class PADataSpaces {
      *             indicates VFS related exception
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
+     * @throws ConfigurationException
+     *             when resolved space's file system has not enough capabilities (because of wrong
+     *             configuration)
      * @see #getAllKnownInputNames()
      */
     public static Map<String, FileObject> resolveAllKnownInputs() throws FileSystemException,
-            NotConfiguredException {
+            NotConfiguredException, ConfigurationException {
         return getMyDataSpacesImpl().resolveAllKnownInputsOutputs(SpaceType.INPUT);
     }
 
@@ -722,13 +727,13 @@ public class PADataSpaces {
      *             indicates VFS related exception
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
-     * @throws ProActiveRuntimeException
+     * @throws ConfigurationException
      *             when resolved space's file system has not enough capabilities (because of wrong
      *             configuration)
      * @see #getAllKnownOutputNames()
      */
     public static Map<String, FileObject> resolveAllKnownOutputs() throws FileSystemException,
-            NotConfiguredException {
+            NotConfiguredException, ConfigurationException {
         return getMyDataSpacesImpl().resolveAllKnownInputsOutputs(SpaceType.OUTPUT);
     }
 
@@ -759,13 +764,13 @@ public class PADataSpaces {
      *             indicates VFS related exception
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
-     * @throws ProActiveRuntimeException
+     * @throws ConfigurationException
      *             when resolved space's file system has not enough capabilities (because of wrong
      *             configuration)
      * @see #getURI(FileObject)
      */
     public static FileObject resolveFile(String uri) throws MalformedURIException, SpaceNotFoundException,
-            FileSystemException, NotConfiguredException {
+            FileSystemException, NotConfiguredException, ConfigurationException {
         return getMyDataSpacesImpl().resolveFile(uri);
     }
 
