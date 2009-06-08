@@ -15,6 +15,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * Instance of this class represents a file within Data Spaces framework, hence the URI address is
  * attached and set during the creation process.
  */
+// FIXME limit access to the getParent()
 public class DataSpacesFileObjectImpl extends AbstractLimitingFileObject implements DataSpacesFileObject {
 
     private final DataSpacesURI spaceUri;
