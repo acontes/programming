@@ -49,7 +49,7 @@ public class URIBasedWriteLimitingPolicy implements LimitingPolicy {
     }
 
     private boolean computeIsReadOnly(String aoId, DataSpacesFileObject fileObject) {
-        final String uriString = DataSpacesImpl.getURI(fileObject);
+        final String uriString = fileObject.getURI();
         final DataSpacesURI uri;
         try {
             uri = DataSpacesURI.parseURI(uriString);
