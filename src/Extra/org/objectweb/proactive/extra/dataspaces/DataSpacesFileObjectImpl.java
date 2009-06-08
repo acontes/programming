@@ -4,7 +4,13 @@ import org.apache.commons.vfs.FileObject;
 
 
 /**
- * Implements the public interface of a file representation in Data Spaces framework.
+ * Implements abstract {@AbstractLimitingFileObject} which is a
+ * decorator for VFS FileObject that limit access to some operations according to provided
+ * LimitingPolicy. Implements also the public interface of a file representation in Data Spaces
+ * framework - {@link DataSpacesFileObject}.
+ * <p>
+ * Instance of this class represents a file within Data Spaces framework, hence the URI address is
+ * attached and set during the creation process.
  */
 public class DataSpacesFileObjectImpl extends AbstractLimitingFileObject implements DataSpacesFileObject {
 
