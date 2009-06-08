@@ -138,8 +138,7 @@ public class SpacesMountManager {
             logger.warn("Accessing URI not usuitable for user (not suitable for having path): " + queryUri);
         }
 
-        final FileObject file = resolveFileVFS(queryUri);
-        return new DataSpacesFileObjectImpl(file, queryUri);
+        return resolveAndDecorateFileVFS(queryUri);
     }
 
     /**
@@ -185,8 +184,7 @@ public class SpacesMountManager {
                 ProActiveLogger.logImpossibleException(logger, e);
                 throw new RuntimeException(e);
             }
-            final FileObject fo = resolveFileVFS(spaceUri);
-            result.put(spaceUri, new DataSpacesFileObjectImpl(fo, spaceUri));
+            result.put(spaceUri, resolveAndDecorateFileVFS(spaceUri));
         }
         return result;
     }
@@ -297,7 +295,8 @@ public class SpacesMountManager {
         logger.info("Unmounted space: " + spaceUri);
     }
 
-    private FileObject resolveFileVFS(final DataSpacesURI uri) throws FileSystemException {
+    private DataSpacesFileObjectImpl resolveAndDecorateFileVFS(final DataSpacesURI uri)
+            throws FileSystemException {
         synchronized (readLock) {
             final DataSpacesURI spacePart = uri.getSpacePartOnly();
             final String relativeToSpace = uri.getRelativeToSpace();
@@ -308,7 +307,12 @@ public class SpacesMountManager {
                 }
 
                 final FileObject spaceRoot = mountedSpaces.get(spacePart);
-                return (relativeToSpace == null) ? spaceRoot : spaceRoot.resolveFile(relativeToSpace);
+                final FileObject file;
+                if (relativeToSpace == null)
+                    file = spaceRoot;
+                else
+                    file = spaceRoot.resolveFile(relativeToSpace);
+                return new DataSpacesFileObjectImpl(file, spacePart, spaceRoot.getName().getPath());
             } catch (FileSystemException x) {
                 logger.warn("Could not access file that should exist (be mounted): " + uri);
                 throw x;

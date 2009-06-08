@@ -1,6 +1,9 @@
 package org.objectweb.proactive.extra.dataspaces;
 
 import org.apache.commons.vfs.FileObject;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -15,26 +18,40 @@ import org.apache.commons.vfs.FileObject;
 public class DataSpacesFileObjectImpl extends AbstractLimitingFileObject implements DataSpacesFileObject {
 
     private final DataSpacesURI spaceUri;
+    private String vfsSpaceRootPath;
 
     /**
      * @param fileObject
-     *            that is to be represented as DataSpacesFileObject, cannot be <code>null</code>
-     * @param URI
-     *            Data Spaces "virtual file system tree" URI of that file object, cannot be
+     *            file object that is going to be represented as DataSpacesFileObject;cannot be
      *            <code>null</code>
+     * @param spaceUri
+     *            Data Spaces URI of this file object's space; cannot be <code>null</code>
+     * @param vfsSpaceRootPath
+     *            VFS path of the space root FileObject
      */
-    public DataSpacesFileObjectImpl(FileObject fileObject, DataSpacesURI URI) {
+    public DataSpacesFileObjectImpl(FileObject fileObject, DataSpacesURI spaceUri, String vfsSpaceRootPath) {
         super(fileObject);
-        this.spaceUri = URI.getSpacePartOnly();
+        this.spaceUri = spaceUri;
+        this.vfsSpaceRootPath = vfsSpaceRootPath;
     }
 
     public String getURI() {
-        return Utils.appendSubDirs(spaceUri.toString(), getName().getPath());
+        // FIXME when DataSpacesFileObject will have just VFS adapter, store full URI as a field instead?
+        final String path = getName().getPath();
+        if (!path.startsWith(vfsSpaceRootPath)) {
+            final ProActiveRuntimeException x = new ProActiveRuntimeException(
+                "VFS path of this DataSpacesFileObject does not start with its space VFS path");
+            ProActiveLogger.logImpossibleException(ProActiveLogger.getLogger(Loggers.DATASPACES), x);
+            throw x;
+        }
+        final String relPath = path.substring(vfsSpaceRootPath.length());
+        return spaceUri.toString() + relPath;
     }
 
     @Override
     protected FileObject doDecorateFile(FileObject file) {
-        final DataSpacesFileObjectImpl newFile = new DataSpacesFileObjectImpl(file, spaceUri);
+        final DataSpacesFileObjectImpl newFile = new DataSpacesFileObjectImpl(file, spaceUri,
+            vfsSpaceRootPath);
         final LimitingPolicy policy = getLimitingPolicy();
 
         if (policy != null) {
