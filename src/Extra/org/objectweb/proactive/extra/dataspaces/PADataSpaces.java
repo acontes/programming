@@ -319,7 +319,6 @@ public class PADataSpaces {
      *             indicates VFS related exception
      * @throws NotConfiguredException
      *             when caller's node is not configured for Data Spaces application
-     * @throws IllegalArgumentException
      * @throws ConfigurationException
      *             when resolved space's file system has not enough capabilities (because of wrong
      *             configuration)
@@ -328,7 +327,7 @@ public class PADataSpaces {
      */
     public static DataSpacesFileObject resolveInput(String name) throws SpaceNotFoundException,
             FileSystemException,
-            NotConfiguredException, ConfigurationException, IllegalArgumentException {
+            NotConfiguredException, ConfigurationException {
         return getMyDataSpacesImpl().resolveInputOutput(name, SpaceType.INPUT, null);
     }
 
