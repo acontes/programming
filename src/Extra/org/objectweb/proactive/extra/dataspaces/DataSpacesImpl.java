@@ -86,10 +86,9 @@ public class DataSpacesImpl {
         }
     }
 
-    private static void setWriteLimitingPolicy(final DataSpacesFileObjectImpl fo) {
+    private static void setFileObjectOwner(final DataSpacesFileObjectImpl fo) {
         final String aoId = Utils.getActiveObjectId(Utils.getCurrentActiveObjectBody());
-        final LimitingPolicy policy = new URIBasedWriteLimitingPolicy(aoId, fo);
-        fo.setLimitingPolicy(policy);
+        fo.setOwnerActiveObjectId(aoId);
     }
 
     private final SpacesMountManager spacesMountManager;
@@ -200,7 +199,7 @@ public class DataSpacesImpl {
                 logger.trace(String.format("Resolved request for %s with name %s (%s)", type, name, uri));
 
             checkCapabilitiesOrWound(fo, type);
-            setWriteLimitingPolicy(fo);
+            setFileObjectOwner(fo);
             return fo;
         } catch (SpaceNotFoundException x) {
             logger.debug("Space not found for input/output space with URI: " + uri, x);
@@ -259,7 +258,7 @@ public class DataSpacesImpl {
                     logger.trace(message);
                 }
                 checkCapabilitiesOrWound(fo, type);
-                setWriteLimitingPolicy(fo);
+                setFileObjectOwner(fo);
                 return fo;
             } catch (SpaceNotFoundException e) {
                 logger.debug("Space not found for blocking try for input/output space with URI: " + uri, e);
@@ -317,7 +316,7 @@ public class DataSpacesImpl {
                 logger.trace("Resolved scratch for an Active Object: " + queryURI);
 
             checkCapabilitiesOrWound(fo, SpaceType.SCRATCH);
-            setWriteLimitingPolicy(fo);
+            setFileObjectOwner(fo);
             return fo;
         } catch (SpaceNotFoundException e) {
             ProActiveLogger.logImpossibleException(logger, e);
@@ -388,7 +387,7 @@ public class DataSpacesImpl {
             DataSpacesFileObjectImpl fo = entry.getValue();
 
             checkCapabilitiesOrWound(fo, type);
-            setWriteLimitingPolicy(fo);
+            setFileObjectOwner(fo);
             ret.put(name, fo);
         }
 
@@ -430,7 +429,7 @@ public class DataSpacesImpl {
                 type = SpaceType.INPUT;
 
             checkCapabilitiesOrWound(fo, type);
-            setWriteLimitingPolicy(fo);
+            setFileObjectOwner(fo);
             return fo;
         } catch (MalformedURIException x) {
             logger.debug("Can not resolve malformed URI: " + uri, x);

@@ -20,13 +20,14 @@ import org.apache.commons.vfs.util.RandomAccessMode;
 
 /**
  * Abstract FileObject decorator, checking if to limit any access to the file basing on pluggable
- * limit policy, set trough {@link #setLimitingPolicy(LimitingPolicy)} method.
+ * rule.
  * <p>
  * Decorator may limit direct write access (like deleting file, opening output stream from
  * getContent()), write checks (like isWriteable()), but also decorates every returned FileObject.
  * Way of decorating returned files is also pluggable.
  * <p>
- * Implementors should provide {@link #doDecorateFile(FileObject)} method.
+ * Implementors should provide {@link #isReadOnly()} and {@link #doDecorateFile(FileObject)}
+ * methods.
  * <p>
  * <strong>Known limitations:</strong>
  * <ul>
@@ -39,10 +40,6 @@ import org.apache.commons.vfs.util.RandomAccessMode;
  */
 public abstract class AbstractLimitingFileObject extends DecoratedFileObject {
 
-    private volatile LimitingPolicy limitingPolicy;
-
-    private Object policyLock = new Object();
-
     public AbstractLimitingFileObject(final FileObject fileObject) {
         super(fileObject);
     }
@@ -54,31 +51,14 @@ public abstract class AbstractLimitingFileObject extends DecoratedFileObject {
      */
     protected abstract FileObject doDecorateFile(FileObject file);
 
+    /**
+     * @return <code>true</code> if file is read-only, <code>false</code> otherwise
+     */
+    protected abstract boolean isReadOnly();
+
     private void checkIsNotReadOnly() throws FileSystemException {
         if (isReadOnly())
             throw new FileSystemException("File is read-only");
-    }
-
-    /**
-     * Delegates the isReadOnly query to the policy that has been set.
-     *
-     * @return <code>true</code> if file is read-only, <code>false</code> otherwise
-     */
-    private boolean isReadOnly() {
-        final LimitingPolicy policy = getLimitingPolicy();
-        return (policy == null) ? false : policy.isReadOnly();
-    }
-
-    public LimitingPolicy getLimitingPolicy() {
-        synchronized (policyLock) {
-            return limitingPolicy;
-        }
-    }
-
-    public void setLimitingPolicy(LimitingPolicy policy) {
-        synchronized (policyLock) {
-            limitingPolicy = policy;
-        }
     }
 
     @Override

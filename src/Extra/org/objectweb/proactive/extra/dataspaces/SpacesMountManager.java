@@ -24,7 +24,8 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundExceptio
  * Manager creates and maintains Apache VFS manager to pose virtual view provider of file system for
  * each application. It is able to response to queries for files in data spaces or just data spaces,
  * providing DataSpacesFileObjectImpl decorator as a result. Returned FileObject decorator instances
- * are applicable for user level code, although some write-limiting may be required for them.
+ * are applicable for user level code, although for write-limiting features to work correctly it is
+ * required to set up id of active object that becomes owner of returned FileObject.
  * <p>
  * To be able to serve requests for files and data spaces, SpaceMountManager must use
  * {@link SpacesDirectory} as a source of information about data spaces, their mounting points and
@@ -34,8 +35,9 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundExceptio
  * current implementation. Space is mounted only when there is request to provide FileObject for its
  * content. Proper, local or remote access is determined using
  * {@link Utils#getLocalAccessURL(String, String, String)} method. Write-capabilities of returned
- * FileObjects are induced from used protocols' providers - SpacesMountManager does not apply any
- * limitation policies like {@link URIBasedWriteLimitingPolicy} on its own.
+ * FileObjects are induced from used protocols' providers, but also SpacesMountManager apply
+ * restriction policies for returned FileObjects, as described in {@link DataSpacesFileObjectImpl},
+ * to conform with general Data Spaces guarantees.
  * <p>
  * Instances of this class are thread-safe. Also, subsequent requests for the same file using the
  * same manager will result in separate FileObject instances being returned, so there is no
@@ -97,43 +99,40 @@ public class SpacesMountManager {
     }
 
     /**
-     * TODO: block abstract resolving
-     * <p>
      * Resolves query for concrete URI within Data Spaces virtual tree, resulting in file-level
-     * access to this place.
-     * <p>
-     * If query URI is suitable for having path, then returned FileObject decorator can be safely
-     * used to access data in that data spaces, i.e. it conforms to all Data Spaces guarantees
-     * regarding that access.
-     * <p>
-     * If query URI is not suitable for having path (for example, refers only to application id),
-     * then returned FileObject decorator does not provide reliable access to virtual tree, just to
-     * the current state of mountings in that tree. Such queries are not recommended.
+     * access to this place. Provided URI should point to concrete space.
      * <p>
      * This call may block for a while, if {@link SpacesDirectory} need to be queried for data space
      * and/or data space may need to be mounted.
      * 
      * @param queryUri
      *            Data Spaces URI to get access to
-     * @return VFS FileObject that can be used to access this URI content; returned FileObject is
-     *         not opened nor attached in any way; this FileObject instance will never be shared,
-     *         i.e. individual instances are returned for subsequent queries (even the same queries)
+     * @return DataSpacesFileObjectImpl that can be used to access this URI content; returned
+     *         FileObject is not opened nor attached in any way; this FileObject instance will never
+     *         be shared, i.e. individual instances are returned for subsequent queries (even the
+     *         same queries); id of owner active object need to be set before any usage.
      * @throws FileSystemException
      *             indicates VFS related exception during access, like mounting problems, I/O errors
      *             etc.
      * @throws SpaceNotFoundException
      *             when space with that query URI does not exists in SpacesDirectory
+     * @throws IllegalArgumentException
+     *             when provided queryUri does not have space part fully defined
+     * @see DataSpacesURI#isSpacePartFullyDefined()
      */
     public DataSpacesFileObjectImpl resolveFile(final DataSpacesURI queryUri) throws FileSystemException,
             SpaceNotFoundException {
         if (logger.isDebugEnabled())
             logger.debug("File access request: " + queryUri);
 
-        if (queryUri.isSpacePartFullyDefined()) {
-            final DataSpacesURI spaceURI = queryUri.getSpacePartOnly();
-            // it is about a concrete space, nothing abstract
-            ensureSpaceIsMounted(spaceURI, null);
+        if (!queryUri.isSpacePartFullyDefined()) {
+            logger.error("Requested URI does not have space part fully defined");
+            throw new IllegalArgumentException("Requested URI does not have space part fully defined");
         }
+
+        final DataSpacesURI spaceURI = queryUri.getSpacePartOnly();
+        // it is about a concrete space, nothing abstract
+        ensureSpaceIsMounted(spaceURI, null);
         if (!queryUri.isSuitableForHavingPath()) {
             logger.warn("Accessing URI not usuitable for user (not suitable for having path): " + queryUri);
         }
@@ -158,10 +157,11 @@ public class SpacesMountManager {
      * @param queryUri
      *            Data Spaces URI to query for; must be URI without space part being fully defined,
      *            i.e. not pointing to any concrete data space
-     * @return map of data spaces URIs that match the query, pointing to VFS FileObject decorators
+     * @return map of data spaces URIs that match the query, pointing to DataSpacesFileObjectImpl
      *         that can be used to access their content; returned FileObject decorators are not
      *         opened nor attached in any way; these FileObject instances will never be shared, i.e.
-     *         another instances are returned for subsequent queries (even the same queries)
+     *         another instances are returned for subsequent queries (even the same queries); id of
+     *         owner active object need to be set before any usage.
      * @throws FileSystemException
      *             indicates VFS related exception during access, like mounting problems, I/O errors
      *             etc.
