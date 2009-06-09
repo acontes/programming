@@ -22,6 +22,8 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundExceptio
 // or add general docs about various ways of accessing and sharing data through this API
 // TODO add docs about calling from active object's thread. what about returned DataSpacesFileObjects? it should be ok
 // to call them from other thread, if it is not another active objects' thread
+// TODO add docs about casting to DataSpacesFileObject (bleeeah) until we rely in DataSpacesFileObject
+// on FileObject interface
 /**
  * The ProActive Data Spaces API.
  * <p>
