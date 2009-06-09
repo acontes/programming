@@ -18,7 +18,9 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
+import org.objectweb.proactive.extra.dataspaces.DataSpacesFileObject;
 import org.objectweb.proactive.extra.dataspaces.PADataSpaces;
+import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.DataSpacesException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredException;
@@ -88,10 +90,13 @@ public class ExampleProcessing implements Serializable {
      *             when scratch data space hasn't been configured
      * @throws IOException
      *             when IO exception occurred during file writing
+     * @throws ConfigurationException
+     *             when wrong configuration has been provided (capabilities of a FS)
+     * 
      */
     public String writeIntoScratchFile(String fileName, String content) throws NotConfiguredException,
-            IOException {
-        FileObject file = null;
+            IOException, ConfigurationException {
+        DataSpacesFileObject file = null;
         OutputStreamWriter writer = null;
 
         try {
@@ -124,12 +129,14 @@ public class ExampleProcessing implements Serializable {
      *             this AO's scratch hasn't been configured
      * @throws IOException
      *             when IO exception occurred during writing partial results
+     * @throws ConfigurationException
+     *             when wrong configuration has been provided (capabilities of a FS)
      */
     public StringWrapper computePartials(String inputName) throws SpaceNotFoundException,
-            NotConfiguredException, IOException {
+            NotConfiguredException, IOException, ConfigurationException {
 
         logger.info("Processing input " + inputName);
-        FileObject inputFile = null;
+        DataSpacesFileObject inputFile = null;
         BufferedReader reader = null;
         int lines = 0;
 

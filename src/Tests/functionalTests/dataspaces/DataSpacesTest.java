@@ -11,7 +11,6 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,6 +22,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
+import org.objectweb.proactive.extra.dataspaces.DataSpacesFileObject;
 import org.objectweb.proactive.extra.dataspaces.PADataSpaces;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException;
@@ -150,7 +150,8 @@ public class DataSpacesTest extends GCMFunctionalTestDataSpaces {
          */
         private static final long serialVersionUID = 3003545576343285983L;
 
-        private static String readAndCloseFile(final FileObject fo) throws FileSystemException, IOException {
+        private static String readAndCloseFile(final DataSpacesFileObject fo) throws FileSystemException,
+                IOException {
             try {
                 final BufferedReader reader = new BufferedReader(new InputStreamReader(fo.getContent()
                         .getInputStream()));
@@ -164,7 +165,7 @@ public class DataSpacesTest extends GCMFunctionalTestDataSpaces {
             }
         }
 
-        private static String writeAndCloseFile(final FileObject fo, String content)
+        private static String writeAndCloseFile(final DataSpacesFileObject fo, String content)
                 throws FileSystemException, IOException {
             try {
                 final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(fo.getContent()
@@ -184,44 +185,45 @@ public class DataSpacesTest extends GCMFunctionalTestDataSpaces {
         }
 
         public String readDefaultInputFile(String fileName) throws SpaceNotFoundException,
-                NotConfiguredException, IOException {
-            final FileObject fo = PADataSpaces.resolveDefaultInput(fileName);
+                NotConfiguredException, IOException, ConfigurationException {
+            final DataSpacesFileObject fo = PADataSpaces.resolveDefaultInput(fileName);
             return readAndCloseFile(fo);
         }
 
         public String readInputFile(String inputName, String fileName) throws SpaceNotFoundException,
-                NotConfiguredException, IOException {
-            final FileObject fo = PADataSpaces.resolveInput(inputName, fileName);
+                NotConfiguredException, IOException, ConfigurationException {
+            final DataSpacesFileObject fo = PADataSpaces.resolveInput(inputName, fileName);
             return readAndCloseFile(fo);
         }
 
         public String readFile(String uri) throws SpaceNotFoundException, NotConfiguredException,
-                IOException, MalformedURIException {
-            final FileObject fo = PADataSpaces.resolveFile(uri);
+                IOException, MalformedURIException, ConfigurationException {
+            final DataSpacesFileObject fo = PADataSpaces.resolveFile(uri);
             return readAndCloseFile(fo);
         }
 
         public String writeDefaultOutputFile(String fileName, String content) throws FileSystemException,
-                IOException, SpaceNotFoundException, NotConfiguredException {
-            final FileObject fo = PADataSpaces.resolveDefaultOutput(fileName);
+                IOException, SpaceNotFoundException, NotConfiguredException, ConfigurationException {
+            final DataSpacesFileObject fo = PADataSpaces.resolveDefaultOutput(fileName);
             return writeAndCloseFile(fo, content);
         }
 
         public String writeOutputFile(String outputName, String fileName, String content)
-                throws FileSystemException, IOException, SpaceNotFoundException, NotConfiguredException {
-            final FileObject fo = PADataSpaces.resolveOutput(outputName, fileName);
+                throws FileSystemException, IOException, SpaceNotFoundException, NotConfiguredException,
+                ConfigurationException {
+            final DataSpacesFileObject fo = PADataSpaces.resolveOutput(outputName, fileName);
             return writeAndCloseFile(fo, content);
         }
 
         public String writeScratchFile(String fileName, String content) throws FileSystemException,
-                IOException, SpaceNotFoundException, NotConfiguredException {
-            final FileObject fo = PADataSpaces.resolveScratchForAO(fileName);
+                IOException, SpaceNotFoundException, NotConfiguredException, ConfigurationException {
+            final DataSpacesFileObject fo = PADataSpaces.resolveScratchForAO(fileName);
             return writeAndCloseFile(fo, content);
         }
 
         public String writeFile(String uri, String content) throws FileSystemException, IOException,
-                SpaceNotFoundException, NotConfiguredException, MalformedURIException {
-            final FileObject fo = PADataSpaces.resolveFile(uri);
+                SpaceNotFoundException, NotConfiguredException, MalformedURIException, ConfigurationException {
+            final DataSpacesFileObject fo = PADataSpaces.resolveFile(uri);
             return writeAndCloseFile(fo, content);
         }
 
@@ -234,8 +236,9 @@ public class DataSpacesTest extends GCMFunctionalTestDataSpaces {
         }
 
         public StringWrapper readInputFileBlocking(String inputName, String fileName, long timeout)
-                throws SpaceNotFoundException, NotConfiguredException, IOException, ProActiveTimeoutException {
-            final FileObject fo = PADataSpaces.resolveInputBlocking(inputName, fileName, timeout);
+                throws SpaceNotFoundException, NotConfiguredException, IOException,
+                ProActiveTimeoutException, ConfigurationException {
+            final DataSpacesFileObject fo = PADataSpaces.resolveInputBlocking(inputName, fileName, timeout);
             return new StringWrapper(readAndCloseFile(fo));
         }
 

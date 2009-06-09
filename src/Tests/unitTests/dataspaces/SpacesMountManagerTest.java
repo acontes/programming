@@ -16,11 +16,11 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.Map;
 
-import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.objectweb.proactive.extra.dataspaces.DataSpacesFileObject;
 import org.objectweb.proactive.extra.dataspaces.DataSpacesFileObjectImpl;
 import org.objectweb.proactive.extra.dataspaces.DataSpacesURI;
 import org.objectweb.proactive.extra.dataspaces.InputOutputSpaceConfiguration;
@@ -54,7 +54,7 @@ public class SpacesMountManagerTest {
     private File spaceDir;
     private File spaceFile;
     private DataSpacesURI spaceUri;
-    private FileObject fileObject;
+    private DataSpacesFileObject fileObject;
 
     @Before
     public void setUp() throws Exception {
@@ -123,8 +123,8 @@ public class SpacesMountManagerTest {
 
     @Test
     public void testResolveFilesNotSharedFileObject() throws FileSystemException, SpaceNotFoundException {
-        final FileObject fileObject1 = manager.resolveFile(spaceUri);
-        final FileObject fileObject2 = manager.resolveFile(spaceUri);
+        final DataSpacesFileObject fileObject1 = manager.resolveFile(spaceUri);
+        final DataSpacesFileObject fileObject2 = manager.resolveFile(spaceUri);
 
         assertNotSame(fileObject1, fileObject2);
     }
@@ -138,10 +138,11 @@ public class SpacesMountManagerTest {
         }
     }
 
-    private void assertIsSpaceDir(final FileObject fo) throws FileSystemException {
+    private void assertIsSpaceDir(final DataSpacesFileObject fo) throws FileSystemException {
         assertTrue(fo.exists());
         // is it that directory?
-        final FileObject child = fo.getChild(EXISTING_FILE);
+        // FIXME: This should be changed as DataSpacesFileObject inteface will change
+        final DataSpacesFileObject child = (DataSpacesFileObject) fo.getChild(EXISTING_FILE);
         assertNotNull(child);
         assertTrue(child.exists());
         assertEquals(spaceUri.toString(), PADataSpaces.getURI(fo));
@@ -232,11 +233,11 @@ public class SpacesMountManagerTest {
 
         final Map<DataSpacesURI, DataSpacesFileObjectImpl> spaces1 = manager.resolveSpaces(queryUri);
         assertEquals(1, spaces1.size());
-        final FileObject fileObject1 = spaces1.get(spaceUri);
+        final DataSpacesFileObject fileObject1 = spaces1.get(spaceUri);
 
         final Map<DataSpacesURI, DataSpacesFileObjectImpl> spaces2 = manager.resolveSpaces(queryUri);
         assertEquals(1, spaces2.size());
-        final FileObject fileObject2 = spaces2.get(spaceUri);
+        final DataSpacesFileObject fileObject2 = spaces2.get(spaceUri);
         assertNotSame(fileObject1, fileObject2);
     }
 }
