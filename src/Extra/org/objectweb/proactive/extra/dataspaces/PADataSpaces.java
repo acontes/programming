@@ -82,8 +82,7 @@ public class PADataSpaces {
      * @see #resolveDefaultInput(String)
      */
     public static DataSpacesFileObject resolveDefaultInput() throws SpaceNotFoundException,
-            FileSystemException,
-            NotConfiguredException, ConfigurationException {
+            FileSystemException, NotConfiguredException, ConfigurationException {
         return getMyDataSpacesImpl().resolveDefaultInputOutput(SpaceType.INPUT, null);
     }
 
@@ -140,8 +139,7 @@ public class PADataSpaces {
      * @see #resolveDefaultOutput(String)
      */
     public static DataSpacesFileObject resolveDefaultOutput() throws SpaceNotFoundException,
-            FileSystemException,
-            NotConfiguredException, ConfigurationException {
+            FileSystemException, NotConfiguredException, ConfigurationException {
         return getMyDataSpacesImpl().resolveDefaultInputOutput(SpaceType.OUTPUT, null);
     }
 
@@ -328,8 +326,7 @@ public class PADataSpaces {
      * @see #resolveInput(String, String)
      */
     public static DataSpacesFileObject resolveInput(String name) throws SpaceNotFoundException,
-            FileSystemException,
-            NotConfiguredException, ConfigurationException {
+            FileSystemException, NotConfiguredException, ConfigurationException {
         return getMyDataSpacesImpl().resolveInputOutput(name, SpaceType.INPUT, null);
     }
 
@@ -390,8 +387,7 @@ public class PADataSpaces {
      * @see #resolveOutput(String, String)
      */
     public static DataSpacesFileObject resolveOutput(String name) throws SpaceNotFoundException,
-            FileSystemException,
-            NotConfiguredException, ConfigurationException {
+            FileSystemException, NotConfiguredException, ConfigurationException {
         return getMyDataSpacesImpl().resolveInputOutput(name, SpaceType.OUTPUT, null);
     }
 
@@ -588,8 +584,7 @@ public class PADataSpaces {
      * @see #resolveScratchForAO(String)
      */
     public static DataSpacesFileObject resolveScratchForAO() throws FileSystemException,
-            NotConfiguredException,
-            ConfigurationException {
+            NotConfiguredException, ConfigurationException {
         return getMyDataSpacesImpl().resolveScratchForAO(null);
     }
 
@@ -778,8 +773,7 @@ public class PADataSpaces {
      * @see #getURI(DataSpacesFileObject)
      */
     public static DataSpacesFileObject resolveFile(String uri) throws MalformedURIException,
-            SpaceNotFoundException,
-            FileSystemException, NotConfiguredException, ConfigurationException {
+            SpaceNotFoundException, FileSystemException, NotConfiguredException, ConfigurationException {
         return getMyDataSpacesImpl().resolveFile(uri);
     }
 

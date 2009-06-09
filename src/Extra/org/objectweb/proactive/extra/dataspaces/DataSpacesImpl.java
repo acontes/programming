@@ -57,7 +57,7 @@ public class DataSpacesImpl {
      */
     private static void checkCapabilitiesOrWound(DataSpacesFileObjectImpl fo, SpaceType type)
             throws ConfigurationException {
-        
+
         Capability[] expected = PADataSpaces.getCapabilitiesForSpaceType(type);
 
         if (logger.isTraceEnabled())
@@ -134,8 +134,8 @@ public class DataSpacesImpl {
      * @see {@link PADataSpaces#resolveDefaultOutput()}
      */
     public DataSpacesFileObject resolveDefaultInputOutput(SpaceType type, String path)
-            throws IllegalArgumentException,
-            FileSystemException, SpaceNotFoundException, ConfigurationException {
+            throws IllegalArgumentException, FileSystemException, SpaceNotFoundException,
+            ConfigurationException {
         return resolveInputOutput(PADataSpaces.DEFAULT_IN_OUT_NAME, type, path);
     }
 
@@ -156,8 +156,7 @@ public class DataSpacesImpl {
      * @see {@link PADataSpaces#resolveDefaultOutputBlocking(long))}
      */
     public DataSpacesFileObject resolveDefaultInputOutputBlocking(long timeoutMillis, SpaceType type,
-            String path)
-            throws IllegalArgumentException, FileSystemException, ProActiveTimeoutException,
+            String path) throws IllegalArgumentException, FileSystemException, ProActiveTimeoutException,
             ConfigurationException {
         return resolveInputOutputBlocking(PADataSpaces.DEFAULT_IN_OUT_NAME, timeoutMillis, type, path);
     }
@@ -227,8 +226,7 @@ public class DataSpacesImpl {
      * @see {@link PADataSpaces#resolveOutputBlocking(String, long)}
      */
     public DataSpacesFileObject resolveInputOutputBlocking(String name, long timeoutMillis, SpaceType type,
-            String path)
-            throws FileSystemException, IllegalArgumentException, ProActiveTimeoutException,
+            String path) throws FileSystemException, IllegalArgumentException, ProActiveTimeoutException,
             ConfigurationException {
         if (logger.isTraceEnabled())
             logger.trace(String.format("Resolving blocking request for %s with name %s", type, name));
@@ -298,8 +296,7 @@ public class DataSpacesImpl {
      * @see {@link PADataSpaces#resolveScratchForAO()}
      */
     public DataSpacesFileObject resolveScratchForAO(String path) throws FileSystemException,
-            NotConfiguredException,
-            ConfigurationException {
+            NotConfiguredException, ConfigurationException {
         logger.trace("Resolving scratch for an Active Object");
         if (appScratchSpace == null) {
             logger.debug("Request scratch data space for AO on node without scratch space configured");
@@ -365,8 +362,7 @@ public class DataSpacesImpl {
      * @see {@link PADataSpaces#resolveAllKnownOutputs()}
      */
     public Map<String, DataSpacesFileObject> resolveAllKnownInputsOutputs(SpaceType type)
-            throws FileSystemException,
-            IllegalArgumentException, ConfigurationException {
+            throws FileSystemException, IllegalArgumentException, ConfigurationException {
         if (logger.isTraceEnabled())
             logger.trace(String.format("Resolving known %s spaces: ", type));
         checkIsInputOrOutput(type);
