@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.vfs.Capability;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystem;
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -17,6 +18,8 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.util.ProActiveInet;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 
 
@@ -26,6 +29,7 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationExceptio
 public class Utils {
 
     private static final Pattern WINDOWS_DRIVE_PATTERN = Pattern.compile("^[a-zA-Z]:\\\\.*");
+    private static final Logger logger = ProActiveLogger.getLogger(Loggers.DATASPACES);
 
     private Utils() {
     }
@@ -75,8 +79,6 @@ public class Utils {
      * active object.
      * 
      * @return
-     * @throws ProActiveRuntimeException
-     *             when not called from an active thread
      */
     public static Body getCurrentActiveObjectBody() throws ProActiveRuntimeException {
         return PAActiveObject.getBodyOnThis();
@@ -87,24 +89,17 @@ public class Utils {
      * 
      * @return
      * @throws ProActiveRuntimeException
-     *             when internal PA exception on node acquisition or not called from an active
-     *             thread
+     *             when internal PA exception on node acquisition
      */
     public static Node getCurrentNode() throws ProActiveRuntimeException {
-        if (PAActiveObject.getStubOnThis() == null) {
-            // not an AO, get HalfBodies Node
-            // TODO: is it possible to do it in a better way?
-            try {
-                NodeFactory.getNode(getCurrentActiveObjectBody().getNodeURL());
-            } catch (NodeException e) {
-                throw new ProActiveRuntimeException(e);
-            }
-        }
-
+        // TODO: is it possible to do it in a better way?
+        // we do not use PAActiveObject.getNode() to not crash for non-AO caller 
         try {
-            return PAActiveObject.getNode();
+            final String nodeURL = getCurrentActiveObjectBody().getNodeURL();
+            return NodeFactory.getNode(nodeURL);
         } catch (NodeException e) {
-            throw new ProActiveRuntimeException("DataSpaces catched exception that should not occure", e);
+            ProActiveLogger.logImpossibleException(logger, e);
+            throw new ProActiveRuntimeException("Cannot access local bodies or half-bodies node", e);
         }
     }
 
