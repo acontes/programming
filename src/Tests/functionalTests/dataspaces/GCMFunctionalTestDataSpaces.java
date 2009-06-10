@@ -135,7 +135,7 @@ public class GCMFunctionalTestDataSpaces extends GCMFunctionalTest {
         assertTrue(outputDefaultDir.mkdirs());
     }
 
-    @Before
+    @After
     public void removeInputOutputSpacesContent() {
         if (rootTmpDir.exists())
             assertTrue(SkeletonSystemImpl.deleteDirectory(rootTmpDir));
