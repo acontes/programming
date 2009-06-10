@@ -14,6 +14,7 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
@@ -60,7 +61,7 @@ public class Utils {
     }
 
     /**
-     * Returns identifier of an Active Object Body.
+     * Returns identifier of an Body.
      * 
      * @return
      */
@@ -70,22 +71,19 @@ public class Utils {
     }
 
     /**
-     * Returns Body of an Active Object of a current active thread.
+     * Returns Body of an Active Object of a current active thread or HalfBody if caller is not an
+     * active object.
      * 
      * @return
      * @throws ProActiveRuntimeException
      *             when not called from an active thread
      */
     public static Body getCurrentActiveObjectBody() throws ProActiveRuntimeException {
-        // FIXME: depends on PROACTIVE-658
-        if (PAActiveObject.getStubOnThis() == null)
-            throw new ProActiveRuntimeException("This method must be called from an active thread");
-
         return PAActiveObject.getBodyOnThis();
     }
 
     /**
-     * Returns Node for current active thread.
+     * Returns Node for current active thread.or HalfBodies Node if caller is not an active object
      * 
      * @return
      * @throws ProActiveRuntimeException
@@ -94,9 +92,13 @@ public class Utils {
      */
     public static Node getCurrentNode() throws ProActiveRuntimeException {
         if (PAActiveObject.getStubOnThis() == null) {
-            // TODO: what about returning NodeFactory.getDefaultNode() in that case?
-            // it may be useful on deployer's node
-            throw new ProActiveRuntimeException("This method must be called from an active thread");
+            // not an AO, get HalfBodies Node
+            // TODO: is it possible to do it in a better way?
+            try {
+                NodeFactory.getNode(getCurrentActiveObjectBody().getNodeURL());
+            } catch (NodeException e) {
+                throw new ProActiveRuntimeException(e);
+            }
         }
 
         try {
@@ -204,7 +206,7 @@ public class Utils {
     /**
      * Assert that given FileObject's file system has required capabilities. Throw an
      * ConfigurationException if it does not.
-     *
+     * 
      * @param expected
      *            array containing expected capabilities of the specified FileObject's file system.
      * @param fo
@@ -222,7 +224,7 @@ public class Utils {
      * Checks if the calling thread is owner of specified a scratch. If specified scratch URI is not
      * a valid one (with different type or without defined Active Object ID), <code>false</code> is
      * returned.
-     *
+     * 
      * @param uri
      *            of a scratch to check
      * @return <code>true</code> if the calling thread is owner of a scratch with specified valid
