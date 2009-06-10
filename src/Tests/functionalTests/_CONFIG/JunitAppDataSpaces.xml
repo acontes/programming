@@ -12,10 +12,14 @@
 		<descriptorDefaultVariable name="jvmargDefinedByTest" value=" "/>
 		<programVariable name="JVM_PARAMETERS"/>
 		<programVariable name="NAMING_SERVICE_URL"/>
-		<programVariable name="INPUT_DEFAULT_PATH"/>
-		<programVariable name="INPUT_PATH"/>
-		<programVariable name="OUTPUT_DEFAULT_PATH"/>
-		<programVariable name="OUTPUT_PATH"/>
+		<programVariable name="INPUT_DEFAULT_WITH_DIR_PATH"/>
+		<programVariable name="INPUT_WITH_DIR_PATH"/>
+		<programVariable name="INPUT_WITH_FILE_PATH"/>
+		<programVariable name="OUTPUT_DEFAULT_WITH_DIR_PATH"/>
+		<programVariable name="OUTPUT_WITH_DIR_PATH"/>
+		<programVariable name="OUTPUT_WITH_FILE_PATH"/>
+		<programVariable name="OUTPUT_WITH_NOTHING1_PATH"/>		
+		<programVariable name="OUTPUT_WITH_NOTHING2_PATH"/>
 	</environment>
 	
 	<application>
@@ -45,18 +49,30 @@
 				<namingService url="${NAMING_SERVICE_URL}" />
 				<!-- URLs are paths here; it works for VFS, but it is like that just for local testing -->
 				<inputDefault>
-					<remoteAccess url="${INPUT_DEFAULT_PATH}" />
+					<remoteAccess url="${INPUT_DEFAULT_WITH_DIR_PATH}" />
 					<!--  difficult to test locally:
 					<location hostname="${INPUT_DEFAULT_HOSTNAME}" url="${INPUT_DEFAULT_PATH}" />  -->
 				</inputDefault>
-				<input id="named_input">
-					<remoteAccess url="${INPUT_PATH}" />
+				<input id="input_with_dir">
+					<remoteAccess url="${INPUT_WITH_DIR_PATH}" />
+				</input>
+				<input id="input_with_file">
+					<remoteAccess url="${INPUT_WITH_FILE_PATH}" />
 				</input>
 				<outputDefault>
-					<remoteAccess url="${OUTPUT_DEFAULT_PATH}" />
+					<remoteAccess url="${OUTPUT_DEFAULT_WITH_DIR_PATH}" />
 				</outputDefault>
-				<output id="named_output">
-					<remoteAccess url="${OUTPUT_PATH}" />
+				<output id="output_with_dir">
+					<remoteAccess url="${OUTPUT_WITH_DIR_PATH}" />
+				</output>
+				<output id="output_with_file">
+					<remoteAccess url="${OUTPUT_WITH_FILE_PATH}" />
+				</output>
+				<output id="output_with_nothing1">
+					<remoteAccess url="${OUTPUT_WITH_NOTHING1_PATH}" />
+				</output>
+				<output id="output_with_nothing2">
+					<remoteAccess url="${OUTPUT_WITH_NOTHING2_PATH}" />
 				</output>
 			</data>
 		</proactive>

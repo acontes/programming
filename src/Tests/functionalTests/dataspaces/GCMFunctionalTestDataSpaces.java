@@ -1,5 +1,6 @@
 package functionalTests.dataspaces;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedWriter;
@@ -24,10 +25,19 @@ import functionalTests.GCMFunctionalTest;
 
 /**
  * Base of functional tests for Data Spaces. This class deploys Data Spaces with Naming Service,
- * prepares input and output spaces: default input, default output, named input (name
- * {@value #INPUT_NAME}) and named output (name {@value #OUTPUT_NAME}). Both output spaces are
- * empty, while both input spaces contain file {@value #INPUT_FILE_NAME} with
- * {@value #INPUT_FILE_CONTENT}. Scratch space is also defined for each of available Node.
+ * prepares input and output spaces:
+ * <ul>
+ * <li>default input - existing directory containing file {@link #INPUT_FILE_NAME}</li>
+ * <li>named input {@link #INPUT_WITH_DIR_NAME} - existing directory containing file
+ * {@link #INPUT_FILE_NAME} with content {@link #INPUT_FILE_CONTENT}</li>
+ * <li>named input {@link #INPUT_WITH_FILE_NAME} - existing file with content
+ * {@link #INPUT_FILE_CONTENT}</li>
+ * <li>default output - existing empty directory</li>
+ * <li>named output {@link #OUTPUT_WITH_DIR_NAME} - existing empty directory</li>
+ * <li>named output {@link #OUTPUT_WITH_NOTHING_NAME} - non-existing file/directory, that should
+ * have possibility to be created</li>
+ * </ul>
+ * Scratch space is also defined for each of available Node.
  * <p>
  * Test class uses local paths to access data spaces.
  */
@@ -38,10 +48,14 @@ public class GCMFunctionalTestDataSpaces extends GCMFunctionalTest {
             .getResource("/functionalTests/_CONFIG/JunitAppDataSpaces.xml");
 
     static public final String VN_NAME = "nodes";
-    static public final String INPUT_NAME = "named_input";
+    static public final String INPUT_WITH_DIR_NAME = "input_with_dir";
+    static public final String INPUT_WITH_FILE_NAME = "input_with_file";
     static public final String INPUT_FILE_NAME = "test.txt";
     static public final String INPUT_FILE_CONTENT = "toto";
-    static public final String OUTPUT_NAME = "named_output";
+    static public final String OUTPUT_WITH_DIR_NAME = "output_with_dir";
+    static public final String OUTPUT_WITH_FILE_NAME = "output_with_file";
+    static public final String OUTPUT_WITH_NOTHING1_NAME = "output_with_nothing1";
+    static public final String OUTPUT_WITH_NOTHING2_NAME = "output_with_nothing2";
 
     static public final String VAR_DEPDESCRIPTOR = "deploymentDescriptor";
     static public final String VAR_JVMARG = "jvmargDefinedByTest";
@@ -56,18 +70,34 @@ public class GCMFunctionalTestDataSpaces extends GCMFunctionalTest {
     NamingServiceDeployer namingServiceDeployer;
 
     File rootTmpDir;
-    static public final String VAR_INPUT_DEFAULT_PATH = "INPUT_DEFAULT_PATH";
-    File inputDefaultDir;
-    static public final String VAR_INPUT_PATH = "INPUT_PATH";
-    File inputDir;
-    static public final String VAR_OUTPUT_DEFAULT_PATH = "OUTPUT_DEFAULT_PATH";
-    File outputDefaultDir;
-    static public final String VAR_OUTPUT_PATH = "OUTPUT_PATH";
-    File outputDir;
+    static public final String VAR_INPUT_DEFAULT_WITH_DIR_PATH = "INPUT_DEFAULT_WITH_DIR_PATH";
+    File inputDefaultWithDirLocalHandle;
+    static public final String VAR_INPUT_WITH_DIR_PATH = "INPUT_WITH_DIR_PATH";
+    File inputWithDirLocalHandle;
+    static public final String VAR_INPUT_WITH_FILE_PATH = "INPUT_WITH_FILE_PATH";
+    File inputWithFileLocalHandle;
+    static public final String VAR_OUTPUT_DEFAULT_WITH_DIR_PATH = "OUTPUT_DEFAULT_WITH_DIR_PATH";
+    File outputDefaultWithDirLocalHandle;
+    static public final String VAR_OUTPUT_WITH_DIR_PATH = "OUTPUT_WITH_DIR_PATH";
+    File outputWithDirLocalHandle;
+    static public final String VAR_OUTPUT_WITH_FILE_PATH = "OUTPUT_WITH_FILE_PATH";
+    File outputWithFileLocalHandle;
+    static public final String VAR_OUTPUT_WITH_NOTHING1_PATH = "OUTPUT_WITH_NOTHING1_PATH";
+    File outputWithNothing1LocalHandle;
+    static public final String VAR_OUTPUT_WITH_NOTHING2_PATH = "OUTPUT_WITH_NOTHING2_PATH";
+    File outputWithNothing2LocalHandle;
 
-    private static void createInputContent(File dir) throws IOException {
+    private static void createInputDirContent(File dir) throws IOException {
         assertTrue(dir.mkdirs());
         final File file = new File(dir, INPUT_FILE_NAME);
+        createInputFileContent(file);
+    }
+
+    private static void createInputFileContent(final File file) throws IOException {
+        final File parentFile = file.getParentFile();
+        if (!parentFile.exists()) {
+            assertTrue(parentFile.mkdirs());
+        }
         final BufferedWriter writer = new BufferedWriter(new FileWriter(file));
         writer.write(INPUT_FILE_CONTENT);
         writer.close();
@@ -88,19 +118,31 @@ public class GCMFunctionalTestDataSpaces extends GCMFunctionalTest {
                 VariableContractType.ProgramVariable);
 
         rootTmpDir = new File(System.getProperty("java.io.tmpdir"), "ProActive-GCMFunctionalTestDataSpaces");
-        inputDefaultDir = new File(rootTmpDir, "inputDefault");
-        inputDir = new File(rootTmpDir, "input");
-        outputDefaultDir = new File(rootTmpDir, "outputDefault");
-        outputDir = new File(rootTmpDir, "output");
+        inputDefaultWithDirLocalHandle = new File(rootTmpDir, "inputDefaultWithDir");
+        inputWithDirLocalHandle = new File(rootTmpDir, "inputWithDir");
+        inputWithFileLocalHandle = new File(rootTmpDir, "inputWithFile");
+        outputDefaultWithDirLocalHandle = new File(rootTmpDir, "outputDefaultWithDir");
+        outputWithDirLocalHandle = new File(rootTmpDir, "outputWithDir");
+        outputWithFileLocalHandle = new File(rootTmpDir, "outputWithFile");
+        outputWithNothing1LocalHandle = new File(rootTmpDir, "outputWithNothing1");
+        outputWithNothing2LocalHandle = new File(rootTmpDir, "outputWithNothing2");
 
-        vContract.setVariableFromProgram(VAR_INPUT_DEFAULT_PATH, inputDefaultDir.getAbsolutePath(),
+        vContract.setVariableFromProgram(VAR_INPUT_DEFAULT_WITH_DIR_PATH, inputDefaultWithDirLocalHandle
+                .getAbsolutePath(), VariableContractType.ProgramVariable);
+        vContract.setVariableFromProgram(VAR_INPUT_WITH_DIR_PATH, inputWithDirLocalHandle.getAbsolutePath(),
                 VariableContractType.ProgramVariable);
-        vContract.setVariableFromProgram(VAR_INPUT_PATH, inputDir.getAbsolutePath(),
-                VariableContractType.ProgramVariable);
-        vContract.setVariableFromProgram(VAR_OUTPUT_DEFAULT_PATH, outputDefaultDir.getAbsolutePath(),
-                VariableContractType.ProgramVariable);
-        vContract.setVariableFromProgram(VAR_OUTPUT_PATH, outputDir.getAbsolutePath(),
-                VariableContractType.ProgramVariable);
+        vContract.setVariableFromProgram(VAR_INPUT_WITH_FILE_PATH,
+                inputWithFileLocalHandle.getAbsolutePath(), VariableContractType.ProgramVariable);
+        vContract.setVariableFromProgram(VAR_OUTPUT_DEFAULT_WITH_DIR_PATH, outputDefaultWithDirLocalHandle
+                .getAbsolutePath(), VariableContractType.ProgramVariable);
+        vContract.setVariableFromProgram(VAR_OUTPUT_WITH_DIR_PATH,
+                outputWithDirLocalHandle.getAbsolutePath(), VariableContractType.ProgramVariable);
+        vContract.setVariableFromProgram(VAR_OUTPUT_WITH_FILE_PATH, outputWithFileLocalHandle
+                .getAbsolutePath(), VariableContractType.ProgramVariable);
+        vContract.setVariableFromProgram(VAR_OUTPUT_WITH_NOTHING1_PATH, outputWithNothing1LocalHandle
+                .getAbsolutePath(), VariableContractType.ProgramVariable);
+        vContract.setVariableFromProgram(VAR_OUTPUT_WITH_NOTHING2_PATH, outputWithNothing2LocalHandle
+                .getAbsolutePath(), VariableContractType.ProgramVariable);
     }
 
     @Before
@@ -128,11 +170,15 @@ public class GCMFunctionalTestDataSpaces extends GCMFunctionalTest {
 
     @Before
     public void createInputOutputSpacesContent() throws IOException {
-        createInputContent(inputDir);
-        createInputContent(inputDefaultDir);
+        createInputDirContent(inputDefaultWithDirLocalHandle);
+        createInputDirContent(inputWithDirLocalHandle);
+        createInputFileContent(inputWithFileLocalHandle);
 
-        assertTrue(outputDir.mkdirs());
-        assertTrue(outputDefaultDir.mkdirs());
+        assertTrue(outputDefaultWithDirLocalHandle.mkdirs());
+        assertTrue(outputWithDirLocalHandle.mkdirs());
+        assertTrue(outputWithFileLocalHandle.createNewFile());
+        assertFalse(outputWithNothing1LocalHandle.exists());
+        assertFalse(outputWithNothing2LocalHandle.exists());
     }
 
     @After

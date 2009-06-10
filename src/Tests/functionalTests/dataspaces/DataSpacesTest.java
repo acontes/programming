@@ -70,8 +70,10 @@ public class DataSpacesTest extends GCMFunctionalTestDataSpaces {
         // read inputs:
         assertEquals(INPUT_FILE_CONTENT, ao1.readDefaultInputFile(INPUT_FILE_NAME));
         assertEquals(INPUT_FILE_CONTENT, ao2.readDefaultInputFile(INPUT_FILE_NAME));
-        assertEquals(INPUT_FILE_CONTENT, ao3.readInputFile(INPUT_NAME, INPUT_FILE_NAME));
-        assertEquals(INPUT_FILE_CONTENT, ao4.readInputFile(INPUT_NAME, INPUT_FILE_NAME));
+        assertEquals(INPUT_FILE_CONTENT, ao3.readInputFile(INPUT_WITH_DIR_NAME, INPUT_FILE_NAME));
+        assertEquals(INPUT_FILE_CONTENT, ao4.readInputFile(INPUT_WITH_DIR_NAME, INPUT_FILE_NAME));
+        assertEquals(INPUT_FILE_CONTENT, ao1.readInputFile(INPUT_WITH_FILE_NAME, null));
+        assertEquals(INPUT_FILE_CONTENT, ao3.readInputFile(INPUT_WITH_FILE_NAME, null));
 
         // write to outputs:
         final String defaultOutputFileUri = ao1
@@ -81,11 +83,33 @@ public class DataSpacesTest extends GCMFunctionalTestDataSpaces {
         assertEquals(OUTPUT_FILE_CONTENT1, ao3.readFile(defaultOutputFileUri));
         assertEquals(OUTPUT_FILE_CONTENT1, ao4.readFile(defaultOutputFileUri));
 
-        final String outputFileUri = ao1.writeOutputFile(OUTPUT_NAME, OUTPUT_FILE_NAME, OUTPUT_FILE_CONTENT1);
-        assertEquals(OUTPUT_FILE_CONTENT1, ao1.readFile(outputFileUri));
-        assertEquals(OUTPUT_FILE_CONTENT1, ao2.readFile(outputFileUri));
-        assertEquals(OUTPUT_FILE_CONTENT1, ao3.readFile(outputFileUri));
-        assertEquals(OUTPUT_FILE_CONTENT1, ao4.readFile(outputFileUri));
+        final String outputWithDirFileUri = ao1.writeOutputFile(OUTPUT_WITH_DIR_NAME, OUTPUT_FILE_NAME,
+                OUTPUT_FILE_CONTENT1);
+        assertEquals(OUTPUT_FILE_CONTENT1, ao1.readFile(outputWithDirFileUri));
+        assertEquals(OUTPUT_FILE_CONTENT1, ao2.readFile(outputWithDirFileUri));
+        assertEquals(OUTPUT_FILE_CONTENT1, ao3.readFile(outputWithDirFileUri));
+        assertEquals(OUTPUT_FILE_CONTENT1, ao4.readFile(outputWithDirFileUri));
+
+        final String outputWithFileFileUri = ao1.writeOutputFile(OUTPUT_WITH_FILE_NAME, null,
+                OUTPUT_FILE_CONTENT1);
+        assertEquals(OUTPUT_FILE_CONTENT1, ao1.readFile(outputWithFileFileUri));
+        assertEquals(OUTPUT_FILE_CONTENT1, ao2.readFile(outputWithFileFileUri));
+        assertEquals(OUTPUT_FILE_CONTENT1, ao3.readFile(outputWithFileFileUri));
+        assertEquals(OUTPUT_FILE_CONTENT1, ao4.readFile(outputWithFileFileUri));
+
+        final String outputWithNothingFileUri1 = ao1.writeOutputFile(OUTPUT_WITH_NOTHING1_NAME,
+                OUTPUT_FILE_NAME, OUTPUT_FILE_CONTENT1);
+        assertEquals(OUTPUT_FILE_CONTENT1, ao1.readFile(outputWithNothingFileUri1));
+        assertEquals(OUTPUT_FILE_CONTENT1, ao2.readFile(outputWithNothingFileUri1));
+        assertEquals(OUTPUT_FILE_CONTENT1, ao3.readFile(outputWithNothingFileUri1));
+        assertEquals(OUTPUT_FILE_CONTENT1, ao4.readFile(outputWithNothingFileUri1));
+
+        final String outputWithNothingFileUri2 = ao1.writeOutputFile(OUTPUT_WITH_NOTHING2_NAME, null,
+                OUTPUT_FILE_CONTENT1);
+        assertEquals(OUTPUT_FILE_CONTENT1, ao1.readFile(outputWithNothingFileUri2));
+        assertEquals(OUTPUT_FILE_CONTENT1, ao2.readFile(outputWithNothingFileUri2));
+        assertEquals(OUTPUT_FILE_CONTENT1, ao3.readFile(outputWithNothingFileUri2));
+        assertEquals(OUTPUT_FILE_CONTENT1, ao4.readFile(outputWithNothingFileUri2));
 
         // write to scratches:
         final String scratchFileUri1 = ao1.writeScratchFile(OUTPUT_FILE_NAME, OUTPUT_FILE_CONTENT1);
@@ -107,14 +131,18 @@ public class DataSpacesTest extends GCMFunctionalTestDataSpaces {
         // read inputs names:
         final HashSet<String> expectedInputs = new HashSet<String>();
         expectedInputs.add(PADataSpaces.DEFAULT_IN_OUT_NAME);
-        expectedInputs.add(INPUT_NAME);
+        expectedInputs.add(INPUT_WITH_DIR_NAME);
+        expectedInputs.add(INPUT_WITH_FILE_NAME);
         assertEquals(expectedInputs, ao1.getAllKnownInputsNames());
         assertEquals(expectedInputs, ao3.getAllKnownInputsNames());
 
         // read outputs names:
         final HashSet<String> expectedOutputs = new HashSet<String>();
         expectedOutputs.add(PADataSpaces.DEFAULT_IN_OUT_NAME);
-        expectedOutputs.add(OUTPUT_NAME);
+        expectedOutputs.add(OUTPUT_WITH_DIR_NAME);
+        expectedOutputs.add(OUTPUT_WITH_FILE_NAME);
+        expectedOutputs.add(OUTPUT_WITH_NOTHING1_NAME);
+        expectedOutputs.add(OUTPUT_WITH_NOTHING2_NAME);
         assertEquals(expectedInputs, ao1.getAllKnownOutputsNames());
         assertEquals(expectedInputs, ao3.getAllKnownOutputsNames());
 
@@ -127,7 +155,7 @@ public class DataSpacesTest extends GCMFunctionalTestDataSpaces {
                     INPUT_FILE_NAME, 30000);
             final StringWrapper contentWrapper3 = ao3.readInputFileBlocking(ADDED_INPUT_NAME,
                     INPUT_FILE_NAME, 30000);
-            ao4.addInputSpace(ADDED_INPUT_NAME, inputDir.getAbsolutePath());
+            ao4.addInputSpace(ADDED_INPUT_NAME, inputWithDirLocalHandle.getAbsolutePath());
             assertEquals(INPUT_FILE_CONTENT, contentWrapper1.stringValue());
             assertEquals(INPUT_FILE_CONTENT, contentWrapper3.stringValue());
             PAException.endTryWithCatch();
@@ -140,8 +168,6 @@ public class DataSpacesTest extends GCMFunctionalTestDataSpaces {
         assertEquals(expectedInputs, ao3.getAllKnownInputsNames());
         assertEquals(expectedInputs, ao4.getAllKnownInputsNames());
 
-        // TODO tests for creating output files
-        // TODO tests for input/output as file, not as an directory
         // TODO tests for deployer node?
     }
 
