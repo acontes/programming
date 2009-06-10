@@ -470,7 +470,7 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
     /**
      * Returns the string representation of a DataSpacesURI without a space URI prefix. This can be
      * used for resolving files within a particular space.
-     *
+     * 
      * @return string representation of a DataSpacesURI without space URI prefix or
      *         <code>null</code> if DataSpacesURI is no suitable for having a path or contains space
      *         part only
