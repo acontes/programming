@@ -182,14 +182,12 @@ public class Peer implements InitActive, RunActive, Serializable {
      * Unregister the peer from the current structured network.
      */
     public Boolean leave() {
-
-        boolean res = this.structuredOverlay.leave();
-
-        if (res) {
+        if (this.structuredOverlay.leave()) {
             PAActiveObject.terminateActiveObject(false);
+            return true;
         }
 
-        return res;
+        return false;
     }
 
     /**

@@ -48,8 +48,7 @@ public class Zone implements Serializable {
         Coordinate[] minCoords = new Coordinate[CANOverlay.NB_DIMENSIONS];
         Coordinate[] maxCoords = new Coordinate[CANOverlay.NB_DIMENSIONS];
 
-        int i;
-        for (i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
+        for (int i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
             minCoords[i] = new Coordinate(Zone.MIN_COORD);
             maxCoords[i] = new Coordinate(Zone.MAX_COORD);
         }
@@ -70,9 +69,9 @@ public class Zone implements Serializable {
      *             the same dimension.
      */
     public Zone(Coordinate[] min, Coordinate[] max) throws ZoneException {
-        int l = min.length;
-        for (int i = 0; i < l; i++) {
-            if (min[i].equals(max[i])) {
+        for (int i = 0; i < min.length; i++) {
+            if (min[i].compareTo(max[i]) >= 0) {
+                System.out.println("min = " + min[i] + ", max = " + max[i]);
                 throw new ZoneException("Zone is not correctly formed.");
             }
         }
@@ -139,7 +138,7 @@ public class Zone implements Serializable {
      * 
      * WARNING : if an Zone is bordered with an another Zone on the dimension 1 of two dimension,
      * the parameter dimension to specify is 0 because the two Zone share the same Coordinate on the
-     * 0 dimension an not the dimension 1.
+     * 0 dimension and not the dimension 1.
      * 
      * @param zone
      *            the zone to check.
@@ -190,53 +189,51 @@ public class Zone implements Serializable {
     }
 
     /**
-     * Returns two zones representing the original one splited following a dimension.
+     * Returns two zones representing the original one splitted into two following a dimension.
      * 
      * @param dimension
      *            the dimension.
-     * @return the two split zones. Uses {@link Zone#split(int, Coordinate)}
+     * @return two zones representing the original one splitted into two following a dimension.
+     * @throws ZoneException
+     * @see #split(int, Coordinate).
      */
-    public Zone[] split(int dimension) {
+    public Zone[] split(int dimension) throws ZoneException {
         return this.split(dimension, Coordinate.getMiddle(this.getCoordinateMin(dimension), this
                 .getCoordinateMax(dimension)));
     }
 
     /**
-     * Returns two zones representing the original one split following a dimension at the specified
-     * coordinate.
+     * Returns two zones representing the original one splitted into two following a dimension at
+     * the specified coordinate.
      * 
      * @param dimension
      *            the dimension.
      * @param coordinate
      *            the coordinate.
-     * @return the two split zones. If a null zone is created, the first zone will be the current
-     *         zone and the second one will be <code>null</code>.
+     * @return two zones representing the original one splitted into two following a dimension at
+     *         the specified coordinate.
+     * @throws ZoneException
      */
-    public Zone[] split(int dimension, Coordinate coordinate) {
-        Coordinate[] maxCoordLessZone = null;
-        Coordinate[] minCoordGreaterZone = null;
+    public Zone[] split(int dimension, Coordinate coordinate) throws ZoneException {
+        Coordinate[] coordinatesMaxCopy = null;
+        Coordinate[] coordinatesMinCopy = null;
+
         try {
-            maxCoordLessZone = (Coordinate[]) MakeDeepCopy.WithObjectStream.makeDeepCopy(this
+            coordinatesMaxCopy = (Coordinate[]) MakeDeepCopy.WithObjectStream.makeDeepCopy(this
                     .getCoordinatesMax());
-
-            maxCoordLessZone[dimension] = coordinate;
-
-            minCoordGreaterZone = (Coordinate[]) MakeDeepCopy.WithObjectStream.makeDeepCopy(this
+            coordinatesMinCopy = (Coordinate[]) MakeDeepCopy.WithObjectStream.makeDeepCopy(this
                     .getCoordinatesMin());
-            minCoordGreaterZone[dimension] = coordinate;
-
-            return new Zone[] { new Zone(this.getCoordinatesMin(), maxCoordLessZone),
-                    new Zone(minCoordGreaterZone, this.getCoordinatesMax()) };
         } catch (IOException e) {
-            // IOException caused by MakeDeepCopy
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
-            // ClassNotFoundException caused by MakeDeepCopy
             e.printStackTrace();
-        } catch (ZoneException e) {
         }
 
-        return new Zone[] { this, null };
+        coordinatesMaxCopy[dimension] = coordinate;
+        coordinatesMinCopy[dimension] = coordinate;
+
+        return new Zone[] { new Zone(this.getCoordinatesMin(), coordinatesMaxCopy),
+                new Zone(coordinatesMinCopy, this.getCoordinatesMax()) };
     }
 
     /**
@@ -266,7 +263,7 @@ public class Zone implements Serializable {
     }
 
     /**
-     * Is the coordinate in the zone following a dimension ?
+     * Indicates if the zone contains the specified coordinate following the given dimension.
      * 
      * @param dimension
      *            the dimension.

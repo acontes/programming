@@ -6,7 +6,7 @@ import org.objectweb.proactive.extensions.structuredp2p.responses.ActionResponse
 
 
 /**
- * A PingMessage is a concrete message to remove a neighbor from a peer.
+ * A RemoveNeighborMessage is a concrete message to remove a neighbor from a peer.
  * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent

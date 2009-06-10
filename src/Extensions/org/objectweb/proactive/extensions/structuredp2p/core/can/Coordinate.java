@@ -5,8 +5,8 @@ import java.math.BigDecimal;
 
 
 /**
- * Coordinate is used in {@link CANOverlay} in order to specify the position of a given peer in the
- * space.
+ * Coordinate is used in {@link CANOverlay} in order to specify the space which is managed by a peer
+ * on a network.
  * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent
@@ -42,61 +42,17 @@ public class Coordinate implements Serializable {
     }
 
     /**
-     * Determinates the middle between two coordinates.
+     * Returns the middle between two coordinates.
      * 
      * @param min
      *            the coordinate min.
      * @param max
      *            the coordinate max.
-     * @return coordinates of the middle.
+     * @return the middle between two coordinates.
      */
     public static Coordinate getMiddle(Coordinate min, Coordinate max) {
-        // FIXME check with strings
-        BigDecimal minL = new BigDecimal(min.getValue());
-        BigDecimal maxL = new BigDecimal(max.getValue());
-
-        return new Coordinate(minL.add(maxL).divide(new BigDecimal(2)).toString());
-    }
-
-    /**
-     * Calculates the <em>Levenshtein</em> distance between two strings.
-     * 
-     * @param coord
-     *            the coordinate.
-     * @return the Levenshtein distance between two strings.
-     */
-    public int levenshteinDistance(Coordinate coord) {
-
-        String str1 = this.value;
-        String str2 = coord.getValue();
-        int[][] distance = new int[str1.length() + 1][str2.length() + 1];
-
-        for (int i = 0; i <= str1.length(); i++) {
-            distance[i][0] = i;
-        }
-        for (int j = 0; j <= str2.length(); j++) {
-            distance[0][j] = j;
-        }
-
-        for (int i = 1; i <= str1.length(); i++) {
-            for (int j = 1; j <= str2.length(); j++) {
-                distance[i][j] = this.minimum(distance[i - 1][j] + 1, distance[i][j - 1] + 1,
-                        distance[i - 1][j - 1] + ((str1.charAt(i - 1) == str2.charAt(j - 1)) ? 0 : 1));
-            }
-        }
-        return distance[str1.length()][str2.length()];
-    }
-
-    /**
-     * Calculates the minimum of three int.
-     * 
-     * @param a
-     * @param b
-     * @param c
-     * @return the minimum.
-     */
-    private int minimum(int a, int b, int c) {
-        return Math.min(Math.min(a, b), c);
+        return new Coordinate((new BigDecimal(min.getValue()).add(new BigDecimal(max.getValue()))
+                .divide(new BigDecimal(2))).toString());
     }
 
     /**
@@ -133,32 +89,6 @@ public class Coordinate implements Serializable {
         }
     }
 
-    /*
-     * private String stringValue(int n){ return ""; }
-     * 
-     * public String middle(String str1 , String str2){ int midCor = this.lenvensteinDistance(str1,
-     * str2) / 2; return stringValue(str1.hashCode() + midCor); }
-     */
-
-    /**
-     * {@inheritDoc}
-     */
-    public String toString() {
-        return this.getValue();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean equals(Object o) {
-        if (!(o instanceof Coordinate)) {
-            throw new IllegalArgumentException();
-        }
-
-        Coordinate coord = (Coordinate) o;
-        return new BigDecimal(this.value).equals(new BigDecimal(coord.getValue()));
-    }
-
     /**
      * Compares two coordinates.
      * 
@@ -170,10 +100,7 @@ public class Coordinate implements Serializable {
      *         lexicographically greater than the coordinate argument.
      */
     public int compareTo(Coordinate coord) {
-        BigDecimal val = new BigDecimal(coord.getValue());
-        BigDecimal cur = new BigDecimal(this.getValue());
-
-        return cur.compareTo(val);
+        return new BigDecimal(this.getValue()).compareTo(new BigDecimal(coord.getValue()));
     }
 
     /**
@@ -184,10 +111,7 @@ public class Coordinate implements Serializable {
      * @return the distance between the current coordinate and the specified coordinate.
      */
     public BigDecimal distanceWith(Coordinate coord) {
-        BigDecimal val = new BigDecimal(coord.getValue());
-        BigDecimal cur = new BigDecimal(this.getValue());
-
-        return cur.subtract(val);
+        return new BigDecimal(this.getValue()).subtract(new BigDecimal(coord.getValue()));
     }
 
     /**
@@ -206,5 +130,24 @@ public class Coordinate implements Serializable {
         }
 
         return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String toString() {
+        return this.getValue();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean equals(Object o) {
+        if (!(o instanceof Coordinate)) {
+            throw new IllegalArgumentException();
+        }
+
+        Coordinate coord = (Coordinate) o;
+        return new BigDecimal(this.value).equals(new BigDecimal(coord.getValue()));
     }
 }
