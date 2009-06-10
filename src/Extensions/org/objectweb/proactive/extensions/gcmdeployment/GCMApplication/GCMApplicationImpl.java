@@ -206,14 +206,20 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
 
             this.vContract.close();
 
+            // always start Data Spaces BEFORE applying tech services on local node
+            // (to provide working Data Spaces, DataSpacesTechnicalService assumes that appId is known and 
+            // application is registered in working NamingService) 
+            if (dataSpacesEnabled) {
+                startDataSpaces();
+            }
+            
             // apply Application-wide tech services on local node
             //
             Node defaultNode = NodeFactory.getDefaultNode();
             Node halfBodiesNode = NodeFactory.getHalfBodiesNode();
             TechnicalServicesProperties appTSProperties = parser.getAppTechnicalServices();
-            // FIXME: Data Spaces Naming Service or application id are potentially not configured yet, 
-            // while we try to configure local node using them 
 
+            // FIXME: appId (now: deployment id) need to be set on local nodes to make DS working on them
             for (Map.Entry<String, HashMap<String, String>> tsp : appTSProperties) {
 
                 TechnicalService ts = TechnicalServicesFactory.create(tsp.getKey(), tsp.getValue());
@@ -247,10 +253,6 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
             }
 
             isStarted = true;
-
-            if (dataSpacesEnabled) {
-                startDataSpaces();
-            }
 
             deploymentTree = buildDeploymentTree();
             for (GCMVirtualNodeInternal virtualNode : virtualNodes.values()) {
