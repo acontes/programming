@@ -785,6 +785,7 @@ public class PADataSpaces {
      * @return valid URI for specified file object
      * @see {@link #resolveFile(String)}
      */
+    // TODO: this method may be eventually removed
     public static String getURI(DataSpacesFileObject fileObject) {
         return DataSpacesImpl.getURI(fileObject);
     }
