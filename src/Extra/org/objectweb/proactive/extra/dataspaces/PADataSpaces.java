@@ -92,13 +92,12 @@ public class PADataSpaces {
      * execution.
      * <p>
      * Returned file handle can be directly used to perform operations on the file/directory,
-     * regardless of the underlying protocol. If specified file doesn't exist, one should call
-     * {@link DataSpacesFileObject#createFile()} or {@link DataSpacesFileObject#createFolder()}
-     * method. Closing returned DataSpacesFileObject is a caller's responsibility.
+     * regardless of the underlying protocol. Closing returned DataSpacesFileObject is a caller's
+     * responsibility.
      * <p>
-     * As input data space minimal capabilities are checked, its content is expected to be readable
-     * from any node of this application if it was defined correctly. It is intended to provide any
-     * form of input to the application.
+     * As input data space minimal capabilities are checked locally, its content is expected to be
+     * readable from any node of this application if it was defined correctly. It is intended to
+     * provide any form of input to the application.
      * 
      * @param path
      *            path of a file in the default input data space; <code>null</code> denotes request
@@ -149,13 +148,14 @@ public class PADataSpaces {
      * execution.
      * <p>
      * Returned file handle can be directly used to perform operations on the file/directory,
-     * regardless of the underlying protocol. If specified file doesn't exist, one should call
+     * regardless of the underlying protocol. If specified file does not exist, one should call
      * {@link DataSpacesFileObject#createFile()} or {@link DataSpacesFileObject#createFolder()}
      * method. Closing returned DataSpacesFileObject is a caller's responsibility.
      * <p>
-     * As output data space minimal capabilities are checked, its content is expected to be writable
-     * from any node of this application if it was defined correctly. It is intended to store
-     * globally any computation results. Writes synchronization is a developer’s responsibility.
+     * As output data space minimal capabilities are checked locally, its content is expected to be
+     * writable from any node of this application if it was defined correctly. It is intended to
+     * store globally any computation results. Writes synchronization is a developer’s
+     * responsibility.
      * 
      * @param path
      *            path of a file in the default output data space; <code>null</code> denotes request
@@ -336,13 +336,12 @@ public class PADataSpaces {
      * execution.
      * <p>
      * Returned file handle can be directly used to perform operations on the file/directory,
-     * regardless of the underlying protocol. If specified file doesn't exist, one should call
-     * {@link DataSpacesFileObject#createFile()} or {@link DataSpacesFileObject#createFolder()}
-     * method. Closing returned DataSpacesFileObject is a caller's responsibility.
+     * regardless of the underlying protocol. Closing returned DataSpacesFileObject is a caller's
+     * responsibility.
      * <p>
-     * As input data space capabilities are checked, its content is expected to be readable from any
-     * node of this application if it was defined correctly. It is intended to provide any form of
-     * input to the application.
+     * As input data space capabilities are checked locally, its content is expected to be readable
+     * from any node of this application if it was defined correctly. It is intended to provide any
+     * form of input to the application.
      * 
      * @param name
      *            name of an input data space to resolve
@@ -397,7 +396,7 @@ public class PADataSpaces {
      * execution.
      * <p>
      * Returned file handle can be directly used to perform operations on the file/directory,
-     * regardless of the underlying protocol. If specified file doesn't exist, one should call
+     * regardless of the underlying protocol. If specified file does not exist, one should call
      * {@link DataSpacesFileObject#createFile()} or {@link DataSpacesFileObject#createFolder()}
      * method. Closing returned DataSpacesFileObject is a caller's responsibility.
      * <p>
@@ -571,6 +570,8 @@ public class PADataSpaces {
     /**
      * Returns file handle to calling Active Object's <i>scratch data space</i>. This method call is
      * equal to {@link #resolveScratchForAO(String)} with null path argument.
+     * <p>
+     * Returned file always exists.
      * 
      * @return file handle to the scratch for calling Active Object
      * @throws FileSystemException
@@ -594,15 +595,15 @@ public class PADataSpaces {
      * space (as configured for a node, usually in deployment descriptor).
      * <p>
      * Returned file handle can be directly used to perform operations on the file/directory,
-     * regardless of the underlying protocol. If specified file doesn't exist, one should call
+     * regardless of the underlying protocol. If specified file does not exist, one should call
      * {@link DataSpacesFileObject#createFile()} or {@link DataSpacesFileObject#createFolder()}
      * method. Closing returned DataSpacesFileObject is a caller's responsibility.
      * <p>
-     * As returned scratch minimal capabilities are checked, its content is expected to be writable
-     * by this Active Object and readable by other Active Objects of this application. It is
-     * intended to store any temporary results of computation and possibly share them with other
-     * Active Objects. These results will be most probably automatically removed after application
-     * terminates.
+     * As returned scratch minimal capabilities are checked locally, its content is expected to be
+     * writable by this Active Object and should be readable by other Active Objects of this
+     * application (which is checked in {@link #resolveFile(String)} call). It is intended to store
+     * any temporary results of computation and possibly share them with other Active Objects. These
+     * results will be most probably automatically removed after application terminates.
      * 
      * @param path
      *            path of a file in the scratch for calling Active Object; <code>null</code> denotes
@@ -632,7 +633,7 @@ public class PADataSpaces {
      * call (that locally precedes this call or precedes it in a global real-time), is also
      * returned.
      * <p>
-     * This method does not cause intputs to be mounted, i.e. it doesn’t cause local VFS view to be
+     * This method does not cause inputs to be mounted, i.e. it doesn’t cause local VFS view to be
      * refreshed.
      * 
      * @return set of all names of inputs defined for caller's application before the moment of this
@@ -714,11 +715,12 @@ public class PADataSpaces {
      * <p>
      * Returned file handles can be directly used to perform operations on the file/directory,
      * regardless of the underlying protocol. Every output is mounted in result of this call, i.e.
-     * it does refresh local VFS view. Closing returned DataSpacesFileObjects is a caller's
-     * responsibility.
+     * it does refresh local VFS view. If file does not exist, one should call
+     * {@link DataSpacesFileObject#createFile()} or {@link DataSpacesFileObject#createFolder()}
+     * method. Closing returned DataSpacesFileObjects is a caller's responsibility.
      * <p>
-     * As output data spaces minimal capabilities are checked, their content is expected to be
-     * readable from any node of this application if it was defined correctly. It is intended to
+     * As output data spaces minimal capabilities are checked locally, their content is expected to
+     * be writable from any node of this application if it was defined correctly. It is intended to
      * provide any form of output to the application. Names of output spaces are application-level
      * contract.
      * 
@@ -749,7 +751,12 @@ public class PADataSpaces {
      * <p>
      * Returned file handle should be readable, but not necessarily writable. This kind of
      * capabilities checking is caller’s responsibility or it can be implied from a calling objects
-     * contract (e.g. data space type of a URI being passed is known).
+     * contract (e.g. data space type of a URI being passed is known). Minimal capabilities are
+     * checked locally according to a type of space represented by provided URI. For input its
+     * content is expected to be readable from any node of this application if it was defined
+     * correctly. For output its content is expected to be writable from any node of this
+     * application. For scratch its content is expected to be writable by owning Active Object and
+     * should be readable by other Active Objects of this application.
      * <p>
      * Note that URI from another application should work if passed here if both application share
      * some lifecycle period and they are configured to use the same Naming Service.
