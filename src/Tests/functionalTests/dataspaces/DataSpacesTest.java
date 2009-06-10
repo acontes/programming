@@ -140,6 +140,8 @@ public class DataSpacesTest extends GCMFunctionalTestDataSpaces {
         assertEquals(expectedInputs, ao3.getAllKnownInputsNames());
         assertEquals(expectedInputs, ao4.getAllKnownInputsNames());
 
+        // TODO tests for creating output files
+        // TODO tests for input/output as file, not as an directory
         // TODO tests for deployer node?
     }
 
