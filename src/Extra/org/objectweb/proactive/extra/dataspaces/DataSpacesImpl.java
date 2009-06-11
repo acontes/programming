@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import org.apache.commons.vfs.Capability;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
@@ -19,6 +18,9 @@ import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.dataspaces.adapter.vfs.VFSFileObjectAdapter;
+import org.objectweb.proactive.extra.dataspaces.api.Capability;
+import org.objectweb.proactive.extra.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredException;
@@ -55,7 +57,7 @@ public class DataSpacesImpl {
      * @throws ConfigurationException
      *             when expected capabilities are not fulfilled
      */
-    private static void checkCapabilitiesOrWound(DataSpacesFileObjectImpl fo, SpaceType type)
+    private static void checkCapabilitiesOrWound(DataSpacesFileObject fo, SpaceType type)
             throws ConfigurationException {
 
         Capability[] expected = PADataSpaces.getCapabilitiesForSpaceType(type);
@@ -86,9 +88,11 @@ public class DataSpacesImpl {
         }
     }
 
-    private static void setFileObjectOwner(final DataSpacesFileObjectImpl fo) {
+    private static void setFileObjectOwner(final VFSFileObjectAdapter fo) {
         final String aoId = Utils.getActiveObjectId(Utils.getCurrentActiveObjectBody());
-        fo.setOwnerActiveObjectId(aoId);
+
+        if (fo.getAdaptee() instanceof DataSpacesFileObjectImpl)
+            ((DataSpacesFileObjectImpl) fo.getAdaptee()).setOwnerActiveObjectId(aoId);
     }
 
     private final SpacesMountManager spacesMountManager;
@@ -193,7 +197,7 @@ public class DataSpacesImpl {
         }
 
         try {
-            final DataSpacesFileObjectImpl fo = spacesMountManager.resolveFile(uri);
+            final VFSFileObjectAdapter fo = spacesMountManager.resolveFile(uri);
             if (logger.isTraceEnabled())
                 logger.trace(String.format("Resolved request for %s with name %s (%s)", type, name, uri));
 
@@ -249,7 +253,7 @@ public class DataSpacesImpl {
         long currTime = startTime;
         while (currTime < startTime + timeoutMillis) {
             try {
-                final DataSpacesFileObjectImpl fo = spacesMountManager.resolveFile(uri);
+                final VFSFileObjectAdapter fo = spacesMountManager.resolveFile(uri);
                 if (logger.isTraceEnabled()) {
                     final String message = String.format(
                             "Resolved blocking request for %s with name %s (%s)", type, name, uri);
@@ -307,7 +311,7 @@ public class DataSpacesImpl {
         try {
             final DataSpacesURI scratchURI = appScratchSpace.getScratchForAO(body);
             final DataSpacesURI queryURI = scratchURI.withPath(path);
-            final DataSpacesFileObjectImpl fo = spacesMountManager.resolveFile(queryURI);
+            final VFSFileObjectAdapter fo = spacesMountManager.resolveFile(queryURI);
 
             if (logger.isTraceEnabled())
                 logger.trace("Resolved scratch for an Active Object: " + queryURI);
@@ -368,7 +372,7 @@ public class DataSpacesImpl {
         checkIsInputOrOutput(type);
 
         final DataSpacesURI uri = DataSpacesURI.createURI(appId, type);
-        final Map<DataSpacesURI, DataSpacesFileObjectImpl> spaces;
+        final Map<DataSpacesURI, VFSFileObjectAdapter> spaces;
         try {
             spaces = spacesMountManager.resolveSpaces(uri);
         } catch (FileSystemException x) {
@@ -378,9 +382,9 @@ public class DataSpacesImpl {
 
         final Map<String, DataSpacesFileObject> ret = new HashMap<String, DataSpacesFileObject>(spaces.size());
 
-        for (Entry<DataSpacesURI, DataSpacesFileObjectImpl> entry : spaces.entrySet()) {
+        for (Entry<DataSpacesURI, VFSFileObjectAdapter> entry : spaces.entrySet()) {
             final String name = entry.getKey().getName();
-            DataSpacesFileObjectImpl fo = entry.getValue();
+            VFSFileObjectAdapter fo = entry.getValue();
 
             checkCapabilitiesOrWound(fo, type);
             setFileObjectOwner(fo);
@@ -414,7 +418,7 @@ public class DataSpacesImpl {
             if (!spaceURI.isSuitableForHavingPath())
                 throw new MalformedURIException("Specified URI represents internal high-level directories");
 
-            final DataSpacesFileObjectImpl fo = spacesMountManager.resolveFile(spaceURI);
+            final VFSFileObjectAdapter fo = spacesMountManager.resolveFile(spaceURI);
             SpaceType type = spaceURI.getSpaceType(); // as isComplete cannot be null
 
             if (logger.isTraceEnabled())

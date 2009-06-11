@@ -5,9 +5,6 @@ package org.objectweb.proactive.extra.dataspaces;
 
 import java.util.regex.Pattern;
 
-import org.apache.commons.vfs.Capability;
-import org.apache.commons.vfs.FileObject;
-import org.apache.commons.vfs.FileSystem;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -20,6 +17,9 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.dataspaces.api.Capability;
+import org.objectweb.proactive.extra.dataspaces.api.DataSpacesFileObject;
+import org.objectweb.proactive.extra.dataspaces.api.FileSystem;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 
 
@@ -181,18 +181,18 @@ public class Utils {
      * 
      * @param expected
      *            array containing expected capabilities of the specified file system.
-     * @param fs
+     * @param fileSystem
      *            specified file system
      * @throws ConfigurationException
      *             when the file system does not have one of expected capabilities
      */
-    public static void assertCapabilitiesMatch(Capability[] expected, FileSystem fs)
+    public static void assertCapabilitiesMatch(Capability[] expected, FileSystem fileSystem)
             throws ConfigurationException {
 
         for (int i = 0; i < expected.length; i++) {
             final Capability capability = expected[i];
 
-            if (!fs.hasCapability(capability))
+            if (!fileSystem.hasCapability(capability))
                 throw new ConfigurationException(
                     "File system used to access data does not support capability: " + capability);
         }
@@ -209,7 +209,7 @@ public class Utils {
      * @throws ConfigurationException
      *             when the FileObject's file system does not have one of expected capabilities
      */
-    public static void assertCapabilitiesMatch(Capability[] expected, FileObject fo)
+    public static void assertCapabilitiesMatch(Capability[] expected, DataSpacesFileObject fo)
             throws ConfigurationException {
 
         assertCapabilitiesMatch(expected, fo.getFileSystem());

@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException;
 
 
@@ -29,7 +30,7 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException
  * management etc. as pure {@link FileObject} does.
  */
 // FIXME limit access to the getParent()
-public class DataSpacesFileObjectImpl extends AbstractLimitingFileObject implements DataSpacesFileObject {
+public class DataSpacesFileObjectImpl extends AbstractLimitingFileObject {
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.DATASPACES);
 
     private final DataSpacesURI spaceUri;

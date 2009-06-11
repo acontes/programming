@@ -11,16 +11,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import org.apache.commons.vfs.FileObject;
-import org.apache.commons.vfs.FileSystemException;
-import org.apache.commons.vfs.FileType;
 import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.extra.dataspaces.DataSpacesFileObjectImpl;
 import org.objectweb.proactive.extra.dataspaces.DataSpacesURI;
 import org.objectweb.proactive.extra.dataspaces.NamingService;
 import org.objectweb.proactive.extra.dataspaces.SpaceInstanceInfo;
 import org.objectweb.proactive.extra.dataspaces.SpacesMountManager;
+import org.objectweb.proactive.extra.dataspaces.adapter.vfs.VFSFileObjectAdapter;
+import org.objectweb.proactive.extra.dataspaces.api.DataSpacesFileObject;
+import org.objectweb.proactive.extra.dataspaces.api.FileType;
+import org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException;
 
 
 // TODO: add options for listing app id's, specifying such for listing and so on..
@@ -43,8 +43,8 @@ public class NamingServiceListing {
         query = DataSpacesURI.createURI(applicationId);
     }
 
-    private String prettyPrint(FileObject fo) throws FileSystemException {
-        final String uri = fo.getName().getURI();
+    private String prettyPrint(DataSpacesFileObject fo) throws FileSystemException {
+        final String uri = fo.getURI();
         final long time = fo.getContent().getLastModifiedTime();
         final Calendar lastModified = Calendar.getInstance();
 
@@ -58,27 +58,27 @@ public class NamingServiceListing {
         }
     }
 
-    private void processFileTree(List<String> ret, FileObject fo) throws FileSystemException {
+    private void processFileTree(List<String> ret, DataSpacesFileObject fo) throws FileSystemException {
         ret.add(prettyPrint(fo));
 
         if (fo.getType().hasChildren()) {
-            final FileObject[] ch = fo.getChildren();
+            final List<DataSpacesFileObject> ch = fo.getChildren();
 
-            for (int i = 0; i < ch.length; i++) {
-                processFileTree(ret, ch[i]);
+            for (DataSpacesFileObject file : ch) {
+                processFileTree(ret, file);
             }
         }
     }
 
-    private void processRecursively() throws FileSystemException {
+    private void processRecursively() throws org.apache.commons.vfs.FileSystemException {
 
         // we need to mount spaces for that..
         mountManager = new SpacesMountManager(namingService);
 
         // get FileObject for each space
-        final Map<DataSpacesURI, DataSpacesFileObjectImpl> files = mountManager.resolveSpaces(query);
+        final Map<DataSpacesURI, VFSFileObjectAdapter> files = mountManager.resolveSpaces(query);
 
-        for (Entry<DataSpacesURI, DataSpacesFileObjectImpl> space : files.entrySet()) {
+        for (Entry<DataSpacesURI, VFSFileObjectAdapter> space : files.entrySet()) {
             try {
                 final List<String> list = new LinkedList<String>();
 
@@ -134,7 +134,7 @@ public class NamingServiceListing {
         if (recursively)
             try {
                 processRecursively();
-            } catch (FileSystemException e) {
+            } catch (org.apache.commons.vfs.FileSystemException e) {
                 e.printStackTrace();
                 recursively = false;
             }

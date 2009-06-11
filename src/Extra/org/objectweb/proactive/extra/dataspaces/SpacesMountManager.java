@@ -15,6 +15,7 @@ import org.apache.commons.vfs.impl.DefaultFileSystemManager;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.dataspaces.adapter.vfs.VFSFileObjectAdapter;
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundException;
 
 
@@ -107,7 +108,7 @@ public class SpacesMountManager {
      * 
      * @param queryUri
      *            Data Spaces URI to get access to
-     * @return DataSpacesFileObjectImpl that can be used to access this URI content; returned
+     * @return DataSpacesFileObject that can be used to access this URI content; returned
      *         FileObject is not opened nor attached in any way; this FileObject instance will never
      *         be shared, i.e. individual instances are returned for subsequent queries (even the
      *         same queries); id of owner active object need to be set before any usage.
@@ -120,7 +121,7 @@ public class SpacesMountManager {
      *             when provided queryUri does not have space part fully defined
      * @see DataSpacesURI#isSpacePartFullyDefined()
      */
-    public DataSpacesFileObjectImpl resolveFile(final DataSpacesURI queryUri) throws FileSystemException,
+    public VFSFileObjectAdapter resolveFile(final DataSpacesURI queryUri) throws FileSystemException,
             SpaceNotFoundException {
         if (logger.isDebugEnabled())
             logger.debug("File access request: " + queryUri);
@@ -169,11 +170,11 @@ public class SpacesMountManager {
      *             when provided queryUri has space part fully defined
      * @see DataSpacesURI#isSpacePartFullyDefined()
      */
-    public Map<DataSpacesURI, DataSpacesFileObjectImpl> resolveSpaces(final DataSpacesURI queryUri)
+    public Map<DataSpacesURI, VFSFileObjectAdapter> resolveSpaces(final DataSpacesURI queryUri)
             throws FileSystemException {
         if (logger.isDebugEnabled())
             logger.debug("Spaces access request: " + queryUri);
-        final Map<DataSpacesURI, DataSpacesFileObjectImpl> result = new HashMap<DataSpacesURI, DataSpacesFileObjectImpl>();
+        final Map<DataSpacesURI, VFSFileObjectAdapter> result = new HashMap<DataSpacesURI, VFSFileObjectAdapter>();
 
         final Set<SpaceInstanceInfo> spaces = directory.lookupMany(queryUri);
         for (final SpaceInstanceInfo space : spaces) {
@@ -295,7 +296,7 @@ public class SpacesMountManager {
         logger.info("Unmounted space: " + spaceUri);
     }
 
-    private DataSpacesFileObjectImpl resolveAndDecorateFileVFS(final DataSpacesURI uri)
+    private VFSFileObjectAdapter resolveAndDecorateFileVFS(final DataSpacesURI uri)
             throws FileSystemException {
         synchronized (readLock) {
             final DataSpacesURI spacePart = uri.getSpacePartOnly();
@@ -306,13 +307,16 @@ public class SpacesMountManager {
                     throw new FileSystemException("Could not access file that should exist (be mounted)");
                 }
 
-                final FileObject spaceRoot = mountedSpaces.get(spacePart);
                 final FileObject file;
+                final DataSpacesFileObjectImpl decoratedFile;
+                final FileObject spaceRoot = mountedSpaces.get(spacePart);
+
                 if (relativeToSpace == null)
                     file = spaceRoot;
                 else
                     file = spaceRoot.resolveFile(relativeToSpace);
-                return new DataSpacesFileObjectImpl(file, spacePart, spaceRoot.getName().getPath());
+                decoratedFile = new DataSpacesFileObjectImpl(file, spacePart, spaceRoot.getName().getPath());
+                return new VFSFileObjectAdapter(file, spacePart, spaceRoot.getName().getPath());
             } catch (FileSystemException x) {
                 logger.warn("Could not access file that should exist (be mounted): " + uri);
                 throw x;

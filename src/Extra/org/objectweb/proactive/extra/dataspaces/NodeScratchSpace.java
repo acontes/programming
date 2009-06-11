@@ -302,11 +302,14 @@ public class NodeScratchSpace {
                 Capability.GET_TYPE, Capability.LIST_CHILDREN, Capability.READ_CONTENT,
                 Capability.WRITE_CONTENT };
 
-        try {
-            Utils.assertCapabilitiesMatch(expected, fs);
-        } catch (ConfigurationException x) {
-            logger.error("Scratch file system: " + x.getMessage());
-            throw x;
+        for (int i = 0; i < expected.length; i++) {
+            final Capability capability = expected[i];
+
+            if (fs.hasCapability(capability))
+                continue;
+
+            logger.error("Scratch file system does not support capability: " + capability);
+            throw new ConfigurationException("Scratch file system does not support capability: " + capability);
         }
     }
 

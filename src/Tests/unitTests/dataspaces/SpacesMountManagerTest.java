@@ -16,12 +16,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.Map;
 
-import org.apache.commons.vfs.FileSystemException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.objectweb.proactive.extra.dataspaces.DataSpacesFileObject;
-import org.objectweb.proactive.extra.dataspaces.DataSpacesFileObjectImpl;
 import org.objectweb.proactive.extra.dataspaces.DataSpacesURI;
 import org.objectweb.proactive.extra.dataspaces.InputOutputSpaceConfiguration;
 import org.objectweb.proactive.extra.dataspaces.PADataSpaces;
@@ -31,6 +28,9 @@ import org.objectweb.proactive.extra.dataspaces.SpacesDirectory;
 import org.objectweb.proactive.extra.dataspaces.SpacesDirectoryImpl;
 import org.objectweb.proactive.extra.dataspaces.SpacesMountManager;
 import org.objectweb.proactive.extra.dataspaces.VFSFactory;
+import org.objectweb.proactive.extra.dataspaces.adapter.vfs.VFSFileObjectAdapter;
+import org.objectweb.proactive.extra.dataspaces.api.DataSpacesFileObject;
+import org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundException;
 
 
@@ -104,13 +104,14 @@ public class SpacesMountManagerTest {
     }
 
     @Test
-    public void testResolveFileForSpace() throws FileSystemException, SpaceNotFoundException {
+    public void testResolveFileForSpace() throws SpaceNotFoundException,
+            IOException {
         fileObject = manager.resolveFile(spaceUri);
         assertIsSpaceDir(fileObject);
     }
 
     @Test
-    public void testResolveFileForSpaceAlreadyMounted1() throws FileSystemException, SpaceNotFoundException {
+    public void testResolveFileForSpaceAlreadyMounted1() throws SpaceNotFoundException, IOException {
         testResolveFileForSpace();
         testResolveFileForSpace();
     }
@@ -122,7 +123,7 @@ public class SpacesMountManagerTest {
     }
 
     @Test
-    public void testResolveFilesNotSharedFileObject() throws FileSystemException, SpaceNotFoundException {
+    public void testResolveFilesNotSharedFileObject() throws IOException, SpaceNotFoundException {
         final DataSpacesFileObject fileObject1 = manager.resolveFile(spaceUri);
         final DataSpacesFileObject fileObject2 = manager.resolveFile(spaceUri);
 
@@ -205,9 +206,9 @@ public class SpacesMountManagerTest {
     }
 
     @Test
-    public void testResolveSpaces() throws FileSystemException {
+    public void testResolveSpaces() throws IOException {
         final DataSpacesURI queryUri = DataSpacesURI.createURI(spaceUri.getAppId());
-        final Map<DataSpacesURI, DataSpacesFileObjectImpl> spaces = manager.resolveSpaces(queryUri);
+        final Map<DataSpacesURI, VFSFileObjectAdapter> spaces = manager.resolveSpaces(queryUri);
         assertEquals(1, spaces.size());
 
         fileObject = spaces.get(spaceUri);
@@ -216,7 +217,7 @@ public class SpacesMountManagerTest {
     }
 
     @Test
-    public void testResolveSpacesAlreadyMounted1() throws FileSystemException {
+    public void testResolveSpacesAlreadyMounted1() throws IOException {
         testResolveSpaces();
         testResolveSpaces();
     }
@@ -228,14 +229,14 @@ public class SpacesMountManagerTest {
     }
 
     @Test
-    public void testResolveSpacesNotSharedFileObject() throws FileSystemException {
+    public void testResolveSpacesNotSharedFileObject() throws IOException {
         final DataSpacesURI queryUri = DataSpacesURI.createURI(spaceUri.getAppId());
 
-        final Map<DataSpacesURI, DataSpacesFileObjectImpl> spaces1 = manager.resolveSpaces(queryUri);
+        final Map<DataSpacesURI, VFSFileObjectAdapter> spaces1 = manager.resolveSpaces(queryUri);
         assertEquals(1, spaces1.size());
         final DataSpacesFileObject fileObject1 = spaces1.get(spaceUri);
 
-        final Map<DataSpacesURI, DataSpacesFileObjectImpl> spaces2 = manager.resolveSpaces(queryUri);
+        final Map<DataSpacesURI, VFSFileObjectAdapter> spaces2 = manager.resolveSpaces(queryUri);
         assertEquals(1, spaces2.size());
         final DataSpacesFileObject fileObject2 = spaces2.get(spaceUri);
         assertNotSame(fileObject1, fileObject2);

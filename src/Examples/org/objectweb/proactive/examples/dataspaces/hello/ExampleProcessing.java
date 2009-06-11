@@ -11,17 +11,16 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.vfs.FileObject;
-import org.apache.commons.vfs.FileSystemException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
-import org.objectweb.proactive.extra.dataspaces.DataSpacesFileObject;
 import org.objectweb.proactive.extra.dataspaces.PADataSpaces;
+import org.objectweb.proactive.extra.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.DataSpacesException;
+import org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundException;
@@ -43,7 +42,8 @@ public class ExampleProcessing implements Serializable {
      * @return writer of a file's content
      * @throws FileSystemException
      */
-    private static OutputStreamWriter getWriter(final FileObject outputFile) throws FileSystemException {
+    private static OutputStreamWriter getWriter(final DataSpacesFileObject outputFile)
+            throws FileSystemException {
         OutputStream os = outputFile.getContent().getOutputStream();
         return new OutputStreamWriter(os);
     }
@@ -56,7 +56,7 @@ public class ExampleProcessing implements Serializable {
      * @return reader of a file's content
      * @throws FileSystemException
      */
-    private static BufferedReader getReader(final FileObject inputFile) throws FileSystemException {
+    private static BufferedReader getReader(final DataSpacesFileObject inputFile) throws FileSystemException {
         final InputStream is = inputFile.getContent().getInputStream();
         return new BufferedReader(new InputStreamReader(is));
     }
@@ -68,8 +68,8 @@ public class ExampleProcessing implements Serializable {
         try {
             if (resource instanceof Closeable)
                 ((Closeable) resource).close();
-            else if (resource instanceof FileObject)
-                ((FileObject) resource).close();
+            else if (resource instanceof DataSpacesFileObject)
+                ((DataSpacesFileObject) resource).close();
         } catch (IOException e) {
             ProActiveLogger.logEatedException(logger, e);
         }
@@ -182,7 +182,7 @@ public class ExampleProcessing implements Serializable {
 
         final List<String> results = new ArrayList<String>();
         for (StringWrapper uriWrapped : partialResults) {
-            FileObject partialResultsFile = null;
+            DataSpacesFileObject partialResultsFile = null;
             BufferedReader reader = null;
             try {
                 partialResultsFile = PADataSpaces.resolveFile(uriWrapped.stringValue());
@@ -196,7 +196,7 @@ public class ExampleProcessing implements Serializable {
             }
         }
 
-        FileObject outputFile = null;
+        DataSpacesFileObject outputFile = null;
         OutputStreamWriter writer = null;
         try {
             outputFile = PADataSpaces.resolveDefaultOutput(FINAL_RESULTS_FILENAME);
