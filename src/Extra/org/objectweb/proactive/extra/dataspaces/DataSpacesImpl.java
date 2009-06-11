@@ -89,6 +89,7 @@ public class DataSpacesImpl {
     }
 
     private static void setFileObjectOwner(final VFSFileObjectAdapter fo) {
+        // FIXME: implement and set also decorator limiting access for !isSuitableForHavingPath() 
         final String aoId = Utils.getActiveObjectId(Utils.getCurrentActiveObjectBody());
 
         if (fo.getAdaptee() instanceof DataSpacesFileObjectImpl)

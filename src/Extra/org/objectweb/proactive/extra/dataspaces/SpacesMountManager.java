@@ -25,8 +25,10 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundExceptio
  * Manager creates and maintains Apache VFS manager to pose virtual view provider of file system for
  * each application. It is able to response to queries for files in data spaces or just data spaces,
  * providing DataSpacesFileObjectImpl decorator as a result. Returned FileObject decorator instances
- * are applicable for user level code, although for write-limiting features to work correctly it is
- * required to set up id of active object that becomes owner of returned FileObject.
+ * are applicable for user level code with access limited to spaces, although for write-limiting
+ * features to work correctly it is required to set up id of active object that becomes owner of
+ * returned FileObject. One may also want to limit access to URIs not suitable for having path,
+ * which is not responsibility of this class.
  * <p>
  * To be able to serve requests for files and data spaces, SpaceMountManager must use
  * {@link SpacesDirectory} as a source of information about data spaces, their mounting points and
@@ -108,10 +110,10 @@ public class SpacesMountManager {
      * 
      * @param queryUri
      *            Data Spaces URI to get access to
-     * @return DataSpacesFileObject that can be used to access this URI content; returned
-     *         FileObject is not opened nor attached in any way; this FileObject instance will never
-     *         be shared, i.e. individual instances are returned for subsequent queries (even the
-     *         same queries); id of owner active object need to be set before any usage.
+     * @return DataSpacesFileObject that can be used to access this URI content; returned FileObject
+     *         is not opened nor attached in any way; this FileObject instance will never be shared,
+     *         i.e. individual instances are returned for subsequent queries (even the same
+     *         queries); id of owner active object need to be set before any usage.
      * @throws FileSystemException
      *             indicates VFS related exception during access, like mounting problems, I/O errors
      *             etc.
@@ -315,7 +317,7 @@ public class SpacesMountManager {
                     file = spaceRoot;
                 else
                     file = spaceRoot.resolveFile(relativeToSpace);
-                decoratedFile = new DataSpacesFileObjectImpl(file, spacePart, spaceRoot.getName().getPath());
+                decoratedFile = new DataSpacesFileObjectImpl(file, spacePart, spaceRoot.getName());
                 return new VFSFileObjectAdapter(file, spacePart, spaceRoot.getName().getPath());
             } catch (FileSystemException x) {
                 logger.warn("Could not access file that should exist (be mounted): " + uri);

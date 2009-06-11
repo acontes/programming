@@ -169,6 +169,7 @@ public class DataSpacesTest extends GCMFunctionalTestDataSpaces {
         assertEquals(expectedInputs, ao4.getAllKnownInputsNames());
 
         // TODO tests for deployer node?
+        // TODO tests for accessing disallowed FileObject
     }
 
     @ActiveObject

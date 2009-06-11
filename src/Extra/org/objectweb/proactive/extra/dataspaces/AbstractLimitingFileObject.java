@@ -19,17 +19,21 @@ import org.apache.commons.vfs.util.RandomAccessMode;
 
 
 /**
- * Abstract FileObject decorator, checking if to limit any access to the file basing on pluggable
- * rule.
+ * Abstract FileObject decorator, checking if to limit write or ancestor access to the file basing
+ * on pluggable rules.
  * <p>
- * Decorator may limit direct write access (like deleting file, opening output stream from
- * getContent()), write checks (like isWriteable()), but also decorates every returned FileObject.
- * Way of decorating returned files is also pluggable.
+ * Decorator may limit write access basing on {@link #isReadOnly()} method: direct write access
+ * (like deleting file, opening output stream from getContent()), write checks (like isWriteable()).
  * <p>
- * Implementors should provide {@link #isReadOnly()} and {@link #doDecorateFile(FileObject)}
- * methods.
+ * Decorator may limit ancestor access (for resolve and getParent queries) basing on pluggable rule
+ * {@link #canReturnAncestor(FileObject)}.
  * <p>
- * <strong>Known limitations:</strong>
+ * It also decorates every returned FileObject. Way of decorating returned files is also pluggable
+ * through {@link #doDecorateFile(FileObject)}.
+ * <p>
+ * Limits for actions are enforced by throwing {@link FileSystemException}.
+ * <p>
+ * <strong>Known limitations of decorator:</strong>
  * <ul>
  * <li>canRenameTo() invoked on non-decorated object with decorated object as target may return
  * false information</li>
@@ -37,8 +41,13 @@ import org.apache.commons.vfs.util.RandomAccessMode;
  * <li>moveTo() invoked on non-decorated object with decorated object as target may not work for
  * some buggy providers; depends on VFS bug: VFS-258</li>
  * </ul>
+ * <p>
+ * Generic type should be an implementor type - class returned by
+ * {@link #doDecorateFile(FileObject)}.
  */
-public abstract class AbstractLimitingFileObject extends DecoratedFileObject {
+// I do not know if it is technically possible to express generic type as an implementor class type.
+// So, implementors have to set it to their own type.
+public abstract class AbstractLimitingFileObject<T extends FileObject> extends DecoratedFileObject {
 
     public AbstractLimitingFileObject(final FileObject fileObject) {
         super(fileObject);
@@ -49,17 +58,23 @@ public abstract class AbstractLimitingFileObject extends DecoratedFileObject {
      *            file to decorate for calls returning FileObjects; never <code>null</code>
      * @return decorated FileObject
      */
-    protected abstract FileObject doDecorateFile(FileObject file);
+    protected abstract T doDecorateFile(FileObject file);
 
     /**
      * @return <code>true</code> if file is read-only, <code>false</code> otherwise
      */
     protected abstract boolean isReadOnly();
 
-    private void checkIsNotReadOnly() throws FileSystemException {
-        if (isReadOnly())
-            throw new FileSystemException("File is read-only");
-    }
+    /**
+     * Checks whether provided ancestor can be returned.
+     * 
+     * @param decoratedAncestor
+     *            ancestor to return, with decorator already applied by
+     *            {@link #doDecorateFile(FileObject)}.
+     * @return <code>true</code> if this decorated ancestor can be returned in any call,
+     *         <code>false</code> otherwise
+     */
+    protected abstract boolean canReturnAncestor(T decoratedAncestor);
 
     @Override
     public boolean canRenameTo(FileObject newfile) {
@@ -109,12 +124,16 @@ public abstract class AbstractLimitingFileObject extends DecoratedFileObject {
 
     @Override
     public FileObject resolveFile(String name, NameScope scope) throws FileSystemException {
-        return decorateFile(super.resolveFile(name, scope));
+        final T resolvedDecorated = decorateFile(super.resolveFile(name, scope));
+        checkCanReturnPotentialAncestor(resolvedDecorated);
+        return resolvedDecorated;
     }
 
     @Override
     public FileObject resolveFile(String path) throws FileSystemException {
-        return decorateFile(super.resolveFile(path));
+        final T resolvedDecorated = decorateFile(super.resolveFile(path));
+        checkCanReturnPotentialAncestor(resolvedDecorated);
+        return resolvedDecorated;
     }
 
     @Override
@@ -145,7 +164,9 @@ public abstract class AbstractLimitingFileObject extends DecoratedFileObject {
 
     @Override
     public FileObject getParent() throws FileSystemException {
-        return decorateFile(super.getParent());
+        final T parentDecorated = decorateFile(super.getParent());
+        checkCanReturnPotentialAncestor(parentDecorated);
+        return parentDecorated;
     }
 
     @Override
@@ -153,7 +174,12 @@ public abstract class AbstractLimitingFileObject extends DecoratedFileObject {
         return new LimitingFileContent(super.getContent());
     }
 
-    private FileObject decorateFile(final FileObject file) {
+    private void checkIsNotReadOnly() throws FileSystemException {
+        if (isReadOnly())
+            throw new FileSystemException("File is read-only");
+    }
+
+    private T decorateFile(final FileObject file) {
         if (file == null)
             return null;
         return doDecorateFile(file);
@@ -174,6 +200,17 @@ public abstract class AbstractLimitingFileObject extends DecoratedFileObject {
         for (final FileObject fo : files)
             result.add(decorateFile(fo));
         return result;
+    }
+
+    private void checkCanReturnPotentialAncestor(final T decoratedFile) throws FileSystemException {
+        if (decoratedFile == null)
+            return;
+        if (getName().isDescendent(decoratedFile.getName(), NameScope.DESCENDENT_OR_SELF)) {
+            return;
+        }
+        if (!canReturnAncestor(decoratedFile)) {
+            throw new FileSystemException("Access denied to one of resolved file ancestor(s)");
+        }
     }
 
     private class LimitingFileContent implements FileContent {

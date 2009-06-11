@@ -1,6 +1,8 @@
 package org.objectweb.proactive.extra.dataspaces;
 
+import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.NameScope;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -26,17 +28,19 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException
  * <li>AO's scratch space - for AO different that scratch's owner</li>
  * </ul>
  * <p>
+ * General file access is limited to spaces.
+ * <p>
  * Instances of this class conform to the same rules regarding concurrent access, resources
  * management etc. as pure {@link FileObject} does.
  */
-// FIXME limit access to the getParent()
-public class DataSpacesFileObjectImpl extends AbstractLimitingFileObject {
+public class DataSpacesFileObjectImpl extends AbstractLimitingFileObject<DataSpacesFileObjectImpl> {
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.DATASPACES);
 
     private final DataSpacesURI spaceUri;
-    private final String vfsSpaceRootPath;
+    private final FileName spaceRootFileName;
     private String ownerActiveObjectId;
-    private Boolean readOnly;
+    private volatile Boolean readOnly;
+    private Object readOnlyLock = new Object();
 
     /**
      * Creates an instance of DataSpacesFileObjectImpl. Before any usage of this class, id of an
@@ -47,32 +51,45 @@ public class DataSpacesFileObjectImpl extends AbstractLimitingFileObject {
      *            <code>null</code>
      * @param spaceUri
      *            Data Spaces URI of this file object's space; cannot be <code>null</code>
-     * @param vfsSpaceRootPath
+     * @param spaceRootFileName
      *            VFS path of the space root FileObject; cannot be <code>null</code>
      */
-    public DataSpacesFileObjectImpl(FileObject fileObject, DataSpacesURI spaceUri, String vfsSpaceRootPath) {
+    public DataSpacesFileObjectImpl(FileObject fileObject, DataSpacesURI spaceUri, FileName spaceRootFileName) {
         super(fileObject);
         this.spaceUri = spaceUri;
-        this.vfsSpaceRootPath = vfsSpaceRootPath;
+        this.spaceRootFileName = spaceRootFileName;
     }
 
     /**
-     * Returned URI is always suitable for having path:
-     * {@link DataSpacesURI#isSuitableForHavingPath()} returns true.
-     * <p>
-     * FIXME: after getParent() limitation it should be like that? what about active object id?
+     * Returned URI is always inside a space - {@link DataSpacesURI#isSpacePartFullyDefined()}
+     * returns always true. {@link DataSpacesURI#isSuitableForHavingPath()} returns true.
      */
     public String getURI() {
-        // FIXME when DataSpacesFileObject will have just VFS adapter, store full URI as a field instead?
-        final String path = getName().getPath();
-        if (!path.startsWith(vfsSpaceRootPath)) {
+        // TODO when DataSpacesFileObject will have just VFS adapter, maybe store full URI as a field instead?
+        // way of concatenating spaceUri and absolutePathInSpace is not the best possible 
+        final FileName name = getName();
+        if (!spaceRootFileName.isDescendent(name, NameScope.DESCENDENT_OR_SELF)) {
             final ProActiveRuntimeException x = new ProActiveRuntimeException(
                 "VFS path of this DataSpacesFileObject does not start with its space VFS path");
             ProActiveLogger.logImpossibleException(logger, x);
             throw x;
         }
-        final String relPath = path.substring(vfsSpaceRootPath.length());
-        return spaceUri.toString() + relPath;
+        final String absolutePathInSpace = name.getPath().substring(spaceRootFileName.getPath().length());
+        return spaceUri.toString() + absolutePathInSpace;
+    }
+
+    /**
+     * @return URI of a file, always inside a space
+     * @see #getURI()
+     */
+    public DataSpacesURI getDataSpacesURI() {
+        final String uriString = getURI();
+        try {
+            return DataSpacesURI.parseURI(uriString);
+        } catch (MalformedURIException e) {
+            ProActiveLogger.logImpossibleException(logger, e);
+            throw new ProActiveRuntimeException("Could not parse self-generated URI", e);
+        }
     }
 
     /**
@@ -93,14 +110,23 @@ public class DataSpacesFileObjectImpl extends AbstractLimitingFileObject {
     @Override
     protected boolean isReadOnly() {
         if (readOnly == null) {
-            readOnly = computeIsReadOnly();
+            synchronized (readOnlyLock) {
+                if (readOnly == null) {
+                    readOnly = computeIsReadOnly();
+                }
+            }
         }
         return readOnly;
     }
 
     @Override
-    protected FileObject doDecorateFile(FileObject file) {
-        return new DataSpacesFileObjectImpl(file, spaceUri, vfsSpaceRootPath);
+    protected boolean canReturnAncestor(final DataSpacesFileObjectImpl fileObject) {
+        return spaceRootFileName.isDescendent(fileObject.getName(), NameScope.DESCENDENT_OR_SELF);
+    }
+
+    @Override
+    protected DataSpacesFileObjectImpl doDecorateFile(FileObject file) {
+        return new DataSpacesFileObjectImpl(file, spaceUri, spaceRootFileName);
     }
 
     private boolean computeIsReadOnly() {
@@ -121,16 +147,6 @@ public class DataSpacesFileObjectImpl extends AbstractLimitingFileObject {
                 return uriAoId == null || !uriAoId.equals(ownerActiveObjectId);
             default:
                 throw new IllegalStateException("Unexpected space type");
-        }
-    }
-
-    private DataSpacesURI getDataSpacesURI() {
-        final String uriString = getURI();
-        try {
-            return DataSpacesURI.parseURI(uriString);
-        } catch (MalformedURIException e) {
-            ProActiveLogger.logImpossibleException(logger, e);
-            throw new ProActiveRuntimeException("Could not parse self-generated URI", e);
         }
     }
 }

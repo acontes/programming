@@ -27,14 +27,16 @@ import org.objectweb.proactive.extra.dataspaces.VFSFactory;
 
 
 /**
- * Test for write limiting and keeping (Abstract)FileObject behavior (which is not so obvious,
- * especially regarding unusual behavior like non-existing file, null array etc.).
+ * Test for general access and write access limiting and keeping (Abstract)FileObject behavior
+ * (which is not so obvious, especially regarding unusual behavior like non-existing file, null
+ * array etc.).
  */
 public class AbstractLimitingFileObjectTest {
     private static final String CHILD_NAME = "abc";
     private FileObject realFile;
     private FileObject readOnlyFile;
     private FileObject readWriteFile;
+    private FileObject ancestorLimitedFile;
     private FileObject anotherFile;
     private DefaultFileSystemManager manager;
 
@@ -45,8 +47,9 @@ public class AbstractLimitingFileObjectTest {
 
         realFile = manager.resolveFile("tmpfs:///test1/test2");
 
-        readWriteFile = new ConstantlyLimitingFileObject(realFile, false);
-        readOnlyFile = new ConstantlyLimitingFileObject(realFile, true);
+        readWriteFile = new ConstantlyLimitingFileObject(realFile, false, true);
+        readOnlyFile = new ConstantlyLimitingFileObject(realFile, true, true);
+        ancestorLimitedFile = new ConstantlyLimitingFileObject(realFile, false, false);
 
         anotherFile = manager.resolveFile("tmpfs:///test2");
         anotherFile.createFile();
@@ -267,8 +270,8 @@ public class AbstractLimitingFileObjectTest {
 
     @Test
     public void testReadOnlyGetParentForRoot() throws FileSystemException {
-        final ConstantlyLimitingFileObject root = new ConstantlyLimitingFileObject(readOnlyFile
-                .getFileSystem().getRoot(), true);
+        final FileObject rawRoot = readOnlyFile.getFileSystem().getRoot();
+        final ConstantlyLimitingFileObject root = new ConstantlyLimitingFileObject(rawRoot, true, true);
         final FileObject parent = root.getParent();
 
         assertNull(parent);
@@ -485,8 +488,8 @@ public class AbstractLimitingFileObjectTest {
 
     @Test
     public void testReadWriteGetParentForRoot() throws FileSystemException {
-        final ConstantlyLimitingFileObject root = new ConstantlyLimitingFileObject(readWriteFile
-                .getFileSystem().getRoot(), true);
+        final FileObject rawRoot = readWriteFile.getFileSystem().getRoot();
+        final ConstantlyLimitingFileObject root = new ConstantlyLimitingFileObject(rawRoot, true, true);
         final FileObject parent = root.getParent();
 
         assertNull(parent);
@@ -546,12 +549,31 @@ public class AbstractLimitingFileObjectTest {
         assertTrue(sameFile.isWriteable());
     }
 
-    private static class ConstantlyLimitingFileObject extends AbstractLimitingFileObject {
-        private final boolean readOnly;
+    @Test(expected = FileSystemException.class)
+    public void testAncestorLimitedGetParent() throws FileSystemException {
+        ancestorLimitedFile.getParent();
+    }
 
-        public ConstantlyLimitingFileObject(final FileObject fileObject, final boolean readOnly) {
+    @Test(expected = FileSystemException.class)
+    public void testAncestorLimitedResolveFileParent() throws FileSystemException {
+        ancestorLimitedFile.resolveFile("../");
+    }
+
+    public void testAncestorLimitedResolveFileChild() throws FileSystemException {
+        final FileObject child = ancestorLimitedFile.resolveFile("unexisting_file");
+        assertNotNull(child);
+    }
+
+    private static class ConstantlyLimitingFileObject extends
+            AbstractLimitingFileObject<ConstantlyLimitingFileObject> {
+        private final boolean readOnly;
+        private boolean allowReturnAncestor;
+
+        public ConstantlyLimitingFileObject(final FileObject fileObject, final boolean readOnly,
+                final boolean allowReturnAncestor) {
             super(fileObject);
             this.readOnly = readOnly;
+            this.allowReturnAncestor = allowReturnAncestor;
         }
 
         @Override
@@ -560,8 +582,13 @@ public class AbstractLimitingFileObjectTest {
         }
 
         @Override
-        protected FileObject doDecorateFile(FileObject file) {
-            return new ConstantlyLimitingFileObject(file, readOnly);
+        protected ConstantlyLimitingFileObject doDecorateFile(FileObject file) {
+            return new ConstantlyLimitingFileObject(file, readOnly, allowReturnAncestor);
+        }
+
+        @Override
+        protected boolean canReturnAncestor(ConstantlyLimitingFileObject decoratedAncestor) {
+            return allowReturnAncestor;
         }
     }
 }
