@@ -190,19 +190,19 @@ public class TestOverlay2D {
 
     @Test
     public void testHasNeighbor() {
-        Assert.assertTrue(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighbors().hasNeighbor(
+        Assert.assertTrue(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighborsDataStructure().hasNeighbor(
                 this.secondPeer));
-        Assert.assertTrue(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighbors().hasNeighbor(
+        Assert.assertTrue(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighborsDataStructure().hasNeighbor(
                 this.thirdPeer));
-        Assert.assertFalse(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighbors().hasNeighbor(
+        Assert.assertFalse(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighborsDataStructure().hasNeighbor(
                 this.fourthPeer));
-        Assert.assertFalse(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighbors().hasNeighbor(
+        Assert.assertFalse(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighborsDataStructure().hasNeighbor(
                 this.firstPeer));
     }
 
     @Test
     public void testGetNearestNeighborFrom() {
-        Assert.assertTrue(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighbors()
+        Assert.assertTrue(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighborsDataStructure()
                 .getNearestNeighborFrom(new Coordinate("11"), 0, 1).equals(this.thirdPeer));
     }
 
@@ -224,7 +224,7 @@ public class TestOverlay2D {
 
     @Test
     public void testNeighborsDataStructureOrder() {
-        List<Peer> neighbors = ((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighbors()
+        List<Peer> neighbors = ((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighborsDataStructure()
                 .getNeighbors(0, NeighborsDataStructure.SUPERIOR_DIRECTION);
 
         Assert
@@ -238,15 +238,15 @@ public class TestOverlay2D {
     public void testLeavingPeer() {
         this.thirdPeer.leave();
 
-        Assert.assertTrue(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighbors().hasNeighbor(
+        Assert.assertTrue(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighborsDataStructure().hasNeighbor(
                 this.fourthPeer));
-        Assert.assertTrue(((CANOverlay) this.fourthPeer.getStructuredOverlay()).getNeighbors().hasNeighbor(
+        Assert.assertTrue(((CANOverlay) this.fourthPeer.getStructuredOverlay()).getNeighborsDataStructure().hasNeighbor(
                 this.firstPeer));
 
         this.fourthPeer.leave();
         this.secondPeer.leave();
 
-        Assert.assertTrue(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighbors().size() == 0);
+        Assert.assertTrue(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighborsDataStructure().size() == 0);
     }
 
     @After

@@ -41,15 +41,15 @@ public class TestNeighborsDataStructure {
         overlay.addNeighbor(neighbors);
         this.peer.setStructuredOverlay(overlay);
 
-        Assert.assertTrue(((CANOverlay) this.peer.getStructuredOverlay()).getNeighbors().hasNeighbor(peer1,
+        Assert.assertTrue(((CANOverlay) this.peer.getStructuredOverlay()).getNeighborsDataStructure().hasNeighbor(peer1,
                 0, 1));
-        Assert.assertTrue(((CANOverlay) this.peer.getStructuredOverlay()).getNeighbors().hasNeighbor(peer2,
+        Assert.assertTrue(((CANOverlay) this.peer.getStructuredOverlay()).getNeighborsDataStructure().hasNeighbor(peer2,
                 0, 0));
     }
 
     @Test
     public void testOrder() {
-        NeighborsDataStructure neighbors = ((CANOverlay) this.peer.getStructuredOverlay()).getNeighbors();
+        NeighborsDataStructure neighbors = ((CANOverlay) this.peer.getStructuredOverlay()).getNeighborsDataStructure();
 
         Iterator<Peer> it = neighbors.iterator();
 

@@ -1,6 +1,7 @@
 package org.objectweb.proactive.extensions.structuredp2p.core;
 
 import java.io.Serializable;
+import java.util.Vector;
 import java.util.concurrent.Future;
 
 import org.objectweb.proactive.Body;
@@ -9,6 +10,7 @@ import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAEventProgramming;
+import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.extensions.structuredp2p.core.can.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.chord.ChordOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
@@ -64,6 +66,11 @@ public class Peer implements InitActive, RunActive, Serializable {
      * The stub associated to the current peer.
      */
     private Peer stub;
+
+    /**
+     * The requests that are bufferized by the current peer to a peer that is preparing to leave.
+     */
+    private Vector<Request> bufferizedRequests = new Vector<Request>();
 
     /**
      * The no-argument constructor as commanded by ProActive.
@@ -273,14 +280,14 @@ public class Peer implements InitActive, RunActive, Serializable {
     public void runActivity(Body body) {
         Service service = new Service(body);
         while (body.isActive()) {
-            if (service.hasRequestToServe()) {
-                service.serveOldest();
-                this.lastRequestTimestamp = System.currentTimeMillis();
+            Request req = service.blockingRemoveOldest(Peer.CHECK_NEIGHBORS_TIMEOUT);
+            if (req == null) {
+                this.structuredOverlay.checkNeighbors();
             } else {
-                if (System.currentTimeMillis() - this.lastRequestTimestamp >= Peer.CHECK_NEIGHBORS_TIMEOUT) {
-                    // this.structuredOverlay.checkNeighbors();
-                }
-                service.waitForRequest();
+                // bufferize=false;
+                service.serve(req);
+                // if (bufferize) {
+                // body.getRequestQueue().add(req);
             }
         }
     }
@@ -303,8 +310,8 @@ public class Peer implements InitActive, RunActive, Serializable {
             CANOverlay thisOverlay = (CANOverlay) this.getStructuredOverlay();
             CANOverlay peerOverlay = (CANOverlay) peer.getStructuredOverlay();
 
-            return (thisOverlay.getZone().equals(peerOverlay.getZone()) && thisOverlay.getNeighbors().equals(
-                    peerOverlay.getNeighbors()));
+            return (thisOverlay.getZone().equals(peerOverlay.getZone()) && thisOverlay
+                    .getNeighborsDataStructure().equals(peerOverlay.getNeighborsDataStructure()));
         } else if (this.getType() == OverlayType.CHORD) {
             // TODO Chord implementation
         }

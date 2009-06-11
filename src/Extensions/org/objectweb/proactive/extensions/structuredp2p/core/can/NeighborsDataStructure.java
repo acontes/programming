@@ -52,6 +52,11 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
     private List<Zone>[][] associatedZones = new Vector[CANOverlay.NB_DIMENSIONS][2];
 
     /**
+     * The state associated to each neighbors.
+     */
+    private List<NeighborState>[][] neighborsState = new Vector[CANOverlay.NB_DIMENSIONS][2];
+
+    /**
      * Constructor.
      */
     public NeighborsDataStructure(Peer masterPeer) {
@@ -62,6 +67,8 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
             this.neighbors[i][NeighborsDataStructure.SUPERIOR_DIRECTION] = new Vector<Peer>();
             this.associatedZones[i][NeighborsDataStructure.INFERIOR_DIRECTION] = new Vector<Zone>();
             this.associatedZones[i][NeighborsDataStructure.SUPERIOR_DIRECTION] = new Vector<Zone>();
+            this.neighborsState[i][NeighborsDataStructure.INFERIOR_DIRECTION] = new Vector<NeighborState>();
+            this.neighborsState[i][NeighborsDataStructure.SUPERIOR_DIRECTION] = new Vector<NeighborState>();
         }
     }
 
@@ -132,13 +139,15 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
             if (zone.getCoordinateMin(nextDimension).compareTo(selectedZone.getCoordinateMin(nextDimension)) < 0) {
                 this.associatedZones[dimension][direction].add(index, zone);
                 this.neighbors[dimension][direction].add(index, remotePeer);
+                this.neighborsState[dimension][direction].add(index, NeighborState.ALIVE);
                 return true;
             }
             index++;
         }
 
         return this.associatedZones[dimension][direction].add(zone) &&
-            this.neighbors[dimension][direction].add(remotePeer);
+            this.neighbors[dimension][direction].add(remotePeer) &&
+            this.neighborsState[dimension][direction].add(NeighborState.ALIVE);
     }
 
     /**
@@ -156,6 +165,7 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
                 if ((index = this.neighbors[dim][direction].indexOf(remotePeer)) != -1) {
                     this.neighbors[dim][direction].remove(index);
                     this.associatedZones[dim][direction].remove(index);
+                    this.neighborsState[dim][direction].remove(index);
                     return true;
                 }
             }
@@ -183,6 +193,7 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
         if ((index = this.neighbors[dimension][direction].indexOf(remotePeer)) != -1) {
             this.neighbors[dimension][direction].remove(index);
             this.associatedZones[dimension][direction].remove(index);
+            this.neighborsState[dimension][direction].remove(index);
             return true;
         }
 
@@ -201,6 +212,7 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
     public void removeAll(int dimension, int direction) {
         this.neighbors[dimension][direction].clear();
         this.associatedZones[dimension][direction].clear();
+        this.neighborsState[dimension][direction].clear();
     }
 
     /**
@@ -295,6 +307,27 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
     }
 
     /**
+     * Returns the {@link NeighborState} for the given peer if it is found.
+     * 
+     * @param remotePeer
+     *            the remotePeer which must me in the data structure.
+     * @param dim
+     *            the dimension.
+     * @param direction
+     *            the direction.
+     * @return the {@link NeighborState} for the given peer if it is found or <code>null</code>.
+     */
+    public NeighborState getNeighborState(Peer remotePeer, int dim, int direction) {
+        int index = -1;
+
+        if ((index = this.neighbors[dim][direction].indexOf(remotePeer)) != -1) {
+            return this.neighborsState[dim][direction].get(index);
+        }
+
+        return null;
+    }
+
+    /**
      * Returns a {@link Peer} from its managed {@link Zone} if it is in the neighbors collection.
      * 
      * @param dimension
@@ -380,7 +413,7 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
     }
 
     /**
-     * Returns the peer which have these neighbors.
+     * Returns the peer which maintains this data structure.
      * 
      * @return the owner peer.
      */
@@ -399,7 +432,7 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
      *            the dimension.
      * @param direction
      *            the direction.
-     * @return <code>true</code> if the are has been update, <code>false</code> otherwise.
+     * @return <code>true</code> if the zone has been update, <code>false</code> otherwise.
      */
     public boolean updateZone(Peer remotePeer, Zone zone, int dimension, int direction) {
         int index = this.neighbors[dimension][direction].indexOf(remotePeer);
@@ -408,14 +441,32 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
             return false;
         }
 
-        /*
-         * Peer peer = this.neighbors[dimension][direction].get(index); CANOverlay overlay =
-         * (CANOverlay) peer.getStructuredOverlay(); overlay.setZone(zone);
-         * peer.setStructuredOverlay(overlay); this.neighbors[dimension][direction].set(index,
-         * peer);
-         */
-
         return this.associatedZones[dimension][direction].set(index, zone) != null;
+    }
+
+    /**
+     * Sets the state of the specified neighbor.
+     * 
+     * @param remotePeer
+     *            the neighbor to update.
+     * @param state
+     *            the state to set.
+     * @param dim
+     *            the dimension.
+     * @param direction
+     *            the direction.
+     * @return <code>true</code> if the state has been update, <code>false</code> otherwise.
+     */
+    public boolean setNeighborState(Peer remotePeer, NeighborState state, int dim, int direction) {
+        int index = -1;
+
+        if ((index = this.neighbors[dim][direction].indexOf(remotePeer)) != -1) {
+            this.neighborsState[dim][direction].set(index, state);
+            return true;
+        }
+
+        return false;
+
     }
 
     /**

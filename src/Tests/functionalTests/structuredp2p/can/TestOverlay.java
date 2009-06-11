@@ -158,11 +158,12 @@ public class TestOverlay {
 
     @Test
     public void testLeave() {
-        int second = TestOverlay.getOverlay(TestOverlay.secondPeer).getNeighbors().size();
+        int second = TestOverlay.getOverlay(TestOverlay.secondPeer).getNeighborsDataStructure().size();
 
         Assert.assertTrue(TestOverlay.fourthPeer.leave());
 
-        Assert.assertEquals(second - 1, TestOverlay.getOverlay(TestOverlay.secondPeer).getNeighbors().size());
+        Assert.assertEquals(second - 1, TestOverlay.getOverlay(TestOverlay.secondPeer)
+                .getNeighborsDataStructure().size());
 
         // Is the peer a neighbor again ??
         Assert.assertFalse(TestOverlay.getOverlay(TestOverlay.firstPeer).hasNeighbor(TestOverlay.fourthPeer));

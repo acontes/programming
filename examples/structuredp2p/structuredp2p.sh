@@ -14,16 +14,18 @@ default_hostname=`hostname`
 
 if [[ $# -eq  0 ]]
 then
-        echo "Usage: $0 [TYPE_LAUNCH]"
-        echo "  NB_PEERS : number of peers to start"
-        echo "  ENTRY_POINT : the hostname of the computer which is used for entryPoint"
+        echo "Usage: $0 NB_PEERS TYPE DESCRIPTOR"
+        echo "  NB_PEERS : the number of peers to create for the network"
+        echo "  TYPE : "
+        echo "    I  : for an interactive launching"
+        echo "    ST : for a stress test that you can stop by CTRL-C"
         exit 1
 fi
 
 echo
 echo ---------- STRUCTURED P2P ----------
 
-args="$default_descriptor $2 ${1-$default_hostname}"
+args="$default_descriptor $2 $3 ${1-$default_hostname}"
 
 export CLASSPATH=../../lib/*:$CLASSPATH
 export CLASSPATH=../../classes/Core:$CLASSPATH
