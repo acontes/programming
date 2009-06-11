@@ -318,7 +318,7 @@ public class SpacesMountManager {
                 else
                     file = spaceRoot.resolveFile(relativeToSpace);
                 decoratedFile = new DataSpacesFileObjectImpl(file, spacePart, spaceRoot.getName());
-                return new VFSFileObjectAdapter(file, spacePart, spaceRoot.getName().getPath());
+                return new VFSFileObjectAdapter(decoratedFile, spacePart, spaceRoot.getName().getPath());
             } catch (FileSystemException x) {
                 logger.warn("Could not access file that should exist (be mounted): " + uri);
                 throw x;
