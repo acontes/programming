@@ -147,8 +147,10 @@ public class CANOverlay extends StructuredOverlay {
             for (int i = 0; i < neighborsToMergeWith.size() - 1; i++) {
                 Zone[] newZones = null;
                 try {
+                    Zone zone = this.neighbors.getZone(neighborsToMergeWith.get(i));
                     newZones = zoneToSplit.split(CANOverlay.getNextDimension(lastDimension), this.neighbors
-                            .getZone(neighborsToMergeWith.get(i)).getCoordinateMax(lastDimension));
+                            .getZone(neighborsToMergeWith.get(i)).getCoordinateMax(
+                                    CANOverlay.getNextDimension(lastDimension)));
                 } catch (ZoneException e) {
                     e.printStackTrace();
                 }
@@ -362,7 +364,6 @@ public class CANOverlay extends StructuredOverlay {
                         } catch (Exception e) {
                             // TODO: a response returns an exception
                             // nearest.remove(nearestPeer);
-                            System.out.println("EXCEPTION NEAREST");
                             List<Peer> nearest = this.neighbors.getNeighbors(dim, direction);
                             for (Peer peer : nearest) {
                                 try {
@@ -379,6 +380,7 @@ public class CANOverlay extends StructuredOverlay {
             }
         }
 
+        // TODO
         throw new IllegalStateException("The searched position doesn't exist.");
     }
 

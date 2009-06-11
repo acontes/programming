@@ -250,11 +250,16 @@ public class Zone implements Serializable {
         if (border == -1) {
             throw new ZoneException("Zones are not bordered : " + this + " | " + zone + ".");
         } else {
-            // FIXME test also the load balancing to choose the good zone
-            // merge the two zones
-            Coordinate[] minCoord = this.coordinatesMin.clone();
-            Coordinate[] maxCoord = this.coordinatesMax.clone();
-
+            Coordinate[] minCoord = null;
+            Coordinate[] maxCoord = null;
+            try {
+                minCoord = (Coordinate[]) MakeDeepCopy.WithObjectStream.makeDeepCopy(this.coordinatesMin);
+                maxCoord = (Coordinate[]) MakeDeepCopy.WithObjectStream.makeDeepCopy(this.coordinatesMax);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
             minCoord[border] = Coordinate.min(this.getCoordinateMin(border), zone.getCoordinateMin(border));
             maxCoord[border] = Coordinate.max(this.getCoordinateMax(border), zone.getCoordinateMax(border));
 
