@@ -32,15 +32,15 @@ public enum FileType {
         this.hasAttrs = hasAttrs;
     }
 
-    public boolean isHasChildren() {
+    public boolean hasChildren() {
         return hasChildren;
     }
 
-    public boolean isHasContent() {
+    public boolean hasContent() {
         return hasContent;
     }
 
-    public boolean isHasAttrs() {
+    public boolean hasAttrs() {
         return hasAttrs;
     }
 }
