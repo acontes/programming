@@ -33,7 +33,6 @@ public class PeerLauncher {
     private LauncherType launcherType;
 
     public PeerLauncher(String[] args) {
-
         if (args.length < 2) {
             System.err.println("Usage : java " + PeerLauncher.class.getCanonicalName() + " " +
                 "descriptor nbPeers [trackerURI] ");
@@ -44,7 +43,7 @@ public class PeerLauncher {
             this.uri = args[3];
         }
 
-        if (args[2].equals("ST")) {
+        if (args[1].equals("ST")) {
             this.launcherType = LauncherType.STRESS_TEST;
         } else {
             this.launcherType = LauncherType.INTERACTIVE;
@@ -60,7 +59,7 @@ public class PeerLauncher {
 
         this.avaibleNodes = Deployment.getVirtualNode("Peer").getCurrentNodes();
 
-        for (int i = 0; i < Integer.parseInt(args[1]); i++) {
+        for (int i = 0; i < Integer.parseInt(args[2]); i++) {
             this.addPeer();
         }
 

@@ -12,13 +12,13 @@ fi
 default_descriptor=${workingDir}/GCMA.xml
 default_hostname=`hostname`
 
-if [[ $# -eq  0 ]]
+if [[ $# -lt  2 ]]	
 then
-        echo "Usage: $0 NB_PEERS TYPE DESCRIPTOR"
-        echo "  NB_PEERS : the number of peers to create for the network"
+        echo "Usage: $0 NB_PEERS TYPE"
+        echo "  NB_PEERS : the number of peers to create on the network."
         echo "  TYPE : "
-        echo "    I  : for an interactive launching"
-        echo "    ST : for a stress test that you can stop by CTRL-C"
+        echo "    I  : for an interactive launching."
+        echo "    ST : for a stress test that you can stop by CTRL-C."
         exit 1
 fi
 
