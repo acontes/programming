@@ -212,7 +212,7 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
             if (dataSpacesEnabled) {
                 startDataSpaces();
             }
-            
+
             // apply Application-wide tech services on local node
             //
             Node defaultNode = NodeFactory.getDefaultNode();

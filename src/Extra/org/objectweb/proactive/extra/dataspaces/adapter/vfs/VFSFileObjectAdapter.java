@@ -287,8 +287,7 @@ public class VFSFileObjectAdapter implements DataSpacesFileObject {
      *            may be null only if <code>array</code> is
      *
      */
-    private <T extends Collection<DataSpacesFileObject>> void adaptVFSResult(FileObject[] array,
-            T adapted) {
+    private <T extends Collection<DataSpacesFileObject>> void adaptVFSResult(FileObject[] array, T adapted) {
         if (array == null)
             return;
         for (int i = 0; i < array.length; i++) {

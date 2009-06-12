@@ -2,7 +2,6 @@ package org.objectweb.proactive.extra.dataspaces.api;
 
 public enum FileType {
 
-
     /**
      * Represents a folder type
      */
@@ -24,8 +23,7 @@ public enum FileType {
 
     private final boolean hasAttrs;
 
-    private FileType(final boolean hasChildren, final boolean hasContent,
-            final boolean hasAttrs) {
+    private FileType(final boolean hasChildren, final boolean hasContent, final boolean hasAttrs) {
 
         this.hasChildren = hasChildren;
         this.hasContent = hasContent;

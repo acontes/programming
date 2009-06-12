@@ -22,6 +22,7 @@ import org.objectweb.proactive.extra.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extra.dataspaces.api.FileType;
 import org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException;
 
+
 /**
  * Tool for printing listing of a NamingService content.
  */

@@ -3,6 +3,7 @@ package org.objectweb.proactive.extra.dataspaces.adapter.vfs;
 import org.objectweb.proactive.extra.dataspaces.api.Capability;
 import org.objectweb.proactive.extra.dataspaces.api.FileSystem;
 
+
 public class VFSFileSystemAdapter implements FileSystem {
 
     final private org.apache.commons.vfs.FileSystem adaptee;

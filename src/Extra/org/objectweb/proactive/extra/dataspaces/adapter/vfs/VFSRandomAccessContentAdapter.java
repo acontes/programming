@@ -5,6 +5,7 @@ import java.io.InputStream;
 
 import org.objectweb.proactive.extra.dataspaces.api.RandomAccessContent;
 
+
 public class VFSRandomAccessContentAdapter implements RandomAccessContent {
 
     final private org.apache.commons.vfs.RandomAccessContent adaptee;

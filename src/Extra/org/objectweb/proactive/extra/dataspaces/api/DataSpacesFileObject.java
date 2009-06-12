@@ -149,8 +149,7 @@ public interface DataSpacesFileObject {
      * @throws FileSystemException
      */
     public abstract void findFiles(FileSelector selector, boolean depthwise,
-            List<DataSpacesFileObject> selected)
-            throws FileSystemException;
+            List<DataSpacesFileObject> selected) throws FileSystemException;
 
     /**
      * Deletes this file. Does nothing if this file does not exist of if it is a folder that has
@@ -235,18 +234,18 @@ public interface DataSpacesFileObject {
      */
     public abstract void moveTo(DataSpacesFileObject destFile) throws FileSystemException;
 
-     /**
-     * Returns this file's content. The {@link FileContent} returned by this method can be used to
-     * read and write the content of the file.
-     * <p/>
-     * <p>
-     * This method can be called if the file does not exist, and the returned {@link FileContent}
-     * can be used to create the file by writing its content.
-     *
-     * @return This file's content.
-     * @throws FileSystemException
-     *             On error getting this file's content.
-     */
+    /**
+    * Returns this file's content. The {@link FileContent} returned by this method can be used to
+    * read and write the content of the file.
+    * <p/>
+    * <p>
+    * This method can be called if the file does not exist, and the returned {@link FileContent}
+    * can be used to create the file by writing its content.
+    *
+    * @return This file's content.
+    * @throws FileSystemException
+    *             On error getting this file's content.
+    */
     public abstract FileContent getContent() throws FileSystemException;
 
     /**

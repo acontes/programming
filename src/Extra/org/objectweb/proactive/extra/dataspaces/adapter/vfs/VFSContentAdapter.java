@@ -13,6 +13,7 @@ import org.objectweb.proactive.extra.dataspaces.api.RandomAccessContent;
 import org.objectweb.proactive.extra.dataspaces.api.RandomAccessMode;
 import org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException;
 
+
 public class VFSContentAdapter implements FileContent {
 
     final private org.apache.commons.vfs.FileContent adaptee;
