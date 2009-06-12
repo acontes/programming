@@ -124,6 +124,9 @@ public abstract class AbstractLimitingFileObject<T extends FileObject> extends D
 
     @Override
     public FileObject resolveFile(String name, NameScope scope) throws FileSystemException {
+        // TODO: what if super.getParent() returns null? DataSpacesFileObjectImpl constructor
+        // needs not null FO, that causes parentDecorated.getName and others throw a NullPointerException
+        // when check* methods called..
         final T resolvedDecorated = decorateFile(super.resolveFile(name, scope));
         checkCanReturnPotentialAncestor(resolvedDecorated);
         return resolvedDecorated;
@@ -131,6 +134,9 @@ public abstract class AbstractLimitingFileObject<T extends FileObject> extends D
 
     @Override
     public FileObject resolveFile(String path) throws FileSystemException {
+        // TODO: what if super.getParent() returns null? DataSpacesFileObjectImpl constructor
+        // needs not null FO, that causes parentDecorated.getName and others throw a NullPointerException
+        // when check* methods called..
         final T resolvedDecorated = decorateFile(super.resolveFile(path));
         checkCanReturnPotentialAncestor(resolvedDecorated);
         return resolvedDecorated;
@@ -164,6 +170,9 @@ public abstract class AbstractLimitingFileObject<T extends FileObject> extends D
 
     @Override
     public FileObject getParent() throws FileSystemException {
+        // TODO: what if super.getParent() returns null? DataSpacesFileObjectImpl constructor
+        // needs not null FO, that causes parentDecorated.getName and others throw a NullPointerException
+        // when check* methods called.. 
         final T parentDecorated = decorateFile(super.getParent());
         checkCanReturnPotentialAncestor(parentDecorated);
         return parentDecorated;

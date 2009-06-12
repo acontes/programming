@@ -109,6 +109,8 @@ public class DataSpacesFileObjectImpl extends AbstractLimitingFileObject<DataSpa
 
     @Override
     protected boolean isReadOnly() {
+        //TODO why we do it again in a lazy way? Most of calls will use isReadOnly, so we can do it
+        // in the constructor, even because it does not take a long while..
         if (readOnly == null) {
             synchronized (readOnlyLock) {
                 if (readOnly == null) {
