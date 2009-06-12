@@ -22,22 +22,25 @@ import org.objectweb.proactive.extra.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extra.dataspaces.api.FileType;
 import org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException;
 
-
-// TODO: add options for listing app id's, specifying such for listing and so on..
 /**
  * Tool for printing listing of a NamingService content.
  */
 public class NamingServiceListing {
 
-    private static final int APPLICATION_ID = 0;
+    private long applicationID;
 
     private String namingServiceURL;
+
     private boolean recursively;
+    private boolean listApplications;
+
     private DataSpacesURI query;
     private Set<SpaceInstanceInfo> listing;
     private Map<DataSpacesURI, List<String>> recurseTree = new HashMap<DataSpacesURI, List<String>>();
     private NamingService namingService;
     private SpacesMountManager mountManager;
+
+    private Set<Long> registeredApplications;
 
     private void buildLSQuery(long applicationId) {
         query = DataSpacesURI.createURI(applicationId);
@@ -91,16 +94,42 @@ public class NamingServiceListing {
     }
 
     public NamingServiceListing(String[] args) throws FileSystemException {
-        if (args.length == 2 && "-R".equals(args[0])) {
+        String appIdString = null;
+        boolean printHelp = false;
+
+        if (args.length == 3 && "-R".equals(args[0])) {
             recursively = true;
             namingServiceURL = args[1];
-        } else if (args.length == 1 && !"--help".equals(args[0])) {
+            appIdString = args[2];
+        } else if (args.length == 2) {
             namingServiceURL = args[0];
+            appIdString = args[1];
+        } else if (args.length == 1 && "--help".equals(args[0])) {
+            printHelp = true;
+        } else if (args.length == 1) {
+            namingServiceURL = args[0];
+            listApplications = true;
         } else
+            printHelp = true;
+
+        if (printHelp)
             throw new IllegalArgumentException();
+
+        if (appIdString != null) {
+            try {
+                applicationID = Long.parseLong(appIdString);
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException(e.getMessage());
+            }
+        }
     }
 
     public void prettyPrint() {
+
+        if (listApplications) {
+            System.out.println(registeredApplications);
+            return;
+        }
 
         if (listing == null) {
             System.out.println("<EMPTY>");
@@ -125,10 +154,16 @@ public class NamingServiceListing {
             System.out.println(string);
     }
 
-    public Set<SpaceInstanceInfo> execute(long applicationId) throws ProActiveException, URISyntaxException {
-        buildLSQuery(applicationId);
-
+    public Set<SpaceInstanceInfo> execute() throws ProActiveException, URISyntaxException {
         namingService = NamingService.createNamingServiceStub(namingServiceURL);
+
+        if (listApplications) {
+            registeredApplications = namingService.getRegisteredApplications();
+            return null;
+        }
+
+        buildLSQuery(applicationID);
+        System.out.println("looking for: " + query);
         listing = namingService.lookupMany(query);
 
         if (recursively)
@@ -148,15 +183,24 @@ public class NamingServiceListing {
         try {
             ls = new NamingServiceListing(args);
         } catch (IllegalArgumentException e) {
+            final String msg = e.getMessage();
             final String name = NamingServiceListing.class.getName();
-            System.out.println("Usage: java " + name + " [-R] <naming service URL>");
+
+            if (msg != null)
+                System.out.println("Error: " + msg);
+
+            System.out.println("Usage: java " + name + " [-R] <naming service URL> <application ID>");
+            System.out.println("       java " + name + " <naming service URL>");
             System.out.println("       java " + name + " --help");
-            System.out.println("Print listing of all data spaces mounted in <naming service URL>.");
+            System.out
+                    .println("Prints listing of all data spaces mounted in <naming service URL> with provided");
+            System.out
+                    .println("<application ID>. When no <application ID> provided list all registered application IDs.");
             System.out.println("\t-R\tenables recursive listing of data space content");
             System.out.println("\t--help\tprints this screen");
             return;
         }
-        ls.execute(APPLICATION_ID);
+        ls.execute();
         ls.prettyPrint();
         PALifeCycle.exitSuccess();
     }
