@@ -31,7 +31,6 @@
  */
 package org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -53,7 +52,6 @@ import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplic
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.TechnicalServicesProperties;
 import org.objectweb.proactive.extra.dataspaces.InputOutputSpaceConfiguration;
 import org.objectweb.proactive.extra.dataspaces.SpaceType;
-import org.objectweb.proactive.extra.dataspaces.service.DataSpacesTechnicalService;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -128,7 +126,9 @@ public class ApplicationParserProactive extends AbstractApplicationParser {
             final Node dataNode = (Node) xpath.evaluate(XPATH_DATA, paNode, XPathConstants.NODE);
             if (dataNode != null) {
                 parseDataSpaces(xpath, dataNode);
-                addDataSpacesTechnicalService();
+                // See FIXME in GCMA - we cannot safely add DataSpacesTechnicalService as an app-wide TS.
+                // In current implementation local nodes may be shared, so we cannot safely apply it locally.
+                // addDataSpacesTechnicalService();
                 applicationParser.setDataSpacesEnabled(true);
                 applicationParser.setDataSpacesNamingServiceURL(namingServiceURL);
                 applicationParser.setInputOutputSpacesConfigurations(spacesConfigurations);
@@ -299,23 +299,6 @@ public class ApplicationParserProactive extends AbstractApplicationParser {
             }
             spacesConfigurations.add(config);
         }
-    }
-
-    protected void addDataSpacesTechnicalService() {
-        final HashMap<String, String> dataSpacesProperties = new HashMap<String, String>();
-        if (namingServiceURL == null) {
-            // FIXME
-            throw new IllegalStateException(
-                "NOT IMPLEMENTED: could not start Naming Service on deployer Node");
-        }
-        dataSpacesProperties.put(DataSpacesTechnicalService.PROPERTY_NAMING_SERVICE_URL, namingServiceURL);
-
-        final HashMap<String, HashMap<String, String>> techServicesProperties = new HashMap<String, HashMap<String, String>>();
-        techServicesProperties.put(DataSpacesTechnicalService.class.getName(), dataSpacesProperties);
-
-        // merge with DataSpacesTechnicalService with configuration read from descriptor
-        appTechnicalServicesProperties = appTechnicalServicesProperties
-                .getCombinationWith(new TechnicalServicesProperties(techServicesProperties));
     }
 
     public TechnicalServicesProperties getTechnicalServicesProperties() {

@@ -77,10 +77,12 @@ import org.objectweb.proactive.extensions.gcmdeployment.core.TopologyImpl;
 import org.objectweb.proactive.extensions.gcmdeployment.core.TopologyRootImpl;
 import org.objectweb.proactive.extra.dataspaces.InputOutputSpaceConfiguration;
 import org.objectweb.proactive.extra.dataspaces.NamingService;
+import org.objectweb.proactive.extra.dataspaces.NamingServiceDeployer;
 import org.objectweb.proactive.extra.dataspaces.SpaceInstanceInfo;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ApplicationAlreadyRegisteredException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.WrongApplicationIdException;
+import org.objectweb.proactive.extra.dataspaces.service.DataSpacesTechnicalService;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 import org.objectweb.proactive.gcmdeployment.Topology;
@@ -141,6 +143,9 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
     /** URL of Data Spaces Naming Service */
     private String namingServiceURL;
 
+    /** Deployer of Naming Service if it was requested to be started locally */
+    private NamingServiceDeployer namingServiceDeployer;
+    
     /** Stub to Data Spaces Naming Service */
     private NamingService namingService;
 
@@ -206,11 +211,24 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
 
             this.vContract.close();
 
-            // always start Data Spaces BEFORE applying tech services on local node
+            // always start Data Spaces BEFORE applying tech services on local node if they gonna use DS
             // (to provide working Data Spaces, DataSpacesTechnicalService assumes that appId is known and 
             // application is registered in working NamingService) 
             if (dataSpacesEnabled) {
                 startDataSpaces();
+                
+                // TODO this kind of hacks should be eventually moved to CommandBuilderProActive#setup()
+                // or similar developed mechanism
+                final TechnicalServicesProperties dataSpacesTSP = DataSpacesTechnicalService
+                        .createTechnicalServiceProperties(namingServiceURL);
+                for (GCMVirtualNodeInternal vn : virtualNodes.values()) {
+                    vn.addTechnicalServiceProperties(dataSpacesTSP);
+                }
+                
+                // FIXME: We cannot safely add DataSpacesTechnicalService as an app-wide TS (also local node TS)
+                // as we cannot rely on unique appId (currently deploymentId, which is not even set locally).
+                // In current implementation, in case of many GCM deployments there may be many applications
+                // on that local shared node. 
             }
 
             // apply Application-wide tech services on local node
@@ -219,7 +237,6 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
             Node halfBodiesNode = NodeFactory.getHalfBodiesNode();
             TechnicalServicesProperties appTSProperties = parser.getAppTechnicalServices();
 
-            // FIXME: appId (now: deployment id) need to be set on local nodes to make DS working on them
             for (Map.Entry<String, HashMap<String, String>> tsp : appTSProperties) {
 
                 TechnicalService ts = TechnicalServicesFactory.create(tsp.getKey(), tsp.getValue());
@@ -571,9 +588,11 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
 
     private void startDataSpaces() {
         if (namingServiceURL == null) {
-            GCMA_LOGGER.error("NOT IMPLEMENTED: could not start Naming Service on deployer Node");
-            // FIXME
-            return;
+            namingServiceDeployer = new NamingServiceDeployer(this.deploymentId + "/namingService");
+            namingServiceURL = namingServiceDeployer.getNamingServiceURL();
+            if (GCMA_LOGGER.isDebugEnabled()) {
+                GCMA_LOGGER.debug("Started Naming Service at URL: " + namingServiceURL);
+            }
         }
 
         try {
@@ -622,6 +641,16 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
                 ProActiveLogger.logImpossibleException(GCMA_LOGGER, e);
             }
         }
-        // FIXME if we started Naming Service, let stop it
+
+        if (namingServiceDeployer != null) {
+            try {
+                namingServiceDeployer.terminate();
+                if (GCMA_LOGGER.isDebugEnabled()) {
+                    GCMA_LOGGER.debug("Stopped Naming Service at URL: " + namingServiceURL);
+                }
+            } catch (ProActiveException e) {
+                GCMA_LOGGER.error("Cannot stop started Data Spaces Naming Service cleanly", e);
+            }
+        }
     }
 }

@@ -20,7 +20,6 @@ import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
-import org.objectweb.proactive.extra.dataspaces.NamingServiceDeployer;
 import org.objectweb.proactive.extra.dataspaces.Utils;
 import org.objectweb.proactive.extra.dataspaces.exceptions.DataSpacesException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredException;
@@ -36,9 +35,9 @@ import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
  * <p>
  * Scenario:
  * <ol>
- * <li>NamingService is started, GCM application is deployed with Data Spaces configured on deployed
- * nodes. According to GCMA Descriptor HTTP input resources are registered as named input data
- * spaces. Output file is registered as a default output data space.</li>
+ * <li>GCM application is deployed with Data Spaces configured on deployed nodes and NamingService
+ * started locally. According to GCMA Descriptor HTTP input resources are registered as named input
+ * data spaces. Output file is registered as a default output data space.</li>
  * <li>Application-processing is delegated in {@link #exampleUsage()}. Two ActiveObjects start their
  * local processing in {@link ExampleProcessing#computePartials(String)} in parallel:
  * <ul>
@@ -57,20 +56,18 @@ import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
  * <li>Store final results in a file within the default output data space</li>
  * </ul>
  * </li>
- * <li>As GCM application stops. The NamingService can be stopped.</li>
+ * <li>As GCM application stops.</li>
  * </ol>
  * <p>
  * Example is designed to work with provided GCMA descriptor that you can find in
  * examples/dataspaces/hello/helloApplication.xml. You can provide your GCMD descriptor (by setting
  * gcmd Java property to its path) or use example descriptors from the same directory.
  * <p>
- * To fulfill contract between the GCM descriptors and the application, following variables are set
+ * To fulfill contract between the GCM descriptors and the application, following variable is set
  * from application:
  * <ul>
  * <li><code>{@link #VAR_OUTPUT_HOSTNAME}</code> name of a host that contains the output space is
  * being set to local hostname
- * <li><code>{@link #VAR_NAMING_SERVICE_URL}</code> URL of the NamingService that is automatically
- * started before the GCM deployment
  * </ul>
  * Application assumes that two named input spaces are available {@value #INPUT_RESOURCE1_NAME} and
  * {@value #INPUT_RESOURCE2_NAME} and default output for storing results. GCMD should provide at
@@ -85,12 +82,6 @@ public class HelloExample {
      * Name of a host for output data space.
      */
     public static final String VAR_OUTPUT_HOSTNAME = "OUTPUT_HOSTNAME";
-
-    /**
-     * FIXME: We need to set NamingService address through variable contract from descriptor as we
-     * don't start it automatically yet.
-     */
-    public static final String VAR_NAMING_SERVICE_URL = "NAMING_SERVICE_URL";
 
     public static final String VIRTUAL_NODE_NAME = "Hello";
 
@@ -116,8 +107,6 @@ public class HelloExample {
         new HelloExample().run(args[0]);
     }
 
-    private NamingServiceDeployer namingServiceDeployer;
-
     private List<Node> nodesDeployed;
 
     private GCMApplication gcmApplication;
@@ -138,7 +127,6 @@ public class HelloExample {
         setupVariables();
 
         try {
-            startNamingService();
             startGCM(descriptorPath);
             exampleUsage();
         } catch (Exception x) {
@@ -158,7 +146,6 @@ public class HelloExample {
 
     private void stop() {
         stopGCM();
-        stopNamingService();
         logger.info("Application stopped");
         PALifeCycle.exitSuccess();
     }
@@ -179,25 +166,6 @@ public class HelloExample {
         if (gcmApplication == null)
             return;
         gcmApplication.kill();
-    }
-
-    private void startNamingService() {
-        namingServiceDeployer = new NamingServiceDeployer();
-        final String nsURL = namingServiceDeployer.getNamingServiceURL();
-
-        vContract.setVariableFromProgram(VAR_NAMING_SERVICE_URL, nsURL, VariableContractType.ProgramVariable);
-        logger.info("Naming Service successfully started on: " + nsURL);
-    }
-
-    private void stopNamingService() {
-        if (namingServiceDeployer != null) {
-            try {
-                namingServiceDeployer.terminate();
-            } catch (ProActiveException x) {
-                ProActiveLogger.logEatedException(logger, x);
-            }
-            namingServiceDeployer = null;
-        }
     }
 
     // real processing

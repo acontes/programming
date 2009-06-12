@@ -4,6 +4,7 @@
 package org.objectweb.proactive.extra.dataspaces.service;
 
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.management.Notification;
@@ -21,6 +22,7 @@ import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.TechnicalServicesProperties;
 import org.objectweb.proactive.extra.dataspaces.BaseScratchSpaceConfiguration;
 import org.objectweb.proactive.extra.dataspaces.DataSpacesNodes;
 import org.objectweb.proactive.extra.dataspaces.PADataSpaces;
@@ -55,6 +57,23 @@ public class DataSpacesTechnicalService implements TechnicalService {
 
     private String namingServiceURL;
 
+    /**
+     * Create technical service properties for given configuration that should initialize properly
+     * this class.
+     * 
+     * @param namingServiceURL
+     *            URL of Naming Service
+     * @return technical service properties for given configuration
+     */
+    public static TechnicalServicesProperties createTechnicalServiceProperties(final String namingServiceURL) {
+        final HashMap<String, String> dataSpacesProperties = new HashMap<String, String>();
+        dataSpacesProperties.put(DataSpacesTechnicalService.PROPERTY_NAMING_SERVICE_URL, namingServiceURL);
+
+        final HashMap<String, HashMap<String, String>> techServicesMap = new HashMap<String, HashMap<String, String>>();
+        techServicesMap.put(DataSpacesTechnicalService.class.getName(), dataSpacesProperties);
+        return new TechnicalServicesProperties(techServicesMap);
+    }
+
     // TODO What about polices determining whether to leave data in scratch or remove all directories during unexpected end of application. 
     private static void closeNodeConfigIgnoreException(final Node node) {
         try {
@@ -83,6 +102,7 @@ public class DataSpacesTechnicalService implements TechnicalService {
             ProActiveLogger.logImpossibleException(logger, e);
             // FIXME: it may happen when node acquisition will be implemented - and we have to handle that
             // in slightly better way ;) (see comment in javadoc)
+            // ...or during more than one GCMA deployment on one machine if this TS is applied on local node 
             return;
         } catch (ConfigurationException e) {
             logger.error("Could not configure Data Spaces. Possible configuration problem.", e);

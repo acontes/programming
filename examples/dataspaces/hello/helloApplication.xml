@@ -9,7 +9,6 @@
 		<javaPropertyVariable name="user.name" />
 		<javaPropertyVariable name="gcmdfile" />
 		<programVariable name="OUTPUT_HOSTNAME"/>
-		<programVariable name="NAMING_SERVICE_URL"/>
 	</environment>
 
 	<application>
@@ -28,7 +27,6 @@
 				<nodeProvider refid="provider" />
 			</virtualNode>
 			<data>
-				<namingService url="${NAMING_SERVICE_URL}" />
 				<!--  input data spaces - HTTP resources to process -->
 				<input id="wiki_proactive">
 					<remoteAccess url="http://en.wikipedia.org/wiki/ProActive" />
