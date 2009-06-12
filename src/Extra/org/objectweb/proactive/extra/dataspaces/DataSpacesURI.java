@@ -472,22 +472,23 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
      * used for resolving files within a particular space.
      * 
      * @return string representation of a DataSpacesURI without space URI prefix or
-     *         <code>null</code> if DataSpacesURI is no suitable for having a path or contains space
-     *         part only
-     * @see {@link #isSuitableForHavingPath()}
+     *         <code>null</code> if DataSpacesURI contains space part only
      * @see {@link #isSpacePartOnly()}
      */
     public String getRelativeToSpace() {
-        if (!isSuitableForHavingPath() || isSpacePartOnly())
+        if (isSpacePartOnly())
             return null;
 
-        final StringBuilder sb = new StringBuilder("./");
+        final StringBuilder sb = new StringBuilder();
 
-        if (spaceType == SpaceType.SCRATCH)
-            sb.append(activeObjectId).append('/');
-
-        if (path != null)
+        if (spaceType == SpaceType.SCRATCH) {
+            sb.append(activeObjectId);
+            if (path != null) {
+                sb.append('/').append(path);
+            }
+        } else {
             sb.append(path);
+        }
 
         return sb.toString();
     }
