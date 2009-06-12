@@ -12,7 +12,7 @@ if [ $# = 0 ]; then
 	echo "where COMMAND is one of the following:"
 	echo "  start		start the NamingService"
 	echo "  ls		list the NamingService content"
-	echo "  add		add input into NamingService"
+#	echo "  add		add input into NamingService"
 	echo "For a command help try COMMAND --help"
 	exit 1
 fi
