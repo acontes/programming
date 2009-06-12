@@ -20,6 +20,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.extensions.calcium.system.SkeletonSystemImpl;
+import org.objectweb.proactive.extra.dataspaces.DataSpacesFileObjectImpl;
 import org.objectweb.proactive.extra.dataspaces.DataSpacesURI;
 import org.objectweb.proactive.extra.dataspaces.InputOutputSpaceConfiguration;
 import org.objectweb.proactive.extra.dataspaces.PADataSpaces;
@@ -29,15 +30,16 @@ import org.objectweb.proactive.extra.dataspaces.SpacesDirectory;
 import org.objectweb.proactive.extra.dataspaces.SpacesDirectoryImpl;
 import org.objectweb.proactive.extra.dataspaces.SpacesMountManager;
 import org.objectweb.proactive.extra.dataspaces.VFSFactory;
+import org.objectweb.proactive.extra.dataspaces.adapter.vfs.VFSFileObjectAdapter;
 import org.objectweb.proactive.extra.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundException;
 
 
 /**
- * This test is actually not a pure unit test run in isolation. It depends on correct behavior of
- * {@link SpacesDirectoryImpl}, {@link VFSFactory} and basic {@link SpaceInstanceInfo}/
- * {@link DataSpacesURI}.
+ * This test is actually not a pure unit test run in high isolation. It depends on correct behavior
+ * of {@link SpacesDirectoryImpl}, {@link VFSFactory}, {@link VFSFileObjectAdapter} and
+ * {@link DataSpacesFileObjectImpl} and basic {@link SpaceInstanceInfo}/{@link DataSpacesURI}.
  */
 public class SpacesMountManagerTest {
     private static final String EXISTING_FILE = "file.txt";
