@@ -98,12 +98,14 @@ public class PeerLauncher {
     }
 
     public void removePeer() {
-        Random rand = new Random();
-        Peer p = this.remotePeers.remove(rand.nextInt(this.remotePeers.size()));
-        p.leave();
-
-        this.printInformation("Remove peer managing " + ((CANOverlay) p.getStructuredOverlay()).getZone());
-        // this.printInformation("Leave is not yet fully implemented !");
+        /*
+         * Random rand = new Random(); Peer p =
+         * this.remotePeers.remove(rand.nextInt(this.remotePeers.size())); p.leave();
+         * 
+         * this.printInformation("Remove peer managing " + ((CANOverlay)
+         * p.getStructuredOverlay()).getZone());
+         */
+        this.printInformation("Leave is not yet fully implemented !");
     }
 
     public void lookupMessage() {
