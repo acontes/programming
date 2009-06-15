@@ -73,6 +73,16 @@ public interface DataSpacesFileObject {
     public abstract FileType getType() throws FileSystemException;
 
     /**
+     * Determines if this file's data space has a particular capability.
+     *
+     * @param capability
+     *            The capability to check for.
+     * @return true if this file's data space has the requested capability.
+     * @todo Move this to another interface, so that set of capabilities can be queried.
+     */
+    public abstract boolean hasSpaceCapability(Capability capability);
+
+    /**
      * Returns the folder that contains this file.
      *
      * @return The folder that contains this file. Returns null if this file is the root of a file
@@ -81,13 +91,6 @@ public interface DataSpacesFileObject {
      *             On error finding the file's parent.
      */
     public abstract DataSpacesFileObject getParent() throws FileSystemException;
-
-    /**
-     * Returns the file system that contains this file.
-     *
-     * @return The file system.
-     */
-    public abstract FileSystem getFileSystem();
 
     /**
      * Lists the children of this file.

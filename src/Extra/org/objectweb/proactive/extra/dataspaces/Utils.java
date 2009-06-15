@@ -19,7 +19,6 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.dataspaces.api.Capability;
 import org.objectweb.proactive.extra.dataspaces.api.DataSpacesFileObject;
-import org.objectweb.proactive.extra.dataspaces.api.FileSystem;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 
 
@@ -176,43 +175,28 @@ public class Utils {
     }
 
     /**
-     * Assert that given file system has required capabilities. Throw an ConfigurationException if
-     * it does not.
+     * Assert that given DataSpacesFileObject's data space has required capabilities. Throw an
+     * ConfigurationException if it does not.
      * 
      * @param expected
-     *            array containing expected capabilities of the specified file system.
-     * @param fileSystem
-     *            specified file system
+     *            array containing expected capabilities of the specified DataSpacesFileObject's
+     *            data space.
+     * @param fo
+     *            specified DataSpacesFileObject's
      * @throws ConfigurationException
-     *             when the file system does not have one of expected capabilities
+     *             when the DataSpacesFileObject's data space does not have one of expected
+     *             capabilities
      */
-    public static void assertCapabilitiesMatch(Capability[] expected, FileSystem fileSystem)
+    public static void assertCapabilitiesMatch(Capability[] expected, DataSpacesFileObject fo)
             throws ConfigurationException {
 
         for (int i = 0; i < expected.length; i++) {
             final Capability capability = expected[i];
 
-            if (!fileSystem.hasCapability(capability))
+            if (!fo.hasSpaceCapability(capability))
                 throw new ConfigurationException(
                     "File system used to access data does not support capability: " + capability);
         }
-    }
-
-    /**
-     * Assert that given FileObject's file system has required capabilities. Throw an
-     * ConfigurationException if it does not.
-     * 
-     * @param expected
-     *            array containing expected capabilities of the specified FileObject's file system.
-     * @param fo
-     *            specified FileObject decorated with CapabilitiesInfoFileObject
-     * @throws ConfigurationException
-     *             when the FileObject's file system does not have one of expected capabilities
-     */
-    public static void assertCapabilitiesMatch(Capability[] expected, DataSpacesFileObject fo)
-            throws ConfigurationException {
-
-        assertCapabilitiesMatch(expected, fo.getFileSystem());
     }
 
     /**

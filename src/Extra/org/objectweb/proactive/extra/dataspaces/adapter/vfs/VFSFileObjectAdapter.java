@@ -11,14 +11,19 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.dataspaces.DataSpacesURI;
+import org.objectweb.proactive.extra.dataspaces.api.Capability;
 import org.objectweb.proactive.extra.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extra.dataspaces.api.FileContent;
 import org.objectweb.proactive.extra.dataspaces.api.FileSelector;
-import org.objectweb.proactive.extra.dataspaces.api.FileSystem;
 import org.objectweb.proactive.extra.dataspaces.api.FileType;
 import org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException;
 
 
+/**
+ * TODO: javadoc
+ * <p>
+ * Adapted FileObject should provide any access limitation as required by Data Spaces specification.
+ */
 public class VFSFileObjectAdapter implements DataSpacesFileObject {
 
     private final FileObject adaptee;
@@ -47,6 +52,7 @@ public class VFSFileObjectAdapter implements DataSpacesFileObject {
         this.adaptee = adaptee;
     }
 
+    // TODO: check if URI is available eg. we went above URI root in VFS tree
     private VFSFileObjectAdapter(FileObject adaptee, VFSFileObjectAdapter fileObjectAdapter) {
         this.spaceUri = fileObjectAdapter.spaceUri;
         this.vfsSpaceRootPath = fileObjectAdapter.vfsSpaceRootPath;
@@ -190,11 +196,7 @@ public class VFSFileObjectAdapter implements DataSpacesFileObject {
         }
     }
 
-    public FileSystem getFileSystem() {
-        return new VFSFileSystemAdapter(adaptee.getFileSystem());
-    }
-
-    // TODO: check if the parent exists from DS point of veiw..
+    // TODO: check if the parent exists from DS point of view..
     public DataSpacesFileObject getParent() throws FileSystemException {
         try {
             final FileObject vfsParent = adaptee.getParent();
@@ -280,6 +282,13 @@ public class VFSFileObjectAdapter implements DataSpacesFileObject {
         return adaptee;
     }
 
+    public boolean hasSpaceCapability(Capability capability) {
+        final org.apache.commons.vfs.Capability vfsCapability = buildVFSCapability(capability);
+        final org.apache.commons.vfs.FileSystem vfsFileSystem = adaptee.getFileSystem();
+
+        return vfsFileSystem.hasCapability(vfsCapability);
+    }
+
     /**
      * @param array
      *            may be null
@@ -350,6 +359,61 @@ public class VFSFileObjectAdapter implements DataSpacesFileObject {
                 return Selectors.SELECT_SELF;
             case SELECT_SELF_AND_CHILDREN:
                 return Selectors.SELECT_SELF_AND_CHILDREN;
+            default:
+                return null;
+        }
+    }
+
+    /**
+     * @param capability
+     *            may be null
+     */
+    private static org.apache.commons.vfs.Capability buildVFSCapability(Capability capability) {
+        switch (capability) {
+            case APPEND_CONTENT:
+                return org.apache.commons.vfs.Capability.APPEND_CONTENT;
+            case ATTRIBUTES:
+                return org.apache.commons.vfs.Capability.ATTRIBUTES;
+            case COMPRESS:
+                return org.apache.commons.vfs.Capability.COMPRESS;
+            case CREATE:
+                return org.apache.commons.vfs.Capability.CREATE;
+            case DELETE:
+                return org.apache.commons.vfs.Capability.DELETE;
+            case DIRECTORY_READ_CONTENT:
+                return org.apache.commons.vfs.Capability.DIRECTORY_READ_CONTENT;
+            case FS_ATTRIBUTES:
+                return org.apache.commons.vfs.Capability.FS_ATTRIBUTES;
+            case GET_LAST_MODIFIED:
+                return org.apache.commons.vfs.Capability.GET_LAST_MODIFIED;
+            case GET_TYPE:
+                return org.apache.commons.vfs.Capability.GET_TYPE;
+            case LAST_MODIFIED:
+                return org.apache.commons.vfs.Capability.LAST_MODIFIED;
+            case LIST_CHILDREN:
+                return org.apache.commons.vfs.Capability.LIST_CHILDREN;
+            case MANIFEST_ATTRIBUTES:
+                return org.apache.commons.vfs.Capability.MANIFEST_ATTRIBUTES;
+            case RANDOM_ACCESS_READ:
+                return org.apache.commons.vfs.Capability.RANDOM_ACCESS_READ;
+            case RANDOM_ACCESS_WRITE:
+                return org.apache.commons.vfs.Capability.RANDOM_ACCESS_WRITE;
+            case READ_CONTENT:
+                return org.apache.commons.vfs.Capability.READ_CONTENT;
+            case RENAME:
+                return org.apache.commons.vfs.Capability.RENAME;
+            case SET_LAST_MODIFIED_FILE:
+                return org.apache.commons.vfs.Capability.SET_LAST_MODIFIED_FILE;
+            case SET_LAST_MODIFIED_FOLDER:
+                return org.apache.commons.vfs.Capability.SET_LAST_MODIFIED_FOLDER;
+            case SIGNING:
+                return org.apache.commons.vfs.Capability.SIGNING;
+            case URI:
+                return org.apache.commons.vfs.Capability.URI;
+            case VIRTUAL:
+                return org.apache.commons.vfs.Capability.VIRTUAL;
+            case WRITE_CONTENT:
+                return org.apache.commons.vfs.Capability.WRITE_CONTENT;
             default:
                 return null;
         }
