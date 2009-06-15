@@ -35,7 +35,7 @@ public class VFSFileObjectAdapter implements DataSpacesFileObject {
     private final String vfsSpaceRootPath;
 
     /**
-     * Creates an instance of DataSpacesFileObjectImpl. Before any usage of this class, id of an
+     * Creates an instance of DataSpacesLimitingFileObject. Before any usage of this class, id of an
      * active object has to be set accordingly.
      *
      * @param fileObject

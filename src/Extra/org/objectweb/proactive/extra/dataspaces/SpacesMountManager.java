@@ -26,11 +26,11 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundExceptio
  * Manager creates and maintains Apache VFS manager to pose virtual view provider of file system for
  * each application. It is able to response to queries for files in data spaces or just data spaces,
  * providing {@link VFSFileObjectAdapter} as a result. Returned {@link VFSFileObjectAdapter} is an
- * adapted instance of VFS FileObject decorator - {@link DataSpacesFileObjectImpl}. It is applicable
- * for user level code with access limited to spaces, although for write-limiting features to work
- * correctly it is required to set up id of active object that becomes owner of returned
- * DataSpacesFileObject. One may also want to limit access to URIs not suitable for having path,
- * which is not responsibility of this class.
+ * adapted instance of VFS FileObject decorator - {@link DataSpacesLimitingFileObject}. It is
+ * applicable for user level code with access limited to spaces, although for write-limiting
+ * features to work correctly it is required to set up id of active object that becomes owner of
+ * returned DataSpacesFileObject. One may also want to limit access to URIs not suitable for having
+ * path, which is not responsibility of this class.
  * <p>
  * To be able to serve requests for files and data spaces, SpaceMountManager must use
  * {@link SpacesDirectory} as a source of information about data spaces, their mounting points and
@@ -41,8 +41,8 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundExceptio
  * content. Proper, local or remote access is determined using
  * {@link Utils#getLocalAccessURL(String, String, String)} method. Write-capabilities of returned
  * FileObjects are induced from used protocols' providers, but also SpacesMountManager apply
- * restriction policies for returned FileObjects, as described in {@link DataSpacesFileObjectImpl},
- * to conform with general Data Spaces guarantees.
+ * restriction policies for returned FileObjects, as described in
+ * {@link DataSpacesLimitingFileObject}, to conform with general Data Spaces guarantees.
  * <p>
  * Instances of this class are thread-safe. Also, subsequent requests for the same file using the
  * same manager will result in separate FileObject instances being returned, so there is no
@@ -125,7 +125,7 @@ public class SpacesMountManager {
      * @throws IllegalArgumentException
      *             when provided queryUri does not have space part fully defined
      * @see DataSpacesURI#isSpacePartFullyDefined()
-     * @see DataSpacesFileObjectImpl
+     * @see DataSpacesLimitingFileObject
      */
     public VFSFileObjectAdapter resolveFile(final DataSpacesURI queryUri) throws FileSystemException,
             SpaceNotFoundException {
@@ -177,7 +177,7 @@ public class SpacesMountManager {
      * @throws IllegalArgumentException
      *             when provided queryUri has space part fully defined
      * @see DataSpacesURI#isSpacePartFullyDefined()
-     * @see DataSpacesFileObjectImpl
+     * @see DataSpacesLimitingFileObject
      */
     public Map<DataSpacesURI, VFSFileObjectAdapter> resolveSpaces(final DataSpacesURI queryUri)
             throws FileSystemException {
@@ -315,14 +315,14 @@ public class SpacesMountManager {
                 }
 
                 final FileObject file;
-                final DataSpacesFileObjectImpl decoratedFile;
+                final DataSpacesLimitingFileObject decoratedFile;
                 final FileObject spaceRoot = mountedSpaces.get(spacePart);
 
                 if (relativeToSpace == null)
                     file = spaceRoot;
                 else
                     file = spaceRoot.resolveFile(relativeToSpace);
-                decoratedFile = new DataSpacesFileObjectImpl(file, spacePart, spaceRoot.getName());
+                decoratedFile = new DataSpacesLimitingFileObject(file, spacePart, spaceRoot.getName());
                 return new VFSFileObjectAdapter(decoratedFile, spacePart, spaceRoot.getName().getPath());
             } catch (org.apache.commons.vfs.FileSystemException x) {
                 logger.warn("Could not access file that should exist (be mounted): " + uri);

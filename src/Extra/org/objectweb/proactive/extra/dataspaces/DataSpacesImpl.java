@@ -92,8 +92,8 @@ public class DataSpacesImpl {
         // FIXME: implement and set also decorator limiting access for !isSuitableForHavingPath() 
         final String aoId = Utils.getActiveObjectId(Utils.getCurrentActiveObjectBody());
 
-        if (fo.getAdaptee() instanceof DataSpacesFileObjectImpl)
-            ((DataSpacesFileObjectImpl) fo.getAdaptee()).setOwnerActiveObjectId(aoId);
+        if (fo.getAdaptee() instanceof DataSpacesLimitingFileObject)
+            ((DataSpacesLimitingFileObject) fo.getAdaptee()).setOwnerActiveObjectId(aoId);
     }
 
     private final SpacesMountManager spacesMountManager;

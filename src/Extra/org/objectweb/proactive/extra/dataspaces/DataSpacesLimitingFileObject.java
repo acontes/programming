@@ -33,7 +33,7 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException
  * Instances of this class conform to the same rules regarding concurrent access, resources
  * management etc. as pure {@link FileObject} does.
  */
-public class DataSpacesFileObjectImpl extends AbstractLimitingFileObject<DataSpacesFileObjectImpl> {
+public class DataSpacesLimitingFileObject extends AbstractLimitingFileObject<DataSpacesLimitingFileObject> {
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.DATASPACES);
 
     private final DataSpacesURI spaceUri;
@@ -43,7 +43,7 @@ public class DataSpacesFileObjectImpl extends AbstractLimitingFileObject<DataSpa
     private Object readOnlyLock = new Object();
 
     /**
-     * Creates an instance of DataSpacesFileObjectImpl. Before any usage of this class, id of an
+     * Creates an instance of DataSpacesLimitingFileObject. Before any usage of this class, id of an
      * active object has to be set accordingly.
      * 
      * @param fileObject
@@ -54,7 +54,8 @@ public class DataSpacesFileObjectImpl extends AbstractLimitingFileObject<DataSpa
      * @param spaceRootFileName
      *            VFS path of the space root FileObject; cannot be <code>null</code>
      */
-    public DataSpacesFileObjectImpl(FileObject fileObject, DataSpacesURI spaceUri, FileName spaceRootFileName) {
+    public DataSpacesLimitingFileObject(FileObject fileObject, DataSpacesURI spaceUri,
+            FileName spaceRootFileName) {
         super(fileObject);
         this.spaceUri = spaceUri;
         this.spaceRootFileName = spaceRootFileName;
@@ -122,13 +123,13 @@ public class DataSpacesFileObjectImpl extends AbstractLimitingFileObject<DataSpa
     }
 
     @Override
-    protected boolean canReturnAncestor(final DataSpacesFileObjectImpl fileObject) {
+    protected boolean canReturnAncestor(final DataSpacesLimitingFileObject fileObject) {
         return spaceRootFileName.isDescendent(fileObject.getName(), NameScope.DESCENDENT_OR_SELF);
     }
 
     @Override
-    protected DataSpacesFileObjectImpl doDecorateFile(FileObject file) {
-        return new DataSpacesFileObjectImpl(file, spaceUri, spaceRootFileName);
+    protected DataSpacesLimitingFileObject doDecorateFile(FileObject file) {
+        return new DataSpacesLimitingFileObject(file, spaceUri, spaceRootFileName);
     }
 
     private boolean computeIsReadOnly() {
