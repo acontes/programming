@@ -11,7 +11,6 @@
 		<descriptorDefaultVariable name="deploymentDescriptor" value="localhost/dataSpaces.xml" />
 		<descriptorDefaultVariable name="jvmargDefinedByTest" value=" "/>
 		<programVariable name="JVM_PARAMETERS"/>
-		<programVariable name="NAMING_SERVICE_URL"/>
 		<programVariable name="INPUT_DEFAULT_WITH_DIR_PATH"/>
 		<programVariable name="INPUT_WITH_DIR_PATH"/>
 		<programVariable name="INPUT_WITH_FILE_PATH"/>
@@ -46,7 +45,6 @@
 				<nodeProvider refid="remote" />
 			</virtualNode>
 			<data>
-				<namingService url="${NAMING_SERVICE_URL}" />
 				<!-- URLs are paths here; it works for VFS, but it is like that just for local testing -->
 				<inputDefault>
 					<remoteAccess url="${INPUT_DEFAULT_WITH_DIR_PATH}" />

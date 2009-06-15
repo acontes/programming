@@ -12,11 +12,9 @@ import java.net.URL;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.extensions.calcium.system.SkeletonSystemImpl;
-import org.objectweb.proactive.extra.dataspaces.NamingServiceDeployer;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
 import functionalTests.FunctionalTest;
@@ -66,9 +64,6 @@ public class GCMFunctionalTestDataSpaces extends GCMFunctionalTest {
     static public final String VAR_VMCAPACITY = "vmCapacity";
     int vmCapacity;
 
-    static public final String VAR_NAMING_SERVICE_URL = "NAMING_SERVICE_URL";
-    NamingServiceDeployer namingServiceDeployer;
-
     File rootTmpDir;
     static public final String VAR_INPUT_DEFAULT_WITH_DIR_PATH = "INPUT_DEFAULT_WITH_DIR_PATH";
     File inputDefaultWithDirLocalHandle;
@@ -112,11 +107,6 @@ public class GCMFunctionalTestDataSpaces extends GCMFunctionalTest {
         vContract.setVariableFromProgram(VAR_VMCAPACITY, Integer.valueOf(vmCapacity).toString(),
                 VariableContractType.DescriptorDefaultVariable);
 
-        // hack: need to do that here to acquire proper URL
-        tryStartNamingService();
-        vContract.setVariableFromProgram(VAR_NAMING_SERVICE_URL, namingServiceDeployer.getNamingServiceURL(),
-                VariableContractType.ProgramVariable);
-
         rootTmpDir = new File(System.getProperty("java.io.tmpdir"), "ProActive-GCMFunctionalTestDataSpaces");
         inputDefaultWithDirLocalHandle = new File(rootTmpDir, "inputDefaultWithDir");
         inputWithDirLocalHandle = new File(rootTmpDir, "inputWithDir");
@@ -143,29 +133,6 @@ public class GCMFunctionalTestDataSpaces extends GCMFunctionalTest {
                 .getAbsolutePath(), VariableContractType.ProgramVariable);
         vContract.setVariableFromProgram(VAR_OUTPUT_WITH_NOTHING2_PATH, outputWithNothing2LocalHandle
                 .getAbsolutePath(), VariableContractType.ProgramVariable);
-    }
-
-    @Before
-    public void tryStartNamingService() {
-        if (namingServiceDeployer == null)
-            namingServiceDeployer = new NamingServiceDeployer();
-    }
-
-    @After
-    public void killGCMAAndNamingService() throws ProActiveException {
-        // COPIED AND MODIFIED FROM SUPERCLASS - to enforce appropriate order of actions   
-        logger.info(GCMFunctionalTest.class.getName() + " @After: killDeployment");
-        if (gcmad != null) {
-            gcmad.kill();
-            gcmad = null;
-        }
-        logger.info(GCMFunctionalTest.class.getName() + " @After: killDeployment");
-        // END OF COPIED AND MODIFIED PART
-
-        if (namingServiceDeployer != null) {
-            namingServiceDeployer.terminate();
-            namingServiceDeployer = null;
-        }
     }
 
     @Before
