@@ -559,6 +559,7 @@ public class AbstractLimitingFileObjectTest {
         ancestorLimitedFile.resolveFile("../");
     }
 
+    @Test
     public void testAncestorLimitedResolveFileChild() throws FileSystemException {
         final FileObject child = ancestorLimitedFile.resolveFile("unexisting_file");
         assertNotNull(child);
