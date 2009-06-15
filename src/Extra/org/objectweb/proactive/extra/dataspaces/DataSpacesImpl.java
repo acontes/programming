@@ -311,7 +311,7 @@ public class DataSpacesImpl {
         final Body body = Utils.getCurrentActiveObjectBody();
         try {
             final DataSpacesURI scratchURI = appScratchSpace.getScratchForAO(body);
-            final DataSpacesURI queryURI = scratchURI.withPath(path);
+            final DataSpacesURI queryURI = scratchURI.withUserPath(path);
             final VFSFileObjectAdapter fo = spacesMountManager.resolveFile(queryURI);
 
             if (logger.isTraceEnabled())
@@ -416,7 +416,7 @@ public class DataSpacesImpl {
 
         try {
             final DataSpacesURI spaceURI = DataSpacesURI.parseURI(uri);
-            if (!spaceURI.isSuitableForHavingPath())
+            if (!spaceURI.isSuitableForUserPath())
                 throw new MalformedURIException("Specified URI represents internal high-level directories");
 
             final VFSFileObjectAdapter fo = spacesMountManager.resolveFile(spaceURI);

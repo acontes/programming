@@ -12,6 +12,7 @@ import org.objectweb.proactive.extra.dataspaces.SpaceType;
 import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException;
 
 
+// TODO: test getRelativeToSpace() and withRelativeToSpace()
 public class DataSpacesURITest {
     private DataSpacesURI uri;
     private DataSpacesURI uri2;
@@ -26,10 +27,10 @@ public class DataSpacesURITest {
         assertNull(uri.getRuntimeId());
         assertNull(uri.getNodeId());
         assertNull(uri.getActiveObjectId());
-        assertNull(uri.getPath());
+        assertNull(uri.getUserPath());
         assertTrue(uri.isSpacePartOnly());
         assertFalse(uri.isSpacePartFullyDefined());
-        assertFalse(uri.isSuitableForHavingPath());
+        assertFalse(uri.isSuitableForUserPath());
     }
 
     @Test
@@ -42,10 +43,10 @@ public class DataSpacesURITest {
         assertNull(uri.getRuntimeId());
         assertNull(uri.getNodeId());
         assertNull(uri.getActiveObjectId());
-        assertNull(uri.getPath());
+        assertNull(uri.getUserPath());
         assertTrue(uri.isSpacePartOnly());
         assertFalse(uri.isSpacePartFullyDefined());
-        assertFalse(uri.isSuitableForHavingPath());
+        assertFalse(uri.isSuitableForUserPath());
     }
 
     @Test
@@ -58,10 +59,10 @@ public class DataSpacesURITest {
         assertNull(uri.getName());
         assertNull(uri.getNodeId());
         assertNull(uri.getActiveObjectId());
-        assertNull(uri.getPath());
+        assertNull(uri.getUserPath());
         assertTrue(uri.isSpacePartOnly());
         assertFalse(uri.isSpacePartFullyDefined());
-        assertFalse(uri.isSuitableForHavingPath());
+        assertFalse(uri.isSuitableForUserPath());
     }
 
     @Test
@@ -74,10 +75,10 @@ public class DataSpacesURITest {
         assertEquals("nodeB", uri.getNodeId());
         assertNull(uri.getActiveObjectId());
         assertNull(uri.getName());
-        assertNull(uri.getPath());
+        assertNull(uri.getUserPath());
         assertTrue(uri.isSpacePartFullyDefined());
         assertTrue(uri.isSpacePartOnly());
-        assertFalse(uri.isSuitableForHavingPath());
+        assertFalse(uri.isSuitableForUserPath());
     }
 
     @Test
@@ -134,10 +135,10 @@ public class DataSpacesURITest {
         assertEquals("runtimeA", uri.getRuntimeId());
         assertEquals("nodeB", uri.getNodeId());
         assertEquals("aoC", uri.getActiveObjectId());
-        assertNull(uri.getPath());
+        assertNull(uri.getUserPath());
         assertNull(uri.getName());
         assertTrue(uri.isSpacePartFullyDefined());
-        assertTrue(uri.isSuitableForHavingPath());
+        assertTrue(uri.isSuitableForUserPath());
         assertFalse(uri.isSpacePartOnly());
     }
 
@@ -195,10 +196,10 @@ public class DataSpacesURITest {
         assertEquals("runtimeA", uri.getRuntimeId());
         assertEquals("nodeB", uri.getNodeId());
         assertEquals("aoC", uri.getActiveObjectId());
-        assertEquals("dir/file.txt", uri.getPath());
+        assertEquals("dir/file.txt", uri.getUserPath());
         assertNull(uri.getName());
         assertTrue(uri.isSpacePartFullyDefined());
-        assertTrue(uri.isSuitableForHavingPath());
+        assertTrue(uri.isSuitableForUserPath());
         assertFalse(uri.isSpacePartOnly());
     }
 
@@ -230,10 +231,10 @@ public class DataSpacesURITest {
         assertNull(uri.getRuntimeId());
         assertNull(uri.getNodeId());
         assertNull(uri.getActiveObjectId());
-        assertNull(uri.getPath());
+        assertNull(uri.getUserPath());
         assertTrue(uri.isSpacePartFullyDefined());
         assertTrue(uri.isSpacePartOnly());
-        assertTrue(uri.isSuitableForHavingPath());
+        assertTrue(uri.isSuitableForUserPath());
     }
 
     @Test
@@ -246,10 +247,10 @@ public class DataSpacesURITest {
         assertNull(uri.getRuntimeId());
         assertNull(uri.getNodeId());
         assertNull(uri.getActiveObjectId());
-        assertNull(uri.getPath());
+        assertNull(uri.getUserPath());
         assertTrue(uri.isSpacePartFullyDefined());
         assertTrue(uri.isSpacePartOnly());
-        assertTrue(uri.isSuitableForHavingPath());
+        assertTrue(uri.isSuitableForUserPath());
     }
 
     @Test
@@ -295,11 +296,11 @@ public class DataSpacesURITest {
         assertEquals(123, uri.getAppId());
         assertEquals(SpaceType.OUTPUT, uri.getSpaceType());
         assertEquals("stats", uri.getName());
-        assertEquals("dir/abc.txt", uri.getPath());
+        assertEquals("dir/abc.txt", uri.getUserPath());
         assertNull(uri.getRuntimeId());
         assertNull(uri.getNodeId());
         assertTrue(uri.isSpacePartFullyDefined());
-        assertTrue(uri.isSuitableForHavingPath());
+        assertTrue(uri.isSuitableForUserPath());
         assertFalse(uri.isSpacePartOnly());
     }
 
@@ -336,7 +337,7 @@ public class DataSpacesURITest {
         assertNull(uri.getRuntimeId());
         assertNull(uri.getNodeId());
         assertNull(uri.getActiveObjectId());
-        assertNull(uri.getPath());
+        assertNull(uri.getUserPath());
     }
 
     @Test
@@ -376,7 +377,7 @@ public class DataSpacesURITest {
         assertNull(uri.getRuntimeId());
         assertNull(uri.getNodeId());
         assertNull(uri.getActiveObjectId());
-        assertNull(uri.getPath());
+        assertNull(uri.getUserPath());
     }
 
     @Test
@@ -398,7 +399,7 @@ public class DataSpacesURITest {
         assertNull(uri.getRuntimeId());
         assertNull(uri.getNodeId());
         assertNull(uri.getActiveObjectId());
-        assertNull(uri.getPath());
+        assertNull(uri.getUserPath());
     }
 
     @Test
@@ -418,7 +419,7 @@ public class DataSpacesURITest {
         assertEquals(123, uri.getAppId());
         assertEquals(SpaceType.INPUT, uri.getSpaceType());
         assertEquals("abc", uri.getName());
-        assertEquals("file.txt", uri.getPath());
+        assertEquals("file.txt", uri.getUserPath());
         assertNull(uri.getRuntimeId());
         assertNull(uri.getNodeId());
         assertNull(uri.getActiveObjectId());
@@ -442,7 +443,7 @@ public class DataSpacesURITest {
         assertNull(uri.getName());
         assertNull(uri.getNodeId());
         assertNull(uri.getActiveObjectId());
-        assertNull(uri.getPath());
+        assertNull(uri.getUserPath());
     }
 
     @Test
@@ -464,7 +465,7 @@ public class DataSpacesURITest {
         assertEquals("nodeB", uri.getNodeId());
         assertNull(uri.getActiveObjectId());
         assertNull(uri.getName());
-        assertNull(uri.getPath());
+        assertNull(uri.getUserPath());
     }
 
     @Test
@@ -486,7 +487,7 @@ public class DataSpacesURITest {
         assertEquals("nodeB", uri.getNodeId());
         assertEquals("aoC", uri.getActiveObjectId());
         assertNull(uri.getName());
-        assertNull(uri.getPath());
+        assertNull(uri.getUserPath());
     }
 
     @Test
@@ -508,7 +509,7 @@ public class DataSpacesURITest {
         assertEquals("runtimeA", uri.getRuntimeId());
         assertEquals("nodeB", uri.getNodeId());
         assertEquals("aoC", uri.getActiveObjectId());
-        assertEquals("file.txt", uri.getPath());
+        assertEquals("file.txt", uri.getUserPath());
         assertNull(uri.getName());
     }
 
@@ -551,26 +552,26 @@ public class DataSpacesURITest {
     @Test
     public void testWithPath() {
         uri = DataSpacesURI.createInOutSpaceURI(123, SpaceType.OUTPUT, "123", "dir/abc.txt");
-        uri2 = uri.withPath("xyz");
+        uri2 = uri.withUserPath("xyz");
 
-        assertEquals("xyz", uri2.getPath());
-        assertEquals("dir/abc.txt", uri.getPath());
+        assertEquals("xyz", uri2.getUserPath());
+        assertEquals("dir/abc.txt", uri.getUserPath());
     }
 
     @Test
     public void testWithPathEmpty() {
         uri = DataSpacesURI.createInOutSpaceURI(123, SpaceType.OUTPUT, "123", "dir/abc.txt");
-        uri2 = uri.withPath(null);
+        uri2 = uri.withUserPath(null);
 
-        assertNull(uri2.getPath());
-        assertEquals("dir/abc.txt", uri.getPath());
+        assertNull(uri2.getUserPath());
+        assertEquals("dir/abc.txt", uri.getUserPath());
     }
 
     @Test
     public void testWithPathIllegal1() {
         uri = DataSpacesURI.createURI(123, SpaceType.OUTPUT);
         try {
-            uri.withPath("xyz");
+            uri.withUserPath("xyz");
             fail("expected exception");
         } catch (IllegalArgumentException x) {
         }
@@ -580,7 +581,7 @@ public class DataSpacesURITest {
     public void testWithPathIllegal2() {
         uri = DataSpacesURI.createScratchSpaceURI(123, "runtimeA", "nodeB");
         try {
-            uri.withPath("xyz");
+            uri.withUserPath("xyz");
             fail("expected exception");
         } catch (IllegalArgumentException x) {
         }
@@ -617,7 +618,7 @@ public class DataSpacesURITest {
     public void testWithActiveObjectIdIllegal1() {
         uri = DataSpacesURI.createURI(123, SpaceType.OUTPUT);
         try {
-            uri.withPath("xyz");
+            uri.withUserPath("xyz");
             fail("expected exception");
         } catch (IllegalArgumentException x) {
         }
@@ -627,7 +628,7 @@ public class DataSpacesURITest {
     public void testWithActiveObjectIdIllegal2() {
         uri = DataSpacesURI.createScratchSpaceURI(123, "runtimeA", "nodeB");
         try {
-            uri.withPath("xyz");
+            uri.withUserPath("xyz");
             fail("expected exception");
         } catch (IllegalArgumentException x) {
         }
@@ -640,7 +641,7 @@ public class DataSpacesURITest {
 
         assertTrue(uri2.isSpacePartOnly());
         assertEquals("aoC", uri.getActiveObjectId());
-        assertEquals("dir/file.txt", uri.getPath());
+        assertEquals("dir/file.txt", uri.getUserPath());
     }
 
     @Test
@@ -649,7 +650,7 @@ public class DataSpacesURITest {
         uri2 = uri.getSpacePartOnly();
 
         assertTrue(uri2.isSpacePartOnly());
-        assertEquals("dir/file.txt", uri.getPath());
+        assertEquals("dir/file.txt", uri.getUserPath());
     }
 
     @Test

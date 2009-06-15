@@ -212,7 +212,7 @@ public class SpacesMountManagerTest {
 
     @Test
     public void testResolveFileForFileInReadOnlySpace() throws SpaceNotFoundException, IOException {
-        final DataSpacesURI fileUri = readOnlyUri.withPath(EXISTING_FILE);
+        final DataSpacesURI fileUri = readOnlyUri.withUserPath(EXISTING_FILE);
         fileObjectRO = manager.resolveFile(fileUri);
 
         assertTrue(fileObjectRO.exists());
@@ -239,7 +239,7 @@ public class SpacesMountManagerTest {
 
     @Test
     public void testResolveFileForUnexistingFileInSpace() throws SpaceNotFoundException, IOException {
-        final DataSpacesURI fileUri = readOnlyUri.withPath(NONEXISTING_FILE);
+        final DataSpacesURI fileUri = readOnlyUri.withUserPath(NONEXISTING_FILE);
         fileObjectRO = manager.resolveFile(fileUri);
         assertFalse(fileObjectRO.exists());
     }
@@ -260,7 +260,7 @@ public class SpacesMountManagerTest {
 
     @Test
     public void testResolveFileForFileInNonexistingSpace() throws SpaceNotFoundException, IOException {
-        final DataSpacesURI fileUri = NONEXISTING_SPACE.withPath(NONEXISTING_FILE);
+        final DataSpacesURI fileUri = NONEXISTING_SPACE.withUserPath(NONEXISTING_FILE);
         try {
             manager.resolveFile(fileUri);
             fail("Exception expected");

@@ -29,7 +29,7 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException
  * <li>type of data space: input, output or scratch; e.g. output</li>
  * <li>name of input/output OR scratch runtime, node and active object id; these components are
  * non-empty strings without slashes; e.g. stats OR runtimeXX/nodeYY/aoZZ</li>
- * <li>defined path within data space; this component is a non-empty string; e.g. some_dir/file.txt</li>
+ * <li>user path within data space; this component is a non-empty string; e.g. some_dir/file.txt</li>
  * </ol>
  * 
  * Every component except scheme and application id can be unspecified in URI. However, components
@@ -44,14 +44,14 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException
  * concrete data space.
  * 
  * <p>
- * URI without path and active object id are said to have <strong>space part only defined</strong> (
- * {@link #isSuitableForHavingPath()}). Space part only URI can be extracted from any URI with
- * <strong>space part fully defined</strong> through {@link #getSpacePartOnly()}. Such URI is
+ * URI without userPath and active object id are said to have <strong>space part only
+ * defined</strong> ({@link #isSpacePartOnly()}). Space part only URI can be extracted from any URI
+ * with <strong>space part fully defined</strong> through {@link #getSpacePartOnly()}. Such URI is
  * suitable for queries at data spaces granularity level.
  * 
  * <p>
- * URI is said to be <strong>suitable for having path</strong> when every its components are defined
- * (path is optional). Such URI can be used by end-user.
+ * URI is said to be <strong>suitable for user path</strong> ({@link #isSuitableForUserPath()}) when
+ * every its components are defined (userPath is optional). Such URI can be used by end-user.
  * 
  * <p>
  * Instances of this class are comparable, in a way corresponding to described hierarchy,
@@ -113,7 +113,7 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
      * 
      * This is only a shortcut for
      * {@link #createScratchSpaceURI(long, String, String, String, String)} with <code>null</code>
-     * values for nodeId, activeObjectId and path.
+     * values for nodeId, activeObjectId and userPath.
      * 
      * @param appId
      *            application id
@@ -133,7 +133,7 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
      * 
      * This is only a shortcut for
      * {@link #createScratchSpaceURI(long, String, String, String, String)} with <code>null</code>
-     * values for activeObjectId and path.
+     * values for activeObjectId and userPath.
      * 
      * @param appId
      *            application id
@@ -154,7 +154,8 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
 
     /**
      * Creates URI of scratch type with only runtimeId, nodeId and activeObjectId specified. Created
-     * URI has always space part fully defined if arguments are not <code>null</code>.
+     * URI has always space part fully defined and is suitable for user path if arguments are not
+     * <code>null</code>.
      * 
      * @param appId
      *            application id
@@ -179,8 +180,8 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
     }
 
     /**
-     * Creates URI of scratch type. Created URI has always space part fully defined if arguments are
-     * not <code>null</code>.
+     * Creates URI of scratch type. Created URI has always space part fully defined and is suitable
+     * for user path if arguments are not <code>null</code>.
      * 
      * @param appId
      *            application id
@@ -192,27 +193,28 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
      *            May be <code>null</code> if following arguments are also <code>null</code>.
      * @param activeObjectId
      *            activeObjectId (for AO being on node with nodeId) who is owner of that scratch
-     *            space part. May be <code>null</code> if following argument path is also
+     *            space part. May be <code>null</code> if following argument userPath is also
      *            <code>null</code>.
-     * @param path
-     *            path within data space. May be <code>null</code>.
+     * @param userPath
+     *            userPath within data space. May be <code>null</code>.
      * @return URI for that specification
      * @throws IllegalArgumentException
      *             when <code>null</code> values in arguments do not obey URI components hierarchy
-     *             requirements or runtimeId, nodeId, activeObjectId or path are invalid.
+     *             requirements or runtimeId, nodeId, activeObjectId or userPath are invalid.
      */
     public static DataSpacesURI createScratchSpaceURI(long appId, String runtimeId, String nodeId,
-            String activeObjectId, String path) {
-        return new DataSpacesURI(appId, SpaceType.SCRATCH, null, runtimeId, nodeId, activeObjectId, path);
+            String activeObjectId, String userPath) {
+        return new DataSpacesURI(appId, SpaceType.SCRATCH, null, runtimeId, nodeId, activeObjectId, userPath);
     }
 
     /**
      * Creates URI of input or output type with only appId and name specified. Created URI has
-     * always space part fully defined if arguments are not <code>null</code>.
+     * always space part fully defined and is suitable for user path if arguments are not
+     * <code>null</code>.
      * 
      * This method is only a shortcut for
      * {@link #createInOutSpaceURI(long, SpaceType, String, String)} with <code>null</code> value
-     * for argument path.
+     * for argument userPath.
      * 
      * @param appId
      *            application id
@@ -232,8 +234,8 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
     }
 
     /**
-     * Creates URI of input or output type. Created URI has always space part fully defined if
-     * arguments are not <code>null</code>.
+     * Creates URI of input or output type. Created URI has always space part fully defined and is
+     * suitable for user path if arguments are not <code>null</code>.
      * 
      * @param appId
      *            application id
@@ -241,17 +243,18 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
      *            space type - only {@link SpaceType#INPUT} or {@link SpaceType#OUTPUT} is allowed
      *            here. May be <code>null</code> if following arguments are also <code>null</code>.
      * @param name
-     *            name of input. May be <code>null</code> if following path argument is also
+     *            name of input. May be <code>null</code> if following userPath argument is also
      *            <code>null</code>.
-     * @param path
-     *            path within data space. May be <code>null</code>.
+     * @param userPath
+     *            userPath within data space. May be <code>null</code>.
      * @return URI for that specification
      * @throws IllegalArgumentException
      *             when <code>null</code> values in arguments do not obey URI components hierarchy
-     *             requirements or name or path are invalid.
+     *             requirements or name or userPath are invalid.
      */
-    public static DataSpacesURI createInOutSpaceURI(long appId, SpaceType spaceType, String name, String path) {
-        return new DataSpacesURI(appId, spaceType, name, null, null, null, path);
+    public static DataSpacesURI createInOutSpaceURI(long appId, SpaceType spaceType, String name,
+            String userPath) {
+        return new DataSpacesURI(appId, spaceType, name, null, null, null, userPath);
     }
 
     /**
@@ -261,9 +264,9 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
      * parsable. Scheme and application need to be always present in provided string, while other
      * components are optional.
      * <p>
-     * End slash after last component (except path) is allowed, but not required. It is recommended
-     * to not use it, as it is not used in URI canonical form returned by {@link #toString()}
-     * method.
+     * End slash after last component (except userPath) is allowed, but not required. It is
+     * recommended to not use it, as it is not used in URI canonical form returned by
+     * {@link #toString()} method.
      * 
      * @param uri
      *            string with URI to parse
@@ -297,7 +300,7 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
             // regexp patter guarantees correct space type enum name
             final SpaceType spaceType = SpaceType.valueOf(spaceTypeString);
 
-            // both name and path may be null,
+            // both name and userPath may be null,
             // but hierarchy is guaranteed by the expression
             final String name = m.group(8);
             final String path = m.group(10);
@@ -327,14 +330,14 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
 
     private final String activeObjectId;
 
-    private final String path;
+    private final String userPath;
 
     private DataSpacesURI(long appId, SpaceType spaceType, String name, String runtimeId, String nodeId,
-            String activeObjectId, String path) {
+            String activeObjectId, String userPath) {
 
         if ((spaceType == null && (name != null || runtimeId != null)) ||
             (runtimeId == null && nodeId != null) || (nodeId == null && activeObjectId != null) ||
-            (activeObjectId == null && name == null && path != null)) {
+            (activeObjectId == null && name == null && userPath != null)) {
             throw new IllegalArgumentException(
                 "Malformed URI. Provided arguments do not meet hierarchy consistency requirement.");
         }
@@ -353,8 +356,8 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
                 "Data Spaces URI component can not be empty nor contain slashes.");
         }
 
-        if (path != null && path.length() == 0) {
-            throw new IllegalArgumentException("Data Spaces URI path can not be empty string.");
+        if (userPath != null && userPath.length() == 0) {
+            throw new IllegalArgumentException("Data Spaces URI userPath can not be empty string.");
         }
 
         this.appId = appId;
@@ -363,7 +366,7 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
         this.runtimeId = runtimeId;
         this.nodeId = nodeId;
         this.activeObjectId = activeObjectId;
-        this.path = path;
+        this.userPath = userPath;
     }
 
     /**
@@ -413,17 +416,17 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
     }
 
     /**
-     * @return path within space. May be <code>null</code>.
+     * @return userPath within space. May be <code>null</code>.
      */
-    public String getPath() {
-        return path;
+    public String getUserPath() {
+        return userPath;
     }
 
     /**
      * Checks whether URI has space part fully defined, i.e. points to concrete data space.
      * 
-     * Such URI has space type and name (or runtimeId and nodeId in case of scratch) defined. Path
-     * and activeObjectId specification are optional.
+     * Such URI has space type and name (or runtimeId and nodeId in case of scratch) defined.
+     * userPath and activeObjectId specification are optional.
      * 
      * @return <code>true</code> if this URI has space part fully defined; <code>false</code>
      *         otherwise.
@@ -433,35 +436,35 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
     }
 
     /**
-     * Checks whether URI has only space part defined, i.e. without activeObjectId and path being
-     * specified.
+     * Checks whether URI has only space part defined, i.e. without activeObjectId and userPath
+     * being specified.
      * 
      * @return <true>true</code> if this URI has only space part defined; <code>false</code>
      *         otherwise.
      */
     public boolean isSpacePartOnly() {
-        return activeObjectId == null && path == null;
+        return activeObjectId == null && userPath == null;
     }
 
     /**
-     * Checks whether URI is suitable for having path defined, through {@link #withPath(String)}
-     * method.
+     * Checks whether URI is suitable for having userPath defined, through
+     * {@link #withUserPath(String)} method.
      * <p>
      * Such URI can be used by end-user.
      * 
-     * @return <code>true</code> when URI is suitable for having path defined, <code>false</code>
-     *         otherwise.
+     * @return <code>true</code> when URI is suitable for having userPath defined,
+     *         <code>false</code> otherwise.
      */
-    public boolean isSuitableForHavingPath() {
+    public boolean isSuitableForUserPath() {
         return isSpacePartFullyDefined() && (spaceType != SpaceType.SCRATCH || activeObjectId != null);
     }
 
     /**
-     * Returns copy of this URI with only space part being defined, without activeObjectId or path.
-     * Such URI is suitable for data spaces granularity level queries.
+     * Returns copy of this URI with only space part being defined, without activeObjectId or
+     * userPath. Such URI is suitable for data spaces granularity level queries.
      * 
      * @return copy of this this URI with only space part components defined, without activeObjectId
-     *         or path.
+     *         or userPath.
      */
     public DataSpacesURI getSpacePartOnly() {
         return new DataSpacesURI(appId, spaceType, name, runtimeId, nodeId, null, null);
@@ -483,11 +486,11 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
 
         if (spaceType == SpaceType.SCRATCH) {
             sb.append(activeObjectId);
-            if (path != null) {
-                sb.append('/').append(path);
+            if (userPath != null) {
+                sb.append('/').append(userPath);
             }
         } else {
-            sb.append(path);
+            sb.append(userPath);
         }
 
         return sb.toString();
@@ -508,30 +511,73 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
      * @see #isSpacePartFullyDefined()
      */
     public DataSpacesURI withActiveObjectId(final String newActiveObjectId) {
-        return new DataSpacesURI(appId, spaceType, name, runtimeId, nodeId, newActiveObjectId, path);
+        return new DataSpacesURI(appId, spaceType, name, runtimeId, nodeId, newActiveObjectId, userPath);
     }
 
     /**
-     * Creates copy of this URI with new path.
+     * Creates copy of this URI with new userPath.
      * 
      * @param newPath
-     *            path to set in newly created URI. May be <code>null</code>. Can be non-null and
-     *            nonempty String if this URI is suitable for having path.
-     * @return copy of this URI with provided path set.
+     *            userPath to set in newly created URI. May be <code>null</code>. Can be non-null
+     *            and nonempty String if this URI is suitable for having userPath.
+     * @return copy of this URI with provided userPath set.
      * @throws IllegalArgumentException
-     *             when nonempty path was requested for URI unsuitable for having path or path is
-     *             invalid (empty string).
-     * @see #isSuitableForHavingPath()
+     *             when nonempty newPath was requested for URI unsuitable for having user path or
+     *             newPath is invalid (empty string).
+     * @see #isSuitableForUserPath()
      */
-    public DataSpacesURI withPath(String newPath) {
+    public DataSpacesURI withUserPath(String newPath) {
         return new DataSpacesURI(appId, spaceType, name, runtimeId, nodeId, activeObjectId, newPath);
     }
 
     /**
-     * Generates next URI key (in sense of comparator of this class) in the same path level. This is
-     * method for <strong>internal usage only</strong>.
+     * Creates copy of this URI with new part being relative to space - concerning activeObjectId
+     * (only for scratches) and userPath.
      * 
-     * @return next URI key, in the same path level.
+     * @param newRelativeToSpace
+     *            new part relative to space. For scratch space URI this consists of
+     *            activeObjectId/userPath, for other types of spaces it is just userPath. May be
+     *            <code>null</code>. Can be non-null and nonempty String if this URI has space part
+     *            fully defined.
+     * @return copy of this URI with provided new part relative to space.
+     * @throws IllegalArgumentException
+     *             when nonempty newRelativeToSpace was requested for URI without space part fully
+     *             defined or newRelativeToSpace is invalid (empty activeObjectId or userPath
+     *             components etc.).
+     * @see #getRelativeToSpace()
+     * @see #isSpacePartFullyDefined()
+     */
+    public DataSpacesURI withRelativeToSpace(String newRelativeToSpace) {
+        if (newRelativeToSpace == null)
+            return new DataSpacesURI(appId, spaceType, name, runtimeId, nodeId, null, null);
+
+        if (!isSpacePartFullyDefined()) {
+            throw new IllegalArgumentException("");
+        }
+
+        final String newActiveObjectId;
+        final String newUserPath;
+        if (spaceType == SpaceType.SCRATCH) {
+            final String parts[] = newRelativeToSpace.split("/", 2);
+            newActiveObjectId = parts[0];
+            if (parts.length == 2) {
+                newUserPath = parts[1];
+            } else {
+                newUserPath = null;
+            }
+        } else {
+            newActiveObjectId = null;
+            newUserPath = newRelativeToSpace;
+        }
+
+        return new DataSpacesURI(appId, spaceType, name, runtimeId, nodeId, newActiveObjectId, newUserPath);
+    }
+
+    /**
+     * Generates next URI key (in sense of comparator of this class). This is method for
+     * <strong>internal usage only</strong>.
+     * 
+     * @return next URI key
      * @throws IllegalStateException
      *             if this URI has space part fully defined.
      * @see #isSpacePartFullyDefined()
@@ -619,9 +665,9 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
                 throw new IllegalStateException("Unexpected space type");
         }
 
-        if (path != null) {
+        if (userPath != null) {
             sb.append('/');
-            sb.append(path);
+            sb.append(userPath);
         }
 
         return sb.toString();
@@ -723,16 +769,16 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
                 break;
         }
 
-        if (path == null) {
-            if (other.path != null) {
+        if (userPath == null) {
+            if (other.userPath != null) {
                 return -1;
             }
             return 0;
         } else {
-            if (other.path == null) {
+            if (other.userPath == null) {
                 return 1;
             }
-            return path.compareTo(other.path);
+            return userPath.compareTo(other.userPath);
         }
     }
 
@@ -756,7 +802,7 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
         result = prime * result + ((runtimeId == null) ? 0 : runtimeId.hashCode());
         result = prime * result + ((nodeId == null) ? 0 : nodeId.hashCode());
         result = prime * result + ((activeObjectId == null) ? 0 : activeObjectId.hashCode());
-        result = prime * result + ((path == null) ? 0 : path.hashCode());
+        result = prime * result + ((userPath == null) ? 0 : userPath.hashCode());
         return result;
     }
 }

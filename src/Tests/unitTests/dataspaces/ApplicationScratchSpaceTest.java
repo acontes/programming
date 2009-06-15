@@ -137,7 +137,7 @@ public class ApplicationScratchSpaceTest {
         assertValidDataSpacesURI(uri, activeObjectId);
         assertTrue(uri.isSpacePartFullyDefined());
         assertFalse(uri.isSpacePartOnly());
-        assertTrue(uri.isSuitableForHavingPath());
+        assertTrue(uri.isSuitableForUserPath());
     }
 
     /**
@@ -278,6 +278,6 @@ public class ApplicationScratchSpaceTest {
         assertEquals(SpaceType.SCRATCH, uri.getSpaceType());
         assertEquals(activeObjectId, uri.getActiveObjectId());
         assertNull(uri.getName());
-        assertNull(uri.getPath());
+        assertNull(uri.getUserPath());
     }
 }
