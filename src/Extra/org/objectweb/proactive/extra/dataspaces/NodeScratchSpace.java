@@ -149,7 +149,6 @@ public class NodeScratchSpace {
         this.node = node;
     }
 
-    // TODO check "other stuff" like os permissions in more explicit way?
     /**
      * Initializes instance (and all related configuration objects) on a node and performs file
      * system configuration and accessing tests.
@@ -197,6 +196,10 @@ public class NodeScratchSpace {
                 checkCapabilities(partialSpaceFile.getFileSystem());
                 partialSpaceFile.delete(Selectors.EXCLUDE_SELF);
                 partialSpaceFile.createFolder();
+                if (!partialSpaceFile.isWriteable()) {
+                    throw new org.apache.commons.vfs.FileSystemException(
+                        "Created directory is unexpectedly not writable");
+                }
                 // just a hint
                 partialSpaceFile.close();
             } catch (org.apache.commons.vfs.FileSystemException x) {
