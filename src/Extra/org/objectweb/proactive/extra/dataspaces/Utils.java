@@ -92,7 +92,8 @@ public class Utils {
      */
     public static Node getCurrentNode() throws ProActiveRuntimeException {
         // TODO: is it possible to do it in a better way?
-        // we do not use PAActiveObject.getNode() to not crash for non-AO caller 
+        // We do not use PAActiveObject.getNode() to not crash for non-AO caller.
+        // However, currently DataSpaces are not being configured for half bodies nodes anyway. 
         try {
             final String nodeURL = getCurrentActiveObjectBody().getNodeURL();
             return NodeFactory.getNode(nodeURL);
