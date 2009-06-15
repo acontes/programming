@@ -80,7 +80,7 @@ public class NamingServiceListing {
         mountManager = new SpacesMountManager(namingService);
 
         // get FileObject for each space
-        final Map<DataSpacesURI, VFSFileObjectAdapter> files = mountManager.resolveSpaces(query);
+        final Map<DataSpacesURI, VFSFileObjectAdapter> files = mountManager.resolveSpaces(query, null);
 
         for (Entry<DataSpacesURI, VFSFileObjectAdapter> space : files.entrySet()) {
             try {

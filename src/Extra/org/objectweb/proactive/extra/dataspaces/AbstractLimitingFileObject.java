@@ -25,13 +25,15 @@ import org.apache.commons.vfs.util.RandomAccessMode;
  * Decorator may limit write access basing on {@link #isReadOnly()} method: direct write access
  * (like deleting file, opening output stream from getContent()), write checks (like isWriteable()).
  * <p>
- * Decorator may limit ancestor access (for resolve and getParent queries) basing on pluggable rule
- * {@link #canReturnAncestor(FileObject)}.
+ * Decorator may limit ancestor access (for resolve and getParent queries) starting from some level
+ * basing on pluggable rule {@link #canReturnAncestor(FileObject)}.
  * <p>
  * It also decorates every returned FileObject. Way of decorating returned files is also pluggable
  * through {@link #doDecorateFile(FileObject)}.
  * <p>
- * Limits for actions are enforced by throwing {@link FileSystemException}.
+ * Limits for write actions and resolve queries are enforced by throwing {@link FileSystemException}
+ * , query methods like {@link #isWriteable()} changes behavior, while {@link #getParent()} return
+ * null for accessing disallowed ancestor.
  * <p>
  * <strong>Known limitations of decorator:</strong>
  * <ul>
@@ -66,7 +68,9 @@ public abstract class AbstractLimitingFileObject<T extends FileObject> extends D
     protected abstract boolean isReadOnly();
 
     /**
-     * Checks whether provided ancestor can be returned.
+     * Checks whether provided ancestor can be returned. The rule should be consistent among
+     * siblings and ancestors of given ancestor. I.e. if one ancestor is denied, then limitation
+     * should concern also its siblings and ancestors in file system tree.
      * 
      * @param decoratedAncestor
      *            ancestor to return, with decorator already applied by
@@ -124,21 +128,15 @@ public abstract class AbstractLimitingFileObject<T extends FileObject> extends D
 
     @Override
     public FileObject resolveFile(String name, NameScope scope) throws FileSystemException {
-        // TODO: what if super.getParent() returns null? DataSpacesFileObjectImpl constructor
-        // needs not null FO, that causes parentDecorated.getName and others throw a NullPointerException
-        // when check* methods called..
         final T resolvedDecorated = decorateFile(super.resolveFile(name, scope));
-        checkCanReturnPotentialAncestor(resolvedDecorated);
+        checkIsNotDisallowedAncestor(resolvedDecorated);
         return resolvedDecorated;
     }
 
     @Override
     public FileObject resolveFile(String path) throws FileSystemException {
-        // TODO: what if super.getParent() returns null? DataSpacesFileObjectImpl constructor
-        // needs not null FO, that causes parentDecorated.getName and others throw a NullPointerException
-        // when check* methods called..
         final T resolvedDecorated = decorateFile(super.resolveFile(path));
-        checkCanReturnPotentialAncestor(resolvedDecorated);
+        checkIsNotDisallowedAncestor(resolvedDecorated);
         return resolvedDecorated;
     }
 
@@ -170,11 +168,10 @@ public abstract class AbstractLimitingFileObject<T extends FileObject> extends D
 
     @Override
     public FileObject getParent() throws FileSystemException {
-        // TODO: what if super.getParent() returns null? DataSpacesFileObjectImpl constructor
-        // needs not null FO, that causes parentDecorated.getName and others throw a NullPointerException
-        // when check* methods called.. 
         final T parentDecorated = decorateFile(super.getParent());
-        checkCanReturnPotentialAncestor(parentDecorated);
+        if (isDisallowedAncestor(parentDecorated)) {
+            return null;
+        }
         return parentDecorated;
     }
 
@@ -211,13 +208,17 @@ public abstract class AbstractLimitingFileObject<T extends FileObject> extends D
         return result;
     }
 
-    private void checkCanReturnPotentialAncestor(final T decoratedFile) throws FileSystemException {
+    private boolean isDisallowedAncestor(final T decoratedFile) {
         if (decoratedFile == null)
-            return;
+            return false;
         if (getName().isDescendent(decoratedFile.getName(), NameScope.DESCENDENT_OR_SELF)) {
-            return;
+            return false;
         }
-        if (!canReturnAncestor(decoratedFile)) {
+        return !canReturnAncestor(decoratedFile);
+    }
+
+    private void checkIsNotDisallowedAncestor(final T decoratedFile) throws FileSystemException {
+        if (isDisallowedAncestor(decoratedFile)) {
             throw new FileSystemException("Access denied to one of resolved file ancestor(s)");
         }
     }

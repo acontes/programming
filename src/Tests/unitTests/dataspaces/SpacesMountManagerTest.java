@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -36,10 +37,12 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundException;
 
 
+// TODO: add test for URI not suitable for having path and perhaps AO owner 
 /**
  * This test is actually not a pure unit test run in high isolation. It depends on correct behavior
- * of {@link SpacesDirectoryImpl}, {@link VFSFactory}, {@link VFSFileObjectAdapter} and
- * {@link DataSpacesLimitingFileObject} and basic {@link SpaceInstanceInfo}/{@link DataSpacesURI}.
+ * of {@link SpacesDirectoryImpl}, {@link VFSFactory}, {@link VFSFileObjectAdapter} together with
+ * {@link DataSpacesLimitingFileObject} and basic classes - {@link SpaceInstanceInfo}/
+ * {@link DataSpacesURI}.
  */
 public class SpacesMountManagerTest {
     private static final String EXISTING_FILE = "file.txt";
@@ -124,7 +127,7 @@ public class SpacesMountManagerTest {
     }
 
     public void testResolveFileForReadOnlySpace() throws IOException, SpaceNotFoundException {
-        fileObjectRO = manager.resolveFile(readOnlyUri);
+        fileObjectRO = manager.resolveFile(readOnlyUri, null);
         assertIsWorkingReadOnlySpaceDir(fileObjectRO);
     }
 
@@ -141,8 +144,8 @@ public class SpacesMountManagerTest {
     }
 
     public void testResolveFilesNotSharedFileObject() throws IOException, SpaceNotFoundException {
-        final DataSpacesFileObject fileObject1 = manager.resolveFile(readOnlyUri);
-        final DataSpacesFileObject fileObject2 = manager.resolveFile(readOnlyUri);
+        final DataSpacesFileObject fileObject1 = manager.resolveFile(readOnlyUri, null);
+        final DataSpacesFileObject fileObject2 = manager.resolveFile(readOnlyUri, null);
 
         assertNotSame(fileObject1, fileObject2);
     }
@@ -150,7 +153,7 @@ public class SpacesMountManagerTest {
     @Test
     public void testResolveFileForUnexistingSpace() throws SpaceNotFoundException, IOException {
         try {
-            manager.resolveFile(NONEXISTING_SPACE);
+            manager.resolveFile(NONEXISTING_SPACE, null);
             fail("Exception expected");
         } catch (SpaceNotFoundException x) {
         }
@@ -174,11 +177,7 @@ public class SpacesMountManagerTest {
         }
 
         // check if access restrictions are computed correctly - these 2 should be denied 
-        try {
-            fo.getParent();
-            fail("Expected exception - should not have access to parent file of space dir");
-        } catch (FileSystemException x) {
-        }
+        assertNull(fo.getParent());
         try {
             fo.resolveFile("../");
             fail("Expected exception - should not have access to parent file of space dir");
@@ -213,7 +212,7 @@ public class SpacesMountManagerTest {
     @Test
     public void testResolveFileForFileInReadOnlySpace() throws SpaceNotFoundException, IOException {
         final DataSpacesURI fileUri = readOnlyUri.withUserPath(EXISTING_FILE);
-        fileObjectRO = manager.resolveFile(fileUri);
+        fileObjectRO = manager.resolveFile(fileUri, null);
 
         assertTrue(fileObjectRO.exists());
         // is it that file?
@@ -240,7 +239,7 @@ public class SpacesMountManagerTest {
     @Test
     public void testResolveFileForUnexistingFileInSpace() throws SpaceNotFoundException, IOException {
         final DataSpacesURI fileUri = readOnlyUri.withUserPath(NONEXISTING_FILE);
-        fileObjectRO = manager.resolveFile(fileUri);
+        fileObjectRO = manager.resolveFile(fileUri, null);
         assertFalse(fileObjectRO.exists());
     }
 
@@ -262,7 +261,7 @@ public class SpacesMountManagerTest {
     public void testResolveFileForFileInNonexistingSpace() throws SpaceNotFoundException, IOException {
         final DataSpacesURI fileUri = NONEXISTING_SPACE.withUserPath(NONEXISTING_FILE);
         try {
-            manager.resolveFile(fileUri);
+            manager.resolveFile(fileUri, null);
             fail("Exception expected");
         } catch (SpaceNotFoundException x) {
         }
@@ -271,7 +270,8 @@ public class SpacesMountManagerTest {
     @Test
     public void testResolveSpaces() throws IOException {
         final DataSpacesURI queryUri = DataSpacesURI.createURI(readOnlyUri.getAppId());
-        final Map<DataSpacesURI, ? extends DataSpacesFileObject> spaces = manager.resolveSpaces(queryUri);
+        final Map<DataSpacesURI, ? extends DataSpacesFileObject> spaces = manager.resolveSpaces(queryUri,
+                null);
         assertEquals(2, spaces.size());
 
         fileObjectRO = spaces.get(readOnlyUri);
@@ -299,11 +299,13 @@ public class SpacesMountManagerTest {
     public void testResolveSpacesNotSharedFileObject() throws IOException {
         final DataSpacesURI queryUri = DataSpacesURI.createURI(readOnlyUri.getAppId());
 
-        final Map<DataSpacesURI, ? extends DataSpacesFileObject> spaces1 = manager.resolveSpaces(queryUri);
+        final Map<DataSpacesURI, ? extends DataSpacesFileObject> spaces1 = manager.resolveSpaces(queryUri,
+                null);
         assertEquals(2, spaces1.size());
         final DataSpacesFileObject fileObject1 = spaces1.get(readOnlyUri);
 
-        final Map<DataSpacesURI, ? extends DataSpacesFileObject> spaces2 = manager.resolveSpaces(queryUri);
+        final Map<DataSpacesURI, ? extends DataSpacesFileObject> spaces2 = manager.resolveSpaces(queryUri,
+                null);
         assertEquals(2, spaces2.size());
         final DataSpacesFileObject fileObject2 = spaces2.get(readOnlyUri);
         assertNotSame(fileObject1, fileObject2);

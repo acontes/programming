@@ -7,19 +7,13 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extra.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException;
 
 
 /**
- * Implementation of a file representation in Data Spaces framework - {@link DataSpacesFileObject}.
- * This class represents file within space, that is accessed through VFS library, with usage of
- * {@link AbstractLimitingFileObject} decorator which limits access to some operations.
- * <p>
- * Instance of this class represents a file within Data Spaces framework, hence the URI address
- * related information is attached during the creation process. However, to make write-access limits
- * working properly, id of owner active object has to be set before any use, through
- * {@link #setOwnerActiveObjectId(String)}.
+ * Implementation of a VFS FileObject with some restrictions applied. This class represents file
+ * within data space (with URI suitable for user path) that is accessed through VFS library. It is
+ * intended to be used with VFS-DataSpaces adapter.
  * <p>
  * To conform to general Data Spaces guarantees, basing on file URI and Active Object id write
  * access is limited for:
@@ -28,7 +22,7 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException
  * <li>AO's scratch space - for AO different that scratch's owner</li>
  * </ul>
  * <p>
- * General file access is limited to spaces.
+ * General file access is limited to files within spaces, with URIs suitable for user path.
  * <p>
  * Instances of this class conform to the same rules regarding concurrent access, resources
  * management etc. as pure {@link FileObject} does.
@@ -36,11 +30,10 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException
 public class DataSpacesLimitingFileObject extends AbstractLimitingFileObject<DataSpacesLimitingFileObject> {
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.DATASPACES);
 
-    private final DataSpacesURI spaceUri;
+    private final DataSpacesURI spaceRootUri;
     private final FileName spaceRootFileName;
-    private String ownerActiveObjectId;
-    private volatile Boolean readOnly;
-    private Object readOnlyLock = new Object();
+    private final String ownerActiveObjectId;
+    private final boolean readOnly;
 
     /**
      * Creates an instance of DataSpacesLimitingFileObject. Before any usage of this class, id of an
@@ -49,94 +42,85 @@ public class DataSpacesLimitingFileObject extends AbstractLimitingFileObject<Dat
      * @param fileObject
      *            file object that is going to be represented as DataSpacesFileObject; cannot be
      *            <code>null</code>
-     * @param spaceUri
+     * @param spaceRootUri
      *            Data Spaces URI of this file object's space; cannot be <code>null</code>
      * @param spaceRootFileName
      *            VFS path of the space root FileObject; cannot be <code>null</code>
+     * @param ownerActiveObjectId
+     *            id of active object owning this FileObject instance; may be <code>null</code>,
+     *            which corresponds to anonymous (unimportant) owner.
      */
-    public DataSpacesLimitingFileObject(FileObject fileObject, DataSpacesURI spaceUri,
-            FileName spaceRootFileName) {
+    public DataSpacesLimitingFileObject(FileObject fileObject, DataSpacesURI spaceRootUri,
+            FileName spaceRootFileName, String ownerActiveObjectId) {
         super(fileObject);
-        this.spaceUri = spaceUri;
+        this.spaceRootUri = spaceRootUri;
         this.spaceRootFileName = spaceRootFileName;
+        this.ownerActiveObjectId = ownerActiveObjectId;
+        this.readOnly = computeIsReadOnly();
     }
 
     /**
-     * Returned URI is always inside a space - {@link DataSpacesURI#isSpacePartFullyDefined()}
-     * returns always true. {@link DataSpacesURI#isSuitableForHavingPath()} returns true.
+     * Returned URI is always suitable for user path.
+     * 
+     * @see DataSpacesURI#isSuitableForUserPath()
      */
     public String getURI() {
-        // TODO when DataSpacesFileObject will have just VFS adapter, maybe store full URI as a field instead?
-        // way of concatenating spaceUri and absolutePathInSpace is not the best possible 
-        final FileName name = getName();
-        if (!spaceRootFileName.isDescendent(name, NameScope.DESCENDENT_OR_SELF)) {
-            final ProActiveRuntimeException x = new ProActiveRuntimeException(
-                "VFS path of this DataSpacesFileObject does not start with its space VFS path");
+        try {
+            return getDataSpacesURI().toString();
+        } catch (MalformedURIException x) {
             ProActiveLogger.logImpossibleException(logger, x);
-            throw x;
+            throw new ProActiveRuntimeException(x);
         }
-        final String absolutePathInSpace = name.getPath().substring(spaceRootFileName.getPath().length());
-        return spaceUri.toString() + absolutePathInSpace;
     }
 
     /**
-     * @return URI of a file, always inside a space
+     * @return URI of a file, always suitable for user path.
+     * @throws MalformedURIException
+     *             when this file is not representing any URI
+     * @see DataSpacesURI#isSuitableForUserPath()
      * @see #getURI()
      */
-    public DataSpacesURI getDataSpacesURI() {
-        final String uriString = getURI();
-        try {
-            return DataSpacesURI.parseURI(uriString);
-        } catch (MalformedURIException e) {
-            ProActiveLogger.logImpossibleException(logger, e);
-            throw new ProActiveRuntimeException("Could not parse self-generated URI", e);
+    public DataSpacesURI getDataSpacesURI() throws MalformedURIException {
+        final FileName name = getName();
+        if (!spaceRootFileName.isDescendent(name, NameScope.DESCENDENT_OR_SELF)) {
+            throw new MalformedURIException(
+                "VFS path of this DataSpacesFileObject does not start with its space VFS path");
         }
-    }
-
-    /**
-     * Sets id of owner active object of this FileObject instance. Can be done only once.
-     * 
-     * @param ownerActiveObjectId
-     *            id of active object owning this FileObject instance.
-     */
-    public void setOwnerActiveObjectId(String ownerActiveObjectId) {
-        if (this.ownerActiveObjectId != null) {
-            final ProActiveRuntimeException x = new ProActiveRuntimeException("Owner AO id already set");
-            ProActiveLogger.logImpossibleException(logger, x);
-            throw x;
+        final String path = name.getPath();
+        String relativeToSpace = path.substring(spaceRootFileName.getPath().length()).replaceFirst("^/", "");
+        if (relativeToSpace.length() == 0) {
+            relativeToSpace = null;
         }
-        this.ownerActiveObjectId = ownerActiveObjectId;
+        return spaceRootUri.withRelativeToSpace(relativeToSpace);
     }
 
     @Override
     protected boolean isReadOnly() {
-        //TODO why we do it again in a lazy way? Most of calls will use isReadOnly, so we can do it
-        // in the constructor, even because it does not take a long while..
-        if (readOnly == null) {
-            synchronized (readOnlyLock) {
-                if (readOnly == null) {
-                    readOnly = computeIsReadOnly();
-                }
-            }
-        }
         return readOnly;
     }
 
     @Override
     protected boolean canReturnAncestor(final DataSpacesLimitingFileObject fileObject) {
-        return spaceRootFileName.isDescendent(fileObject.getName(), NameScope.DESCENDENT_OR_SELF);
+        try {
+            final DataSpacesURI uri = fileObject.getDataSpacesURI();
+            return uri.isSuitableForUserPath();
+        } catch (MalformedURIException x) {
+            return false;
+        }
     }
 
     @Override
     protected DataSpacesLimitingFileObject doDecorateFile(FileObject file) {
-        return new DataSpacesLimitingFileObject(file, spaceUri, spaceRootFileName);
+        return new DataSpacesLimitingFileObject(file, spaceRootUri, spaceRootFileName, ownerActiveObjectId);
     }
 
     private boolean computeIsReadOnly() {
-        final DataSpacesURI uri = getDataSpacesURI();
-
-        if (ownerActiveObjectId == null) {
-            logger.warn("Computing whether file access is read-only without owner AO being defined");
+        final DataSpacesURI uri;
+        try {
+            uri = getDataSpacesURI();
+        } catch (MalformedURIException e) {
+            // ignore that kind of files
+            return true;
         }
 
         // real logic

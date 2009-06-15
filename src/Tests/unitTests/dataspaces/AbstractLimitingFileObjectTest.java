@@ -549,9 +549,8 @@ public class AbstractLimitingFileObjectTest {
         assertTrue(sameFile.isWriteable());
     }
 
-    @Test(expected = FileSystemException.class)
     public void testAncestorLimitedGetParent() throws FileSystemException {
-        ancestorLimitedFile.getParent();
+        assertNull(ancestorLimitedFile.getParent());
     }
 
     @Test(expected = FileSystemException.class)

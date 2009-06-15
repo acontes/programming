@@ -88,14 +88,6 @@ public class DataSpacesImpl {
         }
     }
 
-    private static void setFileObjectOwner(final VFSFileObjectAdapter fo) {
-        // FIXME: implement and set also decorator limiting access for !isSuitableForHavingPath() 
-        final String aoId = Utils.getActiveObjectId(Utils.getCurrentActiveObjectBody());
-
-        if (fo.getAdaptee() instanceof DataSpacesLimitingFileObject)
-            ((DataSpacesLimitingFileObject) fo.getAdaptee()).setOwnerActiveObjectId(aoId);
-    }
-
     private final SpacesMountManager spacesMountManager;
 
     private final SpacesDirectory spacesDirectory;
@@ -198,12 +190,12 @@ public class DataSpacesImpl {
         }
 
         try {
-            final VFSFileObjectAdapter fo = spacesMountManager.resolveFile(uri);
+            final String aoId = Utils.getActiveObjectId(Utils.getCurrentActiveObjectBody());
+            final VFSFileObjectAdapter fo = spacesMountManager.resolveFile(uri, aoId);
             if (logger.isTraceEnabled())
                 logger.trace(String.format("Resolved request for %s with name %s (%s)", type, name, uri));
 
             checkCapabilitiesOrWound(fo, type);
-            setFileObjectOwner(fo);
             return fo;
         } catch (SpaceNotFoundException x) {
             logger.debug("Space not found for input/output space with URI: " + uri, x);
@@ -254,14 +246,14 @@ public class DataSpacesImpl {
         long currTime = startTime;
         while (currTime < startTime + timeoutMillis) {
             try {
-                final VFSFileObjectAdapter fo = spacesMountManager.resolveFile(uri);
+                final String aoId = Utils.getActiveObjectId(Utils.getCurrentActiveObjectBody());
+                final VFSFileObjectAdapter fo = spacesMountManager.resolveFile(uri, aoId);
                 if (logger.isTraceEnabled()) {
                     final String message = String.format(
                             "Resolved blocking request for %s with name %s (%s)", type, name, uri);
                     logger.trace(message);
                 }
                 checkCapabilitiesOrWound(fo, type);
-                setFileObjectOwner(fo);
                 return fo;
             } catch (SpaceNotFoundException e) {
                 logger.debug("Space not found for blocking try for input/output space with URI: " + uri, e);
@@ -312,13 +304,13 @@ public class DataSpacesImpl {
         try {
             final DataSpacesURI scratchURI = appScratchSpace.getScratchForAO(body);
             final DataSpacesURI queryURI = scratchURI.withUserPath(path);
-            final VFSFileObjectAdapter fo = spacesMountManager.resolveFile(queryURI);
+            final String aoId = Utils.getActiveObjectId(Utils.getCurrentActiveObjectBody());
+            final VFSFileObjectAdapter fo = spacesMountManager.resolveFile(queryURI, aoId);
 
             if (logger.isTraceEnabled())
                 logger.trace("Resolved scratch for an Active Object: " + queryURI);
 
             checkCapabilitiesOrWound(fo, SpaceType.SCRATCH);
-            setFileObjectOwner(fo);
             return fo;
         } catch (SpaceNotFoundException e) {
             ProActiveLogger.logImpossibleException(logger, e);
@@ -375,7 +367,8 @@ public class DataSpacesImpl {
         final DataSpacesURI uri = DataSpacesURI.createURI(appId, type);
         final Map<DataSpacesURI, VFSFileObjectAdapter> spaces;
         try {
-            spaces = spacesMountManager.resolveSpaces(uri);
+            final String aoId = Utils.getActiveObjectId(Utils.getCurrentActiveObjectBody());
+            spaces = spacesMountManager.resolveSpaces(uri, aoId);
         } catch (FileSystemException x) {
             logger.debug(String.format("VFS-level problem during resolving known %s spaces: ", type), x);
             throw x;
@@ -388,7 +381,6 @@ public class DataSpacesImpl {
             VFSFileObjectAdapter fo = entry.getValue();
 
             checkCapabilitiesOrWound(fo, type);
-            setFileObjectOwner(fo);
             ret.put(name, fo);
         }
 
@@ -419,7 +411,8 @@ public class DataSpacesImpl {
             if (!spaceURI.isSuitableForUserPath())
                 throw new MalformedURIException("Specified URI represents internal high-level directories");
 
-            final VFSFileObjectAdapter fo = spacesMountManager.resolveFile(spaceURI);
+            final String aoId = Utils.getActiveObjectId(Utils.getCurrentActiveObjectBody());
+            final VFSFileObjectAdapter fo = spacesMountManager.resolveFile(spaceURI, aoId);
             SpaceType type = spaceURI.getSpaceType(); // as isComplete cannot be null
 
             if (logger.isTraceEnabled())
@@ -430,7 +423,6 @@ public class DataSpacesImpl {
                 type = SpaceType.INPUT;
 
             checkCapabilitiesOrWound(fo, type);
-            setFileObjectOwner(fo);
             return fo;
         } catch (MalformedURIException x) {
             logger.debug("Can not resolve malformed URI: " + uri, x);
