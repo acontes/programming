@@ -3,7 +3,6 @@ package org.objectweb.proactive.examples.dataspaces.hello;
 import java.io.Serializable;
 import java.net.URISyntaxException;
 
-import org.apache.commons.vfs.FileSystemException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ObjectForSynchro;
 import org.objectweb.proactive.core.ProActiveException;
@@ -14,6 +13,7 @@ import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.extra.dataspaces.BaseScratchSpaceConfiguration;
 import org.objectweb.proactive.extra.dataspaces.DataSpacesNodes;
 import org.objectweb.proactive.extra.dataspaces.Utils;
+import org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredException;
 
 

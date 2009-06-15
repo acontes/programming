@@ -9,7 +9,6 @@ import java.util.Map;
 import org.apache.commons.vfs.Capability;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystem;
-import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.Selectors;
 import org.apache.commons.vfs.impl.DefaultFileSystemManager;
 import org.apache.log4j.Logger;
@@ -18,6 +17,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
+import org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException;
 
 
 // TODO perhaps checking for remote URL should be improved/changed when we know how do we start
@@ -59,11 +59,10 @@ public class NodeScratchSpace {
             try {
                 this.spaceFile = createEmptyDirectoryRelative(partialSpaceFile, appIdString);
                 spaceFile.close();
-            } catch (FileSystemException x) {
+            } catch (org.apache.commons.vfs.FileSystemException x) {
                 logger.error("Could not create directory for application scratch space", x);
-                throw x;
+                throw new FileSystemException(x);
             }
-
             try {
                 final ScratchSpaceConfiguration scratchSpaceConf = baseScratchConfiguration
                         .createScratchSpaceConfiguration(runtimeId, nodeId, appIdString);
@@ -79,11 +78,15 @@ public class NodeScratchSpace {
         public void close() throws FileSystemException {
             logger.debug("Closing application scratch space");
             try {
-                final int filesNumber = spaceFile.delete(Selectors.SELECT_ALL);
-                logger.debug("Deleted " + filesNumber + " files in scratch application directory");
-            } finally {
-                // just a hint
-                spaceFile.close();
+                try {
+                    final int filesNumber = spaceFile.delete(Selectors.SELECT_ALL);
+                    logger.debug("Deleted " + filesNumber + " files in scratch application directory");
+                } finally {
+                    // just a hint
+                    spaceFile.close();
+                }
+            } catch (org.apache.commons.vfs.FileSystemException e) {
+                throw new FileSystemException(e);
             }
             logger.info("Closed application scratch space");
         }
@@ -103,10 +106,10 @@ public class NodeScratchSpace {
                     createEmptyDirectoryRelative(spaceFile, aoid).close();
                     // just a hint
                     spaceFile.close();
-                } catch (FileSystemException x) {
+                } catch (org.apache.commons.vfs.FileSystemException x) {
                     logger.error(String.format(
                             "Could not create directory for Active Object (id: %s) scratch", aoid), x);
-                    throw x;
+                    throw new FileSystemException(x);
                 }
                 uri = spaceInstanceInfo.getMountingPoint().withActiveObjectId(aoid);
                 logger.info(String
@@ -176,9 +179,9 @@ public class NodeScratchSpace {
 
         try {
             fileSystemManager = VFSFactory.createDefaultFileSystemManager();
-        } catch (FileSystemException x) {
+        } catch (org.apache.commons.vfs.FileSystemException x) {
             logger.error("Could not create and configure VFS manager", x);
-            throw x;
+            throw new FileSystemException(x);
         }
 
         try {
@@ -196,9 +199,9 @@ public class NodeScratchSpace {
                 partialSpaceFile.createFolder();
                 // just a hint
                 partialSpaceFile.close();
-            } catch (FileSystemException x) {
+            } catch (org.apache.commons.vfs.FileSystemException x) {
                 logger.error("Could not initialize scratch space at: " + partialSpacePath);
-                throw x;
+                throw new FileSystemException(x);
             }
             configured = true;
             logger.info("Initialized node scratch space at: " + partialSpacePath);
@@ -268,7 +271,7 @@ public class NodeScratchSpace {
                 else
                     logger
                             .debug("Scratch directory for whole runtime was not deleted (not considered as empty)");
-            } catch (FileSystemException x) {
+            } catch (org.apache.commons.vfs.FileSystemException x) {
                 logger.debug(
                         "Could not delete scratch directory for whole runtime - perhaps it was not empty", x);
             }
@@ -276,7 +279,7 @@ public class NodeScratchSpace {
             // it is probably not needed to close files if manager is closed, but with VFS you never know...
             fRuntime.close();
             partialSpaceFile.close();
-        } catch (FileSystemException x) {
+        } catch (org.apache.commons.vfs.FileSystemException x) {
             ProActiveLogger.logEatedException(logger, "Could not close correctly node scratch space", x);
         } finally {
             this.fileSystemManager.close();
@@ -285,7 +288,7 @@ public class NodeScratchSpace {
     }
 
     private FileObject createEmptyDirectoryRelative(final FileObject parent, final String path)
-            throws FileSystemException {
+            throws org.apache.commons.vfs.FileSystemException {
 
         FileObject f = parent.resolveFile(path);
         f.delete(Selectors.EXCLUDE_SELF);

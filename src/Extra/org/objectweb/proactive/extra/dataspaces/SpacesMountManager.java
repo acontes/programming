@@ -10,13 +10,13 @@ import java.util.Set;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystem;
-import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.impl.DefaultFileSystemManager;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.dataspaces.adapter.vfs.VFSFileObjectAdapter;
 import org.objectweb.proactive.extra.dataspaces.api.DataSpacesFileObject;
+import org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundException;
 
 
@@ -96,9 +96,9 @@ public class SpacesMountManager {
             // delete(FileSelector) method. Anyway, it is rather better to do it this way, than returning
             // shared FileObjects with broken concurrency 
             this.vfsManager = VFSFactory.createDefaultFileSystemManager(false);
-        } catch (FileSystemException x) {
+        } catch (org.apache.commons.vfs.FileSystemException x) {
             logger.error("Could not create and configure VFS manager", x);
-            throw x;
+            throw new FileSystemException(x);
         }
         logger.info("Mount manager initialized, VFS instance created");
     }
@@ -129,6 +129,7 @@ public class SpacesMountManager {
      */
     public VFSFileObjectAdapter resolveFile(final DataSpacesURI queryUri) throws FileSystemException,
             SpaceNotFoundException {
+
         if (logger.isDebugEnabled())
             logger.debug("File access request: " + queryUri);
 
@@ -180,9 +181,10 @@ public class SpacesMountManager {
      */
     public Map<DataSpacesURI, VFSFileObjectAdapter> resolveSpaces(final DataSpacesURI queryUri)
             throws FileSystemException {
+
+        final Map<DataSpacesURI, VFSFileObjectAdapter> result = new HashMap<DataSpacesURI, VFSFileObjectAdapter>();
         if (logger.isDebugEnabled())
             logger.debug("Spaces access request: " + queryUri);
-        final Map<DataSpacesURI, VFSFileObjectAdapter> result = new HashMap<DataSpacesURI, VFSFileObjectAdapter>();
 
         final Set<SpaceInstanceInfo> spaces = directory.lookupMany(queryUri);
         for (final SpaceInstanceInfo space : spaces) {
@@ -215,13 +217,7 @@ public class SpacesMountManager {
         synchronized (writeLock) {
             synchronized (readLock) {
                 for (final DataSpacesURI spaceUri : new ArrayList<DataSpacesURI>(mountedSpaces.keySet())) {
-                    try {
-                        unmountSpace(spaceUri);
-                    } catch (FileSystemException e) {
-                        final String message = String.format("Could not properly unmount %s (ignoring)",
-                                spaceUri);
-                        ProActiveLogger.logEatedException(logger, message, e);
-                    }
+                    unmountSpace(spaceUri);
                 }
                 vfsManager.close();
             }
@@ -231,6 +227,7 @@ public class SpacesMountManager {
 
     private void ensureSpaceIsMounted(final DataSpacesURI spaceURI, SpaceInstanceInfo info)
             throws SpaceNotFoundException, FileSystemException {
+
         final boolean mounted;
         synchronized (readLock) {
             mounted = mountedSpaces.containsKey(spaceURI);
@@ -265,15 +262,16 @@ public class SpacesMountManager {
      * little bit more complex synchronization)
      */
     private void mountSpace(final SpaceInstanceInfo spaceInfo) throws FileSystemException {
+
         final DataSpacesURI mountingPoint = spaceInfo.getMountingPoint();
         final String accessUrl = Utils.getLocalAccessURL(spaceInfo.getUrl(), spaceInfo.getPath(), spaceInfo
                 .getHostname());
         final FileObject mountedRoot;
         try {
             mountedRoot = vfsManager.resolveFile(accessUrl);
-        } catch (FileSystemException x) {
+        } catch (org.apache.commons.vfs.FileSystemException x) {
             logger.warn(String.format("Could not access URL %s to mount %s", accessUrl, mountingPoint));
-            throw x;
+            throw new FileSystemException(x);
         }
 
         synchronized (readLock) {
@@ -289,14 +287,14 @@ public class SpacesMountManager {
     /*
      * Assumed to be called within writeLock and readLock, mountedSpaces contains specified spaceUri
      */
-    private void unmountSpace(final DataSpacesURI spaceUri) throws FileSystemException {
+    private void unmountSpace(final DataSpacesURI spaceUri) {
         final FileObject spaceRoot = mountedSpaces.remove(spaceUri);
         final FileSystem spaceFileSystem = spaceRoot.getFileSystem();
 
         // we may not need to close FileObject, but with VFS you never know...
         try {
             spaceRoot.close();
-        } catch (FileSystemException x) {
+        } catch (org.apache.commons.vfs.FileSystemException x) {
             ProActiveLogger.logEatedException(logger, String.format(
                     "Could not close data space %s root file object", spaceUri), x);
         }
@@ -306,6 +304,7 @@ public class SpacesMountManager {
 
     private VFSFileObjectAdapter resolveAndDecorateFileVFS(final DataSpacesURI uri)
             throws FileSystemException {
+
         synchronized (readLock) {
             final DataSpacesURI spacePart = uri.getSpacePartOnly();
             final String relativeToSpace = uri.getRelativeToSpace();
@@ -325,9 +324,9 @@ public class SpacesMountManager {
                     file = spaceRoot.resolveFile(relativeToSpace);
                 decoratedFile = new DataSpacesFileObjectImpl(file, spacePart, spaceRoot.getName());
                 return new VFSFileObjectAdapter(decoratedFile, spacePart, spaceRoot.getName().getPath());
-            } catch (FileSystemException x) {
+            } catch (org.apache.commons.vfs.FileSystemException x) {
                 logger.warn("Could not access file that should exist (be mounted): " + uri);
-                throw x;
+                throw new FileSystemException(x);
             }
         }
     }

@@ -125,13 +125,10 @@ public class NodeScratchSpaceTest {
 
     /**
      * Check if files are being created.
-     * 
-     * @throws ConfigurationException
-     * @throws FileSystemException
-     * @throws IllegalStateException
      */
     @Test
-    public void testInitNSS() throws ConfigurationException, FileSystemException, IllegalStateException {
+    public void testInitNSS() throws Exception {
+
         nodeScratchSpace.init();
         configured = true;
         String path = Utils.appendSubDirs(testDirPath, RUNTIME_ID, NODE_ID);
@@ -164,14 +161,9 @@ public class NodeScratchSpaceTest {
 
     /**
      * Double initialization case checking.
-     * 
-     * @throws ConfigurationException
-     * @throws FileSystemException
-     * @throws IllegalStateException
      */
     @Test
-    public void testInitNSSIllegalState() throws ConfigurationException, FileSystemException,
-            IllegalStateException {
+    public void testInitNSSIllegalState() throws Exception {
 
         nodeScratchSpace.init();
         configured = true;
@@ -186,14 +178,9 @@ public class NodeScratchSpaceTest {
 
     /**
      * Initialization after close method call.
-     * 
-     * @throws ConfigurationException
-     * @throws FileSystemException
-     * @throws IllegalStateException
      */
     @Test
-    public void testInitNSSIllegalState2() throws ConfigurationException, FileSystemException,
-            IllegalStateException {
+    public void testInitNSSIllegalState2() throws Exception {
 
         nodeScratchSpace.init();
         configured = true;
@@ -211,14 +198,9 @@ public class NodeScratchSpaceTest {
 
     /**
      * Check if files are being created and not null instance returned.
-     * 
-     * @throws ConfigurationException
-     * @throws FileSystemException
-     * @throws IllegalStateException
      */
     @Test
-    public void testInitForApplication() throws ConfigurationException, FileSystemException,
-            IllegalStateException {
+    public void testInitForApplication() throws Exception {
 
         nodeScratchSpace.init();
         configured = true;
@@ -227,14 +209,9 @@ public class NodeScratchSpaceTest {
 
     /**
      * InitForApplication without former node initialization.
-     * 
-     * @throws ConfigurationException
-     * @throws FileSystemException
-     * @throws IllegalStateException
      */
     @Test
-    public void testInitForApplicationIllegalState() throws ConfigurationException, FileSystemException,
-            IllegalStateException {
+    public void testInitForApplicationIllegalState() throws Exception {
         try {
             nodeScratchSpace.initForApplication();
             fail("Exception expected");
@@ -250,14 +227,9 @@ public class NodeScratchSpaceTest {
 
     /**
      * Passing configuration without remote access defined.
-     * 
-     * @throws ConfigurationException
-     * @throws FileSystemException
-     * @throws IllegalStateException
      */
     @Test
-    public void testInitForApplicationConfigurationException() throws ConfigurationException,
-            FileSystemException, IllegalStateException {
+    public void testInitForApplicationConfigurationException() throws Exception {
 
         BaseScratchSpaceConfiguration conf = new BaseScratchSpaceConfiguration(null, testDirPath);
         nodeScratchSpace = new NodeScratchSpace(node, conf);
@@ -278,13 +250,9 @@ public class NodeScratchSpaceTest {
     /**
      * Check if only one data space is being removed. Note that closing is also tested on each
      * {@link #tearDown()} method call.
-     * 
-     * @throws ConfigurationException
-     * @throws FileSystemException
-     * @throws IllegalStateException
      */
     @Test
-    public void testClose() throws ConfigurationException, FileSystemException, IllegalStateException {
+    public void testClose() throws Exception {
         final String path1 = Utils.appendSubDirs(testDirPath, RUNTIME_ID, NODE_ID);
         final String path2 = Utils.appendSubDirs(testDirPath, RUNTIME_ID, NODE_ID_2);
         final Node node2 = new MOCKNode(RUNTIME_ID, NODE_ID_2, APP_ID);
@@ -309,7 +277,7 @@ public class NodeScratchSpaceTest {
         assertEquals(0, fPartialDS.getChildren().length);
     }
 
-    private void checkInitForApplication() throws FileSystemException, ConfigurationException {
+    private void checkInitForApplication() throws Exception {
         final String dataSpacePath = Utils.appendSubDirs(testDirPath, RUNTIME_ID, NODE_ID, Long
                 .toString(APP_ID));
         final ApplicationScratchSpace app = nodeScratchSpace.initForApplication();

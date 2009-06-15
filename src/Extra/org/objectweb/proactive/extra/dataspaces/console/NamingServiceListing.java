@@ -74,7 +74,7 @@ public class NamingServiceListing {
         }
     }
 
-    private void processRecursively() throws org.apache.commons.vfs.FileSystemException {
+    private void processRecursively() throws FileSystemException {
 
         // we need to mount spaces for that..
         mountManager = new SpacesMountManager(namingService);
@@ -170,7 +170,7 @@ public class NamingServiceListing {
         if (recursively)
             try {
                 processRecursively();
-            } catch (org.apache.commons.vfs.FileSystemException e) {
+            } catch (FileSystemException e) {
                 e.printStackTrace();
                 recursively = false;
             }

@@ -112,9 +112,12 @@ public class ApplicationScratchSpaceTest {
      * Check if directory is being created.
      * 
      * @throws FileSystemException
+     * @throws FileSystemException
      */
     @Test
-    public void testGetScratchForAO() throws FileSystemException {
+    public void testGetScratchForAO() throws FileSystemException,
+            org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException {
+
         applicationScratchSpace.getScratchForAO(body);
         assertIsExistingEmptyDirectory(scratchPath);
     }
@@ -123,9 +126,12 @@ public class ApplicationScratchSpaceTest {
      * Check if returned URI is valid.
      * 
      * @throws FileSystemException
+     * @throws org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException
      */
     @Test
-    public void testGetScratchForAO1() throws FileSystemException {
+    public void testGetScratchForAO1() throws FileSystemException,
+            org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException {
+
         final DataSpacesURI uri = applicationScratchSpace.getScratchForAO(body);
 
         assertValidDataSpacesURI(uri, activeObjectId);

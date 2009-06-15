@@ -3,8 +3,8 @@
  */
 package org.objectweb.proactive.extra.dataspaces;
 
-import org.apache.commons.vfs.FileSystemException;
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException;
 
 
 /**
