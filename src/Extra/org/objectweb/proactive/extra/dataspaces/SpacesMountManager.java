@@ -16,6 +16,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.dataspaces.adapter.vfs.VFSFileObjectAdapter;
+import org.objectweb.proactive.extra.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundException;
 
 
@@ -24,10 +25,11 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundExceptio
  * <p>
  * Manager creates and maintains Apache VFS manager to pose virtual view provider of file system for
  * each application. It is able to response to queries for files in data spaces or just data spaces,
- * providing DataSpacesFileObjectImpl decorator as a result. Returned FileObject decorator instances
- * are applicable for user level code with access limited to spaces, although for write-limiting
- * features to work correctly it is required to set up id of active object that becomes owner of
- * returned FileObject. One may also want to limit access to URIs not suitable for having path,
+ * providing {@link VFSFileObjectAdapter} as a result. Returned {@link VFSFileObjectAdapter} is an
+ * adapted instance of VFS FileObject decorator - {@link DataSpacesFileObjectImpl}. It is applicable
+ * for user level code with access limited to spaces, although for write-limiting features to work
+ * correctly it is required to set up id of active object that becomes owner of returned
+ * DataSpacesFileObject. One may also want to limit access to URIs not suitable for having path,
  * which is not responsibility of this class.
  * <p>
  * To be able to serve requests for files and data spaces, SpaceMountManager must use
@@ -110,8 +112,9 @@ public class SpacesMountManager {
      * 
      * @param queryUri
      *            Data Spaces URI to get access to
-     * @return DataSpacesFileObject that can be used to access this URI content; returned FileObject
-     *         is not opened nor attached in any way; this FileObject instance will never be shared,
+     * @return VFS adapter that can be used to access this URI content through
+     *         {@link DataSpacesFileObject} interface; returned DataSpacesFileObject is not opened
+     *         nor attached in any way; this DataSpacesFileObject instance will never be shared,
      *         i.e. individual instances are returned for subsequent queries (even the same
      *         queries); id of owner active object need to be set before any usage.
      * @throws FileSystemException
@@ -122,6 +125,7 @@ public class SpacesMountManager {
      * @throws IllegalArgumentException
      *             when provided queryUri does not have space part fully defined
      * @see DataSpacesURI#isSpacePartFullyDefined()
+     * @see DataSpacesFileObjectImpl
      */
     public VFSFileObjectAdapter resolveFile(final DataSpacesURI queryUri) throws FileSystemException,
             SpaceNotFoundException {
@@ -160,17 +164,19 @@ public class SpacesMountManager {
      * @param queryUri
      *            Data Spaces URI to query for; must be URI without space part being fully defined,
      *            i.e. not pointing to any concrete data space
-     * @return map of data spaces URIs that match the query, pointing to DataSpacesFileObjectImpl
-     *         that can be used to access their content; returned FileObject decorators are not
-     *         opened nor attached in any way; these FileObject instances will never be shared, i.e.
-     *         another instances are returned for subsequent queries (even the same queries); id of
-     *         owner active object need to be set before any usage.
+     * @return map of data spaces URIs that match the query, pointing to
+     *         {@link VFSFileObjectAdapter} that can be used to access their content through
+     *         {@link DataSpacesFileObject} interface; returned DataSpacesFileObject are not opened
+     *         nor attached in any way; these DataSpacesFileObject instances will never be shared,
+     *         i.e. another instances are returned for subsequent queries (even the same queries);
+     *         id of owner active object need to be set before any usage.
      * @throws FileSystemException
      *             indicates VFS related exception during access, like mounting problems, I/O errors
      *             etc.
      * @throws IllegalArgumentException
      *             when provided queryUri has space part fully defined
      * @see DataSpacesURI#isSpacePartFullyDefined()
+     * @see DataSpacesFileObjectImpl
      */
     public Map<DataSpacesURI, VFSFileObjectAdapter> resolveSpaces(final DataSpacesURI queryUri)
             throws FileSystemException {
