@@ -22,7 +22,6 @@ import org.objectweb.proactive.extra.dataspaces.core.SpaceInstanceInfo;
 import org.objectweb.proactive.extra.dataspaces.core.SpacesMountManager;
 import org.objectweb.proactive.extra.dataspaces.core.naming.SpacesDirectory;
 import org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException;
-import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundException;
 import org.objectweb.proactive.extra.dataspaces.vfs.adapter.VFSFileObjectAdapter;
 
@@ -237,13 +236,13 @@ public class VFSSpacesMountManagerImpl implements SpacesMountManager {
             final DataSpacesURI spacePart = uri.getSpacePartOnly();
             final String relativeToSpace = uri.getRelativeToSpace();
 
-            try {
-                if (!mountedSpaces.containsKey(spacePart)) {
-                    throw new FileSystemException("Could not access file that should exist (be mounted)");
-                }
+            if (!mountedSpaces.containsKey(spacePart)) {
+                throw new FileSystemException("Could not access file that should exist (be mounted)");
+            }
 
-                final FileObject file;
-                final FileObject spaceRoot = mountedSpaces.get(spacePart);
+            final FileObject spaceRoot = mountedSpaces.get(spacePart);
+            final FileObject file;
+            try {
                 if (relativeToSpace == null)
                     file = spaceRoot;
                 else
@@ -252,7 +251,7 @@ public class VFSSpacesMountManagerImpl implements SpacesMountManager {
                     spacePart, spaceRoot.getName(), ownerActiveObjectId);
                 return new VFSFileObjectAdapter(limitingFile, spacePart, spaceRoot.getName());
             } catch (org.apache.commons.vfs.FileSystemException x) {
-                logger.warn("Could not access file that should exist (be mounted): " + uri);
+                logger.warn("Could not access file within a space: " + uri);
                 throw new FileSystemException(x);
             } catch (FileSystemException e) {
                 ProActiveLogger.logImpossibleException(logger, e);
