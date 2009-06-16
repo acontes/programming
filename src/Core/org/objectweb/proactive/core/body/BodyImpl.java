@@ -812,10 +812,12 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                         nextTags.addTag(newTag);
                 }
             }
-            // Check the presence of the DSI Tag
+            // Check the presence of the DSI Tag if enabled
             // Ohterwise add it
-            if (!nextTags.check(DsiTag.IDENTIFIER)) {
-                nextTags.addTag(new DsiTag(bodyID, currentreq.getSequenceNumber()));
+            if (PAProperties.PA_TAG_DSI.isTrue()){
+                if (!nextTags.check(DsiTag.IDENTIFIER)) {
+                    nextTags.addTag(new DsiTag(bodyID, currentreq.getSequenceNumber()));
+                }
             }
             return nextTags;
         }

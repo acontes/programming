@@ -49,6 +49,7 @@ import org.objectweb.proactive.core.body.request.RequestQueue;
 import org.objectweb.proactive.core.body.tags.MessageTags;
 import org.objectweb.proactive.core.body.tags.tag.DsiTag;
 import org.objectweb.proactive.core.component.request.ComponentRequestImpl;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.gc.HalfBodies;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.node.Node;
@@ -263,9 +264,12 @@ public class HalfBody extends AbstractBody {
             long sequenceID = getNextSequenceID();
 
             // Create DSI MessageTag
-            MessageTags tags = messageTagsFactory.newMessageTags();
-            tags.addTag(new DsiTag(bodyID, sequenceID));
-
+            MessageTags tags = null;
+            if (PAProperties.PA_TAG_DSI.isTrue()){
+                tags = messageTagsFactory.newMessageTags();
+                tags.addTag(new DsiTag(bodyID, sequenceID));
+            }
+            
             Request request = this.internalRequestFactory.newRequest(methodCall, HalfBody.this,
                     future == null, sequenceID, tags);
 
