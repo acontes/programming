@@ -19,7 +19,8 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException
 
 
 /**
- * TODO: javadoc
+ * VFS {@Link FileObject} adapter to {@link DataSpacesFileObject} interface, adding getURI
+ * functionality.
  * <p>
  * Adapted FileObject should provide any access limitation as required by Data Spaces specification.
  */
@@ -53,7 +54,7 @@ public class VFSFileObjectAdapter implements DataSpacesFileObject {
 
     private VFSFileObjectAdapter(FileObject adaptee, VFSFileObjectAdapter fileObjectAdapter)
             throws FileSystemException {
-        
+
         this.mountingPointURI = fileObjectAdapter.mountingPointURI;
         this.mountingPointVFSFileName = fileObjectAdapter.mountingPointVFSFileName;
         this.adaptee = adaptee;
@@ -67,10 +68,10 @@ public class VFSFileObjectAdapter implements DataSpacesFileObject {
     public String getURI() throws FileSystemException {
         final FileName path = adaptee.getName();
         final String mpURIString = mountingPointURI.toString();
-        
+
         try {
             final String relativePath = mountingPointVFSFileName.getRelativeName(path);
-            
+
             if (".".equals(relativePath))
                 return mpURIString;
             else
@@ -310,7 +311,7 @@ public class VFSFileObjectAdapter implements DataSpacesFileObject {
             E vfsResult, T adapted) throws FileSystemException {
 
         for (FileObject fo : vfsResult) {
-                adapted.add(new VFSFileObjectAdapter(fo, this));
+            adapted.add(new VFSFileObjectAdapter(fo, this));
         }
     }
 
@@ -418,7 +419,7 @@ public class VFSFileObjectAdapter implements DataSpacesFileObject {
 
     private void checkURIConsistencyOrWound() throws MalformedURIException {
         final FileName adapteeName = adaptee.getName();
-        
+
         if (mountingPointVFSFileName.isDescendent(adapteeName))
             return;
         final String mpPath = mountingPointVFSFileName.getPath();
@@ -440,7 +441,7 @@ public class VFSFileObjectAdapter implements DataSpacesFileObject {
 
     @Override
     public boolean equals(Object candidate) {
-        
+
         if (!(candidate instanceof DataSpacesFileObject))
             return false;
 

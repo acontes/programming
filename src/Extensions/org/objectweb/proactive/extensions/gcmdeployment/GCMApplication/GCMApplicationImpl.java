@@ -145,7 +145,7 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
 
     /** Deployer of Naming Service if it was requested to be started locally */
     private NamingServiceDeployer namingServiceDeployer;
-    
+
     /** Stub to Data Spaces Naming Service */
     private NamingService namingService;
 
@@ -216,7 +216,7 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
             // application is registered in working NamingService) 
             if (dataSpacesEnabled) {
                 startDataSpaces();
-                
+
                 // TODO this kind of hacks should be eventually moved to CommandBuilderProActive#setup()
                 // or similar developed mechanism
                 final TechnicalServicesProperties dataSpacesTSP = DataSpacesTechnicalService
@@ -224,7 +224,7 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
                 for (GCMVirtualNodeInternal vn : virtualNodes.values()) {
                     vn.addTechnicalServiceProperties(dataSpacesTSP);
                 }
-                
+
                 // FIXME: We cannot safely add DataSpacesTechnicalService as an app-wide TS (also local node TS)
                 // as we cannot rely on unique appId (currently deploymentId, which is not even set locally).
                 // In current implementation, in case of many GCM deployments there may be many applications

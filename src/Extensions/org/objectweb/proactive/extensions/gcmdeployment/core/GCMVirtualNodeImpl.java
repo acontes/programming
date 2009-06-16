@@ -667,7 +667,7 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
         this.nodeTechnicalServicesProperties = this.nodeTechnicalServicesProperties
                 .getCombinationWith(technicalServices);
     }
-    
+
     public UniqueID getUniqueID() {
         return uniqueID;
     }
