@@ -74,7 +74,7 @@ public class TestHalfBody extends FunctionalTest {
             count++;
         }
 
-        public void finish() {
+        public boolean finish() {
             long endTime = System.currentTimeMillis();
             double throughput = (1000.0 * count) / (endTime - startTime);
 
@@ -82,6 +82,7 @@ public class TestHalfBody extends FunctionalTest {
             System.out.println("Duration: " + (endTime - startTime));
             System.out.println("Throughput " + throughput);
             HudsonReport.reportToHudson(TestHalfBody.class, throughput);
+            return true;
         }
     }
 
