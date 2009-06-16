@@ -19,7 +19,6 @@ import org.objectweb.proactive.extensions.structuredp2p.messages.PingMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.RemoveNeighborMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANAddNeighborMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANJoinMessage;
-import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANLeaveMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANLookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANMergeMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANPrepareToLeaveMessage;
@@ -128,7 +127,6 @@ public class CANOverlay extends StructuredOverlay {
 
             List<Peer> neighborsToMergeWith = this.neighborsDataStructure.getNeighbors(lastDimension,
                     CANOverlay.getOppositeDirection(lastDirection));
-            Zone zoneToSplit = this.getZone();
 
             /*
              * Notify all the neighbors to update the state of the current peer which leave the
@@ -142,6 +140,7 @@ public class CANOverlay extends StructuredOverlay {
             }
 
             if (neighborsToMergeWith.size() > 1) {
+                Zone zoneToSplit = this.getZone();
                 System.out.println("MERGE WITH MANY PEER " + neighborsToMergeWith.size());
                 /*
                  * For the last dimension and direction of the split, we split N-1 times, where N is
@@ -200,8 +199,8 @@ public class CANOverlay extends StructuredOverlay {
              * structure.
              */
             try {
-                PAFuture.waitForAll(this.sendMessageTo(this.getNeighborsDataStructure(), new CANLeaveMessage(
-                    this.getRemotePeer(), lastDimension, lastDirection)));
+                PAFuture.waitForAll(this.sendMessageTo(this.getNeighborsDataStructure(), new LeaveMessage(
+                    this.getRemotePeer())));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -557,9 +556,8 @@ public class CANOverlay extends StructuredOverlay {
      * {@inheritDoc}
      */
     public ActionResponseMessage handleLeaveMessage(LeaveMessage msg) {
-        CANLeaveMessage message = (CANLeaveMessage) msg;
-        return new ActionResponseMessage(msg.getCreationTimestamp(), this.neighborsDataStructure.remove(
-                message.getPeer(), message.getDimension(), message.getDirection()));
+        return new ActionResponseMessage(msg.getCreationTimestamp(), this.neighborsDataStructure.remove(msg
+                .getPeer()));
     }
 
     /**

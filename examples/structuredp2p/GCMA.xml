@@ -35,10 +35,10 @@
 
 	<resources>
 		<nodeProvider id="Peer">
-			<file path="GCMD-Peers.xml" />
+			<file path="GCMD-Peers-Local.xml" />
 		</nodeProvider>
 		<nodeProvider id="Tracker">
-			<file path="GCMD-Trackers.xml" />
+			<file path="GCMD-Trackers-Local.xml" />
 		</nodeProvider>
 	</resources>
 

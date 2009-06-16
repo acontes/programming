@@ -18,7 +18,7 @@ then
         echo "  NB_PEERS : the number of peers to create on the network."
         echo "  TYPE : "
         echo "    I  : for an interactive launching."
-        echo "    ST : for a stress test that you can stop by CTRL-C."
+        echo "    ST : for a stress test that you can stop by q-ENTER."
         exit 1
 fi
 
