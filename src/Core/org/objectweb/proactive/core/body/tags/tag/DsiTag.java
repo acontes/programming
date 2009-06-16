@@ -17,7 +17,7 @@ public class DsiTag extends Tag {
      * and an UniqueID as the tag DATA
      */
     public DsiTag() {
-        super(IDENTIFIER, new UniqueID());
+        super(IDENTIFIER, new UniqueID().getCanonString());
     }
 
     /**
