@@ -39,7 +39,9 @@ public abstract class Tag implements Serializable {
     public Tag(String id, Object data) {
         this.id = id;
         this.data = data;
-        logger.debug("Creation of a new tag : " + id);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Creation of a new tag : " + id);
+        }
     }
 
     /**

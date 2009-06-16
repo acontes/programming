@@ -39,7 +39,9 @@ public class LocalMemoryLeaseThread implements Runnable {
         final int period = PAProperties.PA_MEMORY_TAG_LEASE_PERIOD.getValueAsInt();
 
         for (;;) {
-            logger.debug("LEASING THREAD RUNNING - " + this);
+            if (logger.isDebugEnabled()) {
+                logger.debug("LEASING THREAD RUNNING - " + this);
+            }
             try {
                 Thread.sleep(period * 1000);
             } catch (InterruptedException e) {
@@ -53,8 +55,10 @@ public class LocalMemoryLeaseThread implements Runnable {
                     for (LocalMemoryTag memory : memories.values()) {
                         memory.decCurrentLease(period);
                         if (memory.leaseExceeded()) {
-                            logger.debug("Remove local memory of the Tag \"" + memory.getTagIDReferer() +
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("Remove local memory of the Tag \"" + memory.getTagIDReferer() +
                                 "\"");
+                            }
                             memories.remove(memory.getTagIDReferer());
                         }
                     }

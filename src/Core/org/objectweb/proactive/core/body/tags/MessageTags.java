@@ -43,7 +43,9 @@ public class MessageTags implements Serializable {
     public Tag addTag(Tag tag) {
         String id = tag.getId();
         this.messagestags.put(id, tag);
-        //logger.debug("Adding the tag : " + tag);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Adding the tag : " + tag);
+        }
         return tag;
     }
 
@@ -53,7 +55,9 @@ public class MessageTags implements Serializable {
      * @return the Tag removed
      */
     public Tag removeTag(String id) {
-        logger.debug("Remove the tag : " + id);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Remove the tag : " + id);
+        }
         return this.messagestags.remove(id);
     }
 

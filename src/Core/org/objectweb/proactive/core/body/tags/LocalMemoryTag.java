@@ -49,7 +49,9 @@ public class LocalMemoryTag implements Serializable {
         this.currentlease = lease;
         this.leaseInc = lease / 2;
         this.memory = new HashMap<String, Object>();
-        logger.debug("New Tag LocalMemory for the tag " + tagID + " with a lease of " + lease);
+        if (logger.isDebugEnabled()) {
+            logger.debug("New Tag LocalMemory for the tag " + tagID + " with a lease of " + lease);
+        }
     }
 
     /**
@@ -62,8 +64,10 @@ public class LocalMemoryTag implements Serializable {
             this.currentlease += leaseInc;
         }
         this.memory.put(key, value);
-        logger.debug("Put value in the Tag LocalMemory of " + tagIDReferer + " : key=" + key + ", value=" +
-            value);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Put value in the Tag LocalMemory of " + tagIDReferer + " : key=" + key + ", value=" +
+                    value);
+        }
     }
 
     /**
@@ -75,7 +79,9 @@ public class LocalMemoryTag implements Serializable {
         synchronized (lock) {
             this.currentlease += leaseInc;
         }
-        logger.debug("Get value in the Tag LocalMemory of " + tagIDReferer + " : key=" + key);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Get value in the Tag LocalMemory of " + tagIDReferer + " : key=" + key);
+        }
         return this.memory.get(key);
     }
 
@@ -84,7 +90,9 @@ public class LocalMemoryTag implements Serializable {
      * @return true if the lease value is <= 0
      */
     public boolean leaseExceeded() {
-        logger.debug("Lease value under 0 for the Tag LocalMemory of " + tagIDReferer);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Lease value under 0 for the Tag LocalMemory of " + tagIDReferer);
+        }
         return currentlease <= 0;
     }
 
@@ -95,8 +103,10 @@ public class LocalMemoryTag implements Serializable {
     public void decCurrentLease(int decValue) {
         synchronized (lock) {
             this.currentlease -= decValue;
-            logger.debug("Decrement lease value of the Tag LocalMemory of " + tagIDReferer +
-                ": new lease value = " + currentlease);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Decrement lease value of the Tag LocalMemory of " + tagIDReferer +
+                        ": new lease value = " + currentlease);
+            }
         }
     }
 
