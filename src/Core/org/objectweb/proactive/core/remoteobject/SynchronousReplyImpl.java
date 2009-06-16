@@ -135,7 +135,6 @@ public class SynchronousReplyImpl implements Reply, Serializable {
         // TODO Auto-generated method stub
     }
 
-    @Override
     public MessageTags getTags() {
         // TODO Auto-generated method stub
         return null;

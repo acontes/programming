@@ -10,12 +10,14 @@ import org.objectweb.proactive.core.body.tags.Tag;
  */
 public class DsiTag extends Tag {
 
+    public static final String IDENTIFIER = "PA_TAG_DSI";
+    
     /**
      * Constructor setting the Tag name "PA_TAG_DSI"
      * and an UniqueID as the tag DATA
      */
     public DsiTag() {
-        super("PA_TAG_DSI", new UniqueID());
+        super(IDENTIFIER, new UniqueID());
     }
 
     /**

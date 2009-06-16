@@ -814,7 +814,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             }
             // Check the presence of the DSI Tag
             // Ohterwise add it
-            if (!nextTags.check("PA_TAG_DSI")) {
+            if (!nextTags.check(DsiTag.IDENTIFIER)) {
                 nextTags.addTag(new DsiTag());
             }
             return nextTags;
