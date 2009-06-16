@@ -59,7 +59,6 @@ public class SpacesMountManager {
     private final SpacesDirectory directory;
     private final Map<DataSpacesURI, FileObject> mountedSpaces = new HashMap<DataSpacesURI, FileObject>();
 
-    // TODO: check if this synchronization is really needed after we removed VirtualFileSystem
     /*
      * These two locks represent two levels of synchronization. In any execution only readLock is
      * acquired or both locks are acquired in constant order (writeLock, then readLock) to avoid
