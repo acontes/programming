@@ -2,6 +2,7 @@ package org.objectweb.proactive.examples.structuredp2p.can;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
 import java.util.Random;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -18,7 +19,7 @@ import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANLookupMe
 import org.objectweb.proactive.extensions.structuredp2p.responses.can.CANLookupResponseMessage;
 
 
-public class PeerLauncher {
+public class PeerLauncher extends Observable {
 
     private List<Node> avaibleNodes;
     private List<Peer> remotePeers = new ArrayList<Peer>();
@@ -95,6 +96,8 @@ public class PeerLauncher {
         } catch (NodeException e) {
             e.printStackTrace();
         }
+        this.setChanged();
+        this.notifyObservers();
     }
 
     public void removePeer() {
@@ -103,6 +106,8 @@ public class PeerLauncher {
         this.printInformation("Remove peer managing " + ((CANOverlay) peer.getStructuredOverlay()).getZone());
         this.remotePeers.remove(peer);
         peer.leave();
+        this.setChanged();
+        this.notifyObservers();
     }
 
     public void lookupMessage() {
@@ -153,5 +158,9 @@ public class PeerLauncher {
 
     public LauncherType getLauncherType() {
         return this.launcherType;
+    }
+
+    public void update(Observable o, Object arg) {
+
     }
 }
