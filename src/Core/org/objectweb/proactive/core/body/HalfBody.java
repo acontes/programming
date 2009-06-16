@@ -35,7 +35,6 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Job;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.exceptions.HalfBodyException;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.ft.service.FaultToleranceTechnicalService;
@@ -48,7 +47,6 @@ import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFactory;
 import org.objectweb.proactive.core.body.request.RequestQueue;
 import org.objectweb.proactive.core.body.tags.MessageTags;
-import org.objectweb.proactive.core.body.tags.Tag;
 import org.objectweb.proactive.core.body.tags.tag.DsiTag;
 import org.objectweb.proactive.core.component.request.ComponentRequestImpl;
 import org.objectweb.proactive.core.gc.HalfBodies;
@@ -263,6 +261,7 @@ public class HalfBody extends AbstractBody {
         public void sendRequest(MethodCall methodCall, Future future, UniversalBody destinationBody)
                 throws java.io.IOException, RenegotiateSessionException, CommunicationForbiddenException {
             long sequenceID = getNextSequenceID();
+
             // Create DSI MessageTag
             MessageTags tags = messageTagsFactory.newMessageTags();
             tags.addTag(new DsiTag());

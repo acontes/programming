@@ -65,8 +65,8 @@ public class LocalMemoryTag implements Serializable {
         }
         this.memory.put(key, value);
         if (logger.isDebugEnabled()) {
-            logger.debug("Put value in the Tag LocalMemory of " + tagIDReferer + " : key=" + key + ", value=" +
-                    value);
+            logger.debug("Put value in the Tag LocalMemory of " + tagIDReferer + " : key=" + key +
+                ", value=" + value);
         }
     }
 
@@ -105,7 +105,7 @@ public class LocalMemoryTag implements Serializable {
             this.currentlease -= decValue;
             if (logger.isDebugEnabled()) {
                 logger.debug("Decrement lease value of the Tag LocalMemory of " + tagIDReferer +
-                        ": new lease value = " + currentlease);
+                    ": new lease value = " + currentlease);
             }
         }
     }

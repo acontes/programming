@@ -57,7 +57,7 @@ public class LocalMemoryLeaseThread implements Runnable {
                         if (memory.leaseExceeded()) {
                             if (logger.isDebugEnabled()) {
                                 logger.debug("Remove local memory of the Tag \"" + memory.getTagIDReferer() +
-                                "\"");
+                                    "\"");
                             }
                             memories.remove(memory.getTagIDReferer());
                         }

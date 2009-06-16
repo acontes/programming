@@ -33,11 +33,8 @@ public class MessageTags implements Serializable {
     }
 
     /**
-     * Add a tag on the request with an different propagation policy 
-     * than the one in the TagRegistry, and a user data content.
-     * @param id     - Identifier of the tag in the TagRegistry
-     * @param policy - Propagation Policy
-     * @param data   - User data attached to the tag
+     * Add a tag on the request.
+     * @param tag - the new tag.
      * @return the new tag
      */
     public Tag addTag(Tag tag) {

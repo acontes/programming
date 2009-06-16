@@ -30,7 +30,7 @@ public abstract class Tag implements Serializable {
     protected Object data;
 
     private String cachedToString;
-    
+
     /**
      * Tag constructor
      * @param id     - Identifier of the tag
@@ -130,16 +130,16 @@ public abstract class Tag implements Serializable {
      * Display Tag Information
      */
     public String toString() {
-        if( cachedToString == null ) {
+        if (cachedToString == null) {
             synchronized (this) {
-                if( cachedToString == null ) {
+                if (cachedToString == null) {
                     this.cachedToString = "[TAG]" + id + "[DATA]" + data + "[END]";
                 }
             }
         }
-        return cachedToString; 
+        return cachedToString;
     }
-    
+
     /**
      * Return the JMX Notification String for this Tag composed of
      * the tag id and the toString of the Data
@@ -148,5 +148,4 @@ public abstract class Tag implements Serializable {
     public String getNotificationMessage() {
         return this.toString();
     }
-
 }
