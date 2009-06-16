@@ -161,9 +161,9 @@ public class SpacesMountManagerTest {
 
     private void assertIsWorkingReadOnlySpaceDir(final DataSpacesFileObject fo) throws FileSystemException {
         assertTrue(fo.exists());
+
         // is it that directory?
-        // FIXME: This casting should be changed as DataSpacesFileObject interface will change
-        final DataSpacesFileObject child = (DataSpacesFileObject) fo.getChild(EXISTING_FILE);
+        final DataSpacesFileObject child = fo.getChild(EXISTING_FILE);
         assertNotNull(child);
         assertTrue(child.exists());
         assertEquals(readOnlyUri.toString(), PADataSpaces.getURI(fo));
