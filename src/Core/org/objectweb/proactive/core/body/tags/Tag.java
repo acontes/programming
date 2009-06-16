@@ -7,7 +7,6 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.BodyImpl;
-import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -30,6 +29,8 @@ public abstract class Tag implements Serializable {
     /** User Data attached to this tag */
     protected Object data;
 
+    private String cachedToString;
+    
     /**
      * Tag constructor
      * @param id     - Identifier of the tag
@@ -127,7 +128,23 @@ public abstract class Tag implements Serializable {
      * Display Tag Information
      */
     public String toString() {
-        return "<TAG: id=" + id + ", data=" + data + ">";
+        if( cachedToString == null ) {
+            synchronized (this) {
+                if( cachedToString == null ) {
+                    this.cachedToString = "[TAG]" + id + "[DATA]" + data + "[END]";
+                }
+            }
+        }
+        return cachedToString; 
+    }
+    
+    /**
+     * Return the JMX Notification String for this Tag composed of
+     * the tag id and the toString of the Data
+     * @return jmx notification String
+     */
+    public String getNotificationMessage() {
+        return this.toString();
     }
 
 }

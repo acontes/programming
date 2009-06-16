@@ -41,9 +41,10 @@ public class MessageTags implements Serializable {
      * @return the new tag
      */
     public Tag addTag(Tag tag) {
-        this.messagestags.put(tag.getId(), tag);
-        logger.debug("Adding the tag : " + tag);
-        return messagestags.get(tag.getId());
+        String id = tag.getId();
+        this.messagestags.put(id, tag);
+        //logger.debug("Adding the tag : " + tag);
+        return tag;
     }
 
     /**

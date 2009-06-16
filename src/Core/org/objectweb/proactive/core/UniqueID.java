@@ -124,17 +124,23 @@ public class UniqueID implements java.io.Serializable, Comparable<UniqueID> {
 
     public String shortString() {
         if (this.cachedShortString == null) {
-            this.cachedShortString = "" + Math.abs(this.getCanonString().hashCode() % 100000);
+            synchronized (this) {
+                if (this.cachedShortString == null) {
+                    this.cachedShortString = "" + Math.abs(this.getCanonString().hashCode() % 100000);
+                }
+            }
         }
-
         return this.cachedShortString;
     }
 
     public String getCanonString() {
         if (this.cachedCanonString == null) {
-            this.cachedCanonString = ("" + this.id + "--" + this.vmID).replace(':', '-');
+            synchronized (this) {
+                if (this.cachedCanonString == null) {
+                    this.cachedCanonString = ("" + this.id + "--" + this.vmID).replace(':', '-');
+                }
+            }
         }
-
         return this.cachedCanonString;
     }
 

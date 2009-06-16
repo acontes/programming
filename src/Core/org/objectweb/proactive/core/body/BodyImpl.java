@@ -461,7 +461,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         String result = "";
         if (tags != null) {
             for (Tag tag : tags.getTags()) {
-                result += "[TAG]" + tag.getId() + "[DATA]" + tag.getData() + "[END]";
+                result += tag.getNotificationMessage();
             }
         }
         return result;
