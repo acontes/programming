@@ -25,6 +25,7 @@ import org.objectweb.proactive.extra.dataspaces.DataSpacesLimitingFileObject;
 import org.objectweb.proactive.extra.dataspaces.DataSpacesURI;
 import org.objectweb.proactive.extra.dataspaces.InputOutputSpaceConfiguration;
 import org.objectweb.proactive.extra.dataspaces.PADataSpaces;
+import org.objectweb.proactive.extra.dataspaces.ScratchSpaceConfiguration;
 import org.objectweb.proactive.extra.dataspaces.SpaceInstanceInfo;
 import org.objectweb.proactive.extra.dataspaces.SpaceType;
 import org.objectweb.proactive.extra.dataspaces.SpacesDirectory;
@@ -37,7 +38,6 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundException;
 
 
-// TODO: add test for URI not suitable for having path and perhaps AO owner 
 /**
  * This test is actually not a pure unit test run in high isolation. It depends on correct behavior
  * of {@link SpacesDirectoryImpl}, {@link VFSFactory}, {@link VFSFileObjectAdapter} together with
@@ -45,13 +45,13 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundExceptio
  * {@link DataSpacesURI}.
  */
 public class SpacesMountManagerTest {
-    private static final String EXISTING_FILE = "file.txt";
+    private static final String INPUT_FILE = "file.txt";
 
-    private static final String EXISTING_SUBDIR = "dir";
-
-    private static final String TEST_FILE_CONTENT = "test";
+    private static final String INPUT_FILE_CONTENT = "test";
 
     private static final String NONEXISTING_FILE = "got_you_i_do_not_exist.txt";
+
+    private static final String SCRATCH_ACTIVE_OBJECT_ID = "777";
 
     private static final DataSpacesURI NONEXISTING_SPACE = DataSpacesURI.createInOutSpaceURI(123,
             SpaceType.OUTPUT, "dummy");
@@ -66,55 +66,72 @@ public class SpacesMountManagerTest {
         }
     }
 
+    private static String getURLForFile(final File file) throws IOException {
+        return "file:///" + file.getCanonicalPath().replaceFirst("^/", "");
+    }
+
     private SpacesMountManager manager;
     private SpacesDirectory directory;
     private File spacesDir;
-    private DataSpacesURI readOnlyUri;
-    private DataSpacesURI readWriteUri;
-    private DataSpacesFileObject fileObjectRO;
-    private DataSpacesFileObject fileObjectRW;
+    private DataSpacesURI inputUri;
+    private DataSpacesURI outputUri;
+    private DataSpacesURI scratchUri;
+    private DataSpacesFileObject fileObject;
 
     @Before
     public void setUp() throws Exception {
-        // create files
         spacesDir = new File(System.getProperty("java.io.tmpdir"), "ProActive-SpaceMountManagerTest");
-        final File roSpaceDir = new File(spacesDir, "readOnly");
-        final File rwSpaceDir = new File(spacesDir, "readWrite");
-        assertTrue(roSpaceDir.mkdirs());
-        assertTrue(rwSpaceDir.mkdirs());
 
-        final File readOnlySpaceFile = new File(roSpaceDir, EXISTING_FILE);
-        final OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(readOnlySpaceFile));
-        osw.write(TEST_FILE_CONTENT);
+        // input space
+        final File inputSpaceDir = new File(spacesDir, "input");
+        assertTrue(inputSpaceDir.mkdirs());
+        final File inputSpaceFile = new File(inputSpaceDir, INPUT_FILE);
+        final OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(inputSpaceFile));
+        osw.write(INPUT_FILE_CONTENT);
         osw.close();
-        final File spaceSubdir = new File(roSpaceDir, EXISTING_SUBDIR);
-        spaceSubdir.mkdir();
 
-        final String roSpaceUrl = "file:///" + roSpaceDir.getCanonicalPath().replaceFirst("^/", "");
-        final InputOutputSpaceConfiguration roSpaceConf = InputOutputSpaceConfiguration
-                .createInputSpaceConfiguration(roSpaceUrl, null, null, "read_only_space");
-        final SpaceInstanceInfo roSpaceInfo = new SpaceInstanceInfo(123, roSpaceConf);
-        readOnlyUri = roSpaceInfo.getMountingPoint();
+        final String inputSpaceUrl = getURLForFile(inputSpaceDir);
+        final InputOutputSpaceConfiguration inputSpaceConf = InputOutputSpaceConfiguration
+                .createInputSpaceConfiguration(inputSpaceUrl, null, null, "read_only_space");
+        final SpaceInstanceInfo inputSpaceInfo = new SpaceInstanceInfo(123, inputSpaceConf);
+        inputUri = inputSpaceInfo.getMountingPoint();
 
-        final String rwSpaceUrl = "file:///" + rwSpaceDir.getCanonicalPath().replaceFirst("^/", "");
-        final InputOutputSpaceConfiguration rwSpaceConf = InputOutputSpaceConfiguration
-                .createOutputSpaceConfiguration(rwSpaceUrl, null, null, "read_write_space");
-        final SpaceInstanceInfo rwSpaceInfo = new SpaceInstanceInfo(123, rwSpaceConf);
-        readWriteUri = rwSpaceInfo.getMountingPoint();
+        // output space
+        final File outputSpaceDir = new File(spacesDir, "output");
+        assertTrue(outputSpaceDir.mkdirs());
 
+        final String outputSpaceUrl = getURLForFile(outputSpaceDir);
+        final InputOutputSpaceConfiguration outputSpaceConf = InputOutputSpaceConfiguration
+                .createOutputSpaceConfiguration(outputSpaceUrl, null, null, "read_write_space");
+        final SpaceInstanceInfo outputSpaceInfo = new SpaceInstanceInfo(123, outputSpaceConf);
+        outputUri = outputSpaceInfo.getMountingPoint();
+
+        // scratch space
+        final File scratchSpaceDir = new File(spacesDir, "scratch");
+        assertTrue(scratchSpaceDir.mkdirs());
+        final File scratchSpaceSubdir = new File(scratchSpaceDir, SCRATCH_ACTIVE_OBJECT_ID);
+        scratchSpaceSubdir.mkdir();
+
+        final String scratchSpaceUrl = getURLForFile(scratchSpaceDir);
+        final ScratchSpaceConfiguration scratchSpaceConf = new ScratchSpaceConfiguration(scratchSpaceUrl,
+            null, null);
+        final SpaceInstanceInfo scratchSpaceInfo = new SpaceInstanceInfo(123, "runtimeA", "nodeB",
+            scratchSpaceConf);
+        scratchUri = scratchSpaceInfo.getMountingPoint();
+
+        // directory and finally manager
         directory = new SpacesDirectoryImpl();
-        directory.register(roSpaceInfo);
-        directory.register(rwSpaceInfo);
+        directory.register(inputSpaceInfo);
+        directory.register(outputSpaceInfo);
+        directory.register(scratchSpaceInfo);
 
         manager = new SpacesMountManager(directory);
     }
 
     @After
     public void tearDown() {
-        closeFileObject(fileObjectRO);
-        fileObjectRO = null;
-        closeFileObject(fileObjectRW);
-        fileObjectRW = null;
+        closeFileObject(fileObject);
+        fileObject = null;
 
         if (manager != null) {
             manager.close();
@@ -126,26 +143,31 @@ public class SpacesMountManagerTest {
         }
     }
 
-    public void testResolveFileForReadOnlySpace() throws IOException, SpaceNotFoundException {
-        fileObjectRO = manager.resolveFile(readOnlyUri, null);
-        assertIsWorkingReadOnlySpaceDir(fileObjectRO);
+    public void testResolveFileForInputSpace() throws IOException, SpaceNotFoundException {
+        fileObject = manager.resolveFile(inputUri, null);
+        assertIsWorkingInputSpaceDir(fileObject);
     }
 
     @Test
-    public void testResolveFileForReadOnlySpaceAlreadyMounted1() throws IOException, SpaceNotFoundException {
-        testResolveFileForReadOnlySpace();
-        testResolveFileForReadOnlySpace();
+    public void testResolveFileForInputSpaceAlreadyMounted1() throws IOException, SpaceNotFoundException {
+        testResolveFileForInputSpace();
+        testResolveFileForInputSpace();
     }
 
     @Test
-    public void testResolveFileForReadOnlySpaceAlreadyMounted2() throws SpaceNotFoundException, IOException {
-        testResolveFileForFileInReadOnlySpace();
-        testResolveFileForReadOnlySpace();
+    public void testResolveFileForInputSpaceAlreadyMounted2() throws SpaceNotFoundException, IOException {
+        testResolveFileForFileInInputSpace();
+        testResolveFileForInputSpace();
+    }
+
+    public void testResolveFileForOutputSpace() throws IOException, SpaceNotFoundException {
+        fileObject = manager.resolveFile(outputUri, null);
+        assertIsWorkingOutputSpaceDir(fileObject);
     }
 
     public void testResolveFilesNotSharedFileObject() throws IOException, SpaceNotFoundException {
-        final DataSpacesFileObject fileObject1 = manager.resolveFile(readOnlyUri, null);
-        final DataSpacesFileObject fileObject2 = manager.resolveFile(readOnlyUri, null);
+        final DataSpacesFileObject fileObject1 = manager.resolveFile(inputUri, null);
+        final DataSpacesFileObject fileObject2 = manager.resolveFile(inputUri, null);
 
         assertNotSame(fileObject1, fileObject2);
     }
@@ -159,19 +181,40 @@ public class SpacesMountManagerTest {
         }
     }
 
-    private void assertIsWorkingReadOnlySpaceDir(final DataSpacesFileObject fo) throws FileSystemException {
+    @Test
+    public void testResolveFileForSpacePartNotFullyDefined() throws SpaceNotFoundException, IOException {
+        final DataSpacesURI uri = DataSpacesURI.createURI(inputUri.getAppId());
+        assertFalse(uri.isSpacePartFullyDefined());
+        try {
+            manager.resolveFile(uri, null);
+            fail("Exception expected");
+        } catch (IllegalArgumentException x) {
+        }
+    }
+
+    @Test
+    public void testResolveFileForNotSuitableForUserPath() throws SpaceNotFoundException, IOException {
+        assertFalse(scratchUri.isSuitableForUserPath());
+        try {
+            manager.resolveFile(scratchUri, null);
+            fail("Exception expected");
+        } catch (IllegalArgumentException x) {
+        }
+    }
+
+    private void assertIsWorkingInputSpaceDir(final DataSpacesFileObject fo) throws FileSystemException {
         assertTrue(fo.exists());
 
         // is it that directory?
-        final DataSpacesFileObject child = fo.getChild(EXISTING_FILE);
+        final DataSpacesFileObject child = fo.getChild(INPUT_FILE);
         assertNotNull(child);
         assertTrue(child.exists());
-        assertEquals(readOnlyUri.toString(), PADataSpaces.getURI(fo));
+        assertEquals(inputUri.toString(), PADataSpaces.getURI(fo));
 
         // check if write access restrictions are computed correctly - this should be denied
         try {
             child.delete();
-            fail("Expected exception - should not have right to write to read only space");
+            fail("Expected exception - should not have right to write to input space");
         } catch (FileSystemException x) {
             assertTrue(child.exists());
         }
@@ -184,25 +227,20 @@ public class SpacesMountManagerTest {
         } catch (FileSystemException x) {
         }
 
-        // FIXME: This casting should be changed as DataSpacesFileObject interface will change
-        final DataSpacesFileObject subdir = (DataSpacesFileObject) fo.getChild(EXISTING_SUBDIR);
-        assertNotNull(subdir);
-        assertTrue(subdir.exists());
-
         // check if access restrictions are computed correctly - this should be allowed
-        subdir.getParent();
+        assertNotNull(child.getParent());
         // this not
         try {
-            subdir.resolveFile("../..");
+            child.resolveFile("../..");
             fail("Expected exception - should not have access to parent file of space dir");
         } catch (FileSystemException x) {
         }
     }
 
-    private void assertIsWorkingReadWriteSpaceDir(DataSpacesFileObject fo) throws FileSystemException {
+    private void assertIsWorkingOutputSpaceDir(DataSpacesFileObject fo) throws FileSystemException {
         assertTrue(fo.exists());
-        // FIXME: This casting should be changed as DataSpacesFileObject interface will change
-        final DataSpacesFileObject child = (DataSpacesFileObject) fo.resolveFile("new_file");
+        assertEquals(outputUri.toString(), PADataSpaces.getURI(fo));
+        final DataSpacesFileObject child = fo.resolveFile("new_file");
 
         // check if write access restrictions are computed correctly - this should be allowed
         child.createFile();
@@ -210,50 +248,109 @@ public class SpacesMountManagerTest {
     }
 
     @Test
-    public void testResolveFileForFileInReadOnlySpace() throws SpaceNotFoundException, IOException {
-        final DataSpacesURI fileUri = readOnlyUri.withUserPath(EXISTING_FILE);
-        fileObjectRO = manager.resolveFile(fileUri, null);
+    public void testResolveFileForFileInInputSpace() throws SpaceNotFoundException, IOException {
+        final DataSpacesURI fileUri = inputUri.withUserPath(INPUT_FILE);
+        fileObject = manager.resolveFile(fileUri, null);
 
-        assertTrue(fileObjectRO.exists());
+        assertTrue(fileObject.exists());
         // is it that file?
-        final InputStream io = fileObjectRO.getContent().getInputStream();
+        final InputStream io = fileObject.getContent().getInputStream();
         final BufferedReader reader = new BufferedReader(new InputStreamReader(io));
-        assertEquals(TEST_FILE_CONTENT, reader.readLine());
-        assertEquals(fileUri.toString(), PADataSpaces.getURI(fileObjectRO));
+        assertEquals(INPUT_FILE_CONTENT, reader.readLine());
+        assertEquals(fileUri.toString(), PADataSpaces.getURI(fileObject));
     }
 
     @Test
-    public void testResolveFileForFileInReadOnlySpaceAlreadyMounted1() throws SpaceNotFoundException,
+    public void testResolveFileForFileInInputSpaceAlreadyMounted1() throws SpaceNotFoundException,
             IOException {
-        testResolveFileForFileInReadOnlySpace();
-        testResolveFileForFileInReadOnlySpace();
+        testResolveFileForFileInInputSpace();
+        testResolveFileForFileInInputSpace();
     }
 
     @Test
-    public void testResolveFileForFileInReadOnlySpaceAlreadyMounted2() throws SpaceNotFoundException,
+    public void testResolveFileForFileInInputSpaceAlreadyMounted2() throws SpaceNotFoundException,
             IOException {
-        testResolveFileForReadOnlySpace();
-        testResolveFileForFileInReadOnlySpace();
+        testResolveFileForInputSpace();
+        testResolveFileForFileInInputSpace();
+    }
+
+    @Test
+    public void testResolveFileForFileInScratchSpaceForOwner() throws SpaceNotFoundException, IOException {
+        final DataSpacesURI fileUri = scratchUri.withActiveObjectId(SCRATCH_ACTIVE_OBJECT_ID);
+        fileObject = manager.resolveFile(fileUri, SCRATCH_ACTIVE_OBJECT_ID);
+        assertIsWorkingScratchForAODir(fileObject, fileUri, true);
+    }
+
+    @Test
+    public void testResolveFileForFileInScratchSpaceForOtherAO() throws SpaceNotFoundException, IOException {
+        final DataSpacesURI fileUri = scratchUri.withActiveObjectId(SCRATCH_ACTIVE_OBJECT_ID);
+        final String nonexistingActiveObjectId = SCRATCH_ACTIVE_OBJECT_ID + "toto";
+        fileObject = manager.resolveFile(fileUri, nonexistingActiveObjectId);
+        assertIsWorkingScratchForAODir(fileObject, fileUri, false);
+    }
+
+    @Test
+    public void testResolveFileForFileInScratchSpaceForAnonymousOwner() throws SpaceNotFoundException,
+            IOException {
+        final DataSpacesURI fileUri = scratchUri.withActiveObjectId(SCRATCH_ACTIVE_OBJECT_ID);
+        fileObject = manager.resolveFile(fileUri, null);
+        assertIsWorkingScratchForAODir(fileObject, fileUri, false);
+    }
+
+    private void assertIsWorkingScratchForAODir(final DataSpacesFileObject fo, final DataSpacesURI fileUri,
+            final boolean owner) throws FileSystemException, IOException {
+        assertTrue(fo.exists());
+        assertEquals(fileUri.toString(), PADataSpaces.getURI(fo));
+        final DataSpacesFileObject child = fo.resolveFile("new_file");
+
+        if (owner) {
+            // check if write access restrictions are computed correctly - this should be allowed
+            child.createFile();
+            assertTrue(child.exists());
+        } else {
+            try {
+                child.createFile();
+                fail("Expected exception - should not have right to write to other AO's scratch");
+            } catch (FileSystemException x) {
+            }
+        }
+
+        // check if access restrictions are computed correctly - these 2 should be denied 
+        assertNull(fo.getParent());
+        try {
+            fo.resolveFile("../");
+            fail("Expected exception - should not have access to parent file of scratch for AO");
+        } catch (FileSystemException x) {
+        }
+
+        // check if access restrictions are computed correctly - this should be allowed
+        assertNotNull(child.getParent());
+        // this not
+        try {
+            child.resolveFile("../..");
+            fail("Expected exception - should not have access to parent file of scratch for AO");
+        } catch (FileSystemException x) {
+        }
     }
 
     @Test
     public void testResolveFileForUnexistingFileInSpace() throws SpaceNotFoundException, IOException {
-        final DataSpacesURI fileUri = readOnlyUri.withUserPath(NONEXISTING_FILE);
-        fileObjectRO = manager.resolveFile(fileUri, null);
-        assertFalse(fileObjectRO.exists());
+        final DataSpacesURI fileUri = inputUri.withUserPath(NONEXISTING_FILE);
+        fileObject = manager.resolveFile(fileUri, null);
+        assertFalse(fileObject.exists());
     }
 
     @Test
-    public void testResolveFileForUnexistingFileInReadOnlySpaceAlreadyMounted1()
-            throws SpaceNotFoundException, IOException {
-        testResolveFileForFileInReadOnlySpace();
+    public void testResolveFileForUnexistingFileInInputSpaceAlreadyMounted1() throws SpaceNotFoundException,
+            IOException {
+        testResolveFileForFileInInputSpace();
         testResolveFileForUnexistingFileInSpace();
     }
 
     @Test
-    public void testResolveFileForUnexistingFileInReadOnlySpaceAlreadyMounted2()
-            throws SpaceNotFoundException, IOException {
-        testResolveFileForReadOnlySpace();
+    public void testResolveFileForUnexistingFileInInputSpaceAlreadyMounted2() throws SpaceNotFoundException,
+            IOException {
+        testResolveFileForInputSpace();
         testResolveFileForUnexistingFileInSpace();
     }
 
@@ -269,18 +366,14 @@ public class SpacesMountManagerTest {
 
     @Test
     public void testResolveSpaces() throws IOException {
-        final DataSpacesURI queryUri = DataSpacesURI.createURI(readOnlyUri.getAppId());
+        final DataSpacesURI queryUri = DataSpacesURI.createURI(inputUri.getAppId(), inputUri.getSpaceType());
         final Map<DataSpacesURI, ? extends DataSpacesFileObject> spaces = manager.resolveSpaces(queryUri,
                 null);
-        assertEquals(2, spaces.size());
+        assertEquals(1, spaces.size());
 
-        fileObjectRO = spaces.get(readOnlyUri);
-        assertNotNull(fileObjectRO);
-        assertIsWorkingReadOnlySpaceDir(fileObjectRO);
-
-        fileObjectRW = spaces.get(readWriteUri);
-        assertNotNull(fileObjectRW);
-        assertIsWorkingReadWriteSpaceDir(fileObjectRW);
+        fileObject = spaces.get(inputUri);
+        assertNotNull(fileObject);
+        assertIsWorkingInputSpaceDir(fileObject);
     }
 
     @Test
@@ -291,23 +384,43 @@ public class SpacesMountManagerTest {
 
     @Test
     public void testResolveSpacesAlreadyMounted2() throws SpaceNotFoundException, IOException {
-        testResolveFileForFileInReadOnlySpace();
+        testResolveFileForFileInInputSpace();
         testResolveSpaces();
     }
 
     @Test
     public void testResolveSpacesNotSharedFileObject() throws IOException {
-        final DataSpacesURI queryUri = DataSpacesURI.createURI(readOnlyUri.getAppId());
+        final DataSpacesURI queryUri = DataSpacesURI.createURI(inputUri.getAppId(), inputUri.getSpaceType());
 
         final Map<DataSpacesURI, ? extends DataSpacesFileObject> spaces1 = manager.resolveSpaces(queryUri,
                 null);
-        assertEquals(2, spaces1.size());
-        final DataSpacesFileObject fileObject1 = spaces1.get(readOnlyUri);
+        assertEquals(1, spaces1.size());
+        final DataSpacesFileObject fileObject1 = spaces1.get(inputUri);
 
         final Map<DataSpacesURI, ? extends DataSpacesFileObject> spaces2 = manager.resolveSpaces(queryUri,
                 null);
-        assertEquals(2, spaces2.size());
-        final DataSpacesFileObject fileObject2 = spaces2.get(readOnlyUri);
+        assertEquals(1, spaces2.size());
+        final DataSpacesFileObject fileObject2 = spaces2.get(inputUri);
         assertNotSame(fileObject1, fileObject2);
+    }
+
+    @Test
+    public void testResolveSpacesForSpacePartFullyDefined() throws SpaceNotFoundException, IOException {
+        try {
+            manager.resolveSpaces(inputUri, null);
+            fail("Exception expected");
+        } catch (IllegalArgumentException x) {
+        }
+    }
+
+    @Test
+    public void testResolveSpacesForNotSuitableForUserPath() throws SpaceNotFoundException, IOException {
+        final DataSpacesURI uri = DataSpacesURI.createScratchSpaceURI(scratchUri.getAppId(), scratchUri
+                .getRuntimeId());
+        try {
+            manager.resolveSpaces(uri, null);
+            fail("Exception expected");
+        } catch (IllegalArgumentException x) {
+        }
     }
 }
