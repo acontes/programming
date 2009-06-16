@@ -79,8 +79,10 @@ public class VFSFactory {
         final DefaultFileReplicator replicator = new DefaultFileReplicator();
         manager.setReplicator(new PrivilegedFileReplicator(replicator));
         manager.setTemporaryFileStore(replicator);
-        if (!enableFilesCache)
+        if (!enableFilesCache) {
+            // WISH: one beautiful day one may try to use FilesCache aware of AO instead of NullFilesCache
             manager.setFilesCache(new NullFilesCache());
+        }
 
         manager.addProvider("file", new DefaultLocalFileProvider());
         manager.addProvider("http", new HttpFileProvider());
