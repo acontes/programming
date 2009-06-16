@@ -19,6 +19,7 @@ import org.objectweb.proactive.extra.dataspaces.Utils;
 import org.objectweb.proactive.extra.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extra.dataspaces.core.DataSpacesURI;
 import org.objectweb.proactive.extra.dataspaces.core.SpaceInstanceInfo;
+import org.objectweb.proactive.extra.dataspaces.core.SpacesMountManager;
 import org.objectweb.proactive.extra.dataspaces.core.naming.SpacesDirectory;
 import org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException;
@@ -26,37 +27,21 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundExceptio
 import org.objectweb.proactive.extra.dataspaces.vfs.adapter.VFSFileObjectAdapter;
 
 
-// WISH: extract interface
 /**
- * Manages data spaces mountings and file accessing, connecting Data Spaces and VFS worlds in this
- * implementation.
+ * Implementation of SpacesMountManager using Apache Commons VFS library.
  * <p>
- * Manager creates and maintains Apache VFS manager to pose virtual view provider of file system for
- * each application. It is able to response to queries for files in data spaces or just data spaces,
- * providing {@link DataSpacesFileObject} as a result. Returned object is associated with specific
- * active object. It is applicable for user level code with access limited to files with URIs
- * suitable for user path.
+ * Manager creates and maintains Apache VFS manager to imitate virtual view of file system for each
+ * application.
  * <p>
- * To be able to serve requests for files and data spaces, SpaceMountManager must use
- * {@link SpacesDirectory} as a source of information about data spaces, their mounting points and
- * access methods.
- * <p>
- * Manager maintains mountings of data spaces in local Map, using lazy on-request strategy in
- * current implementation. Space is mounted only when there is request to provide FileObject for its
- * content. Proper, local or remote access is determined using
- * {@link Utils#getLocalAccessURL(String, String, String)} method. Write-capabilities of returned
- * FileObjects are induced from used protocols' providers, but SpacesMountManager applies also
- * restriction policies for returned FileObjects, to conform with general Data Spaces guarantees, as
- * described and implemented in {@link DataSpacesLimitingFileObject}.
- * <p>
- * Instances of this class are thread-safe. Also, subsequent requests for the same file using the
- * same manager will result in separate FileObject instances being returned, so there is no
- * concurrency issue related to returned FileObjects. They are not shared. Each instance of manager
- * must be closed using {@link #close()} method when it is not used anymore.
- * 
- * @see SpacesDirectory
+ * Manager maintains mountings of data spaces in local Map, using lazy on-request strategy. Space is
+ * mounted only when there is request to provide DataSpacesFileObject for its content. Proper, local
+ * or remote access is determined using {@link Utils#getLocalAccessURL(String, String, String)}
+ * method. Write-capabilities of returned DataSpacesFileObjects are induced from used protocols'
+ * providers. VFSSpacesMountManagerImpl applies also restriction policies for returned FileObjects,
+ * to conform with general Data Spaces guarantees, as implemented in
+ * {@link DataSpacesLimitingFileObject}.
  */
-public class SpacesMountManager {
+public class VFSSpacesMountManagerImpl implements SpacesMountManager {
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.DATASPACES_MOUNT_MANAGER);
 
     private final DefaultFileSystemManager vfsManager;
@@ -92,7 +77,7 @@ public class SpacesMountManager {
      * @throws FileSystemException
      *             when VFS configuration fails
      */
-    public SpacesMountManager(SpacesDirectory directory) throws FileSystemException {
+    public VFSSpacesMountManagerImpl(SpacesDirectory directory) throws FileSystemException {
         logger.debug("Initializing spaces mount manager");
         this.directory = directory;
 
@@ -108,32 +93,6 @@ public class SpacesMountManager {
         logger.info("Mount manager initialized, VFS instance created");
     }
 
-    /**
-     * Resolves query for URI within Data Spaces virtual tree, resulting in file-level access to
-     * this place. Provided URI should be suitable for user path.
-     * <p>
-     * This call may block for a while, if {@link SpacesDirectory} need to be queried for data space
-     * and/or data space may need to be mounted.
-     * 
-     * @param queryUri
-     *            Data Spaces URI to get access to
-     * @param ownerActiveObjectId
-     *            Id of active object requesting this file, that will become owner of returned
-     *            {@link DataSpacesFileObject} instance. May be <code>null</code>, which corresponds
-     *            to anonymous (unimportant) owner.
-     * @return {@link DataSpacesFileObject} instance that can be used to access this URI content;
-     *         returned DataSpacesFileObject is not opened nor attached in any way; this
-     *         DataSpacesFileObject instance will never be shared, i.e. individual instances are
-     *         returned for subsequent queries (even the same queries).
-     * @throws FileSystemException
-     *             indicates VFS related exception during access, like mounting problems, I/O errors
-     *             etc.
-     * @throws SpaceNotFoundException
-     *             when space with that query URI does not exists in SpacesDirectory
-     * @throws IllegalArgumentException
-     *             when provided queryUri is not suitable for user path
-     * @see DataSpacesURI#isSuitableForUserPath()
-     */
     public DataSpacesFileObject resolveFile(final DataSpacesURI queryUri, final String ownerActiveObjectId)
             throws FileSystemException, SpaceNotFoundException {
 
@@ -152,42 +111,6 @@ public class SpacesMountManager {
         return doResolveFile(queryUri, ownerActiveObjectId);
     }
 
-    /**
-     * Resolve query for URI without space part being fully defined, resulting in file-level access
-     * to all data spaces that shares this common prefix. Requested result spaces must be suitable
-     * for user path.
-     * <p>
-     * For any URI query, returned set contains all spaces (URIs) that match defined components in
-     * queried URI, allowing them to have any values for undefined components.
-     * <p>
-     * e.g. for <code>vfs:///123/input/</code> query you may get
-     * <code>vfs:///123/input/default/</code> and <code>vfs:///123/input/abc/</code> as a result,
-     * but not <code>vfs:///123/output/</code>
-     * <p>
-     * This call may block for a while, as {@link SpacesDirectory} need to be queried for data
-     * spaces and/or some data spaces may need to be mounted.
-     * 
-     * @param queryUri
-     *            Data Spaces URI to query for; must be URI without space part being fully defined,
-     *            i.e. not pointing to any concrete data space
-     * @param ownerActiveObjectId
-     *            Id of active object requesting this files, that will become owner of returned
-     *            {@link DataSpacesFileObject} instances. May be <code>null</code>, which
-     *            corresponds to anonymous (unimportant) owner.
-     * @return map of data spaces URIs that match the query, pointing to
-     *         {@link DataSpacesFileObject} instances that can be used to access their content;
-     *         returned DataSpacesFileObject are not opened nor attached in any way; these
-     *         DataSpacesFileObject instances will never be shared, i.e. another instances are
-     *         returned for subsequent queries (even the same queries).
-     * @throws FileSystemException
-     *             indicates VFS related exception during access, like mounting problems, I/O errors
-     *             etc.
-     * @throws IllegalArgumentException
-     *             when provided queryUri has space part fully defined or some of resolved spaces
-     *             URIs are not suitable for user path
-     * @see DataSpacesURI#isSpacePartFullyDefined()
-     * @see DataSpacesURI#isSuitableForUserPath()
-     */
     public Map<DataSpacesURI, DataSpacesFileObject> resolveSpaces(final DataSpacesURI queryUri,
             final String ownerActiveObjectId) throws FileSystemException {
 
@@ -216,18 +139,6 @@ public class SpacesMountManager {
         return result;
     }
 
-    /**
-     * Closes this manager instance.
-     * <p>
-     * Closing it indicates unmounting mounted data spaces. Any further access to already opened
-     * FileObject within these data spaces or any call of this instance may result in undefined
-     * behavior for caller.
-     * <p>
-     * VFS manager instance nor SpacesDirectory instance provided at constructor are not closed in
-     * any way.
-     * <p>
-     * Subsequent calls to these method may result in undefined behavior.
-     */
     public void close() {
         logger.debug("Closing mount manager");
         synchronized (writeLock) {

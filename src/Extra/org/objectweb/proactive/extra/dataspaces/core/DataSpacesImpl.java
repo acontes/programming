@@ -29,7 +29,6 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredExceptio
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceAlreadyRegisteredException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.WrongApplicationIdException;
-import org.objectweb.proactive.extra.dataspaces.vfs.SpacesMountManager;
 
 
 /**

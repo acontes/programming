@@ -15,7 +15,7 @@ import org.objectweb.proactive.extra.dataspaces.core.naming.NamingService;
 import org.objectweb.proactive.extra.dataspaces.core.naming.SpacesDirectory;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException;
-import org.objectweb.proactive.extra.dataspaces.vfs.SpacesMountManager;
+import org.objectweb.proactive.extra.dataspaces.vfs.VFSSpacesMountManagerImpl;
 
 
 /**
@@ -268,8 +268,8 @@ public class NodeConfigurator {
             // no exception can be thrown since now
             cachingDirectory = cachingDir;
 
-            // create SpacesMountManager
-            spacesMountManager = new SpacesMountManager(cachingDirectory);
+            // create VFSSpacesMountManagerImpl
+            spacesMountManager = new VFSSpacesMountManagerImpl(cachingDirectory);
 
             // create implementation object connected to the application's
             // configuration

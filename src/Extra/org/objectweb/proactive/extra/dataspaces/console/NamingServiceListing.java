@@ -17,9 +17,10 @@ import org.objectweb.proactive.extra.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extra.dataspaces.api.FileType;
 import org.objectweb.proactive.extra.dataspaces.core.DataSpacesURI;
 import org.objectweb.proactive.extra.dataspaces.core.SpaceInstanceInfo;
+import org.objectweb.proactive.extra.dataspaces.core.SpacesMountManager;
 import org.objectweb.proactive.extra.dataspaces.core.naming.NamingService;
 import org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException;
-import org.objectweb.proactive.extra.dataspaces.vfs.SpacesMountManager;
+import org.objectweb.proactive.extra.dataspaces.vfs.VFSSpacesMountManagerImpl;
 
 
 /**
@@ -76,7 +77,7 @@ public class NamingServiceListing {
     private void processRecursively() throws FileSystemException {
 
         // we need to mount spaces for that..
-        mountManager = new SpacesMountManager(namingService);
+        mountManager = new VFSSpacesMountManagerImpl(namingService);
 
         // get FileObject for each space
         final Map<DataSpacesURI, DataSpacesFileObject> files = mountManager.resolveSpaces(query, null);

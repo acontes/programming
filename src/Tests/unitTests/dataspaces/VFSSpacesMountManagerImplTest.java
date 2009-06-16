@@ -28,12 +28,13 @@ import org.objectweb.proactive.extra.dataspaces.core.InputOutputSpaceConfigurati
 import org.objectweb.proactive.extra.dataspaces.core.ScratchSpaceConfiguration;
 import org.objectweb.proactive.extra.dataspaces.core.SpaceInstanceInfo;
 import org.objectweb.proactive.extra.dataspaces.core.SpaceType;
+import org.objectweb.proactive.extra.dataspaces.core.SpacesMountManager;
 import org.objectweb.proactive.extra.dataspaces.core.naming.SpacesDirectory;
 import org.objectweb.proactive.extra.dataspaces.core.naming.SpacesDirectoryImpl;
 import org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundException;
 import org.objectweb.proactive.extra.dataspaces.vfs.DataSpacesLimitingFileObject;
-import org.objectweb.proactive.extra.dataspaces.vfs.SpacesMountManager;
+import org.objectweb.proactive.extra.dataspaces.vfs.VFSSpacesMountManagerImpl;
 import org.objectweb.proactive.extra.dataspaces.vfs.VFSFactory;
 import org.objectweb.proactive.extra.dataspaces.vfs.adapter.VFSFileObjectAdapter;
 
@@ -44,7 +45,7 @@ import org.objectweb.proactive.extra.dataspaces.vfs.adapter.VFSFileObjectAdapter
  * {@link DataSpacesLimitingFileObject} and basic classes - {@link SpaceInstanceInfo}/
  * {@link DataSpacesURI}.
  */
-public class SpacesMountManagerTest {
+public class VFSSpacesMountManagerImplTest {
     private static final String INPUT_FILE = "file.txt";
 
     private static final String INPUT_FILE_CONTENT = "test";
@@ -121,7 +122,7 @@ public class SpacesMountManagerTest {
         directory.register(outputSpaceInfo);
         directory.register(scratchSpaceInfo);
 
-        manager = new SpacesMountManager(directory);
+        manager = new VFSSpacesMountManagerImpl(directory);
     }
 
     @After
