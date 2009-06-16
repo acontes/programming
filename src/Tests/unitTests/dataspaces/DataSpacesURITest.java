@@ -618,7 +618,7 @@ public class DataSpacesURITest {
     public void testWithActiveObjectIdIllegal1() {
         uri = DataSpacesURI.createURI(123, SpaceType.OUTPUT);
         try {
-            uri.withUserPath("xyz");
+            uri.withActiveObjectId("aoId");
             fail("expected exception");
         } catch (IllegalArgumentException x) {
         }
@@ -626,9 +626,9 @@ public class DataSpacesURITest {
 
     @Test
     public void testWithActiveObjectIdIllegal2() {
-        uri = DataSpacesURI.createScratchSpaceURI(123, "runtimeA", "nodeB");
+        uri = DataSpacesURI.createScratchSpaceURI(123, "runtimeA");
         try {
-            uri.withUserPath("xyz");
+            uri.withActiveObjectId("aoId");
             fail("expected exception");
         } catch (IllegalArgumentException x) {
         }
