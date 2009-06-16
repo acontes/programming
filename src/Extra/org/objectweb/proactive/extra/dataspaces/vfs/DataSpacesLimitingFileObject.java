@@ -44,7 +44,8 @@ public class DataSpacesLimitingFileObject extends AbstractLimitingFileObject<Dat
      *            file object that is going to be represented as DataSpacesFileObject; cannot be
      *            <code>null</code>
      * @param spaceRootUri
-     *            Data Spaces URI of this file object's space; cannot be <code>null</code>
+     *            Data Spaces URI of this file object's space; must have space part fully defined
+     *            and only this part; cannot be <code>null</code>
      * @param spaceRootFileName
      *            VFS path of the space root FileObject; cannot be <code>null</code>
      * @param ownerActiveObjectId
@@ -82,6 +83,7 @@ public class DataSpacesLimitingFileObject extends AbstractLimitingFileObject<Dat
      * @see #getURI()
      */
     public DataSpacesURI getDataSpacesURI() throws MalformedURIException {
+        // TODO do it like in VFSFileObjectAdapter
         final FileName name = getName();
         if (!spaceRootFileName.isDescendent(name, NameScope.DESCENDENT_OR_SELF)) {
             throw new MalformedURIException(
