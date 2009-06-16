@@ -8,6 +8,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Random;
@@ -28,6 +29,8 @@ public class ContentAddressableNetworkGUI extends JFrame implements Observer {
     private PeerLauncher peerLauncher;
     private int HEIGHT = 500;
     private int WIDTH = 500;
+
+    private HashMap<Peer, Color> peersColor = new HashMap<Peer, Color>();
 
     public ContentAddressableNetworkGUI(PeerLauncher peerLauncher) {
         this.peerLauncher = peerLauncher;
@@ -97,7 +100,13 @@ public class ContentAddressableNetworkGUI extends JFrame implements Observer {
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
             for (Peer peer : ContentAddressableNetworkGUI.this.peerLauncher.getRemotePeers()) {
-                g2d.setColor(this.getRandomColor());
+                if (ContentAddressableNetworkGUI.this.peersColor.get(peer) != null) {
+                    g2d.setColor(ContentAddressableNetworkGUI.this.peersColor.get(peer));
+                } else {
+                    Color color = this.getRandomColor();
+                    ContentAddressableNetworkGUI.this.peersColor.put(peer, color);
+                    g2d.setColor(color);
+                }
                 Zone zone = ((CANOverlay) peer.getStructuredOverlay()).getZone();
 
                 int xMin = (int) (Double.parseDouble(zone.getCoordinateMin(0).getValue()) * ContentAddressableNetworkGUI.this.WIDTH);
@@ -124,7 +133,6 @@ public class ContentAddressableNetworkGUI extends JFrame implements Observer {
              * 
              * } } } this.zoneClicked = null; }
              **/
-
         }
 
         public Peer getClicked(int x, int y) {
@@ -148,7 +156,7 @@ public class ContentAddressableNetworkGUI extends JFrame implements Observer {
             int v = rand.nextInt(256);
             int b = rand.nextInt(256);
 
-            if (r + v + b < 420) {
+            if (r + v + b < 320) {
                 return this.getRandomColor();
             }
 
@@ -156,7 +164,6 @@ public class ContentAddressableNetworkGUI extends JFrame implements Observer {
         }
     }
 
-    @Override
     public void update(Observable o, Object arg) {
         this.repaint();
     }
