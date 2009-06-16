@@ -7,8 +7,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.junit.Test;
-import org.objectweb.proactive.extra.dataspaces.DataSpacesURI;
-import org.objectweb.proactive.extra.dataspaces.SpaceType;
+import org.objectweb.proactive.extra.dataspaces.core.DataSpacesURI;
+import org.objectweb.proactive.extra.dataspaces.core.SpaceType;
 import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException;
 
 

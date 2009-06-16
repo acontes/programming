@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.objectweb.proactive.extra.dataspaces;
+package org.objectweb.proactive.extra.dataspaces.vfs;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,11 +15,15 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extra.dataspaces.adapter.vfs.VFSFileObjectAdapter;
+import org.objectweb.proactive.extra.dataspaces.Utils;
 import org.objectweb.proactive.extra.dataspaces.api.DataSpacesFileObject;
+import org.objectweb.proactive.extra.dataspaces.core.DataSpacesURI;
+import org.objectweb.proactive.extra.dataspaces.core.SpaceInstanceInfo;
+import org.objectweb.proactive.extra.dataspaces.core.naming.SpacesDirectory;
 import org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundException;
+import org.objectweb.proactive.extra.dataspaces.vfs.adapter.VFSFileObjectAdapter;
 
 
 // WISH: extract interface

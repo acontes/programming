@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.objectweb.proactive.extra.dataspaces;
+package org.objectweb.proactive.extra.dataspaces.core.naming;
 
 import org.objectweb.proactive.api.PARemoteObject;
 import org.objectweb.proactive.core.ProActiveException;

@@ -75,10 +75,10 @@ import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeInter
 import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeRemoteObjectAdapter;
 import org.objectweb.proactive.extensions.gcmdeployment.core.TopologyImpl;
 import org.objectweb.proactive.extensions.gcmdeployment.core.TopologyRootImpl;
-import org.objectweb.proactive.extra.dataspaces.InputOutputSpaceConfiguration;
-import org.objectweb.proactive.extra.dataspaces.NamingService;
-import org.objectweb.proactive.extra.dataspaces.NamingServiceDeployer;
-import org.objectweb.proactive.extra.dataspaces.SpaceInstanceInfo;
+import org.objectweb.proactive.extra.dataspaces.core.InputOutputSpaceConfiguration;
+import org.objectweb.proactive.extra.dataspaces.core.SpaceInstanceInfo;
+import org.objectweb.proactive.extra.dataspaces.core.naming.NamingService;
+import org.objectweb.proactive.extra.dataspaces.core.naming.NamingServiceDeployer;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ApplicationAlreadyRegisteredException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.WrongApplicationIdException;

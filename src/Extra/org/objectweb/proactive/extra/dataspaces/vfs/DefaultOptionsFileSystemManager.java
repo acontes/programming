@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.objectweb.proactive.extra.dataspaces;
+package org.objectweb.proactive.extra.dataspaces.vfs;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.objectweb.proactive.extra.dataspaces;
+package org.objectweb.proactive.extra.dataspaces.api;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,8 +9,10 @@ import java.util.Set;
 
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.extra.dataspaces.api.Capability;
-import org.objectweb.proactive.extra.dataspaces.api.DataSpacesFileObject;
+import org.objectweb.proactive.extra.dataspaces.Utils;
+import org.objectweb.proactive.extra.dataspaces.core.DataSpacesImpl;
+import org.objectweb.proactive.extra.dataspaces.core.DataSpacesNodes;
+import org.objectweb.proactive.extra.dataspaces.core.SpaceType;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException;

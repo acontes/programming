@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.objectweb.proactive.extra.dataspaces;
+package org.objectweb.proactive.extra.dataspaces.core;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,8 +16,10 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.dataspaces.Utils;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException;
+import org.objectweb.proactive.extra.dataspaces.vfs.VFSFactory;
 
 
 // TODO perhaps checking for remote URL should be improved/changed when we know how do we start

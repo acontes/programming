@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.objectweb.proactive.extra.dataspaces;
+package org.objectweb.proactive.extra.dataspaces.core;
 
 import java.net.URISyntaxException;
 
@@ -10,8 +10,12 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.dataspaces.core.naming.CachingSpacesDirectory;
+import org.objectweb.proactive.extra.dataspaces.core.naming.NamingService;
+import org.objectweb.proactive.extra.dataspaces.core.naming.SpacesDirectory;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException;
+import org.objectweb.proactive.extra.dataspaces.vfs.SpacesMountManager;
 
 
 /**

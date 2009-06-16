@@ -1,8 +1,8 @@
 package unitTests.dataspaces;
 
-import org.objectweb.proactive.extra.dataspaces.CachingSpacesDirectory;
-import org.objectweb.proactive.extra.dataspaces.SpacesDirectory;
-import org.objectweb.proactive.extra.dataspaces.SpacesDirectoryImpl;
+import org.objectweb.proactive.extra.dataspaces.core.naming.CachingSpacesDirectory;
+import org.objectweb.proactive.extra.dataspaces.core.naming.SpacesDirectory;
+import org.objectweb.proactive.extra.dataspaces.core.naming.SpacesDirectoryImpl;
 
 
 public class CachingSpacesDirectoryTest extends SpacesDirectoryAbstractBase {

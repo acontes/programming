@@ -10,9 +10,9 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
-import org.objectweb.proactive.extra.dataspaces.BaseScratchSpaceConfiguration;
-import org.objectweb.proactive.extra.dataspaces.DataSpacesNodes;
 import org.objectweb.proactive.extra.dataspaces.Utils;
+import org.objectweb.proactive.extra.dataspaces.core.BaseScratchSpaceConfiguration;
+import org.objectweb.proactive.extra.dataspaces.core.DataSpacesNodes;
 import org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredException;
 

@@ -2,7 +2,6 @@ package org.objectweb.proactive.extra.dataspaces.api;
 
 import java.util.List;
 
-import org.objectweb.proactive.extra.dataspaces.PADataSpaces;
 import org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException;
 
 

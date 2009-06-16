@@ -1,4 +1,4 @@
-package org.objectweb.proactive.extra.dataspaces.adapter.vfs;
+package org.objectweb.proactive.extra.dataspaces.vfs.adapter;
 
 import java.io.IOException;
 import java.io.InputStream;

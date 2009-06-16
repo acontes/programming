@@ -13,13 +13,13 @@ import java.util.Map.Entry;
 
 import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.extra.dataspaces.DataSpacesURI;
-import org.objectweb.proactive.extra.dataspaces.NamingService;
-import org.objectweb.proactive.extra.dataspaces.SpaceInstanceInfo;
-import org.objectweb.proactive.extra.dataspaces.SpacesMountManager;
 import org.objectweb.proactive.extra.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extra.dataspaces.api.FileType;
+import org.objectweb.proactive.extra.dataspaces.core.DataSpacesURI;
+import org.objectweb.proactive.extra.dataspaces.core.SpaceInstanceInfo;
+import org.objectweb.proactive.extra.dataspaces.core.naming.NamingService;
 import org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException;
+import org.objectweb.proactive.extra.dataspaces.vfs.SpacesMountManager;
 
 
 /**

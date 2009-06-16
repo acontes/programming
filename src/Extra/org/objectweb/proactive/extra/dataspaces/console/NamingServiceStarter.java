@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extra.dataspaces.NamingServiceDeployer;
+import org.objectweb.proactive.extra.dataspaces.core.naming.NamingServiceDeployer;
 
 
 /**

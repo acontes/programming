@@ -20,12 +20,12 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.extra.dataspaces.ApplicationScratchSpace;
-import org.objectweb.proactive.extra.dataspaces.BaseScratchSpaceConfiguration;
-import org.objectweb.proactive.extra.dataspaces.NodeScratchSpace;
 import org.objectweb.proactive.extra.dataspaces.Utils;
-import org.objectweb.proactive.extra.dataspaces.VFSFactory;
+import org.objectweb.proactive.extra.dataspaces.core.ApplicationScratchSpace;
+import org.objectweb.proactive.extra.dataspaces.core.BaseScratchSpaceConfiguration;
+import org.objectweb.proactive.extra.dataspaces.core.NodeScratchSpace;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
+import org.objectweb.proactive.extra.dataspaces.vfs.VFSFactory;
 
 import unitTests.dataspaces.mock.MOCKNode;
 

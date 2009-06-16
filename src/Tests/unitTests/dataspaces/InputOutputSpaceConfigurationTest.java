@@ -6,8 +6,8 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.fail;
 
 import org.junit.Test;
-import org.objectweb.proactive.extra.dataspaces.InputOutputSpaceConfiguration;
-import org.objectweb.proactive.extra.dataspaces.SpaceType;
+import org.objectweb.proactive.extra.dataspaces.core.InputOutputSpaceConfiguration;
+import org.objectweb.proactive.extra.dataspaces.core.SpaceType;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 
 

@@ -1,4 +1,4 @@
-package org.objectweb.proactive.extra.dataspaces.adapter.vfs;
+package org.objectweb.proactive.extra.dataspaces.vfs.adapter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -8,12 +8,12 @@ import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.Selectors;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.extra.dataspaces.DataSpacesURI;
 import org.objectweb.proactive.extra.dataspaces.api.Capability;
 import org.objectweb.proactive.extra.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extra.dataspaces.api.FileContent;
 import org.objectweb.proactive.extra.dataspaces.api.FileSelector;
 import org.objectweb.proactive.extra.dataspaces.api.FileType;
+import org.objectweb.proactive.extra.dataspaces.core.DataSpacesURI;
 import org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException;
 

@@ -21,21 +21,21 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.extensions.calcium.system.SkeletonSystemImpl;
-import org.objectweb.proactive.extra.dataspaces.DataSpacesLimitingFileObject;
-import org.objectweb.proactive.extra.dataspaces.DataSpacesURI;
-import org.objectweb.proactive.extra.dataspaces.InputOutputSpaceConfiguration;
-import org.objectweb.proactive.extra.dataspaces.PADataSpaces;
-import org.objectweb.proactive.extra.dataspaces.ScratchSpaceConfiguration;
-import org.objectweb.proactive.extra.dataspaces.SpaceInstanceInfo;
-import org.objectweb.proactive.extra.dataspaces.SpaceType;
-import org.objectweb.proactive.extra.dataspaces.SpacesDirectory;
-import org.objectweb.proactive.extra.dataspaces.SpacesDirectoryImpl;
-import org.objectweb.proactive.extra.dataspaces.SpacesMountManager;
-import org.objectweb.proactive.extra.dataspaces.VFSFactory;
-import org.objectweb.proactive.extra.dataspaces.adapter.vfs.VFSFileObjectAdapter;
 import org.objectweb.proactive.extra.dataspaces.api.DataSpacesFileObject;
+import org.objectweb.proactive.extra.dataspaces.api.PADataSpaces;
+import org.objectweb.proactive.extra.dataspaces.core.DataSpacesURI;
+import org.objectweb.proactive.extra.dataspaces.core.InputOutputSpaceConfiguration;
+import org.objectweb.proactive.extra.dataspaces.core.ScratchSpaceConfiguration;
+import org.objectweb.proactive.extra.dataspaces.core.SpaceInstanceInfo;
+import org.objectweb.proactive.extra.dataspaces.core.SpaceType;
+import org.objectweb.proactive.extra.dataspaces.core.naming.SpacesDirectory;
+import org.objectweb.proactive.extra.dataspaces.core.naming.SpacesDirectoryImpl;
 import org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundException;
+import org.objectweb.proactive.extra.dataspaces.vfs.DataSpacesLimitingFileObject;
+import org.objectweb.proactive.extra.dataspaces.vfs.SpacesMountManager;
+import org.objectweb.proactive.extra.dataspaces.vfs.VFSFactory;
+import org.objectweb.proactive.extra.dataspaces.vfs.adapter.VFSFileObjectAdapter;
 
 
 /**

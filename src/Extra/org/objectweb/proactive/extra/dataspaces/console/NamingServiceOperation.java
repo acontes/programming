@@ -4,9 +4,9 @@ import java.net.URISyntaxException;
 
 import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.extra.dataspaces.InputOutputSpaceConfiguration;
-import org.objectweb.proactive.extra.dataspaces.NamingService;
-import org.objectweb.proactive.extra.dataspaces.SpaceInstanceInfo;
+import org.objectweb.proactive.extra.dataspaces.core.InputOutputSpaceConfiguration;
+import org.objectweb.proactive.extra.dataspaces.core.SpaceInstanceInfo;
+import org.objectweb.proactive.extra.dataspaces.core.naming.NamingService;
 import org.objectweb.proactive.extra.dataspaces.exceptions.WrongApplicationIdException;
 
 

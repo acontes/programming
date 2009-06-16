@@ -1,4 +1,4 @@
-package org.objectweb.proactive.extra.dataspaces;
+package org.objectweb.proactive.extra.dataspaces.core;
 
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 

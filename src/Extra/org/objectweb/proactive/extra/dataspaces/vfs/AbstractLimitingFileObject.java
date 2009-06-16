@@ -1,4 +1,4 @@
-package org.objectweb.proactive.extra.dataspaces;
+package org.objectweb.proactive.extra.dataspaces.vfs;
 
 import java.io.InputStream;
 import java.io.OutputStream;
