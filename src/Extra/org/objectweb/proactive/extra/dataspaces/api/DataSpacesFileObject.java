@@ -23,13 +23,12 @@ public interface DataSpacesFileObject {
      * {@link PADataSpaces#resolveFile(String)} method call.
      * 
      * @return URI of a represented file without the trailing slash
-     * @throws FileSystemException
      */
-    public abstract String getURI() throws FileSystemException;
+    public abstract String getURI();
 
     /**
      * Determines if this file exists.
-     *
+     * 
      * @return <code>true</code> if this file exists, <code>false</code> if not.
      * @throws FileSystemException
      *             On error determining if this file exists.
@@ -38,7 +37,7 @@ public interface DataSpacesFileObject {
 
     /**
      * Determines if this file is hidden.
-     *
+     * 
      * @return <code>true</code> if this file is hidden, <code>false</code> if not.
      * @throws FileSystemException
      *             On error determining if this file exists.
@@ -47,7 +46,7 @@ public interface DataSpacesFileObject {
 
     /**
      * Determines if this file can be read.
-     *
+     * 
      * @return <code>true</code> if this file is readable, <code>false</code> if not.
      * @throws FileSystemException
      *             On error determining if this file exists.
@@ -56,7 +55,7 @@ public interface DataSpacesFileObject {
 
     /**
      * Determines if this file can be written to.
-     *
+     * 
      * @return <code>true</code> if this file is writeable, <code>false</code> if not.
      * @throws FileSystemException
      *             On error determining if this file exists.
@@ -65,7 +64,7 @@ public interface DataSpacesFileObject {
 
     /**
      * Returns this file's type.
-     *
+     * 
      * @return One of the {@link FileType} enums. Never returns null.
      * @throws FileSystemException
      *             On error determining the file's type.
@@ -74,7 +73,7 @@ public interface DataSpacesFileObject {
 
     /**
      * Determines if this file's data space has a particular capability.
-     *
+     * 
      * @param capability
      *            The capability to check for.
      * @return true if this file's data space has the requested capability.
@@ -84,7 +83,7 @@ public interface DataSpacesFileObject {
 
     /**
      * Returns the folder that contains this file.
-     *
+     * 
      * @return The folder that contains this file. Returns null if this file is the root of a file
      *         system.
      * @throws FileSystemException
@@ -94,7 +93,7 @@ public interface DataSpacesFileObject {
 
     /**
      * Lists the children of this file.
-     *
+     * 
      * @return An array containing the children of this file. The array is unordered. If the file
      *         does not have any children, a zero-length array is returned. This method never
      *         returns null.
@@ -107,7 +106,7 @@ public interface DataSpacesFileObject {
     /**
      * Returns a child of this file. Note that this method returns <code>null</code> when the child
      * does not exist.
-     *
+     * 
      * @param name
      *            The name of the child.
      * @return The child, or null if there is no such child.
@@ -120,7 +119,7 @@ public interface DataSpacesFileObject {
     /**
      * Finds a file, relative to this file. Equivalent to calling
      * <code>resolveFile( path, NameScope.FILE_SYSTEM )</code>.
-     *
+     * 
      * @param path
      *            The path of the file to locate. Can either be a relative path or an absolute path.
      * @return The file.
@@ -131,7 +130,7 @@ public interface DataSpacesFileObject {
 
     /**
      * Finds the set of matching descendents of this file, in depthwise order.
-     *
+     * 
      * @param selector
      *            The selector to use to select matching files.
      * @return The matching files. The files are returned in depthwise order (that is, a child
@@ -142,7 +141,7 @@ public interface DataSpacesFileObject {
 
     /**
      * Finds the set of matching descendents of this file.
-     *
+     * 
      * @param selector
      *            the selector used to determine if the file should be selected
      * @param depthwise
@@ -158,7 +157,7 @@ public interface DataSpacesFileObject {
      * Deletes this file. Does nothing if this file does not exist of if it is a folder that has
      * children. Does not delete any descendents of this file, use {@link #delete(FileSelector)} for
      * that.
-     *
+     * 
      * @return true if this object has been deleted
      * @throws FileSystemException
      *             If this file is a non-empty folder, or if this file is read-only, or on error
@@ -173,7 +172,7 @@ public interface DataSpacesFileObject {
      * <p>
      * This method is not transactional. If it fails and throws an exception, this file will
      * potentially only be partially deleted.
-     *
+     * 
      * @param selector
      *            The selector to use to select which files to delete.
      * @return the number of deleted objects
@@ -186,7 +185,7 @@ public interface DataSpacesFileObject {
     /**
      * Creates this folder, if it does not exist. Also creates any ancestor folders which do not
      * exist. This method does nothing if the folder already exists.
-     *
+     * 
      * @throws FileSystemException
      *             If the folder already exists with the wrong type, or the parent folder is
      *             read-only, or on error creating this folder or one of its ancestors.
@@ -196,7 +195,7 @@ public interface DataSpacesFileObject {
     /**
      * Creates this file, if it does not exist. Also creates any ancestor folders which do not
      * exist. This method does nothing if the file already exists and is a file.
-     *
+     * 
      * @throws FileSystemException
      *             If the file already exists with the wrong type, or the parent folder is
      *             read-only, or on error creating this file or one of its ancestors.
@@ -212,7 +211,7 @@ public interface DataSpacesFileObject {
      * <p>
      * This method is not transactional. If it fails and throws an exception, this file will
      * potentially only be partially copied.
-     *
+     * 
      * @param srcFile
      *            The source file to copy.
      * @param selector
@@ -228,7 +227,7 @@ public interface DataSpacesFileObject {
      * Move this file.
      * <p>
      * If the destFile exists, it is deleted first</b>
-     *
+     * 
      * @param destFile
      *            the New filename.
      * @throws FileSystemException
@@ -238,17 +237,17 @@ public interface DataSpacesFileObject {
     public abstract void moveTo(DataSpacesFileObject destFile) throws FileSystemException;
 
     /**
-    * Returns this file's content. The {@link FileContent} returned by this method can be used to
-    * read and write the content of the file.
-    * <p/>
-    * <p>
-    * This method can be called if the file does not exist, and the returned {@link FileContent}
-    * can be used to create the file by writing its content.
-    *
-    * @return This file's content.
-    * @throws FileSystemException
-    *             On error getting this file's content.
-    */
+     * Returns this file's content. The {@link FileContent} returned by this method can be used to
+     * read and write the content of the file.
+     * <p/>
+     * <p>
+     * This method can be called if the file does not exist, and the returned {@link FileContent}
+     * can be used to create the file by writing its content.
+     * 
+     * @return This file's content.
+     * @throws FileSystemException
+     *             On error getting this file's content.
+     */
     public abstract FileContent getContent() throws FileSystemException;
 
     /**
@@ -257,7 +256,7 @@ public interface DataSpacesFileObject {
      * <p/>
      * <p>
      * The file object can continue to be used after this method is called.
-     *
+     * 
      * @throws FileSystemException
      *             On error closing the file.
      * @see FileContent#close

@@ -7,7 +7,10 @@ import java.util.List;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.Selectors;
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.dataspaces.api.Capability;
 import org.objectweb.proactive.extra.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extra.dataspaces.api.FileContent;
@@ -25,6 +28,7 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException
  * Adapted FileObject should provide any access limitation as required by Data Spaces specification.
  */
 public class VFSFileObjectAdapter implements DataSpacesFileObject {
+    private final static Logger logger = ProActiveLogger.getLogger(Loggers.DATASPACES);
 
     private final FileObject adaptee;
 
@@ -65,7 +69,7 @@ public class VFSFileObjectAdapter implements DataSpacesFileObject {
         }
     }
 
-    public String getURI() throws FileSystemException {
+    public String getURI() {
         final FileName path = adaptee.getName();
         final String mpURIString = mountingPointURI.toString();
 
@@ -77,7 +81,8 @@ public class VFSFileObjectAdapter implements DataSpacesFileObject {
             else
                 return mpURIString + '/' + relativePath;
         } catch (org.apache.commons.vfs.FileSystemException e) {
-            throw new FileSystemException(e);
+            ProActiveLogger.logImpossibleException(logger, e);
+            throw new ProActiveRuntimeException(e);
         }
     }
 
@@ -446,10 +451,6 @@ public class VFSFileObjectAdapter implements DataSpacesFileObject {
             return false;
 
         final DataSpacesFileObject file = (DataSpacesFileObject) candidate;
-        try {
-            return (this.getURI().equals(file.getURI()));
-        } catch (FileSystemException e) {
-            throw new ProActiveRuntimeException(e);
-        }
+        return this.getURI().equals(file.getURI());
     }
 }

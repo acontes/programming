@@ -52,11 +52,7 @@ public class DataSpacesImpl {
      * @see {@link PADataSpaces#getURI(DataSpacesFileObject)}
      */
     public static String getURI(DataSpacesFileObject fileObject) {
-        try {
-            return fileObject.getURI();
-        } catch (FileSystemException e) {
-            return null;
-        }
+        return fileObject.getURI();
     }
 
     /**
