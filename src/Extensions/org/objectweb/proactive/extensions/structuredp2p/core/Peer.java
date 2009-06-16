@@ -1,7 +1,6 @@
 package org.objectweb.proactive.extensions.structuredp2p.core;
 
 import java.io.Serializable;
-import java.util.Vector;
 import java.util.concurrent.Future;
 
 import org.objectweb.proactive.Body;
@@ -39,7 +38,7 @@ public class Peer implements InitActive, RunActive, Serializable {
      * The timeout to wait before to check neighbors via the call of
      * {@link StructuredOverlay#checkNeighbors()} .
      */
-    public static final int CHECK_NEIGHBORS_TIMEOUT = 100;
+    public static final int CHECK_NEIGHBORS_TIMEOUT = 3000;
 
     /**
      * The structured protocol which is used by the peer.
@@ -58,19 +57,9 @@ public class Peer implements InitActive, RunActive, Serializable {
     private DataStorage dataStorage;
 
     /**
-     * Timestamp when the last request has been served.
-     */
-    private long lastRequestTimestamp;
-
-    /**
      * The stub associated to the current peer.
      */
     private Peer stub;
-
-    /**
-     * The requests that are bufferized by the current peer to a peer that is preparing to leave.
-     */
-    private Vector<Request> bufferizedRequests = new Vector<Request>();
 
     /**
      * The no-argument constructor as commanded by ProActive.
@@ -270,7 +259,6 @@ public class Peer implements InitActive, RunActive, Serializable {
         }
 
         PAActiveObject.setImmediateService("setResponseMessageDeliveryTime");
-        this.lastRequestTimestamp = System.currentTimeMillis();
         this.stub = (Peer) PAActiveObject.getStubOnThis();
     }
 
@@ -282,7 +270,7 @@ public class Peer implements InitActive, RunActive, Serializable {
         while (body.isActive()) {
             Request req = service.blockingRemoveOldest(Peer.CHECK_NEIGHBORS_TIMEOUT);
             if (req == null) {
-                this.structuredOverlay.checkNeighbors();
+                // this.structuredOverlay.checkNeighbors();
             } else {
                 // bufferize=false;
                 service.serve(req);

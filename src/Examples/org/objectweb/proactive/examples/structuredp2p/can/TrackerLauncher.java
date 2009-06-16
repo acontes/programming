@@ -31,7 +31,9 @@ public class TrackerLauncher {
 
         this.trackerVirtualNode = Deployment.getVirtualNode("Tracker");
         this.nbTrackers = this.trackerVirtualNode.getCurrentNodes().size();
-
+        System.out.println();
+        System.out.println(this.nbTrackers + "TRACKERS TO CREATE");
+        System.out.println();
         for (int i = 0; i < this.nbTrackers; i++) {
             this.createNewTracker();
         }

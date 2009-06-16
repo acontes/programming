@@ -42,6 +42,9 @@ public class InteractiveThread implements Runnable {
                 this.peerLauncher.removePeer();
             } else if (inputLine.equalsIgnoreCase("lookup")) {
                 this.peerLauncher.lookupMessage();
+            } else if (inputLine.equalsIgnoreCase("nop")) {
+                this.peerLauncher.printInformation(this.peerLauncher.getRemotePeers().size() +
+                    " peer(s) on the network.");
             } else if (inputLine.startsWith("random")) {
                 int nbOperations = Integer.parseInt(inputLine.split(" ")[1]);
 
@@ -77,6 +80,7 @@ public class InteractiveThread implements Runnable {
         System.out.println("  > Type in 'lookup' : send a lookup message to a random peer");
         System.out.println("  > Type in 'leave' : force a random peer to quit the network");
         System.out.println("  > Type in 'random x' : perform x random operations (lookup, join, leave)");
+        System.out.println("  > Type in 'nop' : give the number of peers on the network");
         System.out.println("  > Type in 'quit' : quit the application");
     }
 }

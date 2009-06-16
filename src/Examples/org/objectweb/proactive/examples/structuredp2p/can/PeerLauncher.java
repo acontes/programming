@@ -85,11 +85,11 @@ public class PeerLauncher {
 
             TrackerLauncher.trackers.get(this.trackersIndex % TrackerLauncher.trackers.size()).addOnNetwork(
                     peer);
-            this.trackersIndex++;
-
             this
                     .printInformation("Add peer managing " +
                         ((CANOverlay) peer.getStructuredOverlay()).getZone());
+            this.trackersIndex++;
+
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
         } catch (NodeException e) {
@@ -98,14 +98,11 @@ public class PeerLauncher {
     }
 
     public void removePeer() {
-        /*
-         * Random rand = new Random(); Peer p =
-         * this.remotePeers.remove(rand.nextInt(this.remotePeers.size())); p.leave();
-         * 
-         * this.printInformation("Remove peer managing " + ((CANOverlay)
-         * p.getStructuredOverlay()).getZone());
-         */
-        this.printInformation("Leave is not yet fully implemented !");
+        Random rand = new Random();
+        Peer peer = this.remotePeers.remove(rand.nextInt(this.remotePeers.size()));
+        this.printInformation("Remove peer managing " + ((CANOverlay) peer.getStructuredOverlay()).getZone());
+        this.remotePeers.remove(peer);
+        peer.leave();
     }
 
     public void lookupMessage() {

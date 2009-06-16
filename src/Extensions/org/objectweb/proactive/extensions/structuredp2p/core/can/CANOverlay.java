@@ -19,6 +19,7 @@ import org.objectweb.proactive.extensions.structuredp2p.messages.PingMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.RemoveNeighborMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANAddNeighborMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANJoinMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANLeaveMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANLookupMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANMergeMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANPrepareToLeaveMessage;
@@ -140,41 +141,56 @@ public class CANOverlay extends StructuredOverlay {
                 e.printStackTrace();
             }
 
-            /*
-             * For the last dimension and direction of the split, we split N-1 times, where N is the
-             * number of neighbors in the last dimension and last reverse direction.
-             */
-            for (int i = 0; i < neighborsToMergeWith.size() - 1; i++) {
-                Zone[] newZones = null;
-                try {
-                    newZones = zoneToSplit.split(CANOverlay.getNextDimension(lastDimension),
-                            this.neighborsDataStructure.getZone(neighborsToMergeWith.get(i))
-                                    .getCoordinateMax(CANOverlay.getNextDimension(lastDimension)));
-                } catch (ZoneException e) {
-                    e.printStackTrace();
-                }
-
-                NeighborsDataStructure neighborsOfCurrentNeighbor = new NeighborsDataStructure(
-                    neighborsToMergeWith.get(i));
-                neighborsOfCurrentNeighbor.addAll(this.neighborsDataStructure);
-
-                zoneToSplit = newZones[1];
-
+            if (neighborsToMergeWith.size() > 1) {
+                System.out.println("MERGE WITH MANY PEER " + neighborsToMergeWith.size());
                 /*
-                 * Merge the new zones obtained with the suitable neighbors.
+                 * For the last dimension and direction of the split, we split N-1 times, where N is
+                 * the number of neighbors in the last dimension and last reverse direction.
                  */
+                for (int i = 0; i < neighborsToMergeWith.size() - 1; i++) {
+                    Zone[] newZones = null;
+                    try {
+                        newZones = zoneToSplit.split(CANOverlay.getNextDimension(lastDimension),
+                                this.neighborsDataStructure.getZone(neighborsToMergeWith.get(i))
+                                        .getCoordinateMax(CANOverlay.getNextDimension(lastDimension)));
+                    } catch (ZoneException e) {
+                        e.printStackTrace();
+                    }
+
+                    NeighborsDataStructure neighborsOfCurrentNeighbor = new NeighborsDataStructure(
+                        neighborsToMergeWith.get(i));
+                    neighborsOfCurrentNeighbor.addAll(this.neighborsDataStructure);
+
+                    zoneToSplit = newZones[1];
+
+                    /*
+                     * Merge the new zones obtained with the suitable neighbors.
+                     */
+                    try {
+                        ActionResponseMessage response = (ActionResponseMessage) PAFuture.getFutureValue(this
+                                .sendMessageTo(neighborsToMergeWith.get(i), new CANMergeMessage(this
+                                        .getRemotePeer(), lastDimension, lastDirection,
+                                    neighborsOfCurrentNeighbor, newZones[0], this.getLocalPeer()
+                                            .getDataStorage().getDataFromZone(this.getZone()))));
+                        responses.add(response);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    neighbors.add(neighborsOfCurrentNeighbor);
+                }
+            } else { /* There is only one peer to merge with */
+                System.out.println("ONLY ONE PEER TO MERGE WITH " + neighborsToMergeWith.size());
                 try {
                     ActionResponseMessage response = (ActionResponseMessage) PAFuture.getFutureValue(this
-                            .sendMessageTo(neighborsToMergeWith.get(i), new CANMergeMessage(this
+                            .sendMessageTo(neighborsToMergeWith.get(0), new CANMergeMessage(this
                                     .getRemotePeer(), lastDimension, lastDirection,
-                                neighborsOfCurrentNeighbor, newZones[0], this.getLocalPeer().getDataStorage()
-                                        .getDataFromZone(this.getZone()))));
+                                new NeighborsDataStructure(neighborsToMergeWith.get(0)), this.getZone(), this
+                                        .getLocalPeer().getDataStorage().getDataFromZone(this.getZone()))));
                     responses.add(response);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
-                neighbors.add(neighborsOfCurrentNeighbor);
             }
 
             this.setZone(null);
@@ -184,8 +200,8 @@ public class CANOverlay extends StructuredOverlay {
              * structure.
              */
             try {
-                PAFuture.waitForAll(this.sendMessageTo(this.getNeighborsDataStructure(), new LeaveMessage(
-                    this.getRemotePeer())));
+                PAFuture.waitForAll(this.sendMessageTo(this.getNeighborsDataStructure(), new CANLeaveMessage(
+                    this.getRemotePeer(), lastDimension, lastDirection)));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -368,7 +384,7 @@ public class CANOverlay extends StructuredOverlay {
                                 .getCoordinates()[CANOverlay.getNextDimension(dim)], dim, direction);
 
                         if (this.neighborsDataStructure.getNeighborState(nearestPeer, dim, direction) == NeighborState.PREPARE_TO_LEAVE) {
-                            System.out.println("CANOverlay.sendMessage()");
+                            System.out.println("CANOverlay.sendMessage() to PREPARE TO LEAVE");
                             // this.getLocalPeer()
                         }
                         try {
@@ -541,8 +557,9 @@ public class CANOverlay extends StructuredOverlay {
      * {@inheritDoc}
      */
     public ActionResponseMessage handleLeaveMessage(LeaveMessage msg) {
-        return new ActionResponseMessage(msg.getCreationTimestamp(), this.neighborsDataStructure.remove(msg
-                .getPeer()));
+        CANLeaveMessage message = (CANLeaveMessage) msg;
+        return new ActionResponseMessage(msg.getCreationTimestamp(), this.neighborsDataStructure.remove(
+                message.getPeer(), message.getDimension(), message.getDirection()));
     }
 
     /**

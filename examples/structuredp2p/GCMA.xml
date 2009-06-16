@@ -28,8 +28,8 @@
 
 			</configuration>
 
-			<virtualNode id="Peer" capacity="3" />
-			<virtualNode id="Tracker" capacity="3" />
+			<virtualNode id="Peer" capacity="1" />
+			<virtualNode id="Tracker" capacity="1" />
 		</proactive>
 	</application>
 
