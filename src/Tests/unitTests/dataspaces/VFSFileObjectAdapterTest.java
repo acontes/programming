@@ -94,7 +94,19 @@ public class VFSFileObjectAdapterTest {
     }
     
     @Test
-    public void testGetURI() throws FileSystemException {
+    public void testGetURI1() throws org.apache.commons.vfs.FileSystemException, MalformedURIException,
+            FileSystemException {
+        final FileObject rootFileObject = fileSystemManager.resolveFile("file://" + rootDirPath);
+        final FileName mountintPointFileName = rootFileObject.getName();
+        final FileObject rootAdaptee = rootFileObject;
+        final DataSpacesFileObject fo = new VFSFileObjectAdapter(rootAdaptee, mountingPointURI,
+            mountintPointFileName);
+
+        assertEquals("vfs:///1/scratch/rt1/node1/ao1", fo.getURI());
+    }
+
+    @Test
+    public void testGetURI2() throws FileSystemException {
         assertEquals("vfs:///1/scratch/rt1/node1/ao1/dir/file.txt", dsFileObject.getURI());
     }
     
@@ -112,13 +124,13 @@ public class VFSFileObjectAdapterTest {
     
     @Test(expected = FileSystemException.class)
     public void testResolveExceedsRoot() throws FileSystemException {
-        dsFileObject.resolveFile("../../");
+        dsFileObject.resolveFile("../../../");
     }
     
     @Test(expected = FileSystemException.class)
     public void testGetParentExceedsRoot() throws FileSystemException {
-        DataSpacesFileObject parent = dsFileObject.resolveFile("..");
-        parent.getParent();
+        DataSpacesFileObject grandParent = dsFileObject.getParent().getParent();
+        grandParent.getParent();
     }
     
     @Test(expected = MalformedURIException.class)
