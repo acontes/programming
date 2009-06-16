@@ -66,10 +66,6 @@ public class SpacesMountManagerTest {
         }
     }
 
-    private static String getURLForFile(final File file) throws IOException {
-        return "file:///" + file.getCanonicalPath().replaceFirst("^/", "");
-    }
-
     private SpacesMountManager manager;
     private SpacesDirectory directory;
     private File spacesDir;
@@ -90,7 +86,7 @@ public class SpacesMountManagerTest {
         osw.write(INPUT_FILE_CONTENT);
         osw.close();
 
-        final String inputSpaceUrl = getURLForFile(inputSpaceDir);
+        final String inputSpaceUrl = inputSpaceDir.getAbsolutePath();
         final InputOutputSpaceConfiguration inputSpaceConf = InputOutputSpaceConfiguration
                 .createInputSpaceConfiguration(inputSpaceUrl, null, null, "read_only_space");
         final SpaceInstanceInfo inputSpaceInfo = new SpaceInstanceInfo(123, inputSpaceConf);
@@ -100,7 +96,7 @@ public class SpacesMountManagerTest {
         final File outputSpaceDir = new File(spacesDir, "output");
         assertTrue(outputSpaceDir.mkdirs());
 
-        final String outputSpaceUrl = getURLForFile(outputSpaceDir);
+        final String outputSpaceUrl = outputSpaceDir.getAbsolutePath();
         final InputOutputSpaceConfiguration outputSpaceConf = InputOutputSpaceConfiguration
                 .createOutputSpaceConfiguration(outputSpaceUrl, null, null, "read_write_space");
         final SpaceInstanceInfo outputSpaceInfo = new SpaceInstanceInfo(123, outputSpaceConf);
@@ -112,7 +108,7 @@ public class SpacesMountManagerTest {
         final File scratchSpaceSubdir = new File(scratchSpaceDir, SCRATCH_ACTIVE_OBJECT_ID);
         scratchSpaceSubdir.mkdir();
 
-        final String scratchSpaceUrl = getURLForFile(scratchSpaceDir);
+        final String scratchSpaceUrl = scratchSpaceDir.getAbsolutePath();
         final ScratchSpaceConfiguration scratchSpaceConf = new ScratchSpaceConfiguration(scratchSpaceUrl,
             null, null);
         final SpaceInstanceInfo scratchSpaceInfo = new SpaceInstanceInfo(123, "runtimeA", "nodeB",
