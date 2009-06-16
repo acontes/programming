@@ -22,7 +22,6 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundException;
 
 
-// TODO change return type to interface
 // WISH: extract interface
 /**
  * Manages data spaces mountings and file accessing, connecting Data Spaces and VFS worlds in this
@@ -132,7 +131,7 @@ public class SpacesMountManager {
      *             when provided queryUri is not suitable for user path
      * @see DataSpacesURI#isSuitableForUserPath()
      */
-    public VFSFileObjectAdapter resolveFile(final DataSpacesURI queryUri, final String ownerActiveObjectId)
+    public DataSpacesFileObject resolveFile(final DataSpacesURI queryUri, final String ownerActiveObjectId)
             throws FileSystemException, SpaceNotFoundException {
 
         if (logger.isDebugEnabled())
@@ -186,10 +185,10 @@ public class SpacesMountManager {
      * @see DataSpacesURI#isSpacePartFullyDefined()
      * @see DataSpacesURI#isSuitableForUserPath()
      */
-    public Map<DataSpacesURI, VFSFileObjectAdapter> resolveSpaces(final DataSpacesURI queryUri,
+    public Map<DataSpacesURI, DataSpacesFileObject> resolveSpaces(final DataSpacesURI queryUri,
             final String ownerActiveObjectId) throws FileSystemException {
 
-        final Map<DataSpacesURI, VFSFileObjectAdapter> result = new HashMap<DataSpacesURI, VFSFileObjectAdapter>();
+        final Map<DataSpacesURI, DataSpacesFileObject> result = new HashMap<DataSpacesURI, DataSpacesFileObject>();
         if (logger.isDebugEnabled())
             logger.debug("Spaces access request: " + queryUri);
 
@@ -315,7 +314,7 @@ public class SpacesMountManager {
     }
 
     // uri should be always suitable for user path
-    private VFSFileObjectAdapter doResolveFile(final DataSpacesURI uri, final String ownerActiveObjectId)
+    private DataSpacesFileObject doResolveFile(final DataSpacesURI uri, final String ownerActiveObjectId)
             throws FileSystemException {
 
         synchronized (readLock) {

@@ -17,7 +17,6 @@ import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extra.dataspaces.adapter.vfs.VFSFileObjectAdapter;
 import org.objectweb.proactive.extra.dataspaces.api.Capability;
 import org.objectweb.proactive.extra.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
@@ -195,7 +194,7 @@ public class DataSpacesImpl {
 
         try {
             final String aoId = Utils.getActiveObjectId(Utils.getCurrentActiveObjectBody());
-            final VFSFileObjectAdapter fo = spacesMountManager.resolveFile(uri, aoId);
+            final DataSpacesFileObject fo = spacesMountManager.resolveFile(uri, aoId);
             if (logger.isTraceEnabled())
                 logger.trace(String.format("Resolved request for %s with name %s (%s)", type, name, uri));
 
@@ -251,7 +250,7 @@ public class DataSpacesImpl {
         while (currTime < startTime + timeoutMillis) {
             try {
                 final String aoId = Utils.getActiveObjectId(Utils.getCurrentActiveObjectBody());
-                final VFSFileObjectAdapter fo = spacesMountManager.resolveFile(uri, aoId);
+                final DataSpacesFileObject fo = spacesMountManager.resolveFile(uri, aoId);
                 if (logger.isTraceEnabled()) {
                     final String message = String.format(
                             "Resolved blocking request for %s with name %s (%s)", type, name, uri);
@@ -309,7 +308,7 @@ public class DataSpacesImpl {
             final DataSpacesURI scratchURI = appScratchSpace.getScratchForAO(body);
             final DataSpacesURI queryURI = scratchURI.withUserPath(path);
             final String aoId = Utils.getActiveObjectId(Utils.getCurrentActiveObjectBody());
-            final VFSFileObjectAdapter fo = spacesMountManager.resolveFile(queryURI, aoId);
+            final DataSpacesFileObject fo = spacesMountManager.resolveFile(queryURI, aoId);
 
             if (logger.isTraceEnabled())
                 logger.trace("Resolved scratch for an Active Object: " + queryURI);
@@ -369,7 +368,7 @@ public class DataSpacesImpl {
         checkIsInputOrOutput(type);
 
         final DataSpacesURI uri = DataSpacesURI.createURI(appId, type);
-        final Map<DataSpacesURI, VFSFileObjectAdapter> spaces;
+        final Map<DataSpacesURI, DataSpacesFileObject> spaces;
         try {
             final String aoId = Utils.getActiveObjectId(Utils.getCurrentActiveObjectBody());
             spaces = spacesMountManager.resolveSpaces(uri, aoId);
@@ -380,9 +379,9 @@ public class DataSpacesImpl {
 
         final Map<String, DataSpacesFileObject> ret = new HashMap<String, DataSpacesFileObject>(spaces.size());
 
-        for (Entry<DataSpacesURI, VFSFileObjectAdapter> entry : spaces.entrySet()) {
+        for (Entry<DataSpacesURI, DataSpacesFileObject> entry : spaces.entrySet()) {
             final String name = entry.getKey().getName();
-            VFSFileObjectAdapter fo = entry.getValue();
+            DataSpacesFileObject fo = entry.getValue();
 
             checkCapabilitiesOrWound(fo, type);
             ret.put(name, fo);
@@ -416,7 +415,7 @@ public class DataSpacesImpl {
                 throw new MalformedURIException("Specified URI represents internal high-level directories");
 
             final String aoId = Utils.getActiveObjectId(Utils.getCurrentActiveObjectBody());
-            final VFSFileObjectAdapter fo = spacesMountManager.resolveFile(spaceURI, aoId);
+            final DataSpacesFileObject fo = spacesMountManager.resolveFile(spaceURI, aoId);
             SpaceType type = spaceURI.getSpaceType(); // as isComplete cannot be null
 
             if (logger.isTraceEnabled())
