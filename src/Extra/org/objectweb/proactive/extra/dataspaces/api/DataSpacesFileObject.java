@@ -22,10 +22,11 @@ public interface DataSpacesFileObject {
      * Returns the file's URI in the Data Spaces virtual file system. It remains valid when passed
      * to active ActiveObject, and hence can be resolved there trough
      * {@link PADataSpaces#resolveFile(String)} method call.
-     *
-     * @return URI of a represented file
+     * 
+     * @return URI of a represented file without the trailing slash
+     * @throws FileSystemException
      */
-    public abstract String getURI();
+    public abstract String getURI() throws FileSystemException;
 
     /**
      * Determines if this file exists.

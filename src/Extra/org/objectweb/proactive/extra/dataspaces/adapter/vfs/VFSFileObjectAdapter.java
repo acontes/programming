@@ -4,12 +4,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.Selectors;
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.dataspaces.DataSpacesURI;
 import org.objectweb.proactive.extra.dataspaces.api.Capability;
 import org.objectweb.proactive.extra.dataspaces.api.DataSpacesFileObject;
@@ -17,6 +15,7 @@ import org.objectweb.proactive.extra.dataspaces.api.FileContent;
 import org.objectweb.proactive.extra.dataspaces.api.FileSelector;
 import org.objectweb.proactive.extra.dataspaces.api.FileType;
 import org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException;
+import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException;
 
 
 /**
@@ -28,54 +27,51 @@ public class VFSFileObjectAdapter implements DataSpacesFileObject {
 
     private final FileObject adaptee;
 
-    private static final Logger logger = ProActiveLogger.getLogger(Loggers.DATASPACES);
+    private final DataSpacesURI mountingPointURI;
 
-    private final DataSpacesURI spaceUri;
-
-    private final String vfsSpaceRootPath;
+    private FileName mountingPointVFSFileName;
 
     /**
-     * Creates an instance of DataSpacesLimitingFileObject. Before any usage of this class, id of an
-     * active object has to be set accordingly.
-     *
+     * 
      * @param fileObject
      *            file object that is going to be represented as DataSpacesFileObject; cannot be
      *            <code>null</code>
-     * @param spaceUri
+     * @param mountingPointURI
      *            Data Spaces URI of this file object's space; cannot be <code>null</code>
      * @param vfsSpaceRootPath
      *            VFS path of the space root FileObject; cannot be <code>null</code>
+     * @throws MalformedURIException
+     *             when mounting point URI does not fit underlying FileObject's path
      */
-    public VFSFileObjectAdapter(FileObject adaptee, DataSpacesURI spaceUri, String vfsSpaceRootPath) {
-        this.spaceUri = spaceUri;
-        this.vfsSpaceRootPath = vfsSpaceRootPath;
+    public VFSFileObjectAdapter(FileObject adaptee, DataSpacesURI mountingPointURI,
+            FileName mountingPointVFSFileName) throws MalformedURIException {
+        this.mountingPointURI = mountingPointURI;
+        this.mountingPointVFSFileName = mountingPointVFSFileName;
         this.adaptee = adaptee;
+        checkURIConsistencyOrWound();
     }
 
-    // TODO: check if URI is available eg. we went above URI root in VFS tree
-    private VFSFileObjectAdapter(FileObject adaptee, VFSFileObjectAdapter fileObjectAdapter) {
-        this.spaceUri = fileObjectAdapter.spaceUri;
-        this.vfsSpaceRootPath = fileObjectAdapter.vfsSpaceRootPath;
+    private VFSFileObjectAdapter(FileObject adaptee, VFSFileObjectAdapter fileObjectAdapter)
+            throws FileSystemException {
+        
+        this.mountingPointURI = fileObjectAdapter.mountingPointURI;
+        this.mountingPointVFSFileName = fileObjectAdapter.mountingPointVFSFileName;
         this.adaptee = adaptee;
-    }
-
-    //FIXME:
-    /*
-     * * Returned URI is always suitable for having path: {@link
-     * DataSpacesURI#isSuitableForHavingPath()} returns true. <p> FIXME: after getParent()
-     * limitation it should be like that?
-     */
-    public String getURI() {
-        // FIXME when DataSpacesFileObject will have just VFS adapter, store full URI as a field instead?
-        final String path = adaptee.getName().getPath();
-        if (!path.startsWith(vfsSpaceRootPath)) {
-            final ProActiveRuntimeException x = new ProActiveRuntimeException(
-                "VFS path of this DataSpacesFileObject does not start with its space VFS path");
-            ProActiveLogger.logImpossibleException(logger, x);
-            throw x;
+        try {
+            checkURIConsistencyOrWound();
+        } catch (MalformedURIException e) {
+            throw new FileSystemException(e);
         }
-        final String relPath = path.substring(vfsSpaceRootPath.length());
-        return spaceUri.toString() + relPath;
+    }
+
+    public String getURI() throws FileSystemException {
+        final FileName path = adaptee.getName();
+        try {
+            final String relativePath = mountingPointVFSFileName.getRelativeName(path);
+            return mountingPointURI.toString() + '/' + relativePath;
+        } catch (org.apache.commons.vfs.FileSystemException e) {
+            throw new FileSystemException(e);
+        }
     }
 
     public void close() throws FileSystemException {
@@ -200,8 +196,7 @@ public class VFSFileObjectAdapter implements DataSpacesFileObject {
     public DataSpacesFileObject getParent() throws FileSystemException {
         try {
             final FileObject vfsParent = adaptee.getParent();
-            adaptVFSResult(vfsParent);
-            return null;
+            return adaptVFSResult(vfsParent);
         } catch (org.apache.commons.vfs.FileSystemException e) {
             throw new FileSystemException(e);
         }
@@ -253,14 +248,6 @@ public class VFSFileObjectAdapter implements DataSpacesFileObject {
         }
     }
 
-    private FileObject getVFSAdapteeOrWound(DataSpacesFileObject file) throws FileSystemException {
-
-        if (file instanceof VFSFileObjectAdapter) {
-            return ((VFSFileObjectAdapter) file).getAdaptee();
-        }
-        throw new FileSystemException("Operation unsupported: destination file system unknown");
-    }
-
     public void refresh() throws FileSystemException {
         try {
             adaptee.refresh();
@@ -294,9 +281,11 @@ public class VFSFileObjectAdapter implements DataSpacesFileObject {
      *            may be null
      * @param adapted
      *            may be null only if <code>array</code> is
-     *
+     * @throws FileSystemException
+     * 
      */
-    private <T extends Collection<DataSpacesFileObject>> void adaptVFSResult(FileObject[] array, T adapted) {
+    private <T extends Collection<DataSpacesFileObject>> void adaptVFSResult(FileObject[] array, T adapted)
+            throws FileSystemException {
         if (array == null)
             return;
         for (int i = 0; i < array.length; i++) {
@@ -309,20 +298,22 @@ public class VFSFileObjectAdapter implements DataSpacesFileObject {
      *            cannot be null
      * @param adapted
      *            cannot be null
+     * @throws FileSystemException
      */
     private <T extends Collection<DataSpacesFileObject>, E extends Collection<FileObject>> void adaptVFSResult(
-            E vfsResult, T adapted) {
+            E vfsResult, T adapted) throws FileSystemException {
 
         for (FileObject fo : vfsResult) {
-            adapted.add(new VFSFileObjectAdapter(fo, this));
+                adapted.add(new VFSFileObjectAdapter(fo, this));
         }
     }
 
     /**
      * @param vfsFileObject
      *            may be null
+     * @throws FileSystemException
      */
-    private VFSFileObjectAdapter adaptVFSResult(final FileObject vfsFileObject) {
+    private VFSFileObjectAdapter adaptVFSResult(final FileObject vfsFileObject) throws FileSystemException {
         return vfsFileObject == null ? null : new VFSFileObjectAdapter(vfsFileObject, this);
     }
 
@@ -416,6 +407,34 @@ public class VFSFileObjectAdapter implements DataSpacesFileObject {
                 return org.apache.commons.vfs.Capability.WRITE_CONTENT;
             default:
                 return null;
+        }
+    }
+
+    private void checkURIConsistencyOrWound() throws MalformedURIException {
+        if (!mountingPointVFSFileName.isDescendent(adaptee.getName()))
+            throw new MalformedURIException(
+                "Specified mounting point URI does not fit underlying FileObject's path");
+    }
+
+    private FileObject getVFSAdapteeOrWound(DataSpacesFileObject file) throws FileSystemException {
+
+        if (file instanceof VFSFileObjectAdapter) {
+            return ((VFSFileObjectAdapter) file).getAdaptee();
+        }
+        throw new FileSystemException("Operation unsupported: destination file system unknown");
+    }
+
+    @Override
+    public boolean equals(Object candidate) {
+        
+        if (!(candidate instanceof DataSpacesFileObject))
+            return false;
+
+        final DataSpacesFileObject file = (DataSpacesFileObject) candidate;
+        try {
+            return (this.getURI().equals(file.getURI()));
+        } catch (FileSystemException e) {
+            throw new ProActiveRuntimeException(e);
         }
     }
 }

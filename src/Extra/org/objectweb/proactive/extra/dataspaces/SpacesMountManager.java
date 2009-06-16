@@ -12,11 +12,13 @@ import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystem;
 import org.apache.commons.vfs.impl.DefaultFileSystemManager;
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.dataspaces.adapter.vfs.VFSFileObjectAdapter;
 import org.objectweb.proactive.extra.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException;
+import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundException;
 
 
@@ -333,10 +335,13 @@ public class SpacesMountManager {
                     file = spaceRoot.resolveFile(relativeToSpace);
                 final DataSpacesLimitingFileObject limitingFile = new DataSpacesLimitingFileObject(file,
                     spacePart, spaceRoot.getName(), ownerActiveObjectId);
-                return new VFSFileObjectAdapter(limitingFile, spacePart, spaceRoot.getName().getPath());
+                return new VFSFileObjectAdapter(limitingFile, spacePart, spaceRoot.getName());
             } catch (org.apache.commons.vfs.FileSystemException x) {
                 logger.warn("Could not access file that should exist (be mounted): " + uri);
                 throw new FileSystemException(x);
+            } catch (MalformedURIException e) {
+                ProActiveLogger.logImpossibleException(logger, e);
+                throw new ProActiveRuntimeException(e);
             }
         }
     }
