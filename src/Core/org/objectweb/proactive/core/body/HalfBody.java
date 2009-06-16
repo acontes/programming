@@ -264,7 +264,7 @@ public class HalfBody extends AbstractBody {
 
             // Create DSI MessageTag
             MessageTags tags = messageTagsFactory.newMessageTags();
-            tags.addTag(new DsiTag());
+            tags.addTag(new DsiTag(bodyID, ++dsitagincrement));
 
             Request request = this.internalRequestFactory.newRequest(methodCall, HalfBody.this,
                     future == null, sequenceID, tags);

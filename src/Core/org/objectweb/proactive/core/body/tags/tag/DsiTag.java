@@ -1,5 +1,7 @@
 package org.objectweb.proactive.core.body.tags.tag;
 
+import java.rmi.server.UID;
+
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.tags.Tag;
 
@@ -11,13 +13,15 @@ import org.objectweb.proactive.core.body.tags.Tag;
 public class DsiTag extends Tag {
 
     public static final String IDENTIFIER = "PA_TAG_DSI";
-
+    
     /**
      * Constructor setting the Tag name "PA_TAG_DSI"
      * and an UniqueID as the tag DATA
      */
-    public DsiTag() {
-        super(IDENTIFIER, new UniqueID().getCanonString());
+    public DsiTag(UniqueID id, long cpt) {
+        //super(IDENTIFIER, new UniqueID().getCanonString());
+        super(IDENTIFIER, "" + id.getCanonString() + "::" + cpt);
+
     }
 
     /**
@@ -27,5 +31,5 @@ public class DsiTag extends Tag {
         // Propagate itself
         return this;
     }
-
+    
 }

@@ -175,6 +175,9 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     protected MessageTagsFactory messageTagsFactory;
     protected Map<String, LocalMemoryTag> localMemoryTags;
 
+    // DSI Tag incrementer
+    protected long dsitagincrement = 0;
+    
     //
     // -- PRIVATE MEMBERS -----------------------------------------------
     //
