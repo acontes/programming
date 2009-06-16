@@ -389,6 +389,14 @@ public class SpacesMountManagerTest {
     }
 
     @Test
+    public void testResolveSpacesNonexisting() throws SpaceNotFoundException, IOException {
+        final String nonexistingRuntimeId = scratchUri.getRuntimeId() + "toto";
+        final DataSpacesURI queryUri = DataSpacesURI.createScratchSpaceURI(scratchUri.getAppId(),
+                nonexistingRuntimeId);
+        assertEquals(0, manager.resolveSpaces(queryUri, null).size());
+    }
+
+    @Test
     public void testResolveSpacesNotSharedFileObject() throws IOException {
         final DataSpacesURI queryUri = DataSpacesURI.createURI(inputUri.getAppId(), inputUri.getSpaceType());
 

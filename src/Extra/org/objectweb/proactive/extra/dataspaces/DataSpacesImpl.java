@@ -342,8 +342,10 @@ public class DataSpacesImpl {
         final Set<SpaceInstanceInfo> infos = spacesDirectory.lookupMany(aURI);
         final Set<String> names = new HashSet<String>();
 
-        for (SpaceInstanceInfo sii : infos) {
-            names.add(sii.getName());
+        if (infos != null) {
+            for (SpaceInstanceInfo sii : infos) {
+                names.add(sii.getName());
+            }
         }
         if (logger.isTraceEnabled())
             logger.trace(String.format("Resolved known %s names: %s", type, new ArrayList<String>(names)));

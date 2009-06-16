@@ -192,20 +192,22 @@ public class SpacesMountManager {
             logger.debug("Spaces access request: " + queryUri);
 
         final Set<SpaceInstanceInfo> spaces = directory.lookupMany(queryUri);
-        for (final SpaceInstanceInfo space : spaces) {
-            final DataSpacesURI spaceUri = space.getMountingPoint();
-            if (!spaceUri.isSuitableForUserPath()) {
-                logger.error("Resolved space is not suitable for user path: " + spaceUri);
-                throw new IllegalArgumentException("Resolved space is not suitable for user path: " +
-                    spaceUri);
+        if (spaces != null) {
+            for (final SpaceInstanceInfo space : spaces) {
+                final DataSpacesURI spaceUri = space.getMountingPoint();
+                if (!spaceUri.isSuitableForUserPath()) {
+                    logger.error("Resolved space is not suitable for user path: " + spaceUri);
+                    throw new IllegalArgumentException("Resolved space is not suitable for user path: " +
+                        spaceUri);
+                }
+                try {
+                    ensureSpaceIsMounted(spaceUri, space);
+                } catch (SpaceNotFoundException e) {
+                    ProActiveLogger.logImpossibleException(logger, e);
+                    throw new RuntimeException(e);
+                }
+                result.put(spaceUri, doResolveFile(spaceUri, ownerActiveObjectId));
             }
-            try {
-                ensureSpaceIsMounted(spaceUri, space);
-            } catch (SpaceNotFoundException e) {
-                ProActiveLogger.logImpossibleException(logger, e);
-                throw new RuntimeException(e);
-            }
-            result.put(spaceUri, doResolveFile(spaceUri, ownerActiveObjectId));
         }
         return result;
     }
