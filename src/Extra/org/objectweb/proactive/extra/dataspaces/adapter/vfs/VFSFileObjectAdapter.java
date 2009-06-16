@@ -66,9 +66,15 @@ public class VFSFileObjectAdapter implements DataSpacesFileObject {
 
     public String getURI() throws FileSystemException {
         final FileName path = adaptee.getName();
+        final String mpURIString = mountingPointURI.toString();
+        
         try {
             final String relativePath = mountingPointVFSFileName.getRelativeName(path);
-            return mountingPointURI.toString() + '/' + relativePath;
+            
+            if (".".equals(relativePath))
+                return mpURIString;
+            else
+                return mpURIString + '/' + relativePath;
         } catch (org.apache.commons.vfs.FileSystemException e) {
             throw new FileSystemException(e);
         }
@@ -411,9 +417,17 @@ public class VFSFileObjectAdapter implements DataSpacesFileObject {
     }
 
     private void checkURIConsistencyOrWound() throws MalformedURIException {
-        if (!mountingPointVFSFileName.isDescendent(adaptee.getName()))
-            throw new MalformedURIException(
-                "Specified mounting point URI does not fit underlying FileObject's path");
+        final FileName adapteeName = adaptee.getName();
+        
+        if (mountingPointVFSFileName.isDescendent(adapteeName))
+            return;
+        final String mpPath = mountingPointVFSFileName.getPath();
+        final String adPath = adapteeName.getPath();
+
+        if (mpPath.equals(adPath))
+            return;
+        throw new MalformedURIException(
+            "Specified mounting point URI does not fit underlying FileObject's path");
     }
 
     private FileObject getVFSAdapteeOrWound(DataSpacesFileObject file) throws FileSystemException {
