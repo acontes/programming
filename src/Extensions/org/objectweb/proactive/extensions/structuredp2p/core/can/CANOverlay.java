@@ -82,31 +82,27 @@ public class CANOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
-    public Boolean join(Peer remotePeerOnNetwork) {
-        try {
-            CANJoinResponseMessage response = (CANJoinResponseMessage) PAFuture.getFutureValue(this
-                    .sendMessageTo(remotePeerOnNetwork, new CANJoinMessage(this.getRemotePeer())));
+    public Boolean join(Peer remotePeerOnNetwork) throws Exception {
 
-            if (response.hasSucceeded()) {
-                int dimension = response.getDimension();
-                int direction = response.getDirection();
+        CANJoinResponseMessage response = (CANJoinResponseMessage) PAFuture.getFutureValue(this
+                .sendMessageTo(remotePeerOnNetwork, new CANJoinMessage(this.getRemotePeer())));
 
-                /* Actions on local peer */
-                this.setZone(response.getLocalZone());
-                this.splitHistory = response.getSplitHistory();
-                this.saveSplit(dimension, direction);
-                this.neighborsDataStructure.addAll(response.getNeighbors());
+        if (response.hasSucceeded()) {
+            int dimension = response.getDimension();
+            int direction = response.getDirection();
 
-                this.updateNeighbors();
+            /* Actions on local peer */
+            this.setZone(response.getLocalZone());
+            this.splitHistory = response.getSplitHistory();
+            this.saveSplit(dimension, direction);
+            this.neighborsDataStructure.addAll(response.getNeighbors());
 
-                this.neighborsDataStructure.add(response.getRemotePeer(), response.getRemoteZone(),
-                        dimension, CANOverlay.getOppositeDirection(direction));
+            this.updateNeighbors();
 
-                return true;
-            }
+            this.neighborsDataStructure.add(response.getRemotePeer(), response.getRemoteZone(), dimension,
+                    CANOverlay.getOppositeDirection(direction));
 
-        } catch (Exception e) {
-            e.printStackTrace();
+            return true;
         }
 
         return false;
@@ -116,95 +112,99 @@ public class CANOverlay extends StructuredOverlay {
      * {@inheritDoc}
      */
     public Boolean leave() {
-        /* If the split history is not empty, ie. there is more than one peer on the network */
-        if (this.splitHistory.size() > 0) {
-            int[] lastOperation = this.splitHistory.pop();
-            int lastDimension = lastOperation[0];
-            int lastDirection = lastOperation[1];
+        /* The current peer associated to this overlay is the only peer on the network */
+        if (this.neighborsDataStructure.size() == 0) {
+            return true;
+        }
 
-            List<ActionResponseMessage> responses = new ArrayList<ActionResponseMessage>();
-            List<NeighborsDataStructure> neighbors = new ArrayList<NeighborsDataStructure>();
+        // if (this.splitHistory.size() > 0) {
+        int[] lastOperation = this.splitHistory.pop();
+        int lastDimension = lastOperation[0];
+        int lastDirection = lastOperation[1];
 
-            List<Peer> neighborsToMergeWith = this.neighborsDataStructure.getNeighbors(lastDimension,
-                    CANOverlay.getOppositeDirection(lastDirection));
+        List<ActionResponseMessage> responses = new ArrayList<ActionResponseMessage>();
+        List<NeighborsDataStructure> neighbors = new ArrayList<NeighborsDataStructure>();
 
+        List<Peer> neighborsToMergeWith = this.neighborsDataStructure.getNeighbors(lastDimension, CANOverlay
+                .getOppositeDirection(lastDirection));
+
+        /*
+         * Notify all the neighbors to update the state of the current peer which leave the network
+         * into their neighbors list.
+         */
+        try {
+            this.sendMessageTo(this.neighborsDataStructure, new CANPrepareToLeaveMessage(
+                this.getRemotePeer(), lastDimension, CANOverlay.getOppositeDirection(lastDirection)));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (neighborsToMergeWith.size() > 1) {
+            Zone zoneToSplit = this.getZone();
+            System.out.println("MERGE WITH MANY PEER " + neighborsToMergeWith.size());
             /*
-             * Notify all the neighbors to update the state of the current peer which leave the
-             * network into their neighbors list.
+             * For the last dimension and direction of the split, we split N-1 times, where N is the
+             * number of neighbors in the last dimension and last reverse direction.
              */
-            try {
-                this.sendMessageTo(this.neighborsDataStructure, new CANPrepareToLeaveMessage(this
-                        .getRemotePeer(), lastDimension, CANOverlay.getOppositeDirection(lastDirection)));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            if (neighborsToMergeWith.size() > 1) {
-                Zone zoneToSplit = this.getZone();
-                System.out.println("MERGE WITH MANY PEER " + neighborsToMergeWith.size());
-                /*
-                 * For the last dimension and direction of the split, we split N-1 times, where N is
-                 * the number of neighbors in the last dimension and last reverse direction.
-                 */
-                for (int i = 0; i < neighborsToMergeWith.size() - 1; i++) {
-                    Zone[] newZones = null;
-                    try {
-                        newZones = zoneToSplit.split(CANOverlay.getNextDimension(lastDimension),
-                                this.neighborsDataStructure.getZone(neighborsToMergeWith.get(i))
-                                        .getCoordinateMax(CANOverlay.getNextDimension(lastDimension)));
-                    } catch (ZoneException e) {
-                        e.printStackTrace();
-                    }
-
-                    NeighborsDataStructure neighborsOfCurrentNeighbor = new NeighborsDataStructure(
-                        neighborsToMergeWith.get(i));
-                    neighborsOfCurrentNeighbor.addAll(this.neighborsDataStructure);
-
-                    zoneToSplit = newZones[1];
-
-                    /*
-                     * Merge the new zones obtained with the suitable neighbors.
-                     */
-                    try {
-                        ActionResponseMessage response = (ActionResponseMessage) PAFuture.getFutureValue(this
-                                .sendMessageTo(neighborsToMergeWith.get(i), new CANMergeMessage(this
-                                        .getRemotePeer(), lastDimension, lastDirection,
-                                    neighborsOfCurrentNeighbor, newZones[0], this.getLocalPeer()
-                                            .getDataStorage().getDataFromZone(this.getZone()))));
-                        responses.add(response);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-                    neighbors.add(neighborsOfCurrentNeighbor);
+            for (int i = 0; i < neighborsToMergeWith.size() - 1; i++) {
+                Zone[] newZones = null;
+                try {
+                    newZones = zoneToSplit.split(CANOverlay.getNextDimension(lastDimension),
+                            this.neighborsDataStructure.getZone(neighborsToMergeWith.get(i))
+                                    .getCoordinateMax(CANOverlay.getNextDimension(lastDimension)));
+                } catch (ZoneException e) {
+                    e.printStackTrace();
                 }
-            } else { /* There is only one peer to merge with */
-                System.out.println("ONLY ONE PEER TO MERGE WITH " + neighborsToMergeWith.size());
+
+                NeighborsDataStructure neighborsOfCurrentNeighbor = new NeighborsDataStructure(
+                    neighborsToMergeWith.get(i));
+                neighborsOfCurrentNeighbor.addAll(this.neighborsDataStructure);
+
+                zoneToSplit = newZones[1];
+
+                /*
+                 * Merge the new zones obtained with the suitable neighbors.
+                 */
                 try {
                     ActionResponseMessage response = (ActionResponseMessage) PAFuture.getFutureValue(this
-                            .sendMessageTo(neighborsToMergeWith.get(0), new CANMergeMessage(this
+                            .sendMessageTo(neighborsToMergeWith.get(i), new CANMergeMessage(this
                                     .getRemotePeer(), lastDimension, lastDirection,
-                                new NeighborsDataStructure(neighborsToMergeWith.get(0)), this.getZone(), this
-                                        .getLocalPeer().getDataStorage().getDataFromZone(this.getZone()))));
+                                neighborsOfCurrentNeighbor, newZones[0], this.getLocalPeer().getDataStorage()
+                                        .getDataFromZone(this.getZone()))));
                     responses.add(response);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+
+                neighbors.add(neighborsOfCurrentNeighbor);
             }
-
-            this.setZone(null);
-
-            /*
-             * Notify all the neighbors to remove the pear which leave from their neighbors data
-             * structure.
-             */
+        } else { /* There is only one peer to merge with */
+            System.out.println("ONLY ONE PEER TO MERGE WITH " + neighborsToMergeWith.size());
             try {
-                PAFuture.waitForAll(this.sendMessageTo(this.getNeighborsDataStructure(), new LeaveMessage(
-                    this.getRemotePeer())));
+                ActionResponseMessage response = (ActionResponseMessage) PAFuture.getFutureValue(this
+                        .sendMessageTo(neighborsToMergeWith.get(0), new CANMergeMessage(this.getRemotePeer(),
+                            lastDimension, lastDirection, new NeighborsDataStructure(neighborsToMergeWith
+                                    .get(0)), this.getZone(), this.getLocalPeer().getDataStorage()
+                                    .getDataFromZone(this.getZone()))));
+                responses.add(response);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+
+        this.setZone(null);
+
+        /*
+         * Notify all the neighbors to remove the pear which leave from their neighbors data
+         * structure.
+         */
+        try {
+            PAFuture.waitForAll(this.sendMessageTo(this.getNeighborsDataStructure(), new LeaveMessage(this
+                    .getRemotePeer())));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        // }
 
         /*
          * Set all neighbors reference to null.

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import org.objectweb.proactive.extensions.structuredp2p.core.can.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
 
 

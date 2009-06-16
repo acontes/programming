@@ -48,8 +48,9 @@ public abstract class StructuredOverlay implements Serializable {
      * 
      * @param remotePeer
      *            the peer (entry point) which is used in order to join the network.
+     * @throws Exception
      */
-    public abstract Boolean join(Peer remotePeer);
+    public abstract Boolean join(Peer remotePeer) throws Exception;
 
     /**
      * Left the current network.

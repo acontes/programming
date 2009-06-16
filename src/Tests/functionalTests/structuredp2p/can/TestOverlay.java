@@ -64,7 +64,11 @@ public class TestOverlay {
 
     @Test
     public void testSecondPeer() {
-        Assert.assertTrue(TestOverlay.secondPeer.join(TestOverlay.firstPeer));
+        try {
+            Assert.assertTrue(TestOverlay.secondPeer.join(TestOverlay.firstPeer));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         // Are they neighbors ??
         Assert.assertTrue(TestOverlay.getOverlay(TestOverlay.firstPeer).hasNeighbor(TestOverlay.secondPeer));
@@ -83,7 +87,11 @@ public class TestOverlay {
 
     @Test
     public void testThirdPeer() {
-        Assert.assertTrue(TestOverlay.thirdPeer.join(TestOverlay.secondPeer));
+        try {
+            Assert.assertTrue(TestOverlay.thirdPeer.join(TestOverlay.secondPeer));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         // Are they neighbors ??
         Assert.assertTrue(TestOverlay.getOverlay(TestOverlay.firstPeer).hasNeighbor(TestOverlay.thirdPeer));
@@ -107,7 +115,11 @@ public class TestOverlay {
 
     @Test
     public void testFourthPeer() {
-        Assert.assertTrue(TestOverlay.fourthPeer.join(TestOverlay.thirdPeer));
+        try {
+            Assert.assertTrue(TestOverlay.fourthPeer.join(TestOverlay.thirdPeer));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         // Are they neighbors ??
         Assert.assertTrue(TestOverlay.getOverlay(TestOverlay.secondPeer).hasNeighbor(TestOverlay.fourthPeer));
@@ -188,7 +200,11 @@ public class TestOverlay {
         Random rand = new Random();
 
         for (int i = 3; i < peers.length; i++) {
-            peers[i].join(peers[rand.nextInt(i)]);
+            try {
+                peers[i].join(peers[rand.nextInt(i)]);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         Peer toFind = peers[rand.nextInt(peers.length)];

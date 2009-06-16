@@ -5,6 +5,7 @@ import java.util.Scanner;
 
 import org.objectweb.proactive.examples.structuredp2p.util.Deployment;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
+import org.objectweb.proactive.extensions.structuredp2p.core.can.CANOverlay;
 
 
 public class InteractiveThread implements Runnable {
@@ -39,12 +40,33 @@ public class InteractiveThread implements Runnable {
             } else if (inputLine.equalsIgnoreCase("add")) {
                 this.peerLauncher.addPeer();
             } else if (inputLine.equalsIgnoreCase("leave")) {
-                this.peerLauncher.removePeer();
+                if (this.peerLauncher.getRemotePeers().size() == 0) {
+                    this.peerLauncher
+                            .printInformation("Impossible to perform leave action, the network has no peer.");
+                } else {
+                    this.peerLauncher.removePeer();
+                }
             } else if (inputLine.equalsIgnoreCase("lookup")) {
                 this.peerLauncher.lookupMessage();
             } else if (inputLine.equalsIgnoreCase("n")) {
                 this.peerLauncher.printInformation(this.peerLauncher.getRemotePeers().size() +
                     " peer(s) on the network.");
+            } else if (inputLine.equalsIgnoreCase("ll")) {
+                if (this.peerLauncher.getRemotePeers().size() == 0) {
+                    this.peerLauncher.printInformation("There is no peer on the network.");
+                } else {
+                    StringBuffer buf = new StringBuffer();
+                    int i = 1;
+                    for (Peer peer : this.peerLauncher.getRemotePeers()) {
+                        buf.append("    " + i + ". ");
+                        buf.append(((CANOverlay) peer.getStructuredOverlay()).getZone());
+                        buf.append("\n");
+                        i++;
+                    }
+
+                    this.peerLauncher.printInformation("The following peer(s) are on the network :\n\n" +
+                        buf.toString());
+                }
             } else if (inputLine.startsWith("random")) {
                 int nbOperations = Integer.parseInt(inputLine.split(" ")[1]);
 
@@ -81,6 +103,7 @@ public class InteractiveThread implements Runnable {
         System.out.println("  > Type in 'leave' : force a random peer to quit the network");
         System.out.println("  > Type in 'random x' : perform x random operations (lookup, join, leave)");
         System.out.println("  > Type in 'n' : give the number of peers on the network");
+        System.out.println("  > Type in 'll' : list all peers on the network");
         System.out.println("  > Type in 'quit' : quit the application");
     }
 }

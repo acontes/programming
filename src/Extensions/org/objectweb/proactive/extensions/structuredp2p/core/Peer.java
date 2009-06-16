@@ -170,7 +170,7 @@ public class Peer implements InitActive, RunActive, Serializable {
      * @param remotePeer
      *            the peer which serves as entry point.
      */
-    public Boolean join(Peer remotePeer) {
+    public Boolean join(Peer remotePeer) throws Exception {
         return this.structuredOverlay.join(remotePeer);
     }
 
@@ -179,7 +179,7 @@ public class Peer implements InitActive, RunActive, Serializable {
      */
     public Boolean leave() {
         if (this.structuredOverlay.leave()) {
-            PAActiveObject.terminateActiveObject(false);
+            PAActiveObject.terminateActiveObject(true);
             return true;
         }
 
