@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.NameScope;
 import org.apache.commons.vfs.Selectors;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -18,7 +19,6 @@ import org.objectweb.proactive.extra.dataspaces.api.FileSelector;
 import org.objectweb.proactive.extra.dataspaces.api.FileType;
 import org.objectweb.proactive.extra.dataspaces.core.DataSpacesURI;
 import org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException;
-import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException;
 
 
 /**
@@ -42,48 +42,38 @@ public class VFSFileObjectAdapter implements DataSpacesFileObject {
      *            file object that is going to be represented as DataSpacesFileObject; cannot be
      *            <code>null</code>
      * @param mountingPointURI
-     *            Data Spaces URI of this file object's space; cannot be <code>null</code>
-     * @param vfsSpaceRootPath
-     *            VFS path of the space root FileObject; cannot be <code>null</code>
-     * @throws MalformedURIException
-     *             when mounting point URI does not fit underlying FileObject's path
+     *            Data Spaces URI of this file object's space; ; must have space part fully defined
+     *            and only this part; cannot be <code>null</code>
+     * @param mountingPointVFSFileName
+     *            VFS file name of the space root FileObject; cannot be <code>null</code>
+     * @throws FileSystemException
+     *             when mounting point file name does not fit adaptee's name
      */
     public VFSFileObjectAdapter(FileObject adaptee, DataSpacesURI mountingPointURI,
-            FileName mountingPointVFSFileName) throws MalformedURIException {
+            FileName mountingPointVFSFileName) throws FileSystemException {
         this.mountingPointURI = mountingPointURI;
         this.mountingPointVFSFileName = mountingPointVFSFileName;
         this.adaptee = adaptee;
-        checkURIConsistencyOrWound();
+        checkFileNamesConsistencyOrWound();
     }
 
     private VFSFileObjectAdapter(FileObject adaptee, VFSFileObjectAdapter fileObjectAdapter)
             throws FileSystemException {
-
-        this.mountingPointURI = fileObjectAdapter.mountingPointURI;
-        this.mountingPointVFSFileName = fileObjectAdapter.mountingPointVFSFileName;
-        this.adaptee = adaptee;
-        try {
-            checkURIConsistencyOrWound();
-        } catch (MalformedURIException e) {
-            throw new FileSystemException(e);
-        }
+        this(adaptee, fileObjectAdapter.mountingPointURI, fileObjectAdapter.mountingPointVFSFileName);
     }
 
     public String getURI() {
-        final FileName path = adaptee.getName();
-        final String mpURIString = mountingPointURI.toString();
-
+        String relativePath;
         try {
-            final String relativePath = mountingPointVFSFileName.getRelativeName(path);
-
-            if (".".equals(relativePath))
-                return mpURIString;
-            else
-                return mpURIString + '/' + relativePath;
+            relativePath = mountingPointVFSFileName.getRelativeName(adaptee.getName());
         } catch (org.apache.commons.vfs.FileSystemException e) {
             ProActiveLogger.logImpossibleException(logger, e);
             throw new ProActiveRuntimeException(e);
         }
+        if (".".equals(relativePath))
+            relativePath = null;
+
+        return mountingPointURI.withRelativeToSpace(relativePath).toString();
     }
 
     public void close() throws FileSystemException {
@@ -422,18 +412,11 @@ public class VFSFileObjectAdapter implements DataSpacesFileObject {
         }
     }
 
-    private void checkURIConsistencyOrWound() throws MalformedURIException {
+    private void checkFileNamesConsistencyOrWound() throws FileSystemException {
         final FileName adapteeName = adaptee.getName();
 
-        if (mountingPointVFSFileName.isDescendent(adapteeName))
-            return;
-        final String mpPath = mountingPointVFSFileName.getPath();
-        final String adPath = adapteeName.getPath();
-
-        if (mpPath.equals(adPath))
-            return;
-        throw new MalformedURIException(
-            "Specified mounting point URI does not fit underlying FileObject's path");
+        if (!mountingPointVFSFileName.isDescendent(adapteeName, NameScope.DESCENDENT_OR_SELF))
+            throw new FileSystemException("Specified mounting point file name does not fit adaptee's name");
     }
 
     private FileObject getVFSAdapteeOrWound(DataSpacesFileObject file) throws FileSystemException {

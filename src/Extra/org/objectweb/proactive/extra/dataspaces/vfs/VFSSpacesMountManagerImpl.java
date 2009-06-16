@@ -254,7 +254,7 @@ public class VFSSpacesMountManagerImpl implements SpacesMountManager {
             } catch (org.apache.commons.vfs.FileSystemException x) {
                 logger.warn("Could not access file that should exist (be mounted): " + uri);
                 throw new FileSystemException(x);
-            } catch (MalformedURIException e) {
+            } catch (FileSystemException e) {
                 ProActiveLogger.logImpossibleException(logger, e);
                 throw new ProActiveRuntimeException(e);
             }

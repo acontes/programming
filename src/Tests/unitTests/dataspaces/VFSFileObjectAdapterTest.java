@@ -15,6 +15,7 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.objectweb.proactive.extensions.calcium.system.SkeletonSystemImpl;
 import org.objectweb.proactive.extra.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extra.dataspaces.core.DataSpacesURI;
 import org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException;
@@ -23,6 +24,8 @@ import org.objectweb.proactive.extra.dataspaces.vfs.VFSFactory;
 import org.objectweb.proactive.extra.dataspaces.vfs.adapter.VFSFileObjectAdapter;
 
 
+// TODO: some adapted functionality smoke tests
+// also resolveFile with absolute path, getParent() getting exception or null?
 public class VFSFileObjectAdapterTest {
 
     private static final long appId = 1;
@@ -30,17 +33,15 @@ public class VFSFileObjectAdapterTest {
     private static final String nodeId = "node1";
     private static final String activeObjectId = "ao1";
     private static final String path = "dir/file.txt";
-    private static final DataSpacesURI mountingPointURI = DataSpacesURI.createScratchSpaceURI(appId,
-            runtimeId, nodeId, activeObjectId);
+    private static final DataSpacesURI spaceURI = DataSpacesURI.createScratchSpaceURI(appId, runtimeId,
+            nodeId);
+    private static final DataSpacesURI fileURI = spaceURI.withActiveObjectId(activeObjectId).withUserPath(
+            path);
 
     private static DefaultFileSystemManager fileSystemManager;
     private DataSpacesFileObject dsFileObject;
     private FileObject adaptee;
     private File testDir;
-    private File someDir;
-    private File someFile;
-    private File rootDir;
-    private File differentDir;
     private String differentDirPath;
     private String rootDirPath;
 
@@ -58,10 +59,11 @@ public class VFSFileObjectAdapterTest {
     public void setUp() throws IOException, MalformedURIException {
 
         testDir = new File(System.getProperty("java.io.tmpdir"), "ProActive-VFSFileObjectAdapterTest");
-        differentDir = new File(testDir, "different");
-        rootDir = new File(testDir, "root");
-        someDir = new File(rootDir, "dir");
-        someFile = new File(someDir, "file.txt");
+        final File differentDir = new File(testDir, "different");
+        final File rootDir = new File(testDir, "root");
+        final File aoDir = new File(rootDir, "ao1");
+        final File someDir = new File(aoDir, "dir");
+        final File someFile = new File(someDir, "file.txt");
         assertTrue(someDir.mkdirs());
         assertTrue(differentDir.mkdir());
         assertTrue(someFile.createNewFile());
@@ -71,23 +73,17 @@ public class VFSFileObjectAdapterTest {
 
         final FileObject rootFileObject = fileSystemManager.resolveFile("file://" + rootDirPath);
         final FileName mountintPointFileName = rootFileObject.getName();
-        adaptee = rootFileObject.resolveFile(path);
+        adaptee = rootFileObject.resolveFile(fileURI.getRelativeToSpace());
 
-        dsFileObject = new VFSFileObjectAdapter(adaptee, mountingPointURI, mountintPointFileName);
+        dsFileObject = new VFSFileObjectAdapter(adaptee, spaceURI, mountintPointFileName);
     }
 
     @After
     public void tearDown() {
-        testAndDelete(someFile);
-        testAndDelete(someDir);
-        testAndDelete(rootDir);
-        testAndDelete(differentDir);
-        testAndDelete(testDir);
-        rootDir = null;
-        differentDir = null;
-        testDir = null;
-        someDir = null;
-        someFile = null;
+        if (testDir != null && testDir.exists()) {
+            assertTrue(SkeletonSystemImpl.deleteDirectory(testDir));
+            testDir = null;
+        }
 
         adaptee = null;
         dsFileObject = null;
@@ -99,15 +95,14 @@ public class VFSFileObjectAdapterTest {
         final FileObject rootFileObject = fileSystemManager.resolveFile("file://" + rootDirPath);
         final FileName mountintPointFileName = rootFileObject.getName();
         final FileObject rootAdaptee = rootFileObject;
-        final DataSpacesFileObject fo = new VFSFileObjectAdapter(rootAdaptee, mountingPointURI,
-            mountintPointFileName);
+        final DataSpacesFileObject fo = new VFSFileObjectAdapter(rootAdaptee, spaceURI, mountintPointFileName);
 
-        assertEquals("vfs:///1/scratch/rt1/node1/ao1", fo.getURI());
+        assertEquals(spaceURI.toString(), fo.getURI());
     }
 
     @Test
     public void testGetURI2() throws FileSystemException {
-        assertEquals("vfs:///1/scratch/rt1/node1/ao1/dir/file.txt", dsFileObject.getURI());
+        assertEquals(fileURI.toString(), dsFileObject.getURI());
     }
 
     @Test
@@ -124,32 +119,28 @@ public class VFSFileObjectAdapterTest {
 
     @Test(expected = FileSystemException.class)
     public void testResolveExceedsRoot() throws FileSystemException {
-        dsFileObject.resolveFile("../../../");
+        dsFileObject.resolveFile("../../../../");
     }
 
     @Test(expected = FileSystemException.class)
     public void testGetParentExceedsRoot() throws FileSystemException {
-        DataSpacesFileObject grandParent = dsFileObject.getParent().getParent();
-        grandParent.getParent();
+        DataSpacesFileObject grandGrandParent = dsFileObject.getParent().getParent().getParent();
+        grandGrandParent.getParent();
     }
 
-    @Test(expected = MalformedURIException.class)
-    public void testMismatchedRoot() throws MalformedURIException, org.apache.commons.vfs.FileSystemException {
+    @Test(expected = FileSystemException.class)
+    public void testMismatchedRoot() throws FileSystemException, org.apache.commons.vfs.FileSystemException {
         final FileName diffName;
         diffName = fileSystemManager.resolveFile(differentDirPath).getName();
-        new VFSFileObjectAdapter(adaptee, mountingPointURI, diffName);
+        new VFSFileObjectAdapter(adaptee, spaceURI, diffName);
     }
 
     private void assertIsSomeDir(DataSpacesFileObject parent) throws FileSystemException {
-        assertEquals("vfs:///1/scratch/rt1/node1/ao1/dir", parent.getURI());
+        assertEquals(spaceURI.withActiveObjectId(activeObjectId).withUserPath("dir").toString(), parent
+                .getURI());
         final List<DataSpacesFileObject> desc = parent.getChildren();
         assertEquals(1, desc.size());
         assertTrue(desc.contains(dsFileObject));
         assertEquals(dsFileObject, parent.getChild("file.txt"));
-    }
-
-    private void testAndDelete(File f) {
-        if (f != null)
-            assertTrue(f.delete());
     }
 }
