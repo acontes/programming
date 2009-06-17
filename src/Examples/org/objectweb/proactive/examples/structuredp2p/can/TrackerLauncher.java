@@ -22,7 +22,7 @@ public class TrackerLauncher {
 
     public TrackerLauncher(String[] args) {
         try {
-            Deployment.deploy(args[0]);
+            Deployment.deploy("./GCMA.xml");
         } catch (NodeException e) {
             e.printStackTrace();
         } catch (ProActiveException e) {

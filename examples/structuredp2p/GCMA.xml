@@ -8,6 +8,8 @@
 		<javaPropertyVariable name="java.home" />
 		<javaPropertyVariable name="proactive.home" />
 		<javaPropertyVariable name="user.home" />
+		<javaPropertyVariable name="descriptor.peer" />
+		<javaPropertyVariable name="descriptor.tracker" />
 
 		<descriptorVariable name="hostCapacity" value="1" />
 		<descriptorVariable name="vmCapacity" value="1" />
@@ -28,17 +30,22 @@
 
 			</configuration>
 
-			<virtualNode id="Peer" capacity="1" />
-			<virtualNode id="Tracker" capacity="1" />
+			<virtualNode id="Peer" capacity="1">
+				<nodeProvider refid="Peer" />
+				<nodeProvider refid="Tracker" />
+			</virtualNode>
+			<virtualNode id="Tracker" capacity="1">
+				<nodeProvider refid="Tracker" />
+			</virtualNode>
 		</proactive>
 	</application>
 
 	<resources>
 		<nodeProvider id="Peer">
-			<file path="GCMD-Peers-Local.xml" />
+			<file path="${descriptor.peer}" />
 		</nodeProvider>
 		<nodeProvider id="Tracker">
-			<file path="GCMD-Trackers-Local.xml" />
+			<file path="${descriptor.tracker}" />
 		</nodeProvider>
 	</resources>
 

@@ -40,18 +40,16 @@ public class PeerLauncher extends Observable {
             System.exit(1);
         }
 
-        if (args.length > 3) {
-            this.uri = args[3];
-        }
+        this.uri = args[0];
 
-        if (args[1].equals("ST")) {
+        if (args[2].equals("ST")) {
             this.launcherType = LauncherType.STRESS_TEST;
         } else {
             this.launcherType = LauncherType.INTERACTIVE;
         }
 
         try {
-            Deployment.deploy(args[0]);
+            Deployment.deploy("./GCMA.xml");
         } catch (NodeException e) {
             e.printStackTrace();
         } catch (ProActiveException e) {
@@ -60,7 +58,7 @@ public class PeerLauncher extends Observable {
 
         this.avaibleNodes = Deployment.getVirtualNode("Peer").getCurrentNodes();
 
-        for (int i = 0; i < Integer.parseInt(args[2]); i++) {
+        for (int i = 0; i < Integer.parseInt(args[1]); i++) {
             this.addPeer();
         }
 
