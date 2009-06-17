@@ -24,8 +24,7 @@ import org.objectweb.proactive.extra.dataspaces.vfs.VFSFactory;
 import org.objectweb.proactive.extra.dataspaces.vfs.adapter.VFSFileObjectAdapter;
 
 
-// TODO: some adapted functionality smoke tests
-// also resolveFile with absolute path, getParent() getting exception or null?
+// TODO: some adapted functionality smoke tests - an abstract test for DataSpacesFileObject?
 public class VFSFileObjectAdapterTest {
 
     private static final long appId = 1;
@@ -99,7 +98,7 @@ public class VFSFileObjectAdapterTest {
 
         assertEquals(spaceURI.toString(), fo.getURI());
     }
-
+    
     @Test
     public void testGetURI2() throws FileSystemException {
         assertEquals(fileURI.toString(), dsFileObject.getURI());
@@ -128,6 +127,21 @@ public class VFSFileObjectAdapterTest {
         grandGrandParent.getParent();
     }
 
+    @Test(expected = FileSystemException.class)
+    public void testGetParentOnFilesystemRoot() throws org.apache.commons.vfs.FileSystemException,
+            FileSystemException {
+        final FileObject rootFileObject = fileSystemManager.resolveFile("file:///");
+        final FileName mountintPointFileName = rootFileObject.getName();
+        final FileObject rootAdaptee = rootFileObject;
+        final DataSpacesFileObject fo = new VFSFileObjectAdapter(rootAdaptee, spaceURI, mountintPointFileName);
+        fo.getParent();
+    }
+    
+    @Test(expected = FileSystemException.class)
+    public void testResolveAbsolutePath() throws FileSystemException {
+        dsFileObject.resolveFile("/absolute/path");
+    }
+    
     @Test(expected = FileSystemException.class)
     public void testMismatchedRoot() throws FileSystemException, org.apache.commons.vfs.FileSystemException {
         final FileName diffName;

@@ -194,14 +194,17 @@ public class VFSFileObjectAdapter implements DataSpacesFileObject {
         }
     }
 
-    // TODO: check if the parent exists from DS point of view..
     public DataSpacesFileObject getParent() throws FileSystemException {
+        final FileObject vfsParent;
         try {
-            final FileObject vfsParent = adaptee.getParent();
-            return adaptVFSResult(vfsParent);
+            vfsParent = adaptee.getParent();
         } catch (org.apache.commons.vfs.FileSystemException e) {
             throw new FileSystemException(e);
         }
+        
+        if (vfsParent == null)
+            throw new FileSystemException("Operation cannot be performed due to file system limitations");
+        return adaptVFSResult(vfsParent);
     }
 
     public FileType getType() throws FileSystemException {
@@ -258,8 +261,9 @@ public class VFSFileObjectAdapter implements DataSpacesFileObject {
         }
     }
 
-    // FIXME check if path is reasonable in sense of DS
     public DataSpacesFileObject resolveFile(String path) throws FileSystemException {
+        if (path.startsWith("/"))
+            throw new FileSystemException("Cannot resolve an absolute path");
         try {
             return adaptVFSResult(adaptee.resolveFile(path));
         } catch (org.apache.commons.vfs.FileSystemException e) {
