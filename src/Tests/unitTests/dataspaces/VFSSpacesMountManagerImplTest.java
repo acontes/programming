@@ -215,7 +215,11 @@ public class VFSSpacesMountManagerImplTest {
         }
 
         // check if access restrictions are computed correctly - these 2 should be denied 
-        assertNull(fo.getParent());
+        try {
+            fo.getParent();
+            fail("Expected exception - should not have access to parent file of space dir");
+        } catch (FileSystemException x) {
+        }
         try {
             fo.resolveFile("../");
             fail("Expected exception - should not have access to parent file of space dir");
@@ -311,7 +315,11 @@ public class VFSSpacesMountManagerImplTest {
         }
 
         // check if access restrictions are computed correctly - these 2 should be denied 
-        assertNull(fo.getParent());
+        try {
+            fo.getParent();
+            fail("Expected exception - should not have access to parent file of scratch for AO");
+        } catch (FileSystemException x) {
+        }
         try {
             fo.resolveFile("../");
             fail("Expected exception - should not have access to parent file of scratch for AO");

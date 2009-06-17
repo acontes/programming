@@ -86,10 +86,9 @@ public interface DataSpacesFileObject {
     /**
      * Returns the folder that contains this file.
      * 
-     * @return The folder that contains this file. Returns null if this file is the root of a file
-     *         system.
+     * @return The folder that contains this file. Never returns <code>null</code>.
      * @throws FileSystemException
-     *             On error finding the file's parent.
+     *             On error finding the file's parent, e.g. when it does not exist.
      */
     public abstract DataSpacesFileObject getParent() throws FileSystemException;
 
