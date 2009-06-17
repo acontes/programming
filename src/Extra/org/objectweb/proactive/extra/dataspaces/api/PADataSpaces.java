@@ -3,7 +3,9 @@
  */
 package org.objectweb.proactive.extra.dataspaces.api;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -50,7 +52,7 @@ public class PADataSpaces {
     /**
      * The file system's capabilities specification of each space, that must be fulfilled.
      */
-    private static Map<SpaceType, Capability[]> capabilitesSpecification = new HashMap<SpaceType, Capability[]>();
+    private static Map<SpaceType, List<Capability>> capabilitesSpecification = new HashMap<SpaceType, List<Capability>>();
 
     static {
         final Capability[] writable = new Capability[] { Capability.CREATE, Capability.DELETE,
@@ -59,9 +61,9 @@ public class PADataSpaces {
 
         final Capability[] readOnly = new Capability[] { Capability.GET_TYPE, Capability.READ_CONTENT };
 
-        capabilitesSpecification.put(SpaceType.OUTPUT, writable);
-        capabilitesSpecification.put(SpaceType.SCRATCH, writable);
-        capabilitesSpecification.put(SpaceType.INPUT, readOnly);
+        capabilitesSpecification.put(SpaceType.OUTPUT, Arrays.asList(writable));
+        capabilitesSpecification.put(SpaceType.SCRATCH, Arrays.asList(writable));
+        capabilitesSpecification.put(SpaceType.INPUT, Arrays.asList(readOnly));
     }
 
     private PADataSpaces() {
@@ -953,11 +955,11 @@ public class PADataSpaces {
      * @param type
      *            space type that file system capabilities are to be returned for, cannot be
      *            <code>null</code>
-     * @return array containing capabilities of a file system for the specified space type, cannot
-     *         be <code>null</code>
-     * 
+     * @return list containing capabilities of a file system for the specified space type, cannot be
+     *         <code>null</code>
+     * @see DataSpacesFileObject#hasSpaceCapability(Capability)
      */
-    public static Capability[] getCapabilitiesForSpaceType(SpaceType type) {
+    public static List<Capability> getCapabilitiesForSpaceType(SpaceType type) {
         return capabilitesSpecification.get(type);
     }
 
