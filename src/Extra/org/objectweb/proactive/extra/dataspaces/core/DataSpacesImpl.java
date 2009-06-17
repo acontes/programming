@@ -400,19 +400,19 @@ public class DataSpacesImpl {
             logger.trace("Resolving file: " + uri);
 
         try {
-            final DataSpacesURI spaceURI = DataSpacesURI.parseURI(uri);
-            if (!spaceURI.isSuitableForUserPath())
+            final DataSpacesURI dataSpacesURI = DataSpacesURI.parseURI(uri);
+            if (!dataSpacesURI.isSuitableForUserPath())
                 throw new MalformedURIException("Specified URI represents internal high-level directories");
 
             final String aoId = Utils.getActiveObjectId(Utils.getCurrentActiveObjectBody());
-            final DataSpacesFileObject fo = spacesMountManager.resolveFile(spaceURI, aoId);
-            SpaceType type = spaceURI.getSpaceType(); // as isComplete cannot be null
+            final DataSpacesFileObject fo = spacesMountManager.resolveFile(dataSpacesURI, aoId);
+            SpaceType type = dataSpacesURI.getSpaceType(); // as isComplete cannot be null
 
             if (logger.isTraceEnabled())
                 logger.trace("Resolved file: " + uri);
 
             // CCheck if specified URI refers to scratch, and if so, who is its owner.
-            if (type == SpaceType.SCRATCH && !Utils.isScratchOwnedByCallingThread(spaceURI))
+            if (type == SpaceType.SCRATCH && !Utils.isScratchOwnedByCallingThread(dataSpacesURI))
                 type = SpaceType.INPUT;
 
             checkCapabilitiesOrWound(fo, type);
