@@ -23,12 +23,8 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceAlreadyRegistere
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundException;
 
 
-// TODO add docs about data sharing - do not pass DataSpacesFileObject, only URI!
-// or add general docs about various ways of accessing and sharing data through this API
-// TODO add docs about calling from active object's thread. what about returned DataSpacesFileObjects? it should be ok
-// to call them from other thread, if it is not another active objects' thread
-// TODO add docs about casting to DataSpacesFileObject (bleeeah) until we rely in DataSpacesFileObject
-// on FileObject interface
+// TODO add general docs about various ways of accessing and sharing data through this API -- or refer to a not-yet-written manual?
+// TODO what about returned DataSpacesFileObjects is ok to call them from other, not ao's thread?
 /**
  * The ProActive Data Spaces API.
  * <p>
@@ -39,6 +35,21 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundExceptio
  * Note that all <code>resolve*</code> method call might block for a while if there is a need to
  * mount a data space or request for access information. All these methods return
  * DataSpacesFileObject instance, that should be closed by caller of this method.
+ * <p>
+ * API methods are divided into following categories:
+ * <ol>
+ * <li>Methods for adding input/output data spaces during the application runtime. These are:
+ * {@link #addDefaultInput(String, String)}, {@link #addDefaultOutput(String, String)},
+ * {@link #addInput(String, String, String)}, {@link #addOutput(String, String, String)}</li>
+ * <li>Methods for obtaining a snapshot of already known input/output data spaces. Methods:
+ * {@link #getAllKnownInputNames()} and {@link #getAllKnownOutputNames()}</li>
+ * <li>Methods for resolving {@link DataSpacesFileObject} instances from data spaces, all
+ * <code>resolve*</code> methods. Those instances <b>must not</b> be shared between two different
+ * ActiveObjects. Instead use {@link DataSpacesFileObject#getURI()} method for obtaining particular
+ * file's URI, that is <b>allowed</b> to pass between two different ActiveObjects.</li>
+ * <li>Method {@link #getCapabilitiesForSpaceType(SpaceType)} for obtaining minimal
+ * {@link Capability} list of a data space type.</li>
+ * </ol>
  * 
  * @see DataSpacesFileObject
  */
