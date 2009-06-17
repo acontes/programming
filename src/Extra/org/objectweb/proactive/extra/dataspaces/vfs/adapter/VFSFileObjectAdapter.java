@@ -32,40 +32,40 @@ public class VFSFileObjectAdapter implements DataSpacesFileObject {
 
     private final FileObject adaptee;
 
-    private final DataSpacesURI mountingPointURI;
+    private final DataSpacesURI dataSpaceURI;
 
-    private FileName mountingPointVFSFileName;
+    private FileName dataSpaceVFSFileName;
 
     /**
      * 
      * @param fileObject
      *            file object that is going to be represented as DataSpacesFileObject; cannot be
      *            <code>null</code>
-     * @param mountingPointURI
+     * @param dataSpaceURI
      *            Data Spaces URI of this file object's space; ; must have space part fully defined
      *            and only this part; cannot be <code>null</code>
-     * @param mountingPointVFSFileName
+     * @param dataSpaceVFSFileName
      *            VFS file name of the space root FileObject; cannot be <code>null</code>
      * @throws FileSystemException
      *             when mounting point file name does not fit adaptee's name
      */
-    public VFSFileObjectAdapter(FileObject adaptee, DataSpacesURI mountingPointURI,
-            FileName mountingPointVFSFileName) throws FileSystemException {
-        this.mountingPointURI = mountingPointURI;
-        this.mountingPointVFSFileName = mountingPointVFSFileName;
+    public VFSFileObjectAdapter(FileObject adaptee, DataSpacesURI dataSpaceURI,
+            FileName dataSpaceVFSFileName) throws FileSystemException {
+        this.dataSpaceURI = dataSpaceURI;
+        this.dataSpaceVFSFileName = dataSpaceVFSFileName;
         this.adaptee = adaptee;
         checkFileNamesConsistencyOrWound();
     }
 
     private VFSFileObjectAdapter(FileObject adaptee, VFSFileObjectAdapter fileObjectAdapter)
             throws FileSystemException {
-        this(adaptee, fileObjectAdapter.mountingPointURI, fileObjectAdapter.mountingPointVFSFileName);
+        this(adaptee, fileObjectAdapter.dataSpaceURI, fileObjectAdapter.dataSpaceVFSFileName);
     }
 
     public String getURI() {
         String relativePath;
         try {
-            relativePath = mountingPointVFSFileName.getRelativeName(adaptee.getName());
+            relativePath = dataSpaceVFSFileName.getRelativeName(adaptee.getName());
         } catch (org.apache.commons.vfs.FileSystemException e) {
             ProActiveLogger.logImpossibleException(logger, e);
             throw new ProActiveRuntimeException(e);
@@ -73,7 +73,7 @@ public class VFSFileObjectAdapter implements DataSpacesFileObject {
         if (".".equals(relativePath))
             relativePath = null;
 
-        return mountingPointURI.withRelativeToSpace(relativePath).toString();
+        return dataSpaceURI.withRelativeToSpace(relativePath).toString();
     }
 
     public void close() throws FileSystemException {
@@ -415,7 +415,7 @@ public class VFSFileObjectAdapter implements DataSpacesFileObject {
     private void checkFileNamesConsistencyOrWound() throws FileSystemException {
         final FileName adapteeName = adaptee.getName();
 
-        if (!mountingPointVFSFileName.isDescendent(adapteeName, NameScope.DESCENDENT_OR_SELF))
+        if (!dataSpaceVFSFileName.isDescendent(adapteeName, NameScope.DESCENDENT_OR_SELF))
             throw new FileSystemException("Specified mounting point file name does not fit adaptee's name");
     }
 
