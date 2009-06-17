@@ -102,7 +102,7 @@ public class NodeScratchSpace {
             final DataSpacesURI uri;
             if (!scratches.containsKey(aoid)) {
                 try {
-                    // TODO we can use VFSSpacesMountManagerImpl for that and return FileObject,
+                    // TODO we could use VFSSpacesMountManagerImpl for that if it returned FileObject,
                     // so we can avoid unnecessarily double mounting resulting in opening, 
                     // closing and opening again the same file
                     createEmptyDirectoryRelative(spaceFile, aoid).close();
