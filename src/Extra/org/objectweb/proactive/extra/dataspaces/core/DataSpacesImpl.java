@@ -48,14 +48,28 @@ public class DataSpacesImpl {
      * @throws ConfigurationException
      *             when expected capabilities are not fulfilled
      */
-    private static void checkCapabilitiesOrWound(DataSpacesFileObject fo, SpaceType type)
+    private static void checkCapabilitiesOrWound(DataSpacesFileObject fo, SpaceType type, boolean owner)
             throws ConfigurationException {
 
-        Set<Capability> expected = PADataSpaces.getCapabilitiesForSpaceType(type);
+        final Set<Capability> expected;
+        switch (type) {
+            case INPUT:
+                expected = PADataSpaces.INPUT_SPACE_CAPABILITIES;
+                break;
+            case OUTPUT:
+                expected = PADataSpaces.OUTPUT_SPACE_CAPABILITIES;
+                break;
+            case SCRATCH:
+                expected = (owner ? PADataSpaces.SCRATCH_SPACE_OWNER_CAPABILITIES
+                        : PADataSpaces.SCRATCH_SPACE_NONOWNER_CAPABILITIES);
+                break;
+            default:
+                throw new IllegalArgumentException("Unexpected space type; World is not round-shaped");
+        }
 
         if (logger.isTraceEnabled())
-            logger.trace(String.format("Checking FS capabilities (count: %d) for %s type", expected.size(),
-                    type));
+            logger.trace(String.format("Checking FS capabilities (count: %d) for %s type, owner: %b",
+                    expected.size(), type, owner));
 
         try {
             Utils.assertCapabilitiesMatch(expected, fo);
@@ -186,7 +200,7 @@ public class DataSpacesImpl {
             if (logger.isTraceEnabled())
                 logger.trace(String.format("Resolved request for %s with name %s (%s)", type, name, uri));
 
-            checkCapabilitiesOrWound(fo, type);
+            checkCapabilitiesOrWound(fo, type, false);
             return fo;
         } catch (SpaceNotFoundException x) {
             logger.debug("Space not found for input/output space with URI: " + uri, x);
@@ -244,7 +258,7 @@ public class DataSpacesImpl {
                             "Resolved blocking request for %s with name %s (%s)", type, name, uri);
                     logger.trace(message);
                 }
-                checkCapabilitiesOrWound(fo, type);
+                checkCapabilitiesOrWound(fo, type, false);
                 return fo;
             } catch (SpaceNotFoundException e) {
                 logger.debug("Space not found for blocking try for input/output space with URI: " + uri, e);
@@ -301,7 +315,7 @@ public class DataSpacesImpl {
             if (logger.isTraceEnabled())
                 logger.trace("Resolved scratch for an Active Object: " + queryURI);
 
-            checkCapabilitiesOrWound(fo, SpaceType.SCRATCH);
+            checkCapabilitiesOrWound(fo, SpaceType.SCRATCH, true);
             return fo;
         } catch (SpaceNotFoundException e) {
             ProActiveLogger.logImpossibleException(logger, e);
@@ -373,7 +387,7 @@ public class DataSpacesImpl {
             final String name = entry.getKey().getName();
             DataSpacesFileObject fo = entry.getValue();
 
-            checkCapabilitiesOrWound(fo, type);
+            checkCapabilitiesOrWound(fo, type, false);
             ret.put(name, fo);
         }
 
@@ -411,11 +425,7 @@ public class DataSpacesImpl {
             if (logger.isTraceEnabled())
                 logger.trace("Resolved file: " + uri);
 
-            // CCheck if specified URI refers to scratch, and if so, who is its owner.
-            if (type == SpaceType.SCRATCH && !Utils.isScratchOwnedByCallingThread(dataSpacesURI))
-                type = SpaceType.INPUT;
-
-            checkCapabilitiesOrWound(fo, type);
+            checkCapabilitiesOrWound(fo, type, Utils.isScratchOwnedByCallingThread(dataSpacesURI));
             return fo;
         } catch (MalformedURIException x) {
             logger.debug("Can not resolve malformed URI: " + uri, x);

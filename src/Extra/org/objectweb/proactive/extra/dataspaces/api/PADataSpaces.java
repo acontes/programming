@@ -3,8 +3,7 @@
  */
 package org.objectweb.proactive.extra.dataspaces.api;
 
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -50,6 +49,10 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundExceptio
  * <li>Method {@link #getCapabilitiesForSpaceType(SpaceType)} for obtaining minimal
  * {@link Capability} list of a data space type.</li>
  * </ol>
+ * <p>
+ * Minimal capabilities for returned files are defined in constants
+ * {@link #INPUT_SPACE_CAPABILITIES}, {@link #OUTPUT_SPACE_CAPABILITIES},
+ * {@link #SCRATCH_SPACE_OWNER_CAPABILITIES}, {@link #SCRATCH_SPACE_NONOWNER_CAPABILITIES}.
  * 
  * @see DataSpacesFileObject
  */
@@ -61,20 +64,63 @@ public class PADataSpaces {
     public static final String DEFAULT_IN_OUT_NAME = "default";
 
     /**
-     * The file system's capabilities specification of each space, that must be fulfilled.
+     * The set of input space's minimal capabilities that are guaranteed to be fulfilled by every
+     * {@link DataSpacesFileObject} in input space accessed from any Active Object.
+     * 
+     * @see DataSpacesFileObject#hasSpaceCapability(Capability)
      */
-    private static Map<SpaceType, Set<Capability>> capabilitesSpecification = new HashMap<SpaceType, Set<Capability>>();
+    public final static Set<Capability> INPUT_SPACE_CAPABILITIES;
+
+    /**
+     * The set of output space's minimal capabilities that are guaranteed to be fulfilled by every
+     * {@link DataSpacesFileObject} in output space accessed from any Active Object.
+     * 
+     * @see DataSpacesFileObject#hasSpaceCapability(Capability)
+     */
+    public final static Set<Capability> OUTPUT_SPACE_CAPABILITIES;
+
+    /**
+     * The set of scratch minimal capabilities that are guaranteed to be fulfilled by every
+     * {@link DataSpacesFileObject} in scratch, accessed only from Active Object that is
+     * <strong>OWNER</strong> of that scratch. Owner of a scratch is an Active Object that
+     * previously obtained access to that scratch by {@link PADataSpaces#resolveScratchForAO()} (or
+     * {@link PADataSpaces#resolveScratchForAO(String)}) method call.
+     * 
+     * @see DataSpacesFileObject#hasSpaceCapability(Capability)
+     * @see #SCRATCH_SPACE_NONOWNER_CAPABILITIES
+     */
+    public final static Set<Capability> SCRATCH_SPACE_OWNER_CAPABILITIES;
+
+    /**
+     * The set of scratch minimal capabilities that are guaranteed to be fulfilled by every
+     * {@link DataSpacesFileObject} in scratch, accessed only from Active Object that is <strong>NOT
+     * OWNER</strong> of that scratch. Owner of a scratch is an Active Object that previously
+     * obtained access to that scratch by {@link PADataSpaces#resolveScratchForAO()} (or
+     * {@link PADataSpaces#resolveScratchForAO(String)}) method call. No other Active Object is
+     * considered as an owner of a scratch.
+     * 
+     * @see DataSpacesFileObject#hasSpaceCapability(Capability)
+     * @see #SCRATCH_SPACE_OWNER_CAPABILITIES
+     */
+    public final static Set<Capability> SCRATCH_SPACE_NONOWNER_CAPABILITIES;
 
     static {
-        final Capability[] writable = new Capability[] { Capability.CREATE, Capability.DELETE,
-                Capability.GET_TYPE, Capability.LIST_CHILDREN, Capability.READ_CONTENT,
-                Capability.WRITE_CONTENT };
+        Set<Capability> readOnly = new HashSet<Capability>();
+        readOnly.add(Capability.GET_TYPE);
+        readOnly.add(Capability.READ_CONTENT);
+        readOnly = Collections.unmodifiableSet(readOnly);
 
-        final Capability[] readOnly = new Capability[] { Capability.GET_TYPE, Capability.READ_CONTENT };
+        Set<Capability> readWrite = new HashSet<Capability>(readOnly);
+        readWrite.add(Capability.CREATE);
+        readWrite.add(Capability.DELETE);
+        readWrite.add(Capability.LIST_CHILDREN);
+        readWrite.add(Capability.WRITE_CONTENT);
+        readWrite = Collections.unmodifiableSet(readWrite);
 
-        capabilitesSpecification.put(SpaceType.OUTPUT, new HashSet<Capability>(Arrays.asList(writable)));
-        capabilitesSpecification.put(SpaceType.SCRATCH, new HashSet<Capability>(Arrays.asList(writable)));
-        capabilitesSpecification.put(SpaceType.INPUT, new HashSet<Capability>(Arrays.asList(readOnly)));
+        INPUT_SPACE_CAPABILITIES = readOnly;
+        OUTPUT_SPACE_CAPABILITIES = readWrite;
+        SCRATCH_SPACE_OWNER_CAPABILITIES = readOnly;
+        SCRATCH_SPACE_NONOWNER_CAPABILITIES = readWrite;
     }
 
     private PADataSpaces() {
@@ -949,29 +995,6 @@ public class PADataSpaces {
     public static String addOutput(String name, String url, String path)
             throws SpaceAlreadyRegisteredException, NotConfiguredException, ConfigurationException {
         return getMyDataSpacesImpl().addInputOutput(name, url, path, SpaceType.OUTPUT);
-    }
-
-    /**
-     * Returns the file system's minimal capabilities that are fulfilled by specified space type.
-     * Contracted by the specification.
-     * <p>
-     * For {@link SpaceType#SCRATCH} space the returned capabilities refer only to an ActiveObject's
-     * site that owns that scratch, obtained previously by
-     * {@link PADataSpaces#resolveScratchForAO()} (or
-     * {@link PADataSpaces#resolveScratchForAO(String)}) method.
-     * <p>
-     * For {@link SpaceType#INPUT} and {@link SpaceType#OUTPUT} spaces the returned capabilities
-     * remains valid on all sites.
-     * 
-     * @param type
-     *            space type that file system capabilities are to be returned for, cannot be
-     *            <code>null</code>
-     * @return set of capabilities of a file system for the specified space type, cannot be
-     *         <code>null</code>
-     * @see DataSpacesFileObject#hasSpaceCapability(Capability)
-     */
-    public static Set<Capability> getCapabilitiesForSpaceType(SpaceType type) {
-        return capabilitesSpecification.get(type);
     }
 
     private static DataSpacesImpl getMyDataSpacesImpl() throws NotConfiguredException {
