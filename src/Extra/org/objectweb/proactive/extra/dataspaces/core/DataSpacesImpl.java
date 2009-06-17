@@ -6,6 +6,7 @@ package org.objectweb.proactive.extra.dataspaces.core;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -51,10 +52,10 @@ public class DataSpacesImpl {
     private static void checkCapabilitiesOrWound(DataSpacesFileObject fo, SpaceType type)
             throws ConfigurationException {
 
-        Capability[] expected = PADataSpaces.getCapabilitiesForSpaceType(type);
+        List<Capability> expected = PADataSpaces.getCapabilitiesForSpaceType(type);
 
         if (logger.isTraceEnabled())
-            logger.trace(String.format("Checking FS capabilities (count: %d) for %s type", expected.length,
+            logger.trace(String.format("Checking FS capabilities (count: %d) for %s type", expected.size(),
                     type));
 
         try {

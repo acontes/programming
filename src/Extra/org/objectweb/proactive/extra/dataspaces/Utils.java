@@ -3,6 +3,7 @@
  */
 package org.objectweb.proactive.extra.dataspaces;
 
+import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
@@ -190,12 +191,10 @@ public class Utils {
      *             when the DataSpacesFileObject's data space does not have one of expected
      *             capabilities
      */
-    public static void assertCapabilitiesMatch(Capability[] expected, DataSpacesFileObject fo)
+    public static void assertCapabilitiesMatch(List<Capability> expected, DataSpacesFileObject fo)
             throws ConfigurationException {
 
-        for (int i = 0; i < expected.length; i++) {
-            final Capability capability = expected[i];
-
+        for (Capability capability : expected) {
             if (!fo.hasSpaceCapability(capability))
                 throw new ConfigurationException(
                     "File system used to access data does not support capability: " + capability);
