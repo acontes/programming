@@ -136,12 +136,12 @@ public class VFSFileObjectAdapterTest {
         final DataSpacesFileObject fo = new VFSFileObjectAdapter(rootAdaptee, spaceURI, mountintPointFileName);
         fo.getParent();
     }
-    
+
     @Test(expected = FileSystemException.class)
     public void testResolveAbsolutePath() throws FileSystemException {
         dsFileObject.resolveFile("/absolute/path");
     }
-    
+
     @Test(expected = FileSystemException.class)
     public void testMismatchedRoot() throws FileSystemException, org.apache.commons.vfs.FileSystemException {
         final FileName diffName;

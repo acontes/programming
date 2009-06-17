@@ -201,7 +201,7 @@ public class VFSFileObjectAdapter implements DataSpacesFileObject {
         } catch (org.apache.commons.vfs.FileSystemException e) {
             throw new FileSystemException(e);
         }
-        
+
         if (vfsParent == null)
             throw new FileSystemException("Operation cannot be performed due to file system limitations");
         return adaptVFSResult(vfsParent);
