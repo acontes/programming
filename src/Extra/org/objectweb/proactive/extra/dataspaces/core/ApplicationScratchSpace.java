@@ -15,7 +15,7 @@ public interface ApplicationScratchSpace {
     /**
      * Returns DataSpacesURI for a specified body of an ActiveObject.
      * <p>
-     * First call of this method removes all already existing files in a scratch data space.
+     * First call of this method removes all already existing files in a scratch.
      * 
      * @param body
      *            of an ActiveObject
