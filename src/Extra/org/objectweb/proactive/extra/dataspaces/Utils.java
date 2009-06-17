@@ -3,7 +3,7 @@
  */
 package org.objectweb.proactive.extra.dataspaces;
 
-import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
@@ -183,15 +183,15 @@ public class Utils {
      * ConfigurationException if it does not.
      * 
      * @param expected
-     *            array containing expected capabilities of the specified DataSpacesFileObject's
-     *            data space.
+     *            set containing expected capabilities of the specified DataSpacesFileObject's data
+     *            space.
      * @param fo
      *            specified DataSpacesFileObject's
      * @throws ConfigurationException
      *             when the DataSpacesFileObject's data space does not have one of expected
      *             capabilities
      */
-    public static void assertCapabilitiesMatch(List<Capability> expected, DataSpacesFileObject fo)
+    public static void assertCapabilitiesMatch(Set<Capability> expected, DataSpacesFileObject fo)
             throws ConfigurationException {
 
         for (Capability capability : expected) {
