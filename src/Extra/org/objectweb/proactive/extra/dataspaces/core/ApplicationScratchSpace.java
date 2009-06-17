@@ -10,33 +10,33 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException;
 /**
  * Supports scratch data space. Implementations of this interface are thread-safe.
  */
-// TODO improve/complete docs
 public interface ApplicationScratchSpace {
 
     /**
      * Returns DataSpacesURI for a specified body of an ActiveObject.
-     * 
-     * First call of this method removes all already existing files in a scratch data space.
      * <p>
-     * FIXME: is it really true (here) ??
+     * First call of this method removes all already existing files in a scratch data space.
      * 
      * @param body
-     * @return
+     *            of an ActiveObject
+     * @return URI of an ActiveObject's scratch that can be used for resolving files
      * @throws FileSystemException
+     *             when any file system related exception occurres during scratch creation (first
+     *             method call)
      */
     public DataSpacesURI getScratchForAO(Body body) throws FileSystemException;
 
     /**
      * Instance stays unchanged during application run.
      * 
-     * @return
+     * @return description of a scratch data space
      */
     public SpaceInstanceInfo getSpaceInstanceInfo();
 
     /**
-     * Mounting point stays unchanged during application run.
+     * Mounting point instance stays unchanged during application run.
      * 
-     * @return
+     * @return URI of a scratch data space's mounting point
      */
     public DataSpacesURI getSpaceMountingPoint();
 
@@ -45,6 +45,7 @@ public interface ApplicationScratchSpace {
      * undefined results.
      * 
      * @throws FileSystemException
+     *             when any file system related exception occurres
      */
     public void close() throws FileSystemException;
 }
