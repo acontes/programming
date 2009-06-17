@@ -779,7 +779,7 @@ public class PADataSpaces {
      * 
      * @param uri
      *            valid URI within an existing data space, returned by
-     *            {@link #getURI(DataSpacesFileObject)}
+     *            {@link DataSpacesFileObject#getURI()}
      * @return handle for specified file
      * @throws MalformedURIException
      *             passed URI is invalid or not suitable for use by user (accessing internal
@@ -793,7 +793,7 @@ public class PADataSpaces {
      * @throws ConfigurationException
      *             when resolved space's file system has not enough capabilities (because of wrong
      *             configuration)
-     * @see #getURI(DataSpacesFileObject)
+     * @see DataSpacesFileObject#getURI()
      */
     public static DataSpacesFileObject resolveFile(String uri) throws MalformedURIException,
             SpaceNotFoundException, FileSystemException, NotConfiguredException, ConfigurationException {
