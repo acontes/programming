@@ -29,16 +29,17 @@ import org.objectweb.proactive.extra.dataspaces.core.SpaceInstanceInfo;
 import org.objectweb.proactive.extra.dataspaces.core.SpaceType;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 import org.objectweb.proactive.extra.dataspaces.vfs.VFSFactory;
+import org.objectweb.proactive.extra.dataspaces.vfs.VFSNodeScratchSpaceImpl;
 
 import unitTests.dataspaces.mock.MOCKBody;
 import unitTests.dataspaces.mock.MOCKNode;
 
 
 /**
- * Tests for {@link ApplicationScratchSpace} implementation. Uses MOCK objects for Body
- * implementation.
+ * Tests for {@link ApplicationScratchSpace} implementation from {@link VFSNodeScratchSpaceImpl}.
+ * Uses MOCK objects for Body implementation.
  */
-public class ApplicationScratchSpaceTest {
+public class VFSApplicationScratchSpaceImplTest {
 
     private static final String NODE_ID = "node_id";
     private static final String RUNTIME_ID = "rt_id";
@@ -73,7 +74,8 @@ public class ApplicationScratchSpaceTest {
 
     @Before
     public void setUp() throws ConfigurationException, IOException {
-        testDir = new File(System.getProperty("java.io.tmpdir"), "ProActive-ApplicationScratchSpaceTest");
+        testDir = new File(System.getProperty("java.io.tmpdir"),
+            "ProActive-VFSApplicationScratchSpaceImplTest");
         assertTrue(testDir.mkdir());
         testDirPath = testDir.getCanonicalPath();
         scratchDataSpacePath = Utils.appendSubDirs(testDirPath, RUNTIME_ID, NODE_ID, APP_ID);
@@ -81,9 +83,9 @@ public class ApplicationScratchSpaceTest {
         node = new MOCKNode(RUNTIME_ID, NODE_ID, APP_ID_LONG);
         body = new MOCKBody();
         localAccessConfig = new BaseScratchSpaceConfiguration(ACCESS_URL, testDirPath);
-        nodeScratchSpace = new NodeScratchSpace(node, localAccessConfig);
+        nodeScratchSpace = new VFSNodeScratchSpaceImpl();
 
-        nodeScratchSpace.init();
+        nodeScratchSpace.init(node, localAccessConfig);
         configured = true;
 
         applicationScratchSpace = nodeScratchSpace.initForApplication();

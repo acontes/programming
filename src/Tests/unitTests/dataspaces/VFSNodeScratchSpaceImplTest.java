@@ -26,15 +26,16 @@ import org.objectweb.proactive.extra.dataspaces.core.BaseScratchSpaceConfigurati
 import org.objectweb.proactive.extra.dataspaces.core.NodeScratchSpace;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 import org.objectweb.proactive.extra.dataspaces.vfs.VFSFactory;
+import org.objectweb.proactive.extra.dataspaces.vfs.VFSNodeScratchSpaceImpl;
 
 import unitTests.dataspaces.mock.MOCKNode;
 
 
 /**
- * Test for {@link NodeScratchSpaceTest} class, uses view MOCK Objects for imitating integration
+ * Test for {@link VFSNodeScratchSpaceImpl} class, uses view MOCK Objects for imitating integration
  * with ProActive (obtaining ID's of a node, runtime).
  */
-public class NodeScratchSpaceTest {
+public class VFSNodeScratchSpaceImplTest {
 
     private static final String NODE_ID_2 = "second_node";
     private static final String NODE_ID = "node_id";
@@ -68,13 +69,13 @@ public class NodeScratchSpaceTest {
 
     @Before
     public void setUp() throws ConfigurationException, IOException {
-        testDir = new File(System.getProperty("java.io.tmpdir"), "ProActive-NodeScratchSpaceTest");
+        testDir = new File(System.getProperty("java.io.tmpdir"), "ProActive-VFSNodeScratchSpaceImplTest");
         assertTrue(testDir.mkdir());
         testDirPath = testDir.getCanonicalPath();
         localAccessConfig = new BaseScratchSpaceConfiguration(SCRATCH_URL, testDirPath);
 
         node = new MOCKNode(RUNTIME_ID, NODE_ID, APP_ID);
-        nodeScratchSpace = new NodeScratchSpace(node, localAccessConfig);
+        nodeScratchSpace = new VFSNodeScratchSpaceImpl();
         configured = false;
         configured2 = false;
     }
@@ -129,7 +130,7 @@ public class NodeScratchSpaceTest {
     @Test
     public void testInitNSS() throws Exception {
 
-        nodeScratchSpace.init();
+        nodeScratchSpace.init(node, localAccessConfig);
         configured = true;
         String path = Utils.appendSubDirs(testDirPath, RUNTIME_ID, NODE_ID);
         assertIsExistingEmptyDirectory(path);
@@ -153,7 +154,7 @@ public class NodeScratchSpaceTest {
         osw.write(TEST_FILE_CONTENT);
         osw.close();
 
-        nodeScratchSpace.init();
+        nodeScratchSpace.init(node, localAccessConfig);
         configured = true;
         assertIsExistingEmptyDirectory(partialDS);
         partialDSDummyFile = null;
@@ -165,10 +166,10 @@ public class NodeScratchSpaceTest {
     @Test
     public void testInitNSSIllegalState() throws Exception {
 
-        nodeScratchSpace.init();
+        nodeScratchSpace.init(node, localAccessConfig);
         configured = true;
         try {
-            nodeScratchSpace.init();
+            nodeScratchSpace.init(node, localAccessConfig);
             fail("Exception expected");
         } catch (IllegalStateException e) {
         } catch (Exception e) {
@@ -182,13 +183,13 @@ public class NodeScratchSpaceTest {
     @Test
     public void testInitNSSIllegalState2() throws Exception {
 
-        nodeScratchSpace.init();
+        nodeScratchSpace.init(node, localAccessConfig);
         configured = true;
         nodeScratchSpace.close();
         configured = false;
 
         try {
-            nodeScratchSpace.init();
+            nodeScratchSpace.init(node, localAccessConfig);
             fail("Exception expected");
         } catch (IllegalStateException e) {
         } catch (Exception e) {
@@ -202,7 +203,7 @@ public class NodeScratchSpaceTest {
     @Test
     public void testInitForApplication() throws Exception {
 
-        nodeScratchSpace.init();
+        nodeScratchSpace.init(node, localAccessConfig);
         configured = true;
         checkInitForApplication();
     }
@@ -220,7 +221,7 @@ public class NodeScratchSpaceTest {
             fail("Wrong exception");
         }
 
-        nodeScratchSpace.init();
+        nodeScratchSpace.init(node, localAccessConfig);
         configured = true;
         checkInitForApplication();
     }
@@ -232,8 +233,8 @@ public class NodeScratchSpaceTest {
     public void testInitForApplicationConfigurationException() throws Exception {
 
         BaseScratchSpaceConfiguration conf = new BaseScratchSpaceConfiguration(null, testDirPath);
-        nodeScratchSpace = new NodeScratchSpace(node, conf);
-        nodeScratchSpace.init();
+        nodeScratchSpace = new VFSNodeScratchSpaceImpl();
+        nodeScratchSpace.init(node, conf);
         configured = true;
 
         try {
@@ -256,11 +257,11 @@ public class NodeScratchSpaceTest {
         final String path1 = Utils.appendSubDirs(testDirPath, RUNTIME_ID, NODE_ID);
         final String path2 = Utils.appendSubDirs(testDirPath, RUNTIME_ID, NODE_ID_2);
         final Node node2 = new MOCKNode(RUNTIME_ID, NODE_ID_2, APP_ID);
-        nodeScratchSpace2 = new NodeScratchSpace(node2, localAccessConfig);
+        nodeScratchSpace2 = new VFSNodeScratchSpaceImpl();
 
-        nodeScratchSpace.init();
+        nodeScratchSpace.init(node, localAccessConfig);
         configured = true;
-        nodeScratchSpace2.init();
+        nodeScratchSpace2.init(node2, localAccessConfig);
         configured2 = true;
 
         assertIsExistingEmptyDirectory(path1);

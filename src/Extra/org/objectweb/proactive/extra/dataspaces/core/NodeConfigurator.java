@@ -15,6 +15,7 @@ import org.objectweb.proactive.extra.dataspaces.core.naming.NamingService;
 import org.objectweb.proactive.extra.dataspaces.core.naming.SpacesDirectory;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException;
+import org.objectweb.proactive.extra.dataspaces.vfs.VFSNodeScratchSpaceImpl;
 import org.objectweb.proactive.extra.dataspaces.vfs.VFSSpacesMountManagerImpl;
 
 
@@ -91,9 +92,8 @@ public class NodeConfigurator {
                     "Space configuration is not complete, no remote access URL provided");
             }
 
-            final NodeScratchSpace configuringScratchSpace = new NodeScratchSpace(node,
-                baseScratchConfiguration);
-            configuringScratchSpace.init();
+            final NodeScratchSpace configuringScratchSpace = new VFSNodeScratchSpaceImpl();
+            configuringScratchSpace.init(node, baseScratchConfiguration);
             this.nodeScratchSpace = configuringScratchSpace;
         }
         configured = true;
