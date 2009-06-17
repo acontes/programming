@@ -201,7 +201,7 @@ public class DataSpacesTest extends GCMFunctionalTestDataSpaces {
                         .getOutputStream()));
                 try {
                     writer.write(content);
-                    return PADataSpaces.getURI(fo);
+                    return fo.getURI();
                 } finally {
                     writer.close();
                 }

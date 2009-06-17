@@ -105,7 +105,7 @@ public class ExampleProcessing implements Serializable {
             writer = getWriter(file);
             writer.write(content);
 
-            return PADataSpaces.getURI(file);
+            return file.getURI();
         } catch (IOException e) {
             logger.error("Exception while IO operation", e);
             throw e;

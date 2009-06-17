@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -22,7 +21,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.extensions.calcium.system.SkeletonSystemImpl;
 import org.objectweb.proactive.extra.dataspaces.api.DataSpacesFileObject;
-import org.objectweb.proactive.extra.dataspaces.api.PADataSpaces;
 import org.objectweb.proactive.extra.dataspaces.core.DataSpacesURI;
 import org.objectweb.proactive.extra.dataspaces.core.InputOutputSpaceConfiguration;
 import org.objectweb.proactive.extra.dataspaces.core.ScratchSpaceConfiguration;
@@ -34,8 +32,8 @@ import org.objectweb.proactive.extra.dataspaces.core.naming.SpacesDirectoryImpl;
 import org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundException;
 import org.objectweb.proactive.extra.dataspaces.vfs.DataSpacesLimitingFileObject;
-import org.objectweb.proactive.extra.dataspaces.vfs.VFSSpacesMountManagerImpl;
 import org.objectweb.proactive.extra.dataspaces.vfs.VFSFactory;
+import org.objectweb.proactive.extra.dataspaces.vfs.VFSSpacesMountManagerImpl;
 import org.objectweb.proactive.extra.dataspaces.vfs.adapter.VFSFileObjectAdapter;
 
 
@@ -206,7 +204,7 @@ public class VFSSpacesMountManagerImplTest {
         final DataSpacesFileObject child = fo.getChild(INPUT_FILE);
         assertNotNull(child);
         assertTrue(child.exists());
-        assertEquals(inputUri.toString(), PADataSpaces.getURI(fo));
+        assertEquals(inputUri.toString(), fo.getURI());
 
         // check if write access restrictions are computed correctly - this should be denied
         try {
@@ -236,7 +234,7 @@ public class VFSSpacesMountManagerImplTest {
 
     private void assertIsWorkingOutputSpaceDir(DataSpacesFileObject fo) throws FileSystemException {
         assertTrue(fo.exists());
-        assertEquals(outputUri.toString(), PADataSpaces.getURI(fo));
+        assertEquals(outputUri.toString(), fo.getURI());
         final DataSpacesFileObject child = fo.resolveFile("new_file");
 
         // check if write access restrictions are computed correctly - this should be allowed
@@ -254,7 +252,7 @@ public class VFSSpacesMountManagerImplTest {
         final InputStream io = fileObject.getContent().getInputStream();
         final BufferedReader reader = new BufferedReader(new InputStreamReader(io));
         assertEquals(INPUT_FILE_CONTENT, reader.readLine());
-        assertEquals(fileUri.toString(), PADataSpaces.getURI(fileObject));
+        assertEquals(fileUri.toString(), fileObject.getURI());
     }
 
     @Test
@@ -297,7 +295,7 @@ public class VFSSpacesMountManagerImplTest {
     private void assertIsWorkingScratchForAODir(final DataSpacesFileObject fo, final DataSpacesURI fileUri,
             final boolean owner) throws FileSystemException, IOException {
         assertTrue(fo.exists());
-        assertEquals(fileUri.toString(), PADataSpaces.getURI(fo));
+        assertEquals(fileUri.toString(), fo.getURI());
         final DataSpacesFileObject child = fo.resolveFile("new_file");
 
         if (owner) {

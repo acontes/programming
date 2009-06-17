@@ -788,19 +788,6 @@ public class PADataSpaces {
     }
 
     /**
-     * Returns URI for a given {@link DataSpacesFileObject}. URI remains valid in the whole
-     * application, hence it can be passed to another AO and resolved there.
-     * 
-     * @param fileObject
-     * @return valid URI for specified file object
-     * @see {@link #resolveFile(String)}
-     */
-    // TODO: this method may be eventually removed
-    public static String getURI(DataSpacesFileObject fileObject) {
-        return DataSpacesImpl.getURI(fileObject);
-    }
-
-    /**
      * Adds <i>default input data space</i> definition, during the application execution.
      * <p>
      * Input must have a global access URL defined, that is used to access this data space from

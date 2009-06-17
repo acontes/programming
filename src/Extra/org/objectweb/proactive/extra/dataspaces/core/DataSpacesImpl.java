@@ -45,17 +45,6 @@ public class DataSpacesImpl {
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.DATASPACES);
 
     /**
-     * Implementation method for {@link PADataSpaces#getURI(DataSpacesFileObject)}.
-     * 
-     * @param fileObject
-     * @return
-     * @see {@link PADataSpaces#getURI(DataSpacesFileObject)}
-     */
-    public static String getURI(DataSpacesFileObject fileObject) {
-        return fileObject.getURI();
-    }
-
-    /**
      * @throws ConfigurationException
      *             when expected capabilities are not fulfilled
      */
