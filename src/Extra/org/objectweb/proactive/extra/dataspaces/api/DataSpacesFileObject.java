@@ -14,6 +14,8 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException;
  * <p>
  * Some operations may be limited according to the caller's context and granted privileges, see
  * {@link PADataSpaces} documentation for the details.
+ * <p>
+ * All implementors must provide equals method logic.
  */
 public interface DataSpacesFileObject {
 
@@ -273,4 +275,6 @@ public interface DataSpacesFileObject {
      * check if someone reads/write to this file
      */
     public abstract boolean isContentOpen();
+
+    public abstract boolean equals(Object candidate);
 }
