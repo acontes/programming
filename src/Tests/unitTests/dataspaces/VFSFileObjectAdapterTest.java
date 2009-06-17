@@ -98,7 +98,7 @@ public class VFSFileObjectAdapterTest {
 
         assertEquals(spaceURI.toString(), fo.getURI());
     }
-    
+
     @Test
     public void testGetURI2() throws FileSystemException {
         assertEquals(fileURI.toString(), dsFileObject.getURI());
