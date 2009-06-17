@@ -23,7 +23,7 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException;
 
 /**
  * VFS {@Link FileObject} adapter to {@link DataSpacesFileObject} interface, adding getURI
- * functionality.
+ * functionality. Defines two DataSpacesFileObject as equal if their URI strings are equal.
  * <p>
  * Adapted FileObject should provide any access limitation as required by Data Spaces specification.
  */
@@ -42,15 +42,15 @@ public class VFSFileObjectAdapter implements DataSpacesFileObject {
      *            file object that is going to be represented as DataSpacesFileObject; cannot be
      *            <code>null</code>
      * @param dataSpaceURI
-     *            Data Spaces URI of this file object's space; ; must have space part fully defined
+     *            Data Spaces URI of this file object's space; must have space part fully defined
      *            and only this part; cannot be <code>null</code>
      * @param dataSpaceVFSFileName
      *            VFS file name of the space root FileObject; cannot be <code>null</code>
      * @throws FileSystemException
-     *             when mounting point file name does not fit adaptee's name
+     *             when data space file name does not match adaptee's name
      */
-    public VFSFileObjectAdapter(FileObject adaptee, DataSpacesURI dataSpaceURI,
-            FileName dataSpaceVFSFileName) throws FileSystemException {
+    public VFSFileObjectAdapter(FileObject adaptee, DataSpacesURI dataSpaceURI, FileName dataSpaceVFSFileName)
+            throws FileSystemException {
         this.dataSpaceURI = dataSpaceURI;
         this.dataSpaceVFSFileName = dataSpaceVFSFileName;
         this.adaptee = adaptee;
@@ -420,7 +420,7 @@ public class VFSFileObjectAdapter implements DataSpacesFileObject {
         final FileName adapteeName = adaptee.getName();
 
         if (!dataSpaceVFSFileName.isDescendent(adapteeName, NameScope.DESCENDENT_OR_SELF))
-            throw new FileSystemException("Specified mounting point file name does not fit adaptee's name");
+            throw new FileSystemException("Specified data space file name does not match adaptee's name");
     }
 
     private FileObject getVFSAdapteeOrWound(DataSpacesFileObject file) throws FileSystemException {
