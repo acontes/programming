@@ -83,18 +83,23 @@ public class DataSpacesLimitingFileObject extends AbstractLimitingFileObject<Dat
      * @see #getURI()
      */
     public DataSpacesURI getDataSpacesURI() throws MalformedURIException {
-        // TODO do it like in VFSFileObjectAdapter
         final FileName name = getName();
         if (!spaceRootFileName.isDescendent(name, NameScope.DESCENDENT_OR_SELF)) {
             throw new MalformedURIException(
                 "VFS path of this DataSpacesFileObject does not start with its space VFS path");
         }
-        final String path = name.getPath();
-        String relativeToSpace = path.substring(spaceRootFileName.getPath().length()).replaceFirst("^/", "");
-        if (relativeToSpace.length() == 0) {
-            relativeToSpace = null;
+
+        String relativePath;
+        try {
+            relativePath = spaceRootFileName.getRelativeName(name);
+        } catch (org.apache.commons.vfs.FileSystemException e) {
+            ProActiveLogger.logImpossibleException(logger, e);
+            throw new ProActiveRuntimeException(e);
         }
-        return spaceRootUri.withRelativeToSpace(relativeToSpace);
+        if (".".equals(relativePath))
+            relativePath = null;
+
+        return spaceRootUri.withRelativeToSpace(relativePath);
     }
 
     @Override
