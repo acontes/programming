@@ -181,24 +181,24 @@ public class Start implements Serializable {
         // If need be, create a displayer
         Displayer displayer = null;
         Deployer deployer = null;
-        if (display) {
-            try {
-                GCMApplication gcmad = PAGCMDeployment.loadApplicationDescriptor(new File(xmlFileName));
-                gcmad.startDeployment();
-                GCMVirtualNode workers = gcmad.getVirtualNode("Workers");
+        try {
+            GCMApplication gcmad = PAGCMDeployment.loadApplicationDescriptor(new File(xmlFileName));
+            gcmad.startDeployment();
+            GCMVirtualNode workers = gcmad.getVirtualNode("Workers");
 
-                if (workers == null)
-                    throw new ProActiveException("Failed to acquire \"Workers\" virtual node");
+            if (workers == null)
+                throw new ProActiveException("Failed to acquire \"Workers\" virtual node");
 
-                deployer = (Deployer) PAActiveObject.newActive(Deployer.class.getName(), new Object[] {
-                        gcmad, workers });
+            deployer = (Deployer) PAActiveObject.newActive(Deployer.class.getName(), new Object[] { gcmad,
+                    workers });
 
+            if (display) {
                 displayer = (Displayer) PAActiveObject.newActive(Displayer.class.getName(), new Object[] {
                         Integer.valueOf(totalNbBodies), Boolean.valueOf(displayft), deployer,
                         new BooleanWrapper(ddd) });
-            } catch (ProActiveException e) {
-                abort(e);
             }
+        } catch (ProActiveException e) {
+            abort(e);
         }
 
         switch (input) {

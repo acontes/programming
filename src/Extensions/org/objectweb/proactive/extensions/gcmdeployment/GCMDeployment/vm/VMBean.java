@@ -10,11 +10,11 @@ public class VMBean implements Serializable {
     String id;
     String name;
     String userName;
-	String userPwd;
+    String userPwd;
     TopologyImpl node;
     HostInfoImpl hostInfo;
 
-	boolean clone;
+    boolean clone;
 
     VMBean(String id, boolean c, String name, HostInfoImpl hostInfo) {
         this.id = id;
@@ -23,10 +23,10 @@ public class VMBean implements Serializable {
         this.hostInfo = hostInfo;
     }
 
-    VMBean(String id, boolean c, String name, String user, String pwd, HostInfoImpl hostInfo){
-    	this(id,c,name,hostInfo);
-    	this.userName = user;
-    	this.userPwd = pwd;
+    VMBean(String id, boolean c, String name, String user, String pwd, HostInfoImpl hostInfo) {
+        this(id, c, name, hostInfo);
+        this.userName = user;
+        this.userPwd = pwd;
     }
 
     public String getId() {
@@ -59,26 +59,26 @@ public class VMBean implements Serializable {
     }
 
     public String getUserName() {
-		return userName;
-	}
+        return userName;
+    }
 
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
 
-	public String getUserPwd() {
-		return userPwd;
-	}
+    public String getUserPwd() {
+        return userPwd;
+    }
 
-	public void setUserPwd(String userPwd) {
-		this.userPwd = userPwd;
-	}
+    public void setUserPwd(String userPwd) {
+        this.userPwd = userPwd;
+    }
 
     public HostInfoImpl getHostInfo() {
-		return hostInfo;
-	}
+        return hostInfo;
+    }
 
-	public void setHostInfo(HostInfoImpl hostInfo) {
-		this.hostInfo = hostInfo;
-	}	
+    public void setHostInfo(HostInfoImpl hostInfo) {
+        this.hostInfo = hostInfo;
+    }
 }

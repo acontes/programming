@@ -31,9 +31,9 @@ public class VMMLibXenParser extends AbstractVMMParser {
         ArrayList<VMBean> vms = vmm.getVms();
         String userName = vmm.getUser();
         String userPwd = vmm.getPwd();
-        for(VMBean vm : vms){
-        	vm.setUserName(userName);
-        	vm.setUserPwd(userPwd);
+        for (VMBean vm : vms) {
+            vm.setUserName(userName);
+            vm.setUserPwd(userPwd);
         }
         return vmm;
     }

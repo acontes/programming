@@ -45,6 +45,7 @@ import org.ow2.proactive.virtualizing.virtualbox.VirtualboxVM;
 import org.ow2.proactive.virtualizing.virtualbox.VirtualboxVMM;
 import org.ow2.proactive.virtualizing.virtualbox.VirtualboxVM.DataKey;
 
+
 /**
  * This class is an implementation of the {@link AbstractVMM} class for
  * VirtualBox nonOse hypervisor. It is compulsory to run a non open source
@@ -57,45 +58,48 @@ import org.ow2.proactive.virtualizing.virtualbox.VirtualboxVM.DataKey;
  */
 public class VMMVirtualbox extends AbstractVMM {
 
-	/** Every registered hypervisors */
+    /** Every registered hypervisors */
     private ArrayList<VirtualboxVMM> vmms = new ArrayList<VirtualboxVMM>();
     /** Every registered virtual machines */
     private ArrayList<VirtualboxVM> vms = new ArrayList<VirtualboxVM>();
 
     @Override
-	public void start(CommandBuilderProActive comm, GCMApplicationInternal gcma) {
-		//contact hypervisors & setup environment
-		ArrayList<String> uris = super.getUris();
-		for (String uri : uris) {
-			VirtualboxVMM vmm;
-			try {
-				vmm = new VirtualboxVMM(uri, getUser(), getPwd());
-			} catch (VirtualServiceException e) {
-				GCMDeploymentLoggers.GCMD_LOGGER.error("Unable to connect to " + uri + "'s hypervisor.", e);
-				return;
-			}
-			ArrayList<VMBean> vmsMap = super.getVms();
-			for (VMBean vm : vmsMap) {
-				VirtualboxVM temp = null;
-				try {
-					temp = vmm.getNewVM(vm.getId());
-				} catch (VirtualServiceException e) {
-					GCMDeploymentLoggers.GCMD_LOGGER.error("Unable to get " + vm.getId() + " from Virtualbox hypervisor.", e);
-					continue;
-				}
-				if (vm.isClone()) {
-					GCMDeploymentLoggers.GCMD_LOGGER.error("Clone feature isn't supported for Virtualbox hypervisor.");
-					GCMDeploymentLoggers.GCMD_LOGGER.error("Trying to boot the template...");
-				}
-				try {
-					startVM(temp, gcma, comm, vm.getHostInfo());
-				} catch (Exception e) {
-					GCMDeploymentLoggers.GCMD_LOGGER.error("Unable to start " + vm.getName() + " from Virtualbox hypervisor.", e);
-				}
-				this.vms.add(temp);
-			}
-		}
-	}
+    public void start(CommandBuilderProActive comm, GCMApplicationInternal gcma) {
+        //contact hypervisors & setup environment
+        ArrayList<String> uris = super.getUris();
+        for (String uri : uris) {
+            VirtualboxVMM vmm;
+            try {
+                vmm = new VirtualboxVMM(uri, getUser(), getPwd());
+            } catch (VirtualServiceException e) {
+                GCMDeploymentLoggers.GCMD_LOGGER.error("Unable to connect to " + uri + "'s hypervisor.", e);
+                return;
+            }
+            ArrayList<VMBean> vmsMap = super.getVms();
+            for (VMBean vm : vmsMap) {
+                VirtualboxVM temp = null;
+                try {
+                    temp = vmm.getNewVM(vm.getId());
+                } catch (VirtualServiceException e) {
+                    GCMDeploymentLoggers.GCMD_LOGGER.error("Unable to get " + vm.getId() +
+                        " from Virtualbox hypervisor.", e);
+                    continue;
+                }
+                if (vm.isClone()) {
+                    GCMDeploymentLoggers.GCMD_LOGGER
+                            .error("Clone feature isn't supported for Virtualbox hypervisor.");
+                    GCMDeploymentLoggers.GCMD_LOGGER.error("Trying to boot the template...");
+                }
+                try {
+                    startVM(temp, gcma, comm, vm.getHostInfo());
+                } catch (Exception e) {
+                    GCMDeploymentLoggers.GCMD_LOGGER.error("Unable to start " + vm.getName() +
+                        " from Virtualbox hypervisor.", e);
+                }
+                this.vms.add(temp);
+            }
+        }
+    }
 
     @Override
     public void stop() {
@@ -118,22 +122,22 @@ public class VMMVirtualbox extends AbstractVMM {
      * @param hostInfo the hostinfo used to build the command
      * @throws VirtualServiceException if a problem occurs
      */
-	private void startVM(VirtualboxVM vm, GCMApplicationInternal gcma, CommandBuilderProActive comm,
-			HostInfoImpl hostInfo) throws VirtualServiceException {
-		//register appli within boostrapServlet singleton
-		BootstrapServlet bootstrapServlet = BootstrapServlet.get();
-		String deploymentIdKey = new Long(gcma.getDeploymentId()).toString();
-		long key = ProActiveCounter.getUniqID();
-		String vmKey = deploymentIdKey + ":" + key;
-		HashMap<String, String> values = new HashMap<String, String>();
-		values.put(BootstrapServlet.PA_RT_COMMAND, comm.buildCommand(hostInfo, gcma));
-		String bootstrapAddress = bootstrapServlet.registerAppli(vmKey, values);
-		vm.powerOn();
-		try {
-			vm.pushData(DataKey.proacBootstrapURL, bootstrapAddress);
-		} catch (VirtualServiceException e) {
-			GCMDeploymentLoggers.GCMD_LOGGER.error(
-					"Cannot pass the bootstrap URL to the virtual machine.", e);
-		}
-	}
+    private void startVM(VirtualboxVM vm, GCMApplicationInternal gcma, CommandBuilderProActive comm,
+            HostInfoImpl hostInfo) throws VirtualServiceException {
+        //register appli within boostrapServlet singleton
+        BootstrapServlet bootstrapServlet = BootstrapServlet.get();
+        String deploymentIdKey = new Long(gcma.getDeploymentId()).toString();
+        long key = ProActiveCounter.getUniqID();
+        String vmKey = deploymentIdKey + ":" + key;
+        HashMap<String, String> values = new HashMap<String, String>();
+        values.put(BootstrapServlet.PA_RT_COMMAND, comm.buildCommand(hostInfo, gcma));
+        String bootstrapAddress = bootstrapServlet.registerAppli(vmKey, values);
+        vm.powerOn();
+        try {
+            vm.pushData(DataKey.proacBootstrapURL, bootstrapAddress);
+        } catch (VirtualServiceException e) {
+            GCMDeploymentLoggers.GCMD_LOGGER
+                    .error("Cannot pass the bootstrap URL to the virtual machine.", e);
+        }
+    }
 }

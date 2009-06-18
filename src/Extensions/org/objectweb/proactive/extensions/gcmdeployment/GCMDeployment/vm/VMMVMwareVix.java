@@ -46,6 +46,7 @@ import org.ow2.proactive.virtualizing.vmwarevix.VMwareVMM;
 import org.ow2.proactive.virtualizing.vmwarevix.VMwareVM.DataKey;
 import org.ow2.proactive.virtualizing.vmwarevix.VMwareVMM.Service;
 
+
 /**
  * An implementation of {@link AbstractVMM} based on VMware Vix API.
  * This class is able to handle VMware server <= 2.0, Workstations and some ESX.
@@ -62,39 +63,42 @@ public class VMMVMwareVix extends AbstractVMM {
     private Service service = Service.vmwareServerVI;
 
     @Override
-	public void start(CommandBuilderProActive comm, GCMApplicationInternal gcma) {
-		//contact hypervisors & setup environment
-		ArrayList<String> uris = super.getUris();
-		for (String uri : uris) {
-			VMwareVMM vmm;
-			try {
-				vmm = new VMwareVMM(uri, getUser(), getPwd());
-			} catch (VirtualServiceException e) {
-				GCMDeploymentLoggers.GCMD_LOGGER.error("Unable to connect to " + uri + "'s hypervisor.", e);
-				return;
-			}
-			ArrayList<VMBean> vmsMap = super.getVms();
-			for (VMBean vm : vmsMap) {
-				VMwareVM temp = null;
-				try {
-					temp = vmm.getNewVM(vm.getId());
-				} catch (VirtualServiceException e) {
-					GCMDeploymentLoggers.GCMD_LOGGER.error("Unable to get " + vm.getId() + " from VMware hypervisor.", e);
-					continue;
-				}
-				if (vm.isClone()) {
-					GCMDeploymentLoggers.GCMD_LOGGER.error("Clone feature isn't supported for VMware hypervisor.");
-					GCMDeploymentLoggers.GCMD_LOGGER.error("Trying to boot the template...");
-				}
-				try {
-					startVM(temp, gcma, comm, vm.getHostInfo());
-				} catch (Exception e) {
-					GCMDeploymentLoggers.GCMD_LOGGER.error("Unable to start " + vm.getName() + " from VMware hypervisor.", e);
-				}
-				this.vms.add(temp);
-			}
-		}
-	}
+    public void start(CommandBuilderProActive comm, GCMApplicationInternal gcma) {
+        //contact hypervisors & setup environment
+        ArrayList<String> uris = super.getUris();
+        for (String uri : uris) {
+            VMwareVMM vmm;
+            try {
+                vmm = new VMwareVMM(uri, getUser(), getPwd());
+            } catch (VirtualServiceException e) {
+                GCMDeploymentLoggers.GCMD_LOGGER.error("Unable to connect to " + uri + "'s hypervisor.", e);
+                return;
+            }
+            ArrayList<VMBean> vmsMap = super.getVms();
+            for (VMBean vm : vmsMap) {
+                VMwareVM temp = null;
+                try {
+                    temp = vmm.getNewVM(vm.getId());
+                } catch (VirtualServiceException e) {
+                    GCMDeploymentLoggers.GCMD_LOGGER.error("Unable to get " + vm.getId() +
+                        " from VMware hypervisor.", e);
+                    continue;
+                }
+                if (vm.isClone()) {
+                    GCMDeploymentLoggers.GCMD_LOGGER
+                            .error("Clone feature isn't supported for VMware hypervisor.");
+                    GCMDeploymentLoggers.GCMD_LOGGER.error("Trying to boot the template...");
+                }
+                try {
+                    startVM(temp, gcma, comm, vm.getHostInfo());
+                } catch (Exception e) {
+                    GCMDeploymentLoggers.GCMD_LOGGER.error("Unable to start " + vm.getName() +
+                        " from VMware hypervisor.", e);
+                }
+                this.vms.add(temp);
+            }
+        }
+    }
 
     private VMwareVMM getVMM(String uri) throws VirtualServiceException {
         String user = getUser();
@@ -131,24 +135,24 @@ public class VMMVMwareVix extends AbstractVMM {
      * @param hostInfo the hostinfo used to build the command
      * @throws VirtualServiceException if a problem occurs
      */
-	private void startVM(VMwareVM vm, GCMApplicationInternal gcma, CommandBuilderProActive comm,
-			HostInfoImpl hostInfo) throws VirtualServiceException {
-		//register appli within boostrapServlet singleton
-		BootstrapServlet bootstrapServlet = BootstrapServlet.get();
-		String deploymentIdKey = new Long(gcma.getDeploymentId()).toString();
-		long key = ProActiveCounter.getUniqID();
-		String vmKey = deploymentIdKey + ":" + key;
-		HashMap<String, String> values = new HashMap<String, String>();
-		values.put(BootstrapServlet.PA_RT_COMMAND, comm.buildCommand(hostInfo, gcma));
-		String bootstrapAddress = bootstrapServlet.registerAppli(vmKey, values);
-		vm.powerOn();
-		try {
-			vm.pushData(DataKey.proacBootstrapURL, bootstrapAddress);
-		} catch (VirtualServiceException e) {
-			GCMDeploymentLoggers.GCMD_LOGGER.error(
-					"Cannot pass the bootstrap URL to the virtual machine.", e);
-		}
-	}
+    private void startVM(VMwareVM vm, GCMApplicationInternal gcma, CommandBuilderProActive comm,
+            HostInfoImpl hostInfo) throws VirtualServiceException {
+        //register appli within boostrapServlet singleton
+        BootstrapServlet bootstrapServlet = BootstrapServlet.get();
+        String deploymentIdKey = new Long(gcma.getDeploymentId()).toString();
+        long key = ProActiveCounter.getUniqID();
+        String vmKey = deploymentIdKey + ":" + key;
+        HashMap<String, String> values = new HashMap<String, String>();
+        values.put(BootstrapServlet.PA_RT_COMMAND, comm.buildCommand(hostInfo, gcma));
+        String bootstrapAddress = bootstrapServlet.registerAppli(vmKey, values);
+        vm.powerOn();
+        try {
+            vm.pushData(DataKey.proacBootstrapURL, bootstrapAddress);
+        } catch (VirtualServiceException e) {
+            GCMDeploymentLoggers.GCMD_LOGGER
+                    .error("Cannot pass the bootstrap URL to the virtual machine.", e);
+        }
+    }
 
     /*----------------------
      * Getters & Setters

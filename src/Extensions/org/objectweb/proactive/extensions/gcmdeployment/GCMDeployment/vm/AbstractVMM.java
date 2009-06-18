@@ -56,7 +56,7 @@ public abstract class AbstractVMM implements Serializable {
      * the virtualization layer handles clones...
      */
     public void addVMBean(String key, int count) {
-    	addVMBean(key, count, null);
+        addVMBean(key, count, null);
     }
 
     /**
@@ -66,18 +66,18 @@ public abstract class AbstractVMM implements Serializable {
      * @param osType the operating system of your virtual machine (unix || windows).
      */
     public void addVMBean(String key, int count, String osType) {
-    	HostInfoImpl hostInfo = new HostInfoImpl();
-    	if(osType != null){
-    		hostInfo.setOs( osType.equals( OperatingSystem.unix.name()) ? OperatingSystem.unix : OperatingSystem.windows );
-    	}
-    	if (count == 1) {
-    		vms.add(new VMBean(key, false, key, hostInfo));
-    	} else
-    		for (int i = 0; i < count; i++) {
-    			vms
-    			.add(new VMBean(key, true, key + "_PAClone" + (i + 1) + "_" +
-    					ProActiveCounter.getUniqID(), hostInfo));
-    		}    	
+        HostInfoImpl hostInfo = new HostInfoImpl();
+        if (osType != null) {
+            hostInfo.setOs(osType.equals(OperatingSystem.unix.name()) ? OperatingSystem.unix
+                    : OperatingSystem.windows);
+        }
+        if (count == 1) {
+            vms.add(new VMBean(key, false, key, hostInfo));
+        } else
+            for (int i = 0; i < count; i++) {
+                vms.add(new VMBean(key, true,
+                    key + "_PAClone" + (i + 1) + "_" + ProActiveCounter.getUniqID(), hostInfo));
+            }
     }
 
     /*------------------

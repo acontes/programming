@@ -118,9 +118,12 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
         try {
             List<AbstractVMM> vmms = resources.getVMM();
             for (AbstractVMM vmm : vmms) {
-            	//since deployment with virtualization is meaningless outside of a ProActive application
-            	//it is compulsory to downcast the commandBuilder to be able to bootstrap remote PART
-                vmm.start(commandBuilder instanceof CommandBuilderProActive?(CommandBuilderProActive)commandBuilder:null,gcma);
+                //since deployment with virtualization is meaningless outside of a ProActive application
+                //it is compulsory to downcast the commandBuilder to be able to bootstrap remote PART
+                vmm
+                        .start(
+                                commandBuilder instanceof CommandBuilderProActive ? (CommandBuilderProActive) commandBuilder
+                                        : null, gcma);
             }
         } catch (Exception e) {
             GCMDeploymentLoggers.GCMD_LOGGER.error("Unable to start virtual machines.", e);

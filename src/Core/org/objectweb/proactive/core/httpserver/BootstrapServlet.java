@@ -107,7 +107,7 @@ public class BootstrapServlet extends HttpServlet {
         synchronized (get()) {
             applis.put(id, values);
             String res = getBaseURI() + "?" + BootstrapServlet.VM_ID + "=" + id;
-			logger.info("Bootstrap servlet registered an app on:  " + res);
+            logger.info("Bootstrap servlet registered an app on:  " + res);
             return res;
         }
     }

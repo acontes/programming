@@ -58,90 +58,94 @@ import org.ow2.proactive.virtualizing.vmwarevi.VMwareVMM;
  */
 public class VMMVMwareVI extends AbstractVMM {
 
-	/** Every registered hypervisors */
-	private ArrayList<VMwareVMM> vmms = new ArrayList<VMwareVMM>();
-	//the associated boolean specify if the virtual is a clone.
-	/** Every registered virtual machines */
-	private Map<VMwareVM, Boolean> vms = new HashMap<VMwareVM, Boolean>();
+    /** Every registered hypervisors */
+    private ArrayList<VMwareVMM> vmms = new ArrayList<VMwareVMM>();
+    //the associated boolean specify if the virtual is a clone.
+    /** Every registered virtual machines */
+    private Map<VMwareVM, Boolean> vms = new HashMap<VMwareVM, Boolean>();
 
-	@Override
-	public void start(CommandBuilderProActive comm, GCMApplicationInternal gcma) {
-		//contact hypervisors & setup environment
-		ArrayList<String> uris = super.getUris();
-		for (String uri : uris) {
-			VMwareVMM vmm;
-			try {
-				vmm = new VMwareVMM(uri, getUser(), getPwd());
-			} catch (VirtualServiceException e) {
-				GCMDeploymentLoggers.GCMD_LOGGER.error("Unable to connect to " + uri + "'s hypervisor.", e);
-				return;
-			}
-			ArrayList<VMBean> vmsMap = super.getVms();
-			for (VMBean vm : vmsMap) {
-				VMwareVM temp = null;
-				try {
-					temp = vmm.getNewVM(vm.getId());
-				} catch (VirtualServiceException e) {
-					GCMDeploymentLoggers.GCMD_LOGGER.error("Unable to get " + vm.getId() + " from VMware hypervisor.", e);
-					continue;
-				}
-				if (vm.isClone()) {
-					try {
-						temp = temp.clone(vm.getName());
-					} catch (VirtualServiceException e) {
-						GCMDeploymentLoggers.GCMD_LOGGER.error("Unable to clone " + vm.getId() + " from VMware hypervisor.", e);
-						continue;
-					}
-				}
-				try {
-					startVM(temp, gcma, comm, vm.getHostInfo());
-				} catch (Exception e) {
-					GCMDeploymentLoggers.GCMD_LOGGER.error("Unable to start " + vm.getName() + " from VMware hypervisor.", e);
-					if(vm.isClone()){
-						try {
-							temp.destroy();
-						} catch (VirtualServiceException e1) {
-							GCMDeploymentLoggers.GCMD_LOGGER.error("A sever exception occured while destroying unused " +
-									vm.getName() + " virtual machine." + System.getProperty("line.separator") + 
-									". You have to do it by yourself, be careful.", e);
-							continue;
-						}
-					}
-				}
-				this.vms.put(temp, vm.isClone());
-			}
-		}
-	}
+    @Override
+    public void start(CommandBuilderProActive comm, GCMApplicationInternal gcma) {
+        //contact hypervisors & setup environment
+        ArrayList<String> uris = super.getUris();
+        for (String uri : uris) {
+            VMwareVMM vmm;
+            try {
+                vmm = new VMwareVMM(uri, getUser(), getPwd());
+            } catch (VirtualServiceException e) {
+                GCMDeploymentLoggers.GCMD_LOGGER.error("Unable to connect to " + uri + "'s hypervisor.", e);
+                return;
+            }
+            ArrayList<VMBean> vmsMap = super.getVms();
+            for (VMBean vm : vmsMap) {
+                VMwareVM temp = null;
+                try {
+                    temp = vmm.getNewVM(vm.getId());
+                } catch (VirtualServiceException e) {
+                    GCMDeploymentLoggers.GCMD_LOGGER.error("Unable to get " + vm.getId() +
+                        " from VMware hypervisor.", e);
+                    continue;
+                }
+                if (vm.isClone()) {
+                    try {
+                        temp = temp.clone(vm.getName());
+                    } catch (VirtualServiceException e) {
+                        GCMDeploymentLoggers.GCMD_LOGGER.error("Unable to clone " + vm.getId() +
+                            " from VMware hypervisor.", e);
+                        continue;
+                    }
+                }
+                try {
+                    startVM(temp, gcma, comm, vm.getHostInfo());
+                } catch (Exception e) {
+                    GCMDeploymentLoggers.GCMD_LOGGER.error("Unable to start " + vm.getName() +
+                        " from VMware hypervisor.", e);
+                    if (vm.isClone()) {
+                        try {
+                            temp.destroy();
+                        } catch (VirtualServiceException e1) {
+                            GCMDeploymentLoggers.GCMD_LOGGER.error(
+                                    "A sever exception occured while destroying unused " + vm.getName() +
+                                        " virtual machine." + System.getProperty("line.separator") +
+                                        ". You have to do it by yourself, be careful.", e);
+                            continue;
+                        }
+                    }
+                }
+                this.vms.put(temp, vm.isClone());
+            }
+        }
+    }
 
-	@Override
-	public void stop() {
-		Set<VMwareVM> vmSet = vms.keySet();
-		for (VMwareVM vm : vmSet) {
-			try {
-				vm.powerOff();
-			} catch (VirtualServiceException e) {
-				try {
-					GCMDeploymentLoggers.GCMD_LOGGER.error("Unable to power off the virtual machine " +
-							vm.getName());
-				} catch (VirtualServiceException e1) {
-					GCMDeploymentLoggers.GCMD_LOGGER
-					.error("A sever error occured while powering off a virtual machine");
-				}
-			}
-			if (vms.get(vm))
-				try {
-					vm.destroy();
-				} catch (VirtualServiceException e) {
-					try {
-						GCMDeploymentLoggers.GCMD_LOGGER.error("Unable to destroy the virtual machine " +
-								vm.getName());
-					} catch (VirtualServiceException e1) {
-						GCMDeploymentLoggers.GCMD_LOGGER
-						.error("A sever error occured while destroying a virtual machine");
-					}
-				}
-		}
-	}
+    @Override
+    public void stop() {
+        Set<VMwareVM> vmSet = vms.keySet();
+        for (VMwareVM vm : vmSet) {
+            try {
+                vm.powerOff();
+            } catch (VirtualServiceException e) {
+                try {
+                    GCMDeploymentLoggers.GCMD_LOGGER.error("Unable to power off the virtual machine " +
+                        vm.getName());
+                } catch (VirtualServiceException e1) {
+                    GCMDeploymentLoggers.GCMD_LOGGER
+                            .error("A sever error occured while powering off a virtual machine");
+                }
+            }
+            if (vms.get(vm))
+                try {
+                    vm.destroy();
+                } catch (VirtualServiceException e) {
+                    try {
+                        GCMDeploymentLoggers.GCMD_LOGGER.error("Unable to destroy the virtual machine " +
+                                vm.getName());
+                    } catch (VirtualServiceException e1) {
+                        GCMDeploymentLoggers.GCMD_LOGGER
+                                .error("A sever error occured while destroying a virtual machine");
+                    }
+                }
+        }
+    }
 
     /**
      * This method is in charge of booting the virtual machine and registering a web page
@@ -152,22 +156,22 @@ public class VMMVMwareVI extends AbstractVMM {
      * @param hostInfo the hostinfo used to build the command
      * @throws VirtualServiceException if a problem occurs
      */
-	private void startVM(VMwareVM vm, GCMApplicationInternal gcma, CommandBuilderProActive comm,
-			HostInfoImpl hostInfo) throws VirtualServiceException {
-		//register appli within boostrapServlet singleton
-		BootstrapServlet bootstrapServlet = BootstrapServlet.get();
-		String deploymentIdKey = new Long(gcma.getDeploymentId()).toString();
-		long key = ProActiveCounter.getUniqID();
-		String vmKey = deploymentIdKey + ":" + key;
-		HashMap<String, String> values = new HashMap<String, String>();
-		values.put(BootstrapServlet.PA_RT_COMMAND, comm.buildCommand(hostInfo, gcma));
-		String bootstrapAddress = bootstrapServlet.registerAppli(vmKey, values);
-		vm.powerOn();
-		try {
-			vm.pushData(VMwareVM.DataKey.proacBootstrapURL, bootstrapAddress);
-		} catch (VirtualServiceException e) {
-			GCMDeploymentLoggers.GCMD_LOGGER.error(
-					"Cannot pass the bootstrap URL to the virtual machine.", e);
-		}
-	}
+    private void startVM(VMwareVM vm, GCMApplicationInternal gcma, CommandBuilderProActive comm,
+            HostInfoImpl hostInfo) throws VirtualServiceException {
+        //register appli within boostrapServlet singleton
+        BootstrapServlet bootstrapServlet = BootstrapServlet.get();
+        String deploymentIdKey = new Long(gcma.getDeploymentId()).toString();
+        long key = ProActiveCounter.getUniqID();
+        String vmKey = deploymentIdKey + ":" + key;
+        HashMap<String, String> values = new HashMap<String, String>();
+        values.put(BootstrapServlet.PA_RT_COMMAND, comm.buildCommand(hostInfo, gcma));
+        String bootstrapAddress = bootstrapServlet.registerAppli(vmKey, values);
+        vm.powerOn();
+        try {
+            vm.pushData(VMwareVM.DataKey.proacBootstrapURL, bootstrapAddress);
+        } catch (VirtualServiceException e) {
+            GCMDeploymentLoggers.GCMD_LOGGER
+                    .error("Cannot pass the bootstrap URL to the virtual machine.", e);
+        }
+    }
 }
