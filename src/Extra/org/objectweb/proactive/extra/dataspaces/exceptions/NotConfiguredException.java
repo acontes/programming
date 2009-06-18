@@ -3,6 +3,7 @@
  */
 package org.objectweb.proactive.extra.dataspaces.exceptions;
 
+// TODO: make it extend ConfigurationException?
 /**
  *
  *
