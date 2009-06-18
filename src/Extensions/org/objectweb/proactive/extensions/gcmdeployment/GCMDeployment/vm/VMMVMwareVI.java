@@ -138,7 +138,7 @@ public class VMMVMwareVI extends AbstractVMM {
                 } catch (VirtualServiceException e) {
                     try {
                         GCMDeploymentLoggers.GCMD_LOGGER.error("Unable to destroy the virtual machine " +
-                                vm.getName());
+                            vm.getName());
                     } catch (VirtualServiceException e1) {
                         GCMDeploymentLoggers.GCMD_LOGGER
                                 .error("A sever error occured while destroying a virtual machine");

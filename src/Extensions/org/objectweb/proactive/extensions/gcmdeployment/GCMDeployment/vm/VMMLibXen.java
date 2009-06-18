@@ -16,6 +16,7 @@ import org.ow2.proactive.virtualizing.xenserver.XenServerVM;
 import org.ow2.proactive.virtualizing.xenserver.XenServerVMM;
 import org.ow2.proactive.virtualizing.xenserver.XenServerVM.DataKey;
 
+
 /**
  * This is an implementation of the {@link AbstractVMM} class for
  * XenOss & XenServer hypervisors. Note that the
@@ -95,7 +96,7 @@ public class VMMLibXen extends AbstractVMM {
             }
         }
     }
-	
+
     @Override
     public void stop() {
         Set<XenServerVM> vmSet = vms.keySet();
@@ -105,7 +106,7 @@ public class VMMLibXen extends AbstractVMM {
             } catch (VirtualServiceException e) {
                 try {
                     GCMDeploymentLoggers.GCMD_LOGGER.error("Unable to power off the virtual machine " +
-                            vm.getName());
+                        vm.getName());
                 } catch (VirtualServiceException e1) {
                     GCMDeploymentLoggers.GCMD_LOGGER
                             .error("A sever error occured while powering off a virtual machine");
@@ -117,7 +118,7 @@ public class VMMLibXen extends AbstractVMM {
                 } catch (VirtualServiceException e) {
                     try {
                         GCMDeploymentLoggers.GCMD_LOGGER.error("Unable to destroy the virtual machine " +
-                                vm.getName());
+                            vm.getName());
                     } catch (VirtualServiceException e1) {
                         GCMDeploymentLoggers.GCMD_LOGGER
                                 .error("A sever error occured while destroying a virtual machine");

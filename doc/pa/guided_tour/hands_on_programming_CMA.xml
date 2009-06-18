@@ -868,6 +868,7 @@
          ===============================================================================
       </screen>
 		<para>
+         You can therefore realise that information returned in the second display are information about the local host but not about
          the host where the active object was running on. This is totally normal since when you call the <literal>toString()</literal>
          method, you will implicitly get the active object from the remote host and call this method next. So, if variable initializations
          are done in the <literal>toString()</literal> method, returned information will be information on the local host, whereas if variable
