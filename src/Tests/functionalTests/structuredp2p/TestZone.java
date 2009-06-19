@@ -4,10 +4,10 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.objectweb.proactive.extensions.structuredp2p.core.can.CANOverlay;
-import org.objectweb.proactive.extensions.structuredp2p.core.can.Coordinate;
-import org.objectweb.proactive.extensions.structuredp2p.core.can.Zone;
-import org.objectweb.proactive.extensions.structuredp2p.core.exception.ZoneException;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.Coordinate;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.Zone;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.ZoneException;
 
 
 /**

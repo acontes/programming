@@ -3,17 +3,16 @@ package org.objectweb.proactive.extensions.structuredp2p.core.overlay;
 import java.io.Serializable;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
-import org.objectweb.proactive.extensions.structuredp2p.messages.AddNeighborMessage;
-import org.objectweb.proactive.extensions.structuredp2p.messages.LeaveMessage;
-import org.objectweb.proactive.extensions.structuredp2p.messages.LookupMessage;
-import org.objectweb.proactive.extensions.structuredp2p.messages.Message;
-import org.objectweb.proactive.extensions.structuredp2p.messages.PingMessage;
-import org.objectweb.proactive.extensions.structuredp2p.messages.RemoveNeighborMessage;
-import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANRemoveNeighborMessage;
-import org.objectweb.proactive.extensions.structuredp2p.responses.ActionResponseMessage;
-import org.objectweb.proactive.extensions.structuredp2p.responses.JoinResponseMessage;
-import org.objectweb.proactive.extensions.structuredp2p.responses.LookupResponseMessage;
-import org.objectweb.proactive.extensions.structuredp2p.responses.ResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.AddNeighborMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.LeaveMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.Message;
+import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.RemoveNeighborMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.can.CANRemoveNeighborMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.Query;
+import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.QueryResponse;
+import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.ActionResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.JoinResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.ResponseMessage;
 
 
 /**
@@ -70,27 +69,26 @@ public abstract class StructuredOverlay implements Serializable {
     public abstract void update();
 
     /**
-     * Sends a {@link LookupMessage} on the network from the current peer.
+     * Sends a {@link Query} on the network without response.
      * 
-     * @param msg
-     *            the message to send
-     * @return the response in agreement with the type of message sent.
+     * @param query
+     *            the query to send.
      */
-    public abstract LookupResponseMessage sendMessage(LookupMessage msg);
+    public abstract void send(Query query);
 
     /**
      * Send a {@link Message} to a known {@link Peer}.
      * 
      * @param peer
-     *            the peer to which we want to send the message.
+     *            the remote peer to which we want to send the message.
      * @param msg
      *            the message to send.
      * 
      * @return the response in agreement with the type of message sent.
      * @throws Exception
-     *             this exception appears when a message cannot be send to a peer.
+     *             an exception appears when a message cannot be send to a peer.
      */
-    public abstract ResponseMessage sendMessageTo(Peer peer, Message msg) throws Exception;
+    public abstract ResponseMessage sendTo(Peer remotePeer, Message msg) throws Exception;
 
     /**
      * Handles a {@link AddNeighborMessage}.
@@ -120,23 +118,28 @@ public abstract class StructuredOverlay implements Serializable {
     public abstract ActionResponseMessage handleLeaveMessage(LeaveMessage msg);
 
     /**
-     * Handles a {@link LookupMessage}.
+     * Handles a {@link Query}.
      * 
-     * @param msg
-     *            the lookup message that is handled.
-     * @return the {@link LookupResponseMessage} response.
+     * @param query
+     *            the query to handle.
      */
-    public abstract LookupResponseMessage handleLookupMessage(LookupMessage msg);
+    public void handleQuery(Query query) {
+        this.send(new QueryResponse(query, this.getRemotePeer()));
+    }
 
     /**
-     * Handles a {@link PingMessage}.
+     * Handles a {@link QueryResponse}.
      * 
-     * @param msg
-     *            the message that is handled.
-     * @return the {@link PingResponseMessage} response.
+     * @param response
+     *            the response to handle.
      */
-    public ResponseMessage handleMessage(PingMessage msg) {
-        return new ResponseMessage(msg.getCreationTimestamp());
+    public void handleQueryResponse(QueryResponse response) {
+        response.setDeliveryTime();
+
+        synchronized (this.getLocalPeer().getOneWayResponses()) {
+            this.getLocalPeer().getOneWayResponses().put(response.getUid(), response);
+            this.getLocalPeer().getOneWayResponses().notifyAll();
+        }
     }
 
     /**

@@ -11,10 +11,10 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
-import org.objectweb.proactive.extensions.structuredp2p.core.can.CANOverlay;
-import org.objectweb.proactive.extensions.structuredp2p.core.can.NeighborsDataStructure;
-import org.objectweb.proactive.extensions.structuredp2p.core.can.Zone;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.NeighborsDataStructure;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.Zone;
 
 
 public class TestNeighborsDataStructure {

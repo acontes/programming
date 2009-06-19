@@ -1,6 +1,6 @@
 package org.objectweb.proactive.examples.structuredp2p.can;
 
-import org.objectweb.proactive.extensions.structuredp2p.core.can.CANOverlay;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
 
 
 public class Launcher {

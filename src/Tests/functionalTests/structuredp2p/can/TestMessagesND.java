@@ -8,16 +8,13 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
-import org.objectweb.proactive.extensions.structuredp2p.core.can.CANOverlay;
-import org.objectweb.proactive.extensions.structuredp2p.core.can.Coordinate;
-import org.objectweb.proactive.extensions.structuredp2p.core.can.Zone;
-import org.objectweb.proactive.extensions.structuredp2p.core.exception.ZoneException;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
-import org.objectweb.proactive.extensions.structuredp2p.messages.LookupMessage;
-import org.objectweb.proactive.extensions.structuredp2p.messages.PingMessage;
-import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANLookupMessage;
-import org.objectweb.proactive.extensions.structuredp2p.responses.ResponseMessage;
-import org.objectweb.proactive.extensions.structuredp2p.responses.can.CANLookupResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.Coordinate;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.Zone;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.ZoneException;
+import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.Query;
+import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.ResponseMessage;
 
 
 /**
@@ -33,7 +30,7 @@ public class TestMessagesND {
     private Peer firstPeer;
     private Peer secondPeer;
     private Peer thirdPeer;
-    private LookupMessage lMsg;
+    private Query lMsg;
     private Coordinate messCoord[];
     private Coordinate minCoord[];
     private Coordinate maxCoord[];
@@ -102,7 +99,7 @@ public class TestMessagesND {
     @Test
     public void testSendMessage() {
 
-        this.srcResponse = this.firstPeer.sendMessage(this.lMsg);
+        this.srcResponse = this.firstPeer.search(this.lMsg);
         Assert.assertNotNull("the src response is not null", this.srcResponse);
         for (int i = 0; i < this.dim; i++) {
             Assert.assertEquals(i + "th coordinate ok",
@@ -169,7 +166,7 @@ public class TestMessagesND {
         this.secondPeer.setStructuredOverlay(this.splitCan2);
 
         this.myResponse = this.firstPeer.sendMessage(this.lMsg);
-        this.srcResponse = this.secondPeer.sendMessageTo(this.firstPeer, new PingMessage());
+        this.srcResponse = this.secondPeer.sendTo(this.firstPeer, new PingMessage());
         Assert.assertNotNull("the src response is not null", this.myResponse);
 
         for (int i = 0; i < this.dim; i++) {

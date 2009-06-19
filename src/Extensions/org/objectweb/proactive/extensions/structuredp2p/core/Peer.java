@@ -1,24 +1,24 @@
 package org.objectweb.proactive.extensions.structuredp2p.core;
 
 import java.io.Serializable;
-import java.util.concurrent.Future;
+import java.util.HashMap;
+import java.util.UUID;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PAEventProgramming;
 import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.extensions.structuredp2p.core.can.CANOverlay;
-import org.objectweb.proactive.extensions.structuredp2p.core.chord.ChordOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredOverlay;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.chord.ChordOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.data.DataStorage;
-import org.objectweb.proactive.extensions.structuredp2p.messages.LookupMessage;
-import org.objectweb.proactive.extensions.structuredp2p.messages.Message;
-import org.objectweb.proactive.extensions.structuredp2p.responses.LookupResponseMessage;
-import org.objectweb.proactive.extensions.structuredp2p.responses.ResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.Message;
+import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.Query;
+import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.QueryResponse;
+import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.ResponseMessage;
 
 
 /**
@@ -38,12 +38,17 @@ public class Peer implements InitActive, RunActive, Serializable {
      * The timeout to wait before to check neighbors via the call of
      * {@link StructuredOverlay#checkNeighbors()} .
      */
-    public static final int CHECK_NEIGHBORS_TIMEOUT = 3000;
+    public static final int CHECK_NEIGHBORS_TIMEOUT = 7777;
 
     /**
      * The structured protocol which is used by the peer.
      */
     private StructuredOverlay structuredOverlay;
+
+    /**
+     * Responses associated to the oneWay search on the network.
+     */
+    private HashMap<UUID, QueryResponse> oneWayResponses = new HashMap<UUID, QueryResponse>();
 
     /**
      * The type of the overlay which is used by the peer. The type is equal to one of
@@ -79,30 +84,38 @@ public class Peer implements InitActive, RunActive, Serializable {
     }
 
     /**
-     * Sends a {@link LookupMessage} on the network from the current peer.
+     * Sends a {@link Query} on the network from the current peer.
      * 
-     * @param msg
-     *            the message to send
+     * @param query
+     *            the message to send.
      * @return the response in agreement with the type of message sent.
      */
-    public LookupResponseMessage sendMessage(LookupMessage msg) {
-        msg.incrementNbSteps();
-        LookupResponseMessage response = this.structuredOverlay.sendMessage(msg);
-        response.setDeliveryTime();
-        return response;
+    public QueryResponse search(Query query) {
+        UUID uid = UUID.randomUUID();
+        query.setUid(uid);
+        this.structuredOverlay.send(query);
+
+        synchronized (this.oneWayResponses) {
+            while (this.oneWayResponses.get(uid) == null) {
+                try {
+                    this.oneWayResponses.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return this.oneWayResponses.get(uid);
     }
 
     /**
-     * Sends a {@link LookupMessage} on the network from the current peer without callback. Whitout
-     * callback, the latency will not be initialized.
+     * Sends a {@link Query} on the network without response.
      * 
-     * @param msg
-     *            the message to send
-     * @return the response in agreement with the type of message sent.
+     * @param query
+     *            the query to send.
      */
-    public LookupResponseMessage sendMessageWithoutCallback(LookupMessage msg) {
-        msg.incrementNbSteps();
-        return this.structuredOverlay.sendMessage(msg);
+    public void send(Query query) {
+        this.structuredOverlay.send(query);
     }
 
     /**
@@ -117,50 +130,11 @@ public class Peer implements InitActive, RunActive, Serializable {
      * @throws Exception
      *             this exception appears when a message cannot be send to a peer.
      */
-    public ResponseMessage sendMessageTo(Peer remotePeer, Message msg) throws Exception {
-        try {
-            ResponseMessage future = remotePeer.receiveMessage(msg);
-
-            // Callback on ResponseMessage
-            PAEventProgramming.addActionOnFuture(future, "setResponseMessageDeliveryTime");
-            return future;
-        } catch (Exception e) {
-            throw new Exception("Error while sending a message to a peer.");
-        }
-    }
-
-    /**
-     * Sends a {@link Message} to a known {@link Peer} without callback.
-     * 
-     * @param remotePeer
-     *            the peer to which we want to send the message.
-     * @param msg
-     *            the message to send.
-     * 
-     * @return the response in agreement with the type of message sent.
-     * @throws Exception
-     *             this exception appears when a message cannot be send to a peer.
-     */
-    public ResponseMessage sendMessageToWithoutCallback(Peer remotePeer, Message msg) throws Exception {
+    public ResponseMessage sendTo(Peer remotePeer, Message msg) throws Exception {
         try {
             return remotePeer.receiveMessage(msg);
         } catch (Exception e) {
-            throw new Exception("Error while sending a message to a peer without callback.");
-        }
-    }
-
-    /**
-     * Setup the delivery timestamp of the {@link ResponseMessage}.
-     * 
-     * @param future
-     *            the response message to initialize.
-     */
-    public void setResponseMessageDeliveryTime(Future<ResponseMessage> future) {
-        try {
-            ResponseMessage response = future.get();
-            response.setDeliveryTime();
-        } catch (Exception e) {
-            e.printStackTrace();
+            throw new Exception("Error while sending a message to a peer.");
         }
     }
 
@@ -178,12 +152,7 @@ public class Peer implements InitActive, RunActive, Serializable {
      * Unregister the peer from the current structured network.
      */
     public Boolean leave() {
-        if (this.structuredOverlay.leave()) {
-            PAActiveObject.terminateActiveObject(true);
-            return true;
-        }
-
-        return false;
+        return this.structuredOverlay.leave();
     }
 
     /**
@@ -213,6 +182,10 @@ public class Peer implements InitActive, RunActive, Serializable {
      */
     public Peer getStub() {
         return this.stub;
+    }
+
+    public Body getBody() {
+        return PAActiveObject.getBodyOnThis();
     }
 
     /**
@@ -258,7 +231,7 @@ public class Peer implements InitActive, RunActive, Serializable {
                 throw new IllegalArgumentException("The peer type must be one of OverlayType.");
         }
 
-        PAActiveObject.setImmediateService("setResponseMessageDeliveryTime");
+        PAActiveObject.setImmediateService("search");
         this.stub = (Peer) PAActiveObject.getStubOnThis();
     }
 
@@ -266,17 +239,16 @@ public class Peer implements InitActive, RunActive, Serializable {
      * {@inheritDoc}
      */
     public void runActivity(Body body) {
+
         Service service = new Service(body);
         while (body.isActive()) {
             Request req = service.blockingRemoveOldest(Peer.CHECK_NEIGHBORS_TIMEOUT);
             if (req == null) {
                 // this.structuredOverlay.checkNeighbors();
             } else {
-                // bufferize=false;
                 service.serve(req);
-                // if (bufferize) {
-                // body.getRequestQueue().add(req);
             }
+            System.out.println("size = " + body.getFuturePool().getIncomingFutures().size());
         }
     }
 
@@ -305,5 +277,9 @@ public class Peer implements InitActive, RunActive, Serializable {
         }
 
         return false;
+    }
+
+    public HashMap<UUID, QueryResponse> getOneWayResponses() {
+        return this.oneWayResponses;
     }
 }

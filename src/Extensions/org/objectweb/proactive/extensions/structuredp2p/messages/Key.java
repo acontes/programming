@@ -7,12 +7,15 @@ import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredO
 
 
 /**
- * The Key is an abstraction for the various {@link StructuredOverlay}. It is used when we want to
- * lookup a {@link Peer} from it position which can be an identifier, a coordinate, ...
+ * The Key is an abstraction for the various {@link StructuredOverlay}. It is used in order to
+ * perform a search on the network by criteria which can be an Identifier, a Coordinate, ...
  * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent
  * @author Trovato Alexandre
+ * 
+ * @see Peer#search(org.objectweb.proactive.extensions.structuredp2p.messages.oneway.Query)
+ * @see StructuredOverlay#send(org.objectweb.proactive.extensions.structuredp2p.messages.oneway.Query)
  * 
  * @version 0.1
  */

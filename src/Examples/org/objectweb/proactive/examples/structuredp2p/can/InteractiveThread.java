@@ -5,7 +5,7 @@ import java.util.Scanner;
 
 import org.objectweb.proactive.examples.structuredp2p.util.Deployment;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
-import org.objectweb.proactive.extensions.structuredp2p.core.can.CANOverlay;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
 
 
 public class InteractiveThread implements Runnable {

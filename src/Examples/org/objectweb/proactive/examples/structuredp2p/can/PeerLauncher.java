@@ -12,11 +12,9 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.examples.structuredp2p.util.Deployment;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
-import org.objectweb.proactive.extensions.structuredp2p.core.can.CANOverlay;
-import org.objectweb.proactive.extensions.structuredp2p.core.can.Coordinate;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
-import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANLookupMessage;
-import org.objectweb.proactive.extensions.structuredp2p.responses.can.CANLookupResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.Coordinate;
 
 
 public class PeerLauncher extends Observable {
@@ -75,18 +73,16 @@ public class PeerLauncher extends Observable {
 
     public void addPeer() {
         Random rand = new Random();
+        Peer peer = null;
 
         try {
-            Peer peer = (Peer) PAActiveObject.newActive(Peer.class.getCanonicalName(),
+            peer = (Peer) PAActiveObject.newActive(Peer.class.getCanonicalName(),
                     new Object[] { OverlayType.CAN }, this.avaibleNodes.get(rand.nextInt(this.avaibleNodes
                             .size())));
             this.remotePeers.add(peer);
 
             TrackerLauncher.trackers.get(this.trackersIndex % TrackerLauncher.trackers.size()).addOnNetwork(
                     peer);
-            this
-                    .printInformation("Add peer managing " +
-                        ((CANOverlay) peer.getStructuredOverlay()).getZone());
             this.trackersIndex++;
 
         } catch (ActiveObjectCreationException e) {
@@ -94,8 +90,8 @@ public class PeerLauncher extends Observable {
         } catch (NodeException e) {
             e.printStackTrace();
         }
-        this.setChanged();
-        this.notifyObservers();
+        this.printInformation("Add peer managing " + ((CANOverlay) peer.getStructuredOverlay()).getZone());
+        this.updateGUI();
     }
 
     public void removePeer() {
@@ -104,8 +100,7 @@ public class PeerLauncher extends Observable {
         this.printInformation("Remove peer managing " + ((CANOverlay) peer.getStructuredOverlay()).getZone());
         this.remotePeers.remove(peer);
         peer.leave();
-        this.setChanged();
-        this.notifyObservers();
+        this.updateGUI();
     }
 
     public void lookupMessage() {
@@ -125,8 +120,8 @@ public class PeerLauncher extends Observable {
 
         Peer sender = this.remotePeers.get(rand.nextInt(this.remotePeers.size()));
 
-        CANLookupResponseMessage response = (CANLookupResponseMessage) sender
-                .sendMessage(new CANLookupMessage(searchedPosition));
+        CANLookupResponseMessage response = (CANLookupResponseMessage) sender.search(new CANLookupMessage(
+            searchedPosition));
 
         this.printInformation("Lookup for peer managing " + buf + ".\n    Lookup start from peer managing " +
             ((CANOverlay) sender.getStructuredOverlay()).getZone() + ".\n    Peer found in " +
@@ -158,7 +153,8 @@ public class PeerLauncher extends Observable {
         return this.launcherType;
     }
 
-    public void update(Observable o, Object arg) {
-
+    public void updateGUI() {
+        this.setChanged();
+        this.notifyObservers();
     }
 }

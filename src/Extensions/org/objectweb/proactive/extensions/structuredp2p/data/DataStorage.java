@@ -3,7 +3,7 @@ package org.objectweb.proactive.extensions.structuredp2p.data;
 import java.io.Serializable;
 import java.util.HashMap;
 
-import org.objectweb.proactive.extensions.structuredp2p.core.can.Zone;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.Zone;
 
 
 /**

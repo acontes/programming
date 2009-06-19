@@ -12,15 +12,14 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
-import org.objectweb.proactive.extensions.structuredp2p.core.can.CANOverlay;
-import org.objectweb.proactive.extensions.structuredp2p.core.can.Coordinate;
-import org.objectweb.proactive.extensions.structuredp2p.core.can.NeighborsDataStructure;
-import org.objectweb.proactive.extensions.structuredp2p.core.can.Zone;
-import org.objectweb.proactive.extensions.structuredp2p.core.exception.ZoneException;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
-import org.objectweb.proactive.extensions.structuredp2p.messages.LookupMessage;
-import org.objectweb.proactive.extensions.structuredp2p.messages.can.CANLookupMessage;
-import org.objectweb.proactive.extensions.structuredp2p.responses.can.CANLookupResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.Coordinate;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.NeighborsDataStructure;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.Zone;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.ZoneException;
+import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.Query;
+import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.QueryResponse;
 
 
 /**
@@ -41,7 +40,7 @@ public class TestOverlay2D {
     private Peer thirdPeer;
     private Peer fourthPeer;
 
-    private LookupMessage msg;
+    private Query msg;
 
     @Before
     public void setUp() throws ActiveObjectCreationException, NodeException, ZoneException {
@@ -190,14 +189,14 @@ public class TestOverlay2D {
 
     @Test
     public void testHasNeighbor() {
-        Assert.assertTrue(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighborsDataStructure().hasNeighbor(
-                this.secondPeer));
-        Assert.assertTrue(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighborsDataStructure().hasNeighbor(
-                this.thirdPeer));
-        Assert.assertFalse(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighborsDataStructure().hasNeighbor(
-                this.fourthPeer));
-        Assert.assertFalse(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighborsDataStructure().hasNeighbor(
-                this.firstPeer));
+        Assert.assertTrue(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighborsDataStructure()
+                .hasNeighbor(this.secondPeer));
+        Assert.assertTrue(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighborsDataStructure()
+                .hasNeighbor(this.thirdPeer));
+        Assert.assertFalse(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighborsDataStructure()
+                .hasNeighbor(this.fourthPeer));
+        Assert.assertFalse(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighborsDataStructure()
+                .hasNeighbor(this.firstPeer));
     }
 
     @Test
@@ -217,15 +216,15 @@ public class TestOverlay2D {
     @Test
     public void testSendMessage() {
         // Lookup for peer which manages (11, 11)
-        CANLookupResponseMessage response = (CANLookupResponseMessage) this.firstPeer.sendMessage(this.msg);
+        QueryResponse response = (CANLookupResponseMessage) this.firstPeer.search(this.msg);
         Assert.assertEquals(this.fourthPeer, response.getPeer());
         Assert.assertTrue(response.getLatency() > 0);
     }
 
     @Test
     public void testNeighborsDataStructureOrder() {
-        List<Peer> neighbors = ((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighborsDataStructure()
-                .getNeighbors(0, NeighborsDataStructure.SUPERIOR_DIRECTION);
+        List<Peer> neighbors = ((CANOverlay) this.firstPeer.getStructuredOverlay())
+                .getNeighborsDataStructure().getNeighbors(0, NeighborsDataStructure.SUPERIOR_DIRECTION);
 
         Assert
                 .assertTrue(((CANOverlay) neighbors.get(0).getStructuredOverlay()).getZone()
@@ -238,15 +237,16 @@ public class TestOverlay2D {
     public void testLeavingPeer() {
         this.thirdPeer.leave();
 
-        Assert.assertTrue(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighborsDataStructure().hasNeighbor(
-                this.fourthPeer));
-        Assert.assertTrue(((CANOverlay) this.fourthPeer.getStructuredOverlay()).getNeighborsDataStructure().hasNeighbor(
-                this.firstPeer));
+        Assert.assertTrue(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighborsDataStructure()
+                .hasNeighbor(this.fourthPeer));
+        Assert.assertTrue(((CANOverlay) this.fourthPeer.getStructuredOverlay()).getNeighborsDataStructure()
+                .hasNeighbor(this.firstPeer));
 
         this.fourthPeer.leave();
         this.secondPeer.leave();
 
-        Assert.assertTrue(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighborsDataStructure().size() == 0);
+        Assert.assertTrue(((CANOverlay) this.firstPeer.getStructuredOverlay()).getNeighborsDataStructure()
+                .size() == 0);
     }
 
     @After
