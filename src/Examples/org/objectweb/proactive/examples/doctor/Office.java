@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -114,7 +114,8 @@ public class Office {
 
     public void addDoctor(int id, long meanTime, long sigmaTime) {
         try {
-            Object[] params = { new Integer(id), new Long(meanTime), new Long(sigmaTime), me, rand };
+            Object[] params = { Integer.valueOf(id), Long.valueOf(meanTime), Long.valueOf(sigmaTime), me,
+                    rand };
 
             Doctor newDoc = (Doctor) org.objectweb.proactive.api.PAActiveObject.newActive(Doctor.class
                     .getName(), params);

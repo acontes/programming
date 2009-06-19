@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -108,7 +108,7 @@ public class KernelMG extends Kernel {
 
             // Construct the communicator active object
             communicator = (Communicator) PAActiveObject.newActive(Communicator.class.getName(),
-                    new Object[] { new Integer(this.problemClass.NUM_PROCS) }, chosenOneNode);
+                    new Object[] { Integer.valueOf(this.problemClass.NUM_PROCS) }, chosenOneNode);
 
             communicator.setup();
 

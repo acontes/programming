@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -50,7 +50,7 @@ import org.objectweb.proactive.core.util.wrapper.DoubleWrapper;
  * @author The ProActive Team
  *
  */
-@SuppressWarnings("serial")
+
 public class Worker implements Serializable {
 
     /** The number that identifies the worker in a group */
@@ -85,10 +85,15 @@ public class Worker implements Serializable {
     public DoubleWrapper start(long numOfIterations) {
         N = numOfIterations;
 
+        //@snippet-start integralPi_3
         // ProActive initialization
         rank = PASPMD.getMyRank();
         groupSize = PASPMD.getMySPMDGroupSize();
+
+        // Get all workers references
         workersArray = (Worker[]) PAGroup.getGroup(PASPMD.getSPMDGroup()).toArray(new Worker[0]);
+        //@snippet-end integralPi_3
+
         body = PAActiveObject.getBodyOnThis();
 
         if (this.rank == 0) {
@@ -113,6 +118,7 @@ public class Worker implements Serializable {
             sum += f((i - 0.5) * w);
         sum *= w;
 
+        //@snippet-start integralPi_6
         // The leader collects partial results.
         // Others just send their computed data to the rank 0.
         if (rank == 0) {
@@ -123,6 +129,7 @@ public class Worker implements Serializable {
         } else {
             workersArray[0].updateX(sum);
         }
+        //@snippet-end integralPi_6
 
         long elapsedTime = (System.currentTimeMillis() - startTime);
 
@@ -144,6 +151,7 @@ public class Worker implements Serializable {
         return ((4.0 / (1.0 + (x * x))));
     }
 
+    //@snippet-start integralPi_7
     /**
      * This method will be called remotely by a worker to send its value.
      *
@@ -152,4 +160,5 @@ public class Worker implements Serializable {
     public void updateX(double value) {
         this.x = value;
     }
+    //@snippet-end integralPi_7
 }

@@ -4,8 +4,8 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,6 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package functionalTests.annotations;
 
@@ -168,7 +169,7 @@ public abstract class AnnotationTest extends FunctionalTest {
     protected final Result ERROR = new Result(1, 0);
 
     // the errors of compilation execution
-    @SuppressWarnings("serial")
+
     public final class CompilationExecutionException extends Exception {
 
         public CompilationExecutionException(String str) {
@@ -182,7 +183,7 @@ public abstract class AnnotationTest extends FunctionalTest {
     }
 
     // if I don't find a compiler...
-    @SuppressWarnings("serial")
+
     public class NoCompilerDetectedException extends Exception {
 
         public NoCompilerDetectedException(String message) {

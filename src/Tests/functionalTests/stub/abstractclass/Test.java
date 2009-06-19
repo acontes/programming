@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -33,8 +33,6 @@ package functionalTests.stub.abstractclass;
 
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.core.util.ProActiveInet;
-import org.objectweb.proactive.core.util.URIBuilder;
 
 import functionalTests.FunctionalTest;
 
@@ -49,10 +47,9 @@ public class Test extends FunctionalTest {
     @org.junit.Test
     public void action() throws Exception {
         Factory f = (Factory) PAActiveObject.newActive(Factory.class.getName(), new Object[] {});
-        PAActiveObject.registerByName(f, "myFactory");
+        String url = PAActiveObject.registerByName(f, "myFactory");
 
-        Factory factory = (Factory) PAActiveObject.lookupActive(Factory.class.getName(), URIBuilder
-                .buildURIFromProperties(ProActiveInet.getInstance().getHostname(), "myFactory").toString());
+        Factory factory = (Factory) PAActiveObject.lookupActive(Factory.class.getName(), url);
         AbstractClass abstractClass = factory.getWidget(NodeFactory.getDefaultNode());
         abstractClass.foo();
         abstractClass.bar();

@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -299,8 +299,8 @@ public class JavassistByteCodeStubBuilder {
             return bytecode;
         } catch (Exception e) {
             //                        generatedCtClass.debugWriteFile();
-            throw new RuntimeException("Cannot generated stub for class " + className + " with javassist : " +
-                e.getMessage(), e);
+            throw new RuntimeException("Failed to generate stub for class " + className +
+                " with javassist : " + e.getMessage(), e);
         }
     }
 

@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -37,7 +37,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
- * Implementation of the {@link org.objectweb.fractal.api.control.SuperController} interface.
+ * Extension of the {@link org.objectweb.fractal.api.control.SuperController} interface.
  *
  * @author The ProActive Team
  */

@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -230,21 +230,21 @@ public class ProActiveRuntimeWrapper extends NotificationBroadcasterSupport impl
      * @see org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean#getDebugInfo()
      */
     public DebuggerInformation getDebugInfo() {
-        return DebuggerConnection.getDebugInfo();
+        return DebuggerConnection.getDebuggerConnection().getDebugInfo();
     }
 
     /**
      * @see org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean#removeDebugger()
      */
     public void removeDebugger() {
-        DebuggerConnection.removeDebugger();
+        DebuggerConnection.getDebuggerConnection().removeDebugger();
     }
 
     /**
      * @see org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean#hasDebuggerConnected()
      */
     public boolean hasDebuggerConnected() {
-        return DebuggerConnection.hasDebuggerConnected();
+        return DebuggerConnection.getDebuggerConnection().hasDebuggerConnected();
     }
 
     /**

@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -34,6 +34,7 @@ package org.objectweb.proactive.core.body.message;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.ft.message.MessageInfo;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
+import org.objectweb.proactive.core.body.tags.MessageTags;
 
 
 /**
@@ -47,7 +48,7 @@ import org.objectweb.proactive.core.body.ft.protocols.FTManager;
  * @since   ProActive 0.9
  *
  */
-@SuppressWarnings("serial")
+
 public class MessageImpl implements Message, java.io.Serializable {
 
     /** The name of the method called */
@@ -74,6 +75,9 @@ public class MessageImpl implements Message, java.io.Serializable {
     /** ftmanager linked to this message */
     protected transient FTManager ftm;
 
+    // DSI
+    protected MessageTags tags;
+
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -88,12 +92,14 @@ public class MessageImpl implements Message, java.io.Serializable {
      * @param isOneWay <code>true</code> if oneWay
      * @param methodName the method name of the method call
      */
-    public MessageImpl(UniqueID sourceID, long sequenceNumber, boolean isOneWay, String methodName) {
+    public MessageImpl(UniqueID sourceID, long sequenceNumber, boolean isOneWay, String methodName,
+            MessageTags tags) {
         this.sourceID = sourceID;
         this.sequenceNumber = sequenceNumber;
         this.timeStamp = System.currentTimeMillis();
         this.isOneWay = isOneWay;
         this.methodName = methodName;
+        this.tags = tags;
     }
 
     //
@@ -159,5 +165,9 @@ public class MessageImpl implements Message, java.io.Serializable {
 
     public FTManager getFTManager() {
         return this.ftm;
+    }
+
+    public MessageTags getTags() {
+        return tags;
     }
 }

@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -178,28 +178,6 @@ public interface ProActiveRuntime extends SecurityEntity {
      * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
      */
     public ProActiveRuntime getProActiveRuntime(String proActiveRuntimeName) throws ProActiveException;
-
-    /**
-     * <i><font size="-1" color="#FF0000">**For internal use only** </font></i>
-     * Tells this runtime that it's registered in another one
-     * @param proActiveRuntimeName the name of the remote ProActiveRuntime in which this runtime is registered
-     */
-    void addAcquaintance(String proActiveRuntimeName) throws ProActiveException;
-
-    /**
-     * Returns all the ProActiveRuntime URL in which this runtime is registered
-     * @return all the ProActiveRuntime URL in which this runtime is registered
-     * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
-     */
-    public String[] getAcquaintances() throws ProActiveException;
-
-    /**
-     * <i><font size="-1" color="#FF0000">**For internal use only** </font></i>.
-     * Tell to this runtime that is no more registered in <code>proActiveRuntimeName</code>.
-     * @param proActiveRuntimeName the name of the remote ProActiveRuntime.
-     * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
-     */
-    public void rmAcquaintance(String proActiveRuntimeName) throws ProActiveException;
 
     /**
      * Kills this ProActiveRuntime and this VM

@@ -1,3 +1,35 @@
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ActiveEon Team
+ *                        http://www.activeeon.com/
+ *  Contributor(s):
+ *
+ *
+ * ################################################################
+ * $$ACTIVEEON_INITIAL_DEV$$
+ */
 package org.objectweb.proactive.extra.messagerouting.router;
 
 import java.io.IOException;
@@ -18,8 +50,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.SweetCountDownLatch;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
@@ -38,7 +72,11 @@ public class RouterImpl extends RouterInternal implements Runnable {
     private final static int READ_BUFFER_SIZE = 4096;
 
     /** True is the router must stop or is stopped*/
-    private AtomicBoolean stopped = new AtomicBoolean(false);
+    private final AtomicBoolean stopped = new AtomicBoolean(false);
+    /** Can pass when the router has been successfully shutdown */
+    private final SweetCountDownLatch isStopped = new SweetCountDownLatch(1);
+    /** The thread running the select loop */
+    private final AtomicReference<Thread> selectThread = new AtomicReference<Thread>();
 
     /** Thread pool used to execute all asynchronous tasks */
     private final ExecutorService tpe;
@@ -100,6 +138,13 @@ public class RouterImpl extends RouterInternal implements Runnable {
     }
 
     public void run() {
+        boolean r = this.selectThread.compareAndSet(null, Thread.currentThread());
+        if (r == false) {
+            logger.error("A select thread has already been started, aborting the current thread ",
+                    new Exception());
+            return;
+        }
+
         Set<SelectionKey> selectedKeys = null;
         Iterator<SelectionKey> it;
         SelectionKey key;
@@ -148,7 +193,7 @@ public class RouterImpl extends RouterInternal implements Runnable {
         } catch (IOException e) {
             ProActiveLogger.logEatedException(logger, e);
         }
-
+        this.isStopped.countDown();
     }
 
     /** Accept a new connection */
@@ -226,13 +271,16 @@ public class RouterImpl extends RouterInternal implements Runnable {
         Client client = attachment.getClient();
         if (client != null) {
             client.discardAttachment();
+
+            // Broadcast the disconnection to every client
+            // If client is null, then the handshake has not completed and we
+            // don't need to broadcast the disconnection
+            AgentID disconnectedAgent = client.getAgentId();
+            Collection<Client> clients = clientMap.values();
+            tpe.submit(new DisconnectionBroadcaster(clients, disconnectedAgent));
         }
         logger.debug("Client " + sc.socket() + " disconnected");
 
-        // Broadcast the disconnection to every client
-        Collection<Client> clients = clientMap.values();
-        AgentID disconnectedAgent = attachment.getClient().getAgentId();
-        tpe.submit(new DisconnectionBroadcaster(clients, disconnectedAgent));
     }
 
     /* @@@@@@@@@@ ROUTER PACKAGE INTERFACE 
@@ -272,6 +320,12 @@ public class RouterImpl extends RouterInternal implements Runnable {
             throw new IllegalStateException("Router already stopped");
 
         this.stopped.set(true);
+
+        Thread t = this.selectThread.get();
+        if (t != null) {
+            t.interrupt();
+            this.isStopped.await();
+        }
     }
 
     private static class DisconnectionBroadcaster implements Runnable {

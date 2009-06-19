@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -155,14 +155,15 @@ public class StubGenerator {
         // ClassPool.releaseUnmodifiedClassFile = true;
         for (File file : files) {
             String str = file.toString().replaceFirst(Matcher.quoteReplacement(srcDir.toString()), "");
-            try {
-                if (!verbose) {
-                    System.setErr(mute);
-                }
 
-                StubGenerator.generateClass(str, destDir.toString() + File.separator);
-            } catch (Throwable e) {
-                System.out.println("Stub generation failed: " + str);
+            if (!verbose) {
+                System.setErr(mute);
+            }
+
+            boolean success = StubGenerator.generateClass(str, destDir.toString() + File.separator);
+            if (success) {
+                System.out.println("Generated stub: " +
+                    Utils.convertClassNameToStubClassName(processClassName(str), null));
             }
         }
 
@@ -193,12 +194,13 @@ public class StubGenerator {
      * @param arg
      * @param directoryName
      */
-    public static void generateClass(String arg, String directoryName) {
+    public static boolean generateClass(String arg, String directoryName) {
         String className = processClassName(arg);
         String fileName = null;
 
         String stubClassName = null;
 
+        boolean success = false;
         try {
             // Generates the bytecode for the class
             byte[] data;
@@ -219,10 +221,13 @@ public class StubGenerator {
             fos.write(data);
             fos.flush();
             fos.close();
-        } catch (Exception e) {
-            System.err.println("Cannot compute stub generation for class " + className);
-            System.err.println("Reason is " + e);
+            success = true;
+        } catch (Throwable e) {
+            System.err.println("Stub generation failed for class: " + className);
+            e.printStackTrace();
         }
+
+        return success;
     }
 
     /**

@@ -19,7 +19,6 @@
 	<property file="${user.home}/.proactive/build.properties" />
 	<import file="common.xml" />
 	
-	<import file="../doc/ic2d/build.xml"  optional="true" />
 	<import file="../doc/pa/build.xml"  optional="true" />
 	
 	<!-- ************
@@ -116,8 +115,6 @@
 	<target name="tests" depends="compile.tests" />
 	<target name="proActiveJar" depends="deploy" description="Deprecated, see deploy" />
 	<!-- <target name="all" depends="compile,docs" description="build the class files and the documentation" />-->
-	<target name="ic2dLibClean" depends="ic2d.libClean" description="Deprecated, see ic2d.libClean" />
-	<target name="ic2dLib" depends="ic2d.libCopy" description="Deprecated, see ic2d.libCopy" />
 
 
 
@@ -163,13 +160,33 @@
             <arg value="-class"/>
             <arg value="org/objectweb/proactive/core/runtime/ProActiveRuntime" />
 		</java>
-
 		<java classname="org.objectweb.proactive.ext.util.StubGenerator" fork="true">
 			<classpath refid="project.classpath" />
             <arg value="-srcDir"/>
 			<arg value="${cl.proactive.dir}"/>
             <arg value="-class"/>
             <arg value="org/objectweb/proactive/core/body/UniversalBody" />
+		</java>
+		<java classname="org.objectweb.proactive.ext.util.StubGenerator" fork="true">
+			<classpath refid="project.classpath" />
+            <arg value="-srcDir"/>
+			<arg value="${cl.proactive.dir}"/>
+            <arg value="-class"/>
+            <arg value="org/objectweb/proactive/core/component/type/Composite" />
+		</java>
+		<java classname="org.objectweb.proactive.ext.util.StubGenerator" fork="true">
+			<classpath refid="project.classpath" />
+            <arg value="-srcDir"/>
+			<arg value="${cl.proactive.dir}"/>
+            <arg value="-class"/>
+            <arg value="org/objectweb/proactive/core/component/ProActiveInterfaceImpl" />
+		</java>
+		<java classname="org.objectweb.proactive.ext.util.StubGenerator" fork="true">
+			<classpath refid="project.classpath" />
+            <arg value="-srcDir"/>
+			<arg value="${cl.proactive.dir}"/>
+            <arg value="-class"/>
+            <arg value="org/objectweb/proactive/core/jmx/util/JMXNotificationListener" />
 		</java>
 
 	    <antcall target="ibis"/>
@@ -350,12 +367,15 @@
 		</concat>
 
 		<jar manifest="${compile.dir}/Manifest.mf" destfile="${deploy.lib.dir}/ProActive.jar" index="true">
-			<fileset dir="${cl.proactive.dir}" includes="**" />
-			<fileset dir="${cl.extensions.dir}" includes="**" />
+			<fileset dir="${cl.proactive.dir}" includes="**"/>
+			<fileset dir="${cl.extensions.dir}">
+				<include name="**"/>
+				<exclude name="org/objectweb/proactive/extensions/annotation/**/*CTree*"/>
+			</fileset>
 			<fileset dir="${cl.extra.dir}" includes="**" />
 			<fileset dir="${config.dir}" includes="ProActiveConfiguration.xml" />
 			<fileset dir="${osgi.res.dir}" includes="metadata.xml" />
-			<fileset dir="${compile.dir}" includes="META-INF/services/javax.annotation.processing.Processor"/>
+
 			<indexjars>
 				<fileset dir="${lib.dir}">
 					<include name="*.jar" />
@@ -427,14 +447,23 @@
 	</target>
 	
 	<target name="deploy.annotations.java6" depends="compile.extensions, -deploy.mkdir" description="Create a jar file which contains only the JDK 1.6 annotations">
-		<jar destfile="${deploy.lib.dir}/ProActive_annotations_CTree.jar" index="true">
-			<fileset dir="${cl.extensions.dir}">
-				<include name="org/objectweb/proactive/extensions/annotation/**"/>
-			</fileset>
-			<!-- annotations info -->
-		    <fileset dir="${compile.dir}" includes="META-INF/services/com.sun.mirror.apt.AnnotationProcessorFactory" />
-			<fileset dir="${compile.dir}" includes="META-INF/services/javax.annotation.processing.Processor"/>
-		</jar>
+		<if name="ant.java.version" value="1.5">
+			<else>
+				<jar destfile="${deploy.lib.dir}/ProActive_annotations_CTree.jar" index="true">
+					<service type="com.sun.mirror.apt.AnnotationProcessorFactory">
+						<provider classname="org.objectweb.proactive.extensions.annotation.common.ProActiveAnnotationProcessorFactory"/>
+						<provider classname="org.objectweb.proactive.extensions.annotation.common.BogusAnnotationProcessorFactory"/>
+					</service>
+					<service type="javax.annotation.processing.Processor">
+						<provider classname="org.objectweb.proactive.extensions.annotation.common.ProActiveProcessorCTree"/>
+					</service>
+
+					<fileset dir="${cl.extensions.dir}">
+						<include name="org/objectweb/proactive/extensions/annotation/**"/>
+					</fileset>
+					</jar>
+			</else>
+		</if>
 	</target>
 
 	<target name="-deploy.mkdir">
@@ -446,7 +475,7 @@
 
 	<target name="deploy.annotations.all" depends="deploy.annotations.java5, deploy.annotations.java6" />
 
-	<target name="deploy.all" depends="deploy.core, deploy.examples, deploy.tests, deploy.utils, deploy.annotations.all" description="Populate dist/ with all ProActive Programming dependencies and JARs" />
+	<target name="deploy.all" depends="deploy.core, deploy.examples, deploy.tests, deploy.utils, deploy.annotations.java6" description="Populate dist/ with all ProActive Programming dependencies and JARs" />
 
 	<target name="deploy" depends="deploy.all" description="Populate dist/ (with ProActive_examples.jar)" />
 
@@ -591,6 +620,10 @@
 
 	<target name="junit.http" depends="compile.tests, deploy.all" description="Run all non regression tests on the current host only">
 		<junitMacro communication.protocol="http" nodedescriptor="/functionalTests/descriptor/defaultnodes/NodesLocal.xml" testsuite="testsuite"/>
+	</target>
+
+	<target name="junit.rmissh" depends="compile.tests, deploy.all" description="Run all non regression tests on the current host only">
+		<junitMacro communication.protocol="rmissh" nodedescriptor="/functionalTests/descriptor/defaultnodes/NodesLocal.xml" testsuite="testsuite"/>
 	</target>
 
 	<target name="junit.rmi" depends="compile.tests, deploy.all" description="Run all non regression tests on the current host only">
@@ -780,7 +813,6 @@
 		<eclipse_format_m>
 			<sourcefileset>
 				<fileset dir="${src.dir}" includes="**/*.java" />
-				<fileset dir="${ic2d-plugin.dir}" includes="**/*.java" />
 			</sourcefileset>
 		</eclipse_format_m>
 	</target>
@@ -792,9 +824,6 @@
 			<fileset dir="${src.dir}">
 				<include name="**/*.java" />
 			</fileset>
-			<!-- 
-				<fileset dir="${ic2d-plugin.dir}" includes="**/*.java" />
-				-->
 		</copy>
 
 		<eclipse_format_m>
@@ -818,36 +847,11 @@
 	</target>
 
 
-
-
-
-	<!-- ************
-		IC2D		
-	-->
-
-
-	<target name="ic2d.libCopy" depends="deploy" description="Copy all needed libraries to IC2D">
-		<copy todir="${ic2d-plugin.dir}/${plugin.lib}/lib" includeemptydirs="no">
-			<fileset dir="${lib.dir}" />
-		</copy>
-		<copy file="${deploy.lib.dir}/ProActive.jar" todir="${ic2d-plugin.dir}/${plugin.lib}" />
-	</target>
-
-
-	<target name="ic2d.libClean" description="Clean all needed libraries to IC2D">
-		<delete dir="${ic2d-plugin.dir}/${plugin.lib}/lib" />
-		<delete file="${ic2d-plugin.dir}/${plugin.lib}/ProActive.jar" />
-	</target>
-
-
-
-
-
 	<!-- ************
 		Misc		
 	-->
 
-	<target name="clean" description="Remove all generated files" depends="ic2d.libClean">
+	<target name="clean" description="Remove all generated files">
 		<delete dir="${classes.dir}" />
 		<delete dir="${release.dir}" />
 		<delete dir="${deploy.dir}" />
@@ -855,6 +859,7 @@
 		<delete dir="${test.classes.dir}" />
 		<delete file="tests.log" />
 		<delete dir="${junit.dir}" />
+		<delete dir="${tutorials.dir}" />
 		<subant target="doc.clean" inheritall="true">
 			<fileset dir="../doc/toolchain" includes="doc.xml"/>
 		</subant>
@@ -1088,4 +1093,47 @@
 		</chmod>
 	</target>
 
+    <!-- ====================================== -->
+    <!--          Create the tutorial           -->
+    <!-- ====================================== -->
+    <target name="tutorials" depends="deploy.core" description="Extracts tutorials from sources and creates the tutorials directory with building and launching scripts">
+        <delete quiet="true">
+            <fileset dir="${tutorials.src}"/>
+        </delete>
+        <mkdir dir="${tutorials.src}"/>
+        <java classname="doc.tutorials.Tutorializer" fork="true">
+            <classpath>
+                <fileset dir="${base.dir}/doc/toolchain/lib">
+                    <include name="**/*.jar"/>
+                </fileset>
+            </classpath>
+            <arg value="${src.dir}" />
+            <arg value="${tutorials.src}" />
+        </java>
+        <mkdir dir="${tutorials.dist}"/>
+        <copy toDir="${tutorials.dist}">
+            <fileset dir="${deploy.dir}">
+                <include name="**/*" />
+                <exclude name="ProActive_examples.jar" />
+                <exclude name="ProActive_utils.jar" />
+                <exclude name="ProActive_tests.jar" />
+             </fileset>
+        </copy>
+        <mkdir dir="${tutorials.dir}/scripts"/>
+        <copy toDir="${tutorials.dir}/scripts">
+            <fileset dir="${src.examples.dir}/${examples.path}/userguide/scripts">
+                <include name="**/*" />
+            </fileset>
+        </copy>
+        <chmod dir="${tutorials.dir}/scripts"
+               perm="755"
+               includes="**/*.sh"/>
+        <mkdir dir="${tutorials.dir}/compile"/>
+        <copy toDir="${tutorials.dir}/compile">
+            <fileset dir="${src.examples.dir}/${examples.path}/userguide/compile">
+                <include name="**/*" />
+            </fileset>
+        </copy>
+        <chmod file="${tutorials.dir}/compile/build" perm="755"/>
+    </target>
 </project>

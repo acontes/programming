@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -52,7 +52,7 @@ public class WSConstants {
 
     public static final String NAMESPACE = "/proactive/";
     public static final String SERV_WSDL = NAMESPACE + "wsdl";
-    public static final String SERV_RPC_ROUTER = NAMESPACE + "rpcrouter";
+    public static final String SERV_RPC_ROUTER = NAMESPACE + "/servlet/rpcrouter";
     public static final String SERV_MESSAGE_ROUTER = NAMESPACE + "messagerouter";
 
     public static final String PROACTIVE_PROVIDER = ProActiveProvider.class.getName();

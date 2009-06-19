@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -41,7 +41,6 @@ import org.objectweb.proactive.examples.webservices.c3dWS.ws.Service1Locator;
 import org.objectweb.proactive.examples.webservices.c3dWS.ws.Service1Soap;
 
 
-@SuppressWarnings("serial")
 public class WSUser implements User, Serializable {
     private String name;
     private String urlCallback;

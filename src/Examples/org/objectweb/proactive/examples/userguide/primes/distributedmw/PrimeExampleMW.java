@@ -1,10 +1,11 @@
+//@tutorial-start
 /*
  * ################################################################
  *
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -31,6 +32,7 @@
  * $$ACTIVEEON_INITIAL_DEV$$
  */
 //@snippet-start primes_distributedmw_example
+//@snippet-start primes_distributedmw_skeleton
 package org.objectweb.proactive.examples.userguide.primes.distributedmw;
 
 import java.util.ArrayList;
@@ -72,14 +74,18 @@ public class PrimeExampleMW {
             //@snippet-end mw_primes_master_creation
             //@snippet-start mw_primes_resources
             // Deploy resources
-            master.addResources(new URL("file://" + args[0]));
+            master.addResources(new URL(args[0]));
             //@snippet-end mw_primes_resources
             // Create and submit the tasks
             master.solve(createTasks(candidate));
 
-            //TODO 3. Wait all results from master */
+            //TODO 3. Wait all results from master
+            //@snippet-break primes_distributedmw_skeleton
+            //@tutorial-break
             // Collect results            
             List<Boolean> results = master.waitAllResults();
+            //@tutorial-resume
+            //@snippet-resume primes_distributedmw_skeleton
 
             // Test the primality
             boolean isPrime = true;
@@ -122,8 +128,12 @@ public class PrimeExampleMW {
 
             //TODO 4. Create a new task for the current interval and 
             // add it to the list of tasks 
+            //@snippet-break primes_distributedmw_skeleton
+            //@tutorial-break
             // Adds the task for the current interval to the list of tasks
             tasks.add(new FindPrimeTask(number, begin, end));
+            //@tutorial-resume
+            //@snippet-resume primes_distributedmw_skeleton
 
             // Update the begin and the end of the interval
             begin = end + 1;
@@ -133,4 +143,6 @@ public class PrimeExampleMW {
         return tasks;
     }
 }
+//@tutorial-end
 //@snippet-end primes_distributedmw_example
+//@snippet-end primes_distributedmw_skeleton

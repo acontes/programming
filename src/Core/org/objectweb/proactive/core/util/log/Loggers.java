@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -77,9 +77,12 @@ public interface Loggers {
     public static final String LOAD_BALANCING = CORE + ".loadbalancing";
     public static final String IC2D = CORE + ".ic2d";
     public static final String EXAMPLES = CORE + ".examples";
-    public static final String HTTPSERVER = CORE + ".httpserver";
+    public static final String HTTP_SERVER = CORE + ".http.server";
+    public static final String HTTP_CLIENT = CORE + ".http.client";
 
     public static final String BNB = CORE + "bnb";
+
+    public static final String DSI = CORE + ".dsi";
 
     // Security loggers
     public static final String SECURITY = CORE + ".security";
@@ -137,6 +140,11 @@ public interface Loggers {
     static final public String JMX = CORE + ".jmx";
     static final public String JMX_MBEAN = JMX + ".mbean";
     static final public String JMX_NOTIFICATION = JMX + ".notification";
+
+    // Message Tagging
+    static final public String MESSAGE_TAGGING = CORE + ".messagetagging";
+    static final public String MESSAGE_TAGGING_LOCALMEMORY = MESSAGE_TAGGING + ".localmemory";
+    static final public String MESSAGE_TAGGING_LOCALMEMORY_LEASING = MESSAGE_TAGGING_LOCALMEMORY + ".leasing";
 
     // Forwarding
     static final public String FORWARDING = CORE + ".forwarding";

@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -80,9 +80,6 @@ public class MetaObjectInterfaceClassGenerator extends AbstractInterfaceClassGen
     protected static final String IMPL_FIELD_NAME = "impl"; //delegatee
     private static MetaObjectInterfaceClassGenerator instance;
 
-    // this boolean for deciding of a possible indirection for the functionnal calls
-    protected boolean isPrimitive = false;
-
     public MetaObjectInterfaceClassGenerator() {
     }
 
@@ -116,9 +113,6 @@ public class MetaObjectInterfaceClassGenerator extends AbstractInterfaceClassGen
                 CtMethod[] reifiedMethods;
                 CtClass generatedCtClass = pool.makeClass(generatedClassFullName);
 
-                //this.fcInterfaceName = fcInterfaceName;
-                //isPrimitive = ((ProActiveComponentRepresentativeImpl) owner).getHierarchicalType()
-                //                                                    .equals(ComponentParameters.PRIMITIVE);
                 List<CtClass> interfacesToImplement = new ArrayList<CtClass>();
 
                 // add interface to reify
@@ -156,7 +150,7 @@ public class MetaObjectInterfaceClassGenerator extends AbstractInterfaceClassGen
                 methodsField.setModifiers(Modifier.STATIC);
                 generatedCtClass.addField(methodsField);
 
-                // field for generics parameters
+                // field for generic parameters
                 CtField genericTypesMappingField = new CtField(pool.get("java.util.Map"),
                     "genericTypesMapping", generatedCtClass);
 
@@ -244,7 +238,6 @@ public class MetaObjectInterfaceClassGenerator extends AbstractInterfaceClassGen
 
             return reference;
         } catch (Exception e) {
-            e.printStackTrace();
             throw new InterfaceGenerationFailedException(
                 "Cannot generate meta object representative on interface [" + interfaceName +
                     "] with signature [" + interfaceType.getFcItfSignature() + "] with javassist", e);

@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -51,6 +51,8 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
  *
  *  This class stores all logger used in ProActive. It provides an easy way
  *  to create and to retrieve a logger.
+ *  
+ *  @see Loggers
  */
 public class ProActiveLogger extends Logger {
 

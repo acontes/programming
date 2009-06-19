@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -64,8 +64,8 @@ public class Displayer implements Serializable {
                         .getConstructor(
                                 new Class[] { String.class, Integer.class, Boolean.class, Start.class })
                         .newInstance(
-                                new Object[] { "ProActive N-Body", new Integer(this.nbBodies),
-                                        new Boolean(this.displayft), deployer });
+                                new Object[] { "ProActive N-Body", Integer.valueOf(this.nbBodies),
+                                        Boolean.valueOf(this.displayft), deployer });
             } catch (Throwable e) {
                 e.printStackTrace();
             }

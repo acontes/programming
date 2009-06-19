@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -42,6 +42,7 @@ import org.objectweb.proactive.core.body.ft.exception.ProtocolErrorException;
 import org.objectweb.proactive.core.body.ft.message.MessageInfo;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.reply.Reply;
+import org.objectweb.proactive.core.body.tags.MessageTags;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityEntity;
@@ -77,6 +78,9 @@ public class AwaitedRequest implements Request, java.io.Serializable {
     //Non Functional Requests
     protected boolean isNFRequest = false;
     protected int nfRequestPriority;
+
+    // Request Tags
+    protected MessageTags tags;
 
     /**
      * Create a new awaited request.
@@ -270,5 +274,13 @@ public class AwaitedRequest implements Request, java.io.Serializable {
      */
     public String getSenderNodeURL() {
         return this.wrappedRequest.getSenderNodeURL();
+    }
+
+    /**
+     * Return the tags on this request
+     * @return tags
+     */
+    public MessageTags getTags() {
+        return tags;
     }
 }

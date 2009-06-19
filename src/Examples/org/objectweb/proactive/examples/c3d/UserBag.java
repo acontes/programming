@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -40,7 +40,7 @@ import java.util.Iterator;
  * Storage for triples of (int -> User  -> String).
  * This is a Bag, because keys can be the same [even though they shouldn't be!].
  */
-@SuppressWarnings("serial")
+
 public class UserBag implements Serializable {
     private ArrayList<Troika> list = new ArrayList<Troika>();
 

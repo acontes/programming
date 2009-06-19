@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -483,6 +483,18 @@ public enum PAProperties {
     PA_DEBUG("proactive.debug", PAPropertiesType.BOOLEAN),
 
     /* ------------------------------------
+     *  MESSAGE TAGGING 
+     */
+    /** Set the max period for LocalMemoryTag lease time */
+    PA_MAX_MEMORY_TAG_LEASE("proactive.tagmemory.lease.max", PAPropertiesType.INTEGER),
+
+    /** Set the Period of the running thread for tag memory leasing check */
+    PA_MEMORY_TAG_LEASE_PERIOD("proactive.tagmemory.lease.period", PAPropertiesType.INTEGER),
+
+    /** Enable or disable the Distributed Service ID Tag */
+    PA_TAG_DSI("proactive.tag.dsi", PAPropertiesType.BOOLEAN),
+    
+    /* ------------------------------------
      *  FILE TRANSFER
      */
 
@@ -537,7 +549,16 @@ public enum PAProperties {
     /**
      * TODO
      */
-    PA_UNICORE_FORKCLIENT("proactive.unicore.forkclient", PAPropertiesType.BOOLEAN);
+    PA_UNICORE_FORKCLIENT("proactive.unicore.forkclient", PAPropertiesType.BOOLEAN),
+
+    /**
+     * if true, any reference on the reified object within an outgoing request or reply is
+     * replaced by a reference on the active object. This feature can be used when activating 
+     * an object whose source code cannot be modified to replace the code that return <code>this</code>
+     * by the reference on the active object using <code>PAActiveObject.getStubOnThis()</code>
+     */
+    PA_IMPLICITGETSTUBONTHIS("proactive.implicitgetstubonthis", PAPropertiesType.BOOLEAN);
+
     static final Logger logger = ProActiveLogger.getLogger(Loggers.CONFIGURATION);
     public static final String TRUE = "true";
     public static final String FALSE = "false";

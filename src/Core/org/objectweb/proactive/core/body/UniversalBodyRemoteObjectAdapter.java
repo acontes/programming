@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.security.AccessControlException;
 import java.security.PublicKey;
 
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
@@ -58,7 +59,6 @@ import org.objectweb.proactive.core.security.securityentity.Entities;
 import org.objectweb.proactive.core.security.securityentity.Entity;
 
 
-@SuppressWarnings("serial")
 public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody> implements UniversalBody {
 
     /**
@@ -82,6 +82,7 @@ public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody> imp
     public UniversalBodyRemoteObjectAdapter(UniversalBody u) {
         super(u);
         if (bodyLogger.isDebugEnabled()) {
+            //Thread.dumpStack();
             bodyLogger.debug(target.getClass());
         }
     }
@@ -173,11 +174,11 @@ public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody> imp
     }
 
     @Deprecated
-    public void register(String url) throws IOException, UnknownProtocolException {
+    public void register(String url) throws ProActiveException {
         target.register(url);
     }
 
-    public String registerByName(String name) throws IOException {
+    public String registerByName(String name) throws IOException, ProActiveException {
         return target.registerByName(name);
     }
 

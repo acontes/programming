@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -49,7 +49,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @since   ProActive 0.9
  *
  */
-@SuppressWarnings("serial")
+
 @PublicAPI
 public class UniqueID implements java.io.Serializable, Comparable<UniqueID> {
     private java.rmi.server.UID id;
@@ -124,17 +124,23 @@ public class UniqueID implements java.io.Serializable, Comparable<UniqueID> {
 
     public String shortString() {
         if (this.cachedShortString == null) {
-            this.cachedShortString = "" + Math.abs(this.getCanonString().hashCode() % 100000);
+            synchronized (this) {
+                if (this.cachedShortString == null) {
+                    this.cachedShortString = "" + Math.abs(this.getCanonString().hashCode() % 100000);
+                }
+            }
         }
-
         return this.cachedShortString;
     }
 
     public String getCanonString() {
         if (this.cachedCanonString == null) {
-            this.cachedCanonString = ("" + this.id + "--" + this.vmID).replace(':', '-');
+            synchronized (this) {
+                if (this.cachedCanonString == null) {
+                    this.cachedCanonString = ("" + this.id + "--" + this.vmID).replace(':', '-');
+                }
+            }
         }
-
         return this.cachedCanonString;
     }
 

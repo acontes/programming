@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -42,7 +42,7 @@ import org.objectweb.proactive.core.util.profiling.TimerWarehouse;
  * A Technical Service for timing purpose.
  * @author The ProActive Team
  */
-@SuppressWarnings("serial")
+
 public class TimItTechnicalService implements TechnicalService, java.io.Serializable {
     private String timitActivation;
     private String reduceResults;

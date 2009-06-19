@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -31,6 +31,7 @@
  */
 package org.objectweb.proactive.core.component.controller;
 
+import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.fractal.api.control.LifeCycleController;
 import org.objectweb.proactive.annotation.PublicAPI;
 
@@ -58,10 +59,10 @@ public interface ProActiveLifeCycleController extends LifeCycleController {
     /**
      * @see org.objectweb.fractal.api.control.LifeCycleController#startFc()
      */
-    public void startFc(short priority);
+    public void startFc(short priority) throws IllegalLifeCycleException;
 
     /**
      * @see org.objectweb.fractal.api.control.LifeCycleController#stopFc()
      */
-    public void stopFc(short priority);
+    public void stopFc(short priority) throws IllegalLifeCycleException;
 }

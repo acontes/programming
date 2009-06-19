@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -39,6 +39,7 @@ import org.objectweb.proactive.core.body.reply.ReplyReceiverFactory;
 import org.objectweb.proactive.core.body.request.RequestFactory;
 import org.objectweb.proactive.core.body.request.RequestQueueFactory;
 import org.objectweb.proactive.core.body.request.RequestReceiverFactory;
+import org.objectweb.proactive.core.body.tags.MessageTagsFactory;
 import org.objectweb.proactive.core.component.identity.ProActiveComponentFactory;
 import org.objectweb.proactive.core.debug.stepbystep.DebuggerFactory;
 import org.objectweb.proactive.core.group.spmd.ProActiveSPMDGroupManagerFactory;
@@ -149,6 +150,13 @@ public interface MetaObjectFactory {
     public void setProActiveSecurityManager(ProActiveSecurityManager psm);
 
     public Object clone() throws CloneNotSupportedException;
+
+    // REQUEST-TAGS
+    /**
+     * Create the RequestTags manager.
+     * @return the RequestTags manager
+     */
+    public MessageTagsFactory newRequestTagsFactory();
 
     // FAULT-TOLERANCE
 

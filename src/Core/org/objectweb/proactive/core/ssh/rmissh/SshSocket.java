@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -59,14 +59,7 @@ import org.objectweb.proactive.core.ssh.TryCache;
 public class SshSocket extends Socket {
     private SshTunnel _tunnel;
     private Socket _socket;
-    static private TryCache _tryCache = null;
-
-    static private TryCache getTryCache() {
-        if (_tryCache == null) {
-            _tryCache = new TryCache();
-        }
-        return _tryCache;
-    }
+    static final private TryCache _tryCache = new TryCache();
 
     @Override
     protected void finalize() throws Throwable {
@@ -79,7 +72,7 @@ public class SshSocket extends Socket {
     }
 
     public SshSocket(String host, int port) throws IOException {
-        if (PAProperties.PA_SSH_TUNNELING_TRY_NORMAL_FIRST.isTrue() && getTryCache().needToTry(host, port)) {
+        if (PAProperties.PA_SSH_TUNNELING_TRY_NORMAL_FIRST.isTrue() && _tryCache.needToTry(host, port)) {
             try {
                 if (logger.isDebugEnabled()) {
                     logger.debug("try socket to " + host + ":" + port);
@@ -87,7 +80,7 @@ public class SshSocket extends Socket {
                 InetSocketAddress address = new InetSocketAddress(host, port);
                 _socket = new Socket();
                 _socket.connect(address, SshParameters.getConnectTimeout());
-                getTryCache().recordTrySuccess(host, port);
+                _tryCache.recordTrySuccess(host, port);
                 if (logger.isDebugEnabled()) {
                     logger.debug("success normal socket to " + host + ":" + port);
                 }
@@ -96,7 +89,7 @@ public class SshSocket extends Socket {
                 if (logger.isDebugEnabled()) {
                     logger.debug("failure normal socket to " + host + ":" + port);
                 }
-                getTryCache().recordTryFailure(host, port);
+                _tryCache.recordTryFailure(host, port);
                 _socket = null;
             }
         }

@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -40,6 +40,7 @@ import org.objectweb.proactive.core.body.ft.message.MessageInfo;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.future.MethodCallResult;
 import org.objectweb.proactive.core.body.reply.Reply;
+import org.objectweb.proactive.core.body.tags.MessageTags;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 
@@ -132,5 +133,10 @@ public class SynchronousReplyImpl implements Reply, Serializable {
 
     public void setMessageInfo(MessageInfo mi) {
         // TODO Auto-generated method stub
+    }
+
+    public MessageTags getTags() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

@@ -1,10 +1,11 @@
+//@tutorial-start
 /*
  * ################################################################
  *
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -43,7 +44,7 @@ public class Main {
             String currentState = new String();
             //create the active oject
             CMAgentInitialized ao = (CMAgentInitialized) PAActiveObject.newActive(CMAgentInitialized.class
-                    .getName(), null); // 
+                    .getName(), null);
             currentState = ao.getCurrentState().toString();
             System.out.println(currentState);
             PAActiveObject.terminateActiveObject(ao, false);
@@ -55,3 +56,4 @@ public class Main {
         }
     }
 }
+//@tutorial-end

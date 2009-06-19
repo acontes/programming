@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -47,6 +47,8 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.representative.ItfID;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.util.ClassDataCache;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -93,6 +95,13 @@ public class Utils {
 
     public static boolean isRepresentativeClassName(String classname) {
         return (classname.startsWith(GENERATED_DEFAULT_PREFIX) && classname
+                .endsWith(REPRESENTATIVE_DEFAULT_SUFFIX));
+    }
+
+    public static boolean isGathercastProxyRepresentativeClassName(String classname) {
+        return (classname.startsWith(GENERATED_DEFAULT_PREFIX + GEN_ESCAPE_CHAR + GENERATED_DEFAULT_PREFIX) &&
+        // the GATHERCAST_ITF_PROXY_DEFAULT_SUFFIX has to be escaped since it's its representative
+            classname.contains(GEN_ESCAPE_CHAR + GATHERCAST_ITF_PROXY_DEFAULT_SUFFIX) && classname
                 .endsWith(REPRESENTATIVE_DEFAULT_SUFFIX));
     }
 
@@ -181,8 +190,8 @@ public class Utils {
         Object[] effectiveArguments = new Object[4];
         effectiveArguments[0] = className;
         effectiveArguments[1] = bytes;
-        effectiveArguments[2] = new Integer(0);
-        effectiveArguments[3] = new Integer(bytes.length);
+        effectiveArguments[2] = Integer.valueOf(0);
+        effectiveArguments[3] = Integer.valueOf(bytes.length);
 
         return (Class<?>) method.invoke(Thread.currentThread().getContextClassLoader(), effectiveArguments);
     }
@@ -209,8 +218,29 @@ public class Utils {
             return bytecode;
         }
         if (Utils.isRepresentativeClassName(classname)) {
+            // special case for GathercastProxy representative, we have to generate the proxy 
+            // before generating its representative
+            if (Utils.isGathercastProxyRepresentativeClassName(classname)) {
+                String proxyClassname = Utils.getInterfaceSignatureFromRepresentativeClassName(classname);
+                try {
+                    // try to fetch the class from the default class loader
+                    Thread.currentThread().getContextClassLoader().loadClass(proxyClassname);
+                } catch (ClassNotFoundException cnfe) {
+                    try {
+                        Utils.defineClass(proxyClassname, GatherInterfaceGenerator
+                                .generateInterfaceByteCode(proxyClassname)); //load the class
+                    } catch (Exception e) {
+                        ProActiveLogger
+                                .getLogger(Loggers.COMPONENTS_GEN_ITFS)
+                                .error(
+                                        "GathercastProxy class '" + proxyClassname +
+                                            "' generation failed. Try to continue with the generation of its representative",
+                                        e);
+                    }
+                }
+            }
+
             // try to generate a representative
-            //            logger.info("Trying to generate representative class : " + classname);
             bytecode = RepresentativeInterfaceClassGenerator.generateInterfaceByteCode(classname, null);
 
             if (bytecode != null) {
@@ -219,8 +249,6 @@ public class Utils {
         }
 
         if (Utils.isGathercastProxyClassName(classname)) {
-            // try to generate a representative
-            //            logger.info("Trying to generate representative class : " + classname);
             bytecode = GatherInterfaceGenerator.generateInterfaceByteCode(classname);
 
             if (bytecode != null) {

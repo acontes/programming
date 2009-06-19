@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -43,6 +43,7 @@ import javax.management.remote.JMXServiceURL;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.jmx.ProActiveJMXConstants;
 import org.objectweb.proactive.core.node.NodeException;
@@ -160,7 +161,12 @@ public class ProActiveConnectorServer extends JMXConnectorServer {
         String path = this.address.getURLPath();
         int index = path.indexOf(ProActiveJMXConstants.SERVER_REGISTERED_NAME);
         String url = path.substring(index);
-        PAActiveObject.registerByName(this.paServer, url);
+        try {
+            PAActiveObject.registerByName(this.paServer, url);
+        } catch (ProActiveException e) {
+            throw new IOException("Failed to register the JMX ProActive Server at " + url + ". " +
+                e.getMessage());
+        }
         state = STARTED;
     }
 

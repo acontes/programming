@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -67,7 +67,7 @@ public class MOPClassLoader extends URLClassLoader {
 
     /**
      * Get the bytecode of a stub given its name. If the stub can not be found
-     * the cache, the MOPClassLoader tries to generate it.
+     * in the cache, the MOPClassLoader tries to generate it.
      * @param classname The name of the stub class
      * @return An array representing the bytecode of the stub, null if the
      *  stub could not be found or created
@@ -218,8 +218,8 @@ public class MOPClassLoader extends URLClassLoader {
                     Object[] effectiveArguments = new Object[5];
                     effectiveArguments[0] = name;
                     effectiveArguments[1] = data;
-                    effectiveArguments[2] = new Integer(0);
-                    effectiveArguments[3] = new Integer(data.length);
+                    effectiveArguments[2] = Integer.valueOf(0);
+                    effectiveArguments[3] = Integer.valueOf(data.length);
                     effectiveArguments[4] = this.getClass().getProtectionDomain();
 
                     //  we have been loaded through the bootclasspath

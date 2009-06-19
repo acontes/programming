@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -64,7 +64,6 @@ public class Executor {
         Logger logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT + ".job." + jobId);
         jobId++;
 
-        command = command.replaceAll("'", "\"");
         logger.debug("Command submited: " + command);
         try {
             logger.info("executing command=" + command);

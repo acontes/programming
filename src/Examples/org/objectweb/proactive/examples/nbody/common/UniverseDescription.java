@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -52,7 +52,7 @@ import org.xml.sax.Attributes;
  * @author The ProActive Team
  *
  */
-@SuppressWarnings("serial")
+
 public class UniverseDescription implements Serializable {
     // Fields
     private Vector<PlanetDescription> planets;

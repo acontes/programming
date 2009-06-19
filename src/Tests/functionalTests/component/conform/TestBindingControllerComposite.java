@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -181,7 +181,6 @@ public class TestBindingControllerComposite extends TestBindingController {
     }
 
     @Test
-    @Ignore
     public void testCompositeNoSuchInterface() throws Exception {
         try {
             Fractal.getBindingController(r).lookupFc("c");
@@ -259,7 +258,6 @@ public class TestBindingControllerComposite extends TestBindingController {
     }
 
     @Test
-    @Ignore
     public void testWouldCreateInvalidExportBinding() throws Exception {
         Fractal.getBindingController(r).bindFc("server", c.getFcInterface("server"));
         try {
@@ -270,7 +268,6 @@ public class TestBindingControllerComposite extends TestBindingController {
     }
 
     @Test
-    @Ignore
     public void testWouldCreateInvalidLocalBinding() throws Exception {
         Fractal.getBindingController(c).bindFc("client", d.getFcInterface("server"));
         try {
@@ -281,7 +278,6 @@ public class TestBindingControllerComposite extends TestBindingController {
     }
 
     @Test
-    @Ignore
     public void testWouldCreateInvalidImportBinding() throws Exception {
         ContentController cc = Fractal.getContentController(r);
         Fractal.getBindingController(d).bindFc("client", cc.getFcInternalInterface("client"));

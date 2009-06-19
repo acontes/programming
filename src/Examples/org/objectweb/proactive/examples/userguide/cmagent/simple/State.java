@@ -1,10 +1,11 @@
+//@tutorial-start
 /*
  * ################################################################
  *
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -80,3 +81,4 @@ public class State implements Serializable {
     }
 }
 //@snippet-end state_full
+//@tutorial-end

@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.rmi;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -118,7 +119,8 @@ public class RegistryHelper {
         // java.rmi.registry.Registry registry = null;
         try {
             // whether an effective registry exists or not we should get a reference
-            registry = java.rmi.registry.LocateRegistry.getRegistry(port);
+            registry = java.rmi.registry.LocateRegistry.getRegistry(
+                    ProActiveInet.getInstance().getHostname(), port);
             if (registry == null) {
                 return null;
             }

@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -60,7 +60,6 @@ import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.ProActiveInterface;
-import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.config.ComponentConfigurationHandler;
 import org.objectweb.proactive.core.component.controller.AbstractProActiveController;
 import org.objectweb.proactive.core.component.gen.RepresentativeInterfaceClassGenerator;
@@ -389,12 +388,12 @@ public class ProActiveComponentRepresentativeImpl implements ProActiveComponentR
         if (fcInterfaceReferences.containsKey(interfaceName)) {
             return fcInterfaceReferences.get(interfaceName);
         } else {
-            if (interfaceName.equals("component")) {
+            if (interfaceName.equals(Constants.COMPONENT)) {
                 return this;
             }
 
             // maybe the member of a collection itf?
-            InterfaceType itfType = Utils.getItfType(interfaceName, this);
+            InterfaceType itfType = ((ComponentType) this.getFcType()).getFcInterfaceType(interfaceName);
             if ((itfType != null) && itfType.isFcCollectionItf()) {
                 try {
                     // generate the corresponding interface locally

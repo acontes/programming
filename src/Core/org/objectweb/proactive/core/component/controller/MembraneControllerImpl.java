@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -686,9 +686,7 @@ public class MembraneControllerImpl extends AbstractProActiveController implemen
 
         InterfaceType[] itfTypes = ((ComponentType) ((ProActiveComponentImpl) getFcItfOwner()).getNFType())
                 .getFcInterfaceTypes();
-        ProActiveInterfaceType paItfT;
         for (InterfaceType itfT : itfTypes) {
-            paItfT = (ProActiveInterfaceType) itfT;
             if (!itfT.isFcOptionalItf()) {//Are all mandatory interfaces bound??
                 try {
                     ProActiveInterface paItf = (ProActiveInterface) getFcItfOwner().getFcInterface(

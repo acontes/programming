@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -67,10 +67,10 @@ public class GCMFunctionalTestDefaultNodes extends GCMFunctionalTest {
         this.hostCapacity = hostCapacity;
         this.vmCapacity = vmCapacity;
 
-        super.vContract.setVariableFromProgram(GCMFunctionalTestDefaultNodes.VAR_HOSTCAPACITY, new Integer(
-            hostCapacity).toString(), VariableContractType.DescriptorDefaultVariable);
-        super.vContract.setVariableFromProgram(GCMFunctionalTestDefaultNodes.VAR_VMCAPACITY, new Integer(
-            vmCapacity).toString(), VariableContractType.DescriptorDefaultVariable);
+        super.vContract.setVariableFromProgram(GCMFunctionalTestDefaultNodes.VAR_HOSTCAPACITY, Integer
+                .valueOf(hostCapacity).toString(), VariableContractType.DescriptorDefaultVariable);
+        super.vContract.setVariableFromProgram(GCMFunctionalTestDefaultNodes.VAR_VMCAPACITY, Integer.valueOf(
+                vmCapacity).toString(), VariableContractType.DescriptorDefaultVariable);
 
     }
 

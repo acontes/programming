@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -105,9 +105,9 @@ public class KernelIS extends Kernel {
             // Get the node from the URL
             Node chosenOneNode = NodeFactory.getNode(PAActiveObject.getActiveObjectNodeUrl(chosenOne));
 
-            allBucketSize = (AllBucketSize) PAActiveObject
-                    .newActive(AllBucketSize.class.getName(), new Object[] { workers,
-                            new Integer(this.problemClass.NUM_PROCS), new Integer(arraySize) }, chosenOneNode);
+            allBucketSize = (AllBucketSize) PAActiveObject.newActive(AllBucketSize.class.getName(),
+                    new Object[] { workers, new Integer(this.problemClass.NUM_PROCS),
+                            Integer.valueOf(arraySize) }, chosenOneNode);
 
             workers.setAllBucketSize(allBucketSize);
 

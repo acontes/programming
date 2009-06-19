@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -91,7 +91,6 @@ public class TestLifeCycleControllerComposite extends TestLifeCycleController {
 
     @Override
     @Test
-    @Ignore
     public void testMandatoryInterfaceNotBound() throws Exception {
         super.testMandatoryInterfaceNotBound();
         ContentController cc = Fractal.getContentController(r);
@@ -117,6 +116,9 @@ public class TestLifeCycleControllerComposite extends TestLifeCycleController {
 
         // TODO test issue: adding a sub-component in a started composite automatically starts the added one?
         cc.addFcSubComponent(d);
+        //crash here
+        //due to org.objectweb.proactive.core.component.controller.AbstractProActiveController.checkLifeCycleIsStopped() 
+        //first line which impose the composite to be in stopped state
         try {
             cc.removeFcSubComponent(d);
             // fail();

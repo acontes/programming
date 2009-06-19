@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -51,7 +51,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * It is based on Jetty
  */
 public class HTTPServer {
-    final private static Logger logger = ProActiveLogger.getLogger(Loggers.HTTPSERVER);
+    final private static Logger logger = ProActiveLogger.getLogger(Loggers.HTTP_SERVER);
 
     private static HTTPServer httpServer;
 
@@ -128,6 +128,14 @@ public class HTTPServer {
         PAProperties.PA_XMLHTTP_PORT.setValue(connector.getLocalPort());
 
         logger.debug("Started the HTTP server on port " + connector.getLocalPort());
+    }
+
+    /** Stop the HTTP server 
+     * 
+     * @throws Exception If the HTTP server fails to stop
+     */
+    public void stop() throws Exception {
+        this.server.stop();
     }
 
     /**

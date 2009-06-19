@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -40,7 +40,7 @@ package org.objectweb.proactive.core.util;
  * @version 1.0,  2002/05
  * @since   ProActive 0.9.2
  */
-@SuppressWarnings("serial")
+
 public class ThreadStoreImpl implements ThreadStore, java.io.Serializable {
     private int counter;
     private boolean defaultOpenState;

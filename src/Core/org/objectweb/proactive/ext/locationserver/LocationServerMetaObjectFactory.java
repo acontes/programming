@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -38,6 +38,7 @@ import org.objectweb.proactive.core.body.migration.MigrationManager;
 import org.objectweb.proactive.core.body.migration.MigrationManagerFactory;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFactory;
+import org.objectweb.proactive.core.body.tags.MessageTags;
 import org.objectweb.proactive.core.mop.MethodCall;
 
 
@@ -98,8 +99,8 @@ public class LocationServerMetaObjectFactory extends ProActiveMetaObjectFactory 
         transient private LocationServer server = LocationServerFactory.getLocationServer();
 
         public Request newRequest(MethodCall methodCall, UniversalBody sourceBody, boolean isOneWay,
-                long sequenceID) {
-            return new RequestWithLocationServer(methodCall, sourceBody, isOneWay, sequenceID, server);
+                long sequenceID, MessageTags tags) {
+            return new RequestWithLocationServer(methodCall, sourceBody, isOneWay, sequenceID, server, tags);
         }
     }
 

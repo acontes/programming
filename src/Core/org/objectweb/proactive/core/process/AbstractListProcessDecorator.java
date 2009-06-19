@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -429,7 +429,7 @@ public abstract class AbstractListProcessDecorator implements ExternalProcessDec
                     String end = listexclude[i].substring(listexclude[i].indexOf("-") + 1, listexclude[i]
                             .length());
                     for (int j = Integer.parseInt(init); j <= Integer.parseInt(end); j++) {
-                        excludeArray.add(new Integer(j).toString());
+                        excludeArray.add(Integer.valueOf(j).toString());
                     }
                 }
             }

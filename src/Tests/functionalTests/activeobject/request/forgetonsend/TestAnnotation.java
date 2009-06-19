@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -34,6 +34,8 @@ package functionalTests.activeobject.request.forgetonsend;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+
+import junit.framework.Assert;
 
 import org.junit.Test;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -89,6 +91,6 @@ public class TestAnnotation extends FunctionalTest {
             e1.printStackTrace();
         }
 
-        assertTrue(b1.takeFast().equals("aahgie"));
+        Assert.assertEquals("aahgie", b1.takeFast());
     }
 }

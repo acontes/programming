@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -64,7 +64,7 @@ public interface MulticastController extends CollectiveInterfaceController {
      * @throws ParameterDispatchException if there is an error in the dispatch of the parameters
      */
     public List<MethodCall> generateMethodCallsForMulticastDelegatee(MethodCall mc,
-            ProxyForComponentInterfaceGroup delegatee) throws ParameterDispatchException;
+            ProxyForComponentInterfaceGroup<?> delegatee) throws ParameterDispatchException;
 
     public int allocateServerIndex(MethodCall mc, int partitioningIndex, int nbConnectedServerInterfaces);
 
@@ -103,5 +103,5 @@ public interface MulticastController extends CollectiveInterfaceController {
      * @param multicastItfName name of a multicast interface
      * @return a reference on this multicast interface
      */
-    public ProxyForComponentInterfaceGroup lookupFcMulticast(String multicastItfName);
+    public ProxyForComponentInterfaceGroup<?> lookupFcMulticast(String multicastItfName);
 }

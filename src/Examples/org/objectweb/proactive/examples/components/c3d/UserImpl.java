@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -35,6 +35,7 @@ import java.io.IOException;
 
 import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.examples.c3d.C3DUser;
@@ -43,7 +44,7 @@ import org.objectweb.proactive.examples.c3d.gui.NameAndHostDialog;
 
 
 /** The component container for a User. */
-@SuppressWarnings("serial")
+
 public class UserImpl extends C3DUser implements BindingController, User {
 
     /** Mandatory ProActive empty no-arg constructor */
@@ -77,7 +78,7 @@ public class UserImpl extends C3DUser implements BindingController, User {
         // Register the User in the Registry.
         try {
             Fractive.registerByName(Fractive.getComponentRepresentativeOnThis(), "User");
-        } catch (IOException e) {
+        } catch (ProActiveException e) {
             logger.error("Registering 'User' for future lookup failed");
             e.printStackTrace();
         }
@@ -101,6 +102,7 @@ public class UserImpl extends C3DUser implements BindingController, User {
         return null;
     }
 
+    //@snippet-start C3D_Components_1
     /** Binds to this UserImpl component the dispatcher which should be used. */
     public void bindFc(final String interfaceName, final Object serverInterface) {
         if (interfaceName.equals("user2dispatcher")) {
@@ -109,6 +111,8 @@ public class UserImpl extends C3DUser implements BindingController, User {
             // Registering back to the dispatcher is done in the go() method
         }
     }
+
+    //@snippet-end C3D_Components_1
 
     /** Detaches the user from its dispatcher.
      * Notice how it has not been called in terminate() ?

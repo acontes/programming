@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -56,7 +56,6 @@ public class TestHalfBody extends FunctionalTest {
         client.startTest();
     }
 
-    @SuppressWarnings("serial")
     static public class Server implements Serializable {
         boolean firstRequest = true;
         long count = 0;
@@ -75,7 +74,7 @@ public class TestHalfBody extends FunctionalTest {
             count++;
         }
 
-        public void finish() {
+        public boolean finish() {
             long endTime = System.currentTimeMillis();
             double throughput = (1000.0 * count) / (endTime - startTime);
 
@@ -83,10 +82,10 @@ public class TestHalfBody extends FunctionalTest {
             System.out.println("Duration: " + (endTime - startTime));
             System.out.println("Throughput " + throughput);
             HudsonReport.reportToHudson(TestHalfBody.class, throughput);
+            return true;
         }
     }
 
-    @SuppressWarnings("serial")
     static public class Client implements Serializable {
         private Server server;
 

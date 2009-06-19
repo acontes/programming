@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -212,10 +212,10 @@ public class BasicPrimeExample extends AbstractExample {
         public Boolean run(WorkerMemory memory) {
             for (long divider = begin; divider < end; divider++) {
                 if ((candidate % divider) == 0) {
-                    return new Boolean(false);
+                    return Boolean.valueOf(false);
                 }
             }
-            return new Boolean(true);
+            return Boolean.valueOf(true);
         }
     }
 }

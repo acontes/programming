@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -213,8 +213,6 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
                     }
                     if (interface_types[i].isFcMulticastItf() && interface_types[i].isFcClientItf()) {//TODO : This piece of code has to be tested
                         itf_ref = createInterfaceOnGroupOfDelegatees(interface_types[i]);
-                        //                    itf_ref = ProActiveComponentGroup.newComponentInterfaceGroup(interface_types[i],
-                        //                            getFcItfOwner());
                     } else {
                         itf_ref = MetaObjectInterfaceClassGenerator.instance().generateInterface(
                                 interface_types[i].getFcItfName(), this, interface_types[i],
@@ -330,8 +328,6 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
                 }
                 if (interface_types[i].isFcMulticastItf()) {
                     itf_ref = createInterfaceOnGroupOfDelegatees(interface_types[i]);
-                    //                    itf_ref = ProActiveComponentGroup.newComponentInterfaceGroup(interface_types[i],
-                    //                            getFcItfOwner());
                 } else {
                     // no interface generated for client itfs of primitive
                     // components
@@ -346,7 +342,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
                             if (!interface_types[i].isFcCollectionItf()) {
                                 if (!interface_types[i].isFcClientItf()) {
                                     (itf_ref).setFcItfImpl(getReferenceOnBaseObject());
-                                } else if (interface_types[i].isFcClientItf()) {
+                                } else {
                                     (itf_ref).setFcItfImpl(null);
                                 }
                             }
@@ -531,7 +527,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
             }
             return (controlItfs.get(interfaceName));
         }
-        if (interfaceName.equals("component")) {
+        if (interfaceName.equals(Constants.COMPONENT)) {
             return this;
         }
         if (serverItfs.containsKey(interfaceName)) {

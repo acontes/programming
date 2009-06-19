@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -135,9 +135,9 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @since ProActive 0.91
  * 
  */
-@SuppressWarnings("serial")
+
 public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl implements ProActiveRuntime,
-        LocalProActiveRuntime, ProActiveRuntimeImplMBean {
+        LocalProActiveRuntime {
 
     /**
      * 
@@ -158,6 +158,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
             proActiveRuntime = new ProActiveRuntimeImpl();
             proActiveRuntime.createMBean();
         } catch (UnknownProtocolException e) {
+            e.printStackTrace();
+        } catch (ProActiveException e) {
             e.printStackTrace();
         }
     }
@@ -183,8 +185,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
     // map proActiveRuntime registered on this VM and their names
     private java.util.Hashtable<String, ProActiveRuntime> proActiveRuntimeMap;
 
-    // synchronized set of URL to runtimes in which we are registered
-    private java.util.Set<String> runtimeAcquaintancesURL;
     private ProActiveRuntime parentRuntime;
     protected RemoteObjectExposer<ProActiveRuntime> roe;
 
@@ -195,7 +195,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
 
     /** The MBean representing this ProActive Runtime */
     private ProActiveRuntimeWrapperMBean mbean;
-    private RegistrationForwarder registrationForwarder;
 
     private long gcmNodes;
 
@@ -204,12 +203,10 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
     // -----------------------------------------------------------
     //
     // singleton
-    protected ProActiveRuntimeImpl() throws UnknownProtocolException {
+    protected ProActiveRuntimeImpl() throws ProActiveException {
         try {
             this.vmInformation = new VMInformationImpl();
             this.proActiveRuntimeMap = new java.util.Hashtable<String, ProActiveRuntime>();
-            this.runtimeAcquaintancesURL = java.util.Collections
-                    .synchronizedSortedSet(new java.util.TreeSet<String>());
             this.virtualNodesMap = new java.util.Hashtable<String, VirtualNodeInternal>();
             this.descriptorMap = new java.util.Hashtable<String, ProActiveDescriptorInternal>();
             this.nodeMap = new java.util.Hashtable<String, LocalNode>();
@@ -335,7 +332,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
     public void setParent(ProActiveRuntime parentPARuntime) {
         if (this.parentRuntime == null) {
             this.parentRuntime = parentPARuntime;
-            this.runtimeAcquaintancesURL.add(parentPARuntime.getURL());
         } else {
             runtimeLogger.error("Parent runtime already set!");
         }
@@ -453,23 +449,27 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
             nodeSecurityManager.setParent(this);
         }
 
-        LocalNode localNode = new LocalNode(nodeName, jobId, nodeSecurityManager, vnName);
-
-        if (replacePreviousBinding && (this.nodeMap.get(nodeName) != null)) {
-            localNode.setActiveObjects(this.nodeMap.get(nodeName).getActiveObjectsId());
-            this.nodeMap.remove(nodeName);
-        }
-
-        this.nodeMap.put(nodeName, localNode);
-
-        Node node = null;
         try {
-            node = new NodeImpl((ProActiveRuntime) PARemoteObject.lookup(URI.create(localNode.getURL())),
-                localNode.getURL(), URIBuilder.getProtocol(localNode.getURL()), jobId);
+            LocalNode localNode = new LocalNode(nodeName, jobId, nodeSecurityManager, vnName);
+            if (replacePreviousBinding && (this.nodeMap.get(nodeName) != null)) {
+                localNode.setActiveObjects(this.nodeMap.get(nodeName).getActiveObjectsId());
+                this.nodeMap.remove(nodeName);
+            }
+
+            this.nodeMap.put(nodeName, localNode);
+
+            Node node = null;
+            try {
+                node = new NodeImpl((ProActiveRuntime) PARemoteObject.lookup(URI.create(localNode.getURL())),
+                    localNode.getURL(), URIBuilder.getProtocol(localNode.getURL()), jobId);
+            } catch (ProActiveException e) {
+                throw new NodeException("Failed to created NodeImpl", e);
+            }
+            return node;
         } catch (ProActiveException e) {
-            throw new NodeException("Failed to created NodeImpl", e);
+            throw new NodeException("Failed to create the LocalNode for " + nodeName, e);
         }
-        return node;
+
     }
 
     public Node createGCMNode(ProActiveSecurityManager nodeSecurityManager, String vnName, String jobId,
@@ -651,38 +651,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
     }
 
     /**
-     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#addAcquaintance(String)
-     */
-    public void addAcquaintance(String proActiveRuntimeName) {
-        this.runtimeAcquaintancesURL.add(proActiveRuntimeName);
-    }
-
-    /**
-     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getAcquaintances()
-     */
-    public String[] getAcquaintances() {
-        String[] urls;
-
-        synchronized (this.runtimeAcquaintancesURL) {
-            urls = new String[this.runtimeAcquaintancesURL.size()];
-
-            java.util.Iterator<String> iter = this.runtimeAcquaintancesURL.iterator();
-
-            for (int i = 0; i < urls.length; i++)
-                urls[i] = iter.next();
-        }
-
-        return urls;
-    }
-
-    /**
-     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#rmAcquaintance(java.lang.String)
-     */
-    public void rmAcquaintance(String proActiveRuntimeName) {
-        this.runtimeAcquaintancesURL.remove(proActiveRuntimeName);
-    }
-
-    /**
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#killRT(boolean)
      */
     public void killRT(boolean softly) {
@@ -767,7 +735,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
     }
 
     public void registerVirtualNode(String virtualNodeName, boolean replacePreviousBinding)
-            throws UnknownProtocolException {
+            throws ProActiveException {
         this.roe.createRemoteObject(virtualNodeName);
     }
 
@@ -1591,14 +1559,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
     }
 
     public void addDeployment(long deploymentId) {
-        createRegistrationForwarder();
-        registrationForwarder.doNotForward(deploymentId);
-    }
-
-    synchronized private void createRegistrationForwarder() {
-        if (registrationForwarder == null) {
-            this.registrationForwarder = new RegistrationForwarder();
-        }
     }
 
     public void setDeploymentId(long deploymentId) {

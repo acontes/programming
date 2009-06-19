@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -106,14 +106,20 @@ public class ProActiveComponentTypeImpl implements ComponentType, ProActiveInter
     /**
      * @see org.objectweb.fractal.api.type.ComponentType#getFcInterfaceType(String)
      */
-    public InterfaceType getFcInterfaceType(String name) throws NoSuchInterfaceException {
+    public InterfaceType getFcInterfaceType(String itfName) throws NoSuchInterfaceException {
         for (int i = 0; i < interfaceTypes.length; i++) {
-            InterfaceType type = interfaceTypes[i];
-            if (type.getFcItfName().equals(name)) {
-                return type;
+            if (interfaceTypes[i].isFcCollectionItf()) {
+                if (itfName.startsWith(interfaceTypes[i].getFcItfName()) &&
+                    !itfName.equals(interfaceTypes[i].getFcItfName())) {
+                    return interfaceTypes[i];
+                }
+            } else {
+                if (itfName.equals(interfaceTypes[i].getFcItfName())) {
+                    return interfaceTypes[i];
+                }
             }
         }
-        throw new NoSuchInterfaceException(name);
+        throw new NoSuchInterfaceException(itfName);
     }
 
     /**

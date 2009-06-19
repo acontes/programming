@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -43,6 +43,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -95,7 +96,7 @@ public class ProActiveServicesImpl implements ProActiveService {
      * @see org.objectweb.proactive.osgi.ProActiveService#register(java.lang.Object, java.lang.String)
      */
     @SuppressWarnings("deprecation")
-    public void register(Object obj, String url) throws IOException {
+    public void register(Object obj, String url) throws ProActiveException {
         PAActiveObject.register(obj, url);
     }
 

@@ -1,10 +1,11 @@
+//@tutorial-start
 /*
  * ################################################################
  *
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -29,6 +30,8 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
+//@snippet-start migrate_main_cma_skeleton
+//@snippet-start migrate_main_cma_full
 package org.objectweb.proactive.examples.userguide.cmagent.migration;
 
 import java.io.BufferedReader;
@@ -80,8 +83,12 @@ public class Main {
                 //display the menu with the available nodes 
                 k = 1;
                 for (Node node : vn.getCurrentNodes()) {
-                    //TODO 2. Add the node URL to the menu 
+                    //TODO 2. Add the node URL to the menu
+                    //@snippet-break migrate_main_cma_skeleton
+                    //@tutorial-break
                     System.out.println(k + ".  Statistics for node :" + node.getNodeInformation().getURL());
+                    //@tutorial-resume
+                    //@snippet-resume migrate_main_cma_skeleton
                     k++;
                 }
                 System.out.println("0.  Exit");
@@ -102,14 +109,25 @@ public class Main {
                     break;
 
                 //TODO 3. Migrate the active object to the selected node:  choice-1
+                //@snippet-break migrate_main_cma_skeleton
+                //@tutorial-break
                 ao.migrateTo(nodeArray[choice - 1]); //migrate
-
+                //@tutorial-resume
+                //@snippet-resume migrate_main_cma_skeleton
                 //TODO 4. Get the state and the last request time and print them out
+                //@snippet-break migrate_main_cma_skeleton
+                //@tutorial-break
                 String currentState = ao.getCurrentState().toString(); //get the state
                 System.out.println("\n" + currentState);
-                //TODO 5. Display information for the selected node 
+                //@tutorial-resume
+                //@snippet-resume migrate_main_cma_skeleton
+                //TODO 5. Print the execution time of the last request
+                //@snippet-break migrate_main_cma_skeleton
+                //@tutorial-break
                 System.out.println("Calculating the statistics took " +
                     ao.getLastRequestServeTime().longValue() + "ms \n");
+                //@tutorial-resume
+                //@snippet-resume migrate_main_cma_skeleton
             }
         } catch (NodeException nodeExcep) {
             System.err.println(nodeExcep.getMessage());
@@ -120,10 +138,17 @@ public class Main {
         } catch (ProActiveException e) {
             System.err.println(e.getMessage());
         } finally {
-            //TODO 6. Stop all the objects and JVMS
+            //TODO 6. Stop all the objects and JVM
+            //@snippet-break migrate_main_cma_skeleton
+            //@tutorial-break
             if (pad != null)
                 pad.kill();
             PALifeCycle.exitSuccess();
+            //@snippet-resume migrate_main_cma_skeleton
+            //@tutorial-resume
         }
     }
 }
+//@snippet-end migrate_main_cma_skeleton
+//@snippet-end migrate_main_cma_full
+//@tutorial-end

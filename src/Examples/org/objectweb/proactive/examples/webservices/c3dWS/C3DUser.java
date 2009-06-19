@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -292,7 +292,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
         VirtualNode user = proActiveDescriptor.getVirtualNode("User");
 
         Node node = user.getNode();
-        Object[] params = { new Boolean(false), new Boolean(false), "" };
+        Object[] params = { Boolean.valueOf(false), Boolean.valueOf(false), "" };
 
         try {
             C3DUser c3duser = (C3DUser) org.objectweb.proactive.api.PAActiveObject.newActive(
@@ -527,7 +527,6 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
         PAActiveObject.terminateActiveObject(true);
     }
 
-    @SuppressWarnings("serial")
     public class UserFrame extends Frame implements ActionListener, ItemListener {
 
         /**

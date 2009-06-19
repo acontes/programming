@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -85,11 +85,11 @@ public class TryCache {
 
     public void recordTrySuccess(String host, int port) {
         String key = getKey(host, port);
-        _hash.put(key, new Boolean(true));
+        _hash.put(key, Boolean.valueOf(true));
     }
 
     public void recordTryFailure(String host, int port) {
         String key = getKey(host, port);
-        _hash.put(key, new Boolean(false));
+        _hash.put(key, Boolean.valueOf(false));
     }
 }
