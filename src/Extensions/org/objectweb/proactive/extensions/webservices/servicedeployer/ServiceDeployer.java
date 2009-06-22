@@ -39,7 +39,8 @@ public class ServiceDeployer {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.WEB_SERVICES);
 
     static {
-        System.setSecurityManager(new java.rmi.RMISecurityManager());
+        if (System.getSecurityManager() == null)
+            System.setSecurityManager(new java.rmi.RMISecurityManager());
         try {
             RuntimeFactory.getDefaultRuntime();
         } catch (ProActiveException e) {
