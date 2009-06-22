@@ -1,5 +1,7 @@
 package functionalTests.structuredp2p.can;
 
+import junit.framework.Assert;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -32,8 +34,6 @@ public class TestQuery {
 
     @BeforeClass
     public static void setUp() throws Exception {
-        System.out.println("TestQuery.setUp()");
-
         TestQuery.firstPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
                 new Object[] { OverlayType.CAN });
         TestQuery.secondPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
@@ -59,14 +59,14 @@ public class TestQuery {
     @Test
     public void testMySearch() {
         QueryResponse response = TestQuery.firstPeer.search(TestQuery.query);
-        System.out.println("test = " + response.getLatency());
-        System.out.println("nbSteps receive = " + response.getNbSteps());
-        System.out.println("nbSteps send = " + response.getNbStepsForSend());
+
+        Assert.assertTrue(response.getLatency() > 1);
+        Assert.assertTrue(response.getNbSteps() > 0);
+        Assert.assertTrue(response.getNbStepsForSend() > 0);
     }
 
     @AfterClass
     public static void tearDown() {
-        System.out.println("TestQuery.tearDown()");
         TestQuery.query = null;
     }
 

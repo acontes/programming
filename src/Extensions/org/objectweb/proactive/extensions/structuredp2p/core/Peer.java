@@ -76,7 +76,7 @@ public class Peer implements InitActive, RunActive, Serializable {
      * Constructor.
      * 
      * @param type
-     *            the type of the overlay which is used by the peer.
+     *            @ the type of the overlay which is used by the peer.
      */
     public Peer(OverlayType type) {
         this.type = type;
@@ -92,9 +92,12 @@ public class Peer implements InitActive, RunActive, Serializable {
      */
     public QueryResponse search(Query query) {
         UUID uid = UUID.randomUUID();
-        query.setUid(uid);
+        query.setUUID(uid);
+        System.out.println("Peer.search() " + System.identityHashCode(this.oneWayResponses));
+        System.out.println("Peer.search() zone hashcode " +
+            System.identityHashCode(((CANOverlay) this.getStructuredOverlay()).getZone()));
         this.structuredOverlay.send(query);
-
+        System.out.println("Peer.search() " + this.oneWayResponses.getClass());
         synchronized (this.oneWayResponses) {
             while (this.oneWayResponses.get(uid) == null) {
                 try {
@@ -248,7 +251,6 @@ public class Peer implements InitActive, RunActive, Serializable {
             } else {
                 service.serve(req);
             }
-            System.out.println("size = " + body.getFuturePool().getIncomingFutures().size());
         }
     }
 

@@ -122,13 +122,13 @@ public class CANOverlay extends StructuredOverlay {
 
         /*
          * Terminate the current body in order to notify all the neighbors that they can't send
-         * message to the current local peer. If they try they will receive a ProActiveException.
+         * message to the current remote peer. If they try they will receive a
+         * BodyTerminatedException.
          */
         super.getLocalPeer().getBody().terminate(true);
 
         if (neighborsToMergeWith.size() > 1) {
             Zone zoneToSplit = this.getZone();
-            System.out.println("MERGE WITH MANY PEER " + neighborsToMergeWith.size());
             /*
              * For the last dimension and direction of the split, we split N-1 times, where N is the
              * number of neighbors in the last dimension and last reverse direction.
@@ -165,7 +165,6 @@ public class CANOverlay extends StructuredOverlay {
                 neighbors.add(neighborsOfCurrentNeighbor);
             }
         } else { /* There is only one peer to merge with */
-            System.out.println("ONLY ONE PEER TO MERGE WITH " + neighborsToMergeWith.size());
             try {
                 ActionResponseMessage response = (ActionResponseMessage) PAFuture.getFutureValue(this.sendTo(
                         neighborsToMergeWith.get(0), new CANMergeMessage(this.getRemotePeer(), lastDimension,
@@ -185,12 +184,11 @@ public class CANOverlay extends StructuredOverlay {
          * structure.
          */
         try {
-            PAFuture.waitForAll(this.sendMessageTo(this.getNeighborsDataStructure(), new LeaveMessage(this
+            PAFuture.waitForAll(this.sendTo(this.getNeighborsDataStructure(), new LeaveMessage(this
                     .getRemotePeer())));
         } catch (Exception e) {
             e.printStackTrace();
         }
-        // }
 
         /*
          * Set all neighbors reference to null.
@@ -345,6 +343,7 @@ public class CANOverlay extends StructuredOverlay {
         Coordinate[] coordinatesToReach = (Coordinate[]) query.getKeyToReach().getValue();
 
         if (this.contains(coordinatesToReach)) {
+            System.out.println("contains");
             query.handle(this);
         } else {
             int direction;
@@ -354,31 +353,36 @@ public class CANOverlay extends StructuredOverlay {
                 direction = NeighborsDataStructure.SUPERIOR_DIRECTION;
                 pos = this.contains(dim, coordinatesToReach[dim]);
 
+                System.out.println("zone = " + this.zone);
+                System.out.println("coordinatesToReach[dim] = " + coordinatesToReach[dim]);
+                System.out.println("coordinate min = " + this.zone.getCoordinateMin(dim) + ", max=" +
+                    this.zone.getCoordinateMax(dim));
+                System.out.println("pos = " + pos);
+
                 if (pos == -1) {
                     direction = NeighborsDataStructure.INFERIOR_DIRECTION;
-                }
 
+                    System.out.println("direction <---inf");
+                } else {
+                    System.out.println("direction sup--->");
+                }
+                System.out.println("----------");
                 if (pos != 0) {
                     List<Peer> neighbors = this.neighborsDataStructure.getNeighbors(dim, direction);
 
                     if (neighbors.size() > 0) {
-                        Peer nearestPeer = this.neighborsDataStructure.getNearestNeighborFrom(
+                        Peer nearestPeer = this.neighborsDataStructure.getNearestNeighborFrom(this.zone,
                                 coordinatesToReach[CANOverlay.getNextDimension(dim)], dim, direction);
                         query.incrementNbSteps();
 
                         try {
                             nearestPeer.send(query);
                         } catch (Exception e) {
-
-                            System.out.println("Exception");
-                            /*
-                             * // TODO: get another way List<Peer> nearest =
-                             * this.neighborsDataStructure.getNeighbors(dim, direction); for (Peer
-                             * peer : nearest) { try {
-                             * 
-                             * } catch (Exception ex) { ex.printStackTrace(); } }
-                             */
+                            e.printStackTrace();
                         }
+                        break;
+                    } else {
+                        System.out.println("size = " + neighbors.size());
                     }
                 }
             }
@@ -404,7 +408,7 @@ public class CANOverlay extends StructuredOverlay {
      * @throws Exception
      *             this exception appears when a message cannot be send to a peer.
      */
-    public List<ResponseMessage> sendMessageTo(List<Peer> remotePeers, Message msg) throws Exception {
+    public List<ResponseMessage> sendTo(List<Peer> remotePeers, Message msg) throws Exception {
         List<ResponseMessage> responses = new ArrayList<ResponseMessage>(remotePeers.size());
 
         for (Peer remotePeer : remotePeers) {
@@ -426,8 +430,7 @@ public class CANOverlay extends StructuredOverlay {
      * @throws Exception
      *             this exception appears when a message cannot be send to a peer.
      */
-    public List<ResponseMessage> sendMessageTo(NeighborsDataStructure dataStructure, Message msg)
-            throws Exception {
+    public List<ResponseMessage> sendTo(NeighborsDataStructure dataStructure, Message msg) throws Exception {
         List<ResponseMessage> responses = new ArrayList<ResponseMessage>();
 
         for (Peer remotePeer : dataStructure) {

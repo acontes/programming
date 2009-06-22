@@ -15,6 +15,8 @@ import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.Coordinate;
+import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.QueryResponse;
+import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can.RDFQuery;
 
 
 public class PeerLauncher extends Observable {
@@ -106,22 +108,22 @@ public class PeerLauncher extends Observable {
     public void lookupMessage() {
         Random rand = new Random();
 
-        Coordinate[] searchedPosition = new Coordinate[CANOverlay.NB_DIMENSIONS];
+        Coordinate[] coordinatesToFind = new Coordinate[CANOverlay.NB_DIMENSIONS];
 
         String buf = "(";
-        for (int i = 0; i < searchedPosition.length; i++) {
-            searchedPosition[i] = new Coordinate("" + rand.nextDouble());
+        for (int i = 0; i < coordinatesToFind.length; i++) {
+            coordinatesToFind[i] = new Coordinate("" + rand.nextDouble());
             if (i != 0) {
                 buf += ",";
             }
-            buf += searchedPosition[i];
+            buf += coordinatesToFind[i];
         }
         buf += ")";
 
         Peer sender = this.remotePeers.get(rand.nextInt(this.remotePeers.size()));
 
-        CANLookupResponseMessage response = (CANLookupResponseMessage) sender.search(new CANLookupMessage(
-            searchedPosition));
+        QueryResponse response = sender.search(new RDFQuery(coordinatesToFind, ((CANOverlay) sender
+                .getStructuredOverlay()).getZone().getCoordinatesMin()));
 
         this.printInformation("Lookup for peer managing " + buf + ".\n    Lookup start from peer managing " +
             ((CANOverlay) sender.getStructuredOverlay()).getZone() + ".\n    Peer found in " +

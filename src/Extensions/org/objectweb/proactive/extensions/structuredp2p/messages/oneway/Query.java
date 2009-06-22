@@ -31,7 +31,7 @@ public abstract class Query implements Serializable {
     /**
      * Universally unique identifier used in order to identify the response.
      */
-    private UUID uid;
+    private UUID uuid;
 
     /**
      * The key used in order to route the query on the network.
@@ -99,7 +99,7 @@ public abstract class Query implements Serializable {
         this.keyToReach = keyToReach;
         this.keyFromSender = keyFromSender;
         this.creationTimestamp = creationTimestamp;
-        this.uid = uid;
+        this.uuid = uid;
     }
 
     /**
@@ -140,8 +140,8 @@ public abstract class Query implements Serializable {
      * 
      * @return the universally unique identifier used in order to identify the response.
      */
-    public UUID getUid() {
-        return this.uid;
+    public UUID getUUID() {
+        return this.uuid;
     }
 
     /**
@@ -201,7 +201,7 @@ public abstract class Query implements Serializable {
      * @param uid
      *            the new uid to set.
      */
-    public void setUid(UUID uid) {
-        this.uid = uid;
+    public void setUUID(UUID uid) {
+        this.uuid = uid;
     }
 }

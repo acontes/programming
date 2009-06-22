@@ -14,6 +14,7 @@ import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.Coordin
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.Zone;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.ZoneException;
 import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.Query;
+import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can.RDFQuery;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.ResponseMessage;
 
 
@@ -81,7 +82,7 @@ public class TestMessagesND {
         this.can = ((CANOverlay) (this.firstPeer.getStructuredOverlay()));
         this.can.setZone(this.zone);
         this.firstPeer.setStructuredOverlay(this.can);
-        this.lMsg = new CANLookupMessage(this.messCoord);
+        this.lMsg = new RDFQuery(this.messCoord);
     }
 
     @Test

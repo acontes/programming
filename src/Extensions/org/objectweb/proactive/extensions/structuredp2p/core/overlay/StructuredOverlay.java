@@ -30,7 +30,7 @@ public abstract class StructuredOverlay implements Serializable {
     /**
      * The local peer which is associated with the overlay.
      */
-    private final Peer localPeer;
+    private Peer localPeer = null;
 
     /**
      * Constructor.
@@ -137,7 +137,7 @@ public abstract class StructuredOverlay implements Serializable {
         response.setDeliveryTime();
 
         synchronized (this.getLocalPeer().getOneWayResponses()) {
-            this.getLocalPeer().getOneWayResponses().put(response.getUid(), response);
+            this.getLocalPeer().getOneWayResponses().put(response.getUUID(), response);
             this.getLocalPeer().getOneWayResponses().notifyAll();
         }
     }

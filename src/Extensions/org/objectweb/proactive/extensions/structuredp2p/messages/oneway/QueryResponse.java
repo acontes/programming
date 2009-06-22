@@ -46,7 +46,7 @@ public class QueryResponse extends Query {
      */
     public QueryResponse(Query query, Peer remotePeerFound) {
         super(query.getKeyToFind(), query.getKeyFromSender(), query.getKeyFromSender(), query
-                .getCreationTimestamp(), query.getUid());
+                .getCreationTimestamp(), query.getUUID());
         this.remotePeerFound = remotePeerFound;
         this.nbStepsForSend = query.getNbSteps();
     }

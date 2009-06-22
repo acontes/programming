@@ -1,7 +1,6 @@
 package org.objectweb.proactive.extensions.structuredp2p.core.overlay.can;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -363,20 +362,25 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
      * @param direction
      *            the direction.
      */
-    public Peer getNearestNeighborFrom(Coordinate coordinate, int dim, int direction) {
-        Zone nearest = null;
-        BigDecimal distance;
-        BigDecimal minDistance = null;
+    public Peer getNearestNeighborFrom(Zone ownerZone, Coordinate coordinate, int dim, int direction) {
+        int nearest = 0;
 
-        for (Zone zone : this.associatedZones[dim][direction]) {
-            distance = coordinate.distanceWith(zone.getCoordinateMax(CANOverlay.getNextDimension(dim)));
-            if (minDistance == null || distance.compareTo(minDistance) < 0) {
-                minDistance = distance;
-                nearest = zone;
+        if (ownerZone.getCoordinateMax(CANOverlay.getNextDimension(dim)).compareTo(coordinate) < 0) {
+            return this.neighbors[dim][direction].get(0);
+        } else if (coordinate.compareTo(ownerZone.getCoordinateMin(CANOverlay.getNextDimension(dim))) < 0) {
+            return this.neighbors[dim][direction].get(this.neighbors[dim][direction].size() - 1);
+        } else {
+            for (int i = 1; i < this.associatedZones[dim][direction].size(); i++) {
+                if (this.associatedZones[dim][direction].get(i).getCoordinateMax(
+                        CANOverlay.getNextDimension(dim)).compareTo(coordinate) > 0) {
+                    nearest = i;
+                } else {
+                    break;
+                }
             }
         }
 
-        return this.neighbors[dim][direction].get(this.associatedZones[dim][direction].indexOf(nearest));
+        return this.neighbors[dim][direction].get(nearest);
     }
 
     /**

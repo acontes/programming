@@ -104,17 +104,6 @@ public class Coordinate implements Serializable {
     }
 
     /**
-     * Returns the distance between the current coordinate and the specified coordinate.
-     * 
-     * @param coord
-     *            the specified coordinate.
-     * @return the distance between the current coordinate and the specified coordinate.
-     */
-    public BigDecimal distanceWith(Coordinate coord) {
-        return new BigDecimal(this.getValue()).subtract(new BigDecimal(coord.getValue()));
-    }
-
-    /**
      * Says if the this coordinate is between twice in argument.
      * 
      * @param coord1

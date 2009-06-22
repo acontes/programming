@@ -273,17 +273,14 @@ public class Zone implements Serializable {
      * @param coordinate
      *            the coordinate to check.
      * @return <code>0</code> if the current coordinate is in the zone, <code>-1</code> if the
-     *         coordinate is lexicographically less than the minimal coordinate of the zone and
-     *         <code>1</code> if the coordinate is lexicographically grater than the maximal
-     *         coordinate of the zone and .
+     *         coordinate is taller than the minimal coordinate of the zone and <code>1</code> if
+     *         the coordinate is greater than the maximal coordinate of the zone and .((CANOverlay)
+     *         this.firstPeer.getStructuredOverlay()).getZone() .getCoordinatesMin()
      */
     public int contains(int dimension, Coordinate coordinate) {
-        boolean isGreaterThanMin = this.getCoordinateMin(dimension).compareTo(coordinate) <= 0;
-        boolean isLessThanMax = this.getCoordinateMax(dimension).compareTo(coordinate) > 0;
-
-        if (!isLessThanMax) {
+        if (coordinate.compareTo(this.getCoordinateMax(dimension)) >= 0) {
             return 1;
-        } else if (!isGreaterThanMin) {
+        } else if (coordinate.compareTo(this.getCoordinateMin(dimension)) < 0) {
             return -1;
         }
 
