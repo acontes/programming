@@ -35,7 +35,7 @@
         <prop key="components.creation.timeout" value="10000" /> <!-- timeout in seconds for parallel creation of components -->
 		<prop key="proactive.tagmemory.lease.max" value="60" />
 		<prop key="proactive.tagmemory.lease.period" value="21" />
-		<prop key="proactive.tag.dsi" value="false" />
+		<prop key="proactive.tag.dsi" value="true" />
 		
 		<!-- ***************************************************** -->
 		<!-- MASTER/WORKER PROPERTIES VALUE -->

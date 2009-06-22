@@ -714,7 +714,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                 throws IOException, RenegotiateSessionException, CommunicationForbiddenException {
             long sequenceID = getNextSequenceID();
 
-            MessageTags tags = applyTags();
+            MessageTags tags = applyTags(sequenceID);
 
             Request request = this.internalRequestFactory.newRequest(methodCall, BodyImpl.this,
                     future == null, sequenceID, tags);
@@ -798,7 +798,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
          * Propagate all tags attached to the current served request.
          * @return The MessageTags for the propagation
          */
-        private MessageTags applyTags() {
+        private MessageTags applyTags(long sequenceID) {
             // apply the code of all message TAGs from current context
             Request currentreq = LocalBodyStore.getInstance().getContext().getCurrentRequest();
             MessageTags currentMessagetags = null;
@@ -816,7 +816,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             // Ohterwise add it
             if (PAProperties.PA_TAG_DSI.isTrue()){
                 if (!nextTags.check(DsiTag.IDENTIFIER)) {
-                    nextTags.addTag(new DsiTag(bodyID, currentreq.getSequenceNumber()));
+                    nextTags.addTag(new DsiTag(bodyID, sequenceID));
                 }
             }
             return nextTags;
