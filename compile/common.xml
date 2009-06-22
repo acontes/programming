@@ -44,6 +44,7 @@
 	<property name="proactive.core.path" value="${proactive.path}/core" />
 	<property name="proactive.ext.path" value="${proactive.path}/ext" />
 	<property name="extensions.path"    value="${proactive.path}/extensions"/>
+	<property name="examples.path"    value="${proactive.path}/examples"/>
 	<property name="extra.path"    		value="${proactive.path}/extra"/>
 
 	<!-- Javac properties -->
@@ -82,6 +83,12 @@
 	<property name="axis2.class.dir" value="${webservices.class.dir}/axis2" />
 	<property name="services.path" value="repository/services" />
 	<property name="temp.class.dir" value="${axis2.class.dir}/temp" />
+
+   <!-- Tutorial properties -->
+   <property name="tutorials.dir"		value="${base.dir}/tutorials" />
+   <property name="tutorials.src"		value="${tutorials.dir}/src" />
+   <property name="tutorials.lib"		value="${tutorials.dir}/dist/lib" />
+
 
 	<!-- ================================================================ -->
 	<!--                   define the different classpaths                -->
