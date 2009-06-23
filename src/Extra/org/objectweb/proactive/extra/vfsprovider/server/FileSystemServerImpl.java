@@ -86,12 +86,13 @@ public class FileSystemServerImpl implements FileSystemServer {
         }
     }
 
-    public long streamSkip(long stream, int bytes) throws IOException, StreamNotFoundException,
+    public long streamSkip(long stream, long bytes) throws IOException, StreamNotFoundException,
             WrongStreamTypeException {
         final Stream instance = tryGetStreamOrWound(stream);
         synchronized (instance) {
             checkContainsStreamOrWound(stream);
-            return instance.skip(bytes);
+            // FIXME: do it better than casting, which is only a hotfix to make it compile
+            return instance.skip((int) bytes);
         }
     }
 

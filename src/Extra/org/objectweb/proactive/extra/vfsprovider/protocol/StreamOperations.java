@@ -151,7 +151,7 @@ public interface StreamOperations {
      * @throws WrongStreamTypeException
      *             when mode of a stream does not allow to call this method
      */
-    public abstract long streamSkip(long stream, int bytes) throws IOException, StreamNotFoundException,
+    public abstract long streamSkip(long stream, long bytes) throws IOException, StreamNotFoundException,
             WrongStreamTypeException;
 
     /**
