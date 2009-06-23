@@ -182,7 +182,7 @@ public class FileSystemServerImpl implements FileSystemServer {
 
     /**
      * An private inner class that plays a role of a factory for particular stream modes adapters.
-     *
+     * 
      * @see StreamMode
      * @see Stream
      */

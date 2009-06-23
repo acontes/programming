@@ -27,7 +27,7 @@ public interface StreamOperations {
     /**
      * Open a file stream in specified mode that defines a subset of methods that are allowed to
      * invoke.
-     *
+     * 
      * @param path
      *            of a file whose stream is to be open
      * @param mode
@@ -43,7 +43,7 @@ public interface StreamOperations {
     /**
      * Read number of <code>bytes</code> bytes from an open stream defined by unique id that was
      * previously returned by {@link #streamOpen(String, StreamMode)} method call.
-     *
+     * 
      * @param stream
      *            an unique id of an open stream
      * @param bytes
@@ -63,7 +63,7 @@ public interface StreamOperations {
     /**
      * Write an array of bytes into an open stream specified by an unique id that was previously
      * returned by {@link #streamOpen(String, StreamMode)} method call.
-     *
+     * 
      * @param stream
      *            an unique id of an open stream
      * @param data
@@ -82,7 +82,7 @@ public interface StreamOperations {
      * Change the position of a file stream pointer specified by an unique id that was previously
      * returned by {@link #streamOpen(String, StreamMode)} method call. This stream pointer
      * indicates the position of a next read or write into a stream.
-     *
+     * 
      * @param stream
      *            an unique id of an open stream
      * @param position
@@ -101,7 +101,7 @@ public interface StreamOperations {
     /**
      * Return the length of a file represented by a stream that has been once open by
      * {@link #streamOpen(String, StreamMode)} method call. Stream is identified by an unique id.
-     *
+     * 
      * @param stream
      *            an unique id of an open stream
      * @return length of a file represented by a stream
@@ -119,7 +119,7 @@ public interface StreamOperations {
      * Return the position of a file stream pointer specified by an unique id that was previously
      * returned by {@link #streamOpen(String, StreamMode)} method call. This stream pointer
      * indicates the position of a next read or write into a stream.
-     *
+     * 
      * @param stream
      *            an unique id of an open stream
      * @return position of a file stream pointer
@@ -138,7 +138,7 @@ public interface StreamOperations {
      * that was previously returned by {@link #streamOpen(String, StreamMode)} method call. From a
      * variety of reasons this method call may skip less that specified number of bytes. If
      * <code>bytes</code> is negative, no bytes are skipped.
-     *
+     * 
      * @param stream
      *            an unique id of an open stream
      * @param bytes
@@ -174,7 +174,7 @@ public interface StreamOperations {
     /**
      * Close a stream specified by unique id that was previously returned by
      * {@link #streamOpen(String, StreamMode)} method call.
-     *
+     * 
      * @param stream
      *            an unique id of an open stream
      * @throws IOException
