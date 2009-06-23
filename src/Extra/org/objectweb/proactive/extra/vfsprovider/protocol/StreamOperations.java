@@ -155,6 +155,23 @@ public interface StreamOperations {
             WrongStreamTypeException;
 
     /**
+     * Flushes an output stream specified by unique id that was previously returned by
+     * {@link #streamOpen(String, StreamMode)} method call, and forces any buffered output bytes to
+     * be written out.
+     * 
+     * @param stream
+     *            an unique id of an open stream
+     * @throws IOException
+     *             if an I/O error occurred while performing this method
+     * @throws StreamNotFoundException
+     *             if specified stream unique id has not been found or it has been closed
+     * @throws WrongStreamTypeException
+     *             when mode of a stream does not allow to call this method
+     */
+    public abstract void streamFlush(long stream) throws IOException, StreamNotFoundException,
+            WrongStreamTypeException;
+
+    /**
      * Close a stream specified by unique id that was previously returned by
      * {@link #streamOpen(String, StreamMode)} method call.
      *

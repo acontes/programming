@@ -105,6 +105,11 @@ public class FileSystemServerImpl implements FileSystemServer {
         }
     }
 
+    public void streamFlush(long stream) throws IOException, StreamNotFoundException,
+            WrongStreamTypeException {
+        // TODO Auto-generated method stub
+    }
+
     public boolean fileCreate(String path, FileType type) throws IOException {
         final File file = resolvePath(path);
         switch (type) {
