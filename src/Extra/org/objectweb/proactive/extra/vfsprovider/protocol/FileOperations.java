@@ -15,7 +15,7 @@ public interface FileOperations {
 
     public abstract FileInfo fileGetInfo(String path) throws IOException, FileNotFoundException;
 
-    public abstract void fileCreate(String path, FileType type) throws IOException;
+    public abstract boolean fileCreate(String path, FileType type) throws IOException;
 
     public abstract void fileDelete(String path, boolean recursive) throws IOException, FileNotFoundException;
 

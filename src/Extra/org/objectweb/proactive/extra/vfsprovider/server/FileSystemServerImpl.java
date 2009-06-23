@@ -15,6 +15,7 @@ import org.objectweb.proactive.extra.vfsprovider.protocol.FileType;
 import org.objectweb.proactive.extra.vfsprovider.protocol.StreamMode;
 
 
+// TODO paths..
 //TODO auto close of opened and unused streams
 // TODO finish javadoc..
 /**
@@ -75,8 +76,15 @@ public class FileSystemServerImpl implements FileSystemServer {
         tryGetStreamOrWound(stream).write(data);
     }
 
-    public void fileCreate(String path, FileType type) throws IOException {
-        // TODO Auto-generated method stub
+    public boolean fileCreate(String path, FileType type) throws IOException {
+        final File file = resolvePath(path);
+        switch (type) {
+            case DIRECTORY:
+                return file.mkdir();
+            case FILE:
+                return file.createNewFile();
+        }
+        return false;
     }
 
     public void fileDelete(String path, boolean recursive) throws IOException, FileNotFoundException {
