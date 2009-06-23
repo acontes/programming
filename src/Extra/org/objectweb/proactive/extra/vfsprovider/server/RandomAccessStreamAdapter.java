@@ -29,19 +29,19 @@ public class RandomAccessStreamAdapter implements Stream {
         this.writable = writable;
     }
 
-    synchronized public void close() throws IOException {
+    public void close() throws IOException {
         randomFile.close();
     }
 
-    synchronized public long getLength() throws IOException {
+    public long getLength() throws IOException {
         return randomFile.length();
     }
 
-    synchronized public long getPosition() throws IOException {
+    public long getPosition() throws IOException {
         return randomFile.getFilePointer();
     }
 
-    synchronized public byte[] read(int bytes) throws IOException, WrongStreamTypeException {
+    public byte[] read(int bytes) throws IOException, WrongStreamTypeException {
         final byte[] data = new byte[bytes];
         final int count = randomFile.read(data);
 
@@ -50,15 +50,15 @@ public class RandomAccessStreamAdapter implements Stream {
         return data;
     }
 
-    synchronized public void seek(long position) throws IOException {
+    public void seek(long position) throws IOException {
         randomFile.seek(position);
     }
 
-    synchronized public long skip(int bytes) throws IOException {
+    public long skip(int bytes) throws IOException {
         return randomFile.skipBytes(bytes);
     }
 
-    synchronized public void write(byte[] data) throws IOException, WrongStreamTypeException {
+    public void write(byte[] data) throws IOException, WrongStreamTypeException {
         if (!writable)
             throw new WrongStreamTypeException();
 

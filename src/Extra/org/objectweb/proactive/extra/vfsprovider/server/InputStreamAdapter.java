@@ -17,7 +17,7 @@ public class InputStreamAdapter implements Stream {
         adaptee = new FileInputStream(file);
     }
 
-    synchronized public void close() throws IOException {
+    public void close() throws IOException {
         adaptee.close();
     }
 
@@ -29,7 +29,7 @@ public class InputStreamAdapter implements Stream {
         throw new WrongStreamTypeException();
     }
 
-    synchronized public byte[] read(int bytes) throws IOException {
+    public byte[] read(int bytes) throws IOException {
         final byte[] data = new byte[bytes];
         final int count = adaptee.read(data);
 
@@ -42,7 +42,7 @@ public class InputStreamAdapter implements Stream {
         throw new WrongStreamTypeException();
     }
 
-    synchronized public long skip(int bytes) throws IOException {
+    public long skip(int bytes) throws IOException {
         return adaptee.skip(bytes);
     }
 

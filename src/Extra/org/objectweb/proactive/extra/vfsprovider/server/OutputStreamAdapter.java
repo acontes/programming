@@ -17,7 +17,7 @@ public class OutputStreamAdapter implements Stream {
         adaptee = new FileOutputStream(file, append);
     }
 
-    synchronized public void close() throws IOException {
+    public void close() throws IOException {
         adaptee.close();
     }
 
@@ -41,7 +41,7 @@ public class OutputStreamAdapter implements Stream {
         throw new WrongStreamTypeException();
     }
 
-    synchronized public void write(byte[] data) throws IOException, WrongStreamTypeException {
+    public void write(byte[] data) throws IOException, WrongStreamTypeException {
         adaptee.write(data);
     }
 }

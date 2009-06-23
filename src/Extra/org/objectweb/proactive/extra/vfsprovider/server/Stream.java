@@ -13,8 +13,6 @@ import org.objectweb.proactive.extra.vfsprovider.exceptions.WrongStreamTypeExcep
  * {@link WrongStreamTypeException} is thrown when particular operation is not supported. Methods
  * without {@link WrongStreamTypeException} in their <code>throws</code> clause must be supported by
  * each implementation.
- * <p>
- * Implementations of this interface are thread-safe.
  */
 public interface Stream {
 

@@ -20,8 +20,7 @@ import org.objectweb.proactive.extra.vfsprovider.exceptions.WrongStreamTypeExcep
  * This may cause that {@link StreamNotFoundException} is thrown, when trying to invoke a method on
  * already closed stream. In this case a stream needs to be reopen.
  * <p>
- * Implementations of this interface are thread-safe although concurrent operations performed on a
- * single stream may cause concurrent phenomena, as there is no any stream-lock.
+ * Implementations of this interface are thread-safe.
  */
 public interface StreamOperations {
 

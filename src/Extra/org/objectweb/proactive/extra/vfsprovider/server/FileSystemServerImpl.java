@@ -25,10 +25,11 @@ import org.objectweb.proactive.extra.vfsprovider.protocol.StreamMode;
  * by {@link StreamFactory} private inner class basing on {@link StreamMode}.
  * <p>
  * Operations performed on {@link #streams} map are synchronized on <code>this</code> lock. To
- * fulfill protocol's thread-safety, an implicit {@link Stream} operations synchronization is
- * required and assumed.
- *
+ * fulfill protocol's thread-safety, an explicit {@link Stream} operations synchronization is
+ * required with double checking if map contains an open stream.
+ * 
  * @see FileSystemServer
+ * @see Stream
  */
 public class FileSystemServerImpl implements FileSystemServer {
 
@@ -36,44 +37,71 @@ public class FileSystemServerImpl implements FileSystemServer {
 
     private long idGenerator = 0;
 
-    public void streamClose(long stream) throws IOException, StreamNotFoundException {
-        tryGetAndRemoveStreamOrWound(stream).close();
-    }
-
-    public long streamGetLength(long stream) throws IOException, StreamNotFoundException,
-            WrongStreamTypeException {
-        return tryGetStreamOrWound(stream).getLength();
-    }
-
-    public long streamGetPosition(long stream) throws IOException, StreamNotFoundException,
-            WrongStreamTypeException {
-        return tryGetStreamOrWound(stream).getPosition();
-    }
-
     public long streamOpen(String path, StreamMode mode) throws IOException {
         final File file = resolvePath(path);
         final Stream instance = StreamFactory.createStreamInstance(file, mode);
         return storeStream(instance);
     }
 
+    public void streamClose(long stream) throws IOException, StreamNotFoundException {
+        final Stream instance = tryGetAndRemoveStreamOrWound(stream);
+        synchronized (instance) {
+            instance.close();
+        }
+    }
+
+    public long streamGetLength(long stream) throws IOException, StreamNotFoundException,
+            WrongStreamTypeException {
+        final Stream instance = tryGetStreamOrWound(stream);
+        synchronized (instance) {
+            checkContainsStreamOrWound(stream);
+            return instance.getLength();
+        }
+    }
+
+    public long streamGetPosition(long stream) throws IOException, StreamNotFoundException,
+            WrongStreamTypeException {
+        final Stream instance = tryGetStreamOrWound(stream);
+        synchronized (instance) {
+            checkContainsStreamOrWound(stream);
+            return instance.getPosition();
+        }
+    }
+
     public byte[] streamRead(long stream, int bytes) throws IOException, StreamNotFoundException,
             WrongStreamTypeException {
-        return tryGetStreamOrWound(stream).read(bytes);
+        final Stream instance = tryGetStreamOrWound(stream);
+        synchronized (instance) {
+            checkContainsStreamOrWound(stream);
+            return instance.read(bytes);
+        }
     }
 
     public void streamSeek(long stream, long position) throws IOException, StreamNotFoundException,
             WrongStreamTypeException {
-        tryGetStreamOrWound(stream).seek(position);
+        final Stream instance = tryGetStreamOrWound(stream);
+        synchronized (instance) {
+            checkContainsStreamOrWound(stream);
+            instance.seek(position);
+        }
     }
 
     public long streamSkip(long stream, int bytes) throws IOException, StreamNotFoundException,
             WrongStreamTypeException {
-        return tryGetStreamOrWound(stream).skip(bytes);
+        final Stream instance = tryGetStreamOrWound(stream);
+        synchronized (instance) {
+            checkContainsStreamOrWound(stream);
+            return instance.skip(bytes);
+        }
     }
 
     public void streamWrite(long stream, byte[] data) throws IOException, StreamNotFoundException,
             WrongStreamTypeException {
-        tryGetStreamOrWound(stream).write(data);
+        final Stream instance = tryGetStreamOrWound(stream);
+        synchronized (instance) {
+            checkContainsStreamOrWound(stream);
+            instance.write(data);
+        }
     }
 
     public boolean fileCreate(String path, FileType type) throws IOException {
@@ -139,6 +167,11 @@ public class FileSystemServerImpl implements FileSystemServer {
         if (streams.containsKey(stream))
             return streams.remove(stream);
         throw new StreamNotFoundException();
+    }
+
+    synchronized private void checkContainsStreamOrWound(long stream) throws StreamNotFoundException {
+        if (!streams.containsKey(stream))
+            throw new StreamNotFoundException();
     }
 
     /**
