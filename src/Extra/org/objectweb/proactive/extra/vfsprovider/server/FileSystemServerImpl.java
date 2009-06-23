@@ -140,9 +140,9 @@ public class FileSystemServerImpl implements FileSystemServer {
 
     }
 
-    public void fileSetLastModifiedTime(String path, long time) throws IOException, FileNotFoundException {
+    public boolean fileSetLastModifiedTime(String path, long time) throws IOException, FileNotFoundException {
         // TODO Auto-generated method stub
-
+        return false;
     }
 
     // FIXME

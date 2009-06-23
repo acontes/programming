@@ -21,6 +21,6 @@ public interface FileOperations {
 
     public abstract void fileRename(String path, String newPath) throws IOException, FileNotFoundException;
 
-    public abstract void fileSetLastModifiedTime(String path, long time) throws IOException,
+    public abstract boolean fileSetLastModifiedTime(String path, long time) throws IOException,
             FileNotFoundException;
 }
