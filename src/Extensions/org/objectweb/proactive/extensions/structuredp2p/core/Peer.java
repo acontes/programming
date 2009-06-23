@@ -2,8 +2,10 @@ package org.objectweb.proactive.extensions.structuredp2p.core;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.Vector;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
@@ -18,6 +20,7 @@ import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.chord.ChordOverlay;
+import org.objectweb.proactive.extensions.structuredp2p.core.requests.StructuredMetaObjectFactory;
 import org.objectweb.proactive.extensions.structuredp2p.data.DataStorage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.Message;
 import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.Query;
@@ -40,7 +43,7 @@ public class Peer implements InitActive, RunActive, Serializable {
 
     /**
      * The timeout to wait before to check neighbors via the call of
-     * {@link StructuredOverlay#checkNeighbors()} .
+     * {@link StructuredOverlay#checkNeighbors()}.
      */
     public static final int CHECK_NEIGHBORS_TIMEOUT = 7777;
 
@@ -53,6 +56,11 @@ public class Peer implements InitActive, RunActive, Serializable {
      * Responses associated to the oneWay search on the network.
      */
     private Map<UUID, QueryResponse> oneWayResponses = new HashMap<UUID, QueryResponse>();
+
+    /**
+     * Queries which are bufferized when a {@link Peer#sendTo(Peer, Message)} is not accepted.
+     */
+    private List<Query> bufferizedQueries = new Vector<Query>();
 
     /**
      * The type of the overlay which is used by the peer. The type is equal to one of
@@ -97,11 +105,8 @@ public class Peer implements InitActive, RunActive, Serializable {
     public QueryResponse search(Query query) {
         UUID uid = UUID.randomUUID();
         query.setUUID(uid);
-        System.out.println("Peer.search() " + System.identityHashCode(this.oneWayResponses));
-        System.out.println("Peer.search() zone hashcode " +
-            System.identityHashCode(((CANOverlay) this.getStructuredOverlay()).getZone()));
         this.structuredOverlay.send(query);
-        System.out.println("Peer.search() " + this.oneWayResponses.getClass());
+
         synchronized (this.oneWayResponses) {
             while (this.oneWayResponses.get(uid) == null) {
                 try {
@@ -138,11 +143,7 @@ public class Peer implements InitActive, RunActive, Serializable {
      *             this exception appears when a message cannot be send to a peer.
      */
     public ResponseMessage sendTo(Peer remotePeer, Message msg) throws Exception {
-        try {
-            return remotePeer.receiveMessage(msg);
-        } catch (Exception e) {
-            throw new Exception("Error while sending a message to a peer.");
-        }
+        return remotePeer.receiveMessage(msg);
     }
 
     /**
@@ -295,6 +296,16 @@ public class Peer implements InitActive, RunActive, Serializable {
     }
 
     /**
+     * Bufferize a new query that will be performed at the time of the next checking.
+     * 
+     * @param query
+     *            the query to bufferize.
+     */
+    public void bufferizeQuery(Query query) {
+        this.bufferizedQueries.add(query);
+    }
+
+    /**
      * Create a new Peer ActiveObject.
      * 
      * @param type
@@ -308,7 +319,7 @@ public class Peer implements InitActive, RunActive, Serializable {
     public static Peer newActivePeer(OverlayType type, Node node) throws ActiveObjectCreationException,
             NodeException {
         return (Peer) PAActiveObject.newActive(Peer.class.getName(), null, new Object[] { type }, node, null,
-                null);
+                new StructuredMetaObjectFactory());
     }
 
     /**

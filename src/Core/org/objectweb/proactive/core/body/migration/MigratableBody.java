@@ -1,33 +1,27 @@
 /*
  * ################################################################
- *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
- *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * 
+ * ProActive: The Java(TM) library for Parallel, Distributed, Concurrent computing with Security and
+ * Mobility
+ * 
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis Contact: proactive@ow2.org
+ * 
+ * This library is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation; either version 2 of the
+ * License, or any later version.
+ * 
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * 
+ * You should have received a copy of the GNU General Public License along with this library; if
+ * not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+ * 02111-1307 USA
+ * 
+ * Initial developer(s): The ProActive Team http://proactive.inria.fr/team_members.htm
+ * Contributor(s):
+ * 
+ * ################################################################ $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive.core.body.migration;
 
@@ -97,27 +91,27 @@ public class MigratableBody extends BodyImpl implements Migratable, java.io.Seri
     }
 
     public UniversalBody migrateTo(Node node) throws MigrationException {
-        return internalMigrateTo(node, false);
+        return this.internalMigrateTo(node, false);
     }
 
     public UniversalBody cloneTo(Node node) throws MigrationException {
-        return internalMigrateTo(node, true);
+        return this.internalMigrateTo(node, true);
     }
 
     public void addMigrationEventListener(MigrationEventListener listener) {
-        if (migrationManager != null) {
-            migrationManager.addMigrationEventListener(listener);
+        if (this.migrationManager != null) {
+            this.migrationManager.addMigrationEventListener(listener);
         }
     }
 
     public void removeMigrationEventListener(MigrationEventListener listener) {
-        if (migrationManager != null) {
-            migrationManager.removeMigrationEventListener(listener);
+        if (this.migrationManager != null) {
+            this.migrationManager.removeMigrationEventListener(listener);
         }
     }
 
     public MigrationManager getMigrationManager() {
-        return migrationManager;
+        return this.migrationManager;
     }
 
     //
@@ -131,17 +125,19 @@ public class MigratableBody extends BodyImpl implements Migratable, java.io.Seri
     protected void activityStarted() {
         super.activityStarted();
 
-        if (migrationLogger.isDebugEnabled()) {
-            migrationLogger.debug("Body run on node " + nodeURL + " migration=" + hasJustMigrated);
+        if (MigratableBody.migrationLogger.isDebugEnabled()) {
+            MigratableBody.migrationLogger.debug("Body run on node " + this.nodeURL + " migration=" +
+                this.hasJustMigrated);
         }
-        if (bodyLogger.isDebugEnabled()) {
-            bodyLogger.debug("Body run on node " + nodeURL + " migration=" + hasJustMigrated);
+        if (MigratableBody.bodyLogger.isDebugEnabled()) {
+            MigratableBody.bodyLogger.debug("Body run on node " + this.nodeURL + " migration=" +
+                this.hasJustMigrated);
         }
-        if (hasJustMigrated) {
-            if (migrationManager != null) {
-                migrationManager.startingAfterMigration(this);
+        if (this.hasJustMigrated) {
+            if (this.migrationManager != null) {
+                this.migrationManager.startingAfterMigration(this);
             }
-            hasJustMigrated = false;
+            this.hasJustMigrated = false;
         }
     }
 
@@ -157,7 +153,7 @@ public class MigratableBody extends BodyImpl implements Migratable, java.io.Seri
         this.hasJustMigrated = true;
     }
 
-    protected RequestReceiver getRequestReceiver() {
+    public RequestReceiver getRequestReceiver() {
         return this.requestReceiver;
     }
 
@@ -185,29 +181,30 @@ public class MigratableBody extends BodyImpl implements Migratable, java.io.Seri
             }
         }
 
-        if (!isAlive()) {
+        if (!this.isAlive()) {
             throw new MigrationException("Attempt to migrate a dead body that has been terminated");
         }
 
-        if (!isActive()) {
+        if (!this.isActive()) {
             throw new MigrationException("Attempt to migrate a non active body");
         }
 
         // PROACTIVE-277
         Class reifiedClass = this.localBodyStrategy.getReifiedObject().getClass();
         if (reifiedClass.isMemberClass() && !Modifier.isStatic(reifiedClass.getModifiers())) {
-            // this active object has been turned active from an instance of a non static member class
+            // this active object has been turned active from an instance of a non static member
+            // class
             // cannot be migrated dur to reference to the enclosing instance
             throw new MigrationException("Attempt to migrate a instance of a non static member class");
         }
 
         try {
             // check node with Manager
-            node = migrationManager.checkNode(node);
+            node = this.migrationManager.checkNode(node);
         } catch (MigrationException me) {
             // JMX Notification
-            if (mbean != null) {
-                mbean.sendNotification(NotificationType.migrationExceptionThrown, me);
+            if (this.mbean != null) {
+                this.mbean.sendNotification(NotificationType.migrationExceptionThrown, me);
             }
 
             // End JMX Notification
@@ -215,8 +212,8 @@ public class MigratableBody extends BodyImpl implements Migratable, java.io.Seri
         }
 
         // get the name of the node
-        String saveNodeURL = nodeURL;
-        nodeURL = node.getNodeInformation().getURL();
+        String saveNodeURL = this.nodeURL;
+        this.nodeURL = node.getNodeInformation().getURL();
 
         // security checks
         try {
@@ -241,7 +238,7 @@ public class MigratableBody extends BodyImpl implements Migratable, java.io.Seri
                 }
             }
         } catch (SecurityNotAvailableException e1) {
-            bodyLogger.debug("Security not available");
+            MigratableBody.bodyLogger.debug("Security not available");
         } catch (CommunicationForbiddenException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -251,23 +248,23 @@ public class MigratableBody extends BodyImpl implements Migratable, java.io.Seri
         }
 
         try {
-            nodeURL = node.getNodeInformation().getURL();
+            this.nodeURL = node.getNodeInformation().getURL();
 
             // stop accepting communication
-            blockCommunication();
+            this.blockCommunication();
 
             // save the id
-            savedID = bodyID;
+            savedID = this.bodyID;
             if (byCopy) {
                 // if moving by copy we have to create a new unique ID
                 // the bodyID will be automatically recreate when deserialized
-                bodyID = null;
+                this.bodyID = null;
             }
 
             // security
             // save opened sessions
             if (this.isSecurityOn) {
-                openedSessions = securityManager.getOpenedConnexion();
+                this.openedSessions = this.securityManager.getOpenedConnexion();
             }
 
             // Set copyMode tag in all futures
@@ -275,9 +272,9 @@ public class MigratableBody extends BodyImpl implements Migratable, java.io.Seri
             this.getFuturePool().setCopyMode(true);
 
             // try to migrate
-            migratedBody = migrationManager.migrateTo(node, this);
+            migratedBody = this.migrationManager.migrateTo(node, this);
 
-            if (isSecurityOn) {
+            if (this.isSecurityOn) {
                 this.internalBodySecurity.setDistantBody(migratedBody);
             }
 
@@ -288,25 +285,25 @@ public class MigratableBody extends BodyImpl implements Migratable, java.io.Seri
                 this.ftmanager.updateLocationAtServer(savedID, migratedBody);
             }
         } catch (MigrationException e) {
-            openedSessions = null;
-            nodeURL = saveNodeURL;
-            bodyID = savedID;
-            localBodyStrategy.getFuturePool().setCopyMode(false);
+            this.openedSessions = null;
+            this.nodeURL = saveNodeURL;
+            this.bodyID = savedID;
+            this.localBodyStrategy.getFuturePool().setCopyMode(false);
             if (this.isSecurityOn) {
                 this.internalBodySecurity.setDistantBody(null);
             }
-            acceptCommunication();
+            this.acceptCommunication();
             throw e;
         }
 
         if (!byCopy) {
             this.migrationManager.changeBodyAfterMigration(this, migratedBody);
-            activityStopped(false);
+            this.activityStopped(false);
         } else {
-            bodyID = savedID;
-            nodeURL = saveNodeURL;
+            this.bodyID = savedID;
+            this.nodeURL = saveNodeURL;
         }
-        acceptCommunication();
+        this.acceptCommunication();
 
         return migratedBody;
     }
@@ -315,20 +312,20 @@ public class MigratableBody extends BodyImpl implements Migratable, java.io.Seri
     // -- SERIALIZATION METHODS -----------------------------------------------
     //
     private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
-        if (migrationLogger.isDebugEnabled()) {
-            migrationLogger.debug("stream =  " + out);
+        if (MigratableBody.migrationLogger.isDebugEnabled()) {
+            MigratableBody.migrationLogger.debug("stream =  " + out);
         }
         out.defaultWriteObject();
     }
 
     private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
-        if (migrationLogger.isDebugEnabled()) {
-            migrationLogger.debug("stream =  " + in);
+        if (MigratableBody.migrationLogger.isDebugEnabled()) {
+            MigratableBody.migrationLogger.debug("stream =  " + in);
         }
         in.defaultReadObject();
-        hasJustMigrated = true;
+        this.hasJustMigrated = true;
         if (this.isSecurityOn) {
-            internalBodySecurity = new InternalBodySecurity(null);
+            this.internalBodySecurity = new InternalBodySecurity(null);
             // securityManager.setBody(this);
         }
     }
@@ -337,6 +334,6 @@ public class MigratableBody extends BodyImpl implements Migratable, java.io.Seri
      * @see org.objectweb.proactive.core.body.LocalBodyStrategy#getNextSequenceID()
      */
     public long getNextSequenceID() {
-        return localBodyStrategy.getNextSequenceID();
+        return this.localBodyStrategy.getNextSequenceID();
     }
 }

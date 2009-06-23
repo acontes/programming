@@ -1,33 +1,27 @@
 /*
  * ################################################################
- *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
- *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * 
+ * ProActive: The Java(TM) library for Parallel, Distributed, Concurrent computing with Security and
+ * Mobility
+ * 
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis Contact: proactive@ow2.org
+ * 
+ * This library is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation; either version 2 of the
+ * License, or any later version.
+ * 
+ * This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * 
+ * You should have received a copy of the GNU General Public License along with this library; if
+ * not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+ * 02111-1307 USA
+ * 
+ * Initial developer(s): The ProActive Team http://proactive.inria.fr/team_members.htm
+ * Contributor(s):
+ * 
+ * ################################################################ $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive.core.body;
 
@@ -89,25 +83,22 @@ import org.objectweb.proactive.core.util.profiling.TimerWarehouse;
 /**
  * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
  * <p>
- * This class gives a common implementation of the Body interface. It provides
- * all the non specific behavior allowing sub-class to write the detail
- * implementation.
+ * This class gives a common implementation of the Body interface. It provides all the non specific
+ * behavior allowing sub-class to write the detail implementation.
  * </p>
  * <p>
  * Each body is identify by an unique identifier.
  * </p>
  * <p>
- * All active bodies that get created in one JVM register themselves into a
- * table that allows to tack them done. The registering and deregistering is
- * done by the AbstractBody and the table is managed here as well using some
- * static methods.
+ * All active bodies that get created in one JVM register themselves into a table that allows to
+ * tack them done. The registering and deregistering is done by the AbstractBody and the table is
+ * managed here as well using some static methods.
  * </p>
  * <p>
- * In order to let somebody customize the body of an active object without
- * subclassing it, AbstractBody delegates lot of tasks to satellite objects that
- * implements a given interface. Abstract protected methods instantiate those
- * objects allowing subclasses to create them as they want (using customizable
- * factories or instance).
+ * In order to let somebody customize the body of an active object without subclassing it,
+ * AbstractBody delegates lot of tasks to satellite objects that implements a given interface.
+ * Abstract protected methods instantiate those objects allowing subclasses to create them as they
+ * want (using customizable factories or instance).
  * </p>
  * 
  * @author The ProActive Team
@@ -153,8 +144,8 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
      * @param nodeURL
      *            the URL of the node that body is attached to
      * @param factory
-     *            the factory able to construct new factories for each type of
-     *            meta objects needed by this body
+     *            the factory able to construct new factories for each type of meta objects needed
+     *            by this body
      */
     public BodyImpl(Object reifiedObject, String nodeURL, MetaObjectFactory factory, String jobId)
             throws ActiveObjectCreationException {
@@ -178,7 +169,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         this.requestReceiver = factory.newRequestReceiverFactory().newRequestReceiver();
         this.replyReceiver = factory.newReplyReceiverFactory().newReplyReceiver();
 
-        setLocalBodyImpl(new ActiveLocalBodyStrategy(reifiedObject, factory.newRequestQueueFactory()
+        this.setLocalBodyImpl(new ActiveLocalBodyStrategy(reifiedObject, factory.newRequestQueueFactory()
                 .newRequestQueue(this.bodyID), factory.newRequestFactory()));
         this.localBodyStrategy.getFuturePool().setOwnerBody(this);
 
@@ -188,7 +179,8 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             if ("true".equals(node.getProperty(FaultToleranceTechnicalService.FT_ENABLED))) {
                 // if the object is a ProActive internal object, FT is disabled
                 if (!super.isProActiveInternalObject) {
-                    // if the object is not serializable or instance of non static enclosing class (PROACTIVE-277), FT is disabled
+                    // if the object is not serializable or instance of non static enclosing class
+                    // (PROACTIVE-277), FT is disabled
                     Class reifiedClass = this.localBodyStrategy.getReifiedObject().getClass();
                     if ((this.localBodyStrategy.getReifiedObject() instanceof Serializable) ||
                         (reifiedClass.isMemberClass() && !Modifier.isStatic(reifiedClass.getModifiers()))) {
@@ -198,18 +190,18 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                                     .getProperty(FaultToleranceTechnicalService.PROTOCOL));
                             this.ftmanager = factory.newFTManagerFactory().newFTManager(protocolSelector);
                             this.ftmanager.init(this);
-                            if (bodyLogger.isDebugEnabled()) {
-                                bodyLogger.debug("Init FTManager on " + this.getNodeURL());
+                            if (UniversalBody.bodyLogger.isDebugEnabled()) {
+                                UniversalBody.bodyLogger.debug("Init FTManager on " + this.getNodeURL());
                             }
                         } catch (ProActiveException e) {
-                            bodyLogger
+                            UniversalBody.bodyLogger
                                     .error("**ERROR** Unable to init FTManager. Fault-tolerance is disabled " +
                                         e);
                             this.ftmanager = null;
                         }
                     } else {
                         // target body is not serilizable
-                        bodyLogger
+                        UniversalBody.bodyLogger
                                 .error("**WARNING** Activated object is not serializable or instance of non static member class (" +
                                     this.localBodyStrategy.getReifiedObject().getClass() +
                                     "). Fault-tolerance is disabled for this active object");
@@ -220,7 +212,8 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                 this.ftmanager = null;
             }
         } catch (ProActiveException e) {
-            bodyLogger.error("**ERROR** Unable to read node configuration. Fault-tolerance is disabled");
+            UniversalBody.bodyLogger
+                    .error("**ERROR** Unable to read node configuration. Fault-tolerance is disabled");
             this.ftmanager = null;
         }
 
@@ -233,13 +226,14 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             if (!mbs.isRegistered(oname)) {
                 super.mbean = new BodyWrapper(oname, this);
                 try {
-                    mbs.registerMBean(mbean, oname);
+                    mbs.registerMBean(this.mbean, oname);
                 } catch (InstanceAlreadyExistsException e) {
-                    bodyLogger.error("A MBean with the object name " + oname + " already exists", e);
+                    UniversalBody.bodyLogger.error("A MBean with the object name " + oname +
+                        " already exists", e);
                 } catch (MBeanRegistrationException e) {
-                    bodyLogger.error("Can't register the MBean of the body", e);
+                    UniversalBody.bodyLogger.error("Can't register the MBean of the body", e);
                 } catch (NotCompliantMBeanException e) {
-                    bodyLogger.error("The MBean of the body is not JMX compliant", e);
+                    UniversalBody.bodyLogger.error("The MBean of the body is not JMX compliant", e);
                 }
             }
         }
@@ -251,8 +245,8 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
     //
 
     /**
-     * Receives a request for later processing. The call to this method is non
-     * blocking unless the body cannot temporary receive the request.
+     * Receives a request for later processing. The call to this method is non blocking unless the
+     * body cannot temporary receive the request.
      * 
      * @param request
      *            the request to process
@@ -263,12 +257,12 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
     protected int internalReceiveRequest(Request request) throws java.io.IOException,
             RenegotiateSessionException {
         // JMX Notification
-        if (!isProActiveInternalObject && (this.mbean != null)) {
+        if (!this.isProActiveInternalObject && (this.mbean != null)) {
             // If the node is not a HalfBody
             if (!NodeFactory.isHalfBodiesNode(request.getSenderNodeURL())) {
                 RequestNotificationData requestNotificationData = new RequestNotificationData(request
                         .getSourceBodyID(), request.getSenderNodeURL(), this.bodyID, this.nodeURL, request
-                        .getMethodName(), getRequestQueue().size() + 1);
+                        .getMethodName(), this.getRequestQueue().size() + 1);
                 this.mbean.sendNotification(NotificationType.requestReceived, requestNotificationData);
             }
         }
@@ -297,22 +291,20 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
     @Override
     protected int internalReceiveReply(Reply reply) throws java.io.IOException {
         // JMX Notification
-        if (!isProActiveInternalObject && (this.mbean != null)) {
+        if (!this.isProActiveInternalObject && (this.mbean != null)) {
             this.mbean.sendNotification(NotificationType.replyReceived);
         }
 
         // END JMX Notification
-        return replyReceiver.receiveReply(reply, this, getFuturePool());
+        return this.replyReceiver.receiveReply(reply, this, this.getFuturePool());
     }
 
     /**
-     * Signals that the activity of this body, managed by the active thread has
-     * just stopped.
+     * Signals that the activity of this body, managed by the active thread has just stopped.
      * 
      * @param completeACs
-     *            if true, and if there are remaining AC in the futurepool, the
-     *            AC thread is not killed now; it will be killed after the
-     *            sending of the last remaining AC.
+     *            if true, and if there are remaining AC in the futurepool, the AC thread is not
+     *            killed now; it will be killed after the sending of the last remaining AC.
      */
     @Override
     protected void activityStopped(boolean completeACs) {
@@ -324,21 +316,21 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             // this method can be called twos times if the automatic
             // continuation thread
             // is killed *after* the activity thread.
-            bodyLogger.debug("Terminating already terminated body " + this.getID());
+            UniversalBody.bodyLogger.debug("Terminating already terminated body " + this.getID());
         }
 
         this.getFuturePool().terminateAC(completeACs);
 
         if (!completeACs) {
-            setLocalBodyImpl(new InactiveLocalBodyStrategy());
+            this.setLocalBodyImpl(new InactiveLocalBodyStrategy());
         } else {
             // the futurepool is still needed for remaining ACs
-            setLocalBodyImpl(new InactiveLocalBodyStrategy(this.getFuturePool()));
+            this.setLocalBodyImpl(new InactiveLocalBodyStrategy(this.getFuturePool()));
         }
     }
 
     public boolean checkMethod(String methodName) {
-        return checkMethod(methodName, null);
+        return this.checkMethod(methodName, null);
     }
 
     public void setImmediateService(String methodName) {
@@ -400,12 +392,12 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         }
 
         // check if the method is defined as public
-        Class<?> reifiedClass = getReifiedObject().getClass();
+        Class<?> reifiedClass = this.getReifiedObject().getClass();
         boolean exists = org.objectweb.proactive.core.mop.Utils.checkMethodExistence(reifiedClass,
                 methodName, parametersTypes);
 
         if (exists) {
-            storeInMethodCache(methodName, parametersTypes);
+            this.storeInMethodCache(methodName, parametersTypes);
 
             return true;
         }
@@ -414,8 +406,8 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
     }
 
     /**
-     * Stores the given method name with the given parameters types inside our
-     * method signature cache to avoid re-testing them
+     * Stores the given method name with the given parameters types inside our method signature
+     * cache to avoid re-testing them
      * 
      * @param methodName
      *            name of the method
@@ -443,7 +435,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                 signatures.add(parameterTlist);
             }
 
-            checkedMethodNames.put(methodName, signatures);
+            this.checkedMethodNames.put(methodName, signatures);
         }
     }
 
@@ -498,21 +490,21 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         }
 
         /**
-         * Serves the request. The request should be removed from the request
-         * queue before serving, which is correctly done by all methods of the
-         * Service class. However, this condition is not ensured for custom
-         * calls on serve.
+         * Serves the request. The request should be removed from the request queue before serving,
+         * which is correctly done by all methods of the Service class. However, this condition is
+         * not ensured for custom calls on serve.
          */
         public void serve(Request request) {
             if (Profiling.TIMERS_COMPILED) {
-                TimerWarehouse.startServeTimer(bodyID, request.getMethodCall().getReifiedMethod());
+                TimerWarehouse.startServeTimer(BodyImpl.this.bodyID, request.getMethodCall()
+                        .getReifiedMethod());
             }
 
             // push the new context
             LocalBodyStore.getInstance().pushContext(new Context(BodyImpl.this, request));
 
             try {
-                serveInternal(request);
+                this.serveInternal(request);
             } finally {
                 LocalBodyStore.getInstance().popContext();
             }
@@ -527,20 +519,20 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                 return;
             }
 
-            if (!isProActiveInternalObject) {
-                if (((RequestReceiverImpl) requestReceiver).immediateExecution(request)) {
-                    debugger.breakpoint(BreakpointType.NewImmediateService, request);
+            if (!BodyImpl.this.isProActiveInternalObject) {
+                if (((RequestReceiverImpl) BodyImpl.this.requestReceiver).immediateExecution(request)) {
+                    BodyImpl.this.debugger.breakpoint(BreakpointType.NewImmediateService, request);
                 } else {
-                    debugger.breakpoint(BreakpointType.NewService, request);
+                    BodyImpl.this.debugger.breakpoint(BreakpointType.NewService, request);
                 }
             }
 
             // JMX Notification
-            if (!isProActiveInternalObject && (mbean != null)) {
+            if (!BodyImpl.this.isProActiveInternalObject && (BodyImpl.this.mbean != null)) {
                 RequestNotificationData data = new RequestNotificationData(request.getSourceBodyID(), request
                         .getSenderNodeURL(), BodyImpl.this.bodyID, BodyImpl.this.nodeURL, request
-                        .getMethodName(), getRequestQueue().size());
-                mbean.sendNotification(NotificationType.servingStarted, data);
+                        .getMethodName(), this.getRequestQueue().size());
+                BodyImpl.this.mbean.sendNotification(NotificationType.servingStarted, data);
             }
 
             // END JMX Notification
@@ -548,16 +540,17 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
 
             // If the request is not a "terminate Active Object" request,
             // it is served normally.
-            if (!isTerminateAORequest(request)) {
+            if (!this.isTerminateAORequest(request)) {
                 reply = request.serve(BodyImpl.this);
             }
 
-            if (!isProActiveInternalObject) {
+            if (!BodyImpl.this.isProActiveInternalObject) {
                 try {
-                    if (isInImmediateService())
-                        debugger.breakpoint(BreakpointType.EndImmediateService, request);
-                    else
-                        debugger.breakpoint(BreakpointType.EndService, request);
+                    if (BodyImpl.this.isInImmediateService()) {
+                        BodyImpl.this.debugger.breakpoint(BreakpointType.EndImmediateService, request);
+                    } else {
+                        BodyImpl.this.debugger.breakpoint(BreakpointType.EndService, request);
+                    }
                 } catch (IOException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -565,17 +558,17 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             }
 
             if (reply == null) {
-                if (!isActive()) {
+                if (!BodyImpl.this.isActive()) {
                     return; // test if active in case of terminate() method
                     // otherwise eventProducer would be null
                 }
 
                 // JMX Notification
-                if (!isProActiveInternalObject && (mbean != null)) {
+                if (!BodyImpl.this.isProActiveInternalObject && (BodyImpl.this.mbean != null)) {
                     RequestNotificationData data = new RequestNotificationData(request.getSourceBodyID(),
                         request.getSenderNodeURL(), BodyImpl.this.bodyID, BodyImpl.this.nodeURL, request
-                                .getMethodName(), getRequestQueue().size());
-                    mbean.sendNotification(NotificationType.voidRequestServed, data);
+                                .getMethodName(), this.getRequestQueue().size());
+                    BodyImpl.this.mbean.sendNotification(NotificationType.voidRequestServed, data);
                 }
 
                 // END JMX Notification
@@ -587,11 +580,11 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             }
 
             // JMX Notification
-            if (!isProActiveInternalObject && (mbean != null)) {
+            if (!BodyImpl.this.isProActiveInternalObject && (BodyImpl.this.mbean != null)) {
                 RequestNotificationData data = new RequestNotificationData(request.getSourceBodyID(), request
                         .getSenderNodeURL(), BodyImpl.this.bodyID, BodyImpl.this.nodeURL, request
-                        .getMethodName(), getRequestQueue().size());
-                mbean.sendNotification(NotificationType.replySent, data);
+                        .getMethodName(), this.getRequestQueue().size());
+                BodyImpl.this.mbean.sendNotification(NotificationType.replySent, data);
             }
 
             // END JMX Notification
@@ -614,14 +607,14 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                         this.retrySendReplyWithException(reply, e1, request.getSender());
                     } catch (Exception retryException1) {
                         // the stacktraced exception must be the first one
-                        sendReplyExceptionsLogger.error(e1.getMessage(), e1);
+                        UniversalBody.sendReplyExceptionsLogger.error(e1.getMessage(), e1);
                     }
                 } catch (ProActiveRuntimeException e2) {
                     try {
                         this.retrySendReplyWithException(reply, e2, request.getSender());
                     } catch (Exception retryException2) {
                         // the stacktraced exception must be the first one
-                        sendReplyExceptionsLogger.error(e2.getMessage(), e2);
+                        UniversalBody.sendReplyExceptionsLogger.error(e2.getMessage(), e2);
                     }
                 }
             }
@@ -643,7 +636,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
 
         public void sendRequest(MethodCall methodCall, Future future, UniversalBody destinationBody)
                 throws IOException, RenegotiateSessionException, CommunicationForbiddenException {
-            long sequenceID = getNextSequenceID();
+            long sequenceID = this.getNextSequenceID();
             Request request = this.internalRequestFactory.newRequest(methodCall, BodyImpl.this,
                     future == null, sequenceID);
 
@@ -661,7 +654,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             // TODO Write this section, after the commit of Arnaud
             // TODO Send a notification only if the destination doesn't
             // implement ProActiveInternalObject
-            if (!isProActiveInternalObject && (mbean != null)) {
+            if (!BodyImpl.this.isProActiveInternalObject && (BodyImpl.this.mbean != null)) {
                 ServerConnector serverConnector = ProActiveRuntimeImpl.getProActiveRuntime()
                         .getJMXServerConnector();
 
@@ -671,9 +664,10 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                     UniqueID connectorID = serverConnector.getUniqueID();
 
                     if (!connectorID.equals(destinationBody.getID())) {
-                        mbean.sendNotification(NotificationType.requestSent, new RequestNotificationData(
-                            BodyImpl.this.bodyID, BodyImpl.this.getNodeURL(), destinationBody.getID(),
-                            destinationBody.getNodeURL(), methodCall.getName(), -1));
+                        BodyImpl.this.mbean.sendNotification(NotificationType.requestSent,
+                                new RequestNotificationData(BodyImpl.this.bodyID, BodyImpl.this.getNodeURL(),
+                                    destinationBody.getID(), destinationBody.getNodeURL(), methodCall
+                                            .getName(), -1));
                     }
                 }
             }
@@ -689,11 +683,9 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         }
 
         /**
-         * Returns a unique identifier that can be used to tag a future, a
-         * request
+         * Returns a unique identifier that can be used to tag a future, a request
          * 
-         * @return a unique identifier that can be used to tag a future, a
-         *         request.
+         * @return a unique identifier that can be used to tag a future, a request.
          */
         public synchronized long getNextSequenceID() {
             return BodyImpl.this.bodyID.toString().hashCode() + ++this.absoluteSequenceID;
@@ -704,19 +696,18 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         //
 
         /**
-         * Test if the MethodName of the request is "terminateAO" or
-         * "terminateAOImmediately". If true, AbstractBody.terminate() is called
+         * Test if the MethodName of the request is "terminateAO" or "terminateAOImmediately". If
+         * true, AbstractBody.terminate() is called
          * 
          * @param request
          *            The request to serve
-         * @return true if the name of the method is "terminateAO" or
-         *         "terminateAOImmediately".
+         * @return true if the name of the method is "terminateAO" or "terminateAOImmediately".
          */
         private boolean isTerminateAORequest(Request request) {
             boolean terminateRequest = (request.getMethodName()).startsWith("_terminateAO");
 
             if (terminateRequest) {
-                terminate();
+                BodyImpl.this.terminate();
             }
 
             return terminateRequest;

@@ -9,7 +9,6 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
@@ -39,22 +38,14 @@ public class TestOverlay {
 
     @BeforeClass
     public static void setUpBeforeClass() throws Exception {
-        TestOverlay.firstPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
-                new Object[] { OverlayType.CAN });
-        TestOverlay.secondPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
-                new Object[] { OverlayType.CAN });
-        TestOverlay.thirdPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
-                new Object[] { OverlayType.CAN });
-        TestOverlay.fourthPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
-                new Object[] { OverlayType.CAN });
-        TestOverlay.fifthPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
-                new Object[] { OverlayType.CAN });
-        TestOverlay.sixthPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
-                new Object[] { OverlayType.CAN });
-        TestOverlay.seventhPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
-                new Object[] { OverlayType.CAN });
-        TestOverlay.eighthPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
-                new Object[] { OverlayType.CAN });
+        TestOverlay.firstPeer = Peer.newActivePeer(OverlayType.CAN);
+        TestOverlay.secondPeer = Peer.newActivePeer(OverlayType.CAN);
+        TestOverlay.thirdPeer = Peer.newActivePeer(OverlayType.CAN);
+        TestOverlay.fourthPeer = Peer.newActivePeer(OverlayType.CAN);
+        TestOverlay.fifthPeer = Peer.newActivePeer(OverlayType.CAN);
+        TestOverlay.sixthPeer = Peer.newActivePeer(OverlayType.CAN);
+        TestOverlay.seventhPeer = Peer.newActivePeer(OverlayType.CAN);
+        TestOverlay.eighthPeer = Peer.newActivePeer(OverlayType.CAN);
     }
 
     @AfterClass

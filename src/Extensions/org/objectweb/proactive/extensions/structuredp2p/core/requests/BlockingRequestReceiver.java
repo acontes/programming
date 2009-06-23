@@ -1,4 +1,4 @@
-package org.objectweb.proactive.extensions.structuredp2p.core;
+package org.objectweb.proactive.extensions.structuredp2p.core.requests;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.request.Request;
@@ -18,15 +18,18 @@ public class BlockingRequestReceiver extends org.objectweb.proactive.core.body.r
     boolean acceptReception = true;
 
     /**
+     * Constructor.
+     */
+    public BlockingRequestReceiver() {
+        super();
+    }
+
+    /**
      * {@inheritDoc}
      */
     public int receiveRequest(Request request, Body bodyReceiver) {
         if (!this.acceptReception) {
-            try {
-                throw new IllegalAccessException();
-            } catch (Exception e) {
-            }
-            return 0;
+            throw new BlockingRequestReceiverException(this.getClass().getName());
         } else {
             return super.receiveRequest(request, bodyReceiver);
         }
