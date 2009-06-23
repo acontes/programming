@@ -2,6 +2,10 @@ package org.objectweb.proactive.extra.vfsprovider.exceptions;
 
 public class WrongStreamTypeException extends Exception {
 
+    public WrongStreamTypeException() {
+        super("Operation not allowed for this stream type");
+    }
+
     /**
      * 
      */
