@@ -2,14 +2,18 @@ package org.objectweb.proactive.extensions.structuredp2p.core;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
+import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
@@ -48,7 +52,7 @@ public class Peer implements InitActive, RunActive, Serializable {
     /**
      * Responses associated to the oneWay search on the network.
      */
-    private HashMap<UUID, QueryResponse> oneWayResponses = new HashMap<UUID, QueryResponse>();
+    private Map<UUID, QueryResponse> oneWayResponses = new HashMap<UUID, QueryResponse>();
 
     /**
      * The type of the overlay which is used by the peer. The type is equal to one of
@@ -281,7 +285,43 @@ public class Peer implements InitActive, RunActive, Serializable {
         return false;
     }
 
-    public HashMap<UUID, QueryResponse> getOneWayResponses() {
+    /**
+     * Returns the oneWay responses.
+     * 
+     * @return the oneWay responses.
+     */
+    public Map<UUID, QueryResponse> getOneWayResponses() {
         return this.oneWayResponses;
     }
+
+    /**
+     * Create a new Peer ActiveObject.
+     * 
+     * @param type
+     *            the type of the peer, which is one of {@link OverlayType}.
+     * @param node
+     *            the node used by the peer.
+     * @return the new Peer object created.
+     * @throws ActiveObjectCreationException
+     * @throws NodeException
+     */
+    public static Peer newActivePeer(OverlayType type, Node node) throws ActiveObjectCreationException,
+            NodeException {
+        return (Peer) PAActiveObject.newActive(Peer.class.getName(), null, new Object[] { type }, node, null,
+                null);
+    }
+
+    /**
+     * Create a new Peer ActiveObject.
+     * 
+     * @param type
+     *            the type of the peer, which is one of {@link OverlayType}.
+     * @return the new Peer object created.
+     * @throws ActiveObjectCreationException
+     * @throws NodeException
+     */
+    public static Peer newActivePeer(OverlayType type) throws ActiveObjectCreationException, NodeException {
+        return Peer.newActivePeer(type, null);
+    }
+
 }

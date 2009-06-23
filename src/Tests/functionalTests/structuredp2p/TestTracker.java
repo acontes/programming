@@ -26,8 +26,7 @@ public class TestTracker {
     @BeforeClass
     public static void setUp() throws Exception {
         try {
-            TestTracker.tracker = (Tracker) PAActiveObject.newActive(Tracker.class.getName(),
-                    new Object[] { OverlayType.CAN });
+            TestTracker.tracker = Tracker.newActiveTracker(OverlayType.CAN);
             // Binds the tracker to a specific URL on the RMI registry
             PAActiveObject.registerByName(TestTracker.tracker, "TestTracker");
         } catch (ActiveObjectCreationException e) {
@@ -41,7 +40,7 @@ public class TestTracker {
 
     @Test(expected = java.lang.IllegalArgumentException.class)
     public void testAddOnNetworkWithWrongPeerType() throws ActiveObjectCreationException, NodeException {
-        Peer peer = (Peer) PAActiveObject.newActive(Peer.class.getName(), new Object[] { OverlayType.CHORD });
+        Peer peer = Peer.newActivePeer(OverlayType.CHORD);
         TestTracker.tracker.addOnNetwork(peer.getStub());
     }
 
@@ -53,8 +52,7 @@ public class TestTracker {
 
     @Test
     public void testAddOnNetworkWithCorrectPeerType() throws ActiveObjectCreationException, NodeException {
-        TestTracker.peer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
-                new Object[] { OverlayType.CAN });
+        TestTracker.peer = Peer.newActivePeer(OverlayType.CAN);
         TestTracker.tracker.addOnNetwork(TestTracker.peer.getStub());
 
         Assert.assertEquals(1, TestTracker.tracker.getNumberOfManagedPeers());

@@ -5,7 +5,6 @@ import junit.framework.Assert;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
@@ -34,14 +33,10 @@ public class TestQuery {
 
     @BeforeClass
     public static void setUp() throws Exception {
-        TestQuery.firstPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
-                new Object[] { OverlayType.CAN });
-        TestQuery.secondPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
-                new Object[] { OverlayType.CAN });
-        TestQuery.thirdPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
-                new Object[] { OverlayType.CAN });
-        TestQuery.fourthPeer = (Peer) PAActiveObject.newActive(Peer.class.getName(),
-                new Object[] { OverlayType.CAN });
+        TestQuery.firstPeer = Peer.newActivePeer(OverlayType.CAN);
+        TestQuery.secondPeer = Peer.newActivePeer(OverlayType.CAN);
+        TestQuery.thirdPeer = Peer.newActivePeer(OverlayType.CAN);
+        TestQuery.fourthPeer = Peer.newActivePeer(OverlayType.CAN);
 
         try {
             TestQuery.secondPeer.join(TestQuery.firstPeer);
@@ -57,12 +52,13 @@ public class TestQuery {
     }
 
     @Test
-    public void testMySearch() {
+    public void testBasicSearch() {
         QueryResponse response = TestQuery.firstPeer.search(TestQuery.query);
 
         Assert.assertTrue(response.getLatency() > 1);
         Assert.assertTrue(response.getNbSteps() > 0);
         Assert.assertTrue(response.getNbStepsForSend() > 0);
+        Assert.assertEquals(TestQuery.thirdPeer, response.getRemotePeerFound());
     }
 
     @AfterClass

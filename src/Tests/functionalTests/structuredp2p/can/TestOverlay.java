@@ -3,6 +3,8 @@
  */
 package functionalTests.structuredp2p.can;
 
+import java.util.Random;
+
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -11,6 +13,8 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
+import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.QueryResponse;
+import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can.RDFQuery;
 
 
 /**
@@ -188,28 +192,33 @@ public class TestOverlay {
         Assert.assertFalse(TestOverlay.getOverlay(TestOverlay.thirdPeer).hasNeighbor(TestOverlay.thirdPeer));
     }
 
-    /*
-     * @IgnoreTe public void testSendMessage() { Peer[] peers = new Peer[] { TestOverlay.firstPeer,
-     * TestOverlay.secondPeer, TestOverlay.thirdPeer, TestOverlay.fifthPeer, TestOverlay.sixthPeer,
-     * TestOverlay.seventhPeer, TestOverlay.eighthPeer };
-     * 
-     * Random rand = new Random();
-     * 
-     * for (int i = 3; i < peers.length; i++) { try { peers[i].join(peers[rand.nextInt(i)]); } catch
-     * (Exception e) { e.printStackTrace(); } }
-     * 
-     * Peer toFind = peers[rand.nextInt(peers.length)]; Peer sender =
-     * peers[rand.nextInt(peers.length)];
-     * 
-     * RDFQuery msg = new RDFQuery(TestOverlay.getOverlay(toFind).getZone().getCoordinatesMin(),
-     * TestOverlay .getOverlay(sender).getZone().getCoordinatesMin());
-     * 
-     * QueryResponse response = sender.search(msg);
-     * 
-     * Assert.assertEquals(TestOverlay.getOverlay(toFind).getZone(), TestOverlay.getOverlay(
-     * response.getRemotePeerFound()).getZone()); Assert.assertEquals(toFind,
-     * response.getRemotePeerFound()); }
-     */
+    @Test
+    public void testSendMessage() {
+        Peer[] peers = new Peer[] { TestOverlay.firstPeer, TestOverlay.secondPeer, TestOverlay.thirdPeer,
+                TestOverlay.fifthPeer, TestOverlay.sixthPeer, TestOverlay.seventhPeer, TestOverlay.eighthPeer };
+
+        Random rand = new Random();
+
+        for (int i = 3; i < peers.length; i++) {
+            try {
+                peers[i].join(peers[rand.nextInt(i)]);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        Peer toFind = peers[rand.nextInt(peers.length)];
+        Peer sender = peers[rand.nextInt(peers.length)];
+
+        RDFQuery msg = new RDFQuery(TestOverlay.getOverlay(toFind).getZone().getCoordinatesMin(), TestOverlay
+                .getOverlay(sender).getZone().getCoordinatesMin());
+
+        QueryResponse response = sender.search(msg);
+
+        Assert.assertEquals(TestOverlay.getOverlay(toFind).getZone(), TestOverlay.getOverlay(
+                response.getRemotePeerFound()).getZone());
+        Assert.assertEquals(toFind, response.getRemotePeerFound());
+    }
 
     @Test
     public void leaveAll() {

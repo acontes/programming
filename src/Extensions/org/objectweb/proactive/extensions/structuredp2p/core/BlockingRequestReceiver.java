@@ -22,7 +22,10 @@ public class BlockingRequestReceiver extends org.objectweb.proactive.core.body.r
      */
     public int receiveRequest(Request request, Body bodyReceiver) {
         if (!this.acceptReception) {
-            // TODO Throws my SUPER EXCEPTION
+            try {
+                throw new IllegalAccessException();
+            } catch (Exception e) {
+            }
             return 0;
         } else {
             return super.receiveRequest(request, bodyReceiver);

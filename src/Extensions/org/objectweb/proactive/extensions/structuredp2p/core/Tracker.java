@@ -4,6 +4,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
 
@@ -101,5 +104,19 @@ public class Tracker implements Serializable {
      */
     public int getNumberOfManagedPeers() {
         return this.remotePeers.size();
+    }
+
+    /**
+     * Create a new Tracker ActiveObject.
+     * 
+     * @param type
+     *            the type of the peer, which is one of {@link OverlayType}.
+     * @return the new Peer object created.
+     * @throws ActiveObjectCreationException
+     * @throws NodeException
+     */
+    public static Tracker newActiveTracker(OverlayType type) throws ActiveObjectCreationException,
+            NodeException {
+        return (Tracker) PAActiveObject.newActive(Tracker.class.getName(), new Object[] { type });
     }
 }
