@@ -6,26 +6,46 @@ import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemOptions;
 import org.apache.commons.vfs.provider.AbstractFileSystem;
+import org.objectweb.proactive.extra.vfsprovider.protocol.FileSystemServer;
 
 
 public class ProActiveFileSystem extends AbstractFileSystem {
+    private FileSystemServer server;
 
-    protected ProActiveFileSystem(FileName rootName, FileObject parentLayer,
-            FileSystemOptions fileSystemOptions) {
-        super(rootName, parentLayer, fileSystemOptions);
-        // TODO Auto-generated constructor stub
+    protected ProActiveFileSystem(FileName rootName, FileSystemOptions fileSystemOptions) {
+        super(rootName, null, fileSystemOptions);
+        this.server = createServerStub();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    protected void addCapabilities(Collection caps) {
+        caps.addAll(ProActiveFileProvider.CAPABILITIES);
     }
 
     @Override
-    protected void addCapabilities(Collection arg0) {
-        // TODO Auto-generated method stub
-
+    protected FileObject createFile(FileName name) throws Exception {
+        return new ProActiveFileObject(name, this);
     }
 
+    protected FileSystemServer getServer() {
+        synchronized (this) {
+            if (server == null) {
+                server = createServerStub();
+            }
+            return server;
+        }
+    }
+
+    // always called within synchronized (this)
     @Override
-    protected FileObject createFile(FileName arg0) throws Exception {
-        // TODO Auto-generated method stub
+    protected void doCloseCommunicationLink() {
+        server = null;
+    }
+
+    private FileSystemServer createServerStub() {
+        final String serverURL = ((ProActiveFileName) getRootName()).getServerURL();
+        // TODO
         return null;
     }
-
 }
