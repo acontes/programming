@@ -1,20 +1,34 @@
 package org.objectweb.proactive.extra.vfsprovider.server;
 
+import java.io.IOException;
+
+import org.objectweb.proactive.extra.vfsprovider.exceptions.WrongStreamTypeException;
+
+
+/**
+ * Interface defining a set of operations that can be performed on a file stream from
+ * {@link FileSystemServerImpl}.
+ * <p>
+ * Implementations of this interface adapt variety of streams, hence
+ * {@link WrongStreamTypeException} is thrown when particular operation is not supported. Methods
+ * without {@link WrongStreamTypeException} in their <code>throws</code> clause must be supported by
+ * each implementation.
+ * <p>
+ * Implementations of this interface are thread-safe.
+ */
 public interface Stream {
 
-    void close();
+    public abstract void close() throws IOException;
 
-    long getLength();
+    public abstract long getLength() throws IOException, WrongStreamTypeException;
 
-    long getPosition();
+    public abstract long getPosition() throws IOException, WrongStreamTypeException;
 
-    byte[] read(long bytes);
+    public abstract byte[] read(int bytes) throws IOException, WrongStreamTypeException;
 
-    void seek(long position);
+    public abstract void seek(long position) throws IOException, WrongStreamTypeException;
 
-    long skip(long bytes);
+    public abstract long skip(int bytes) throws IOException, WrongStreamTypeException;
 
-    int write(byte[] data);
-
-    void open();
+    public abstract void write(byte[] data) throws IOException, WrongStreamTypeException;
 }
