@@ -68,9 +68,17 @@ public class RandomAccessStreamAdapter implements Stream {
     }
 
     public void write(byte[] data) throws IOException, WrongStreamTypeException {
+        assureIsWritable();
+        randomFile.write(data);
+    }
+
+    public void flush() throws IOException, WrongStreamTypeException {
+        assureIsWritable();
+        randomFile.getChannel().force(true);
+    }
+
+    private void assureIsWritable() throws WrongStreamTypeException {
         if (!writable)
             throw new WrongStreamTypeException();
-
-        randomFile.write(data);
     }
 }

@@ -44,4 +44,8 @@ public class OutputStreamAdapter implements Stream {
     public void write(byte[] data) throws IOException, WrongStreamTypeException {
         adaptee.write(data);
     }
+
+    public void flush() throws IOException, WrongStreamTypeException {
+        adaptee.flush();
+    }
 }

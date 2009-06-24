@@ -49,4 +49,8 @@ public class InputStreamAdapter implements Stream {
     public void write(byte[] data) throws WrongStreamTypeException {
         throw new WrongStreamTypeException();
     }
+
+    public void flush() throws WrongStreamTypeException {
+        throw new WrongStreamTypeException();
+    }
 }
