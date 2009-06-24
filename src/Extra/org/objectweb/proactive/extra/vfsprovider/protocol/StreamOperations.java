@@ -29,7 +29,7 @@ public interface StreamOperations {
      * invoke.
      * 
      * @param path
-     *            of a file whose stream is to be open
+     *            of a file whose stream is to be open, cannot be <code>null</code>
      * @param mode
      *            of a stream to be open, cannot be <code>null</code>
      * @return generated stream id that may be used later in the other method calls, the id is
@@ -67,7 +67,7 @@ public interface StreamOperations {
      * @param stream
      *            an unique id of an open stream
      * @param data
-     *            array of bytes that is to be written
+     *            array of bytes that is to be written, cannot be <code>null</code>
      * @throws IOException
      *             if an I/O error occurred while performing this method
      * @throws StreamNotFoundException
