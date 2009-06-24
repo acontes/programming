@@ -17,9 +17,7 @@ import org.objectweb.proactive.extra.vfsprovider.protocol.FileType;
 import org.objectweb.proactive.extra.vfsprovider.protocol.StreamMode;
 
 
-// TODO paths..
 //TODO auto close of opened and unused streams
-// TODO finish javadoc..
 /**
  * Implements remote file system protocol defined in {@link FileSystemServer} interface.
  * <p>
@@ -29,15 +27,38 @@ import org.objectweb.proactive.extra.vfsprovider.protocol.StreamMode;
  * Operations performed on {@link #streams} map are synchronized on <code>this</code> lock. To
  * fulfill protocol's thread-safety, an explicit {@link Stream} operations synchronization is
  * required with double checking if map contains an open stream.
+ * <p>
+ * File managing related operations implementation base on {@link File} class.
  * 
  * @see FileSystemServer
  * @see Stream
  */
 public class FileSystemServerImpl implements FileSystemServer {
 
+    private static final char SEPARATOR_TO_REPLACE = File.separatorChar == '\\' ? '/' : '\\';
+
     private final Map<Long, Stream> streams = new HashMap<Long, Stream>();
 
+    private final File rootFile;
+
+    private final String rootCanonicalPath;
+
     private long idGenerator = 0;
+
+    /**
+     * TODO javadoc
+     *
+     * @param rootPath
+     * @throws IOException
+     */
+    public FileSystemServerImpl(String rootPath) throws IOException {
+        rootFile = new File(rootPath);
+        if (!rootFile.isDirectory())
+            if (!rootFile.mkdirs())
+                throw new IOException("Root directory does not exist and unable to create such");
+
+        rootCanonicalPath = rootFile.getCanonicalPath();
+    }
 
     public long streamOpen(String path, StreamMode mode) throws IOException {
         final Stream instance;
@@ -214,10 +235,23 @@ public class FileSystemServerImpl implements FileSystemServer {
         }
     }
 
-    // FIXME
-    private File resolvePath(String relative) {
-        final String ROOT = "/";
-        return new File(ROOT + relative);
+    /*
+     * Replace not-platform-like separators and check if path is valid.
+     */
+    private File resolvePath(String absolute) throws IOException {
+        final String path = absolute.replace(SEPARATOR_TO_REPLACE, File.separatorChar);
+        checkConditionIsTrue(path.startsWith(File.separator), "Provided path is not absolut");
+        final File file = new File(rootFile, path);
+        final String canonicalPath;
+
+        try {
+            canonicalPath = file.getCanonicalPath();
+        } catch (SecurityException sec) {
+            throw new IOException(sec);
+        }
+        if (!canonicalPath.startsWith(rootCanonicalPath))
+            throw new IOException("Provided path is out of file system tree scope");
+        return file;
     }
 
     private void checkConditionIsTrue(boolean condition, String message) throws IOException {
