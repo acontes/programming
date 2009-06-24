@@ -32,7 +32,7 @@ public interface FileOperations {
      * <p>
      * Returned set of information of a single or all files may be not coherent, as the simultaneous
      * file system operations, that can change attributes while reading, are not prohibited.
-     * 
+     *
      * @param path
      *            of a file, cannot be <code>null</code>
      * @return map of names and file information of child files and directories, may be empty if the
@@ -78,7 +78,7 @@ public interface FileOperations {
      * check the postcondition, that the file does not exist.
      * <p>
      * Note: The postcondition check may be influenced by any concurrent file system operation.
-     * 
+     *
      * @param path
      *            of a file that is to be deleted, cannot be <code>null</code>
      * @param recursive
@@ -109,7 +109,7 @@ public interface FileOperations {
      * <p>
      * Precision of the "last modified time" property is related to the particular file system,
      * although all platforms support file's last modification time to the nearest second.
-     * 
+     *
      * @param path
      *            path of a file to rename, cannot be <code>null</code>
      * @param time

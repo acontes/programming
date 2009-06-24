@@ -123,7 +123,7 @@ public class FileSystemServerImpl implements FileSystemServer {
                 file.createNewFile();
                 checkConditionIsTrue(file.isFile(), "File creation failed");
             }
-        } catch (SecurityException sec) { 
+        } catch (SecurityException sec) {
             throw new IOException(sec);
         }
     }
@@ -151,7 +151,7 @@ public class FileSystemServerImpl implements FileSystemServer {
     public Set<String> fileListChildren(String path) throws IOException {
         final File file = resolvePath(path);
         final String[] list;
-        
+
         try {
             list = file.list();
         } catch (SecurityException sec) {
@@ -166,7 +166,7 @@ public class FileSystemServerImpl implements FileSystemServer {
         final File file = resolvePath(path);
         final File[] children;
         final Map<String, FileInfo> infos;
-        
+
         try {
             children = file.listFiles();
         } catch (SecurityException sec) {
