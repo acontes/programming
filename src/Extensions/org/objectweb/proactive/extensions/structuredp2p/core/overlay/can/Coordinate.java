@@ -1,7 +1,6 @@
 package org.objectweb.proactive.extensions.structuredp2p.core.overlay.can;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 
 
 /**
@@ -15,128 +14,72 @@ import java.math.BigDecimal;
  * @version 0.1
  */
 @SuppressWarnings("serial")
-public class Coordinate implements Serializable {
+public abstract class Coordinate implements Comparable<Coordinate>, Serializable {
 
-    /**
-     * The content of the coordinate.
-     */
-    private final String value;
+    private String value;
 
     /**
      * Constructor.
-     * 
-     * @param value
-     *            the value used in order to initialized the coordinate.
      */
     public Coordinate(String value) {
         this.value = value;
     }
 
-    /**
-     * Returns the content of the coordinate.
-     * 
-     * @return the content of the coordinate.
-     */
-    public String getValue() {
-        return this.value;
-    }
+    public abstract int compareTo(Coordinate coordinate);
 
-    /**
-     * Returns the middle between two coordinates.
-     * 
-     * @param min
-     *            the coordinate min.
-     * @param max
-     *            the coordinate max.
-     * @return the middle between two coordinates.
-     */
-    public static Coordinate getMiddle(Coordinate min, Coordinate max) {
-        return new Coordinate((new BigDecimal(min.getValue()).add(new BigDecimal(max.getValue()))
-                .divide(new BigDecimal(2))).toString());
-    }
+    public abstract Coordinate getMiddleWith(Coordinate coordinate);
 
-    /**
-     * Returns the maximum coordinate between the specified coordinates.
+    /*
+     * * Says if the this coordinate is between twice in argument.
      * 
-     * @param coord1
-     *            the first coordinate.
-     * @param coord2
-     *            the second coordinate.
-     * @return the coordinate which is the greatest between the two coordinates.
-     */
-    public static Coordinate max(Coordinate coord1, Coordinate coord2) {
-        if (coord1.compareTo(coord2) > 0) {
-            return coord1;
-        } else {
-            return coord2;
-        }
-    }
-
-    /**
-     * Returns the minimum coordinate between the specified coordinates.
+     * @param coord1 a coordinate
      * 
-     * @param coord1
-     *            the first coordinate.
-     * @param coord2
-     *            the second coordinate.
-     * @return the coordinate which is the smallest between the two coordinates.
+     * @param coord2 a coordinate
      */
-    public static Coordinate min(Coordinate coord1, Coordinate coord2) {
-        if (coord1.compareTo(coord2) < 0) {
-            return coord1;
-        } else {
-            return coord2;
-        }
-    }
-
-    /**
-     * Compares two coordinates.
-     * 
-     * @param coord
-     *            the value to compare with.
-     * @return The value <code>0</code> if the argument coordinate is equal to this coordinate; a
-     *         value less than <code>0</code> if this coordinate is lexicographically less than the
-     *         coordinate argument; and a value greater than <code>0</code> if this coordinate is
-     *         lexicographically greater than the coordinate argument.
-     */
-    public int compareTo(Coordinate coord) {
-        return new BigDecimal(this.getValue()).compareTo(new BigDecimal(coord.getValue()));
-    }
-
-    /**
-     * Says if the this coordinate is between twice in argument.
-     * 
-     * @param coord1
-     *            a coordinate
-     * @param coord2
-     *            a coordinate
-     */
-    public boolean isBetween(Coordinate coord1, Coordinate coord2) {
-        if (coord1.compareTo(coord2) < 0) {
-            return (this.compareTo(coord1) >= 0) && (this.compareTo(coord2) < 0);
-        } else if (coord1.compareTo(coord2) > 0) {
-            return (this.compareTo(coord2) >= 0) && (this.compareTo(coord1) < 0);
+    public static boolean isBetween(Coordinate current, Coordinate a, Coordinate b) {
+        if (a.compareTo(b) < 0) {
+            return (current.compareTo(a) >= 0) && (current.compareTo(b) < 0);
+        } else if (a.compareTo(b) > 0) {
+            return (current.compareTo(b) >= 0) && (current.compareTo(a) < 0);
         }
 
         return false;
     }
 
     /**
-     * {@inheritDoc}
+     * 
      */
-    public String toString() {
-        return this.getValue();
+    public static Coordinate min(Coordinate coord1, Coordinate coord2) {
+        if (coord1.compareTo(coord2) < 0) {
+            return (coord1);
+        } else {
+            return (coord2);
+        }
     }
 
-    /**
-     * {@inheritDoc}
+    /***
+     * 
      */
-    public boolean equals(Object o) {
-        if (!(o instanceof Coordinate)) {
+    public static Coordinate max(Coordinate coord1, Coordinate coord2) {
+        if (coord1.compareTo(coord2) > 0) {
+            return (coord1);
+        } else {
+            return coord2;
+        }
+    }
+
+    public String getValue() {
+        return this.value;
+    }
+
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Coordinate)) {
             throw new IllegalArgumentException();
         }
+        return this.value.equals(((Coordinate) obj).getValue());
+    }
 
-        Coordinate coord = (Coordinate) o;
-        return new BigDecimal(this.value).equals(new BigDecimal(coord.getValue()));
+    public String toString() {
+        return this.getValue();
     }
 }

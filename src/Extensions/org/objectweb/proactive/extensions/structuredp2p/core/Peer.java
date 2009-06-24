@@ -2,10 +2,8 @@ package org.objectweb.proactive.extensions.structuredp2p.core;
 
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.Vector;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
@@ -20,6 +18,7 @@ import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.chord.ChordOverlay;
+import org.objectweb.proactive.extensions.structuredp2p.core.requests.BlockingRequestReceiverException;
 import org.objectweb.proactive.extensions.structuredp2p.core.requests.StructuredMetaObjectFactory;
 import org.objectweb.proactive.extensions.structuredp2p.data.DataStorage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.Message;
@@ -32,6 +31,10 @@ import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.R
  * Defines a peer which connects itself in structured network. The network topology is one of
  * {@link OverlayType}.
  * 
+ * This class must never be instantiate directly. In order to create a new active peer you must use
+ * the static functions {@link #newActivePeer(OverlayType)} and
+ * {@link #newActivePeer(OverlayType, Node)}.
+ * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent
  * @author Trovato Alexandre
@@ -42,12 +45,6 @@ import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.R
 public class Peer implements InitActive, RunActive, Serializable {
 
     /**
-     * The timeout to wait before to check neighbors via the call of
-     * {@link StructuredOverlay#checkNeighbors()}.
-     */
-    public static final int CHECK_NEIGHBORS_TIMEOUT = 7777;
-
-    /**
      * The structured protocol which is used by the peer.
      */
     private StructuredOverlay structuredOverlay;
@@ -56,11 +53,6 @@ public class Peer implements InitActive, RunActive, Serializable {
      * Responses associated to the oneWay search on the network.
      */
     private Map<UUID, QueryResponse> oneWayResponses = new HashMap<UUID, QueryResponse>();
-
-    /**
-     * Queries which are bufferized when a {@link Peer#sendTo(Peer, Message)} is not accepted.
-     */
-    private List<Query> bufferizedQueries = new Vector<Query>();
 
     /**
      * The type of the overlay which is used by the peer. The type is equal to one of
@@ -142,8 +134,18 @@ public class Peer implements InitActive, RunActive, Serializable {
      * @throws Exception
      *             this exception appears when a message cannot be send to a peer.
      */
-    public ResponseMessage sendTo(Peer remotePeer, Message msg) throws Exception {
-        return remotePeer.receiveMessage(msg);
+    public ResponseMessage sendTo(Peer remotePeer, Message msg) {
+        ResponseMessage response = null;
+        try {
+            response = remotePeer.receiveMessage(msg);
+        } catch (BlockingRequestReceiverException e) {
+            System.out.println("SENDTO");
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return response;
     }
 
     /**
@@ -250,9 +252,9 @@ public class Peer implements InitActive, RunActive, Serializable {
 
         Service service = new Service(body);
         while (body.isActive()) {
-            Request req = service.blockingRemoveOldest(Peer.CHECK_NEIGHBORS_TIMEOUT);
+            Request req = service.blockingRemoveOldest(StructuredOverlay.UPDATE_TIMEOUT);
             if (req == null) {
-                // this.structuredOverlay.checkNeighbors();
+                this.structuredOverlay.update();
             } else {
                 service.serve(req);
             }
@@ -293,16 +295,6 @@ public class Peer implements InitActive, RunActive, Serializable {
      */
     public Map<UUID, QueryResponse> getOneWayResponses() {
         return this.oneWayResponses;
-    }
-
-    /**
-     * Bufferize a new query that will be performed at the time of the next checking.
-     * 
-     * @param query
-     *            the query to bufferize.
-     */
-    public void bufferizeQuery(Query query) {
-        this.bufferizedQueries.add(query);
     }
 
     /**

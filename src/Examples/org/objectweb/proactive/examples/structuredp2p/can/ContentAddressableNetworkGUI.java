@@ -21,6 +21,7 @@ import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.Coordinate;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.LexicographicCoordinate;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.Zone;
 
 
@@ -126,7 +127,7 @@ public class ContentAddressableNetworkGUI extends JFrame implements Observer {
 
             for (Peer peer : ContentAddressableNetworkGUI.this.peerLauncher.getRemotePeers()) {
                 if (((CANOverlay) peer.getStructuredOverlay()).contains(new Coordinate[] {
-                        new Coordinate("" + bigX), new Coordinate("" + bigY) })) {
+                        new LexicographicCoordinate("" + bigX), new LexicographicCoordinate("" + bigY) })) {
                     return peer;
                 }
             }
@@ -146,7 +147,7 @@ public class ContentAddressableNetworkGUI extends JFrame implements Observer {
         }
     }
 
-    public void update(Observable o, Object arg) {
+    public synchronized void update(Observable o, Object arg) {
         this.repaint();
     }
 }

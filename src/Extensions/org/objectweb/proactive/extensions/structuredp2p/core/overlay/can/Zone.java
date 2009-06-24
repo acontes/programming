@@ -48,8 +48,8 @@ public class Zone implements Serializable {
         Coordinate[] maxCoords = new Coordinate[CANOverlay.NB_DIMENSIONS];
 
         for (int i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
-            minCoords[i] = new Coordinate(Zone.MIN_COORD);
-            maxCoords[i] = new Coordinate(Zone.MAX_COORD);
+            minCoords[i] = new LexicographicCoordinate(Zone.MIN_COORD);
+            maxCoords[i] = new LexicographicCoordinate(Zone.MAX_COORD);
         }
 
         this.coordinatesMin = minCoords;
@@ -153,13 +153,13 @@ public class Zone implements Serializable {
                 dimRes = (this.getCoordinateMin(dim).equals(zone.getCoordinateMax(dim)) || this
                         .getCoordinateMax(dim).equals(zone.getCoordinateMin(dim)));
             } else {
-                borderRes |= (this.getCoordinateMin(dim).isBetween(zone.getCoordinateMin(dim),
-                        zone.getCoordinateMax(dim)) || this.getCoordinateMax(dim).isBetween(
-                        zone.getCoordinateMin(dim), zone.getCoordinateMax(dim))) ||
-                    zone.getCoordinateMin(dim).isBetween(this.getCoordinateMin(dim),
-                            this.getCoordinateMax(dim)) ||
-                    zone.getCoordinateMax(dim).isBetween(this.getCoordinateMin(dim),
-                            this.getCoordinateMax(dim));
+                borderRes |= (Coordinate.isBetween(this.getCoordinateMin(dim), zone.getCoordinateMin(dim),
+                        zone.getCoordinateMax(dim)) || Coordinate.isBetween(this.getCoordinateMax(dim), zone
+                        .getCoordinateMin(dim), zone.getCoordinateMax(dim))) ||
+                    Coordinate.isBetween(zone.getCoordinateMin(dim), this.getCoordinateMin(dim), this
+                            .getCoordinateMax(dim)) ||
+                    Coordinate.isBetween(zone.getCoordinateMax(dim), this.getCoordinateMin(dim), this
+                            .getCoordinateMax(dim));
             }
         }
 
@@ -196,8 +196,8 @@ public class Zone implements Serializable {
      * @see #split(int, Coordinate).
      */
     public Zone[] split(int dimension) throws ZoneException {
-        return this.split(dimension, Coordinate.getMiddle(this.getCoordinateMin(dimension), this
-                .getCoordinateMax(dimension)));
+        return this.split(dimension, this.getCoordinateMin(dimension).getMiddleWith(
+                this.getCoordinateMax(dimension)));
     }
 
     /**

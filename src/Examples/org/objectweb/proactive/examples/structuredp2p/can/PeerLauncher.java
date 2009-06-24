@@ -6,7 +6,6 @@ import java.util.Observable;
 import java.util.Random;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -15,6 +14,7 @@ import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.Coordinate;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.LexicographicCoordinate;
 import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.QueryResponse;
 import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can.RDFQuery;
 
@@ -40,16 +40,16 @@ public class PeerLauncher extends Observable {
             System.exit(1);
         }
 
-        this.uri = args[0];
+        this.uri = args[1];
 
-        if (args[2].equals("ST")) {
+        if (args[3].equals("ST")) {
             this.launcherType = LauncherType.STRESS_TEST;
         } else {
             this.launcherType = LauncherType.INTERACTIVE;
         }
 
         try {
-            Deployment.deploy("./GCMA.xml");
+            Deployment.deploy(args[0]);
         } catch (NodeException e) {
             e.printStackTrace();
         } catch (ProActiveException e) {
@@ -58,7 +58,7 @@ public class PeerLauncher extends Observable {
 
         this.avaibleNodes = Deployment.getVirtualNode("Peer").getCurrentNodes();
 
-        for (int i = 0; i < Integer.parseInt(args[1]); i++) {
+        for (int i = 0; i < Integer.parseInt(args[2]); i++) {
             this.addPeer();
         }
 
@@ -78,9 +78,8 @@ public class PeerLauncher extends Observable {
         Peer peer = null;
 
         try {
-            peer = (Peer) PAActiveObject.newActive(Peer.class.getCanonicalName(),
-                    new Object[] { OverlayType.CAN }, this.avaibleNodes.get(rand.nextInt(this.avaibleNodes
-                            .size())));
+            peer = Peer.newActivePeer(OverlayType.CAN, this.avaibleNodes.get(rand.nextInt(this.avaibleNodes
+                    .size())));
             this.remotePeers.add(peer);
 
             TrackerLauncher.trackers.get(this.trackersIndex % TrackerLauncher.trackers.size()).addOnNetwork(
@@ -112,7 +111,7 @@ public class PeerLauncher extends Observable {
 
         String buf = "(";
         for (int i = 0; i < coordinatesToFind.length; i++) {
-            coordinatesToFind[i] = new Coordinate("" + rand.nextDouble());
+            coordinatesToFind[i] = new LexicographicCoordinate("" + rand.nextDouble());
             if (i != 0) {
                 buf += ",";
             }

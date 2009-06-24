@@ -66,15 +66,6 @@ public class ChordOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public void checkNeighbors() {
-        // TODO checkNeighbors()
-
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public Boolean join(Peer remotePeer) {
         // TODO join(Peer remotePeer)
         return null;

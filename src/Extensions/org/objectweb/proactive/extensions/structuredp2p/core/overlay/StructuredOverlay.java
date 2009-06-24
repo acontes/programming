@@ -1,6 +1,8 @@
 package org.objectweb.proactive.extensions.structuredp2p.core.overlay;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.Vector;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.AddNeighborMessage;
@@ -28,9 +30,20 @@ import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.R
 public abstract class StructuredOverlay implements Serializable {
 
     /**
+     * The timeout in milliseconds to wait before checking the network with the call of
+     * {@link StructuredOverlay#update()}.
+     */
+    public static final int UPDATE_TIMEOUT = 1234;
+
+    /**
      * The local peer which is associated with the overlay.
      */
     private Peer localPeer = null;
+
+    /**
+     * Queries which are bufferized when a {@link Peer#sendTo(Peer, Message)} is not accepted.
+     */
+    private List<Query> bufferizedQueries = new Vector<Query>();
 
     /**
      * Constructor.
@@ -54,19 +67,21 @@ public abstract class StructuredOverlay implements Serializable {
     /**
      * Left the current network.
      * 
-     * @return <code>true</code> if the peer has correctly leave the overlay.
+     * @return <code>true</code> if the peer has correctly leave the overlay. <code>false</code>
+     *         otherwise.
      */
     public abstract Boolean leave();
 
     /**
-     * Check neighbors list in order to see if a neighbor is died, if it is, so the list is updated.
+     * Check the network in order to update it.
      */
-    public abstract void checkNeighbors();
-
-    /**
-     * FIXME do what ? parameters or not ?
-     */
-    public abstract void update();
+    public void update() {
+        if (this.getBufferizedQueries().size() > 0) {
+            for (Query query : this.getBufferizedQueries()) {
+                this.send(query);
+            }
+        }
+    }
 
     /**
      * Sends a {@link Query} on the network without response.
@@ -88,7 +103,9 @@ public abstract class StructuredOverlay implements Serializable {
      * @throws Exception
      *             an exception appears when a message cannot be send to a peer.
      */
-    public abstract ResponseMessage sendTo(Peer remotePeer, Message msg) throws Exception;
+    public ResponseMessage sendTo(Peer remotePeer, Message msg) {
+        return this.localPeer.sendTo(remotePeer, msg);
+    }
 
     /**
      * Handles a {@link AddNeighborMessage}.
@@ -140,6 +157,25 @@ public abstract class StructuredOverlay implements Serializable {
             this.getLocalPeer().getOneWayResponses().put(response.getUUID(), response);
             this.getLocalPeer().getOneWayResponses().notifyAll();
         }
+    }
+
+    /**
+     * Bufferize a new query that will be performed at the time of the next checking.
+     * 
+     * @param query
+     *            the query to bufferize.
+     */
+    public void bufferizeQuery(Query query) {
+        this.bufferizedQueries.add(query);
+    }
+
+    /**
+     * Returns the queries that are bufferized.
+     * 
+     * @return the queries that are bufferized.
+     */
+    public List<Query> getBufferizedQueries() {
+        return this.bufferizedQueries;
     }
 
     /**

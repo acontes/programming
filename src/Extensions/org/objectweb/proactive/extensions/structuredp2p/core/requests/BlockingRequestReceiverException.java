@@ -6,6 +6,10 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 @SuppressWarnings("serial")
 public class BlockingRequestReceiverException extends ProActiveRuntimeException {
 
+    public BlockingRequestReceiverException() {
+        super();
+    }
+
     public BlockingRequestReceiverException(String objectName) {
         super(objectName + " cannot receive request any more.");
     }

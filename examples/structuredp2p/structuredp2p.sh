@@ -11,6 +11,7 @@ fi
 
 default_descriptor=../GCMD_Local.xml
 default_hostname=`hostname`
+descriptor_app="$workingDir/GCMA.xml"
 descriptor_peer=$default_descriptor
 descriptor_tracker=$default_descriptor
 
@@ -34,7 +35,7 @@ fi
 echo
 echo ---------- STRUCTURED P2P ----------
 
-args="$default_hostname $1 $2"
+args="$descriptor_app $default_hostname $1 $2"
 
 export CLASSPATH=../../lib/*:$CLASSPATH
 export CLASSPATH=../../classes/Core:$CLASSPATH

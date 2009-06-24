@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.Stack;
 
-import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.body.migration.MigratableBody;
 import org.objectweb.proactive.core.util.converter.MakeDeepCopy;
@@ -79,7 +78,7 @@ public class CANOverlay extends StructuredOverlay {
      */
     public Boolean join(Peer remotePeerOnNetwork) throws Exception {
 
-        CANJoinResponseMessage response = (CANJoinResponseMessage) PAFuture.getFutureValue(this.sendTo(
+        CANJoinResponseMessage response = (CANJoinResponseMessage) PAFuture.getFutureValue(super.sendTo(
                 remotePeerOnNetwork, new CANJoinMessage(this.getRemotePeer())));
 
         if (response.hasSucceeded()) {
@@ -126,7 +125,7 @@ public class CANOverlay extends StructuredOverlay {
         /*
          * Terminate the current body in order to notify all the neighbors that they can't send
          * message to the current remote peer. If they try they will receive a
-         * BlockingRequestReception.
+         * BlockingRequestReceiverException.
          */
         ((BlockingRequestReceiver) ((MigratableBody) super.getLocalPeer().getBody()).getRequestReceiver())
                 .prohibitReception();
@@ -263,11 +262,11 @@ public class CANOverlay extends StructuredOverlay {
                                 this.neighborsDataStructure.getZone(neighbor) == null ||
                                 this.getZone().getBorderedDimension(
                                         this.neighborsDataStructure.getZone(neighbor)) == -1) {
-                                response = this.sendTo(neighbor, new CANRemoveNeighborMessage(this
+                                response = super.sendTo(neighbor, new CANRemoveNeighborMessage(this
                                         .getRemotePeer(), dim, CANOverlay.getOppositeDirection(dir)));
                                 peers.add(neighbor);
                             } else {
-                                response = this.sendTo(neighbor, new CANAddNeighborMessage(this
+                                response = super.sendTo(neighbor, new CANAddNeighborMessage(this
                                         .getRemotePeer(), this.getZone(), dim, CANOverlay
                                         .getOppositeDirection(dir)));
                             }
@@ -322,19 +321,14 @@ public class CANOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
-    public void checkNeighbors() {
-        for (Peer neighbor : this.neighborsDataStructure) {
-            if (!PAActiveObject.pingActiveObject(neighbor)) {
-                // TODO neighbors is not accessible
-            }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public void update() {
-        // TODO what is the update method for ?
+        super.update();
+
+        for (Peer neighbor : this.neighborsDataStructure) {
+            // if (!PAActiveObject.pingActiveObject(neighbor)) {
+            // TODO neighbors is not accessible
+            // }
+        }
     }
 
     /**
@@ -378,20 +372,18 @@ public class CANOverlay extends StructuredOverlay {
                         try {
                             nearestPeer.send(query);
                         } catch (BlockingRequestReceiverException e) {
-                            this.getLocalPeer().bufferizeQuery(query);
+                            super.bufferizeQuery(query);
+                            System.out.println("Blocking");
+                        } catch (Exception e) {
+                            // TODO Dirty Leave
+                            System.out.println("DIRTY LEAVE");
                         }
+
                         break;
                     }
                 }
             }
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public ResponseMessage sendTo(Peer remotePeer, Message msg) throws Exception {
-        return this.getLocalPeer().sendTo(remotePeer, msg);
     }
 
     /**
@@ -410,7 +402,7 @@ public class CANOverlay extends StructuredOverlay {
         List<ResponseMessage> responses = new ArrayList<ResponseMessage>(remotePeers.size());
 
         for (Peer remotePeer : remotePeers) {
-            responses.add(this.sendTo(remotePeer, msg));
+            responses.add(super.sendTo(remotePeer, msg));
         }
 
         return responses;
@@ -432,7 +424,7 @@ public class CANOverlay extends StructuredOverlay {
         List<ResponseMessage> responses = new ArrayList<ResponseMessage>();
 
         for (Peer remotePeer : dataStructure) {
-            responses.add(this.sendTo(remotePeer, msg));
+            responses.add(super.sendTo(remotePeer, msg));
         }
 
         return responses;
