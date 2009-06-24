@@ -94,8 +94,7 @@ public class FileSystemServerImpl implements FileSystemServer {
         final Stream instance = tryGetStreamOrWound(stream);
         synchronized (instance) {
             checkContainsStreamOrWound(stream);
-            // FIXME: do it better than casting, which is only a hotfix to make it compile
-            return instance.skip((int) bytes);
+            return instance.skip(bytes);
         }
     }
 
