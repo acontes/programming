@@ -3,7 +3,9 @@ package org.objectweb.proactive.extra.vfsprovider.server;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -37,6 +39,7 @@ public class FileSystemServerImpl implements FileSystemServer {
 
     private long idGenerator = 0;
 
+    // TODO exceptions?
     public long streamOpen(String path, StreamMode mode) throws IOException {
         final File file = resolvePath(path);
         final Stream instance = StreamFactory.createStreamInstance(file, mode);
@@ -121,34 +124,54 @@ public class FileSystemServerImpl implements FileSystemServer {
         return false;
     }
 
-    public void fileDelete(String path, boolean recursive) throws IOException, FileNotFoundException {
-        // TODO Auto-generated method stub
-
+    // TODO: propagate void->boolean change to the client
+    public boolean fileDelete(String path, boolean recursive) {
+        final File file = resolvePath(path);
+        if (recursive)
+            return deleteRecursive(file);
+        return file.delete();
     }
 
-    public FileInfo fileGetInfo(String path) throws IOException, FileNotFoundException {
-        // TODO Auto-generated method stub
+    public FileInfo fileGetInfo(String path) {
+        final File file = resolvePath(path);
+        if (file.exists())
+            return new FileInfoImpl(file);
         return null;
     }
 
-    public Set<String> fileListChildren(String path) throws IOException, FileNotFoundException {
-        // TODO Auto-generated method stub
-        return null;
+    public Set<String> fileListChildren(String path) {
+        final File file = resolvePath(path);
+
+        if (file.isFile())
+            return null;
+        return new HashSet<String>(Arrays.asList(file.list()));
     }
 
-    public Map<String, FileInfo> fileListChildrenInfo(String path) throws IOException, FileNotFoundException {
-        // TODO Auto-generated method stub
-        return null;
+    public Map<String, FileInfo> fileListChildrenInfo(String path) {
+        final File file = resolvePath(path);
+
+        if (file.isFile())
+            return null;
+
+        final File[] children = file.listFiles();
+        final Map<String, FileInfo> infos = new HashMap<String, FileInfo>(children.length);
+
+        for (int i = 0; i < children.length; i++) {
+            File ch = children[i];
+            infos.put(ch.getName(), new FileInfoImpl(ch));
+        }
+        return infos;
     }
 
-    public void fileRename(String path, String newPath) throws IOException, FileNotFoundException {
-        // TODO Auto-generated method stub
-
+    public boolean fileRename(String path, String newPath) {
+        final File src = resolvePath(path);
+        final File dest = resolvePath(path);
+        return src.renameTo(dest);
     }
 
-    public boolean fileSetLastModifiedTime(String path, long time) throws IOException, FileNotFoundException {
-        // TODO Auto-generated method stub
-        return false;
+    public boolean fileSetLastModifiedTime(String path, long time) {
+        final File file = resolvePath(path);
+        return file.setLastModified(time);
     }
 
     // FIXME
@@ -178,6 +201,15 @@ public class FileSystemServerImpl implements FileSystemServer {
     synchronized private void checkContainsStreamOrWound(long stream) throws StreamNotFoundException {
         if (!streams.containsKey(stream))
             throw new StreamNotFoundException();
+    }
+
+    private boolean deleteRecursive(File file) {
+        if (file.isDirectory())
+            for (File child : file.listFiles()) {
+                deleteRecursive(child);
+            }
+        // if deleting children didn't succeed, false will be returned
+        return file.delete();
     }
 
     /**
