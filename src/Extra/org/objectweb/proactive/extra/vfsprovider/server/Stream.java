@@ -26,7 +26,7 @@ public interface Stream {
 
     public abstract void seek(long position) throws IOException, WrongStreamTypeException;
 
-    public abstract long skip(int bytes) throws IOException, WrongStreamTypeException;
+    public abstract long skip(long bytes) throws IOException, WrongStreamTypeException;
 
     public abstract void write(byte[] data) throws IOException, WrongStreamTypeException;
 }

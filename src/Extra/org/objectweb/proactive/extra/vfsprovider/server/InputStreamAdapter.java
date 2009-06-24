@@ -42,7 +42,7 @@ public class InputStreamAdapter implements Stream {
         throw new WrongStreamTypeException();
     }
 
-    public long skip(int bytes) throws IOException {
+    public long skip(long bytes) throws IOException {
         return adaptee.skip(bytes);
     }
 

@@ -54,8 +54,17 @@ public class RandomAccessStreamAdapter implements Stream {
         randomFile.seek(position);
     }
 
-    public long skip(int bytes) throws IOException {
-        return randomFile.skipBytes(bytes);
+    public long skip(long bytes) throws IOException {
+        long skippedTotal = 0;
+        int skipped = Integer.MAX_VALUE;
+
+        while (bytes > Integer.MAX_VALUE && skipped == Integer.MAX_VALUE) {
+            skipped = randomFile.skipBytes(Integer.MAX_VALUE);
+            bytes -= skipped;
+            skippedTotal += skipped;
+        }
+        skippedTotal += randomFile.skipBytes((int) (bytes % Integer.MAX_VALUE));
+        return skippedTotal;
     }
 
     public void write(byte[] data) throws IOException, WrongStreamTypeException {

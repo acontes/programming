@@ -37,7 +37,7 @@ public class OutputStreamAdapter implements Stream {
         throw new WrongStreamTypeException();
     }
 
-    public long skip(int bytes) throws IOException, WrongStreamTypeException {
+    public long skip(long bytes) throws IOException, WrongStreamTypeException {
         throw new WrongStreamTypeException();
     }
 
