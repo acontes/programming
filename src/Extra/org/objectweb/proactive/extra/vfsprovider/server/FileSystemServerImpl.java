@@ -112,49 +112,69 @@ public class FileSystemServerImpl implements FileSystemServer {
         // TODO Auto-generated method stub
     }
 
-    public boolean fileCreate(String path, FileType type) throws IOException {
+    public void fileCreate(String path, FileType type) throws IOException {
         final File file = resolvePath(path);
-        switch (type) {
-            case DIRECTORY:
-                return file.mkdir();
-            case FILE:
-                return file.createNewFile();
+
+        try {
+            if (type == FileType.DIRECTORY) {
+                file.mkdirs();
+                checkConditionIsTrue(file.isDirectory(), "Directory creation failed");
+            } else {
+                file.createNewFile();
+                checkConditionIsTrue(file.isFile(), "File creation failed");
+            }
+        } catch (SecurityException sec) { 
+            throw new IOException(sec);
         }
-        return false;
     }
 
-    // TODO: propagate void->boolean change to the client
-    public boolean fileDelete(String path, boolean recursive) {
+    public void fileDelete(String path, boolean recursive) throws IOException {
         final File file = resolvePath(path);
-        if (recursive)
-            return deleteRecursive(file);
-        return file.delete();
+        try {
+            if (recursive)
+                deleteRecursive(file);
+            else
+                file.delete();
+        } catch (SecurityException sec) {
+            throw new IOException(sec);
+        }
+        checkConditionIsTrue(!file.exists(), "Unable to delete a file");
     }
 
-    public FileInfo fileGetInfo(String path) {
+    public FileInfo fileGetInfo(String path) throws IOException {
         final File file = resolvePath(path);
         if (file.exists())
             return new FileInfoImpl(file);
         return null;
     }
 
-    public Set<String> fileListChildren(String path) {
+    public Set<String> fileListChildren(String path) throws IOException {
         final File file = resolvePath(path);
-
-        if (file.isFile())
-            return null;
-        return new HashSet<String>(Arrays.asList(file.list()));
+        final String[] list;
+        
+        try {
+            list = file.list();
+        } catch (SecurityException sec) {
+            throw new IOException(sec);
+        }
+        checkConditionIsTrue(file.isDirectory(), "Specified file is not a directory");
+        checkConditionIsTrue(list != null, "An IO error occurred while listing the directory");
+        return new HashSet<String>(Arrays.asList(list));
     }
 
-    public Map<String, FileInfo> fileListChildrenInfo(String path) {
+    public Map<String, FileInfo> fileListChildrenInfo(String path) throws IOException {
         final File file = resolvePath(path);
-
-        if (file.isFile())
-            return null;
-
-        final File[] children = file.listFiles();
-        final Map<String, FileInfo> infos = new HashMap<String, FileInfo>(children.length);
-
+        final File[] children;
+        final Map<String, FileInfo> infos;
+        
+        try {
+            children = file.listFiles();
+        } catch (SecurityException sec) {
+            throw new IOException(sec);
+        }
+        checkConditionIsTrue(file.isDirectory(), "Specified file is not a directory");
+        checkConditionIsTrue(children != null, "An IO error occurred while listing the directory");
+        infos = new HashMap<String, FileInfo>(children.length);
         for (int i = 0; i < children.length; i++) {
             File ch = children[i];
             infos.put(ch.getName(), new FileInfoImpl(ch));
@@ -162,21 +182,38 @@ public class FileSystemServerImpl implements FileSystemServer {
         return infos;
     }
 
-    public boolean fileRename(String path, String newPath) {
+    public void fileRename(String path, String newPath) throws IOException {
         final File src = resolvePath(path);
         final File dest = resolvePath(path);
-        return src.renameTo(dest);
+        final boolean result;
+
+        try {
+            result = src.renameTo(dest);
+        } catch (SecurityException sec) {
+            throw new IOException(sec);
+        }
+        checkConditionIsTrue(result, "Failed to rename a file");
     }
 
-    public boolean fileSetLastModifiedTime(String path, long time) {
+    public boolean fileSetLastModifiedTime(String path, long time) throws IOException {
         final File file = resolvePath(path);
-        return file.setLastModified(time);
+        checkConditionIsTrue(file.exists(), "Cannot set last modified time property of a not existing file");
+        try {
+            return file.setLastModified(time);
+        } catch (SecurityException sec) {
+            throw new IOException(sec);
+        }
     }
 
     // FIXME
     private File resolvePath(String relative) {
         final String ROOT = "/";
         return new File(ROOT + relative);
+    }
+
+    private void checkConditionIsTrue(boolean condition, String message) throws IOException {
+        if (condition)
+            throw new IOException(message);
     }
 
     synchronized private long storeStream(Stream instance) {
@@ -207,7 +244,6 @@ public class FileSystemServerImpl implements FileSystemServer {
             for (File child : file.listFiles()) {
                 deleteRecursive(child);
             }
-        // if deleting children didn't succeed, false will be returned
         return file.delete();
     }
 
