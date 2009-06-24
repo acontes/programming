@@ -25,8 +25,8 @@ import org.objectweb.proactive.extra.vfsprovider.exceptions.WrongStreamTypeExcep
 public interface StreamOperations {
 
     /**
-     * Open a file stream in specified mode that defines a subset of methods that are allowed to
-     * invoke.
+     * Open a file stream in specified <code>mode</code> that defines a subset of methods that are
+     * allowed to invoke.
      * 
      * @param path
      *            of a file whose stream is to be open, cannot be <code>null</code>
@@ -36,7 +36,9 @@ public interface StreamOperations {
      *         unique within one server instance; stream identified by this id is open until
      *         {@link #streamClose(long)} method is called
      * @throws IOException
-     *             when specified path points to non existing file or stream cannot be open
+     *             when specified path points to directory, a non existing file that cannot/should
+     *             not be created (e.g. reading mode specified), a stream cannot be open due to I/O
+     *             error, or a security exception occurred
      */
     public abstract long streamOpen(String path, StreamMode mode) throws IOException;
 

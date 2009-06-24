@@ -39,10 +39,15 @@ public class FileSystemServerImpl implements FileSystemServer {
 
     private long idGenerator = 0;
 
-    // TODO exceptions?
     public long streamOpen(String path, StreamMode mode) throws IOException {
+        final Stream instance;
         final File file = resolvePath(path);
-        final Stream instance = StreamFactory.createStreamInstance(file, mode);
+
+        try {
+            instance = StreamFactory.createStreamInstance(file, mode);
+        } catch (SecurityException sec) {
+            throw new IOException(sec);
+        }
         return storeStream(instance);
     }
 
@@ -254,7 +259,8 @@ public class FileSystemServerImpl implements FileSystemServer {
      * @see Stream
      */
     private static class StreamFactory {
-        public static Stream createStreamInstance(File file, StreamMode mode) throws FileNotFoundException {
+        public static Stream createStreamInstance(File file, StreamMode mode) throws FileNotFoundException,
+                SecurityException {
             switch (mode) {
                 case RANDOM_ACCESS_READ:
                     return RandomAccessStreamAdapter.createRandomAccessRead(file);
