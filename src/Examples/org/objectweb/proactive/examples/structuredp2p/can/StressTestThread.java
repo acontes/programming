@@ -21,13 +21,13 @@ public class StressTestThread implements Runnable {
             int res = rand.nextInt(3);
             switch (res) {
                 case 0:
-                    this.peerLauncher.addPeer();
+                    // this.peerLauncher.addPeer();
                     break;
                 case 1:
                     this.peerLauncher.lookupMessage();
                     break;
                 case 2:
-                    this.peerLauncher.removePeer();
+                    // this.peerLauncher.removePeer();
                     break;
                 default:
                     break;

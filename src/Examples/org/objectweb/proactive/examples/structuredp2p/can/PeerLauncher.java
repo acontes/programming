@@ -106,12 +106,11 @@ public class PeerLauncher extends Observable {
 
     public void lookupMessage() {
         Random rand = new Random();
-
         Coordinate[] coordinatesToFind = new Coordinate[CANOverlay.NB_DIMENSIONS];
 
         String buf = "(";
         for (int i = 0; i < coordinatesToFind.length; i++) {
-            coordinatesToFind[i] = new LexicographicCoordinate("" + rand.nextDouble());
+            coordinatesToFind[i] = LexicographicCoordinate.random(1 + rand.nextInt());
             if (i != 0) {
                 buf += ",";
             }

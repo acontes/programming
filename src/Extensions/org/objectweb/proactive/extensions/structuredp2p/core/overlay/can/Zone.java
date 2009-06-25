@@ -23,12 +23,12 @@ public class Zone implements Serializable {
     /**
      * The minimal value we manage.
      */
-    public static String MIN_COORD = "0";
+    public static String MIN_COORD = "!";
 
     /**
      * The maximal value we manage.
      */
-    public static String MAX_COORD = "1.0";
+    public static String MAX_COORD = "/";
 
     /**
      * The minimum coordinates.
