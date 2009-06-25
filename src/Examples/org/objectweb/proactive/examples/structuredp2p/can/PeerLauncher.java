@@ -92,7 +92,7 @@ public class PeerLauncher extends Observable {
             e.printStackTrace();
         }
         this.printInformation("Add peer managing " + ((CANOverlay) peer.getStructuredOverlay()).getZone());
-        this.updateGUI();
+        // this.updateGUI();
     }
 
     public void removePeer() {
@@ -101,7 +101,7 @@ public class PeerLauncher extends Observable {
         this.printInformation("Remove peer managing " + ((CANOverlay) peer.getStructuredOverlay()).getZone());
         this.remotePeers.remove(peer);
         peer.leave();
-        this.updateGUI();
+        // this.updateGUI();
     }
 
     public void lookupMessage() {
@@ -117,6 +117,8 @@ public class PeerLauncher extends Observable {
             buf += coordinatesToFind[i];
         }
         buf += ")";
+
+        System.out.println("coord = " + buf.toString());
 
         Peer sender = this.remotePeers.get(rand.nextInt(this.remotePeers.size()));
 
