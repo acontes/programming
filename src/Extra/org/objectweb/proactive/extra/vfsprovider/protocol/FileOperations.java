@@ -58,8 +58,9 @@ public interface FileOperations {
     public abstract FileInfo fileGetInfo(String path) throws IOException;
 
     /**
-     * Create a file of a <code>type</code> with given abstract <code>path</code>. This method
-     * checks the postcondition, that the file exists and is of a proper <code>type</code>.
+     * Create a file of a <code>type</code> with given abstract <code>path</code>, along with the
+     * ancestor directories if they hasn't existed yet. This method checks the postcondition, that
+     * the file exists and is of a proper <code>type</code>.
      * <p>
      * Note: The postcondition check may be influenced by any concurrent file system operation.
      * 

@@ -150,6 +150,7 @@ public class FileSystemServerImpl implements FileSystemServer {
                 file.mkdirs();
                 checkConditionIsTrue(file.isDirectory(), "Directory creation failed");
             } else {
+                file.getParentFile().mkdirs();
                 file.createNewFile();
                 checkConditionIsTrue(file.isFile(), "File creation failed");
             }
