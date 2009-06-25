@@ -13,65 +13,66 @@ import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.Lexicog
  */
 public class TestCoordinate {
 
-    private Coordinate coord;
-    private Coordinate coordMin;
-    private Coordinate coordMax;
+    private Coordinate coordinate;
+    private Coordinate firstCoordinate;
+    private Coordinate secondCoordinate;
 
     @Before
     public void setUp() throws Exception {
-        this.coordMin = new LexicographicCoordinate("0");
-        this.coordMax = new LexicographicCoordinate("100");
+        this.firstCoordinate = new LexicographicCoordinate("e");
+        this.secondCoordinate = new LexicographicCoordinate("l");
     }
 
     @Test
     public void testCompare() {
-        Assert.assertTrue(this.coordMin.compareTo(this.coordMax) < 0);
-        Assert.assertTrue(this.coordMax.compareTo(this.coordMin) > 0);
+        Assert.assertTrue(this.firstCoordinate.compareTo(this.secondCoordinate) < 0);
+        Assert.assertTrue(this.secondCoordinate.compareTo(this.firstCoordinate) > 0);
 
-        this.coord = new LexicographicCoordinate("0");
-        Assert.assertTrue(this.coordMin.compareTo(this.coord) == 0);
-        Assert.assertTrue(this.coord.compareTo(this.coordMin) == 0);
+        this.coordinate = new LexicographicCoordinate("e");
+        Assert.assertTrue(this.firstCoordinate.compareTo(this.coordinate) == 0);
+        Assert.assertTrue(this.coordinate.compareTo(this.firstCoordinate) == 0);
 
-        this.coord = new LexicographicCoordinate("50");
-        Assert.assertTrue(this.coordMax.compareTo(this.coord) > 0);
-        Assert.assertTrue(this.coord.compareTo(this.coordMax) < 0);
+        this.coordinate = new LexicographicCoordinate("a");
+        Assert.assertTrue(this.secondCoordinate.compareTo(this.coordinate) > 0);
+        Assert.assertTrue(this.coordinate.compareTo(this.secondCoordinate) < 0);
 
-        this.coord = new LexicographicCoordinate("100");
-        Assert.assertTrue(this.coordMax.compareTo(this.coord) == 0);
-        Assert.assertTrue(this.coord.compareTo(this.coordMax) == 0);
+        this.coordinate = new LexicographicCoordinate("l");
+        Assert.assertTrue(this.secondCoordinate.compareTo(this.coordinate) == 0);
+        Assert.assertTrue(this.coordinate.compareTo(this.secondCoordinate) == 0);
     }
 
     @Test
     public void testIsBetween() {
-        this.coord = new LexicographicCoordinate("-10");
-        Assert.assertFalse(Coordinate.isBetween(this.coord, this.coordMin, this.coordMax));
+        this.coordinate = new LexicographicCoordinate("a");
+        Assert
+                .assertFalse(Coordinate.isBetween(this.coordinate, this.firstCoordinate,
+                        this.secondCoordinate));
 
-        this.coord = new LexicographicCoordinate("0");
-        Assert.assertTrue(Coordinate.isBetween(this.coord, this.coordMin, this.coordMax));
+        this.coordinate = new LexicographicCoordinate("g");
+        Assert.assertTrue(Coordinate.isBetween(this.coordinate, this.firstCoordinate, this.secondCoordinate));
 
-        this.coord = new LexicographicCoordinate("50");
-        Assert.assertTrue(Coordinate.isBetween(this.coord, this.coordMin, this.coordMax));
+        this.coordinate = new LexicographicCoordinate("eff");
+        Assert.assertTrue(Coordinate.isBetween(this.coordinate, this.firstCoordinate, this.secondCoordinate));
 
-        this.coord = new LexicographicCoordinate("100");
-        Assert.assertFalse(Coordinate.isBetween(this.coord, this.coordMin, this.coordMax));
-
-        this.coord = new LexicographicCoordinate("200");
-        Assert.assertFalse(Coordinate.isBetween(this.coord, this.coordMin, this.coordMax));
+        this.coordinate = new LexicographicCoordinate("lee");
+        Assert
+                .assertFalse(Coordinate.isBetween(this.coordinate, this.firstCoordinate,
+                        this.secondCoordinate));
     }
 
     @Test
     public void testMiddle() {
-        this.coord = new LexicographicCoordinate("50");
-        Assert.assertEquals(this.coord, this.coordMin.getMiddleWith(this.coordMax));
+        Assert.assertEquals(new LexicographicCoordinate("hh"), this.firstCoordinate
+                .getMiddleWith(this.secondCoordinate));
 
-        this.coord = new LexicographicCoordinate("0");
-        Assert.assertNotSame(this.coord, this.coordMin.getMiddleWith(this.coordMax));
+        Assert.assertNotSame(new LexicographicCoordinate("he"), this.firstCoordinate
+                .getMiddleWith(this.secondCoordinate));
     }
 
     @After
     public void tearDown() {
-        this.coord = null;
-        this.coordMax = null;
-        this.coordMin = null;
+        this.coordinate = null;
+        this.secondCoordinate = null;
+        this.firstCoordinate = null;
     }
 }
