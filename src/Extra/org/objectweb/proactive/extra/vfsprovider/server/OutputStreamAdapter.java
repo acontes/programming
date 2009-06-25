@@ -9,10 +9,23 @@ import java.io.OutputStream;
 import org.objectweb.proactive.extra.vfsprovider.exceptions.WrongStreamTypeException;
 
 
+/**
+ * Stream adapter for {@link OutputStream} of a {@link File}, allowing the sequential writings.
+ */
 public class OutputStreamAdapter implements Stream {
 
     private final OutputStream adaptee;
 
+    /**
+     * Adapt output stream of specified file, in append or normal mode.
+     * 
+     * @param file
+     *            of which stream is to be open
+     * @param append
+     *            indicates if open stream in append or normal mode
+     * @throws FileNotFoundException
+     *             when specified file does not exist
+     */
     public OutputStreamAdapter(File file, boolean append) throws FileNotFoundException {
         adaptee = new FileOutputStream(file, append);
     }

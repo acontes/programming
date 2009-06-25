@@ -8,16 +8,41 @@ import java.io.RandomAccessFile;
 import org.objectweb.proactive.extra.vfsprovider.exceptions.WrongStreamTypeException;
 
 
+/**
+ * Stream adapter for {@link RandomAccessFile} created from specified {@link File}, allowing the
+ * random readings and/or writings. Two different static factory methods provided for different
+ * access mode.
+ */
 public class RandomAccessStreamAdapter implements Stream {
 
     private final RandomAccessFile randomFile;
 
     private final boolean writable;
 
+    /**
+     * Create a stream adapter with specified {@link File} as {@link RandomAccessFile} in read only
+     * mode.
+     * 
+     * @param file
+     *            to adapt
+     * @return stream
+     * @throws FileNotFoundException
+     *             when specified file does not exist
+     */
     public static Stream createRandomAccessRead(File file) throws FileNotFoundException {
         return new RandomAccessStreamAdapter(file, false);
     }
 
+    /**
+     * Create a stream adapter with specified {@link File} as {@link RandomAccessFile} in read and
+     * write mode.
+     * 
+     * @param file
+     *            to adapt
+     * @return stream
+     * @throws FileNotFoundException
+     *             when specified file does not exist
+     */
     public static Stream createRandomAccessReadWrite(File file) throws FileNotFoundException {
         return new RandomAccessStreamAdapter(file, true);
     }

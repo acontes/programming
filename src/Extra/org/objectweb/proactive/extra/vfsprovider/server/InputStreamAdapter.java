@@ -9,10 +9,21 @@ import java.io.InputStream;
 import org.objectweb.proactive.extra.vfsprovider.exceptions.WrongStreamTypeException;
 
 
+/**
+ * Stream adapter for {@link InputStream} of a {@link File}, allowing the sequential readings.
+ */
 public class InputStreamAdapter implements Stream {
 
     private final InputStream adaptee;
 
+    /**
+     * Adapt input stream of a specified file.
+     * 
+     * @param file
+     *            of which stream is to be open
+     * @throws FileNotFoundException
+     *             when specified file does not exist
+     */
     public InputStreamAdapter(File file) throws FileNotFoundException {
         adaptee = new FileInputStream(file);
     }
