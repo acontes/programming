@@ -110,14 +110,13 @@ public class PeerLauncher extends Observable {
 
         String buf = "(";
         for (int i = 0; i < coordinatesToFind.length; i++) {
-            coordinatesToFind[i] = LexicographicCoordinate.random(1 + rand.nextInt(9));
+            coordinatesToFind[i] = LexicographicCoordinate.random(1 + rand.nextInt(1));
             if (i != 0) {
                 buf += ",";
             }
             buf += coordinatesToFind[i];
         }
         buf += ")";
-
         System.out.println("coord = " + buf.toString());
 
         Peer sender = this.remotePeers.get(rand.nextInt(this.remotePeers.size()));

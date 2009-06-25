@@ -345,7 +345,6 @@ public class CANOverlay extends StructuredOverlay {
      */
     public void send(Query query) {
         Coordinate[] coordinatesToReach = (Coordinate[]) query.getKeyToReach().getValue();
-
         if (this.contains(coordinatesToReach)) {
             query.handle(this);
         } else {
@@ -371,6 +370,8 @@ public class CANOverlay extends StructuredOverlay {
 
                         try {
                             nearestPeer.send(query);
+         
+                            
                         } catch (BlockingRequestReceiverException e) {
                             super.bufferizeQuery(query);
                             System.out.println("Blocking");
