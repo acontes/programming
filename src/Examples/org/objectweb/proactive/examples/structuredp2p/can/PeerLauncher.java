@@ -110,7 +110,7 @@ public class PeerLauncher extends Observable {
 
         String buf = "(";
         for (int i = 0; i < coordinatesToFind.length; i++) {
-            coordinatesToFind[i] = LexicographicCoordinate.random(1 + rand.nextInt());
+            coordinatesToFind[i] = LexicographicCoordinate.random(1 + rand.nextInt(9));
             if (i != 0) {
                 buf += ",";
             }
