@@ -72,7 +72,10 @@ import org.objectweb.proactive.core.body.request.RequestReceiver;
 import org.objectweb.proactive.core.body.request.RequestReceiverImpl;
 import org.objectweb.proactive.core.body.tags.MessageTags;
 import org.objectweb.proactive.core.body.tags.Tag;
+import org.objectweb.proactive.core.body.tags.tag.CMTag;
 import org.objectweb.proactive.core.body.tags.tag.DsiTag;
+import org.objectweb.proactive.core.component.body.ComponentBodyImpl;
+import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.request.ComponentRequestImpl;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.debug.stepbystep.BreakpointType;
@@ -89,7 +92,6 @@ import org.objectweb.proactive.core.mop.ObjectReferenceReplacer;
 import org.objectweb.proactive.core.mop.ObjectReplacer;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.security.exceptions.CommunicationForbiddenException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.util.profiling.Profiling;
@@ -314,7 +316,6 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                 tagNotification);
             this.mbean.sendNotification(NotificationType.replyReceived, requestNotificationData);
         }
-
         // END JMX Notification
         return replyReceiver.receiveReply(reply, this, getFuturePool());
     }
@@ -734,23 +735,25 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             // TODO Send a notification only if the destination doesn't
             // implement ProActiveInternalObject
             if (!isProActiveInternalObject && (mbean != null)) {
-                ServerConnector serverConnector = ProActiveRuntimeImpl.getProActiveRuntime()
-                        .getJMXServerConnector();
-
+//          	cruz: this if's are removed because I still don't get the point
+//            	      of the serverConnector, and I want the "requestSent" notification to be generated
+//                ServerConnector serverConnector = ProActiveRuntimeImpl.getProActiveRuntime()
+//                        .getJMXServerConnector();
+//
                 // If the connector server is not active the connectorID can be
                 // null
-                if ((serverConnector != null) && serverConnector.getConnectorServer().isActive()) {
-                    UniqueID connectorID = serverConnector.getUniqueID();
-
-                    if (!connectorID.equals(destinationBody.getID())) {
+//                if ((serverConnector != null) && serverConnector.getConnectorServer().isActive()) {
+//                    UniqueID connectorID = serverConnector.getUniqueID();
+//
+//                    if (!connectorID.equals(destinationBody.getID())) {
                         String tagNotification = createTagNotification(tags);
 
                         mbean.sendNotification(NotificationType.requestSent, new RequestNotificationData(
                             BodyImpl.this.bodyID, BodyImpl.this.getNodeURL(), destinationBody.getID(),
                             destinationBody.getNodeURL(), methodCall.getName(), -1, request
                                     .getSequenceNumber(), tagNotification));
-                    }
-                }
+//                    }
+//                }
             }
 
             // END JMX Notification
@@ -819,6 +822,26 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                     nextTags.addTag(new DsiTag(bodyID, sequenceID));
                 }
             }
+            
+            // if the request is a Component request, propagate it accordingly
+            if(currentreq != null) {
+            	if(currentreq.getMethodCall().getComponentMetadata() != null) {
+            		String componentName;
+            		
+            		// ugly!
+            		// This behaviour should be part of the Tag, but how can the Tag have
+            		// access to the BodyImpl ?
+            		if(BodyImpl.this instanceof ComponentBodyImpl) {
+            			ProActiveComponent pac = ((ComponentBodyImpl)BodyImpl.this).getProActiveComponentImpl();
+            			componentName = pac.getComponentParameters().getName();
+            			if(nextTags.check(CMTag.IDENTIFIER)) {
+            				nextTags.removeTag(CMTag.IDENTIFIER);
+            			}
+            			nextTags.addTag(new CMTag(bodyID, sequenceID, componentName));
+            		}
+            	}
+            }
+            
             return nextTags;
         }
     }

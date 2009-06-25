@@ -91,8 +91,10 @@ public class ComponentRequestImpl extends RequestImpl implements ComponentReques
         declaringClass = methodCall.getReifiedMethod().getDeclaringClass();
     }
 
+    // The component request also propagates the Tags, if there's any
     public ComponentRequestImpl(Request request) {
-        super(request.getMethodCall(), request.getSender(), request.isOneWay(), request.getSequenceNumber());
+        super(request.getMethodCall(), request.getSender(), request.isOneWay(), request.getSequenceNumber(), 
+        		request.getTags());
         declaringClass = methodCall.getReifiedMethod().getDeclaringClass();
     }
 

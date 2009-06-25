@@ -52,6 +52,7 @@ import org.objectweb.fractal.api.control.NameController;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
+import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
@@ -73,20 +74,36 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
         NotificationListener {
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_CONTROLLERS);
 
+    /** To connect to the (Component) mbean */
     private transient JMXNotificationManager jmxNotificationManager;
 
+    /** Monitoring status */
     private boolean started;
 
+    /** Log for incoming requests */
+    private Map<ComponentRequestID, RequestStats> requestLog;
+    
+    /** Log for outgoing request */
+    private Map<ComponentRequestID, CallStats> callLog;
+    
+    
     private Map<String, MethodStatistics> statistics;
-
     private Map<String, String> keysList;
 
+    
     public MonitorControllerImpl(Component owner) {
         super(owner);
         jmxNotificationManager = JMXNotificationManager.getInstance();
     }
 
-    protected void setControllerItfType() {
+    @Override
+	public void initController() {
+    	logger.debug("Monitoring Controller init");
+	}
+
+
+
+	protected void setControllerItfType() {
         try {
             setItfType(ProActiveTypeFactoryImpl.instance().createFcItfType(Constants.MONITOR_CONTROLLER,
                     MonitorController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
@@ -189,20 +206,38 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
     }
 
     public void startMonitoring() {
-        if (statistics == null) {
-            registerMethods();
-        }
+    	
+    	boolean run = true;
+    	if(!run) {
+    		logger.debug("Starting Monitoring");
+    		return;
+    	}
+    	
+//    	if (statistics == null) {
+//            registerMethods();
+//        }
+    	
         if (!started) {
-            initMethodStatistics();
+        	logger.debug("Starting Monitoring");
+//            initMethodStatistics();
             try {
-                jmxNotificationManager.subscribe(FactoryName.createActiveObjectName(PAActiveObject
-                        .getBodyOnThis().getID()), this, FactoryName.getCompleteUrl(ProActiveRuntimeImpl
-                        .getProActiveRuntime().getURL()));
+            	// subscribes this class as a listener to JMX notifications from the BodyWrapperMBean
+            	// from the AO implementing this Component
+                jmxNotificationManager.subscribe(
+                		FactoryName.createActiveObjectName(PAActiveObject.getBodyOnThis().getID()),
+                		this,
+                		FactoryName.getCompleteUrl(ProActiveRuntimeImpl.getProActiveRuntime().getURL()));
             } catch (IOException e) {
-                throw new ProActiveRuntimeException("JMX subscribtion for the MonitorController has failed",
-                    e);
+                throw new ProActiveRuntimeException("JMX subscription for the MonitorController has failed", e);
             }
             started = true;
+            String componentName="";
+            try {
+            	componentName = Fractal.getNameController(owner).getFcName();
+    		} catch (NoSuchInterfaceException e) {
+    			e.printStackTrace();
+    		}
+            logger.debug("["+ componentName +"] Monitoring Started");
         }
     }
 
@@ -267,36 +302,108 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
     }
 
     public void handleNotification(Notification notification, Object handback) {
+    	
         String type = notification.getType();
+        String componentName = "";
+        try {
+        	componentName = Fractal.getNameController(owner).getFcName();
+		} catch (NoSuchInterfaceException e) {
+			e.printStackTrace();
+		}
+		// no handling ... for the moment ... for replyReceived, and requestSent
+        
         if (type.equals(NotificationType.requestReceived)) {
             RequestNotificationData data = (RequestNotificationData) notification.getUserData();
-            String key = keysList.get(data.getMethodName());
-            if (key != null) {
-                ((MethodStatisticsAbstract) statistics.get(key)).notifyArrivalOfRequest(notification
-                        .getTimeStamp());
-            }
-        } else if (type.equals(NotificationType.servingStarted)) {
+            logger.debug("["+componentName+"][requestRecv] From:" + data.getSource() +
+            		" To:"+ data.getDestination() +
+            		" Method:" + data.getMethodName() +
+            		" SeqNumber: " + data.getSequenceNumber() +
+            		" Timestamp: " + notification.getTimeStamp() +
+            		" NotifSeqNbr: " + notification.getSequenceNumber() +
+            		" Tags: " + data.getTags());
+            // Still needs the interface name !!!! (look at CompoentnRequestImpl?)
+//            String key = keysList.get(data.getMethodName());
+//            if (key != null) {
+//                ((MethodStatisticsAbstract) statistics.get(key)).notifyArrivalOfRequest(notification
+//                        .getTimeStamp());
+//            }
+        } 
+        else if (type.equals(NotificationType.servingStarted)) {
             RequestNotificationData data = (RequestNotificationData) notification.getUserData();
-            String key = keysList.get(data.getMethodName());
-            if (key != null) {
-                ((MethodStatisticsAbstract) statistics.get(key)).notifyDepartureOfRequest(notification
-                        .getTimeStamp());
-            }
-        } else if (type.equals(NotificationType.replySent)) {
+            logger.debug("["+componentName+"][servingStar] From:" + data.getSource() +
+            		" To:"+ data.getDestination() +
+            		" Method:" + data.getMethodName() +
+            		" SeqNumber: " + data.getSequenceNumber() +
+            		" Timestamp: " + notification.getTimeStamp() +
+            		" NotifSeqNbr: " + notification.getSequenceNumber() +
+            		" Tags: " + data.getTags());
+//            String key = keysList.get(data.getMethodName());
+//            if (key != null) {
+//                ((MethodStatisticsAbstract) statistics.get(key)).notifyDepartureOfRequest(notification
+//                        .getTimeStamp());
+//            }
+        } 
+        else if (type.equals(NotificationType.replySent)) {
             RequestNotificationData data = (RequestNotificationData) notification.getUserData();
-            String key = keysList.get(data.getMethodName());
-            if (key != null) {
-                ((MethodStatisticsAbstract) statistics.get(key)).notifyReplyOfRequestSent(notification
-                        .getTimeStamp());
-            }
-        } else if (type.equals(NotificationType.voidRequestServed)) {
+            logger.debug("["+componentName+"][replySent  ] From:" + data.getSource() +
+            		" To:"+ data.getDestination() +
+            		" Method:" + data.getMethodName() +
+            		" SeqNumber: " + data.getSequenceNumber() +
+            		" Timestamp: " + notification.getTimeStamp() +
+            		" NotifSeqNbr: " + notification.getSequenceNumber() +
+            		" Tags: " + data.getTags());
+//            String key = keysList.get(data.getMethodName());
+//            if (key != null) {
+//                ((MethodStatisticsAbstract) statistics.get(key)).notifyReplyOfRequestSent(notification
+//                        .getTimeStamp());
+//            }
+        } 
+        else if (type.equals(NotificationType.voidRequestServed)) {
             RequestNotificationData data = (RequestNotificationData) notification.getUserData();
-            String key = keysList.get(data.getMethodName());
-            if (key != null) {
-                ((MethodStatisticsAbstract) statistics.get(key)).notifyReplyOfRequestSent(notification
-                        .getTimeStamp());
-            }
-        } else if (type.equals(NotificationType.setOfNotifications)) {
+            logger.debug("["+componentName+"][voidReqServ] From:" + data.getSource() +
+            		" To:"+ data.getDestination() +
+            		" Method:" + data.getMethodName() +
+            		" SeqNumber: " + data.getSequenceNumber() +
+            		" Timestamp: " + notification.getTimeStamp() +
+            		" NotifSeqNbr: " + notification.getSequenceNumber() +
+            		" Tags: " + data.getTags());
+//            String key = keysList.get(data.getMethodName());
+//            if (key != null) {
+//                ((MethodStatisticsAbstract) statistics.get(key)).notifyReplyOfRequestSent(notification
+//                        .getTimeStamp());
+//            }
+        }
+        else if (type.equals(NotificationType.requestSent)) {
+            RequestNotificationData data = (RequestNotificationData) notification.getUserData();
+            logger.debug("["+componentName+"][requestSent] From:" + data.getSource() +
+            		" To:"+ data.getDestination() +
+            		" Method:" + data.getMethodName() +
+            		" SeqNumber: " + data.getSequenceNumber() +
+            		" Timestamp: " + notification.getTimeStamp() +
+            		" NotifSeqNbr: " + notification.getSequenceNumber() +
+            		" Tags: " + data.getTags());
+//            String key = keysList.get(data.getMethodName());
+//            if (key != null) {
+//                ((MethodStatisticsAbstract) statistics.get(key)).notifyReplyOfRequestSent(notification
+//                        .getTimeStamp());
+//            }
+        } 
+        else if (type.equals(NotificationType.replyReceived)) {
+            RequestNotificationData data = (RequestNotificationData) notification.getUserData();
+            logger.debug("["+componentName+"][replyRecv  ] From:" + data.getSource() +
+            		" To:"+ data.getDestination() +
+            		" Method:" + data.getMethodName() +
+            		" SeqNumber: " + data.getSequenceNumber() +
+            		" Timestamp: " + notification.getTimeStamp() +
+            		" NotifSeqNbr: " + notification.getSequenceNumber() +
+            		" Tags: " + data.getTags());
+//            String key = keysList.get(data.getMethodName());
+//            if (key != null) {
+//                ((MethodStatisticsAbstract) statistics.get(key)).notifyReplyOfRequestSent(notification
+//                        .getTimeStamp());
+//            }
+        } 
+        else if (type.equals(NotificationType.setOfNotifications)) {
             @SuppressWarnings("unchecked")
             ConcurrentLinkedQueue<Notification> notificationsList = (ConcurrentLinkedQueue<Notification>) notification
                     .getUserData();
