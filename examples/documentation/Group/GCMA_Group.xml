@@ -29,7 +29,7 @@
 
 	<resources>
 		<nodeProvider id="LOCAL">
-			<file path="../GCMD_Local.xml" />
+			<file path="../../GCMD_Local.xml" />
 		</nodeProvider>
 	</resources>
 

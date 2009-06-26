@@ -113,7 +113,7 @@
               on remote JVMS are exported with. At this stage several
               protocols are supported: <emphasis role="bold">RMI(rmi),
               HTTP(http), IBIS/RMI(ibis), SSH tunneling for RMI/HTTP(rmissh),
-              JINI(jini)</emphasis>. It means that once the JVM starts, Nodes,
+              ProActive Message Routing(pamr)</emphasis>. It means that once the JVM starts, Nodes,
               Active Objects that will be created on this JVM, will export
               themselves using the protocol specified in <emphasis role="bold">proactive.communication.protocol</emphasis>
               property. They will be reachable transparently through the given
@@ -326,21 +326,6 @@
               <para><emphasis role="bold">fractal.provider</emphasis> This
               property defines the bootstrap component for the Fractal
               component model</para>
-            </listitem>
-
-            <listitem>
-              <para><emphasis role="bold">proactive.classloader</emphasis>
-              runtimes created with this property enabled fetch missing
-              classes using a special mechanism
-              (see the 
-              
-              <!-- This url can only work in the html generated files: in pdf there's no ".." -->
-              <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="../api_complete/org/objectweb/proactive/core/classloader/package-summary.html" os="html">
-              classloader package javadoc</link>
-              <phrase os="pdf">org.objectweb.proactive.core.classloader javadoc</phrase>). 
-              This is an alternative to RMI dynamic class
-              downloading, useful for instance when performing hierarchical
-              deployment.</para>
             </listitem>
 
             <listitem>
