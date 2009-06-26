@@ -54,7 +54,18 @@ public class InputStreamAdapter implements Stream {
         throw new WrongStreamTypeException();
     }
 
+    /**
+     * This skip implementation must deal with the SUN's JVM closed Bug ID: 6294974 and 4454092
+     * (duplicate) that redefined the {@link FileInputStream#skip(long)} behavior: "This method may
+     * skip more bytes than are remaining in the backing file. This produces no exception and the
+     * number of bytes skipped may include some number of bytes that were beyond the EOF of the
+     * backing file". Hence skips only available bytes. (Or the Stream interface should be less
+     * strict on the return value)
+     **/
     public long skip(long bytes) throws IOException {
+        final long avail = adaptee.available();
+        if (avail < bytes)
+            bytes = avail;
         return adaptee.skip(bytes);
     }
 
