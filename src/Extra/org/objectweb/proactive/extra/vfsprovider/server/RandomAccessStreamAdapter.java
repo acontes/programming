@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.Arrays;
 
 import org.objectweb.proactive.extra.vfsprovider.exceptions.WrongStreamTypeException;
 
@@ -72,7 +73,7 @@ public class RandomAccessStreamAdapter implements Stream {
 
         if (count == -1)
             return null;
-        return data;
+        return Arrays.copyOf(data, count);
     }
 
     public void seek(long position) throws IOException {
@@ -83,7 +84,7 @@ public class RandomAccessStreamAdapter implements Stream {
         long skippedTotal = 0;
         int skipped = Integer.MAX_VALUE;
 
-        while (bytes > Integer.MAX_VALUE && skipped == Integer.MAX_VALUE) {
+        while (bytes >= Integer.MAX_VALUE && skipped == Integer.MAX_VALUE) {
             skipped = randomFile.skipBytes(Integer.MAX_VALUE);
             bytes -= skipped;
             skippedTotal += skipped;

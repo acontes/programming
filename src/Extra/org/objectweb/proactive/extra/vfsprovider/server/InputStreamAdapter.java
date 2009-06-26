@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 
 import org.objectweb.proactive.extra.vfsprovider.exceptions.WrongStreamTypeException;
 
@@ -46,7 +47,7 @@ public class InputStreamAdapter implements Stream {
 
         if (count == -1)
             return null;
-        return data;
+        return Arrays.copyOf(data, count);
     }
 
     public void seek(long position) throws WrongStreamTypeException {
