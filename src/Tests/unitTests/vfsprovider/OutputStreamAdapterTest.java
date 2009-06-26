@@ -8,13 +8,14 @@ import org.objectweb.proactive.extra.vfsprovider.exceptions.WrongStreamTypeExcep
 import org.objectweb.proactive.extra.vfsprovider.server.OutputStreamAdapter;
 import org.objectweb.proactive.extra.vfsprovider.server.Stream;
 
+
 public class OutputStreamAdapterTest extends AbstractStreamTest {
-    
+
     @Override
     protected Stream getInstance(File f) throws Exception {
         return new OutputStreamAdapter(f, false);
     }
-    
+
     @Override
     @Test(expected = WrongStreamTypeException.class)
     public void skipTest() throws IOException, WrongStreamTypeException {
@@ -50,31 +51,31 @@ public class OutputStreamAdapterTest extends AbstractStreamTest {
     public void readZeroTest() throws IOException, WrongStreamTypeException {
         super.readZeroTest();
     }
-    
+
     @Override
     @Test(expected = WrongStreamTypeException.class)
     public void getLengthTest() throws IOException, WrongStreamTypeException {
         super.getLengthTest();
     }
-    
+
     @Override
     @Test(expected = WrongStreamTypeException.class)
     public void getLengthAfterChange() throws Exception {
         super.getLengthAfterChange();
     }
-    
+
     @Override
     @Test(expected = WrongStreamTypeException.class)
     public void getPositionTest() throws Exception {
         super.getPositionTest();
     }
-    
+
     @Override
     @Test(expected = WrongStreamTypeException.class)
     public void seekTest() throws IOException, WrongStreamTypeException {
         super.seekTest();
     }
-    
+
     @Override
     @Test(expected = WrongStreamTypeException.class)
     public void seekAndGetLengthTest() throws IOException, WrongStreamTypeException {

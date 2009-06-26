@@ -9,13 +9,14 @@ import org.objectweb.proactive.extra.vfsprovider.exceptions.WrongStreamTypeExcep
 import org.objectweb.proactive.extra.vfsprovider.server.RandomAccessStreamAdapter;
 import org.objectweb.proactive.extra.vfsprovider.server.Stream;
 
+
 public class RandomReadAdapterTest extends AbstractStreamTest {
 
     @Override
     protected Stream getInstance(File f) throws Exception {
         return RandomAccessStreamAdapter.createRandomAccessRead(f);
     }
-    
+
     @Override
     @Test(expected = WrongStreamTypeException.class)
     public void writeTest() throws IOException, WrongStreamTypeException {
@@ -27,7 +28,7 @@ public class RandomReadAdapterTest extends AbstractStreamTest {
     public void flushTest() throws IOException, WrongStreamTypeException {
         super.flushTest();
     }
-    
+
     @Override
     @Test(expected = FileNotFoundException.class)
     public void createFromNotExistingFileTest() throws Exception {

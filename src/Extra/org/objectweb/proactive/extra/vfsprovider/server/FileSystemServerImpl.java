@@ -289,7 +289,7 @@ public class FileSystemServerImpl implements FileSystemServer {
             if (children != null)
                 for (File child : file.listFiles()) {
                     deleteRecursive(child);
-            }
+                }
         }
         return file.delete();
     }

@@ -39,7 +39,7 @@ public class InputStreamAdapterTest extends AbstractStreamTest {
     public void seekTest() throws IOException, WrongStreamTypeException {
         super.seekTest();
     }
-    
+
     @Override
     @Test(expected = WrongStreamTypeException.class)
     public void seekAndGetLengthTest() throws IOException, WrongStreamTypeException {
@@ -57,7 +57,7 @@ public class InputStreamAdapterTest extends AbstractStreamTest {
     public void flushTest() throws IOException, WrongStreamTypeException {
         super.flushTest();
     }
-    
+
     @Override
     @Test(expected = WrongStreamTypeException.class)
     public void getLengthAfterChange() throws Exception {
