@@ -9,8 +9,16 @@ public class StressTestThread implements Runnable {
     private PeerLauncher peerLauncher;
     private boolean running = true;
 
-    public StressTestThread(PeerLauncher peerLauncher) {
+    private boolean performJoin = false;
+    private boolean performLeave = false;
+    private boolean performSearch = false;
+
+    public StressTestThread(PeerLauncher peerLauncher, boolean performJoin, boolean performLeave,
+            boolean performSearch) {
         this.peerLauncher = peerLauncher;
+        this.performJoin = performJoin;
+        this.performLeave = performLeave;
+        this.performSearch = performSearch;
     }
 
     public void run() {
@@ -21,13 +29,19 @@ public class StressTestThread implements Runnable {
             int res = rand.nextInt(3);
             switch (res) {
                 case 0:
-                    this.peerLauncher.addPeer();
+                    if (this.performJoin) {
+                        this.peerLauncher.performJoin();
+                    }
                     break;
                 case 1:
-                    this.peerLauncher.lookupMessage();
+                    if (this.performLeave) {
+                        this.peerLauncher.performLeave();
+                    }
                     break;
                 case 2:
-                    // this.peerLauncher.removePeer();
+                    if (this.performSearch) {
+                        this.peerLauncher.performSearch();
+                    }
                     break;
                 default:
                     break;

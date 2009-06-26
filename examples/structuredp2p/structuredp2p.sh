@@ -11,6 +11,7 @@ fi
 
 default_descriptor=../GCMD_Local.xml
 default_hostname=`hostname`
+default_st_operation=jls
 descriptor_app="$workingDir/GCMA.xml"
 descriptor_peer=$default_descriptor
 descriptor_tracker=$default_descriptor
@@ -28,14 +29,25 @@ fi
 
 if [[ $# -gt 2 && "$3" == "eons" ]]
 then 
+	default_st_operation=$4
 	descriptor_peer=GCMD-Peers.xml
 	descriptor_tracker=GCMD-Trackers.xml
 fi	
 
+if [[ $# -eq 3 && $2 == "ST" ]]
+then
+	default_st_operation=$3
+fi
+
+if [[ $# -eq 4 && $2 == "ST" ]]
+then
+	default_st_operation=$4
+fi
+
 echo
 echo ---------- STRUCTURED P2P ----------
 
-args="$descriptor_app $default_hostname $1 $2"
+args="$descriptor_app $default_hostname $1 $2 $default_st_operation"
 
 export CLASSPATH=../../lib/*:$CLASSPATH
 export CLASSPATH=../../classes/Core:$CLASSPATH

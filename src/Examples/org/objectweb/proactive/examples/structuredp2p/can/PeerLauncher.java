@@ -59,7 +59,7 @@ public class PeerLauncher extends Observable {
         this.avaibleNodes = Deployment.getVirtualNode("Peer").getCurrentNodes();
 
         for (int i = 0; i < Integer.parseInt(args[2]); i++) {
-            this.addPeer();
+            this.performJoin();
         }
 
         Runnable threadToExecute;
@@ -67,13 +67,14 @@ public class PeerLauncher extends Observable {
         if (this.getLauncherType() == LauncherType.INTERACTIVE) {
             threadToExecute = new InteractiveThread(this);
         } else {
-            threadToExecute = new StressTestThread(this);
+            threadToExecute = new StressTestThread(this, args[4].contains("j"), args[4].contains("l"),
+                args[4].contains("s"));
         }
 
         new Thread(threadToExecute).start();
     }
 
-    public void addPeer() {
+    public void performJoin() {
         Random rand = new Random();
         Peer peer = null;
 
@@ -92,19 +93,17 @@ public class PeerLauncher extends Observable {
             e.printStackTrace();
         }
         this.printInformation("Add peer managing " + ((CANOverlay) peer.getStructuredOverlay()).getZone());
-        // this.updateGUI();
     }
 
-    public void removePeer() {
+    public void performLeave() {
         Random rand = new Random();
         Peer peer = this.remotePeers.remove(rand.nextInt(this.remotePeers.size()));
         this.printInformation("Remove peer managing " + ((CANOverlay) peer.getStructuredOverlay()).getZone());
         this.remotePeers.remove(peer);
         peer.leave();
-        // this.updateGUI();
     }
 
-    public void lookupMessage() {
+    public void performSearch() {
         Random rand = new Random();
         Coordinate[] coordinatesToFind = new Coordinate[CANOverlay.NB_DIMENSIONS];
 

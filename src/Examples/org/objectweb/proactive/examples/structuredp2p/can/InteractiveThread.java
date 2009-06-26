@@ -38,16 +38,16 @@ public class InteractiveThread implements Runnable {
                     e.printStackTrace();
                 }
             } else if (inputLine.equalsIgnoreCase("add")) {
-                this.peerLauncher.addPeer();
+                this.peerLauncher.performJoin();
             } else if (inputLine.equalsIgnoreCase("leave")) {
                 if (this.peerLauncher.getRemotePeers().size() == 0) {
                     this.peerLauncher
                             .printInformation("Impossible to perform leave action, the network has no peer.");
                 } else {
-                    this.peerLauncher.removePeer();
+                    this.peerLauncher.performLeave();
                 }
             } else if (inputLine.equalsIgnoreCase("lookup")) {
-                this.peerLauncher.lookupMessage();
+                this.peerLauncher.performSearch();
             } else if (inputLine.equalsIgnoreCase("n")) {
                 this.peerLauncher.printInformation(this.peerLauncher.getRemotePeers().size() +
                     " peer(s) on the network.");
@@ -75,13 +75,13 @@ public class InteractiveThread implements Runnable {
                     int res = rand.nextInt(3);
                     switch (res) {
                         case 0:
-                            this.peerLauncher.addPeer();
+                            this.peerLauncher.performJoin();
                             break;
                         case 1:
-                            this.peerLauncher.lookupMessage();
+                            this.peerLauncher.performSearch();
                             break;
                         case 2:
-                            this.peerLauncher.removePeer();
+                            this.peerLauncher.performLeave();
                             break;
                         default:
                             break;
