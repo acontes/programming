@@ -47,7 +47,9 @@ public class InputStreamAdapter implements Stream {
 
         if (count == -1)
             return null;
-        return Arrays.copyOf(data, count);
+        if (count < bytes)
+            return Arrays.copyOf(data, count);
+        return data;
     }
 
     public void seek(long position) throws WrongStreamTypeException {
