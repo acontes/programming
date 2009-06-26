@@ -26,7 +26,8 @@ public interface StreamOperations {
 
     /**
      * Open a file stream in specified <code>mode</code> that defines a subset of methods that are
-     * allowed to invoke.
+     * allowed to invoke. If specified <code>path</code> points to not existing file and
+     * <code>mode</code> indicates writings, that file will be created.
      * 
      * @param path
      *            of a file whose stream is to be open, cannot be <code>null</code>
@@ -43,7 +44,7 @@ public interface StreamOperations {
     public abstract long streamOpen(String path, StreamMode mode) throws IOException;
 
     /**
-     * Read number of <code>bytes</code> bytes from an open stream defined by unique id that was
+     * Read number of bytes <code>bytes</code> from an open stream defined by unique id that was
      * previously returned by {@link #streamOpen(String, StreamMode)} method call.
      * 
      * @param stream
@@ -136,7 +137,7 @@ public interface StreamOperations {
             WrongStreamTypeException;
 
     /**
-     * Skip and discard number of <code>bytes</code> bytes of an open stream defined by unique id
+     * Skip and discard number of bytes <code>bytes</code> of an open stream defined by unique id
      * that was previously returned by {@link #streamOpen(String, StreamMode)} method call. From a
      * variety of reasons this method call may skip less that specified number of bytes. If
      * <code>bytes</code> is negative, no bytes are skipped.
