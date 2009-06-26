@@ -108,5 +108,5 @@ public class A implements Serializable {
     }
     //@snippet-resume class_A
     //@snippet-end class_A_exception
-
 }
+//@snippet-end class_A
