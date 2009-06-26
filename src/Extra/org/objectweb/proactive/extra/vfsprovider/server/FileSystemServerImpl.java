@@ -284,10 +284,13 @@ public class FileSystemServerImpl implements FileSystemServer {
     }
 
     private boolean deleteRecursive(File file) {
-        if (file.isDirectory())
-            for (File child : file.listFiles()) {
-                deleteRecursive(child);
+        if (file.isDirectory()) {
+            final File[] children = file.listFiles();
+            if (children != null)
+                for (File child : file.listFiles()) {
+                    deleteRecursive(child);
             }
+        }
         return file.delete();
     }
 
