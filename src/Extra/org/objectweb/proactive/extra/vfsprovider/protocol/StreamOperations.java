@@ -84,7 +84,9 @@ public interface StreamOperations {
     /**
      * Change the position of a file stream pointer specified by an unique id that was previously
      * returned by {@link #streamOpen(String, StreamMode)} method call. This stream pointer
-     * indicates the position of a next read or write into a stream.
+     * indicates the position of a next read or write into a stream. Seek operation with
+     * <code>position</code> exceeding the EOF will not affect the file length, unless any write
+     * operation is performed in the new position.
      * 
      * @param stream
      *            an unique id of an open stream
