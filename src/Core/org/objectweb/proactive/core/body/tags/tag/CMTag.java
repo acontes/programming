@@ -18,10 +18,10 @@ public class CMTag extends Tag {
      * Constructor setting the Tag name "PA_TAG_CM"
      * and an UniqueID as the tag DATA
      */
-    public CMTag(UniqueID id, long cpt, String name) {
+    public CMTag(UniqueID id, long cpt, String sourceName, String destName, String interfaceName, String methodName) {
         //super(IDENTIFIER, new UniqueID().getCanonString());
         //super(IDENTIFIER, "" + id.getCanonString() + "::" + cpt);
-    	super(IDENTIFIER, "" + name + "::" + cpt);
+    	super(IDENTIFIER, "" + sourceName + "::" + destName + "::" + interfaceName + "::" + methodName);
     }
 
     /**
