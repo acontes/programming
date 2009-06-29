@@ -31,10 +31,19 @@
  */
 package performanceTests.throughput;
 
+import java.io.Serializable;
+
+import org.junit.Test;
+import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.node.NodeException;
+
+import performanceTests.HudsonReport;
+import functionalTests.FunctionalTest;
 
 
-public class TestHalfBody extends Throughput {
+public class TestHalfBody extends FunctionalTest {
 
     static {
         PAProperties.PA_COMMUNICATION_PROTOCOL.setValue("rmi");

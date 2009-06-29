@@ -429,7 +429,7 @@
 					</programlisting>
 					This method is only used for the deployment and shouldn't be used by end users.
 					If you have to use it you just have to supply a good org.ow2.proactive.virtualizing.vmwarevi.DataKey Enum.
-					You can then get it from your virtual machine thanks to the vmware-guestd tool:
+					You can then get it from your virtual machine thanks to the vmware-guestd tool ( guest tools need to be installed in guest ):
 					<programlisting>
 						vmware-guestd --cmd "info-get guestinfo.[datakey value]"
 					</programlisting>
@@ -521,7 +521,7 @@
 					</programlisting>
 					This method is only used for the deployment and shouldn't be used by end users.
 					If you have to use it you just have to supply a good org.ow2.proactive.virtualizing.vmwarevix.DataKey Enum.
-					You can then get it from your virtual machine thanks to the vmware-guestd tool:
+					You can then get it from your virtual machine thanks to the vmware-guestd tool ( guest tools need to be installed in guest ) :
 					<programlisting>
 						vmware-guestd --cmd "info-get guestinfo.[datakey value]"
 					</programlisting>
@@ -623,6 +623,22 @@
   						VirtualboxVM vm = vmm.getVirtualMachines();
   					</programlisting>
   				</para>
+				<para>
+					This module implements extra features to allow ProActive deployment.
+					It is possible to "push" data into registered virtual machines ( as long as guest tools are installed
+					in the guest. To see how to install guest tools refer to your virtualization software documentation )
+					thanks to:
+					<programlisting>
+						public boolean pushData(DataKey key, String value) throws VirtualServiceException
+					</programlisting>
+					This method is only used for the deployment and shouldn't be used by end users.
+					If you have to use it you just have to supply a good org.ow2.proactive.virtualizing.virtualbox.DataKey Enum.
+					You can then get it from your virtual machine thanks to the VBoxControl tool ( guest tools need to be installed in guest ) :
+					<programlisting>
+						VBoxControl guestproperty get datakey
+					</programlisting>
+					where [datakey] is the string value of the VirtualboxVM.DataKey you supplied.
+				</para>
   			</sect2>
   		</sect1>
 
@@ -847,7 +863,7 @@
 				<title>XenServer</title>
 				<para>
 					<emphasis>
-						<phrase>This section concerns products compatible with LibXen ( SDK for web service access, for XenServer and Xen OSS ). </phrase>
+						<phrase>This section concerns products compatible with LibXen ( SDK for web service access for XenServer ). </phrase>
 						<phrase>Note that the associated python script launcher doesn't work with python 3 due to XenAPI.py incompatibility. </phrase>
 					</emphasis>
 				</para>
@@ -896,9 +912,8 @@
 					per virtual machine ( because you almost always manage your virtual infrastructure thanks to an user interface and can <quote>click</quote>
 					the good one. ), we ask you to do so to ensure the good function of the deployment feature. <quote>os</quote> attribute indicates
 					the guest virtual machine's operating system. <quote>count</quote> allows you to precise the number of virtual machine of this type you want
-					to deploy. Note that this feature doesn't work for Xen Oss as the underlying implementation is not provided by xen.org. 
-					To enable an efficient clone feature on XenServer, be sure to host your virtual machines on an EXT based pool. If you want to change
-					the backing file system of your virtual machine disk pool, refer to that 
+					to deploy. To enable an efficient clone feature on XenServer, be sure to host your virtual machines on an EXT based pool.
+					If you want to change the backing file system of your virtual machine disk pool, refer to that
 					<ulink url="http://www.tokeshi.com/index.php?option=com_content&amp;task=view&amp;id=5025">tutorial</ulink>. 
 				</para>
 			</sect2>

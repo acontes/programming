@@ -87,6 +87,7 @@ import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.hostinfo.H
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.hostinfo.Tool;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.vm.AbstractVMM;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.vm.VMMLibXenParser;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.vm.VMMLibvirtParser;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.vm.VMMParser;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.vm.VMMVMwareVIParser;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.vm.VMMVMwareVixParser;
@@ -249,6 +250,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         registerVMMParser(new VMMVMwareVixParser());
         registerVMMParser(new VMMLibXenParser());
         registerVMMParser(new VMMVirtualboxParser());
+        registerVMMParser(new VMMLibvirtParser());
         // TODO add other vmm parsers here
     }
 
