@@ -32,7 +32,7 @@ import org.objectweb.proactive.extra.vfsprovider.server.Stream;
  * accept {@link Long#MAX_VALUE} and throw an IOException.
  */
 public abstract class AbstractStreamTest extends AbstractIOOperationsTest {
-    
+
     protected static final String TEST_FILE_NEW_CONTENT = "fouxdufafafauxdufafafafa";
 
     protected static final int TEST_FILE_NEW_CONTENT_LEN = TEST_FILE_NEW_CONTENT.getBytes().length;

@@ -29,7 +29,7 @@ public abstract class AbstractIOOperationsTest {
         }
         return file.delete();
     }
-    
+
     public String getTestDirFilename() {
         return "ProActive-AbstractIOOperationsTest";
     }
