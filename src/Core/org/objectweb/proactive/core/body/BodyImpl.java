@@ -47,7 +47,10 @@ import javax.management.MBeanServer;
 import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
 
+import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
+import org.objectweb.fractal.api.control.BindingController;
+import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -75,12 +78,17 @@ import org.objectweb.proactive.core.body.tags.Tag;
 import org.objectweb.proactive.core.body.tags.tag.CMTag;
 import org.objectweb.proactive.core.body.tags.tag.DsiTag;
 import org.objectweb.proactive.core.component.ComponentMethodCallMetadata;
+import org.objectweb.proactive.core.component.ComponentParameters;
+import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.body.ComponentBodyImpl;
+import org.objectweb.proactive.core.component.controller.ProActiveBindingController;
+import org.objectweb.proactive.core.component.controller.ProActiveBindingControllerImpl;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative;
 import org.objectweb.proactive.core.component.request.ComponentRequestImpl;
+import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.debug.stepbystep.BreakpointType;
 import org.objectweb.proactive.core.gc.GarbageCollector;
@@ -92,6 +100,7 @@ import org.objectweb.proactive.core.jmx.server.ServerConnector;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.MOPException;
 import org.objectweb.proactive.core.mop.MethodCall;
+import org.objectweb.proactive.core.mop.MethodCallInfo;
 import org.objectweb.proactive.core.mop.ObjectReferenceReplacer;
 import org.objectweb.proactive.core.mop.ObjectReplacer;
 import org.objectweb.proactive.core.node.Node;
@@ -831,33 +840,44 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             
             // if the request is a Component request, propagate it accordingly
             if(currentreq != null) {
-            	//if(currentreq.getMethodCall().getComponentMetadata() != null) {
             	if(currentreq instanceof ComponentRequestImpl) {
-            		String componentSourceName = "";
-            		String componentDestName = "";
-            		String interfaceName = "";
-            		String methodName = "";
+            		String componentSourceName = "-";
+            		String componentDestName = ""; // not required: remove
+            		String interfaceName = "-";
+            		String methodName = "-";
             		// ugly!
-            		// This behaviour should be part of the Tag t.apply(), but how can the Tag have
-            		// access to the BodyImpl ?
-            		if(BodyImpl.this instanceof ComponentBodyImpl) {
-            			ProActiveComponent pac = ((ComponentBodyImpl)BodyImpl.this).getProActiveComponentImpl();
+            		// This behaviour should be part of the Tag t.apply(), but how can the Tag have access to the BodyImpl ?
+            		// Moreover, Component specific behaviour shouldn't be in ComponentBodyImpl, instead of here? 
+            		// So, it wouldn't be necessary to do things like if(methodCall.getComponentMetadata != null) to know if it's a ComponentRequest
+            		// (but that's like a "major" thing)
+
+            		ComponentMethodCallMetadata cmcmd = methodCall.getComponentMetadata();
+            		ProActiveComponent pac = ((ComponentBodyImpl)BodyImpl.this).getProActiveComponentImpl();
+            		
+            		if(pac != null && cmcmd != null) {
+            			ComponentParameters cp = pac.getComponentParameters();
             			componentSourceName = pac.getComponentParameters().getName();
-            			ProActiveComponentRepresentative pacr = (ProActiveComponentRepresentative) pac.getRepresentativeOnThis();
-            			ComponentMethodCallMetadata cmcmd = methodCall.getComponentMetadata();
-            			if(cmcmd != null) {
-            				interfaceName = cmcmd.getComponentInterfaceName();
-            			}
-            			methodName = methodCall.getName();
-            			
-            			if(nextTags.check(CMTag.IDENTIFIER)) {
-            				nextTags.removeTag(CMTag.IDENTIFIER);
-            			}
-            			nextTags.addTag(new CMTag(bodyID, sequenceID, componentSourceName, componentDestName, interfaceName, methodName));
+            			interfaceName = cmcmd.getComponentInterfaceName();
+            			// why does this return false????
+            			// System.out.println("::::::::::"+cmcmd.isComponentMethodCall());
             		}
+        			methodName = methodCall.getName();
+            		//System.out.println("Call from " + componentSourceName + " to " + interfaceName + "." + methodName);
+
+            		// Replace the current CMTag (if exists) for a new CMTag with the data of the requestSent
+        			long oldSeqID = 0;
+            		if(nextTags.check(CMTag.IDENTIFIER)) {
+            			CMTag oldTag = (CMTag) nextTags.removeTag(CMTag.IDENTIFIER);
+            			oldSeqID = oldTag.getNewSeqID();
+            		}
+            		
+            		// sequenceID is the new one, just generated (in sendRequest).
+            		// need to find the request that was being served, to be able to associate it in the callLog
+            		nextTags.addTag(new CMTag(bodyID, oldSeqID, sequenceID, componentSourceName, componentDestName, interfaceName, methodName));
+
             	}
             }
-            
+
             return nextTags;
         }
     }

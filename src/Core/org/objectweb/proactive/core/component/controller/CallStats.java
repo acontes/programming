@@ -9,7 +9,7 @@ package org.objectweb.proactive.core.component.controller;
 public class CallStats {
 	
 	/** ID of the parent request */
-	private long parentID;
+	private ComponentRequestID parentID;
 	
 	private String calledComponent;
 	private String interfaceName;
@@ -22,7 +22,7 @@ public class CallStats {
 	private boolean finished;
 	private boolean voidRequest;
 	
-	public CallStats(long parentID, String calledComponent, String interfaceName, String methodName,
+	public CallStats(ComponentRequestID parentID, String calledComponent, String interfaceName, String methodName,
 			long sentTime, boolean voidRequest) {
 		
 		this.parentID = parentID;
@@ -59,7 +59,7 @@ public class CallStats {
 		this.wbnStartTime = wbnStartTime;
 	}
 
-	public long getParentID() {
+	public ComponentRequestID getParentID() {
 		return parentID;
 	}
 

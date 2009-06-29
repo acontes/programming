@@ -40,6 +40,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.management.Notification;
 import javax.management.NotificationListener;
@@ -55,6 +57,7 @@ import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.body.tags.tag.CMTag;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.Utils;
@@ -99,6 +102,9 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
     @Override
 	public void initController() {
     	logger.debug("Monitoring Controller init");
+    	// some of these two HashMap's should be synchronized? 
+    	requestLog = new HashMap<ComponentRequestID, RequestStats>();
+    	callLog = new HashMap<ComponentRequestID, CallStats>();
 	}
 
 
@@ -247,6 +253,7 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
                     .getBodyOnThis().getID()), this);
             started = false;
         }
+        displayCallLog();
     }
 
     public void resetMonitoring() {
@@ -314,14 +321,13 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
         
         if (type.equals(NotificationType.requestReceived)) {
             RequestNotificationData data = (RequestNotificationData) notification.getUserData();
-            logger.debug("["+componentName+"][requestRecv] From:" + data.getSource() +
-            		" To:"+ data.getDestination() +
+            logger.debug("["+componentName+"][requestRecv] " + //"From:" + data.getSource() +
+            		//" To:"+ data.getDestination() +
             		" Method:" + data.getMethodName() +
             		" SeqNumber: " + data.getSequenceNumber() +
             		" Timestamp: " + notification.getTimeStamp() +
             		" NotifSeqNbr: " + notification.getSequenceNumber() +
             		" Tags: " + data.getTags());
-            // Still needs the interface name !!!! (look at CompoentnRequestImpl?)
 //            String key = keysList.get(data.getMethodName());
 //            if (key != null) {
 //                ((MethodStatisticsAbstract) statistics.get(key)).notifyArrivalOfRequest(notification
@@ -330,13 +336,14 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
         } 
         else if (type.equals(NotificationType.servingStarted)) {
             RequestNotificationData data = (RequestNotificationData) notification.getUserData();
-            logger.debug("["+componentName+"][servingStar] From:" + data.getSource() +
-            		" To:"+ data.getDestination() +
-            		" Method:" + data.getMethodName() +
-            		" SeqNumber: " + data.getSequenceNumber() +
-            		" Timestamp: " + notification.getTimeStamp() +
-            		" NotifSeqNbr: " + notification.getSequenceNumber() +
-            		" Tags: " + data.getTags());
+//            logger.debug("["+componentName+"][servingStar] From:" + data.getSource() +
+//            		" To:"+ data.getDestination() +
+//            		" Method:" + data.getMethodName() +
+//            		" SeqNumber: " + data.getSequenceNumber() +
+//            		" Timestamp: " + notification.getTimeStamp() +
+//            		" NotifSeqNbr: " + notification.getSequenceNumber() +
+//            		" Tags: " + data.getTags());
+            
 //            String key = keysList.get(data.getMethodName());
 //            if (key != null) {
 //                ((MethodStatisticsAbstract) statistics.get(key)).notifyDepartureOfRequest(notification
@@ -345,13 +352,14 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
         } 
         else if (type.equals(NotificationType.replySent)) {
             RequestNotificationData data = (RequestNotificationData) notification.getUserData();
-            logger.debug("["+componentName+"][replySent  ] From:" + data.getSource() +
-            		" To:"+ data.getDestination() +
-            		" Method:" + data.getMethodName() +
-            		" SeqNumber: " + data.getSequenceNumber() +
-            		" Timestamp: " + notification.getTimeStamp() +
-            		" NotifSeqNbr: " + notification.getSequenceNumber() +
-            		" Tags: " + data.getTags());
+//            logger.debug("["+componentName+"][replySent  ] From:" + data.getSource() +
+//            		" To:"+ data.getDestination() +
+//            		" Method:" + data.getMethodName() +
+//            		" SeqNumber: " + data.getSequenceNumber() +
+//            		" Timestamp: " + notification.getTimeStamp() +
+//            		" NotifSeqNbr: " + notification.getSequenceNumber() +
+//            		" Tags: " + data.getTags());
+            
 //            String key = keysList.get(data.getMethodName());
 //            if (key != null) {
 //                ((MethodStatisticsAbstract) statistics.get(key)).notifyReplyOfRequestSent(notification
@@ -360,13 +368,14 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
         } 
         else if (type.equals(NotificationType.voidRequestServed)) {
             RequestNotificationData data = (RequestNotificationData) notification.getUserData();
-            logger.debug("["+componentName+"][voidReqServ] From:" + data.getSource() +
-            		" To:"+ data.getDestination() +
-            		" Method:" + data.getMethodName() +
-            		" SeqNumber: " + data.getSequenceNumber() +
-            		" Timestamp: " + notification.getTimeStamp() +
-            		" NotifSeqNbr: " + notification.getSequenceNumber() +
-            		" Tags: " + data.getTags());
+//            logger.debug("["+componentName+"][voidReqServ] From:" + data.getSource() +
+//            		" To:"+ data.getDestination() +
+//            		" Method:" + data.getMethodName() +
+//            		" SeqNumber: " + data.getSequenceNumber() +
+//            		" Timestamp: " + notification.getTimeStamp() +
+//            		" NotifSeqNbr: " + notification.getSequenceNumber() +
+//            		" Tags: " + data.getTags());
+            
 //            String key = keysList.get(data.getMethodName());
 //            if (key != null) {
 //                ((MethodStatisticsAbstract) statistics.get(key)).notifyReplyOfRequestSent(notification
@@ -375,13 +384,15 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
         }
         else if (type.equals(NotificationType.requestSent)) {
             RequestNotificationData data = (RequestNotificationData) notification.getUserData();
-            logger.debug("["+componentName+"][requestSent] From:" + data.getSource() +
-            		" To:"+ data.getDestination() +
+            logger.debug("["+componentName+"][requestSent] " + //"From:" + data.getSource() +
+//            		" To:"+ data.getDestination() +
             		" Method:" + data.getMethodName() +
             		" SeqNumber: " + data.getSequenceNumber() +
             		" Timestamp: " + notification.getTimeStamp() +
             		" NotifSeqNbr: " + notification.getSequenceNumber() +
             		" Tags: " + data.getTags());
+            
+            processRequestSent(notification);
 //            String key = keysList.get(data.getMethodName());
 //            if (key != null) {
 //                ((MethodStatisticsAbstract) statistics.get(key)).notifyReplyOfRequestSent(notification
@@ -390,13 +401,14 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
         } 
         else if (type.equals(NotificationType.replyReceived)) {
             RequestNotificationData data = (RequestNotificationData) notification.getUserData();
-            logger.debug("["+componentName+"][replyRecv  ] From:" + data.getSource() +
-            		" To:"+ data.getDestination() +
-            		" Method:" + data.getMethodName() +
-            		" SeqNumber: " + data.getSequenceNumber() +
-            		" Timestamp: " + notification.getTimeStamp() +
-            		" NotifSeqNbr: " + notification.getSequenceNumber() +
-            		" Tags: " + data.getTags());
+//            logger.debug("["+componentName+"][replyRecv  ] From:" + data.getSource() +
+//            		" To:"+ data.getDestination() +
+//            		" Method:" + data.getMethodName() +
+//            		" SeqNumber: " + data.getSequenceNumber() +
+//            		" Timestamp: " + notification.getTimeStamp() +
+//            		" NotifSeqNbr: " + notification.getSequenceNumber() +
+//            		" Tags: " + data.getTags());
+            
 //            String key = keysList.get(data.getMethodName());
 //            if (key != null) {
 //                ((MethodStatisticsAbstract) statistics.get(key)).notifyReplyOfRequestSent(notification
@@ -411,6 +423,72 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
                 handleNotification(iterator.next(), handback);
             }
         }
+    }
+    
+    
+    private void processRequestSent(Notification notification) {
+    	// adds the request to callLog
+    	// this should be the first notification regarding this request, anyway the order is not guaranteed,
+    	// so care must be taken when procesing the corresponding "replyReceived"
+    	RequestNotificationData data = (RequestNotificationData) notification.getUserData();
+    	// TODO: Move this processing to the CMTag part
+    	String cmTag = extractCMTag(data);
+    	String[] cmTagFields = cmTag.split("::");
+    	ComponentRequestID parent = new ComponentRequestID(Long.parseLong(cmTagFields[0]));
+    	ComponentRequestID current = new ComponentRequestID(Long.parseLong(cmTagFields[1]));
+    	String interfaceName = cmTagFields[4];
+    	String methodName = cmTagFields[5];
+    	if(interfaceName.equals("-")) {
+    		return;
+    	}
+    	CallStats cs = new CallStats(parent, "", interfaceName, methodName, notification.getTimeStamp(), false);
+    	callLog.put(current, cs);
+    }
+    
+    private String extractCMTag(RequestNotificationData data) {
+    	CMTag res = null;
+    	String tagString = data.getTags();
+    	// The ? is a "reluctant" quantifier, to make the .* to match the smallest possible string.
+    	Pattern pattern = Pattern.compile("\\[TAG\\](.*?)\\[DATA\\](.*?)\\[END\\]");
+    	Pattern inner = Pattern.compile("\\[(.*?)\\]");
+    	Matcher match = pattern.matcher(tagString);
+    	//System.out.println("Orign: "+ tagString);
+    	String currentTag;
+    	String currentFields[];
+    	while(match.find()) {
+    		currentTag = match.group();
+    		//System.out.println("Resul: "+ currentTag);
+    		currentFields = inner.split(currentTag);
+    		if(currentFields[1].equals(CMTag.IDENTIFIER)) {
+    			// This is the CMTag. Process it
+    			//String tagFields[] = currentFields[2].split("::");
+    			return currentFields[2];
+    			// And this shouldn't be necessary!!!... the CMTag should have a constructor that receives a string
+    			//return new CMTag(null, Long.parseLong(tagFields[0]), Long.parseLong(tagFields[1]), tagFields[2], tagFields[3], tagFields[4], tagFields[5]);
+    		}
+    	}
+    	
+    	return null;
+    }
+    
+    public void displayCallLog() {
+        String componentName = "";
+        try {
+        	componentName = Fractal.getNameController(owner).getFcName();
+		} catch (NoSuchInterfaceException e) {
+			e.printStackTrace();
+		}
+		System.out.println("[callLog]:" +componentName);
+    	int nKeys = callLog.size();
+    	Iterator<ComponentRequestID> i = callLog.keySet().iterator();
+    	ComponentRequestID crID;
+    	CallStats cs;
+    	while(i.hasNext()) {
+    		crID = i.next();
+    		cs = callLog.get(crID);
+    		System.out.println("[callLog:"+componentName+"] Parent: "+ cs.getParentID() + " Current: "+ crID + " Call: "+ cs.getInterfaceName()+"."+cs.getMethodName()+ " Time: " + cs.getSentTime());
+    		
+    	}
     }
 
     /*

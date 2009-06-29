@@ -19,4 +19,8 @@ public class ComponentRequestID {
 	public long getComponentRequestID() {
 		return reqID;
 	}
+	
+	public String toString() {
+		return ""+reqID;
+	}
 }
