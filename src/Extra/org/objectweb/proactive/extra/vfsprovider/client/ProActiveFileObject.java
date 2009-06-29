@@ -1,18 +1,22 @@
 package org.objectweb.proactive.extra.vfsprovider.client;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Arrays;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.RandomAccessContent;
 import org.apache.commons.vfs.provider.AbstractFileObject;
+import org.apache.commons.vfs.provider.AbstractRandomAccessStreamContent;
 import org.apache.commons.vfs.util.FileObjectUtils;
 import org.apache.commons.vfs.util.MonitorInputStream;
 import org.apache.commons.vfs.util.MonitorOutputStream;
@@ -24,9 +28,8 @@ import org.objectweb.proactive.extra.vfsprovider.protocol.FileSystemServer;
 import org.objectweb.proactive.extra.vfsprovider.protocol.StreamMode;
 
 
-// TODO check for correctness of protocol <-> FileObject exceptions/errors mapping
 public class ProActiveFileObject extends AbstractFileObject {
-    // log in VFS (not ProActive) way
+    // logging in VFS (not ProActive) way
     private static Log log = LogFactory.getLog(ProActiveFileObject.class);
 
     private static final FileInfo IMAGINARY_FILE_INFO = new FileInfo() {
@@ -57,25 +60,22 @@ public class ProActiveFileObject extends AbstractFileObject {
         }
     };
 
-    private static IOException generateAndLogIOWrongStreamTypeExecption(WrongStreamTypeException e) {
-        log
-                .error("File server unexpectedly does not allow to perform some type of operation on an opened stream");
-        return new IOException(
-            "File server unexpectedly does not allow to perform some type of operation on an opened stream",
-            e);
-    }
-
-    private static IOException generateAndLogIOStreamNotFoundException(StreamNotFoundException e) {
-        log.error("File server unexpectedly closed the reopened file stream");
-        return new IOException("File server unexpectedly closed the reopened file stream", e);
-    }
-
     private FileInfo fileInfo;
     private ProActiveFileSystem proactiveFS;
 
     protected ProActiveFileObject(FileName name, ProActiveFileSystem fs) {
         super(name, fs);
         this.proactiveFS = fs;
+    }
+
+    // let's access server this way, as ProActiveFileSystem is responsible
+    // for managing its instance(s)
+    private FileSystemServer getServer() {
+        return proactiveFS.getServer();
+    }
+
+    private String getPath() {
+        return ((ProActiveFileName) getName()).getPath();
     }
 
     @Override
@@ -94,6 +94,14 @@ public class ProActiveFileObject extends AbstractFileObject {
     protected void doDetach() throws Exception {
         synchronized (proactiveFS) {
             fileInfo = null;
+        }
+    }
+
+    @Override
+    protected void onChange() throws Exception {
+        synchronized (proactiveFS) {
+            doDetach();
+            doAttach();
         }
     }
 
@@ -162,6 +170,19 @@ public class ProActiveFileObject extends AbstractFileObject {
                 org.objectweb.proactive.extra.vfsprovider.protocol.FileType.DIRECTORY);
     }
 
+    // Overrides AbstractFileObject implementation for better performance.  
+    @Override
+    public void createFile() throws FileSystemException {
+        synchronized (proactiveFS) {
+            try {
+                getServer().fileCreate(getPath(),
+                        org.objectweb.proactive.extra.vfsprovider.protocol.FileType.FILE);
+            } catch (final Exception e) {
+                throw new FileSystemException("vfs.provider/create-file.error", getName(), e);
+            }
+        }
+    }
+
     @Override
     protected void doDelete() throws Exception {
         getServer().fileDelete(getPath(), false);
@@ -180,101 +201,86 @@ public class ProActiveFileObject extends AbstractFileObject {
     }
 
     @Override
-    protected void onChange() throws Exception {
-        synchronized (proactiveFS) {
-            doDetach();
-            doAttach();
-        }
-    }
-
-    @Override
     protected InputStream doGetInputStream() throws Exception {
-        return new MonitorInputStream(new RawProActiveInputStreamAdapter());
+        return new MonitorInputStream(new ProActiveInputStream());
     }
 
     @Override
     protected OutputStream doGetOutputStream(boolean append) throws Exception {
-        return new MonitorOutputStream(new RawProActiveOutputStreamAdapter(append));
+        return new MonitorOutputStream(new ProActiveOutputStream(append));
     }
 
     @Override
     protected RandomAccessContent doGetRandomAccessContent(RandomAccessMode mode) throws Exception {
-        // TODO Auto-generated method stub
-        return super.doGetRandomAccessContent(mode);
+        return new ProActiveRandomAccessContent(mode);
     }
 
-    private String getPath() {
-        return ((ProActiveFileName) getName()).getPath();
-    }
-
-    // we always access server this way, as ProActiveFileSystem is responsible
-    // for managing its instance(s)
-    private FileSystemServer getServer() {
-        return proactiveFS.getServer();
-    }
-
-    private class RawProActiveInputStreamAdapter extends InputStream {
-        private final byte[] SINGLE_BYTE_BUF = new byte[1];
+    private class ProActiveInputStream extends AbstractProActiveInputStreamAdapter {
+        private long position;
         private long streamId;
-        private long pos;
 
-        public RawProActiveInputStreamAdapter() throws IOException {
+        public ProActiveInputStream() throws IOException {
             streamId = getServer().streamOpen(getPath(), StreamMode.SEQUENTIAL_READ);
         }
 
-        public synchronized long getStreamId() {
+        @Override
+        protected long getStreamId() {
             return streamId;
         }
 
         @Override
-        public synchronized int read(byte[] b, int off, int len) throws IOException {
-            byte result[];
-            try {
-                try {
-                    result = getServer().streamRead(streamId, len);
-                } catch (StreamNotFoundException e) {
-                    reopenStream();
-                    result = getServer().streamRead(streamId, len);
-                }
-            } catch (WrongStreamTypeException e) {
-                throw generateAndLogIOWrongStreamTypeExecption(e);
-            } catch (StreamNotFoundException e) {
-                throw generateAndLogIOStreamNotFoundException(e);
-            }
-
-            if (result == null) {
-                return -1;
-            }
-            System.arraycopy(result, 0, b, off, result.length);
-            pos += result.length;
-            return result.length;
+        protected FileSystemServer getServer() {
+            return ProActiveFileObject.this.getServer();
         }
 
         @Override
-        public int read() throws IOException {
-            if (read(SINGLE_BYTE_BUF) == -1) {
-                return -1;
+        public synchronized void close() throws IOException {
+            try {
+                getServer().streamClose(streamId);
+            } catch (StreamNotFoundException e) {
+                //ignore 
             }
-            return SINGLE_BYTE_BUF[0];
         }
 
         @Override
-        public synchronized long skip(long n) throws IOException {
+        protected void notifyBytesRead(long bytesNumber) {
+            position += bytesNumber;
+        }
+
+        @Override
+        protected void reopenStream() throws IOException {
+            ProActiveFileObject.log.debug("Reopening input stream: " + streamId);
             try {
-                long skippedBytes;
-                try {
-                    skippedBytes = getServer().streamSkip(streamId, n);
-                } catch (StreamNotFoundException e) {
-                    reopenStream();
-                    skippedBytes = getServer().streamSkip(streamId, n);
+                streamId = getServer().streamOpen(getPath(), StreamMode.SEQUENTIAL_READ);
+                if (position > 0) {
+                    final long skipped = getServer().streamSkip(streamId, position);
+                    if (skipped != position) {
+                        close();
+                        throw new IOException("Could not skip proper number of bytes");
+                    }
                 }
-                pos += skippedBytes;
-                return skippedBytes;
-            } catch (StreamNotFoundException e) {
-                throw generateAndLogIOStreamNotFoundException(e);
-            } catch (WrongStreamTypeException e) {
-                throw generateAndLogIOWrongStreamTypeExecption(e);
+            } catch (Exception x) {
+                throw Utils.generateAndLogIOExceptionCouldNotReopen(log, x);
             }
+        }
+    }
+
+    private class ProActiveOutputStream extends AbstractProActiveOutputStreamAdapter {
+        private long streamId;
+
+        private ProActiveOutputStream(final boolean append) throws IOException {
+            final StreamMode mode = append ? StreamMode.SEQUENTIAL_APPEND : StreamMode.SEQUENTIAL_WRITE;
+            streamId = getServer().streamOpen(getPath(), mode);
+        }
+
+        @Override
+        protected long getStreamId() {
+            return streamId;
+        }
+
+        @Override
+        protected FileSystemServer getServer() {
+            return ProActiveFileObject.this.getServer();
         }
 
         @Override
@@ -286,87 +292,384 @@ public class ProActiveFileObject extends AbstractFileObject {
             }
         }
 
-        private void reopenStream() throws IOException, StreamNotFoundException, WrongStreamTypeException {
-            log.debug("Reopening input stream: " + streamId);
-            streamId = getServer().streamOpen(getPath(), StreamMode.SEQUENTIAL_READ);
-            if (pos > 0) {
-                getServer().streamSkip(streamId, pos);
+        @Override
+        protected void notifyBytesWritten(long bytesNumber) {
+            // ignore
+        }
+
+        @Override
+        protected void reopenStream() throws IOException {
+            ProActiveFileObject.log.debug("Reopening output stream: " + streamId);
+            try {
+                streamId = getServer().streamOpen(getPath(), StreamMode.SEQUENTIAL_APPEND);
+            } catch (Exception x) {
+                throw Utils.generateAndLogIOExceptionCouldNotReopen(log, x);
             }
         }
     }
 
-    private class RawProActiveOutputStreamAdapter extends OutputStream {
-        private final byte[] SINGLE_BYTE_BUF = new byte[1];
+    private class ProActiveRandomAccessContent extends AbstractRandomAccessStreamContent {
         private long streamId;
+        private final StreamMode streamMode;
+        private long bufInputStreamPosition;
+        private long position;
+        private DataInputStream dis;
+        private DataOutputStream dos;
 
-        public RawProActiveOutputStreamAdapter(final boolean append) throws IOException {
-            final StreamMode mode;
-            if (append) {
-                mode = StreamMode.SEQUENTIAL_APPEND;
+        private ProActiveRandomAccessContent(RandomAccessMode mode) throws IOException {
+            super(mode);
+            if (mode == RandomAccessMode.READ) {
+                streamMode = StreamMode.RANDOM_ACCESS_READ;
+            } else if (mode == RandomAccessMode.READWRITE) {
+                streamMode = StreamMode.RANDOM_ACCESS_READ_WRITE;
             } else {
-                mode = StreamMode.SEQUENTIAL_WRITE;
+                throw new IllegalArgumentException("Unexpected random access mode");
             }
-            streamId = getServer().streamOpen(getPath(), mode);
-        }
-
-        public synchronized long getStreamId() {
-            return streamId;
+            streamId = getServer().streamOpen(getPath(), streamMode);
         }
 
         @Override
-        public synchronized void write(byte[] b, int off, int len) throws IOException {
-            final byte bytesToSent[];
-            if (off != 0 || len != b.length) {
-                bytesToSent = Arrays.copyOfRange(b, off, len);
+        protected DataInputStream getDataInputStream() throws IOException {
+            if (dis == null) {
+                dis = createDataInputStream();
+            }
+            return dis;
+        }
+
+        private DataInputStream createDataInputStream() throws IOException {
+            final InputStream is = new AbstractProActiveInputStreamAdapter() {
+                @Override
+                protected long getStreamId() {
+                    return streamId;
+                }
+
+                @Override
+                protected FileSystemServer getServer() {
+                    return ProActiveFileObject.this.getServer();
+                }
+
+                @Override
+                public void close() throws IOException {
+                    dis = null;
+                }
+
+                @Override
+                protected void notifyBytesRead(long bytes) {
+                    position += bytes;
+                }
+
+                @Override
+                protected void reopenStream() throws IOException {
+                    ProActiveRandomAccessContent.this.reopenStream();
+                }
+
+                @Override
+                public int read() throws IOException {
+                    checkNotClosed();
+                    return super.read();
+                }
+
+                @Override
+                public int read(byte[] b) throws IOException {
+                    checkNotClosed();
+                    return super.read(b);
+                }
+
+                @Override
+                public synchronized int read(byte[] b, int off, int len) throws IOException {
+                    checkNotClosed();
+                    return super.read(b, off, len);
+                }
+
+                @Override
+                public synchronized long skip(long n) throws IOException {
+                    checkNotClosed();
+                    return super.skip(n);
+                }
+
+                @Override
+                public int available() throws IOException {
+                    checkNotClosed();
+                    return super.available();
+                }
+
+                private void checkNotClosed() throws IOException {
+                    if (dis == null) {
+                        throw new IOException("Stream closed");
+                    }
+                }
+            };
+
+            if (streamMode == StreamMode.RANDOM_ACCESS_READ) {
+                // user gets buffered MonitorInputStream, so we have to count read bytes
+                // for getFilePointer() in that buffered stream, not on raw stream
+                return new DataInputStream(new FilterInputStream(new MonitorInputStream(is)) {
+                    @Override
+                    public int read() throws IOException {
+                        final int result = super.read();
+                        if (result > 0) {
+                            bufInputStreamPosition++;
+                        }
+                        return result;
+                    }
+
+                    @Override
+                    public int read(byte[] b) throws IOException {
+                        final int result = super.read(b);
+                        if (result > 0) {
+                            bufInputStreamPosition += result;
+                        }
+                        return result;
+                    }
+
+                    @Override
+                    public int read(byte[] b, int off, int len) throws IOException {
+                        final int result = super.read(b, off, len);
+                        if (result > 0) {
+                            bufInputStreamPosition += result;
+                        }
+                        return result;
+                    }
+
+                    @Override
+                    public long skip(long n) throws IOException {
+                        final long result = super.skip(n);
+                        bufInputStreamPosition += result;
+                        return result;
+                    }
+                });
             } else {
-                bytesToSent = b;
+                return new DataInputStream(is);
+            }
+        }
+
+        private DataOutputStream getDataOutputStream() throws IOException {
+            if (dos == null) {
+                dos = createDataOutputStream();
+            }
+            return dos;
+        }
+
+        private DataOutputStream createDataOutputStream() throws IOException {
+            final OutputStream is = new AbstractProActiveOutputStreamAdapter() {
+                @Override
+                protected long getStreamId() {
+                    return streamId;
+                }
+
+                @Override
+                protected FileSystemServer getServer() {
+                    return ProActiveFileObject.this.getServer();
+                }
+
+                @Override
+                public void close() throws IOException {
+                    dos = null;
+                }
+
+                @Override
+                protected void notifyBytesWritten(long bytes) {
+                    position += bytes;
+                }
+
+                @Override
+                protected void reopenStream() throws IOException {
+                    ProActiveRandomAccessContent.this.reopenStream();
+                }
+
+                @Override
+                public void write(int b) throws IOException {
+                    checkNotClosed();
+                    super.write(b);
+                }
+
+                @Override
+                public void write(byte[] b) throws IOException {
+                    checkNotClosed();
+                    super.write(b);
+                }
+
+                @Override
+                public synchronized void write(byte[] b, int off, int len) throws IOException {
+                    checkNotClosed();
+                    super.write(b, off, len);
+                }
+
+                private void checkNotClosed() throws IOException {
+                    if (dos == null) {
+                        throw new IOException("Stream closed");
+                    }
+                }
+            };
+            return new DataOutputStream(is);
+        }
+
+        private void reopenStream() throws IOException {
+            ProActiveFileObject.log.debug("Reopening random access stream: " + streamId);
+            try {
+                streamId = getServer().streamOpen(getPath(), streamMode);
+            } catch (Exception x) {
+                throw Utils.generateAndLogIOExceptionCouldNotReopen(log, x);
             }
 
+            if (position > 0) {
+                try {
+                    getServer().streamSeek(streamId, position);
+                } catch (Exception x) {
+                    close();
+                    throw Utils.generateAndLogIOExceptionCouldNotReopen(log, x);
+                }
+            }
+        }
+
+        private void checkStreamModeReadWrite() throws IOException {
+            if (streamMode != StreamMode.RANDOM_ACCESS_READ_WRITE) {
+                throw new IOException("Incorrect stream mode");
+            }
+        }
+
+        public void close() throws IOException {
+            try {
+                // these 2 closes should never fail
+                if (dis != null) {
+                    dis.close();
+                }
+                if (dos != null) {
+                    dos.close();
+                }
+            } finally {
+                try {
+                    getServer().streamClose(streamId);
+                } catch (StreamNotFoundException e) {
+                    // ignore
+                }
+            }
+        }
+
+        public long getFilePointer() {
+            if (streamMode == StreamMode.RANDOM_ACCESS_READ) {
+                return bufInputStreamPosition;
+            }
+            return position;
+        }
+
+        public long length() throws IOException {
             try {
                 try {
-                    getServer().streamWrite(streamId, bytesToSent);
+                    return getServer().streamGetLength(streamId);
                 } catch (StreamNotFoundException e) {
                     reopenStream();
-                    getServer().streamWrite(streamId, bytesToSent);
+                    return getServer().streamGetLength(streamId);
                 }
             } catch (WrongStreamTypeException e) {
-                throw generateAndLogIOWrongStreamTypeExecption(e);
+                throw Utils.generateAndLogIOExceptionWrongStreamType(log, e);
             } catch (StreamNotFoundException e) {
-                throw generateAndLogIOStreamNotFoundException(e);
+                throw Utils.generateAndLogIOExceptionStreamNotFound(log, e);
             }
+        }
+
+        public void seek(long pos) throws IOException {
+            try {
+                try {
+                    getServer().streamSeek(streamId, pos);
+                } catch (StreamNotFoundException e) {
+                    reopenStream();
+                    getServer().streamSeek(streamId, pos);
+                }
+                this.position = pos;
+                if (streamMode == StreamMode.RANDOM_ACCESS_READ) {
+                    this.bufInputStreamPosition = pos;
+                    getDataInputStream().close();
+                }
+            } catch (WrongStreamTypeException e) {
+                throw Utils.generateAndLogIOExceptionWrongStreamType(log, e);
+            } catch (StreamNotFoundException e) {
+                throw Utils.generateAndLogIOExceptionStreamNotFound(log, e);
+            }
+        }
+
+        @Override
+        public void write(byte[] b) throws IOException {
+            checkStreamModeReadWrite();
+            getDataOutputStream().write(b);
+        }
+
+        @Override
+        public void write(byte[] b, int off, int len) throws IOException {
+            checkStreamModeReadWrite();
+            getDataOutputStream().write(b, off, len);
         }
 
         @Override
         public void write(int b) throws IOException {
-            SINGLE_BYTE_BUF[0] = (byte) b;
-            write(SINGLE_BYTE_BUF);
+            checkStreamModeReadWrite();
+            getDataOutputStream().write(b);
         }
 
         @Override
-        public synchronized void flush() throws IOException {
-            try {
-                getServer().streamFlush(streamId);
-            } catch (WrongStreamTypeException e) {
-                throw generateAndLogIOWrongStreamTypeExecption(e);
-            } catch (StreamNotFoundException e) {
-                // as long as FileSystemServer guarantees that this exception can occur
-                // after streamOpen() only after proper close at server side,
-                // we do not need to open it to flush it again - we can ignore it
-            }
+        public void writeBoolean(boolean v) throws IOException {
+            checkStreamModeReadWrite();
+            getDataOutputStream().writeBoolean(v);
         }
 
         @Override
-        public synchronized void close() throws IOException {
-            try {
-                getServer().streamClose(streamId);
-            } catch (StreamNotFoundException e) {
-                // ignore
-            }
+        public void writeByte(int v) throws IOException {
+            checkStreamModeReadWrite();
+            getDataOutputStream().writeByte(v);
         }
 
-        private void reopenStream() throws IOException {
-            log.debug("Reopening output stream: " + streamId);
-            streamId = getServer().streamOpen(getPath(), StreamMode.SEQUENTIAL_APPEND);
+        @Override
+        public void writeBytes(String s) throws IOException {
+            checkStreamModeReadWrite();
+            getDataOutputStream().writeBytes(s);
+        }
+
+        @Override
+        public void writeChar(int v) throws IOException {
+            checkStreamModeReadWrite();
+            getDataOutputStream().writeChar(v);
+        }
+
+        @Override
+        public void writeChars(String s) throws IOException {
+            checkStreamModeReadWrite();
+            getDataOutputStream().writeChars(s);
+        }
+
+        @Override
+        public void writeDouble(double v) throws IOException {
+            checkStreamModeReadWrite();
+            getDataOutputStream().writeDouble(v);
+        }
+
+        @Override
+        public void writeFloat(float v) throws IOException {
+            checkStreamModeReadWrite();
+            getDataOutputStream().writeFloat(v);
+        }
+
+        @Override
+        public void writeInt(int v) throws IOException {
+            checkStreamModeReadWrite();
+            getDataOutputStream().writeInt(v);
+        }
+
+        @Override
+        public void writeLong(long v) throws IOException {
+            checkStreamModeReadWrite();
+            getDataOutputStream().writeLong(v);
+        }
+
+        @Override
+        public void writeShort(int v) throws IOException {
+            checkStreamModeReadWrite();
+            getDataOutputStream().writeShort(v);
+        }
+
+        @Override
+        public void writeUTF(String str) throws IOException {
+            checkStreamModeReadWrite();
+            getDataOutputStream().writeUTF(str);
         }
     }
 }
