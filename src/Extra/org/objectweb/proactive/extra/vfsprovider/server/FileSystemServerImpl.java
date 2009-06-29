@@ -161,15 +161,25 @@ public class FileSystemServerImpl implements FileSystemServer {
 
     public void fileDelete(String path, boolean recursive) throws IOException {
         final File file = resolvePath(path);
+        final String canonicalPath;
         try {
+            canonicalPath = file.getCanonicalPath();
+            
             if (recursive)
                 deleteRecursive(file);
-            else
-                file.delete();
+            if (file.isDirectory())
+                checkConditionIsTrue(file.list().length == 0, "Unable to delete a not empty directory");
+            if (!canonicalPath.equals(rootCanonicalPath)) {
+                try {
+                    file.delete();
+                } catch (SecurityException sec) {
+                    throw new IOException(sec);
+                }
+                checkConditionIsTrue(!file.exists(), "Unable to delete a file");
+            }
         } catch (SecurityException sec) {
             throw new IOException(sec);
         }
-        checkConditionIsTrue(!file.exists(), "Unable to delete a file");
     }
 
     public FileInfo fileGetInfo(String path) throws IOException {
@@ -215,7 +225,7 @@ public class FileSystemServerImpl implements FileSystemServer {
 
     public void fileRename(String path, String newPath) throws IOException {
         final File src = resolvePath(path);
-        final File dest = resolvePath(path);
+        final File dest = resolvePath(newPath);
         final boolean result;
 
         try {
@@ -241,7 +251,7 @@ public class FileSystemServerImpl implements FileSystemServer {
      */
     private File resolvePath(String absolute) throws IOException {
         final String path = absolute.replace(SEPARATOR_TO_REPLACE, File.separatorChar);
-        checkConditionIsTrue(path.startsWith(File.separator), "Provided path is not absolut");
+        checkConditionIsTrue(path.startsWith(File.separator), "Provided path is not absolute");
         final File file = new File(rootFile, path);
         final String canonicalPath;
 
@@ -256,7 +266,7 @@ public class FileSystemServerImpl implements FileSystemServer {
     }
 
     private void checkConditionIsTrue(boolean condition, String message) throws IOException {
-        if (condition)
+        if (!condition)
             throw new IOException(message);
     }
 
@@ -283,15 +293,15 @@ public class FileSystemServerImpl implements FileSystemServer {
             throw new StreamNotFoundException();
     }
 
-    private boolean deleteRecursive(File file) {
+    private void deleteRecursive(File file) {
         if (file.isDirectory()) {
             final File[] children = file.listFiles();
             if (children != null)
                 for (File child : file.listFiles()) {
                     deleteRecursive(child);
+                    child.delete();
                 }
         }
-        return file.delete();
     }
 
     /**

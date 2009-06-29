@@ -59,8 +59,9 @@ public interface FileOperations {
 
     /**
      * Create a file of a <code>type</code> with given abstract <code>path</code>, along with the
-     * ancestor directories if they hasn't existed yet. This method checks the postcondition, that
-     * the file exists and is of a proper <code>type</code>.
+     * ancestor directories if they hasn't existed yet. If file is already created, it remains
+     * unchanged and method terminates normally. This method checks the postcondition, that the file
+     * exists and is of a proper <code>type</code>.
      * <p>
      * Note: The postcondition check may be influenced by any concurrent file system operation.
      * 
@@ -79,14 +80,19 @@ public interface FileOperations {
      * check the postcondition, that the file does not exist.
      * <p>
      * Note: The postcondition check may be influenced by any concurrent file system operation.
-     *
+     * <p>
+     * Whole file system content (all descendant files) can be deleted when specified its root path
+     * along with recursive option. When attempting to delete not existing file, this method
+     * terminates normally.
+     * 
      * @param path
      *            of a file that is to be deleted, cannot be <code>null</code>
      * @param recursive
      *            <code>true</code> if file is to be deleted recursively, <code>false</code>
      *            otherwise
      * @throws IOException
-     *             when postcondition check failed or security exception occurred
+     *             when postcondition check failed, deleting not empty directory without recursive
+     *             option or security exception occurred
      */
     public abstract void fileDelete(String path, boolean recursive) throws IOException;
 
@@ -105,12 +111,12 @@ public interface FileOperations {
     public abstract void fileRename(String path, String newPath) throws IOException;
 
     /**
-     * Set the "last modified time" property of an existing file specified by given abstract
-     * <code>path</code> to <code>time</code>.
+     * Set the "last modified time" property of an existing file (ordinal file or directory)
+     * specified by given abstract <code>path</code> to <code>time</code>.
      * <p>
      * Precision of the "last modified time" property is related to the particular file system,
      * although all platforms support file's last modification time to the nearest second.
-     *
+     * 
      * @param path
      *            path of a file to rename, cannot be <code>null</code>
      * @param time
