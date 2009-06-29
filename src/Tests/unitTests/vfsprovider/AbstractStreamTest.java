@@ -10,10 +10,8 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
 import java.util.Arrays;
 
 import org.junit.After;
@@ -33,23 +31,20 @@ import org.objectweb.proactive.extra.vfsprovider.server.Stream;
  * Often a {@link Integer#MAX_VALUE} is used for a long argument, as few native methods may not
  * accept {@link Long#MAX_VALUE} and throw an IOException.
  */
-public abstract class AbstractStreamTest {
-
-    protected static final String TEST_FILE_CONTENT = "qwerty";
-
-    protected static final int TEST_FILE_CONTENT_LEN = TEST_FILE_CONTENT.getBytes().length;
-
-    private static final String TEST_FILE_NEW_CONTENT = "fouxdufafafauxdufafafafa";
+public abstract class AbstractStreamTest extends AbstractIOOperationsTest {
+    
+    protected static final String TEST_FILE_NEW_CONTENT = "fouxdufafafauxdufafafafa";
 
     protected static final int TEST_FILE_NEW_CONTENT_LEN = TEST_FILE_NEW_CONTENT.getBytes().length;
 
     protected Stream stream;
 
-    protected File testDir;
-
-    protected File testFile;
-
     protected abstract Stream getInstance(File f) throws Exception;
+    
+    @Override
+    public String getTestDirFilename() {
+        return "ProActive-StreamOperationsTest";
+    }
 
     /**
      * Subclasses may override this method to provide more sophisticated {@link #getPositionTest()}
@@ -81,26 +76,8 @@ public abstract class AbstractStreamTest {
         return TEST_FILE_CONTENT_LEN;
     }
 
-    public static boolean deleteRecursively(File file) {
-        if (file.isDirectory()) {
-            final File[] children = file.listFiles();
-            if (children != null)
-                for (File ch : children)
-                    deleteRecursively(ch);
-        }
-        return file.delete();
-    }
-
     @Before
     public void setUp() throws Exception {
-        testDir = new File(System.getProperty("java.io.tmpdir"), "ProActive-StreamTest");
-        testFile = new File(testDir, "test.txt");
-        assertTrue(testDir.mkdirs());
-        assertTrue(testFile.createNewFile());
-
-        final OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(testFile));
-        osw.write(TEST_FILE_CONTENT);
-        osw.close();
         stream = getInstance(testFile);
         assertNotNull(stream);
     }
@@ -109,10 +86,6 @@ public abstract class AbstractStreamTest {
     public void tearDown() throws IOException {
         if (stream != null)
             stream.close();
-
-        if (testDir != null)
-            assertTrue(deleteRecursively(testDir));
-        testDir = null;
     }
 
     @Test
