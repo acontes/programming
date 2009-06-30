@@ -254,6 +254,7 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
             started = false;
         }
         displayCallLog();
+        displayRequestLog();
     }
 
     public void resetMonitoring() {
@@ -328,6 +329,7 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
             		" Timestamp: " + notification.getTimeStamp() +
             		" NotifSeqNbr: " + notification.getSequenceNumber() +
             		" Tags: " + data.getTags());
+            processRequestReceived(notification);
 //            String key = keysList.get(data.getMethodName());
 //            if (key != null) {
 //                ((MethodStatisticsAbstract) statistics.get(key)).notifyArrivalOfRequest(notification
@@ -425,6 +427,21 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
         }
     }
     
+    private void processRequestReceived(Notification notification) {
+    	RequestNotificationData data = (RequestNotificationData) notification.getUserData();
+    	String cmTag = extractCMTag(data);
+    	String[] cmTagFields = cmTag.split("::");
+    	ComponentRequestID parent = new ComponentRequestID(Long.parseLong(cmTagFields[0]));
+    	ComponentRequestID current = new ComponentRequestID(Long.parseLong(cmTagFields[1]));
+    	String sourceName = cmTagFields[2];
+    	String interfaceName = cmTagFields[4];
+    	String methodName = cmTagFields[5];
+    	if(interfaceName.equals("-")) {
+    		return;
+    	}
+    	RequestStats rs = new RequestStats(sourceName, interfaceName, methodName, notification.getTimeStamp());
+    	requestLog.put(current, rs);
+    }
     
     private void processRequestSent(Notification notification) {
     	// adds the request to callLog
@@ -491,6 +508,26 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
     	}
     }
 
+    public void displayRequestLog() {
+        String componentName = "";
+        try {
+        	componentName = Fractal.getNameController(owner).getFcName();
+		} catch (NoSuchInterfaceException e) {
+			e.printStackTrace();
+		}
+		System.out.println("[requestLog]:" +componentName);
+    	int nKeys = requestLog.size();
+    	Iterator<ComponentRequestID> i = requestLog.keySet().iterator();
+    	ComponentRequestID crID;
+    	RequestStats rs;
+    	while(i.hasNext()) {
+    		crID = i.next();
+    		rs = requestLog.get(crID);
+    		System.out.println("[reqsLog:"+componentName+"] ID: "+ crID + " Sender: "+ rs.getCallerComponent() + " Call: "+ rs.getInterfaceName()+"."+rs.getMethodName() + " Time: " + rs.getArrivalTime());
+    		
+    	}
+    }
+    
     /*
      * ---------- PRIVATE METHODS FOR SERIALIZATION ----------
      */
