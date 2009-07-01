@@ -21,10 +21,8 @@ import org.objectweb.proactive.extra.vfsprovider.exceptions.WrongStreamTypeExcep
  * already closed stream. In this case a stream needs to be reopen.
  * <p>
  * Note, that any method may throw {@link IOException} as a parameter type is not supported in the
- * native implementation.
- * <p>
- * TODO: regarding above's note: try to implement it anyway, but there is variety of native
- * implementations, and some of them may not support specific data?
+ * native implementation provided by the platform. Implementations of this interface remain
+ * transparent for such a behavior.
  * <p>
  * Implementations of this interface are thread-safe.
  */
