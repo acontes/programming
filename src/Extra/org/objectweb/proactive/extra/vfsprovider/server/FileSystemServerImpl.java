@@ -78,6 +78,7 @@ public class FileSystemServerImpl implements FileSystemServer {
      * Create an instance of {@link FileSystemServer} that has its root in <code>rootPath</code>
      * directory. To enable auto closing of unused streams call {@link #startAutoClosing()} method.
      * 
+     * 
      * @param rootPath
      *            path of an existing directory that will be root for the file system
      * @throws IOException
