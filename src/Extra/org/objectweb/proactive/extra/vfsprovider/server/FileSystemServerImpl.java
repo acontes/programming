@@ -72,6 +72,10 @@ public class FileSystemServerImpl implements FileSystemServer {
     private final File rootFile;
 
     private final String rootCanonicalPath;
+    
+    private boolean serverStopped;
+    
+    private final Object serverStopLock = new Object();
 
     private long idGenerator = 0;
 
@@ -81,16 +85,15 @@ public class FileSystemServerImpl implements FileSystemServer {
      * Create an instance of {@link FileSystemServer} that has its root in <code>rootPath</code>
      * directory. To enable auto closing of unused streams call {@link #startAutoClosing()} method.
      * 
-     * 
      * @param rootPath
      *            path of an existing directory that will be root for the file system
-     * @throws IOException
+     * @throws IllegalArgumentException
      *             when specified path points to file that does not exist or is not a directory
      */
     public FileSystemServerImpl(String rootPath) throws IOException {
         rootFile = new File(rootPath);
         if (!rootFile.isDirectory())
-            throw new IOException("Root directory does not exist");
+            throw new IllegalArgumentException("Root directory does not exist");
 
         rootCanonicalPath = rootFile.getCanonicalPath();
     }
@@ -101,6 +104,9 @@ public class FileSystemServerImpl implements FileSystemServer {
      * {@link #STREAM_AUTOCLOSE_CHECKING_INTERVAL_MILIS} constant values.
      */
     public synchronized void startAutoClosing() {
+        if (serverStopped)
+            throw new IllegalStateException("Server has been already stopped");
+        
         if (streamAutocloseThread == null) {
             streamAutocloseThread = new StreamAutocloseThread();
             streamAutocloseThread.start();
@@ -114,22 +120,40 @@ public class FileSystemServerImpl implements FileSystemServer {
      * Stop server facilities, in particular the auto closing mechanism. This method should be
      * called when server is no longer used, to release system resources (stop facilities' threads).
      */
-    public void stopServer() {
+    public synchronized void stopServer() {
+        synchronized (serverStopLock) {
+            serverStopped = true;
+        }
+        
         streamAutocloseThread.setToStop();
-        // TODO stop accepting streamOpen, close all streams
+        final HashSet<Long> snapshot = new HashSet<Long>(streams.keySet());
+        for (Long stream : snapshot) {
+            try {
+                streamClose(stream);
+            } catch (IOException e) {
+                logger.info("Exception while closing stream", e);
+            } catch (StreamNotFoundException e) {
+                ProActiveLogger.logImpossibleException(logger, e);
+            }
+        }
         logger.info("Autoclose feature stopped, all streams closed");
     }
 
     public long streamOpen(String path, StreamMode mode) throws IOException {
-        final Stream instance;
-        final File file = resolvePath(path);
-
-        try {
-            instance = StreamFactory.createStreamInstance(file, mode);
-        } catch (SecurityException sec) {
-            throw new IOException(sec);
+        synchronized (serverStopLock) {
+            if (serverStopped)
+                throw new IllegalStateException("File server has been stopped");
+            
+            final Stream instance;
+            final File file = resolvePath(path);
+            
+            try {
+                instance = StreamFactory.createStreamInstance(file, mode);
+            } catch (SecurityException sec) {
+                throw new IOException(sec);
+            }
+            return storeStream(instance);
         }
-        return storeStream(instance);
     }
 
     public void streamClose(long stream) throws IOException, StreamNotFoundException {
@@ -434,6 +458,7 @@ public class FileSystemServerImpl implements FileSystemServer {
                 processTimestamps();
                 freeze();
             }
+            logger.trace("StreamAutocloseThread thread terminates");
         }
 
         public void setToStop() {
@@ -484,7 +509,7 @@ public class FileSystemServerImpl implements FileSystemServer {
                 } catch (InterruptedException e) {
                 }
                 period = timestamp - System.currentTimeMillis();
-            } while (period > 0);
+            } while (period > 0 && running);
         }
 
         /**
