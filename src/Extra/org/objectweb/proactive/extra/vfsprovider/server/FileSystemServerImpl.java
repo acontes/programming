@@ -164,7 +164,7 @@ public class FileSystemServerImpl implements FileSystemServer {
         final String canonicalPath;
         try {
             canonicalPath = file.getCanonicalPath();
-            
+
             if (recursive)
                 deleteRecursive(file);
             if (file.isDirectory())

@@ -40,7 +40,7 @@ public abstract class AbstractStreamTest extends AbstractIOOperationsTest {
     protected Stream stream;
 
     protected abstract Stream getInstance(File f) throws Exception;
-    
+
     @Override
     public String getTestDirFilename() {
         return "ProActive-StreamOperationsTest";
