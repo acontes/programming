@@ -15,6 +15,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.vfsprovider.exceptions.StreamNotFoundException;
 import org.objectweb.proactive.extra.vfsprovider.exceptions.WrongStreamTypeException;
 import org.objectweb.proactive.extra.vfsprovider.protocol.FileInfo;
@@ -22,8 +25,6 @@ import org.objectweb.proactive.extra.vfsprovider.protocol.FileSystemServer;
 import org.objectweb.proactive.extra.vfsprovider.protocol.FileType;
 import org.objectweb.proactive.extra.vfsprovider.protocol.StreamMode;
 
-
-// TODO loggers
 /**
  * Implements remote file system protocol defined in {@link FileSystemServer} interface.
  * <p>
@@ -53,11 +54,13 @@ import org.objectweb.proactive.extra.vfsprovider.protocol.StreamMode;
  */
 public class FileSystemServerImpl implements FileSystemServer {
 
+    private static final Logger logger = ProActiveLogger.getLogger(Loggers.VFS_PROVIDER_SERVER);
+
     private static final char SEPARATOR_TO_REPLACE = File.separatorChar == '\\' ? '/' : '\\';
 
     public static final long STREAM_AUTOCLOSE_CHECKING_INTERVAL_MILIS = 1000 * 30;
 
-    public static final long STREAM_OPEN_MAXIMUM_PERIOD_MILIS = 1000 * 60 * 2;
+    public static final long STREAM_OPEN_MAXIMUM_PERIOD_MILIS = 1000 * 60;
 
     private final Map<Long, Stream> streams = Collections.synchronizedMap(new HashMap<Long, Stream>());
 
@@ -101,7 +104,9 @@ public class FileSystemServerImpl implements FileSystemServer {
         if (streamAutocloseThread == null) {
             streamAutocloseThread = new StreamAutocloseThread();
             streamAutocloseThread.start();
-            System.out.println("Starting autoclose feature");
+            logger.info("Starting autoclose feature");
+        } else {
+            logger.info("Autoclose feature already started");
         }
     }
 
@@ -111,6 +116,8 @@ public class FileSystemServerImpl implements FileSystemServer {
      */
     public void stopServer() {
         streamAutocloseThread.setToStop();
+        // TODO stop accepting streamOpen, close all streams
+        logger.info("Autoclose feature stopped, all streams closed");
     }
 
     public long streamOpen(String path, StreamMode mode) throws IOException {
@@ -424,8 +431,8 @@ public class FileSystemServerImpl implements FileSystemServer {
         @Override
         public void run() {
             while (running) {
-                freeze();
                 processTimestamps();
+                freeze();
             }
         }
 
@@ -444,20 +451,24 @@ public class FileSystemServerImpl implements FileSystemServer {
             final long current = System.currentTimeMillis();
             sort(snapshot, comparator);
 
-            System.out.println("Autoclose: processing timestamps snapshot of " + snapshot.toString() +
-                " streams");
+            logger.debug("Autoclose: processing streams");
+            if (logger.isTraceEnabled()) {
+                logger.trace("Autoclose: current time " + current);
+                logger.trace("Autoclose: timestamps snapshot: " + snapshot.toString());
+            }
 
             for (Entry<Long, Long> entry : snapshot) {
-                System.out.println("Autoclose: current: " + current + " snapshot's: " + entry.getValue());
+                if (logger.isTraceEnabled())
+                    logger.trace("Autoclose: iterating timestamp: " + entry.getValue());
                 if (current - entry.getValue() < STREAM_OPEN_MAXIMUM_PERIOD_MILIS) {
-                    System.out.println("Autoclose: remaining snapshots are valid, break..");
+                    logger.debug("Autoclose: remaining streams are still valid, break..");
                     return;
                 }
                 try {
-                    System.out.println("Autoclose: closing an old stream");
+                    logger.debug("Autoclose: closing an old stream");
                     streamClose(entry.getKey());
                 } catch (IOException e) {
-                    // TODO log me
+                    logger.info("An exception when trying to autoclose an open stream", e);
                 } catch (StreamNotFoundException e) {
                     // it seems someone else has already closed it
                 }
@@ -473,7 +484,7 @@ public class FileSystemServerImpl implements FileSystemServer {
                 } catch (InterruptedException e) {
                 }
                 period = timestamp - System.currentTimeMillis();
-            } while (period < 0);
+            } while (period > 0);
         }
 
         /**

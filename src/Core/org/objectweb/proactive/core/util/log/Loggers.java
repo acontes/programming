@@ -164,4 +164,8 @@ public interface Loggers {
     public static final String DATASPACES_MOUNT_MANAGER = DATASPACES + ".mountmanager";
     public static final String DATASPACES_CONFIGURATOR = DATASPACES + ".configurator";
     public static final String DATASPACES_NAMING_SERVICE = DATASPACES + ".namingservice";
+
+    // VFS Provider
+    public static final String VFS_PROVIDER = CORE + ".vfsprovider";
+    public static final String VFS_PROVIDER_SERVER = VFS_PROVIDER + ".server";
 }
