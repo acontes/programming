@@ -169,13 +169,16 @@ public interface StreamOperations {
      * Flushes an output stream specified by unique id that was previously returned by
      * {@link #streamOpen(String, StreamMode)} method call, and forces any buffered output bytes to
      * be written out.
+     * <p>
+     * This method guarantees, that if {@link StreamNotFoundException} is thrown, a corresponding
+     * stream has been closed (and hence flushed).
      * 
      * @param stream
      *            an unique id of an open stream
      * @throws IOException
      *             if an I/O error occurred while performing this method
      * @throws StreamNotFoundException
-     *             if specified stream unique id has not been found or it has been closed
+     *             if specified stream unique id has not been found or it has been closed correctly
      * @throws WrongStreamTypeException
      *             when mode of a stream does not allow to call this method
      */

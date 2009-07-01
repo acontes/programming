@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -24,9 +25,17 @@ import org.objectweb.proactive.extra.vfsprovider.protocol.StreamMode;
  * File stream related operations are delegated to particular {@link Stream} implementation, created
  * by {@link StreamFactory} private inner class basing on {@link StreamMode}.
  * <p>
- * Operations performed on {@link #streams} map are synchronized on <code>this</code> lock. To
- * fulfill protocol's thread-safety, an explicit {@link Stream} operations synchronization is
- * required with double checking if map contains an open stream.
+ * Operations performed on {@link #streams} map are synchronized trough
+ * {@link Collections#synchronizedMap(Map)} implicit synchronization. To fulfill protocol's
+ * thread-safety, an explicit {@link Stream} operations synchronization is required with double
+ * checking if map contains an open stream. Generating unique identifiers is synchronized on
+ * <code>this</code>.
+ * <p>
+ * To guarantee that {@link #streamFlush(long)} method throws {@link StreamNotFoundException} only
+ * if stream has been closed correctly, an "in progress state" map is hold. Flush requests are
+ * queued on stream instances from this map until stream is finally closed. Stream instance is put
+ * to this map only if close operation is in progress, therefore all flush requests will eventually
+ * return.
  * <p>
  * File managing related operations implementation base on {@link File} class.
  * 
@@ -37,7 +46,9 @@ public class FileSystemServerImpl implements FileSystemServer {
 
     private static final char SEPARATOR_TO_REPLACE = File.separatorChar == '\\' ? '/' : '\\';
 
-    private final Map<Long, Stream> streams = new HashMap<Long, Stream>();
+    private final Map<Long, Stream> streams = Collections.synchronizedMap(new HashMap<Long, Stream>());
+
+    private final Map<Long, Stream> streamsToClose = Collections.synchronizedMap(new HashMap<Long, Stream>());
 
     private final File rootFile;
 
@@ -76,6 +87,8 @@ public class FileSystemServerImpl implements FileSystemServer {
         final Stream instance = tryGetAndRemoveStreamOrWound(stream);
         synchronized (instance) {
             instance.close();
+            streamsToClose.remove(stream);
+            instance.notifyAll();
         }
     }
 
@@ -135,10 +148,28 @@ public class FileSystemServerImpl implements FileSystemServer {
 
     public void streamFlush(long stream) throws IOException, StreamNotFoundException,
             WrongStreamTypeException {
-        final Stream instance = tryGetStreamOrWound(stream);
-        synchronized (instance) {
-            checkContainsStreamOrWound(stream);
-            instance.flush();
+
+        try {
+            final Stream instance = tryGetStreamOrWound(stream);
+
+            synchronized (instance) {
+                checkContainsStreamOrWound(stream);
+                instance.flush();
+                return;
+            }
+        } catch (StreamNotFoundException notFound) {
+            // be sure that a stream instance is closed successfully
+            final Stream instance = streamsToClose.get(stream);
+
+            if (instance != null)
+                synchronized (instance) {
+                    while (streamsToClose.containsKey(stream))
+                        try {
+                            instance.wait();
+                        } catch (InterruptedException e) {
+                        }
+                }
+            throw notFound;
         }
     }
 
@@ -276,19 +307,23 @@ public class FileSystemServerImpl implements FileSystemServer {
         return idGenerator;
     }
 
-    synchronized private Stream tryGetStreamOrWound(long stream) throws StreamNotFoundException {
-        if (streams.containsKey(stream))
-            return streams.get(stream);
-        throw new StreamNotFoundException();
+    private Stream tryGetStreamOrWound(long stream) throws StreamNotFoundException {
+        final Stream instance = streams.get(stream);
+        if (instance == null)
+            throw new StreamNotFoundException();
+        return instance;
     }
 
-    synchronized private Stream tryGetAndRemoveStreamOrWound(long stream) throws StreamNotFoundException {
-        if (streams.containsKey(stream))
-            return streams.remove(stream);
-        throw new StreamNotFoundException();
+    private Stream tryGetAndRemoveStreamOrWound(long stream) throws StreamNotFoundException {
+        final Stream instance = streams.remove(stream);
+
+        if (instance == null)
+            throw new StreamNotFoundException();
+        streamsToClose.put(stream, instance);
+        return instance;
     }
 
-    synchronized private void checkContainsStreamOrWound(long stream) throws StreamNotFoundException {
+    private void checkContainsStreamOrWound(long stream) throws StreamNotFoundException {
         if (!streams.containsKey(stream))
             throw new StreamNotFoundException();
     }
