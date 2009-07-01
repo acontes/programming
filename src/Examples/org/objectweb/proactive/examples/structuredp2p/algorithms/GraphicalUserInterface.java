@@ -140,17 +140,23 @@ public class GraphicalUserInterface extends JFrame {
             for (Zone zone : GraphicalUserInterface.this.zones) {
                 g2d.setColor(zone.color);
                 g2d.fillRect(zone.xMin, zone.yMin, zone.xMax - zone.xMin, zone.yMax - zone.yMin);
+                g2d.setColor(Color.black);
+                g2d.drawString("("+zone.xMin+ ","  + zone.yMin + ")", 
+                        zone.xMin, zone.yMin+10);
+                g2d.drawString("(" +zone.xMax+ ","  + zone.yMax + ") ", 
+                        zone.xMax-60, zone.yMax-10);
             }
-
+        //    System.out.println("Canvas.paintComponent() " + this.zoneClicked);
             if (this.zoneClicked != null) {
                 g2d.setColor(Color.black);
                 g2d.drawLine(this.zoneClicked.xMin, this.zoneClicked.yMin, this.zoneClicked.xMax,
                         this.zoneClicked.yMax);
-
+               
                 for (int i = 0; i < 2; i++) {
                     for (int j = 0; j < 2; j++) {
                         for (Zone zone : this.zoneClicked.neighbors[i][j]) {
                             Random rand = new Random();
+                        
                             g2d.drawString("N#" + GraphicalUserInterface.this.zones.indexOf(zone) + " [" + i +
                                 "][" + j + "]", zone.xMin - 25 + (zone.xMax - zone.xMin) / 2, zone.yMin + 5 +
                                 rand.nextInt(20) + (zone.yMax - zone.yMin) / 2);

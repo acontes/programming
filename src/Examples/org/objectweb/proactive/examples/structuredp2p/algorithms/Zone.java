@@ -13,10 +13,10 @@ import java.util.Random;
 
 public class Zone {
 
-    public int xMin = 0;
-    public int xMax = 500;
-    public int yMin = 0;
-    public int yMax = 500;
+    public int xMin = 5;
+    public int xMax = 485;
+    public int yMin = 5;
+    public int yMax = 485;
 
     public HashSet<Zone>[][] neighbors;
     public ArrayList<int[]> splitHistory;
