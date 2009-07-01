@@ -1,14 +1,19 @@
 package org.objectweb.proactive.extra.vfsprovider.server;
 
+import static java.util.Collections.sort;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.objectweb.proactive.extra.vfsprovider.exceptions.StreamNotFoundException;
 import org.objectweb.proactive.extra.vfsprovider.exceptions.WrongStreamTypeException;
@@ -18,12 +23,16 @@ import org.objectweb.proactive.extra.vfsprovider.protocol.FileType;
 import org.objectweb.proactive.extra.vfsprovider.protocol.StreamMode;
 
 
-//TODO auto close of opened and unused streams
+// TODO loggers
 /**
  * Implements remote file system protocol defined in {@link FileSystemServer} interface.
  * <p>
  * File stream related operations are delegated to particular {@link Stream} implementation, created
  * by {@link StreamFactory} private inner class basing on {@link StreamMode}.
+ * <p>
+ * There is an auto closing of unused streams mechanism implemented, that starts when
+ * {@link #startAutoClosing()} method is called and stops explicitly with {@link #stopServer()}
+ * method call.
  * <p>
  * Operations performed on {@link #streams} map are synchronized trough
  * {@link Collections#synchronizedMap(Map)} implicit synchronization. To fulfill protocol's
@@ -46,9 +55,16 @@ public class FileSystemServerImpl implements FileSystemServer {
 
     private static final char SEPARATOR_TO_REPLACE = File.separatorChar == '\\' ? '/' : '\\';
 
+    public static final long STREAM_AUTOCLOSE_CHECKING_INTERVAL_MILIS = 1000 * 30;
+
+    public static final long STREAM_OPEN_MAXIMUM_PERIOD_MILIS = 1000 * 60 * 2;
+
     private final Map<Long, Stream> streams = Collections.synchronizedMap(new HashMap<Long, Stream>());
 
     private final Map<Long, Stream> streamsToClose = Collections.synchronizedMap(new HashMap<Long, Stream>());
+
+    private final Map<Long, Long> streamLastUsedTimestamp = Collections
+            .synchronizedMap(new HashMap<Long, Long>());
 
     private final File rootFile;
 
@@ -56,19 +72,44 @@ public class FileSystemServerImpl implements FileSystemServer {
 
     private long idGenerator = 0;
 
+    private StreamAutocloseThread streamAutocloseThread;
+
     /**
-     * TODO javadoc
-     *
+     * Create an instance of {@link FileSystemServer} that has its root in <code>rootPath</code>
+     * directory. To enable auto closing of unused streams call {@link #startAutoClosing()} method.
+     * 
      * @param rootPath
+     *            path of an existing directory that will be root for the file system
      * @throws IOException
+     *             when specified path points to file that does not exist or is not a directory
      */
     public FileSystemServerImpl(String rootPath) throws IOException {
         rootFile = new File(rootPath);
         if (!rootFile.isDirectory())
-            if (!rootFile.mkdirs())
-                throw new IOException("Root directory does not exist and unable to create such");
+            throw new IOException("Root directory does not exist");
 
         rootCanonicalPath = rootFile.getCanonicalPath();
+    }
+
+    /**
+     * Enable auto closing of unused streams. The mechanism bases on
+     * {@link #STREAM_OPEN_MAXIMUM_PERIOD_MILIS} and
+     * {@link #STREAM_AUTOCLOSE_CHECKING_INTERVAL_MILIS} constant values.
+     */
+    public synchronized void startAutoClosing() {
+        if (streamAutocloseThread == null) {
+            streamAutocloseThread = new StreamAutocloseThread();
+            streamAutocloseThread.start();
+            System.out.println("Starting autoclose feature");
+        }
+    }
+
+    /**
+     * Stop server facilities, in particular the auto closing mechanism. This method should be
+     * called when server is no longer used, to release system resources (stop facilities' threads).
+     */
+    public void stopServer() {
+        streamAutocloseThread.setToStop();
     }
 
     public long streamOpen(String path, StreamMode mode) throws IOException {
@@ -302,15 +343,20 @@ public class FileSystemServerImpl implements FileSystemServer {
     }
 
     synchronized private long storeStream(Stream instance) {
+        final Long timestamp = System.currentTimeMillis();
         idGenerator++;
         streams.put(idGenerator, instance);
+        streamLastUsedTimestamp.put(idGenerator, timestamp);
         return idGenerator;
     }
 
     private Stream tryGetStreamOrWound(long stream) throws StreamNotFoundException {
         final Stream instance = streams.get(stream);
+
         if (instance == null)
             throw new StreamNotFoundException();
+        final Long timestamp = System.currentTimeMillis();
+        streamLastUsedTimestamp.put(stream, timestamp);
         return instance;
     }
 
@@ -320,6 +366,7 @@ public class FileSystemServerImpl implements FileSystemServer {
         if (instance == null)
             throw new StreamNotFoundException();
         streamsToClose.put(stream, instance);
+        streamLastUsedTimestamp.remove(stream);
         return instance;
     }
 
@@ -361,6 +408,87 @@ public class FileSystemServerImpl implements FileSystemServer {
                     return new OutputStreamAdapter(file, false);
             }
             return null;
+        }
+    }
+
+    /**
+     * An private inner class that is used as a thread for auto closing streams that are not used at
+     * least for {@link FileSystemServerImpl#STREAM_OPEN_MAXIMUM_PERIOD_MILIS}.
+     */
+    private class StreamAutocloseThread extends Thread {
+        private Comparator<Entry<Long, Long>> comparator = new StreamTimestampsComparator();
+
+        private volatile boolean running = true;
+
+        @Override
+        public void run() {
+            while (running) {
+                freeze();
+                processTimestamps();
+            }
+        }
+
+        public void setToStop() {
+            running = false;
+        }
+
+        /**
+         * Take a snapshot of time stamps corresponding to last stream access and decide whether to
+         * close the old streams according to
+         * {@link FileSystemServerImpl#STREAM_OPEN_MAXIMUM_PERIOD_MILIS}.
+         */
+        private void processTimestamps() {
+            final ArrayList<Entry<Long, Long>> snapshot = new ArrayList<Map.Entry<Long, Long>>(
+                streamLastUsedTimestamp.entrySet());
+            final long current = System.currentTimeMillis();
+            sort(snapshot, comparator);
+
+            System.out.println("Autoclose: processing timestamps snapshot of " + snapshot.toString() +
+                " streams");
+
+            for (Entry<Long, Long> entry : snapshot) {
+                System.out.println("Autoclose: current: " + current + " snapshot's: " + entry.getValue());
+                if (current - entry.getValue() < STREAM_OPEN_MAXIMUM_PERIOD_MILIS) {
+                    System.out.println("Autoclose: remaining snapshots are valid, break..");
+                    return;
+                }
+                try {
+                    System.out.println("Autoclose: closing an old stream");
+                    streamClose(entry.getKey());
+                } catch (IOException e) {
+                    // TODO log me
+                } catch (StreamNotFoundException e) {
+                    // it seems someone else has already closed it
+                }
+            }
+        }
+
+        private void freeze() {
+            long timestamp = System.currentTimeMillis() + STREAM_AUTOCLOSE_CHECKING_INTERVAL_MILIS;
+            long period = STREAM_AUTOCLOSE_CHECKING_INTERVAL_MILIS;
+            do {
+                try {
+                    sleep(period);
+                } catch (InterruptedException e) {
+                }
+                period = timestamp - System.currentTimeMillis();
+            } while (period < 0);
+        }
+
+        /**
+         * Comparator used to sort <code>(stream, time stamp)</code> entries according to the time
+         * stamp in the ascending order.
+         */
+        private class StreamTimestampsComparator implements Comparator<Entry<Long, Long>> {
+            public int compare(Entry<Long, Long> o1, Entry<Long, Long> o2) {
+                final long t1 = o1.getValue();
+                final long t2 = o2.getValue();
+                if (t1 < t2)
+                    return -1;
+                if (t1 == t2)
+                    return 0;
+                return 1;
+            }
         }
     }
 }
