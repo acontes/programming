@@ -62,6 +62,7 @@ import org.objectweb.proactive.core.body.tags.tag.CMTag;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.Utils;
+import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
@@ -217,11 +218,12 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
     	
     	boolean run = true;
     	if(!run) {
-    		logger.debug("Starting Monitoring");
     		return;
     	}
     	
     	// experiment to try to get a reference on the connected components
+    	// not necessary anymore
+    	/*
     	NameController nc = null;
         try {
             nc = (NameController) owner.getFcInterface(Constants.NAME_CONTROLLER);
@@ -252,11 +254,11 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
 				String destName = pacr.getComponentParameters().getName();
 				System.out.println("["+name+"]-->["+destName+"."+paitf.getFcItfName()+"] ");
 			}
-		}
+		}*/
 
-//    	if (statistics == null) {
+    	if (statistics == null) {
 //            registerMethods();
-//        }
+        }
     	
         if (!started) {
         	logger.debug("Starting Monitoring");
@@ -353,7 +355,6 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
 		} catch (NoSuchInterfaceException e) {
 			e.printStackTrace();
 		}
-		// no handling ... for the moment ... for replyReceived, and requestSent
         
         if (type.equals(NotificationType.requestReceived)) {
             RequestNotificationData data = (RequestNotificationData) notification.getUserData();
@@ -373,13 +374,14 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
         } 
         else if (type.equals(NotificationType.servingStarted)) {
             RequestNotificationData data = (RequestNotificationData) notification.getUserData();
-//            logger.debug("["+componentName+"][servingStar] From:" + data.getSource() +
-//            		" To:"+ data.getDestination() +
-//            		" Method:" + data.getMethodName() +
-//            		" SeqNumber: " + data.getSequenceNumber() +
-//            		" Timestamp: " + notification.getTimeStamp() +
-//            		" NotifSeqNbr: " + notification.getSequenceNumber() +
-//            		" Tags: " + data.getTags());
+            logger.debug("["+componentName+"][servingStar] " + //From:" + data.getSource() +
+            		//" To:"+ data.getDestination() +
+            		" Method:" + data.getMethodName() +
+            		" SeqNumber: " + data.getSequenceNumber() +
+            		" Timestamp: " + notification.getTimeStamp() +
+            		" NotifSeqNbr: " + notification.getSequenceNumber() +
+            		" Tags: " + data.getTags());
+            processServingStarted(notification);
             
 //            String key = keysList.get(data.getMethodName());
 //            if (key != null) {
@@ -462,6 +464,11 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
         }
     }
     
+    private void processServingStarted(Notification notification) {
+    	//RequestNotificationData data = (RequestNotificationData) notification.getUserData();
+    	//String cmTag = extractCMTag(data);
+    }
+    
     private void processRequestReceived(Notification notification) {
     	RequestNotificationData data = (RequestNotificationData) notification.getUserData();
     	String cmTag = extractCMTag(data);
@@ -469,12 +476,13 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
     	ComponentRequestID parent = new ComponentRequestID(Long.parseLong(cmTagFields[0]));
     	ComponentRequestID current = new ComponentRequestID(Long.parseLong(cmTagFields[1]));
     	String sourceName = cmTagFields[2];
+    	String destName = cmTagFields[3];
     	String interfaceName = cmTagFields[4];
     	String methodName = cmTagFields[5];
     	if(interfaceName.equals("-")) {
     		return;
     	}
-    	RequestStats rs = new RequestStats(sourceName, interfaceName, methodName, notification.getTimeStamp());
+    	RequestStats rs = new RequestStats(sourceName, destName, interfaceName, methodName, notification.getTimeStamp());
     	requestLog.put(current, rs);
     }
     
@@ -488,12 +496,13 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
     	String[] cmTagFields = cmTag.split("::");
     	ComponentRequestID parent = new ComponentRequestID(Long.parseLong(cmTagFields[0]));
     	ComponentRequestID current = new ComponentRequestID(Long.parseLong(cmTagFields[1]));
+    	String destComponentName = cmTagFields[3];
     	String interfaceName = cmTagFields[4];
     	String methodName = cmTagFields[5];
     	if(interfaceName.equals("-")) {
     		return;
     	}
-    	CallStats cs = new CallStats(parent, "", interfaceName, methodName, notification.getTimeStamp(), false);
+    	CallStats cs = new CallStats(parent, destComponentName, interfaceName, methodName, notification.getTimeStamp(), false);
     	callLog.put(current, cs);
     }
     
@@ -504,16 +513,13 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
     	Pattern pattern = Pattern.compile("\\[TAG\\](.*?)\\[DATA\\](.*?)\\[END\\]");
     	Pattern inner = Pattern.compile("\\[(.*?)\\]");
     	Matcher match = pattern.matcher(tagString);
-    	//System.out.println("Orign: "+ tagString);
     	String currentTag;
     	String currentFields[];
     	while(match.find()) {
     		currentTag = match.group();
-    		//System.out.println("Resul: "+ currentTag);
     		currentFields = inner.split(currentTag);
     		if(currentFields[1].equals(CMTag.IDENTIFIER)) {
     			// This is the CMTag. Process it
-    			//String tagFields[] = currentFields[2].split("::");
     			return currentFields[2];
     			// And this shouldn't be necessary!!!... the CMTag should have a constructor that receives a string
     			//return new CMTag(null, Long.parseLong(tagFields[0]), Long.parseLong(tagFields[1]), tagFields[2], tagFields[3], tagFields[4], tagFields[5]);
@@ -530,15 +536,13 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
 		} catch (NoSuchInterfaceException e) {
 			e.printStackTrace();
 		}
-		System.out.println("[callLog]:" +componentName);
-    	int nKeys = callLog.size();
     	Iterator<ComponentRequestID> i = callLog.keySet().iterator();
     	ComponentRequestID crID;
     	CallStats cs;
     	while(i.hasNext()) {
     		crID = i.next();
     		cs = callLog.get(crID);
-    		System.out.println("[callLog:"+componentName+"] Parent: "+ cs.getParentID() + " Current: "+ crID + " Call: "+ cs.getInterfaceName()+"."+cs.getMethodName()+ " Time: " + cs.getSentTime());
+    		System.out.println("[callLog:"+componentName+"] Parent: "+ cs.getParentID() + " Current: "+ crID + " Call: "+ cs.getCalledComponent() + "." + cs.getInterfaceName()+"."+cs.getMethodName()+ " Time: " + cs.getSentTime());
     		
     	}
     }
@@ -550,15 +554,13 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
 		} catch (NoSuchInterfaceException e) {
 			e.printStackTrace();
 		}
-		System.out.println("[requestLog]:" +componentName);
-    	int nKeys = requestLog.size();
     	Iterator<ComponentRequestID> i = requestLog.keySet().iterator();
     	ComponentRequestID crID;
     	RequestStats rs;
     	while(i.hasNext()) {
     		crID = i.next();
     		rs = requestLog.get(crID);
-    		System.out.println("[reqsLog:"+componentName+"] ID: "+ crID + " Sender: "+ rs.getCallerComponent() + " Call: "+ rs.getInterfaceName()+"."+rs.getMethodName() + " Time: " + rs.getArrivalTime());
+    		System.out.println("[reqsLog:"+componentName+"] ID: "+ crID + " Sender: "+ rs.getCallerComponent() + " Call: "+ rs.getCalledComponent() + "." + rs.getInterfaceName()+"."+rs.getMethodName() + " Time: " + rs.getArrivalTime());
     		
     	}
     }

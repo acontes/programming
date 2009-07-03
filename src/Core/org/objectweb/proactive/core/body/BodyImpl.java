@@ -51,6 +51,7 @@ import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.type.InterfaceType;
+import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -82,6 +83,7 @@ import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.ProActiveInterface;
+import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.body.ComponentBodyImpl;
 import org.objectweb.proactive.core.component.controller.ProActiveBindingController;
 import org.objectweb.proactive.core.component.controller.ProActiveBindingControllerImpl;
@@ -488,7 +490,8 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
     // -- inner classes -----------------------------------------------
     //
     private class ActiveLocalBodyStrategy implements LocalBodyStrategy, java.io.Serializable {
-        /** A pool future that contains the pending future objects */
+
+		/** A pool future that contains the pending future objects */
         protected FuturePool futures;
 
         /** The reified object target of the request processed by this body */
@@ -748,7 +751,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             // TODO Send a notification only if the destination doesn't
             // implement ProActiveInternalObject
             if (!isProActiveInternalObject && (mbean != null)) {
-//          	cruz: this if's are removed because I still don't get the point
+//          	cruz: removing this if's are removed because I still don't get the point
 //            	      of the serverConnector, and I want the "requestSent" notification to be generated
 //                ServerConnector serverConnector = ProActiveRuntimeImpl.getProActiveRuntime()
 //                        .getJMXServerConnector();
@@ -831,18 +834,18 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                 }
             }
             // Check the presence of the DSI Tag if enabled
-            // Ohterwise add it
+            // Otherwise add it
             if (PAProperties.PA_TAG_DSI.isTrue()){
                 if (!nextTags.check(DsiTag.IDENTIFIER)) {
                     nextTags.addTag(new DsiTag(bodyID, sequenceID));
                 }
             }
             
-            // if the request is a Component request, propagate it accordingly
+            // if the request is a Component request, propagate the tag accordingly
             if(currentreq != null) {
             	if(currentreq instanceof ComponentRequestImpl) {
             		String componentSourceName = "-";
-            		String componentDestName = ""; // not required: remove
+            		String componentDestName = "";
             		String interfaceName = "-";
             		String methodName = "-";
             		// ugly!
@@ -860,6 +863,19 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             			interfaceName = cmcmd.getComponentInterfaceName();
             			// why does this return false????
             			// System.out.println("::::::::::"+cmcmd.isComponentMethodCall());
+            			// if this component is generating a request, it should have a bound client interface,
+            			// and should have BindingController, so it shouldn't throw a NoSuchInterfaceException here
+            			BindingController bc = null;
+            			try {
+							bc = Fractal.getBindingController(pac);
+							if(!Utils.isControllerInterfaceName(interfaceName)) {
+								componentDestName = ((ProActiveComponentRepresentative)((ProActiveInterface) bc.lookupFc(interfaceName)).getFcItfOwner()).getComponentParameters().getName();
+							}
+						} catch (NoSuchInterfaceException e) {
+							e.printStackTrace();
+						}
+						
+            			
             		}
         			methodName = methodCall.getName();
             		//System.out.println("Call from " + componentSourceName + " to " + interfaceName + "." + methodName);

@@ -22,9 +22,15 @@ public class CMTag extends Tag {
      * and an UniqueID as the tag DATA
      */
     public CMTag(UniqueID id, long oldSeqID, long newSeqID, String sourceName, String destName, String interfaceName, String methodName) {
-        //super(IDENTIFIER, new UniqueID().getCanonString());
-        //super(IDENTIFIER, "" + id.getCanonString() + "::" + seqID);
     	super(IDENTIFIER, "" + oldSeqID + "::" + newSeqID + "::" + sourceName + "::" + destName + "::" + interfaceName + "::" + methodName);
+    }
+    
+    /**
+     * Constructor to create the CMTag from the notification String
+     * @param data
+     */
+    public CMTag(String data) {
+    	super(IDENTIFIER, data);
     }
 
     /**

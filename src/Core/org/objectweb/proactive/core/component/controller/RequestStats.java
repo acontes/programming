@@ -10,6 +10,7 @@ package org.objectweb.proactive.core.component.controller;
 public class RequestStats {
 
 	private String callerComponent;
+	private String calledComponent;
 	private String interfaceName;
 	private String methodName;
 		
@@ -19,8 +20,9 @@ public class RequestStats {
 	
 	private boolean finished;
 	
-	public RequestStats(String callerComponent, String interfaceName, String methodName, long arrivalTime) {
+	public RequestStats(String callerComponent, String calledComponent, String interfaceName, String methodName, long arrivalTime) {
 		this.callerComponent = callerComponent;
+		this.calledComponent = calledComponent;
 		this.interfaceName = interfaceName;
 		this.methodName = methodName;
 		this.arrivalTime = arrivalTime;
@@ -45,6 +47,10 @@ public class RequestStats {
 
 	public String getCallerComponent() {
 		return callerComponent;
+	}
+	
+	public String getCalledComponent() {
+		return calledComponent;
 	}
 
 	public String getInterfaceName() {
