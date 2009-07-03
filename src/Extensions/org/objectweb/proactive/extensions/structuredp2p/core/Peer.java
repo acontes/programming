@@ -3,6 +3,7 @@ package org.objectweb.proactive.extensions.structuredp2p.core;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Stack;
 import java.util.UUID;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -53,6 +54,11 @@ public class Peer implements InitActive, RunActive, Serializable {
      * Responses associated to the oneWay search on the network.
      */
     private Map<UUID, QueryResponse> oneWayResponses = new HashMap<UUID, QueryResponse>();
+
+    /**
+     * Peer which are currently not accessible because they are preparing to leave.
+     */
+    private Stack<Peer> peersWhichAreLeaving = new Stack<Peer>();
 
     /**
      * The type of the overlay which is used by the peer. The type is equal to one of
@@ -136,10 +142,11 @@ public class Peer implements InitActive, RunActive, Serializable {
      */
     public ResponseMessage sendTo(Peer remotePeer, Message msg) {
         ResponseMessage response = null;
+
         try {
             response = remotePeer.receiveMessage(msg);
         } catch (BlockingRequestReceiverException e) {
-            System.out.println("SENDTO");
+            System.out.println("Peer.sendTo()");
             e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
@@ -162,7 +169,27 @@ public class Peer implements InitActive, RunActive, Serializable {
      * Unregister the peer from the current structured network.
      */
     public Boolean leave() {
-        return this.structuredOverlay.leave();
+        this.structuredOverlay.leave();
+        return true;
+    }
+
+    /**
+     * 
+     * @param remoteNeighbor
+     * @return
+     */
+    public boolean notifyNeighborStartLeave(Peer remoteNeighbor) {
+        this.peersWhichAreLeaving.push(remoteNeighbor);
+        return true;
+    }
+
+    /**
+     * 
+     * @param remoteNeighbor
+     * @return
+     */
+    public boolean notifyNeighborEndLeave(Peer remoteNeighbor) {
+        return this.peersWhichAreLeaving.remove(remoteNeighbor);
     }
 
     /**
@@ -194,6 +221,11 @@ public class Peer implements InitActive, RunActive, Serializable {
         return this.stub;
     }
 
+    /**
+     * Returns the {@link Body} of the current active object.
+     * 
+     * @return the {@link Body} of the current active object.
+     */
     public Body getBody() {
         return PAActiveObject.getBodyOnThis();
     }
@@ -214,6 +246,14 @@ public class Peer implements InitActive, RunActive, Serializable {
      */
     public OverlayType getType() {
         return this.type;
+    }
+
+    /**
+     * 
+     * @return
+     */
+    public Stack<Peer> getPeersWhichArePreparingToLeave() {
+        return this.peersWhichAreLeaving;
     }
 
     /**
@@ -249,14 +289,20 @@ public class Peer implements InitActive, RunActive, Serializable {
      * {@inheritDoc}
      */
     public void runActivity(Body body) {
-
         Service service = new Service(body);
+
         while (body.isActive()) {
-            Request req = service.blockingRemoveOldest(StructuredOverlay.UPDATE_TIMEOUT);
-            if (req == null) {
-                this.structuredOverlay.update();
+            Request request = null;
+            if (this.peersWhichAreLeaving.size() > 0) {
+                service.serveOldest("notifyNeighborEndLeave");
             } else {
-                service.serve(req);
+                request = service.blockingRemoveOldest(StructuredOverlay.UPDATE_TIMEOUT);
+
+                if (request == null) {
+                    this.structuredOverlay.update();
+                } else {
+                    service.serve(request);
+                }
             }
         }
     }

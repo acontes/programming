@@ -10,6 +10,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
+import org.objectweb.proactive.extensions.structuredp2p.core.requests.BlockingRequestReceiverException;
 
 
 /**
@@ -28,7 +29,7 @@ public class Tracker implements Serializable {
     /**
      * The probability to add a new peer in the tracker list.
      */
-    private static final int PROBABILITY = 3;
+    private static final int PROBABILITY = 5;
 
     /**
      * The remote peers list that the tracker maintains.
@@ -77,7 +78,10 @@ public class Tracker implements Serializable {
                         this.remotePeers.add(remotePeer);
                     }
                 }
+            } catch (BlockingRequestReceiverException e) {
+                this.addOnNetwork(remotePeer);
             } catch (Exception e) {
+                System.out.println("Tracker.addOnNetwork() EXCEPTION");
                 // The remote peer we contact in order to join is died, so we retry with an another
                 this.remotePeers.remove(peerToJoin);
                 this.addOnNetwork(remotePeer);

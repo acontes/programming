@@ -109,9 +109,6 @@ public abstract class Coordinate implements Comparable<Coordinate>, Serializable
      * {@inheritDoc}
      */
     public boolean equals(Object obj) {
-        if (!(obj instanceof Coordinate)) {
-            throw new IllegalArgumentException();
-        }
         return this.value.equals(((Coordinate) obj).getValue());
     }
 

@@ -6,7 +6,6 @@ import java.util.Vector;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.AddNeighborMessage;
-import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.LeaveMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.Message;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.RemoveNeighborMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.can.CANRemoveNeighborMessage;
@@ -33,7 +32,7 @@ public abstract class StructuredOverlay implements Serializable {
      * The timeout in milliseconds to wait before checking the network with the call of
      * {@link StructuredOverlay#update()}.
      */
-    public static final int UPDATE_TIMEOUT = 1234;
+    public static final int UPDATE_TIMEOUT = 500;
 
     /**
      * The local peer which is associated with the overlay.
@@ -79,6 +78,7 @@ public abstract class StructuredOverlay implements Serializable {
         if (this.getBufferizedQueries().size() > 0) {
             for (Query query : this.getBufferizedQueries()) {
                 this.send(query);
+                this.getBufferizedQueries().remove(query);
             }
         }
     }
@@ -124,15 +124,6 @@ public abstract class StructuredOverlay implements Serializable {
      * @return the {@link JoinResponseMessage} response.
      */
     public abstract JoinResponseMessage handleJoinMessage(Message msg);
-
-    /**
-     * Handles a {@link LeaveMessage}.
-     * 
-     * @param msg
-     *            the message that is handled.
-     * @return the {@link EmptyResponseMessage} response.
-     */
-    public abstract ActionResponseMessage handleLeaveMessage(LeaveMessage msg);
 
     /**
      * Handles a {@link Query}.

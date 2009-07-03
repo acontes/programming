@@ -22,6 +22,13 @@ public class StressTestThread implements Runnable {
     }
 
     public void run() {
+        try {
+            Thread.sleep(4000);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
         new Thread(new KeyListenerThread(this)).start();
 
         while (this.running) {

@@ -5,7 +5,6 @@ import java.util.HashMap;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.AddNeighborMessage;
-import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.LeaveMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.Message;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.RemoveNeighborMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.Query;
@@ -108,14 +107,6 @@ public class ChordOverlay extends StructuredOverlay {
      */
     public JoinResponseMessage handleJoinMessage(Message msg) {
         // TODO handleJoinMessage(Message msg)
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public ActionResponseMessage handleLeaveMessage(LeaveMessage leaveMessage) {
-        // TODO handleLeaveMessage(LeaveMessage leaveMessage)
         return null;
     }
 

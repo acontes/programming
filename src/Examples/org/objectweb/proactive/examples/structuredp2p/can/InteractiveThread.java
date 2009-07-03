@@ -37,16 +37,16 @@ public class InteractiveThread implements Runnable {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            } else if (inputLine.equalsIgnoreCase("add")) {
+            } else if (inputLine.equalsIgnoreCase("join") || inputLine.equals("j")) {
                 this.peerLauncher.performJoin();
-            } else if (inputLine.equalsIgnoreCase("leave")) {
+            } else if (inputLine.equalsIgnoreCase("leave") || inputLine.equals("l")) {
                 if (this.peerLauncher.getRemotePeers().size() == 0) {
                     this.peerLauncher
                             .printInformation("Impossible to perform leave action, the network has no peer.");
                 } else {
                     this.peerLauncher.performLeave();
                 }
-            } else if (inputLine.equalsIgnoreCase("lookup")) {
+            } else if (inputLine.equalsIgnoreCase("search") || inputLine.equals("s")) {
                 this.peerLauncher.performSearch();
             } else if (inputLine.equalsIgnoreCase("n")) {
                 this.peerLauncher.printInformation(this.peerLauncher.getRemotePeers().size() +
@@ -98,10 +98,10 @@ public class InteractiveThread implements Runnable {
      */
     public void printOptions() {
         System.out.println("[ Select an action to perform ]");
-        System.out.println("  > Type in 'add' : add a new peer at a random position");
-        System.out.println("  > Type in 'lookup' : send a lookup message to a random peer");
+        System.out.println("  > Type in 'join' : add a new peer at a random position");
         System.out.println("  > Type in 'leave' : force a random peer to quit the network");
-        System.out.println("  > Type in 'random x' : perform x random operations (lookup, join, leave)");
+        System.out.println("  > Type in 'search' : send a lookup message to a random peer");
+        System.out.println("  > Type in 'random x' : perform x random operations (join, leave, search)");
         System.out.println("  > Type in 'n' : give the number of peers on the network");
         System.out.println("  > Type in 'll' : list all peers on the network");
         System.out.println("  > Type in 'quit' : quit the application");

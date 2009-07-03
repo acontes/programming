@@ -26,12 +26,10 @@ public class Zone implements Serializable {
 
     public static String MIN_COORD = "a";
 
-
     /**
      * The maximal value we manage.
      */
     public static String MAX_COORD = "z";
-
 
     /**
      * The minimum coordinates.
@@ -71,13 +69,6 @@ public class Zone implements Serializable {
      *             the same dimension.
      */
     public Zone(Coordinate[] min, Coordinate[] max) throws ZoneException {
-        for (int i = 0; i < min.length; i++) {
-            if (min[i].compareTo(max[i]) >= 0) {
-            	System.out.println("min[i]"+min[i].toString()+ ":max[i]"+max[i].toString()) ;
-                throw new ZoneException("Zone is not correctly formed.");
-            }
-        }
-
         this.coordinatesMin = min;
         this.coordinatesMax = max;
     }

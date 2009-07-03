@@ -126,6 +126,7 @@ public class PeerLauncher extends Observable {
         this.printInformation("Lookup for peer managing " + buf + ".\n    Lookup start from peer managing " +
             ((CANOverlay) sender.getStructuredOverlay()).getZone() + ".\n    Peer found in " +
             response.getLatency() + "ms with " + response.getNbSteps() + " steps.");
+
     }
 
     public void printInformation(String mess) {

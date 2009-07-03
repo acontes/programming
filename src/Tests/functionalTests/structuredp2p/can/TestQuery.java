@@ -61,6 +61,13 @@ public class TestQuery {
         Assert.assertEquals(TestQuery.thirdPeer, response.getRemotePeerFound());
     }
 
+    @Test
+    public void testLeave() {
+        TestQuery.fourthPeer.leave();
+        TestQuery.thirdPeer.leave();
+        TestQuery.secondPeer.leave();
+    }
+
     @AfterClass
     public static void tearDown() {
         TestQuery.query = null;

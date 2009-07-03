@@ -15,7 +15,7 @@ import org.objectweb.proactive.core.body.request.RequestReceiver;
  */
 @SuppressWarnings("serial")
 public class BlockingRequestReceiver extends org.objectweb.proactive.core.body.request.RequestReceiverImpl {
-    boolean acceptReception = true;
+    boolean allowReception = true;
 
     /**
      * Constructor.
@@ -28,7 +28,7 @@ public class BlockingRequestReceiver extends org.objectweb.proactive.core.body.r
      * {@inheritDoc}
      */
     public int receiveRequest(Request request, Body bodyReceiver) {
-        if (!this.acceptReception) {
+        if (!this.allowReception) {
             throw new BlockingRequestReceiverException(this.getClass().getName());
         } else {
             return super.receiveRequest(request, bodyReceiver);
@@ -41,22 +41,22 @@ public class BlockingRequestReceiver extends org.objectweb.proactive.core.body.r
      * @return <code>true</code> if the {@code RequestReceiver} accepts to receive new requests.
      *         <code>false</code> otherwise.
      */
-    public boolean acceptReception() {
-        return this.acceptReception;
+    public boolean allowReception() {
+        return this.allowReception;
     }
 
     /**
      * Allows the {@code RequestReceiver} to receive new requests.
      */
-    public void allowReception() {
-        this.allowReception();
+    public void acceptReception() {
+        this.allowReception = true;
     }
 
     /**
      * Prohibits the {@code RequestReceiver} to receive new requests.
      */
-    public void prohibitReception() {
-        this.acceptReception = false;
+    public void blockReception() {
+        this.allowReception = false;
     }
 
 }

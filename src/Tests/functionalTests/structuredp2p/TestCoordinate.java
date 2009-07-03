@@ -62,11 +62,20 @@ public class TestCoordinate {
 
     @Test
     public void testMiddle() {
-        Assert.assertEquals(new LexicographicCoordinate("hh"), this.firstCoordinate
+        Assert.assertEquals(new LexicographicCoordinate("h\u0001"), this.firstCoordinate
                 .getMiddleWith(this.secondCoordinate));
 
-        Assert.assertNotSame(new LexicographicCoordinate("he"), this.firstCoordinate
+        Assert.assertNotSame(new LexicographicCoordinate("e"), this.firstCoordinate
                 .getMiddleWith(this.secondCoordinate));
+    }
+
+    @Test
+    public void testGetMiddle() {
+        Coordinate middleCoordinate = this.firstCoordinate;
+        for (int nbSplit = 0; nbSplit < 500; nbSplit++) {
+            middleCoordinate = middleCoordinate.getMiddleWith(this.secondCoordinate);
+            Assert.assertTrue(middleCoordinate.compareTo(this.secondCoordinate) < 0);
+        }
     }
 
     @After
