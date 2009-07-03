@@ -50,6 +50,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
+import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.control.NameController;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.InterfaceType;
@@ -61,6 +62,7 @@ import org.objectweb.proactive.core.body.tags.tag.CMTag;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.Utils;
+import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
@@ -219,6 +221,39 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
     		return;
     	}
     	
+    	// experiment to try to get a reference on the connected components
+    	NameController nc = null;
+        try {
+            nc = (NameController) owner.getFcInterface(Constants.NAME_CONTROLLER);
+        } catch (NoSuchInterfaceException e) {
+            e.printStackTrace();
+        }
+        String name = nc.getFcName();
+        String itfs[] = null;
+        BindingController bc = null;
+        try {
+        	bc = Fractal.getBindingController(owner);
+		} catch (NoSuchInterfaceException e1) {
+			System.out.println("Component "+ name + " doesn't have a BindingController interface");
+		}
+		Interface itf = null;
+		ProActiveInterface paitf = null;
+		ProActiveComponentRepresentative pacr = null;
+		if(bc != null) {
+			itfs = bc.listFc();
+			for(int i=0; i<itfs.length; i++) {
+				try {
+					itf = (Interface) bc.lookupFc(itfs[i]);
+				} catch (NoSuchInterfaceException e) {
+					e.printStackTrace();
+				}
+				paitf = (ProActiveInterface) itf;
+				pacr = (ProActiveComponentRepresentative) paitf.getFcItfOwner();
+				String destName = pacr.getComponentParameters().getName();
+				System.out.println("["+name+"]-->["+destName+"."+paitf.getFcItfName()+"] ");
+			}
+		}
+
 //    	if (statistics == null) {
 //            registerMethods();
 //        }
