@@ -23,21 +23,11 @@ public class ComputeRandom {
 
     /**
      * @param args
-<<<<<<< HEAD:src/Examples/org/objectweb/proactive/examples/vm/ComputeRandom.java
-     * @throws IOException 
-     * @throws FileNotFoundException 
-     * @throws ServiceException 
-     * @throws VirtualServiceException 
-     * @throws ProActiveException 
-     * @throws InterruptedException 
-=======
-     * @throws IOException
      * @throws FileNotFoundException
      * @throws ServiceException
      * @throws VirtualServiceException
      * @throws ProActiveException
      * @throws InterruptedException
->>>>>>> using last virtualization layer libraries.:src/Examples/org/objectweb/proactive/examples/vm/ComputeRandom.java
      */
     public static void main(String[] args) throws FileNotFoundException, IOException,
             VirtualServiceException, ProActiveException, InterruptedException {

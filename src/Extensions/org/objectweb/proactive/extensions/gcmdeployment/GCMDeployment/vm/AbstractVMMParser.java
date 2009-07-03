@@ -50,78 +50,78 @@ import org.w3c.dom.NodeList;
  */
 public abstract class AbstractVMMParser implements VMMParser {
 
-	static final String XPATH_AUTH = "dep:authentication";
-	static final String XPATH_HYPERVISOR = "dep:hypervisor";
-	static final String XPATH_IMAGE = "dep:image";
-	static final String PA_VMM_ID = "id";
-	static final String PA_AUTH_USER = "user";
-	static final String PA_AUTH_PWD = "pwd";
-	static final String PA_HYPERVISOR_URI = "url";
-	static final String PA_IMAGE_ID = "key";
-	static final String PA_IMAGE_OS = "os";
-	static final String PA_IMAGE_COUNT = "count";
+    static final String XPATH_AUTH = "dep:authentication";
+    static final String XPATH_HYPERVISOR = "dep:hypervisor";
+    static final String XPATH_IMAGE = "dep:image";
+    static final String PA_VMM_ID = "id";
+    static final String PA_AUTH_USER = "user";
+    static final String PA_AUTH_PWD = "pwd";
+    static final String PA_HYPERVISOR_URI = "url";
+    static final String PA_IMAGE_ID = "key";
+    static final String PA_IMAGE_OS = "os";
+    static final String PA_IMAGE_COUNT = "count";
 
-	/**
-	 * To get authentication, hypervisor's uri, image and id information.
-	 * @param vmmNode
-	 * @param xpath
-	 * @return
-	 * @throws XPathExpressionException
-	 */
-	protected AbstractVMM parseVMMNodeCommonInfo(Node vmmNode, XPath xpath) throws XPathExpressionException {
-		AbstractVMM vmm = createVMM();
+    /**
+     * To get authentication, hypervisor's uri, image and id information.
+     * @param vmmNode
+     * @param xpath
+     * @return
+     * @throws XPathExpressionException
+     */
+    protected AbstractVMM parseVMMNodeCommonInfo(Node vmmNode, XPath xpath) throws XPathExpressionException {
+        AbstractVMM vmm = createVMM();
 
-		//setId
-		String id = GCMParserHelper.getAttributeValue(vmmNode, PA_VMM_ID);
-		vmm.setId(id);
+        //setId
+        String id = GCMParserHelper.getAttributeValue(vmmNode, PA_VMM_ID);
+        vmm.setId(id);
 
-		//gathering authentication info
-		NodeList auths = (NodeList) xpath.evaluate(XPATH_AUTH, vmmNode, XPathConstants.NODESET);
-		if (auths.getLength() > 1)
-			GCMDeploymentLoggers.GCMD_LOGGER
-			.warn("To many authentication info supplied. Only the first one is taken into account");
-		if(auths != null && auths.getLength() >= 1){
-			Node auth = auths.item(0);
-			String value = GCMParserHelper.getAttributeValue(auth, PA_AUTH_USER);
-			vmm.setUser(value);
-			value = GCMParserHelper.getAttributeValue(auth, PA_AUTH_PWD);
-			vmm.setPwd(value);
-		}
+        //gathering authentication info
+        NodeList auths = (NodeList) xpath.evaluate(XPATH_AUTH, vmmNode, XPathConstants.NODESET);
+        if (auths.getLength() > 1)
+            GCMDeploymentLoggers.GCMD_LOGGER
+                    .warn("To many authentication info supplied. Only the first one is taken into account");
+        if (auths != null && auths.getLength() >= 1) {
+            Node auth = auths.item(0);
+            String value = GCMParserHelper.getAttributeValue(auth, PA_AUTH_USER);
+            vmm.setUser(value);
+            value = GCMParserHelper.getAttributeValue(auth, PA_AUTH_PWD);
+            vmm.setPwd(value);
+        }
 
-		//gathering hypervisors info
-		NodeList hypervisors = (NodeList) xpath.evaluate(XPATH_HYPERVISOR, vmmNode, XPathConstants.NODESET);
-		if(hypervisors != null){
-			for (int i = 0; i < hypervisors.getLength(); ++i) {
-				Node hypervisor = hypervisors.item(i);
-				vmm.addHypervisorBean(GCMParserHelper.getAttributeValue(hypervisor, PA_HYPERVISOR_URI));
-			}
-		}else{
-			vmm.addHypervisorBean(null);
-		}
+        //gathering hypervisors info
+        NodeList hypervisors = (NodeList) xpath.evaluate(XPATH_HYPERVISOR, vmmNode, XPathConstants.NODESET);
+        if (hypervisors != null) {
+            for (int i = 0; i < hypervisors.getLength(); ++i) {
+                Node hypervisor = hypervisors.item(i);
+                vmm.addHypervisorBean(GCMParserHelper.getAttributeValue(hypervisor, PA_HYPERVISOR_URI));
+            }
+        } else {
+            vmm.addHypervisorBean(null);
+        }
 
-		//gathering images info
-		NodeList images = (NodeList) xpath.evaluate(XPATH_IMAGE, vmmNode, XPathConstants.NODESET);
-		if(images != null){
-			for (int i = 0; i < images.getLength(); ++i) {
-				Node image = images.item(i);
-				String key = GCMParserHelper.getAttributeValue(image, PA_IMAGE_ID);
-				String count = GCMParserHelper.getAttributeValue(image, PA_IMAGE_COUNT);
-				String os = GCMParserHelper.getAttributeValue(image, PA_IMAGE_OS);
-				vmm.addVMBean(key, count == null ? 1 : Integer.parseInt(count), os);
-			}
-		}
-		return vmm;
-	}
+        //gathering images info
+        NodeList images = (NodeList) xpath.evaluate(XPATH_IMAGE, vmmNode, XPathConstants.NODESET);
+        if (images != null) {
+            for (int i = 0; i < images.getLength(); ++i) {
+                Node image = images.item(i);
+                String key = GCMParserHelper.getAttributeValue(image, PA_IMAGE_ID);
+                String count = GCMParserHelper.getAttributeValue(image, PA_IMAGE_COUNT);
+                String os = GCMParserHelper.getAttributeValue(image, PA_IMAGE_OS);
+                vmm.addVMBean(key, count == null ? 1 : Integer.parseInt(count), os);
+            }
+        }
+        return vmm;
+    }
 
-	/**
-	 * to return the associated Virtual machine manager
-	 * with the good dynamic type.
-	 */
-	public abstract AbstractVMM createVMM();
+    /**
+     * to return the associated Virtual machine manager
+     * with the good dynamic type.
+     */
+    public abstract AbstractVMM createVMM();
 
-	/**
-	 * get the tag's name that the instanciated
-	 * parser will have to handle.
-	 */
-	public abstract String getNodeName();
+    /**
+     * get the tag's name that the instanciated
+     * parser will have to handle.
+     */
+    public abstract String getNodeName();
 }

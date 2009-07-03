@@ -499,7 +499,7 @@
 					Besides, if you want to get only one virtual machine you have to supply the absolute .vmx file path.
 					Indeed, the path depends on what kind of product you run. For VMware Workstation
 					and VMware Server before release 2 just put the absolute file path.
-					Here is an exemple VMware Server after release 2:
+					Here is an example VMware Server after release 2:
 					<programlisting>
 						VMwareVMM vmm = new VMwareVMM("https://jily.activeeon.com:8333/sdk","inria","inria123",VMwareVMM.Service.vmwareServerVI);
 						ArrayList&lt;VMwareVM&gt; vms = vmm.getVirtualMachines();

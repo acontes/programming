@@ -197,7 +197,7 @@ Export-Package: org.objectweb.proactive,
  org.objectweb.proactive.mpi,
  org.objectweb.proactive.mpi.control,
  org.objectweb.proactive.mpi.control.util,
-DynamicImport-Package: *
+DynamicImport-Package: * 
 Bundle-Location: file:bundles/proactiveBundle.jar
 Bundle-Activator: org.objectweb.proactive.extensions.osgi.Activator
 Metadata-Location: metadata.xml
