@@ -5,6 +5,6 @@
 	<target name="compile" depends="core, stubGenerator, extra, -compile"/>
 	
 	<target name="-compile">
-		<compile_extension module="dataspaces" />	
+		<compile_extra module="dataspaces" />	
 	</target>
 </project>
