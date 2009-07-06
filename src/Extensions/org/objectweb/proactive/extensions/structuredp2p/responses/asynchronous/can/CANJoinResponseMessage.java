@@ -2,11 +2,10 @@ package org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.
 
 import java.util.Stack;
 
-import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.NeighborsDataStructure;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.Zone;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.can.CANJoinMessage;
-import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.JoinResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.ResponseMessage;
 
 
 /**
@@ -19,12 +18,7 @@ import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.J
  * @version 0.1
  */
 @SuppressWarnings("serial")
-public class CANJoinResponseMessage extends JoinResponseMessage {
-
-    /**
-     * The remote zone.
-     */
-    private final Zone remoteZone;
+public class CANJoinResponseMessage implements ResponseMessage {
 
     /**
      * The current dimension.
@@ -39,7 +33,7 @@ public class CANJoinResponseMessage extends JoinResponseMessage {
     /**
      * The current zone.
      */
-    private final Zone localZone;
+    private final Zone affectedZone;
 
     /**
      * The current neighbors.
@@ -62,20 +56,17 @@ public class CANJoinResponseMessage extends JoinResponseMessage {
      *            the direction.
      * @param zone
      *            the zone of the new peer.
-     * @param newNeighbors
+     * @param affectedNeighbors
      *            the neighbors of the remote peer.
      * @param splitHistory
      *            the splitHistory of the remote peer.
      */
-    public CANJoinResponseMessage(Peer remotePeer, Zone remoteZone, int dimension, int directionInv,
-            Zone zone, NeighborsDataStructure newNeighbors, Stack<int[]> splitHistory) {
-        super((zone != null), remotePeer);
-
-        this.remoteZone = remoteZone;
+    public CANJoinResponseMessage(int dimension, int directionInv, Zone zone,
+            NeighborsDataStructure affectedNeighbors, Stack<int[]> splitHistory) {
         this.dimension = dimension;
         this.direction = directionInv;
-        this.localZone = zone;
-        this.neighbors = newNeighbors;
+        this.affectedZone = zone;
+        this.neighbors = affectedNeighbors;
         this.splitHistory = splitHistory;
     }
 
@@ -83,22 +74,11 @@ public class CANJoinResponseMessage extends JoinResponseMessage {
      * {@inheritDoc}
      */
     public CANJoinResponseMessage(boolean succeded) {
-        super(succeded, null);
-        this.remoteZone = null;
         this.dimension = -1;
         this.direction = -1;
-        this.localZone = null;
+        this.affectedZone = null;
         this.neighbors = null;
         this.splitHistory = null;
-    }
-
-    /**
-     * Returns the remote zone.
-     * 
-     * @return the remoteZone
-     */
-    public Zone getRemoteZone() {
-        return this.remoteZone;
     }
 
     /**
@@ -106,7 +86,7 @@ public class CANJoinResponseMessage extends JoinResponseMessage {
      * 
      * @return the dimension.
      */
-    public int getDimension() {
+    public int getAffectedDimension() {
         return this.dimension;
     }
 
@@ -115,7 +95,7 @@ public class CANJoinResponseMessage extends JoinResponseMessage {
      * 
      * @return the direction.
      */
-    public int getDirection() {
+    public int getAffectedDirection() {
         return this.direction;
     }
 
@@ -124,8 +104,8 @@ public class CANJoinResponseMessage extends JoinResponseMessage {
      * 
      * @return the zone.
      */
-    public Zone getLocalZone() {
-        return this.localZone;
+    public Zone getAffectedZone() {
+        return this.affectedZone;
     }
 
     /**
@@ -133,7 +113,7 @@ public class CANJoinResponseMessage extends JoinResponseMessage {
      * 
      * @return the neighbors.
      */
-    public NeighborsDataStructure getNeighbors() {
+    public NeighborsDataStructure getAffectedNeighborsDataStructure() {
         return this.neighbors;
     }
 

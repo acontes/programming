@@ -92,6 +92,7 @@ public class PeerLauncher extends Observable {
         } catch (NodeException e) {
             e.printStackTrace();
         }
+        this.updateGUI();
         this.printInformation("Add peer managing " + ((CANOverlay) peer.getStructuredOverlay()).getZone());
     }
 
@@ -116,7 +117,6 @@ public class PeerLauncher extends Observable {
             buf += coordinatesToFind[i];
         }
         buf += ")";
-        System.out.println("coord = " + buf.toString());
 
         Peer sender = this.remotePeers.get(rand.nextInt(this.remotePeers.size()));
 

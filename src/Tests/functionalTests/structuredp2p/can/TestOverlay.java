@@ -8,7 +8,6 @@ import java.util.Random;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
@@ -149,9 +148,41 @@ public class TestOverlay {
             Assert.assertFalse(TestOverlay.getOverlay(TestOverlay.fourthPeer).hasNeighbor(
                     TestOverlay.firstPeer));
         }
+
     }
 
-    @Ignore
+    @Test
+    public void testLeave() {
+        int second = TestOverlay.getOverlay(TestOverlay.secondPeer).getNeighborsDataStructure().size();
+
+        Assert.assertTrue(TestOverlay.fourthPeer.leave());
+
+        Assert.assertEquals(second - 1, TestOverlay.getOverlay(TestOverlay.secondPeer)
+                .getNeighborsDataStructure().size());
+
+        // Is the peer a neighbor again ??
+        Assert.assertFalse(TestOverlay.getOverlay(TestOverlay.firstPeer).hasNeighbor(TestOverlay.fourthPeer));
+        Assert
+                .assertFalse(TestOverlay.getOverlay(TestOverlay.secondPeer).hasNeighbor(
+                        TestOverlay.fourthPeer));
+        Assert.assertFalse(TestOverlay.getOverlay(TestOverlay.thirdPeer).hasNeighbor(TestOverlay.fourthPeer));
+
+        // Is a peer neighbor to itself ??
+        Assert.assertFalse(TestOverlay.getOverlay(TestOverlay.firstPeer).hasNeighbor(TestOverlay.firstPeer));
+        Assert
+                .assertFalse(TestOverlay.getOverlay(TestOverlay.secondPeer).hasNeighbor(
+                        TestOverlay.secondPeer));
+        Assert.assertFalse(TestOverlay.getOverlay(TestOverlay.thirdPeer).hasNeighbor(TestOverlay.thirdPeer));
+    }
+
+    @Test
+    public void leaveAll() {
+        Assert.assertTrue(TestOverlay.thirdPeer.leave());
+        Assert.assertTrue(TestOverlay.secondPeer.leave());
+        Assert.assertTrue(TestOverlay.firstPeer.leave());
+    }
+
+    @Test
     public void testSendMessage() {
         Peer[] peers = new Peer[] { TestOverlay.firstPeer, TestOverlay.secondPeer, TestOverlay.thirdPeer,
                 TestOverlay.fifthPeer, TestOverlay.sixthPeer, TestOverlay.seventhPeer, TestOverlay.eighthPeer };
@@ -177,43 +208,6 @@ public class TestOverlay {
         Assert.assertEquals(TestOverlay.getOverlay(toFind).getZone(), TestOverlay.getOverlay(
                 response.getRemotePeerFound()).getZone());
         Assert.assertEquals(toFind, response.getRemotePeerFound());
-    }
-
-    @Test
-    public void testLeave() {
-        int second = TestOverlay.getOverlay(TestOverlay.secondPeer).getNeighborsDataStructure().size();
-        System.out
-                .println("Before Second peer, has " +
-                    TestOverlay.getOverlay(TestOverlay.secondPeer).getNeighborsDataStructure().size() +
-                    "neighbor(s)");
-        Assert.assertTrue(TestOverlay.fourthPeer.leave());
-        System.out
-                .println("After Second peer, has " +
-                    TestOverlay.getOverlay(TestOverlay.secondPeer).getNeighborsDataStructure().size() +
-                    "neighbor(s)");
-        Assert.assertEquals(second - 1, TestOverlay.getOverlay(TestOverlay.secondPeer)
-                .getNeighborsDataStructure().size());
-
-        // Is the peer a neighbor again ??
-        Assert.assertFalse(TestOverlay.getOverlay(TestOverlay.firstPeer).hasNeighbor(TestOverlay.fourthPeer));
-        Assert
-                .assertFalse(TestOverlay.getOverlay(TestOverlay.secondPeer).hasNeighbor(
-                        TestOverlay.fourthPeer));
-        Assert.assertFalse(TestOverlay.getOverlay(TestOverlay.thirdPeer).hasNeighbor(TestOverlay.fourthPeer));
-
-        // Is a peer neighbor to itself ??
-        Assert.assertFalse(TestOverlay.getOverlay(TestOverlay.firstPeer).hasNeighbor(TestOverlay.firstPeer));
-        Assert
-                .assertFalse(TestOverlay.getOverlay(TestOverlay.secondPeer).hasNeighbor(
-                        TestOverlay.secondPeer));
-        Assert.assertFalse(TestOverlay.getOverlay(TestOverlay.thirdPeer).hasNeighbor(TestOverlay.thirdPeer));
-    }
-
-    @Test
-    public void leaveAll() {
-        Assert.assertTrue(TestOverlay.thirdPeer.leave());
-        Assert.assertTrue(TestOverlay.secondPeer.leave());
-        Assert.assertTrue(TestOverlay.firstPeer.leave());
     }
 
     public static CANOverlay getOverlay(Peer peer) {

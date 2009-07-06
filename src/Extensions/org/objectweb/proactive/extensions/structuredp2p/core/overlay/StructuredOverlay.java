@@ -77,8 +77,8 @@ public abstract class StructuredOverlay implements Serializable {
     public void update() {
         if (this.getBufferizedQueries().size() > 0) {
             for (Query query : this.getBufferizedQueries()) {
-                this.send(query);
                 this.getBufferizedQueries().remove(query);
+                this.send(query);
             }
         }
     }
@@ -123,7 +123,7 @@ public abstract class StructuredOverlay implements Serializable {
      *            the message that is handled.
      * @return the {@link JoinResponseMessage} response.
      */
-    public abstract JoinResponseMessage handleJoinMessage(Message msg);
+    public abstract ResponseMessage handleJoinMessage(Message msg);
 
     /**
      * Handles a {@link Query}.
@@ -195,4 +195,9 @@ public abstract class StructuredOverlay implements Serializable {
     public Peer getRemotePeer() {
         return this.localPeer.getStub();
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public abstract String toString();
 }

@@ -28,12 +28,12 @@ public class TestZone {
         Coordinate[] coords = new Coordinate[CANOverlay.NB_DIMENSIONS];
 
         for (int i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
-            coords[i] = new LexicographicCoordinate("" + Zone.MIN_COORD);
+            coords[i] = new LexicographicCoordinate("" + Zone.COORDINATE_MIN);
         }
         Assert.assertArrayEquals(TestZone.zone.getCoordinatesMin(), coords);
 
         for (int i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
-            coords[i] = new LexicographicCoordinate("" + Zone.MAX_COORD);
+            coords[i] = new LexicographicCoordinate("" + Zone.COORDINATE_MAX);
         }
         Assert.assertArrayEquals(TestZone.zone.getCoordinatesMax(), coords);
     }
@@ -44,26 +44,26 @@ public class TestZone {
         Coordinate[] coords = new Coordinate[CANOverlay.NB_DIMENSIONS];
 
         for (int i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
-            coords[i] = new LexicographicCoordinate(Zone.MIN_COORD);
+            coords[i] = new LexicographicCoordinate(Zone.COORDINATE_MIN);
         }
         Assert.assertArrayEquals(newZones[0].getCoordinatesMin(), coords);
 
-        coords[0] = (new LexicographicCoordinate(Zone.MIN_COORD)).getMiddleWith(new LexicographicCoordinate(
-            Zone.MAX_COORD));
+        coords[0] = (new LexicographicCoordinate(Zone.COORDINATE_MIN)).getMiddleWith(new LexicographicCoordinate(
+            Zone.COORDINATE_MAX));
         for (int i = 1; i < CANOverlay.NB_DIMENSIONS; i++) {
-            coords[i] = new LexicographicCoordinate(Zone.MAX_COORD);
+            coords[i] = new LexicographicCoordinate(Zone.COORDINATE_MAX);
         }
         Assert.assertArrayEquals(newZones[0].getCoordinatesMax(), coords);
 
-        coords[0] = (new LexicographicCoordinate(Zone.MIN_COORD)).getMiddleWith(new LexicographicCoordinate(
-            Zone.MAX_COORD));
+        coords[0] = (new LexicographicCoordinate(Zone.COORDINATE_MIN)).getMiddleWith(new LexicographicCoordinate(
+            Zone.COORDINATE_MAX));
         for (int i = 1; i < CANOverlay.NB_DIMENSIONS; i++) {
-            coords[i] = new LexicographicCoordinate(Zone.MIN_COORD);
+            coords[i] = new LexicographicCoordinate(Zone.COORDINATE_MIN);
         }
         Assert.assertArrayEquals(newZones[1].getCoordinatesMin(), coords);
 
         for (int i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
-            coords[i] = new LexicographicCoordinate(Zone.MAX_COORD);
+            coords[i] = new LexicographicCoordinate(Zone.COORDINATE_MAX);
         }
         Assert.assertArrayEquals(newZones[1].getCoordinatesMax(), coords);
 

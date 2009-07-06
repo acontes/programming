@@ -24,12 +24,12 @@ public class Zone implements Serializable {
      * The minimal value we manage.
      */
 
-    public static String MIN_COORD = "a";
+    public static String COORDINATE_MIN = "a";
 
     /**
      * The maximal value we manage.
      */
-    public static String MAX_COORD = "z";
+    public static String COORDINATE_MAX = "z";
 
     /**
      * The minimum coordinates.
@@ -49,8 +49,8 @@ public class Zone implements Serializable {
         Coordinate[] maxCoords = new Coordinate[CANOverlay.NB_DIMENSIONS];
 
         for (int i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
-            minCoords[i] = new LexicographicCoordinate(Zone.MIN_COORD);
-            maxCoords[i] = new LexicographicCoordinate(Zone.MAX_COORD);
+            minCoords[i] = new LexicographicCoordinate(Zone.COORDINATE_MIN);
+            maxCoords[i] = new LexicographicCoordinate(Zone.COORDINATE_MAX);
         }
 
         this.coordinatesMin = minCoords;

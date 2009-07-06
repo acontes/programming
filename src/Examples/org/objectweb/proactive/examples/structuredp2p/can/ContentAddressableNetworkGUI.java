@@ -104,16 +104,19 @@ public class ContentAddressableNetworkGUI extends JFrame implements Observer {
                     ((CANOverlay) this.clickedPeer.getStructuredOverlay()).getZone());
                 g2d.setColor(Color.black);
 
-                Zone zone = ((CANOverlay) this.clickedPeer.getStructuredOverlay()).getZone();
+                for (Peer neighbor : ((CANOverlay) this.clickedPeer.getStructuredOverlay())
+                        .getNeighborsDataStructure()) {
 
-                int xMin = (int) (Double.parseDouble(zone.getCoordinateMin(0).getValue()) * ContentAddressableNetworkGUI.this.WIDTH);
-                int yMin = (int) (Double.parseDouble(zone.getCoordinateMin(1).getValue()) * ContentAddressableNetworkGUI.this.HEIGHT);
+                    Zone zone = ((CANOverlay) neighbor.getStructuredOverlay()).getZone();
 
-                int xMax = (int) (Double.parseDouble(zone.getCoordinateMax(0).getValue()) * ContentAddressableNetworkGUI.this.WIDTH);
-                int yMax = (int) (Double.parseDouble(zone.getCoordinateMax(1).getValue()) * ContentAddressableNetworkGUI.this.HEIGHT);
+                    int xMin = (int) (Double.parseDouble(zone.getCoordinateMin(0).getValue()) * ContentAddressableNetworkGUI.this.WIDTH);
+                    int yMin = (int) (Double.parseDouble(zone.getCoordinateMin(1).getValue()) * ContentAddressableNetworkGUI.this.HEIGHT);
 
-                g2d.drawLine(xMin, yMin, xMax - xMin, yMax - yMin);
+                    int xMax = (int) (Double.parseDouble(zone.getCoordinateMax(0).getValue()) * ContentAddressableNetworkGUI.this.WIDTH);
+                    int yMax = (int) (Double.parseDouble(zone.getCoordinateMax(1).getValue()) * ContentAddressableNetworkGUI.this.HEIGHT);
 
+                    g2d.drawLine(xMin, yMin, xMax - xMin, yMax - yMin);
+                }
                 this.clickedPeer = null;
             }
 

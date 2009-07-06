@@ -123,4 +123,10 @@ public class ChordOverlay extends StructuredOverlay {
         // TODO Auto-generated method stub
 
     }
+
+    @Override
+    public String toString() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

@@ -1,5 +1,8 @@
 package functionalTests.structuredp2p.can;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import junit.framework.Assert;
 
 import org.junit.AfterClass;
@@ -44,6 +47,22 @@ public class TestQuery {
             TestQuery.fourthPeer.join(TestQuery.thirdPeer);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+
+        List<Peer> peers = new ArrayList<Peer>();
+        peers.add(TestQuery.firstPeer);
+        peers.add(TestQuery.secondPeer);
+        peers.add(TestQuery.thirdPeer);
+        peers.add(TestQuery.fourthPeer);
+
+        int i = 1;
+        for (Peer peer : peers) {
+            System.out.println(i + " " + peer.getStructuredOverlay());
+            for (Peer neighbor : ((CANOverlay) peer.getStructuredOverlay()).getNeighborsDataStructure()) {
+                System.out.println("n = " + neighbor.getStructuredOverlay());
+            }
+            System.out.println();
+            i++;
         }
 
         TestQuery.query = new RDFQuery(((CANOverlay) TestQuery.thirdPeer.getStructuredOverlay()).getZone()
