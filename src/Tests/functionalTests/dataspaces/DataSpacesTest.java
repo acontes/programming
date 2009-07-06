@@ -185,8 +185,8 @@ public class DataSpacesTest extends GCMFunctionalTestDataSpaces {
         expectedOutputs.add(OUTPUT_WITH_FILE_NAME);
         expectedOutputs.add(OUTPUT_WITH_NOTHING1_NAME);
         expectedOutputs.add(OUTPUT_WITH_NOTHING2_NAME);
-        assertEquals(expectedInputs, ao1.getAllKnownOutputsNames());
-        assertEquals(expectedInputs, ao3.getAllKnownOutputsNames());
+        assertEquals(expectedOutputs, ao1.getAllKnownOutputsNames());
+        assertEquals(expectedOutputs, ao3.getAllKnownOutputsNames());
 
         // blocking resolve input + add input:
         // (exceptions for readInputFileBlocking - to make it asynchronous)
@@ -338,7 +338,7 @@ public class DataSpacesTest extends GCMFunctionalTestDataSpaces {
         }
 
         public Set<String> getAllKnownOutputsNames() throws NotConfiguredException {
-            return PADataSpaces.getAllKnownInputNames();
+            return PADataSpaces.getAllKnownOutputNames();
         }
 
         public StringWrapper readInputFileBlocking(String inputName, String fileName, long timeout)
