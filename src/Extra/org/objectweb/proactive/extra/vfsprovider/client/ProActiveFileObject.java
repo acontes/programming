@@ -197,7 +197,11 @@ public class ProActiveFileObject extends AbstractFileObject {
 
     @Override
     protected boolean doSetLastModTime(long modtime) throws Exception {
-        return getServer().fileSetLastModifiedTime(getPath(), modtime);
+        final boolean result = getServer().fileSetLastModifiedTime(getPath(), modtime);
+        if (result) {
+            onChange();
+        }
+        return result;
     }
 
     @Override
