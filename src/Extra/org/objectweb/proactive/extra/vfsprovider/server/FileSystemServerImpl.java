@@ -77,7 +77,7 @@ public class FileSystemServerImpl implements FileSystemServer {
     private String rootCanonicalPath;
 
     private boolean serverStopped;
-    
+
     private final Object serverStopLock = new Object();
 
     private long idGenerator = 0;
@@ -115,7 +115,7 @@ public class FileSystemServerImpl implements FileSystemServer {
     public synchronized void startAutoClosing() {
         if (serverStopped)
             throw new IllegalStateException("Server has been already stopped");
-        
+
         if (streamAutocloseThread == null) {
             streamAutocloseThread = new StreamAutocloseThread();
             streamAutocloseThread.start();
@@ -136,7 +136,7 @@ public class FileSystemServerImpl implements FileSystemServer {
         synchronized (serverStopLock) {
             serverStopped = true;
         }
-        
+
         streamAutocloseThread.setToStop();
         final HashSet<Long> snapshot = new HashSet<Long>(streams.keySet());
         for (Long stream : snapshot) {
@@ -155,10 +155,10 @@ public class FileSystemServerImpl implements FileSystemServer {
         synchronized (serverStopLock) {
             if (serverStopped)
                 throw new IllegalStateException("File server has been stopped");
-            
+
             final Stream instance;
             final File file = resolvePath(path);
-            
+
             try {
                 instance = StreamFactory.createStreamInstance(file, mode);
             } catch (SecurityException sec) {
