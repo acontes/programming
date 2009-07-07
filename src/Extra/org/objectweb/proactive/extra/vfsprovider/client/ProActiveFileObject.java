@@ -163,7 +163,10 @@ public class ProActiveFileObject extends AbstractFileObject {
     @Override
     protected String[] doListChildren() throws Exception {
         final Set<String> files = getServer().fileListChildren(getPath());
-        return (String[]) files.toArray();
+        if (files == null) {
+            return null;
+        }
+        return result;
     }
 
     @Override

@@ -311,8 +311,9 @@ public class FileSystemServerImpl implements FileSystemServer {
         } catch (SecurityException sec) {
             throw new IOException(sec);
         }
-        checkConditionIsTrue(file.isDirectory(), "Specified file is not a directory");
-        checkConditionIsTrue(list != null, "An IO error occurred while listing the directory");
+        if (list == null) {
+            return null;
+        }
         return new HashSet<String>(Arrays.asList(list));
     }
 
@@ -326,8 +327,9 @@ public class FileSystemServerImpl implements FileSystemServer {
         } catch (SecurityException sec) {
             throw new IOException(sec);
         }
-        checkConditionIsTrue(file.isDirectory(), "Specified file is not a directory");
-        checkConditionIsTrue(children != null, "An IO error occurred while listing the directory");
+        if (children == null) {
+            return null;
+        }
         infos = new HashMap<String, FileInfo>(children.length);
         for (int i = 0; i < children.length; i++) {
             File ch = children[i];

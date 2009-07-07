@@ -19,10 +19,10 @@ public interface FileOperations {
      * @param path
      *            of a file, cannot be <code>null</code>
      * @return set of names of child files and directories, may be empty if the directory is empty;
-     *         is never <code>null</code>
+     *         <code>null</code> when specified file is not an existing directory or cannot be
+     *         accessed
      * @throws IOException
-     *             when specified file is not an existing directory or when an security or I/O error
-     *             occurred
+     *             when an security or I/O error occurred
      */
     public abstract Set<String> fileListChildren(String path) throws IOException;
 
@@ -32,11 +32,12 @@ public interface FileOperations {
      * <p>
      * Returned set of information of a single or all files may be not coherent, as the simultaneous
      * file system operations, that can change attributes while reading, are not prohibited.
-     *
+     * 
      * @param path
      *            of a file, cannot be <code>null</code>
      * @return map of names and file information of child files and directories, may be empty if the
-     *         directory is empty; is never <code>null</code>
+     *         directory is empty; <code>null</code> when specified file is not an existing
+     *         directory or cannot be accessed
      * @throws IOException
      *             when specified file is not an existing directory, when unable to read
      *             "last modified time" attribute, or when an security or I/O error occurred
