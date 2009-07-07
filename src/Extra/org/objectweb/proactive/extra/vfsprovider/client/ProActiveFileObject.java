@@ -100,8 +100,10 @@ public class ProActiveFileObject extends AbstractFileObject {
     @Override
     protected void onChange() throws Exception {
         synchronized (proactiveFS) {
-            doDetach();
-            doAttach();
+            if (isAttached()) {
+                doDetach();
+                doAttach();
+            }
         }
     }
 
