@@ -49,15 +49,15 @@ public class FileSystemServerDeployer {
         url = roe.getURL();
     }
 
-    public FileSystemServer getLocalNamingService() {
+    public FileSystemServer getLocalFileSystemServer() {
         return this.fileSystemServer;
     }
 
-    public FileSystemServer getRemoteNamingService() throws ProActiveException {
+    public FileSystemServer getRemoteFileSystemServer() throws ProActiveException {
         return (FileSystemServer) RemoteObjectHelper.generatedObjectStub(this.roe.getRemoteObject());
     }
 
-    public String getNamingServiceURL() {
+    public String getRemoteFileSystemServerURL() {
         return this.url;
     }
 
