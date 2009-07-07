@@ -34,7 +34,7 @@ public class ProActiveFileName extends GenericFileName {
         }
 
         public static ProActiveProviderScheme forServerScheme(String serverScheme) {
-            return ProActiveProviderScheme.valueOf(serverScheme);
+            return ProActiveProviderScheme.valueOf(serverScheme.toUpperCase());
         }
 
         public static ProActiveProviderScheme forVFSScheme(String vfsScheme) {
@@ -42,7 +42,7 @@ public class ProActiveFileName extends GenericFileName {
                 throw new IllegalArgumentException(vfsScheme + " is not a valid VFS server scheme");
             }
             final String strippedScheme = vfsScheme.substring(VFS_PREFIX.length());
-            return ProActiveProviderScheme.valueOf(strippedScheme);
+            return ProActiveProviderScheme.valueOf(strippedScheme.toUpperCase());
         }
     }
 
@@ -89,7 +89,7 @@ public class ProActiveFileName extends GenericFileName {
     @Override
     public FileName createName(String absPath, FileType type) {
         return new ProActiveFileName(getScheme(), getHostName(), getPort(), getUserName(), getPassword(),
-            servicePath, getPath(), getType());
+            servicePath, absPath, type);
     }
 
     public String getServicePath() {
