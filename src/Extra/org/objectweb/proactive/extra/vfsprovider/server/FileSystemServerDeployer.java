@@ -20,9 +20,9 @@ public class FileSystemServerDeployer {
     /** URL of the remote object */
     final private String url;
 
-    final private FileSystemServer fileSystemServer;
+    private FileSystemServerImpl fileSystemServer;
 
-    RemoteObjectExposer<FileSystemServer> roe;
+    private RemoteObjectExposer<FileSystemServerImpl> roe;
 
     /**
      * Deploys locally a FileSystemServer as a RemoteObject with a default name.
@@ -49,7 +49,7 @@ public class FileSystemServerDeployer {
         url = roe.getURL();
     }
 
-    public FileSystemServer getLocalFileSystemServer() {
+    public FileSystemServerImpl getLocalFileSystemServer() {
         return this.fileSystemServer;
     }
 
@@ -62,7 +62,7 @@ public class FileSystemServerDeployer {
     }
 
     /**
-     * Unexport the remote object.
+     * Unexport the remote object and stops the server.
      * 
      * @throws ProActiveException
      */
@@ -70,6 +70,9 @@ public class FileSystemServerDeployer {
         if (roe != null) {
             roe.unexportAll();
             roe = null;
+            // FIXME?
+            // fileSystemServer.stopServer();
+            fileSystemServer = null;
         }
     }
 }

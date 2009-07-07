@@ -129,6 +129,9 @@ public class FileSystemServerImpl implements FileSystemServer {
      * Stop server facilities, in particular the auto closing mechanism. This method should be
      * called when server is no longer used, to release system resources (stop facilities' threads).
      */
+    // FIXME method crashes when autoclosing wasn't started, but it's marked as general stopping method
+    // what about method that can be called on undeployment. maybe also closing opened streams? + sanity checks in each public method
+    // TODO/WISH: maybe we can start autoclosing in constructor basing on configuration from proactive property mechanism?  
     public synchronized void stopServer() {
         synchronized (serverStopLock) {
             serverStopped = true;
