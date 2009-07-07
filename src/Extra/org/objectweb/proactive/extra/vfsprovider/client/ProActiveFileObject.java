@@ -17,6 +17,7 @@ import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.RandomAccessContent;
 import org.apache.commons.vfs.provider.AbstractFileObject;
 import org.apache.commons.vfs.provider.AbstractRandomAccessStreamContent;
+import org.apache.commons.vfs.provider.UriParser;
 import org.apache.commons.vfs.util.FileObjectUtils;
 import org.apache.commons.vfs.util.MonitorInputStream;
 import org.apache.commons.vfs.util.MonitorOutputStream;
@@ -74,8 +75,8 @@ public class ProActiveFileObject extends AbstractFileObject {
         return proactiveFS.getServer();
     }
 
-    private String getPath() {
-        return ((ProActiveFileName) getName()).getPath();
+    private String getPath() throws FileSystemException {
+        return ((ProActiveFileName) getName()).getPathDecoded();
     }
 
     @Override
@@ -165,6 +166,12 @@ public class ProActiveFileObject extends AbstractFileObject {
         final Set<String> files = getServer().fileListChildren(getPath());
         if (files == null) {
             return null;
+        }
+
+        final String result[] = new String[files.size()];
+        int i = 0;
+        for (final String f : files) {
+            result[i++] = UriParser.encode(f);
         }
         return result;
     }
