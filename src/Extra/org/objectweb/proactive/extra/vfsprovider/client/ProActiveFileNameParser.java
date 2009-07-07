@@ -16,7 +16,7 @@ public class ProActiveFileNameParser extends HostFileNameParser {
     }
 
     private static String extractServicePath(StringBuffer path) throws FileSystemException {
-        if (path.length() > 0 || path.charAt(0) != FileName.SEPARATOR_CHAR) {
+        if (path.length() > 0 && path.charAt(0) != FileName.SEPARATOR_CHAR) {
             throw new FileSystemException(
                 "Invalid path in URI: service path after host name does not begin with slash");
         }
