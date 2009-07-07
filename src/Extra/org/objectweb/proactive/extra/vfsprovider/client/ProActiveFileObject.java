@@ -182,19 +182,6 @@ public class ProActiveFileObject extends AbstractFileObject {
                 org.objectweb.proactive.extra.vfsprovider.protocol.FileType.DIRECTORY);
     }
 
-    // Overrides AbstractFileObject implementation for better performance.  
-    @Override
-    public void createFile() throws FileSystemException {
-        synchronized (proactiveFS) {
-            try {
-                getServer().fileCreate(getPath(),
-                        org.objectweb.proactive.extra.vfsprovider.protocol.FileType.FILE);
-            } catch (final Exception e) {
-                throw new FileSystemException("vfs.provider/create-file.error", getName(), e);
-            }
-        }
-    }
-
     @Override
     protected void doDelete() throws Exception {
         getServer().fileDelete(getPath(), false);
