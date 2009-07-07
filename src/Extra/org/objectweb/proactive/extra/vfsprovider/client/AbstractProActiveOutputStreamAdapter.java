@@ -9,6 +9,7 @@ import java.util.Arrays;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.vfs.FileSystemException;
 import org.objectweb.proactive.extra.vfsprovider.exceptions.StreamNotFoundException;
 import org.objectweb.proactive.extra.vfsprovider.exceptions.WrongStreamTypeException;
 import org.objectweb.proactive.extra.vfsprovider.protocol.FileSystemServer;
@@ -72,7 +73,7 @@ abstract class AbstractProActiveOutputStreamAdapter extends OutputStream {
 
     protected abstract long getStreamId();
 
-    protected abstract FileSystemServer getServer();
+    protected abstract FileSystemServer getServer() throws FileSystemException;
 
     @Override
     public abstract void close() throws IOException;

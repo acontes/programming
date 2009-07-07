@@ -70,7 +70,7 @@ public class ProActiveFileObject extends AbstractFileObject {
 
     // let's access server this way, as ProActiveFileSystem is responsible
     // for managing its instance(s)
-    private FileSystemServer getServer() {
+    private FileSystemServer getServer() throws FileSystemException {
         return proactiveFS.getServer();
     }
 
@@ -229,7 +229,7 @@ public class ProActiveFileObject extends AbstractFileObject {
         }
 
         @Override
-        protected FileSystemServer getServer() {
+        protected FileSystemServer getServer() throws FileSystemException {
             return ProActiveFileObject.this.getServer();
         }
 
@@ -279,7 +279,7 @@ public class ProActiveFileObject extends AbstractFileObject {
         }
 
         @Override
-        protected FileSystemServer getServer() {
+        protected FileSystemServer getServer() throws FileSystemException {
             return ProActiveFileObject.this.getServer();
         }
 
@@ -344,7 +344,7 @@ public class ProActiveFileObject extends AbstractFileObject {
                 }
 
                 @Override
-                protected FileSystemServer getServer() {
+                protected FileSystemServer getServer() throws FileSystemException {
                     return ProActiveFileObject.this.getServer();
                 }
 
@@ -458,7 +458,7 @@ public class ProActiveFileObject extends AbstractFileObject {
                 }
 
                 @Override
-                protected FileSystemServer getServer() {
+                protected FileSystemServer getServer() throws FileSystemException {
                     return ProActiveFileObject.this.getServer();
                 }
 
