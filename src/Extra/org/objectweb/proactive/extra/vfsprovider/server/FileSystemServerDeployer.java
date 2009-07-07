@@ -44,7 +44,7 @@ public class FileSystemServerDeployer {
      */
     public FileSystemServerDeployer(String name, String rootPath) throws IOException {
         fileSystemServer = new FileSystemServerImpl(rootPath);
-        roe = PARemoteObject.newRemoteObject(FileSystemServerImpl.class.getName(), this.fileSystemServer);
+        roe = PARemoteObject.newRemoteObject(FileSystemServer.class.getName(), this.fileSystemServer);
         roe.createRemoteObject(name);
         url = roe.getURL();
     }
