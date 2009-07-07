@@ -18,12 +18,14 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.annotation.RemoteObject;
 import org.objectweb.proactive.extra.vfsprovider.exceptions.StreamNotFoundException;
 import org.objectweb.proactive.extra.vfsprovider.exceptions.WrongStreamTypeException;
 import org.objectweb.proactive.extra.vfsprovider.protocol.FileInfo;
 import org.objectweb.proactive.extra.vfsprovider.protocol.FileSystemServer;
 import org.objectweb.proactive.extra.vfsprovider.protocol.FileType;
 import org.objectweb.proactive.extra.vfsprovider.protocol.StreamMode;
+
 
 /**
  * Implements remote file system protocol defined in {@link FileSystemServer} interface.
@@ -52,6 +54,7 @@ import org.objectweb.proactive.extra.vfsprovider.protocol.StreamMode;
  * @see FileSystemServer
  * @see Stream
  */
+@RemoteObject
 public class FileSystemServerImpl implements FileSystemServer {
 
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.VFS_PROVIDER_SERVER);
@@ -69,10 +72,10 @@ public class FileSystemServerImpl implements FileSystemServer {
     private final Map<Long, Long> streamLastUsedTimestamp = Collections
             .synchronizedMap(new HashMap<Long, Long>());
 
-    private final File rootFile;
+    private File rootFile;
 
-    private final String rootCanonicalPath;
-    
+    private String rootCanonicalPath;
+
     private boolean serverStopped;
     
     private final Object serverStopLock = new Object();
@@ -80,6 +83,12 @@ public class FileSystemServerImpl implements FileSystemServer {
     private long idGenerator = 0;
 
     private StreamAutocloseThread streamAutocloseThread;
+
+    /**
+     * ProActive empty non-arg constructor. <strong>Internal use only.</strong>
+     */
+    public FileSystemServerImpl() {
+    }
 
     /**
      * Create an instance of {@link FileSystemServer} that has its root in <code>rootPath</code>
