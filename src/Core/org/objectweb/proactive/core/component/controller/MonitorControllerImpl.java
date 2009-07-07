@@ -374,13 +374,13 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
         } 
         else if (type.equals(NotificationType.servingStarted)) {
             RequestNotificationData data = (RequestNotificationData) notification.getUserData();
-            logger.debug("["+componentName+"][servingStar] " + //From:" + data.getSource() +
+ /*           logger.debug("["+componentName+"][servingStar] " + //From:" + data.getSource() +
             		//" To:"+ data.getDestination() +
             		" Method:" + data.getMethodName() +
             		" SeqNumber: " + data.getSequenceNumber() +
             		" Timestamp: " + notification.getTimeStamp() +
             		" NotifSeqNbr: " + notification.getSequenceNumber() +
-            		" Tags: " + data.getTags());
+            		" Tags: " + data.getTags());*/
             processServingStarted(notification);
             
 //            String key = keysList.get(data.getMethodName());
@@ -391,13 +391,14 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
         } 
         else if (type.equals(NotificationType.replySent)) {
             RequestNotificationData data = (RequestNotificationData) notification.getUserData();
-//            logger.debug("["+componentName+"][replySent  ] From:" + data.getSource() +
-//            		" To:"+ data.getDestination() +
-//            		" Method:" + data.getMethodName() +
-//            		" SeqNumber: " + data.getSequenceNumber() +
-//            		" Timestamp: " + notification.getTimeStamp() +
-//            		" NotifSeqNbr: " + notification.getSequenceNumber() +
-//            		" Tags: " + data.getTags());
+            logger.debug("["+componentName+"][replySent  ] " + //From:" + data.getSource() +
+            		//" To:"+ data.getDestination() +
+            		" Method:" + data.getMethodName() +
+            		" SeqNumber: " + data.getSequenceNumber() +
+            		" Timestamp: " + notification.getTimeStamp() +
+            		" NotifSeqNbr: " + notification.getSequenceNumber() +
+            		" Tags: " + data.getTags());
+            processReplySent(notification);
             
 //            String key = keysList.get(data.getMethodName());
 //            if (key != null) {
@@ -464,11 +465,47 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
         }
     }
     
+    
     private void processServingStarted(Notification notification) {
-    	//RequestNotificationData data = (RequestNotificationData) notification.getUserData();
-    	//String cmTag = extractCMTag(data);
+    	RequestNotificationData data = (RequestNotificationData) notification.getUserData();
+    	String cmTag = extractCMTag(data);
+    	// the request may not have a CMTag, when the request was invoked directly on the component
+    	// (not from another component).
+    	// In that case no "requestReceived" notification was generated either
+    	if(cmTag == null) {
+    		return;
+    	}
+    	String[] cmTagFields = cmTag.split("::");
+    	ComponentRequestID parent = new ComponentRequestID(Long.parseLong(cmTagFields[0]));
+    	ComponentRequestID current = new ComponentRequestID(Long.parseLong(cmTagFields[1]));
+    	String sourceName = cmTagFields[2];
+    	String destName = cmTagFields[3];
+    	String interfaceName = cmTagFields[4];
+    	String methodName = cmTagFields[5];
+    	RequestStats rs;
+    	// checks if the request data has already been entered in the map
+    	if(requestLog.containsKey(current)) {
+    		rs = requestLog.get(current);
+    		rs.setServingStartTime(notification.getTimeStamp());
+    		// updates the value
+    		requestLog.put(current, rs);
+    	}
+    	// else, the data should be added (without the arrival time), and be added later,
+    	// when the corresponding requestReceived notification be processed
+    	else {
+    		rs = new RequestStats(sourceName, destName, interfaceName, methodName, 0);
+    		rs.setServingStartTime(notification.getTimeStamp());
+    		requestLog.put(current, rs);
+    	}
     }
     
+    /**
+     * Process the requestReceived notification.
+     * Stores the request data in the requestLog.
+     * TODO It's possible that some other notifications (servingStarted, replySent,...) be received before
+     *      this one. In that case, when this entry is added to the requestLog, the other ones must be considered
+     * @param notification
+     */
     private void processRequestReceived(Notification notification) {
     	RequestNotificationData data = (RequestNotificationData) notification.getUserData();
     	String cmTag = extractCMTag(data);
@@ -482,10 +519,28 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
     	if(interfaceName.equals("-")) {
     		return;
     	}
-    	RequestStats rs = new RequestStats(sourceName, destName, interfaceName, methodName, notification.getTimeStamp());
-    	requestLog.put(current, rs);
+    	RequestStats rs;
+    	// checks if the request data has already been entered in the map
+    	if(requestLog.containsKey(current)) {
+    		// if the key was already there, it has to modify it to add the arrival time
+    		rs = requestLog.get(current);
+    		rs.setArrivalTime(notification.getTimeStamp());
+    		requestLog.put(current, rs);
+    	}
+    	else {
+    		// if there was no key, then it has to insert a new one
+    		rs = new RequestStats(sourceName, destName, interfaceName, methodName, notification.getTimeStamp());
+    		requestLog.put(current, rs);
+    	}
     }
     
+    /**
+     * Process the requestSent notification.
+     * Stores the new call in the callLog.
+     * TODO It's possible that some other notifications (replyReceived, ...) be received before
+     *      this one. In that case, when this entry is added to the requestLog, the other ones must be considered
+     * @param notification
+     */
     private void processRequestSent(Notification notification) {
     	// adds the request to callLog
     	// this should be the first notification regarding this request, anyway the order is not guaranteed,
@@ -506,8 +561,52 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
     	callLog.put(current, cs);
     }
     
+    /**
+     * Process the replySent notification.
+     * This notification is generated when a reply is sent to the caller component as an answer to a non-void request 
+     * @param notification
+     */
+    private void processReplySent(Notification notification) {
+    	// modifies the request in the requestLog, to add the time at which the reply was sent
+    	RequestNotificationData data = (RequestNotificationData) notification.getUserData();
+    	String cmTag = extractCMTag(data);
+    	// the request may not have a CMTag, when the request was invoked directly on the component
+    	// (not from another component).
+    	// In that case no "requestReceived" notification was generated either
+    	if(cmTag == null) {
+    		return;
+    	}
+    	String[] cmTagFields = cmTag.split("::");
+    	ComponentRequestID parent = new ComponentRequestID(Long.parseLong(cmTagFields[0]));
+    	ComponentRequestID current = new ComponentRequestID(Long.parseLong(cmTagFields[1]));
+    	String sourceName = cmTagFields[2];
+    	String destName = cmTagFields[3];
+    	String interfaceName = cmTagFields[4];
+    	String methodName = cmTagFields[5];
+    	RequestStats rs;
+    	// checks if the request data has already been entered in the map
+    	if(requestLog.containsKey(current)) {
+    		rs = requestLog.get(current);
+    		rs.setReplyTime(notification.getTimeStamp());
+    		// updates the value
+    		requestLog.put(current, rs);
+    	}
+    	// else, the data should be added (without the arrival time), and be added later,
+    	// when the corresponding requestReceived notification be processed
+    	else {
+    		rs = new RequestStats(sourceName, destName, interfaceName, methodName, 0);
+    		rs.setReplyTime(notification.getTimeStamp());
+    		requestLog.put(current, rs);
+    	}
+    }
+    
+    /**
+     * Extracts the CMTag from the complete Tag string (which can include several tags)
+     * @param data
+     * @return
+     */
+    
     private String extractCMTag(RequestNotificationData data) {
-    	CMTag res = null;
     	String tagString = data.getTags();
     	// The ? is a "reluctant" quantifier, to make the .* to match the smallest possible string.
     	Pattern pattern = Pattern.compile("\\[TAG\\](.*?)\\[DATA\\](.*?)\\[END\\]");
@@ -542,7 +641,9 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
     	while(i.hasNext()) {
     		crID = i.next();
     		cs = callLog.get(crID);
-    		System.out.println("[callLog:"+componentName+"] Parent: "+ cs.getParentID() + " Current: "+ crID + " Call: "+ cs.getCalledComponent() + "." + cs.getInterfaceName()+"."+cs.getMethodName()+ " Time: " + cs.getSentTime());
+    		System.out.println("[callLog:"+componentName+"] Parent: "+ cs.getParentID() + " Current: "+ crID + 
+    				" Call: "+ cs.getCalledComponent() + "." + cs.getInterfaceName()+"."+cs.getMethodName()+ 
+    				" Time: " + cs.getSentTime());
     		
     	}
     }
@@ -560,7 +661,12 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
     	while(i.hasNext()) {
     		crID = i.next();
     		rs = requestLog.get(crID);
-    		System.out.println("[reqsLog:"+componentName+"] ID: "+ crID + " Sender: "+ rs.getCallerComponent() + " Call: "+ rs.getCalledComponent() + "." + rs.getInterfaceName()+"."+rs.getMethodName() + " Time: " + rs.getArrivalTime());
+    		System.out.println("[reqsLog:"+componentName+"] ID: "+ crID + " Sender: "+ rs.getCallerComponent() +
+    				" Call: "+ rs.getCalledComponent() + "." + rs.getInterfaceName()+"."+rs.getMethodName() +
+    				" Arr: " + rs.getArrivalTime() + " Serv: " + rs.getServingStartTime() + " Repl: " + rs.getReplyTime() +
+    				" WQ: " + (rs.getServingStartTime()-rs.getArrivalTime()) + 
+    				" SRV: " + (rs.getReplyTime()-rs.getServingStartTime()) +
+    				" TOT: "+ (rs.getReplyTime() - rs.getArrivalTime()));
     		
     	}
     }

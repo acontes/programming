@@ -64,6 +64,10 @@ public class RequestStats {
 	public long getArrivalTime() {
 		return arrivalTime;
 	}
+	
+	public void setArrivalTime(long arrivalTime) {
+		this.arrivalTime = arrivalTime;
+	}
 
 	public boolean isFinished() {
 		return finished;
