@@ -29,6 +29,11 @@ import org.objectweb.proactive.extra.vfsprovider.protocol.FileSystemServer;
 import org.objectweb.proactive.extra.vfsprovider.protocol.StreamMode;
 
 
+/**
+ * VFS FileObject implementation for ProActive protocol.
+ * 
+ * @see ProActiveFileProvider
+ */
 public class ProActiveFileObject extends AbstractFileObject {
     // logging in VFS (not ProActive) way
     private static Log log = LogFactory.getLog(ProActiveFileObject.class);

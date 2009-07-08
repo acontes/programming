@@ -14,6 +14,12 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.extra.vfsprovider.protocol.FileSystemServer;
 
 
+/**
+ * VFS FileSystem implementation - representation of connection with one remote
+ * {@link FileSystemServer}.
+ * 
+ * @see ProActiveFileProvider
+ */
 public class ProActiveFileSystem extends AbstractFileSystem {
     private FileSystemServer server;
 

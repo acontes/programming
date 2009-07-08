@@ -7,6 +7,9 @@ import org.objectweb.proactive.extra.vfsprovider.exceptions.StreamNotFoundExcept
 import org.objectweb.proactive.extra.vfsprovider.exceptions.WrongStreamTypeException;
 
 
+/**
+ * Error-handling utils class.
+ */
 class Utils {
     public static IOException generateAndLogIOExceptionWrongStreamType(Log log, WrongStreamTypeException e) {
         log

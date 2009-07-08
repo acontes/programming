@@ -14,6 +14,9 @@ import org.objectweb.proactive.extra.vfsprovider.exceptions.WrongStreamTypeExcep
 import org.objectweb.proactive.extra.vfsprovider.protocol.FileSystemServer;
 
 
+/**
+ * Generic adapter of remotely accessed {@link FileSystemServer} to {@link InputStream} class.
+ */
 abstract class AbstractProActiveInputStreamAdapter extends InputStream {
     private static final Log log = LogFactory.getLog(AbstractProActiveInputStreamAdapter.class);
 

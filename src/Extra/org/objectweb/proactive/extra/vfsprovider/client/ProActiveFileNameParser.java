@@ -8,6 +8,12 @@ import org.apache.commons.vfs.provider.UriParser;
 import org.apache.commons.vfs.provider.VfsComponentContext;
 
 
+/**
+ * VFS file name parser for ProActive file access protocol, transforming String representation of
+ * URL to {@link ProActiveFileName} instances.
+ * 
+ * @see ProActiveFileName
+ */
 public class ProActiveFileNameParser extends HostFileNameParser {
     private final static ProActiveFileNameParser INSTANCE = new ProActiveFileNameParser();
 
