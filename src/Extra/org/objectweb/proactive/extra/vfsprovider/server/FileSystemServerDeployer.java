@@ -70,8 +70,7 @@ public class FileSystemServerDeployer {
         if (roe != null) {
             roe.unexportAll();
             roe = null;
-            // FIXME?
-            // fileSystemServer.stopServer();
+            fileSystemServer.stopServer();
             fileSystemServer = null;
         }
     }
