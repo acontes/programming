@@ -73,7 +73,7 @@ public class BaseScratchSpaceConfiguration implements Serializable {
      * <p>
      * Remote access URL may contain special metavariable {@value #HOSTNAME_VARIABLE_KEYWORD} that
      * is later filled by localhost hostname.
-     *
+     * 
      * @param url
      *            Base access URL to scratch space, where subdirectories will be created. Used for
      *            accessing from remote nodes. URL defines which protocol is used to access the data

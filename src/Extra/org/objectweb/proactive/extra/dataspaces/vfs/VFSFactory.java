@@ -34,8 +34,8 @@ import org.objectweb.proactive.extra.vfsprovider.protocol.FileSystemServer;
  * <li>FTP, scheme <code>ftp:</code></li>
  * <li>SFTP, scheme <code>sftp:</code> (with strict host-key checking disabled by default if no
  * other FileSystemOptions are provided)</li>
- * <li>ProActive protocol (see {@link FileSystemServer}), see
- * {@link ProActiveFileName.ProActiveProviderScheme} for supported schemes</li>
+ * <li>ProActive protocol (see {@link FileSystemServer}), see {@link ProActiveProviderScheme} for
+ * supported schemes</li>
  * <li>default URL provider handled by Java URL class</code>
  * </ul>
  * 
