@@ -45,14 +45,14 @@ public class ProActiveFileNameParser extends HostFileNameParser {
         // Extract the scheme and authority parts
         final Authority auth = extractToPath(filename, name);
 
+        // Extract the server service path before processing the file path.
+        final String servicePath = extractServicePath(name);
+
         // Decode and adjust separators
         UriParser.canonicalizePath(name, 0, name.length(), this);
         UriParser.fixSeparators(name);
 
-        // Extract the share
-        final String servicePath = extractServicePath(name);
-
-        // Normalize the path.  Do this after extracting the servicePath
+        // Normalize the path.
         final FileType fileType = UriParser.normalisePath(name);
         final String path = name.toString();
 
