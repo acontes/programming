@@ -183,6 +183,7 @@ public class NodeConfigurator {
         checkConfigured();
 
         tryCloseAppConfigurator();
+        tryCloseProvider();
         if (nodeScratchSpace != null)
             nodeScratchSpace.close();
         nodeScratchSpace = null;
@@ -203,11 +204,21 @@ public class NodeConfigurator {
     public synchronized void tryCloseAppConfigurator() {
         if (appConfigurator == null)
             return;
-
         logger.debug("Closing Data Spaces application node configuration");
         appConfigurator.close();
         appConfigurator = null;
         logger.info("Closed Data Spaces application node configuration");
+    }
+
+    private void tryCloseProvider() {
+        if (providerDeployer == null)
+            return;
+        try {
+            providerDeployer.terminate();
+        } catch (ProActiveException e) {
+            ProActiveLogger.logEatedException(logger, "Could not close correctly the ProActive provider", e);
+        }
+        providerDeployer = null;
     }
 
     private BaseScratchSpaceConfiguration startPAProvider(
@@ -320,15 +331,6 @@ public class NodeConfigurator {
                             "Could not close correctly application scratch space", x);
                 }
                 applicationScratchSpace = null;
-            }
-            if (providerDeployer != null) {
-                try {
-                    providerDeployer.terminate();
-                } catch (ProActiveException e) {
-                    ProActiveLogger.logEatedException(logger,
-                            "Could not close correctly the ProActive provider", e);
-                }
-                providerDeployer = null;
             }
         }
     }
