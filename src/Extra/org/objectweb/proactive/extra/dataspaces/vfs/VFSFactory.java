@@ -16,6 +16,10 @@ import org.apache.commons.vfs.provider.sftp.SftpFileSystemConfigBuilder;
 import org.apache.commons.vfs.provider.url.UrlFileProvider;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.vfsprovider.client.ProActiveFileName;
+import org.objectweb.proactive.extra.vfsprovider.client.ProActiveFileProvider;
+import org.objectweb.proactive.extra.vfsprovider.client.ProActiveFileName.ProActiveProviderScheme;
+import org.objectweb.proactive.extra.vfsprovider.protocol.FileSystemServer;
 
 
 /**
@@ -30,6 +34,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * <li>FTP, scheme <code>ftp:</code></li>
  * <li>SFTP, scheme <code>sftp:</code> (with strict host-key checking disabled by default if no
  * other FileSystemOptions are provided)</li>
+ * <li>ProActive protocol (see {@link FileSystemServer}), see
+ * {@link ProActiveFileName.ProActiveProviderScheme} for supported schemes</li>
  * <li>default URL provider handled by Java URL class</code>
  * </ul>
  * 
@@ -89,6 +95,10 @@ public class VFSFactory {
         manager.addProvider("https", new HttpsFileProvider());
         manager.addProvider("ftp", new FtpFileProvider());
         manager.addProvider("sftp", new SftpFileProvider());
+        final ProActiveFileProvider proactiveProvider = new ProActiveFileProvider();
+        for (ProActiveProviderScheme scheme : ProActiveFileName.ProActiveProviderScheme.values()) {
+            manager.addProvider(scheme.getVFSScheme(), proactiveProvider);
+        }
         manager.setDefaultProvider(new UrlFileProvider());
 
         manager.init();
