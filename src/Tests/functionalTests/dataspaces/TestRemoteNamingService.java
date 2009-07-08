@@ -31,7 +31,7 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.WrongApplicationIdExc
 /**
  * Test NamingService on the local default node.
  */
-public class RemoteNamingServiceTest {
+public class TestRemoteNamingService {
     // extends GCMFunctionalTestDefaultNodes {
 
     private static final String NAME = "DSnamingservice";
@@ -62,7 +62,7 @@ public class RemoteNamingServiceTest {
 
     private NamingServiceDeployer remoteObjectDeployer;
 
-    public RemoteNamingServiceTest() throws ConfigurationException {
+    public TestRemoteNamingService() throws ConfigurationException {
         // super(1, 1);
 
         InputOutputSpaceConfiguration configInput1 = InputOutputSpaceConfiguration

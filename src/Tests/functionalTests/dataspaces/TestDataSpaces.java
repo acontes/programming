@@ -34,7 +34,7 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceAlreadyRegistere
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundException;
 
 
-public class DataSpacesTest extends GCMFunctionalTestDataSpaces {
+public class TestDataSpaces extends GCMFunctionalTestDataSpaces {
     private static final String ADDED_INPUT_NAME = "another_input";
     private static final String OUTPUT_FILE_NAME = "some_file.txt";
     private static final String OUTPUT_FILE_CONTENT1 = "didum";
@@ -49,7 +49,7 @@ public class DataSpacesTest extends GCMFunctionalTestDataSpaces {
     private TestActiveObject ao3;
     private TestActiveObject ao4;
 
-    public DataSpacesTest() {
+    public TestDataSpaces() {
         super(2, 2);
     }
 
