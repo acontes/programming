@@ -43,7 +43,7 @@ import functionalTests.GCMFunctionalTest;
 public class GCMFunctionalTestDataSpaces extends GCMFunctionalTest {
 
     static final private URL dataSpacesApplicationDescriptor = FunctionalTest.class
-            .getResource("/functionalTests/_CONFIG/JunitAppDataSpaces.xml");
+            .getResource("/functionalTests/dataspaces/JunitAppDataSpaces.xml");
 
     static public final String VN_NAME = "nodes";
     static public final String INPUT_WITH_DIR_NAME = "input_with_dir";

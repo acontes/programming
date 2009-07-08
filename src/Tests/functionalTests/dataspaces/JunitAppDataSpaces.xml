@@ -8,7 +8,7 @@
 		<javaPropertyVariable name="proactive.home"/>
 		<javaPropertyVariable name="java.home"/>
 
-		<descriptorDefaultVariable name="deploymentDescriptor" value="localhost/dataSpaces.xml" />
+		<descriptorDefaultVariable name="deploymentDescriptor" value="dataSpaces.xml" />
 		<descriptorDefaultVariable name="jvmargDefinedByTest" value=" "/>
 		<programVariable name="JVM_PARAMETERS"/>
 		<programVariable name="INPUT_DEFAULT_WITH_DIR_PATH"/>
