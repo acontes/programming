@@ -98,6 +98,8 @@ public class FileSystemServerImpl implements FileSystemServer {
      *            path of an existing directory that will be root for the file system
      * @throws IllegalArgumentException
      *             when specified path points to file that does not exist or is not a directory
+     *             FIXME actually we can allow exporting file, or not-yet-existing directory
+     *             (everything), like we allow to use it in node scratch exported via this provider
      * @throws IOException
      *             when IO error occurred
      */
@@ -138,6 +140,7 @@ public class FileSystemServerImpl implements FileSystemServer {
 
         if (streamAutocloseThread != null)
             streamAutocloseThread.setToStop();
+        // FIXME that copying is most probably not thread-safe
         final HashSet<Long> snapshot = new HashSet<Long>(streams.keySet());
         for (Long stream : snapshot) {
             try {
@@ -164,6 +167,8 @@ public class FileSystemServerImpl implements FileSystemServer {
             } catch (SecurityException sec) {
                 throw new IOException(sec);
             }
+            // FIXME possible deadlock: storeStream acquires lock on this, already having lock on serverStopLock,
+            // while stop server does it in reverse order 
             return storeStream(instance);
         }
     }
@@ -243,6 +248,9 @@ public class FileSystemServerImpl implements FileSystemServer {
                 return;
             }
         } catch (StreamNotFoundException notFound) {
+            // FIXME (severe): hmm maybe we need this kind of guarantee for each method throwing SNFException.
+            // if so possibly other implementation of wound may be useful
+
             // be sure that a stream instance is closed successfully
             final Stream instance = streamsToClose.get(stream);
 
@@ -283,6 +291,7 @@ public class FileSystemServerImpl implements FileSystemServer {
 
             if (recursive)
                 deleteRecursive(file);
+            // FIXME file.list() can return null?
             if (file.isDirectory())
                 checkConditionIsTrue(file.list().length == 0, "Unable to delete a not empty directory");
             if (!canonicalPath.equals(rootCanonicalPath)) {
@@ -293,6 +302,7 @@ public class FileSystemServerImpl implements FileSystemServer {
                 }
                 checkConditionIsTrue(!file.exists(), "Unable to delete a file");
             }
+            // FIXME can't we remove root file? even if so, then some security exception?
         } catch (SecurityException sec) {
             throw new IOException(sec);
         }
@@ -402,6 +412,7 @@ public class FileSystemServerImpl implements FileSystemServer {
         if (instance == null)
             throw new StreamNotFoundException();
         final Long timestamp = System.currentTimeMillis();
+        // FIXME get on streams and put on timestamps are not atomic
         streamLastUsedTimestamp.put(stream, timestamp);
         return instance;
     }
@@ -412,6 +423,7 @@ public class FileSystemServerImpl implements FileSystemServer {
         if (instance == null)
             throw new StreamNotFoundException();
         streamsToClose.put(stream, instance);
+        // FIXME get on streams, put  streamsToClose and remove on timestamps are not atomic
         streamLastUsedTimestamp.remove(stream);
         return instance;
     }
@@ -421,6 +433,7 @@ public class FileSystemServerImpl implements FileSystemServer {
             throw new StreamNotFoundException();
     }
 
+    // TODO this method can be static
     private void deleteRecursive(File file) {
         if (file.isDirectory()) {
             final File[] children = file.listFiles();
@@ -432,6 +445,8 @@ public class FileSystemServerImpl implements FileSystemServer {
         }
     }
 
+    // TODO making it class with static methods doesn't give any advantage over pure static method
+    // (factory method vs factory class)
     /**
      * An private inner class that plays a role of a factory for particular stream modes adapters.
      * 
@@ -469,6 +484,7 @@ public class FileSystemServerImpl implements FileSystemServer {
         @Override
         public void run() {
             while (running) {
+                // FIXME: move running check to freeze (or inline it here) and implement wait-signal for setToStop()/freeze() ?
                 processTimestamps();
                 freeze();
             }
@@ -485,6 +501,7 @@ public class FileSystemServerImpl implements FileSystemServer {
          * {@link FileSystemServerImpl#STREAM_OPEN_MAXIMUM_PERIOD_MILIS}.
          */
         private void processTimestamps() {
+            // FIXME this copying may be not atomic (although it can be in current ArrayList implementation)
             final ArrayList<Entry<Long, Long>> snapshot = new ArrayList<Map.Entry<Long, Long>>(
                 streamLastUsedTimestamp.entrySet());
             final long current = System.currentTimeMillis();
