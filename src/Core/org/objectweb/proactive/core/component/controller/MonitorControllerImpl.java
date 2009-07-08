@@ -441,13 +441,13 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
         } 
         else if (type.equals(NotificationType.replyReceived)) {
             RequestNotificationData data = (RequestNotificationData) notification.getUserData();
-//            logger.debug("["+componentName+"][replyRecv  ] From:" + data.getSource() +
+            logger.debug("["+componentName+"][replyRecv  ] " + //From:" + data.getSource() +
 //            		" To:"+ data.getDestination() +
-//            		" Method:" + data.getMethodName() +
-//            		" SeqNumber: " + data.getSequenceNumber() +
-//            		" Timestamp: " + notification.getTimeStamp() +
-//            		" NotifSeqNbr: " + notification.getSequenceNumber() +
-//            		" Tags: " + data.getTags());
+            		" Method:" + data.getMethodName() +
+            		" SeqNumber: " + data.getSequenceNumber() +
+            		" Timestamp: " + notification.getTimeStamp() +
+            		" NotifSeqNbr: " + notification.getSequenceNumber() +
+            		" Tags: " + data.getTags());
             
 //            String key = keysList.get(data.getMethodName());
 //            if (key != null) {

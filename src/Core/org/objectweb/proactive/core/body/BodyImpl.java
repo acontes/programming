@@ -55,6 +55,7 @@ import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.benchmarks.timit.util.CoreTimersContainer;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -580,8 +581,8 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                     tagNotification);
                 mbean.sendNotification(NotificationType.servingStarted, data);
             }
-
             // END JMX Notification
+            
             Reply reply = null;
 
             // If the request is not a "terminate Active Object" request,
@@ -626,17 +627,27 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                 TimerWarehouse.startTimer(BodyImpl.this.bodyID, TimerWarehouse.SEND_REPLY);
             }
 
+            // cruz: at this time, the reply has not been sent
             // JMX Notification
-            if (!isProActiveInternalObject && (mbean != null)) {
-                String tagNotification = createTagNotification(request.getTags());
-                RequestNotificationData data = new RequestNotificationData(request.getSourceBodyID(), request
-                        .getSenderNodeURL(), BodyImpl.this.bodyID, BodyImpl.this.nodeURL, request
-                        .getMethodName(), getRequestQueue().size(), request.getSequenceNumber(),
-                    tagNotification);
-                mbean.sendNotification(NotificationType.replySent, data);
+//            if (!isProActiveInternalObject && (mbean != null)) {
+//                String tagNotification = createTagNotification(request.getTags());
+//                RequestNotificationData data = new RequestNotificationData(request.getSourceBodyID(), request
+//                        .getSenderNodeURL(), BodyImpl.this.bodyID, BodyImpl.this.nodeURL, request
+//                        .getMethodName(), getRequestQueue().size(), request.getSequenceNumber(),
+//                    tagNotification);
+//                mbean.sendNotification(NotificationType.replySent, data);
+//            }
+            MethodCallResult mcr = reply.getResult();
+            if(mcr != null) {
+            	Object res = mcr.getResult();
+            	if(res != null) {
+            		System.out.println("Got reply for method " + reply.getMethodName() + " and is a "+ res.getClass().getName() + " ... " + PAFuture.isAwaited(res) );
+            		
+            		
+            	}
             }
-
             // END JMX Notification
+            
             ArrayList<UniversalBody> destinations = new ArrayList<UniversalBody>();
             destinations.add(request.getSender());
             this.getFuturePool().registerDestinations(destinations);
@@ -690,6 +701,18 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                     }
                 }
             }
+            
+            // cruz: here is when the reply has been really sent
+            // JMX Notification
+            if (!isProActiveInternalObject && (mbean != null)) {
+                String tagNotification = createTagNotification(request.getTags());
+                RequestNotificationData data = new RequestNotificationData(request.getSourceBodyID(), request
+                        .getSenderNodeURL(), BodyImpl.this.bodyID, BodyImpl.this.nodeURL, request
+                        .getMethodName(), getRequestQueue().size(), request.getSequenceNumber(),
+                    tagNotification);
+                mbean.sendNotification(NotificationType.replySent, data);
+            }
+            // END JMX Notification
 
             if (Profiling.TIMERS_COMPILED) {
                 TimerWarehouse.stopTimer(BodyImpl.this.bodyID, TimerWarehouse.SEND_REPLY);

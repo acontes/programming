@@ -150,7 +150,6 @@ public class ReplyImpl extends MessageImpl implements Reply, Serializable {
                 e.printStackTrace();
             }
         }
-
         // end security
         // fault-tolerance returned value
         return destinationBody.receiveReply(this);
