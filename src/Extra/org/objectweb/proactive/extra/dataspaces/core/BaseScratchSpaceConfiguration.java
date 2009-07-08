@@ -68,6 +68,35 @@ public class BaseScratchSpaceConfiguration implements Serializable {
     }
 
     /**
+     * Creates base for a scratch space configuration with specified remote access, if it was not
+     * specified yet.
+     * <p>
+     * Remote access URL may contain special metavariable {@value #HOSTNAME_VARIABLE_KEYWORD} that
+     * is later filled by localhost hostname.
+     *
+     * @param url
+     *            Base access URL to scratch space, where subdirectories will be created. Used for
+     *            accessing from remote nodes. URL defines which protocol is used to access the data
+     *            from remote node, and some additional information for protocol like path,
+     *            sometimes user name and password. This URL may contain special variable
+     *            {@value #HOSTNAME_VARIABLE_KEYWORD} that is later filled with actual host name for
+     *            caller, so scratch configuration definition may be more generic — sufficient to
+     *            use in context of generic host configuration. Cannot be <code>null</code>.
+     * @return an instance of BaseScratchSpaceConfiguration with defined remote access
+     * @throws ConfigurationException
+     *             when remote access has been already specified or given URL is <code>null</code>
+     * @see {@link #BaseScratchSpaceConfiguration(String, String)}
+     */
+    public BaseScratchSpaceConfiguration getWithRemoteAccess(final String url) throws ConfigurationException {
+        if (this.url != null)
+            throw new ConfigurationException(
+                "Remote access has been already specified and cannot be redefined");
+        if (url == null)
+            throw new ConfigurationException("Cannot set remote access as an empty url");
+        return new BaseScratchSpaceConfiguration(url, this.path);
+    }
+
+    /**
      * @return remote access URL with hostname metavariable filled with actual localhost hostname.
      *         May be <code>null</code>
      */
