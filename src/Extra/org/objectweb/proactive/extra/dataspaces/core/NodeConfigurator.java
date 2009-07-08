@@ -243,7 +243,7 @@ public class NodeConfigurator {
         try {
             providerURL = ProActiveFileName.getServerVFSRootURL(serverURL);
         } catch (URISyntaxException e) {
-            logger.error("Self-created URL contains unknown/unsupported protocol scheme", e);
+            logger.error("Self-created URL is malformed", e);
             throw new ProActiveRuntimeException(e);
         }
         return baseScratchConfiguration.getWithRemoteAccess(providerURL);
