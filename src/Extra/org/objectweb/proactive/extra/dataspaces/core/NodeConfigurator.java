@@ -13,6 +13,7 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.dataspaces.Utils;
 import org.objectweb.proactive.extra.dataspaces.core.naming.CachingSpacesDirectory;
 import org.objectweb.proactive.extra.dataspaces.core.naming.NamingService;
 import org.objectweb.proactive.extra.dataspaces.core.naming.SpacesDirectory;
@@ -233,7 +234,8 @@ public class NodeConfigurator {
         if (!rootFile.isDirectory())
             rootFile.mkdirs();
         try {
-            providerDeployer = new FileSystemServerDeployer(rootPath);
+            final String serviceId = Utils.getRuntimeId(node) + '/' + Utils.getNodeId(node);
+            providerDeployer = new FileSystemServerDeployer(serviceId, rootPath);
         } catch (IOException e) {
             throw new FileSystemException(e);
         }
