@@ -98,6 +98,8 @@ public class FileSystemServerImpl implements FileSystemServer {
      *            path of an existing directory that will be root for the file system
      * @throws IllegalArgumentException
      *             when specified path points to file that does not exist or is not a directory
+     * @throws IOException
+     *             when IO error occurred
      */
     public FileSystemServerImpl(String rootPath) throws IOException {
         rootFile = new File(rootPath);
@@ -129,15 +131,13 @@ public class FileSystemServerImpl implements FileSystemServer {
      * Stop server facilities, in particular the auto closing mechanism. This method should be
      * called when server is no longer used, to release system resources (stop facilities' threads).
      */
-    // FIXME method crashes when autoclosing wasn't started, but it's marked as general stopping method
-    // what about method that can be called on undeployment. maybe also closing opened streams? + sanity checks in each public method
-    // TODO/WISH: maybe we can start autoclosing in constructor basing on configuration from proactive property mechanism?  
     public synchronized void stopServer() {
         synchronized (serverStopLock) {
             serverStopped = true;
         }
 
-        streamAutocloseThread.setToStop();
+        if (streamAutocloseThread != null)
+            streamAutocloseThread.setToStop();
         final HashSet<Long> snapshot = new HashSet<Long>(streams.keySet());
         for (Long stream : snapshot) {
             try {
@@ -145,7 +145,7 @@ public class FileSystemServerImpl implements FileSystemServer {
             } catch (IOException e) {
                 logger.info("Exception while closing stream", e);
             } catch (StreamNotFoundException e) {
-                ProActiveLogger.logImpossibleException(logger, e);
+                // someone has just closed stream through streamClose() 
             }
         }
         logger.info("Autoclose feature stopped, all streams closed");
