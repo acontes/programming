@@ -91,7 +91,10 @@
 	<classpathentry kind="lib" path="lib/xml-apis.jar"/>
 	<classpathentry kind="lib" path="compile/lib/junit-4.3.jar"/>
 	<classpathentry kind="lib" path="compile/lib/ant.jar"/>
-	<classpathentry kind="lib" path="lib/owlim-2.9.1.jar"/>
-	<classpathentry kind="lib" path="lib/trree-2.9.1.jar"/>
+	<classpathentry kind="lib" path="lib/owlim-3.0.beta10.jar"/>
+	<classpathentry kind="lib" path="lib/trree-3.0.beta10.jar"/>
+	<classpathentry kind="lib" path="lib/openrdf-sesame-2.2.2-onejar.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-api-1.3.0.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-jdk14-1.3.0.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

@@ -323,10 +323,6 @@ public class CANOverlay extends StructuredOverlay {
         return this.neighborsDataStructure;
     }
 
-    public void setNeighborDataStructure(NeighborsDataStructure neighbors) {
-        this.neighborsDataStructure = neighbors;
-    }
-
     /**
      * {@inheritDoc}
      */
