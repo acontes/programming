@@ -91,16 +91,23 @@ public class NodeConfigurator {
         checkNotConfigured();
 
         this.node = node;
-        if (baseScratchConfiguration != null) {
-            if (baseScratchConfiguration.getUrl() == null) {
-                baseScratchConfiguration = startPAProvider(baseScratchConfiguration);
-            }
+        try {
+            if (baseScratchConfiguration != null) {
+                if (baseScratchConfiguration.getUrl() == null) {
+                    baseScratchConfiguration = startPAProvider(baseScratchConfiguration);
+                }
 
-            final NodeScratchSpace configuringScratchSpace = new VFSNodeScratchSpaceImpl();
-            configuringScratchSpace.init(node, baseScratchConfiguration);
-            this.nodeScratchSpace = configuringScratchSpace;
+                final NodeScratchSpace configuringScratchSpace = new VFSNodeScratchSpaceImpl();
+                configuringScratchSpace.init(node, baseScratchConfiguration);
+                this.nodeScratchSpace = configuringScratchSpace;
+            }
+            configured = true;
+        } finally {
+            if (!configured) {
+                tryCloseProvider();
+                // node scratch space is not configured (does not need close) for sure
+            }
         }
-        configured = true;
         logger.info("Node configured for Data Spaces");
     }
 
