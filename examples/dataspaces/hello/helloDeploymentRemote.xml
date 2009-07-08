@@ -24,8 +24,8 @@
 				<homeDirectory base="root" relpath="${user.home}" />
 				<scratch>
 					<path base="root" relpath="${java.io.tmpdir}/dataspaces" />
-					<remoteAccess
-						url="sftp://${user.name}@#{hostname}${java.io.tmpdir}/dataspaces" />
+					<!-- Use this if you prefer SFTP rather than ProActive Provider file access
+					<remoteAccess url="sftp://${user.name}@#{hostname}${java.io.tmpdir}/dataspaces" /> -->
 				</scratch>
 			</host>
 
