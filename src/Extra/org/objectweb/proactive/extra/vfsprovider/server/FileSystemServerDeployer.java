@@ -9,6 +9,7 @@ import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.extra.vfsprovider.protocol.FileSystemServer;
 
 
+// TODO: autoclosing option?
 /**
  * Deploys {@link FileSystemServer} with instance of {@link FileSystemServerImpl} implementation on
  * the local runtime.
