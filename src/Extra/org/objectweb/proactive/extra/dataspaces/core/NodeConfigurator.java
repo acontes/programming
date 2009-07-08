@@ -3,10 +3,13 @@
  */
 package org.objectweb.proactive.extra.dataspaces.core;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -17,6 +20,8 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationExceptio
 import org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException;
 import org.objectweb.proactive.extra.dataspaces.vfs.VFSNodeScratchSpaceImpl;
 import org.objectweb.proactive.extra.dataspaces.vfs.VFSSpacesMountManagerImpl;
+import org.objectweb.proactive.extra.vfsprovider.client.ProActiveFileName;
+import org.objectweb.proactive.extra.vfsprovider.server.FileSystemServerDeployer;
 
 
 /**
@@ -53,6 +58,8 @@ public class NodeConfigurator {
 
     private NodeApplicationConfigurator appConfigurator;
 
+    private FileSystemServerDeployer providerDeployer;
+
     private Node node;
 
     /**
@@ -67,8 +74,8 @@ public class NodeConfigurator {
      *            node to configure
      * @param baseScratchConfiguration
      *            base scratch data space configuration, may be <code>null</code> if node does not
-     *            provide a scratch space
-     * 
+     *            provide a scratch space; not existing directory pointed by this configuration will
+     *            be created
      * @throws IllegalStateException
      *             when trying to reconfigure already configured instance
      * @throws ConfigurationException
@@ -84,12 +91,8 @@ public class NodeConfigurator {
 
         this.node = node;
         if (baseScratchConfiguration != null) {
-            // TODO as provider will be implemented, we can move this check elsewhere? for now it's ok.
             if (baseScratchConfiguration.getUrl() == null) {
-                logger.error("Space configuration is not complete, no remote access URL provided");
-                logger.error("ProActive provider is not implemented");
-                throw new ConfigurationException(
-                    "Space configuration is not complete, no remote access URL provided");
+                baseScratchConfiguration = startPAProvider(baseScratchConfiguration);
             }
 
             final NodeScratchSpace configuringScratchSpace = new VFSNodeScratchSpaceImpl();
@@ -207,6 +210,32 @@ public class NodeConfigurator {
         logger.info("Closed Data Spaces application node configuration");
     }
 
+    private BaseScratchSpaceConfiguration startPAProvider(
+            BaseScratchSpaceConfiguration baseScratchConfiguration) throws FileSystemException,
+            ConfigurationException {
+
+        final String serverURL;
+        final String providerURL;
+        final String rootPath = baseScratchConfiguration.getPath();
+        final File rootFile = new File(rootPath);
+
+        if (!rootFile.isDirectory())
+            rootFile.mkdirs();
+        try {
+            providerDeployer = new FileSystemServerDeployer(rootPath);
+        } catch (IOException e) {
+            throw new FileSystemException(e);
+        }
+        serverURL = providerDeployer.getRemoteFileSystemServerURL();
+        try {
+            providerURL = ProActiveFileName.getServerVFSRootURL(serverURL);
+        } catch (URISyntaxException e) {
+            logger.error("Self-created URL contains unknown/unsupported protocol scheme", e);
+            throw new ProActiveRuntimeException(e);
+        }
+        return baseScratchConfiguration.getWithRemoteAccess(providerURL);
+    }
+
     private void checkConfigured() throws IllegalStateException {
         if (!configured) {
             logger.error("Attempting to perform operation on not configured node");
@@ -291,6 +320,15 @@ public class NodeConfigurator {
                             "Could not close correctly application scratch space", x);
                 }
                 applicationScratchSpace = null;
+            }
+            if (providerDeployer != null) {
+                try {
+                    providerDeployer.terminate();
+                } catch (ProActiveException e) {
+                    ProActiveLogger.logEatedException(logger,
+                            "Could not close correctly the ProActive provider", e);
+                }
+                providerDeployer = null;
             }
         }
     }
