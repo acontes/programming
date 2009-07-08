@@ -3,11 +3,7 @@ package org.objectweb.proactive.extra.dataspaces.core;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException;
-import org.objectweb.proactive.extra.dataspaces.vfs.VFSNodeScratchSpaceImpl;
 
-
-//TODO perhaps checking for remote URL should be improved/changed when we know how do we start
-//ProActive VFS provider
 
 /**
  * Manages and configures base scratch data spaces directories of a Node, then acts as a producer
@@ -36,12 +32,8 @@ public interface NodeScratchSpace {
      * Initializes instance (and all related configuration objects) on a specified node and performs
      * file system initialization and accessing tests, basing on provided configuration.
      * <p>
-     * Provided configuration should have a remote access URL already defined. It is not checked
-     * here explicitly, but will be thrown as an exception during
-     * {@link VFSNodeScratchSpaceImpl#initForApplication()} method call.
-     * <p>
-     * Local access will be used (if is defined) for accessing directories of scratch data space for
-     * this node.
+     * Provided configuration should have a remote access URL already defined. Local access (if is
+     * defined) will be used for accessing directories of scratch data space for this node.
      * <p>
      * Any existing files in directory specified by configuration will be silently deleted.
      * <p>
@@ -81,12 +73,8 @@ public interface NodeScratchSpace {
      *             when problem occurred during accessing remote or local file system
      * @throws IllegalStateException
      *             when this instance is not initialized
-     * @throws ConfigurationException
-     *             when provided information is not enough to build a complete space definition
-     *             (e.g. lack of remote access defined)
      */
-    public ApplicationScratchSpace initForApplication() throws FileSystemException, IllegalStateException,
-            ConfigurationException;
+    public ApplicationScratchSpace initForApplication() throws FileSystemException, IllegalStateException;
 
     /**
      * Close any opened resources and cleans all node-related scratch space files. If no other

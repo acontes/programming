@@ -229,23 +229,12 @@ public class VFSNodeScratchSpaceImplTest {
     /**
      * Passing configuration without remote access defined.
      */
-    @Test
-    public void testInitForApplicationConfigurationException() throws Exception {
+    @Test(expected = ConfigurationException.class)
+    public void testInitConfigurationException() throws Exception {
 
         BaseScratchSpaceConfiguration conf = new BaseScratchSpaceConfiguration(null, testDirPath);
         nodeScratchSpace = new VFSNodeScratchSpaceImpl();
         nodeScratchSpace.init(node, conf);
-        configured = true;
-
-        try {
-            nodeScratchSpace.initForApplication();
-            fail("Exception expected");
-        } catch (ConfigurationException e) {
-        } catch (Exception e) {
-            fail("Wrong exception");
-        }
-
-        // nodeScratchSpace instance cannot be used anymore..
     }
 
     /**

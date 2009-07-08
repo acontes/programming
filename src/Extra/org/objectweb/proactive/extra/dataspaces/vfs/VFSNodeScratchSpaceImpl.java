@@ -13,6 +13,7 @@ import org.apache.commons.vfs.Selectors;
 import org.apache.commons.vfs.impl.DefaultFileSystemManager;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -53,7 +54,7 @@ public class VFSNodeScratchSpaceImpl implements NodeScratchSpace {
 
         private final SpaceInstanceInfo spaceInstanceInfo;
 
-        private AppScratchSpaceImpl() throws FileSystemException, ConfigurationException {
+        private AppScratchSpaceImpl() throws FileSystemException {
             logger.debug("Initializing application node scratch space");
             final long appId = Utils.getApplicationId(node);
             final String appIdString = Long.toString(appId);
@@ -72,9 +73,9 @@ public class VFSNodeScratchSpaceImpl implements NodeScratchSpace {
                         .createScratchSpaceConfiguration(runtimeId, nodeId, appIdString);
                 this.spaceInstanceInfo = new SpaceInstanceInfo(appId, runtimeId, nodeId, scratchSpaceConf);
             } catch (ConfigurationException x) {
-                logger.error("Invalid scratch space configuration, removing created files", x);
+                ProActiveLogger.logImpossibleException(logger, x);
                 close();
-                throw x;
+                throw new ProActiveRuntimeException(x);
             }
             logger.info("Initialized application node scratch space");
         }
@@ -142,6 +143,10 @@ public class VFSNodeScratchSpaceImpl implements NodeScratchSpace {
             throw new IllegalStateException("Instance already configured");
         }
 
+        if (conf.getUrl() == null) {
+            throw new ConfigurationException("No remote access URL defined in base scratch configuration");
+        }
+
         this.node = node;
         this.baseScratchConfiguration = conf;
 
@@ -184,7 +189,7 @@ public class VFSNodeScratchSpaceImpl implements NodeScratchSpace {
     }
 
     public synchronized ApplicationScratchSpace initForApplication() throws FileSystemException,
-            IllegalStateException, ConfigurationException {
+            IllegalStateException {
 
         checkIfConfigured();
         return new AppScratchSpaceImpl();

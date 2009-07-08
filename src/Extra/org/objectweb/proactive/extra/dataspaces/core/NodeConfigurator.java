@@ -129,8 +129,8 @@ public class NodeConfigurator {
      * @throws ProActiveException
      *             when exception occurred during contacting with NamingService
      * @throws ConfigurationException
-     *             when configuration appears to be wrong during scratch space initialization (e.g.
-     *             capabilities checking)
+     *             when space appears to be already registered or application is not registered in
+     *             Naming Service
      * @throws FileSystemException
      *             VFS related exception during scratch data space creation
      */
