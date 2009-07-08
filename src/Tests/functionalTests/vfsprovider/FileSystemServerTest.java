@@ -21,7 +21,7 @@ public class FileSystemServerTest extends AbstractIOOperationsTest {
     public String getTestDirFilename() {
         return "PROACTIVE-FileSystemServerFunctionalTest";
     }
-    
+
     @Test
     public void test() throws IOException, StreamNotFoundException, WrongStreamTypeException {
         FileSystemServerImpl server = new FileSystemServerImpl(testDir.getAbsolutePath());
