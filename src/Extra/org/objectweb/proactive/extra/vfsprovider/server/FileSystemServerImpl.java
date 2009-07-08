@@ -27,6 +27,7 @@ import org.objectweb.proactive.extra.vfsprovider.protocol.FileType;
 import org.objectweb.proactive.extra.vfsprovider.protocol.StreamMode;
 
 
+// TODO actually we can allow exporting file, or not-yet-existing directory
 /**
  * Implements remote file system protocol defined in {@link FileSystemServer} interface.
  * <p>
@@ -37,11 +38,10 @@ import org.objectweb.proactive.extra.vfsprovider.protocol.StreamMode;
  * {@link #startAutoClosing()} method is called and stops explicitly with {@link #stopServer()}
  * method call.
  * <p>
- * Operations performed on {@link #streams} map are synchronized trough
- * {@link Collections#synchronizedMap(Map)} implicit synchronization. To fulfill protocol's
- * thread-safety, an explicit {@link Stream} operations synchronization is required with double
- * checking if map contains an open stream. Generating unique identifiers is synchronized on
- * <code>this</code>.
+ * Operations performed on {@link #streams} map are synchronized trough explicit synchronization. To
+ * fulfill protocol's thread-safety, an explicit {@link Stream} operations synchronization is
+ * required with double checking if map contains an open stream. Generating unique identifiers is
+ * synchronized on <code>this</code>.
  * <p>
  * To guarantee that {@link #streamFlush(long)} method throws {@link StreamNotFoundException} only
  * if stream has been closed correctly, an "in progress state" map is hold. Flush requests are
@@ -65,12 +65,11 @@ public class FileSystemServerImpl implements FileSystemServer {
 
     public static final long STREAM_OPEN_MAXIMUM_PERIOD_MILIS = 1000 * 60;
 
-    private final Map<Long, Stream> streams = Collections.synchronizedMap(new HashMap<Long, Stream>());
+    private final Map<Long, Stream> streams = new HashMap<Long, Stream>();
 
     private final Map<Long, Stream> streamsToClose = Collections.synchronizedMap(new HashMap<Long, Stream>());
 
-    private final Map<Long, Long> streamLastUsedTimestamp = Collections
-            .synchronizedMap(new HashMap<Long, Long>());
+    private final Map<Long, Long> streamLastUsedTimestamp = new HashMap<Long, Long>();
 
     private File rootFile;
 
@@ -80,7 +79,7 @@ public class FileSystemServerImpl implements FileSystemServer {
 
     private final Object serverStopLock = new Object();
 
-    private long idGenerator = 0;
+    private volatile long idGenerator = 0;
 
     private StreamAutocloseThread streamAutocloseThread;
 
@@ -98,8 +97,6 @@ public class FileSystemServerImpl implements FileSystemServer {
      *            path of an existing directory that will be root for the file system
      * @throws IllegalArgumentException
      *             when specified path points to file that does not exist or is not a directory
-     *             FIXME actually we can allow exporting file, or not-yet-existing directory
-     *             (everything), like we allow to use it in node scratch exported via this provider
      * @throws IOException
      *             when IO error occurred
      */
@@ -109,6 +106,8 @@ public class FileSystemServerImpl implements FileSystemServer {
             throw new IllegalArgumentException("Root directory does not exist");
 
         rootCanonicalPath = rootFile.getCanonicalPath();
+        if (logger.isTraceEnabled())
+            logger.trace("FileSystemServerImpl started with root: " + rootCanonicalPath);
     }
 
     /**
@@ -140,8 +139,11 @@ public class FileSystemServerImpl implements FileSystemServer {
 
         if (streamAutocloseThread != null)
             streamAutocloseThread.setToStop();
-        // FIXME that copying is most probably not thread-safe
-        final HashSet<Long> snapshot = new HashSet<Long>(streams.keySet());
+
+        final HashSet<Long> snapshot;
+        synchronized (streams) {
+            snapshot = new HashSet<Long>(streams.keySet());
+        }
         for (Long stream : snapshot) {
             try {
                 streamClose(stream);
@@ -167,8 +169,6 @@ public class FileSystemServerImpl implements FileSystemServer {
             } catch (SecurityException sec) {
                 throw new IOException(sec);
             }
-            // FIXME possible deadlock: storeStream acquires lock on this, already having lock on serverStopLock,
-            // while stop server does it in reverse order 
             return storeStream(instance);
         }
     }
@@ -248,9 +248,6 @@ public class FileSystemServerImpl implements FileSystemServer {
                 return;
             }
         } catch (StreamNotFoundException notFound) {
-            // FIXME (severe): hmm maybe we need this kind of guarantee for each method throwing SNFException.
-            // if so possibly other implementation of wound may be useful
-
             // be sure that a stream instance is closed successfully
             final Stream instance = streamsToClose.get(stream);
 
@@ -291,9 +288,11 @@ public class FileSystemServerImpl implements FileSystemServer {
 
             if (recursive)
                 deleteRecursive(file);
-            // FIXME file.list() can return null?
-            if (file.isDirectory())
-                checkConditionIsTrue(file.list().length == 0, "Unable to delete a not empty directory");
+            if (file.isDirectory()) {
+                final String[] children = file.list();
+                checkConditionIsTrue(children != null, "An IO error occured while listing directory");
+                checkConditionIsTrue(children.length == 0, "Unable to delete a not empty directory");
+            }
             if (!canonicalPath.equals(rootCanonicalPath)) {
                 try {
                     file.delete();
@@ -398,43 +397,53 @@ public class FileSystemServerImpl implements FileSystemServer {
             throw new IOException(message);
     }
 
-    synchronized private long storeStream(Stream instance) {
+    private long storeStream(Stream instance) {
         final Long timestamp = System.currentTimeMillis();
-        idGenerator++;
-        streams.put(idGenerator, instance);
-        streamLastUsedTimestamp.put(idGenerator, timestamp);
-        return idGenerator;
+        final long id = idGenerator++;
+
+        synchronized (streams) {
+            streams.put(id, instance);
+            synchronized (streamLastUsedTimestamp) {
+                streamLastUsedTimestamp.put(id, timestamp);
+            }
+        }
+        return id;
     }
 
     private Stream tryGetStreamOrWound(long stream) throws StreamNotFoundException {
-        final Stream instance = streams.get(stream);
-
-        if (instance == null)
-            throw new StreamNotFoundException();
         final Long timestamp = System.currentTimeMillis();
-        // FIXME get on streams and put on timestamps are not atomic
-        streamLastUsedTimestamp.put(stream, timestamp);
-        return instance;
+        synchronized (streams) {
+            final Stream instance = streams.get(stream);
+            if (instance == null)
+                throw new StreamNotFoundException();
+            synchronized (streamLastUsedTimestamp) {
+                streamLastUsedTimestamp.put(stream, timestamp);
+            }
+            return instance;
+        }
     }
 
     private Stream tryGetAndRemoveStreamOrWound(long stream) throws StreamNotFoundException {
-        final Stream instance = streams.remove(stream);
-
-        if (instance == null)
-            throw new StreamNotFoundException();
-        streamsToClose.put(stream, instance);
-        // FIXME get on streams, put  streamsToClose and remove on timestamps are not atomic
-        streamLastUsedTimestamp.remove(stream);
-        return instance;
+        synchronized (streams) {
+            final Stream instance = streams.remove(stream);
+            if (instance == null)
+                throw new StreamNotFoundException();
+            streamsToClose.put(stream, instance);
+            synchronized (streamLastUsedTimestamp) {
+                streamLastUsedTimestamp.remove(stream);
+            }
+            return instance;
+        }
     }
 
     private void checkContainsStreamOrWound(long stream) throws StreamNotFoundException {
-        if (!streams.containsKey(stream))
-            throw new StreamNotFoundException();
+        synchronized (streams) {
+            if (!streams.containsKey(stream))
+                throw new StreamNotFoundException();
+        }
     }
 
-    // TODO this method can be static
-    private void deleteRecursive(File file) {
+    private static void deleteRecursive(File file) {
         if (file.isDirectory()) {
             final File[] children = file.listFiles();
             if (children != null)
@@ -445,8 +454,6 @@ public class FileSystemServerImpl implements FileSystemServer {
         }
     }
 
-    // TODO making it class with static methods doesn't give any advantage over pure static method
-    // (factory method vs factory class)
     /**
      * An private inner class that plays a role of a factory for particular stream modes adapters.
      * 
@@ -501,9 +508,10 @@ public class FileSystemServerImpl implements FileSystemServer {
          * {@link FileSystemServerImpl#STREAM_OPEN_MAXIMUM_PERIOD_MILIS}.
          */
         private void processTimestamps() {
-            // FIXME this copying may be not atomic (although it can be in current ArrayList implementation)
-            final ArrayList<Entry<Long, Long>> snapshot = new ArrayList<Map.Entry<Long, Long>>(
-                streamLastUsedTimestamp.entrySet());
+            final ArrayList<Entry<Long, Long>> snapshot;
+            synchronized (streamLastUsedTimestamp) {
+                snapshot = new ArrayList<Map.Entry<Long, Long>>(streamLastUsedTimestamp.entrySet());
+            }
             final long current = System.currentTimeMillis();
             sort(snapshot, comparator);
 
