@@ -607,7 +607,6 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
 
         // FIXME: app id - temporary solution?
         final long appId = deploymentId;
-        GCMA_LOGGER.warn("Application id is not yet implemented in proper way, assuming id=0");
 
         Set<SpaceInstanceInfo> spacesInstances = null;
         if (spacesConfigurations != null) {
