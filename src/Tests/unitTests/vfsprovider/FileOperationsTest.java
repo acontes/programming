@@ -92,9 +92,8 @@ public class FileOperationsTest extends AbstractIOOperationsTest {
         server.fileSetLastModifiedTime(TEST_FILENAME, 12345667);
     }
 
-    @Test(expected = IOException.class)
     public void listChildrenNotExisting() throws IOException {
-        server.fileListChildren(TEST_SEPARATOR + "not_existing");
+        assertNull(server.fileListChildren(TEST_SEPARATOR + "not_existing"));
     }
 
     @Test
@@ -102,9 +101,8 @@ public class FileOperationsTest extends AbstractIOOperationsTest {
         assertNull(server.fileGetInfo(TEST_SEPARATOR + "not_existing"));
     }
 
-    @Test(expected = IOException.class)
     public void listChildrenInfoNotExisting() throws IOException {
-        server.fileListChildrenInfo(TEST_SEPARATOR + "not_existing");
+        assertNull(server.fileListChildrenInfo(TEST_SEPARATOR + "not_existing"));
     }
 
     @Test
