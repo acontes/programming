@@ -25,8 +25,6 @@
 				<homeDirectory base="root" relpath="${user.home}"/>
 				<scratch>
 					<path base="root" relpath="${java.io.tmpdir}"/>
-					<!-- valid just for test configuration with all nodes being local -->
-					<remoteAccess url="${java.io.tmpdir}"/>
 				</scratch>
 			</host>
 		</hosts>

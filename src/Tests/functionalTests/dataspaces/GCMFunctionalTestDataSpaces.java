@@ -7,14 +7,18 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.extensions.calcium.system.SkeletonSystemImpl;
+import org.objectweb.proactive.extra.vfsprovider.client.ProActiveFileName;
+import org.objectweb.proactive.extra.vfsprovider.server.FileSystemServerDeployer;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
 import functionalTests.FunctionalTest;
@@ -65,22 +69,25 @@ public class GCMFunctionalTestDataSpaces extends GCMFunctionalTest {
     int vmCapacity;
 
     File rootTmpDir;
-    static public final String VAR_INPUT_DEFAULT_WITH_DIR_PATH = "INPUT_DEFAULT_WITH_DIR_PATH";
+    static public final String VAR_INPUT_DEFAULT_WITH_DIR_URL = "INPUT_DEFAULT_WITH_DIR_URL";
     File inputDefaultWithDirLocalHandle;
-    static public final String VAR_INPUT_WITH_DIR_PATH = "INPUT_WITH_DIR_PATH";
+    static public final String VAR_INPUT_WITH_DIR_URL = "INPUT_WITH_DIR_URL";
     File inputWithDirLocalHandle;
-    static public final String VAR_INPUT_WITH_FILE_PATH = "INPUT_WITH_FILE_PATH";
+    static public final String VAR_INPUT_WITH_FILE_URL = "INPUT_WITH_FILE_URL";
     File inputWithFileLocalHandle;
-    static public final String VAR_OUTPUT_DEFAULT_WITH_DIR_PATH = "OUTPUT_DEFAULT_WITH_DIR_PATH";
+    static public final String VAR_OUTPUT_DEFAULT_WITH_DIR_URL = "OUTPUT_DEFAULT_WITH_DIR_URL";
     File outputDefaultWithDirLocalHandle;
-    static public final String VAR_OUTPUT_WITH_DIR_PATH = "OUTPUT_WITH_DIR_PATH";
+    static public final String VAR_OUTPUT_WITH_DIR_URL = "OUTPUT_WITH_DIR_URL";
     File outputWithDirLocalHandle;
-    static public final String VAR_OUTPUT_WITH_FILE_PATH = "OUTPUT_WITH_FILE_PATH";
+    static public final String VAR_OUTPUT_WITH_FILE_URL = "OUTPUT_WITH_FILE_URL";
     File outputWithFileLocalHandle;
-    static public final String VAR_OUTPUT_WITH_NOTHING1_PATH = "OUTPUT_WITH_NOTHING1_PATH";
+    static public final String VAR_OUTPUT_WITH_NOTHING1_URL = "OUTPUT_WITH_NOTHING1_URL";
     File outputWithNothing1LocalHandle;
-    static public final String VAR_OUTPUT_WITH_NOTHING2_PATH = "OUTPUT_WITH_NOTHING2_PATH";
+    static public final String VAR_OUTPUT_WITH_NOTHING2_URL = "OUTPUT_WITH_NOTHING2_URL";
     File outputWithNothing2LocalHandle;
+
+    private FileSystemServerDeployer fileSystemServerDeployer;
+    private final String fileSystemServerRootURL;
 
     private static void createInputDirContent(File dir) throws IOException {
         assertTrue(dir.mkdirs());
@@ -98,7 +105,8 @@ public class GCMFunctionalTestDataSpaces extends GCMFunctionalTest {
         writer.close();
     }
 
-    public GCMFunctionalTestDataSpaces(int hostCapacity, int vmCapacity) {
+    public GCMFunctionalTestDataSpaces(int hostCapacity, int vmCapacity) throws URISyntaxException,
+            IOException {
         super(dataSpacesApplicationDescriptor);
         this.hostCapacity = hostCapacity;
         this.vmCapacity = vmCapacity;
@@ -108,6 +116,11 @@ public class GCMFunctionalTestDataSpaces extends GCMFunctionalTest {
                 VariableContractType.DescriptorDefaultVariable);
 
         rootTmpDir = new File(System.getProperty("java.io.tmpdir"), "ProActive-GCMFunctionalTestDataSpaces");
+        // hacks to get URL here
+        tryStartFileSystemServer();
+        fileSystemServerRootURL = ProActiveFileName.getServerVFSRootURL(fileSystemServerDeployer
+                .getRemoteFileSystemServerURL());
+
         inputDefaultWithDirLocalHandle = new File(rootTmpDir, "inputDefaultWithDir");
         inputWithDirLocalHandle = new File(rootTmpDir, "inputWithDir");
         inputWithFileLocalHandle = new File(rootTmpDir, "inputWithFile");
@@ -117,22 +130,22 @@ public class GCMFunctionalTestDataSpaces extends GCMFunctionalTest {
         outputWithNothing1LocalHandle = new File(rootTmpDir, "outputWithNothing1");
         outputWithNothing2LocalHandle = new File(rootTmpDir, "outputWithNothing2");
 
-        vContract.setVariableFromProgram(VAR_INPUT_DEFAULT_WITH_DIR_PATH, inputDefaultWithDirLocalHandle
-                .getAbsolutePath(), VariableContractType.ProgramVariable);
-        vContract.setVariableFromProgram(VAR_INPUT_WITH_DIR_PATH, inputWithDirLocalHandle.getAbsolutePath(),
+        vContract.setVariableFromProgram(VAR_INPUT_DEFAULT_WITH_DIR_URL,
+                getRootSubdirURL(inputDefaultWithDirLocalHandle), VariableContractType.ProgramVariable);
+        vContract.setVariableFromProgram(VAR_INPUT_WITH_DIR_URL, getRootSubdirURL(inputWithDirLocalHandle),
                 VariableContractType.ProgramVariable);
-        vContract.setVariableFromProgram(VAR_INPUT_WITH_FILE_PATH,
-                inputWithFileLocalHandle.getAbsolutePath(), VariableContractType.ProgramVariable);
-        vContract.setVariableFromProgram(VAR_OUTPUT_DEFAULT_WITH_DIR_PATH, outputDefaultWithDirLocalHandle
-                .getAbsolutePath(), VariableContractType.ProgramVariable);
-        vContract.setVariableFromProgram(VAR_OUTPUT_WITH_DIR_PATH,
-                outputWithDirLocalHandle.getAbsolutePath(), VariableContractType.ProgramVariable);
-        vContract.setVariableFromProgram(VAR_OUTPUT_WITH_FILE_PATH, outputWithFileLocalHandle
-                .getAbsolutePath(), VariableContractType.ProgramVariable);
-        vContract.setVariableFromProgram(VAR_OUTPUT_WITH_NOTHING1_PATH, outputWithNothing1LocalHandle
-                .getAbsolutePath(), VariableContractType.ProgramVariable);
-        vContract.setVariableFromProgram(VAR_OUTPUT_WITH_NOTHING2_PATH, outputWithNothing2LocalHandle
-                .getAbsolutePath(), VariableContractType.ProgramVariable);
+        vContract.setVariableFromProgram(VAR_INPUT_WITH_FILE_URL, getRootSubdirURL(inputWithFileLocalHandle),
+                VariableContractType.ProgramVariable);
+        vContract.setVariableFromProgram(VAR_OUTPUT_DEFAULT_WITH_DIR_URL,
+                getRootSubdirURL(outputDefaultWithDirLocalHandle), VariableContractType.ProgramVariable);
+        vContract.setVariableFromProgram(VAR_OUTPUT_WITH_DIR_URL, getRootSubdirURL(outputWithDirLocalHandle),
+                VariableContractType.ProgramVariable);
+        vContract.setVariableFromProgram(VAR_OUTPUT_WITH_FILE_URL,
+                getRootSubdirURL(outputWithFileLocalHandle), VariableContractType.ProgramVariable);
+        vContract.setVariableFromProgram(VAR_OUTPUT_WITH_NOTHING1_URL,
+                getRootSubdirURL(outputWithNothing1LocalHandle), VariableContractType.ProgramVariable);
+        vContract.setVariableFromProgram(VAR_OUTPUT_WITH_NOTHING2_URL,
+                getRootSubdirURL(outputWithNothing2LocalHandle), VariableContractType.ProgramVariable);
     }
 
     @Before
@@ -154,6 +167,25 @@ public class GCMFunctionalTestDataSpaces extends GCMFunctionalTest {
             assertTrue(SkeletonSystemImpl.deleteDirectory(rootTmpDir));
     }
 
+    @Before
+    public void tryStartFileSystemServer() throws IOException {
+        if (fileSystemServerDeployer == null) {
+            rootTmpDir.mkdirs();
+            assertTrue(rootTmpDir.exists());
+            fileSystemServerDeployer = new FileSystemServerDeployer(
+                "ProActive-GCMFunctionalTestDataSpaces/fileSystemServer", rootTmpDir.getAbsolutePath());
+        }
+    }
+
+    @After
+    public void tryStopFileSystemServer() throws ProActiveException {
+        // we stop it before stopping GCM application, but it shouldn't cause problems
+        if (fileSystemServerDeployer != null) {
+            fileSystemServerDeployer.terminate();
+            fileSystemServerDeployer = null;
+        }
+    }
+
     protected Node getANode() {
         checkDeploymentState();
 
@@ -165,5 +197,9 @@ public class GCMFunctionalTestDataSpaces extends GCMFunctionalTest {
         if (gcmad == null || !gcmad.isStarted()) {
             throw new IllegalStateException("deployment is not started");
         }
+    }
+
+    protected String getRootSubdirURL(final File dir) {
+        return fileSystemServerRootURL + dir.getName();
     }
 }

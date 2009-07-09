@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -49,7 +50,7 @@ public class TestDataSpaces extends GCMFunctionalTestDataSpaces {
     private TestActiveObject ao3;
     private TestActiveObject ao4;
 
-    public TestDataSpaces() {
+    public TestDataSpaces() throws URISyntaxException, IOException {
         super(2, 2);
     }
 
@@ -199,7 +200,7 @@ public class TestDataSpaces extends GCMFunctionalTestDataSpaces {
                     INPUT_FILE_NAME, 30000);
             final StringWrapper contentWrapper4 = ao4.readInputFileBlocking(ADDED_INPUT_NAME,
                     INPUT_FILE_NAME, 30000);
-            ao1.addInputSpace(ADDED_INPUT_NAME, inputWithDirLocalHandle.getAbsolutePath());
+            ao1.addInputSpace(ADDED_INPUT_NAME, getRootSubdirURL(inputWithDirLocalHandle));
             assertEquals(INPUT_FILE_CONTENT, contentWrapper1B.stringValue());
             assertEquals(INPUT_FILE_CONTENT, contentWrapper2.stringValue());
             assertEquals(INPUT_FILE_CONTENT, contentWrapper4.stringValue());

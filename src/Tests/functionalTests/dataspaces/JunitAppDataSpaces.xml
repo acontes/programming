@@ -11,14 +11,14 @@
 		<descriptorDefaultVariable name="deploymentDescriptor" value="dataSpaces.xml" />
 		<descriptorDefaultVariable name="jvmargDefinedByTest" value=" "/>
 		<programVariable name="JVM_PARAMETERS"/>
-		<programVariable name="INPUT_DEFAULT_WITH_DIR_PATH"/>
-		<programVariable name="INPUT_WITH_DIR_PATH"/>
-		<programVariable name="INPUT_WITH_FILE_PATH"/>
-		<programVariable name="OUTPUT_DEFAULT_WITH_DIR_PATH"/>
-		<programVariable name="OUTPUT_WITH_DIR_PATH"/>
-		<programVariable name="OUTPUT_WITH_FILE_PATH"/>
-		<programVariable name="OUTPUT_WITH_NOTHING1_PATH"/>		
-		<programVariable name="OUTPUT_WITH_NOTHING2_PATH"/>
+		<programVariable name="INPUT_DEFAULT_WITH_DIR_URL"/>
+		<programVariable name="INPUT_WITH_DIR_URL"/>
+		<programVariable name="INPUT_WITH_FILE_URL"/>
+		<programVariable name="OUTPUT_DEFAULT_WITH_DIR_URL"/>
+		<programVariable name="OUTPUT_WITH_DIR_URL"/>
+		<programVariable name="OUTPUT_WITH_FILE_URL"/>
+		<programVariable name="OUTPUT_WITH_NOTHING1_URL"/>		
+		<programVariable name="OUTPUT_WITH_NOTHING2_URL"/>
 	</environment>
 	
 	<application>
@@ -45,32 +45,31 @@
 				<nodeProvider refid="remote" />
 			</virtualNode>
 			<data>
-				<!-- URLs are paths here; it works for VFS, but it is like that just for local testing -->
 				<inputDefault>
-					<remoteAccess url="${INPUT_DEFAULT_WITH_DIR_PATH}" />
+					<remoteAccess url="${INPUT_DEFAULT_WITH_DIR_URL}" />
 					<!--  difficult to test locally:
-					<location hostname="${INPUT_DEFAULT_HOSTNAME}" url="${INPUT_DEFAULT_PATH}" />  -->
+					<location hostname="${INPUT_DEFAULT_HOSTNAME}" path="${INPUT_DEFAULT_WITH_DIR_PATH}" />  -->
 				</inputDefault>
 				<input id="input_with_dir">
-					<remoteAccess url="${INPUT_WITH_DIR_PATH}" />
+					<remoteAccess url="${INPUT_WITH_DIR_URL}" />
 				</input>
 				<input id="input_with_file">
-					<remoteAccess url="${INPUT_WITH_FILE_PATH}" />
+					<remoteAccess url="${INPUT_WITH_FILE_URL}" />
 				</input>
 				<outputDefault>
-					<remoteAccess url="${OUTPUT_DEFAULT_WITH_DIR_PATH}" />
+					<remoteAccess url="${OUTPUT_DEFAULT_WITH_DIR_URL}" />
 				</outputDefault>
 				<output id="output_with_dir">
-					<remoteAccess url="${OUTPUT_WITH_DIR_PATH}" />
+					<remoteAccess url="${OUTPUT_WITH_DIR_URL}" />
 				</output>
 				<output id="output_with_file">
-					<remoteAccess url="${OUTPUT_WITH_FILE_PATH}" />
+					<remoteAccess url="${OUTPUT_WITH_FILE_URL}" />
 				</output>
 				<output id="output_with_nothing1">
-					<remoteAccess url="${OUTPUT_WITH_NOTHING1_PATH}" />
+					<remoteAccess url="${OUTPUT_WITH_NOTHING1_URL}" />
 				</output>
 				<output id="output_with_nothing2">
-					<remoteAccess url="${OUTPUT_WITH_NOTHING2_PATH}" />
+					<remoteAccess url="${OUTPUT_WITH_NOTHING2_URL}" />
 				</output>
 			</data>
 		</proactive>
