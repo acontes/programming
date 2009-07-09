@@ -108,8 +108,8 @@ public class FileSystemServerImpl implements FileSystemServer {
             throw new IllegalArgumentException("Root directory does not exist");
 
         rootCanonicalPath = rootFile.getCanonicalPath();
-        if (logger.isTraceEnabled())
-            logger.trace("FileSystemServerImpl started with root: " + rootCanonicalPath);
+        if (logger.isDebugEnabled())
+            logger.debug("FileSystemServerImpl started with root: " + rootCanonicalPath);
     }
 
     /**
@@ -126,9 +126,9 @@ public class FileSystemServerImpl implements FileSystemServer {
         if (streamAutocloseThread == null) {
             streamAutocloseThread = new StreamAutocloseThread();
             streamAutocloseThread.start();
-            logger.info("Starting autoclose feature");
+            logger.debug("Starting autoclose feature");
         } else {
-            logger.info("Autoclose feature already started");
+            logger.debug("Autoclose feature already started");
         }
     }
 
@@ -152,12 +152,12 @@ public class FileSystemServerImpl implements FileSystemServer {
             try {
                 streamClose(stream);
             } catch (IOException e) {
-                logger.info("Exception while closing stream", e);
+                ProActiveLogger.logEatedException(logger, "Exception while closing stream", e);
             } catch (StreamNotFoundException e) {
                 // someone has just closed stream through streamClose() 
             }
         }
-        logger.info("Autoclose feature stopped, all streams closed");
+        logger.debug("File server stopped (all streams closed)");
     }
 
     public long streamOpen(String path, StreamMode mode) throws IOException {
