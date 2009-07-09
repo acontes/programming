@@ -79,7 +79,9 @@ public class FileSystemServerImpl implements FileSystemServer {
 
     private final Object serverStopLock = new Object();
 
-    private volatile long idGenerator = 0;
+    private long idGenerator = 0;
+
+    private final Object idGeneratorLock = new Object();
 
     private StreamAutocloseThread streamAutocloseThread;
 
@@ -401,8 +403,10 @@ public class FileSystemServerImpl implements FileSystemServer {
 
     private long storeStream(Stream instance) {
         final Long timestamp = System.currentTimeMillis();
-        final long id = idGenerator++;
-
+        final long id;
+        synchronized (idGeneratorLock) {
+            id = idGenerator++;
+        }
         synchronized (streams) {
             streams.put(id, instance);
             synchronized (streamLastUsedTimestamp) {
