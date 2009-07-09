@@ -241,7 +241,8 @@ public class NodeConfigurator {
         if (!rootFile.isDirectory())
             rootFile.mkdirs();
         try {
-            final String serviceId = Utils.getRuntimeId(node) + '/' + Utils.getNodeId(node);
+            final String serviceId = Utils.getRuntimeId(node) + '/' + Utils.getNodeId(node) +
+                "/fileSystemServer";
             providerDeployer = new FileSystemServerDeployer(serviceId, rootPath);
         } catch (IOException e) {
             throw new FileSystemException(e);
