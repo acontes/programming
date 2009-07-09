@@ -75,6 +75,7 @@ public interface FileOperations {
      */
     public abstract void fileCreate(String path, FileType type) throws IOException;
 
+    // TODO: idea: maybe "rm -r /" should be disallowed? 
     /**
      * Delete a file specified by given abstract <code>path</code>. When specified file is a
      * directory, then it must be empty, unless the recursive deleting is specified. This method

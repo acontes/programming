@@ -27,7 +27,7 @@ import org.objectweb.proactive.extra.vfsprovider.protocol.FileType;
 import org.objectweb.proactive.extra.vfsprovider.protocol.StreamMode;
 
 
-// TODO actually we can allow exporting file, or not-yet-existing directory
+// TODO idea: now we export existing directory, shall we allow to export a file?
 /**
  * Implements remote file system protocol defined in {@link FileSystemServer} interface.
  * <p>
@@ -305,7 +305,6 @@ public class FileSystemServerImpl implements FileSystemServer {
                 }
                 checkConditionIsTrue(!file.exists(), "Unable to delete a file");
             }
-            // FIXME can't we remove root file? even if so, then some security exception?
         } catch (SecurityException sec) {
             throw new IOException(sec);
         }
