@@ -41,7 +41,7 @@ import org.objectweb.proactive.extra.vfsprovider.protocol.StreamMode;
  * Operations performed on {@link #streams} map are synchronized trough explicit synchronization. To
  * fulfill protocol's thread-safety, an explicit {@link Stream} operations synchronization is
  * required with double checking if map contains an open stream. Generating unique identifiers is
- * synchronized on <code>this</code>.
+ * atomic.
  * <p>
  * To guarantee that {@link #streamFlush(long)} method throws {@link StreamNotFoundException} only
  * if stream has been closed correctly, an "in progress state" map is hold. Flush requests are
@@ -116,8 +116,10 @@ public class FileSystemServerImpl implements FileSystemServer {
      * {@link #STREAM_AUTOCLOSE_CHECKING_INTERVAL_MILIS} constant values.
      */
     public synchronized void startAutoClosing() {
-        if (serverStopped)
-            throw new IllegalStateException("Server has been already stopped");
+        synchronized (serverStopLock) {
+            if (serverStopped)
+                throw new IllegalStateException("Server has been already stopped");
+        }
 
         if (streamAutocloseThread == null) {
             streamAutocloseThread = new StreamAutocloseThread();
