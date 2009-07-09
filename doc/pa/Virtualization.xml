@@ -3,7 +3,7 @@
 <chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0"
 	xml:id="virtualization">
 	<info>
-		<title xml:id="virtualization_chapter_title">ProActive GCMDeployment and Virtual Environment.</title>
+		<title xml:id="virtualization_chapter_title">GCMDeployment and Virtual Environment.</title>
 	</info>
 	<para>
 	<emphasis>
@@ -296,11 +296,15 @@
 				NT core based systems you can use <link xlink:href="http://support.microsoft.com/kb/243486/fr">autoexnt.exe/autoexnt.bat</link>
 				that registers as a service. This application runs the SYSROOT/windows32/autoexnt.bat content at system launch, for example:
 				<programlisting>
-					"C:\\Python26\python.exe" "C:\\ProActive\bin\scripts\proactivemain.py" "C:\\ProActive\bin\scripts\proactive-runtime.log"
+					set python_path=C:\\Python26\python.exe
+					set pa_home=C:\\ProActive
+					set log_file=C:\\log\proactive-runtime.log
+					"%python_path%" "%pa_home%\scripts\virtualization\proactivemain.py" "%log_file%"
 				</programlisting>
 			</para>
 			<para>
 				For a Debian based system, you can use update-rc.d:
+				( cp all virtualization scripts in /etc/init.d )
 				<programlisting>
 					sudo update-rc.d proactive-runtime start 99 2 3 5 . stop 99 0 1 6 .
 				</programlisting>
@@ -365,7 +369,7 @@
 					
 					exit 0
 				</programlisting>
-				For redhat based system, you'll have to use chkconfig utility and replace start-stop-daemon by a background launch
+				For redhat based systems, you'll have to use chkconfig utility and replace start-stop-daemon by a background launch
 				plus remove log messages.
 				<programlisting>
 					#!/bin/sh
@@ -446,7 +450,7 @@
 				<para>
 					For all handled VMware products you have to install VMware guest tools. This step is really straight forward.
 					For VMware Server prior 2, power the virtual machine on, on the VMware Server console, click Devices, install
-					guest tools. That mount a CD into your VM. If you run a Windows OS, launch the installer.exe, and on a Linux one,
+					guest tools. This mounts a CD into your VM. If you run a Windows OS, launch the installer.exe, and on a Linux one,
 					run the installer.sh.
 					For VMware Server &gt; 2, launch your virtual machine, from the virtual machine administration page, right column,
 					click install guest tools. This will also mount a CD within your VM.
@@ -663,7 +667,7 @@
 		    	<para>
 		    		<emphasis>
 		    			<phrase>This hypervisors are not supported for ProActive Deployment.</phrase>
-						<phrase>You need to use libvirt in addition to make this software work with deployment.</phrase>
+						<phrase>You need to use libvirt in addition to make these softwares work with deployment.</phrase>
 		    		</emphasis>
 		    	</para>
 		    	<para>
@@ -1038,7 +1042,9 @@
 					</emphasis>
 				</para>
 				<para>
-					To deploy your virtual infrastructure with products compatbile with
+					You need to put the JNA's jar in your classpath and to fix the jna.library.path or java.library.path system property
+					( launch the JVM with -Djna.library.path=... ) to point to the libvixAllProducts.so lib, or specify it thanks to
+					LD_LIBRARY_PATH variable on linux or PATH on windows. To deploy your virtual infrastructure with products compatbile with
 					<link xlink:href="http://libvirt.org">Libvirt</link>, you can use a &lt;libvirt&gt; section. Here is an example on
 					how to use it:
 					<programlisting>
@@ -1131,9 +1137,8 @@
 					vboxwebsrv service you started before launching the deployment.
 				</para>
 				<para>
-					The &lt;authentication&gt; tag is optional if connecting locally and is used to specify a user with sufficient permissions 
-					to manage your virtual environment through Libvirt environment ( virt-manager, virsh... ). If you connect locally, you may 
-					avoid this tag. The only attributes of that section are user and pwd.
+					The &lt;authentication&gt; tag is used to specify a user with sufficient permissions to manager your Virtualbox
+					environment.
 				</para>
 				<para>
 					The &lt;image&gt; tag points out which virtual machines you want to deploy. It admits the following attributes:
@@ -1141,8 +1146,7 @@
 						key="someName"
 						os="windows"
 					</programlisting>
-					The <quote>key</quote> attribute designates the unique name of your virtual machine like you registered it
-					( the way it appears thanks to a <quote>virsh -c qemu+ssh://localhost/system list --all</quote> ). 
+					The <quote>key</quote> attribute designates the unique name of your virtual machine like you registered it. 
 					<quote>os</quote> attribute indicates the guest virtual machine's operating system. 
 					Note that that module doesn't support cloning feature.
 				</para>
@@ -1205,8 +1209,8 @@
 								The machine [standard]myUbuntu/myUbuntu.vmx isn't registered for the current host.
 						</programlisting>
 						For the example above, the good path is:
-						<quote>[standard]&nbsp;myUbuntu/myUbuntu.vmx</quote> .
-						Note the space ( "&nbsp;" ) between the datastore's name and the begin of the path...
+						<quote>[standard] myUbuntu/myUbuntu.vmx</quote> .
+						Note the space ( " " ) between the datastore's name and the begin of the path...
 					</para>
 				</listitem>
 			</itemizedlist>

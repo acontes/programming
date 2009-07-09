@@ -1822,6 +1822,27 @@
        y1="843.20789"
        x2="547.80806"
        y2="383.7653" />
+    <inkscape:perspective
+       id="perspective4135"
+       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 526.18109 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4148"
+       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 526.18109 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4161"
+       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 526.18109 : 1"
+       sodipodi:type="inkscape:persp3d" />
   </defs>
   <sodipodi:namedview
      inkscape:document-units="mm"
@@ -1837,9 +1858,9 @@
      id="namedview5367"
      showgrid="false"
      inkscape:window-width="1680"
-     inkscape:window-height="979"
-     inkscape:window-x="0"
-     inkscape:window-y="25" />
+     inkscape:window-height="1029"
+     inkscape:window-x="1680"
+     inkscape:window-y="0" />
   <metadata
      id="metadata5369">
     <rdf:RDF>
@@ -1864,10 +1885,16 @@
        sodipodi:rx="288"
        sodipodi:ry="159"
        d="M 1042,573.09448 A 288,159 0 1 1 466,573.09448 A 288,159 0 1 1 1042,573.09448 z"
-       transform="matrix(0.6446225,0,0,0.5572804,-77.871681,-13.839329)" />
+       transform="matrix(0.6446225,0,0,0.5572804,-77.871681,-13.839329)"
+       inkscape:export-filename="/user/jmguilla/home/workspace-git/ProActive/doc/pa/images/proactive_virtualization_deployment.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
     <g
        transform="matrix(0.4707994,0,0,0.3899082,474.93527,99.239633)"
-       id="g5446">
+       id="g5446"
+       inkscape:export-filename="/user/jmguilla/home/workspace-git/ProActive/doc/pa/images/proactive_virtualization_deployment.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
       <g
          transform="matrix(0.453022,2.194121e-2,0,0.459825,-103.5561,277.0976)"
          id="g5448">
@@ -2141,7 +2168,10 @@
     </g>
     <g
        transform="matrix(0.4707994,0,0,0.3899082,593.54583,85.307626)"
-       id="g5534">
+       id="g5534"
+       inkscape:export-filename="/user/jmguilla/home/workspace-git/ProActive/doc/pa/images/proactive_virtualization_deployment.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
       <g
          transform="matrix(0.453022,2.194121e-2,0,0.459825,-103.5561,277.0976)"
          id="g5536">
@@ -2352,7 +2382,10 @@
     </g>
     <g
        id="g9348"
-       transform="matrix(0.6446225,0,0,0.5572804,-78.516303,13.467412)">
+       transform="matrix(0.6446225,0,0,0.5572804,-78.516303,13.467412)"
+       inkscape:export-filename="/user/jmguilla/home/workspace-git/ProActive/doc/pa/images/proactive_virtualization_deployment.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
       <g
          id="g5622"
          transform="matrix(0.7303491,0,0,0.6996624,758.56696,138.91214)">
@@ -2708,7 +2741,10 @@
     </g>
     <g
        id="g10332"
-       transform="matrix(0.6446225,0,0,0.5572804,-88.830264,-2.1364401)">
+       transform="matrix(0.6446225,0,0,0.5572804,-88.830264,-2.1364401)"
+       inkscape:export-filename="/user/jmguilla/home/workspace-git/ProActive/doc/pa/images/proactive_virtualization_deployment.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
       <g
          id="g5710"
          transform="matrix(0.7303491,0,0,0.6996624,955.56696,147.91214)">
@@ -2923,7 +2959,10 @@
     </g>
     <g
        id="g115188"
-       transform="matrix(1.0115865,0,0,0.7109707,1137.8277,-203.58868)">
+       transform="matrix(1.0115865,0,0,0.7109707,1137.8277,-203.58868)"
+       inkscape:export-filename="/user/jmguilla/home/workspace-git/ProActive/doc/pa/images/proactive_virtualization_deployment.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
       <rect
          y="978.81433"
          x="63.805199"
@@ -3262,7 +3301,10 @@
     </g>
     <g
        id="g10427"
-       transform="matrix(0.6446225,0,0,0.5572804,-360.86095,-163.19048)">
+       transform="matrix(0.6446225,0,0,0.5572804,-360.86095,-163.19048)"
+       inkscape:export-filename="/user/jmguilla/home/workspace-git/ProActive/doc/pa/images/proactive_virtualization_deployment.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
       <g
          id="g10429"
          transform="matrix(0.7303491,0,0,0.6996624,758.56696,138.91214)">
@@ -3620,10 +3662,16 @@
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.59936261px;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#Arrow1Lend);stroke-opacity:1"
        d="M 65.234512,46.399611 C 164.84295,34.657043 263.56803,32.842222 328.31906,55.146958 C 343.23691,60.285695 356.35147,66.704669 367.25808,74.57742 C 384.60911,87.101959 396.3721,103.30584 400.91778,123.8878 C 402.30173,130.15405 403.0167,136.8261 403.0167,143.92369"
        id="path11003"
-       sodipodi:nodetypes="csssc" />
+       sodipodi:nodetypes="csssc"
+       inkscape:export-filename="/user/jmguilla/home/workspace-git/ProActive/doc/pa/images/proactive_virtualization_deployment.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
     <g
        id="g48565"
-       transform="matrix(0.6781093,0,0,0.6119648,-10.61179,-9.7848689)">
+       transform="matrix(0.6781093,0,0,0.6119648,-10.61179,-9.7848689)"
+       inkscape:export-filename="/user/jmguilla/home/workspace-git/ProActive/doc/pa/images/proactive_virtualization_deployment.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
       <path
          transform="matrix(6.392368,0.545409,-0.130014,2.864752,-184.6606,-38.15109)"
          style="fill:url(#radialGradient1977);fill-opacity:1;fill-rule:evenodd;stroke-width:1pt"
@@ -3732,7 +3780,10 @@
     </g>
     <g
        id="g14596"
-       transform="matrix(0.6781093,0,0,0.6119648,-18.024948,193.90113)">
+       transform="matrix(0.6781093,0,0,0.6119648,-18.024948,193.90113)"
+       inkscape:export-filename="/user/jmguilla/home/workspace-git/ProActive/doc/pa/images/proactive_virtualization_deployment.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
       <path
          transform="matrix(6.392368,0.545409,-0.130014,2.864752,-184.6606,-38.15109)"
          style="fill:url(#radialGradient14636);fill-opacity:1;fill-rule:evenodd;stroke-width:1pt"
@@ -3841,7 +3892,10 @@
     </g>
     <g
        id="g14676"
-       transform="matrix(0.3011387,0,0,0.3100224,326.18593,45.259105)">
+       transform="matrix(0.3011387,0,0,0.3100224,326.18593,45.259105)"
+       inkscape:export-filename="/user/jmguilla/home/workspace-git/ProActive/doc/pa/images/proactive_virtualization_deployment.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
       <rect
          y="978.81433"
          x="63.805199"
@@ -4181,14 +4235,23 @@
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.59936261px;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#Arrow1Lend);stroke-opacity:1"
        d="M 312.76955,240.3332 C 236.05947,298.84765 270.86908,309.99325 283.76153,316.68062"
-       id="path14782" />
+       id="path14782"
+       inkscape:export-filename="/user/jmguilla/home/workspace-git/ProActive/doc/pa/images/proactive_virtualization_deployment.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.59936261px;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#Arrow1Lend);stroke-opacity:1"
        d="M 534.51969,317.79518 C 678.2705,97.669409 777.54236,-36.077894 65.879134,31.353039"
-       id="path15299" />
+       id="path15299"
+       inkscape:export-filename="/user/jmguilla/home/workspace-git/ProActive/doc/pa/images/proactive_virtualization_deployment.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
     <g
        id="g15889"
-       transform="matrix(0.6446225,0,0,0.5572804,-6.9632076,1.2072425)">
+       transform="matrix(0.6446225,0,0,0.5572804,-6.9632076,1.2072425)"
+       inkscape:export-filename="/user/jmguilla/home/workspace-git/ProActive/doc/pa/images/proactive_virtualization_deployment.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90">
       <g
          transform="matrix(0.3730763,0,0,0.3469316,13.743868,112.54418)"
          id="g74729">
@@ -4316,14 +4379,20 @@
        d="M 115.36869,28.035485 A 6.0714288,5.7142859 0 1 1 115.41124,28.03052 L 114.64286,22.362181 z"
        sodipodi:start="1.4509605"
        sodipodi:end="7.7270846"
-       transform="matrix(0.9342478,0,0,0.858146,-57.341299,66.776502)" />
+       transform="matrix(0.9342478,0,0,0.858146,-57.341299,66.776502)"
+       inkscape:export-filename="/user/jmguilla/home/workspace-git/ProActive/doc/pa/images/proactive_virtualization_deployment.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
     <text
        xml:space="preserve"
        style="font-size:10.51189899px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
        x="42.833214"
        y="96.289764"
        id="text83559"
-       transform="scale(1.0755134,0.9297885)"><tspan
+       transform="scale(1.0755134,0.9297885)"
+       inkscape:export-filename="/user/jmguilla/home/workspace-git/ProActive/doc/pa/images/proactive_virtualization_deployment.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
          sodipodi:role="line"
          id="tspan83561"
          x="42.833214"
@@ -4339,14 +4408,20 @@
        d="M 115.36869,28.035485 A 6.0714288,5.7142859 0 1 1 115.41124,28.03052 L 114.64286,22.362181 z"
        sodipodi:start="1.4509605"
        sodipodi:end="7.7270846"
-       transform="matrix(1.0325897,0,0,0.9484772,-0.9301347,85.933154)" />
+       transform="matrix(1.0325897,0,0,0.9484772,-0.9301347,85.933154)"
+       inkscape:export-filename="/user/jmguilla/home/workspace-git/ProActive/doc/pa/images/proactive_virtualization_deployment.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
     <text
        xml:space="preserve"
        style="font-size:11.61841297px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
        x="105.40455"
        y="119.46887"
        id="text83565"
-       transform="scale(1.0755134,0.9297885)"><tspan
+       transform="scale(1.0755134,0.9297885)"
+       inkscape:export-filename="/user/jmguilla/home/workspace-git/ProActive/doc/pa/images/proactive_virtualization_deployment.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
          sodipodi:role="line"
          id="tspan83567"
          x="105.40455"
@@ -4362,14 +4437,20 @@
        d="M 115.36869,28.035485 A 6.0714288,5.7142859 0 1 1 115.41124,28.03052 L 114.64286,22.362181 z"
        sodipodi:start="1.4509605"
        sodipodi:end="7.7270846"
-       transform="matrix(1.0837406,0,0,0.9467037,224.94757,29.130213)" />
+       transform="matrix(1.0837406,0,0,0.9467037,224.94757,29.130213)"
+       inkscape:export-filename="/user/jmguilla/home/workspace-git/ProActive/doc/pa/images/proactive_virtualization_deployment.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
     <text
        xml:space="preserve"
        style="font-size:11.89156818px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
        x="312.73505"
        y="59.809078"
        id="text83571"
-       transform="scale(1.1028615,0.9067321)"><tspan
+       transform="scale(1.1028615,0.9067321)"
+       inkscape:export-filename="/user/jmguilla/home/workspace-git/ProActive/doc/pa/images/proactive_virtualization_deployment.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
          sodipodi:role="line"
          id="tspan83573"
          x="312.73505"
@@ -4385,14 +4466,20 @@
        d="M 115.36869,28.035485 A 6.0714288,5.7142859 0 1 1 115.41124,28.03052 L 114.64286,22.362181 z"
        sodipodi:start="1.4509605"
        sodipodi:end="7.7270846"
-       transform="matrix(1.3316073,0,0,1.1256221,145.92855,240.79674)" />
+       transform="matrix(1.3316073,0,0,1.1256221,145.92855,240.79674)"
+       inkscape:export-filename="/user/jmguilla/home/workspace-git/ProActive/doc/pa/images/proactive_virtualization_deployment.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
     <text
        xml:space="preserve"
        style="font-size:14.37321281px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
        x="261.6282"
        y="303.42477"
        id="text83577"
-       transform="scale(1.121133,0.8919548)"><tspan
+       transform="scale(1.121133,0.8919548)"
+       inkscape:export-filename="/user/jmguilla/home/workspace-git/ProActive/doc/pa/images/proactive_virtualization_deployment.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
          sodipodi:role="line"
          id="tspan83579"
          x="261.6282"
@@ -4408,14 +4495,20 @@
        d="M 115.36869,28.035485 A 6.0714288,5.7142859 0 1 1 115.41124,28.03052 L 114.64286,22.362181 z"
        sodipodi:start="1.4509605"
        sodipodi:end="7.7270846"
-       transform="matrix(1.1801026,0,0,1.083974,460.14615,10.735341)" />
+       transform="matrix(1.1801026,0,0,1.083974,460.14615,10.735341)"
+       inkscape:export-filename="/user/jmguilla/home/workspace-git/ProActive/doc/pa/images/proactive_virtualization_deployment.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
     <text
        xml:space="preserve"
        style="font-size:13.2781868px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
        x="549.28937"
        y="42.456402"
        id="text83583"
-       transform="scale(1.0755134,0.9297885)"><tspan
+       transform="scale(1.0755134,0.9297885)"
+       inkscape:export-filename="/user/jmguilla/home/workspace-git/ProActive/doc/pa/images/proactive_virtualization_deployment.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
          sodipodi:role="line"
          id="tspan83585"
          x="549.28937"
@@ -4423,11 +4516,17 @@
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.02363586;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#Arrow1Lend);stroke-miterlimit:4;stroke-dasharray:3.07090733, 1.02363577;stroke-dashoffset:0.61418144;stroke-opacity:1"
        d="M 81.350075,73.706351 C 157.41553,89.86748 53.631307,132.22079 53.631307,132.22079"
-       id="path15928" />
+       id="path15928"
+       inkscape:export-filename="/user/jmguilla/home/workspace-git/ProActive/doc/pa/images/proactive_virtualization_deployment.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.59889066;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#Arrow1Lend);stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="M 120.02742,182.37603 C 238.63796,99.898535 213.49769,50.300574 105.84573,60.33162"
-       id="path4137" />
+       id="path4137"
+       inkscape:export-filename="/user/jmguilla/home/workspace-git/ProActive/doc/pa/images/proactive_virtualization_deployment.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
     <path
        sodipodi:type="arc"
        style="opacity:1;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.93699998;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
@@ -4439,17 +4538,49 @@
        d="M 115.36869,28.035485 A 6.0714288,5.7142859 0 1 1 115.41124,28.03052 L 114.64286,22.362181 z"
        sodipodi:start="1.4509605"
        sodipodi:end="7.7270846"
-       transform="matrix(1.1801026,0,0,1.083974,51.133182,60.611938)" />
+       transform="matrix(1.1801026,0,0,1.083974,51.133182,60.611938)"
+       inkscape:export-filename="/user/jmguilla/home/workspace-git/ProActive/doc/pa/images/proactive_virtualization_deployment.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
     <text
        xml:space="preserve"
        style="font-size:13.2781868px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
        x="168.99377"
        y="96.099365"
        id="text5432"
-       transform="scale(1.0755134,0.9297885)"><tspan
+       transform="scale(1.0755134,0.9297885)"
+       inkscape:export-filename="/user/jmguilla/home/workspace-git/ProActive/doc/pa/images/proactive_virtualization_deployment.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
          sodipodi:role="line"
          id="tspan5434"
          x="168.99377"
          y="96.099365">5</tspan></text>
+    <image
+       y="119.89057"
+       x="313.13028"
+       id="image4137"
+       height="41.756897"
+       width="82.614288"
+       sodipodi:absref="/user/jmguilla/home/Desktop/xenserver.gif"
+       xlink:href="/user/jmguilla/home/Desktop/xenserver.gif"
+       inkscape:transform-center-x="-30.405171"
+       inkscape:transform-center-y="-48.648273" />
+    <image
+       y="130.4157"
+       x="396.34015"
+       id="image4150"
+       height="32"
+       width="116"
+       sodipodi:absref="/user/jmguilla/home/Desktop/vmware.gif"
+       xlink:href="/user/jmguilla/home/Desktop/vmware.gif" />
+    <image
+       y="115.6588"
+       x="512.61157"
+       id="image4163"
+       height="59.776356"
+       width="56.332268"
+       sodipodi:absref="/user/jmguilla/home/Desktop/vbox.gif"
+       xlink:href="/user/jmguilla/home/Desktop/vbox.gif" />
   </g>
 </svg>
