@@ -494,10 +494,11 @@ public class FileSystemServerImpl implements FileSystemServer {
 
         private volatile boolean running = true;
 
+        private final Object lock = new Object();
+
         @Override
         public void run() {
             while (running) {
-                // FIXME: move running check to freeze (or inline it here) and implement wait-signal for setToStop()/freeze() ?
                 processTimestamps();
                 freeze();
             }
@@ -505,7 +506,10 @@ public class FileSystemServerImpl implements FileSystemServer {
         }
 
         public void setToStop() {
-            running = false;
+            synchronized (lock) {
+                running = false;
+                lock.notify();
+            }
         }
 
         /**
@@ -548,13 +552,17 @@ public class FileSystemServerImpl implements FileSystemServer {
         private void freeze() {
             long timestamp = System.currentTimeMillis() + STREAM_AUTOCLOSE_CHECKING_INTERVAL_MILIS;
             long period = STREAM_AUTOCLOSE_CHECKING_INTERVAL_MILIS;
-            do {
-                try {
-                    sleep(period);
-                } catch (InterruptedException e) {
+
+            while (period > 0 && running) {
+                synchronized (lock) {
+                    try {
+                        if (running)
+                            lock.wait(period);
+                    } catch (InterruptedException e) {
+                    }
                 }
                 period = timestamp - System.currentTimeMillis();
-            } while (period > 0 && running);
+            }
         }
 
         /**
