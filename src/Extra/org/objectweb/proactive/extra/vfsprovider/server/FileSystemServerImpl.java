@@ -549,8 +549,8 @@ public class FileSystemServerImpl implements FileSystemServer {
             final long current = System.currentTimeMillis();
             sort(snapshot, comparator);
 
-            logger.debug("Autoclose: processing streams");
             if (logger.isTraceEnabled()) {
+                logger.trace("Autoclose: processing streams");
                 logger.trace("Autoclose: current time " + current);
                 logger.trace("Autoclose: timestamps snapshot: " + snapshot.toString());
             }
@@ -559,11 +559,11 @@ public class FileSystemServerImpl implements FileSystemServer {
                 if (logger.isTraceEnabled())
                     logger.trace("Autoclose: iterating timestamp: " + entry.getValue());
                 if (current - entry.getValue() < streamOpenMaximumPeriodMillis) {
-                    logger.debug("Autoclose: remaining streams are still valid, break..");
+                    logger.trace("Autoclose: remaining streams are still valid, break..");
                     return;
                 }
                 try {
-                    logger.debug("Autoclose: closing an old stream");
+                    logger.debug("Autoclose: closing an old stream: " + entry.getKey());
                     streamClose(entry.getKey());
                 } catch (IOException e) {
                     logger.info("An exception when trying to autoclose an open stream", e);
