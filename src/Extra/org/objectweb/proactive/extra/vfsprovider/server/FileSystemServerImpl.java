@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.annotation.RemoteObject;
@@ -29,14 +30,16 @@ import org.objectweb.proactive.extra.vfsprovider.protocol.StreamMode;
 
 // TODO idea: now we export existing directory, shall we allow to export a file?
 /**
- * Implements remote file system protocol defined in {@link FileSystemServer} interface.
+ * Implements remote file system protocol defined in {@link FileSystemServer} interface rooted in
+ * existing directory.
  * <p>
  * File stream related operations are delegated to particular {@link Stream} implementation, created
  * by {@link StreamFactory} private inner class basing on {@link StreamMode}.
  * <p>
  * There is an auto closing of unused streams mechanism implemented, that starts when
  * {@link #startAutoClosing()} method is called and stops explicitly with {@link #stopServer()}
- * method call.
+ * method call. Auto closing related properties can be redefined through {@link PAProperties}, see
+ * {@link #FileSystemServerImpl(String)} for the details.
  * <p>
  * Operations performed on {@link #streams} map are synchronized trough explicit synchronization. To
  * fulfill protocol's thread-safety, an explicit {@link Stream} operations synchronization is
@@ -61,9 +64,13 @@ public class FileSystemServerImpl implements FileSystemServer {
 
     private static final char SEPARATOR_TO_REPLACE = File.separatorChar == '\\' ? '/' : '\\';
 
-    public static final long STREAM_AUTOCLOSE_CHECKING_INTERVAL_MILIS = 1000 * 30;
+    public static final long DEFAULT_STREAM_AUTOCLOSE_CHECKING_INTERVAL_MILLIS = 1000 * 30;
 
-    public static final long STREAM_OPEN_MAXIMUM_PERIOD_MILIS = 1000 * 60;
+    public static final long DEFAULT_STREAM_OPEN_MAXIMUM_PERIOD_MILLIS = 1000 * 60;
+
+    private long streamOpenMaximumPeriodMillis = DEFAULT_STREAM_OPEN_MAXIMUM_PERIOD_MILLIS;
+
+    private long streamAutocloseCheckingIntervalMillis = DEFAULT_STREAM_AUTOCLOSE_CHECKING_INTERVAL_MILLIS;
 
     private final Map<Long, Stream> streams = new HashMap<Long, Stream>();
 
@@ -94,6 +101,9 @@ public class FileSystemServerImpl implements FileSystemServer {
     /**
      * Create an instance of {@link FileSystemServer} that has its root in <code>rootPath</code>
      * directory. To enable auto closing of unused streams call {@link #startAutoClosing()} method.
+     * <p>
+     * This implementation reads {@link PAProperties} to reset auto closing parameters, if those
+     * have been defined. In the other case, parameters are set to their default values.
      * 
      * @param rootPath
      *            path of an existing directory that will be root for the file system
@@ -101,6 +111,10 @@ public class FileSystemServerImpl implements FileSystemServer {
      *             when specified path points to file that does not exist or is not a directory
      * @throws IOException
      *             when IO error occurred
+     * @see PAProperties#PA_VFSPROVIDER_STREAM_AUTOCLOSE_CHECKING_INTERVAL_MILLIS
+     * @see PAProperties#PA_VFSPROVIDER_STREAM_OPEN_MAXIMUM_PERIOD_MILLIS
+     * @see #DEFAULT_STREAM_AUTOCLOSE_CHECKING_INTERVAL_MILLIS
+     * @see #DEFAULT_STREAM_OPEN_MAXIMUM_PERIOD_MILLIS
      */
     public FileSystemServerImpl(String rootPath) throws IOException {
         rootFile = new File(rootPath);
@@ -108,14 +122,25 @@ public class FileSystemServerImpl implements FileSystemServer {
             throw new IllegalArgumentException("Root directory does not exist");
 
         rootCanonicalPath = rootFile.getCanonicalPath();
+        setupParameters();
         if (logger.isDebugEnabled())
             logger.debug("FileSystemServerImpl started with root: " + rootCanonicalPath);
     }
 
+    private void setupParameters() {
+        if (PAProperties.PA_VFSPROVIDER_STREAM_AUTOCLOSE_CHECKING_INTERVAL_MILLIS.isSet())
+            streamAutocloseCheckingIntervalMillis = PAProperties.PA_VFSPROVIDER_STREAM_AUTOCLOSE_CHECKING_INTERVAL_MILLIS
+                    .getValueAsInt();
+
+        if (PAProperties.PA_VFSPROVIDER_STREAM_OPEN_MAXIMUM_PERIOD_MILLIS.isSet())
+            streamOpenMaximumPeriodMillis = PAProperties.PA_VFSPROVIDER_STREAM_OPEN_MAXIMUM_PERIOD_MILLIS
+                    .getValueAsInt();
+    }
+
     /**
      * Enable auto closing of unused streams. The mechanism bases on
-     * {@link #STREAM_OPEN_MAXIMUM_PERIOD_MILIS} and
-     * {@link #STREAM_AUTOCLOSE_CHECKING_INTERVAL_MILIS} constant values.
+     * {@link #streamOpenMaximumPeriodMillis} and {@link #streamAutocloseCheckingIntervalMillis}
+     * constant values.
      */
     public synchronized void startAutoClosing() {
         synchronized (serverStopLock) {
@@ -486,7 +511,7 @@ public class FileSystemServerImpl implements FileSystemServer {
 
     /**
      * An private inner class that is used as a thread for auto closing streams that are not used at
-     * least for {@link FileSystemServerImpl#STREAM_OPEN_MAXIMUM_PERIOD_MILIS}.
+     * least for {@link FileSystemServerImpl#streamOpenMaximumPeriodMillis}.
      */
     private class StreamAutocloseThread extends Thread {
         private Comparator<Entry<Long, Long>> comparator = new StreamTimestampsComparator();
@@ -514,7 +539,7 @@ public class FileSystemServerImpl implements FileSystemServer {
         /**
          * Take a snapshot of time stamps corresponding to last stream access and decide whether to
          * close the old streams according to
-         * {@link FileSystemServerImpl#STREAM_OPEN_MAXIMUM_PERIOD_MILIS}.
+         * {@link FileSystemServerImpl#streamOpenMaximumPeriodMillis}.
          */
         private void processTimestamps() {
             final ArrayList<Entry<Long, Long>> snapshot;
@@ -533,7 +558,7 @@ public class FileSystemServerImpl implements FileSystemServer {
             for (Entry<Long, Long> entry : snapshot) {
                 if (logger.isTraceEnabled())
                     logger.trace("Autoclose: iterating timestamp: " + entry.getValue());
-                if (current - entry.getValue() < STREAM_OPEN_MAXIMUM_PERIOD_MILIS) {
+                if (current - entry.getValue() < streamOpenMaximumPeriodMillis) {
                     logger.debug("Autoclose: remaining streams are still valid, break..");
                     return;
                 }
@@ -549,8 +574,8 @@ public class FileSystemServerImpl implements FileSystemServer {
         }
 
         private void freeze() {
-            long timestamp = System.currentTimeMillis() + STREAM_AUTOCLOSE_CHECKING_INTERVAL_MILIS;
-            long period = STREAM_AUTOCLOSE_CHECKING_INTERVAL_MILIS;
+            long timestamp = System.currentTimeMillis() + streamAutocloseCheckingIntervalMillis;
+            long period = streamAutocloseCheckingIntervalMillis;
 
             while (period > 0 && running) {
                 synchronized (lock) {

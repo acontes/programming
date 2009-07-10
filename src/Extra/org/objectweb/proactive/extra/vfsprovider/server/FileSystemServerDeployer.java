@@ -29,10 +29,11 @@ public class FileSystemServerDeployer {
      * Deploys locally a FileSystemServer as a RemoteObject with a default name.
      * 
      * @param rootPath
+     * @param autoclosing
      * @throws IOException
      */
-    public FileSystemServerDeployer(String rootPath) throws IOException {
-        this(FILE_SERVER_DEFAULT_NAME, rootPath);
+    public FileSystemServerDeployer(String rootPath, boolean autoclosing) throws IOException {
+        this(FILE_SERVER_DEFAULT_NAME, rootPath, autoclosing);
     }
 
     /**
@@ -41,13 +42,16 @@ public class FileSystemServerDeployer {
      * @param name
      *            of deployed RemoteObject
      * @param rootPath
+     * @param autoclosing
      * @throws IOException
      */
-    public FileSystemServerDeployer(String name, String rootPath) throws IOException {
+    public FileSystemServerDeployer(String name, String rootPath, boolean autoclosing) throws IOException {
         fileSystemServer = new FileSystemServerImpl(rootPath);
         roe = PARemoteObject.newRemoteObject(FileSystemServer.class.getName(), this.fileSystemServer);
         roe.createRemoteObject(name);
         url = roe.getURL();
+        if (autoclosing)
+            fileSystemServer.startAutoClosing();
     }
 
     public FileSystemServerImpl getLocalFileSystemServer() {
