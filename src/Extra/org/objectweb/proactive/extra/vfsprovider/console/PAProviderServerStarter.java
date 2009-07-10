@@ -10,9 +10,9 @@ import org.objectweb.proactive.extra.vfsprovider.server.FileSystemServerDeployer
 
 
 /**
- * Class for starting PA Provider manually.
+ * Class for starting PA Provider server manually.
  */
-public class PAProviderStarter {
+public class PAProviderServerStarter {
 
     private static String rootDirectory;
 
@@ -26,14 +26,15 @@ public class PAProviderStarter {
      * @throws URISyntaxException
      */
     public static void main(String[] args) throws IOException, URISyntaxException {
-        final String name = PAProviderStarter.class.getName();
+        final String name = PAProviderServerStarter.class.getName();
 
         try {
             parseArgs(args);
         } catch (IllegalArgumentException e) {
             System.out.println("Usage: java " + name + " <root directory> [PAProvider name]");
             System.out.println("       java " + name + " --help");
-            System.out.println("Starts the PA Provider for <root directory> with default or specified name.");
+            System.out
+                    .println("Starts the PA Provider server for <root directory> with default or specified name.");
             System.out.println("\t--help\tprints this screen");
             return;
         }

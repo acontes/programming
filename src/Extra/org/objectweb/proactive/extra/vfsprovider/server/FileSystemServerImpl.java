@@ -111,8 +111,8 @@ public class FileSystemServerImpl implements FileSystemServer {
      *             when specified path points to file that does not exist or is not a directory
      * @throws IOException
      *             when IO error occurred
-     * @see PAProperties#PA_VFSPROVIDER_STREAM_AUTOCLOSE_CHECKING_INTERVAL_MILLIS
-     * @see PAProperties#PA_VFSPROVIDER_STREAM_OPEN_MAXIMUM_PERIOD_MILLIS
+     * @see PAProperties#PA_VFSPROVIDER_SERVER_STREAM_AUTOCLOSE_CHECKING_INTERVAL_MILLIS
+     * @see PAProperties#PA_VFSPROVIDER_SERVER_STREAM_OPEN_MAXIMUM_PERIOD_MILLIS
      * @see #DEFAULT_STREAM_AUTOCLOSE_CHECKING_INTERVAL_MILLIS
      * @see #DEFAULT_STREAM_OPEN_MAXIMUM_PERIOD_MILLIS
      */
@@ -128,12 +128,12 @@ public class FileSystemServerImpl implements FileSystemServer {
     }
 
     private void setupParameters() {
-        if (PAProperties.PA_VFSPROVIDER_STREAM_AUTOCLOSE_CHECKING_INTERVAL_MILLIS.isSet())
-            streamAutocloseCheckingIntervalMillis = PAProperties.PA_VFSPROVIDER_STREAM_AUTOCLOSE_CHECKING_INTERVAL_MILLIS
+        if (PAProperties.PA_VFSPROVIDER_SERVER_STREAM_AUTOCLOSE_CHECKING_INTERVAL_MILLIS.isSet())
+            streamAutocloseCheckingIntervalMillis = PAProperties.PA_VFSPROVIDER_SERVER_STREAM_AUTOCLOSE_CHECKING_INTERVAL_MILLIS
                     .getValueAsInt();
 
-        if (PAProperties.PA_VFSPROVIDER_STREAM_OPEN_MAXIMUM_PERIOD_MILLIS.isSet())
-            streamOpenMaximumPeriodMillis = PAProperties.PA_VFSPROVIDER_STREAM_OPEN_MAXIMUM_PERIOD_MILLIS
+        if (PAProperties.PA_VFSPROVIDER_SERVER_STREAM_OPEN_MAXIMUM_PERIOD_MILLIS.isSet())
+            streamOpenMaximumPeriodMillis = PAProperties.PA_VFSPROVIDER_SERVER_STREAM_OPEN_MAXIMUM_PERIOD_MILLIS
                     .getValueAsInt();
     }
 

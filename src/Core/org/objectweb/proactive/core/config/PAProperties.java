@@ -528,15 +528,15 @@ public enum PAProperties {
      * This property indicates how often an auto closing mechanism is started to collect and close
      * all unused streams open trough file system server interface.
      */
-    PA_VFSPROVIDER_STREAM_AUTOCLOSE_CHECKING_INTERVAL_MILLIS(
-            "proactive.vfsprovider.stream_autoclose_checking_millis", PAPropertiesType.INTEGER),
+    PA_VFSPROVIDER_SERVER_STREAM_AUTOCLOSE_CHECKING_INTERVAL_MILLIS(
+            "proactive.vfsprovider.server.stream_autoclose_checking_millis", PAPropertiesType.INTEGER),
 
     /**
      * This property indicates a period after that a stream is perceived as unused and therefore can
      * be closed by auto closing mechanism.
      */
-    PA_VFSPROVIDER_STREAM_OPEN_MAXIMUM_PERIOD_MILLIS(
-            "proactive.vfsprovider.stream_open_maximum_period_millis", PAPropertiesType.INTEGER),
+    PA_VFSPROVIDER_SERVER_STREAM_OPEN_MAXIMUM_PERIOD_MILLIS(
+            "proactive.vfsprovider.server.stream_open_maximum_period_millis", PAPropertiesType.INTEGER),
 
     // -------------- Misc
 

@@ -59,7 +59,7 @@ public class NodeConfigurator {
 
     private NodeApplicationConfigurator appConfigurator;
 
-    private FileSystemServerDeployer providerDeployer;
+    private FileSystemServerDeployer providerServerDeployer;
 
     private Node node;
 
@@ -94,7 +94,7 @@ public class NodeConfigurator {
         try {
             if (baseScratchConfiguration != null) {
                 if (baseScratchConfiguration.getUrl() == null) {
-                    baseScratchConfiguration = startPAProvider(baseScratchConfiguration);
+                    baseScratchConfiguration = startProActiveProviderServer(baseScratchConfiguration);
                 }
 
                 final NodeScratchSpace configuringScratchSpace = new VFSNodeScratchSpaceImpl();
@@ -104,7 +104,7 @@ public class NodeConfigurator {
             configured = true;
         } finally {
             if (!configured) {
-                tryCloseProvider();
+                tryCloseProviderServer();
                 // node scratch space is not configured (does not need close) for sure
             }
         }
@@ -191,7 +191,7 @@ public class NodeConfigurator {
         checkConfigured();
 
         tryCloseAppConfigurator();
-        tryCloseProvider();
+        tryCloseProviderServer();
         if (nodeScratchSpace != null)
             nodeScratchSpace.close();
         nodeScratchSpace = null;
@@ -218,18 +218,18 @@ public class NodeConfigurator {
         logger.info("Closed Data Spaces application node configuration");
     }
 
-    private void tryCloseProvider() {
-        if (providerDeployer == null)
+    private void tryCloseProviderServer() {
+        if (providerServerDeployer == null)
             return;
         try {
-            providerDeployer.terminate();
+            providerServerDeployer.terminate();
         } catch (ProActiveException e) {
             ProActiveLogger.logEatedException(logger, "Could not close correctly the ProActive provider", e);
         }
-        providerDeployer = null;
+        providerServerDeployer = null;
     }
 
-    private BaseScratchSpaceConfiguration startPAProvider(
+    private BaseScratchSpaceConfiguration startProActiveProviderServer(
             BaseScratchSpaceConfiguration baseScratchConfiguration) throws FileSystemException,
             ConfigurationException {
 
@@ -243,11 +243,11 @@ public class NodeConfigurator {
         try {
             final String serviceId = Utils.getRuntimeId(node) + '/' + Utils.getNodeId(node) +
                 "/fileSystemServer";
-            providerDeployer = new FileSystemServerDeployer(serviceId, rootPath, true);
+            providerServerDeployer = new FileSystemServerDeployer(serviceId, rootPath, true);
         } catch (IOException e) {
             throw new FileSystemException(e);
         }
-        serverURL = providerDeployer.getRemoteFileSystemServerURL();
+        serverURL = providerServerDeployer.getRemoteFileSystemServerURL();
         try {
             providerURL = ProActiveFileName.getServerVFSRootURL(serverURL);
         } catch (URISyntaxException e) {
