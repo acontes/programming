@@ -171,7 +171,7 @@ public interface StreamOperations {
      * This method guarantees, that if {@link StreamNotFoundException} is thrown, a corresponding
      * stream has been closed (and hence flushed).
      * <p>
-     * TODO maybe we need this kind of guarantee for each method throwing SNFException?
+     * TODO idea: do we need this kind of guarantee for each method throwing SNFException?
      * 
      * @param stream
      *            an unique id of an open stream

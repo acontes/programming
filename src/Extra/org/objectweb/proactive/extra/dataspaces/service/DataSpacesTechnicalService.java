@@ -74,7 +74,7 @@ public class DataSpacesTechnicalService implements TechnicalService {
         return new TechnicalServicesProperties(techServicesMap);
     }
 
-    // TODO What about polices determining whether to leave data in scratch or remove all directories during unexpected end of application. 
+    // TODO idea: about polices determining whether to leave or remove data and directories in scratch after unexpected end of application. 
     private static void closeNodeConfigIgnoreException(final Node node) {
         try {
             DataSpacesNodes.closeNodeConfig(node);
