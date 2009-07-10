@@ -30,20 +30,20 @@ public class ManualConfigurationExample {
         final NamingService remoteNamingService = namingServiceDeployer.getRemoteNamingService();
 
         // use some unique application id
-        final long applicationId = 88 + 666;
+        final long applicationId = 1234431;
         // register application, without predefined inputs and outputs 
         remoteNamingService.registerApplication(applicationId, null);
 
         // configure node for DS
-        final Node halfBofiesNode = NodeFactory.getHalfBodiesNode();
+        final Node halfBodiesNode = NodeFactory.getHalfBodiesNode();
 
         // hacky force application id on that node
         // FIXME oops it doesn't work: we have remote object stub + adapter, we cannot cast so easily...
-        ((ProActiveRuntimeImpl) halfBofiesNode.getProActiveRuntime()).setDeploymentId(applicationId);
+        ((ProActiveRuntimeImpl) halfBodiesNode.getProActiveRuntime()).setDeploymentId(applicationId);
 
         // node is configured without scratch
-        DataSpacesNodes.configureNode(halfBofiesNode, null);
-        DataSpacesNodes.configureApplication(halfBofiesNode, namingServiceURL);
+        DataSpacesNodes.configureNode(halfBodiesNode, null);
+        DataSpacesNodes.configureApplication(halfBodiesNode, namingServiceURL);
 
         // now we can use PADataSpaces from AO/bodies on that node.
         // in case of half-bodies node, we can use PADataSpaces from non-AO
@@ -65,7 +65,7 @@ public class ManualConfigurationExample {
         }
 
         // after using DS, we can clean up
-        DataSpacesNodes.closeNodeConfig(halfBofiesNode);
+        DataSpacesNodes.closeNodeConfig(halfBodiesNode);
         namingServiceDeployer.terminate();
         // (actually, this part should be also implemented as finally, as we should always close DS on node and NamingService)
     }
