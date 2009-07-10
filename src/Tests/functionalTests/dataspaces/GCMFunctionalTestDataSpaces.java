@@ -173,7 +173,7 @@ public class GCMFunctionalTestDataSpaces extends GCMFunctionalTest {
             rootTmpDir.mkdirs();
             assertTrue(rootTmpDir.exists());
             fileSystemServerDeployer = new FileSystemServerDeployer(
-                "ProActive-GCMFunctionalTestDataSpaces/fileSystemServer", rootTmpDir.getAbsolutePath());
+                "ProActive-GCMFunctionalTestDataSpaces/fileSystemServer", rootTmpDir.getAbsolutePath(), true);
         }
     }
 
