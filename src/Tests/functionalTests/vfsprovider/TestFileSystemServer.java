@@ -15,7 +15,7 @@ import unitTests.vfsprovider.AbstractIOOperationsTest;
 /**
  * Simple usage test.
  */
-public class FileSystemServerTest extends AbstractIOOperationsTest {
+public class TestFileSystemServer extends AbstractIOOperationsTest {
 
     @Override
     public String getTestDirFilename() {
