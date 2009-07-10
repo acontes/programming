@@ -9,6 +9,9 @@ import org.objectweb.proactive.extra.vfsprovider.client.ProActiveFileName;
 import org.objectweb.proactive.extra.vfsprovider.server.FileSystemServerDeployer;
 
 
+/**
+ * Class for starting PA Provider manually.
+ */
 public class PAProviderStarter {
 
     private static String rootDirectory;
@@ -68,7 +71,7 @@ public class PAProviderStarter {
             deployer = new FileSystemServerDeployer(rootDirectory, true);
         else
             deployer = new FileSystemServerDeployer(providerName, rootDirectory, true);
-        
+
         final String url = ProActiveFileName.getServerVFSRootURL(deployer.getRemoteFileSystemServerURL());
         System.out.println("PAProvider successfully started.\nVFS URL of this provider: " + url);
     }
