@@ -42,7 +42,6 @@ public class ProActiveProviderTest extends AbstractProviderTestConfig {
 
     @Override
     protected void setUp() throws Exception {
-        // TODO: try with autoclosing
         deployer = new FileSystemServerDeployer(AbstractVfsTestCase.getTestDirectory(), false);
     }
 
