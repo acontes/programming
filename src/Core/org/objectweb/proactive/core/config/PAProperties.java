@@ -522,6 +522,22 @@ public enum PAProperties {
      */
     PA_DATASPACES_SCRATCH_PATH("proactive.dataspaces.scratch_path", PAPropertiesType.STRING),
 
+    // -------------- VFS PROVIDER
+
+    /**
+     * This property indicates how often an auto closing mechanism is started to collect and close
+     * all unused streams open trough file system server interface.
+     */
+    PA_VFSPROVIDER_STREAM_AUTOCLOSE_CHECKING_INTERVAL_MILLIS(
+            "proactive.vfsprovider.stream_autoclose_checking_millis", PAPropertiesType.INTEGER),
+
+    /**
+     * This property indicates a period after that a stream is perceived as unused and therefore can
+     * be closed by auto closing mechanism.
+     */
+    PA_VFSPROVIDER_STREAM_OPEN_MAXIMUM_PERIOD_MILLIS(
+            "proactive.vfsprovider.stream_open_maximum_period_millis", PAPropertiesType.INTEGER),
+
     // -------------- Misc
 
     /**
