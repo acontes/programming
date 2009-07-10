@@ -37,9 +37,9 @@ public class ManualConfigurationExample {
         // configure node for DS
         final Node halfBodiesNode = NodeFactory.getHalfBodiesNode();
 
-        // hacky force application id on that node
-        // FIXME oops it doesn't work: we have remote object stub + adapter, we cannot cast so easily...
-        ((ProActiveRuntimeImpl) halfBodiesNode.getProActiveRuntime()).setDeploymentId(applicationId);
+        // hacky force application id on that runtime
+        // FIXME it does not work, as deployment id is cached on ProActiveRuntimeRemoteObjectAdapter 
+        ProActiveRuntimeImpl.getProActiveRuntime().setDeploymentId(applicationId);
 
         // node is configured without scratch
         DataSpacesNodes.configureNode(halfBodiesNode, null);
