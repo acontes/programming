@@ -171,7 +171,11 @@ public interface StreamOperations {
      * This method guarantees, that if {@link StreamNotFoundException} is thrown, a corresponding
      * stream has been closed (and hence flushed).
      * <p>
-     * TODO idea: do we need this kind of guarantee for each method throwing SNFException?
+     * FIXME: most probably we need this kind of guarantee for each method that can be called by
+     * stream opened in random/sequential WRITE mode and throwing SNFException. consider this
+     * execution related to 1 file: open(), write("abc"), AUTOCLOSE, write("def") resulting in SNF
+     * while autoclosing not finished, open(), write("def") which may corrupt file if happened
+     * before autoclosing finished
      * 
      * @param stream
      *            an unique id of an open stream
