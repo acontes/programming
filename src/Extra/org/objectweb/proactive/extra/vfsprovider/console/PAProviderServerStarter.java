@@ -5,8 +5,7 @@ import java.net.URISyntaxException;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.extra.vfsprovider.client.ProActiveFileName;
-import org.objectweb.proactive.extra.vfsprovider.server.FileSystemServerDeployer;
+import org.objectweb.proactive.extra.vfsprovider.FileSystemServerDeployer;
 
 
 /**
@@ -25,7 +24,7 @@ public class PAProviderServerStarter {
      * @throws IOException
      * @throws URISyntaxException
      */
-    public static void main(String[] args) throws IOException, URISyntaxException {
+    public static void main(String[] args) throws IOException {
         final String name = PAProviderServerStarter.class.getName();
 
         try {
@@ -67,13 +66,13 @@ public class PAProviderServerStarter {
         });
     }
 
-    private static void startServer() throws IOException, URISyntaxException {
+    private static void startServer() throws IOException {
         if (providerName == null)
             deployer = new FileSystemServerDeployer(rootDirectory, true);
         else
             deployer = new FileSystemServerDeployer(providerName, rootDirectory, true);
 
-        final String url = ProActiveFileName.getServerVFSRootURL(deployer.getRemoteFileSystemServerURL());
+        final String url = deployer.getVFSRootURL();
         System.out.println("PAProvider successfully started.\nVFS URL of this provider: " + url);
     }
 

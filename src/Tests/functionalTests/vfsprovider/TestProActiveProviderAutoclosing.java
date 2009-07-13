@@ -23,8 +23,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.extra.dataspaces.vfs.VFSFactory;
-import org.objectweb.proactive.extra.vfsprovider.client.ProActiveFileName;
-import org.objectweb.proactive.extra.vfsprovider.server.FileSystemServerDeployer;
+import org.objectweb.proactive.extra.vfsprovider.FileSystemServerDeployer;
 
 import unitTests.vfsprovider.AbstractIOOperationsBase;
 
@@ -91,8 +90,6 @@ public class TestProActiveProviderAutoclosing extends AbstractIOOperationsBase {
         PAProperties.PA_VFSPROVIDER_SERVER_STREAM_AUTOCLOSE_CHECKING_INTERVAL_MILLIS.setValue(CHECKING_TIME);
         PAProperties.PA_VFSPROVIDER_SERVER_STREAM_OPEN_MAXIMUM_PERIOD_MILLIS.setValue(AUTOCLOSE_TIME);
         serverDeployer = new FileSystemServerDeployer(testDir.getAbsolutePath(), true);
-        serverVFSRootURL = ProActiveFileName.getServerVFSRootURL(serverDeployer
-                .getRemoteFileSystemServerURL());
 
         // set up VFS manager with ProActiveProvider
         vfsManager = VFSFactory.createDefaultFileSystemManager();
@@ -107,7 +104,6 @@ public class TestProActiveProviderAutoclosing extends AbstractIOOperationsBase {
 
         if (serverDeployer != null) {
             serverDeployer.terminate();
-            serverVFSRootURL = null;
             serverDeployer = null;
         }
     }
@@ -359,6 +355,6 @@ public class TestProActiveProviderAutoclosing extends AbstractIOOperationsBase {
     }
 
     private FileObject openFileObject(final String fileName) throws FileSystemException {
-        return vfsManager.resolveFile(serverVFSRootURL).resolveFile(fileName);
+        return vfsManager.resolveFile(serverDeployer.getVFSRootURL()).resolveFile(fileName);
     }
 }

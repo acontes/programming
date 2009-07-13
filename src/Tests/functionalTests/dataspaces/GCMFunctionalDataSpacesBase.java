@@ -7,7 +7,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.junit.After;
@@ -17,8 +16,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.extensions.calcium.system.SkeletonSystemImpl;
-import org.objectweb.proactive.extra.vfsprovider.client.ProActiveFileName;
-import org.objectweb.proactive.extra.vfsprovider.server.FileSystemServerDeployer;
+import org.objectweb.proactive.extra.vfsprovider.FileSystemServerDeployer;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
 import functionalTests.FunctionalTest;
@@ -105,8 +103,7 @@ public class GCMFunctionalDataSpacesBase extends GCMFunctionalTest {
         writer.close();
     }
 
-    public GCMFunctionalDataSpacesBase(int hostCapacity, int vmCapacity) throws URISyntaxException,
-            IOException {
+    public GCMFunctionalDataSpacesBase(int hostCapacity, int vmCapacity) throws IOException {
         super(dataSpacesApplicationDescriptor);
         this.hostCapacity = hostCapacity;
         this.vmCapacity = vmCapacity;
@@ -118,8 +115,7 @@ public class GCMFunctionalDataSpacesBase extends GCMFunctionalTest {
         rootTmpDir = new File(System.getProperty("java.io.tmpdir"), "ProActive-GCMFunctionalDataSpacesBase");
         // hacks to get URL here
         tryStartFileSystemServer();
-        fileSystemServerRootURL = ProActiveFileName.getServerVFSRootURL(fileSystemServerDeployer
-                .getRemoteFileSystemServerURL());
+        fileSystemServerRootURL = fileSystemServerDeployer.getVFSRootURL();
 
         inputDefaultWithDirLocalHandle = new File(rootTmpDir, "inputDefaultWithDir");
         inputWithDirLocalHandle = new File(rootTmpDir, "inputWithDir");

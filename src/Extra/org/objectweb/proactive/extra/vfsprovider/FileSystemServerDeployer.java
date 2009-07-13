@@ -1,17 +1,23 @@
-package org.objectweb.proactive.extra.vfsprovider.server;
+package org.objectweb.proactive.extra.vfsprovider;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 import org.objectweb.proactive.api.PARemoteObject;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.vfsprovider.client.ProActiveFileName;
 import org.objectweb.proactive.extra.vfsprovider.protocol.FileSystemServer;
+import org.objectweb.proactive.extra.vfsprovider.server.FileSystemServerImpl;
 
 
 /**
  * Deploys {@link FileSystemServer} with instance of {@link FileSystemServerImpl} implementation on
- * the local runtime.
+ * the local runtime and provides URL access methods.
  */
 public class FileSystemServerDeployer {
 
@@ -19,6 +25,9 @@ public class FileSystemServerDeployer {
 
     /** URL of the remote object */
     final private String url;
+
+    /** URL of root file exposed through that server */
+    private String vfsRootURL;
 
     private FileSystemServerImpl fileSystemServer;
 
@@ -49,6 +58,12 @@ public class FileSystemServerDeployer {
         roe = PARemoteObject.newRemoteObject(FileSystemServer.class.getName(), this.fileSystemServer);
         roe.createRemoteObject(name);
         url = roe.getURL();
+        try {
+            vfsRootURL = ProActiveFileName.getServerVFSRootURL(url);
+        } catch (URISyntaxException e) {
+            ProActiveLogger.logImpossibleException(ProActiveLogger.getLogger(Loggers.VFS_PROVIDER_SERVER), e);
+            throw new ProActiveRuntimeException(e);
+        }
         if (autoclosing)
             fileSystemServer.startAutoClosing();
     }
@@ -61,8 +76,18 @@ public class FileSystemServerDeployer {
         return (FileSystemServer) RemoteObjectHelper.generatedObjectStub(this.roe.getRemoteObject());
     }
 
+    /**
+     * <strong>internal use only!</strong>
+     */
     public String getRemoteFileSystemServerURL() {
         return this.url;
+    }
+
+    /**
+     * @return URL pointing to root file exposed by this provider server; suitable for VFS provider
+     */
+    public String getVFSRootURL() {
+        return vfsRootURL;
     }
 
     /**

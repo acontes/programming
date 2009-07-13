@@ -24,10 +24,10 @@ import org.apache.commons.vfs.impl.DefaultFileSystemManager;
 import org.apache.commons.vfs.test.ProviderTestConfig;
 import org.apache.commons.vfs.test.ProviderTestSuite;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.extra.vfsprovider.FileSystemServerDeployer;
 import org.objectweb.proactive.extra.vfsprovider.client.ProActiveFileName;
 import org.objectweb.proactive.extra.vfsprovider.client.ProActiveFileProvider;
 import org.objectweb.proactive.extra.vfsprovider.client.ProActiveFileName.ProActiveProviderScheme;
-import org.objectweb.proactive.extra.vfsprovider.server.FileSystemServerDeployer;
 
 import unitTests.vfsprovider.AbstractIOOperationsBase;
 
@@ -92,8 +92,7 @@ public class ProActiveProviderTest extends TestCase implements ProviderTestConfi
     }
 
     public FileObject getBaseTestFolder(FileSystemManager fs) throws Exception {
-        final String serverURL = deployer.getRemoteFileSystemServerURL();
-        final String vfsRootURL = ProActiveFileName.getServerVFSRootURL(serverURL);
+        final String vfsRootURL = deployer.getVFSRootURL();
         return fs.resolveFile(vfsRootURL);
     }
 

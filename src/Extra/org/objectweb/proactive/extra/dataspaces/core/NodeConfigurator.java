@@ -9,7 +9,6 @@ import java.net.URISyntaxException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -21,8 +20,7 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationExceptio
 import org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException;
 import org.objectweb.proactive.extra.dataspaces.vfs.VFSNodeScratchSpaceImpl;
 import org.objectweb.proactive.extra.dataspaces.vfs.VFSSpacesMountManagerImpl;
-import org.objectweb.proactive.extra.vfsprovider.client.ProActiveFileName;
-import org.objectweb.proactive.extra.vfsprovider.server.FileSystemServerDeployer;
+import org.objectweb.proactive.extra.vfsprovider.FileSystemServerDeployer;
 
 
 /**
@@ -233,8 +231,6 @@ public class NodeConfigurator {
             BaseScratchSpaceConfiguration baseScratchConfiguration) throws FileSystemException,
             ConfigurationException {
 
-        final String serverURL;
-        final String providerURL;
         final String rootPath = baseScratchConfiguration.getPath();
         final File rootFile = new File(rootPath);
 
@@ -247,14 +243,8 @@ public class NodeConfigurator {
         } catch (IOException e) {
             throw new FileSystemException(e);
         }
-        serverURL = providerServerDeployer.getRemoteFileSystemServerURL();
-        try {
-            providerURL = ProActiveFileName.getServerVFSRootURL(serverURL);
-        } catch (URISyntaxException e) {
-            logger.error("Self-created URL is malformed", e);
-            throw new ProActiveRuntimeException(e);
-        }
-        return baseScratchConfiguration.getWithRemoteAccess(providerURL);
+        final String vfsRootURL = providerServerDeployer.getVFSRootURL();
+        return baseScratchConfiguration.getWithRemoteAccess(vfsRootURL);
     }
 
     private void checkConfigured() throws IllegalStateException {
