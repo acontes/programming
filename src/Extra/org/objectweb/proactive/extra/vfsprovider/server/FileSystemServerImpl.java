@@ -203,65 +203,101 @@ public class FileSystemServerImpl implements FileSystemServer {
     }
 
     public void streamClose(long stream) throws IOException, StreamNotFoundException {
-        final Stream instance = tryGetAndRemoveStreamOrWound(stream);
-        synchronized (instance) {
-            instance.close();
-            streamsToClose.remove(stream);
-            instance.notifyAll();
+        try {
+            final Stream instance = tryGetAndRemoveStreamOrWound(stream);
+            synchronized (instance) {
+                instance.close();
+                streamsToClose.remove(stream);
+                instance.notifyAll();
+            }
+        } catch (StreamNotFoundException notFound) {
+            waitUntilStreamIsClosed(stream);
+            throw notFound;
         }
     }
 
     public long streamGetLength(long stream) throws IOException, StreamNotFoundException,
             WrongStreamTypeException {
-        final Stream instance = tryGetStreamOrWound(stream);
-        synchronized (instance) {
-            checkContainsStreamOrWound(stream);
-            return instance.getLength();
+        try {
+            final Stream instance = tryGetStreamOrWound(stream);
+            synchronized (instance) {
+                checkContainsStreamOrWound(stream);
+                return instance.getLength();
+            }
+        } catch (StreamNotFoundException notFound) {
+            waitUntilStreamIsClosed(stream);
+            throw notFound;
         }
     }
 
     public long streamGetPosition(long stream) throws IOException, StreamNotFoundException,
             WrongStreamTypeException {
-        final Stream instance = tryGetStreamOrWound(stream);
-        synchronized (instance) {
-            checkContainsStreamOrWound(stream);
-            return instance.getPosition();
+        try {
+            final Stream instance = tryGetStreamOrWound(stream);
+            synchronized (instance) {
+                checkContainsStreamOrWound(stream);
+                return instance.getPosition();
+            }
+        } catch (StreamNotFoundException notFound) {
+            waitUntilStreamIsClosed(stream);
+            throw notFound;
         }
     }
 
     public byte[] streamRead(long stream, int bytes) throws IOException, StreamNotFoundException,
             WrongStreamTypeException {
-        final Stream instance = tryGetStreamOrWound(stream);
-        synchronized (instance) {
-            checkContainsStreamOrWound(stream);
-            return instance.read(bytes);
+        try {
+            final Stream instance = tryGetStreamOrWound(stream);
+            synchronized (instance) {
+                checkContainsStreamOrWound(stream);
+                return instance.read(bytes);
+            }
+        } catch (StreamNotFoundException notFound) {
+            waitUntilStreamIsClosed(stream);
+            throw notFound;
         }
     }
 
     public void streamSeek(long stream, long position) throws IOException, StreamNotFoundException,
             WrongStreamTypeException {
-        final Stream instance = tryGetStreamOrWound(stream);
-        synchronized (instance) {
-            checkContainsStreamOrWound(stream);
-            instance.seek(position);
+        try {
+            final Stream instance = tryGetStreamOrWound(stream);
+            synchronized (instance) {
+                checkContainsStreamOrWound(stream);
+                instance.seek(position);
+            }
+        } catch (StreamNotFoundException notFound) {
+            waitUntilStreamIsClosed(stream);
+            throw notFound;
         }
     }
 
     public long streamSkip(long stream, long bytes) throws IOException, StreamNotFoundException,
             WrongStreamTypeException {
-        final Stream instance = tryGetStreamOrWound(stream);
-        synchronized (instance) {
-            checkContainsStreamOrWound(stream);
-            return instance.skip(bytes);
+        try {
+            final Stream instance = tryGetStreamOrWound(stream);
+            synchronized (instance) {
+                checkContainsStreamOrWound(stream);
+                return instance.skip(bytes);
+            }
+        } catch (StreamNotFoundException notFound) {
+            waitUntilStreamIsClosed(stream);
+            throw notFound;
         }
+
     }
 
     public void streamWrite(long stream, byte[] data) throws IOException, StreamNotFoundException,
             WrongStreamTypeException {
-        final Stream instance = tryGetStreamOrWound(stream);
-        synchronized (instance) {
-            checkContainsStreamOrWound(stream);
-            instance.write(data);
+        try {
+            final Stream instance = tryGetStreamOrWound(stream);
+            synchronized (instance) {
+                checkContainsStreamOrWound(stream);
+                instance.write(data);
+            }
+        } catch (StreamNotFoundException notFound) {
+            waitUntilStreamIsClosed(stream);
+            throw notFound;
         }
     }
 
@@ -270,24 +306,13 @@ public class FileSystemServerImpl implements FileSystemServer {
 
         try {
             final Stream instance = tryGetStreamOrWound(stream);
-
             synchronized (instance) {
                 checkContainsStreamOrWound(stream);
                 instance.flush();
                 return;
             }
         } catch (StreamNotFoundException notFound) {
-            // be sure that a stream instance is closed successfully
-            final Stream instance = streamsToClose.get(stream);
-
-            if (instance != null)
-                synchronized (instance) {
-                    while (streamsToClose.containsKey(stream))
-                        try {
-                            instance.wait();
-                        } catch (InterruptedException e) {
-                        }
-                }
+            waitUntilStreamIsClosed(stream);
             throw notFound;
         }
     }
@@ -389,6 +414,19 @@ public class FileSystemServerImpl implements FileSystemServer {
         } catch (SecurityException sec) {
             throw new IOException(sec);
         }
+    }
+
+    private void waitUntilStreamIsClosed(long stream) {
+        // be sure that a stream instance is closed successfully
+        final Stream instance = streamsToClose.get(stream);
+        if (instance != null)
+            synchronized (instance) {
+                while (streamsToClose.containsKey(stream))
+                    try {
+                        instance.wait();
+                    } catch (InterruptedException e) {
+                    }
+            }
     }
 
     /*

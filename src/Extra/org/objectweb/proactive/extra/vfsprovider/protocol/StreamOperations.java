@@ -50,6 +50,9 @@ public interface StreamOperations {
     /**
      * Read number of bytes <code>bytes</code> from an open stream defined by unique id that was
      * previously returned by {@link #streamOpen(String, StreamMode)} method call.
+     * <p>
+     * This method guarantees, that if {@link StreamNotFoundException} is thrown, a corresponding
+     * stream has been closed
      * 
      * @param stream
      *            an unique id of an open stream
@@ -60,7 +63,7 @@ public interface StreamOperations {
      * @throws IOException
      *             if an I/O error occurred while performing this method
      * @throws StreamNotFoundException
-     *             if specified stream unique id has not been found or it has been closed
+     *             if specified stream unique id has not been found or it has been already closed
      * @throws WrongStreamTypeException
      *             when mode of a stream does not allow to call this method
      */
@@ -70,6 +73,9 @@ public interface StreamOperations {
     /**
      * Write an array of bytes into an open stream specified by an unique id that was previously
      * returned by {@link #streamOpen(String, StreamMode)} method call.
+     * <p>
+     * This method guarantees, that if {@link StreamNotFoundException} is thrown, a corresponding
+     * stream has been closed
      * 
      * @param stream
      *            an unique id of an open stream
@@ -78,7 +84,7 @@ public interface StreamOperations {
      * @throws IOException
      *             if an I/O error occurred while performing this method
      * @throws StreamNotFoundException
-     *             if specified stream unique id has not been found or it has been closed
+     *             if specified stream unique id has not been found or it has been already closed
      * @throws WrongStreamTypeException
      *             when mode of a stream does not allow to call this method
      */
@@ -91,6 +97,9 @@ public interface StreamOperations {
      * indicates the position of a next read or write into a stream. Seek operation with
      * <code>position</code> exceeding the EOF will not affect the file length, unless any write
      * operation is performed in the new position.
+     * <p>
+     * This method guarantees, that if {@link StreamNotFoundException} is thrown, a corresponding
+     * stream has been closed
      * 
      * @param stream
      *            an unique id of an open stream
@@ -100,7 +109,7 @@ public interface StreamOperations {
      *             if an I/O error occurred while performing this method or position is a negative
      *             number
      * @throws StreamNotFoundException
-     *             if specified stream unique id has not been found or it has been closed
+     *             if specified stream unique id has not been found or it has been already closed
      * @throws WrongStreamTypeException
      *             when mode of a stream does not allow to call this method
      */
@@ -110,6 +119,9 @@ public interface StreamOperations {
     /**
      * Return the length of a file represented by a stream that has been once open by
      * {@link #streamOpen(String, StreamMode)} method call. Stream is identified by an unique id.
+     * <p>
+     * This method guarantees, that if {@link StreamNotFoundException} is thrown, a corresponding
+     * stream has been closed
      * 
      * @param stream
      *            an unique id of an open stream
@@ -117,7 +129,7 @@ public interface StreamOperations {
      * @throws IOException
      *             if an I/O error occurred while performing this method
      * @throws StreamNotFoundException
-     *             if specified stream unique id has not been found or it has been closed
+     *             if specified stream unique id has not been found or it has been already closed
      * @throws WrongStreamTypeException
      *             when mode of a stream does not allow to call this method
      */
@@ -128,6 +140,9 @@ public interface StreamOperations {
      * Return the position of a file stream pointer specified by an unique id that was previously
      * returned by {@link #streamOpen(String, StreamMode)} method call. This stream pointer
      * indicates the position of a next read or write into a stream.
+     * <p>
+     * This method guarantees, that if {@link StreamNotFoundException} is thrown, a corresponding
+     * stream has been closed
      * 
      * @param stream
      *            an unique id of an open stream
@@ -135,7 +150,7 @@ public interface StreamOperations {
      * @throws IOException
      *             if an I/O error occurred while performing this method
      * @throws StreamNotFoundException
-     *             if specified stream unique id has not been found or it has been closed
+     *             if specified stream unique id has not been found or it has been already closed
      * @throws WrongStreamTypeException
      *             when mode of a stream does not allow to call this method
      */
@@ -147,6 +162,9 @@ public interface StreamOperations {
      * that was previously returned by {@link #streamOpen(String, StreamMode)} method call. From a
      * variety of reasons this method call may skip less that specified number of bytes. If
      * <code>bytes</code> is negative, no bytes are skipped.
+     * <p>
+     * This method guarantees, that if {@link StreamNotFoundException} is thrown, a corresponding
+     * stream has been closed
      * 
      * @param stream
      *            an unique id of an open stream
@@ -156,7 +174,7 @@ public interface StreamOperations {
      * @throws IOException
      *             if an I/O error occurred while performing this method
      * @throws StreamNotFoundException
-     *             if specified stream unique id has not been found or it has been closed
+     *             if specified stream unique id has not been found or it has been already closed
      * @throws WrongStreamTypeException
      *             when mode of a stream does not allow to call this method
      */
@@ -170,19 +188,13 @@ public interface StreamOperations {
      * <p>
      * This method guarantees, that if {@link StreamNotFoundException} is thrown, a corresponding
      * stream has been closed (and hence flushed).
-     * <p>
-     * FIXME: most probably we need this kind of guarantee for each method that can be called by
-     * stream opened in random/sequential WRITE mode and throwing SNFException. consider this
-     * execution related to 1 file: open(), write("abc"), AUTOCLOSE, write("def") resulting in SNF
-     * while autoclosing not finished, open(), write("def") which may corrupt file if happened
-     * before autoclosing finished
      * 
      * @param stream
      *            an unique id of an open stream
      * @throws IOException
      *             if an I/O error occurred while performing this method
      * @throws StreamNotFoundException
-     *             if specified stream unique id has not been found or it has been closed correctly
+     *             if specified stream unique id has not been found or it has been already closed
      * @throws WrongStreamTypeException
      *             when mode of a stream does not allow to call this method
      */
