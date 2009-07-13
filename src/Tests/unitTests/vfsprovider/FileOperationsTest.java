@@ -249,11 +249,10 @@ public class FileOperationsTest extends AbstractIOOperationsTest {
         server.fileDelete(dirPath, false);
     }
 
-    @Test
+    @Test(expected = IOException.class)
     public void deleteRootRecursively() throws IOException {
         final String path = TEST_SEPARATOR;
         server.fileDelete(path, true);
-        assertEquals(0, server.fileListChildren(path).size());
     }
 
     @Test(expected = IOException.class)

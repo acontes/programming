@@ -314,22 +314,12 @@ public class FileSystemServerImpl implements FileSystemServer {
         final String canonicalPath;
         try {
             canonicalPath = file.getCanonicalPath();
-
+            if (canonicalPath.equals(rootCanonicalPath))
+                throw new IOException("Cannot delete a root directory");
             if (recursive)
                 deleteRecursive(file);
-            if (file.isDirectory()) {
-                final String[] children = file.list();
-                checkConditionIsTrue(children != null, "An IO error occured while listing directory");
-                checkConditionIsTrue(children.length == 0, "Unable to delete a not empty directory");
-            }
-            if (!canonicalPath.equals(rootCanonicalPath)) {
-                try {
-                    file.delete();
-                } catch (SecurityException sec) {
-                    throw new IOException(sec);
-                }
-                checkConditionIsTrue(!file.exists(), "Unable to delete a file");
-            }
+            file.delete();
+            checkConditionIsTrue(!file.exists(), "Unable to delete a file");
         } catch (SecurityException sec) {
             throw new IOException(sec);
         }
@@ -477,7 +467,7 @@ public class FileSystemServerImpl implements FileSystemServer {
         if (file.isDirectory()) {
             final File[] children = file.listFiles();
             if (children != null)
-                for (File child : file.listFiles()) {
+                for (File child : children) {
                     deleteRecursive(child);
                     child.delete();
                 }

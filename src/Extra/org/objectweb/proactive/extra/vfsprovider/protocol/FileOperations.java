@@ -75,11 +75,6 @@ public interface FileOperations {
      */
     public abstract void fileCreate(String path, FileType type) throws IOException;
 
-    // TODO: idea: maybe "rm -r /" should be disallowed?
-    // TODO/FIXME: this method silently exists when given fileDelete("/", false);
-    // TODO: another discussion is whether fileDlete("/", true) should silently delete everything except "/"
-    // which is against VFS API and differs from somehow comparable tested FTP server implementation;
-    // we should perhaps check some other protocols and their providers, how they handle that
     /**
      * Delete a file specified by given abstract <code>path</code>. When specified file is a
      * directory, then it must be empty, unless the recursive deleting is specified. This method
@@ -87,9 +82,7 @@ public interface FileOperations {
      * <p>
      * Note: The postcondition check may be influenced by any concurrent file system operation.
      * <p>
-     * Whole file system content (all descendant files) can be deleted when specified its root path
-     * along with recursive option. When attempting to delete not existing file, this method
-     * terminates normally.
+     * When attempting to delete not existing file, this method terminates normally.
      * 
      * @param path
      *            of a file that is to be deleted, cannot be <code>null</code>
