@@ -30,17 +30,13 @@ import unitTests.vfsprovider.AbstractIOOperationsTest;
 /**
  * ProActiveProvider and FileSystemServerImpl tests for autoclosing feature.
  */
-public class TestProActiveProviderAutoclosing {
+public class TestProActiveProviderAutoclosing extends AbstractIOOperationsTest {
     private static final int AUTOCLOSE_TIME = 100;
     private static final int CHECKING_TIME = 10;
     private static final int SLEEP_TIME = AUTOCLOSE_TIME * 3;
-    private static final String EXISTING_FILE_NAME = "existing_file.txt";
     // big enough to ignore buffering behavior
-    private static final int EXISTING_FILE_A_CHARS_NUMBER = 1000000;
-    private static final int EXISTING_FILE_B_CHARS_NUMBER = 1000000;
-
-    private final static File testDir = new File(System.getProperty("java.io.tmpdir"),
-        "ProActive-TestProaActiveProviderAutoclosing");
+    private static final int TEST_FILE_A_CHARS_NUMBER = 1000000;
+    private static final int TEST_FILE_B_CHARS_NUMBER = 1000000;
 
     private static BufferedReader openBufferedReader(final FileObject fo) throws FileSystemException {
         return new BufferedReader(new InputStreamReader(openInputStream(fo)));
@@ -70,14 +66,12 @@ public class TestProActiveProviderAutoclosing {
 
     @Before
     public void setUp() throws Exception {
-        // create directory with content; unfortunately we cannot easily reuse AbstractIOFileOperations (setUp order)
-        assertTrue(testDir.mkdirs());
-        assertTrue(testDir.exists());
-        final Writer writer = new BufferedWriter(new FileWriter(new File(testDir, EXISTING_FILE_NAME)));
-        for (int i = 0; i < EXISTING_FILE_A_CHARS_NUMBER; i++) {
+        // overwrite TEST_FILENAME with content for our needs
+        final Writer writer = new BufferedWriter(new FileWriter(new File(testDir, TEST_FILENAME)));
+        for (int i = 0; i < TEST_FILE_A_CHARS_NUMBER; i++) {
             writer.write("a");
         }
-        for (int i = 0; i < EXISTING_FILE_B_CHARS_NUMBER; i++) {
+        for (int i = 0; i < TEST_FILE_B_CHARS_NUMBER; i++) {
             writer.write("b");
         }
         writer.close();
@@ -104,10 +98,6 @@ public class TestProActiveProviderAutoclosing {
             serverDeployer.terminate();
             serverVFSRootURL = null;
             serverDeployer = null;
-        }
-
-        if (testDir.exists()) {
-            AbstractIOOperationsTest.deleteRecursively(testDir);
         }
     }
 
@@ -157,11 +147,11 @@ public class TestProActiveProviderAutoclosing {
 
     @Test
     public void testInputStreamOpenAutocloseRead() throws Exception {
-        final FileObject fo = openFileObject(EXISTING_FILE_NAME);
+        final FileObject fo = openFileObject(TEST_FILENAME);
         final BufferedReader reader = openBufferedReader(fo);
         try {
             Thread.sleep(SLEEP_TIME);
-            for (int i = 0; i < EXISTING_FILE_A_CHARS_NUMBER; i++) {
+            for (int i = 0; i < TEST_FILE_A_CHARS_NUMBER; i++) {
                 assertTrue('a' == reader.read());
             }
         } finally {
@@ -172,14 +162,14 @@ public class TestProActiveProviderAutoclosing {
 
     @Test
     public void testInputStreamOpenReadAutocloseRead() throws Exception {
-        final FileObject fo = openFileObject(EXISTING_FILE_NAME);
+        final FileObject fo = openFileObject(TEST_FILENAME);
         final BufferedReader reader = openBufferedReader(fo);
         try {
-            for (int i = 0; i < EXISTING_FILE_A_CHARS_NUMBER; i++) {
+            for (int i = 0; i < TEST_FILE_A_CHARS_NUMBER; i++) {
                 assertTrue('a' == reader.read());
             }
             Thread.sleep(SLEEP_TIME);
-            for (int i = 0; i < EXISTING_FILE_B_CHARS_NUMBER; i++) {
+            for (int i = 0; i < TEST_FILE_B_CHARS_NUMBER; i++) {
                 assertTrue('b' == reader.read());
             }
         } finally {
@@ -190,11 +180,11 @@ public class TestProActiveProviderAutoclosing {
 
     @Test
     public void testInputStreamOpenSkipAutocloseRead() throws Exception {
-        final FileObject fo = openFileObject(EXISTING_FILE_NAME);
+        final FileObject fo = openFileObject(TEST_FILENAME);
         // we have to use input stream to avoid Readers buffering (input stream buffering is ok) 
         final InputStream is = openInputStream(fo);
         try {
-            is.skip(EXISTING_FILE_A_CHARS_NUMBER);
+            is.skip(TEST_FILE_A_CHARS_NUMBER);
             Thread.sleep(SLEEP_TIME);
             assertTrue('b' == is.read());
         } finally {
