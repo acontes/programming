@@ -15,7 +15,9 @@ import java.io.Writer;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
+import org.apache.commons.vfs.RandomAccessContent;
 import org.apache.commons.vfs.impl.DefaultFileSystemManager;
+import org.apache.commons.vfs.util.RandomAccessMode;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,7 +41,7 @@ public class TestProActiveProviderAutoclosing extends AbstractIOOperationsTest {
     private static final int TEST_FILE_B_CHARS_NUMBER = 1000000;
 
     private static BufferedReader openBufferedReader(final FileObject fo) throws FileSystemException {
-        return new BufferedReader(new InputStreamReader(openInputStream(fo)));
+        return getBufferedReader(openInputStream(fo));
     }
 
     private static InputStream openInputStream(final FileObject fo) throws FileSystemException {
@@ -48,6 +50,15 @@ public class TestProActiveProviderAutoclosing extends AbstractIOOperationsTest {
 
     private static OutputStreamWriter openWriter(final FileObject fo) throws FileSystemException {
         return new OutputStreamWriter(fo.getContent().getOutputStream());
+    }
+
+    private static RandomAccessContent openRandomAccessContent(final FileObject fo,
+            final RandomAccessMode mode) throws FileSystemException {
+        return fo.getContent().getRandomAccessContent(mode);
+    }
+
+    private static BufferedReader getBufferedReader(final InputStream is) throws FileSystemException {
+        return new BufferedReader(new InputStreamReader(is));
     }
 
     private static void assertContentEquals(final FileObject fo, final String expectedContent)
@@ -193,7 +204,159 @@ public class TestProActiveProviderAutoclosing extends AbstractIOOperationsTest {
         fo.close();
     }
 
-    // TODO randomAccess read-only and read-write
+    @Test
+    public void testRandomReadWriteAccessOpenAutocloseWrite() throws Exception {
+        final FileObject fo = openFileObject("out.txt");
+        fo.createFile();
+        final RandomAccessContent rac = openRandomAccessContent(fo, RandomAccessMode.READWRITE);
+        try {
+            Thread.sleep(SLEEP_TIME);
+            rac.write("test".getBytes());
+        } finally {
+            rac.close();
+        }
+        assertContentEquals(fo, "test");
+        fo.close();
+    }
+
+    @Test
+    public void testRandomReadWriteAccessOpenWriteAutocloseGetPosWrite() throws Exception {
+        final FileObject fo = openFileObject("out.txt");
+        fo.createFile();
+        final RandomAccessContent rac = openRandomAccessContent(fo, RandomAccessMode.READWRITE);
+        try {
+            rac.write("abc".getBytes());
+            Thread.sleep(SLEEP_TIME);
+            assertEquals("abc".getBytes().length, rac.getFilePointer());
+            rac.write("def".getBytes());
+        } finally {
+            rac.close();
+        }
+        assertContentEquals(fo, "abcdef");
+        fo.close();
+    }
+
+    @Test
+    public void testRandomReadWriteAccessOpenWriteSeekAutocloseGetPosWrite() throws Exception {
+        final FileObject fo = openFileObject("out.txt");
+        fo.createFile();
+        final RandomAccessContent rac = openRandomAccessContent(fo, RandomAccessMode.READWRITE);
+        try {
+            rac.write("abcdef".getBytes());
+            rac.seek("abc".getBytes().length);
+            Thread.sleep(SLEEP_TIME);
+            assertEquals("abc".getBytes().length, rac.getFilePointer());
+            rac.write("ghi".getBytes());
+        } finally {
+            rac.close();
+        }
+        assertContentEquals(fo, "abcghi");
+        fo.close();
+    }
+
+    @Test
+    public void testRandomReadOnlyAccessOpenAutocloseRead() throws Exception {
+        final FileObject fo = openFileObject(TEST_FILENAME);
+        final RandomAccessContent rac = openRandomAccessContent(fo, RandomAccessMode.READ);
+        try {
+            Thread.sleep(SLEEP_TIME);
+            for (int i = 0; i < TEST_FILE_A_CHARS_NUMBER; i++) {
+                assertTrue('a' == rac.readByte());
+            }
+        } finally {
+            rac.close();
+        }
+        fo.close();
+    }
+
+    @Test
+    public void testRandomReadOnlyAccessOpenReadAutocloseRead() throws Exception {
+        final FileObject fo = openFileObject(TEST_FILENAME);
+        final RandomAccessContent rac = openRandomAccessContent(fo, RandomAccessMode.READ);
+        try {
+            for (int i = 0; i < TEST_FILE_A_CHARS_NUMBER; i++) {
+                assertTrue('a' == rac.readByte());
+            }
+            Thread.sleep(SLEEP_TIME);
+            for (int i = 0; i < TEST_FILE_B_CHARS_NUMBER; i++) {
+                assertTrue('b' == rac.readByte());
+            }
+        } finally {
+            rac.close();
+        }
+        fo.close();
+    }
+
+    @Test
+    public void testRandomReadOnlyAccessOpenReadSeekAutocloseGetPosRead() throws Exception {
+        final FileObject fo = openFileObject(TEST_FILENAME);
+        final RandomAccessContent rac = openRandomAccessContent(fo, RandomAccessMode.READ);
+        try {
+            rac.readByte();
+            rac.seek(TEST_FILE_A_CHARS_NUMBER);
+            Thread.sleep(SLEEP_TIME);
+            assertEquals(TEST_FILE_A_CHARS_NUMBER, rac.getFilePointer());
+            assertTrue('b' == rac.readByte());
+        } finally {
+            rac.close();
+        }
+        fo.close();
+    }
+
+    @Test
+    public void testRandomReadOnlyAccessInputStreamOpenAutocloseRead() throws Exception {
+        final FileObject fo = openFileObject(TEST_FILENAME);
+        final RandomAccessContent rac = openRandomAccessContent(fo, RandomAccessMode.READ);
+        final BufferedReader reader = getBufferedReader(rac.getInputStream());
+        try {
+            Thread.sleep(SLEEP_TIME);
+            for (int i = 0; i < TEST_FILE_A_CHARS_NUMBER; i++) {
+                assertTrue('a' == reader.read());
+            }
+        } finally {
+            rac.close();
+        }
+        fo.close();
+    }
+
+    @Test
+    public void testRandomReadOnlyAccessInputStreamOpenReadAutocloseRead() throws Exception {
+        final FileObject fo = openFileObject(TEST_FILENAME);
+        final RandomAccessContent rac = openRandomAccessContent(fo, RandomAccessMode.READ);
+        final BufferedReader reader = getBufferedReader(rac.getInputStream());
+        try {
+            for (int i = 0; i < TEST_FILE_A_CHARS_NUMBER; i++) {
+                assertTrue('a' == reader.read());
+            }
+            Thread.sleep(SLEEP_TIME);
+            for (int i = 0; i < TEST_FILE_B_CHARS_NUMBER; i++) {
+                assertTrue('b' == reader.read());
+            }
+        } finally {
+            rac.close();
+        }
+        fo.close();
+    }
+
+    @Test
+    public void testRandomReadOnlyAccessInputStreamOpenSeekAutocloseReadGetPos() throws Exception {
+        final FileObject fo = openFileObject(TEST_FILENAME);
+        final RandomAccessContent rac = openRandomAccessContent(fo, RandomAccessMode.READ);
+        InputStream is = rac.getInputStream();
+        try {
+            rac.seek(TEST_FILE_A_CHARS_NUMBER);
+            // reget input stream
+            is = rac.getInputStream();
+            Thread.sleep(SLEEP_TIME);
+            for (int i = 0; i < TEST_FILE_B_CHARS_NUMBER; i++) {
+                assertTrue('b' == is.read());
+            }
+            assertEquals(TEST_FILE_A_CHARS_NUMBER + TEST_FILE_B_CHARS_NUMBER, rac.getFilePointer());
+        } finally {
+            rac.close();
+        }
+        fo.close();
+    }
 
     private FileObject openFileObject(final String fileName) throws FileSystemException {
         return vfsManager.resolveFile(serverVFSRootURL).resolveFile(fileName);
