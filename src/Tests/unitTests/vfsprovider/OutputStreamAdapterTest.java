@@ -9,7 +9,7 @@ import org.objectweb.proactive.extra.vfsprovider.server.OutputStreamAdapter;
 import org.objectweb.proactive.extra.vfsprovider.server.Stream;
 
 
-public class OutputStreamAdapterTest extends AbstractStreamTest {
+public class OutputStreamAdapterTest extends AbstractStreamBase {
 
     @Override
     protected Stream getInstance(File f) throws Exception {

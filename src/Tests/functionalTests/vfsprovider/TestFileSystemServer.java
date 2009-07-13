@@ -9,13 +9,13 @@ import org.objectweb.proactive.extra.vfsprovider.exceptions.WrongStreamTypeExcep
 import org.objectweb.proactive.extra.vfsprovider.protocol.StreamMode;
 import org.objectweb.proactive.extra.vfsprovider.server.FileSystemServerImpl;
 
-import unitTests.vfsprovider.AbstractIOOperationsTest;
+import unitTests.vfsprovider.AbstractIOOperationsBase;
 
 
 /**
  * Simple usage test.
  */
-public class TestFileSystemServer extends AbstractIOOperationsTest {
+public class TestFileSystemServer extends AbstractIOOperationsBase {
 
     @Override
     public String getTestDirFilename() {

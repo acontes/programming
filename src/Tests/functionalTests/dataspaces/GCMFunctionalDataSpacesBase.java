@@ -44,7 +44,7 @@ import functionalTests.GCMFunctionalTest;
  * Test class uses local paths to access data spaces.
  */
 @Ignore
-public class GCMFunctionalTestDataSpaces extends GCMFunctionalTest {
+public class GCMFunctionalDataSpacesBase extends GCMFunctionalTest {
 
     static final private URL dataSpacesApplicationDescriptor = FunctionalTest.class
             .getResource("/functionalTests/dataspaces/JunitAppDataSpaces.xml");
@@ -105,7 +105,7 @@ public class GCMFunctionalTestDataSpaces extends GCMFunctionalTest {
         writer.close();
     }
 
-    public GCMFunctionalTestDataSpaces(int hostCapacity, int vmCapacity) throws URISyntaxException,
+    public GCMFunctionalDataSpacesBase(int hostCapacity, int vmCapacity) throws URISyntaxException,
             IOException {
         super(dataSpacesApplicationDescriptor);
         this.hostCapacity = hostCapacity;
@@ -115,7 +115,7 @@ public class GCMFunctionalTestDataSpaces extends GCMFunctionalTest {
         vContract.setVariableFromProgram(VAR_VMCAPACITY, Integer.valueOf(vmCapacity).toString(),
                 VariableContractType.DescriptorDefaultVariable);
 
-        rootTmpDir = new File(System.getProperty("java.io.tmpdir"), "ProActive-GCMFunctionalTestDataSpaces");
+        rootTmpDir = new File(System.getProperty("java.io.tmpdir"), "ProActive-GCMFunctionalDataSpacesBase");
         // hacks to get URL here
         tryStartFileSystemServer();
         fileSystemServerRootURL = ProActiveFileName.getServerVFSRootURL(fileSystemServerDeployer
@@ -173,7 +173,7 @@ public class GCMFunctionalTestDataSpaces extends GCMFunctionalTest {
             rootTmpDir.mkdirs();
             assertTrue(rootTmpDir.exists());
             fileSystemServerDeployer = new FileSystemServerDeployer(
-                "ProActive-GCMFunctionalTestDataSpaces/fileSystemServer", rootTmpDir.getAbsolutePath(), true);
+                "ProActive-GCMFunctionalDataSpacesBase/fileSystemServer", rootTmpDir.getAbsolutePath(), true);
         }
     }
 

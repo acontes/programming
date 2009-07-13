@@ -31,7 +31,7 @@ import org.objectweb.proactive.extra.vfsprovider.server.Stream;
  * Often a {@link Integer#MAX_VALUE} is used for a long argument, as few native methods may not
  * accept {@link Long#MAX_VALUE} and throw an IOException.
  */
-public abstract class AbstractStreamTest extends AbstractIOOperationsTest {
+public abstract class AbstractStreamBase extends AbstractIOOperationsBase {
 
     protected static final String TEST_FILE_NEW_CONTENT = "fouxdufafafauxdufafafafa";
 

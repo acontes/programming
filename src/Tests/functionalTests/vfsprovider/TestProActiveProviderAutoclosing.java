@@ -26,13 +26,13 @@ import org.objectweb.proactive.extra.dataspaces.vfs.VFSFactory;
 import org.objectweb.proactive.extra.vfsprovider.client.ProActiveFileName;
 import org.objectweb.proactive.extra.vfsprovider.server.FileSystemServerDeployer;
 
-import unitTests.vfsprovider.AbstractIOOperationsTest;
+import unitTests.vfsprovider.AbstractIOOperationsBase;
 
 
 /**
  * ProActiveProvider and FileSystemServerImpl tests for autoclosing feature.
  */
-public class TestProActiveProviderAutoclosing extends AbstractIOOperationsTest {
+public class TestProActiveProviderAutoclosing extends AbstractIOOperationsBase {
     private static final int AUTOCLOSE_TIME = 100;
     private static final int CHECKING_TIME = 10;
     private static final int SLEEP_TIME = AUTOCLOSE_TIME * 3;

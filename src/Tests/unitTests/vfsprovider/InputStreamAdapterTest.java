@@ -14,7 +14,7 @@ import org.objectweb.proactive.extra.vfsprovider.server.Stream;
  * Test suite for {@link InputStreamAdapter}. Redefines those tests, that are not supported by this
  * adapter.
  */
-public class InputStreamAdapterTest extends AbstractStreamTest {
+public class InputStreamAdapterTest extends AbstractStreamBase {
 
     @Override
     @Test(expected = FileNotFoundException.class)

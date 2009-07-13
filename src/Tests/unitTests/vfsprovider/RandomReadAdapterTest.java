@@ -10,7 +10,7 @@ import org.objectweb.proactive.extra.vfsprovider.server.RandomAccessStreamAdapte
 import org.objectweb.proactive.extra.vfsprovider.server.Stream;
 
 
-public class RandomReadAdapterTest extends AbstractStreamTest {
+public class RandomReadAdapterTest extends AbstractStreamBase {
 
     @Override
     protected Stream getInstance(File f) throws Exception {

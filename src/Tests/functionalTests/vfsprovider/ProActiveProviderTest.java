@@ -29,7 +29,7 @@ import org.objectweb.proactive.extra.vfsprovider.client.ProActiveFileProvider;
 import org.objectweb.proactive.extra.vfsprovider.client.ProActiveFileName.ProActiveProviderScheme;
 import org.objectweb.proactive.extra.vfsprovider.server.FileSystemServerDeployer;
 
-import unitTests.vfsprovider.AbstractIOOperationsTest;
+import unitTests.vfsprovider.AbstractIOOperationsBase;
 
 
 /**
@@ -143,7 +143,7 @@ public class ProActiveProviderTest extends TestCase implements ProviderTestConfi
     }
 
     private void removeTestDir() {
-        AbstractIOOperationsTest.deleteRecursively(testDir);
+        AbstractIOOperationsBase.deleteRecursively(testDir);
         Assert.assertFalse(testDir.exists());
     }
 }

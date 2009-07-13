@@ -10,9 +10,11 @@ import java.io.OutputStreamWriter;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 
 
-public abstract class AbstractIOOperationsTest {
+@Ignore
+public abstract class AbstractIOOperationsBase {
 
     protected static final String TEST_FILENAME = "test.txt";
     protected static final String TEST_FILE_CONTENT = "qwerty";
@@ -31,7 +33,7 @@ public abstract class AbstractIOOperationsTest {
     }
 
     public String getTestDirFilename() {
-        return "ProActive-AbstractIOOperationsTest";
+        return "ProActive-AbstractIOOperationsBase";
     }
 
     @Before

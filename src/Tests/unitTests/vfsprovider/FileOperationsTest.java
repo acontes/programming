@@ -25,7 +25,7 @@ import org.objectweb.proactive.extra.vfsprovider.server.FileSystemServerImpl;
 /**
  * Tests for file management related operations.
  */
-public class FileOperationsTest extends AbstractIOOperationsTest {
+public class FileOperationsTest extends AbstractIOOperationsBase {
 
     private static final String TEST_SEPARATOR = "\\"; // mix a little
     private static final String READONLY_FILENAME = "another.txt";
