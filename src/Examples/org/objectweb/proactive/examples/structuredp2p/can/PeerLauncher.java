@@ -13,8 +13,8 @@ import org.objectweb.proactive.examples.structuredp2p.util.Deployment;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
-import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.Coordinate;
-import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.LexicographicCoordinate;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates.Coordinate;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates.LexicographicCoordinate;
 import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.QueryResponse;
 import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can.RDFQuery;
 
@@ -120,8 +120,7 @@ public class PeerLauncher extends Observable {
 
         Peer sender = this.remotePeers.get(rand.nextInt(this.remotePeers.size()));
 
-        QueryResponse response = sender.search(new RDFQuery(coordinatesToFind, ((CANOverlay) sender
-                .getStructuredOverlay()).getZone().getCoordinatesMin()));
+        QueryResponse response = sender.search(new RDFQuery(sender, coordinatesToFind));
 
         this.printInformation("Lookup for peer managing " + buf + ".\n    Lookup start from peer managing " +
             ((CANOverlay) sender.getStructuredOverlay()).getZone() + ".\n    Peer found in " +

@@ -6,6 +6,7 @@ import org.objectweb.proactive.core.body.request.RequestReceiverFactory;
 
 /**
  * @author Pellegrino Laurent
+ * @version 0.1, 07/09/2009
  */
 @SuppressWarnings("serial")
 public class StructuredMetaObjectFactory extends ProActiveMetaObjectFactory {

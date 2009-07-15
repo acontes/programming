@@ -1,6 +1,8 @@
-package org.objectweb.proactive.extensions.structuredp2p.core.overlay.can;
+package org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates;
 
 import java.io.Serializable;
+
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
 
 
 /**
@@ -17,6 +19,13 @@ import java.io.Serializable;
 public abstract class Coordinate implements Comparable<Coordinate>, Serializable {
 
     private String value;
+
+    /**
+     * Constructor.
+     */
+    public Coordinate() {
+
+    }
 
     /**
      * Constructor.
@@ -103,6 +112,10 @@ public abstract class Coordinate implements Comparable<Coordinate>, Serializable
      */
     public String getValue() {
         return this.value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
     }
 
     /**

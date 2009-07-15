@@ -2,8 +2,9 @@ package org.objectweb.proactive.extensions.structuredp2p.core;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
-import java.util.Stack;
+import java.util.Set;
 import java.util.UUID;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -21,7 +22,7 @@ import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOver
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.chord.ChordOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.requests.BlockingRequestReceiverException;
 import org.objectweb.proactive.extensions.structuredp2p.core.requests.StructuredMetaObjectFactory;
-import org.objectweb.proactive.extensions.structuredp2p.data.DataStorage;
+import org.objectweb.proactive.extensions.structuredp2p.data.OwlimStorage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.Message;
 import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.Query;
 import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.QueryResponse;
@@ -58,7 +59,7 @@ public class Peer implements InitActive, RunActive, Serializable {
     /**
      * Peer which are currently not accessible because they are preparing to leave.
      */
-    private Stack<Peer> peersWhichAreLeaving = new Stack<Peer>();
+    private Set<Peer> peersWhichAreLeaving = new HashSet<Peer>();
 
     /**
      * The type of the overlay which is used by the peer. The type is equal to one of
@@ -69,7 +70,7 @@ public class Peer implements InitActive, RunActive, Serializable {
     /**
      * Contains data that are stored in the peer.
      */
-    private DataStorage dataStorage;
+    private OwlimStorage dataStorage;
 
     /**
      * The stub associated to the current peer.
@@ -90,7 +91,7 @@ public class Peer implements InitActive, RunActive, Serializable {
      */
     public Peer(OverlayType type) {
         this.type = type;
-        this.dataStorage = new DataStorage();
+        this.dataStorage = new OwlimStorage();
     }
 
     /**
@@ -179,7 +180,7 @@ public class Peer implements InitActive, RunActive, Serializable {
      * @return
      */
     public boolean notifyNeighborStartLeave(Peer remoteNeighbor) {
-        this.peersWhichAreLeaving.push(remoteNeighbor);
+        this.peersWhichAreLeaving.add(remoteNeighbor);
         return true;
     }
 
@@ -208,7 +209,7 @@ public class Peer implements InitActive, RunActive, Serializable {
      * 
      * @return the data that are managed by the peer.
      */
-    public DataStorage getDataStorage() {
+    public OwlimStorage getDataStorage() {
         return this.dataStorage;
     }
 
@@ -252,7 +253,7 @@ public class Peer implements InitActive, RunActive, Serializable {
      * 
      * @return
      */
-    public Stack<Peer> getPeersWhichArePreparingToLeave() {
+    public Set<Peer> getPeersWhichArePreparingToLeave() {
         return this.peersWhichAreLeaving;
     }
 
@@ -294,7 +295,18 @@ public class Peer implements InitActive, RunActive, Serializable {
         while (body.isActive()) {
             Request request = null;
             if (this.peersWhichAreLeaving.size() > 0) {
+                /*
+                 * boolean receiveFromLeaver = false; request = service.blockingRemoveOldest();
+                 * 
+                 * for (Peer peer : this.peersWhichAreLeaving) { if
+                 * (peer.getBody().getID().equals(request.getSender().getID())) {
+                 * System.out.println("OK FIND !!!"); receiveFromLeaver = true;
+                 * service.serve(request); break; } }
+                 * 
+                 * if (!receiveFromLeaver) { System.out.println("NT FIND");
+                 */
                 service.serveOldest("notifyNeighborEndLeave");
+                // }
             } else {
                 request = service.blockingRemoveOldest(StructuredOverlay.UPDATE_TIMEOUT);
 

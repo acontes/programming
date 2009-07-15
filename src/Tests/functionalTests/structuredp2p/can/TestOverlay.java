@@ -183,7 +183,19 @@ public class TestOverlay {
     }
 
     @Test
-    public void testSendMessage() {
+    public void testSendMessage() throws Exception {
+        TestOverlay.firstPeer = Peer.newActivePeer(OverlayType.CAN);
+        TestOverlay.secondPeer = Peer.newActivePeer(OverlayType.CAN);
+        TestOverlay.thirdPeer = Peer.newActivePeer(OverlayType.CAN);
+        TestOverlay.fourthPeer = Peer.newActivePeer(OverlayType.CAN);
+        TestOverlay.fifthPeer = Peer.newActivePeer(OverlayType.CAN);
+        TestOverlay.sixthPeer = Peer.newActivePeer(OverlayType.CAN);
+        TestOverlay.seventhPeer = Peer.newActivePeer(OverlayType.CAN);
+        TestOverlay.eighthPeer = Peer.newActivePeer(OverlayType.CAN);
+
+        TestOverlay.secondPeer.join(TestOverlay.firstPeer);
+        TestOverlay.thirdPeer.join(TestOverlay.secondPeer);
+
         Peer[] peers = new Peer[] { TestOverlay.firstPeer, TestOverlay.secondPeer, TestOverlay.thirdPeer,
                 TestOverlay.fifthPeer, TestOverlay.sixthPeer, TestOverlay.seventhPeer, TestOverlay.eighthPeer };
 
@@ -200,8 +212,7 @@ public class TestOverlay {
         Peer toFind = peers[rand.nextInt(peers.length)];
         Peer sender = peers[rand.nextInt(peers.length)];
 
-        RDFQuery msg = new RDFQuery(TestOverlay.getOverlay(toFind).getZone().getCoordinatesMin(), TestOverlay
-                .getOverlay(sender).getZone().getCoordinatesMin());
+        RDFQuery msg = new RDFQuery(sender, TestOverlay.getOverlay(toFind).getZone().getCoordinatesMin());
 
         QueryResponse response = sender.search(msg);
 

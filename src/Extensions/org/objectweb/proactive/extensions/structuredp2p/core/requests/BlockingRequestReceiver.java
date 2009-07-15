@@ -12,6 +12,9 @@ import org.objectweb.proactive.core.body.request.RequestReceiver;
  * can always perform method calls on other active objects.
  * 
  * @author Pellegrino Laurent
+ * @version 0.1, 07/09/2009
+ * 
+ * @see RequestReceiver
  */
 @SuppressWarnings("serial")
 public class BlockingRequestReceiver extends org.objectweb.proactive.core.body.request.RequestReceiverImpl {

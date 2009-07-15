@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Vector;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates.Coordinate;
 
 
 /**
@@ -20,11 +21,6 @@ import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
  */
 @SuppressWarnings( { "serial" })
 public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
-
-    /**
-     * The peer which has these neighbors.
-     */
-    private final Peer ownerPeer;
 
     /**
      * Inferior direction compared to a given peer.
@@ -53,9 +49,7 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
     /**
      * Constructor.
      */
-    public NeighborsDataStructure(Peer masterPeer) {
-        this.ownerPeer = masterPeer;
-
+    public NeighborsDataStructure() {
         for (int i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
             this.neighbors[i][NeighborsDataStructure.INFERIOR_DIRECTION] = new Vector<Peer>();
             this.neighbors[i][NeighborsDataStructure.SUPERIOR_DIRECTION] = new Vector<Peer>();
@@ -94,7 +88,7 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
         for (int dim = 0; dim < CANOverlay.NB_DIMENSIONS; dim++) {
             for (int direction = 0; direction < 2; direction++) {
                 for (Peer peer : neighbors.getNeighbors(dim, direction)) {
-                    res &= this.add(peer, neighbors.getZone(peer), dim, direction);
+                    res &= this.add(peer, neighbors.getZoneBy(peer), dim, direction);
                 }
             }
         }
@@ -118,10 +112,8 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
      * @return <code>true</code> if the neighbor has been add, <code>false</code> otherwise.
      */
     public boolean add(Peer remotePeer, Zone zone, int dimension, int direction) {
-        if (remotePeer.equals(this.ownerPeer)) {
+        if (this.neighbors[dimension][direction].contains(remotePeer)) {
             return false;
-        } else if (this.neighbors[dimension][direction].contains(remotePeer)) {
-            return this.updateZone(remotePeer, zone, dimension, direction);
         }
 
         int index = 0;
@@ -258,7 +250,7 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
      *            the criteria used in order to find the zone
      * @return the zone found or <code>null</code>.
      */
-    public Zone getZone(Peer remotePeer) {
+    public Zone getZoneBy(Peer remotePeer) {
         for (int dim = 0; dim < CANOverlay.NB_DIMENSIONS; dim++) {
             for (int direction = 0; direction < 2; direction++) {
                 int index = -1;
@@ -277,17 +269,17 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
      * 
      * @param remotePeer
      *            the criteria used in order to find the zone
-     * @param dim
+     * @param dimension
      *            the dimension.
      * @param direction
      *            the direction.
      * @return the zone found or <code>null</code>.
      */
-    public Zone getZone(Peer remotePeer, int dim, int direction) {
+    public Zone getZoneBy(Peer remotePeer, int dimension, int direction) {
         int index = -1;
 
-        if ((index = this.neighbors[dim][direction].indexOf(remotePeer)) != -1) {
-            return this.associatedZones[dim][direction].get(index);
+        if ((index = this.neighbors[dimension][direction].indexOf(remotePeer)) != -1) {
+            return this.associatedZones[dimension][direction].get(index);
         }
 
         return null;
@@ -305,7 +297,7 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
      *            the criteria used in order to find the peer.
      * @return the peer found or <code>null</code>.
      */
-    public Peer getPeer(int dimension, int direction, Zone zone) {
+    public Peer getPeerBy(Zone zone, int dimension, int direction) {
         int index = -1;
 
         if ((index = this.associatedZones[dimension][direction].indexOf(zone)) != -1) {
@@ -316,19 +308,19 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
     }
 
     /**
-     * Returns the neighbors data structure.
+     * Returns all the neighbors of the data structure.
      * 
-     * @return the neighbors data structure.
+     * @return all the neighbors of the data structure.
      */
     public List<Peer>[][] getNeighbors() {
         return this.neighbors;
     }
 
     /**
-     * Returns the neighbors of the managed zone for the given dimension.
+     * Returns all the neighbors for the specified dimension.
      * 
      * @param dimension
-     *            the dimension to use (dimension start to 0 and max is defined by
+     *            the dimension to use (dimension start to <code>0</code> and max is defined by
      *            {@link CANOverlay#NB_DIMENSIONS} - 1).
      * @return the neighbors of the managed zone for the specified dimension.
      */
@@ -337,15 +329,15 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
     }
 
     /**
-     * Returns the neighbors of the managed zone for the specified <code>dimension</code> and
-     * <code>direction</code>.
+     * Returns all the neighbors for the specified <code>dimension</code> and <code>direction</code>
+     * .
      * 
      * @param dimension
      *            the dimension to use (dimension start to <code>0</code> and max is defined by
      *            {@link CANOverlay#NB_DIMENSIONS} - 1).
      * @param direction
      *            the direction ({@link #INFERIOR_DIRECTION} or {@link #SUPERIOR_DIRECTION}).
-     * @return the neighbors of the managed zone for the specified dimension.
+     * @return all the neighbors for the specified dimension and direction.
      */
     public List<Peer> getNeighbors(int dimension, int direction) {
         return this.neighbors[dimension][direction];
@@ -354,6 +346,9 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
     /**
      * Returns the neighbor which is the nearest of the given {@link Coordinate} for the specified
      * <code>dimension</code>, <code>direction</code>.
+     * 
+     * @param ownerZone
+     *            the zone of the owner.
      * 
      * @param coordinate
      *            the coordinate to check.
@@ -381,15 +376,6 @@ public class NeighborsDataStructure implements Iterable<Peer>, Serializable {
         }
 
         return this.neighbors[dim][direction].get(nearest);
-    }
-
-    /**
-     * Returns the peer which maintains this data structure.
-     * 
-     * @return the owner peer.
-     */
-    public Peer getOwnerPeer() {
-        return this.ownerPeer;
     }
 
     /**

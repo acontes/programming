@@ -5,31 +5,38 @@ import java.io.Serializable;
 
 import org.objectweb.proactive.core.util.converter.MakeDeepCopy;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates.BigDecimalCoordinate;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates.Coordinate;
 
 
 /**
- * An zone indicates the space which is managed by a {@link Peer}. The minimum coordinates are the
- * left higher corner. The maximum coordinates are the corner lower right.
+ * An zone indicates the space which is managed by a {@link Peer}. The minimum coordinates
+ * correspond to the left higher corner. The maximum coordinates correspond to the corner lower
+ * right.
  * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent
  * @author Trovato Alexandre
  * 
- * @version 0.1
+ * @version 0.1, 07/09/2009
  */
 @SuppressWarnings("serial")
 public class Zone implements Serializable {
 
     /**
-     * The minimal value we manage.
+     * The type of coordinate to use.
      */
-
-    public static String COORDINATE_MIN = "a";
+    public static final Class<? extends Coordinate> COORDINATE_TYPE = BigDecimalCoordinate.class;
 
     /**
-     * The maximal value we manage.
+     * The minimal value to manage.
      */
-    public static String COORDINATE_MAX = "z";
+    public static final String COORDINATE_MIN = "0";
+
+    /**
+     * The maximal value to manage.
+     */
+    public static final String COORDINATE_MAX = "1";
 
     /**
      * The minimum coordinates.
@@ -49,8 +56,27 @@ public class Zone implements Serializable {
         Coordinate[] maxCoords = new Coordinate[CANOverlay.NB_DIMENSIONS];
 
         for (int i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
-            minCoords[i] = new LexicographicCoordinate(Zone.COORDINATE_MIN);
-            maxCoords[i] = new LexicographicCoordinate(Zone.COORDINATE_MAX);
+
+            Coordinate coordinate = null;
+            try {
+                coordinate = Zone.COORDINATE_TYPE.newInstance();
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+            coordinate.setValue(Zone.COORDINATE_MIN);
+            minCoords[i] = coordinate;
+
+            try {
+                coordinate = Zone.COORDINATE_TYPE.newInstance();
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+            coordinate.setValue(Zone.COORDINATE_MAX);
+            maxCoords[i] = coordinate;
         }
 
         this.coordinatesMin = minCoords;

@@ -4,8 +4,8 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.Coordinate;
-import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.LexicographicCoordinate;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates.Coordinate;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates.LexicographicCoordinate;
 
 
 /**

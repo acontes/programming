@@ -65,14 +65,20 @@ public class TestQuery {
             i++;
         }
 
-        TestQuery.query = new RDFQuery(((CANOverlay) TestQuery.thirdPeer.getStructuredOverlay()).getZone()
-                .getCoordinatesMin(), ((CANOverlay) TestQuery.firstPeer.getStructuredOverlay()).getZone()
-                .getCoordinatesMin());
+        TestQuery.query = new RDFQuery(TestQuery.firstPeer, ((CANOverlay) TestQuery.thirdPeer
+                .getStructuredOverlay()).getZone().getCoordinatesMin());
     }
 
     @Test
     public void testBasicSearch() {
         QueryResponse response = TestQuery.firstPeer.search(TestQuery.query);
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
         Assert.assertTrue(response.getLatency() > 1);
         Assert.assertTrue(response.getNbSteps() > 0);

@@ -20,9 +20,9 @@ import javax.swing.JFrame;
 import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
-import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.Coordinate;
-import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.LexicographicCoordinate;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.Zone;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates.Coordinate;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates.LexicographicCoordinate;
 
 
 @SuppressWarnings("serial")

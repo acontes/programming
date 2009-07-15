@@ -1,7 +1,9 @@
 package org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can;
 
+import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredOverlay;
-import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.Coordinate;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates.Coordinate;
 import org.objectweb.proactive.extensions.structuredp2p.messages.Key;
 import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.Query;
 
@@ -19,13 +21,15 @@ public class RDFQuery extends Query {
     /**
      * Constructor.
      * 
+     * @param sender
+     *            the peer which sent the query.
+     * 
      * @param coordinatesToFind
      *            the coordinates to reach.
-     * @param coordinatesFromSender
-     *            the coordinate managed by the peer sending the query.
      */
-    public RDFQuery(Coordinate[] coordinatesToFind, Coordinate[] coordinatesFromSender) {
-        super(new Key<Coordinate[]>(coordinatesToFind), new Key<Coordinate[]>(coordinatesFromSender));
+    public RDFQuery(Peer sender, Coordinate[] coordinatesToFind) {
+        super(new Key<Coordinate[]>(coordinatesToFind), new Key<Coordinate[]>(((CANOverlay) sender
+                .getStructuredOverlay()).getZone().getCoordinatesMin()));
     }
 
     /**

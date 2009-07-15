@@ -1,6 +1,8 @@
-package org.objectweb.proactive.extensions.structuredp2p.core.overlay.can;
+package org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates;
 
 import java.math.BigDecimal;
+
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
 
 
 /**
@@ -15,6 +17,13 @@ import java.math.BigDecimal;
  */
 @SuppressWarnings("serial")
 public class BigDecimalCoordinate extends Coordinate {
+
+    /**
+     * Constructor.
+     */
+    public BigDecimalCoordinate() {
+        super();
+    }
 
     /**
      * Constructor.

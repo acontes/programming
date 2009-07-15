@@ -30,7 +30,7 @@ public class TestNeighborsDataStructure {
     public void testAddAll() throws ActiveObjectCreationException, NodeException {
         Peer peer1 = Peer.newActivePeer(OverlayType.CAN);
         Peer peer2 = Peer.newActivePeer(OverlayType.CAN);
-        NeighborsDataStructure neighbors = new NeighborsDataStructure(this.peer);
+        NeighborsDataStructure neighbors = new NeighborsDataStructure();
         neighbors.add(peer1, 0, 1);
         neighbors.add(peer2, 0, 0);
 
