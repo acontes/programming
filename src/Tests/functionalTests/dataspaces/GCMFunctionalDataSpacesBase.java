@@ -13,6 +13,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.extensions.calcium.system.SkeletonSystemImpl;
@@ -37,7 +38,7 @@ import functionalTests.GCMFunctionalTest;
  * <li>named output {@link #OUTPUT_WITH_NOTHING_NAME} - non-existing file/directory, that should
  * have possibility to be created</li>
  * </ul>
- * Scratch space is also defined for each of available Node.
+ * Scratch space is also defined for each of available Node and local nodes.
  * <p>
  * Test class uses local paths to access data spaces.
  */
@@ -142,6 +143,9 @@ public class GCMFunctionalDataSpacesBase extends GCMFunctionalTest {
                 getRootSubdirURL(outputWithNothing1LocalHandle), VariableContractType.ProgramVariable);
         vContract.setVariableFromProgram(VAR_OUTPUT_WITH_NOTHING2_URL,
                 getRootSubdirURL(outputWithNothing2LocalHandle), VariableContractType.ProgramVariable);
+
+        // set scratch configuration for local node
+        PAProperties.PA_DATASPACES_SCRATCH_PATH.setValue(System.getProperty("java.io.tmpdir"));
     }
 
     @Before

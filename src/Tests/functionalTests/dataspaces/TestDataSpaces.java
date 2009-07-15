@@ -23,6 +23,7 @@ import org.objectweb.proactive.api.PAException;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.extra.dataspaces.api.DataSpacesFileObject;
@@ -44,11 +45,14 @@ public class TestDataSpaces extends GCMFunctionalDataSpacesBase {
     private Node node2;
     private Node node3;
     private Node node4;
+    private Node nodeLocal;
     private TestActiveObject ao1;
     private TestActiveObject ao1B;
     private TestActiveObject ao2;
     private TestActiveObject ao3;
     private TestActiveObject ao4;
+    private TestActiveObject aoLocal;
+    private TestActiveObject aoFake;
 
     public TestDataSpaces() throws URISyntaxException, IOException {
         super(2, 2);
@@ -60,23 +64,31 @@ public class TestDataSpaces extends GCMFunctionalDataSpacesBase {
         node2 = getANode();
         node3 = getANode();
         node4 = getANode();
+        nodeLocal = NodeFactory.getDefaultNode();
         // create AOs on hosts on the same and different runtimes
         ao1 = (TestActiveObject) PAActiveObject.newActive(TestActiveObject.class.getName(), null, node1);
         ao1B = (TestActiveObject) PAActiveObject.newActive(TestActiveObject.class.getName(), null, node1);
         ao2 = (TestActiveObject) PAActiveObject.newActive(TestActiveObject.class.getName(), null, node2);
         ao3 = (TestActiveObject) PAActiveObject.newActive(TestActiveObject.class.getName(), null, node3);
         ao4 = (TestActiveObject) PAActiveObject.newActive(TestActiveObject.class.getName(), null, node4);
+        // AO for default local node
+        aoLocal = (TestActiveObject) PAActiveObject.newActive(TestActiveObject.class.getName(), null,
+                nodeLocal);
+        // non-AO to test behavior for local half-bodies node
+        aoFake = new TestActiveObject();
         // no need for @After, as whole GCMApp will be killed
     }
 
     @Test
     public void action() throws SpaceNotFoundException, NotConfiguredException, IOException,
             MalformedURIException, ProActiveTimeoutException, SpaceAlreadyRegisteredException,
-            ConfigurationException {
+            ConfigurationException, InterruptedException {
         // read inputs:
         assertEquals(INPUT_FILE_CONTENT, ao1.readDefaultInputFile(INPUT_FILE_NAME));
         assertEquals(INPUT_FILE_CONTENT, ao1B.readDefaultInputFile(INPUT_FILE_NAME));
         assertEquals(INPUT_FILE_CONTENT, ao2.readDefaultInputFile(INPUT_FILE_NAME));
+        assertEquals(INPUT_FILE_CONTENT, aoLocal.readDefaultInputFile(INPUT_FILE_NAME));
+        assertEquals(INPUT_FILE_CONTENT, aoFake.readDefaultInputFile(INPUT_FILE_NAME));
         assertEquals(INPUT_FILE_CONTENT, ao3.readInputFile(INPUT_WITH_DIR_NAME, INPUT_FILE_NAME));
         assertEquals(INPUT_FILE_CONTENT, ao4.readInputFile(INPUT_WITH_DIR_NAME, INPUT_FILE_NAME));
         assertEquals(INPUT_FILE_CONTENT, ao1.readInputFile(INPUT_WITH_FILE_NAME, null));
@@ -98,6 +110,8 @@ public class TestDataSpaces extends GCMFunctionalDataSpacesBase {
         assertEquals(OUTPUT_FILE_CONTENT1, ao2.readFile(defaultOutputFileUri));
         assertEquals(OUTPUT_FILE_CONTENT1, ao3.readFile(defaultOutputFileUri));
         assertEquals(OUTPUT_FILE_CONTENT1, ao4.readFile(defaultOutputFileUri));
+        assertEquals(OUTPUT_FILE_CONTENT1, aoLocal.readFile(defaultOutputFileUri));
+        assertEquals(OUTPUT_FILE_CONTENT1, aoFake.readFile(defaultOutputFileUri));
 
         final String outputWithDirFileUri = ao1.writeOutputFile(OUTPUT_WITH_DIR_NAME, OUTPUT_FILE_NAME,
                 OUTPUT_FILE_CONTENT1);
@@ -105,6 +119,8 @@ public class TestDataSpaces extends GCMFunctionalDataSpacesBase {
         assertEquals(OUTPUT_FILE_CONTENT1, ao2.readFile(outputWithDirFileUri));
         assertEquals(OUTPUT_FILE_CONTENT1, ao3.readFile(outputWithDirFileUri));
         assertEquals(OUTPUT_FILE_CONTENT1, ao4.readFile(outputWithDirFileUri));
+        assertEquals(OUTPUT_FILE_CONTENT1, aoLocal.readFile(outputWithDirFileUri));
+        assertEquals(OUTPUT_FILE_CONTENT1, aoFake.readFile(outputWithDirFileUri));
 
         final String outputWithFileFileUri = ao1.writeOutputFile(OUTPUT_WITH_FILE_NAME, null,
                 OUTPUT_FILE_CONTENT1);
@@ -112,6 +128,8 @@ public class TestDataSpaces extends GCMFunctionalDataSpacesBase {
         assertEquals(OUTPUT_FILE_CONTENT1, ao2.readFile(outputWithFileFileUri));
         assertEquals(OUTPUT_FILE_CONTENT1, ao3.readFile(outputWithFileFileUri));
         assertEquals(OUTPUT_FILE_CONTENT1, ao4.readFile(outputWithFileFileUri));
+        assertEquals(OUTPUT_FILE_CONTENT1, aoLocal.readFile(outputWithFileFileUri));
+        assertEquals(OUTPUT_FILE_CONTENT1, aoFake.readFile(outputWithFileFileUri));
 
         final String outputWithNothingFileUri1 = ao1.writeOutputFile(OUTPUT_WITH_NOTHING1_NAME,
                 OUTPUT_FILE_NAME, OUTPUT_FILE_CONTENT1);
@@ -119,6 +137,8 @@ public class TestDataSpaces extends GCMFunctionalDataSpacesBase {
         assertEquals(OUTPUT_FILE_CONTENT1, ao2.readFile(outputWithNothingFileUri1));
         assertEquals(OUTPUT_FILE_CONTENT1, ao3.readFile(outputWithNothingFileUri1));
         assertEquals(OUTPUT_FILE_CONTENT1, ao4.readFile(outputWithNothingFileUri1));
+        assertEquals(OUTPUT_FILE_CONTENT1, aoLocal.readFile(outputWithNothingFileUri1));
+        assertEquals(OUTPUT_FILE_CONTENT1, aoFake.readFile(outputWithNothingFileUri1));
 
         final String outputWithNothingFileUri2 = ao1.writeOutputFile(OUTPUT_WITH_NOTHING2_NAME, null,
                 OUTPUT_FILE_CONTENT1);
@@ -126,12 +146,16 @@ public class TestDataSpaces extends GCMFunctionalDataSpacesBase {
         assertEquals(OUTPUT_FILE_CONTENT1, ao2.readFile(outputWithNothingFileUri2));
         assertEquals(OUTPUT_FILE_CONTENT1, ao3.readFile(outputWithNothingFileUri2));
         assertEquals(OUTPUT_FILE_CONTENT1, ao4.readFile(outputWithNothingFileUri2));
+        assertEquals(OUTPUT_FILE_CONTENT1, aoLocal.readFile(outputWithNothingFileUri2));
+        assertEquals(OUTPUT_FILE_CONTENT1, aoFake.readFile(outputWithNothingFileUri2));
 
         // write to scratches:
         final String scratchFileUri1 = ao1.writeScratchFile(OUTPUT_FILE_NAME, OUTPUT_FILE_CONTENT1);
         final String scratchFileUri2 = ao2.writeScratchFile(OUTPUT_FILE_NAME, OUTPUT_FILE_CONTENT2);
         final String scratchFileUri3 = ao3.writeScratchFile(OUTPUT_FILE_NAME, OUTPUT_FILE_CONTENT1);
         final String scratchFileUri4 = ao4.writeScratchFile(OUTPUT_FILE_NAME, OUTPUT_FILE_CONTENT2);
+        final String scratchFileUriLocal = aoLocal.writeScratchFile(OUTPUT_FILE_NAME, OUTPUT_FILE_CONTENT1);
+        final String scratchFileUriFake = aoFake.writeScratchFile(OUTPUT_FILE_NAME, OUTPUT_FILE_CONTENT2);
 
         assertEquals(OUTPUT_FILE_CONTENT1, ao1.readFile(scratchFileUri1));
         assertEquals(OUTPUT_FILE_CONTENT1, ao1B.readFile(scratchFileUri1));
@@ -144,6 +168,12 @@ public class TestDataSpaces extends GCMFunctionalDataSpacesBase {
         assertEquals(OUTPUT_FILE_CONTENT1, ao1.readFile(scratchFileUri3));
 
         assertEquals(OUTPUT_FILE_CONTENT2, ao3.readFile(scratchFileUri4));
+
+        assertEquals(OUTPUT_FILE_CONTENT1, ao4.readFile(scratchFileUriLocal));
+        assertEquals(OUTPUT_FILE_CONTENT1, aoLocal.readFile(scratchFileUriLocal));
+
+        assertEquals(OUTPUT_FILE_CONTENT2, ao3.readFile(scratchFileUriFake));
+        assertEquals(OUTPUT_FILE_CONTENT2, aoLocal.readFile(scratchFileUriFake));
 
         // write to AO's scratch by URI:
         ao1.writeFile(scratchFileUri1, OUTPUT_FILE_CONTENT2);
@@ -171,6 +201,20 @@ public class TestDataSpaces extends GCMFunctionalDataSpacesBase {
         }
         assertEquals(OUTPUT_FILE_CONTENT2, ao1.readFile(scratchFileUri1));
 
+        try {
+            aoLocal.writeFile(scratchFileUri1, OUTPUT_FILE_CONTENT1);
+            fail("Unexpectedly AO from default local node is able to write other AO's scratch");
+        } catch (FileSystemException x) {
+        }
+        assertEquals(OUTPUT_FILE_CONTENT2, ao1.readFile(scratchFileUri1));
+
+        try {
+            aoFake.writeFile(scratchFileUri1, OUTPUT_FILE_CONTENT1);
+            fail("Unexpectedly AO from default local node is able to write other AO's scratch");
+        } catch (FileSystemException x) {
+        }
+        assertEquals(OUTPUT_FILE_CONTENT2, ao1.readFile(scratchFileUri1));
+
         // read inputs names:
         final HashSet<String> expectedInputs = new HashSet<String>();
         expectedInputs.add(PADataSpaces.DEFAULT_IN_OUT_NAME);
@@ -178,6 +222,8 @@ public class TestDataSpaces extends GCMFunctionalDataSpacesBase {
         expectedInputs.add(INPUT_WITH_FILE_NAME);
         assertEquals(expectedInputs, ao1.getAllKnownInputsNames());
         assertEquals(expectedInputs, ao3.getAllKnownInputsNames());
+        assertEquals(expectedInputs, aoLocal.getAllKnownInputsNames());
+        assertEquals(expectedInputs, aoFake.getAllKnownInputsNames());
 
         // read outputs names:
         final HashSet<String> expectedOutputs = new HashSet<String>();
@@ -188,6 +234,8 @@ public class TestDataSpaces extends GCMFunctionalDataSpacesBase {
         expectedOutputs.add(OUTPUT_WITH_NOTHING2_NAME);
         assertEquals(expectedOutputs, ao1.getAllKnownOutputsNames());
         assertEquals(expectedOutputs, ao3.getAllKnownOutputsNames());
+        assertEquals(expectedOutputs, aoLocal.getAllKnownOutputsNames());
+        assertEquals(expectedOutputs, aoFake.getAllKnownOutputsNames());
 
         // blocking resolve input + add input:
         // (exceptions for readInputFileBlocking - to make it asynchronous)
@@ -200,6 +248,20 @@ public class TestDataSpaces extends GCMFunctionalDataSpacesBase {
                     INPUT_FILE_NAME, 30000);
             final StringWrapper contentWrapper4 = ao4.readInputFileBlocking(ADDED_INPUT_NAME,
                     INPUT_FILE_NAME, 30000);
+            final StringWrapper contentWrapperLocal = aoLocal.readInputFileBlocking(ADDED_INPUT_NAME,
+                    INPUT_FILE_NAME, 30000);
+            final StringBuilder contentWrapperFake = new StringBuilder();
+            new Thread() {
+                public void run() {
+                    try {
+                        contentWrapperFake.append(aoFake.readInputFileBlocking(ADDED_INPUT_NAME,
+                                INPUT_FILE_NAME, 30000));
+                    } catch (Exception x) {
+                        fail("Could not read added input space");
+                    }
+                };
+            }.start();
+
             // give them a while to try without success (to let them ask one again for that space) 
             Thread.sleep(1000);
             ao1.addInputSpace(ADDED_INPUT_NAME, getRootSubdirURL(inputWithDirLocalHandle));
@@ -207,6 +269,8 @@ public class TestDataSpaces extends GCMFunctionalDataSpacesBase {
             assertEquals(INPUT_FILE_CONTENT, contentWrapper1B.stringValue());
             assertEquals(INPUT_FILE_CONTENT, contentWrapper2.stringValue());
             assertEquals(INPUT_FILE_CONTENT, contentWrapper4.stringValue());
+            assertEquals(INPUT_FILE_CONTENT, contentWrapperLocal.stringValue());
+            assertEquals(INPUT_FILE_CONTENT, contentWrapperFake.toString());
             PAException.endTryWithCatch();
         } finally {
             PAException.removeTryWithCatch();
@@ -217,6 +281,8 @@ public class TestDataSpaces extends GCMFunctionalDataSpacesBase {
         assertEquals(expectedInputs, ao2.getAllKnownInputsNames());
         assertEquals(expectedInputs, ao3.getAllKnownInputsNames());
         assertEquals(expectedInputs, ao4.getAllKnownInputsNames());
+        assertEquals(expectedInputs, aoLocal.getAllKnownInputsNames());
+        assertEquals(expectedInputs, aoFake.getAllKnownInputsNames());
 
         // do something on DataSpacesFileObject...
         // check getURI()
@@ -244,7 +310,6 @@ public class TestDataSpaces extends GCMFunctionalDataSpacesBase {
         }
 
         // TODO: perform more operations on DataSpacesFileObject
-        // TODO tests for deployer node?
     }
 
     @ActiveObject
