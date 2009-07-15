@@ -256,6 +256,9 @@ public class TestDataSpaces extends GCMFunctionalDataSpacesBase {
                     try {
                         contentWrapperFake.append(aoFake.readInputFileBlocking(ADDED_INPUT_NAME,
                                 INPUT_FILE_NAME, 30000));
+                        synchronized (contentWrapperFake) {
+                            contentWrapperFake.notifyAll();
+                        }
                     } catch (Exception x) {
                         fail("Could not read added input space");
                     }
@@ -270,6 +273,11 @@ public class TestDataSpaces extends GCMFunctionalDataSpacesBase {
             assertEquals(INPUT_FILE_CONTENT, contentWrapper2.stringValue());
             assertEquals(INPUT_FILE_CONTENT, contentWrapper4.stringValue());
             assertEquals(INPUT_FILE_CONTENT, contentWrapperLocal.stringValue());
+            synchronized (contentWrapperFake) {
+                if (contentWrapperFake.length() == 0) {
+                    contentWrapperFake.wait(29000);
+                }
+            }
             assertEquals(INPUT_FILE_CONTENT, contentWrapperFake.toString());
             PAException.endTryWithCatch();
         } finally {
