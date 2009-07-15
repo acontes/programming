@@ -91,6 +91,12 @@ import org.objectweb.proactive.gcmdeployment.Topology;
 public class GCMApplicationImpl implements GCMApplicationInternal {
     static private Map<Long, GCMApplication> localDeployments = new HashMap<Long, GCMApplication>();
 
+    /** Flag to store information whether DataSpaces were already on configured for some GCMA on JVM */
+    private static boolean dataSpacesConfiguredOnJVM;
+
+    /** Lock for an above flag */
+    private static Object dataSpacesConfiguredOnJVMLock = new Object();
+
     /** An unique identifier for this deployment */
     private long deploymentId;
 
@@ -211,12 +217,27 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
 
             this.vContract.close();
 
-            // always start Data Spaces BEFORE applying tech services on local node if they gonna use DS
+            TechnicalServicesProperties appTSProperties = parser.getAppTechnicalServices();
+
+            // always start Data Spaces BEFORE applying tech services on local node
             // (to provide working Data Spaces, DataSpacesTechnicalService assumes that appId is known and 
             // application is registered in working NamingService) 
             if (dataSpacesEnabled) {
+                synchronized (dataSpacesConfiguredOnJVMLock) {
+                    if (dataSpacesConfiguredOnJVM) {
+                        GCMA_LOGGER.error("DataSpaces were already configured for this JVM"
+                            + " for different GCM application, they cannot be configured again");
+                        dataSpacesEnabled = false;
+                    } else {
+                        dataSpacesConfiguredOnJVM = true;
+                    }
+                }
+            }
+            if (dataSpacesEnabled) {
                 startDataSpaces();
 
+                // we need to add technical service properties here, as we already know the application id
+                // (deploymentId) and NamingService URL
                 // TODO this kind of hacks should be eventually moved to CommandBuilderProActive#setup()
                 // or similar developed mechanism
                 final TechnicalServicesProperties dataSpacesTSP = DataSpacesTechnicalService
@@ -224,18 +245,13 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
                 for (GCMVirtualNodeInternal vn : virtualNodes.values()) {
                     vn.addTechnicalServiceProperties(dataSpacesTSP);
                 }
-
-                // FIXME: We cannot safely add DataSpacesTechnicalService as an app-wide TS (also local node TS)
-                // as we cannot rely on unique appId (currently deploymentId, which is not even set locally).
-                // In current implementation, in case of many GCM deployments there may be many applications
-                // on that local shared node. 
+                appTSProperties = appTSProperties.getCombinationWith(dataSpacesTSP);
             }
 
             // apply Application-wide tech services on local node
             //
             Node defaultNode = NodeFactory.getDefaultNode();
             Node halfBodiesNode = NodeFactory.getHalfBodiesNode();
-            TechnicalServicesProperties appTSProperties = parser.getAppTechnicalServices();
 
             for (Map.Entry<String, HashMap<String, String>> tsp : appTSProperties) {
 
