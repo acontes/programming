@@ -200,7 +200,10 @@ public class TestDataSpaces extends GCMFunctionalDataSpacesBase {
                     INPUT_FILE_NAME, 30000);
             final StringWrapper contentWrapper4 = ao4.readInputFileBlocking(ADDED_INPUT_NAME,
                     INPUT_FILE_NAME, 30000);
+            // give them a while to try without success (to let them ask one again for that space) 
+            Thread.sleep(1000);
             ao1.addInputSpace(ADDED_INPUT_NAME, getRootSubdirURL(inputWithDirLocalHandle));
+
             assertEquals(INPUT_FILE_CONTENT, contentWrapper1B.stringValue());
             assertEquals(INPUT_FILE_CONTENT, contentWrapper2.stringValue());
             assertEquals(INPUT_FILE_CONTENT, contentWrapper4.stringValue());
