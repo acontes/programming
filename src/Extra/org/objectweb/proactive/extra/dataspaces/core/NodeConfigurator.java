@@ -43,8 +43,8 @@ import org.objectweb.proactive.extra.vfsprovider.FileSystemServerDeployer;
  * </ol>
  * <p>
  * Instances of this class are thread-safe. They can be managed by {@link DataSpacesNodes} static
- * class or in some other way. It is assumed that Node's application identifier will not change
- * between {@link #configureApplication(String)} and {@link #tryCloseAppConfigurator()} calls.
+ * class or in some other way. It is assumed that Node's application will not change between
+ * {@link #configureApplication(long, String)} and {@link #tryCloseAppConfigurator()} calls.
  * 
  * @see DataSpacesImpl
  */
@@ -110,13 +110,11 @@ public class NodeConfigurator {
     }
 
     /**
-     * Configures node for a specific application. resulting in creation of configured
-     * {@link DataSpacesImpl}.
+     * Configures node for a specific application with its identifier, resulting in creation of
+     * configured {@link DataSpacesImpl}.
      * <p>
      * Configuration of a node for an application involves association to provided NamingService and
-     * registration of application scratch space for this node, if it exists. Application identifier
-     * is grabbed from current node state. That application identifier should remain stable until
-     * {@link #tryCloseAppConfigurator()} call.
+     * registration of application scratch space for this node, if it exists.
      * <p>
      * This method may be called several times for different applications, after node has been
      * configured through {@link #configureNode(Node, SpaceConfiguration)}. Subsequent calls will
@@ -126,6 +124,8 @@ public class NodeConfigurator {
      * subsequent {@link #getDataSpaceImpl()} call will throw {@link IllegalStateException} until
      * successful configuration.
      * 
+     * @param appId
+     *            id of application running on this node
      * @param namingServiceURL
      *            URL of naming service remote object for that application
      * @throws IllegalStateException
@@ -140,8 +140,9 @@ public class NodeConfigurator {
      * @throws FileSystemException
      *             VFS related exception during scratch data space creation
      */
-    synchronized public void configureApplication(String namingServiceURL) throws IllegalStateException,
-            FileSystemException, ProActiveException, ConfigurationException, URISyntaxException {
+    synchronized public void configureApplication(long appId, String namingServiceURL)
+            throws IllegalStateException, FileSystemException, ProActiveException, ConfigurationException,
+            URISyntaxException {
         logger.debug("Configuring node for Data Spaces application");
         checkConfigured();
 
@@ -149,7 +150,7 @@ public class NodeConfigurator {
         appConfigurator = new NodeApplicationConfigurator();
         boolean appConfigured = false;
         try {
-            appConfigurator.configure(namingServiceURL);
+            appConfigurator.configure(appId, namingServiceURL);
             appConfigured = true;
         } finally {
             if (!appConfigured)
@@ -271,8 +272,8 @@ public class NodeConfigurator {
 
         private DataSpacesImpl impl;
 
-        private void configure(String namingServiceURL) throws FileSystemException, URISyntaxException,
-                ProActiveException, ConfigurationException {
+        private void configure(final long appId, final String namingServiceURL) throws FileSystemException,
+                URISyntaxException, ProActiveException, ConfigurationException {
 
             // create naming service stub with URL and decorate it with local cache
             // use local variables so GC can collect them if something fails
@@ -290,7 +291,7 @@ public class NodeConfigurator {
 
             // create scratch data space for this application and register it
             if (nodeScratchSpace != null) {
-                applicationScratchSpace = nodeScratchSpace.initForApplication();
+                applicationScratchSpace = nodeScratchSpace.initForApplication(appId);
                 final SpaceInstanceInfo scratchInfo = applicationScratchSpace.getSpaceInstanceInfo();
 
                 boolean registered = false;
@@ -313,7 +314,7 @@ public class NodeConfigurator {
 
             // create implementation object connected to the application's
             // configuration
-            impl = new DataSpacesImpl(node, spacesMountManager, cachingDirectory, applicationScratchSpace);
+            impl = new DataSpacesImpl(appId, spacesMountManager, cachingDirectory, applicationScratchSpace);
         }
 
         private DataSpacesImpl getDataSpacesImpl() {

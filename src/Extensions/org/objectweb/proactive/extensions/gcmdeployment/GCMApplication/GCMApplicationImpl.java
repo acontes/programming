@@ -220,7 +220,7 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
                 // TODO this kind of hacks should be eventually moved to CommandBuilderProActive#setup()
                 // or similar developed mechanism
                 final TechnicalServicesProperties dataSpacesTSP = DataSpacesTechnicalService
-                        .createTechnicalServiceProperties(namingServiceURL);
+                        .createTechnicalServiceProperties(deploymentId, namingServiceURL);
                 for (GCMVirtualNodeInternal vn : virtualNodes.values()) {
                     vn.addTechnicalServiceProperties(dataSpacesTSP);
                 }
@@ -605,15 +605,12 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
             return;
         }
 
-        // FIXME: app id - temporary solution?
-        final long appId = deploymentId;
-
         Set<SpaceInstanceInfo> spacesInstances = null;
         if (spacesConfigurations != null) {
             spacesInstances = new HashSet<SpaceInstanceInfo>();
             for (final InputOutputSpaceConfiguration config : spacesConfigurations) {
                 try {
-                    spacesInstances.add(new SpaceInstanceInfo(appId, config));
+                    spacesInstances.add(new SpaceInstanceInfo(deploymentId, config));
                 } catch (ConfigurationException e) {
                     ProActiveLogger.logImpossibleException(GCMA_LOGGER, e);
                 }
@@ -621,10 +618,11 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
         }
 
         try {
-            namingService.registerApplication(appId, spacesInstances);
+            namingService.registerApplication(deploymentId, spacesInstances);
         } catch (ApplicationAlreadyRegisteredException e) {
-            GCMA_LOGGER.error(String.format(
-                    "Application with id=%d is already registered in specified Naming Serivce", appId), e);
+            GCMA_LOGGER.error(
+                    String.format("Application with id=%d is already registered in specified Naming Serivce",
+                            deploymentId), e);
         } catch (WrongApplicationIdException e) {
             ProActiveLogger.logImpossibleException(GCMA_LOGGER, e);
         }
@@ -632,10 +630,8 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
 
     private void stopDataSpaces() {
         if (namingService != null) {
-            // FIXME: app id - temporary solution?
-            final long appId = deploymentId;
             try {
-                namingService.unregisterApplication(appId);
+                namingService.unregisterApplication(deploymentId);
             } catch (WrongApplicationIdException e) {
                 ProActiveLogger.logImpossibleException(GCMA_LOGGER, e);
             }

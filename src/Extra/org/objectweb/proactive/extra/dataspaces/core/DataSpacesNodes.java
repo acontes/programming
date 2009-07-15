@@ -40,7 +40,7 @@ public class DataSpacesNodes {
      * 
      * This method is usable after setting up this node with
      * {@link #configureNode(Node, SpaceConfiguration)} and
-     * {@link #configureApplication(Node, String)} calls.
+     * {@link #configureApplication(Node, long, String)} calls.
      * 
      * Returned instance is usable while node is kept configured for the application, with
      * particular application identifier associated to this node during that time.
@@ -66,7 +66,7 @@ public class DataSpacesNodes {
 
     /**
      * Configures Data Spaces on node and stores that configuration, so it can be later configured
-     * for specific application by {@link #configureApplication(Node, String)} or closed by
+     * for specific application by {@link #configureApplication(Node, long, String)} or closed by
      * {@link #closeNodeConfig(Node)}.
      * 
      * @param node
@@ -99,7 +99,7 @@ public class DataSpacesNodes {
      * with Data Spaces implementation instance, so they can be later accessed by
      * {@link #getDataSpacesImpl(Node)} or closed through
      * {@link #tryCloseNodeApplicationConfig(Node)} or subsequent
-     * {@link #configureApplication(Node, String)}.
+     * {@link #configureApplication(Node, long, String)}.
      * 
      * This method can be called on an already configured node (see
      * {@link #configureNode(Node, SpaceConfiguration)}) or even already application-configured node
@@ -107,6 +107,8 @@ public class DataSpacesNodes {
      * 
      * @param node
      *            node to be configured for Data Spaces application
+     * @param appId
+     *            identifier of application running on that node
      * @param namingServiceURL
      *            URL of a Naming Service to connect to
      * @throws URISyntaxException
@@ -119,11 +121,11 @@ public class DataSpacesNodes {
      *             VFS related exception during scratch data space creation
      * @see NodeConfigurator#configureApplication(Node, long, String)
      */
-    public static void configureApplication(Node node, String namingServiceURL) throws ProActiveException,
-            NotConfiguredException, URISyntaxException, FileSystemException {
+    public static void configureApplication(Node node, long appId, String namingServiceURL)
+            throws ProActiveException, NotConfiguredException, URISyntaxException, FileSystemException {
         final NodeConfigurator nodeConfig = getOrFailNodeConfigurator(node);
         try {
-            nodeConfig.configureApplication(namingServiceURL);
+            nodeConfig.configureApplication(appId, namingServiceURL);
         } catch (IllegalStateException x) {
             logger.debug("Requested Data Spaces node application configuration for not configured node");
             // it can occur only in case of concurrent configuration, let's wrap it

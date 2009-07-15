@@ -74,7 +74,7 @@ public class VFSNodeScratchSpaceImplTest {
         testDirPath = testDir.getCanonicalPath();
         localAccessConfig = new BaseScratchSpaceConfiguration(SCRATCH_URL, testDirPath);
 
-        node = new MOCKNode(RUNTIME_ID, NODE_ID, APP_ID);
+        node = new MOCKNode(RUNTIME_ID, NODE_ID);
         nodeScratchSpace = new VFSNodeScratchSpaceImpl();
         configured = false;
         configured2 = false;
@@ -214,7 +214,7 @@ public class VFSNodeScratchSpaceImplTest {
     @Test
     public void testInitForApplicationIllegalState() throws Exception {
         try {
-            nodeScratchSpace.initForApplication();
+            nodeScratchSpace.initForApplication(APP_ID);
             fail("Exception expected");
         } catch (IllegalStateException e) {
         } catch (Exception e) {
@@ -245,7 +245,7 @@ public class VFSNodeScratchSpaceImplTest {
     public void testClose() throws Exception {
         final String path1 = Utils.appendSubDirs(testDirPath, RUNTIME_ID, NODE_ID);
         final String path2 = Utils.appendSubDirs(testDirPath, RUNTIME_ID, NODE_ID_2);
-        final Node node2 = new MOCKNode(RUNTIME_ID, NODE_ID_2, APP_ID);
+        final Node node2 = new MOCKNode(RUNTIME_ID, NODE_ID_2);
         nodeScratchSpace2 = new VFSNodeScratchSpaceImpl();
 
         nodeScratchSpace.init(node, localAccessConfig);
@@ -270,7 +270,7 @@ public class VFSNodeScratchSpaceImplTest {
     private void checkInitForApplication() throws Exception {
         final String dataSpacePath = Utils.appendSubDirs(testDirPath, RUNTIME_ID, NODE_ID, Long
                 .toString(APP_ID));
-        final ApplicationScratchSpace app = nodeScratchSpace.initForApplication();
+        final ApplicationScratchSpace app = nodeScratchSpace.initForApplication(APP_ID);
         assertNotNull(app);
         assertIsExistingEmptyDirectory(dataSpacePath);
     }

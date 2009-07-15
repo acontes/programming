@@ -54,9 +54,8 @@ public class VFSNodeScratchSpaceImpl implements NodeScratchSpace {
 
         private final SpaceInstanceInfo spaceInstanceInfo;
 
-        private AppScratchSpaceImpl() throws FileSystemException {
+        private AppScratchSpaceImpl(final long appId) throws FileSystemException {
             logger.debug("Initializing application node scratch space");
-            final long appId = Utils.getApplicationId(node);
             final String appIdString = Long.toString(appId);
             final String runtimeId = Utils.getRuntimeId(node);
             final String nodeId = Utils.getNodeId(node);
@@ -188,11 +187,11 @@ public class VFSNodeScratchSpaceImpl implements NodeScratchSpace {
         }
     }
 
-    public synchronized ApplicationScratchSpace initForApplication() throws FileSystemException,
-            IllegalStateException {
+    public synchronized ApplicationScratchSpace initForApplication(final long appId)
+            throws FileSystemException, IllegalStateException {
 
         checkIfConfigured();
-        return new AppScratchSpaceImpl();
+        return new AppScratchSpaceImpl(appId);
     }
 
     public synchronized void close() throws IllegalStateException {

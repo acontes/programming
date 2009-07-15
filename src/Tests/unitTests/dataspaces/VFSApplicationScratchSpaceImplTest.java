@@ -80,7 +80,7 @@ public class VFSApplicationScratchSpaceImplTest {
         testDirPath = testDir.getCanonicalPath();
         scratchDataSpacePath = Utils.appendSubDirs(testDirPath, RUNTIME_ID, NODE_ID, APP_ID);
 
-        node = new MOCKNode(RUNTIME_ID, NODE_ID, APP_ID_LONG);
+        node = new MOCKNode(RUNTIME_ID, NODE_ID);
         body = new MOCKBody();
         localAccessConfig = new BaseScratchSpaceConfiguration(ACCESS_URL, testDirPath);
         nodeScratchSpace = new VFSNodeScratchSpaceImpl();
@@ -88,7 +88,7 @@ public class VFSApplicationScratchSpaceImplTest {
         nodeScratchSpace.init(node, localAccessConfig);
         configured = true;
 
-        applicationScratchSpace = nodeScratchSpace.initForApplication();
+        applicationScratchSpace = nodeScratchSpace.initForApplication(APP_ID_LONG);
         assertNotNull(applicationScratchSpace);
         assertIsExistingEmptyDirectory(scratchDataSpacePath);
 

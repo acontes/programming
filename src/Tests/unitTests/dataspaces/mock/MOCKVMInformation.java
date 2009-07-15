@@ -12,11 +12,8 @@ public class MOCKVMInformation implements VMInformation {
 
     final private String name;
 
-    final private long deploymentId;
-
-    public MOCKVMInformation(String runtimeId, long deploymentId) {
+    public MOCKVMInformation(String runtimeId) {
         name = runtimeId;
-        this.deploymentId = deploymentId;
     }
 
     public long getCapacity() {
@@ -26,7 +23,7 @@ public class MOCKVMInformation implements VMInformation {
 
     public long getDeploymentId() {
 
-        return deploymentId;
+        return 0;
     }
 
     public String getDescriptorVMName() {

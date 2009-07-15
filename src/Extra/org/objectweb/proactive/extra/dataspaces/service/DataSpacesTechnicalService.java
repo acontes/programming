@@ -40,7 +40,7 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredExceptio
  * {@link PAProperties#PA_DATASPACES_SCRATCH_URL} and
  * {@link PAProperties#PA_DATASPACES_SCRATCH_PATH})</li>
  * <li>Application level configuration is read from technical service properties (
- * {@link #PROPERTY_NAMING_SERVICE_URL}) and Node properties (application id).</li>
+ * {@link #PROPERTY_APPLICATION_ID} abd {@link #PROPERTY_NAMING_SERVICE_URL}).</li>
  * </ul>
  * <p>
  * This implementation sets up Data Spaces in {@link #apply(Node)} and cleans up after Data Spaces
@@ -51,22 +51,30 @@ public class DataSpacesTechnicalService implements TechnicalService {
 
     private static final long serialVersionUID = -6664368270086233701L;
 
+    public static final String PROPERTY_APPLICATION_ID = "proactive.dataspaces.application_id";
+
     public static final String PROPERTY_NAMING_SERVICE_URL = "proactive.dataspaces.naming_service_url";
 
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.DATASPACES_CONFIGURATOR);
 
     private String namingServiceURL;
 
+    private Long appId;
+
     /**
      * Create technical service properties for given configuration that should initialize properly
      * this class.
      * 
+     * @param appId
+     *            identifier of application
      * @param namingServiceURL
      *            URL of Naming Service
      * @return technical service properties for given configuration
      */
-    public static TechnicalServicesProperties createTechnicalServiceProperties(final String namingServiceURL) {
+    public static TechnicalServicesProperties createTechnicalServiceProperties(final long appId,
+            final String namingServiceURL) {
         final HashMap<String, String> dataSpacesProperties = new HashMap<String, String>();
+        dataSpacesProperties.put(DataSpacesTechnicalService.PROPERTY_APPLICATION_ID, Long.toString(appId));
         dataSpacesProperties.put(DataSpacesTechnicalService.PROPERTY_NAMING_SERVICE_URL, namingServiceURL);
 
         final HashMap<String, HashMap<String, String>> techServicesMap = new HashMap<String, HashMap<String, String>>();
@@ -112,9 +120,8 @@ public class DataSpacesTechnicalService implements TechnicalService {
             return;
         }
 
-        // we assume that node's application id is already set up accordingly in this moment
         try {
-            DataSpacesNodes.configureApplication(node, namingServiceURL);
+            DataSpacesNodes.configureApplication(node, appId, namingServiceURL);
         } catch (NotConfiguredException e) {
             // it should not happen as we configure it above
             ProActiveLogger.logImpossibleException(logger, e);
@@ -139,11 +146,23 @@ public class DataSpacesTechnicalService implements TechnicalService {
     }
 
     /**
-     * Requires NamingService URL property: {@link #PROPERTY_NAMING_SERVICE_URL}.
+     * Requires application id and NamingService URL properties: {@link #PROPERTY_APPLICATION_ID}
+     * and {@link #PROPERTY_NAMING_SERVICE_URL}.
      **/
     public void init(Map<String, String> argValues) {
-        namingServiceURL = argValues.get(PROPERTY_NAMING_SERVICE_URL);
+        final String appIdString = argValues.get(PROPERTY_APPLICATION_ID);
+        if (appIdString == null) {
+            logger
+                    .error("Initialization error - provided TS properties are incomplete, application id is not specified.");
+        } else {
+            try {
+                appId = Long.parseLong(appIdString);
+            } catch (NumberFormatException x) {
+                ProActiveLogger.logImpossibleException(logger, x);
+            }
+        }
 
+        namingServiceURL = argValues.get(PROPERTY_NAMING_SERVICE_URL);
         if (namingServiceURL == null) {
             logger
                     .error("Initialization error - provided TS properties are incomplete, NamingService URL is not specified.");
@@ -151,7 +170,7 @@ public class DataSpacesTechnicalService implements TechnicalService {
     }
 
     private boolean isProperlyInitialized() {
-        return namingServiceURL != null;
+        return namingServiceURL != null && appId != null;
     }
 
     private void registerNotificationListener(final Node node) {

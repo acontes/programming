@@ -8,7 +8,6 @@ import java.net.URISyntaxException;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.extra.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extra.dataspaces.api.PADataSpaces;
 import org.objectweb.proactive.extra.dataspaces.core.DataSpacesNodes;
@@ -37,13 +36,9 @@ public class ManualConfigurationExample {
         // configure node for DS
         final Node halfBodiesNode = NodeFactory.getHalfBodiesNode();
 
-        // hacky force application id on that runtime
-        // FIXME it does not work, as deployment id is cached on ProActiveRuntimeRemoteObjectAdapter 
-        ProActiveRuntimeImpl.getProActiveRuntime().setDeploymentId(applicationId);
-
         // node is configured without scratch
         DataSpacesNodes.configureNode(halfBodiesNode, null);
-        DataSpacesNodes.configureApplication(halfBodiesNode, namingServiceURL);
+        DataSpacesNodes.configureApplication(halfBodiesNode, applicationId, namingServiceURL);
 
         // now we can use PADataSpaces from AO/bodies on that node.
         // in case of half-bodies node, we can use PADataSpaces from non-AO

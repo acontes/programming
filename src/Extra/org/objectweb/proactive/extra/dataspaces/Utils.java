@@ -107,16 +107,6 @@ public class Utils {
     }
 
     /**
-     * Returns an application id that is registered on a node.
-     * 
-     * @return
-     */
-    public static long getApplicationId(Node node) {
-        // FIXME depends on PROACTIVE-661 story; as a temporary solution we check it that way:
-        return node.getVMInformation().getDeploymentId();
-    }
-
-    /**
      * Determines local access URL for accessing some data, basing on provided remote access URL,
      * local access path and hostname specification.
      * <p>

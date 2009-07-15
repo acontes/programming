@@ -16,9 +16,9 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException;
  * are set through {@link #init(Node, BaseScratchSpaceConfiguration)} method. It performs basic
  * preliminary initialization that is independent from concrete application. It need to be called
  * before any further use of this instance.</li>
- * <li>for each application executed at previously specified node, {@link #initForApplication()} is
- * called to acquire instance of {@link ApplicationScratchSpace}. It should be called only once per
- * each application.</li>
+ * <li>for each application executed at previously specified node, {@link #initForApplication(long)
+ * )} is called to acquire instance of {@link ApplicationScratchSpace}. It should be called only
+ * once per each application.</li>
  * <li>when no more scratch space is going to be used on specified node, instance is closed by
  * {@link #close()} call, which cleans up base scratch data spaces directories.
  * </ul>
@@ -38,9 +38,9 @@ public interface NodeScratchSpace {
      * Any existing files in directory specified by configuration will be silently deleted.
      * <p>
      * This method can be called only once for each instance. Once called,
-     * {@link ApplicationScratchSpace} instances can be returned by {@link #initForApplication()}.
-     * Once initialized, this instance must be closed by {@link #close()} method. If initialization
-     * fails, there is no need to close it explicitly.
+     * {@link ApplicationScratchSpace} instances can be returned by
+     * {@link #initForApplication(long))}. Once initialized, this instance must be closed by
+     * {@link #close()} method. If initialization fails, there is no need to close it explicitly.
      * 
      * @param node
      *            node to install scratch space for
@@ -61,12 +61,12 @@ public interface NodeScratchSpace {
      * NodeScratchSpace has been configured and initialized by
      * {@link #init(Node, BaseScratchSpaceConfiguration)}.
      * <p>
-     * Application identifier is grabbed from Node state.
-     * <p>
      * Local access will be used (if is defined) for accessing scratch data space. Any potentially
      * existing files on this scratch Data Space directory will be silently deleted in result of
      * this call. Subsequent calls for the same application will result in undefined behavior.
      * 
+     * @param appId
+     *            id of application running on node
      * @return instance giving access to manage and use scratch data space, that need to be closed
      *         explicitly
      * @throws FileSystemException
@@ -74,7 +74,8 @@ public interface NodeScratchSpace {
      * @throws IllegalStateException
      *             when this instance is not initialized
      */
-    public ApplicationScratchSpace initForApplication() throws FileSystemException, IllegalStateException;
+    public ApplicationScratchSpace initForApplication(long appId) throws FileSystemException,
+            IllegalStateException;
 
     /**
      * Close any opened resources and cleans all node-related scratch space files. If no other

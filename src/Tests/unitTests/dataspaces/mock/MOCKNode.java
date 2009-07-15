@@ -16,9 +16,9 @@ public class MOCKNode implements Node {
     final private MOCKNodeInformation info;
     final private MOCKProActiveRuntime runtime;
 
-    public MOCKNode(String runtimeId, String nodeId, long deploymentId) {
+    public MOCKNode(String runtimeId, String nodeId) {
         info = new MOCKNodeInformation(nodeId);
-        runtime = new MOCKProActiveRuntime(runtimeId, deploymentId);
+        runtime = new MOCKProActiveRuntime(runtimeId);
     }
 
     public Object[] getActiveObjects() throws NodeException, ActiveObjectCreationException {
