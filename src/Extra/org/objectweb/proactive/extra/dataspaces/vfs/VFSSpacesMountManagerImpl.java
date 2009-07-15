@@ -89,7 +89,7 @@ public class VFSSpacesMountManagerImpl implements SpacesMountManager {
             logger.error("Could not create and configure VFS manager", x);
             throw new FileSystemException(x);
         }
-        logger.info("Mount manager initialized, VFS instance created");
+        logger.debug("Mount manager initialized, VFS instance created");
     }
 
     public DataSpacesFileObject resolveFile(final DataSpacesURI queryUri, final String ownerActiveObjectId)
@@ -148,7 +148,7 @@ public class VFSSpacesMountManagerImpl implements SpacesMountManager {
                 vfsManager.close();
             }
         }
-        logger.info("Mount manager closed");
+        logger.debug("Mount manager closed");
     }
 
     private void ensureSpaceIsMounted(final DataSpacesURI spaceURI, SpaceInstanceInfo info)
@@ -207,7 +207,8 @@ public class VFSSpacesMountManagerImpl implements SpacesMountManager {
             }
             mountedSpaces.put(mountingPoint, mountedRoot);
         }
-        logger.info(String.format("Mounted space: %s (access URL: %s)", mountingPoint, accessUrl));
+        if (logger.isDebugEnabled())
+            logger.debug(String.format("Mounted space: %s (access URL: %s)", mountingPoint, accessUrl));
     }
 
     /*
@@ -225,7 +226,8 @@ public class VFSSpacesMountManagerImpl implements SpacesMountManager {
                     "Could not close data space %s root file object", spaceUri), x);
         }
         vfsManager.closeFileSystem(spaceFileSystem);
-        logger.info("Unmounted space: " + spaceUri);
+        if (logger.isDebugEnabled())
+            logger.debug("Unmounted space: " + spaceUri);
     }
 
     // uri should be always suitable for user path

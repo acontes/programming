@@ -106,7 +106,7 @@ public class NodeConfigurator {
                 // node scratch space is not configured (does not need close) for sure
             }
         }
-        logger.info("Node configured for Data Spaces");
+        logger.debug("Node configured for Data Spaces");
     }
 
     /**
@@ -214,7 +214,7 @@ public class NodeConfigurator {
         logger.debug("Closing Data Spaces application node configuration");
         appConfigurator.close();
         appConfigurator = null;
-        logger.info("Closed Data Spaces application node configuration");
+        logger.debug("Closed Data Spaces application node configuration");
     }
 
     private void tryCloseProviderServer() {
@@ -298,7 +298,7 @@ public class NodeConfigurator {
                 try {
                     cachingDir.register(scratchInfo);
                     registered = true;
-                    logger.info("Scratch space for application registered");
+                    logger.debug("Scratch space for application registered");
                 } finally {
                     if (!registered) {
                         logger.error("Could not register application scratch space to Naming Service");

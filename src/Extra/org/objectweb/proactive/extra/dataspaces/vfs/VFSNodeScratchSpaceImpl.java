@@ -76,7 +76,7 @@ public class VFSNodeScratchSpaceImpl implements NodeScratchSpace {
                 close();
                 throw new ProActiveRuntimeException(x);
             }
-            logger.info("Initialized application node scratch space");
+            logger.debug("Initialized application node scratch space");
         }
 
         public void close() throws FileSystemException {
@@ -92,7 +92,7 @@ public class VFSNodeScratchSpaceImpl implements NodeScratchSpace {
             } catch (org.apache.commons.vfs.FileSystemException e) {
                 throw new FileSystemException(e);
             }
-            logger.info("Closed application scratch space");
+            logger.debug("Closed application scratch space");
         }
 
         public synchronized DataSpacesURI getScratchForAO(Body body) throws FileSystemException {
@@ -116,8 +116,9 @@ public class VFSNodeScratchSpaceImpl implements NodeScratchSpace {
                     throw new FileSystemException(x);
                 }
                 uri = spaceInstanceInfo.getMountingPoint().withActiveObjectId(aoid);
-                logger.info(String
-                        .format("Created scratch for Active Object with id: %s, URI: %s", aoid, uri));
+                if (logger.isDebugEnabled())
+                    logger.debug(String.format("Created scratch for Active Object with id: %s, URI: %s",
+                            aoid, uri));
                 scratches.put(aoid, uri);
             } else
                 uri = scratches.get(aoid);
@@ -180,7 +181,7 @@ public class VFSNodeScratchSpaceImpl implements NodeScratchSpace {
                 throw new FileSystemException(x);
             }
             configured = true;
-            logger.info("Initialized node scratch space at: " + partialSpacePath);
+            logger.debug("Initialized node scratch space at: " + partialSpacePath);
         } finally {
             if (!configured)
                 fileSystemManager.close();
@@ -231,7 +232,7 @@ public class VFSNodeScratchSpaceImpl implements NodeScratchSpace {
         } finally {
             this.fileSystemManager.close();
         }
-        logger.info("Closed node scratch space");
+        logger.debug("Closed node scratch space");
     }
 
     private FileObject createEmptyDirectoryRelative(final FileObject parent, final String path)

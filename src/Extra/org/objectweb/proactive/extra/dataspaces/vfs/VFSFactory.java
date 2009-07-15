@@ -102,7 +102,7 @@ public class VFSFactory {
         manager.setDefaultProvider(new UrlFileProvider());
 
         manager.init();
-        logger.info("Created and initialized new VFS manager");
+        logger.debug("Created and initialized new VFS manager");
         return manager;
     }
 

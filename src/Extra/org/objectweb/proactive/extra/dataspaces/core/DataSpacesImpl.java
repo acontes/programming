@@ -501,8 +501,8 @@ public class DataSpacesImpl {
             throw x;
         }
 
-        if (logger.isInfoEnabled())
-            logger.info("Added input/output data space: " + spaceInstanceInfo);
+        if (logger.isDebugEnabled())
+            logger.debug("Added input/output data space: " + spaceInstanceInfo);
         return spaceInstanceInfo.getMountingPoint().toString();
     }
 }
