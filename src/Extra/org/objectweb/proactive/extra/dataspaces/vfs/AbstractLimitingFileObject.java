@@ -39,9 +39,10 @@ import org.apache.commons.vfs.util.RandomAccessMode;
  * <ul>
  * <li>canRenameTo() invoked on non-decorated object with decorated object as target may return
  * false information</li>
- * <li>returned FileContent returns undecorated file for getFile(); depends on VFS bug: VFS-259</li>
+ * <li>returned FileContent returns undecorated file for getFile(); depends on VFS bug: VFS-259
+ * (fixed in VFS fork)</li>
  * <li>moveTo() invoked on non-decorated object with decorated object as target may not work for
- * some buggy providers; depends on VFS bug: VFS-258</li>
+ * some buggy providers; depends on VFS bug: VFS-258 (fixed in VFS fork)</li>
  * </ul>
  * <p>
  * Generic type should be an implementor type - class returned by
@@ -256,12 +257,10 @@ public abstract class AbstractLimitingFileObject<T extends FileObject> extends D
         }
 
         public FileObject getFile() {
-            // FIXME: we should return decorated file object, but it would break some down-casting in
-            // providers implementations (see HttpFileContentInfoFactory and WebdavFileContentInfoFactory).
-            // They would require change to use something like FileObjectUtils.getAbstractFileObject()
-            // instead of casting. Patch proposed, depends on VFS-259
-            // return decorateFile(content.getFile());
-            return content.getFile();
+            // FIXME: depends on VFS-259, fixed in VFS fork
+            // for vanilla VFS it would break some down-casting in providers implementations
+            // (see HttpFileContentInfoFactory and WebdavFileContentInfoFactory).
+            return decorateFile(content.getFile());
         }
 
         public InputStream getInputStream() throws FileSystemException {

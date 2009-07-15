@@ -329,8 +329,7 @@ public class AbstractLimitingFileObjectTest {
         }
     }
 
-    //FIXME: VFS bug/limitation: VFS-259
-    @Ignore
+    //FIXME: depends on VFS-259, fixed in VFS fork
     @Test
     public void testReadOnlyGetContentGetFile() throws FileSystemException {
         final FileObject sameFile = readOnlyFile.getContent().getFile();

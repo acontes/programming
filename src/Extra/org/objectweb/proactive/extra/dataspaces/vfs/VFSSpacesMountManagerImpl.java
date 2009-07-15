@@ -81,7 +81,8 @@ public class VFSSpacesMountManagerImpl implements SpacesMountManager {
         this.directory = directory;
 
         try {
-            // FIXME: unless VFS-256 is fixed, this manager will always return FileObjects with broken
+            // FIXME: depends on VFS-256 (fixed in VFS fork)
+            // in vanilla VFS version, this manager will always return FileObjects with broken
             // delete(FileSelector) method. Anyway, it is rather better to do it this way, than returning
             // shared FileObjects with broken concurrency 
             this.vfsManager = VFSFactory.createDefaultFileSystemManager(false);

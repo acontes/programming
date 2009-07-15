@@ -11,14 +11,12 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.vfs.FileName;
-import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.RandomAccessContent;
 import org.apache.commons.vfs.provider.AbstractFileObject;
 import org.apache.commons.vfs.provider.AbstractRandomAccessStreamContent;
 import org.apache.commons.vfs.provider.UriParser;
-import org.apache.commons.vfs.util.FileObjectUtils;
 import org.apache.commons.vfs.util.MonitorInputStream;
 import org.apache.commons.vfs.util.MonitorOutputStream;
 import org.apache.commons.vfs.util.RandomAccessMode;
@@ -193,10 +191,8 @@ public class ProActiveFileObject extends AbstractFileObject {
     }
 
     @Override
-    protected void doRename(FileObject newfile) throws Exception {
-        final ProActiveFileObject proactiveDestFile = (ProActiveFileObject) FileObjectUtils
-                .getAbstractFileObject(newfile);
-        getServer().fileRename(getPath(), proactiveDestFile.getPath());
+    protected void doRename(AbstractFileObject newfile) throws Exception {
+        getServer().fileRename(getPath(), ((ProActiveFileObject) newfile).getPath());
     }
 
     @Override
