@@ -50,8 +50,8 @@ import org.objectweb.proactive.extensions.gcmdeployment.GCMParserHelper;
 import org.objectweb.proactive.extensions.gcmdeployment.PathElement;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationParser;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.TechnicalServicesProperties;
-import org.objectweb.proactive.extra.dataspaces.core.InputOutputSpaceConfiguration;
-import org.objectweb.proactive.extra.dataspaces.core.SpaceType;
+import org.objectweb.proactive.extensions.dataspaces.core.InputOutputSpaceConfiguration;
+import org.objectweb.proactive.extensions.dataspaces.core.SpaceType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 

@@ -20,9 +20,9 @@ import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
-import org.objectweb.proactive.extra.dataspaces.Utils;
-import org.objectweb.proactive.extra.dataspaces.exceptions.DataSpacesException;
-import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredException;
+import org.objectweb.proactive.extensions.dataspaces.Utils;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.DataSpacesException;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.NotConfiguredException;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 

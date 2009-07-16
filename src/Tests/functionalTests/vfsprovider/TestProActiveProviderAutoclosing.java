@@ -22,8 +22,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.extra.dataspaces.vfs.VFSFactory;
-import org.objectweb.proactive.extra.vfsprovider.FileSystemServerDeployer;
+import org.objectweb.proactive.extensions.dataspaces.vfs.VFSFactory;
+import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
 
 import unitTests.vfsprovider.AbstractIOOperationsBase;
 

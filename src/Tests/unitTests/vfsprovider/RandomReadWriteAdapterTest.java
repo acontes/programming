@@ -2,8 +2,8 @@ package unitTests.vfsprovider;
 
 import java.io.File;
 
-import org.objectweb.proactive.extra.vfsprovider.server.RandomAccessStreamAdapter;
-import org.objectweb.proactive.extra.vfsprovider.server.Stream;
+import org.objectweb.proactive.extensions.vfsprovider.server.RandomAccessStreamAdapter;
+import org.objectweb.proactive.extensions.vfsprovider.server.Stream;
 
 
 public class RandomReadWriteAdapterTest extends AbstractStreamBase {

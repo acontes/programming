@@ -4,14 +4,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
-import org.objectweb.proactive.extra.dataspaces.Utils;
-import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
+import org.objectweb.proactive.extensions.dataspaces.Utils;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.ConfigurationException;
 
 
 public class UtilsTest {
     @Test
     public void testGetLocalAccessURLMatchingHostname()
-            throws org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException {
+            throws org.objectweb.proactive.extensions.dataspaces.exceptions.ConfigurationException {
         final String hostname = Utils.getHostname();
         assertEquals("/local", Utils.getLocalAccessURL("http://remote/", "/local", hostname));
     }

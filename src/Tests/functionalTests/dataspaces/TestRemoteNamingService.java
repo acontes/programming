@@ -16,16 +16,16 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.extra.dataspaces.core.DataSpacesURI;
-import org.objectweb.proactive.extra.dataspaces.core.InputOutputSpaceConfiguration;
-import org.objectweb.proactive.extra.dataspaces.core.ScratchSpaceConfiguration;
-import org.objectweb.proactive.extra.dataspaces.core.SpaceInstanceInfo;
-import org.objectweb.proactive.extra.dataspaces.core.naming.NamingService;
-import org.objectweb.proactive.extra.dataspaces.core.naming.NamingServiceDeployer;
-import org.objectweb.proactive.extra.dataspaces.exceptions.ApplicationAlreadyRegisteredException;
-import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
-import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceAlreadyRegisteredException;
-import org.objectweb.proactive.extra.dataspaces.exceptions.WrongApplicationIdException;
+import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesURI;
+import org.objectweb.proactive.extensions.dataspaces.core.InputOutputSpaceConfiguration;
+import org.objectweb.proactive.extensions.dataspaces.core.ScratchSpaceConfiguration;
+import org.objectweb.proactive.extensions.dataspaces.core.SpaceInstanceInfo;
+import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
+import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingServiceDeployer;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.ApplicationAlreadyRegisteredException;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.ConfigurationException;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.SpaceAlreadyRegisteredException;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.WrongApplicationIdException;
 
 import functionalTests.FunctionalTest;
 

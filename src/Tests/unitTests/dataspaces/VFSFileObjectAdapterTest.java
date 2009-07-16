@@ -16,12 +16,12 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.objectweb.proactive.extensions.calcium.system.SkeletonSystemImpl;
-import org.objectweb.proactive.extra.dataspaces.api.DataSpacesFileObject;
-import org.objectweb.proactive.extra.dataspaces.core.DataSpacesURI;
-import org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException;
-import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException;
-import org.objectweb.proactive.extra.dataspaces.vfs.VFSFactory;
-import org.objectweb.proactive.extra.dataspaces.vfs.adapter.VFSFileObjectAdapter;
+import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
+import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesURI;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.MalformedURIException;
+import org.objectweb.proactive.extensions.dataspaces.vfs.VFSFactory;
+import org.objectweb.proactive.extensions.dataspaces.vfs.adapter.VFSFileObjectAdapter;
 
 
 // TODO: some adapted functionality smoke tests - an abstract test for DataSpacesFileObject?

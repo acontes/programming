@@ -4,9 +4,9 @@ import java.io.File;
 import java.io.IOException;
 
 import org.junit.Test;
-import org.objectweb.proactive.extra.vfsprovider.exceptions.WrongStreamTypeException;
-import org.objectweb.proactive.extra.vfsprovider.server.OutputStreamAdapter;
-import org.objectweb.proactive.extra.vfsprovider.server.Stream;
+import org.objectweb.proactive.extensions.vfsprovider.exceptions.WrongStreamTypeException;
+import org.objectweb.proactive.extensions.vfsprovider.server.OutputStreamAdapter;
+import org.objectweb.proactive.extensions.vfsprovider.server.Stream;
 
 
 public class OutputStreamAdapterTest extends AbstractStreamBase {

@@ -5,9 +5,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.junit.Test;
-import org.objectweb.proactive.extra.vfsprovider.exceptions.WrongStreamTypeException;
-import org.objectweb.proactive.extra.vfsprovider.server.InputStreamAdapter;
-import org.objectweb.proactive.extra.vfsprovider.server.Stream;
+import org.objectweb.proactive.extensions.vfsprovider.exceptions.WrongStreamTypeException;
+import org.objectweb.proactive.extensions.vfsprovider.server.InputStreamAdapter;
+import org.objectweb.proactive.extensions.vfsprovider.server.Stream;
 
 
 /**

@@ -8,13 +8,13 @@ import java.net.URISyntaxException;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.extra.dataspaces.api.DataSpacesFileObject;
-import org.objectweb.proactive.extra.dataspaces.api.PADataSpaces;
-import org.objectweb.proactive.extra.dataspaces.core.DataSpacesNodes;
-import org.objectweb.proactive.extra.dataspaces.core.naming.NamingService;
-import org.objectweb.proactive.extra.dataspaces.core.naming.NamingServiceDeployer;
-import org.objectweb.proactive.extra.dataspaces.exceptions.ApplicationAlreadyRegisteredException;
-import org.objectweb.proactive.extra.dataspaces.exceptions.WrongApplicationIdException;
+import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
+import org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces;
+import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes;
+import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
+import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingServiceDeployer;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.ApplicationAlreadyRegisteredException;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.WrongApplicationIdException;
 
 
 /**

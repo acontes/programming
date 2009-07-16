@@ -46,10 +46,10 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.TechnicalServicesProperties;
-import org.objectweb.proactive.extra.dataspaces.api.PADataSpaces;
-import org.objectweb.proactive.extra.dataspaces.core.InputOutputSpaceConfiguration;
-import org.objectweb.proactive.extra.dataspaces.core.SpaceType;
-import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
+import org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces;
+import org.objectweb.proactive.extensions.dataspaces.core.InputOutputSpaceConfiguration;
+import org.objectweb.proactive.extensions.dataspaces.core.SpaceType;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.ConfigurationException;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

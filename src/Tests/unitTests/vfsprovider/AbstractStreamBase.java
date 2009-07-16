@@ -18,8 +18,8 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.objectweb.proactive.extra.vfsprovider.exceptions.WrongStreamTypeException;
-import org.objectweb.proactive.extra.vfsprovider.server.Stream;
+import org.objectweb.proactive.extensions.vfsprovider.exceptions.WrongStreamTypeException;
+import org.objectweb.proactive.extensions.vfsprovider.server.Stream;
 
 
 /**

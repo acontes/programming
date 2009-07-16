@@ -22,8 +22,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.objectweb.proactive.extra.dataspaces.vfs.AbstractLimitingFileObject;
-import org.objectweb.proactive.extra.dataspaces.vfs.VFSFactory;
+import org.objectweb.proactive.extensions.dataspaces.vfs.AbstractLimitingFileObject;
+import org.objectweb.proactive.extensions.dataspaces.vfs.VFSFactory;
 
 
 /**

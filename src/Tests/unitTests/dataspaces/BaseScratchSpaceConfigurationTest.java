@@ -5,11 +5,11 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 import org.junit.Test;
-import org.objectweb.proactive.extra.dataspaces.Utils;
-import org.objectweb.proactive.extra.dataspaces.core.BaseScratchSpaceConfiguration;
-import org.objectweb.proactive.extra.dataspaces.core.ScratchSpaceConfiguration;
-import org.objectweb.proactive.extra.dataspaces.core.SpaceType;
-import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
+import org.objectweb.proactive.extensions.dataspaces.Utils;
+import org.objectweb.proactive.extensions.dataspaces.core.BaseScratchSpaceConfiguration;
+import org.objectweb.proactive.extensions.dataspaces.core.ScratchSpaceConfiguration;
+import org.objectweb.proactive.extensions.dataspaces.core.SpaceType;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.ConfigurationException;
 
 
 public class BaseScratchSpaceConfigurationTest {

@@ -12,13 +12,13 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.objectweb.proactive.extra.dataspaces.core.DataSpacesURI;
-import org.objectweb.proactive.extra.dataspaces.core.InputOutputSpaceConfiguration;
-import org.objectweb.proactive.extra.dataspaces.core.ScratchSpaceConfiguration;
-import org.objectweb.proactive.extra.dataspaces.core.SpaceInstanceInfo;
-import org.objectweb.proactive.extra.dataspaces.core.SpaceType;
-import org.objectweb.proactive.extra.dataspaces.core.naming.SpacesDirectory;
-import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceAlreadyRegisteredException;
+import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesURI;
+import org.objectweb.proactive.extensions.dataspaces.core.InputOutputSpaceConfiguration;
+import org.objectweb.proactive.extensions.dataspaces.core.ScratchSpaceConfiguration;
+import org.objectweb.proactive.extensions.dataspaces.core.SpaceInstanceInfo;
+import org.objectweb.proactive.extensions.dataspaces.core.SpaceType;
+import org.objectweb.proactive.extensions.dataspaces.core.naming.SpacesDirectory;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.SpaceAlreadyRegisteredException;
 
 
 @Ignore

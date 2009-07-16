@@ -20,7 +20,7 @@ shift
 
 # what command to run?
 if [ "$command" = "start" ]; then
-	CLASS="org.objectweb.proactive.extra.vfsprovider.console.PAProviderServerStarter"
+	CLASS="org.objectweb.proactive.extensions.vfsprovider.console.PAProviderServerStarter"
 fi
 
 $JAVACMD "$CLASS" "$@"

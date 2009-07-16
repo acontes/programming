@@ -14,12 +14,12 @@ import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.objectweb.proactive.extra.dataspaces.core.SpaceInstanceInfo;
-import org.objectweb.proactive.extra.dataspaces.core.naming.NamingService;
-import org.objectweb.proactive.extra.dataspaces.core.naming.SpacesDirectory;
-import org.objectweb.proactive.extra.dataspaces.exceptions.ApplicationAlreadyRegisteredException;
-import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceAlreadyRegisteredException;
-import org.objectweb.proactive.extra.dataspaces.exceptions.WrongApplicationIdException;
+import org.objectweb.proactive.extensions.dataspaces.core.SpaceInstanceInfo;
+import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
+import org.objectweb.proactive.extensions.dataspaces.core.naming.SpacesDirectory;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.ApplicationAlreadyRegisteredException;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.SpaceAlreadyRegisteredException;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.WrongApplicationIdException;
 
 
 /**

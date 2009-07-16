@@ -16,10 +16,10 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.objectweb.proactive.extra.vfsprovider.protocol.FileInfo;
-import org.objectweb.proactive.extra.vfsprovider.protocol.FileOperations;
-import org.objectweb.proactive.extra.vfsprovider.protocol.FileType;
-import org.objectweb.proactive.extra.vfsprovider.server.FileSystemServerImpl;
+import org.objectweb.proactive.extensions.vfsprovider.protocol.FileInfo;
+import org.objectweb.proactive.extensions.vfsprovider.protocol.FileOperations;
+import org.objectweb.proactive.extensions.vfsprovider.protocol.FileType;
+import org.objectweb.proactive.extensions.vfsprovider.server.FileSystemServerImpl;
 
 
 /**

@@ -5,9 +5,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
 import org.junit.Test;
-import org.objectweb.proactive.extra.dataspaces.core.ScratchSpaceConfiguration;
-import org.objectweb.proactive.extra.dataspaces.core.SpaceType;
-import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
+import org.objectweb.proactive.extensions.dataspaces.core.ScratchSpaceConfiguration;
+import org.objectweb.proactive.extensions.dataspaces.core.SpaceType;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.ConfigurationException;
 
 
 public class ScratchSpaceConfigurationTest {

@@ -24,10 +24,10 @@ import org.apache.commons.vfs.impl.DefaultFileSystemManager;
 import org.apache.commons.vfs.test.ProviderTestConfig;
 import org.apache.commons.vfs.test.ProviderTestSuite;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.extra.vfsprovider.FileSystemServerDeployer;
-import org.objectweb.proactive.extra.vfsprovider.client.ProActiveFileName;
-import org.objectweb.proactive.extra.vfsprovider.client.ProActiveFileProvider;
-import org.objectweb.proactive.extra.vfsprovider.client.ProActiveFileName.ProActiveProviderScheme;
+import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
+import org.objectweb.proactive.extensions.vfsprovider.client.ProActiveFileName;
+import org.objectweb.proactive.extensions.vfsprovider.client.ProActiveFileProvider;
+import org.objectweb.proactive.extensions.vfsprovider.client.ProActiveFileName.ProActiveProviderScheme;
 
 import unitTests.vfsprovider.AbstractIOOperationsBase;
 

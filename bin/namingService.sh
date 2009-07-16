@@ -22,11 +22,11 @@ shift
 
 # what command to run?
 if [ "$command" = "start" ]; then
-	CLASS="org.objectweb.proactive.extra.dataspaces.console.NamingServiceStarter"
+	CLASS="org.objectweb.proactive.extensions.dataspaces.console.NamingServiceStarter"
 elif [ "$command" = "add" ]; then
-	CLASS="org.objectweb.proactive.extra.dataspaces.console.NamingServiceOperation"
+	CLASS="org.objectweb.proactive.extensions.dataspaces.console.NamingServiceOperation"
 elif [ "$command" = "ls" ]; then
-	CLASS="org.objectweb.proactive.extra.dataspaces.console.NamingServiceListing"
+	CLASS="org.objectweb.proactive.extensions.dataspaces.console.NamingServiceListing"
 fi
 
 $JAVACMD "$CLASS" "$@"

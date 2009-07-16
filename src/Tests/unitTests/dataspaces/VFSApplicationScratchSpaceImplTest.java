@@ -20,16 +20,16 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.extra.dataspaces.Utils;
-import org.objectweb.proactive.extra.dataspaces.core.ApplicationScratchSpace;
-import org.objectweb.proactive.extra.dataspaces.core.BaseScratchSpaceConfiguration;
-import org.objectweb.proactive.extra.dataspaces.core.DataSpacesURI;
-import org.objectweb.proactive.extra.dataspaces.core.NodeScratchSpace;
-import org.objectweb.proactive.extra.dataspaces.core.SpaceInstanceInfo;
-import org.objectweb.proactive.extra.dataspaces.core.SpaceType;
-import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
-import org.objectweb.proactive.extra.dataspaces.vfs.VFSFactory;
-import org.objectweb.proactive.extra.dataspaces.vfs.VFSNodeScratchSpaceImpl;
+import org.objectweb.proactive.extensions.dataspaces.Utils;
+import org.objectweb.proactive.extensions.dataspaces.core.ApplicationScratchSpace;
+import org.objectweb.proactive.extensions.dataspaces.core.BaseScratchSpaceConfiguration;
+import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesURI;
+import org.objectweb.proactive.extensions.dataspaces.core.NodeScratchSpace;
+import org.objectweb.proactive.extensions.dataspaces.core.SpaceInstanceInfo;
+import org.objectweb.proactive.extensions.dataspaces.core.SpaceType;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.ConfigurationException;
+import org.objectweb.proactive.extensions.dataspaces.vfs.VFSFactory;
+import org.objectweb.proactive.extensions.dataspaces.vfs.VFSNodeScratchSpaceImpl;
 
 import unitTests.dataspaces.mock.MOCKBody;
 import unitTests.dataspaces.mock.MOCKNode;
@@ -118,7 +118,7 @@ public class VFSApplicationScratchSpaceImplTest {
      */
     @Test
     public void testGetScratchForAO() throws FileSystemException,
-            org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException {
+            org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException {
 
         applicationScratchSpace.getScratchForAO(body);
         assertIsExistingEmptyDirectory(scratchPath);
@@ -128,11 +128,11 @@ public class VFSApplicationScratchSpaceImplTest {
      * Check if returned URI is valid.
      * 
      * @throws FileSystemException
-     * @throws org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException
+     * @throws org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException
      */
     @Test
     public void testGetScratchForAO1() throws FileSystemException,
-            org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException {
+            org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException {
 
         final DataSpacesURI uri = applicationScratchSpace.getScratchForAO(body);
 

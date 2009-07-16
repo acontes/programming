@@ -26,14 +26,14 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
-import org.objectweb.proactive.extra.dataspaces.api.DataSpacesFileObject;
-import org.objectweb.proactive.extra.dataspaces.api.PADataSpaces;
-import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationException;
-import org.objectweb.proactive.extra.dataspaces.exceptions.FileSystemException;
-import org.objectweb.proactive.extra.dataspaces.exceptions.MalformedURIException;
-import org.objectweb.proactive.extra.dataspaces.exceptions.NotConfiguredException;
-import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceAlreadyRegisteredException;
-import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceNotFoundException;
+import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
+import org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.ConfigurationException;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.MalformedURIException;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.NotConfiguredException;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.SpaceAlreadyRegisteredException;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.SpaceNotFoundException;
 
 
 public class TestDataSpaces extends GCMFunctionalDataSpacesBase {

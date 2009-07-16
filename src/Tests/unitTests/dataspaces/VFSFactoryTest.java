@@ -17,8 +17,8 @@ import org.apache.commons.vfs.impl.DefaultFileSystemManager;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.objectweb.proactive.extra.dataspaces.core.DataSpacesURI;
-import org.objectweb.proactive.extra.dataspaces.vfs.VFSFactory;
+import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesURI;
+import org.objectweb.proactive.extensions.dataspaces.vfs.VFSFactory;
 
 
 public class VFSFactoryTest {

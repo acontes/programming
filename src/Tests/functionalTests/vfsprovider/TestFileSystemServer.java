@@ -4,10 +4,10 @@ import java.io.IOException;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.objectweb.proactive.extra.vfsprovider.exceptions.StreamNotFoundException;
-import org.objectweb.proactive.extra.vfsprovider.exceptions.WrongStreamTypeException;
-import org.objectweb.proactive.extra.vfsprovider.protocol.StreamMode;
-import org.objectweb.proactive.extra.vfsprovider.server.FileSystemServerImpl;
+import org.objectweb.proactive.extensions.vfsprovider.exceptions.StreamNotFoundException;
+import org.objectweb.proactive.extensions.vfsprovider.exceptions.WrongStreamTypeException;
+import org.objectweb.proactive.extensions.vfsprovider.protocol.StreamMode;
+import org.objectweb.proactive.extensions.vfsprovider.server.FileSystemServerImpl;
 
 import unitTests.vfsprovider.AbstractIOOperationsBase;
 
