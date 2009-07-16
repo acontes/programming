@@ -27,11 +27,13 @@ import org.objectweb.proactive.extra.dataspaces.exceptions.ConfigurationExceptio
 import org.objectweb.proactive.extra.dataspaces.exceptions.SpaceAlreadyRegisteredException;
 import org.objectweb.proactive.extra.dataspaces.exceptions.WrongApplicationIdException;
 
+import functionalTests.FunctionalTest;
+
 
 /**
  * Test NamingService on the local default node.
  */
-public class TestRemoteNamingService {
+public class TestRemoteNamingService extends FunctionalTest {
     // extends GCMFunctionalTestDefaultNodes {
 
     private static final String NAME = "DSnamingservice";
