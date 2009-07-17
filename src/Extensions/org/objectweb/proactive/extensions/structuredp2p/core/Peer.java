@@ -22,7 +22,8 @@ import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOver
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.chord.ChordOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.requests.BlockingRequestReceiverException;
 import org.objectweb.proactive.extensions.structuredp2p.core.requests.StructuredMetaObjectFactory;
-import org.objectweb.proactive.extensions.structuredp2p.data.OwlimStorage;
+import org.objectweb.proactive.extensions.structuredp2p.datastorage.DataStorage;
+import org.objectweb.proactive.extensions.structuredp2p.datastorage.owlim.OWLIMStorage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.Message;
 import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.Query;
 import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.QueryResponse;
@@ -70,7 +71,7 @@ public class Peer implements InitActive, RunActive, Serializable {
     /**
      * Contains data that are stored in the peer.
      */
-    private OwlimStorage dataStorage;
+    private transient DataStorage dataStorage;
 
     /**
      * The stub associated to the current peer.
@@ -91,7 +92,6 @@ public class Peer implements InitActive, RunActive, Serializable {
      */
     public Peer(OverlayType type) {
         this.type = type;
-        this.dataStorage = new OwlimStorage();
     }
 
     /**
@@ -209,7 +209,7 @@ public class Peer implements InitActive, RunActive, Serializable {
      * 
      * @return the data that are managed by the peer.
      */
-    public OwlimStorage getDataStorage() {
+    public DataStorage getDataStorage() {
         return this.dataStorage;
     }
 
@@ -271,19 +271,25 @@ public class Peer implements InitActive, RunActive, Serializable {
      * {@inheritDoc}
      */
     public void initActivity(Body body) {
-        switch (this.type) {
-            case CAN:
-                this.structuredOverlay = new CANOverlay(this);
-                break;
-            case CHORD:
-                this.structuredOverlay = new ChordOverlay(this);
-                break;
-            default:
-                throw new IllegalArgumentException("The peer type must be one of OverlayType.");
-        }
+        try {
+            this.dataStorage = new OWLIMStorage();
 
-        PAActiveObject.setImmediateService("search");
-        this.stub = (Peer) PAActiveObject.getStubOnThis();
+            switch (this.type) {
+                case CAN:
+                    this.structuredOverlay = new CANOverlay(this);
+                    break;
+                case CHORD:
+                    this.structuredOverlay = new ChordOverlay(this);
+                    break;
+                default:
+                    throw new IllegalArgumentException("The peer type must be one of OverlayType.");
+            }
+
+            PAActiveObject.setImmediateService("search");
+            this.stub = (Peer) PAActiveObject.getStubOnThis();
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
     }
 
     /**

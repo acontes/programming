@@ -5,7 +5,7 @@ import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredO
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.NeighborsDataStructure;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.Zone;
-import org.objectweb.proactive.extensions.structuredp2p.data.OwlimStorage;
+import org.objectweb.proactive.extensions.structuredp2p.datastorage.owlim.OWLIMStorage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.Message;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.ActionResponseMessage;
 
@@ -50,7 +50,7 @@ public class CANMergeMessage implements Message {
     /**
      * The resources to merge with.
      */
-    private final OwlimStorage resources;
+    private final OWLIMStorage resources;
 
     /**
      * Constructor.
@@ -69,7 +69,7 @@ public class CANMergeMessage implements Message {
      *            the resources to merge with.
      */
     public CANMergeMessage(Peer remotePeer, int dimension, int direction, NeighborsDataStructure neighbors,
-            Zone remoteZone, OwlimStorage remoteResources) {
+            Zone remoteZone, OWLIMStorage remoteResources) {
         this.remotePeer = remotePeer;
         this.dimension = dimension;
         this.direction = direction;
@@ -139,7 +139,7 @@ public class CANMergeMessage implements Message {
      * 
      * @return the resources to merge with.
      */
-    public OwlimStorage getResources() {
+    public OWLIMStorage getResources() {
         return this.resources;
     }
 }

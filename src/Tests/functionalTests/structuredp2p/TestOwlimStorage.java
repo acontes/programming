@@ -4,23 +4,23 @@ import info.aduna.iteration.CloseableIteration;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import junit.framework.Assert;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.objectweb.proactive.extensions.structuredp2p.data.DataStorage;
-import org.objectweb.proactive.extensions.structuredp2p.data.OwlimStorage;
+import org.objectweb.proactive.extensions.structuredp2p.datastorage.DataStorage;
+import org.objectweb.proactive.extensions.structuredp2p.datastorage.owlim.OWLIMStorage;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
+import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.StatementImpl;
-import org.openrdf.model.impl.URIImpl;
 import org.openrdf.query.Binding;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
-import org.openrdf.repository.RepositoryException;
 
 
 /**
@@ -31,13 +31,23 @@ import org.openrdf.repository.RepositoryException;
  */
 public class TestOwlimStorage {
     private static DataStorage owlimStorage;
-    private static URI subject = new URIImpl("http://exa‹mple.org/owlim#Pilat");
-    private static URI predicate = new URIImpl("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
-    private static URI object = new URIImpl("http://example.org/owlim#Human");
+    private static ValueFactory owlimValueFactory;
+
+    private static URI subject;
+    private static URI predicate;
+    private static URI object;
 
     @BeforeClass
     public static void setUpBeforeClass() {
-        TestOwlimStorage.owlimStorage = new OwlimStorage();
+        TestOwlimStorage.owlimStorage = new OWLIMStorage();
+        TestOwlimStorage.owlimValueFactory = TestOwlimStorage.owlimStorage.getRepository().getValueFactory();
+
+        TestOwlimStorage.subject = TestOwlimStorage.owlimValueFactory
+                .createURI("http://example.org/owlim#Pilat");
+        TestOwlimStorage.predicate = TestOwlimStorage.owlimValueFactory
+                .createURI("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
+        TestOwlimStorage.object = TestOwlimStorage.owlimValueFactory
+                .createURI("http://example.org/owlim#Human");
     }
 
     @Test
@@ -45,20 +55,15 @@ public class TestOwlimStorage {
         TestOwlimStorage.owlimStorage.add(new StatementImpl(TestOwlimStorage.subject,
             TestOwlimStorage.predicate, TestOwlimStorage.object));
 
-        List<Statement> results = null;
-        try {
-            results = TestOwlimStorage.owlimStorage.evaluateQuery(
-                    new StatementImpl(TestOwlimStorage.subject, null, null)).asList();
-        } catch (RepositoryException e) {
-            e.printStackTrace();
-        }
+        Set<Statement> results = null;
+        results = TestOwlimStorage.owlimStorage
+                .query(new StatementImpl(TestOwlimStorage.subject, null, null));
 
-        Assert.assertEquals(2, results.size());
-        Assert.assertEquals(TestOwlimStorage.subject, results.get(0).getSubject());
-        Assert.assertEquals(TestOwlimStorage.predicate, results.get(0).getPredicate());
-        Assert.assertEquals(TestOwlimStorage.subject, results.get(1).getSubject());
-        Assert.assertEquals(TestOwlimStorage.predicate, results.get(1).getPredicate());
-        Assert.assertEquals(TestOwlimStorage.object, results.get(1).getObject());
+        Statement[] resultsAsArray = results.toArray(new Statement[] {});
+
+        Assert.assertEquals(1, results.size());
+        Assert.assertEquals(TestOwlimStorage.subject, resultsAsArray[0].getSubject());
+        Assert.assertEquals(TestOwlimStorage.predicate, resultsAsArray[0].getPredicate());
     }
 
     @Test
@@ -70,8 +75,8 @@ public class TestOwlimStorage {
         query += "  ?man rdf:type ex:Human .\n";
         query += "}";
 
-        CloseableIteration<BindingSet, QueryEvaluationException> results = TestOwlimStorage.owlimStorage
-                .evaluateQuery(QueryLanguage.SPARQL, query);
+        CloseableIteration<? extends BindingSet, QueryEvaluationException> results = TestOwlimStorage.owlimStorage
+                .query(QueryLanguage.SPARQL, query);
 
         List<String> subjects = new ArrayList<String>();
 
@@ -101,14 +106,11 @@ public class TestOwlimStorage {
 
     @Test
     public void testRemove() {
-        TestOwlimStorage.owlimStorage.remove(new StatementImpl(TestOwlimStorage.subject, null, null));
+        TestOwlimStorage.owlimStorage.remove(TestOwlimStorage.owlimValueFactory.createStatement(
+                TestOwlimStorage.subject, TestOwlimStorage.predicate, TestOwlimStorage.object));
 
-        try {
-            Assert.assertEquals(0, TestOwlimStorage.owlimStorage.evaluateQuery(
-                    new StatementImpl(TestOwlimStorage.subject, null, null)).asList().size());
-        } catch (RepositoryException e) {
-            e.printStackTrace();
-        }
+        Assert.assertEquals(0, TestOwlimStorage.owlimStorage.query(
+                new StatementImpl(TestOwlimStorage.subject, null, null)).size());
     }
 
     @AfterClass

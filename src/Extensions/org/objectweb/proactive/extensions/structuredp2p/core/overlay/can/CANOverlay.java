@@ -95,6 +95,7 @@ public class CANOverlay extends StructuredOverlay {
                 }
             }
         }
+        this.updateNeighbors();
 
         return true;
     }
@@ -137,9 +138,12 @@ public class CANOverlay extends StructuredOverlay {
                 /* We are alone on this pitiless world : nothing to do */
                 break;
             case 1:
-                this.sendTo(neighborsToMergeWith.get(0), new CANMergeMessage(this.getRemotePeer(),
-                    lastDimension, lastDirection, new NeighborsDataStructure(), this.getZone(), this
-                            .getLocalPeer().getDataStorage().getDataFromZone(this.getZone())));
+                /*
+                 * this.sendTo(neighborsToMergeWith.get(0), new
+                 * CANMergeMessage(this.getRemotePeer(), lastDimension, lastDirection, new
+                 * NeighborsDataStructure(), this.getZone(), this
+                 * .getLocalPeer().getDataStorage().getDataFromZone(this.getZone())));
+                 */
                 break;
             default:
                 Zone zoneToSplit = this.getZone();
@@ -167,9 +171,12 @@ public class CANOverlay extends StructuredOverlay {
                     /*
                      * Merge the new zones obtained with the suitable neighbors.
                      */
-                    this.sendTo(neighborsToMergeWith.get(i), new CANMergeMessage(this.getRemotePeer(),
-                        lastDimension, lastDirection, neighborsOfCurrentNeighbor, newZones[0], this
-                                .getLocalPeer().getDataStorage().getDataFromZone(this.getZone())));
+                    /*
+                     * this.sendTo(neighborsToMergeWith.get(i), new
+                     * CANMergeMessage(this.getRemotePeer(), lastDimension, lastDirection,
+                     * neighborsOfCurrentNeighbor, newZones[0], this
+                     * .getLocalPeer().getDataStorage().getDataFromZone(this.getZone())));
+                     */
                 }
                 break;
         }
@@ -484,7 +491,7 @@ public class CANOverlay extends StructuredOverlay {
             e.printStackTrace();
         }
 
-        // Update the peer which is already on the network
+        // Update the zone of the peer which is already on the network
         this.setZone(newZones[direction]);
         this.saveSplit(dimension, direction);
 
@@ -494,11 +501,14 @@ public class CANOverlay extends StructuredOverlay {
         neighborsOfThePeerWhichJoin.removeAll(dimension, direction);
         neighborsOfThePeerWhichJoin.add(this.getRemotePeer(), this.zone, dimension, direction);
 
+        // Update the neighbors of the peer which is already on the network
         for (Peer neighborToRemove : this.neighborsDataStructure.getNeighbors(dimension, directionInv)) {
             PAFuture.waitFor(this.sendTo(neighborToRemove, new CANRemoveNeighborMessage(this.getRemotePeer(),
                 dimension, direction)));
         }
         this.neighborsDataStructure.removeAll(dimension, directionInv);
+        // Update neighbors in order to check the other dimensions
+        this.updateNeighbors();
 
         Stack<int[]> newHistory = null;
         try {

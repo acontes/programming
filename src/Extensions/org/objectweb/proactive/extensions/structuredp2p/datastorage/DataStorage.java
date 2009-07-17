@@ -1,14 +1,15 @@
-package org.objectweb.proactive.extensions.structuredp2p.data;
+package org.objectweb.proactive.extensions.structuredp2p.datastorage;
 
 import info.aduna.iteration.CloseableIteration;
 
 import java.io.Serializable;
+import java.util.Set;
 
 import org.openrdf.model.Statement;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
-import org.openrdf.repository.RepositoryResult;
+import org.openrdf.repository.Repository;
 
 
 /**
@@ -20,10 +21,18 @@ public interface DataStorage extends Serializable {
 
     public abstract void remove(Statement stmt);
 
-    public abstract CloseableIteration<BindingSet, QueryEvaluationException> evaluateQuery(
+    public abstract CloseableIteration<? extends BindingSet, QueryEvaluationException> query(
             QueryLanguage language, String query);
 
-    public abstract RepositoryResult<Statement> evaluateQuery(Statement stmt);
+    public abstract Set<Statement> query(Statement stmt);
+
+    public abstract void startup();
 
     public abstract void shutdown();
+
+    public abstract void shutdownWithRepositoriesRemoving();
+
+    public abstract void shutdownWithRepositoryRemoving(String name);
+
+    public abstract Repository getRepository();
 }
