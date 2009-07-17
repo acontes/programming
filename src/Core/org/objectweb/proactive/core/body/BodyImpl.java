@@ -588,11 +588,11 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             // If the request is not a "terminate Active Object" request,
             // it is served normally.
             if (!isTerminateAORequest(request)) {
-                reply = request.serve(BodyImpl.this);
+            	reply = request.serve(BodyImpl.this);
             }
 
             if (!isProActiveInternalObject) {
-                try {
+            	try {
                     if (isInImmediateService())
                         debugger.breakpoint(BreakpointType.EndImmediateService, request);
                     else
@@ -641,9 +641,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             if(mcr != null) {
             	Object res = mcr.getResult();
             	if(res != null) {
-            		System.out.println("Got reply for method " + reply.getMethodName() + " and is a "+ res.getClass().getName() + " ... " + PAFuture.isAwaited(res) );
-            		
-            		
+            		System.out.println("Got reply for method " + reply.getMethodName() + " and is a "+ res.getClass().getName() + " ... awaited?" + PAFuture.isAwaited(res) );	
             	}
             }
             // END JMX Notification
@@ -684,7 +682,9 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                 // Useful if the exception is due to the content of the result
                 // (e.g. InvalidClassException)
                 try {
+                	//System.out.println(System.currentTimeMillis() + ": replySendBgn" + request.getMethodName() );
                     reply.send(request.getSender());
+                    //System.out.println(System.currentTimeMillis() + ": replySendEnd" + request.getMethodName() );
                 } catch (IOException e1) {
                     try {
                         this.retrySendReplyWithException(reply, e1, request.getSender());

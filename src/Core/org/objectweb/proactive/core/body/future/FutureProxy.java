@@ -330,6 +330,12 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
             mbean.sendNotification(NotificationType.receivedFutureResult, new FutureNotificationData(bodyId,
                 getCreatorID()));
         }
+        else {
+        	Body so = PAActiveObject.getBodyOnThis();
+        	if(so != null) {
+        		logger.debug("Received Future Result. I'm a "+ so.getClass().getName() + ". " + so.getMBean() );
+        	}
+        }
 
         // END JMX Notification
         if (Profiling.TIMERS_COMPILED) {

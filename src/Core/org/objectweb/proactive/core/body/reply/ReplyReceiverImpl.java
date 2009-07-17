@@ -32,7 +32,16 @@
 package org.objectweb.proactive.core.body.reply;
 
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
+import org.objectweb.proactive.core.body.BodyImpl;
 import org.objectweb.proactive.core.body.future.FuturePool;
+import org.objectweb.proactive.core.body.future.MethodCallResult;
+import org.objectweb.proactive.core.body.tags.MessageTags;
+import org.objectweb.proactive.core.body.tags.Tag;
+import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
+import org.objectweb.proactive.core.jmx.notification.NotificationType;
+import org.objectweb.proactive.core.jmx.notification.RequestNotificationData;
 
 
 public class ReplyReceiverImpl implements ReplyReceiver, java.io.Serializable {
@@ -40,6 +49,56 @@ public class ReplyReceiverImpl implements ReplyReceiver, java.io.Serializable {
     }
 
     public int receiveReply(Reply r, Body receiverBody, FuturePool futurePool) throws java.io.IOException {
-        return futurePool.receiveFutureValue(r.getSequenceNumber(), r.getSourceBodyID(), r.getResult(), r);
+    	int n = -1;
+    	boolean awaited = false;
+    	MethodCallResult mcr = r.getResult();
+    	String className = "";
+    	String name = PAActiveObject.getBodyOnThis().getName();
+    	if(r.getResult() != null) {
+    		Object res = r.getResult().getResult();
+    		if(res != null) {
+    			awaited = PAFuture.isAwaited(res);
+    			if(!awaited) {
+    				n = 0;
+    			}
+    			else {
+    				n = 1;
+    			}
+    			className = r.getResult().getResult().getClass().getName();
+    		}
+    	}
+    	
+    	System.out.println(System.currentTimeMillis() + ": replyReceived(futureupdate) " + r.getMethodName() + " [" + className + "]" +  " ["+ name +"] + Awaited? "+ n);
+    	
+    	// Here, I know if the result is really available (awaited == false).
+    	// If it is, then I should generate a notification realReplyReceived, and read it
+    	if(n == 0) {
+    		Body body = PAActiveObject.getBodyOnThis();
+    		BodyWrapperMBean mbean = null;
+    		if(body != null) {
+    			mbean = body.getMBean();
+    			if(mbean != null) {
+    				String tagNotification = createTagNotification(r.getTags());
+    				RequestNotificationData requestNotificationData = new RequestNotificationData(
+    						body.getID(), body.getNodeURL(), r.getSourceBodyID(), body.getNodeURL(),
+    						r.getMethodName(), body.getRequestQueue().size() + 1, r.getSequenceNumber(),
+    						tagNotification);
+    				mbean.sendNotification(NotificationType.realReplyReceived, requestNotificationData);
+    			}
+    		}
+    	}
+    	
+    	int a = futurePool.receiveFutureValue(r.getSequenceNumber(), r.getSourceBodyID(), r.getResult(), r);
+    	return a;
     }
+    
+    private String createTagNotification(MessageTags tags) {
+        String result = "";
+        if (tags != null) {
+            for (Tag tag : tags.getTags()) {
+                result += tag.getNotificationMessage();
+            }
+        }
+        return result;
+    }        
 }

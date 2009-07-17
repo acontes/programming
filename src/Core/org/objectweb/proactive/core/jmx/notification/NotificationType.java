@@ -52,6 +52,8 @@ public class NotificationType {
     public final static String requestSent = "requestSent";
     public final static String servingStarted = "servingStarted";
     public final static String voidRequestServed = "voidRequestServed";
+    // -- cruz
+    public final static String realReplyReceived = "realReplyReceived";
 
     // --- Corresponds to the MigrationEvent -----------------------
     public final static String migratedBodyRestarted = "migratedBodyRestarted";

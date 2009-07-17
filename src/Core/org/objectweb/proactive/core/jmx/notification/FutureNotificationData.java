@@ -81,4 +81,10 @@ public class FutureNotificationData implements Serializable {
     public UniqueID getCreatorID() {
         return creatorID;
     }
+    
+    @Override
+    public String toString() {
+        return "FutureNotification. Body which waits for this: " + bodyID + ". Body that creates the future: "
+        	+ creatorID;
+    }
 }

@@ -67,6 +67,7 @@ import org.objectweb.proactive.core.component.representative.ProActiveComponentR
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
+import org.objectweb.proactive.core.jmx.notification.FutureNotificationData;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.jmx.notification.RequestNotificationData;
 import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
@@ -358,11 +359,12 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
         
         if (type.equals(NotificationType.requestReceived)) {
             RequestNotificationData data = (RequestNotificationData) notification.getUserData();
-            logger.debug("["+componentName+"][requestRecv] " + //"From:" + data.getSource() +
+            logger.debug(
+            		" Timestamp: " + notification.getTimeStamp() +
+            		"["+componentName+"][requestRecv] " + //"From:" + data.getSource() +
             		//" To:"+ data.getDestination() +
             		" Method:" + data.getMethodName() +
             		" SeqNumber: " + data.getSequenceNumber() +
-            		" Timestamp: " + notification.getTimeStamp() +
             		" NotifSeqNbr: " + notification.getSequenceNumber() +
             		" Tags: " + data.getTags());
             processRequestReceived(notification);
@@ -391,11 +393,12 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
         } 
         else if (type.equals(NotificationType.replySent)) {
             RequestNotificationData data = (RequestNotificationData) notification.getUserData();
-            logger.debug("["+componentName+"][replySent  ] " + //From:" + data.getSource() +
+            logger.debug(
+            		" Timestamp: " + notification.getTimeStamp() +
+            		"["+componentName+"][replySent  ] " + //From:" + data.getSource() +
             		//" To:"+ data.getDestination() +
             		" Method:" + data.getMethodName() +
             		" SeqNumber: " + data.getSequenceNumber() +
-            		" Timestamp: " + notification.getTimeStamp() +
             		" NotifSeqNbr: " + notification.getSequenceNumber() +
             		" Tags: " + data.getTags());
             processReplySent(notification);
@@ -424,11 +427,12 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
         }
         else if (type.equals(NotificationType.requestSent)) {
             RequestNotificationData data = (RequestNotificationData) notification.getUserData();
-            logger.debug("["+componentName+"][requestSent] " + //"From:" + data.getSource() +
+            logger.debug(
+            		" Timestamp: " + notification.getTimeStamp() +
+            		"["+componentName+"][requestSent] " + //"From:" + data.getSource() +
 //            		" To:"+ data.getDestination() +
             		" Method:" + data.getMethodName() +
             		" SeqNumber: " + data.getSequenceNumber() +
-            		" Timestamp: " + notification.getTimeStamp() +
             		" NotifSeqNbr: " + notification.getSequenceNumber() +
             		" Tags: " + data.getTags());
             
@@ -441,11 +445,12 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
         } 
         else if (type.equals(NotificationType.replyReceived)) {
             RequestNotificationData data = (RequestNotificationData) notification.getUserData();
-            logger.debug("["+componentName+"][replyRecv  ] " + //From:" + data.getSource() +
+            logger.debug(
+            		" Timestamp: " + notification.getTimeStamp() +
+            		"["+componentName+"][replyRecv  ] " + //From:" + data.getSource() +
 //            		" To:"+ data.getDestination() +
             		" Method:" + data.getMethodName() +
             		" SeqNumber: " + data.getSequenceNumber() +
-            		" Timestamp: " + notification.getTimeStamp() +
             		" NotifSeqNbr: " + notification.getSequenceNumber() +
             		" Tags: " + data.getTags());
             
@@ -455,6 +460,37 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
 //                        .getTimeStamp());
 //            }
         } 
+        else if(type.equals(NotificationType.receivedFutureResult)) {
+        	FutureNotificationData data = (FutureNotificationData) notification.getUserData();
+        	logger.debug(
+        			" Timestamp: " + notification.getTimeStamp() +
+            		"["+componentName+"][futureUpdt ] " + //From:" + data.getSource() +
+//            		" To:"+ data.getDestination() +
+//            		" Method:" + data.getMethodName() +
+//            		" SeqNumber: " + data.getSequenceNumber() +
+//            		" NotifSeqNbr: " + notification.getSequenceNumber() +
+//            		" Tags: " + data.getTags()
+            		" Creator" + data.getCreatorID() +
+            		" Waiter" + data.getBodyID()
+            		);
+        }
+        else if(type.equals(NotificationType.realReplyReceived)) {
+        	RequestNotificationData data = (RequestNotificationData) notification.getUserData();
+            logger.debug(
+            		" Timestamp: " + notification.getTimeStamp() +
+            		"["+componentName+"][RRreplyRecv] " + //From:" + data.getSource() +
+//            		" To:"+ data.getDestination() +
+            		" Method:" + data.getMethodName() +
+            		" SeqNumber: " + data.getSequenceNumber() +
+            		" NotifSeqNbr: " + notification.getSequenceNumber() +
+            		" Tags: " + data.getTags());
+            
+//            String key = keysList.get(data.getMethodName());
+//            if (key != null) {
+//                ((MethodStatisticsAbstract) statistics.get(key)).notifyReplyOfRequestSent(notification
+//                        .getTimeStamp());
+//            }
+        }
         else if (type.equals(NotificationType.setOfNotifications)) {
             @SuppressWarnings("unchecked")
             ConcurrentLinkedQueue<Notification> notificationsList = (ConcurrentLinkedQueue<Notification>) notification

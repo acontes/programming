@@ -363,7 +363,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     }
 
     public int receiveReply(Reply reply) throws java.io.IOException {
-        // System.out.println(" --> receiveReply m="+reply.getMethodName());
+        //System.out.println(" --> receiveReply m="+reply.getMethodName());
         // NON_FT is returned if this object is not fault tolerant
         int ftres = FTManager.NON_FT;
         if (this.ftmanager != null) {

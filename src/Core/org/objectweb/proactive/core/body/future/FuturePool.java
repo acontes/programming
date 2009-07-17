@@ -252,7 +252,7 @@ public class FuturePool extends Object implements java.io.Serializable {
             Reply reply) throws java.io.IOException {
         // get all aiwated futures
         ArrayList<Future> futuresToUpdate = futures.getFuturesToUpdate(id, creatorID);
-
+        //System.out.println(System.currentTimeMillis() + ": replyReceived " + reply.getMethodName() );
         if (futuresToUpdate != null) {
             // FAULT-TOLERANCE
             int ftres = FTManager.NON_FT;
