@@ -8,6 +8,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
+import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.vfsprovider.client.ProActiveFileName;
@@ -61,6 +62,9 @@ public class FileSystemServerDeployer {
         try {
             vfsRootURL = ProActiveFileName.getServerVFSRootURL(url);
         } catch (URISyntaxException e) {
+            ProActiveLogger.logImpossibleException(ProActiveLogger.getLogger(Loggers.VFS_PROVIDER_SERVER), e);
+            throw new ProActiveRuntimeException(e);
+        } catch (UnknownProtocolException e) {
             ProActiveLogger.logImpossibleException(ProActiveLogger.getLogger(Loggers.VFS_PROVIDER_SERVER), e);
             throw new ProActiveRuntimeException(e);
         }

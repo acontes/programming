@@ -27,7 +27,6 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
 import org.objectweb.proactive.extensions.vfsprovider.client.ProActiveFileName;
 import org.objectweb.proactive.extensions.vfsprovider.client.ProActiveFileProvider;
-import org.objectweb.proactive.extensions.vfsprovider.client.ProActiveFileName.ProActiveProviderScheme;
 
 import unitTests.vfsprovider.AbstractIOOperationsBase;
 
@@ -86,8 +85,8 @@ public class ProActiveProviderTest extends TestCase implements ProviderTestConfi
 
     public void prepare(final DefaultFileSystemManager manager) throws Exception {
         final ProActiveFileProvider provider = new ProActiveFileProvider();
-        for (ProActiveProviderScheme scheme : ProActiveFileName.ProActiveProviderScheme.values()) {
-            manager.addProvider(scheme.getVFSScheme(), provider);
+        for (final String scheme : ProActiveFileName.getAllVFSSchemes()) {
+            manager.addProvider(scheme, provider);
         }
     }
 

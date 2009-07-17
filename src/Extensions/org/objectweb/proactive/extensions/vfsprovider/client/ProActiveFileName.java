@@ -1,10 +1,18 @@
 package org.objectweb.proactive.extensions.vfsprovider.client;
 
 import java.net.URISyntaxException;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.commons.vfs.FileName;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.GenericFileName;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectProtocolFactoryRegistry;
+import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.extensions.vfsprovider.protocol.FileSystemServer;
 
 
@@ -44,69 +52,16 @@ public class ProActiveFileName extends GenericFileName {
     public static final String VFS_PREFIX = "pap";
 
     /**
-     * Supported protocol scheme with default port, defining both scheme for pure transport protocol
-     * and scheme with prefix {@link ProActiveFileName#VFS_PREFIX}, representing ProActive file
-     * access protocol based on that transport.
+     * @return set of all prefixed schemes potentially used by ProActive file access protocol,
+     *         basing on ProActive transport protocols.
      */
-    public enum ProActiveProviderScheme {
-        RMI(-1), RMISSH(-1), HTTP(80), IBIS(-1);
-
-        private final int defaultPort;
-
-        private ProActiveProviderScheme(int defaultPort) {
-            this.defaultPort = defaultPort;
+    public static Set<String> getAllVFSSchemes() {
+        final Enumeration<String> enumaration = RemoteObjectProtocolFactoryRegistry.keys();
+        final Set<String> result = new HashSet<String>();
+        while (enumaration.hasMoreElements()) {
+            result.add(getVFSSchemeForServerScheme(enumaration.nextElement()));
         }
-
-        /**
-         * @return pure transport scheme (without prefix)
-         */
-        public String getServerScheme() {
-            return name().toLowerCase();
-        }
-
-        /**
-         * @return ProActive file access protocol scheme (with prefix)
-         */
-        public String getVFSScheme() {
-            return VFS_PREFIX + getServerScheme();
-        }
-
-        /**
-         * @return default port for transport protocol; <code>-1</code> if undefined/unknown.
-         */
-        public int getDefaultPort() {
-            return defaultPort;
-        }
-
-        /**
-         * Gives ProActiveProviderScheme instance for given transport protocol scheme.
-         *
-         * @param serverScheme
-         *            transport protocol scheme
-         * @return corresponding ProActiveProviderScheme instance
-         * @throws IllegalArgumentException
-         *             when this protocol is not supported
-         */
-        public static ProActiveProviderScheme forServerScheme(String serverScheme) {
-            return ProActiveProviderScheme.valueOf(serverScheme.toUpperCase());
-        }
-
-        /**
-         * Gives ProActiveProviderScheme instance for given ProActive file access protocol scheme.
-         *
-         * @param serverScheme
-         *            ProActive file access protocol scheme
-         * @return corresponding ProActiveProviderScheme instance
-         * @throws IllegalArgumentException
-         *             when this protocol is not supported
-         */
-        public static ProActiveProviderScheme forVFSScheme(String vfsScheme) {
-            if (!vfsScheme.startsWith(VFS_PREFIX)) {
-                throw new IllegalArgumentException(vfsScheme + " is not a valid VFS server scheme");
-            }
-            final String strippedScheme = vfsScheme.substring(VFS_PREFIX.length());
-            return ProActiveProviderScheme.valueOf(strippedScheme.toUpperCase());
-        }
+        return result;
     }
 
     /**
@@ -117,19 +72,50 @@ public class ProActiveFileName extends GenericFileName {
      * @return VFS URL of root of remote file system exposed by provided server
      * @throws URISyntaxException
      *             when given URL does not conform to expected URL syntax (no scheme defined)
+     * @throws UnknownProtocolException
+     *             when scheme in given URL is not recognized as one of the known protocols scheme
      * @throws IllegalArgumentException
      *             when scheme of given URL is not supported, i.e. is not one of
      *             {@link ProActiveProviderScheme}
      */
-    public static String getServerVFSRootURL(String serverURL) throws URISyntaxException {
+    public static String getServerVFSRootURL(String serverURL) throws URISyntaxException,
+            UnknownProtocolException {
         final int dotIndex = serverURL.indexOf(':');
         if (dotIndex == -1) {
             throw new URISyntaxException(serverURL, "Could not find URL scheme");
         }
         final String schemeString = serverURL.substring(0, dotIndex);
         final String remainingPart = serverURL.substring(dotIndex);
-        final ProActiveProviderScheme scheme = ProActiveProviderScheme.forServerScheme(schemeString);
-        return scheme.getVFSScheme() + remainingPart + SERVICE_AND_FILE_PATH_SEPARATOR + SEPARATOR_CHAR;
+        checkServerScheme(schemeString);
+        return getVFSSchemeForServerScheme(schemeString) + remainingPart + SERVICE_AND_FILE_PATH_SEPARATOR +
+            SEPARATOR_CHAR;
+    }
+
+    private static String getVFSSchemeForServerScheme(String serverScheme) {
+        return VFS_PREFIX + serverScheme;
+    }
+
+    private static String getServerSchemeForVFSScheme(String vfsScheme) {
+        if (!vfsScheme.startsWith(VFS_PREFIX)) {
+            throw new IllegalArgumentException(vfsScheme + " is not a valid VFS server scheme");
+        }
+        final String strippedScheme = vfsScheme.substring(VFS_PREFIX.length());
+        return strippedScheme;
+    }
+
+    private static void checkServerScheme(final String serverScheme) throws UnknownProtocolException {
+        if (RemoteObjectProtocolFactoryRegistry.get(serverScheme) == null) {
+            throw new UnknownProtocolException("Scheme " + serverScheme +
+                " is not recognized as used by any of transport protocols");
+        }
+    }
+
+    private static int getServerDefaultPortForVFSScheme(String vfsScheme) throws UnknownProtocolException {
+        final String serverScheme = getServerSchemeForVFSScheme(vfsScheme);
+        checkServerScheme(serverScheme);
+        final RemoteObjectFactory serverProtocolFactory = AbstractRemoteObjectFactory
+                .getRemoteObjectFactory(serverScheme);
+        return serverProtocolFactory.getPort();
     }
 
     private final String servicePath;
@@ -138,9 +124,9 @@ public class ProActiveFileName extends GenericFileName {
     private final Object serverURLSync = new Object();
 
     protected ProActiveFileName(String scheme, String hostName, int port, String userName, String password,
-            String servicePath, String path, FileType type) {
-        super(scheme, hostName, port, ProActiveProviderScheme.forVFSScheme(scheme).getDefaultPort(),
-                userName, password, path, type);
+            String servicePath, String path, FileType type) throws UnknownProtocolException {
+        super(scheme, hostName, port, getServerDefaultPortForVFSScheme(scheme), userName, password, path,
+                type);
         if (servicePath == null || servicePath.length() == 0) {
             this.servicePath = ROOT_PATH;
         } else {
@@ -157,8 +143,13 @@ public class ProActiveFileName extends GenericFileName {
 
     @Override
     public FileName createName(String absPath, FileType type) {
-        return new ProActiveFileName(getScheme(), getHostName(), getPort(), getUserName(), getPassword(),
-            servicePath, absPath, type);
+        try {
+            return new ProActiveFileName(getScheme(), getHostName(), getPort(), getUserName(), getPassword(),
+                servicePath, absPath, type);
+        } catch (UnknownProtocolException e) {
+            // it should never happen as it would be already thrown for this instance constructor
+            throw new ProActiveRuntimeException(e);
+        }
     }
 
     /**
@@ -184,7 +175,7 @@ public class ProActiveFileName extends GenericFileName {
 
     private String createServerURL() {
         final StringBuffer buffer = new StringBuffer();
-        buffer.append(ProActiveProviderScheme.forVFSScheme(getScheme()).getServerScheme());
+        buffer.append(getServerSchemeForVFSScheme(getScheme()));
         buffer.append("://");
         appendCredentials(buffer, true);
         buffer.append(getHostName());

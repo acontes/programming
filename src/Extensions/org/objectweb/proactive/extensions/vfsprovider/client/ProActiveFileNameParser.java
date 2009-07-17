@@ -6,6 +6,7 @@ import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.provider.HostFileNameParser;
 import org.apache.commons.vfs.provider.UriParser;
 import org.apache.commons.vfs.provider.VfsComponentContext;
+import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 
 
 /**
@@ -62,7 +63,11 @@ public class ProActiveFileNameParser extends HostFileNameParser {
         final FileType fileType = UriParser.normalisePath(name);
         final String path = name.toString();
 
-        return new ProActiveFileName(auth.scheme, auth.hostName, auth.port, auth.userName, auth.password,
-            servicePath, path, fileType);
+        try {
+            return new ProActiveFileName(auth.scheme, auth.hostName, auth.port, auth.userName, auth.password,
+                servicePath, path, fileType);
+        } catch (UnknownProtocolException e) {
+            throw new FileSystemException("Unknown protocol scheme of URL", e);
+        }
     }
 }
