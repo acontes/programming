@@ -23,7 +23,7 @@ import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemExcept
 
 /**
  * VFS {@Link FileObject} adapter to {@link DataSpacesFileObject} interface, adding getURI
- * functionality. Defines two DataSpacesFileObject as equal if their URI strings are equal.
+ * functionality.
  * <p>
  * Adapted FileObject should provide any access limitation as required by Data Spaces specification.
  */
@@ -235,7 +235,7 @@ public class VFSFileObjectAdapter implements DataSpacesFileObject {
         }
     }
 
-    public boolean isWriteable() throws FileSystemException {
+    public boolean isWritable() throws FileSystemException {
         try {
             return adaptee.isWriteable();
         } catch (org.apache.commons.vfs.FileSystemException e) {
