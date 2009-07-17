@@ -106,6 +106,9 @@ public class DataSpacesTechnicalService implements TechnicalService {
         final BaseScratchSpaceConfiguration baseScratchConfiguration = readScratchConfiguration();
         try {
             DataSpacesNodes.configureNode(node, baseScratchConfiguration);
+        } catch (IllegalArgumentException e) {
+            ProActiveLogger.logImpossibleException(logger, e);
+            return;
         } catch (AlreadyConfiguredException e) {
             ProActiveLogger.logImpossibleException(logger, e);
             // FIXME: it may happen when node acquisition will be implemented - and we have to handle that

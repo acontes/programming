@@ -10,6 +10,7 @@ import java.net.URISyntaxException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.dataspaces.Utils;
@@ -77,6 +78,8 @@ public class NodeConfigurator {
      *            be created
      * @throws IllegalStateException
      *             when trying to reconfigure already configured instance
+     * @throws IllegalArgumentException
+     *             when trying to configure node that is on different runtime/JVM
      * @throws ConfigurationException
      *             when configuration appears to be wrong during node scratch space initialization
      *             (e.g. capabilities checking)
@@ -84,9 +87,14 @@ public class NodeConfigurator {
      *             when VFS creation or scratch initialization fails
      */
     synchronized public void configureNode(Node node, BaseScratchSpaceConfiguration baseScratchConfiguration)
-            throws IllegalStateException, FileSystemException, ConfigurationException {
+            throws IllegalStateException, IllegalArgumentException, FileSystemException,
+            ConfigurationException {
         logger.debug("Configuring node for Data Spaces");
         checkNotConfigured();
+        if (!NodeFactory.isNodeLocal(node)) {
+            logger.error("Node to configure is not on the same runtime/JVM as a caller");
+            throw new IllegalArgumentException("Node to configure is not on the same runtime/JVM as a caller");
+        }
 
         this.node = node;
         try {

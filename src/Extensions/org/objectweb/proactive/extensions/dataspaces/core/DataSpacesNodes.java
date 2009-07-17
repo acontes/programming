@@ -10,6 +10,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.dataspaces.Utils;
@@ -73,6 +74,8 @@ public class DataSpacesNodes {
      *            node to be configured for Data Spaces
      * @param baseScratchConfiguration
      *            base configuration of scratch data space for a specified node
+     * @throws IllegalArgumentException
+     *             when trying to configure node that is on different runtime/JVM
      * @throws FileSystemException
      *             when VFS configuration creation or scratch initialization fails
      * @throws ConfigurationException
@@ -83,7 +86,12 @@ public class DataSpacesNodes {
      * @see NodeConfigurator#configureNode(Node, SpaceConfiguration)
      */
     public static void configureNode(Node node, BaseScratchSpaceConfiguration baseScratchConfiguration)
-            throws AlreadyConfiguredException, FileSystemException, ConfigurationException {
+            throws IllegalArgumentException, AlreadyConfiguredException, FileSystemException,
+            ConfigurationException {
+        if (!NodeFactory.isNodeLocal(node)) {
+            logger.error("Node to configure is not on the same runtime/JVM as a caller");
+            throw new IllegalArgumentException("Node to configure is not on the same runtime/JVM as a caller");
+        }
         final NodeConfigurator nodeConfig = createNodeConfigurator(node);
         try {
             nodeConfig.configureNode(node, baseScratchConfiguration);
