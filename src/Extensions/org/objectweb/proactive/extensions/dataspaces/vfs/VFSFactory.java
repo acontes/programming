@@ -14,6 +14,8 @@ import org.apache.commons.vfs.provider.local.DefaultLocalFileProvider;
 import org.apache.commons.vfs.provider.sftp.SftpFileProvider;
 import org.apache.commons.vfs.provider.sftp.SftpFileSystemConfigBuilder;
 import org.apache.commons.vfs.provider.url.UrlFileProvider;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.vfsprovider.client.ProActiveFileName;
@@ -42,8 +44,15 @@ import org.objectweb.proactive.extensions.vfsprovider.protocol.FileSystemServer;
  * Configured replicator, temporary storage and default files cache are also guaranteed.
  */
 public class VFSFactory {
-    private static final Log4JLogger logger = new Log4JLogger(ProActiveLogger
-            .getLogger(Loggers.DATASPACES_VFS));
+    private static final Log4JLogger logger;
+    static {
+        final Logger rawLogger = ProActiveLogger.getLogger(Loggers.DATASPACES_VFS);
+        if (rawLogger.getEffectiveLevel().isGreaterOrEqual(Level.INFO)) {
+            // quite VFS a bit, as it is more verbose than ProActive conventions
+            rawLogger.setLevel(Level.WARN);
+        }
+        logger = new Log4JLogger(rawLogger);
+    }
 
     /**
      * Creates new DefaultSystemManager instance with configured providers, replicator, temporary
