@@ -103,12 +103,12 @@ public class NamingService implements SpacesDirectory {
             checkApplicationSpaces(appId, spaces);
 
         registeredApplications.add(appId);
-        logger.info("Registered application with id " + appId);
+        logger.debug("Registered application with id " + appId);
         if (spaces != null) {
             directory.register(spaces);
-            if (logger.isInfoEnabled()) {
+            if (logger.isDebugEnabled()) {
                 for (final SpaceInstanceInfo info : spaces)
-                    logger.info("Registered space: " + info);
+                    logger.debug("Registered space: " + info);
             }
         }
     }
@@ -140,10 +140,10 @@ public class NamingService implements SpacesDirectory {
             uris.add(sii.getMountingPoint());
 
         directory.unregister(uris);
-        if (logger.isInfoEnabled()) {
+        if (logger.isDebugEnabled()) {
             for (final DataSpacesURI uri : uris)
-                logger.info("Unregistered space: " + uri);
-            logger.info("Unregistered application with id " + appId);
+                logger.debug("Unregistered space: " + uri);
+            logger.debug("Unregistered application with id " + appId);
         }
     }
 
@@ -176,7 +176,7 @@ public class NamingService implements SpacesDirectory {
                 "There is no application registered with specified application id.");
 
         directory.register(spaceInstanceInfo);
-        logger.info("Registered space: " + spaceInstanceInfo);
+        logger.debug("Registered space: " + spaceInstanceInfo);
     }
 
     public Set<SpaceInstanceInfo> lookupMany(DataSpacesURI uri) throws IllegalArgumentException {
@@ -193,7 +193,7 @@ public class NamingService implements SpacesDirectory {
 
     public boolean unregister(DataSpacesURI uri) {
         final boolean result = directory.unregister(uri);
-        logger.info("Unregistered space: " + uri);
+        logger.debug("Unregistered space: " + uri);
         return result;
     }
 

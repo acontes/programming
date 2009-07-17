@@ -164,7 +164,7 @@ public class NodeConfigurator {
             if (!appConfigured)
                 appConfigurator = null;
         }
-        logger.info("Node configured for Data Spaces application");
+        logger.debug("Node configured for Data Spaces application");
     }
 
     /**
@@ -203,7 +203,7 @@ public class NodeConfigurator {
             nodeScratchSpace.close();
         nodeScratchSpace = null;
         configured = false;
-        logger.info("Data Space node configuration closed, resources released");
+        logger.debug("Data Space node configuration closed, resources released");
     }
 
     /**
