@@ -138,12 +138,11 @@ public class CANOverlay extends StructuredOverlay {
                 /* We are alone on this pitiless world : nothing to do */
                 break;
             case 1:
-                /*
-                 * this.sendTo(neighborsToMergeWith.get(0), new
-                 * CANMergeMessage(this.getRemotePeer(), lastDimension, lastDirection, new
-                 * NeighborsDataStructure(), this.getZone(), this
-                 * .getLocalPeer().getDataStorage().getDataFromZone(this.getZone())));
-                 */
+                this.sendTo(neighborsToMergeWith.get(0), new CANMergeMessage(this.getRemotePeer(),
+                    lastDimension, lastDirection, new NeighborsDataStructure(), this.getZone(), this
+                            .getLocalPeer().getDataStorage().query(
+                                    this.getLocalPeer().getDataStorage().getRepository().getValueFactory()
+                                            .createStatement(null, null, null))));
                 break;
             default:
                 Zone zoneToSplit = this.getZone();
@@ -171,12 +170,14 @@ public class CANOverlay extends StructuredOverlay {
                     /*
                      * Merge the new zones obtained with the suitable neighbors.
                      */
-                    /*
-                     * this.sendTo(neighborsToMergeWith.get(i), new
-                     * CANMergeMessage(this.getRemotePeer(), lastDimension, lastDirection,
-                     * neighborsOfCurrentNeighbor, newZones[0], this
-                     * .getLocalPeer().getDataStorage().getDataFromZone(this.getZone())));
-                     */
+                    // FIXME The given Data are not good : we give all the resources to each
+                    // neighbors to merge with
+                    this.sendTo(neighborsToMergeWith.get(i), new CANMergeMessage(this.getRemotePeer(),
+                        lastDimension, lastDirection, neighborsOfCurrentNeighbor, newZones[0], this
+                                .getLocalPeer().getDataStorage().query(
+                                        this.getLocalPeer().getDataStorage().getRepository()
+                                                .getValueFactory().createStatement(null, null, null))));
+
                 }
                 break;
         }
