@@ -21,7 +21,6 @@ import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.TechnicalServicesProperties;
 import org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces;
 import org.objectweb.proactive.extensions.dataspaces.core.BaseScratchSpaceConfiguration;
 import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes;
@@ -29,6 +28,7 @@ import org.objectweb.proactive.extensions.dataspaces.exceptions.AlreadyConfigure
 import org.objectweb.proactive.extensions.dataspaces.exceptions.ConfigurationException;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.NotConfiguredException;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.TechnicalServicesProperties;
 
 
 /**
