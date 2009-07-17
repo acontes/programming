@@ -31,9 +31,7 @@
  */
 package org.objectweb.proactive.core.remoteobject;
 
-import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Set;
 
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.httpserver.ClassServerServlet;
@@ -126,13 +124,5 @@ public abstract class AbstractRemoteObjectFactory {
     public static RemoteObjectFactory getDefaultRemoteObjectFactory() throws UnknownProtocolException {
         String protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
         return getRemoteObjectFactory(protocol);
-    }
-
-    /** Return all the activated RemoteObjectFactory on this runtime
-     */
-    public static Set<RemoteObjectFactory> getActivedRemoteObjectFactories() {
-        HashSet<RemoteObjectFactory> s = new HashSet<RemoteObjectFactory>();
-        s.addAll(activatedRemoteObjectFactories.values());
-        return s;
     }
 }
