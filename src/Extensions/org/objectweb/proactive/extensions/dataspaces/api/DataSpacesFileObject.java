@@ -1,3 +1,7 @@
+/*
+ * This interface and some other interfaces in this package are highly inspired by Apache Commons VFS API,
+ * as implementations of these interfaces are/were adapted to VFS interfaces. 
+ */
 package org.objectweb.proactive.extensions.dataspaces.api;
 
 import java.util.List;
