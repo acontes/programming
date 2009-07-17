@@ -5,6 +5,6 @@
 	<target name="compile" depends="core, stubGenerator, -compile"/>
 
 	<target name="-compile">
-		<compile_extra module="vfsprovider" />
+		<compile_extension module="vfsprovider" />
 	</target>
 </project>
