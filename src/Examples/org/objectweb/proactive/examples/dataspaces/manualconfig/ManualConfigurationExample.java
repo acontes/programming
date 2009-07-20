@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 
+import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -63,5 +64,7 @@ public class ManualConfigurationExample {
         DataSpacesNodes.closeNodeConfig(halfBodiesNode);
         namingServiceDeployer.terminate();
         // (actually, this part should be also implemented as finally, as we should always close DS on node and NamingService)
+
+        PALifeCycle.exitSuccess();
     }
 }
