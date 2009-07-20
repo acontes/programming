@@ -24,7 +24,8 @@ import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemExcept
  * <p>
  * Instances of this class are not necessarily thread-safe, however it is safe to access the same
  * URI through different DataSpacesFileObject instances (like it happens when accessing the same URI
- * from different Active Objects).
+ * from different Active Objects). It is recommended to explicitly close each instance of this class
+ * after usage to make sure that resources are released, preferably in try-finally section.
  */
 public interface DataSpacesFileObject {
 
