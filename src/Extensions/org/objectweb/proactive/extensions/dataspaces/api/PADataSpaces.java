@@ -22,7 +22,6 @@ import org.objectweb.proactive.extensions.dataspaces.exceptions.SpaceAlreadyRegi
 import org.objectweb.proactive.extensions.dataspaces.exceptions.SpaceNotFoundException;
 
 
-// TODO what about returned DataSpacesFileObjects is ok to call them from other, not ao's thread?
 /**
  * The ProActive Data Spaces API.
  * <p>
@@ -50,6 +49,10 @@ import org.objectweb.proactive.extensions.dataspaces.exceptions.SpaceNotFoundExc
  * Minimal capabilities for returned files are defined in constants
  * {@link #INPUT_SPACE_CAPABILITIES}, {@link #OUTPUT_SPACE_CAPABILITIES},
  * {@link #SCRATCH_SPACE_OWNER_CAPABILITIES}, {@link #SCRATCH_SPACE_NONOWNER_CAPABILITIES}.
+ * <p>
+ * API can be accessed from any Active Object residing on node being configured for Data Spaces
+ * (through GCM deployment or manual configuration) or non-Active Object thread (half body), if Half
+ * Bodies Node is configured for Data Spaces (GCM or manual configuration).
  *
  * @see DataSpacesFileObject
  */
@@ -62,7 +65,7 @@ public class PADataSpaces {
 
     /**
      * The set of input space's minimal capabilities that are guaranteed to be fulfilled by every
-     * {@link DataSpacesFileObject} in input space accessed from any Active Object.
+     * {@link DataSpacesFileObject} in input space accessed from any Active Object (Body).
      *
      * @see DataSpacesFileObject#hasSpaceCapability(Capability)
      */
@@ -70,7 +73,7 @@ public class PADataSpaces {
 
     /**
      * The set of output space's minimal capabilities that are guaranteed to be fulfilled by every
-     * {@link DataSpacesFileObject} in output space accessed from any Active Object.
+     * {@link DataSpacesFileObject} in output space accessed from any Active Object (Body).
      *
      * @see DataSpacesFileObject#hasSpaceCapability(Capability)
      */
@@ -90,11 +93,11 @@ public class PADataSpaces {
 
     /**
      * The set of scratch minimal capabilities that are guaranteed to be fulfilled by every
-     * {@link DataSpacesFileObject} in scratch, accessed only from Active Object that is <strong>NOT
-     * OWNER</strong> of that scratch. Owner of a scratch is an Active Object that previously
-     * obtained access to that scratch by {@link PADataSpaces#resolveScratchForAO()} (or
-     * {@link PADataSpaces#resolveScratchForAO(String)}) method call. No other Active Object is
-     * considered as an owner of a scratch.
+     * {@link DataSpacesFileObject} in scratch, accessed only from Active Object (Body) that is
+     * <strong>NOT OWNER</strong> of that scratch. Owner of a scratch is an Active Object (Body)
+     * that previously obtained access to that scratch by {@link PADataSpaces#resolveScratchForAO()}
+     * (or {@link PADataSpaces#resolveScratchForAO(String)}) method call. No other Active Object
+     * (Body) is considered as an owner of a scratch.
      *
      * @see DataSpacesFileObject#hasSpaceCapability(Capability)
      * @see #SCRATCH_SPACE_OWNER_CAPABILITIES
@@ -627,12 +630,13 @@ public class PADataSpaces {
     }
 
     /**
-     * Returns file handle to calling Active Object's <i>scratch data space</i>. This method call is
-     * equal to {@link #resolveScratchForAO(String)} with null path argument.
+     * Returns file handle to calling Active Object's (or half body - in case of non-AO) <i>scratch
+     * data space</i>. This method call is equal to {@link #resolveScratchForAO(String)} with null
+     * path argument.
      * <p>
      * Returned file always exists.
      *
-     * @return file handle to the scratch for calling Active Object
+     * @return file handle to the scratch for calling Active Object (Body)
      * @throws FileSystemException
      *             indicates VFS related exception
      * @throws NotConfiguredException
@@ -649,9 +653,10 @@ public class PADataSpaces {
     }
 
     /**
-     * Returns file handle to file specified by path in calling Active Object's <i>scratch data
-     * space</i>. If such a scratch has not existed before, it is created in its node scratch data
-     * space (as configured for a node, usually in deployment descriptor).
+     * Returns file handle to file specified by path in calling Active Object's (or half body - in
+     * case of non-AO) <i>scratch data space</i>. If such a scratch has not existed before, it is
+     * created in its node scratch data space (as configured for a node, usually in deployment
+     * descriptor).
      * <p>
      * Returned file handle can be directly used to perform operations on the file/directory,
      * regardless of the underlying protocol. If specified file does not exist, one should call
@@ -659,15 +664,16 @@ public class PADataSpaces {
      * method. Closing returned DataSpacesFileObject is a caller's responsibility.
      * <p>
      * As returned scratch minimal capabilities are checked locally, its content is expected to be
-     * writable by this Active Object and should be readable by other Active Objects of this
-     * application (which is checked in {@link #resolveFile(String)} call). It is intended to store
-     * any temporary results of computation and possibly share them with other Active Objects. These
-     * results will be most probably automatically removed after application terminates.
+     * writable by this Active Object (Body) and should be readable by other Active Objects (Bodies)
+     * of this application (which is checked in {@link #resolveFile(String)} call). It is intended
+     * to store any temporary results of computation and possibly share them with other Active
+     * Objects (Bodies). These results will be most probably automatically removed after application
+     * terminates.
      *
      * @param path
-     *            path of a file in the scratch for calling Active Object; <code>null</code> denotes
-     *            request for data space root
-     * @return file handle to file specified by path in the scratch for calling Active Object
+     *            path of a file in the scratch for calling Active Object (Body); <code>null</code>
+     *            denotes request for data space root
+     * @return file handle to file specified by path in the scratch for calling Active Object (Body)
      * @throws FileSystemException
      *             indicates VFS related exception
      * @throws NotConfiguredException
@@ -814,8 +820,8 @@ public class PADataSpaces {
      * checked locally according to a type of space represented by provided URI. For input its
      * content is expected to be readable from any node of this application if it was defined
      * correctly. For output its content is expected to be writable from any node of this
-     * application. For scratch its content is expected to be writable by owning Active Object and
-     * should be readable by other Active Objects of this application.
+     * application. For scratch its content is expected to be writable by owning Active Object
+     * (Body) and should be readable by other Active Objects (Bodies) of this application.
      * <p>
      * Note that URI from another application should work if passed here if both application share
      * some lifecycle period and they are configured to use the same Naming Service.
@@ -849,12 +855,12 @@ public class PADataSpaces {
      * Input must have a global access URL defined, that is used to access this data space from
      * remote nodes. Local (to caller's node) absolute access path may be used, to achieve better
      * performance by accessing data locally on this node. Provided remote and local access ways
-     * should guarantee that input is readable from any node, Active Object.
+     * should guarantee that input is readable from any node, Active Object (Body).
      * <p>
-     * Returned URI of a created input data space can be safely passed to another Active Object of
-     * this application. It can be also safely access by {@link #resolveDefaultInput()} or
-     * {@link #resolveDefaultInputBlocking(long)} by any other Active Object after this method
-     * returns.
+     * Returned URI of a created input data space can be safely passed to another Active Object
+     * (Body) of this application. It can be also safely access by {@link #resolveDefaultInput()} or
+     * {@link #resolveDefaultInputBlocking(long)} by any other Active Object (Body) after this
+     * method returns.
      *
      * @param url
      *            Access URL to this space, used for accessing data from remote nodes. URL defines
@@ -884,12 +890,12 @@ public class PADataSpaces {
      * Output must have a global access URL defined, that is used to access this data space from
      * remote nodes. Local (to caller's node) absolute access path may be used, to achieve better
      * performance by accessing data locally on this node. Provided remote and local access ways
-     * should guarantee that output is readable from any node, Active Object.
+     * should guarantee that output is readable from any node, Active Object (Body).
      * <p>
-     * Returned URI of a created output data space can be safely passed to another Active Object of
-     * this application. It can be also safely access by {@link #resolveDefaultOutput()} or
-     * {@link #resolveDefaultOutputBlocking(long)} by any other Active Object after this method
-     * returns.
+     * Returned URI of a created output data space can be safely passed to another Active Object
+     * (Body) of this application. It can be also safely access by {@link #resolveDefaultOutput()}
+     * or {@link #resolveDefaultOutputBlocking(long)} by any other Active Object (Body) after this
+     * method returns.
      *
      * @param url
      *            Access URL to this space, used for accessing data from remote nodes. URL defines
@@ -923,11 +929,11 @@ public class PADataSpaces {
      * Input must have a global access URL defined, that is used to access this data space from
      * remote nodes. Local (to caller's node) absolute access path may be used, to achieve better
      * performance by accessing data locally on this node. Provided remote and local access ways
-     * should guarantee that input is readable from any node, Active Object.
+     * should guarantee that input is readable from any node, Active Object (Body).
      * <p>
-     * Returned URI of a created input data space can be safely passed to another Active Object of
-     * this application. Given input name (which might be constant in code) can also be safely used
-     * by any other Active Object after this method returns.
+     * Returned URI of a created input data space can be safely passed to another Active Object
+     * (Body) of this application. Given input name (which might be constant in code) can also be
+     * safely used by any other Active Object (Body) after this method returns.
      *
      * @param name
      *            name of defined input, contract of application; can not be empty or contain
@@ -963,11 +969,11 @@ public class PADataSpaces {
      * Output must have a global access URL defined, that is used to access this data space from
      * remote nodes. Local (to caller's node) absolute access path may be used, to achieve better
      * performance by accessing data locally on this node. Provided remote and local access ways
-     * should guarantee that output is writable from any node, Active Object.
+     * should guarantee that output is writable from any node, Active Object (Body).
      * <p>
-     * Returned URI of a created output data space can be safely passed to another Active Object of
-     * this application. Given output name (which might be constant in code) can also be safely used
-     * by any other Active Object after this method returns.
+     * Returned URI of a created output data space can be safely passed to another Active Object
+     * (Body) of this application. Given output name (which might be constant in code) can also be
+     * safely used by any other Active Object (Body) after this method returns.
      *
      * @param name
      *            name of defined output, contract of application; can not be empty or contain
