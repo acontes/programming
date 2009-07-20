@@ -3,12 +3,11 @@
  */
 package org.objectweb.proactive.extensions.dataspaces.exceptions;
 
-// TODO: make it extend ConfigurationException?
 /**
  *
  *
  */
-public class NotConfiguredException extends DataSpacesException {
+public class NotConfiguredException extends ConfigurationException {
 
     /**
      *
