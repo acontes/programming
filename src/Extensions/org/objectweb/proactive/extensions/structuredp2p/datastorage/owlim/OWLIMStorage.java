@@ -12,10 +12,13 @@ import java.util.Set;
 import org.objectweb.proactive.extensions.structuredp2p.datastorage.DataStorage;
 import org.openrdf.model.Statement;
 import org.openrdf.query.BindingSet;
+import org.openrdf.query.GraphQueryResult;
 import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.Query;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
+import org.openrdf.query.TupleQuery;
+import org.openrdf.query.TupleQueryResult;
 import org.openrdf.query.parser.ParsedQuery;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
@@ -34,7 +37,7 @@ import org.openrdf.sail.nativerdf.NativeStore;
  * 
  * @author Pellegrino Laurent
  * 
- * @version 0.1, 07/15/2009
+ * @version 0.1, 07/20/2009
  */
 @SuppressWarnings("serial")
 public class OWLIMStorage implements DataStorage {
@@ -53,8 +56,7 @@ public class OWLIMStorage implements DataStorage {
     }
 
     /**
-     * 
-     * @return
+     * Loads the properties associated to the datastore.
      */
     private Properties loadProperties() {
         File propertiesFile = new File("owlim/" + OWLIMStorage.OWLIM_PROPERTIES_FILE);
@@ -153,6 +155,13 @@ public class OWLIMStorage implements DataStorage {
         }
     }
 
+    /**
+     * Recursively delete a given directory.
+     * 
+     * @param path
+     *            the path to the directory to remove.
+     * @return <code>true</code> is the delete has succeeded, <code>false</code> otherwise.
+     */
     private boolean deleteDirectory(File path) {
         boolean resultat = true;
 
@@ -171,7 +180,8 @@ public class OWLIMStorage implements DataStorage {
     }
 
     /**
-     * 
+     * Shutdown the repository by removing all the repositories that are on the computer performing
+     * this operation.
      */
     public void shutdownWithRepositoriesRemoving() {
         this.deleteDirectory(new File(this.properties.getProperty("repositories-path")));
@@ -179,6 +189,7 @@ public class OWLIMStorage implements DataStorage {
     }
 
     /**
+     * Shutdown the repository by removing the specified repository.
      * 
      * @param repositoryName
      *            the name of the repository to remove.
@@ -257,6 +268,72 @@ public class OWLIMStorage implements DataStorage {
     /**
      * {@inheritDoc}
      */
+    public TupleQueryResult tupleQuery(QueryLanguage language, String query) {
+        RepositoryConnection conn = null;
+        TupleQueryResult result = null;
+        try {
+            conn = this.repository.getConnection();
+            try {
+                TupleQuery tupleQuery = conn.prepareTupleQuery(language, query);
+                result = tupleQuery.evaluate();
+
+            } catch (QueryEvaluationException e) {
+                e.printStackTrace();
+            }
+
+        } catch (RepositoryException e) {
+            e.printStackTrace();
+        } catch (MalformedQueryException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                conn.close();
+            } catch (RepositoryException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return result;
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Set<Statement> graphQuery(QueryLanguage language, String graphQuery) {
+        RepositoryConnection conn = null;
+        Set<Statement> results = new HashSet<Statement>();
+
+        try {
+            conn = this.repository.getConnection();
+            try {
+                GraphQueryResult graphResult = conn.prepareGraphQuery(language, graphQuery).evaluate();
+
+                while (graphResult.hasNext()) {
+                    results.add(graphResult.next());
+                }
+            } catch (QueryEvaluationException e) {
+                e.printStackTrace();
+            }
+
+        } catch (RepositoryException e) {
+            e.printStackTrace();
+        } catch (MalformedQueryException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                conn.close();
+            } catch (RepositoryException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return results;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public void remove(Statement stmt) {
         RepositoryConnection conn = null;
         try {
@@ -301,6 +378,11 @@ public class OWLIMStorage implements DataStorage {
         return results;
     }
 
+    /**
+     * Returns the repository instance.
+     * 
+     * @return the repository instance.
+     */
     public Repository getRepository() {
         return this.repository;
     }

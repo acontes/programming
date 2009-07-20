@@ -90,6 +90,7 @@ public class TestQuery {
         TestQuery.fourthPeer.leave();
         TestQuery.thirdPeer.leave();
         TestQuery.secondPeer.leave();
+        TestQuery.firstPeer.leave();
     }
 
     @AfterClass

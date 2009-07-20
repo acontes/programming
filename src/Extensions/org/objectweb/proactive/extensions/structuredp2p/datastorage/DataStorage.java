@@ -9,6 +9,7 @@ import org.openrdf.model.Statement;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
+import org.openrdf.query.TupleQueryResult;
 import org.openrdf.repository.Repository;
 
 
@@ -35,4 +36,8 @@ public interface DataStorage extends Serializable {
     public abstract void shutdownWithRepositoryRemoving(String name);
 
     public abstract Repository getRepository();
+
+    public abstract TupleQueryResult tupleQuery(QueryLanguage language, String query);
+
+    public abstract Set<Statement> graphQuery(QueryLanguage language, String graphQuery);
 }

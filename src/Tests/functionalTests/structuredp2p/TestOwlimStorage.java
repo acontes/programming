@@ -10,6 +10,7 @@ import junit.framework.Assert;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.objectweb.proactive.extensions.structuredp2p.datastorage.DataStorage;
 import org.objectweb.proactive.extensions.structuredp2p.datastorage.owlim.OWLIMStorage;
@@ -21,6 +22,7 @@ import org.openrdf.query.Binding;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
+import org.openrdf.query.TupleQueryResult;
 
 
 /**
@@ -69,14 +71,78 @@ public class TestOwlimStorage {
     @Test
     public void testSPARQLQueries() {
         String query = "";
+        // query += "PREFIX fn\n";
+        // query += "PREFIX op\n";
         query += "PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
         query += "PREFIX ex:   <http://example.org/owlim#>\n";
         query += "SELECT ?man WHERE {\n";
-        query += "  ?man rdf:type ex:Human .\n";
-        query += "}";
+        query += "  ?man rdf:type ex:Human .\n} ";
+        // query +=
+        // "  FILTER op:numeric-equal(fn:compare(STR(?man), STR(<http://example.org/owlim#Q>)), -1)}";
 
         CloseableIteration<? extends BindingSet, QueryEvaluationException> results = TestOwlimStorage.owlimStorage
                 .query(QueryLanguage.SPARQL, query);
+
+        List<String> subjects = new ArrayList<String>();
+
+        try {
+            while (results.hasNext()) {
+                for (Binding binding : results.next()) {
+                    try {
+                        subjects.add(binding.getValue().stringValue());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                results.close();
+            } catch (QueryEvaluationException e) {
+                e.printStackTrace();
+            }
+        }
+
+        Assert.assertTrue(subjects.contains("http://example.org/owlim#Pilat"));
+
+    }
+
+    @Test
+    public void testSPARQLTupleQuery() {
+        String query = "";
+        query += "PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n";
+        query += "PREFIX ex:   <http://example.org/owlim#>\n";
+        query += "SELECT ?man WHERE {\n";
+        query += "  ?man rdf:type ex:Human .\n} ";
+
+        TupleQueryResult result = TestOwlimStorage.owlimStorage.tupleQuery(QueryLanguage.SPARQL, query);
+
+        System.out.println("TestOwlimStorage.testSPARQLTupleQuery()");
+
+        List<String> bindingNames = result.getBindingNames();
+        try {
+            while (result.hasNext()) {
+                BindingSet bindingSet = result.next();
+
+                for (String bindingName : bindingNames) {
+                    System.out.println(bindingSet.getValue(bindingName));
+                }
+            }
+        } catch (QueryEvaluationException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Ignore
+    public void testSERQLQueries() {
+        String query = "";
+
+        query += "SELECT X  FROM {X} WHERE X ";
+
+        CloseableIteration<? extends BindingSet, QueryEvaluationException> results = TestOwlimStorage.owlimStorage
+                .query(QueryLanguage.SERQL, query);
 
         List<String> subjects = new ArrayList<String>();
 

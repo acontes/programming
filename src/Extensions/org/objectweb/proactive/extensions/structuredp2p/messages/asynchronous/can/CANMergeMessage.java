@@ -27,7 +27,7 @@ public class CANMergeMessage implements Message {
     /**
      * The peer which is leaving.
      */
-    private final Peer remotePeer;
+    private final Peer remotePeerWichIsLeaving;
 
     /**
      * The current dimension of the leaving peer.
@@ -72,7 +72,7 @@ public class CANMergeMessage implements Message {
      */
     public CANMergeMessage(Peer remotePeer, int dimension, int direction, NeighborsDataStructure neighbors,
             Zone remoteZone, Set<Statement> remoteResources) {
-        this.remotePeer = remotePeer;
+        this.remotePeerWichIsLeaving = remotePeer;
         this.dimension = dimension;
         this.direction = direction;
         this.neighbors = neighbors;
@@ -96,8 +96,8 @@ public class CANMergeMessage implements Message {
      * 
      * @return the remote peer.
      */
-    public Peer getRemotePeer() {
-        return this.remotePeer;
+    public Peer getRemotePeerWhichIsLeaving() {
+        return this.remotePeerWichIsLeaving;
     }
 
     /**

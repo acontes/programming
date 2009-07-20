@@ -182,29 +182,34 @@ public class CANOverlay extends StructuredOverlay {
                 break;
         }
 
+        this.neighborsDataStructure.removeAll(lastDimension, CANOverlay.getOppositeDirection(lastDirection));
+
         /*
          * Send LeaveMessage in order to update the neighbors list.
          */
         for (int dim = 0; dim < CANOverlay.NB_DIMENSIONS; dim++) {
             for (int direction = 0; direction < 2; direction++) {
                 for (Peer neighbor : this.neighborsDataStructure.getNeighbors(dim, direction)) {
-                    if (!neighborsToMergeWith.contains(neighbor)) {
-                        this.sendTo(neighbor, new CANLeaveMessage(this.getRemotePeer(), neighborsToMergeWith,
-                            dim, CANOverlay.getOppositeDirection(direction)));
-                    }
+                    // if (!neighborsToMergeWith.contains(neighbor)) {
+                    this.sendTo(neighbor, new CANLeaveMessage(this.getRemotePeer(), neighborsToMergeWith,
+                        dim, CANOverlay.getOppositeDirection(direction)));
+                    // }
                 }
             }
         }
 
-        this.setZone(null);
-
-        ((BlockingRequestReceiver) ((MigratableBody) super.getLocalPeer().getBody()).getRequestReceiver())
-                .acceptReception();
+        // ((BlockingRequestReceiver) ((MigratableBody)
+        // super.getLocalPeer().getBody()).getRequestReceiver())
+        // .acceptReception();
 
         /*
-         * Notify all the neighbors that the current peer has terminated the leave operation.
+         * Notify all the old neighbors of the peer which is leaving that it has terminated the
+         * leave operation.
          */
         for (Peer neighbor : this.getNeighborsDataStructure()) {
+            neighbor.notifyNeighborEndLeave(this.getRemotePeer());
+        }
+        for (Peer neighbor : neighborsToMergeWith) {
             neighbor.notifyNeighborEndLeave(this.getRemotePeer());
         }
 
@@ -536,7 +541,6 @@ public class CANOverlay extends StructuredOverlay {
             result &= this.neighborsDataStructure.add(newNeighbor, msg.getDimensionToAdd(), msg
                     .getDirectionToAdd());
         }
-
         this.updateNeighbors();
 
         return new ActionResponseMessage(result);
@@ -576,7 +580,8 @@ public class CANOverlay extends StructuredOverlay {
             this.splitHistory.remove(index);
         }
 
-        result &= this.neighborsDataStructure.remove(message.getRemotePeer(), dimension, direction);
+        result &= this.neighborsDataStructure.remove(message.getRemotePeerWhichIsLeaving(), dimension,
+                direction);
         result &= this.neighborsDataStructure.addAll(message.getNeighbors());
 
         this.updateNeighbors();
