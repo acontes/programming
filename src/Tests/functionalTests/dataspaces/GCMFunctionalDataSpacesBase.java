@@ -145,7 +145,9 @@ public class GCMFunctionalDataSpacesBase extends GCMFunctionalTest {
                 getRootSubdirURL(outputWithNothing2LocalHandle), VariableContractType.ProgramVariable);
 
         // set scratch configuration for local node
-        PAProperties.PA_DATASPACES_SCRATCH_PATH.setValue(System.getProperty("java.io.tmpdir"));
+        final File scratchDir = new File(rootTmpDir, "scratch");
+        scratchDir.mkdirs();
+        PAProperties.PA_DATASPACES_SCRATCH_PATH.setValue(scratchDir.getAbsolutePath());
     }
 
     @Before
