@@ -22,7 +22,6 @@ import org.objectweb.proactive.extensions.dataspaces.exceptions.SpaceAlreadyRegi
 import org.objectweb.proactive.extensions.dataspaces.exceptions.SpaceNotFoundException;
 
 
-// TODO add general docs about various ways of accessing and sharing data through this API -- or refer to a not-yet-written manual?
 // TODO what about returned DataSpacesFileObjects is ok to call them from other, not ao's thread?
 /**
  * The ProActive Data Spaces API.
