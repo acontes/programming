@@ -243,8 +243,12 @@ public class NodeConfigurator {
         final String rootPath = baseScratchConfiguration.getPath();
         final File rootFile = new File(rootPath);
 
-        if (!rootFile.isDirectory())
-            rootFile.mkdirs();
+        try {
+            if (!rootFile.isDirectory())
+                rootFile.mkdirs();
+        } catch (SecurityException x) {
+            throw new FileSystemException(x);
+        }
         try {
             final String serviceId = Utils.getRuntimeId(node) + '/' + Utils.getNodeId(node) +
                 "/fileSystemServer";
