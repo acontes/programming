@@ -34,15 +34,15 @@ import unitTests.vfsprovider.AbstractIOOperationsBase;
 /**
  * Test suite for VFS ProActiveProvider basing on VFS generic provider tests (junit3).
  */
-public class ProActiveProviderTest extends TestCase implements ProviderTestConfig {
-    private final static URL TEST_DATA_SRC_ZIP_URL = ProActiveProviderTest.class
+public class TestProActiveProvider extends TestCase implements ProviderTestConfig {
+    private final static URL TEST_DATA_SRC_ZIP_URL = TestProActiveProvider.class
             .getResource("/functionalTests/vfsprovider/_DATA/test-data.zip");
 
     private final static File testDir = new File(System.getProperty("java.io.tmpdir"),
-        "ProActive-ProActiveProviderTest");
+        "ProActive-TestProActiveProvider");
 
     public static Test suite() throws Exception {
-        final ProActiveProviderTest providerTest = new ProActiveProviderTest();
+        final TestProActiveProvider providerTest = new TestProActiveProvider();
         return new ProviderTestSuite(providerTest) {
             @Override
             protected void setUp() throws Exception {
