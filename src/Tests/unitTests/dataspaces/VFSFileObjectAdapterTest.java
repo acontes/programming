@@ -15,13 +15,14 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.objectweb.proactive.extensions.calcium.system.SkeletonSystemImpl;
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesURI;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemException;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.MalformedURIException;
 import org.objectweb.proactive.extensions.dataspaces.vfs.VFSFactory;
 import org.objectweb.proactive.extensions.dataspaces.vfs.adapter.VFSFileObjectAdapter;
+
+import unitTests.vfsprovider.AbstractIOOperationsBase;
 
 
 // TODO: some adapted functionality smoke tests - an abstract test for DataSpacesFileObject?
@@ -80,7 +81,7 @@ public class VFSFileObjectAdapterTest {
     @After
     public void tearDown() {
         if (testDir != null && testDir.exists()) {
-            assertTrue(SkeletonSystemImpl.deleteDirectory(testDir));
+            assertTrue(AbstractIOOperationsBase.deleteRecursively(testDir));
             testDir = null;
         }
 

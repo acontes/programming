@@ -16,10 +16,10 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.xml.VariableContractType;
-import org.objectweb.proactive.extensions.calcium.system.SkeletonSystemImpl;
 import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
+import unitTests.vfsprovider.AbstractIOOperationsBase;
 import functionalTests.FunctionalTest;
 import functionalTests.GCMFunctionalTest;
 
@@ -164,7 +164,7 @@ public class GCMFunctionalDataSpacesBase extends GCMFunctionalTest {
     @After
     public void removeInputOutputSpacesContent() {
         if (rootTmpDir.exists())
-            assertTrue(SkeletonSystemImpl.deleteDirectory(rootTmpDir));
+            assertTrue(AbstractIOOperationsBase.deleteRecursively(rootTmpDir));
     }
 
     @Before

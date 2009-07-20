@@ -19,7 +19,6 @@ import java.util.Map;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.objectweb.proactive.extensions.calcium.system.SkeletonSystemImpl;
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesURI;
 import org.objectweb.proactive.extensions.dataspaces.core.InputOutputSpaceConfiguration;
@@ -35,6 +34,8 @@ import org.objectweb.proactive.extensions.dataspaces.vfs.DataSpacesLimitingFileO
 import org.objectweb.proactive.extensions.dataspaces.vfs.VFSFactory;
 import org.objectweb.proactive.extensions.dataspaces.vfs.VFSSpacesMountManagerImpl;
 import org.objectweb.proactive.extensions.dataspaces.vfs.adapter.VFSFileObjectAdapter;
+
+import unitTests.vfsprovider.AbstractIOOperationsBase;
 
 
 /**
@@ -133,7 +134,7 @@ public class VFSSpacesMountManagerImplTest {
             manager = null;
         }
         if (spacesDir != null && spacesDir.exists()) {
-            assertTrue(SkeletonSystemImpl.deleteDirectory(spacesDir));
+            assertTrue(AbstractIOOperationsBase.deleteRecursively(spacesDir));
             spacesDir = null;
         }
     }
