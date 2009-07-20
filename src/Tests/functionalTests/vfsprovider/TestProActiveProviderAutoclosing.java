@@ -72,7 +72,6 @@ public class TestProActiveProviderAutoclosing extends AbstractIOOperationsBase {
 
     private FileSystemServerDeployer serverDeployer;
     private DefaultFileSystemManager vfsManager;
-    private String serverVFSRootURL;
 
     @Before
     public void setUp() throws Exception {
