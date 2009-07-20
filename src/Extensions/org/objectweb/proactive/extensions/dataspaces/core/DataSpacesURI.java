@@ -476,7 +476,7 @@ public final class DataSpacesURI implements Serializable, Comparable<DataSpacesU
      *
      * @return string representation of a DataSpacesURI without space URI prefix or
      *         <code>null</code> if DataSpacesURI contains space part only
-     * @see {@link #isSpacePartOnly()}
+     * @see #isSpacePartOnly()
      */
     public String getRelativeToSpace() {
         if (isSpacePartOnly())

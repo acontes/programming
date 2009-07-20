@@ -131,8 +131,8 @@ public class DataSpacesImpl {
      * @throws FileSystemException
      * @throws SpaceNotFoundException
      * @throws ConfigurationException
-     * @see {@link PADataSpaces#resolveDefaultInput()}
-     * @see {@link PADataSpaces#resolveDefaultOutput()}
+     * @see PADataSpaces#resolveDefaultInput()
+     * @see PADataSpaces#resolveDefaultOutput()
      */
     public DataSpacesFileObject resolveDefaultInputOutput(SpaceType type, String path)
             throws IllegalArgumentException, FileSystemException, SpaceNotFoundException,
@@ -144,17 +144,8 @@ public class DataSpacesImpl {
      * Implementation (more generic) method for resolveDefaultInputBlocking and
      * resolveDefaultOutputBlocking.
      *
-     * @param timeoutMillis
-     * @param type
-     * @param path
-     *            of a file inside a data space
-     * @return
-     * @throws FileSystemException
-     * @throws IllegalArgumentException
-     * @throws ProActiveTimeoutException
-     * @throws ConfigurationException
-     * @see {@link PADataSpaces#resolveDefaultInputBlocking(long))}
-     * @see {@link PADataSpaces#resolveDefaultOutputBlocking(long))}
+     * @see PADataSpaces#resolveDefaultInputBlocking(long)
+     * @see PADataSpaces#resolveDefaultOutputBlocking(long)
      */
     public DataSpacesFileObject resolveDefaultInputOutputBlocking(long timeoutMillis, SpaceType type,
             String path) throws IllegalArgumentException, FileSystemException, ProActiveTimeoutException,
@@ -165,17 +156,8 @@ public class DataSpacesImpl {
     /**
      * Implementation (more generic) method for resolveInput and resolveOutput.
      *
-     * @param name
-     * @param type
-     * @param path
-     *            of a file inside a data space
-     * @return
-     * @throws FileSystemException
-     * @throws IllegalArgumentException
-     * @throws SpaceNotFoundException
-     * @throws ConfigurationException
-     * @see {@link PADataSpaces#resolveInput(String)}
-     * @see {@link PADataSpaces#resolveOutput(String)}
+     * @see PADataSpaces#resolveInput(String)
+     * @see PADataSpaces#resolveOutput(String)
      */
     public DataSpacesFileObject resolveInputOutput(String name, SpaceType type, String path)
             throws FileSystemException, IllegalArgumentException, SpaceNotFoundException,
@@ -213,18 +195,8 @@ public class DataSpacesImpl {
     /**
      * Implementation (more generic) method for resolveInputBlocking and resolveOutputBlocking.
      *
-     * @param name
-     * @param timeoutMillis
-     * @param type
-     * @param path
-     *            of a file inside a data space
-     * @return
-     * @throws FileSystemException
-     * @throws IllegalArgumentException
-     * @throws ProActiveTimeoutException
-     * @throws ConfigurationException
-     * @see {@link PADataSpaces#resolveInputBlocking(String, long)}
-     * @see {@link PADataSpaces#resolveOutputBlocking(String, long)}
+     * @see PADataSpaces#resolveInputBlocking(String, long)
+     * @see PADataSpaces#resolveOutputBlocking(String, long)
      */
     public DataSpacesFileObject resolveInputOutputBlocking(String name, long timeoutMillis, SpaceType type,
             String path) throws FileSystemException, IllegalArgumentException, ProActiveTimeoutException,
@@ -288,13 +260,7 @@ public class DataSpacesImpl {
     }
 
     /**
-     * @param path
-     *            of a file inside a data space
-     * @return
-     * @throws FileSystemException
-     * @throws NotConfiguredException
-     * @throws ConfigurationException
-     * @see {@link PADataSpaces#resolveScratchForAO()}
+     * @see PADataSpaces#resolveScratchForAO()
      */
     public DataSpacesFileObject resolveScratchForAO(String path) throws FileSystemException,
             NotConfiguredException, ConfigurationException {
@@ -328,11 +294,8 @@ public class DataSpacesImpl {
     /**
      * Implementation (more generic) method for getAllKnownInputNames and getAllKnownInputNames.
      *
-     * @param type
-     * @return set of known names
-     * @throws IllegalArgumentException
-     * @see {@link PADataSpaces#getAllKnownInputNames()}
-     * @see {@link PADataSpaces#getAllKnownOutputNames()}
+     * @see PADataSpaces#getAllKnownInputNames()
+     * @see PADataSpaces#getAllKnownOutputNames()
      */
     public Set<String> getAllKnownInputOutputNames(SpaceType type) throws IllegalArgumentException {
         if (logger.isTraceEnabled())
@@ -356,13 +319,8 @@ public class DataSpacesImpl {
     /**
      * Implementation (more generic) method for resolveAllKnownInputs and resolveAllKnownOutputs.
      *
-     * @param type
-     * @return
-     * @throws FileSystemException
-     * @throws IllegalArgumentException
-     * @throws ConfigurationException
-     * @see {@link PADataSpaces#resolveAllKnownInputs()}
-     * @see {@link PADataSpaces#resolveAllKnownOutputs()}
+     * @see PADataSpaces#resolveAllKnownInputs()
+     * @see PADataSpaces#resolveAllKnownOutputs()
      */
     public Map<String, DataSpacesFileObject> resolveAllKnownInputsOutputs(SpaceType type)
             throws FileSystemException, IllegalArgumentException, ConfigurationException {
@@ -399,13 +357,7 @@ public class DataSpacesImpl {
     }
 
     /**
-     * @param uri
-     * @return
-     * @throws MalformedURIException
-     * @throws FileSystemException
-     * @throws SpaceNotFoundException
-     * @throws ConfigurationException
-     * @see {@link PADataSpaces#resolveFile(String)}
+     * @see PADataSpaces#resolveFile(String)
      */
     public DataSpacesFileObject resolveFile(String uri) throws MalformedURIException, FileSystemException,
             SpaceNotFoundException, ConfigurationException {
@@ -441,15 +393,8 @@ public class DataSpacesImpl {
     /**
      * Implementation (more generic) method for addDefaultInput and addDefaultOutput.
      *
-     * @param name
-     * @param url
-     * @param path
-     * @param type
-     * @return
-     * @throws SpaceAlreadyRegisteredException
-     * @throws ConfigurationException
-     * @see {@link PADataSpaces#addDefaultInput(String, String, String)}
-     * @see {@link PADataSpaces#addDefaultOutput(String, String, String)}
+     * @see PADataSpaces#addDefaultInput(String, String)
+     * @see PADataSpaces#addDefaultOutput(String, String)
      */
     public String addDefaultInputOutput(String url, String path, SpaceType type)
             throws SpaceAlreadyRegisteredException, ConfigurationException, IllegalArgumentException {
@@ -459,15 +404,8 @@ public class DataSpacesImpl {
     /**
      * Implementation (more generic) method for addInput and addOutput.
      *
-     * @param name
-     * @param url
-     * @param path
-     * @param type
-     * @return
-     * @throws SpaceAlreadyRegisteredException
-     * @throws ConfigurationException
-     * @see {@link PADataSpaces#addInput(String, String, String)}
-     * @see {@link PADataSpaces#addOutput(String, String, String)}
+     * @see PADataSpaces#addInput(String, String, String)
+     * @see PADataSpaces#addOutput(String, String, String)
      */
     public String addInputOutput(String name, String url, String path, SpaceType type)
             throws SpaceAlreadyRegisteredException, ConfigurationException {

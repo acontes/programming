@@ -19,32 +19,29 @@ public interface Stream {
 
     /**
      * @throws IOException
-     * @see {@link StreamOperations#streamClose(long)}
+     * @see StreamOperations#streamClose(long)
      */
     public abstract void close() throws IOException;
 
     /**
-     * @return
      * @throws IOException
      * @throws WrongStreamTypeException
-     * @see {@link StreamOperations#streamGetLength(long)}
+     * @see StreamOperations#streamGetLength(long)
      */
     public abstract long getLength() throws IOException, WrongStreamTypeException;
 
     /**
-     * @return
      * @throws IOException
      * @throws WrongStreamTypeException
-     * @see {@link StreamOperations#streamGetPosition(long)}
+     * @see StreamOperations#streamGetPosition(long)
      */
     public abstract long getPosition() throws IOException, WrongStreamTypeException;
 
     /**
      * @param bytes
-     * @return
      * @throws IOException
      * @throws WrongStreamTypeException
-     * @see {@link StreamOperations#streamRead(long, int)}
+     * @see StreamOperations#streamRead(long, int)
      */
     public abstract byte[] read(int bytes) throws IOException, WrongStreamTypeException;
 
@@ -52,16 +49,15 @@ public interface Stream {
      * @param position
      * @throws IOException
      * @throws WrongStreamTypeException
-     * @see {@link StreamOperations#streamSeek(long, long)}
+     * @see StreamOperations#streamSeek(long, long)
      */
     public abstract void seek(long position) throws IOException, WrongStreamTypeException;
 
     /**
      * @param bytes
-     * @return
      * @throws IOException
      * @throws WrongStreamTypeException
-     * @see {@link StreamOperations#streamSkip(long, long)}
+     * @see StreamOperations#streamSkip(long, long)
      */
     public abstract long skip(long bytes) throws IOException, WrongStreamTypeException;
 
@@ -69,14 +65,14 @@ public interface Stream {
      * @param data
      * @throws IOException
      * @throws WrongStreamTypeException
-     * @see {@link StreamOperations#streamWrite(long, byte[])}
+     * @see StreamOperations#streamWrite(long, byte[])
      */
     public abstract void write(byte[] data) throws IOException, WrongStreamTypeException;
 
     /**
      * @throws IOException
      * @throws WrongStreamTypeException
-     * @see {@link StreamOperations#streamFlush(long)}
+     * @see StreamOperations#streamFlush(long)
      */
     public abstract void flush() throws IOException, WrongStreamTypeException;
 }

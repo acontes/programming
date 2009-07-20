@@ -85,7 +85,7 @@ public class BaseScratchSpaceConfiguration implements Serializable {
      * @return an instance of BaseScratchSpaceConfiguration with defined remote access
      * @throws ConfigurationException
      *             when remote access has been already specified or given URL is <code>null</code>
-     * @see {@link #BaseScratchSpaceConfiguration(String, String)}
+     * @see #BaseScratchSpaceConfiguration(String, String)
      */
     public BaseScratchSpaceConfiguration getWithRemoteAccess(final String url) throws ConfigurationException {
         if (this.url != null)

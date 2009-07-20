@@ -10,21 +10,15 @@ import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemExcept
 
 /**
  * Represents the data content of a file.
- * <p/>
  * <p>
  * To read from a file, use the <code>InputStream</code> returned by {@link #getInputStream}.
- * <p/>
  * <p>
  * To write to a file, use the <code>OutputStream</code> returned by {@link #getOutputStream}
  * method. This will create the file, and the parent folder, if necessary.
- * <p/>
  * <p>
  * A file may have multiple InputStreams open at the sametime.
- * <p/>
  *
- * @author <a href="mailto:adammurdoch@apache.org">Adam Murdoch</a>
- * @version $Revision: 537943 $ $Date: 2007-05-14 20:37:14 +0200 (Mon, 14 May 2007) $
- * @see FileObject#getContent
+ * @see DataSpacesFileObject#getContent
  */
 public interface FileContent {
     /**

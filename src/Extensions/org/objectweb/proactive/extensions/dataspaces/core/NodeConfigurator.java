@@ -32,8 +32,8 @@ import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
  * Objects life cycle:
  * <ol>
  * <li>Instance initialization by default constructor.</li>
- * <li>{@link #configureNode(Node, SpaceConfiguration)} method call for passing node-specific and
- * immutable settings. This can be called only once for each instance.</li>
+ * <li>{@link #configureNode(Node, BaseScratchSpaceConfiguration)} method call for passing
+ * node-specific and immutable settings. This can be called only once for each instance.</li>
  * <li>{@link #configureApplication(long, String)} method call for configuring application on a
  * node.</li>
  * <li>Obtaining {@link DataSpacesImpl} from application configuration if needed, by
@@ -125,11 +125,11 @@ public class NodeConfigurator {
      * registration of application scratch space for this node, if it exists.
      * <p>
      * This method may be called several times for different applications, after node has been
-     * configured through {@link #configureNode(Node, SpaceConfiguration)}. Subsequent calls will
-     * close existing application-specific configuration and create a new one.
+     * configured through {@link #configureNode(Node, BaseScratchSpaceConfiguration)}. Subsequent
+     * calls will close existing application-specific configuration and create a new one.
      * <p>
      * If configuration fails, instance of this class remains not configured for an application, any
-     * subsequent {@link #getDataSpaceImpl()} call will throw {@link IllegalStateException} until
+     * subsequent {@link #getDataSpacesImpl()} call will throw {@link IllegalStateException} until
      * successful configuration.
      *
      * @param appId

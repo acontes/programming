@@ -22,8 +22,8 @@ import org.objectweb.proactive.extensions.vfsprovider.protocol.FileSystemServer;
  * <p>
  * File name representation is a bit unusual for that protocol, although it bases on URL, with
  * particular scheme and specific path part interpretation.<br>
- * Scheme part of URL is one of supported protocols scheme defined in
- * {@link ProActiveProviderScheme} with prefix defined by {@link #VFS_PREFIX}. Prefix discriminates
+ * Scheme part of URL is one of ProActive Remote Object transport protocols (see
+ * {@link RemoteObjectFactory} with prefix defined by {@link #VFS_PREFIX}. Prefix discriminates
  * scheme of pure transport protocol (like RMI) from scheme of ProActive file access protocol using
  * that transport (like file access over RMI). e.g. <code>paphttp://</code>, <code>paprmi://</code><br>
  * Path part of URL is divided into two subparts separated by
@@ -75,8 +75,8 @@ public class ProActiveFileName extends GenericFileName {
      * @throws UnknownProtocolException
      *             when scheme in given URL is not recognized as one of the known protocols scheme
      * @throws IllegalArgumentException
-     *             when scheme of given URL is not supported, i.e. is not one of
-     *             {@link ProActiveProviderScheme}
+     *             when scheme of given URL is not supported, i.e. is not one of ProActive Remote
+     *             Object protocols
      */
     public static String getServerVFSRootURL(String serverURL) throws URISyntaxException,
             UnknownProtocolException {

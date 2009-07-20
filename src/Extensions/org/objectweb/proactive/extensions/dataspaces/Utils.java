@@ -37,8 +37,8 @@ public class Utils {
     }
 
     /**
-     * @see {@link ProActiveInet#getHostname()}
-     * @return
+     * @see ProActiveInet#getHostname()
+     * @return hostname of current Runtime
      */
     public static String getHostname() {
         // InetAddress.getLocalHost().getHostName();
@@ -46,10 +46,8 @@ public class Utils {
     }
 
     /**
-     * Returns an identifier of a Runtime of specified Node.
-     *
      * @param node
-     * @return
+     * @return an identifier of a Runtime of specified Node.
      */
     public static String getRuntimeId(Node node) {
         final ProActiveRuntime rt = node.getProActiveRuntime();
@@ -57,19 +55,16 @@ public class Utils {
     }
 
     /**
-     * Returns an identifier of specified Node.
-     *
      * @param node
-     * @return
+     * @return an identifier of specified Node
      */
     public static String getNodeId(final Node node) {
         return node.getNodeInformation().getName();
     }
 
     /**
-     * Returns identifier of an Body.
-     *
-     * @return
+     * @param body
+     * @return an identifier of a Body
      */
     public static String getActiveObjectId(Body body) {
         UniqueID uid = body.getID();
@@ -77,19 +72,15 @@ public class Utils {
     }
 
     /**
-     * Returns Body of an Active Object of a current active thread or HalfBody if caller is not an
-     * active object.
-     *
-     * @return
+     * @return Body of an Active Object of a current active thread or HalfBody if caller is not an
+     *         active object.
      */
     public static Body getCurrentActiveObjectBody() throws ProActiveRuntimeException {
         return PAActiveObject.getBodyOnThis();
     }
 
     /**
-     * Returns Node for current active thread.or HalfBodies Node if caller is not an active object
-     *
-     * @return
+     * @return Node for current active thread or HalfBodies Node if caller is not an active object.
      * @throws ProActiveRuntimeException
      *             when internal PA exception on node acquisition
      */

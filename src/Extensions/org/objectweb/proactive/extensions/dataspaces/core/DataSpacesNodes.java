@@ -40,7 +40,7 @@ public class DataSpacesNodes {
      * Returns DataSpacesImpl instance for a node with configured application.
      *
      * This method is usable after setting up this node with
-     * {@link #configureNode(Node, SpaceConfiguration)} and
+     * {@link #configureNode(Node, BaseScratchSpaceConfiguration)} and
      * {@link #configureApplication(Node, long, String)} calls.
      *
      * Returned instance is usable while node is kept configured for the application, with
@@ -83,7 +83,7 @@ public class DataSpacesNodes {
      *             checking)
      * @throws AlreadyConfiguredException
      *             when node is already configured for Data Spaces
-     * @see NodeConfigurator#configureNode(Node, SpaceConfiguration)
+     * @see NodeConfigurator#configureNode(Node, BaseScratchSpaceConfiguration)
      */
     public static void configureNode(Node node, BaseScratchSpaceConfiguration baseScratchConfiguration)
             throws IllegalArgumentException, AlreadyConfiguredException, FileSystemException,
@@ -110,8 +110,9 @@ public class DataSpacesNodes {
      * {@link #configureApplication(Node, long, String)}.
      *
      * This method can be called on an already configured node (see
-     * {@link #configureNode(Node, SpaceConfiguration)}) or even already application-configured node
-     * - in that case previous application configuration is closed before applying a new one.
+     * {@link #configureNode(Node, BaseScratchSpaceConfiguration)}) or even already
+     * application-configured node - in that case previous application configuration is closed
+     * before applying a new one.
      *
      * @param node
      *            node to be configured for Data Spaces application
@@ -127,7 +128,7 @@ public class DataSpacesNodes {
      *             when node is not configured for Data Spaces
      * @throws FileSystemException
      *             VFS related exception during scratch data space creation
-     * @see NodeConfigurator#configureApplication(Node, long, String)
+     * @see NodeConfigurator#configureApplication(long, String)
      */
     public static void configureApplication(Node node, long appId, String namingServiceURL)
             throws ProActiveException, NotConfiguredException, URISyntaxException, FileSystemException {

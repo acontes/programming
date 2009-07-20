@@ -34,7 +34,7 @@ import org.objectweb.proactive.extensions.vfsprovider.protocol.StreamMode;
  * existing directory.
  * <p>
  * File stream related operations are delegated to particular {@link Stream} implementation, created
- * by {@link StreamFactory} private inner class basing on {@link StreamMode}.
+ * by StreamFactory private inner class basing on {@link StreamMode}.
  * <p>
  * There is an auto closing of unused streams mechanism implemented, that starts when
  * {@link #startAutoClosing()} method is called and stops explicitly with {@link #stopServer()}

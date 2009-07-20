@@ -46,8 +46,6 @@ import org.objectweb.proactive.extensions.dataspaces.exceptions.SpaceNotFoundExc
  * <code>resolve*</code> methods. Those instances <b>must not</b> be shared between two different
  * ActiveObjects. Instead use {@link DataSpacesFileObject#getURI()} method for obtaining particular
  * file's URI, that is <b>allowed</b> to pass between two different ActiveObjects.</li>
- * <li>Method {@link #getCapabilitiesForSpaceType(SpaceType)} for obtaining minimal
- * {@link Capability} list of a data space type.</li>
  * </ol>
  * <p>
  * Minimal capabilities for returned files are defined in constants
@@ -384,7 +382,7 @@ public class PADataSpaces {
      * @throws ConfigurationException
      *             when resolved space's file system has not enough capabilities (because of wrong
      *             configuration)
-     * @see #resolveInputBlocking(long)
+     * @see #resolveInputBlocking(String, long)
      * @see #resolveInput(String, String)
      */
     public static DataSpacesFileObject resolveInput(String name) throws SpaceNotFoundException,
@@ -444,7 +442,7 @@ public class PADataSpaces {
      * @throws ConfigurationException
      *             when resolved space's file system has not enough capabilities (because of wrong
      *             configuration)
-     * @see #resolveOutputBlocking(long)
+     * @see #resolveOutputBlocking(String, long)
      * @see #resolveOutput(String, String)
      */
     public static DataSpacesFileObject resolveOutput(String name) throws SpaceNotFoundException,

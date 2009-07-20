@@ -16,9 +16,9 @@ import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemExcept
  * are set through {@link #init(Node, BaseScratchSpaceConfiguration)} method. It performs basic
  * preliminary initialization that is independent from concrete application. It need to be called
  * before any further use of this instance.</li>
- * <li>for each application executed at previously specified node, {@link #initForApplication(long)
- * )} is called to acquire instance of {@link ApplicationScratchSpace}. It should be called only
- * once per each application.</li>
+ * <li>for each application executed at previously specified node, {@link #initForApplication(long)}
+ * is called to acquire instance of {@link ApplicationScratchSpace}. It should be called only once
+ * per each application.</li>
  * <li>when no more scratch space is going to be used on specified node, instance is closed by
  * {@link #close()} call, which cleans up base scratch data spaces directories.
  * </ul>
@@ -39,12 +39,12 @@ public interface NodeScratchSpace {
      * <p>
      * This method can be called only once for each instance. Once called,
      * {@link ApplicationScratchSpace} instances can be returned by
-     * {@link #initForApplication(long))}. Once initialized, this instance must be closed by
+     * {@link #initForApplication(long)}. Once initialized, this instance must be closed by
      * {@link #close()} method. If initialization fails, there is no need to close it explicitly.
      *
      * @param node
      *            node to install scratch space for
-     * @param conf
+     * @param baseScratchConfiguration
      *            base scratch space configuration with URL defined
      * @throws IllegalStateException
      *             when instance has been already configured

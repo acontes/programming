@@ -22,7 +22,7 @@ import org.objectweb.proactive.extensions.dataspaces.exceptions.FileSystemExcept
 
 
 /**
- * VFS {@Link FileObject} adapter to {@link DataSpacesFileObject} interface, adding getURI
+ * VFS {@link FileObject} adapter to {@link DataSpacesFileObject} interface, adding getURI
  * functionality.
  * <p>
  * Adapted FileObject should provide any access limitation as required by Data Spaces specification.
@@ -37,8 +37,7 @@ public class VFSFileObjectAdapter implements DataSpacesFileObject {
     private FileName dataSpaceVFSFileName;
 
     /**
-     *
-     * @param fileObject
+     * @param adaptee
      *            file object that is going to be represented as DataSpacesFileObject; cannot be
      *            <code>null</code>
      * @param dataSpaceURI
