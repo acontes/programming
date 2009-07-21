@@ -31,8 +31,9 @@ public class ProActiveFileNameParser extends HostFileNameParser {
         int idx = path.indexOf(ProActiveFileName.SERVICE_AND_FILE_PATH_SEPARATOR);
         if (idx == -1) {
             // simply assume that whole path is a service path
+            final String servicePath = path.toString();
             path.delete(0, path.length());
-            return path.toString();
+            return servicePath;
         }
         final String servicePath = path.substring(0, idx);
         path.delete(0, idx + ProActiveFileName.SERVICE_AND_FILE_PATH_SEPARATOR.length());

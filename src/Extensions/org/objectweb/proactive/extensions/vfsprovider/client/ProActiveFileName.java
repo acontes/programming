@@ -111,7 +111,13 @@ public class ProActiveFileName extends GenericFileName {
     }
 
     private static int getServerDefaultPortForVFSScheme(String vfsScheme) throws UnknownProtocolException {
-        final String serverScheme = getServerSchemeForVFSScheme(vfsScheme);
+        final String serverScheme;
+        try {
+            serverScheme = getServerSchemeForVFSScheme(vfsScheme);
+        } catch (IllegalArgumentException x) {
+            throw new UnknownProtocolException("Scheme " + vfsScheme +
+                " is not properly formed ProVFS ProActive provider scheme");
+        }
         checkServerScheme(serverScheme);
         final RemoteObjectFactory serverProtocolFactory = AbstractRemoteObjectFactory
                 .getRemoteObjectFactory(serverScheme);
