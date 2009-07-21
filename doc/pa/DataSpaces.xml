@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="DataSpaces">
+    <info><title xml:id="DataSpacesAPI">Accessing data with Data Spaces API</title></info>
+
+<section xml:id="ds_intro">
+    <info><title>Introduction</title></info>
+    <indexterm><primary>Data Spaces</primary></indexterm>
+
+    <para>
+    In the ProActive library data can be accessed through Dats Spaces API that is to be explained in the following chapter.
+    </para>
+    <para>
+    Data Spaces mechanism conceptually pose the virtual file system layer (further called VFS)  between the user code, that accesses file system trough provided API (like Java IO, POSIX, etc.), and physical (local or remote) location of files. Therefore, a programmer does not need to be aware of real file location, and can use VFS abstraction instead. The Data Spaces mechanism brings such a point of view to the ProActive programmer with a dedicated API from the <literal>org.objectweb.proactive.extensions.dataspaces.api</literal> package.
+    </para>
+    <para>
+    In case of ProActive, Data Spaces layers file systems with variety of access protocols like HTTP, SFTP or local access into one virtual file system with uniform access among all Active Objects. This is achieved by ensuring that every Active Object has the same view of VFS tree &#151; an URI used for accessing data in one Active Object is correct just after passing it to the others. Therefore sharing data becomes comfortable, as standard ProActive communication mechanism can be used for announcing actual URIs.
+    </para>
+    <para>
+    As already mentioned ProActive Data Spaces can be run against variety of access protocols that are provided within the infrastructure (see the list of supported protocols) as well as ProActive&#150;compliant protocols thanks to <literal>PAProviderServer</literal> that can be used wherever no supported protocol is available and successful ProActive deployment can take place. Hence, Data Spaces API can be used on almost every infrastructure.
+    </para>
+    <para>
+    The programmer can use ProActive's Data Spaces API to read application's input data, write and share temporary results and finally gather outputs in uniform manner among all these operations. Hence there are three types of data space abstraction: input, output and scratch. Data Spaces API provides way to access existing data spaces and files within these data spaces, it also gives the ability to define new data spaces. All operations performed through this API concern data spaces owned by one application.
+    </para>
+    <para>
+    The Data Spaces configuration is read from the GCM&#150;D Descriptor for Node&#150;specific information as well as from the GCM&#150;A Descriptor for settings concerning a particular application.
+    </para>
+</section>
+
+<section xml:id="ds_gcmd">
+    <info><title>GCM Deployment Descriptor</title></info>
+    <para>iaa</para>
+</section>
+
+<section xml:id="ds_gcma">
+    <info><title>GCM Application Descriptor</title></info>
+    <para>iaa</para>
+</section>
+</chapter>
