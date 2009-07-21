@@ -11,6 +11,6 @@ import functionalTests.structuredp2p.can.TestQuery;
 
 @RunWith(Suite.class)
 @SuiteClasses(value = { TestTracker.class, TestZone.class, TestCoordinate.class,
-        TestNeighborsDataStructure.class, TestOverlay.class, TestQuery.class, TestOwlimStorage.class })
+        TestNeighborsDataStructure.class, TestOverlay.class, TestQuery.class, TestOWLIMStorage.class })
 public class AllTests {
 }

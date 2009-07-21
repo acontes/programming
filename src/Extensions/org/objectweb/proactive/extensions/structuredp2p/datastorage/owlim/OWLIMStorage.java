@@ -1,7 +1,5 @@
 package org.objectweb.proactive.extensions.structuredp2p.datastorage.owlim;
 
-import info.aduna.iteration.CloseableIteration;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -10,25 +8,18 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.objectweb.proactive.extensions.structuredp2p.datastorage.DataStorage;
+import org.openrdf.OpenRDFException;
 import org.openrdf.model.Statement;
 import org.openrdf.query.BindingSet;
-import org.openrdf.query.GraphQueryResult;
-import org.openrdf.query.MalformedQueryException;
-import org.openrdf.query.Query;
-import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
+import org.openrdf.query.QueryResult;
 import org.openrdf.query.TupleQuery;
-import org.openrdf.query.TupleQueryResult;
-import org.openrdf.query.parser.ParsedQuery;
+import org.openrdf.query.impl.MutableTupleQueryResult;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.RepositoryResult;
-import org.openrdf.repository.sail.SailGraphQuery;
 import org.openrdf.repository.sail.SailRepository;
-import org.openrdf.repository.sail.SailRepositoryConnection;
-import org.openrdf.repository.sail.SailTupleQuery;
-import org.openrdf.sail.SailException;
 import org.openrdf.sail.nativerdf.NativeStore;
 
 
@@ -37,7 +28,7 @@ import org.openrdf.sail.nativerdf.NativeStore;
  * 
  * @author Pellegrino Laurent
  * 
- * @version 0.1, 07/20/2009
+ * @version 0.1, 07/21/2009
  */
 @SuppressWarnings("serial")
 public class OWLIMStorage implements DataStorage {
@@ -80,7 +71,6 @@ public class OWLIMStorage implements DataStorage {
      * Initialize the OWLIM store.
      */
     public void startup() {
-        /* Loads properties */
         Properties properties = this.loadProperties();
 
         File repositoriesPath = new File(properties.getProperty("repositories-path"));
@@ -141,17 +131,34 @@ public class OWLIMStorage implements DataStorage {
     }
 
     /**
-     * Shutdown the repository.
+     * {@inheritDoc}
      */
-    public void shutdown() {
+    public void add(Statement stmt) {
         try {
-            if (this.repository.getConnection().isOpen()) {
-                this.repository.getConnection().close();
-            }
-
-            this.repository.shutDown();
+            RepositoryConnection con = this.repository.getConnection();
+            con.add(stmt);
+            con.close();
         } catch (RepositoryException e) {
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void remove(Statement stmt) {
+        RepositoryConnection conn = null;
+        try {
+            conn = this.repository.getConnection();
+            conn.remove(stmt);
+        } catch (RepositoryException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                conn.close();
+            } catch (RepositoryException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -180,12 +187,27 @@ public class OWLIMStorage implements DataStorage {
     }
 
     /**
+     * Shutdown the repository.
+     */
+    public void shutdown() {
+        try {
+            if (this.repository.getConnection().isOpen()) {
+                this.repository.getConnection().close();
+            }
+
+            this.repository.shutDown();
+        } catch (RepositoryException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * Shutdown the repository by removing all the repositories that are on the computer performing
      * this operation.
      */
     public void shutdownWithRepositoriesRemoving() {
-        this.deleteDirectory(new File(this.properties.getProperty("repositories-path")));
         this.shutdown();
+        this.deleteDirectory(new File(this.properties.getProperty("repositories-path")));
     }
 
     /**
@@ -195,159 +217,33 @@ public class OWLIMStorage implements DataStorage {
      *            the name of the repository to remove.
      */
     public void shutdownWithRepositoryRemoving(String repositoryName) {
+        this.shutdown();
         this
                 .deleteDirectory(new File(this.properties.getProperty("repositories-path") + "/" +
                     repositoryName));
-        this.shutdown();
     }
 
     /**
      * {@inheritDoc}
      */
-    public void add(Statement stmt) {
-        try {
-            RepositoryConnection con = this.repository.getConnection();
-            con.add(stmt);
-            con.close();
-        } catch (RepositoryException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public CloseableIteration<? extends BindingSet, QueryEvaluationException> query(QueryLanguage language,
-            String query) {
-        Query q = null;
+    public QueryResult<BindingSet> query(QueryLanguage language, String query) {
         RepositoryConnection conn = null;
+        QueryResult<BindingSet> queryResults = null;
 
         try {
             conn = this.repository.getConnection();
-            q = conn.prepareQuery(language, query);
-        } catch (RepositoryException e) {
-            e.printStackTrace();
-        } catch (MalformedQueryException e) {
-            e.printStackTrace();
-        }
 
-        ParsedQuery pq = (q instanceof SailGraphQuery ? (SailGraphQuery) q : (SailTupleQuery) q)
-                .getParsedQuery();
-        CloseableIteration<? extends BindingSet, QueryEvaluationException> results = null;
-        try {
-            results = ((SailRepositoryConnection) conn).getSailConnection().evaluate(pq.getTupleExpr(),
-                    pq.getDataset(), q.getBindings(), true);
-        } catch (SailException e) {
-            e.printStackTrace();
-        } finally {
-            /*
-             * try { conn.close(); } catch (RepositoryException e) { e.printStackTrace(); }
-             */
-        }
-
-        return results;
-
-        //
-
-        /*
-         * Set<Statement> results = new HashSet<Statement>();
-         * 
-         * try { conn = this.repository.getConnection(); try { GraphQueryResult graphResult =
-         * conn.prepareGraphQuery(language, query).evaluate(); while (graphResult.hasNext()) {
-         * results.add(graphResult.next()); } } catch (QueryEvaluationException e) {
-         * e.printStackTrace(); }
-         * 
-         * } catch (RepositoryException e) { e.printStackTrace(); } catch (MalformedQueryException
-         * e) { e.printStackTrace(); } finally { try { conn.close(); } catch (RepositoryException e)
-         * { e.printStackTrace(); } }
-         * 
-         * return results;
-         */
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public TupleQueryResult tupleQuery(QueryLanguage language, String query) {
-        RepositoryConnection conn = null;
-        TupleQueryResult result = null;
-        try {
-            conn = this.repository.getConnection();
             try {
                 TupleQuery tupleQuery = conn.prepareTupleQuery(language, query);
-                result = tupleQuery.evaluate();
-
-            } catch (QueryEvaluationException e) {
-                e.printStackTrace();
-            }
-
-        } catch (RepositoryException e) {
-            e.printStackTrace();
-        } catch (MalformedQueryException e) {
-            e.printStackTrace();
-        } finally {
-            try {
+                queryResults = new MutableTupleQueryResult(tupleQuery.evaluate());
+            } finally {
                 conn.close();
-            } catch (RepositoryException e) {
-                e.printStackTrace();
             }
+        } catch (OpenRDFException e) {
+            e.printStackTrace();
         }
 
-        return result;
-
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Set<Statement> graphQuery(QueryLanguage language, String graphQuery) {
-        RepositoryConnection conn = null;
-        Set<Statement> results = new HashSet<Statement>();
-
-        try {
-            conn = this.repository.getConnection();
-            try {
-                GraphQueryResult graphResult = conn.prepareGraphQuery(language, graphQuery).evaluate();
-
-                while (graphResult.hasNext()) {
-                    results.add(graphResult.next());
-                }
-            } catch (QueryEvaluationException e) {
-                e.printStackTrace();
-            }
-
-        } catch (RepositoryException e) {
-            e.printStackTrace();
-        } catch (MalformedQueryException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                conn.close();
-            } catch (RepositoryException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return results;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void remove(Statement stmt) {
-        RepositoryConnection conn = null;
-        try {
-            conn = this.repository.getConnection();
-            conn.remove(stmt);
-        } catch (RepositoryException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                conn.close();
-            } catch (RepositoryException e) {
-                e.printStackTrace();
-            }
-        }
+        return queryResults;
     }
 
     /**
@@ -377,6 +273,75 @@ public class OWLIMStorage implements DataStorage {
 
         return results;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    // public CloseableIteration<? extends BindingSet, QueryEvaluationException> query(QueryLanguage
+    // language,
+    // String query) {
+    // Query q = null;
+    // RepositoryConnection conn = null;
+    //
+    // try {
+    // conn = this.repository.getConnection();
+    // q = conn.prepareQuery(language, query);
+    // } catch (RepositoryException e) {
+    // e.printStackTrace();
+    // } catch (MalformedQueryException e) {
+    // e.printStackTrace();
+    // }
+    //
+    // ParsedQuery pq = (q instanceof SailGraphQuery ? (SailGraphQuery) q : (SailTupleQuery) q)
+    // .getParsedQuery();
+    // CloseableIteration<? extends BindingSet, QueryEvaluationException> results = null;
+    // try {
+    // results = ((SailRepositoryConnection) conn).getSailConnection().evaluate(pq.getTupleExpr(),
+    // pq.getDataset(), q.getBindings(), true);
+    // } catch (SailException e) {
+    // e.printStackTrace();
+    // } finally {
+    // /*
+    // * try { conn.close(); } catch (RepositoryException e) { e.printStackTrace(); }
+    // */
+    // }
+    //
+    // return results;
+    // }
+
+    /**
+     * {@inheritDoc}
+     */
+    // public Set<Statement> graphQuery(QueryLanguage language, String graphQuery) {
+    // RepositoryConnection conn = null;
+    // Set<Statement> results = new HashSet<Statement>();
+    //
+    // try {
+    // conn = this.repository.getConnection();
+    // try {
+    // GraphQueryResult graphResult = conn.prepareGraphQuery(language, graphQuery).evaluate();
+    //
+    // while (graphResult.hasNext()) {
+    // results.add(graphResult.next());
+    // }
+    // } catch (QueryEvaluationException e) {
+    // e.printStackTrace();
+    // }
+    //
+    // } catch (RepositoryException e) {
+    // e.printStackTrace();
+    // } catch (MalformedQueryException e) {
+    // e.printStackTrace();
+    // } finally {
+    // try {
+    // conn.close();
+    // } catch (RepositoryException e) {
+    // e.printStackTrace();
+    // }
+    // }
+    //
+    // return results;
+    // }
 
     /**
      * Returns the repository instance.
