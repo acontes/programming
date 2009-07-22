@@ -31,6 +31,7 @@
  */
 package org.objectweb.proactive.core.body.reply;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
@@ -42,10 +43,15 @@ import org.objectweb.proactive.core.body.tags.Tag;
 import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.jmx.notification.RequestNotificationData;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class ReplyReceiverImpl implements ReplyReceiver, java.io.Serializable {
-    public ReplyReceiverImpl() {
+    
+	final static protected Logger logger = ProActiveLogger.getLogger(Loggers.BODY);
+	
+	public ReplyReceiverImpl() {
     }
 
     public int receiveReply(Reply r, Body receiverBody, FuturePool futurePool) throws java.io.IOException {
@@ -68,7 +74,7 @@ public class ReplyReceiverImpl implements ReplyReceiver, java.io.Serializable {
     		}
     	}
     	
-    	System.out.println(System.currentTimeMillis() + ": replyReceived(futureupdate) " + r.getMethodName() + " [" + className + "]" +  " ["+ name +"] + Awaited? "+ n);
+    	//System.out.println("-------> [ReplyReceiver]replyReceived(futureupdate) " + r.getMethodName() + " [" + className + "]" +  " ["+ name +"] + Awaited? "+ n + "  Tags: "+ r.getTags() );
     	
     	// Here, I know if the result is really available (awaited == false).
     	// If it is, then I should generate a notification realReplyReceived, and read it
@@ -86,8 +92,9 @@ public class ReplyReceiverImpl implements ReplyReceiver, java.io.Serializable {
     				mbean.sendNotification(NotificationType.realReplyReceived, requestNotificationData);
     			}
     		}
+    		//System.out.println("-------> [ReplyReceiver]realReplyReceived(futureupdate) " + r.getMethodName() + " [" + className + "]" +  " ["+ name +"] + Awaited? "+ n + "  Tags: "+ r.getTags() );
     	}
-    	
+    	logger.debug("[ReplyReceiv] receiveReply for Future ["+ r.getSequenceNumber()+"] from body ["+r.getSourceBodyID()+"] Receiver ["+ receiverBody +"]");
     	int a = futurePool.receiveFutureValue(r.getSequenceNumber(), r.getSourceBodyID(), r.getResult(), r);
     	return a;
     }

@@ -113,7 +113,7 @@ public class ComponentRequestImpl extends RequestImpl implements ComponentReques
             try {
                 logger.debug("invocation on method [" + methodCall.getName() + "] of interface [" +
                     methodCall.getComponentMetadata().getComponentInterfaceName() + "] on component : [" +
-                    Fractal.getNameController(actualComponent).getFcName() + "]");
+                    Fractal.getNameController(actualComponent).getFcName() + "] Body: " + targetBody.getID());
             } catch (NoSuchInterfaceException e) {
                 e.printStackTrace();
             }

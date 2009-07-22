@@ -425,6 +425,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                 java.util.Iterator<Future> it = incomingFutures.iterator();
                 while (it.hasNext()) {
                     Future current = it.next();
+                    bodyLogger.debug("[AbstracBody] Body ["+ getName()+"] Calling receiveFuture from registerIncomingFuture "+ current.getID() );
                     getFuturePool().receiveFuture(current);
                 }
                 FuturePool.removeIncomingFutures();

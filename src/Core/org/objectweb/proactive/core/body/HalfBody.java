@@ -279,6 +279,10 @@ public class HalfBody extends AbstractBody {
             }
             if (future != null) {
                 future.setID(sequenceID);
+              //cruz: maybe I can add here the methodName of the future
+                future.setMethodName(methodCall.getName());
+                HalfBody.this.bodyLogger.debug("[BodyImpl   ] Body ["+ HalfBody.this.getName()+"] Calling receiveFuture for making request "+ request.getMethodName() );
+                //--cruz
                 this.futures.receiveFuture(future);
             }
 

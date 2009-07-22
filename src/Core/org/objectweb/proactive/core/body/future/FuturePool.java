@@ -37,8 +37,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
@@ -49,13 +51,19 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.reply.ReplyImpl;
+import org.objectweb.proactive.core.body.tags.MessageTags;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class FuturePool extends Object implements java.io.Serializable {
-    protected boolean newState;
+
+	final static protected Logger logger = ProActiveLogger.getLogger(Loggers.BODY);
+	
+	protected boolean newState;
 
     // table of future and ACs
     // this map is rebuilt on deserailisation of the object
@@ -93,6 +101,7 @@ public class FuturePool extends Object implements java.io.Serializable {
             this.registerACs = false;
             this.sendACs = false;
         }
+        logger.debug("FuturePool ] new FuturePool created");
     }
 
     //
@@ -250,10 +259,32 @@ public class FuturePool extends Object implements java.io.Serializable {
      */
     public synchronized int receiveFutureValue(long id, UniqueID creatorID, MethodCallResult result,
             Reply reply) throws java.io.IOException {
-        // get all aiwated futures
+
+    	// cruz
+    	Body b = PAActiveObject.getBodyOnThis();
+    	String bodyName = null;
+    	String methodName = null;
+    	boolean real = false;
+    	MessageTags mt = null;
+    	if(reply != null) {
+    		methodName = reply.getMethodName();
+    		if(reply.getResult() != null) {
+    			real = !PAFuture.isAwaited(reply.getResult().getResult());	
+    		}    		
+    		mt = reply.getTags();
+    	}
+    	if(b != null) {
+    		bodyName = b.getName();
+    	}
+
+    	logger.debug("[FuturePool ] receiveFutureValue1. Owner: ["+ownerBody.getName()+" ..." + ownerBody.getID() + "] methodName: ["+ methodName +"] isAwaited? "+ !real);
+    	//System.out.println("[FuturePool] receiveFutureValue in [" + ownerBody.getName()+"] for method ["+ methodName+"] Real reply?"+real+ " ... Tags="+mt);
+    	// --cruz
+    	
+    	// get all aiwated futures
         ArrayList<Future> futuresToUpdate = futures.getFuturesToUpdate(id, creatorID);
-        //System.out.println(System.currentTimeMillis() + ": replyReceived " + reply.getMethodName() );
         if (futuresToUpdate != null) {
+        	//System.out.println("[FuturePool] receiveFutureValue: there are "+ futuresToUpdate.size() + " futures to update here");
             // FAULT-TOLERANCE
             int ftres = FTManager.NON_FT;
             if ((reply != null) && (reply.getFTManager() != null)) {
@@ -262,6 +293,11 @@ public class FuturePool extends Object implements java.io.Serializable {
 
             Future future = (futuresToUpdate.get(0));
             if (future != null) {
+//            	if(future.getMethodName() == null) {
+//		            System.out.println("Setting methodName to "+ methodName);
+//            		future.setMethodName(methodName);
+//            	}
+            	logger.debug("[FuturePool ] receiveFutureValue2. Owner: ["+ownerBody.getName()+" ..." + ownerBody.getID() + "] Calling receiveReply on FutureProxy ["+ future.getFutureID()+"]");
                 future.receiveReply(result);
             }
 
@@ -274,6 +310,7 @@ public class FuturePool extends Object implements java.io.Serializable {
                 setCopyMode(true);
                 for (int i = 1; i < numOfFuturesToUpdate; i++) {
                     Future otherFuture = (futuresToUpdate.get(i));
+                    logger.debug("[FuturePool ] receiveFutureValue3. Owner: ["+ownerBody.getName()+" ..." + ownerBody.getID() + "] Calling receiveReply on FutureProxy ["+ otherFuture.getFutureID()+"]");
                     otherFuture.receiveReply((MethodCallResult) Utils.makeDeepCopy(result));
                 }
                 setCopyMode(false);
@@ -312,9 +349,13 @@ public class FuturePool extends Object implements java.io.Serializable {
                     }
                     this.removeDestinations();
 
+                    //System.out.println("Adding AC");
                     // add the deepcopied AC
-                    queueAC.addACRequest(new ACService(bodiesToContinue, new ReplyImpl(creatorID, id, null,
-                        newResult, psm, true)));
+                    //cruz: reply.getMethodName() was null
+                    logger.debug("[FuturePool ] receiveFutureValue4. Owner: ["+ownerBody.getName()+" ..." + ownerBody.getID() + "] Adding AC for method ["+ reply.getMethodName()+"]");
+                    queueAC.addACRequest(new ACService(bodiesToContinue, new ReplyImpl(creatorID, id, reply.getMethodName(),
+                        newResult, psm, true, reply.getTags())));
+                    //--cruz
                 }
             }
             // 3) Remove futures from the futureMap
@@ -333,12 +374,14 @@ public class FuturePool extends Object implements java.io.Serializable {
      * @param futureObject future to register
      */
     public synchronized void receiveFuture(Future futureObject) {
+    	logger.debug("[FuturePool ] receiveFuture. Owner: ["+ownerBody.getName()+" ..." + ownerBody.getID() + "] Received Future for FutureMap ["+ futureObject.getFutureID() +"] sent by ["+futureObject.getSenderID()+"] and calling FutureMap.receiveFuture");
         futureObject.setSenderID(ownerBody.getID());
         futures.receiveFuture(futureObject);
         long id = futureObject.getID();
         UniqueID creatorID = futureObject.getCreatorID();
         if (valuesForFutures.get("" + id + creatorID) != null) {
             try {
+            	logger.debug("[FuturePool ] receiveFuture. Owner: ["+ownerBody.getName()+" ..." + ownerBody.getID() + "] Calling receiveFutureValue ["+ futureObject.getFutureID() +"]");
                 this.receiveFutureValue(id, creatorID, valuesForFutures.remove("" + id + creatorID), null);
             } catch (java.io.IOException e) {
                 e.printStackTrace();
@@ -353,6 +396,7 @@ public class FuturePool extends Object implements java.io.Serializable {
      * @param bodyDest body destination of this continuation
      */
     public void addAutomaticContinuation(FutureID id, UniversalBody bodyDest) {
+    	logger.debug("[FuturePool ] addAutomaticContinuation Owner: ["+ownerBody.getName()+"..."+ownerBody.getID() + "] ID:[" + id.getID() +"] creator: ["+ id.getCreatorID() +"] bodyDest ["+ bodyDest.getID() + "]");
         futures.addAutomaticContinuation(id.getID(), id.getCreatorID(), bodyDest);
     }
 
@@ -509,7 +553,9 @@ public class FuturePool extends Object implements java.io.Serializable {
          * Add a ACservice in the active queue.
          */
         public synchronized void addACRequest(ACService r) {
-            queue.add(r);
+            //look what info is added here...
+        	
+        	queue.add(r);
             counter++;
             notifyAll();
         }
@@ -633,20 +679,25 @@ public class FuturePool extends Object implements java.io.Serializable {
                         .getBodyOnThis()).getProActiveSecurityManager()) : null;
 
                 for (int i = 0; i < dests.size(); i++) {
+                	
                     UniversalBody dest = (dests.get(i));
 
                     // FAULT-TOLERANCE
                     FTManager ftm = ((AbstractBody) FuturePool.this.getOwnerBody()).getFTManager();
 
                     if (remainingSends > 1) {
-                        // create a new reply to keep the original copy unchanged for next sending ...
-                        toSend = new ReplyImpl(reply.getSourceBodyID(), reply.getSequenceNumber(), null,
-                            reply.getResult(), psm, true);
+                        // create a new reply to keep the original copy unchanged for next sending ... 
+                    	//cruz: reply.getMethodName() was null
+                        toSend = new ReplyImpl(reply.getSourceBodyID(), reply.getSequenceNumber(), reply.getMethodName(),
+                            reply.getResult(), psm, true, reply.getTags());
+                        //--cruz
                     } else {
                         // last sending : the orignal can ben sent
                         toSend = reply;
                     }
 
+                    FuturePool.this.logger.debug("[ACService  ] doAC Owner: ["+FuturePool.this.ownerBody.getID()+"] for method ["+ reply.getMethodName()+"] dest:["+dest.getID()+"]");
+                    
                     // send the reply
                     if (ftm != null) {
                         ftm.sendReply(toSend, dest);

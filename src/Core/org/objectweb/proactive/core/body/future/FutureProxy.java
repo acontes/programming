@@ -133,6 +133,10 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     // returns future update info used during dynamic dispatch for groups
     private transient DispatchMonitor dispatchMonitor;
 
+    //cruz
+    private String methodName = null;
+    //--cruz
+    
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -143,6 +147,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
      * is usually called.
      */
     public FutureProxy() throws ConstructionOfReifiedObjectFailedException {
+        logger.debug("[FutureProxy] new FutureProxy created");
     }
 
     /**
@@ -215,6 +220,17 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
             dispatchMonitor.updatedResult(originatingProxy);
         }
         target = obj;
+        
+        
+        // cruz
+        String name = "";
+        if(obj.getResult() != null) {
+        	name = obj.getResult().getClass().getName();
+        }
+        //System.out.println("-------------> FutureProxy. replyReceived. Is awaited? " + isAwaited(obj.getResult()) + " [" + name + "] ID = "+ id);
+        logger.debug("[FutureProxy] receiveReply ID:" + this.id + ", MethodCallResult type: ["+name+"]. IsAwaited? "+isAwaited(obj.getResult()) + " methodName:["+ methodName +"]" );
+        // -- cruz
+        
         ExceptionHandler.addResult(this);
         FutureMonitoring.removeFuture(this);
 
@@ -330,10 +346,17 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
             mbean.sendNotification(NotificationType.receivedFutureResult, new FutureNotificationData(bodyId,
                 getCreatorID()));
         }
-        else {
-        	Body so = PAActiveObject.getBodyOnThis();
-        	if(so != null) {
-        		logger.debug("Received Future Result. I'm a "+ so.getClass().getName() + ". " + so.getMBean() );
+
+        Body b = PAActiveObject.getBodyOnThis();
+        if(b != null) {
+        	if(target.getResult() != null) {
+        		logger.debug("[FutureProxy] waitFor free ID:["+this.id+"], target type: ["+target.getResult().getClass().getName()+"]. IsAwaited?" + isAwaited(target.getResult()));
+        		if(PAFuture.isAwaited(target.getResult())) {
+        			//logger.debug("Received Future Result. ["+b.getName()+"] [type: "+ target.getResult().getClass().getName()+"] method [" + methodName +"]");
+        		}
+        		else {
+        			//logger.debug("Received REAL Result. ["+b.getName()+"] [type: "+ target.getResult().getClass().getName()+"] method [" + methodName +"]");
+        		}
         	}
         }
 
@@ -379,6 +402,10 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 
     public UniversalBody getUpdater() {
         return this.updater;
+    }
+    
+    public UniqueID getSenderID() {
+    	return senderID;
     }
 
     public void setSenderID(UniqueID i) {
@@ -493,6 +520,8 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         out.writeObject(id);
         // Pass a reference to the updater
         out.writeObject(writtenUpdater.getRemoteAdapter());
+        //cruz
+        out.writeObject(methodName);
     }
 
     /**
@@ -505,6 +534,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         target = (MethodCallResult) in.readObject();
         id = (FutureID) in.readObject();
         updater = (UniversalBody) in.readObject();
+        methodName = (String) in.readObject();
         // register all incoming futures, even for migration or checkpointing
         if (this.isAwaited()) {
             FuturePool.registerIncomingFuture(this);
@@ -589,4 +619,12 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     public synchronized void setDispatchMonitor(DispatchMonitor dispatchMonitor) {
         this.dispatchMonitor = dispatchMonitor;
     }
+
+	public String getMethodName() {
+		return methodName;
+	}
+
+	public void setMethodName(String methodName) {
+		this.methodName = methodName;
+	}
 }

@@ -323,16 +323,19 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
      */
     @Override
     protected int internalReceiveReply(Reply reply) throws java.io.IOException {
-        // JMX Notification
-        if (!isProActiveInternalObject && (this.mbean != null)) {
-            String tagNotification = createTagNotification(reply.getTags());
-            RequestNotificationData requestNotificationData = new RequestNotificationData(
-                BodyImpl.this.bodyID, BodyImpl.this.getNodeURL(), reply.getSourceBodyID(), this.nodeURL,
-                reply.getMethodName(), getRequestQueue().size() + 1, reply.getSequenceNumber(),
-                tagNotification);
-            this.mbean.sendNotification(NotificationType.replyReceived, requestNotificationData);
-        }
-        // END JMX Notification
+    	// cruz ... only want to treat replies that have the Future ...
+    	if(!reply.isAutomaticContinuation()) {
+    		// JMX Notification
+    		if (!isProActiveInternalObject && (this.mbean != null)) {
+    			String tagNotification = createTagNotification(reply.getTags());
+    			RequestNotificationData requestNotificationData = new RequestNotificationData(
+    					BodyImpl.this.bodyID, BodyImpl.this.getNodeURL(), reply.getSourceBodyID(), this.nodeURL,
+    					reply.getMethodName(), getRequestQueue().size() + 1, reply.getSequenceNumber(),
+    					tagNotification);
+    			this.mbean.sendNotification(NotificationType.replyReceived, requestNotificationData);
+    		}
+    	}
+    	// END JMX Notification
         return replyReceiver.receiveReply(reply, this, getFuturePool());
     }
 
@@ -641,7 +644,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             if(mcr != null) {
             	Object res = mcr.getResult();
             	if(res != null) {
-            		System.out.println("Got reply for method " + reply.getMethodName() + " and is a "+ res.getClass().getName() + " ... awaited?" + PAFuture.isAwaited(res) );	
+            		//System.out.println("Got reply for method " + reply.getMethodName() + " and is a "+ res.getClass().getName() + "[" + BodyImpl.this.getName() + "]" + " ... awaited?" + PAFuture.isAwaited(res) + " ... Tags: " + reply.getTags());	
             	}
             }
             // END JMX Notification
@@ -766,6 +769,10 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
 
             if (future != null) {
                 future.setID(sequenceID);
+                //cruz: maybe I can add here the methodName of the future
+                future.setMethodName(methodCall.getName());
+                BodyImpl.this.bodyLogger.debug("[BodyImpl   ] Body ["+ BodyImpl.this.getName()+"] Calling receiveFuture for making request "+ request.getMethodName() );
+                //--cruz
                 this.futures.receiveFuture(future);
             }
 

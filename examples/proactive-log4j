@@ -15,7 +15,7 @@ log4j.logger.org.mortbay = WARN
 #log4j.logger.proactive.classloader = DEBUG
 #log4j.logger.proactive.events = DEBUG
 #log4j.logger.proactive.runtime = DEBUG
-#log4j.logger.proactive.body = DEBUG
+log4j.logger.proactive.body = DEBUG
 #log4j.logger.proactive.mop = DEBUG
 #log4j.logger.proactive.groups = DEBUG
 #log4j.logger.proactive.sync_call = DEBUG
@@ -38,11 +38,12 @@ log4j.logger.org.mortbay = WARN
 #log4j.logger.proactive.examples = DEBUG
 
 #log4j.logger.proactive.components = DEBUG
-#log4j.logger.proactive.components.requests = DEBUG
+log4j.logger.proactive.components.requests = DEBUG
 #log4j.logger.proactive.components.activity = DEBUG
 #log4j.logger.proactive.components.bytecodegeneration = DEBUG
 #log4j.logger.proactive.components.adl = DEBUG
 #log4j.logger.proactive.components.gui = DEBUG
+#log4j.logger.proactive.components.controllers = DEBUG
 
 #log4j.logger.proactive.security = DEBUG
 #log4j.logger.proactive.security.node = DEBUG
@@ -77,7 +78,6 @@ log4j.logger.org.mortbay = WARN
 #log4j.logger.proactive.jmx = DEBUG
 #log4j.logger.proactive.jmx.mbean = DEBUG
 #log4j.logger.proactive.jmx.notification = DEBUG
-
 
 ################ Appenders ####################
 #

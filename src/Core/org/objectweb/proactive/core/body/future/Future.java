@@ -128,4 +128,9 @@ public interface Future extends LocalFuture {
      * @param mode true is the copyMode is set
      */
     public void setCopyMode(boolean mode);
+    
+    public void setMethodName(String n);
+    public String getMethodName();
+    public UniqueID getSenderID();
+    
 }
