@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.component.type;
 
 import java.io.Serializable;
 
+import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.Type;
@@ -45,6 +46,8 @@ import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.webservices.WSInfo;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -64,6 +67,8 @@ import org.objectweb.proactive.core.component.webservices.WSInfo;
  */
 @PublicAPI
 public class WSComponent implements Serializable, Component, LifeCycleController {
+    protected static final transient Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
+
     /**
      * Functional interface type.
      */
@@ -172,11 +177,11 @@ public class WSComponent implements Serializable, Component, LifeCycleController
             return tf.createFcType(new InterfaceType[] { fcInterfaceType });
         } catch (InstantiationException e) {
             // should never append
-            e.printStackTrace();
+            logger.error("Could not generate type for web service component", e);
             return null;
         } catch (NoSuchInterfaceException e) {
             // should never append
-            e.printStackTrace();
+            logger.error("Could not generate type for web service component", e);
             return null;
         }
     }

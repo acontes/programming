@@ -211,6 +211,8 @@ public class WSProxyClassGenerator extends AbstractInterfaceClassGenerator {
 
             return reference;
         } catch (Exception e) {
+            logger.error("Cannot generate web service proxy [" + interfaceName + "] with signature [" +
+                interfaceType.getFcItfSignature() + "] with javassist: " + e.getMessage());
             throw new InterfaceGenerationFailedException(
                 "Cannot generate web service proxy [" + interfaceName + "] with signature [" +
                     interfaceType.getFcItfSignature() + "] with javassist", e);

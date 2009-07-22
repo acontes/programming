@@ -37,7 +37,10 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.rpc.client.RPCServiceClient;
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -48,6 +51,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
  */
 @PublicAPI
 public class Axis2WSCaller implements ProActiveWSCaller {
+    protected static final transient Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_REQUESTS);
+
     public Axis2WSCaller() {
     }
 
@@ -65,8 +70,7 @@ public class Axis2WSCaller implements ProActiveWSCaller {
                 return rpcServiceClient.invokeBlocking(qName, args, returnTypes);
             }
         } catch (AxisFault af) {
-            System.err.println("[Axis2] Failed to invoke web service: " + wsUrl);
-            af.printStackTrace();
+            logger.error("[Axis2] Failed to invoke web service: " + wsUrl, af);
             return new Object[] { null };
         }
     }

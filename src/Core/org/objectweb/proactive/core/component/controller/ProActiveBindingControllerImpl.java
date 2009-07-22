@@ -301,7 +301,13 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController 
                     ProActiveTypeFactory.SINGLETON_CARDINALITY);
             } catch (InstantiationException e) {
                 // should never append
-                e.printStackTrace();
+                controllerLogger.error("could not generate ProActive interface type for " + clientItfName +
+                    ": " + e.getMessage());
+                IllegalBindingException ibe = new IllegalBindingException(
+                    "could not generate ProActive interface type for " + clientItfName + ": " +
+                        e.getMessage());
+                ibe.initCause(e);
+                throw ibe;
             }
             try {
                 // generate a proxy implementing the Java client interface and calling the web service

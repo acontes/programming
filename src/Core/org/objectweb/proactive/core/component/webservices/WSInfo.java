@@ -145,7 +145,10 @@ public class WSInfo implements Serializable {
             new URL(wsUrl);
             return wsUrl;
         } catch (MalformedURLException e) {
-            throw new IllegalBindingException("The URL of the web service is malformed: " + wsUrl);
+            IllegalBindingException ibe = new IllegalBindingException(
+                "The URL of the web service is malformed: " + wsUrl);
+            ibe.initCause(e);
+            throw ibe;
         }
     }
 
@@ -157,11 +160,14 @@ public class WSInfo implements Serializable {
             Class<?> c = Class.forName(className);
             if (!c.isAssignableFrom(Class.forName(PROACTIVEWSCALLER_ITF_NAME))) {
                 throw new IllegalBindingException("The web service caller: " + className +
-                    " must implement the " + PROACTIVEWSCALLER_ITF_NAME + "interface");
+                    " must implement the " + PROACTIVEWSCALLER_ITF_NAME + " interface");
             }
             return className;
         } catch (ClassNotFoundException e) {
-            throw new IllegalBindingException("Web service caller: " + className + " cannot be found");
+            IllegalBindingException ibe = new IllegalBindingException("Web service caller: " + className +
+                " cannot be found");
+            ibe.initCause(e);
+            throw ibe;
         }
     }
 

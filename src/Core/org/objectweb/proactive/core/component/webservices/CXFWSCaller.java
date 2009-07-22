@@ -35,7 +35,10 @@ import java.net.URL;
 
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.dynamic.DynamicClientFactory;
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -46,6 +49,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
  */
 @PublicAPI
 public class CXFWSCaller implements ProActiveWSCaller {
+    protected static final transient Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_REQUESTS);
+
     public CXFWSCaller() {
     }
 
@@ -56,8 +61,7 @@ public class CXFWSCaller implements ProActiveWSCaller {
             Client client = dcf.createClient(wsdlUrl);
             return client.invoke(methodName, args);
         } catch (Exception e) {
-            System.err.println("[CXF] Failed to invoke web service: " + wsUrl);
-            e.printStackTrace();
+            logger.error("[CXF] Failed to invoke web service: " + wsUrl, e);
             return new Object[] { null };
         }
     }
