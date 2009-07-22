@@ -27,13 +27,36 @@
     </para>
 </section>
 
-<section xml:id="ds_gcmd">
-    <info><title>GCM Deployment Descriptor</title></info>
-    <para>iaa</para>
+<section xml:id="ds_configuration">
+	<info><title>Configuring Data Spaces</title></info>
+	<section xml:id="ds_configuration_gcm">
+		<info><title>Data Spaces and GCM Deployment</title></info>
+		<section xml:id="ds_gcmd">
+    		<info><title>GCM Deployment Descriptor</title></info>
+    		<para>iaa</para>
+		</section>
+
+		<section xml:id="ds_gcma">
+    		<info><title>GCM Application Descriptor</title></info>
+    		<para>iaa</para>
+		</section>
+	</section>
+	
+	<section xml:id="ds_configuration_manual">
+		<info><title>Manual configuration</title></info>
+		<para>
+		In some environments it may be useful to access Data Spaces configuration API manually. Typical user does not need to know about this API, but it is exposed to give more flexibility for potential usages.
+		</para>
+		<para>
+		TODO
+		</para>
+	</section>
 </section>
 
-<section xml:id="ds_gcma">
-    <info><title>GCM Application Descriptor</title></info>
-    <para>iaa</para>
+<section xml:id="ds_using_api">
+	<info><title>Using Data Spaces API</title></info>
+	<para>
+	TODO...
+	</para>
 </section>
 </chapter>
