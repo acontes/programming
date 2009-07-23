@@ -52,14 +52,116 @@
     </para>
 </section>
 
-<section xml:id="ds_configuration_manual">
-    <info><title>Manual configuration</title></info>
-    <para>
-    In some environments it may be useful to access Data Spaces configuration API manually. Typical user does not need to know about this API, but it is exposed to give more flexibility for potential usages.
-    </para>
-    <para>
-    TODO
-    </para>
+<section xml:id="ds_configuration">
+    <info><title>Configuring Data Spaces</title></info>
+    <section xml:id="ds_configuration_gcm">
+        <info><title>Data Spaces and GCM Deployment</title></info>
+        <para>
+        The easiest and typical way to configure Data Spaces is using it together with GCM Deployment, which is described in <xref linkend="GCMDeployment"/>. 
+        </para>
+        <para>
+        When using Data Spaces with GCM Deployment, all necessary configuration actions are implemented inside GCM deployment mechanism. User and/or administrator just needs to specify configuration in GCM Application and GCM Deployment descriptor files, as usually with this kind of deployment. Once Data Spaces configuration is placed in GCM Deployment descriptors, user can access Data Spaces API from every node deployed through <literal>GCMApplication</literal>.
+        </para>
+        <section xml:id="ds_gcma">
+            <info><title>GCM Application Descriptor</title></info>
+            <para>
+            In GCM Application Descriptor user defines a few application-wide settings:
+            <itemizedlist>
+                <listitem><para>whether to <emphasis>enable or disable Data Spaces</emphasis> for the application,</para></listitem>
+                <listitem><para>(optionally) <emphasis>Naming Service settings</emphasis>,</para></listitem>
+                <listitem><para>(optionally) application's <emphasis>input and output data spaces</emphasis> definitions.</para></listitem>
+            </itemizedlist>
+            </para>
+
+            <para>
+            Let us have a look how example GCM Application Descriptor may look like:
+            <example xml:id="ds_gcma_example">
+            <info>
+                <title>GCMA descriptor fragment - Data Spaces configuration</title>
+            </info>
+            <programlisting language="xml"><textobject><textdata fileref="code_snippets/dataspaces/gcma_fragment.txt"/></textobject></programlisting>
+            </example>
+            </para>
+
+            <para>
+            Step by step - how configuration is specified:
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        <emphasis><literal>&lt;data&gt;</literal></emphasis> tag.
+                    </para>
+                    <para>
+                    Presence of this tag determines whether Data Spaces will be enabled for the whole application. There are no attributes for this tag. All other Data Spaces related tags are included in this one.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        <emphasis><literal>&lt;namingService&gt;</literal></emphasis> tag (optional).
+                    </para>
+                    <para>
+                        Data Spaces needs so called Naming Service to function properly, which acts as a directory of data spaces. This tag is responsible for Naming Service related settings.
+                    </para>
+                    <para>
+                        For typical configuration it is appropriate to omit this tag, which stands for starting own Naming Service for deployed <literal>GCMApplication</literal> and closing it with end of that application life time.  
+                    </para>
+                    <para>
+                        In some configurations you may want to use already started Naming Service. In that case you may specify its URL within <literal>url</literal> attribute, in the following way:
+                        <programlisting language="xml">&lt;namingService url="rmi://branch.inria.fr:1099/5933540059531990841/namingService"&gt;</programlisting>
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        <emphasis>Input and output specification</emphasis> tags (optional).
+                    </para>
+                    <para>
+                        These group of tags specify input and output data spaces for the application. Spaces has to be defined in a specific order: default input space <emphasis><literal>&lt;inputDefault&gt;</literal></emphasis>, named input spaces <emphasis><literal>&lt;input&gt;</literal></emphasis>, default output space <emphasis><literal>&lt;outputDefault&gt;</literal></emphasis> and named output spaces <emphasis><literal>&lt;output&gt;</literal></emphasis>. Each of them is optional.
+                    </para>
+                    <para>
+                        Every input or output data space is defined in almost the same way. Such definition consists of the following tags/attributes:
+                        <itemizedlist>
+                            <listitem>
+                                <para><literal>&lt;remoteAccess&gt;</literal> tag with <literal>url</literal> attribute.</para>
+                                <para>
+                                    This mandatory part of space definition sets URL that will be used for accessing that data space. URL may point to a file or directory.
+                                </para>
+                            </listitem>
+                            <listitem>
+                                <para><literal>&lt;location&gt;</literal> tag with <literal>hostname</literal> and <literal>path</literal> attributes (optional).</para>
+                                <para>
+                                    If this tag is present in space definition, data will be accessed locally on host specified in <literal>hostname</literal>, under local path specified in <literal>path</literal>. This path should represent the same data as <literal>remoteAccess</literal> tag does.    
+                                </para>   
+                            </listitem>
+                            <listitem>
+                                <para><literal>id</literal> attribute (only for non-default spaces).</para>
+                                <para>Non-default input or output spaces have to be identified by unique id, which is set in that attribute.</para>
+                            </listitem>
+                        </itemizedlist>
+                        Example data space definition:
+                        <programlisting language="xml">&lt;input id="precomputation"&gt;
+    &lt;remoteAccess url="sftp://bob@storage.com/var/precomputed/" /&gt;
+    &lt;location hostname="storage.com" path="/var/precomputed/" /&gt;
+&lt;/input&gt;</programlisting>
+                    </para>
+                </listitem>
+            </itemizedlist>
+            </para>
+        </section>
+
+        <section xml:id="ds_gcmd">
+            <info><title>GCM Deployment Descriptor</title></info>
+            <para>iaa</para>
+        </section>
+    </section>
+
+    <section xml:id="ds_configuration_manual">
+        <info><title>Manual configuration</title></info>
+        <para>
+        In some environments it may be useful to access Data Spaces configuration API manually. Most of the users do not need to know about this API, but it is exposed to give more flexibility for potential usages.
+        </para>
+        <para>
+        TODO
+        </para>
+    </section>
 </section>
 
 <section xml:id="ds_using_api">
@@ -97,4 +199,5 @@
     <para>
     A complete example goes here..
     </para>
+</section>
 </chapter>
