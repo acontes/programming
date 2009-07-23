@@ -24,7 +24,6 @@ public abstract class Coordinate implements Comparable<Coordinate>, Serializable
      * Constructor.
      */
     public Coordinate() {
-
     }
 
     /**
@@ -114,6 +113,12 @@ public abstract class Coordinate implements Comparable<Coordinate>, Serializable
         return this.value;
     }
 
+    /**
+     * Sets the value.
+     * 
+     * @param value
+     *            the new value to set.
+     */
     public void setValue(String value) {
         this.value = value;
     }

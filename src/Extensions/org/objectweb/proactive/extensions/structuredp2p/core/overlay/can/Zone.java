@@ -5,8 +5,8 @@ import java.io.Serializable;
 
 import org.objectweb.proactive.core.util.converter.MakeDeepCopy;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
-import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates.BigDecimalCoordinate;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates.Coordinate;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates.LexicographicCoordinate;
 
 
 /**
@@ -26,17 +26,17 @@ public class Zone implements Serializable {
     /**
      * The type of coordinate to use.
      */
-    public static final Class<? extends Coordinate> COORDINATE_TYPE = BigDecimalCoordinate.class;
+    public static final Class<? extends Coordinate> COORDINATE_TYPE = LexicographicCoordinate.class;
 
     /**
      * The minimal value to manage.
      */
-    public static final String COORDINATE_MIN = "0";
+    public static final String COORDINATE_MIN = "http://a";
 
     /**
      * The maximal value to manage.
      */
-    public static final String COORDINATE_MAX = "1";
+    public static final String COORDINATE_MAX = "http://z";
 
     /**
      * The minimum coordinates.

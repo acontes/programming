@@ -6,6 +6,7 @@ import java.util.Scanner;
 import org.objectweb.proactive.examples.structuredp2p.util.Deployment;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
+import org.openrdf.model.Statement;
 
 
 public class InteractiveThread implements Runnable {
@@ -60,6 +61,24 @@ public class InteractiveThread implements Runnable {
                     for (Peer peer : this.peerLauncher.getRemotePeers()) {
                         buf.append("    " + i + ". ");
                         buf.append(((CANOverlay) peer.getStructuredOverlay()).getZone());
+                        buf.append("\n");
+
+                        int j = 1;
+                        for (Statement stmt : peer.query(peer.getDataStorage().getRepository()
+                                .getValueFactory().createStatement(null, null, null))) {
+                            buf.append("       ");
+                            buf.append(j);
+                            buf.append(". ");
+                            buf.append(" <");
+                            buf.append(stmt.getObject());
+                            buf.append(", ");
+                            buf.append(stmt.getPredicate());
+                            buf.append(", ");
+                            buf.append(stmt.getSubject());
+                            buf.append(">\n");
+                            j++;
+                        }
+
                         buf.append("\n");
                         i++;
                     }

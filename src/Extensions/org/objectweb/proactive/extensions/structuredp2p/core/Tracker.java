@@ -81,7 +81,6 @@ public class Tracker implements Serializable {
             } catch (BlockingRequestReceiverException e) {
                 this.addOnNetwork(remotePeer);
             } catch (Exception e) {
-                System.out.println("Tracker.addOnNetwork() EXCEPTION");
                 // The remote peer we contact in order to join is died, so we retry with an another
                 this.remotePeers.remove(peerToJoin);
                 this.addOnNetwork(remotePeer);
@@ -115,8 +114,8 @@ public class Tracker implements Serializable {
      * Create a new Tracker ActiveObject.
      * 
      * @param type
-     *            the type of the peer, which is one of {@link OverlayType}.
-     * @return the new Peer object created.
+     *            the type of the tracker, which is one of {@link OverlayType}.
+     * @return the new Tracker object created.
      * @throws ActiveObjectCreationException
      * @throws NodeException
      */
@@ -129,10 +128,10 @@ public class Tracker implements Serializable {
      * Create a new Tracker ActiveObject.
      * 
      * @param type
-     *            the type of the peer, which is one of {@link OverlayType}.
+     *            the type of the tracker, which is one of {@link OverlayType}.
      * @param node
      *            the node to use.
-     * @return the new Peer object created.
+     * @return the new Tracker object created.
      * @throws ActiveObjectCreationException
      * @throws NodeException
      */

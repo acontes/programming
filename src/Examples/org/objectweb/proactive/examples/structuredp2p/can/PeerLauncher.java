@@ -83,15 +83,21 @@ public class PeerLauncher extends Observable {
                     .size())));
             this.remotePeers.add(peer);
 
+            if (this.remotePeers.size() == 1) {
+                for (int i = 0; i < 100; i++) {
+                    peer.addData();
+                }
+            }
+
             TrackerLauncher.trackers.get(this.trackersIndex % TrackerLauncher.trackers.size()).addOnNetwork(
                     peer);
             this.trackersIndex++;
-
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
         } catch (NodeException e) {
             e.printStackTrace();
         }
+
         this.updateGUI();
         this.printInformation("Add peer managing " + ((CANOverlay) peer.getStructuredOverlay()).getZone());
     }
@@ -111,6 +117,7 @@ public class PeerLauncher extends Observable {
         String buf = "(";
         for (int i = 0; i < coordinatesToFind.length; i++) {
             coordinatesToFind[i] = LexicographicCoordinate.random(1 + rand.nextInt(1));
+            // coordinatesToFind[i] = BigDecimalCoordinate.random();
             if (i != 0) {
                 buf += ",";
             }
@@ -125,7 +132,6 @@ public class PeerLauncher extends Observable {
         this.printInformation("Lookup for peer managing " + buf + ".\n    Lookup start from peer managing " +
             ((CANOverlay) sender.getStructuredOverlay()).getZone() + ".\n    Peer found in " +
             response.getLatency() + "ms with " + response.getNbSteps() + " steps.");
-
     }
 
     public void printInformation(String mess) {

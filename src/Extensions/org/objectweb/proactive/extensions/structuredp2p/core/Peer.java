@@ -19,6 +19,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates.LexicographicCoordinate;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.chord.ChordOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.requests.BlockingRequestReceiverException;
 import org.objectweb.proactive.extensions.structuredp2p.core.requests.StructuredMetaObjectFactory;
@@ -28,6 +29,8 @@ import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.Me
 import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.Query;
 import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.QueryResponse;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.ResponseMessage;
+import org.openrdf.model.Statement;
+import org.openrdf.model.ValueFactory;
 
 
 /**
@@ -391,4 +394,24 @@ public class Peer implements InitActive, RunActive, Serializable {
         return Peer.newActivePeer(type, null);
     }
 
+    public Boolean addData() {
+        ValueFactory valueFactory = this.getDataStorage().getRepository().getValueFactory();
+        this.getDataStorage().add(
+                valueFactory.createStatement(valueFactory.createURI("http://" +
+                    LexicographicCoordinate.random(10).getValue()), valueFactory.createURI("http://" +
+                    LexicographicCoordinate.random(10).getValue()), valueFactory.createURI("http://" +
+                    LexicographicCoordinate.random(10).getValue())));
+        return true;
+    }
+
+    public Set<Statement> query(Statement stmt) {
+        return this.dataStorage.query(stmt);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String toString() {
+        return this.structuredOverlay.toString();
+    }
 }

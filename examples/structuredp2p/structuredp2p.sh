@@ -9,6 +9,16 @@ fi
 
 . ${workingDir}/../env.sh
 
+#export CLASSPATH=../../:$CLASSPATH
+#export CLASSPATH=../../lib/*:$CLASSPATH
+#export CLASSPATH=../../classes/Core:$CLASSPATH
+#export CLASSPATH=../../classes/Benchmarks:$CLASSPATH
+#export CLASSPATH=../../classes/Examples:$CLASSPATH
+#export CLASSPATH=../../classes/Extensions:$CLASSPATH
+#export CLASSPATH=../../classes/Extra:$CLASSPATH
+#export CLASSPATH=../../classes/Tests:$CLASSPATH
+#export CLASSPATH=../../classes/Utils:$CLASSPATH
+
 default_descriptor=../GCMD_Local.xml
 default_hostname=`hostname`
 default_st_operation=jls
@@ -45,19 +55,14 @@ then
 fi
 
 echo
-echo ---------- STRUCTURED P2P ----------
-
+if [[ "$2" == "I" ]]
+then
+	echo ---------- STRUCTURED P2P : Interactive Test  ----------
+else 
+	echo ---------- STRUCTURED P2P : Stress Test  ----------
+fi
+ 
 args="$descriptor_app $default_hostname $1 $2 $default_st_operation"
-
-export CLASSPATH=../../lib/*:$CLASSPATH
-export CLASSPATH=../../classes/Core:$CLASSPATH
-export CLASSPATH=../../classes/Benchmarks:$CLASSPATH
-export CLASSPATH=../../classes/Examples:$CLASSPATH
-export CLASSPATH=../../classes/Extensions:$CLASSPATH
-export CLASSPATH=../../classes/Extra:$CLASSPATH
-export CLASSPATH=../../classes/Tests:$CLASSPATH
-export CLASSPATH=../../classes/Utils:$CLASSPATH
-
 $JAVACMD -Ddescriptor.peer=$descriptor_peer -Ddescriptor.tracker=$descriptor_tracker org.objectweb.proactive.examples.structuredp2p.can.Launcher $args
 
 echo

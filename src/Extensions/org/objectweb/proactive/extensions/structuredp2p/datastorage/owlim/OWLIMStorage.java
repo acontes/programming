@@ -1,16 +1,16 @@
 package org.objectweb.proactive.extensions.structuredp2p.datastorage.owlim;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.HashSet;
-import java.util.Properties;
 import java.util.Set;
 
 import org.objectweb.proactive.extensions.structuredp2p.datastorage.DataStorage;
 import org.openrdf.OpenRDFException;
 import org.openrdf.model.Statement;
 import org.openrdf.query.BindingSet;
+import org.openrdf.query.GraphQueryResult;
+import org.openrdf.query.MalformedQueryException;
+import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.QueryResult;
 import org.openrdf.query.TupleQuery;
@@ -31,13 +31,13 @@ import org.openrdf.sail.nativerdf.NativeStore;
  * @version 0.1, 07/21/2009
  */
 @SuppressWarnings("serial")
-public class OWLIMStorage implements DataStorage {
+public class OWLIMStorage extends DataStorage {
 
     private Repository repository;
 
-    private Properties properties;
+    public static final String ROOT_PATH = System.getProperty("user.home");
 
-    public static String OWLIM_PROPERTIES_FILE = "owlim.properties";
+    public static final String REPOSITORIES_PATH = OWLIMStorage.ROOT_PATH + "/BigOWLIM/repositories";
 
     /**
      * Constructor.
@@ -49,38 +49,35 @@ public class OWLIMStorage implements DataStorage {
     /**
      * Loads the properties associated to the datastore.
      */
-    private Properties loadProperties() {
-        File propertiesFile = new File("owlim/" + OWLIMStorage.OWLIM_PROPERTIES_FILE);
-
-        if (propertiesFile.exists()) {
-            this.properties = new Properties();
-            try {
-                this.properties.load(new FileInputStream(propertiesFile));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-            throw new IllegalStateException("The properties file '" + "owlim/" +
-                OWLIMStorage.OWLIM_PROPERTIES_FILE + "' doesn't exist.");
-        }
-
-        return this.properties;
-    }
+    // private Properties loadProperties() {
+    // File propertiesFile = new File(this.OWLIM_PROPERTIES_FILE);
+    //
+    // if (propertiesFile.exists()) {
+    // this.properties = new Properties();
+    // try {
+    // this.properties.load(new FileInputStream(propertiesFile));
+    // } catch (IOException e) {
+    // e.printStackTrace();
+    // }
+    // } else {
+    // throw new IllegalStateException("The properties file '" + this.OWLIM_PROPERTIES_FILE +
+    // "' doesn't exist.");
+    // }
+    //
+    // return this.properties;
+    // }
 
     /**
-     * Initialize the OWLIM store.
+     * {@inheritDoc}
      */
     public void startup() {
-        Properties properties = this.loadProperties();
-
-        File repositoriesPath = new File(properties.getProperty("repositories-path"));
+        File repositoriesPath = new File(OWLIMStorage.REPOSITORIES_PATH);
 
         if (!repositoriesPath.exists()) {
             repositoriesPath.mkdirs();
         }
 
-        File currentObjectRepository = new File(properties.getProperty("repositories-path"), "" +
-            this.hashCode());
+        File currentObjectRepository = new File(OWLIMStorage.REPOSITORIES_PATH, "" + this.hashCode());
         currentObjectRepository.mkdir();
 
         this.repository = new SailRepository(new NativeStore(currentObjectRepository));
@@ -134,12 +131,18 @@ public class OWLIMStorage implements DataStorage {
      * {@inheritDoc}
      */
     public void add(Statement stmt) {
+        RepositoryConnection conn = null;
         try {
-            RepositoryConnection con = this.repository.getConnection();
-            con.add(stmt);
-            con.close();
+            conn = this.repository.getConnection();
+            conn.add(stmt);
         } catch (RepositoryException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                conn.close();
+            } catch (RepositoryException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -160,67 +163,6 @@ public class OWLIMStorage implements DataStorage {
                 e.printStackTrace();
             }
         }
-    }
-
-    /**
-     * Recursively delete a given directory.
-     * 
-     * @param path
-     *            the path to the directory to remove.
-     * @return <code>true</code> is the delete has succeeded, <code>false</code> otherwise.
-     */
-    private boolean deleteDirectory(File path) {
-        boolean resultat = true;
-
-        if (path.exists()) {
-            File[] files = path.listFiles();
-            for (File file : files) {
-                if (file.isDirectory()) {
-                    resultat &= this.deleteDirectory(file);
-                } else {
-                    resultat &= file.delete();
-                }
-            }
-        }
-        resultat &= path.delete();
-        return (resultat);
-    }
-
-    /**
-     * Shutdown the repository.
-     */
-    public void shutdown() {
-        try {
-            if (this.repository.getConnection().isOpen()) {
-                this.repository.getConnection().close();
-            }
-
-            this.repository.shutDown();
-        } catch (RepositoryException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Shutdown the repository by removing all the repositories that are on the computer performing
-     * this operation.
-     */
-    public void shutdownWithRepositoriesRemoving() {
-        this.shutdown();
-        this.deleteDirectory(new File(this.properties.getProperty("repositories-path")));
-    }
-
-    /**
-     * Shutdown the repository by removing the specified repository.
-     * 
-     * @param repositoryName
-     *            the name of the repository to remove.
-     */
-    public void shutdownWithRepositoryRemoving(String repositoryName) {
-        this.shutdown();
-        this
-                .deleteDirectory(new File(this.properties.getProperty("repositories-path") + "/" +
-                    repositoryName));
     }
 
     /**
@@ -277,6 +219,70 @@ public class OWLIMStorage implements DataStorage {
     /**
      * {@inheritDoc}
      */
+    public boolean queryB(QueryLanguage language, String query) {
+        RepositoryConnection conn = null;
+        boolean result = false;
+
+        try {
+            conn = this.repository.getConnection();
+
+            try {
+                result = conn.prepareBooleanQuery(language, query).evaluate();
+                System.out.println("result = " + result);
+            } finally {
+                conn.close();
+            }
+        } catch (OpenRDFException e) {
+            e.printStackTrace();
+        }
+
+        return new Boolean(result);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Set<Statement> queryV(QueryLanguage language, String graphQuery) {
+        RepositoryConnection conn = null;
+        Set<Statement> results = new HashSet<Statement>();
+
+        try {
+            conn = this.repository.getConnection();
+            try {
+                GraphQueryResult graphResult = conn.prepareGraphQuery(language, graphQuery).evaluate();
+
+                while (graphResult.hasNext()) {
+                    results.add(graphResult.next());
+                }
+            } catch (QueryEvaluationException e) {
+                e.printStackTrace();
+            }
+
+        } catch (RepositoryException e) {
+            e.printStackTrace();
+        } catch (MalformedQueryException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                conn.close();
+            } catch (RepositoryException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return results;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean hasStatements() {
+        return this.queryB(QueryLanguage.SPARQL, "ASK { ?o ?p ?s }");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     // public CloseableIteration<? extends BindingSet, QueryEvaluationException> query(QueryLanguage
     // language,
     // String query) {
@@ -310,43 +316,74 @@ public class OWLIMStorage implements DataStorage {
     // }
 
     /**
-     * {@inheritDoc}
+     * Recursively delete a given directory.
+     * 
+     * @param path
+     *            the path to the directory to remove.
+     * @return <code>true</code> is the delete has succeeded, <code>false</code> otherwise.
      */
-    // public Set<Statement> graphQuery(QueryLanguage language, String graphQuery) {
-    // RepositoryConnection conn = null;
-    // Set<Statement> results = new HashSet<Statement>();
-    //
-    // try {
-    // conn = this.repository.getConnection();
-    // try {
-    // GraphQueryResult graphResult = conn.prepareGraphQuery(language, graphQuery).evaluate();
-    //
-    // while (graphResult.hasNext()) {
-    // results.add(graphResult.next());
-    // }
-    // } catch (QueryEvaluationException e) {
-    // e.printStackTrace();
-    // }
-    //
-    // } catch (RepositoryException e) {
-    // e.printStackTrace();
-    // } catch (MalformedQueryException e) {
-    // e.printStackTrace();
-    // } finally {
-    // try {
-    // conn.close();
-    // } catch (RepositoryException e) {
-    // e.printStackTrace();
-    // }
-    // }
-    //
-    // return results;
-    // }
+    private boolean deleteDirectory(File path) {
+        boolean resultat = true;
+
+        if (path.exists()) {
+            File[] files = path.listFiles();
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    resultat &= this.deleteDirectory(file);
+                } else {
+                    resultat &= file.delete();
+                }
+            }
+        }
+        resultat &= path.delete();
+        return (resultat);
+    }
 
     /**
-     * Returns the repository instance.
+     * {@inheritDoc}
+     */
+    public void shutdown() {
+        try {
+            if (this.repository.getConnection().isOpen()) {
+                this.repository.getConnection().close();
+            }
+
+            this.repository.shutDown();
+        } catch (RepositoryException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void shutdownByRemovingCurrentRepository() {
+        this.shutdownWithRepositoryRemoving("" + this.hashCode());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void shutdownWithRepositoriesRemoving() {
+        this.shutdown();
+        this.deleteDirectory(new File(OWLIMStorage.REPOSITORIES_PATH));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void shutdownWithRepositoryRemoving(String repositoryName) {
+        this.shutdown();
+        this.deleteDirectory(new File(OWLIMStorage.REPOSITORIES_PATH + "/" + repositoryName));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    /*
+     * (non-Javadoc)
      * 
-     * @return the repository instance.
+     * @see org.objectweb.proactive.extensions.structuredp2p.datastorage.DataStorage#getRepository()
      */
     public Repository getRepository() {
         return this.repository;

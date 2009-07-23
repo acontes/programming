@@ -1,11 +1,13 @@
 package org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.can;
 
+import java.util.List;
 import java.util.Stack;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.NeighborsDataStructure;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.Zone;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.can.CANJoinMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.ResponseMessage;
+import org.openrdf.model.Statement;
 
 
 /**
@@ -15,30 +17,30 @@ import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.R
  * @author Pellegrino Laurent
  * @author Trovato Alexandre
  * 
- * @version 0.1
+ * @version 0.1, 07/21/2009
  */
 @SuppressWarnings("serial")
 public class CANJoinResponseMessage implements ResponseMessage {
 
     /**
-     * The current dimension.
+     * The dimension.
      */
     private final int dimension;
 
     /**
-     * The current direction.
+     * The direction affected.
      */
     private final int direction;
 
     /**
-     * The current zone.
+     * The zone affected.
      */
     private final Zone affectedZone;
 
     /**
-     * The current neighbors.
+     * The neighbors affected.
      */
-    private final NeighborsDataStructure neighbors;
+    private final NeighborsDataStructure affectedNeighbors;
 
     /**
      * The current history.
@@ -46,84 +48,86 @@ public class CANJoinResponseMessage implements ResponseMessage {
     private final Stack<int[]> splitHistory;
 
     /**
+     * The statements affected.
+     */
+    private final List<Statement> affectedStatements;
+
+    /**
      * Constructor.
      * 
-     * @param remotePeer
-     *            the remote peer already in the overlay.
      * @param dimension
      *            the dimension.
      * @param directionInv
      *            the direction.
+     * @param splitHistory
+     *            the splitHistory of the remote peer.
      * @param zone
      *            the zone of the new peer.
      * @param affectedNeighbors
      *            the neighbors of the remote peer.
-     * @param splitHistory
-     *            the splitHistory of the remote peer.
      */
-    public CANJoinResponseMessage(int dimension, int directionInv, Zone zone,
-            NeighborsDataStructure affectedNeighbors, Stack<int[]> splitHistory) {
+    public CANJoinResponseMessage(int dimension, int directionInv, Stack<int[]> splitHistory,
+            Zone affectedZone, NeighborsDataStructure affectedNeighbors, List<Statement> affectedStatements) {
         this.dimension = dimension;
         this.direction = directionInv;
-        this.affectedZone = zone;
-        this.neighbors = affectedNeighbors;
         this.splitHistory = splitHistory;
+        this.affectedZone = affectedZone;
+        this.affectedNeighbors = affectedNeighbors;
+        this.affectedStatements = affectedStatements;
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public CANJoinResponseMessage(boolean succeded) {
-        this.dimension = -1;
-        this.direction = -1;
-        this.affectedZone = null;
-        this.neighbors = null;
-        this.splitHistory = null;
-    }
-
-    /**
-     * Returns the current dimension.
+     * Returns the affected dimension.
      * 
-     * @return the dimension.
+     * @return the affected dimension.
      */
     public int getAffectedDimension() {
         return this.dimension;
     }
 
     /**
-     * Returns the current direction.
+     * Returns the affected direction.
      * 
-     * @return the direction.
+     * @return the affected direction.
      */
     public int getAffectedDirection() {
         return this.direction;
     }
 
     /**
-     * Returns the current zone.
+     * Returns the affected history.
      * 
-     * @return the zone.
+     * @return the affected splitHistory.
+     */
+    public Stack<int[]> getSplitHistory() {
+        return this.splitHistory;
+    }
+
+    /**
+     * Returns the affected zone.
+     * 
+     * @return the affected zone.
      */
     public Zone getAffectedZone() {
         return this.affectedZone;
     }
 
     /**
-     * Returns the current neighbors.
+     * Returns the affected neighbors.
      * 
-     * @return the neighbors.
+     * @return the affected neighbors.
      */
     public NeighborsDataStructure getAffectedNeighborsDataStructure() {
-        return this.neighbors;
+        return this.affectedNeighbors;
     }
 
     /**
-     * Returns the current history.
+     * Returns the affected statements.
      * 
-     * @return the splitHistory
+     * @return the affected statements.
      */
-    public Stack<int[]> getSplitHistory() {
-        return this.splitHistory;
+    public List<Statement> getAffectedStatements() {
+        return this.affectedStatements;
     }
 
 }

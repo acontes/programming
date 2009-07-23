@@ -95,7 +95,6 @@ public class TestOWLIMStorage {
                 e.printStackTrace();
             }
         }
-
     }
 
     @Test
@@ -128,6 +127,13 @@ public class TestOWLIMStorage {
     }
 
     @Test
+    public void testSPARQLAsk() {
+        Assert.assertEquals(true, TestOWLIMStorage.owlimStorage.queryB(QueryLanguage.SPARQL,
+                "ASK { ?o ?p ?s }"));
+        Assert.assertEquals(true, TestOWLIMStorage.owlimStorage.hasStatements());
+    }
+
+    @Test
     public void testRemove() {
         TestOWLIMStorage.owlimStorage.remove(TestOWLIMStorage.owlimValueFactory.createStatement(
                 TestOWLIMStorage.subject, TestOWLIMStorage.predicate, TestOWLIMStorage.object));
@@ -135,10 +141,12 @@ public class TestOWLIMStorage {
         Assert.assertEquals(0, TestOWLIMStorage.owlimStorage.query(
                 TestOWLIMStorage.owlimStorage.getRepository().getValueFactory().createStatement(
                         TestOWLIMStorage.subject, null, null)).size());
+
+        Assert.assertEquals(false, TestOWLIMStorage.owlimStorage.hasStatements());
     }
 
     @AfterClass
     public static void tearDownAfterClass() {
-        TestOWLIMStorage.owlimStorage.shutdownWithRepositoriesRemoving();
+        TestOWLIMStorage.owlimStorage.shutdownByRemovingCurrentRepository();
     }
 }

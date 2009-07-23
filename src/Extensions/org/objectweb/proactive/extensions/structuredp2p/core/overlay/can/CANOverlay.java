@@ -26,6 +26,13 @@ import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.Query;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.ActionResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.ResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.can.CANJoinResponseMessage;
+import org.openrdf.model.Statement;
+import org.openrdf.model.ValueFactory;
+import org.openrdf.model.impl.StatementImpl;
+import org.openrdf.query.BindingSet;
+import org.openrdf.query.QueryEvaluationException;
+import org.openrdf.query.QueryLanguage;
+import org.openrdf.query.QueryResult;
 
 
 /**
@@ -46,6 +53,8 @@ public class CANOverlay extends StructuredOverlay {
      * The number of dimensions which is equals to the number of axes.
      */
     public static final int NB_DIMENSIONS = 2;
+
+    public static final String[] DIMENSIONS = new String[] { "o", "p", "s" };
 
     /**
      * Neighbors of the {@link Zone} which is managed.
@@ -83,9 +92,13 @@ public class CANOverlay extends StructuredOverlay {
 
         /* Actions on local peer : the peer which join an existing peer */
         this.setZone(response.getAffectedZone());
+        System.out.println(response.getAffectedZone());
         this.splitHistory = response.getSplitHistory();
         this.saveSplit(response.getAffectedDimension(), response.getAffectedDirection());
         this.neighborsDataStructure = response.getAffectedNeighborsDataStructure();
+        for (Statement stmt : response.getAffectedStatements()) {
+            this.getLocalPeer().getDataStorage().add(stmt);
+        }
 
         for (int dimension = 0; dimension < CANOverlay.NB_DIMENSIONS; dimension++) {
             for (int direction = 0; direction < 2; direction++) {
@@ -372,7 +385,6 @@ public class CANOverlay extends StructuredOverlay {
                         } catch (BlockingRequestReceiverException e) {
                             super.bufferizeQuery(query);
                         } catch (Exception e) {
-                            // TODO Dirty Leave
                             System.out.println("DIRTY LEAVE");
                         }
 
@@ -484,12 +496,12 @@ public class CANOverlay extends StructuredOverlay {
         int direction = this.getRandomDirection();
         int directionInv = CANOverlay.getOppositeDirection(direction);
 
-        // Get the next dimension to split onto
+        // Gets the next dimension to split onto
         if (!this.splitHistory.empty()) {
             dimension = CANOverlay.getNextDimension(this.splitHistory.lastElement()[0]);
         }
 
-        // Split zones
+        // Splits zones
         Zone[] newZones = null;
         try {
             newZones = this.getZone().split(dimension);
@@ -497,7 +509,62 @@ public class CANOverlay extends StructuredOverlay {
             e.printStackTrace();
         }
 
-        // Update the zone of the peer which is already on the network
+        // Splits the data
+        List<Statement> statementsResult = new ArrayList<Statement>();
+
+        System.out.println(this.getLocalPeer().getDataStorage());
+
+        // Perform the data split only if the datastore contains statements
+
+        // if (this.getLocalPeer().getDataStorage().hasStatements()) {
+        if (this.getLocalPeer().getDataStorage().query(new StatementImpl(null, null, null)).iterator()
+                .hasNext()) {
+
+            StringBuffer query = new StringBuffer();
+            query.append("SELECT ?o ?p ?s WHERE {\n");
+            query.append("  ?o ?p ?s .\n");
+            query.append("  FILTER ( str(?");
+            query.append(CANOverlay.DIMENSIONS[dimension]);
+            query.append(") > \"");
+            query.append(newZones[directionInv].getCoordinateMin(dimension));
+            query.append("\" && str(?");
+            query.append(CANOverlay.DIMENSIONS[dimension]);
+            query.append(") < \"");
+            query.append(newZones[directionInv].getCoordinateMax(dimension));
+            query.append("\" ).\n");
+            query.append("}");
+
+            QueryResult<BindingSet> queryResults = this.getLocalPeer().getDataStorage().query(
+                    QueryLanguage.SPARQL, query.toString());
+
+            try {
+                while (queryResults.hasNext()) {
+                    BindingSet bindingSet = queryResults.next();
+                    ValueFactory valueFactory = this.getLocalPeer().getDataStorage().getRepository()
+                            .getValueFactory();
+                    statementsResult.add(valueFactory.createStatement(valueFactory.createURI(bindingSet
+                            .getValue("o").toString()), valueFactory.createURI(bindingSet.getValue("p")
+                            .toString()), valueFactory.createURI(bindingSet.getValue("s").toString())));
+                }
+            } catch (QueryEvaluationException e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    queryResults.close();
+                } catch (QueryEvaluationException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            /*
+             * Removes the outdated statements (statements that have been given to the new peer
+             * which join the network) from the current peer
+             */
+            for (Statement stmt : statementsResult) {
+                this.getLocalPeer().getDataStorage().remove(stmt);
+            }
+        }
+        // Updates the zone of the peer which is already on the network
         this.setZone(newZones[direction]);
         this.saveSplit(dimension, direction);
 
@@ -525,8 +592,8 @@ public class CANOverlay extends StructuredOverlay {
             e.printStackTrace();
         }
 
-        return new CANJoinResponseMessage(dimension, directionInv, newZones[directionInv],
-            neighborsOfThePeerWhichJoin, newHistory);
+        return new CANJoinResponseMessage(dimension, directionInv, newHistory, newZones[directionInv],
+            neighborsOfThePeerWhichJoin, statementsResult);
     }
 
     /**

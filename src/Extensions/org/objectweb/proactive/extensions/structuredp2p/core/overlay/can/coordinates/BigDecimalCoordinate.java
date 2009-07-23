@@ -1,6 +1,7 @@
 package org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates;
 
 import java.math.BigDecimal;
+import java.util.Random;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
 
@@ -122,7 +123,7 @@ public class BigDecimalCoordinate extends Coordinate {
     }
 
     /**
-     * Says if the this coordinate is between twice in argument.
+     * Indicates if the this coordinate is between two coordinates.
      * 
      * @param coord1
      *            a coordinate
@@ -137,5 +138,15 @@ public class BigDecimalCoordinate extends Coordinate {
         }
 
         return false;
+    }
+
+    /**
+     * Generates a random {@link BigDecimalCoordinate}.
+     * 
+     * @return the generated {@link BigDecimalCoordinate}.
+     */
+    public static BigDecimalCoordinate random() {
+        Random rand = new Random();
+        return new BigDecimalCoordinate("" + rand.nextFloat());
     }
 }
