@@ -40,7 +40,6 @@ import junit.framework.Assert;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.api.Component;
@@ -163,12 +162,11 @@ public class TestWebServiceBinding extends ComponentTest {
     }
 
     @Test
-    @Ignore
     public void testWebServicesBindingWithADL() throws Exception {
         Factory factory = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
         Map<Object, Object> context = new HashMap<Object, Object>();
         Component composite = (Component) factory.newComponent(
-                "functionalTests.component.webservices.adl.Composite", context);
+                "functionalTests.component.webservicebinding.adl.Composite", context);
         Fractal.getLifeCycleController(composite).startFc();
         Runner runner = (Runner) composite.getFcInterface("Runner");
         Assert.assertTrue("Failed to invoke web services with composite component", runner.execute()

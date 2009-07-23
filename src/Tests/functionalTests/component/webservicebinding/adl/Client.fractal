@@ -2,12 +2,12 @@
 
 <!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN" "classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd">
 
-<definition name="functionalTests.component.webservices.adl.Client">
-  <interface signature="functionalTests.component.webservices.Runner" role="server" name="Runner"/>
-  <interface signature="functionalTests.component.webservices.Services" role="client" name="Services"/>
-  <!-- <interface signature="functionalTests.component.webservices.ServiceMulticast" role="client" name="ServiceMulticastFalse"/> -->
+<definition name="functionalTests.component.webservicebinding.adl.Client">
+  <interface signature="functionalTests.component.webservicebinding.Runner" role="server" name="Runner"/>
+  <interface signature="functionalTests.component.webservicebinding.Services" role="client" name="Services"/>
+  <!-- <interface signature="functionalTests.component.webservicebinding.ServiceMulticast" role="client" name="ServiceMulticastFalse"/> -->
 
-  <content class="functionalTests.component.webservices.Client"/>
+  <content class="functionalTests.component.webservicebinding.Client"/>
 
   <controller desc="primitive"/>
 </definition>
