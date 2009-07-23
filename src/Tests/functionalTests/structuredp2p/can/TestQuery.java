@@ -14,6 +14,8 @@ import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOver
 import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.Query;
 import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.QueryResponse;
 import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can.RDFQuery;
+import org.openrdf.model.Statement;
+import org.openrdf.model.impl.StatementImpl;
 
 
 /**
@@ -41,6 +43,10 @@ public class TestQuery {
         TestQuery.thirdPeer = Peer.newActivePeer(OverlayType.CAN);
         TestQuery.fourthPeer = Peer.newActivePeer(OverlayType.CAN);
 
+        for (int i = 0; i < 100; i++) {
+            TestQuery.firstPeer.addData();
+        }
+
         try {
             TestQuery.secondPeer.join(TestQuery.firstPeer);
             TestQuery.thirdPeer.join(TestQuery.secondPeer);
@@ -54,6 +60,38 @@ public class TestQuery {
         peers.add(TestQuery.secondPeer);
         peers.add(TestQuery.thirdPeer);
         peers.add(TestQuery.fourthPeer);
+
+        System.out.println(peers.size() + " PEERS");
+
+        int j = 1;
+        for (Peer peer : peers) {
+            StringBuffer buf = new StringBuffer();
+            buf.append("    " + j + ". ");
+            buf.append(((CANOverlay) peer.getStructuredOverlay()).getZone());
+            buf.append("\n");
+
+            int k = 0;
+            for (Statement stmt : peer.query(new StatementImpl(null, null, null))) {
+                buf.append("       ");
+                buf.append(k);
+                buf.append(". ");
+                buf.append(" <");
+                buf.append(stmt.getObject());
+                buf.append(",");
+                buf.append(stmt.getPredicate());
+                buf.append(",");
+                buf.append(stmt.getSubject());
+                buf.append(">\n");
+                k++;
+            }
+
+            buf.append("\n");
+
+            System.out.println(buf.toString());
+            j++;
+        }
+
+        System.out.println("\nNEIGHBORS :\n");
 
         int i = 1;
         for (Peer peer : peers) {
