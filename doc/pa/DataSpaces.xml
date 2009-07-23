@@ -8,7 +8,7 @@
     <indexterm><primary>Data Spaces</primary></indexterm>
 
     <para>
-    In the ProActive library data can be accessed through Dats Spaces API that is to be explained in the following chapter.
+    In the ProActive library data can be accessed through Data Spaces API that is to be explained in the following chapter.
     </para>
     <para>
     Data Spaces mechanism conceptually pose the virtual file system layer (further called VFS)  between the user code, that accesses file system trough provided API (like Java IO, POSIX, etc.), and physical (local or remote) location of files. Therefore, a programmer does not need to be aware of real file location, and can use VFS abstraction instead. The Data Spaces mechanism brings such a point of view to the ProActive programmer with a dedicated API from the <literal>org.objectweb.proactive.extensions.dataspaces.api</literal> package.
@@ -23,40 +23,78 @@
     The programmer can use ProActive's Data Spaces API to read application's input data, write and share temporary results and finally gather outputs in uniform manner among all these operations. Hence there are three types of data space abstraction: input, output and scratch. Data Spaces API provides way to access existing data spaces and files within these data spaces, it also gives the ability to define new data spaces. All operations performed through this API concern data spaces owned by one application.
     </para>
     <para>
-    The Data Spaces configuration is read from the GCM&#150;D Descriptor for Node&#150;specific information as well as from the GCM&#150;A Descriptor for settings concerning a particular application.
+    The Data Spaces configuration, if specified, is read from the GCM&#150;D Descriptor for Node&#150;specific information as well as from the GCM&#150;A Descriptor for settings concerning a particular application. Data Spaces can be configured manually in the run time as well.
+    </para>
+    <para>
+        <figure xml:id="ds_tree">
+            <info><title>Abstract VFS layer used in Data Spaces (simplified). Each space is described by URI path that resolves to underneath physical protocol.</title></info>
+           <mediaobject><imageobject><imagedata scalefit="1" width="50%" contentdepth="50%" fileref="dataspaces/layer.png" format="PNG"/></imageobject></mediaobject>
+        </figure>
+    </para>
+
+    <para>
+        Every file in Data Spaces API is identified by an unique URI that can be used in the whole application, that is shared between Active Objects even if they reside on different nodes. Files are organized in data stores called data spaces, grouped by their purpose and access. To access a file one can use designated data space to resolve file's name or directly by resolving URI received from another Active Object.
+    </para>
+    <para>
+        There are distinguished three different space types: input space with files used as the application's input data, output space for storing the application's result files and scratch space for temporary files with the intermediate results of the computations. Spaces types differ also in the access rights, and therefore input is only meant for read operations, output for read and write as well, whereas scratch access mode depends on the caller. If a calling thread is an owner of a particular scratch, then it can perform both read and write operations. On the other hand, if a calling thread is not an owner (eg. received URI from another Active Object), its access is limited to read only operations.
+    </para>
+    <para>
+    Input and output spaces are mostly defined by the application, hence their configuration is stored in the application&#150;specific GCMA Descriptor or in the application code itself. An application can have several inputs and outputs defined, as each input and output space has its unique (within a single application) name. There can be defined a default (hence single) input or output spaces, so using names is not always needed. For more information please refer to attached JavaDoc.
+    </para>
+    <para>
+    Scratch data space is most likely defined by the system administrator in the GCMD Descriptor in case of the GCM deployment, or manually. Scratch data space is bounded to Node, and particular scratches within a single scratch data space are bounded to Active Objects that reside on this Node. Hence, there is only one scratch that Active Object owns.
+    </para>
+    <para>
+        <figure xml:id="ds_table">
+            <info><title>Data spaces categories, purpose and access rights. (* for scratch space RW access only for owning AO)</title></info>
+           <mediaobject><imageobject><imagedata scalefit="1" width="50%" contentdepth="50%" fileref="dataspaces/dataspaces.png" format="PNG"/></imageobject></mediaobject>
+        </figure>
     </para>
 </section>
 
-<section xml:id="ds_configuration">
-	<info><title>Configuring Data Spaces</title></info>
-	<section xml:id="ds_configuration_gcm">
-		<info><title>Data Spaces and GCM Deployment</title></info>
-		<section xml:id="ds_gcmd">
-    		<info><title>GCM Deployment Descriptor</title></info>
-    		<para>iaa</para>
-		</section>
-
-		<section xml:id="ds_gcma">
-    		<info><title>GCM Application Descriptor</title></info>
-    		<para>iaa</para>
-		</section>
-	</section>
-	
-	<section xml:id="ds_configuration_manual">
-		<info><title>Manual configuration</title></info>
-		<para>
-		In some environments it may be useful to access Data Spaces configuration API manually. Typical user does not need to know about this API, but it is exposed to give more flexibility for potential usages.
-		</para>
-		<para>
-		TODO
-		</para>
-	</section>
+<section xml:id="ds_configuration_manual">
+    <info><title>Manual configuration</title></info>
+    <para>
+    In some environments it may be useful to access Data Spaces configuration API manually. Typical user does not need to know about this API, but it is exposed to give more flexibility for potential usages.
+    </para>
+    <para>
+    TODO
+    </para>
 </section>
 
 <section xml:id="ds_using_api">
-	<info><title>Using Data Spaces API</title></info>
-	<para>
-	TODO...
-	</para>
+    <info><title>Using Data Spaces API</title></info>
+    <para>
+    Below you can find a few simple examples that show how to deal with basic tasks using Data Spaces API. Those examples remain just ideas of how Data Spaces API can be used, we encourage you to invent your own tricky&#150;application. 
+    </para>
+    <para>
+    The first code snippets shows how to read input of an application and to write the final results (here: some statistics). For reading input data, a default input space is used, as there is only one input store used for this example. Statistics are stored in the named output data space according to <literal>STATS_DATA_SPACE</literal> constant, that can be a hard coded identifier, an application parameter, etc.
+    </para>
+    <para>
+    Methods from the Data Spaces API used in this snipped are: <literal>PADataSpaces.resolveDefaultInput</literal> and <literal>PADataSpaces.resolveOutput</literal> that resolve default input and named output respectively, returning instance of <literal>DataSpacesFileObject</literal> class. This class is a part of Data Spaces API and represents a file (ordinal file or directory) from any data space and allows to read and write file's content through standard Java APIs streams along with another file system operations. For convenience, a file name can be specified in the parameters list of above mentioned revolve methods.
+</para>
+    <example xml:id="ds_snippet1">
+        <info><title>Reading from default input and writing to named output</title></info>
+        <programlisting language="java"><textobject><textdata fileref="dataspaces/snippet1.java"/></textobject></programlisting>
+    </example>
+    <para>
+    The next snippet could be part of an application composed of a GUI that allows user to define inputs dynamically in the run time, for the further processing. Inputs are added (registered for the application) on user's demand by <literal>addInputClicked</literal> event handler (made up for this example), that calls Data Spaces API routine <literal>PADataSpaces.addInput</literal> and informs other processing objects (Active Objects) about the new input. The processing can be done as follows. Using the <literal>PADataSpaces.resolveAllKnownInputs</literal> method one can iterate over all inputs registered in the moment of resolving. Hence, for each such an input, a processing (reading particular files) can take place.
+    </para>
+    <example xml:id="ds_snippet2">
+        <info><title>Dealing with inputs more dynamically — adding named input, reading all defined inputs</title></info>
+        <programlisting language="java"><textobject><textdata fileref="dataspaces/snippet2.java"/></textobject></programlisting>
+    </example>
+    <para>
+    This snippet presents how two Active Objects can share data stored in ones scratch. The scenario is as follows. One Active Object resolves a file from its scratch with <literal>PADataSpaces.resolveScratchForAO</literal> Data Spaces APIs method. Once the file is resolved (represented by an instance of <literal>DataSpacesFileObject</literal> class), an intermediate results can be written into its content. As each file within data spaces is identified by its URI, such a URI can be obtained with <literal>getURI</literal> method of <literal>DataSpacesFileObject</literal> class and passed to another Active Object as a parameter of exemplary <literal>readMyFile</literal> method. This method (in a different Active Object!) can finally resolve URI through <literal>PADataSpaces.resolveFile</literal> method call and further process the file content.
+    </para>
+    <example xml:id="ds_snippet3">
+        <info><title>Writing into ones scratch, that is later read by another AO</title></info>
+        <programlisting language="java"><textobject><textdata fileref="dataspaces/snippet3.java"/></textobject></programlisting>
+    </example>
 </section>
+<section xml:id="ds_complete_example">
+    <info><title>Complete example</title></info>
+    <para>
+    A complete example goes here..
+    </para>
 </chapter>
