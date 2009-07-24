@@ -60,7 +60,7 @@
         The easiest and typical way to configure Data Spaces is using it together with GCM Deployment, which is described in <xref linkend="GCMDeployment"/>. 
         </para>
         <para>
-        When using Data Spaces with GCM Deployment, all necessary configuration actions are implemented inside GCM deployment mechanism. User and/or administrator just needs to specify configuration in GCM Application and GCM Deployment descriptor files, as usually with this kind of deployment. Once Data Spaces configuration is placed in GCM Deployment descriptors, user can access Data Spaces API from every node deployed through <literal>GCMApplication</literal>.
+        When using Data Spaces with GCM Deployment, all necessary configuration actions are implemented inside GCM deployment mechanism. User and/or administrator just needs to specify configuration in GCM Application and GCM Deployment descriptor files, as usually with this kind of deployment. Once Data Spaces configuration is placed in GCM descriptors, user can access Data Spaces API from every node deployed through <literal>GCMApplication</literal>.
         </para>
         <section xml:id="ds_gcma">
             <info><title>GCM Application Descriptor</title></info>
@@ -122,7 +122,7 @@
                             <listitem>
                                 <para><literal>&lt;remoteAccess&gt;</literal> tag with <literal>url</literal> attribute.</para>
                                 <para>
-                                    This mandatory part of space definition sets URL that will be used for accessing that data space. URL may point to a file or directory.
+                                    This mandatory part of space definition sets URL that will be used for accessing that data space. URL may point to a file or directory (for output space file may not exist).
                                 </para>
                             </listitem>
                             <listitem>
@@ -132,8 +132,8 @@
                                 </para>   
                             </listitem>
                             <listitem>
-                                <para><literal>id</literal> attribute (only for non-default spaces).</para>
-                                <para>Non-default input or output spaces have to be identified by unique id, which is set in that attribute.</para>
+                                <para><literal>id</literal> attribute (only for non-default, named spaces).</para>
+                                <para>Non-default, named input or output spaces have to be identified by unique id, which is set through that attribute.</para>
                             </listitem>
                         </itemizedlist>
                         Example data space definition:
@@ -149,7 +149,36 @@
 
         <section xml:id="ds_gcmd">
             <info><title>GCM Deployment Descriptor</title></info>
-            <para>iaa</para>
+            <para>
+            In GCM Deployment Descriptor grid administrator defines configuration of scratch data space for each host configuration. It is done by putting settings inside host definition, like in the following example:
+            <example xml:id="ds_gcmd_example">
+                <info>
+                    <title>GCMD descriptor fragment - Data Spaces configuration</title>
+                </info>
+                <programlisting language="xml"><textobject><textdata fileref="code_snippets/dataspaces/gcmd_fragment.txt"/></textobject></programlisting>
+            </example>
+            As you can see, all Data Spaces related configuration is contained within <emphasis><literal>&lt;scratch&gt;</literal></emphasis> tag.
+            </para>
+            <para>
+            If this tag is not present, there will be no scratch data space configured for Nodes with that host configuration, i.e. <literal>PADataSpaces.resolveScratchForAO()</literal> calls will fail on Node with that host configuration. If the tag is present, scratch data space will be configured on Nodes with that configuration. Definition of scratch configuration consists of two tags, whereas at least one of them have to be present:
+            <itemizedlist>
+                <listitem>
+                    <para><literal>&lt;remoteAccess&gt;</literal> tag with <literal>url</literal> attribute.</para>
+                    <para>
+                        This part of scrach space definition is similar to input and output spaces configuration - it sets URL that will be used for accessing that data space. URL should point to directory or non-existing file. Note, that special metavariable <literal>#{hostname}</literal> may be used in URL template, as the same generic host configuration may be applied to more than one real hosts.
+                    </para>
+                    <para>
+                        Absence of <literal>&lt;remoteAccess&gt;</literal> tag have a special meaning in context of scratch configuration. If tag is not present,  ProActive provider server will be automatically started for a Node lifetime, exposing this part of a file system remotely through ProActive protocol, so you do not need to configure and run external protocol server.  
+                    </para>
+                </listitem>
+                <listitem>
+                    <para><literal>&lt;path&gt;</literal> tag with <literal>base</literal> and <literal>relpath</literal> attributes.</para>
+                    <para>
+                        TODO
+                    </para>
+                </listitem>
+            </itemizedlist>
+            </para>    
         </section>
     </section>
 
@@ -160,6 +189,13 @@
         </para>
         <para>
         TODO
+        </para>
+    </section>
+    
+    <section xml:id="ds_configuration_othertools">
+        <info><title>Other delivered tools</title></info>
+        <para>
+            TODO: PAP, NamingService
         </para>
     </section>
 </section>
