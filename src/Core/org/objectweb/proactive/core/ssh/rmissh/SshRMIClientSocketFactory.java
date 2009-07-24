@@ -31,10 +31,13 @@
  */
 package org.objectweb.proactive.core.ssh.rmissh;
 
+import static org.objectweb.proactive.core.ssh.SSH.logger;
+
 import java.io.IOException;
 import java.net.Socket;
 import java.rmi.server.RMIClientSocketFactory;
-import static org.objectweb.proactive.core.ssh.SSH.logger;
+import org.objectweb.proactive.core.ssh.SshProxy;
+import org.objectweb.proactive.core.util.GatewaysInfos;
 import org.objectweb.proactive.core.util.HostsInfos;
 import org.objectweb.proactive.core.util.ProActiveInet;
 
@@ -56,8 +59,25 @@ public class SshRMIClientSocketFactory implements RMIClientSocketFactory, java.i
             logger.debug("Creating a SSH socket for " + host + ":" + port);
         }
 
+        Socket socket = null;
+        String gateway = GatewaysInfos.getGatewayName(host);
+
+        if (gateway != null) {
+
+            if (logger.isDebugEnabled()) {
+                logger.info("Using the gateway " + gateway + " to contact " + host + ":" + port);
+            }
+
+            int gwPort = GatewaysInfos.getGatewayPort(host);
+            socket = new SshProxy(gateway, gwPort, host, port);
+
+        } else {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Gateway not used for " + host);
+            }
         String realName = HostsInfos.getSecondaryName(host);
-        Socket socket = new SshSocket(realName, port);
+            socket = new SshSocket(realName, port);
+        }
         return socket;
     }
 

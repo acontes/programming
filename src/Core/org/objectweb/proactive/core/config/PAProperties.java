@@ -402,6 +402,23 @@ public enum PAProperties {
      */
     PA_SSH_USERNAME("proactive.ssh.username", PAPropertiesType.STRING),
 
+    /**
+     * gateway to use on grid access
+     * 
+     * syntax : *.domain:gateway:port;...
+     *   
+     * or     : 192.168.15.0/24  
+     * 
+     * 'none' can be precised for prevent usage of proxy command on gateway
+     */
+    PA_SSH_PROXY_GATEWAY("proactive.ssh.proxy.gateway", PAPropertiesType.STRING),
+  
+    /**
+     * Specify a gateway to use if outgoing connection are forbid
+     * 
+     */
+    PA_SSH_PROXY_OUT_CONN("proactive.ssh.proxy.outgoing_connection", PAPropertiesType.STRING),
+    
     /* ------------------------------------
      *  SECURITY
      */
