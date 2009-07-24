@@ -39,6 +39,7 @@ import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.Type;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.fractal.api.control.LifeCycleController;
+import org.objectweb.fractal.api.control.NameController;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
@@ -66,7 +67,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  *
  */
 @PublicAPI
-public class WSComponent implements Serializable, Component, LifeCycleController {
+public class WSComponent implements Serializable, Component, NameController, LifeCycleController {
     protected static final transient Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
 
     /**
@@ -157,6 +158,9 @@ public class WSComponent implements Serializable, Component, LifeCycleController
         if (interfaceName.equals(Constants.COMPONENT)) {
             return this;
         }
+        if (interfaceName.equals(Constants.NAME_CONTROLLER)) {
+            return this;
+        }
         if (interfaceName.equals(Constants.LIFECYCLE_CONTROLLER)) {
             return this;
         }
@@ -184,6 +188,13 @@ public class WSComponent implements Serializable, Component, LifeCycleController
             logger.error("Could not generate type for web service component", e);
             return null;
         }
+    }
+
+    public String getFcName() {
+        return "WSComponent-" + wsInfo.getWSUrl();
+    }
+
+    public void setFcName(String name) {
     }
 
     public String getFcState() {
