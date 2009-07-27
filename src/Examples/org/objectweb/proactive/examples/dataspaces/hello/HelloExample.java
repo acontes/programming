@@ -89,6 +89,7 @@ public class HelloExample {
     public static final String INPUT_RESOURCE1_NAME = "wiki_proactive";
 
     public static final String INPUT_RESOURCE2_NAME = "wiki_grid_computing";
+
     // @snippet-end DataSpacesExample_code_constants
 
     /**
@@ -145,6 +146,7 @@ public class HelloExample {
         vContract.setVariableFromProgram(VAR_OUTPUT_HOSTNAME, Utils.getHostname(),
                 VariableContractType.ProgramVariable);
     }
+
     // @snippet-end DataSpacesExample_code_variables
 
     private void stop() {
@@ -165,6 +167,7 @@ public class HelloExample {
         nodesDeployed = vnode.getCurrentNodes();
         logger.info("Nodes started: " + nodesDeployed.size() + " nodes deployed");
     }
+
     // @snippet-end DataSpacesExample_code_startgcm
 
     private void stopGCM() {
@@ -199,6 +202,7 @@ public class HelloExample {
             logger.error("Could not write final results file", x);
         }
     }
+
     // @snippet-end DataSpacesExample_code_scenario
 
     private void checkEnoughRemoteNodesOrDie(int i) throws IllegalStateException {
