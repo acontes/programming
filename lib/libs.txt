@@ -99,4 +99,3 @@
 ./saxon8-dom.jar				Scheduler parser - descriptor variables (Saxon 8 XSLT engine)
 ./owlim-big-3.1.0.jar			BigOWLIM
 ./openrdf-sesame-onejar.jar		BigOWLIM
-./lubm.jar						BigOWLIM
