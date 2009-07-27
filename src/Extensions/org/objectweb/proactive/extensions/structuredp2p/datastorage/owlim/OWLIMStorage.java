@@ -47,27 +47,6 @@ public class OWLIMStorage extends DataStorage {
     }
 
     /**
-     * Loads the properties associated to the datastore.
-     */
-    // private Properties loadProperties() {
-    // File propertiesFile = new File(this.OWLIM_PROPERTIES_FILE);
-    //
-    // if (propertiesFile.exists()) {
-    // this.properties = new Properties();
-    // try {
-    // this.properties.load(new FileInputStream(propertiesFile));
-    // } catch (IOException e) {
-    // e.printStackTrace();
-    // }
-    // } else {
-    // throw new IllegalStateException("The properties file '" + this.OWLIM_PROPERTIES_FILE +
-    // "' doesn't exist.");
-    // }
-    //
-    // return this.properties;
-    // }
-
-    /**
      * {@inheritDoc}
      */
     public void startup() {
@@ -80,51 +59,13 @@ public class OWLIMStorage extends DataStorage {
         File currentObjectRepository = new File(OWLIMStorage.REPOSITORIES_PATH, "" + this.hashCode());
         currentObjectRepository.mkdir();
 
-        this.repository = new SailRepository(new NativeStore(currentObjectRepository));
+        this.repository = new SailRepository(new NativeStore(currentObjectRepository, "spoc,posc"));
 
         try {
             this.repository.initialize();
         } catch (RepositoryException e) {
             e.printStackTrace();
         }
-
-        /* Initialize the repository */
-        /*
-         * this.repositoryManager = new LocalRepositoryManager(new File(OwlimStorage.OWLIM_PATH));
-         * 
-         * try { this.repositoryManager.initialize(); } catch (RepositoryException e) {
-         * e.printStackTrace(); }
-         * 
-         * final Graph graph = new GraphImpl(); RDFParser parser =
-         * Rio.createParser(RDFFormat.TURTLE); RDFHandler handler = new RDFHandler() { public void
-         * endRDF() throws RDFHandlerException { }
-         * 
-         * public void handleComment(String arg0) throws RDFHandlerException { }
-         * 
-         * public void handleNamespace(String arg0, String arg1) throws RDFHandlerException { }
-         * 
-         * public void handleStatement(Statement stmt) throws RDFHandlerException { graph.add(stmt);
-         * }
-         * 
-         * public void startRDF() throws RDFHandlerException { }
-         * 
-         * }; parser.setRDFHandler(handler); try { parser.parse(new
-         * FileReader(OwlimStorage.OWLIM_PATH + "/" + properties.getProperty("config",
-         * OwlimStorage.DEFAULT_CONFIG)), "http://example.org#"); } catch (RDFParseException e) {
-         * e.printStackTrace(); } catch (RDFHandlerException e) { e.printStackTrace(); } catch
-         * (FileNotFoundException e) { e.printStackTrace(); } catch (IOException e) {
-         * e.printStackTrace(); }
-         * 
-         * Iterator<Statement> iterator = graph.match(null, RDF.TYPE, new URIImpl(
-         * "http://www.openrdf.org/config/repository#Repository")); Resource repNode = null; if
-         * (iterator.hasNext()) { Statement st = iterator.next(); repNode = st.getSubject(); }
-         * 
-         * try { this.repositoryConfig = RepositoryConfig.create(graph, repNode);
-         * this.repositoryManager.addRepositoryConfig(this.repositoryConfig); this.repository =
-         * this.repositoryManager.getRepository(properties.getProperty("repository",
-         * OwlimStorage.DEFAULT_REPOSITORY)); } catch (RepositoryConfigException e) {
-         * e.printStackTrace(); } catch (RepositoryException e) { e.printStackTrace(); }
-         */
     }
 
     /**
@@ -228,11 +169,10 @@ public class OWLIMStorage extends DataStorage {
 
             try {
                 result = conn.prepareBooleanQuery(language, query).evaluate();
-                System.out.println("result = " + result);
             } finally {
                 conn.close();
             }
-        } catch (OpenRDFException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -277,43 +217,8 @@ public class OWLIMStorage extends DataStorage {
      * {@inheritDoc}
      */
     public boolean hasStatements() {
-        return this.queryB(QueryLanguage.SPARQL, "ASK { ?o ?p ?s }");
+        return this.queryB(QueryLanguage.SPARQL, "ASK { ?s ?p ?o }");
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    // public CloseableIteration<? extends BindingSet, QueryEvaluationException> query(QueryLanguage
-    // language,
-    // String query) {
-    // Query q = null;
-    // RepositoryConnection conn = null;
-    //
-    // try {
-    // conn = this.repository.getConnection();
-    // q = conn.prepareQuery(language, query);
-    // } catch (RepositoryException e) {
-    // e.printStackTrace();
-    // } catch (MalformedQueryException e) {
-    // e.printStackTrace();
-    // }
-    //
-    // ParsedQuery pq = (q instanceof SailGraphQuery ? (SailGraphQuery) q : (SailTupleQuery) q)
-    // .getParsedQuery();
-    // CloseableIteration<? extends BindingSet, QueryEvaluationException> results = null;
-    // try {
-    // results = ((SailRepositoryConnection) conn).getSailConnection().evaluate(pq.getTupleExpr(),
-    // pq.getDataset(), q.getBindings(), true);
-    // } catch (SailException e) {
-    // e.printStackTrace();
-    // } finally {
-    // /*
-    // * try { conn.close(); } catch (RepositoryException e) { e.printStackTrace(); }
-    // */
-    // }
-    //
-    // return results;
-    // }
 
     /**
      * Recursively delete a given directory.
@@ -349,7 +254,7 @@ public class OWLIMStorage extends DataStorage {
             }
 
             this.repository.shutDown();
-        } catch (RepositoryException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -379,11 +284,6 @@ public class OWLIMStorage extends DataStorage {
 
     /**
      * {@inheritDoc}
-     */
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.objectweb.proactive.extensions.structuredp2p.datastorage.DataStorage#getRepository()
      */
     public Repository getRepository() {
         return this.repository;

@@ -32,6 +32,7 @@ public class BlockingRequestReceiver extends org.objectweb.proactive.core.body.r
      */
     public int receiveRequest(Request request, Body bodyReceiver) {
         if (!this.allowReception) {
+            System.out.println();
             throw new BlockingRequestReceiverException(this.getClass().getName());
         } else {
             return super.receiveRequest(request, bodyReceiver);

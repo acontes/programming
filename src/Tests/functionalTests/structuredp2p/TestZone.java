@@ -48,15 +48,15 @@ public class TestZone {
         }
         Assert.assertArrayEquals(newZones[0].getCoordinatesMin(), coords);
 
-        coords[0] = (new LexicographicCoordinate(Zone.COORDINATE_MIN)).getMiddleWith(new LexicographicCoordinate(
-            Zone.COORDINATE_MAX));
+        coords[0] = (new LexicographicCoordinate(Zone.COORDINATE_MIN))
+                .getMiddleWith(new LexicographicCoordinate(Zone.COORDINATE_MAX));
         for (int i = 1; i < CANOverlay.NB_DIMENSIONS; i++) {
             coords[i] = new LexicographicCoordinate(Zone.COORDINATE_MAX);
         }
         Assert.assertArrayEquals(newZones[0].getCoordinatesMax(), coords);
 
-        coords[0] = (new LexicographicCoordinate(Zone.COORDINATE_MIN)).getMiddleWith(new LexicographicCoordinate(
-            Zone.COORDINATE_MAX));
+        coords[0] = (new LexicographicCoordinate(Zone.COORDINATE_MIN))
+                .getMiddleWith(new LexicographicCoordinate(Zone.COORDINATE_MAX));
         for (int i = 1; i < CANOverlay.NB_DIMENSIONS; i++) {
             coords[i] = new LexicographicCoordinate(Zone.COORDINATE_MIN);
         }

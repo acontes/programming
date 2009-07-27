@@ -12,7 +12,6 @@ import org.objectweb.proactive.extensions.structuredp2p.datastorage.owlim.OWLIMS
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
-import org.openrdf.model.impl.StatementImpl;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
@@ -20,10 +19,10 @@ import org.openrdf.query.QueryResult;
 
 
 /**
- * Test the OwlimStorage wrappers.
+ * Test the OwlimStorage Wrappers.
  * 
  * @author Pellegrino Laurent
- * @version 0.1, 07/21/2009
+ * @version 0.1, 07/25/2009
  */
 public class TestOWLIMStorage {
     private static DataStorage owlimStorage;
@@ -37,7 +36,6 @@ public class TestOWLIMStorage {
     public static void setUpBeforeClass() {
         TestOWLIMStorage.owlimStorage = new OWLIMStorage();
         TestOWLIMStorage.owlimValueFactory = TestOWLIMStorage.owlimStorage.getRepository().getValueFactory();
-
         TestOWLIMStorage.subject = TestOWLIMStorage.owlimValueFactory
                 .createURI("http://example.org/ontology#psychoquack");
         TestOWLIMStorage.predicate = TestOWLIMStorage.owlimValueFactory
@@ -48,12 +46,13 @@ public class TestOWLIMStorage {
 
     @Test
     public void testAdd() {
-        TestOWLIMStorage.owlimStorage.add(new StatementImpl(TestOWLIMStorage.subject,
-            TestOWLIMStorage.predicate, TestOWLIMStorage.object));
+
+        TestOWLIMStorage.owlimStorage.add(TestOWLIMStorage.owlimValueFactory.createStatement(
+                TestOWLIMStorage.subject, TestOWLIMStorage.predicate, TestOWLIMStorage.object));
 
         Set<Statement> results = null;
-        results = TestOWLIMStorage.owlimStorage
-                .query(new StatementImpl(TestOWLIMStorage.subject, null, null));
+        results = TestOWLIMStorage.owlimStorage.query(TestOWLIMStorage.owlimValueFactory.createStatement(
+                TestOWLIMStorage.subject, null, null));
 
         Statement[] resultsAsArray = results.toArray(new Statement[] {});
 
@@ -63,12 +62,12 @@ public class TestOWLIMStorage {
     }
 
     @Test
-    public void testSPARQL() {
+    public void testSPARQLQuery() {
         StringBuffer query = new StringBuffer();
         query.append("PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n");
-        query.append("SELECT ?o ?p ?s WHERE {\n");
-        query.append("  ?o ?p ?s .\n");
-        query.append("  FILTER ( str(?o) < \"http://example.org/ontology#q\" ).\n");
+        query.append("SELECT ?s ?p ?o WHERE {\n");
+        query.append("  ?s ?p ?o .\n");
+        // query.append("  FILTER ( str(?s) < \"http://example.org/ontology#q\" ).\n");
         query.append("}");
 
         QueryResult<BindingSet> queryResults = TestOWLIMStorage.owlimStorage.query(QueryLanguage.SPARQL,
@@ -79,11 +78,11 @@ public class TestOWLIMStorage {
 
             BindingSet bindingSet = queryResults.next();
 
-            Assert.assertEquals("http://example.org/ontology#psychoquack", bindingSet.getValue("o")
+            Assert.assertEquals("http://example.org/ontology#psychoquack", bindingSet.getValue("s")
                     .toString());
             Assert.assertEquals("http://www.w3.org/1999/02/22-rdf-syntax-ns#type", bindingSet.getValue("p")
                     .toString());
-            Assert.assertEquals("http://example.org/ontology#animal", bindingSet.getValue("s").toString());
+            Assert.assertEquals("http://example.org/ontology#animal", bindingSet.getValue("o").toString());
 
             Assert.assertFalse(queryResults.hasNext());
         } catch (QueryEvaluationException e) {
@@ -98,7 +97,7 @@ public class TestOWLIMStorage {
     }
 
     @Test
-    public void testSERQL() {
+    public void testSERQLQuery() {
         StringBuffer query = new StringBuffer();
         query.append("SELECT X FROM {X} <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ");
         query.append("{<http://example.org/ontology#animal>}");
@@ -127,7 +126,7 @@ public class TestOWLIMStorage {
     }
 
     @Test
-    public void testSPARQLAsk() {
+    public void testSPARQLAskQuery() {
         Assert.assertEquals(true, TestOWLIMStorage.owlimStorage.queryB(QueryLanguage.SPARQL,
                 "ASK { ?o ?p ?s }"));
         Assert.assertEquals(true, TestOWLIMStorage.owlimStorage.hasStatements());
@@ -145,8 +144,54 @@ public class TestOWLIMStorage {
         Assert.assertEquals(false, TestOWLIMStorage.owlimStorage.hasStatements());
     }
 
+    @Test
+    public void testSPARQLQueryWithFilter() {
+        ValueFactory vf = TestOWLIMStorage.owlimStorage.getRepository().getValueFactory();
+
+        String[][] data = new String[][] { { "a", "a", "a" }, { "b", "b", "b" }, { "b", "c", "d" },
+                { "e", "b", "e" }, { "a", "e", "o" } };
+
+        for (String[] element : data) {
+            TestOWLIMStorage.owlimStorage.add(vf.createStatement(vf.createURI("http://" + element[0]), vf
+                    .createURI("http://" + element[1]), vf.createURI("http://" + element[2])));
+        }
+
+        StringBuffer queryString = new StringBuffer();
+        queryString.append("SELECT ?s ?p ?o WHERE { ?s ?p ?o . \n");
+        queryString.append("  FILTER ( ");
+        queryString.append("    str(?s) > \"http://a\" && str(?s) < \"http://h\" &&  \n");
+        queryString.append("    str(?p) > \"http://a\" && str(?p) < \"http://h\" && \n");
+        queryString.append("    str(?o) > \"http://a\" && str(?o) < \"http://h\" \n");
+        queryString.append("  ).}");
+
+        QueryResult<BindingSet> result = TestOWLIMStorage.owlimStorage.query(QueryLanguage.SPARQL,
+                queryString.toString());
+
+        try {
+            String prefix = "http://";
+            int index = 1;
+
+            while (result.hasNext()) {
+                BindingSet bs = result.next();
+
+                Assert.assertEquals(prefix + data[index][0], bs.getValue("s").stringValue());
+                Assert.assertEquals(prefix + data[index][1], bs.getValue("p").stringValue());
+                Assert.assertEquals(prefix + data[index][2], bs.getValue("o").stringValue());
+
+                index++;
+            }
+        } catch (QueryEvaluationException e) {
+            e.printStackTrace();
+        }
+    }
+
     @AfterClass
     public static void tearDownAfterClass() {
-        TestOWLIMStorage.owlimStorage.shutdownByRemovingCurrentRepository();
+        TestOWLIMStorage.owlimStorage.shutdown();
+        TestOWLIMStorage.owlimStorage = null;
+
+        TestOWLIMStorage.subject = null;
+        TestOWLIMStorage.predicate = null;
+        TestOWLIMStorage.object = null;
     }
 }

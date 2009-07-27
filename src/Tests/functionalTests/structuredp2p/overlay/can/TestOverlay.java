@@ -1,7 +1,7 @@
 /**
  * 
  */
-package functionalTests.structuredp2p.can;
+package functionalTests.structuredp2p.overlay.can;
 
 import java.util.Random;
 

@@ -1,4 +1,4 @@
-package functionalTests.structuredp2p.can;
+package functionalTests.structuredp2p.overlay.can;
 
 import java.util.Iterator;
 
@@ -8,7 +8,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
@@ -23,7 +22,7 @@ public class TestNeighborsDataStructure {
 
     @Before
     public void setUp() throws Exception {
-        this.peer = (Peer) PAActiveObject.newActive(Peer.class.getName(), new Object[] { OverlayType.CAN });
+        this.peer = Peer.newActivePeer(OverlayType.CAN);
     }
 
     @Test

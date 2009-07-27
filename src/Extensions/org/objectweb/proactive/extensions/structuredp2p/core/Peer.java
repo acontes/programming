@@ -25,12 +25,15 @@ import org.objectweb.proactive.extensions.structuredp2p.core.requests.BlockingRe
 import org.objectweb.proactive.extensions.structuredp2p.core.requests.StructuredMetaObjectFactory;
 import org.objectweb.proactive.extensions.structuredp2p.datastorage.DataStorage;
 import org.objectweb.proactive.extensions.structuredp2p.datastorage.owlim.OWLIMStorage;
+import org.objectweb.proactive.extensions.structuredp2p.datastorage.owlim.wrappers.QueryLanguageWrapper;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.Message;
 import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.Query;
 import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.QueryResponse;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.ResponseMessage;
 import org.openrdf.model.Statement;
 import org.openrdf.model.ValueFactory;
+import org.openrdf.query.BindingSet;
+import org.openrdf.query.QueryResult;
 
 
 /**
@@ -406,6 +409,14 @@ public class Peer implements InitActive, RunActive, Serializable {
 
     public Set<Statement> query(Statement stmt) {
         return this.dataStorage.query(stmt);
+    }
+
+    public QueryResult<BindingSet> query(QueryLanguageWrapper q, String query) {
+        return this.dataStorage.query(q.getValue(), query);
+    }
+
+    public boolean hasStatements() {
+        return this.dataStorage.hasStatements();
     }
 
     /**

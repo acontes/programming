@@ -1,4 +1,4 @@
-package functionalTests.structuredp2p.can;
+package functionalTests.structuredp2p.overlay.can;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,7 +61,7 @@ public class TestQuery {
         peers.add(TestQuery.thirdPeer);
         peers.add(TestQuery.fourthPeer);
 
-        System.out.println(peers.size() + " PEERS");
+        System.out.println();
 
         int j = 1;
         for (Peer peer : peers) {
@@ -69,18 +69,17 @@ public class TestQuery {
             buf.append("    " + j + ". ");
             buf.append(((CANOverlay) peer.getStructuredOverlay()).getZone());
             buf.append("\n");
-
             int k = 0;
             for (Statement stmt : peer.query(new StatementImpl(null, null, null))) {
                 buf.append("       ");
                 buf.append(k);
                 buf.append(". ");
                 buf.append(" <");
-                buf.append(stmt.getObject());
+                buf.append(stmt.getSubject());
                 buf.append(",");
                 buf.append(stmt.getPredicate());
                 buf.append(",");
-                buf.append(stmt.getSubject());
+                buf.append(stmt.getObject());
                 buf.append(">\n");
                 k++;
             }

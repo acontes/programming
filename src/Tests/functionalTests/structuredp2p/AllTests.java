@@ -4,9 +4,9 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-import functionalTests.structuredp2p.can.TestNeighborsDataStructure;
-import functionalTests.structuredp2p.can.TestOverlay;
-import functionalTests.structuredp2p.can.TestQuery;
+import functionalTests.structuredp2p.overlay.can.TestNeighborsDataStructure;
+import functionalTests.structuredp2p.overlay.can.TestOverlay;
+import functionalTests.structuredp2p.overlay.can.TestQuery;
 
 
 @RunWith(Suite.class)

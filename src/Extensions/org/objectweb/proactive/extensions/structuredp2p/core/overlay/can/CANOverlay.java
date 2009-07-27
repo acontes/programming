@@ -28,7 +28,6 @@ import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.R
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.can.CANJoinResponseMessage;
 import org.openrdf.model.Statement;
 import org.openrdf.model.ValueFactory;
-import org.openrdf.model.impl.StatementImpl;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
@@ -52,9 +51,7 @@ public class CANOverlay extends StructuredOverlay {
     /**
      * The number of dimensions which is equals to the number of axes.
      */
-    public static final int NB_DIMENSIONS = 2;
-
-    public static final String[] DIMENSIONS = new String[] { "o", "p", "s" };
+    public static final int NB_DIMENSIONS = 3;
 
     /**
      * Neighbors of the {@link Zone} which is managed.
@@ -96,6 +93,7 @@ public class CANOverlay extends StructuredOverlay {
         this.splitHistory = response.getSplitHistory();
         this.saveSplit(response.getAffectedDimension(), response.getAffectedDirection());
         this.neighborsDataStructure = response.getAffectedNeighborsDataStructure();
+
         for (Statement stmt : response.getAffectedStatements()) {
             this.getLocalPeer().getDataStorage().add(stmt);
         }
@@ -509,91 +507,100 @@ public class CANOverlay extends StructuredOverlay {
             e.printStackTrace();
         }
 
-        // Splits the data
-        List<Statement> statementsResult = new ArrayList<Statement>();
-
-        System.out.println(this.getLocalPeer().getDataStorage());
-
-        // Perform the data split only if the datastore contains statements
-
-        // if (this.getLocalPeer().getDataStorage().hasStatements()) {
-        if (this.getLocalPeer().getDataStorage().query(new StatementImpl(null, null, null)).iterator()
-                .hasNext()) {
-
-            StringBuffer query = new StringBuffer();
-            query.append("SELECT ?o ?p ?s WHERE {\n");
-            query.append("  ?o ?p ?s .\n");
-            query.append("  FILTER ( str(?");
-            query.append(CANOverlay.DIMENSIONS[dimension]);
-            query.append(") > \"");
-            query.append(newZones[directionInv].getCoordinateMin(dimension));
-            query.append("\" && str(?");
-            query.append(CANOverlay.DIMENSIONS[dimension]);
-            query.append(") < \"");
-            query.append(newZones[directionInv].getCoordinateMax(dimension));
-            query.append("\" ).\n");
-            query.append("}");
-
-            QueryResult<BindingSet> queryResults = this.getLocalPeer().getDataStorage().query(
-                    QueryLanguage.SPARQL, query.toString());
-
-            try {
-                while (queryResults.hasNext()) {
-                    BindingSet bindingSet = queryResults.next();
-                    ValueFactory valueFactory = this.getLocalPeer().getDataStorage().getRepository()
-                            .getValueFactory();
-                    statementsResult.add(valueFactory.createStatement(valueFactory.createURI(bindingSet
-                            .getValue("o").toString()), valueFactory.createURI(bindingSet.getValue("p")
-                            .toString()), valueFactory.createURI(bindingSet.getValue("s").toString())));
-                }
-            } catch (QueryEvaluationException e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    queryResults.close();
-                } catch (QueryEvaluationException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            /*
-             * Removes the outdated statements (statements that have been given to the new peer
-             * which join the network) from the current peer
-             */
-            for (Statement stmt : statementsResult) {
-                this.getLocalPeer().getDataStorage().remove(stmt);
-            }
-        }
         // Updates the zone of the peer which is already on the network
         this.setZone(newZones[direction]);
         this.saveSplit(dimension, direction);
 
-        // Neighbors affected for the new peer which want to join the network
-        NeighborsDataStructure neighborsOfThePeerWhichJoin = new NeighborsDataStructure();
-        neighborsOfThePeerWhichJoin.addAll(this.neighborsDataStructure);
-        neighborsOfThePeerWhichJoin.removeAll(dimension, direction);
-        neighborsOfThePeerWhichJoin.add(this.getRemotePeer(), this.zone, dimension, direction);
-
-        // Update the neighbors of the peer which is already on the network
-        for (Peer neighborToRemove : this.neighborsDataStructure.getNeighbors(dimension, directionInv)) {
-            PAFuture.waitFor(this.sendTo(neighborToRemove, new CANRemoveNeighborMessage(this.getRemotePeer(),
-                dimension, direction)));
-        }
-        this.neighborsDataStructure.removeAll(dimension, directionInv);
-        // Update neighbors in order to check the other dimensions
-        this.updateNeighbors();
-
-        Stack<int[]> newHistory = null;
+        // Splits the data
+        List<Statement> statementsResult = new ArrayList<Statement>();
         try {
-            newHistory = (Stack<int[]>) MakeDeepCopy.WithObjectStream.makeDeepCopy(this.splitHistory);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
+            // Perform the data split only if the datastore contains statements
+            if (this.getLocalPeer().getDataStorage().hasStatements()) {
+                String[] names = new String[] { "o", "p", "s" };
+                StringBuffer query = new StringBuffer();
+                query.append("SELECT ?o ?p ?s WHERE {\n");
+                query.append("  ?o ?p ?s .\n");
+                query.append("  FILTER ( ");
+
+                for (int dim = 0; dim < CANOverlay.NB_DIMENSIONS; dim++) {
+                    query.append("str(?");
+                    query.append(names[dim]);
+                    query.append(") > \"");
+                    query.append(newZones[directionInv].getCoordinateMin(dim));
+                    query.append("\" && str(?");
+                    query.append(names[dim]);
+                    query.append(") < \"");
+                    query.append(newZones[directionInv].getCoordinateMax(dim));
+                    query.append("\"");
+                    if (dim != CANOverlay.NB_DIMENSIONS - 1) {
+                        query.append(" && ");
+                    }
+                }
+
+                query.append(").\n}");
+
+                System.out.println(newZones[directionInv]);
+                System.out.println(query);
+
+                QueryResult<BindingSet> queryResults = this.getLocalPeer().getDataStorage().query(
+                        QueryLanguage.SPARQL, query.toString());
+                try {
+                    while (queryResults.hasNext()) {
+                        BindingSet bindingSet = queryResults.next();
+                        ValueFactory valueFactory = this.getLocalPeer().getDataStorage().getRepository()
+                                .getValueFactory();
+                        statementsResult.add(valueFactory.createStatement(valueFactory.createURI(bindingSet
+                                .getValue("o").toString()), valueFactory.createURI(bindingSet.getValue("p")
+                                .toString()), valueFactory.createURI(bindingSet.getValue("s").toString())));
+                    }
+                } catch (QueryEvaluationException e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        queryResults.close();
+                    } catch (QueryEvaluationException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                /*
+                 * Removes the outdated statements (statements that have been given to the new peer
+                 * which join the network) from the current peer
+                 */
+                for (Statement stmt : statementsResult) {
+                    this.getLocalPeer().getDataStorage().remove(stmt);
+                }
+            }
+
+            // Neighbors affected for the new peer which want to join the network
+            NeighborsDataStructure neighborsOfThePeerWhichJoin = new NeighborsDataStructure();
+            neighborsOfThePeerWhichJoin.addAll(this.neighborsDataStructure);
+            neighborsOfThePeerWhichJoin.removeAll(dimension, direction);
+            neighborsOfThePeerWhichJoin.add(this.getRemotePeer(), this.zone, dimension, direction);
+
+            // Update the neighbors of the peer which is already on the network
+            for (Peer neighborToRemove : this.neighborsDataStructure.getNeighbors(dimension, directionInv)) {
+                PAFuture.waitFor(this.sendTo(neighborToRemove, new CANRemoveNeighborMessage(this
+                        .getRemotePeer(), dimension, direction)));
+            }
+            this.neighborsDataStructure.removeAll(dimension, directionInv);
+            // Update neighbors in order to check the other dimensions
+            this.updateNeighbors();
+
+            Stack<int[]> newHistory = null;
+            try {
+                newHistory = (Stack<int[]>) MakeDeepCopy.WithObjectStream.makeDeepCopy(this.splitHistory);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+            return new CANJoinResponseMessage(dimension, directionInv, newHistory, newZones[directionInv],
+                neighborsOfThePeerWhichJoin, statementsResult);
+        } catch (Exception e) {
             e.printStackTrace();
         }
-
-        return new CANJoinResponseMessage(dimension, directionInv, newHistory, newZones[directionInv],
-            neighborsOfThePeerWhichJoin, statementsResult);
+        return null;
     }
 
     /**
