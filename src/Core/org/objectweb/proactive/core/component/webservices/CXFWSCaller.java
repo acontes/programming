@@ -56,10 +56,12 @@ public class CXFWSCaller implements ProActiveWSCaller {
 
     public Object[] callWS(String wsUrl, String methodName, Object[] args, Class<?>[] returnTypes) {
         try {
-            URL wsdlUrl = new URL(wsUrl + "?wsdl");
             DynamicClientFactory dcf = DynamicClientFactory.newInstance();
+            URL wsdlUrl = new URL(wsUrl + "?wsdl");
             Client client = dcf.createClient(wsdlUrl);
-            return client.invoke(methodName, args);
+            Object[] results = client.invoke(methodName, args);
+            client.destroy();
+            return results;
         } catch (Exception e) {
             logger.error("[CXF] Failed to invoke web service: " + wsUrl, e);
             return new Object[] { null };

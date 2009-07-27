@@ -58,16 +58,16 @@ public class Axis2WSCaller implements ProActiveWSCaller {
 
     public Object[] callWS(String wsUrl, String methodName, Object[] args, Class<?>[] returnTypes) {
         try {
-            RPCServiceClient rpcServiceClient = new RPCServiceClient();
-            Options options = rpcServiceClient.getOptions();
+            RPCServiceClient rsc = new RPCServiceClient();
+            Options options = rsc.getOptions();
             options.setTo(new EndpointReference(wsUrl));
             options.setAction(methodName);
             QName qName = new QName(methodName);
             if (returnTypes == null) {
-                rpcServiceClient.invokeRobust(qName, args);
+                rsc.invokeRobust(qName, args);
                 return null;
             } else {
-                return rpcServiceClient.invokeBlocking(qName, args, returnTypes);
+                return rsc.invokeBlocking(qName, args, returnTypes);
             }
         } catch (AxisFault af) {
             logger.error("[Axis2] Failed to invoke web service: " + wsUrl, af);
