@@ -1,4 +1,4 @@
-package org.objectweb.proactive.examples.structuredp2p.can;
+package org.objectweb.proactive.examples.structuredp2p.overlay.can;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -18,6 +18,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 
 import org.objectweb.proactive.core.util.ProActiveRandom;
+import org.objectweb.proactive.examples.structuredp2p.launchers.PeerLauncher;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.Zone;
@@ -80,7 +81,7 @@ public class ContentAddressableNetworkGUI extends JFrame implements Observer {
             Graphics2D g2d = (Graphics2D) g;
             g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-            for (Peer peer : ContentAddressableNetworkGUI.this.peerLauncher.getRemotePeers()) {
+            for (Peer peer : ContentAddressableNetworkGUI.this.peerLauncher.getAvailablePeers()) {
                 if (ContentAddressableNetworkGUI.this.peersColor.get(peer) != null) {
                     g2d.setColor(ContentAddressableNetworkGUI.this.peersColor.get(peer));
                 } else {
@@ -128,7 +129,7 @@ public class ContentAddressableNetworkGUI extends JFrame implements Observer {
             BigDecimal bigY = new BigDecimal(y);
             bigY = bigY.divide(new BigDecimal(ContentAddressableNetworkGUI.this.HEIGHT));
 
-            for (Peer peer : ContentAddressableNetworkGUI.this.peerLauncher.getRemotePeers()) {
+            for (Peer peer : ContentAddressableNetworkGUI.this.peerLauncher.getAvailablePeers()) {
                 if (((CANOverlay) peer.getStructuredOverlay()).contains(new Coordinate[] {
                         new LexicographicCoordinate("" + bigX), new LexicographicCoordinate("" + bigY) })) {
                     return peer;

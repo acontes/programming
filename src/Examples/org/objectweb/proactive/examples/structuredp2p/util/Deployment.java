@@ -13,8 +13,7 @@ import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
 
 /**
- * Manages the deployment and how to retrieve virtual nodes from a GCMA
- * deployment file.
+ * Manages the deployment and how to retrieve virtual nodes from a GCMA deployment file.
  * 
  * @author Kilanga Fanny
  * @author Trovato Alexandre
@@ -38,12 +37,12 @@ public class Deployment {
      */
     public static void deploy(String descriptor) throws NodeException, ProActiveException {
         // Create object representation of the deployment file
-        deployer = PAGCMDeployment.loadApplicationDescriptor(new File(descriptor));
+        Deployment.deployer = PAGCMDeployment.loadApplicationDescriptor(new File(descriptor));
         // Activate all virtual nodes
-        deployer.startDeployment();
+        Deployment.deployer.startDeployment();
         // Wait for all the virtual nodes to become ready
-        deployer.waitReady();
-        deployed = true;
+        Deployment.deployer.waitReady();
+        Deployment.deployed = true;
     }
 
     /*
@@ -54,11 +53,11 @@ public class Deployment {
      * @return the specified virtual node.
      */
     public static GCMVirtualNode getVirtualNode(String vnName) {
-        if (!deployed) {
+        if (!Deployment.deployed) {
             throw new IllegalStateException("You must deploy before retrieve nodes.");
         }
 
-        return deployer.getVirtualNode(vnName);
+        return Deployment.deployer.getVirtualNode(vnName);
     }
 
     /*
@@ -69,12 +68,12 @@ public class Deployment {
      * @return the virtual nodes specified in the descriptor file.
      */
     public static ArrayList<GCMVirtualNode> getAllVirtualNodes() {
-        if (!deployed) {
+        if (!Deployment.deployed) {
             throw new IllegalStateException("You must deploy before retrieve nodes.");
         }
 
         ArrayList<GCMVirtualNode> listVn = new ArrayList<GCMVirtualNode>();
-        Iterator<GCMVirtualNode> it = deployer.getVirtualNodes().values().iterator();
+        Iterator<GCMVirtualNode> it = Deployment.deployer.getVirtualNodes().values().iterator();
 
         while (it.hasNext()) {
             listVn.add(it.next());
@@ -87,9 +86,9 @@ public class Deployment {
      */
     public static void kill() {
         try {
-            deployer.kill();
+            Deployment.deployer.kill();
         } catch (Exception e) {
-            // do nothing
+            e.printStackTrace();
         }
 
         PALifeCycle.exitSuccess();

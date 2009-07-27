@@ -1,4 +1,4 @@
-package org.objectweb.proactive.examples.structuredp2p.can;
+package org.objectweb.proactive.examples.structuredp2p.launchers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,11 +21,11 @@ public class TrackerLauncher {
     private GCMVirtualNode virtualNodeForTracker;
     private int nbTrackersToCreate = 1;
 
-    public static List<Tracker> trackers = new ArrayList<Tracker>();
+    public List<Tracker> trackers = new ArrayList<Tracker>();
 
-    public TrackerLauncher(String[] args) {
+    public TrackerLauncher(String pathToGCMAFile) {
         try {
-            Deployment.deploy(args[0]);
+            Deployment.deploy(pathToGCMAFile);
         } catch (NodeException e) {
             e.printStackTrace();
         } catch (ProActiveException e) {
@@ -44,12 +44,16 @@ public class TrackerLauncher {
 
     private void createNewTracker() {
         try {
-            TrackerLauncher.trackers.add(Tracker.newActiveTracker(OverlayType.CAN, this.virtualNodeForTracker
-                    .getANode()));
+            this.trackers.add(Tracker
+                    .newActiveTracker(OverlayType.CAN, this.virtualNodeForTracker.getANode()));
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
         } catch (NodeException e) {
             e.printStackTrace();
         }
+    }
+
+    public List<Tracker> getAvailableTrackers() {
+        return this.trackers;
     }
 }

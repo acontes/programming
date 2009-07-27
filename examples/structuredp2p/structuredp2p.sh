@@ -9,61 +9,85 @@ fi
 
 . ${workingDir}/../env.sh
 
-#export CLASSPATH=../../:$CLASSPATH
-#export CLASSPATH=../../lib/*:$CLASSPATH
-#export CLASSPATH=../../classes/Core:$CLASSPATH
-#export CLASSPATH=../../classes/Benchmarks:$CLASSPATH
-#export CLASSPATH=../../classes/Examples:$CLASSPATH
-#export CLASSPATH=../../classes/Extensions:$CLASSPATH
-#export CLASSPATH=../../classes/Extra:$CLASSPATH
-#export CLASSPATH=../../classes/Tests:$CLASSPATH
-#export CLASSPATH=../../classes/Utils:$CLASSPATH
+usage() {
+cat << EOF
+Usage: $0 OPTIONS
 
-default_descriptor=../GCMD_Local.xml
-default_hostname=`hostname`
-default_st_operation=jls
-descriptor_app="$workingDir/GCMA.xml"
-descriptor_peer=$default_descriptor
-descriptor_tracker=$default_descriptor
+This script run a structured peer-to-peer network on a machine or a grid in the desired mode for testing : 
+	* Interactive : allows the user to choose the type of actions to perform (join, leave, search, list...)
+	* Stress Test : launches randomly one of three basic operations (join, leave, search) on the network.
 
-if [[ $# -lt  2 ]]	
+OPTIONS:
+    -n     The number of peers to put on the network when it is created. Default is set to 10
+    -i     Interactive mode 
+    -s     Stress Test mode. It can take an argument which is the type of 
+           operations to perform : 'j' for the join operation, 'l' for the leave
+           operation, 's' for a lookup operation. Default is set to 'jls'. 
+    -d     Indicates which GCMD to use for the ProActive application deployment: 
+           'localhost' or 'eons'. Default is set to 'localhost'.	
+   
+EXAMPLES:
+    $0 -n 10 -i         Initializes a structured p2p network in interactive mode with 10 peers on.
+    $0 -n 10 -st js     Initializes a structured p2p network in stress test mode with 10 peers on.
+                        Operations that will be performed are only join and search.
+EOF
+}
+
+NUMBER_OF_PEERS_TO_CREATE=10
+MODE=
+MODE_ARGS=
+DESCRIPTOR_APP="$workingDir/GCMA.xml"
+DESCRIPTOR_PEERS="$workingDir/../GCMD_Local.xml"
+DESCRIPTOR_TRACKERS="$workingDir/../GCMD_Local.xml"
+
+while getopts “n:is:d:” OPTION
+do
+     case $OPTION in
+     	h)
+        	usage
+        	exit
+        	;;
+		n)
+			NUMBER_OF_PEERS_TO_CREATE=$OPTARG
+			;;
+		i)
+			MODE=i
+			;;
+		s)
+			MODE=st
+			MODE_ARGS=$OPTARG
+			;;
+		d)
+			if [[ "$OPTARG" == "eons" ]]
+			then
+				DESCRIPTOR_PEERS="$workingDir/GCMD-Peers.xml"
+				DESCRIPTOR_TRACKERS="$workingDir/GCMD-Trackers.xml"
+			fi
+            ;;
+		?)
+			usage
+			exit
+			;;
+     esac
+done
+
+if [[ -z $MODE ]]
 then
-        echo "Usage: $0 NB_PEERS TYPE [DEPLOYMENT]"
-        echo "  NB_PEERS : the number of peers to create on the network."
-        echo "  TYPE : "
-        echo "    I  : for an interactive launching."
-        echo "    ST : for a stress test that you can stop by q-ENTER."
-        echo "  DEPLOYMENT : local or eons, default it's set on local."
-        exit 1
+	usage
+	exit
 fi
 
-if [[ $# -gt 2 && "$3" == "eons" ]]
-then 
-	default_st_operation=$4
-	descriptor_peer=GCMD-Peers.xml
-	descriptor_tracker=GCMD-Trackers.xml
-fi	
-
-if [[ $# -eq 3 && $2 == "ST" ]]
-then
-	default_st_operation=$3
-fi
-
-if [[ $# -eq 4 && $2 == "ST" ]]
-then
-	default_st_operation=$4
-fi
-
-echo
-if [[ "$2" == "I" ]]
+if [[ "$MODE" == "i" ]]
 then
 	echo ---------- STRUCTURED P2P : Interactive Test  ----------
 else 
 	echo ---------- STRUCTURED P2P : Stress Test  ----------
 fi
  
-args="$descriptor_app $default_hostname $1 $2 $default_st_operation"
-$JAVACMD -Ddescriptor.peer=$descriptor_peer -Ddescriptor.tracker=$descriptor_tracker org.objectweb.proactive.examples.structuredp2p.can.Launcher $args
+ARGS="$DESCRIPTOR_APP $NUMBER_OF_PEERS_TO_CREATE $MODE $MODE_ARGS"
+MAIN_CLASS=org.objectweb.proactive.examples.structuredp2p.Launcher
+
+$JAVACMD -Ddescriptor.peers=$DESCRIPTOR_PEERS -Ddescriptor.trackers=$DESCRIPTOR_TRACKERS $MAIN_CLASS $ARGS
 
 echo
 echo ---------------------------------------------------------

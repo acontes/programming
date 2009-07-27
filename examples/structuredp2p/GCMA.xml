@@ -8,8 +8,8 @@
 		<javaPropertyVariable name="java.home" />
 		<javaPropertyVariable name="proactive.home" />
 		<javaPropertyVariable name="user.home" />
-		<javaPropertyVariable name="descriptor.peer" />
-		<javaPropertyVariable name="descriptor.tracker" />
+		<javaPropertyVariable name="descriptor.peers" />
+		<javaPropertyVariable name="descriptor.trackers" />
 
 		<descriptorVariable name="hostCapacity" value="1" />
 		<descriptorVariable name="vmCapacity" value="1" />
@@ -32,7 +32,6 @@
 
 			<virtualNode id="Peer" capacity="1">
 				<nodeProvider refid="Peer" />
-				<nodeProvider refid="Tracker" />
 			</virtualNode>
 			<virtualNode id="Tracker" capacity="1">
 				<nodeProvider refid="Tracker" />
@@ -42,10 +41,10 @@
 
 	<resources>
 		<nodeProvider id="Peer">
-			<file path="${descriptor.peer}" />
+			<file path="${descriptor.peers}" />
 		</nodeProvider>
 		<nodeProvider id="Tracker">
-			<file path="${descriptor.tracker}" />
+			<file path="${descriptor.trackers}" />
 		</nodeProvider>
 	</resources>
 

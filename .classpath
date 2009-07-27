@@ -92,7 +92,7 @@
 	<classpathentry kind="lib" path="compile/lib/junit-4.3.jar"/>
 	<classpathentry kind="lib" path="compile/lib/ant.jar"/>
 	<classpathentry kind="lib" path="lib/lubm.jar"/>
-	<classpathentry kind="lib" path="lib/openrdf-sesame-onejar.jar"/>
 	<classpathentry kind="lib" path="lib/owlim-big-3.1.0.jar"/>
+	<classpathentry kind="lib" path="lib/openrdf-sesame-onejar.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
