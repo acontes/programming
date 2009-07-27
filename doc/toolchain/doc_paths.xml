@@ -22,7 +22,7 @@
 	
 	
 	<property name="docs.mainFile" 			value="main.xml" />
-	<property name="snippets.start"			value="${docs.dir}/../src" />
+	<property name="snippets.start"			value="${docs.dir}/.." />
 	<property name="snippets.location"		value="${docs.tmp.dir}/automatic_snippets" />
 	
 	
