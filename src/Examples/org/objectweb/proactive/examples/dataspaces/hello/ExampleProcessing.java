@@ -78,6 +78,7 @@ public class ExampleProcessing implements Serializable {
     public ExampleProcessing() {
     }
 
+    // @snippet-start DataSpacesExample_processing
     /**
      * Creates file within AO's scratch and writes content there.
      * 
@@ -100,9 +101,12 @@ public class ExampleProcessing implements Serializable {
         OutputStreamWriter writer = null;
 
         try {
+            // resolve scratch for this AO, and get Data Spaces file representation of fileName;
+            // later, be sure that the file was created and open an output stream writer on this file;
             file = PADataSpaces.resolveScratchForAO(fileName);
             file.createFile();
             writer = getWriter(file);
+            // finally, write the content and return files URI, valid for every AO
             writer.write(content);
 
             return file.getURI();
@@ -141,17 +145,23 @@ public class ExampleProcessing implements Serializable {
         int lines = 0;
 
         try {
+            // resolve a named input that's name was passed as a method's parameter
+            // as input represents file that's content is to be processed, open a reader
             inputFile = PADataSpaces.resolveInput(inputName);
             reader = getReader(inputFile);
 
+            // count lines here..
             while (reader.readLine() != null)
                 lines++;
 
             StringBuffer sb = new StringBuffer();
             sb.append(inputName).append(": ").append(lines).append('\n');
+
+            // store the partial result in a file within AO's scratch
             String fileUri = writeIntoScratchFile(PARTIAL_RESULTS_FILENAME, sb.toString());
             logger.info("partial results written: " + sb.toString());
 
+            // finally return file's URI
             return new StringWrapper(fileUri);
         } catch (IOException e) {
             logger.error("Exception while IO operation", e);
@@ -181,12 +191,17 @@ public class ExampleProcessing implements Serializable {
         logger.info("Gathering and aggregating partial results");
 
         final List<String> results = new ArrayList<String>();
+
+        // for every URI that was passed...
         for (StringWrapper uriWrapped : partialResults) {
             DataSpacesFileObject partialResultsFile = null;
             BufferedReader reader = null;
             try {
+                // ... resolve file pointed by that URI and open a reader, as it contains partial result
                 partialResultsFile = PADataSpaces.resolveFile(uriWrapped.stringValue());
                 reader = getReader(partialResultsFile);
+
+                // ... and gather partial results in a list
                 results.add(reader.readLine());
             } catch (IOException x) {
                 logger.error("Reading one's partial result file failed, trying to continue", x);
@@ -199,6 +214,8 @@ public class ExampleProcessing implements Serializable {
         DataSpacesFileObject outputFile = null;
         OutputStreamWriter writer = null;
         try {
+            // resolve a file from the default output space (as such is been defined in the GCM-A);
+            // be sure that the file exists and write gathered results using the output stream writer
             outputFile = PADataSpaces.resolveDefaultOutput(FINAL_RESULTS_FILENAME);
             outputFile.createFile();
             writer = getWriter(outputFile);
@@ -217,4 +234,5 @@ public class ExampleProcessing implements Serializable {
             closeResource(outputFile);
         }
     }
+    // @snippet-end DataSpacesExample_processing
 }

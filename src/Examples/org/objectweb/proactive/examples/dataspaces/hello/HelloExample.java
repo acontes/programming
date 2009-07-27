@@ -85,9 +85,11 @@ public class HelloExample {
 
     public static final String VIRTUAL_NODE_NAME = "Hello";
 
+    // @snippet-start DataSpacesExample_code_constants
     public static final String INPUT_RESOURCE1_NAME = "wiki_proactive";
 
     public static final String INPUT_RESOURCE2_NAME = "wiki_grid_computing";
+    // @snippet-end DataSpacesExample_code_constants
 
     /**
      * @param args
@@ -135,6 +137,7 @@ public class HelloExample {
         }
     }
 
+    // @snippet-start DataSpacesExample_code_variables
     private void setupVariables() {
         vContract = new VariableContractImpl();
         // this way of getting hostname is not the best solution, but it makes
@@ -142,6 +145,7 @@ public class HelloExample {
         vContract.setVariableFromProgram(VAR_OUTPUT_HOSTNAME, Utils.getHostname(),
                 VariableContractType.ProgramVariable);
     }
+    // @snippet-end DataSpacesExample_code_variables
 
     private void stop() {
         stopGCM();
@@ -149,6 +153,7 @@ public class HelloExample {
         PALifeCycle.exitSuccess();
     }
 
+    // @snippet-start DataSpacesExample_code_startgcm
     private void startGCM(String descriptorPath) throws ProActiveException {
         gcmApplication = PAGCMDeployment.loadApplicationDescriptor(new File(descriptorPath), vContract);
         gcmApplication.startDeployment();
@@ -160,6 +165,7 @@ public class HelloExample {
         nodesDeployed = vnode.getCurrentNodes();
         logger.info("Nodes started: " + nodesDeployed.size() + " nodes deployed");
     }
+    // @snippet-end DataSpacesExample_code_startgcm
 
     private void stopGCM() {
         if (gcmApplication == null)
@@ -168,6 +174,7 @@ public class HelloExample {
     }
 
     // real processing
+    // @snippet-start DataSpacesExample_code_scenario
     private void exampleUsage() throws ActiveObjectCreationException, NodeException, DataSpacesException {
         checkEnoughRemoteNodesOrDie(2);
         final Node nodeA = nodesDeployed.get(0);
@@ -192,6 +199,7 @@ public class HelloExample {
             logger.error("Could not write final results file", x);
         }
     }
+    // @snippet-end DataSpacesExample_code_scenario
 
     private void checkEnoughRemoteNodesOrDie(int i) throws IllegalStateException {
         if (nodesDeployed.size() < i) {
