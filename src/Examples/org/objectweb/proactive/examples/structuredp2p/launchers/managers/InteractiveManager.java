@@ -9,6 +9,11 @@ import org.objectweb.proactive.examples.structuredp2p.launchers.actions.ListActi
 import org.objectweb.proactive.examples.structuredp2p.launchers.actions.QuitAction;
 
 
+/**
+ * 
+ * @author Pellegrino Laurent
+ * @version 0.1, 07/27/2009
+ */
 public class InteractiveManager extends Manager {
 
     public InteractiveManager(PeerLauncher peerLauncher) {

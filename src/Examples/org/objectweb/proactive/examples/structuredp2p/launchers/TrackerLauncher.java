@@ -15,6 +15,11 @@ import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
 
+/**
+ * 
+ * @author Pellegrino Laurent
+ * @version 0.1, 07/27/2009
+ */
 public class TrackerLauncher {
     private Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 

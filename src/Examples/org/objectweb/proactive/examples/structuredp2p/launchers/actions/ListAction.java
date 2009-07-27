@@ -4,6 +4,11 @@ import org.objectweb.proactive.examples.structuredp2p.launchers.managers.Manager
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 
 
+/**
+ * 
+ * @author Pellegrino Laurent
+ * @version 0.1, 07/27/2009
+ */
 public class ListAction extends Action {
 
     public ListAction(Manager manager) {

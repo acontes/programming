@@ -11,6 +11,11 @@ import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.QueryRes
 import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can.RDFQuery;
 
 
+/**
+ * 
+ * @author Pellegrino Laurent
+ * @version 0.1, 07/27/2009
+ */
 public class SearchAction extends Action {
 
     public SearchAction(Manager manager) {

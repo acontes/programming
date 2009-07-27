@@ -26,6 +26,11 @@ import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordin
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates.LexicographicCoordinate;
 
 
+/**
+ * 
+ * @author Pellegrino Laurent
+ * @version 0.1, 06/11/2009
+ */
 @SuppressWarnings("serial")
 public class ContentAddressableNetworkGUI extends JFrame implements Observer {
 

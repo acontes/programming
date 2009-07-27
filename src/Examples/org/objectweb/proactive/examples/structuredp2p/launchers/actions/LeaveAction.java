@@ -7,6 +7,11 @@ import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
 
 
+/**
+ * 
+ * @author Pellegrino Laurent
+ * @version 0.1, 07/27/2009
+ */
 public class LeaveAction extends Action {
 
     public LeaveAction(Manager manager) {
