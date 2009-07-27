@@ -165,7 +165,7 @@
                 <listitem>
                     <para><literal>&lt;remoteAccess&gt;</literal> tag with <literal>url</literal> attribute.</para>
                     <para>
-                        This part of scrach space definition is similar to input and output spaces configuration - it sets URL that will be used for accessing that data space. URL should point to directory or non-existing file. Note, that special metavariable <literal>#{hostname}</literal> may be used in URL template, as the same generic host configuration may be applied to more than one real hosts.
+                        This part of scrach space definition is similar to input and output spaces configuration - it sets URL that will be used for accessing that data space. URL should point to directory or non-existing file. Note, that special metavariable <literal>#{hostname}</literal> may be used in URL template, as the same generic host configuration may be applied to more than one real hosts. <literal>#{hostname}</literal> is replaced with actual Node's hostname during deployment.  
                     </para>
                     <para>
                         Absence of <literal>&lt;remoteAccess&gt;</literal> tag have a special meaning in context of scratch configuration. If tag is not present,  ProActive provider server will be automatically started for a Node lifetime, exposing this part of a file system remotely through ProActive protocol, so you do not need to configure and run external protocol server.  
@@ -174,7 +174,10 @@
                 <listitem>
                     <para><literal>&lt;path&gt;</literal> tag with <literal>base</literal> and <literal>relpath</literal> attributes.</para>
                     <para>
-                        TODO
+                        Path definition part specifies location of scratch space on host's local file system tree. Path specified in <literal>relpath</literal> is relative to <literal>base</literal>, which may be one of following values: <literal>proactive</literal>, <literal>home</literal> or <literal>root</literal> (refer to <xref linkend="GCMDeployment"/> for details).
+                    </para>
+                    <para>
+                        When <literal>&lt;remoteAccess&gt;</literal> is present, local path specification is just used for optimizing local data access. If <literal>&lt;remoteAccess&gt;</literal> is not present, this path is also used as a root of file system exposed through ProActive provider server.  In any configuration, if both local path and access URL are provided, they should point to the same data.
                     </para>
                 </listitem>
             </itemizedlist>
@@ -182,21 +185,118 @@
         </section>
     </section>
 
+    <section xml:id="ds_configuration_command_line_tools">
+        <info><title>Command-line tools</title></info>
+        <section xml:id="ds_configuration_script_naming_service">
+            <info><title><literal>namingService</literal> script</title></info>
+            <para>
+                This shell script allows you to perform <emphasis>operations on Naming Service</emphasis>. In particular, it allows starting standalone Naming Service, which can be shared among several applications. To start Naming Service, use script with <literal>start</literal> command:
+                <screen>linux &gt; ./namingService.sh start
+Naming Service successfully started on: rmi://branch.inria.fr:1099/defaultNamingService</screen>
+                As you can see, you get information with URL of started Naming Service, that you can later use in GCM Application descriptor or for manual configuration, instead of starting separate Naming Service for each application. See <xref linkend="ds_gcma"/> and <xref linkend="ds_configuration_manual"/> for details.
+            </para>
+            <para>
+                You can also start Naming Service within your Java code using <code>NamingServiceDeployer</code> class.  
+            </para>
+            <para>
+                <literal>namingService</literal> script can also be used for monitoring or low-level operations, through <literal>ls</literal> and <literal>add</literal> commands.
+            </para>
+        </section>
+        <section xml:id="ds_configuration_script_proactive_provider">
+            <info><title><literal>PAProviderServer</literal> script</title></info>
+            <para>
+                Using this script you can <emphasis>start ProActive provider server</emphasis>, exposing specified local directory for a remote access. ProActive provider bases on ProActive protocol to create remote file system protocol. Performance of such a protocol may be worse than performance of dedicated protocols like FTP, but it can act as an easy to setup protocol, without lot of configuration nor requirements. To start ProActive provider server, simply use script with <literal>start</literal> command:
+                <screen>linux &gt; ./PAProviderServer.sh start /home/bob/input_data/
+70833@branch - [INFO    communication.rmi] Created a new registry on port 1099
+PAProvider successfully started.
+VFS URL of this provider: paprmi://branch.inria.fr:1099/defaultFileSystemServer?proactive_vfs_provider_path=/
+</screen>
+                Displayed URL of started server can be used as remote access URL of data spaces in GCM Application descriptor, <literal>PADataSpaces</literal> API or manual configuration, to easily set up remote access for some data. See <xref linkend="ds_gcma"/> and <xref linkend="ds_configuration_manual"/> for details.
+            </para>
+            <para>
+                You can also start ProActive provider server within your Java code using <code>FileSystemServerDeployer</code> class.  
+            </para>
+            <para>
+                ProActive provider server uses two ProActive properties (see <xref linkend="ProActiveproperties_69" /> for details), to adjust <emphasis>streams autoclosing</emphasis> feature. This mechanism is meant to close streams that were not being used for a long time, and automatically reopen them if necessary - which can be used to save resources or avoid orphaned resources. Following properties can be set:
+                <itemizedlist>
+                    <listitem>
+                        <para><literal>proactive.vfsprovider.server.stream_autoclose_checking_millis</literal> - indicating how often an auto closing mechanism is started to collect and close all unused streams open (default: 30 000).</para>
+                    </listitem>
+                    <listitem>                                 
+                        <para><literal>proactive.vfsprovider.server.stream_open_maximum_period_millis</literal> - indicating a period after that a stream is perceived as unused and therefore can be closed by auto closing mechanism. (default: 60 000).</para>
+                    </listitem>
+                </itemizedlist>
+            </para>
+        </section>
+    </section>
+
     <section xml:id="ds_configuration_manual">
         <info><title>Manual configuration</title></info>
         <para>
-        In some environments it may be useful to access Data Spaces configuration API manually. Most of the users do not need to know about this API, but it is exposed to give more flexibility for potential usages.
+            In some environments it may be useful to access Data Spaces configuration API manually. Note that <emphasis>most of the users do not need to know anything about this API</emphasis>, but it is exposed to give more flexibility for potential usages. When you need to configure Data Spaces manually, you need to be aware of a few assumptions that Data Spaces bases on, which are normally fulfilled by GCM deployment implementation. 
         </para>
         <para>
-        TODO
+            First of all, Data Spaces uses the concept of <emphasis>application</emphasis> operating on data spaces. Every application is uniquelly identified by <emphasis>application id</emphasis>. Set of input, output and scartch data spaces is always associated with some concrete application and typically application accesses only its own data spaces.    
         </para>
-    </section>
-    
-    <section xml:id="ds_configuration_othertools">
-        <info><title>Other delivered tools</title></info>
         <para>
-            TODO: PAP, NamingService
+            Secondly, Data Spaces assumes that each Node is used at most by one application at any given time, i.e. <emphasis>Node sharing is not allowed</emphasis> between applications using Data Spaces.    
         </para>
+        <para>
+            Configuration of Data Spaces can be divided into two units - <emphasis>Naming Service-level</emphasis> which is common to the whole application and set up once, and <emphasis>Node-level</emphasis> configuration which is invidiually applied for each Node using Data Spaces. Next two sections discuss these two configuration units in more details, while you can find complete manual configuration example in <literal>ManulConfigurationExample</literal> class from <literal>org.objectweb.proactive.examples.dataspaces.manualconfig</literal> package.      
+        </para>
+        
+        <section xml:id="ds_configuration_manual_naming_service">
+            <info><title>Naming Service-level configuration</title></info>
+            <para>
+                Data Spaces needs a running service called Naming Service, which acts as a directory of data spaces. One Naming Service may be used to serve more than one application. Each applicaiton needs to be explicitly registered and unregistered there. Therefore, unique application identifier is required.  
+            </para>
+            <para>
+                Naming Service can be <emphasis>started</emphasis> from Java code using <literal>NamingServiceDeployer</literal> class or using <xref linkend="ds_configuration_command_line_tools"/>:
+                <programlisting language="java"><textobject><textdata fileref="automatic_snippets/DataSpacesManualConfig_StartingNS.snip"/></textobject></programlisting>
+            </para>
+            <para>
+                Once Naming Service is started and can be accessed, application that will use Data Spaces needs to <emphasis>register</emphasis> there with optional set of initial input and output spaces:
+                <programlisting language="java"><textobject><textdata fileref="automatic_snippets/DataSpacesManualConfig_RegisteringApp.snip"/></textobject></programlisting> 
+            </para>
+            <para>
+                When application terminates, it should be deconfigured by  <emphasis>unregistering</emphasis> itself from Naming Service:
+                <programlisting language="java"><textobject><textdata fileref="automatic_snippets/DataSpacesManualConfig_UnregisteringApp.snip"/></textobject></programlisting>   
+            </para>
+            <para>
+                If Naming Service was started through <literal>NamingServiceDeployer</literal> and is not used anymore, it can be  <emphasis>stopped</emphasis>:
+                <programlisting language="java"><textobject><textdata fileref="automatic_snippets/DataSpacesManualConfig_StoppingNS.snip"/></textobject></programlisting>
+            </para>
+        </section>
+
+        <section xml:id="ds_configuration_manual_node">
+            <info><title>Node-level configuration</title></info>
+            <para>
+                Configuration of Node is performed through <literal>DataSpacesNodes</literal> class and consists of two steps. Every Node-level configuration needs to be performed locally on a Node, it cannot be done remotely without any agent Active Object or other mechanism.
+            </para>
+            <para>
+                The first step is to <emphasis>initialize Node for Data Spaces</emphasis> in general, optionally providing base of scratch space configuration that will be later used by applications on this node. This step is application agnostic, and it is performed only once for a node.
+                <programlisting language="java"><textobject><textdata fileref="automatic_snippets/DataSpacesManualConfig_ConfigureNode.snip"/></textobject></programlisting>
+            </para>
+            <para>
+                The second step is to <emphasis>configure Node for a particular application</emphasis>, specyfing unique application id and Naming Service URL.
+                <programlisting language="java"><textobject><textdata fileref="automatic_snippets/DataSpacesManualConfig_ConfigureNodeForApp.snip"/></textobject></programlisting> 
+            </para>
+            <para>
+                When Node is configured for Data Spaces this way, Active Objects bodies (or non-Active Objects half bodies) can safely use <literal>PADataSpaces</literal> API.
+            </para>
+            <para>
+                Once Node has been configured for some application, it can be explicitly <emphasis>deconfigured</emphasis> for that application - when application is not using this Node anymore:
+                <programlisting language="java">DataSpacesNode.tryCloseNodeApplicationConfig(node);</programlisting>
+            </para>
+            <para>
+                ...or it can be <emphasis>reconfigured</emphasis> for another application - when another application is starting to use it:
+                <programlisting language="java">DataSpacesNode.configureApplication(node, anotherApplicationId, namingServiceURL);</programlisting>
+            </para>
+            <para>
+                If Node will not be used anymore for any application (e.g. it is going to be destroyed), its Data Spaces configuration can be completely <emphasis>closed</emphasis>:
+                <programlisting language="java"><textobject><textdata fileref="automatic_snippets/DataSpacesManualConfig_CloseNodeConfig.snip"/></textobject></programlisting> 
+            </para>
+        </section>
     </section>
 </section>
 

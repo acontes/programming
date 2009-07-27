@@ -24,22 +24,33 @@ import org.objectweb.proactive.extensions.dataspaces.exceptions.WrongApplication
 public class ManualConfigurationExample {
     public static void main(String[] args) throws ApplicationAlreadyRegisteredException,
             WrongApplicationIdException, ProActiveException, URISyntaxException, IOException {
+        // @snippet-start DataSpacesManualConfig_StartingNS
         // start Naming Service
         final NamingServiceDeployer namingServiceDeployer = new NamingServiceDeployer();
         final String namingServiceURL = namingServiceDeployer.getNamingServiceURL();
-        final NamingService remoteNamingService = namingServiceDeployer.getRemoteNamingService();
+        // @snippet-end DataSpacesManualConfig_StartingNS
 
-        // use some unique application id
+        // @snippet-start DataSpacesManualConfig_RegisteringApp
+        // need to guarantee uniqueness of application id somehow
         final long applicationId = 1234431;
-        // register application, without predefined inputs and outputs 
-        remoteNamingService.registerApplication(applicationId, null);
+        // access (possibly remote) Naming Service
+        final NamingService namingService = NamingService.createNamingServiceStub(namingServiceURL);
+        // register application, here: without predefined inputs and outputs 
+        namingService.registerApplication(applicationId, null);
+        // @snippet-end DataSpacesManualConfig_RegisteringApp
 
-        // configure node for DS
-        final Node halfBodiesNode = NodeFactory.getHalfBodiesNode();
+        // configure node for DataSpaces
+        final Node node = NodeFactory.getHalfBodiesNode();
 
-        // node is configured without scratch
-        DataSpacesNodes.configureNode(halfBodiesNode, null);
-        DataSpacesNodes.configureApplication(halfBodiesNode, applicationId, namingServiceURL);
+        // @snippet-start DataSpacesManualConfig_ConfigureNode
+        // configure node, here: node is configured without scratch
+        DataSpacesNodes.configureNode(node, null);
+        // @snippet-end DataSpacesManualConfig_ConfigureNode
+
+        // @snippet-start DataSpacesManualConfig_ConfigureNodeForApp
+        // configure node for application
+        DataSpacesNodes.configureApplication(node, applicationId, namingServiceURL);
+        // @snippet-end DataSpacesManualConfig_ConfigureNodeForApp
 
         // now we can use PADataSpaces from AO/bodies on that node.
         // in case of half-bodies node, we can use PADataSpaces from non-AO
@@ -61,9 +72,19 @@ public class ManualConfigurationExample {
         }
 
         // after using DS, we can clean up
-        DataSpacesNodes.closeNodeConfig(halfBodiesNode);
-        namingServiceDeployer.terminate();
         // (actually, this part should be also implemented as finally, as we should always close DS on node and NamingService)
+
+        // @snippet-start DataSpacesManualConfig_CloseNodeConfig
+        DataSpacesNodes.closeNodeConfig(node);
+        // @snippet-end DataSpacesManualConfig_CloseNodeConfig
+
+        // @snippet-start DataSpacesManualConfig_UnregisteringApp
+        namingService.unregisterApplication(applicationId);
+        // @snippet-end DataSpacesManualConfig_UnregisteringApp
+
+        // @snippet-start DataSpacesManualConfig_StoppingNS
+        namingServiceDeployer.terminate();
+        // @snippet-end DataSpacesManualConfig_StoppingNS
 
         PALifeCycle.exitSuccess();
     }
