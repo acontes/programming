@@ -167,7 +167,7 @@ public class ExampleProcessing implements Serializable {
      * space.
      * 
      * @param partialResults
-     *            list of file URIs containing partial results
+     *            iterable instance of file URIs containing partial results
      * @throws MalformedURIException
      *             when any specified URI is not correctly formed
      * @throws DataSpacesException
@@ -176,7 +176,7 @@ public class ExampleProcessing implements Serializable {
      *             when IO exception occurred during writing final results (failures in reading
      *             partial results are ignored)
      */
-    public void gatherPartials(List<StringWrapper> partialResults) throws MalformedURIException,
+    public void gatherPartials(Iterable<StringWrapper> partialResults) throws MalformedURIException,
             DataSpacesException, IOException {
         logger.info("Gathering and aggregating partial results");
 

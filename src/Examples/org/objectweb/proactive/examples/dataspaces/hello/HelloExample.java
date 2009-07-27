@@ -4,9 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-import org.apache.commons.vfs.FileSystemException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -19,10 +19,10 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.core.xml.VariableContractType;
-import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.extensions.dataspaces.Utils;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.DataSpacesException;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.NotConfiguredException;
+import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
@@ -47,8 +47,8 @@ import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
  * <li>Return URI of a file within local scratch containing partial results</li>
  * </ul>
  * </li>
- * <li>The deployer gathers partial URIs of files with partial results into a list and calls
- * {@link ExampleProcessing#gatherPartials(List)} method on one of the AOs, which aggregates
+ * <li>The deployer gathers partial URIs of files with partial results into a collection and calls
+ * {@link ExampleProcessing#gatherPartials(Iterable)} method on one of the AOs, which aggregates
  * results. That method performs:
  * <ul>
  * <li>Read partial results from each specified scratch URI</li>
@@ -120,10 +120,9 @@ public class HelloExample {
      * @param descriptorPath
      *            path to deployment descriptor
      * @throws ProActiveException
-     * @throws FileSystemException
      * @throws URISyntaxException
      */
-    public void run(String descriptorPath) throws ProActiveException, FileSystemException, URISyntaxException {
+    public void run(String descriptorPath) throws ProActiveException, URISyntaxException {
         setupVariables();
 
         try {
@@ -178,9 +177,7 @@ public class HelloExample {
                 ExampleProcessing.class.getName(), null, nodeA);
         final ExampleProcessing processingB = (ExampleProcessing) PAActiveObject.newActive(
                 ExampleProcessing.class.getName(), null, nodeB);
-
-        // This can be turned into Set as PROACTIVE-663 will be resolved
-        final List<StringWrapper> partialResults = new ArrayList<StringWrapper>();
+        final Collection<StringWrapper> partialResults = new ArrayList<StringWrapper>();
         try {
             partialResults.add(processingA.computePartials(INPUT_RESOURCE1_NAME));
             partialResults.add(processingB.computePartials(INPUT_RESOURCE2_NAME));
