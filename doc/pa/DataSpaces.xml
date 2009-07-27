@@ -39,10 +39,10 @@
         There are distinguished three different space types: input space with files used as the application's input data, output space for storing the application's result files and scratch space for temporary files with the intermediate results of the computations. Spaces types differ also in the access rights, and therefore input is only meant for read operations, output for read and write as well, whereas scratch access mode depends on the caller. If a calling thread is an owner of a particular scratch, then it can perform both read and write operations. On the other hand, if a calling thread is not an owner (eg. received URI from another Active Object), its access is limited to read only operations.
     </para>
     <para>
-    Input and output spaces are mostly defined by the application, hence their configuration is stored in the application&#150;specific GCMA Descriptor or in the application code itself. An application can have several inputs and outputs defined, as each input and output space has its unique (within a single application) name. There can be defined a default (hence single) input or output spaces, so using names is not always needed. For more information please refer to attached JavaDoc.
+    Input and output spaces are mostly defined by the application, hence their configuration is stored in the application&#150;specific GCM&#150;A Descriptor or in the application code itself. An application can have several inputs and outputs defined, as each input and output space has its unique (within a single application) name. There can be defined a default (hence single) input or output spaces, so using names is not always needed. For more information please refer to attached JavaDoc.
     </para>
     <para>
-    Scratch data space is most likely defined by the system administrator in the GCMD Descriptor in case of the GCM deployment, or manually. Scratch data space is bounded to Node, and particular scratches within a single scratch data space are bounded to Active Objects that reside on this Node. Hence, there is only one scratch that Active Object owns.
+    Scratch data space is most likely defined by the system administrator in the GCM&#150;D Descriptor in case of the GCM deployment, or manually. Scratch data space is bounded to Node, and particular scratches within a single scratch data space are bounded to Active Objects that reside on this Node. Hence, there is only one scratch that Active Object owns.
     </para>
     <para>
         <figure xml:id="ds_table">
@@ -201,39 +201,133 @@
 </section>
 
 <section xml:id="ds_using_api">
-    <info><title>Using Data Spaces API</title></info>
-    <para>
-    Below you can find a few simple examples that show how to deal with basic tasks using Data Spaces API. Those examples remain just ideas of how Data Spaces API can be used, we encourage you to invent your own tricky&#150;application. 
-    </para>
-    <para>
-    The first code snippets shows how to read input of an application and to write the final results (here: some statistics). For reading input data, a default input space is used, as there is only one input store used for this example. Statistics are stored in the named output data space according to <literal>STATS_DATA_SPACE</literal> constant, that can be a hard coded identifier, an application parameter, etc.
-    </para>
-    <para>
-    Methods from the Data Spaces API used in this snipped are: <literal>PADataSpaces.resolveDefaultInput</literal> and <literal>PADataSpaces.resolveOutput</literal> that resolve default input and named output respectively, returning instance of <literal>DataSpacesFileObject</literal> class. This class is a part of Data Spaces API and represents a file (ordinal file or directory) from any data space and allows to read and write file's content through standard Java APIs streams along with another file system operations. For convenience, a file name can be specified in the parameters list of above mentioned revolve methods.
-</para>
-    <example xml:id="ds_snippet1">
-        <info><title>Reading from default input and writing to named output</title></info>
-        <programlisting language="java"><textobject><textdata fileref="dataspaces/snippet1.java"/></textobject></programlisting>
-    </example>
-    <para>
-    The next snippet could be part of an application composed of a GUI that allows user to define inputs dynamically in the run time, for the further processing. Inputs are added (registered for the application) on user's demand by <literal>addInputClicked</literal> event handler (made up for this example), that calls Data Spaces API routine <literal>PADataSpaces.addInput</literal> and informs other processing objects (Active Objects) about the new input. The processing can be done as follows. Using the <literal>PADataSpaces.resolveAllKnownInputs</literal> method one can iterate over all inputs registered in the moment of resolving. Hence, for each such an input, a processing (reading particular files) can take place.
-    </para>
-    <example xml:id="ds_snippet2">
-        <info><title>Dealing with inputs more dynamically — adding named input, reading all defined inputs</title></info>
-        <programlisting language="java"><textobject><textdata fileref="dataspaces/snippet2.java"/></textobject></programlisting>
-    </example>
-    <para>
-    This snippet presents how two Active Objects can share data stored in ones scratch. The scenario is as follows. One Active Object resolves a file from its scratch with <literal>PADataSpaces.resolveScratchForAO</literal> Data Spaces APIs method. Once the file is resolved (represented by an instance of <literal>DataSpacesFileObject</literal> class), an intermediate results can be written into its content. As each file within data spaces is identified by its URI, such a URI can be obtained with <literal>getURI</literal> method of <literal>DataSpacesFileObject</literal> class and passed to another Active Object as a parameter of exemplary <literal>readMyFile</literal> method. This method (in a different Active Object!) can finally resolve URI through <literal>PADataSpaces.resolveFile</literal> method call and further process the file content.
-    </para>
-    <example xml:id="ds_snippet3">
-        <info><title>Writing into ones scratch, that is later read by another AO</title></info>
-        <programlisting language="java"><textobject><textdata fileref="dataspaces/snippet3.java"/></textobject></programlisting>
-    </example>
-</section>
-<section xml:id="ds_complete_example">
-    <info><title>Complete example</title></info>
-    <para>
-    A complete example goes here..
-    </para>
+<info><title>Using Data Spaces API</title></info>
+
+    <section xml:id="ds_snippets">
+        <info><title>Code snippets and explanation</title></info>
+        <para>
+        Below you can find a few simple examples that show how to deal with basic tasks using Data Spaces API. Those examples remain just ideas of how Data Spaces API can be used, we encourage you to invent your own tricky&#150;application.
+        </para>
+        <section xml:id="ds_codesnippet1">
+            <info><title>Reading from default input, writing to named output</title></info>
+            <para>
+            The first code snippets shows how to read input of an application and to write the final results (here: some statistics). For reading input data, a default input space is used, as there is only one input store used for this example. Statistics are stored in the named output data space according to <literal>STATS_DATA_SPACE</literal> constant, that can be a hard coded identifier, an application parameter, etc.
+            </para>
+            <para>
+            Methods from the Data Spaces API used in this snipped are: <literal>PADataSpaces.resolveDefaultInput</literal> and <literal>PADataSpaces.resolveOutput</literal> that resolve default input and named output respectively, returning instance of <literal>DataSpacesFileObject</literal> class. This class is a part of Data Spaces API and represents a file (ordinal file or directory) from any data space and allows to read and write file's content through standard Java APIs streams along with another file system operations. For convenience, a file name can be specified in the parameters list of above mentioned revolve methods.
+        </para>
+            <example xml:id="ds_snippet1">
+                <info><title>Reading from default input and writing to named output</title></info>
+                <programlisting language="java"><textobject><textdata fileref="dataspaces/snippet1.java"/></textobject></programlisting>
+            </example>
+        </section>
+        <section xml:id="ds_codesnippet2">
+            <info><title>Adding named inputs dynamically, reading all defined inputs</title></info>
+            <para>
+            The next snippet could be part of an application composed of a GUI that allows user to define inputs dynamically in the run time, for the further processing. Inputs are added (registered for the application) on user's demand by <literal>addInputClicked</literal> event handler (made up for this example), that calls Data Spaces API routine <literal>PADataSpaces.addInput</literal> and informs other processing objects (Active Objects) about the new input. The processing can be done as follows. Using the <literal>PADataSpaces.resolveAllKnownInputs</literal> method one can iterate over all inputs registered in the moment of resolving. Hence, for each such an input, a processing (reading particular files) can take place.
+            </para>
+            <example xml:id="ds_snippet2">
+                <info><title>Dealing with inputs more dynamically — adding named input, reading all defined inputs</title></info>
+                <programlisting language="java"><textobject><textdata fileref="dataspaces/snippet2.java"/></textobject></programlisting>
+            </example>
+        </section>
+        <section xml:id="ds_cotesnippet3">
+            <info><title>Sharing scratch URI between two Active Objects</title></info>
+            <para>
+            This snippet presents how two Active Objects can share data stored in ones scratch. The scenario is as follows. One Active Object resolves a file from its scratch with <literal>PADataSpaces.resolveScratchForAO</literal> Data Spaces APIs method. Once the file is resolved (represented by an instance of <literal>DataSpacesFileObject</literal> class), an intermediate results can be written into its content. As each file within data spaces is identified by its URI, such a URI can be obtained with <literal>getURI</literal> method of <literal>DataSpacesFileObject</literal> class and passed to another Active Object as a parameter of exemplary <literal>readMyFile</literal> method. This method (in a different Active Object!) can finally resolve URI through <literal>PADataSpaces.resolveFile</literal> method call and further process the file content.
+            </para>
+            <example xml:id="ds_snippet3">
+                <info><title>Writing into ones scratch, that is later read by another AO</title></info>
+                <programlisting language="java"><textobject><textdata fileref="dataspaces/snippet3.java"/></textobject></programlisting>
+            </example>
+        </section>
+    </section>
+    <section xml:id="ds_complete_example">
+        <info><title>Complete example</title></info>
+        <para>
+        In this section a complete example of processing data with ProActive and Data Spaces API is presented. Source code can be found in <literal>org.objectweb.proactive.examples.dataspaces.hello</literal> package, whereas xml descriptors in the <literal>examples/dataspaces/hello/</literal> sub directory of your ProActive installation.
+        </para>
+        <para>
+        The goal of the processing is simple: count the number of lines in a text documents and store the results in a single text file. The computations are performed as follows. Every input document is mapped onto one Active Object so that inputs can be read and processed (lines counted) in parallel. Number of lines in each document (so called intermediate results) are stored in scratches, so one can read them and gather into one file placed in the output data space. All these operations can be simply done using the Data Spaces API.
+        </para>
+        <section xml:id="ds_section_example_gcmd">
+            <info><title>GCM Deployment Descriptor</title></info>
+            <para>
+            The GCM&#150;D is very simple, as the example is to be run on every infrastructure. In this case, a <emphasis><literal>&lt;scratch&gt;</literal></emphasis> tag is used to enable data spaces on nodes described by the <literal>id="host"</literal> host id. A <emphasis><literal>path</literal></emphasis> element defines a location of a scratch data space, as a sub directory of the system's Temp directory. As there is no <emphasis><literal>&lt;remoteAccess&gt;</literal></emphasis> element, the scratch data space is to be exposed through PAProviderServer that is started automatically.
+            </para>
+            <example xml:id="ds_example_gcmd">
+                <info><title>Part of the GCM&#150;D Descriptor: helloDeploymentRemote.xml</title></info>
+                <programlisting language="xml"><textobject><textdata fileref="automatic_snippets/DataSpacesExample_gcmd.snip"/></textobject></programlisting>
+            </example>
+        </section>
+        <section xml:id="ds_section_example_gcma">
+            <info><title>GCM Application Descriptor</title></info>
+            <para>
+            GCM-A part contains application related information regarding data spaces configuration like inputs and outputs definitions, as well as contract variables used in the example code. The latest is defined as follows:
+                <programlisting language="xml"><textobject><textdata fileref="automatic_snippets/DataSpacesExample_gcma1.snip"/></textobject></programlisting>
+            and represents name of a host that the output data is to be stored on.
+            </para>
+            <para>
+            The data spaces configuration part needs somewhat more explanation. It is placed right after Virtual Node definition, as a last child of the <emphasis><literal>&lt;proactive&gt;</literal></emphasis> element.
+            </para>
+            <example xml:id="ds_example_gcma">
+                <info><title>Part of the GCM&#150;A Descriptor: helloApplication.xml</title></info>
+                <programlisting language="xml"><textobject><textdata fileref="automatic_snippets/DataSpacesExample_gcma2.snip"/></textobject></programlisting>
+            </example>
+            <para>
+            Descriptor defines two named input spaces that serve text resources for our example &#151; a document's lines counter. In this particular case, two resources are accessed by the <literal>HTTP</literal> protocol, as they are two Wikipedia articles on <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://en.wikipedia.org/wiki/ProActive">ProActive library</link> and on <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://en.wikipedia.org/wiki/Grid_computing">grid computing</link>. Those inputs can be later resolved by an application using their names (identifiers), here: <literal>wiki_proactive</literal> and <literal>wiki_grid_computing</literal> respectively.
+            </para>
+            <para>
+            The output space is placed on the <literal>OUTPUT_HOSTNAME</literal> host. Output space is a directory placed in the user's home directory and can be accessed remotely by the <literal>SFTP</literal> protocol or locally, as an explicit location is given.
+            </para>
+        </section>
+        <section xml:id="ds_section_example_code">
+            <info><title>The Java code</title></info>
+            <para>
+            The <literal>HelloExample.java</literal> file contains code responsible for deployment and computation scenario in general. At the beginning, the variable contract is fulfilled, passing the the deploy er host name into descriptor. Therefore the output data space is now fully defined &#151; placed on the deployer's host.
+            </para>
+            <example xml:id="ds_example_variables">
+                <info><title>HelloExample.java: setting up variable from the contract </title></info>
+                <programlisting language="java"><textobject><textdata fileref="automatic_snippets/DataSpacesExample_code_variables.snip"/></textobject></programlisting>
+            </example>
+            <para>
+            The GCM deployment used in this example is a common way to deploy your application, as you can see, no additional work is required to enable the Data Spaces API.
+            </para>
+            <example xml:id="ds_example_gcmastart">
+                <info><title>HelloExample.java: starting the GCM deployment</title></info>
+                <programlisting language="java"><textobject><textdata fileref="automatic_snippets/DataSpacesExample_code_startgcm.snip"/></textobject></programlisting>
+            </example>
+            <para>
+            All routines related to processing scenario are gathered into one <literal>exampleUsage</literal> method (<xref linkend="ds_example_scenario" />). At the very beginning, nodes grabbed previously during the deployment phase are now used for placing two Active Objects instantiated from the <literal>ExampleProcessing</literal> class. Both are later called to perform <literal>computePartials</literal> method, that obtains as a parameter the name of an input space to process. Input space names are defined as follows:
+                <programlisting language="java"><textobject><textdata fileref="automatic_snippets/DataSpacesExample_code_constants.snip"/></textobject></programlisting>
+                and thereby reflect the GCM&#150;A input spaces definition. Partial results (here: number of lines in each document) are stored in text files in the AO's scratches, that URIs appear as a <literal>computePartials</literal> method's return value. Collection of those URI's is later passed to <literal>gatherPartials</literal> method called on one of instantiated Active Objects.
+            </para>
+            <example xml:id="ds_example_scenario">
+                <info><title>HelloExample.java: computation scenario used in the example</title></info>
+                <programlisting language="java"><textobject><textdata fileref="automatic_snippets/DataSpacesExample_code_scenario.snip"/></textobject></programlisting>
+            </example>
+            <para>
+            Finally, let's have a look at routines that are performed by Active Objects instantiated from the <literal>ExampleProcessing</literal> class (<xref linkend="ds_example_processing" /> &#151; refer to comments for the routines' explanation. There are two main processing methods <literal>computePartials</literal> and <literal>gatherPartials</literal> shown, along with the <literal>writeIntoScratchFile</literal> helper method.
+            </para>
+            <example xml:id="ds_example_processing">
+                <info><title>ExampleProcessing.java: routines perfomed by Active Objects</title></info>
+                <programlisting language="java"><textobject><textdata fileref="automatic_snippets/DataSpacesExample_processing.snip"/></textobject></programlisting>
+            </example>
+        </section>
+        <section xml:id="ds_example_output">
+            <info><title>Example's output</title></info>
+            <para>
+            In this section a output of above mentioned example is presented, both: a simplified logger output and the output file's content.
+            </para>
+            <screen>
+# simplified logger's output (info messages from the example of each thread):
+<textobject><textdata fileref="dataspaces/out_log"/></textobject>
+# final results of the processing (order of lines may differ after each run):
+$ cat tmp/output/final_results.txt
+wiki_proactive: 514
+wiki_grid_computing: 732
+            </screen>
+        </section>
+    </section>
 </section>
 </chapter>
