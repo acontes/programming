@@ -99,11 +99,11 @@
                         Data Spaces needs so called Naming Service to function properly, which acts as a directory of data spaces. This tag is responsible for Naming Service related settings.
                     </para>
                     <para>
-                        For typical configuration it is appropriate to omit this tag, which stands for starting own Naming Service for deployed <literal>GCMApplication</literal> and closing it with end of that application life time.  
+                        For typical configuration it is appropriate to omit this tag, which stands for starting own Naming Service for deployed <literal>GCMApplication</literal> and closing it with the end of that application life time.  
                     </para>
                     <para>
                         In some configurations you may want to use already started Naming Service. In that case you may specify its URL within <literal>url</literal> attribute, in the following way:
-                        <programlisting language="xml">&lt;namingService url="rmi://branch.inria.fr:1099/5933540059531990841/namingService"&gt;</programlisting>
+                        <programlisting language="xml">&lt;namingService url="rmi://branch.inria.fr:1099/5933540059531990841/namingService" /&gt;</programlisting>
                     </para>
                 </listitem>
                 <listitem>
@@ -114,18 +114,18 @@
                         These group of tags specify input and output data spaces for the application. Spaces has to be defined in a specific order: default input space <emphasis><literal>&lt;inputDefault&gt;</literal></emphasis>, named input spaces <emphasis><literal>&lt;input&gt;</literal></emphasis>, default output space <emphasis><literal>&lt;outputDefault&gt;</literal></emphasis> and named output spaces <emphasis><literal>&lt;output&gt;</literal></emphasis>. Each of them is optional.
                     </para>
                     <para>
-                        Every input or output data space is defined in almost the same way. Such definition consists of the following tags/attributes:
+                        Every input or output data space is defined in almost the same way. Such a definition consists of the following tags/attributes:
                         <itemizedlist>
                             <listitem>
                                 <para><literal>&lt;remoteAccess&gt;</literal> tag with <literal>url</literal> attribute.</para>
                                 <para>
-                                    This mandatory part of space definition sets URL that will be used for accessing that data space. URL may point to a file or directory (for output space file may not exist).
+                                    This mandatory part of space definition sets URL that will be used for accessing that data space. URL may point to a file or directory. For output space file may not exist yet.
                                 </para>
                             </listitem>
                             <listitem>
                                 <para><literal>&lt;location&gt;</literal> tag with <literal>hostname</literal> and <literal>path</literal> attributes (optional).</para>
                                 <para>
-                                    If this tag is present in space definition, data will be accessed locally on host specified in <literal>hostname</literal>, under local path specified in <literal>path</literal>. This path should represent the same data as <literal>remoteAccess</literal> tag does.    
+                                    If this tag is present in space definition, data will be accessed locally on a host specified in <literal>hostname</literal>, under local path specified in <literal>path</literal>. This path should represent the same data as <literal>remoteAccess</literal> tag does.    
                                 </para>   
                             </listitem>
                             <listitem>
@@ -147,7 +147,7 @@
         <section xml:id="ds_gcmd">
             <info><title>GCM Deployment Descriptor</title></info>
             <para>
-            In GCM Deployment Descriptor grid administrator defines configuration of scratch data space for each host configuration. It is done by putting settings inside host definition, like in the following example:
+            In GCM Deployment Descriptor grid administrator defines configuration of a scratch data space for each host configuration. It is done by putting settings inside host definition, like in the following example:
             <example xml:id="ds_gcmd_example">
                 <info>
                     <title>GCMD descriptor fragment - Data Spaces configuration</title>
@@ -162,10 +162,10 @@
                 <listitem>
                     <para><literal>&lt;remoteAccess&gt;</literal> tag with <literal>url</literal> attribute.</para>
                     <para>
-                        This part of scrach space definition is similar to input and output spaces configuration - it sets URL that will be used for accessing that data space. URL should point to directory or non-existing file. Note, that special metavariable <literal>#{hostname}</literal> may be used in URL template, as the same generic host configuration may be applied to more than one real hosts. <literal>#{hostname}</literal> is replaced with actual Node's hostname during deployment.  
+                        This part of scratch space definition is similar to input and output spaces configuration - it sets URL that will be used for accessing that data space. Any existing file that URL points to will be deleted and replaced with a base scratch space directory. Note that special metavariable <literal>#{hostname}</literal> may be used in URL template, as the same generic host configuration may be applied to more than one real hosts. <literal>#{hostname}</literal> is replaced with actual Node's hostname during deployment.
                     </para>
                     <para>
-                        Absence of <literal>&lt;remoteAccess&gt;</literal> tag have a special meaning in context of scratch configuration. If tag is not present,  ProActive provider server will be automatically started for a Node lifetime, exposing this part of a file system remotely through ProActive protocol, so you do not need to configure and run external protocol server.  
+                        Absence of <literal>&lt;remoteAccess&gt;</literal> tag have a special meaning in context of scratch configuration. If the tag is not present, ProActive provider server will be automatically started for a Node lifetime, exposing this part of a file system remotely through ProActive protocol, so you do not need to configure and run external protocol server.  
                     </para>
                 </listitem>
                 <listitem>
@@ -174,7 +174,7 @@
                         Path definition part specifies location of scratch space on host's local file system tree. Path specified in <literal>relpath</literal> is relative to <literal>base</literal>, which may be one of following values: <literal>proactive</literal>, <literal>home</literal> or <literal>root</literal> (refer to <xref linkend="GCMDeployment"/> for details).
                     </para>
                     <para>
-                        When <literal>&lt;remoteAccess&gt;</literal> is present, local path specification is just used for optimizing local data access. If <literal>&lt;remoteAccess&gt;</literal> is not present, this path is also used as a root of file system exposed through ProActive provider server.  In any configuration, if both local path and access URL are provided, they should point to the same data.
+                        When <literal>&lt;remoteAccess&gt;</literal> tag is present, local path specification is just used for optimizing local data access. If <literal>&lt;remoteAccess&gt;</literal> is not present, this path is also used as a root of file system exposed through ProActive provider server.  In any configuration, if both local path and access URL are provided, they should point to the same data.
                     </para>
                 </listitem>
             </itemizedlist>
@@ -184,16 +184,19 @@
 
     <section xml:id="ds_configuration_command_line_tools">
         <info><title>Command-line tools</title></info>
+        <para>
+            Data Spaces provide some command-line tools that you may find useful in some configurations. Note that they are NOT REQUIRED to be used in basic configurations.
+        </para>
         <section xml:id="ds_configuration_script_naming_service">
             <info><title><literal>namingService</literal> script</title></info>
             <para>
                 This shell script allows you to perform <emphasis>operations on Naming Service</emphasis>. In particular, it allows starting standalone Naming Service, which can be shared among several applications. To start Naming Service, use script with <literal>start</literal> command:
                 <screen>linux &gt; ./namingService.sh start
 Naming Service successfully started on: rmi://branch.inria.fr:1099/defaultNamingService</screen>
-                As you can see, you get information with URL of started Naming Service, that you can later use in GCM Application descriptor or for manual configuration, instead of starting separate Naming Service for each application. See <xref linkend="ds_gcma"/> and <xref linkend="ds_configuration_manual"/> for details.
+                As you can see, you get information with URL of started Naming Service, that you can later use in GCM Application descriptor or for manual configuration, instead of starting separate Naming Service for each application. See <xref linkend="ds_gcma"/> and <xref linkend="ds_configuration_manual"/> for configuration details.
             </para>
             <para>
-                You can also start Naming Service within your Java code using <code>NamingServiceDeployer</code> class.  
+                You can also start Naming Service within your Java code using <code>NamingServiceDeployer</code> class.
             </para>
             <para>
                 <literal>namingService</literal> script can also be used for monitoring or low-level operations, through <literal>ls</literal> and <literal>add</literal> commands.
@@ -208,18 +211,18 @@ Naming Service successfully started on: rmi://branch.inria.fr:1099/defaultNaming
 PAProvider successfully started.
 VFS URL of this provider: paprmi://branch.inria.fr:1099/defaultFileSystemServer?proactive_vfs_provider_path=/
 </screen>
-                Displayed URL of started server can be used as remote access URL of data spaces in GCM Application descriptor, <literal>PADataSpaces</literal> API or manual configuration, to easily set up remote access for some data. See <xref linkend="ds_gcma"/> and <xref linkend="ds_configuration_manual"/> for details.
+                Displayed URL of started server can be used as a remote access URL of data spaces in GCM Application descriptor, <literal>PADataSpaces</literal> API or for manual configuration, to easily set up remote access for some data. See <xref linkend="ds_gcma"/> and <xref linkend="ds_configuration_manual"/> for configuration details and <xref linkend="ds_snippet2"/> or javadoc for API details.
             </para>
             <para>
-                You can also start ProActive provider server within your Java code using <code>FileSystemServerDeployer</code> class.  
+                You can also start ProActive provider server within your Java code using <code>FileSystemServerDeployer</code> class.
             </para>
             <para>
-                ProActive provider server uses two ProActive properties (see <xref linkend="ProActiveproperties_69" /> for details), to adjust <emphasis>streams autoclosing</emphasis> feature. This mechanism is meant to close streams that were not being used for a long time, and automatically reopen them if necessary - which can be used to save resources or avoid orphaned resources. Following properties can be set:
+                ProActive provider server uses two ProActive properties (see <xref linkend="ProActiveproperties_69" /> for details), to adjust <emphasis>streams autoclosing</emphasis> feature. This mechanism is meant to close streams those were not being used for a long time, and automatically reopen them if necessary. It can be used to save resources or avoid orphaned resources. Following properties can be set:
                 <itemizedlist>
                     <listitem>
                         <para><literal>proactive.vfsprovider.server.stream_autoclose_checking_millis</literal> - indicating how often an auto closing mechanism is started to collect and close all unused streams open (default: 30 000).</para>
                     </listitem>
-                    <listitem>                                 
+                    <listitem>
                         <para><literal>proactive.vfsprovider.server.stream_open_maximum_period_millis</literal> - indicating a period after that a stream is perceived as unused and therefore can be closed by auto closing mechanism. (default: 60 000).</para>
                     </listitem>
                 </itemizedlist>
@@ -230,22 +233,22 @@ VFS URL of this provider: paprmi://branch.inria.fr:1099/defaultFileSystemServer?
     <section xml:id="ds_configuration_manual">
         <info><title>Manual configuration</title></info>
         <para>
-            In some environments it may be useful to access Data Spaces configuration API manually. Note that <emphasis>most of the users do not need to know anything about this API</emphasis>, but it is exposed to give more flexibility for potential usages. When you need to configure Data Spaces manually, you need to be aware of a few assumptions that Data Spaces bases on, which are normally fulfilled by GCM deployment implementation. 
+            In some environments it may be useful to access Data Spaces configuration API manually. Note that most of the users do NOT NEED to know anything about this API, but it is exposed to give more flexibility for potential usages. When you need to configure Data Spaces manually, you need to be aware of a few assumptions that Data Spaces bases on, which are normally fulfilled by GCM deployment implementation.
         </para>
         <para>
-            First of all, Data Spaces uses the concept of <emphasis>application</emphasis> operating on data spaces. Every application is uniquelly identified by <emphasis>application id</emphasis>. Set of input, output and scartch data spaces is always associated with some concrete application and typically application accesses only its own data spaces.    
+            First of all, Data Spaces uses the concept of <emphasis>application</emphasis> operating on data spaces. Every application is uniquely identified by <emphasis>application id</emphasis>. Set of input, output and scratch data spaces is always associated with some concrete application and typically application accesses only its own data spaces.
         </para>
         <para>
-            Secondly, Data Spaces assumes that each Node is used at most by one application at any given time, i.e. <emphasis>Node sharing is not allowed</emphasis> between applications using Data Spaces.    
+            Secondly, Data Spaces assumes that each Node is used at most by one application at any given time, i.e. <emphasis>Node sharing is not allowed</emphasis> between applications using Data Spaces.
         </para>
         <para>
-            Configuration of Data Spaces can be divided into two units - <emphasis>Naming Service-level</emphasis> which is common to the whole application and set up once, and <emphasis>Node-level</emphasis> configuration which is invidiually applied for each Node using Data Spaces. Next two sections discuss these two configuration units in more details, while you can find complete manual configuration example in <literal>ManulConfigurationExample</literal> class from <literal>org.objectweb.proactive.examples.dataspaces.manualconfig</literal> package.      
+            Configuration of Data Spaces can be divided into two units - <emphasis>Naming Service-level</emphasis> which is common to the whole application and set up once, and <emphasis>Node-level</emphasis> configuration which is individually applied for each Node. Next two sections discuss these two configuration units in more details, while you can find complete manual configuration example in <literal>ManulConfigurationExample</literal> class from <literal>org.objectweb.proactive.examples.dataspaces.manualconfig</literal> package.
         </para>
-        
+
         <section xml:id="ds_configuration_manual_naming_service">
             <info><title>Naming Service-level configuration</title></info>
             <para>
-                Data Spaces needs a running service called Naming Service, which acts as a directory of data spaces. One Naming Service may be used to serve more than one application. Each applicaiton needs to be explicitly registered and unregistered there. Therefore, unique application identifier is required.  
+                Data Spaces needs a running service called Naming Service, which acts as a directory of data spaces. One Naming Service may be used to serve more than one application. Each application needs to be explicitly registered and unregistered there. Therefore, unique application identifier is required.
             </para>
             <para>
                 Naming Service can be <emphasis>started</emphasis> from Java code using <literal>NamingServiceDeployer</literal> class or using <xref linkend="ds_configuration_command_line_tools"/>:
@@ -253,11 +256,11 @@ VFS URL of this provider: paprmi://branch.inria.fr:1099/defaultFileSystemServer?
             </para>
             <para>
                 Once Naming Service is started and can be accessed, application that will use Data Spaces needs to <emphasis>register</emphasis> there with optional set of initial input and output spaces:
-                <programlisting language="java"><textobject><textdata fileref="automatic_snippets/DataSpacesManualConfig_RegisteringApp.snip"/></textobject></programlisting> 
+                <programlisting language="java"><textobject><textdata fileref="automatic_snippets/DataSpacesManualConfig_RegisteringApp.snip"/></textobject></programlisting>
             </para>
             <para>
                 When application terminates, it should be deconfigured by  <emphasis>unregistering</emphasis> itself from Naming Service:
-                <programlisting language="java"><textobject><textdata fileref="automatic_snippets/DataSpacesManualConfig_UnregisteringApp.snip"/></textobject></programlisting>   
+                <programlisting language="java"><textobject><textdata fileref="automatic_snippets/DataSpacesManualConfig_UnregisteringApp.snip"/></textobject></programlisting>
             </para>
             <para>
                 If Naming Service was started through <literal>NamingServiceDeployer</literal> and is not used anymore, it can be  <emphasis>stopped</emphasis>:
@@ -268,30 +271,30 @@ VFS URL of this provider: paprmi://branch.inria.fr:1099/defaultFileSystemServer?
         <section xml:id="ds_configuration_manual_node">
             <info><title>Node-level configuration</title></info>
             <para>
-                Configuration of Node is performed through <literal>DataSpacesNodes</literal> class and consists of two steps. Every Node-level configuration needs to be performed locally on a Node, it cannot be done remotely without any agent Active Object or other mechanism.
+                Configuration of Node is performed through <literal>DataSpacesNodes</literal> class and consists of two steps. Every Node-level configuration needs to be performed locally on a Node that is being configured, it cannot be done remotely without any agent Active Object or other mechanism.
             </para>
             <para>
-                The first step is to <emphasis>initialize Node for Data Spaces</emphasis> in general, optionally providing base of scratch space configuration that will be later used by applications on this node. This step is application agnostic, and it is performed only once for a node.
+                The first step is to <emphasis>initialize Node for Data Spaces</emphasis> in general, optionally providing base of scratch space configuration that will be later used by applications on this Node. This step is application agnostic, and it is usually performed only once for a Node.
                 <programlisting language="java"><textobject><textdata fileref="automatic_snippets/DataSpacesManualConfig_ConfigureNode.snip"/></textobject></programlisting>
             </para>
             <para>
-                The second step is to <emphasis>configure Node for a particular application</emphasis>, specyfing unique application id and Naming Service URL.
-                <programlisting language="java"><textobject><textdata fileref="automatic_snippets/DataSpacesManualConfig_ConfigureNodeForApp.snip"/></textobject></programlisting> 
+                The second step is to <emphasis>configure Node for a particular application</emphasis>, specifying unique application id and Naming Service URL.
+                <programlisting language="java"><textobject><textdata fileref="automatic_snippets/DataSpacesManualConfig_ConfigureNodeForApp.snip"/></textobject></programlisting>
             </para>
             <para>
                 When Node is configured for Data Spaces this way, Active Objects bodies (or non-Active Objects half bodies) can safely use <literal>PADataSpaces</literal> API.
             </para>
             <para>
-                Once Node has been configured for some application, it can be explicitly <emphasis>deconfigured</emphasis> for that application - when application is not using this Node anymore:
-                <programlisting language="java">DataSpacesNode.tryCloseNodeApplicationConfig(node);</programlisting>
+                Once Node has been configured for some application, it can be explicitly <emphasis>deconfigured for that application</emphasis> - when application is not using this Node anymore:
+                <programlisting language="java">DataSpacesNodes.tryCloseNodeApplicationConfig(node);</programlisting>
             </para>
             <para>
-                ...or it can be <emphasis>reconfigured</emphasis> for another application - when another application is starting to use it:
-                <programlisting language="java">DataSpacesNode.configureApplication(node, anotherApplicationId, namingServiceURL);</programlisting>
+                ...or it can be <emphasis>reconfigured for another application</emphasis> - when another application is starting to use it in place of previous one:
+                <programlisting language="java">DataSpacesNodes.configureApplication(node, anotherApplicationId, namingServiceURL);</programlisting>
             </para>
             <para>
                 If Node will not be used anymore for any application (e.g. it is going to be destroyed), its Data Spaces configuration can be completely <emphasis>closed</emphasis>:
-                <programlisting language="java"><textobject><textdata fileref="automatic_snippets/DataSpacesManualConfig_CloseNodeConfig.snip"/></textobject></programlisting> 
+                <programlisting language="java"><textobject><textdata fileref="automatic_snippets/DataSpacesManualConfig_CloseNodeConfig.snip"/></textobject></programlisting>
             </para>
         </section>
     </section>

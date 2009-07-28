@@ -9,11 +9,11 @@
         <inputDefault>
             <remoteAccess url="sftp://storage.company.com/var/input_data/" />
         </inputDefault>
-    
+
         <outputDefault>
             <remoteAccess url="sftp://bob@output_host.company.com/tmp/output/" />
             <location hostname="output_host.company.com" path="/tmp/output/" />
-        </outputDefault>   
+        </outputDefault>
         <output id="stats">
             <remoteAccess url=ftp://julia:password@another_host.company.com/home/julia/stats/" />
         </output>

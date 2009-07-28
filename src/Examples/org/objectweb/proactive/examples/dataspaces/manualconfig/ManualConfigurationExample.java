@@ -35,7 +35,8 @@ public class ManualConfigurationExample {
         final long applicationId = 1234431;
         // access (possibly remote) Naming Service
         final NamingService namingService = NamingService.createNamingServiceStub(namingServiceURL);
-        // register application, here: without predefined inputs and outputs 
+        // register application, here: without predefined inputs and outputs;
+        // otherwise, provide set of SpaceInstanceInfo instances in place of null
         namingService.registerApplication(applicationId, null);
         // @snippet-end DataSpacesManualConfig_RegisteringApp
 
@@ -43,7 +44,8 @@ public class ManualConfigurationExample {
         final Node node = NodeFactory.getHalfBodiesNode();
 
         // @snippet-start DataSpacesManualConfig_ConfigureNode
-        // configure node, here: node is configured without scratch
+        // configure node, here: node is configured without scratch;
+        // otherwise, provide BaseScratchSpaceConfiguration instance in place of null
         DataSpacesNodes.configureNode(node, null);
         // @snippet-end DataSpacesManualConfig_ConfigureNode
 
