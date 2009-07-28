@@ -14,16 +14,13 @@
     Data Spaces mechanism conceptually pose the virtual file system layer (further called VFS)  between the user code, that accesses file system trough provided API (like Java IO, POSIX, etc.), and physical (local or remote) location of files. Therefore, a programmer does not need to be aware of real file location, and can use VFS abstraction instead. The Data Spaces mechanism brings such a point of view to the ProActive programmer with a dedicated API from the <literal>org.objectweb.proactive.extensions.dataspaces.api</literal> package.
     </para>
     <para>
-    In case of ProActive, Data Spaces layers file systems with variety of access protocols like HTTP, SFTP or local access into one virtual file system with uniform access among all Active Objects. This is achieved by ensuring that every Active Object has the same view of VFS tree &#151; an URI used for accessing data in one Active Object is correct just after passing it to the others. Therefore sharing data becomes comfortable, as standard ProActive communication mechanism can be used for announcing actual URIs.
+    In case of ProActive, Data Spaces API layers the file systems, that can be accessed through variety of access protocols, creating one virtual file system with uniform access among all Active Objects. This is achieved by ensuring that every Active Object has the same view of VFS tree &#151; an URI used for accessing data in one Active Object is correct just after passing it to the others. Therefore sharing data becomes comfortable, as standard ProActive communication mechanism can be used for announcing actual URIs.
     </para>
     <para>
-    As already mentioned ProActive Data Spaces can be run against variety of access protocols that are provided within the infrastructure (see the list of supported protocols) as well as ProActive&#150;compliant protocols thanks to <literal>PAProviderServer</literal> that can be used wherever no supported protocol is available and successful ProActive deployment can take place. Hence, Data Spaces API can be used on almost every infrastructure.
+    As already mentioned, the Data Spaces API can be run against variety of data transfer protocols that are provided by the infrastructure, or even against a standard ProActive&#150;compliant communication protocols. This is achieved through <literal>PAProviderServer</literal> that is to be used wherever no supported data transfer protocol is available, but still the ProActive deployment can take place successfully. Hence, Data Spaces API can be used on almost every infrastructure.
     </para>
     <para>
     The programmer can use ProActive's Data Spaces API to read application's input data, write and share temporary results and finally gather outputs in uniform manner among all these operations. Hence there are three types of data space abstraction: input, output and scratch. Data Spaces API provides way to access existing data spaces and files within these data spaces, it also gives the ability to define new data spaces. All operations performed through this API concern data spaces owned by one application.
-    </para>
-    <para>
-    The Data Spaces configuration, if specified, is read from the GCM&#150;D Descriptor for Node&#150;specific information as well as from the GCM&#150;A Descriptor for settings concerning a particular application. Data Spaces can be configured manually in the run time as well.
     </para>
     <para>
         <figure xml:id="ds_tree">
@@ -33,13 +30,13 @@
     </para>
 
     <para>
-        Every file in Data Spaces API is identified by an unique URI that can be used in the whole application, that is shared between Active Objects even if they reside on different nodes. Files are organized in data stores called data spaces, grouped by their purpose and access. To access a file one can use designated data space to resolve file's name or directly by resolving URI received from another Active Object.
+        Every file in Data Spaces API is identified by an unique URI. It can be shared between Active Objects even if they reside on different nodes. Files are organized in data stores called data spaces, grouped by their purpose and access. To access a file one can use designated data space to resolve file's name or directly resolve URI received from another Active Object.
     </para>
     <para>
-        There are distinguished three different space types: input space with files used as the application's input data, output space for storing the application's result files and scratch space for temporary files with the intermediate results of the computations. Spaces types differ also in the access rights, and therefore input is only meant for read operations, output for read and write as well, whereas scratch access mode depends on the caller. If a calling thread is an owner of a particular scratch, then it can perform both read and write operations. On the other hand, if a calling thread is not an owner (eg. received URI from another Active Object), its access is limited to read only operations.
+        There are distinguished three different space types: input space with files used as the application's input data, output space for storing the application's result files and scratch space for temporary files with the intermediate results of the computations. Spaces types differ in the access rights, and therefore input is only meant for read operations, output for read and write as well, whereas scratch's access mode depends on the caller. If a calling thread is an owner of a particular scratch, then it can perform both read and write operations. On the other hand, if a calling thread is not an owner (eg. has received URI from another Active Object), its access is limited to read only operations.
     </para>
     <para>
-    Input and output spaces are mostly defined by the application, hence their configuration is stored in the application&#150;specific GCM&#150;A Descriptor or in the application code itself. An application can have several inputs and outputs defined, as each input and output space has its unique (within a single application) name. There can be defined a default (hence single) input or output spaces, so using names is not always needed. For more information please refer to attached JavaDoc.
+    Input and output spaces are mostly defined by the application, hence their configuration is stored in the application&#150;specific GCM&#150;A Descriptor or in the application code itself. An application can have several inputs and outputs defined, as each input and output space has its unique (within a single application) name. There can be defined a default (single) input or output spaces, so using names is not always needed. For more information please refer to attached JavaDoc.
     </para>
     <para>
     Scratch data space is most likely defined by the system administrator in the GCM&#150;D Descriptor in case of the GCM deployment, or manually. Scratch data space is bounded to Node, and particular scratches within a single scratch data space are bounded to Active Objects that reside on this Node. Hence, there is only one scratch that Active Object owns.
@@ -311,10 +308,10 @@ VFS URL of this provider: paprmi://branch.inria.fr:1099/defaultFileSystemServer?
         <section xml:id="ds_codesnippet1">
             <info><title>Reading from default input, writing to named output</title></info>
             <para>
-            The first code snippets shows how to read input of an application and to write the final results (here: some statistics). For reading input data, a default input space is used, as there is only one input store used for this example. Statistics are stored in the named output data space according to <literal>STATS_DATA_SPACE</literal> constant, that can be a hard coded identifier, an application parameter, etc.
+            The first code snippet shows how to read input of an application and to write the final results (here: some statistics). For reading input data, a default input space is used, as there is only one input store used for this example. Statistics are stored in the named output data space according to <literal>STATS_DATA_SPACE</literal> constant, that could be a hard coded identifier or even an application parameter.
             </para>
             <para>
-            Methods from the Data Spaces API used in this snipped are: <literal>PADataSpaces.resolveDefaultInput</literal> and <literal>PADataSpaces.resolveOutput</literal> that resolve default input and named output respectively, returning instance of <literal>DataSpacesFileObject</literal> class. This class is a part of Data Spaces API and represents a file (ordinal file or directory) from any data space and allows to read and write file's content through standard Java APIs streams along with another file system operations. For convenience, a file name can be specified in the parameters list of above mentioned revolve methods.
+            Methods from the Data Spaces API used in this snippet are: <literal>PADataSpaces.resolveDefaultInput</literal> and <literal>PADataSpaces.resolveOutput</literal> that resolve default input and named output respectively, returning instance of <literal>DataSpacesFileObject</literal> class. This class is a part of Data Spaces API and represents a file (ordinal file or directory) from any data space and allows to read or write file's content through standard Java APIs streams along with another file system operations. For a convenience, a file name can be specified in the parameters list of above mentioned methods.
         </para>
             <example xml:id="ds_snippet1">
                 <info><title>Reading from default input and writing to named output</title></info>
@@ -334,7 +331,7 @@ VFS URL of this provider: paprmi://branch.inria.fr:1099/defaultFileSystemServer?
         <section xml:id="ds_cotesnippet3">
             <info><title>Sharing scratch URI between two Active Objects</title></info>
             <para>
-            This snippet presents how two Active Objects can share data stored in ones scratch. The scenario is as follows. One Active Object resolves a file from its scratch with <literal>PADataSpaces.resolveScratchForAO</literal> Data Spaces APIs method. Once the file is resolved (represented by an instance of <literal>DataSpacesFileObject</literal> class), an intermediate results can be written into its content. As each file within data spaces is identified by its URI, such a URI can be obtained with <literal>getURI</literal> method of <literal>DataSpacesFileObject</literal> class and passed to another Active Object as a parameter of exemplary <literal>readMyFile</literal> method. This method (in a different Active Object!) can finally resolve URI through <literal>PADataSpaces.resolveFile</literal> method call and further process the file content.
+            This snippet presents how two Active Objects can share data stored in ones scratch. The scenario is as follows. One Active Object resolves a file from its scratch with <literal>PADataSpaces.resolveScratchForAO</literal> Data Spaces APIs method. Once the file is resolved (represented by an instance of <literal>DataSpacesFileObject</literal> class), the intermediate results can be written into its content. As each file within data spaces is identified by its URI, such a URI can be obtained with <literal>getURI</literal> method of <literal>DataSpacesFileObject</literal> class and passed to another Active Object as a parameter of exemplary <literal>readMyFile</literal> method. This method (in a different Active Object or even node!) can finally resolve URI through <literal>PADataSpaces.resolveFile</literal> method call and further process the file's content.
             </para>
             <example xml:id="ds_snippet3">
                 <info><title>Writing into ones scratch, that is later read by another AO</title></info>
@@ -348,12 +345,12 @@ VFS URL of this provider: paprmi://branch.inria.fr:1099/defaultFileSystemServer?
         In this section a complete example of processing data with ProActive and Data Spaces API is presented. Source code can be found in <literal>org.objectweb.proactive.examples.dataspaces.hello</literal> package, whereas xml descriptors in the <literal>examples/dataspaces/hello/</literal> sub directory of your ProActive installation.
         </para>
         <para>
-        The goal of the processing is simple: count the number of lines in a text documents and store the results in a single text file. The computations are performed as follows. Every input document is mapped onto one Active Object so that inputs can be read and processed (lines counted) in parallel. Number of lines in each document (so called intermediate results) are stored in scratches, so one can read them and gather into one file placed in the output data space. All these operations can be simply done using the Data Spaces API.
+        The goal of the processing is simple: count the number of lines in a text documents and store the results in a single text file. The computations are performed as follows. Every input document is mapped onto one Active Object so that inputs can be read and processed (lines counted) in parallel. Number of lines in each document (so called intermediate results) are stored in AO's scratches, so one can finally read them and gather into one file placed in the output data space. All these operations are simply done using the Data Spaces API.
         </para>
         <section xml:id="ds_section_example_gcmd">
             <info><title>GCM Deployment Descriptor</title></info>
             <para>
-            The GCM&#150;D is very simple, as the example is to be run on every infrastructure. In this case, a <emphasis><literal>&lt;scratch&gt;</literal></emphasis> tag is used to enable data spaces on nodes described by the <literal>id="host"</literal> host id. A <emphasis><literal>path</literal></emphasis> element defines a location of a scratch data space, as a sub directory of the system's Temp directory. As there is no <emphasis><literal>&lt;remoteAccess&gt;</literal></emphasis> element, the scratch data space is to be exposed through PAProviderServer that is started automatically.
+            The GCM&#150;D is very simple, as the example is to be run on every infrastructure. In this case, a <emphasis><literal>&lt;scratch&gt;</literal></emphasis> tag is used to enable data spaces on nodes described by the <literal>id="host"</literal> host id. A <emphasis><literal>path</literal></emphasis> element defines a location of a scratch data space, as a sub directory of the system's temporary directory. As there is no <emphasis><literal>&lt;remoteAccess&gt;</literal></emphasis> element, the scratch data space is to be exposed through PAProviderServer that is started automatically.
             </para>
             <example xml:id="ds_example_gcmd">
                 <info><title>Part of the GCM&#150;D Descriptor: helloDeploymentRemote.xml</title></info>
@@ -384,7 +381,7 @@ VFS URL of this provider: paprmi://branch.inria.fr:1099/defaultFileSystemServer?
         <section xml:id="ds_section_example_code">
             <info><title>The Java code</title></info>
             <para>
-            The <literal>HelloExample.java</literal> file contains code responsible for deployment and computation scenario in general. At the beginning, the variable contract is fulfilled, passing the the deploy er host name into descriptor. Therefore the output data space is now fully defined &#151; placed on the deployer's host.
+            The <literal>HelloExample.java</literal> file contains code responsible for deployment and computation scenario in general. At the beginning, the variable contract is fulfilled, passing the deployer's host name into descriptor. Therefore the output data space is now fully defined &#151; placed on the deployer's host.
             </para>
             <example xml:id="ds_example_variables">
                 <info><title>HelloExample.java: setting up variable from the contract </title></info>
@@ -417,7 +414,7 @@ VFS URL of this provider: paprmi://branch.inria.fr:1099/defaultFileSystemServer?
         <section xml:id="ds_example_output">
             <info><title>Example's output</title></info>
             <para>
-            In this section a output of above mentioned example is presented, both: a simplified logger output and the output file's content.
+            In this section an output of above mentioned example is presented, both: a simplified logger output and the output file's content.
             </para>
             <screen>
 # simplified logger's output (info messages from the example of each thread):
