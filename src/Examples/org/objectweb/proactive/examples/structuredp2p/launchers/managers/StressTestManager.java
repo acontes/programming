@@ -54,7 +54,7 @@ public class StressTestManager extends Manager {
         if (this.operationsAllowed.contains(selectedAction.getName())) {
             selectedAction.execute();
         } else {
-            this.performARandomBasicOperation();
+            // this.performARandomBasicOperation();
         }
     }
 

@@ -37,8 +37,8 @@ NUMBER_OF_PEERS_TO_CREATE=10
 MODE=
 MODE_ARGS=
 DESCRIPTOR_APP="$workingDir/GCMA.xml"
-DESCRIPTOR_PEERS="$workingDir/../GCMD_Local.xml"
-DESCRIPTOR_TRACKERS="$workingDir/../GCMD_Local.xml"
+DESCRIPTOR_PEERS="../GCMD_Local.xml"
+DESCRIPTOR_TRACKERS="../GCMD_Local.xml"
 
 while getopts “n:is:d:” OPTION
 do
@@ -60,8 +60,8 @@ do
 		d)
 			if [[ "$OPTARG" == "eons" ]]
 			then
-				DESCRIPTOR_PEERS="$workingDir/GCMD-Peers.xml"
-				DESCRIPTOR_TRACKERS="$workingDir/GCMD-Trackers.xml"
+				DESCRIPTOR_PEERS="GCMD-Peers.xml"
+				DESCRIPTOR_TRACKERS="GCMD-Trackers.xml"
 			fi
             ;;
 		?)
