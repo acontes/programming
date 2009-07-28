@@ -1,9 +1,10 @@
-package org.objectweb.proactive.extensions.structuredp2p.core.overlay.can;
+package org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates;
 
 import java.util.ArrayList;
 import java.util.Random;
 
-import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates.Coordinate;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.Zone;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.ZoneException;
 
 
 /**
