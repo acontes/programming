@@ -6,10 +6,10 @@ import java.util.Random;
 import java.util.Scanner;
 
 import org.objectweb.proactive.examples.structuredp2p.launchers.PeerLauncher;
-import org.objectweb.proactive.examples.structuredp2p.launchers.actions.Action;
-import org.objectweb.proactive.examples.structuredp2p.launchers.actions.JoinAction;
-import org.objectweb.proactive.examples.structuredp2p.launchers.actions.LeaveAction;
-import org.objectweb.proactive.examples.structuredp2p.launchers.actions.SearchAction;
+import org.objectweb.proactive.examples.structuredp2p.launchers.commands.Command;
+import org.objectweb.proactive.examples.structuredp2p.launchers.commands.JoinCommand;
+import org.objectweb.proactive.examples.structuredp2p.launchers.commands.LeaveCommand;
+import org.objectweb.proactive.examples.structuredp2p.launchers.commands.SearchCommand;
 
 
 /**
@@ -25,15 +25,15 @@ public class StressTestManager extends Manager {
         super(peerLauncher);
 
         if (performJoin) {
-            this.operationsAllowed.add(new JoinAction(this).getName());
+            this.operationsAllowed.add(new JoinCommand(this).getName());
         }
 
         if (performLeave) {
-            this.operationsAllowed.add(new LeaveAction(this).getName());
+            this.operationsAllowed.add(new LeaveCommand(this).getName());
         }
 
         if (performSearch) {
-            this.operationsAllowed.add(new SearchAction(this).getName());
+            this.operationsAllowed.add(new SearchCommand(this).getName());
         }
     }
 
@@ -48,8 +48,8 @@ public class StressTestManager extends Manager {
     public void performARandomBasicOperation() {
         Random rand = new Random();
 
-        Action[] basicActions = super.getActions().values().toArray(new Action[] { null });
-        Action selectedAction = basicActions[rand.nextInt(3)];
+        Command[] basicActions = super.getActions().values().toArray(new Command[] { null });
+        Command selectedAction = basicActions[rand.nextInt(3)];
 
         if (this.operationsAllowed.contains(selectedAction.getName())) {
             selectedAction.execute();

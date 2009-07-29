@@ -20,9 +20,9 @@ This script run a structured peer-to-peer network on a machine or a grid in the 
 OPTIONS:
     -n     The number of peers to put on the network when it is created. Default is set to 10
     -i     Interactive mode 
-    -s     Stress Test mode. It can take an argument which is the type of 
+    -s     Stress Test mode. It takes an argument which is the type of 
            operations to perform : 'j' for the join operation, 'l' for the leave
-           operation, 's' for a lookup operation. Default is set to 'jls'. 
+           operation, 's' for a lookup operation. 
     -d     Indicates which GCMD to use for the ProActive application deployment: 
            'localhost' or 'eons'. Default is set to 'localhost'.	
    

@@ -111,7 +111,7 @@ public class Tracker implements Serializable {
     }
 
     /**
-     * Create a new Tracker ActiveObject.
+     * Creates a new Tracker ActiveObject.
      * 
      * @param type
      *            the type of the tracker, which is one of {@link OverlayType}.
@@ -125,7 +125,7 @@ public class Tracker implements Serializable {
     }
 
     /**
-     * Create a new Tracker ActiveObject.
+     * Creates a new Tracker ActiveObject.
      * 
      * @param type
      *            the type of the tracker, which is one of {@link OverlayType}.

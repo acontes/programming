@@ -13,11 +13,19 @@ import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOver
  * @author Pellegrino Laurent
  * @author Trovato Alexandre
  * 
- * @version 0.1
+ * @version 0.3, 07/29/2009
  */
 @SuppressWarnings("serial")
 public abstract class Coordinate implements Comparable<Coordinate>, Serializable {
 
+    /**
+     * Global prefix used by coordinates.
+     */
+    public static final String PREFIX = "http://";
+
+    /**
+     * The String value associated to the coordinate.
+     */
     private String value;
 
     /**

@@ -81,8 +81,9 @@ public class LexicographicCoordinate extends Coordinate {
         tmp.addAll(shortest);
         shortest = tmp;
 
-        System.out.println("LexicographicCoordinate.sumUnicodeCodePoints() longest " + longest);
-        System.out.println("LexicographicCoordinate.sumUnicodeCodePoints() shortest " + shortest);
+        // System.out.println("LexicographicCoordinate.sumUnicodeCodePoints() longest " + longest);
+        // System.out.println("LexicographicCoordinate.sumUnicodeCodePoints() shortest " +
+        // shortest);
         // );
 
         // for (int i = 0; i < minLen; i++) {
@@ -145,13 +146,13 @@ public class LexicographicCoordinate extends Coordinate {
 
     public Coordinate getMiddleWith(Coordinate coord2) {
         ArrayList<Integer> codePtsStr1 = LexicographicCoordinate.fromCoordinateToUnicode(this);
-        System.out.println(this.printInformation(codePtsStr1));
+        // System.out.println(this.printInformation(codePtsStr1));
         ArrayList<Integer> codePtsStr2 = LexicographicCoordinate.fromCoordinateToUnicode(coord2);
-        System.out.println(this.printInformation(codePtsStr2));
+        // System.out.println(this.printInformation(codePtsStr2));
         ArrayList<Integer> sumCodePoints = LexicographicCoordinate.sumUnicodeCodePoints(codePtsStr1,
                 codePtsStr2);
-        System.out.println("LexicographicCoordinate.getMiddleWith() Sum is : " +
-            this.printInformation(sumCodePoints));
+        // System.out.println("LexicographicCoordinate.getMiddleWith() Sum is : " +
+        // this.printInformation(sumCodePoints));
         // System.out.println( "Sum is : "+ this.printInformation(sumCodePoints));
 
         // Computes the middle code point value for each character element
@@ -215,11 +216,12 @@ public class LexicographicCoordinate extends Coordinate {
         int quotient;
         for (int i = codePoints.size() - 1; i >= 0; i--) {
             cp = codePoints.get(i);
-            System.out.println("LexicographicCoordinate.getMiddleUnicodes()  point  " + cp);
+            // System.out.println("LexicographicCoordinate.getMiddleUnicodes()  point  " + cp);
             quotient = cp / 2;
             remainder = cp % 2;
             middleChrCodePts.add(quotient);
-            System.out.println("LexicographicCoordinate.getMiddleUnicodes() remainder " + remainder);
+            // System.out.println("LexicographicCoordinate.getMiddleUnicodes() remainder " +
+            // remainder);
             if (remainder != 0) {
                 // Shift the remainder to the next element
                 if (i > 0) {
@@ -246,7 +248,7 @@ public class LexicographicCoordinate extends Coordinate {
             middleChrCodePts.set(i, middleChrCodePts.get(size - 1 - i));
             middleChrCodePts.set(size - 1 - i, tmp);
         }
-        System.out.println("LexicographicCoordinate.getMiddleUnicodes() " + middleChrCodePts);
+        // System.out.println("LexicographicCoordinate.getMiddleUnicodes() " + middleChrCodePts);
         return (middleChrCodePts);
 
     }
@@ -275,7 +277,7 @@ public class LexicographicCoordinate extends Coordinate {
             generatedString.append(chars.charAt(i));
         }
 
-        return new LexicographicCoordinate(generatedString.toString());
+        return new LexicographicCoordinate(Coordinate.PREFIX + generatedString.toString());
     }
 
     /**

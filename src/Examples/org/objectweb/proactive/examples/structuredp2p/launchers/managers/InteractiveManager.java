@@ -4,9 +4,10 @@ import java.util.List;
 import java.util.Scanner;
 
 import org.objectweb.proactive.examples.structuredp2p.launchers.PeerLauncher;
-import org.objectweb.proactive.examples.structuredp2p.launchers.actions.Action;
-import org.objectweb.proactive.examples.structuredp2p.launchers.actions.ListAction;
-import org.objectweb.proactive.examples.structuredp2p.launchers.actions.QuitAction;
+import org.objectweb.proactive.examples.structuredp2p.launchers.commands.Command;
+import org.objectweb.proactive.examples.structuredp2p.launchers.commands.ListCommand;
+import org.objectweb.proactive.examples.structuredp2p.launchers.commands.QuitCommand;
+import org.objectweb.proactive.examples.structuredp2p.launchers.commands.RandomCommand;
 
 
 /**
@@ -19,14 +20,15 @@ public class InteractiveManager extends Manager {
     public InteractiveManager(PeerLauncher peerLauncher) {
         super(peerLauncher);
 
-        super.addAction(new ListAction(this));
-        super.addAction(new QuitAction(this));
+        super.addAction(new ListCommand(this));
+        super.addAction(new QuitCommand(this));
+        super.addAction(new RandomCommand(this));
     }
 
-    public InteractiveManager(PeerLauncher peerLauncher, List<Action> actionsToAdd) {
+    public InteractiveManager(PeerLauncher peerLauncher, List<Command> actionsToAdd) {
         this(peerLauncher);
 
-        for (Action action : actionsToAdd) {
+        for (Command action : actionsToAdd) {
             super.getActions().put(action.getName(), action);
         }
     }
@@ -42,12 +44,12 @@ public class InteractiveManager extends Manager {
             String[] splittedInputLine = inputLine.split(" ");
             String command = splittedInputLine[0];
 
-            Object[] args = new String[splittedInputLine.length - 1];
+            String[] args = new String[splittedInputLine.length - 1];
             for (int i = 1; i < splittedInputLine.length; i++) {
                 args[i - 1] = splittedInputLine[i];
             }
 
-            for (Action action : super.getActions().values()) {
+            for (Command action : super.getActions().values()) {
                 if (action.getCommandShortcuts().contains(command)) {
                     action.execute(args);
                     break;
@@ -65,9 +67,15 @@ public class InteractiveManager extends Manager {
         StringBuffer buf = new StringBuffer();
         buf.append("[ Select an action to perform ]\n");
 
-        for (Action action : super.getActions().values()) {
+        for (Command action : super.getActions().values()) {
             buf.append(" > Type in '");
             buf.append(action.getCommandShortcuts().get(0));
+
+            for (String arg : action.getArguments()) {
+                buf.append(" ");
+                buf.append(arg);
+            }
+
             buf.append("' : ");
             buf.append(action.getDescription());
             buf.append("\n");

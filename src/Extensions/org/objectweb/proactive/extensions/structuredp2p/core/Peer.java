@@ -28,7 +28,6 @@ import org.objectweb.proactive.extensions.structuredp2p.datastorage.owlim.OWLIMS
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.Message;
 import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.Query;
 import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.QueryResponse;
-import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can.RDFQuery;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.ResponseMessage;
 import org.openrdf.model.Statement;
 import org.openrdf.model.ValueFactory;
@@ -111,8 +110,6 @@ public class Peer implements InitActive, RunActive, Serializable {
     public QueryResponse search(Query query) {
         UUID uid = UUID.randomUUID();
         query.setUUID(uid);
-        System.out.println("Peer.search()" + ((RDFQuery) query).getCoordinatesToReach()[0].getValue() + ", " +
-            ((RDFQuery) query).getCoordinatesToReach()[1].getValue());
         this.structuredOverlay.send(query);
 
         synchronized (this.oneWayResponses) {
@@ -371,7 +368,7 @@ public class Peer implements InitActive, RunActive, Serializable {
     }
 
     /**
-     * Create a new Peer ActiveObject.
+     * Creates a new Peer ActiveObject.
      * 
      * @param type
      *            the type of the peer, which is one of {@link OverlayType}.
@@ -388,7 +385,7 @@ public class Peer implements InitActive, RunActive, Serializable {
     }
 
     /**
-     * Create a new Peer ActiveObject.
+     * Creates a new Peer ActiveObject.
      * 
      * @param type
      *            the type of the peer, which is one of {@link OverlayType}.

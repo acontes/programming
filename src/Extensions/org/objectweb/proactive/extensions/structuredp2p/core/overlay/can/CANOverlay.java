@@ -51,7 +51,7 @@ public class CANOverlay extends StructuredOverlay {
     /**
      * The number of dimensions which is equals to the number of axes.
      */
-    public static final int NB_DIMENSIONS = 2;
+    public static final int NB_DIMENSIONS = 3;
 
     /**
      * Neighbors of the {@link Zone} which is managed.
@@ -89,7 +89,6 @@ public class CANOverlay extends StructuredOverlay {
 
         /* Actions on local peer : the peer which join an existing peer */
         this.setZone(response.getAffectedZone());
-        System.out.println(response.getAffectedZone());
         this.splitHistory = response.getSplitHistory();
         this.saveSplit(response.getAffectedDimension(), response.getAffectedDirection());
         this.neighborsDataStructure = response.getAffectedNeighborsDataStructure();
@@ -355,7 +354,6 @@ public class CANOverlay extends StructuredOverlay {
      * {@inheritDoc}
      */
     public void send(Query query) {
-        System.out.println("CANOverlay.send() " + this);
         Coordinate[] coordinatesToReach = (Coordinate[]) query.getKeyToReach().getValue();
         if (this.contains(coordinatesToReach)) {
             query.handle(this);
@@ -384,7 +382,8 @@ public class CANOverlay extends StructuredOverlay {
                         } catch (BlockingRequestReceiverException e) {
                             super.bufferizeQuery(query);
                         } catch (Exception e) {
-                            System.out.println("DIRTY LEAVE");
+                            System.out.println("CANOverlay.send()");
+                            e.printStackTrace();
                         }
 
                         break;
@@ -539,9 +538,6 @@ public class CANOverlay extends StructuredOverlay {
             }
 
             query.append(").\n}");
-
-            System.out.println(newZones[directionInv]);
-            System.out.println(query);
 
             QueryResult<BindingSet> queryResults = this.getLocalPeer().getDataStorage().query(
                     QueryLanguage.SPARQL, query.toString());

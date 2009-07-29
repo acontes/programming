@@ -22,8 +22,7 @@
 				<java base="root" relpath="${java.home}/bin/java" />
 
 				<applicationClasspath>
-					<pathElement base="proactive" relpath="dist/lib/openrdf-sesame-onejar.jar" />
-					<pathElement base="proactive" relpath="dist/lib/owlim-big-3.1.0.jar" />
+					<pathElement base="proactive" relpath="sesame-jar/" />
 					<pathElement base="proactive" relpath="dist/lib/ProActive_examples.jar" />
 					<pathElement base="proactive" relpath="dist/lib/ibis-1.4.jar" />
 					<pathElement base="proactive" relpath="dist/lib/ibis-connect-1.0.jar" />
