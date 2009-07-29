@@ -1,6 +1,7 @@
 package org.objectweb.proactive.examples.structuredp2p.launchers.managers;
 
-import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.objectweb.proactive.examples.structuredp2p.launchers.PeerLauncher;
 import org.objectweb.proactive.examples.structuredp2p.launchers.actions.Action;
@@ -16,7 +17,7 @@ import org.objectweb.proactive.examples.structuredp2p.launchers.actions.SearchAc
  */
 public abstract class Manager extends Thread {
 
-    private HashMap<String, Action> actions = new HashMap<String, Action>();
+    private Map<String, Action> actions = new TreeMap<String, Action>();
 
     private PeerLauncher peersLauncher;
 
@@ -46,7 +47,7 @@ public abstract class Manager extends Thread {
         this.actions.remove(action.getName());
     }
 
-    public HashMap<String, Action> getActions() {
+    public Map<String, Action> getActions() {
         return this.actions;
     }
 
