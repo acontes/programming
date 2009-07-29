@@ -18,6 +18,13 @@ public class LexicographicCoordinate extends Coordinate {
 
     /**
      * Constructor.
+     */
+    public LexicographicCoordinate() {
+
+    }
+
+    /**
+     * Constructor.
      * 
      * @param value
      */
@@ -72,10 +79,10 @@ public class LexicographicCoordinate extends Coordinate {
             tmp.add(0);
         }
         tmp.addAll(shortest);
-        shortest=tmp;
+        shortest = tmp;
 
-         System.out.println("LexicographicCoordinate.sumUnicodeCodePoints() longest " + longest );
-         System.out.println("LexicographicCoordinate.sumUnicodeCodePoints() shortest " + shortest);
+        System.out.println("LexicographicCoordinate.sumUnicodeCodePoints() longest " + longest);
+        System.out.println("LexicographicCoordinate.sumUnicodeCodePoints() shortest " + shortest);
         // );
 
         // for (int i = 0; i < minLen; i++) {
@@ -143,8 +150,9 @@ public class LexicographicCoordinate extends Coordinate {
         System.out.println(this.printInformation(codePtsStr2));
         ArrayList<Integer> sumCodePoints = LexicographicCoordinate.sumUnicodeCodePoints(codePtsStr1,
                 codePtsStr2);
-        System.out.println("LexicographicCoordinate.getMiddleWith() Sum is : "+ this.printInformation(sumCodePoints));
-       // System.out.println( "Sum is : "+ this.printInformation(sumCodePoints));
+        System.out.println("LexicographicCoordinate.getMiddleWith() Sum is : " +
+            this.printInformation(sumCodePoints));
+        // System.out.println( "Sum is : "+ this.printInformation(sumCodePoints));
 
         // Computes the middle code point value for each character element
         ArrayList<Integer> middleChrCodePts = LexicographicCoordinate.getMiddleUnicodes(sumCodePoints);
@@ -183,10 +191,10 @@ public class LexicographicCoordinate extends Coordinate {
             int c = codePoints.get(i);
             buf.append((char) c);
         }
-//        for (int i = 0; i < codePoints.size(); i++) {
-//            int c = codePoints.get(i);
-//            buf.append((char) c);
-//        }
+        // for (int i = 0; i < codePoints.size(); i++) {
+        // int c = codePoints.get(i);
+        // buf.append((char) c);
+        // }
         return buf.toString();
     }
 
@@ -207,18 +215,18 @@ public class LexicographicCoordinate extends Coordinate {
         int quotient;
         for (int i = codePoints.size() - 1; i >= 0; i--) {
             cp = codePoints.get(i);
-             System.out.println("LexicographicCoordinate.getMiddleUnicodes()  point  " + cp);
+            System.out.println("LexicographicCoordinate.getMiddleUnicodes()  point  " + cp);
             quotient = cp / 2;
             remainder = cp % 2;
             middleChrCodePts.add(quotient);
-System.out.println("LexicographicCoordinate.getMiddleUnicodes() remainder " + remainder);
+            System.out.println("LexicographicCoordinate.getMiddleUnicodes() remainder " + remainder);
             if (remainder != 0) {
                 // Shift the remainder to the next element
                 if (i > 0) {
                     String s = remainder + "" + codePoints.get(i - 1);
                     int newCodePoint = Integer.parseInt(s);
                     codePoints.set(i - 1, newCodePoint);
-                   // codePoints.set(i+1,codePoints.get(i+1)+remainder);
+                    // codePoints.set(i+1,codePoints.get(i+1)+remainder);
                 } else {
                     middleChrCodePts.add(remainder);
                 }
@@ -230,15 +238,15 @@ System.out.println("LexicographicCoordinate.getMiddleUnicodes() remainder " + re
         // middleChrCodePts.set(i, middleChrCodePts.get(size-1-i));
         // middleChrCodePts.set(size-1-i, tmp);
         // }
-        
-        //swap order
+
+        // swap order
         int size = middleChrCodePts.size();
-        for(int i =0; i< size/2;i++) {
+        for (int i = 0; i < size / 2; i++) {
             int tmp = middleChrCodePts.get(i);
-            middleChrCodePts.set(i, middleChrCodePts.get(size-1-i));
-            middleChrCodePts.set(size-1-i,tmp);
+            middleChrCodePts.set(i, middleChrCodePts.get(size - 1 - i));
+            middleChrCodePts.set(size - 1 - i, tmp);
         }
-System.out.println("LexicographicCoordinate.getMiddleUnicodes() " + middleChrCodePts);
+        System.out.println("LexicographicCoordinate.getMiddleUnicodes() " + middleChrCodePts);
         return (middleChrCodePts);
 
     }
@@ -317,7 +325,7 @@ System.out.println("LexicographicCoordinate.getMiddleUnicodes() " + middleChrCod
     public static ArrayList<Integer> alpha2() {
         LexicographicCoordinate l = new LexicographicCoordinate("z");
         return LexicographicCoordinate.fromCoordinateToUnicode(l);
-        
+
     }
 
     public static ArrayList<Integer> alpha3() {
@@ -353,7 +361,7 @@ System.out.println("LexicographicCoordinate.getMiddleUnicodes() " + middleChrCod
     public static void test() {
         ArrayList<Integer> al = LexicographicCoordinate.alpha1();
         String min = LexicographicCoordinate.fromUnicodeToString(al);
-        System.out.println("First String " + min +  " " +al );
+        System.out.println("First String " + min + " " + al);
         // System.out.println(al);
         LexicographicCoordinate cmin = new LexicographicCoordinate(min);
 
@@ -361,10 +369,11 @@ System.out.println("LexicographicCoordinate.getMiddleUnicodes() " + middleChrCod
 
         String max = LexicographicCoordinate.fromUnicodeToString(al2);
         System.out.println("Second String " + max + " " + al2);
-        //System.out.println(al2);
+        // System.out.println(al2);
         System.out.println("Test Sum " + LexicographicCoordinate.sumUnicodeCodePoints(al, al2));
 
-      //  System.out.println("LexicographicCoordinate.test() compare min max " + min.compareTo(max));
+        // System.out.println("LexicographicCoordinate.test() compare min max " +
+        // min.compareTo(max));
         LexicographicCoordinate cmax = new LexicographicCoordinate(max);
         Coordinate c = cmin.getMiddleWith(cmax);
 
@@ -375,10 +384,11 @@ System.out.println("LexicographicCoordinate.getMiddleUnicodes() " + middleChrCod
         System.out
                 .println("LexicographicCoordinate.test() compare middle max " + c.getValue().compareTo(max));
 
-//        for (int i = 0; i < Math.min(min.length(), c.getValue().length()); i++) {
-//            System.out.println("LexicographicCoordinate.test()    min = " + min.charAt(i) + "  middle = " +
-//                c.getValue().charAt(i) + " diff : " + (c.getValue().charAt(i) - min.charAt(i)));
-//        }
+        // for (int i = 0; i < Math.min(min.length(), c.getValue().length()); i++) {
+        // System.out.println("LexicographicCoordinate.test()    min = " + min.charAt(i) +
+        // "  middle = " +
+        // c.getValue().charAt(i) + " diff : " + (c.getValue().charAt(i) - min.charAt(i)));
+        // }
 
         System.out.println("a".compareTo("b"));
         try {
@@ -400,25 +410,25 @@ System.out.println("LexicographicCoordinate.getMiddleUnicodes() " + middleChrCod
      * @param args
      */
     public static void main(String[] args) {
-    //    LexicographicCoordinate.test();
-      
+        // LexicographicCoordinate.test();
+
         Coordinate coord1;
-         Coordinate middleCoord = new LexicographicCoordinate("ax");
-         Coordinate coord2 = new LexicographicCoordinate("bz");
-        
-         int nbOfSplit =3;
-         while (nbOfSplit > 0) {
-         coord1 = new LexicographicCoordinate(middleCoord.getValue());
-         middleCoord = middleCoord.getMiddleWith(coord2);
-         System.out.println("[" + coord1.getValue() + "," + middleCoord.getValue() + "[" + ",[" +
-         middleCoord.getValue() + "," + coord2.getValue() + "[");
-         nbOfSplit--;
-         try {
-            new Zone(new Coordinate[] { coord1 }, new Coordinate[] { middleCoord });
-        } catch (ZoneException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        Coordinate middleCoord = new LexicographicCoordinate("ax");
+        Coordinate coord2 = new LexicographicCoordinate("bz");
+
+        int nbOfSplit = 3;
+        while (nbOfSplit > 0) {
+            coord1 = new LexicographicCoordinate(middleCoord.getValue());
+            middleCoord = middleCoord.getMiddleWith(coord2);
+            System.out.println("[" + coord1.getValue() + "," + middleCoord.getValue() + "[" + ",[" +
+                middleCoord.getValue() + "," + coord2.getValue() + "[");
+            nbOfSplit--;
+            try {
+                new Zone(new Coordinate[] { coord1 }, new Coordinate[] { middleCoord });
+            } catch (ZoneException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
-         }
     }
 }

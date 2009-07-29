@@ -25,14 +25,15 @@ import org.objectweb.proactive.extensions.structuredp2p.core.requests.BlockingRe
 import org.objectweb.proactive.extensions.structuredp2p.core.requests.StructuredMetaObjectFactory;
 import org.objectweb.proactive.extensions.structuredp2p.datastorage.DataStorage;
 import org.objectweb.proactive.extensions.structuredp2p.datastorage.owlim.OWLIMStorage;
-import org.objectweb.proactive.extensions.structuredp2p.datastorage.owlim.wrappers.QueryLanguageWrapper;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.Message;
 import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.Query;
 import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.QueryResponse;
+import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can.RDFQuery;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.ResponseMessage;
 import org.openrdf.model.Statement;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.query.BindingSet;
+import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.QueryResult;
 
 
@@ -110,6 +111,8 @@ public class Peer implements InitActive, RunActive, Serializable {
     public QueryResponse search(Query query) {
         UUID uid = UUID.randomUUID();
         query.setUUID(uid);
+        System.out.println("Peer.search()" + ((RDFQuery) query).getCoordinatesToReach()[0].getValue() + ", " +
+            ((RDFQuery) query).getCoordinatesToReach()[1].getValue());
         this.structuredOverlay.send(query);
 
         synchronized (this.oneWayResponses) {
@@ -411,8 +414,8 @@ public class Peer implements InitActive, RunActive, Serializable {
         return this.dataStorage.query(stmt);
     }
 
-    public QueryResult<BindingSet> query(QueryLanguageWrapper q, String query) {
-        return this.dataStorage.query(q.getValue(), query);
+    public QueryResult<BindingSet> query(QueryLanguage q, String query) {
+        return this.dataStorage.query(q, query);
     }
 
     public boolean hasStatements() {

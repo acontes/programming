@@ -51,7 +51,7 @@ public class CANOverlay extends StructuredOverlay {
     /**
      * The number of dimensions which is equals to the number of axes.
      */
-    public static final int NB_DIMENSIONS = 3;
+    public static final int NB_DIMENSIONS = 2;
 
     /**
      * Neighbors of the {@link Zone} which is managed.
@@ -355,6 +355,7 @@ public class CANOverlay extends StructuredOverlay {
      * {@inheritDoc}
      */
     public void send(Query query) {
+        System.out.println("CANOverlay.send() " + this);
         Coordinate[] coordinatesToReach = (Coordinate[]) query.getKeyToReach().getValue();
         if (this.contains(coordinatesToReach)) {
             query.handle(this);
@@ -513,94 +514,90 @@ public class CANOverlay extends StructuredOverlay {
 
         // Splits the data
         List<Statement> statementsResult = new ArrayList<Statement>();
-        try {
-            // Perform the data split only if the datastore contains statements
-            if (this.getLocalPeer().getDataStorage().hasStatements()) {
-                String[] names = new String[] { "o", "p", "s" };
-                StringBuffer query = new StringBuffer();
-                query.append("SELECT ?o ?p ?s WHERE {\n");
-                query.append("  ?o ?p ?s .\n");
-                query.append("  FILTER ( ");
 
-                for (int dim = 0; dim < CANOverlay.NB_DIMENSIONS; dim++) {
-                    query.append("str(?");
-                    query.append(names[dim]);
-                    query.append(") > \"");
-                    query.append(newZones[directionInv].getCoordinateMin(dim));
-                    query.append("\" && str(?");
-                    query.append(names[dim]);
-                    query.append(") < \"");
-                    query.append(newZones[directionInv].getCoordinateMax(dim));
-                    query.append("\"");
-                    if (dim != CANOverlay.NB_DIMENSIONS - 1) {
-                        query.append(" && ");
-                    }
+        // Perform the data split only if the datastore contains statements
+        if (this.getLocalPeer().getDataStorage().hasStatements()) {
+            String[] names = new String[] { "o", "p", "s" };
+            StringBuffer query = new StringBuffer();
+            query.append("SELECT ?o ?p ?s WHERE {\n");
+            query.append("  ?o ?p ?s .\n");
+            query.append("  FILTER ( ");
+
+            for (int dim = 0; dim < CANOverlay.NB_DIMENSIONS; dim++) {
+                query.append("str(?");
+                query.append(names[dim]);
+                query.append(") > \"");
+                query.append(newZones[directionInv].getCoordinateMin(dim));
+                query.append("\" && str(?");
+                query.append(names[dim]);
+                query.append(") < \"");
+                query.append(newZones[directionInv].getCoordinateMax(dim));
+                query.append("\"");
+                if (dim != CANOverlay.NB_DIMENSIONS - 1) {
+                    query.append(" && ");
                 }
+            }
 
-                query.append(").\n}");
+            query.append(").\n}");
 
-                System.out.println(newZones[directionInv]);
-                System.out.println(query);
+            System.out.println(newZones[directionInv]);
+            System.out.println(query);
 
-                QueryResult<BindingSet> queryResults = this.getLocalPeer().getDataStorage().query(
-                        QueryLanguage.SPARQL, query.toString());
+            QueryResult<BindingSet> queryResults = this.getLocalPeer().getDataStorage().query(
+                    QueryLanguage.SPARQL, query.toString());
+            try {
+                while (queryResults.hasNext()) {
+                    BindingSet bindingSet = queryResults.next();
+                    ValueFactory valueFactory = this.getLocalPeer().getDataStorage().getRepository()
+                            .getValueFactory();
+                    statementsResult.add(valueFactory.createStatement(valueFactory.createURI(bindingSet
+                            .getValue("o").toString()), valueFactory.createURI(bindingSet.getValue("p")
+                            .toString()), valueFactory.createURI(bindingSet.getValue("s").toString())));
+                }
+            } catch (QueryEvaluationException e) {
+                e.printStackTrace();
+            } finally {
                 try {
-                    while (queryResults.hasNext()) {
-                        BindingSet bindingSet = queryResults.next();
-                        ValueFactory valueFactory = this.getLocalPeer().getDataStorage().getRepository()
-                                .getValueFactory();
-                        statementsResult.add(valueFactory.createStatement(valueFactory.createURI(bindingSet
-                                .getValue("o").toString()), valueFactory.createURI(bindingSet.getValue("p")
-                                .toString()), valueFactory.createURI(bindingSet.getValue("s").toString())));
-                    }
+                    queryResults.close();
                 } catch (QueryEvaluationException e) {
                     e.printStackTrace();
-                } finally {
-                    try {
-                        queryResults.close();
-                    } catch (QueryEvaluationException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                /*
-                 * Removes the outdated statements (statements that have been given to the new peer
-                 * which join the network) from the current peer
-                 */
-                for (Statement stmt : statementsResult) {
-                    this.getLocalPeer().getDataStorage().remove(stmt);
                 }
             }
 
-            // Neighbors affected for the new peer which want to join the network
-            NeighborsDataStructure neighborsOfThePeerWhichJoin = new NeighborsDataStructure();
-            neighborsOfThePeerWhichJoin.addAll(this.neighborsDataStructure);
-            neighborsOfThePeerWhichJoin.removeAll(dimension, direction);
-            neighborsOfThePeerWhichJoin.add(this.getRemotePeer(), this.zone, dimension, direction);
-
-            // Update the neighbors of the peer which is already on the network
-            for (Peer neighborToRemove : this.neighborsDataStructure.getNeighbors(dimension, directionInv)) {
-                PAFuture.waitFor(this.sendTo(neighborToRemove, new CANRemoveNeighborMessage(this
-                        .getRemotePeer(), dimension, direction)));
+            /*
+             * Removes the outdated statements (statements that have been given to the new peer
+             * which join the network) from the current peer
+             */
+            for (Statement stmt : statementsResult) {
+                this.getLocalPeer().getDataStorage().remove(stmt);
             }
-            this.neighborsDataStructure.removeAll(dimension, directionInv);
-            // Update neighbors in order to check the other dimensions
-            this.updateNeighbors();
+        }
 
-            Stack<int[]> newHistory = null;
-            try {
-                newHistory = (Stack<int[]>) MakeDeepCopy.WithObjectStream.makeDeepCopy(this.splitHistory);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-            return new CANJoinResponseMessage(dimension, directionInv, newHistory, newZones[directionInv],
-                neighborsOfThePeerWhichJoin, statementsResult);
-        } catch (Exception e) {
+        // Neighbors affected for the new peer which want to join the network
+        NeighborsDataStructure neighborsOfThePeerWhichJoin = new NeighborsDataStructure();
+        neighborsOfThePeerWhichJoin.addAll(this.neighborsDataStructure);
+        neighborsOfThePeerWhichJoin.removeAll(dimension, direction);
+        neighborsOfThePeerWhichJoin.add(this.getRemotePeer(), this.zone, dimension, direction);
+
+        // Update the neighbors of the peer which is already on the network
+        for (Peer neighborToRemove : this.neighborsDataStructure.getNeighbors(dimension, directionInv)) {
+            PAFuture.waitFor(this.sendTo(neighborToRemove, new CANRemoveNeighborMessage(this.getRemotePeer(),
+                dimension, direction)));
+        }
+        this.neighborsDataStructure.removeAll(dimension, directionInv);
+        // Update neighbors in order to check the other dimensions
+        this.updateNeighbors();
+
+        Stack<int[]> newHistory = null;
+        try {
+            newHistory = (Stack<int[]>) MakeDeepCopy.WithObjectStream.makeDeepCopy(this.splitHistory);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        return null;
+        return new CANJoinResponseMessage(dimension, directionInv, newHistory, newZones[directionInv],
+            neighborsOfThePeerWhichJoin, statementsResult);
     }
 
     /**
