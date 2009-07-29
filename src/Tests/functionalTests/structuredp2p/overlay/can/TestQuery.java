@@ -14,8 +14,6 @@ import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOver
 import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.Query;
 import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.QueryResponse;
 import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can.RDFQuery;
-import org.openrdf.model.Statement;
-import org.openrdf.model.impl.StatementImpl;
 
 
 /**
@@ -60,37 +58,6 @@ public class TestQuery {
         peers.add(TestQuery.secondPeer);
         peers.add(TestQuery.thirdPeer);
         peers.add(TestQuery.fourthPeer);
-
-        System.out.println();
-
-        int j = 1;
-        for (Peer peer : peers) {
-            StringBuffer buf = new StringBuffer();
-            buf.append("    " + j + ". ");
-            buf.append(((CANOverlay) peer.getStructuredOverlay()).getZone());
-            buf.append("\n");
-            int k = 0;
-            for (Statement stmt : peer.query(new StatementImpl(null, null, null))) {
-                buf.append("       ");
-                buf.append(k);
-                buf.append(". ");
-                buf.append(" <");
-                buf.append(stmt.getSubject());
-                buf.append(",");
-                buf.append(stmt.getPredicate());
-                buf.append(",");
-                buf.append(stmt.getObject());
-                buf.append(">\n");
-                k++;
-            }
-
-            buf.append("\n");
-
-            System.out.println(buf.toString());
-            j++;
-        }
-
-        System.out.println("\nNEIGHBORS :\n");
 
         int i = 1;
         for (Peer peer : peers) {

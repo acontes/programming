@@ -2,6 +2,8 @@ package org.objectweb.proactive.examples.structuredp2p.launchers.commands;
 
 import org.objectweb.proactive.examples.structuredp2p.launchers.managers.Manager;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
+import org.openrdf.model.Statement;
+import org.openrdf.model.impl.StatementImpl;
 
 
 /**
@@ -35,6 +37,16 @@ public class ListCommand extends Command {
             for (Peer peer : super.getManager().getPeersLauncher().getAvailablePeers()) {
                 buf.append("    " + i + ". ");
                 buf.append(peer);
+                buf.append("\n");
+                for (Statement stmt : peer.query(new StatementImpl(null, null, null))) {
+                    buf.append("         - <");
+                    buf.append(stmt.getSubject());
+                    buf.append(", ");
+                    buf.append(stmt.getPredicate());
+                    buf.append(", ");
+                    buf.append(stmt.getObject());
+                    buf.append(">\n");
+                }
                 buf.append("\n");
                 i++;
             }

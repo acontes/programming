@@ -31,7 +31,7 @@ import org.openrdf.sail.nativerdf.NativeStore;
  * @version 0.1, 07/21/2009
  */
 @SuppressWarnings("serial")
-public class OWLIMStorage extends DataStorage {
+public class OWLIMStorage implements DataStorage {
 
     private Repository repository;
 

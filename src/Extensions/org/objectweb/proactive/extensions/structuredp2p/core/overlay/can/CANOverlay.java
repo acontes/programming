@@ -516,10 +516,10 @@ public class CANOverlay extends StructuredOverlay {
 
         // Perform the data split only if the datastore contains statements
         if (this.getLocalPeer().getDataStorage().hasStatements()) {
-            String[] names = new String[] { "o", "p", "s" };
+            String[] names = new String[] { "s", "p", "o" };
             StringBuffer query = new StringBuffer();
-            query.append("SELECT ?o ?p ?s WHERE {\n");
-            query.append("  ?o ?p ?s .\n");
+            query.append("SELECT ?s ?p ?o WHERE {\n");
+            query.append("  ?s ?p ?o .\n");
             query.append("  FILTER ( ");
 
             for (int dim = 0; dim < CANOverlay.NB_DIMENSIONS; dim++) {
@@ -547,8 +547,8 @@ public class CANOverlay extends StructuredOverlay {
                     ValueFactory valueFactory = this.getLocalPeer().getDataStorage().getRepository()
                             .getValueFactory();
                     statementsResult.add(valueFactory.createStatement(valueFactory.createURI(bindingSet
-                            .getValue("o").toString()), valueFactory.createURI(bindingSet.getValue("p")
-                            .toString()), valueFactory.createURI(bindingSet.getValue("s").toString())));
+                            .getValue("s").toString()), valueFactory.createURI(bindingSet.getValue("p")
+                            .toString()), valueFactory.createURI(bindingSet.getValue("o").toString())));
                 }
             } catch (QueryEvaluationException e) {
                 e.printStackTrace();

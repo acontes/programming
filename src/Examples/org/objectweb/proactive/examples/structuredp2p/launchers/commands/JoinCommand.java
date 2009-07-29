@@ -53,7 +53,7 @@ public class JoinCommand extends Command {
 
             super.getManager().getPeersLauncher().getAvailablePeers().add(peer);
 
-            if (peersLauncher.getAvailableNodes().size() == 1) {
+            if (peersLauncher.getAvailablePeers().size() == 1) {
                 for (int i = 0; i < 100; i++) {
                     peer.addData();
                 }

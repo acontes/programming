@@ -34,6 +34,7 @@ import org.openrdf.model.ValueFactory;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.QueryResult;
+import org.openrdf.repository.Repository;
 
 
 /**
@@ -51,7 +52,7 @@ import org.openrdf.query.QueryResult;
  * @version 0.1
  */
 @SuppressWarnings("serial")
-public class Peer implements InitActive, RunActive, Serializable {
+public class Peer implements DataStorage, InitActive, RunActive, Serializable {
 
     /**
      * The structured protocol which is used by the peer.
@@ -181,9 +182,11 @@ public class Peer implements InitActive, RunActive, Serializable {
     }
 
     /**
+     * Notify the current peer which execute this command that the specified peer is leaving.
      * 
      * @param remoteNeighbor
-     * @return
+     *            the peer which is leaving.
+     * @return <code>true</code> if the notification has succeeded, <code>false</code> otherwise.
      */
     public boolean notifyNeighborStartLeave(Peer remoteNeighbor) {
         this.peersWhichAreLeaving.add(remoteNeighbor);
@@ -191,9 +194,12 @@ public class Peer implements InitActive, RunActive, Serializable {
     }
 
     /**
+     * Notify the current peer which execute this command that the specified peer has ended to
+     * leave.
      * 
      * @param remoteNeighbor
-     * @return
+     *            the peer which is leaving.
+     * @return <code>true</code> if the notification has succeeded, <code>false</code> otherwise.
      */
     public boolean notifyNeighborEndLeave(Peer remoteNeighbor) {
         return this.peersWhichAreLeaving.remove(remoteNeighbor);
@@ -256,8 +262,9 @@ public class Peer implements InitActive, RunActive, Serializable {
     }
 
     /**
+     * Returns the peers which are neighbors and which are leaving.
      * 
-     * @return
+     * @return the peers which are neighbors and which are leaving.
      */
     public Set<Peer> getPeersWhichArePreparingToLeave() {
         return this.peersWhichAreLeaving;
@@ -400,23 +407,10 @@ public class Peer implements InitActive, RunActive, Serializable {
     public Boolean addData() {
         ValueFactory valueFactory = this.getDataStorage().getRepository().getValueFactory();
         this.getDataStorage().add(
-                valueFactory.createStatement(valueFactory.createURI("http://" +
-                    LexicographicCoordinate.random(10).getValue()), valueFactory.createURI("http://" +
-                    LexicographicCoordinate.random(10).getValue()), valueFactory.createURI("http://" +
-                    LexicographicCoordinate.random(10).getValue())));
+                valueFactory.createStatement(valueFactory.createURI(LexicographicCoordinate.random(10)
+                        .getValue()), valueFactory.createURI(LexicographicCoordinate.random(10).getValue()),
+                        valueFactory.createURI(LexicographicCoordinate.random(10).getValue())));
         return true;
-    }
-
-    public Set<Statement> query(Statement stmt) {
-        return this.dataStorage.query(stmt);
-    }
-
-    public QueryResult<BindingSet> query(QueryLanguage q, String query) {
-        return this.dataStorage.query(q, query);
-    }
-
-    public boolean hasStatements() {
-        return this.dataStorage.hasStatements();
     }
 
     /**
@@ -424,5 +418,100 @@ public class Peer implements InitActive, RunActive, Serializable {
      */
     public String toString() {
         return this.structuredOverlay.toString();
+    }
+
+    /*
+     * DataStorage interface implementation.
+     */
+
+    /**
+     * {@inheritDoc}
+     */
+    public void add(Statement stmt) {
+        this.dataStorage.add(stmt);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Repository getRepository() {
+        return this.dataStorage.getRepository();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean hasStatements() {
+        return this.dataStorage.hasStatements();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public QueryResult<BindingSet> query(QueryLanguage language, String query) {
+        return this.dataStorage.query(language, query);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Set<Statement> query(Statement stmt) {
+        return this.dataStorage.query(stmt);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean queryB(QueryLanguage language, String query) {
+        return this.dataStorage.queryB(language, query);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Set<Statement> queryV(QueryLanguage language, String graphQuery) {
+        return this.dataStorage.queryV(language, graphQuery);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void remove(Statement stmt) {
+        this.dataStorage.remove(stmt);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void shutdown() {
+        this.dataStorage.shutdown();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void shutdownByRemovingCurrentRepository() {
+        this.dataStorage.shutdownByRemovingCurrentRepository();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void shutdownWithRepositoriesRemoving() {
+        this.dataStorage.shutdownWithRepositoriesRemoving();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void shutdownWithRepositoryRemoving(String name) {
+        this.dataStorage.shutdownWithRepositoryRemoving(name);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void startup() {
+        this.dataStorage.startup();
     }
 }

@@ -13,13 +13,9 @@ import org.openrdf.repository.Repository;
 
 /**
  * @author Pellegrino Laurent
- * @version 0.1, 07/21/2009
+ * @version 0.1.1, 07/29/2009
  */
-@SuppressWarnings("serial")
-public abstract class DataStorage implements Serializable {
-
-    public DataStorage() {
-    }
+public interface DataStorage extends Serializable {
 
     /**
      * Add a {@link Statement} to the current repository.
