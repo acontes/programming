@@ -14,10 +14,10 @@
     Data Spaces mechanism conceptually pose the virtual file system layer (further called VFS)  between the user code, that accesses file system trough provided API (like Java IO, POSIX, etc.), and physical (local or remote) location of files. Therefore, a programmer does not need to be aware of real file location, and can use VFS abstraction instead. The Data Spaces mechanism brings such a point of view to the ProActive programmer with a dedicated API from the <literal>org.objectweb.proactive.extensions.dataspaces.api</literal> package.
     </para>
     <para>
-    In case of ProActive, Data Spaces API layers the file systems, that can be accessed through variety of access protocols, creating one virtual file system with uniform access among all Active Objects. This is achieved by ensuring that every Active Object has the same view of VFS tree &#151; an URI used for accessing data in one Active Object is correct just after passing it to the others. Therefore sharing data becomes comfortable, as standard ProActive communication mechanism can be used for announcing actual URIs.
+    In case of ProActive, Data Spaces API layers the file systems, that can be accessed through variety of access protocols, creating one virtual file system with uniform access among all Active Objects. This is achieved by ensuring that every Active Object has the same view of VFS tree, an URI used for accessing data in one Active Object is correct just after passing it to the others. Therefore sharing data becomes comfortable, as standard ProActive communication mechanism can be used for announcing actual URIs.
     </para>
     <para>
-    As already mentioned, the Data Spaces API can be run against variety of data transfer protocols that are provided by the infrastructure, or even against a standard ProActive&#150;compliant communication protocols. This is achieved through <literal>PAProviderServer</literal> that is to be used wherever no supported data transfer protocol is available, but still the ProActive deployment can take place successfully. Hence, Data Spaces API can be used on almost every infrastructure.
+    As already mentioned, the Data Spaces API can be run against variety of data transfer protocols that are provided by the infrastructure, or even against a standard ProActive-compliant communication protocols. This is achieved through <literal>PAProviderServer</literal> that is to be used wherever no supported data transfer protocol is available, but still the ProActive deployment can take place successfully. Hence, Data Spaces API can be used on almost every infrastructure.
     </para>
     <para>
     The programmer can use ProActive's Data Spaces API to read application's input data, write and share temporary results and finally gather outputs in uniform manner among all these operations. Hence there are three types of data space abstraction: input, output and scratch. Data Spaces API provides way to access existing data spaces and files within these data spaces, it also gives the ability to define new data spaces. All operations performed through this API concern data spaces owned by one application.
@@ -36,10 +36,10 @@
         There are distinguished three different space types: input space with files used as the application's input data, output space for storing the application's result files and scratch space for temporary files with the intermediate results of the computations. Spaces types differ in the access rights, and therefore input is only meant for read operations, output for read and write as well, whereas scratch's access mode depends on the caller. If a calling thread is an owner of a particular scratch, then it can perform both read and write operations. On the other hand, if a calling thread is not an owner (eg. has received URI from another Active Object), its access is limited to read only operations.
     </para>
     <para>
-    Input and output spaces are mostly defined by the application, hence their configuration is stored in the application&#150;specific GCM&#150;A Descriptor or in the application code itself. An application can have several inputs and outputs defined, as each input and output space has its unique (within a single application) name. There can be defined a default (single) input or output spaces, so using names is not always needed. For more information please refer to attached JavaDoc.
+    Input and output spaces are mostly defined by the application, hence their configuration is stored in the application-specific GCM-A Descriptor or in the application code itself. An application can have several inputs and outputs defined, as each input and output space has its unique (within a single application) name. There can be defined a default (single) input or output spaces, so using names is not always needed. For more information please refer to attached JavaDoc.
     </para>
     <para>
-    Scratch data space is most likely defined by the system administrator in the GCM&#150;D Descriptor in case of the GCM deployment, or manually. Scratch data space is bounded to Node, and particular scratches within a single scratch data space are bounded to Active Objects that reside on this Node. Hence, there is only one scratch that Active Object owns.
+    Scratch data space is most likely defined by the system administrator in the GCM-D Descriptor in case of the GCM deployment, or manually. Scratch data space is bounded to Node, and particular scratches within a single scratch data space are bounded to Active Objects that reside on this Node. Hence, there is only one scratch that Active Object owns.
     </para>
     <para>
         <figure xml:id="ds_table">
@@ -306,7 +306,7 @@ VFS URL of this provider: paprmi://branch.inria.fr:1099/defaultFileSystemServer?
     <section xml:id="ds_snippets">
         <info><title>Code snippets and explanation</title></info>
         <para>
-        Below you can find a few simple examples that show how to deal with basic tasks using Data Spaces API. Those examples remain just ideas of how Data Spaces API can be used, we encourage you to invent your own tricky&#150;application.
+        Below you can find a few simple examples that show how to deal with basic tasks using Data Spaces API. Those examples remain just ideas of how Data Spaces API can be used, we encourage you to invent your own tricky-application.
         </para>
         <section xml:id="ds_codesnippet1">
             <info><title>Reading from default input, writing to named output</title></info>
@@ -353,10 +353,10 @@ VFS URL of this provider: paprmi://branch.inria.fr:1099/defaultFileSystemServer?
         <section xml:id="ds_section_example_gcmd">
             <info><title>GCM Deployment Descriptor</title></info>
             <para>
-            The GCM&#150;D is very simple, as the example is to be run on every infrastructure. In this case, a <emphasis><literal>&lt;scratch&gt;</literal></emphasis> tag is used to enable data spaces on nodes described by the <literal>id="host"</literal> host id. A <emphasis><literal>path</literal></emphasis> element defines a location of a scratch data space, as a sub directory of the system's temporary directory. As there is no <emphasis><literal>&lt;remoteAccess&gt;</literal></emphasis> element, the scratch data space is to be exposed through PAProviderServer that is started automatically.
+            The GCM-D is very simple, as the example is to be run on every infrastructure. In this case, a <emphasis><literal>&lt;scratch&gt;</literal></emphasis> tag is used to enable data spaces on nodes described by the <literal>id="host"</literal> host id. A <emphasis><literal>path</literal></emphasis> element defines a location of a scratch data space, as a sub directory of the system's temporary directory. As there is no <emphasis><literal>&lt;remoteAccess&gt;</literal></emphasis> element, the scratch data space is to be exposed through PAProviderServer that is started automatically.
             </para>
             <example xml:id="ds_example_gcmd">
-                <info><title>Part of the GCM&#150;D Descriptor: helloDeploymentRemote.xml</title></info>
+                <info><title>Part of the GCM-D Descriptor: helloDeploymentRemote.xml</title></info>
                 <programlisting language="xml"><textobject><textdata fileref="automatic_snippets/DataSpacesExample_gcmd.snip"/></textobject></programlisting>
             </example>
         </section>
@@ -371,11 +371,11 @@ VFS URL of this provider: paprmi://branch.inria.fr:1099/defaultFileSystemServer?
             The data spaces configuration part needs somewhat more explanation. It is placed right after Virtual Node definition, as a last child of the <emphasis><literal>&lt;proactive&gt;</literal></emphasis> element.
             </para>
             <example xml:id="ds_example_gcma">
-                <info><title>Part of the GCM&#150;A Descriptor: helloApplication.xml</title></info>
+                <info><title>Part of the GCM-A Descriptor: helloApplication.xml</title></info>
                 <programlisting language="xml"><textobject><textdata fileref="automatic_snippets/DataSpacesExample_gcma2.snip"/></textobject></programlisting>
             </example>
             <para>
-            Descriptor defines two named input spaces that serve text resources for our example &#151; a document's lines counter. In this particular case, two resources are accessed by the <literal>HTTP</literal> protocol, as they are two Wikipedia articles on <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://en.wikipedia.org/wiki/ProActive">ProActive library</link> and on <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://en.wikipedia.org/wiki/Grid_computing">grid computing</link>. Those inputs can be later resolved by an application using their names (identifiers), here: <literal>wiki_proactive</literal> and <literal>wiki_grid_computing</literal> respectively.
+            Descriptor defines two named input spaces that serve text resources for our example , a document's lines counter. In this particular case, two resources are accessed by the <literal>HTTP</literal> protocol, as they are two Wikipedia articles on <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://en.wikipedia.org/wiki/ProActive">ProActive library</link> and on <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="http://en.wikipedia.org/wiki/Grid_computing">grid computing</link>. Those inputs can be later resolved by an application using their names (identifiers), here: <literal>wiki_proactive</literal> and <literal>wiki_grid_computing</literal> respectively.
             </para>
             <para>
             The output space is placed on the <literal>OUTPUT_HOSTNAME</literal> host. Output space is a directory placed in the user's home directory and can be accessed remotely by the <literal>SFTP</literal> protocol or locally, as an explicit location is given.
@@ -384,7 +384,7 @@ VFS URL of this provider: paprmi://branch.inria.fr:1099/defaultFileSystemServer?
         <section xml:id="ds_section_example_code">
             <info><title>The Java code</title></info>
             <para>
-            The <literal>HelloExample.java</literal> file contains code responsible for deployment and computation scenario in general. At the beginning, the variable contract is fulfilled, passing the deployer's host name into descriptor. Therefore the output data space is now fully defined &#151; placed on the deployer's host.
+            The <literal>HelloExample.java</literal> file contains code responsible for deployment and computation scenario in general. At the beginning, the variable contract is fulfilled, passing the deployer's host name into descriptor. Therefore the output data space is now fully defined , placed on the deployer's host.
             </para>
             <example xml:id="ds_example_variables">
                 <info><title>HelloExample.java: setting up variable from the contract </title></info>
@@ -400,18 +400,26 @@ VFS URL of this provider: paprmi://branch.inria.fr:1099/defaultFileSystemServer?
             <para>
             All routines related to processing scenario are gathered into one <literal>exampleUsage</literal> method (<xref linkend="ds_example_scenario" />). At the very beginning, nodes grabbed previously during the deployment phase are now used for placing two Active Objects instantiated from the <literal>ExampleProcessing</literal> class. Both are later called to perform <literal>computePartials</literal> method, that obtains as a parameter the name of an input space to process. Input space names are defined as follows:
                 <programlisting language="java"><textobject><textdata fileref="automatic_snippets/DataSpacesExample_code_constants.snip"/></textobject></programlisting>
-                and thereby reflect the GCM&#150;A input spaces definition. Partial results (here: number of lines in each document) are stored in text files in the AO's scratches, that URIs appear as a <literal>computePartials</literal> method's return value. Collection of those URI's is later passed to <literal>gatherPartials</literal> method called on one of instantiated Active Objects.
+                and thereby reflect the GCM-A input spaces definition. Partial results (here: number of lines in each document) are stored in text files in the AO's scratches, that URIs appear as a <literal>computePartials</literal> method's return value. Collection of those URI's is later passed to <literal>gatherPartials</literal> method called on one of instantiated Active Objects.
             </para>
             <example xml:id="ds_example_scenario">
                 <info><title>HelloExample.java: computation scenario used in the example</title></info>
                 <programlisting language="java"><textobject><textdata fileref="automatic_snippets/DataSpacesExample_code_scenario.snip"/></textobject></programlisting>
             </example>
             <para>
-            Finally, let's have a look at routines that are performed by Active Objects instantiated from the <literal>ExampleProcessing</literal> class (<xref linkend="ds_example_processing" /> &#151; refer to comments for the routines' explanation. There are two main processing methods <literal>computePartials</literal> and <literal>gatherPartials</literal> shown, along with the <literal>writeIntoScratchFile</literal> helper method.
+            Finally, let's have a look at routines that are performed by Active Objects instantiated from the <literal>ExampleProcessing</literal> class (<xref linkend="ds_example_processing1" /> , refer to comments for the routines' explanation. There are two main processing methods <literal>computePartials</literal> and <literal>gatherPartials</literal> shown, along with the <literal>writeIntoScratchFile</literal> helper method.
             </para>
-            <example xml:id="ds_example_processing">
-                <info><title>ExampleProcessing.java: routines perfomed by Active Objects</title></info>
-                <programlisting language="java"><textobject><textdata fileref="automatic_snippets/DataSpacesExample_processing.snip"/></textobject></programlisting>
+            <example xml:id="ds_example_processing1">
+                <info><title>ExampleProcessing.java: routines perfomed by Active Objects (1)</title></info>
+                <programlisting language="java"><textobject><textdata fileref="automatic_snippets/DataSpacesExample_processing1.snip"/></textobject></programlisting>
+            </example>
+            <example xml:id="ds_example_processing2">
+                <info><title>ExampleProcessing.java: routines perfomed by Active Objects (2)</title></info>
+                <programlisting language="java"><textobject><textdata fileref="automatic_snippets/DataSpacesExample_processing2.snip"/></textobject></programlisting>
+            </example>
+            <example xml:id="ds_example_processing3">
+                <info><title>ExampleProcessing.java: routines perfomed by Active Objects (3)</title></info>
+                <programlisting language="java"><textobject><textdata fileref="automatic_snippets/DataSpacesExample_processing3.snip"/></textobject></programlisting>
             </example>
         </section>
         <section xml:id="ds_example_output">

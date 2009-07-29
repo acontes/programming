@@ -78,7 +78,6 @@ public class ExampleProcessing implements Serializable {
     public ExampleProcessing() {
     }
 
-    // @snippet-start DataSpacesExample_processing
     /**
      * Creates file within AO's scratch and writes content there.
      * 
@@ -95,6 +94,7 @@ public class ExampleProcessing implements Serializable {
      *             when wrong configuration has been provided (capabilities of a FS)
      * 
      */
+    // @snippet-start DataSpacesExample_processing1
     public String writeIntoScratchFile(String fileName, String content) throws NotConfiguredException,
             IOException, ConfigurationException {
         DataSpacesFileObject file = null;
@@ -119,6 +119,7 @@ public class ExampleProcessing implements Serializable {
         }
     }
 
+    // @snippet-end DataSpacesExample_processing1
     /**
      * Computes number of lines of a document from specified input data space name, and writes
      * partial results into a file in it's scratch. URI of file within AO's scratch data space is
@@ -136,6 +137,7 @@ public class ExampleProcessing implements Serializable {
      * @throws ConfigurationException
      *             when wrong configuration has been provided (capabilities of a FS)
      */
+    // @snippet-start DataSpacesExample_processing2
     public StringWrapper computePartials(String inputName) throws SpaceNotFoundException,
             NotConfiguredException, IOException, ConfigurationException {
 
@@ -172,6 +174,7 @@ public class ExampleProcessing implements Serializable {
         }
     }
 
+    // @snippet-end DataSpacesExample_processing2
     /**
      * Gathers all partials results from specified scratches into one output file within output data
      * space.
@@ -186,6 +189,7 @@ public class ExampleProcessing implements Serializable {
      *             when IO exception occurred during writing final results (failures in reading
      *             partial results are ignored)
      */
+    // @snippet-start DataSpacesExample_processing3
     public void gatherPartials(Iterable<StringWrapper> partialResults) throws MalformedURIException,
             DataSpacesException, IOException {
         logger.info("Gathering and aggregating partial results");
@@ -234,5 +238,5 @@ public class ExampleProcessing implements Serializable {
             closeResource(outputFile);
         }
     }
-    // @snippet-end DataSpacesExample_processing
+    // @snippet-end DataSpacesExample_processing3
 }
