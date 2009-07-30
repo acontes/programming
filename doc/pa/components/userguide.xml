@@ -618,12 +618,12 @@
 				client interface of a component to a web service.
 			</para>
 			<para>
-				The only requirement to bind a client interface to a
+				The only requirement for binding a client interface to a
 				web service is that the web service must be known in
 				advance in order to ensure the compatibility between
 				the client interface and the web service to bind to.
 				In other words, the Java interface representing the
-				client interface must have the same signature methods
+				client interface must have the same method signatures
 				than those exposed by the web service.
 			</para>
 			<para>
@@ -635,26 +635,26 @@
 				<literal>
 					bindFc
 				</literal>
-				with the API, in the tag
+				with the API or in the tag
 				<literal>
 					binding
 				</literal>
 				with the ADL.
 			</para>
 			<para>
-				By default the Axis2 (http://ws.apache.org/axis2/) API is
+				By default, the Axis2 (http://ws.apache.org/axis2/) API is
 				used to call the web service, but it is also possible to
-				specify another library. If so, the URL must be followed,
+				specify another library. If so, the URL has to be followed,
 				in parenthesis, by the ID or the full name of the class to
 				use to call the web service. The ID (not case sensitive)
-				may be Axis2 or CXF (http://cxf.apache.org/) to use one of
-				these library to call the web service. Otherwise, the full
-				class name given must be the one of a class implementing the
+				may be either Axis2 or CXF (http://cxf.apache.org/).
+				Otherwise, the full	class name has to be the one of a class
+				implementing the
 				<literal>
 					org.objectweb.proactive.core.component.webservices.ProActiveWSCaller
 				</literal>
-				interface which has a single method to call web services:
-				<programlisting language="java"><textobject><textdata fileref="automatic_snippets/proactivewscaller.snip"/></textobject></programlisting>
+				interface. This interface has a single method used to call web services:
+				<programlisting language="java"><textobject><textdata fileref="automatic_snippets/proactivewscaller.snip"/></textobject></programlisting> 
 			</para>
 			<para>
 				For instance, the replacing string of the server interface
@@ -672,7 +672,8 @@
 					</listitem>
 					<listitem>
 						<para>
-							and which, as Axis2 is used by default, is also equivalent to: "http://localhost:8080/proactive/services/Server_HelloWorld"
+							which is also equivalent to: "http://localhost:8080/proactive/services/Server_HelloWorld"
+							since Axis2 is used by default.
 						</para>
 					</listitem>
 				</itemizedlist>
