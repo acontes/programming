@@ -1,9 +1,12 @@
 package org.objectweb.proactive.examples.dataspaces.manualconfig;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
+import java.util.Collections;
+import java.util.Set;
 
 import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.ProActiveException;
@@ -11,7 +14,10 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.extensions.dataspaces.api.DataSpacesFileObject;
 import org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces;
+import org.objectweb.proactive.extensions.dataspaces.core.BaseScratchSpaceConfiguration;
 import org.objectweb.proactive.extensions.dataspaces.core.DataSpacesNodes;
+import org.objectweb.proactive.extensions.dataspaces.core.InputOutputSpaceConfiguration;
+import org.objectweb.proactive.extensions.dataspaces.core.SpaceInstanceInfo;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
 import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingServiceDeployer;
 import org.objectweb.proactive.extensions.dataspaces.exceptions.ApplicationAlreadyRegisteredException;
@@ -33,20 +39,30 @@ public class ManualConfigurationExample {
         // @snippet-start DataSpacesManualConfig_RegisteringApp
         // need to guarantee uniqueness of application id somehow
         final long applicationId = 1234431;
+        // @snippet-bDataSpacesManualConfig_RegisteringApp
+        // create set of predefined inputs and outputs - here: default input accessed only through HTTP
+        final InputOutputSpaceConfiguration inSpaceConf = InputOutputSpaceConfiguration
+                .createInputSpaceConfiguration("http://www.faqs.org/ftp/rfc/rfc2616.txt", null, null,
+                        PADataSpaces.DEFAULT_IN_OUT_NAME);
+        final SpaceInstanceInfo inSpaceInfo = new SpaceInstanceInfo(applicationId, inSpaceConf);
+        final Set<SpaceInstanceInfo> predefinedSpaces = Collections.singleton(inSpaceInfo);
+
         // access (possibly remote) Naming Service
         final NamingService namingService = NamingService.createNamingServiceStub(namingServiceURL);
-        // register application, here: without predefined inputs and outputs;
-        // otherwise, provide set of SpaceInstanceInfo instances in place of null
-        namingService.registerApplication(applicationId, null);
+        // register application
+        namingService.registerApplication(applicationId, predefinedSpaces);
         // @snippet-end DataSpacesManualConfig_RegisteringApp
 
-        // configure node for DataSpaces
+        // node to configure for DataSpaces
         final Node node = NodeFactory.getHalfBodiesNode();
 
         // @snippet-start DataSpacesManualConfig_ConfigureNode
-        // configure node, here: node is configured without scratch;
-        // otherwise, provide BaseScratchSpaceConfiguration instance in place of null
-        DataSpacesNodes.configureNode(node, null);
+        // prepare base scratch configuration - here: using tmp dir,
+        // with null url - exposed through automatically started ProActive provider server
+        final String tmpPath = System.getProperty("java.io.tmpdir") + File.separator + "scratch";
+        // configure node for Data Spaces
+        final BaseScratchSpaceConfiguration scratchConf = new BaseScratchSpaceConfiguration(null, tmpPath);
+        DataSpacesNodes.configureNode(node, scratchConf);
         // @snippet-end DataSpacesManualConfig_ConfigureNode
 
         // @snippet-start DataSpacesManualConfig_ConfigureNodeForApp
@@ -56,8 +72,6 @@ public class ManualConfigurationExample {
 
         // now we can use PADataSpaces from AO/bodies on that node.
         // in case of half-bodies node, we can use PADataSpaces from non-AO
-        PADataSpaces.addDefaultInput("http://www.faqs.org/ftp/rfc/rfc2616.txt", null);
-
         final DataSpacesFileObject fo = PADataSpaces.resolveDefaultInput();
         BufferedReader reader = null;
         try {
