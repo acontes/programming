@@ -192,7 +192,8 @@ public class CANOverlay extends StructuredOverlay {
                 break;
         }
 
-        this.neighborsDataStructure.removeAll(lastDimension, CANOverlay.getOppositeDirection(lastDirection));
+        // this.neighborsDataStructure.removeAll(lastDimension,
+        // CANOverlay.getOppositeDirection(lastDirection));
 
         /*
          * Send LeaveMessage in order to update the neighbors list.
@@ -200,17 +201,16 @@ public class CANOverlay extends StructuredOverlay {
         for (int dim = 0; dim < CANOverlay.NB_DIMENSIONS; dim++) {
             for (int direction = 0; direction < 2; direction++) {
                 for (Peer neighbor : this.neighborsDataStructure.getNeighbors(dim, direction)) {
-                    // if (!neighborsToMergeWith.contains(neighbor)) {
-                    this.sendTo(neighbor, new CANLeaveMessage(this.getRemotePeer(), neighborsToMergeWith,
-                        dim, CANOverlay.getOppositeDirection(direction)));
-                    // }
+                    if (!neighborsToMergeWith.contains(neighbor)) {
+                        this.sendTo(neighbor, new CANLeaveMessage(this.getRemotePeer(), neighborsToMergeWith,
+                            dim, CANOverlay.getOppositeDirection(direction)));
+                    }
                 }
             }
         }
 
-        // ((BlockingRequestReceiver) ((MigratableBody)
-        // super.getLocalPeer().getBody()).getRequestReceiver())
-        // .acceptReception();
+        ((BlockingRequestReceiver) ((MigratableBody) super.getLocalPeer().getBody()).getRequestReceiver())
+                .acceptReception();
 
         /*
          * Notify all the old neighbors of the peer which is leaving that it has terminated the
@@ -605,8 +605,10 @@ public class CANOverlay extends StructuredOverlay {
         result &= this.neighborsDataStructure.remove(msg.getPeerToRemove());
 
         for (Peer newNeighbor : msg.getPeersToAdd()) {
-            result &= this.neighborsDataStructure.add(newNeighbor, msg.getDimensionToAdd(), msg
-                    .getDirectionToAdd());
+            if (!this.getNeighborsDataStructure().hasNeighbor(newNeighbor)) {
+                result &= this.neighborsDataStructure.add(newNeighbor, msg.getDimensionToAdd(), msg
+                        .getDirectionToAdd());
+            }
         }
         this.updateNeighbors();
 

@@ -249,10 +249,6 @@ public class OWLIMStorage implements DataStorage {
      */
     public void shutdown() {
         try {
-            if (this.repository.getConnection().isOpen()) {
-                this.repository.getConnection().close();
-            }
-
             this.repository.shutDown();
         } catch (Exception e) {
             e.printStackTrace();

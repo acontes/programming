@@ -92,9 +92,33 @@ public class TestQuery {
     @Test
     public void testLeave() {
         TestQuery.fourthPeer.leave();
-        TestQuery.thirdPeer.leave();
-        TestQuery.secondPeer.leave();
-        TestQuery.firstPeer.leave();
+        // TestQuery.thirdPeer.leave();
+        // TestQuery.secondPeer.leave();
+        // TestQuery.firstPeer.leave();
+
+        List<Peer> peers = new ArrayList<Peer>();
+        peers.add(TestQuery.firstPeer);
+        peers.add(TestQuery.secondPeer);
+        peers.add(TestQuery.thirdPeer);
+        peers.add(TestQuery.fourthPeer);
+
+        int i = 1;
+        for (Peer peer : peers) {
+            System.out.println(i + " " + peer.getStructuredOverlay());
+
+            for (int dim = 0; dim < CANOverlay.NB_DIMENSIONS; dim++) {
+                for (int direction = 0; direction < 2; direction++) {
+                    for (Peer neighbor : ((CANOverlay) peer.getStructuredOverlay())
+                            .getNeighborsDataStructure().getNeighbors(dim, direction)) {
+                        System.out.println("n = " + neighbor.getStructuredOverlay() + " (dim=" + dim + "," +
+                            direction + ")");
+                    }
+                }
+            }
+
+            System.out.println();
+            i++;
+        }
     }
 
     @AfterClass

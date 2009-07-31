@@ -6,6 +6,7 @@ import junit.framework.Assert;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.objectweb.proactive.extensions.structuredp2p.datastorage.DataStorage;
 import org.objectweb.proactive.extensions.structuredp2p.datastorage.owlim.OWLIMStorage;
@@ -13,9 +14,12 @@ import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.query.BindingSet;
+import org.openrdf.query.MalformedQueryException;
 import org.openrdf.query.QueryEvaluationException;
 import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.QueryResult;
+import org.openrdf.query.parser.ParsedQuery;
+import org.openrdf.query.parser.sparql.SPARQLParser;
 
 
 /**
@@ -42,6 +46,21 @@ public class TestOWLIMStorage {
                 .createURI("http://www.w3.org/1999/02/22-rdf-syntax-ns#type");
         TestOWLIMStorage.object = TestOWLIMStorage.owlimValueFactory
                 .createURI("http://example.org/ontology#animal");
+    }
+
+    @Ignore
+    public void testParseQuery() {
+        SPARQLParser parser = new SPARQLParser();
+        ParsedQuery pq = null;
+        try {
+            pq = parser.parseQuery(
+                    "SELECT ?o ?p ?s WHERE { ?o ?p ?s. FILTER ( str(?o) > \"http://toto\"). }", null);
+        } catch (MalformedQueryException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println(pq.getTupleExpr());
+        System.out.println("Signature = " + pq.getTupleExpr().getSignature());
     }
 
     @Test

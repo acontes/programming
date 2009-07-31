@@ -324,6 +324,7 @@ public class Peer implements DataStorage, InitActive, RunActive, Serializable {
                  * 
                  * if (!receiveFromLeaver) { System.out.println("NT FIND");
                  */
+                System.out.println("waiting for endLeave...");
                 service.serveOldest("notifyNeighborEndLeave");
                 // }
             } else {

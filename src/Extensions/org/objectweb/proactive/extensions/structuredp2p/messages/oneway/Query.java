@@ -9,9 +9,10 @@ import org.objectweb.proactive.extensions.structuredp2p.messages.Key;
 
 
 /**
- * A query is a message which is sent on aF network in order to find a {@link Peer} which manage a
- * {@link Key} contained by the {@link Peer} which send the query. In response, it is given some
- * information that the peer found has, by an object of type {@link QueryResponse}.
+ * A query is a message which is sent on a structured peer-to-peer network in order to find a
+ * {@link Peer} which manage a {@link Key} contained by the {@link Peer} which send the query. In
+ * response, it is given some information that the peer found has, by an object of type
+ * {@link QueryResponse}.
  * <p>
  * A query is performed step by step with "oneWay" method. So, we can't say when the response will
  * be returned. Suppose that the peer A is sending a query in order to reach the peer B managing the
@@ -19,7 +20,7 @@ import org.objectweb.proactive.extensions.structuredp2p.messages.Key;
  * <code>keyToFound</code>. After that the query is sending gradually until the peer managing the
  * <code>keyToReach</code> is found. When it is found, the <code>keyToReach</code> change for
  * <code>keyFromSender</code>. At this time the response is routed to the sender in the opposite
- * direction.
+ * direction without necessarily using the same route.
  * 
  * @author Pellegrino Laurent
  * 
