@@ -5,6 +5,12 @@
                 "docbook.dtd" [
                 <!-- WARNING: Please do not edit with XXE -->
                 <!-- This file is only meant as a concatenation of the other xml files -->
+
+                <!-- This has been added to write some special characters such as en and em dashes -->
+                <!ENTITY % iso-pub PUBLIC "ISO 8879:1986//ENTITIES Publishing//EN//XML"
+                                    "http://www.oasis-open.org/docbook/xmlcharent/0.3/iso-pub.ent">
+                                    %iso-pub;
+
                 <!ENTITY bookinfo SYSTEM "bookinfo.xml">
                 <!ENTITY contributors SYSTEM "contributors.xml">
                 <!ENTITY Principles SYSTEM "Principles.xml">
@@ -67,6 +73,7 @@
                 <!ENTITY MessageRouting SYSTEM "MessageRouting.xml">
 	        <!ENTITY JMX SYSTEM "Jmx.xml">
          	 <!ENTITY JMXMBean SYSTEM "jmxMBean.xml">
+                 <!ENTITY scilab SYSTEM "scilab/ScilabDoc.xml">
                 ]>
                 
 <book xmlns="http://docbook.org/ns/docbook" version="5.0">
@@ -112,15 +119,17 @@
   &mpi;
  </part>
  
- <part xml:id="ProActiveDeployment"><info><title xml:id="DeploymentAndVirtualization_2">Deployment And Virtualization</title></info>
-  
+ <part xml:id="ProActiveConfiguration"><info><title xml:id="ProActiveConfiguration_2">ProActive Configuration</title></info>
   &PAConfiguration;
+  &MessageRouting;
+  &SSHTunneling;
+ </part>
+
+ <part xml:id="ProActiveDeployment"><info><title xml:id="DeploymentAndVirtualization_2">Deployment And Virtualization</title></info>
   &GCMDeployment;
   &Descriptor;
   &VariableContract;
-  &FileTransfer;
-  &MessageRouting;
-  &SSHTunneling;
+  <!--&FileTransfer;-->
   &technicalService;
  </part>
  
@@ -143,7 +152,7 @@
   &OSGi;
   &JMX;
   &JMXMBean;
-  
+  &scilab;
  </part>
  
  <part xml:id="ExtendingProActive"><info><title xml:id="ExtendingProActive_2">Extending ProActive</title></info>

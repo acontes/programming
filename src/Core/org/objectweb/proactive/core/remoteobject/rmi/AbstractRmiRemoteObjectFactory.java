@@ -71,6 +71,7 @@ public abstract class AbstractRmiRemoteObjectFactory extends AbstractRemoteObjec
     protected static RegistryHelper registryHelper;
 
     static {
+
         createClassServer();
         createRegistry();
     }
