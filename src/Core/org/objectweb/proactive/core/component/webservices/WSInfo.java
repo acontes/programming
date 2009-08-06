@@ -158,7 +158,7 @@ public class WSInfo implements Serializable {
     private String checkClassName(String className) throws IllegalBindingException {
         try {
             Class<?> c = Class.forName(className);
-            if (!c.isAssignableFrom(Class.forName(PROACTIVEWSCALLER_ITF_NAME))) {
+            if (!Class.forName(PROACTIVEWSCALLER_ITF_NAME).isAssignableFrom(c)) {
                 throw new IllegalBindingException("The web service caller: " + className +
                     " must implement the " + PROACTIVEWSCALLER_ITF_NAME + " interface");
             }
