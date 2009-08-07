@@ -5,7 +5,7 @@
  *            Concurrent computing with Security and Mobility
  *
  * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,48 +27,30 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.extra.messagerouting.remoteobject;
+package org.objectweb.proactive.extra.pamrssh.remoteobject;
 
-import java.net.InetAddress;
-
-import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extra.messagerouting.client.Agent;
-import org.objectweb.proactive.extra.messagerouting.client.AgentImpl;
-import org.objectweb.proactive.extra.messagerouting.client.ProActiveMessageHandler;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectFactorySPI;
 
 
 /**
- * 
- * @since ProActive 4.1.0
+ * Hook the new protocol inside ProActive
+ * @see org.objectweb.proactive.core.remoteobject.RemoteObjectProtocolFactoryRegistry
+ * @author fabratu
+ * @version %G%, %I%
+ * @since ProActive 4.10
  */
-public class MessageRoutingRemoteObjectFactory extends AbstractRoutingRemoteObjectFactory {
-
-    /** The protocol id of the facotry */
-    static final public String PROTOCOL_ID = "pamr";
-
-    public MessageRoutingRemoteObjectFactory() {
-        super();
-    }
+public class PamrSshRemoteObjectFactorySPI implements RemoteObjectFactorySPI {
 
     @Override
-    protected Agent agentInit(InetAddress routerAddress, int routerPort) {
-        Agent agent = null;
-        try {
-            agent = new AgentImpl(routerAddress, routerPort, ProActiveMessageHandler.class);
-        } catch (ProActiveException e) {
-            logAndThrowException("Failed to create the local agent", e);
-        }
-        return agent;
+    public Class<? extends RemoteObjectFactory> getFactoryClass() {
+        return PamrSshRemoteObjectFactory.class;
     }
 
     @Override
     public String getProtocolId() {
-        return PROTOCOL_ID;
+        return "pamrssh";
     }
 
 }
