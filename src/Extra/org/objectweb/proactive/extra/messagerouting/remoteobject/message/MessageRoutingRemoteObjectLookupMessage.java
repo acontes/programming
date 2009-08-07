@@ -40,8 +40,8 @@ import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.messagerouting.client.Agent;
+import org.objectweb.proactive.extra.messagerouting.remoteobject.AbstractRoutingRemoteObjectFactory;
 import org.objectweb.proactive.extra.messagerouting.remoteobject.MessageRoutingRemoteObject;
-import org.objectweb.proactive.extra.messagerouting.remoteobject.MessageRoutingRemoteObjectFactory;
 import org.objectweb.proactive.extra.messagerouting.remoteobject.util.MessageRoutingRegistry;
 
 
@@ -86,12 +86,16 @@ public class MessageRoutingRemoteObjectLookupMessage extends MessageRoutingMessa
             if (irro != null) {
                 RemoteRemoteObject rro = null;
                 try {
-                    MessageRoutingRemoteObjectFactory f = (MessageRoutingRemoteObjectFactory) AbstractRemoteObjectFactory
-                            .getRemoteObjectFactory(MessageRoutingRemoteObjectFactory.PROTOCOL_ID);
+                    AbstractRoutingRemoteObjectFactory f = (AbstractRoutingRemoteObjectFactory) AbstractRemoteObjectFactory
+                            .getRemoteObjectFactory(this.uri.getScheme());
                     rro = f.newRemoteObject(irro);
                     ((MessageRoutingRemoteObject) rro).setURI(uri);
                     return rro;
                 } catch (UnknownProtocolException e) {
+                    logger.error(
+                            "Cannot get the message routing remote object factory for the protocol scheme" +
+                                this.uri.getScheme(), e);
+                } catch (ClassCastException e) {
                     // Impossible because that class has been created by the factory
                     ProActiveLogger.logImpossibleException(logger, e);
                 }

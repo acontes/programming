@@ -97,13 +97,15 @@ public class MessageRoutingRemoteObject implements RemoteRemoteObject, Serializa
     private Agent getAgent() {
         if (this.agent == null) {
             try {
-                // FIXME: The factory cast is a hack but there is no clean way to do it
-                MessageRoutingRemoteObjectFactory f;
-                f = (MessageRoutingRemoteObjectFactory) AbstractRemoteObjectFactory
-                        .getRemoteObjectFactory("pamr");
+                AbstractRoutingRemoteObjectFactory f = (AbstractRoutingRemoteObjectFactory) AbstractRemoteObjectFactory
+                        .getRemoteObjectFactory(this.remoteObjectURL.getScheme());
                 this.agent = f.getAgent();
             } catch (UnknownProtocolException e) {
-                logger.fatal("Failed to get the local message routing agent", e);
+                logger.fatal("Failed to get the local message routing agent for protocol " +
+                    this.remoteObjectURL.getScheme(), e);
+            } catch (ClassCastException e) {
+                // Impossible because that class has been created by the factory
+                ProActiveLogger.logImpossibleException(logger, e);
             }
         }
 
