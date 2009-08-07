@@ -18,6 +18,7 @@ import org.objectweb.proactive.core.body.request.RequestReceiver;
  */
 @SuppressWarnings("serial")
 public class BlockingRequestReceiver extends org.objectweb.proactive.core.body.request.RequestReceiverImpl {
+
     boolean allowReception = true;
 
     /**
@@ -28,15 +29,10 @@ public class BlockingRequestReceiver extends org.objectweb.proactive.core.body.r
     }
 
     /**
-     * {@inheritDoc}
+     * Allows the {@code RequestReceiver} to receive new requests.
      */
-    public int receiveRequest(Request request, Body bodyReceiver) {
-        if (!this.allowReception) {
-            System.out.println();
-            throw new BlockingRequestReceiverException(this.getClass().getName());
-        } else {
-            return super.receiveRequest(request, bodyReceiver);
-        }
+    public void acceptReception() {
+        this.allowReception = true;
     }
 
     /**
@@ -50,17 +46,22 @@ public class BlockingRequestReceiver extends org.objectweb.proactive.core.body.r
     }
 
     /**
-     * Allows the {@code RequestReceiver} to receive new requests.
-     */
-    public void acceptReception() {
-        this.allowReception = true;
-    }
-
-    /**
      * Prohibits the {@code RequestReceiver} to receive new requests.
      */
     public void blockReception() {
         this.allowReception = false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public int receiveRequest(Request request, Body bodyReceiver) {
+        if (!this.allowReception) {
+            System.out.println();
+            throw new BlockingRequestReceiverException(this.getClass().getName());
+        } else {
+            return super.receiveRequest(request, bodyReceiver);
+        }
     }
 
 }

@@ -24,9 +24,9 @@ import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordin
 public class Zone implements Serializable {
 
     /**
-     * The type of coordinate to use.
+     * The maximal value to manage.
      */
-    public static final Class<? extends Coordinate> COORDINATE_TYPE = LexicographicCoordinate.class;
+    public static final String COORDINATE_MAX = "http://z";
 
     /**
      * The minimal value to manage.
@@ -34,19 +34,19 @@ public class Zone implements Serializable {
     public static final String COORDINATE_MIN = "http://a";
 
     /**
-     * The maximal value to manage.
+     * The type of coordinate to use.
      */
-    public static final String COORDINATE_MAX = "http://z";
-
-    /**
-     * The minimum coordinates.
-     */
-    private Coordinate[] coordinatesMin;
+    public static final Class<? extends Coordinate> COORDINATE_TYPE = LexicographicCoordinate.class;
 
     /**
      * The maximum coordinates.
      */
     private Coordinate[] coordinatesMax;
+
+    /**
+     * The minimum coordinates.
+     */
+    private Coordinate[] coordinatesMin;
 
     /**
      * Constructor. Create the biggest zone with all coordinates.
@@ -100,12 +100,115 @@ public class Zone implements Serializable {
     }
 
     /**
-     * Returns the minimum coordinates that indicates the zone which is managed by a peer.
+     * Check if the coordinates in arguments are in the managed zone.
      * 
-     * @return the minimum coordinates that indicates the zone which is managed by a peer.
+     * @param coordinates
+     *            the coordinates to check.
+     * 
+     * @return true if the coordinates are in the zone, false otherwise.
      */
-    public Coordinate[] getCoordinatesMin() {
-        return this.coordinatesMin;
+    public boolean contains(Coordinate[] coordinates) {
+        int i;
+        boolean res = true;
+
+        for (i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
+            if (!(res &= (this.contains(i, coordinates[i]) == 0))) {
+                return false;
+            }
+        }
+
+        return res;
+    }
+
+    /**
+     * Indicates if the zone contains the specified coordinate following the given dimension.
+     * 
+     * @param dimension
+     *            the dimension.
+     * @param coordinate
+     *            the coordinate to check.
+     * @return <code>0</code> if the current coordinate is in the zone, <code>-1</code> if the
+     *         coordinate is taller than the minimal coordinate of the zone and <code>1</code> if
+     *         the coordinate is greater than the maximal coordinate of the zone and .((CANOverlay)
+     *         this.firstPeer.getStructuredOverlay()).getZone() .getCoordinatesMin()
+     */
+    public int contains(int dimension, Coordinate coordinate) {
+        if (coordinate.compareTo(this.getCoordinateMax(dimension)) >= 0) {
+            return 1;
+        } else if (coordinate.compareTo(this.getCoordinateMin(dimension)) < 0) {
+            return -1;
+        }
+
+        return 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean equals(Object o) {
+        if (!(o instanceof Zone)) {
+            throw new IllegalArgumentException();
+        }
+
+        Zone zone = (Zone) o;
+
+        int i;
+        int nbDim = this.coordinatesMax.length;
+
+        for (i = 0; i < nbDim; i++) {
+            if (!this.getCoordinateMax(i).equals(zone.getCoordinateMax(i)) ||
+                !this.getCoordinateMin(i).equals(zone.getCoordinateMin(i))) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Returns the border dimension between this zone and the argument.
+     * 
+     * @param zone
+     *            the zone to check.
+     * @return the border dimension, <code>-1</code> if they are not bordered.
+     */
+    public int getBorderedDimension(Zone zone) {
+        int i;
+        int nbDim = this.coordinatesMax.length;
+
+        for (i = 0; i < nbDim; i++) {
+            if (this.isBordered(zone, i)) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    /**
+     * Returns the maximum coordinate at a specified dimension that indicates the zone which is
+     * managed by a peer.
+     * 
+     * @param dimension
+     *            the dimension on which we recover the coordinates.
+     * @return the maximum coordinate at a specified dimension that indicates the zone which is
+     *         managed by a peer.
+     */
+    public Coordinate getCoordinateMax(int dimension) {
+        return this.coordinatesMax[dimension];
+    }
+
+    /**
+     * Returns the minimum coordinate at a specified dimension that indicates the zone which is
+     * managed by a peer.
+     * 
+     * @param dimension
+     *            the dimension on which we recover the coordinates.
+     * @return the minimum coordinate at the specified dimension that indicates the zone which is
+     *         managed by a peer.
+     */
+    public Coordinate getCoordinateMin(int dimension) {
+        return this.coordinatesMin[dimension];
     }
 
     /**
@@ -127,29 +230,12 @@ public class Zone implements Serializable {
     }
 
     /**
-     * Returns the minimum coordinate at a specified dimension that indicates the zone which is
-     * managed by a peer.
+     * Returns the minimum coordinates that indicates the zone which is managed by a peer.
      * 
-     * @param dimension
-     *            the dimension on which we recover the coordinates.
-     * @return the minimum coordinate at the specified dimension that indicates the zone which is
-     *         managed by a peer.
+     * @return the minimum coordinates that indicates the zone which is managed by a peer.
      */
-    public Coordinate getCoordinateMin(int dimension) {
-        return this.coordinatesMin[dimension];
-    }
-
-    /**
-     * Returns the maximum coordinate at a specified dimension that indicates the zone which is
-     * managed by a peer.
-     * 
-     * @param dimension
-     *            the dimension on which we recover the coordinates.
-     * @return the maximum coordinate at a specified dimension that indicates the zone which is
-     *         managed by a peer.
-     */
-    public Coordinate getCoordinateMax(int dimension) {
-        return this.coordinatesMax[dimension];
+    public Coordinate[] getCoordinatesMin() {
+        return this.coordinatesMin;
     }
 
     /**
@@ -188,23 +274,34 @@ public class Zone implements Serializable {
     }
 
     /**
-     * Returns the border dimension between this zone and the argument.
+     * Merges two bordered zones.
      * 
      * @param zone
-     *            the zone to check.
-     * @return the border dimension, <code>-1</code> if they are not bordered.
+     *            the zone to which we merge the current.
+     * @return the merged zone.
+     * @throws ZoneException
      */
-    public int getBorderedDimension(Zone zone) {
-        int i;
-        int nbDim = this.coordinatesMax.length;
+    public Zone merge(Zone zone) throws ZoneException {
+        int border = this.getBorderedDimension(zone);
 
-        for (i = 0; i < nbDim; i++) {
-            if (this.isBordered(zone, i)) {
-                return i;
+        if (border == -1) {
+            throw new ZoneException("Zones are not bordered : " + this + " | " + zone + ".");
+        } else {
+            Coordinate[] minCoord = null;
+            Coordinate[] maxCoord = null;
+            try {
+                minCoord = (Coordinate[]) MakeDeepCopy.WithObjectStream.makeDeepCopy(this.coordinatesMin);
+                maxCoord = (Coordinate[]) MakeDeepCopy.WithObjectStream.makeDeepCopy(this.coordinatesMax);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
             }
-        }
+            minCoord[border] = Coordinate.min(this.getCoordinateMin(border), zone.getCoordinateMin(border));
+            maxCoord[border] = Coordinate.max(this.getCoordinateMax(border), zone.getCoordinateMax(border));
 
-        return -1;
+            return new Zone(minCoord, maxCoord);
+        }
     }
 
     /**
@@ -253,103 +350,6 @@ public class Zone implements Serializable {
 
         return new Zone[] { new Zone(this.getCoordinatesMin(), coordinatesMaxCopy),
                 new Zone(coordinatesMinCopy, this.getCoordinatesMax()) };
-    }
-
-    /**
-     * Merges two bordered zones.
-     * 
-     * @param zone
-     *            the zone to which we merge the current.
-     * @return the merged zone.
-     * @throws ZoneException
-     */
-    public Zone merge(Zone zone) throws ZoneException {
-        int border = this.getBorderedDimension(zone);
-
-        if (border == -1) {
-            throw new ZoneException("Zones are not bordered : " + this + " | " + zone + ".");
-        } else {
-            Coordinate[] minCoord = null;
-            Coordinate[] maxCoord = null;
-            try {
-                minCoord = (Coordinate[]) MakeDeepCopy.WithObjectStream.makeDeepCopy(this.coordinatesMin);
-                maxCoord = (Coordinate[]) MakeDeepCopy.WithObjectStream.makeDeepCopy(this.coordinatesMax);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-            minCoord[border] = Coordinate.min(this.getCoordinateMin(border), zone.getCoordinateMin(border));
-            maxCoord[border] = Coordinate.max(this.getCoordinateMax(border), zone.getCoordinateMax(border));
-
-            return new Zone(minCoord, maxCoord);
-        }
-    }
-
-    /**
-     * Indicates if the zone contains the specified coordinate following the given dimension.
-     * 
-     * @param dimension
-     *            the dimension.
-     * @param coordinate
-     *            the coordinate to check.
-     * @return <code>0</code> if the current coordinate is in the zone, <code>-1</code> if the
-     *         coordinate is taller than the minimal coordinate of the zone and <code>1</code> if
-     *         the coordinate is greater than the maximal coordinate of the zone and .((CANOverlay)
-     *         this.firstPeer.getStructuredOverlay()).getZone() .getCoordinatesMin()
-     */
-    public int contains(int dimension, Coordinate coordinate) {
-        if (coordinate.compareTo(this.getCoordinateMax(dimension)) >= 0) {
-            return 1;
-        } else if (coordinate.compareTo(this.getCoordinateMin(dimension)) < 0) {
-            return -1;
-        }
-
-        return 0;
-    }
-
-    /**
-     * Check if the coordinates in arguments are in the managed zone.
-     * 
-     * @param coordinates
-     *            the coordinates to check.
-     * 
-     * @return true if the coordinates are in the zone, false otherwise.
-     */
-    public boolean contains(Coordinate[] coordinates) {
-        int i;
-        boolean res = true;
-
-        for (i = 0; i < CANOverlay.NB_DIMENSIONS; i++) {
-            if (!(res &= (this.contains(i, coordinates[i]) == 0))) {
-                return false;
-            }
-        }
-
-        return res;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean equals(Object o) {
-        if (!(o instanceof Zone)) {
-            throw new IllegalArgumentException();
-        }
-
-        Zone zone = (Zone) o;
-
-        int i;
-        int nbDim = this.coordinatesMax.length;
-
-        for (i = 0; i < nbDim; i++) {
-            if (!this.getCoordinateMax(i).equals(zone.getCoordinateMax(i)) ||
-                !this.getCoordinateMin(i).equals(zone.getCoordinateMin(i))) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     /**

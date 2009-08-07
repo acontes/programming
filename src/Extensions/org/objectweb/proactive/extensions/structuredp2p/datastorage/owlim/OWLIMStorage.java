@@ -33,39 +33,17 @@ import org.openrdf.sail.nativerdf.NativeStore;
 @SuppressWarnings("serial")
 public class OWLIMStorage implements DataStorage {
 
-    private Repository repository;
+    public static final String REPOSITORIES_PATH = OWLIMStorage.ROOT_PATH + "/BigOWLIM/repositories";
 
     public static final String ROOT_PATH = System.getProperty("user.home");
 
-    public static final String REPOSITORIES_PATH = OWLIMStorage.ROOT_PATH + "/BigOWLIM/repositories";
+    private Repository repository;
 
     /**
      * Constructor.
      */
     public OWLIMStorage() {
         this.startup();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void startup() {
-        File repositoriesPath = new File(OWLIMStorage.REPOSITORIES_PATH);
-
-        if (!repositoriesPath.exists()) {
-            repositoriesPath.mkdirs();
-        }
-
-        File currentObjectRepository = new File(OWLIMStorage.REPOSITORIES_PATH, "" + this.hashCode());
-        currentObjectRepository.mkdir();
-
-        this.repository = new SailRepository(new NativeStore(currentObjectRepository, "spoc,posc"));
-
-        try {
-            this.repository.initialize();
-        } catch (RepositoryException e) {
-            e.printStackTrace();
-        }
     }
 
     /**
@@ -88,22 +66,41 @@ public class OWLIMStorage implements DataStorage {
     }
 
     /**
-     * {@inheritDoc}
+     * Recursively delete a given directory.
+     * 
+     * @param path
+     *            the path to the directory to remove.
+     * @return <code>true</code> is the delete has succeeded, <code>false</code> otherwise.
      */
-    public void remove(Statement stmt) {
-        RepositoryConnection conn = null;
-        try {
-            conn = this.repository.getConnection();
-            conn.remove(stmt);
-        } catch (RepositoryException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                conn.close();
-            } catch (RepositoryException e) {
-                e.printStackTrace();
+    private boolean deleteDirectory(File path) {
+        boolean resultat = true;
+
+        if (path.exists()) {
+            File[] files = path.listFiles();
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    resultat &= this.deleteDirectory(file);
+                } else {
+                    resultat &= file.delete();
+                }
             }
         }
+        resultat &= path.delete();
+        return (resultat);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Repository getRepository() {
+        return this.repository;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean hasStatements() {
+        return this.queryB(QueryLanguage.SPARQL, "ASK { ?s ?p ?o }");
     }
 
     /**
@@ -216,32 +213,20 @@ public class OWLIMStorage implements DataStorage {
     /**
      * {@inheritDoc}
      */
-    public boolean hasStatements() {
-        return this.queryB(QueryLanguage.SPARQL, "ASK { ?s ?p ?o }");
-    }
-
-    /**
-     * Recursively delete a given directory.
-     * 
-     * @param path
-     *            the path to the directory to remove.
-     * @return <code>true</code> is the delete has succeeded, <code>false</code> otherwise.
-     */
-    private boolean deleteDirectory(File path) {
-        boolean resultat = true;
-
-        if (path.exists()) {
-            File[] files = path.listFiles();
-            for (File file : files) {
-                if (file.isDirectory()) {
-                    resultat &= this.deleteDirectory(file);
-                } else {
-                    resultat &= file.delete();
-                }
+    public void remove(Statement stmt) {
+        RepositoryConnection conn = null;
+        try {
+            conn = this.repository.getConnection();
+            conn.remove(stmt);
+        } catch (RepositoryException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                conn.close();
+            } catch (RepositoryException e) {
+                e.printStackTrace();
             }
         }
-        resultat &= path.delete();
-        return (resultat);
     }
 
     /**
@@ -281,7 +266,22 @@ public class OWLIMStorage implements DataStorage {
     /**
      * {@inheritDoc}
      */
-    public Repository getRepository() {
-        return this.repository;
+    public void startup() {
+        File repositoriesPath = new File(OWLIMStorage.REPOSITORIES_PATH);
+
+        if (!repositoriesPath.exists()) {
+            repositoriesPath.mkdirs();
+        }
+
+        File currentObjectRepository = new File(OWLIMStorage.REPOSITORIES_PATH, "" + this.hashCode());
+        currentObjectRepository.mkdir();
+
+        this.repository = new SailRepository(new NativeStore(currentObjectRepository, "spoc,posc"));
+
+        try {
+            this.repository.initialize();
+        } catch (RepositoryException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -7,8 +7,8 @@ import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates.Coordinate;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates.LexicographicCoordinate;
-import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.QueryResponse;
-import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can.RDFQuery;
+import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can.LookupQuery;
+import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can.LookupQueryResponse;
 
 
 /**
@@ -52,7 +52,8 @@ public class SearchCommand extends Command {
         Peer sender = super.getManager().getPeersLauncher().getAvailablePeers().get(
                 rand.nextInt(super.getManager().getPeersLauncher().getAvailablePeers().size()));
 
-        QueryResponse response = sender.search(new RDFQuery(sender, coordinatesToFind));
+        LookupQueryResponse response = (LookupQueryResponse) sender.search(new LookupQuery(sender,
+            coordinatesToFind));
 
         super.printInfo("Lookup for peer managing " + buf + ".\n    Lookup start from peer managing " +
             ((CANOverlay) sender.getStructuredOverlay()).getZone() + ".\n    Peer found in " +

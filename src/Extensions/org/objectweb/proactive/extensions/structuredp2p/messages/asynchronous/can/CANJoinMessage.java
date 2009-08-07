@@ -36,18 +36,18 @@ public class CANJoinMessage implements Message {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public CANJoinResponseMessage handle(StructuredOverlay overlay) {
-        return (CANJoinResponseMessage) overlay.handleJoinMessage(this);
-    }
-
-    /**
      * Returns the remote peer.
      * 
      * @return the remotePeer
      */
     public Peer getRemotePeer() {
         return this.remotePeer;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public CANJoinResponseMessage handle(StructuredOverlay overlay) {
+        return (CANJoinResponseMessage) overlay.handleJoinMessage(this);
     }
 }

@@ -1,59 +1,83 @@
 package org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can;
 
+import java.util.Stack;
+
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredOverlay;
-import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates.Coordinate;
-import org.objectweb.proactive.extensions.structuredp2p.messages.Key;
-import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.Query;
 
 
 /**
  * An RDF query is a query used in order to retrieve data from peer by Resource Description
- * Framework criteria which is a method for conceptual description or modeling of information that
- * is implemented in web resources.
+ * Framework criteria which is a method for conceptual description or modeling of information. This
+ * kind of request will query some {@link Peer} (each maintains an RDF datastore) in order to
+ * retrieve results.
+ * 
+ * This kind of query can only be used on a CAN structured peer-to-peer network.
  * 
  * @author Pellegrino Laurent
+ * @version 0.1, 08/03/2009
  */
 @SuppressWarnings("serial")
-public class RDFQuery extends Query {
+public abstract class RDFQuery extends AbstractCANQuery {
+
+    Stack<Peer> visitedPeers = new Stack<Peer>();
+
+    public RDFQuery() {
+        super();
+    }
 
     /**
      * Constructor.
      * 
-     * @param sender
-     *            the peer which sent the query.
-     * 
      * @param coordinatesToFind
      *            the coordinates to reach.
      */
-    public RDFQuery(Peer sender, Coordinate[] coordinatesToFind) {
-        super(new Key<Coordinate[]>(coordinatesToFind), new Key<Coordinate[]>(((CANOverlay) sender
-                .getStructuredOverlay()).getZone().getCoordinatesMin()));
+    public RDFQuery(Coordinate[] coordinatesToFind) {
+        super(coordinatesToFind);
     }
 
     /**
      * {@inheritDoc}
      */
-    public void handle(StructuredOverlay overlay) {
-        overlay.handleQuery(this);
+    public abstract void handle(StructuredOverlay overlay);
+
+    /**
+     * {@inheritDoc}
+     */
+    public abstract void route(StructuredOverlay overlay);
+
+    /**
+     * {@inheritDoc}
+     */
+    public abstract boolean validKeyConstraints(StructuredOverlay overlay);
+
+    /**
+     * Adds a peer to the visited peers stack.
+     * 
+     * @param remotePeer
+     *            the peer to add.
+     */
+    public void addVisitedPeer(Peer remotePeer) {
+        this.visitedPeers.push(remotePeer);
     }
 
     /**
-     * Returns the coordinates to reach.
+     * Returns the peers which has been visited.
      * 
-     * @return the coordinates to reach.
+     * @return the peers which has been visited.
      */
-    public Coordinate[] getCoordinatesToReach() {
-        return (Coordinate[]) super.getKeyToReach().getValue();
+    public Stack<Peer> getVisitedPeers() {
+        return this.visitedPeers;
     }
 
     /**
-     * Returns the coordinates managed by the peer sending the query.
+     * Removes the last peer visited.
      * 
-     * @return the coordinates managed by the peer sending the query.
+     * @return <code>true</code> if the remove has succeeded, <code>false</code> otherwise.
      */
-    public Coordinate[] getCoordinatesFromSender() {
-        return (Coordinate[]) super.getKeyFromSender().getValue();
+    public boolean removeLastVisitedPeer() {
+        return this.visitedPeers.remove(this.visitedPeers.lastElement());
     }
+
 }

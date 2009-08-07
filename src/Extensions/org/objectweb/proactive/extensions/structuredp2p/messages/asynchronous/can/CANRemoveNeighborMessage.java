@@ -46,13 +46,6 @@ public class CANRemoveNeighborMessage extends RemoveNeighborMessage {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public ActionResponseMessage handle(StructuredOverlay overlay) {
-        return overlay.handleRemoveNeighborMessage(this);
-    }
-
-    /**
      * Returns the dimension of the neighbor to remove.
      * 
      * @return the dimension of the neighbor to remove.
@@ -68,6 +61,13 @@ public class CANRemoveNeighborMessage extends RemoveNeighborMessage {
      */
     public int getDirection() {
         return this.direction;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public ActionResponseMessage handle(StructuredOverlay overlay) {
+        return overlay.handleRemoveNeighborMessage(this);
     }
 
 }

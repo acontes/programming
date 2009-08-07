@@ -31,16 +31,6 @@ public class ZoneException extends Exception {
     }
 
     /**
-     * Constructs an {@code ZoneException} with the specified cause.
-     * 
-     * @param cause
-     *            the cause.
-     */
-    public ZoneException(Throwable cause) {
-        super(cause);
-    }
-
-    /**
      * Constructs an {@code ZoneException} with the specified detail message and cause.
      * 
      * @param message
@@ -50,6 +40,16 @@ public class ZoneException extends Exception {
      */
     public ZoneException(String message, Throwable cause) {
         super(message, cause);
+    }
+
+    /**
+     * Constructs an {@code ZoneException} with the specified cause.
+     * 
+     * @param cause
+     *            the cause.
+     */
+    public ZoneException(Throwable cause) {
+        super(cause);
     }
 
 }

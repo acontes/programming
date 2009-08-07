@@ -18,6 +18,27 @@ import org.objectweb.proactive.examples.structuredp2p.launchers.commands.SearchC
  * @version 0.1, 07/27/2009
  */
 public class StressTestManager extends Manager {
+    public class KeyListenerThread implements Runnable {
+
+        private boolean running = true;
+        private StressTestManager stressTestThread;
+
+        public KeyListenerThread(StressTestManager stressTestThread) {
+            this.stressTestThread = stressTestThread;
+        }
+
+        public void run() {
+            Scanner scanner = new Scanner(System.in);
+            while (this.running) {
+                if (scanner.next().equals("q")) {
+                    scanner.close();
+                    this.stressTestThread.stopExecution();
+                    this.running = false;
+                }
+            }
+        }
+    }
+
     private List<String> operationsAllowed = new ArrayList<String>();
 
     public StressTestManager(PeerLauncher peerLauncher, boolean performJoin, boolean performLeave,
@@ -37,14 +58,6 @@ public class StressTestManager extends Manager {
         }
     }
 
-    public void run() {
-        new Thread(new KeyListenerThread(this)).start();
-
-        while (super.isRunning()) {
-            this.performARandomBasicOperation();
-        }
-    }
-
     public void performARandomBasicOperation() {
         Random rand = new Random();
 
@@ -58,24 +71,11 @@ public class StressTestManager extends Manager {
         }
     }
 
-    public class KeyListenerThread implements Runnable {
+    public void run() {
+        new Thread(new KeyListenerThread(this)).start();
 
-        private boolean running = true;
-        private StressTestManager stressTestThread;
-
-        public KeyListenerThread(StressTestManager stressTestThread) {
-            this.stressTestThread = stressTestThread;
-        }
-
-        public void run() {
-            Scanner scanner = new Scanner(System.in);
-            while (this.running) {
-                if (scanner.next().equals("q")) {
-                    scanner.close();
-                    this.stressTestThread.stopExecution();
-                    this.running = false;
-                }
-            }
+        while (super.isRunning()) {
+            this.performARandomBasicOperation();
         }
     }
 }

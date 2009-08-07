@@ -25,11 +25,6 @@ import org.openrdf.model.Statement;
 public class CANMergeMessage implements Message {
 
     /**
-     * The peer which is leaving.
-     */
-    private final Peer remotePeerWichIsLeaving;
-
-    /**
      * The current dimension of the leaving peer.
      */
     private final int dimension;
@@ -45,14 +40,19 @@ public class CANMergeMessage implements Message {
     private final NeighborsDataStructure neighbors;
 
     /**
-     * The zone to merge with.
+     * The peer which is leaving.
      */
-    private final Zone zone;
+    private final Peer remotePeerWichIsLeaving;
 
     /**
      * The resources to merge with.
      */
     private final Set<Statement> resources;
+
+    /**
+     * The zone to merge with.
+     */
+    private final Zone zone;
 
     /**
      * Constructor.
@@ -85,22 +85,6 @@ public class CANMergeMessage implements Message {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public ActionResponseMessage handle(StructuredOverlay overlay) {
-        return ((CANOverlay) overlay).handleMergeMessage(this);
-    }
-
-    /**
-     * Returns the leaving remote peer.
-     * 
-     * @return the remote peer.
-     */
-    public Peer getRemotePeerWhichIsLeaving() {
-        return this.remotePeerWichIsLeaving;
-    }
-
-    /**
      * Returns the dimension of leaving.
      * 
      * @return the dimension.
@@ -128,12 +112,12 @@ public class CANMergeMessage implements Message {
     }
 
     /**
-     * Returns the zone to merge with.
+     * Returns the leaving remote peer.
      * 
-     * @return the zone to merge with.
+     * @return the remote peer.
      */
-    public Zone getZone() {
-        return this.zone;
+    public Peer getRemotePeerWhichIsLeaving() {
+        return this.remotePeerWichIsLeaving;
     }
 
     /**
@@ -143,5 +127,21 @@ public class CANMergeMessage implements Message {
      */
     public Set<Statement> getResources() {
         return this.resources;
+    }
+
+    /**
+     * Returns the zone to merge with.
+     * 
+     * @return the zone to merge with.
+     */
+    public Zone getZone() {
+        return this.zone;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public ActionResponseMessage handle(StructuredOverlay overlay) {
+        return ((CANOverlay) overlay).handleMergeMessage(this);
     }
 }

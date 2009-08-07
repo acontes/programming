@@ -9,8 +9,9 @@ import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.Ad
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.Message;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.RemoveNeighborMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.can.CANRemoveNeighborMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.AbstractQuery;
+import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.AbstractQueryResponse;
 import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.Query;
-import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.QueryResponse;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.ActionResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.JoinResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.ResponseMessage;
@@ -35,14 +36,14 @@ public abstract class StructuredOverlay implements Serializable {
     public static final int UPDATE_TIMEOUT = 500;
 
     /**
-     * The local peer which is associated with the overlay.
-     */
-    private Peer localPeer = null;
-
-    /**
      * Queries which are bufferized when a {@link Peer#sendTo(Peer, Message)} is not accepted.
      */
     private List<Query> bufferizedQueries = new Vector<Query>();
+
+    /**
+     * The local peer which is associated with the overlay.
+     */
+    private Peer localPeer = null;
 
     /**
      * Constructor.
@@ -53,6 +54,80 @@ public abstract class StructuredOverlay implements Serializable {
     public StructuredOverlay(Peer peer) {
         this.localPeer = peer;
     }
+
+    /**
+     * Bufferize a new query that will be performed at the time of the next checking.
+     * 
+     * @param query
+     *            the query to bufferize.
+     */
+    public void bufferizeQuery(AbstractQuery query) {
+        this.bufferizedQueries.add(query);
+    }
+
+    /**
+     * Returns the queries that are bufferized.
+     * 
+     * @return the queries that are bufferized.
+     */
+    public List<Query> getBufferizedQueries() {
+        return this.bufferizedQueries;
+    }
+
+    /**
+     * Returns the current peer that use this overlay.
+     * 
+     * @return the current peer that use this overlay.
+     */
+    public Peer getLocalPeer() {
+        return this.localPeer;
+    }
+
+    /**
+     * Returns the stub associated to the local peer.
+     * 
+     * @return the stub associated to the local peer.
+     */
+    public Peer getRemotePeer() {
+        return this.localPeer.getStub();
+    }
+
+    /**
+     * Handles a {@link AddNeighborMessage}.
+     * 
+     * @param msg
+     *            the message that is handled.
+     * @return the {@link EmptyResponseMessage} response.
+     */
+    public abstract ActionResponseMessage handleAddNeighborMessage(AddNeighborMessage msg);
+
+    /**
+     * Handles a {@code JoinMessage}.
+     * 
+     * @param msg
+     *            the message that is handled.
+     * @return the {@link JoinResponseMessage} response.
+     */
+    public abstract ResponseMessage handleJoinMessage(Message msg);
+
+    /**
+     * Handles a {@link AbstractQueryResponse}.
+     * 
+     * @param response
+     *            the response to handle.
+     */
+    public void handleQueryResponse(AbstractQueryResponse response) {
+
+    }
+
+    /**
+     * Handles a {@link CANRemoveNeighborMessage}.
+     * 
+     * @param msg
+     *            the message that is handled.
+     * @return the {@link ActionResponseMessage} response.
+     */
+    public abstract ActionResponseMessage handleRemoveNeighborMessage(RemoveNeighborMessage msg);
 
     /**
      * Adds a peer to the network.
@@ -72,19 +147,7 @@ public abstract class StructuredOverlay implements Serializable {
     public abstract Boolean leave();
 
     /**
-     * Check the network in order to update it.
-     */
-    public void update() {
-        if (this.getBufferizedQueries().size() > 0) {
-            for (Query query : this.getBufferizedQueries()) {
-                this.getBufferizedQueries().remove(query);
-                this.send(query);
-            }
-        }
-    }
-
-    /**
-     * Sends a {@link Query} on the network without response.
+     * Sends a {@link AbstractQuery} on the network without response.
      * 
      * @param query
      *            the query to send.
@@ -108,96 +171,19 @@ public abstract class StructuredOverlay implements Serializable {
     }
 
     /**
-     * Handles a {@link AddNeighborMessage}.
-     * 
-     * @param msg
-     *            the message that is handled.
-     * @return the {@link EmptyResponseMessage} response.
-     */
-    public abstract ActionResponseMessage handleAddNeighborMessage(AddNeighborMessage msg);
-
-    /**
-     * Handles a {@code JoinMessage}.
-     * 
-     * @param msg
-     *            the message that is handled.
-     * @return the {@link JoinResponseMessage} response.
-     */
-    public abstract ResponseMessage handleJoinMessage(Message msg);
-
-    /**
-     * Handles a {@link Query}.
-     * 
-     * @param query
-     *            the query to handle.
-     */
-    public void handleQuery(Query query) {
-        this.send(new QueryResponse(query, this.getRemotePeer()));
-    }
-
-    /**
-     * Handles a {@link QueryResponse}.
-     * 
-     * @param response
-     *            the response to handle.
-     */
-    public void handleQueryResponse(QueryResponse response) {
-        response.setDeliveryTime();
-
-        synchronized (this.getLocalPeer().getOneWayResponses()) {
-            this.getLocalPeer().getOneWayResponses().put(response.getUUID(), response);
-            this.getLocalPeer().getOneWayResponses().notifyAll();
-        }
-    }
-
-    /**
-     * Bufferize a new query that will be performed at the time of the next checking.
-     * 
-     * @param query
-     *            the query to bufferize.
-     */
-    public void bufferizeQuery(Query query) {
-        this.bufferizedQueries.add(query);
-    }
-
-    /**
-     * Returns the queries that are bufferized.
-     * 
-     * @return the queries that are bufferized.
-     */
-    public List<Query> getBufferizedQueries() {
-        return this.bufferizedQueries;
-    }
-
-    /**
-     * Handles a {@link CANRemoveNeighborMessage}.
-     * 
-     * @param msg
-     *            the message that is handled.
-     * @return the {@link ActionResponseMessage} response.
-     */
-    public abstract ActionResponseMessage handleRemoveNeighborMessage(RemoveNeighborMessage msg);
-
-    /**
-     * Returns the current peer that use this overlay.
-     * 
-     * @return the current peer that use this overlay.
-     */
-    public Peer getLocalPeer() {
-        return this.localPeer;
-    }
-
-    /**
-     * Returns the stub associated to the local peer.
-     * 
-     * @return the stub associated to the local peer.
-     */
-    public Peer getRemotePeer() {
-        return this.localPeer.getStub();
-    }
-
-    /**
      * {@inheritDoc}
      */
     public abstract String toString();
+
+    /**
+     * Check the network in order to update it.
+     */
+    public void update() {
+        if (this.getBufferizedQueries().size() > 0) {
+            for (Query query : this.getBufferizedQueries()) {
+                this.getBufferizedQueries().remove(query);
+                this.send(query);
+            }
+        }
+    }
 }

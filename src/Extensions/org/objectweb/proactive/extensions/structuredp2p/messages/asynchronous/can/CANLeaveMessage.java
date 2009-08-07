@@ -20,13 +20,13 @@ import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.A
 @SuppressWarnings("serial")
 public class CANLeaveMessage implements Message {
 
-    private Peer peerToRemove;
-
-    private List<Peer> peersToAdd;
-
     private int dimensionToAdd;
 
     private int directionToAdd;
+
+    private List<Peer> peersToAdd;
+
+    private Peer peerToRemove;
 
     /**
      * Constructor.
@@ -43,6 +43,22 @@ public class CANLeaveMessage implements Message {
         this.peersToAdd = peersToAdd;
     }
 
+    public int getDimensionToAdd() {
+        return this.dimensionToAdd;
+    }
+
+    public int getDirectionToAdd() {
+        return this.directionToAdd;
+    }
+
+    public List<Peer> getPeersToAdd() {
+        return this.peersToAdd;
+    }
+
+    public Peer getPeerToRemove() {
+        return this.peerToRemove;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -50,24 +66,8 @@ public class CANLeaveMessage implements Message {
         return ((CANOverlay) overlay).handleLeaveMessage(this);
     }
 
-    public Peer getPeerToRemove() {
-        return this.peerToRemove;
-    }
-
-    public List<Peer> getPeersToAdd() {
-        return this.peersToAdd;
-    }
-
-    public int getDimensionToAdd() {
-        return this.dimensionToAdd;
-    }
-
     public void setDimensionToAdd(int dimensionToAdd) {
         this.dimensionToAdd = dimensionToAdd;
-    }
-
-    public int getDirectionToAdd() {
-        return this.directionToAdd;
     }
 
     public void setDirectionToAdd(int directionToAdd) {

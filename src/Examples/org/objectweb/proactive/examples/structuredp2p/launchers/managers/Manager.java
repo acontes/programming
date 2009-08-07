@@ -21,9 +21,9 @@ public abstract class Manager extends Thread {
 
     private Map<String, Command> actions = new TreeMap<String, Command>();
 
-    private PeerLauncher peersLauncher;
-
     private boolean isRunning = false;
+
+    private PeerLauncher peersLauncher;
 
     public Manager(PeerLauncher peerLauncher) {
         this.peersLauncher = peerLauncher;
@@ -33,34 +33,34 @@ public abstract class Manager extends Thread {
         this.addAction(new SearchCommand(this));
     }
 
-    public boolean isRunning() {
-        return this.isRunning;
-    }
-
-    public PeerLauncher getPeersLauncher() {
-        return this.peersLauncher;
-    }
-
     public void addAction(Command action) {
         this.actions.put(action.getName(), action);
-    }
-
-    public void removeAction(Command action) {
-        this.actions.remove(action.getName());
     }
 
     public Map<String, Command> getActions() {
         return this.actions;
     }
 
-    public abstract void run();
-
-    public void stopExecution() {
-        this.isRunning = false;
+    public PeerLauncher getPeersLauncher() {
+        return this.peersLauncher;
     }
+
+    public boolean isRunning() {
+        return this.isRunning;
+    }
+
+    public void removeAction(Command action) {
+        this.actions.remove(action.getName());
+    }
+
+    public abstract void run();
 
     public void startExecution() {
         this.isRunning = true;
         super.start();
+    }
+
+    public void stopExecution() {
+        this.isRunning = false;
     }
 }

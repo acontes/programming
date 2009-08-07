@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Stack;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.NeighborsDataStructure;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.SplitEntry;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.Zone;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.can.CANJoinMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.ResponseMessage;
@@ -23,6 +24,21 @@ import org.openrdf.model.Statement;
 public class CANJoinResponseMessage implements ResponseMessage {
 
     /**
+     * The neighbors affected.
+     */
+    private final NeighborsDataStructure affectedNeighbors;
+
+    /**
+     * The statements affected.
+     */
+    private final List<Statement> affectedStatements;
+
+    /**
+     * The zone affected.
+     */
+    private final Zone affectedZone;
+
+    /**
      * The dimension.
      */
     private final int dimension;
@@ -33,24 +49,9 @@ public class CANJoinResponseMessage implements ResponseMessage {
     private final int direction;
 
     /**
-     * The zone affected.
-     */
-    private final Zone affectedZone;
-
-    /**
-     * The neighbors affected.
-     */
-    private final NeighborsDataStructure affectedNeighbors;
-
-    /**
      * The current history.
      */
-    private final Stack<int[]> splitHistory;
-
-    /**
-     * The statements affected.
-     */
-    private final List<Statement> affectedStatements;
+    private final Stack<SplitEntry> splitHistory;
 
     /**
      * Constructor.
@@ -66,7 +67,7 @@ public class CANJoinResponseMessage implements ResponseMessage {
      * @param affectedNeighbors
      *            the neighbors of the remote peer.
      */
-    public CANJoinResponseMessage(int dimension, int directionInv, Stack<int[]> splitHistory,
+    public CANJoinResponseMessage(int dimension, int directionInv, Stack<SplitEntry> splitHistory,
             Zone affectedZone, NeighborsDataStructure affectedNeighbors, List<Statement> affectedStatements) {
         this.dimension = dimension;
         this.direction = directionInv;
@@ -95,24 +96,6 @@ public class CANJoinResponseMessage implements ResponseMessage {
     }
 
     /**
-     * Returns the affected history.
-     * 
-     * @return the affected splitHistory.
-     */
-    public Stack<int[]> getSplitHistory() {
-        return this.splitHistory;
-    }
-
-    /**
-     * Returns the affected zone.
-     * 
-     * @return the affected zone.
-     */
-    public Zone getAffectedZone() {
-        return this.affectedZone;
-    }
-
-    /**
      * Returns the affected neighbors.
      * 
      * @return the affected neighbors.
@@ -128,6 +111,24 @@ public class CANJoinResponseMessage implements ResponseMessage {
      */
     public List<Statement> getAffectedStatements() {
         return this.affectedStatements;
+    }
+
+    /**
+     * Returns the affected zone.
+     * 
+     * @return the affected zone.
+     */
+    public Zone getAffectedZone() {
+        return this.affectedZone;
+    }
+
+    /**
+     * Returns the affected history.
+     * 
+     * @return the affected splitHistory.
+     */
+    public Stack<SplitEntry> getSplitHistory() {
+        return this.splitHistory;
     }
 
 }

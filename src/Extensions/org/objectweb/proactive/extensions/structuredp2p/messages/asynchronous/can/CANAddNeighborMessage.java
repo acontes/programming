@@ -19,11 +19,6 @@ import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.Ad
 public class CANAddNeighborMessage extends AddNeighborMessage {
 
     /**
-     * The zone from the peer to add as neighbor.
-     */
-    private final Zone remoteZone;
-
-    /**
      * The dimension on which we add the peer as neighbor.
      */
     private final int dimension;
@@ -32,6 +27,11 @@ public class CANAddNeighborMessage extends AddNeighborMessage {
      * The direction on which we add the peer as neighbor.
      */
     private final int direction;
+
+    /**
+     * The zone from the peer to add as neighbor.
+     */
+    private final Zone remoteZone;
 
     /**
      * Constructor.
@@ -51,15 +51,6 @@ public class CANAddNeighborMessage extends AddNeighborMessage {
     }
 
     /**
-     * Returns the zone of the sender of the message.
-     * 
-     * @return the zone of the sender of the message.
-     */
-    public Zone getRemoteZone() {
-        return this.remoteZone;
-    }
-
-    /**
      * Returns the dimension on which the peer must be add as neighbor.
      * 
      * @return the dimension on which the peer must be add as neighbor.
@@ -75,5 +66,14 @@ public class CANAddNeighborMessage extends AddNeighborMessage {
      */
     public int getDirection() {
         return this.direction;
+    }
+
+    /**
+     * Returns the zone of the sender of the message.
+     * 
+     * @return the zone of the sender of the message.
+     */
+    public Zone getRemoteZone() {
+        return this.remoteZone;
     }
 }

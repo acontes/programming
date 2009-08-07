@@ -32,6 +32,36 @@ public class Tracker implements Serializable {
     private static final int PROBABILITY = 5;
 
     /**
+     * Creates a new Tracker ActiveObject.
+     * 
+     * @param type
+     *            the type of the tracker, which is one of {@link OverlayType}.
+     * @return the new Tracker object created.
+     * @throws ActiveObjectCreationException
+     * @throws NodeException
+     */
+    public static Tracker newActiveTracker(OverlayType type) throws ActiveObjectCreationException,
+            NodeException {
+        return Tracker.newActiveTracker(type, null);
+    }
+
+    /**
+     * Creates a new Tracker ActiveObject.
+     * 
+     * @param type
+     *            the type of the tracker, which is one of {@link OverlayType}.
+     * @param node
+     *            the node to use.
+     * @return the new Tracker object created.
+     * @throws ActiveObjectCreationException
+     * @throws NodeException
+     */
+    public static Tracker newActiveTracker(OverlayType type, Node node) throws ActiveObjectCreationException,
+            NodeException {
+        return (Tracker) PAActiveObject.newActive(Tracker.class.getName(), new Object[] { type }, node);
+    }
+
+    /**
      * The remote peers list that the tracker maintains.
      */
     private List<Peer> remotePeers = new ArrayList<Peer>();
@@ -89,6 +119,15 @@ public class Tracker implements Serializable {
     }
 
     /**
+     * Returns the number of peers that the tracker manages.
+     * 
+     * @return the number of peers that the tracker manages.
+     */
+    public int getNumberOfManagedPeers() {
+        return this.remotePeers.size();
+    }
+
+    /**
      * Returns a random peer from the local list.
      * 
      * @return a random peer from the local list.
@@ -99,44 +138,5 @@ public class Tracker implements Serializable {
         }
 
         return this.remotePeers.get(ProActiveRandom.nextInt(this.remotePeers.size()));
-    }
-
-    /**
-     * Returns the number of peers that the tracker manages.
-     * 
-     * @return the number of peers that the tracker manages.
-     */
-    public int getNumberOfManagedPeers() {
-        return this.remotePeers.size();
-    }
-
-    /**
-     * Creates a new Tracker ActiveObject.
-     * 
-     * @param type
-     *            the type of the tracker, which is one of {@link OverlayType}.
-     * @return the new Tracker object created.
-     * @throws ActiveObjectCreationException
-     * @throws NodeException
-     */
-    public static Tracker newActiveTracker(OverlayType type) throws ActiveObjectCreationException,
-            NodeException {
-        return Tracker.newActiveTracker(type, null);
-    }
-
-    /**
-     * Creates a new Tracker ActiveObject.
-     * 
-     * @param type
-     *            the type of the tracker, which is one of {@link OverlayType}.
-     * @param node
-     *            the node to use.
-     * @return the new Tracker object created.
-     * @throws ActiveObjectCreationException
-     * @throws NodeException
-     */
-    public static Tracker newActiveTracker(OverlayType type, Node node) throws ActiveObjectCreationException,
-            NodeException {
-        return (Tracker) PAActiveObject.newActive(Tracker.class.getName(), new Object[] { type }, node);
     }
 }

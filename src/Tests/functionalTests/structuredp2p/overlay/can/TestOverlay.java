@@ -9,11 +9,12 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
-import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.QueryResponse;
-import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can.RDFQuery;
+import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can.LookupQuery;
+import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can.LookupQueryResponse;
 
 
 /**
@@ -212,13 +213,14 @@ public class TestOverlay {
         Peer toFind = peers[rand.nextInt(peers.length)];
         Peer sender = peers[rand.nextInt(peers.length)];
 
-        RDFQuery msg = new RDFQuery(sender, TestOverlay.getOverlay(toFind).getZone().getCoordinatesMin());
+        LookupQuery msg = new LookupQuery(sender, TestOverlay.getOverlay(toFind).getZone()
+                .getCoordinatesMin());
 
-        QueryResponse response = sender.search(msg);
+        LookupQueryResponse response = (LookupQueryResponse) PAFuture.getFutureValue(sender.search(msg));
 
         Assert.assertEquals(TestOverlay.getOverlay(toFind).getZone(), TestOverlay.getOverlay(
-                response.getRemotePeerFound()).getZone());
-        Assert.assertEquals(toFind, response.getRemotePeerFound());
+                response.getPeerFound()).getZone());
+        Assert.assertEquals(toFind, response.getPeerFound());
     }
 
     public static CANOverlay getOverlay(Peer peer) {

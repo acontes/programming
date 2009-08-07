@@ -32,8 +32,8 @@ import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.R
  */
 @SuppressWarnings("serial")
 public class ChordOverlay extends StructuredOverlay {
-    private String identifier;
     private HashMap<String, Peer> fingers;
+    private String identifier;
 
     /**
      * Constructor.
@@ -42,6 +42,15 @@ public class ChordOverlay extends StructuredOverlay {
      */
     public ChordOverlay(Peer peer) {
         super(peer);
+    }
+
+    /**
+     * Returns the fingers associated to this overlay.
+     * 
+     * @return the fingers associated to this overlay.
+     */
+    public HashMap<String, Peer> getFingers() {
+        return this.fingers;
     }
 
     /**
@@ -54,12 +63,27 @@ public class ChordOverlay extends StructuredOverlay {
     }
 
     /**
-     * Returns the fingers associated to this overlay.
-     * 
-     * @return the fingers associated to this overlay.
+     * {@inheritDoc}
      */
-    public HashMap<String, Peer> getFingers() {
-        return this.fingers;
+    public ActionResponseMessage handleAddNeighborMessage(AddNeighborMessage msg) {
+        // TODO handleAddNeighborMessage(AddNeighborMessage msg)
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public JoinResponseMessage handleJoinMessage(Message msg) {
+        // TODO handleJoinMessage(Message msg)
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public ActionResponseMessage handleRemoveNeighborMessage(RemoveNeighborMessage removeNeighborMessage) {
+        // TODO handleRemoveNeighborMessage(RemoveNeighborMessage removeNeighborMessage)
+        return null;
     }
 
     /**
@@ -89,44 +113,25 @@ public class ChordOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
+    public String toString() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public void update() {
         // TODO update()
 
     }
 
     /**
-     * {@inheritDoc}
+     * @{inheritDoc
      */
-    public ActionResponseMessage handleAddNeighborMessage(AddNeighborMessage msg) {
-        // TODO handleAddNeighborMessage(AddNeighborMessage msg)
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public JoinResponseMessage handleJoinMessage(Message msg) {
-        // TODO handleJoinMessage(Message msg)
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public ActionResponseMessage handleRemoveNeighborMessage(RemoveNeighborMessage removeNeighborMessage) {
-        // TODO handleRemoveNeighborMessage(RemoveNeighborMessage removeNeighborMessage)
-        return null;
-    }
-
     @Override
     public void send(Query query) {
         // TODO Auto-generated method stub
 
-    }
-
-    @Override
-    public String toString() {
-        // TODO Auto-generated method stub
-        return null;
     }
 }

@@ -34,18 +34,18 @@ public class RemoveNeighborMessage implements Message {
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public ActionResponseMessage handle(StructuredOverlay overlay) {
-        return overlay.handleRemoveNeighborMessage(this);
-    }
-
-    /**
      * Returns the neighbor peer to remove.
      * 
      * @return the remote peer.
      */
     public Peer getRemotePeer() {
         return this.remotePeer;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public ActionResponseMessage handle(StructuredOverlay overlay) {
+        return overlay.handleRemoveNeighborMessage(this);
     }
 }

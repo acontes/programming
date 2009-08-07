@@ -23,10 +23,10 @@ import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 public class TrackerLauncher {
     private Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
-    private GCMVirtualNode virtualNodeForTracker;
     private int nbTrackersToCreate = 1;
-
     public List<Tracker> trackers = new ArrayList<Tracker>();
+
+    private GCMVirtualNode virtualNodeForTracker;
 
     public TrackerLauncher(String pathToGCMAFile) {
         try {

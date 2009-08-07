@@ -26,15 +26,18 @@ public interface DataStorage extends Serializable {
     public abstract void add(Statement stmt);
 
     /**
-     * Remove the specified {@link Statement} from the current repository.
+     * Returns the repository instance.
      * 
-     * @param stmt
-     *            the statement to remove.
+     * @return the repository instance.
      */
-    public abstract void remove(Statement stmt);
+    public abstract Repository getRepository();
 
-    // public abstract CloseableIteration<? extends BindingSet, QueryEvaluationException> query(
-    // QueryLanguage language, String query);
+    /**
+     * Indicates if the datastore contains statements.
+     * 
+     * @return <code>true</code> if the datastore contains statements. <code>false</code> otherwise.
+     */
+    public abstract boolean hasStatements();
 
     /**
      * Evaluates a query from the specified language and returns the results found.
@@ -46,6 +49,18 @@ public interface DataStorage extends Serializable {
      * @return the results found.
      */
     public abstract QueryResult<BindingSet> query(QueryLanguage language, String query);
+
+    /**
+     * Debrief the datastore in order to found the statements that seems to the specified
+     * {@link Statement}.
+     * 
+     * @param stmt
+     *            the statement used. This can contains null {@link URI} in order to indicate a
+     *            wildcard.
+     * 
+     * @return the results found.
+     */
+    public abstract Set<Statement> query(Statement stmt);
 
     /**
      * Evaluates a query from the specified language and returns the results found.
@@ -70,21 +85,12 @@ public interface DataStorage extends Serializable {
     public abstract Set<Statement> queryV(QueryLanguage language, String graphQuery);
 
     /**
-     * Debrief the datastore in order to found the statements that seems to the specified
-     * {@link Statement}.
+     * Remove the specified {@link Statement} from the current repository.
      * 
      * @param stmt
-     *            the statement used. This can contains null {@link URI} in order to indicate a
-     *            wildcard.
-     * 
-     * @return the results found.
+     *            the statement to remove.
      */
-    public abstract Set<Statement> query(Statement stmt);
-
-    /**
-     * Initialize the OWLIM store.
-     */
-    public abstract void startup();
+    public abstract void remove(Statement stmt);
 
     /**
      * Shutdown the repository.
@@ -111,17 +117,8 @@ public interface DataStorage extends Serializable {
     public abstract void shutdownWithRepositoryRemoving(String name);
 
     /**
-     * Returns the repository instance.
-     * 
-     * @return the repository instance.
+     * Initialize the OWLIM store.
      */
-    public abstract Repository getRepository();
-
-    /**
-     * Indicates if the datastore contains statements.
-     * 
-     * @return <code>true</code> if the datastore contains statements. <code>false</code> otherwise.
-     */
-    public abstract boolean hasStatements();
+    public abstract void startup();
 
 }

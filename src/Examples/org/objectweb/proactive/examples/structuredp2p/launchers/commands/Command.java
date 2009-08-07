@@ -13,12 +13,12 @@ import org.objectweb.proactive.examples.structuredp2p.launchers.managers.Manager
  * @version 0.1, 07/27/2009
  */
 public abstract class Command {
-    private Manager manager;
-
-    private String name;
     private String[] args = new String[] {};
-    private String description;
+
     private List<String> commandShortcuts;
+    private String description;
+    private Manager manager;
+    private String name;
 
     public Command(Manager manager, String name, String description, String... commandShortcuts) {
         this.manager = manager;
@@ -36,26 +36,26 @@ public abstract class Command {
         this.args = args;
     }
 
+    public abstract void execute(String... args);
+
     public String[] getArguments() {
         return this.args;
-    }
-
-    public String getName() {
-        return this.name;
-    }
-
-    public String getDescription() {
-        return this.description;
     }
 
     public List<String> getCommandShortcuts() {
         return this.commandShortcuts;
     }
 
-    public abstract void execute(String... args);
+    public String getDescription() {
+        return this.description;
+    }
 
     public Manager getManager() {
         return this.manager;
+    }
+
+    public String getName() {
+        return this.name;
     }
 
     public void printInfo(String info) {

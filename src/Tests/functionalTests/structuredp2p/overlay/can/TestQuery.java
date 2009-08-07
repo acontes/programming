@@ -8,12 +8,16 @@ import junit.framework.Assert;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.Query;
-import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.QueryResponse;
-import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can.RDFQuery;
+import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can.LookupQuery;
+import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can.LookupQueryResponse;
+import org.openrdf.query.MalformedQueryException;
+import org.openrdf.query.parser.ParsedQuery;
+import org.openrdf.query.parser.sparql.SPARQLParser;
 
 
 /**
@@ -69,24 +73,37 @@ public class TestQuery {
             i++;
         }
 
-        TestQuery.query = new RDFQuery(TestQuery.firstPeer, ((CANOverlay) TestQuery.thirdPeer
+        TestQuery.query = new LookupQuery(TestQuery.firstPeer, ((CANOverlay) TestQuery.thirdPeer
                 .getStructuredOverlay()).getZone().getCoordinatesMin());
     }
 
     @Test
-    public void testBasicSearch() {
-        QueryResponse response = TestQuery.firstPeer.search(TestQuery.query);
+    public void testQueryParsing() {
+        SPARQLParser parser = new SPARQLParser();
+        ParsedQuery pq = null;
 
         try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
+            pq = parser.parseQuery(
+                    "SELECT ?o ?p ?s WHERE { ?o ?p ?s. FILTER ( str(?o) > \"http://toto\"). }", null);
+        } catch (MalformedQueryException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testBasicSearch() {
+        LookupQueryResponse response = null;
+        try {
+            response = (LookupQueryResponse) PAFuture.getFutureValue(TestQuery.firstPeer
+                    .search(TestQuery.query));
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
         Assert.assertTrue(response.getLatency() > 1);
         Assert.assertTrue(response.getNbSteps() > 0);
         Assert.assertTrue(response.getNbStepsForSend() > 0);
-        Assert.assertEquals(TestQuery.thirdPeer, response.getRemotePeerFound());
+        Assert.assertEquals(TestQuery.thirdPeer, response.getPeerFound());
     }
 
     @Test

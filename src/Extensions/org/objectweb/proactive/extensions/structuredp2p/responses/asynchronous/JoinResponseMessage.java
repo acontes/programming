@@ -21,18 +21,6 @@ public class JoinResponseMessage extends ActionResponseMessage {
     private final Peer remotePeer;
 
     /**
-     * Constructor.
-     * 
-     * @param creationTimestamp
-     *            the timestamp indicating the time creation of the message which has been sent.
-     * @param remotePeer
-     *            the remote peer.
-     */
-    public JoinResponseMessage(Peer remotePeer) {
-        this(true, remotePeer);
-    }
-
-    /**
      * Constructor to use when the join operation didn't work.
      * 
      * @param succedeed
@@ -43,6 +31,18 @@ public class JoinResponseMessage extends ActionResponseMessage {
     public JoinResponseMessage(boolean succedeed, Peer remotePeer) {
         super(succedeed);
         this.remotePeer = remotePeer;
+    }
+
+    /**
+     * Constructor.
+     * 
+     * @param creationTimestamp
+     *            the timestamp indicating the time creation of the message which has been sent.
+     * @param remotePeer
+     *            the remote peer.
+     */
+    public JoinResponseMessage(Peer remotePeer) {
+        this(true, remotePeer);
     }
 
     /**

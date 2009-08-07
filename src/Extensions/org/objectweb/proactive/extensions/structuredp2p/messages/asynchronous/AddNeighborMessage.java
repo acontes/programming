@@ -34,6 +34,15 @@ public abstract class AddNeighborMessage implements Message {
     }
 
     /**
+     * Returns the peer to add as neighbor.
+     * 
+     * @return the remote peer.
+     */
+    public Peer getRemotePeer() {
+        return this.remotePeer;
+    }
+
+    /**
      * Handles a {@link AddNeighborMessage} by double dispatch.
      * 
      * @param overlay
@@ -41,14 +50,5 @@ public abstract class AddNeighborMessage implements Message {
      */
     public ActionResponseMessage handle(StructuredOverlay overlay) {
         return overlay.handleAddNeighborMessage(this);
-    }
-
-    /**
-     * Returns the peer to add as neighbor.
-     * 
-     * @return the remote peer.
-     */
-    public Peer getRemotePeer() {
-        return this.remotePeer;
     }
 }

@@ -33,6 +33,30 @@ public class InteractiveManager extends Manager {
         }
     }
 
+    /**
+     * Print app menu option on the standard output.
+     */
+    public void printActionsMenu() {
+        StringBuffer buf = new StringBuffer();
+        buf.append("[ Select an action to perform ]\n");
+
+        for (Command action : super.getActions().values()) {
+            buf.append(" > Type in '");
+            buf.append(action.getCommandShortcuts().get(0));
+
+            for (String arg : action.getArguments()) {
+                buf.append(" ");
+                buf.append(arg);
+            }
+
+            buf.append("' : ");
+            buf.append(action.getDescription());
+            buf.append("\n");
+        }
+
+        System.out.println(buf.toString());
+    }
+
     public void run() {
         Scanner scanner = new Scanner(System.in);
         String inputLine;
@@ -58,29 +82,5 @@ public class InteractiveManager extends Manager {
 
             this.printActionsMenu();
         }
-    }
-
-    /**
-     * Print app menu option on the standard output.
-     */
-    public void printActionsMenu() {
-        StringBuffer buf = new StringBuffer();
-        buf.append("[ Select an action to perform ]\n");
-
-        for (Command action : super.getActions().values()) {
-            buf.append(" > Type in '");
-            buf.append(action.getCommandShortcuts().get(0));
-
-            for (String arg : action.getArguments()) {
-                buf.append(" ");
-                buf.append(arg);
-            }
-
-            buf.append("' : ");
-            buf.append(action.getDescription());
-            buf.append("\n");
-        }
-
-        System.out.println(buf.toString());
     }
 }
