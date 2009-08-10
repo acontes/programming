@@ -2,6 +2,7 @@ package org.objectweb.proactive.examples.structuredp2p.launchers.commands;
 
 import java.util.Random;
 
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.examples.structuredp2p.launchers.managers.Manager;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
@@ -52,12 +53,15 @@ public class SearchCommand extends Command {
         Peer sender = super.getManager().getPeersLauncher().getAvailablePeers().get(
                 rand.nextInt(super.getManager().getPeersLauncher().getAvailablePeers().size()));
 
-        LookupQueryResponse response = (LookupQueryResponse) sender.search(new LookupQuery(sender,
-            coordinatesToFind));
+        LookupQueryResponse response = (LookupQueryResponse) PAFuture.getFutureValue(sender
+                .search(new LookupQuery(sender, coordinatesToFind)));
 
-        super.printInfo("Lookup for peer managing " + buf + ".\n    Lookup start from peer managing " +
-            ((CANOverlay) sender.getStructuredOverlay()).getZone() + ".\n    Peer found in " +
-            response.getLatency() + "ms with " + response.getNbSteps() + " steps.");
+        super
+                .printInfo("Lookup for peer managing " + buf + ".\n    Lookup start from peer managing " +
+                    ((CANOverlay) sender.getStructuredOverlay()).getZone() + ".\n    Peer found in " +
+                    response.getLatency() + "ms with " + response.getTotalNumberOfSteps() + " steps (" +
+                    response.getNbStepsForSend() + " for send, " + response.getNbStepsForReceipt() +
+                    " for receipt).");
     }
 
 }
