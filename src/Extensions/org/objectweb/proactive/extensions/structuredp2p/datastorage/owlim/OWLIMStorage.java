@@ -33,9 +33,9 @@ import org.openrdf.sail.nativerdf.NativeStore;
 @SuppressWarnings("serial")
 public class OWLIMStorage implements DataStorage {
 
-    public static final String REPOSITORIES_PATH = OWLIMStorage.ROOT_PATH + "/BigOWLIM/repositories";
-
     public static final String ROOT_PATH = System.getProperty("user.home");
+
+    public static final String REPOSITORIES_PATH = OWLIMStorage.ROOT_PATH + "/.bigowlim/repositories";
 
     private Repository repository;
 

@@ -1,5 +1,6 @@
 package org.objectweb.proactive.extensions.structuredp2p.messages.oneway;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredOverlay;
@@ -12,7 +13,7 @@ import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredO
  * @author Laurent Pellegrino
  * @version 0.1, 08/05/2009
  */
-public interface Query {
+public interface Query extends Serializable {
 
     /**
      * Returns the timestamp of the creation of the message.
@@ -61,8 +62,6 @@ public interface Query {
      *            the overlay used in order to route the request.
      */
     public abstract void route(StructuredOverlay overlay);
-
-    public abstract void route(StructuredOverlay overlay, Query query);
 
     /**
      * Sets the universally unique identifier used in order to identify the response.

@@ -10,7 +10,6 @@ import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.Me
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.RemoveNeighborMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.can.CANRemoveNeighborMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.AbstractQuery;
-import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.AbstractQueryResponse;
 import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.Query;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.ActionResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.JoinResponseMessage;
@@ -61,7 +60,7 @@ public abstract class StructuredOverlay implements Serializable {
      * @param query
      *            the query to bufferize.
      */
-    public void bufferizeQuery(AbstractQuery query) {
+    public void bufferizeQuery(Query query) {
         this.bufferizedQueries.add(query);
     }
 
@@ -109,16 +108,6 @@ public abstract class StructuredOverlay implements Serializable {
      * @return the {@link JoinResponseMessage} response.
      */
     public abstract ResponseMessage handleJoinMessage(Message msg);
-
-    /**
-     * Handles a {@link AbstractQueryResponse}.
-     * 
-     * @param response
-     *            the response to handle.
-     */
-    public void handleQueryResponse(AbstractQueryResponse response) {
-
-    }
 
     /**
      * Handles a {@link CANRemoveNeighborMessage}.

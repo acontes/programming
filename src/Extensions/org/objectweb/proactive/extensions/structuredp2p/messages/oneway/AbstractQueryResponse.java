@@ -1,5 +1,7 @@
 package org.objectweb.proactive.extensions.structuredp2p.messages.oneway;
 
+import java.util.UUID;
+
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredOverlay;
 
 
@@ -18,7 +20,7 @@ import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredO
  * @version 0.1, 08/05/2009
  */
 @SuppressWarnings("serial")
-public abstract class AbstractQueryResponse<K> extends AbstractQuery<K> implements QueryResponse {
+public abstract class AbstractQueryResponse<K, Q extends AbstractQuery<K>> implements QueryResponse {
 
     private long deliveryTimestamp;
 
@@ -27,6 +29,8 @@ public abstract class AbstractQueryResponse<K> extends AbstractQuery<K> implemen
     private int nbStepsForSend = 0;
 
     private K[] originalKeyToFind;
+
+    protected Q query;
 
     public AbstractQueryResponse() {
         super();
@@ -40,8 +44,9 @@ public abstract class AbstractQueryResponse<K> extends AbstractQuery<K> implemen
      * @param keyToReach
      *            the key used in order to route the response to it recipient.
      */
-    public AbstractQueryResponse(AbstractQuery<K> query, K[] keyToReach) {
-        super(query.getUUID(), keyToReach, query.getDispatchTimestamp());
+    public AbstractQueryResponse(Q query, K[] keyToReach) {
+        this.query = query;
+        this.query.setKeyToReach(keyToReach);
         this.nbStepsForSend = query.getNbSteps();
     }
 
@@ -57,22 +62,16 @@ public abstract class AbstractQueryResponse<K> extends AbstractQuery<K> implemen
     /**
      * {@inheritDoc}
      */
-    public abstract void handle(StructuredOverlay overlay);
+    public long getDispatchTimestamp() {
+        return this.query.getDispatchTimestamp();
+    }
 
     /**
      * {@inheritDoc}
      */
-    public abstract void route(StructuredOverlay overlay, Query query);
-
-    /**
-     * {@inheritDoc}
-     */
-    public abstract void route(StructuredOverlay overlay);
-
-    /**
-     * {@inheritDoc}
-     */
-    public abstract boolean validKeyConstraints(StructuredOverlay overlay);
+    public K[] getKeyToReach() {
+        return this.query.getKeyToReach();
+    }
 
     /**
      * Returns the latency (in milliseconds) between the moment of the creation of the message and
@@ -89,6 +88,13 @@ public abstract class AbstractQueryResponse<K> extends AbstractQuery<K> implemen
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public int getNbSteps() {
+        return this.query.getNbSteps();
+    }
+
+    /**
      * Returns the number of steps performed in order to reach the sender of the query from the peer
      * which has been found.
      * 
@@ -96,7 +102,7 @@ public abstract class AbstractQueryResponse<K> extends AbstractQuery<K> implemen
      *         which has been found.
      */
     public int getNbStepsForReceipt() {
-        return super.getNbSteps();
+        return this.query.getNbSteps();
     }
 
     /**
@@ -130,16 +136,52 @@ public abstract class AbstractQueryResponse<K> extends AbstractQuery<K> implemen
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public UUID getUUID() {
+        return this.query.getUUID();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public abstract void handle(StructuredOverlay overlay);
+
+    /**
+     * {@inheritDoc}
+     */
+    public void incrementNbStepsBy(int increment) {
+        this.query.incrementNbStepsBy(increment);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public abstract void route(StructuredOverlay overlay);
+
+    /**
      * Sets the delivery time of the response (ie. when the response has been receive). The latency
      * is automatically calculated.
      */
     public void setDeliveryTime() {
         this.deliveryTimestamp = System.currentTimeMillis();
-        this.latency = (int) (this.deliveryTimestamp - super.getDispatchTimestamp());
+        this.latency = (int) (this.deliveryTimestamp - this.query.getDispatchTimestamp());
 
         if (this.latency < 0) {
             this.latency = 0;
         }
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setUUID(UUID uuid) {
+        this.query.setUUID(uuid);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public abstract boolean validKeyConstraints(StructuredOverlay overlay);
 
 }

@@ -47,7 +47,7 @@ import org.openrdf.query.QueryResult;
 @SuppressWarnings("serial")
 public class CANOverlay extends StructuredOverlay {
 
-    public static final int NB_DIMENSIONS = 3;
+    public static final int NB_DIMENSIONS = 2;
 
     private NeighborsDataStructure neighborsDataStructure;
 

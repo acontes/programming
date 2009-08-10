@@ -18,7 +18,7 @@ import org.openrdf.model.Statement;
  * 
  */
 @SuppressWarnings("serial")
-public class RDFQueryResponse extends AbstractQueryResponse<Coordinate> {
+public class RDFQueryResponse extends AbstractQueryResponse<Coordinate, RDFQuery> {
 
     private Set<Statement> retrievedStatements;
 

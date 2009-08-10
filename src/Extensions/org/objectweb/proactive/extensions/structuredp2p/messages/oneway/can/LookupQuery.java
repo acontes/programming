@@ -8,7 +8,7 @@ import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOver
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.NeighborsDataStructure;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates.Coordinate;
 import org.objectweb.proactive.extensions.structuredp2p.core.requests.BlockingRequestReceiverException;
-import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.Query;
+import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.QueryResponse;
 
 
 /**
@@ -41,61 +41,64 @@ public class LookupQuery extends AbstractCANQuery {
      * {@inheritDoc}
      */
     public void handle(StructuredOverlay overlay) {
-        System.out.println("LookupQuery.handle()");
-
-        LookupQueryResponse q = new LookupQueryResponse(this, overlay.getRemotePeer());
-
-        // System.out.println("LookupQuery.handle() 2");
-
-        System.out.print("Coordinates = " + ((CANOverlay) overlay).getZone() + "   -   ");
-        System.out.print("Coordinates to reach = ");
-        for (Coordinate coordinate : q.getKeyToReach()) {
-            System.out.print(coordinate.getValue() + ", ");
-        }
-        System.out.println();
-
-        ((CANOverlay) overlay).send(q);
-
-        // System.out.println("LookupQuery.handle() 3");
+        new LookupQueryResponse(this, overlay.getRemotePeer()).route(overlay);
     }
 
     /**
      * {@inheritDoc}
      */
-    public void route(StructuredOverlay overlay, Query query) {
-        System.out.println("LookupQuery.route()");
-        CANOverlay CANOverlay = ((CANOverlay) overlay);
-
+    public void route(StructuredOverlay overlay, QueryResponse queryResponse) {
+        CANOverlay canOverlay = ((CANOverlay) overlay);
         Coordinate[] coordinatesToReach = this.getKeyToReach();
 
-        if (CANOverlay.contains(coordinatesToReach)) {
-            query.handle(overlay);
+        boolean isQueryResponse = (queryResponse == null) ? false : true;
+
+        if (canOverlay.contains(coordinatesToReach)) {
+            if (isQueryResponse) {
+                queryResponse.handle(overlay);
+            } else {
+                this.handle(overlay);
+            }
         } else {
             int direction;
             int pos;
 
             for (int dim = 0; dim < CANOverlay.NB_DIMENSIONS; dim++) {
                 direction = NeighborsDataStructure.SUPERIOR_DIRECTION;
-                pos = CANOverlay.contains(dim, coordinatesToReach[dim]);
+                pos = canOverlay.contains(dim, coordinatesToReach[dim]);
 
                 if (pos == -1) {
                     direction = NeighborsDataStructure.INFERIOR_DIRECTION;
                 }
 
                 if (pos != 0) {
-                    List<Peer> neighbors = CANOverlay.getNeighborsDataStructure()
+                    List<Peer> neighbors = canOverlay.getNeighborsDataStructure()
                             .getNeighbors(dim, direction);
 
                     if (neighbors.size() > 0) {
-                        Peer nearestPeer = CANOverlay.getNeighborsDataStructure().getNearestNeighborFrom(
-                                CANOverlay.getZone(), coordinatesToReach[CANOverlay.getNextDimension(dim)],
+                        Peer nearestPeer = canOverlay.getNeighborsDataStructure().getNearestNeighborFrom(
+                                canOverlay.getZone(), coordinatesToReach[CANOverlay.getNextDimension(dim)],
                                 dim, direction);
-                        super.incrementNbStepsBy(1);
+
+                        if (isQueryResponse) {
+                            queryResponse.incrementNbStepsBy(1);
+                        } else {
+                            super.incrementNbStepsBy(1);
+                        }
 
                         try {
-                            nearestPeer.send(this);
+                            if (isQueryResponse) {
+                                nearestPeer.send(queryResponse);
+                            } else {
+                                nearestPeer.send(this);
+                            }
                         } catch (BlockingRequestReceiverException e) {
-                            overlay.bufferizeQuery(this);
+                            if (isQueryResponse) {
+                                overlay.bufferizeQuery(queryResponse);
+                            } else {
+                                overlay.bufferizeQuery(this);
+                            }
+
                         } catch (Exception e) {
                             System.out.println("CANOverlay.send()");
                             e.printStackTrace();
@@ -108,18 +111,14 @@ public class LookupQuery extends AbstractCANQuery {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public void route(StructuredOverlay overlay) {
-        this.route(overlay, this);
+        this.route(overlay, null);
     }
 
     /**
      * {@inheritDoc}
      */
     public boolean validKeyConstraints(StructuredOverlay overlay) {
-        System.out.println("LookupQuery.validKeyConstraints()");
         return ((CANOverlay) overlay).contains(this.getKeyToReach());
     }
 

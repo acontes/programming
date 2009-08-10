@@ -38,11 +38,6 @@ public abstract class AbstractCANQuery extends AbstractQuery<Coordinate> {
     /**
      * {@inheritDoc}
      */
-    public abstract void route(StructuredOverlay overlay, Query query);
-
-    /**
-     * {@inheritDoc}
-     */
     public abstract boolean validKeyConstraints(StructuredOverlay overlay);
 
 }

@@ -91,11 +91,6 @@ public abstract class AbstractQuery<K> implements Query, Serializable {
     /**
      * {@inheritDoc}
      */
-    public abstract void route(StructuredOverlay overlay, Query query);
-
-    /**
-     * {@inheritDoc}
-     */
     public abstract void route(StructuredOverlay overlay);
 
     /**

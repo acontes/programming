@@ -100,8 +100,12 @@ public class TestQuery {
             e.printStackTrace();
         }
 
+        System.out.println("nbStepsForReceipt = " + response.getNbStepsForReceipt());
+        System.out.println("nbStepsForSend = " + response.getNbStepsForSend());
+
         Assert.assertTrue(response.getLatency() > 1);
         Assert.assertTrue(response.getNbSteps() > 0);
+        Assert.assertTrue(response.getNbStepsForReceipt() > 0);
         Assert.assertTrue(response.getNbStepsForSend() > 0);
         Assert.assertEquals(TestQuery.thirdPeer, response.getPeerFound());
     }
@@ -109,9 +113,9 @@ public class TestQuery {
     @Test
     public void testLeave() {
         TestQuery.fourthPeer.leave();
-        // TestQuery.thirdPeer.leave();
-        // TestQuery.secondPeer.leave();
-        // TestQuery.firstPeer.leave();
+        TestQuery.thirdPeer.leave();
+        TestQuery.secondPeer.leave();
+        TestQuery.firstPeer.leave();
 
         List<Peer> peers = new ArrayList<Peer>();
         peers.add(TestQuery.firstPeer);
@@ -142,5 +146,4 @@ public class TestQuery {
     public static void tearDown() {
         TestQuery.query = null;
     }
-
 }

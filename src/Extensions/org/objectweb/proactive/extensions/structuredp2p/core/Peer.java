@@ -292,6 +292,8 @@ public class Peer implements DataStorage, InitActive, RunActive, Serializable {
      */
     public Boolean leave() {
         this.structuredOverlay.leave();
+        // TODO don't remove repository but use fault-tolerance
+        this.dataStorage.shutdownByRemovingCurrentRepository();
         return true;
     }
 
@@ -437,7 +439,7 @@ public class Peer implements DataStorage, InitActive, RunActive, Serializable {
      * @param query
      *            the query to send.
      */
-    public void send(AbstractQuery query) {
+    public void send(Query query) {
         this.structuredOverlay.send(query);
     }
 
