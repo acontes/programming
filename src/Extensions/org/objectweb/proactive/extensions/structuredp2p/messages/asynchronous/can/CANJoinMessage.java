@@ -27,8 +27,8 @@ public class CANJoinMessage implements Message {
     /**
      * Constructor.
      * 
-     * @param directionInv
      * @param remotePeer
+     *            the remote peer.
      */
     public CANJoinMessage(Peer remotePeer) {
         super();
@@ -38,7 +38,7 @@ public class CANJoinMessage implements Message {
     /**
      * Returns the remote peer.
      * 
-     * @return the remotePeer
+     * @return the remote peer
      */
     public Peer getRemotePeer() {
         return this.remotePeer;

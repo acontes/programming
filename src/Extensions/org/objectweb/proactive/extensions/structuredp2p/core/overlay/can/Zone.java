@@ -311,7 +311,7 @@ public class Zone implements Serializable {
      *            the dimension.
      * @return two zones representing the original one splitted into two following a dimension.
      * @throws ZoneException
-     * @see #split(int, Coordinate).
+     * @see Zone#split(int, Coordinate)
      */
     public Zone[] split(int dimension) throws ZoneException {
         return this.split(dimension, this.getCoordinateMin(dimension).getMiddleWith(
@@ -357,7 +357,7 @@ public class Zone implements Serializable {
      */
     public String toString() {
         StringBuffer buf = new StringBuffer();
-        buf.append("Zone=(");
+        buf.append("(");
 
         for (int i = 0; i < this.coordinatesMin.length; i++) {
             buf.append(this.coordinatesMin[i].getValue());
@@ -366,7 +366,7 @@ public class Zone implements Serializable {
             }
         }
 
-        buf.append(")-->(");
+        buf.append(") to (");
 
         for (int i = 0; i < this.coordinatesMax.length; i++) {
             buf.append(this.coordinatesMax[i].getValue());

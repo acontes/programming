@@ -30,7 +30,7 @@ public abstract class AbstractQueryResponse<K, Q extends AbstractQuery<K>> imple
 
     private K[] originalKeyToFind;
 
-    protected Q query;
+    private Q query;
 
     public AbstractQueryResponse() {
         super();
@@ -66,9 +66,6 @@ public abstract class AbstractQueryResponse<K, Q extends AbstractQuery<K>> imple
         return this.query.getDispatchTimestamp();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public K[] getKeyToReach() {
         return this.query.getKeyToReach();
     }
@@ -123,6 +120,10 @@ public abstract class AbstractQueryResponse<K, Q extends AbstractQuery<K>> imple
      */
     public K[] getOriginalKeyToFind() {
         return this.originalKeyToFind;
+    }
+
+    public Q getQuery() {
+        return this.query;
     }
 
     /**

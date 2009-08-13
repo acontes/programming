@@ -78,7 +78,7 @@ public interface DataStorage extends Serializable {
      * 
      * @param language
      *            the language used for the query.
-     * @param query
+     * @param graphQuery
      *            the query to evaluate.
      * @return the results found (a graph).
      */
@@ -114,7 +114,7 @@ public interface DataStorage extends Serializable {
      * @param repositoryName
      *            the name of the repository to remove.
      */
-    public abstract void shutdownWithRepositoryRemoving(String name);
+    public abstract void shutdownWithRepositoryRemoving(String repositoryName);
 
     /**
      * Initialize the OWLIM store.

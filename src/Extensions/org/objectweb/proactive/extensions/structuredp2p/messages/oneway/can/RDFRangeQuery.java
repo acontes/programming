@@ -2,7 +2,6 @@ package org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates.Coordinate;
-import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.Query;
 
 
 /**
@@ -39,14 +38,6 @@ public class RDFRangeQuery extends RDFQuery {
     public boolean validKeyConstraints(StructuredOverlay overlay) {
         // TODO Auto-generated method stub
         return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void route(StructuredOverlay overlay, Query query) {
-        // TODO Auto-generated method stub
-
     }
 
 }

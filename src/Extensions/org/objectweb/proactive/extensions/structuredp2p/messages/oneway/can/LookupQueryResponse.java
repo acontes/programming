@@ -1,10 +1,14 @@
 package org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates.Coordinate;
 import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.AbstractQueryResponse;
+import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.QueryResponse;
 
 
 /**
@@ -37,8 +41,11 @@ public class LookupQueryResponse extends AbstractQueryResponse<Coordinate, Looku
 
         super.setDeliveryTime();
 
+        List<QueryResponse> result = new ArrayList<QueryResponse>();
+        result.add(this);
+
         synchronized (CANOverlay.getLocalPeer().getOneWayResponses()) {
-            CANOverlay.getLocalPeer().getOneWayResponses().put(super.getUUID(), this);
+            CANOverlay.getLocalPeer().getOneWayResponses().put(super.getUUID(), result);
             CANOverlay.getLocalPeer().getOneWayResponses().notifyAll();
         }
     }
@@ -47,14 +54,14 @@ public class LookupQueryResponse extends AbstractQueryResponse<Coordinate, Looku
      * @{inheritDoc
      */
     public void route(StructuredOverlay overlay) {
-        super.query.route(overlay, this);
+        super.getQuery().route(overlay, this);
     }
 
     /**
      * @{inheritDoc
      */
     public boolean validKeyConstraints(StructuredOverlay overlay) {
-        return super.query.validKeyConstraints(overlay);
+        return super.getQuery().validKeyConstraints(overlay);
     }
 
 }

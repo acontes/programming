@@ -44,9 +44,6 @@ public class LookupQuery extends AbstractCANQuery {
         new LookupQueryResponse(this, overlay.getRemotePeer()).route(overlay);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public void route(StructuredOverlay overlay, QueryResponse queryResponse) {
         CANOverlay canOverlay = ((CANOverlay) overlay);
         Coordinate[] coordinatesToReach = this.getKeyToReach();

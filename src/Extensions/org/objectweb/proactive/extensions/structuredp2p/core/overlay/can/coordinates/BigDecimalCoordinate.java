@@ -37,10 +37,8 @@ public class BigDecimalCoordinate extends Coordinate {
     }
 
     /**
-     * Determinates the middle between two coordinates.
+     * Returns the middle between two coordinates.
      * 
-     * @param min
-     *            the coordinate min.
      * @param max
      *            the coordinate max.
      * @return coordinates of the middle.

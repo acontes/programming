@@ -22,6 +22,9 @@ import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.ca
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.can.CANMergeMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.can.CANRemoveNeighborMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.Query;
+import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.QueryResponse;
+import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can.RDFQuery;
+import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can.RDFQueryResponse;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.ActionResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.ResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.can.CANJoinResponseMessage;
@@ -47,7 +50,7 @@ import org.openrdf.query.QueryResult;
 @SuppressWarnings("serial")
 public class CANOverlay extends StructuredOverlay {
 
-    public static final int NB_DIMENSIONS = 2;
+    public static final int NB_DIMENSIONS = 3;
 
     private NeighborsDataStructure neighborsDataStructure;
 
@@ -69,41 +72,70 @@ public class CANOverlay extends StructuredOverlay {
     }
 
     /**
-     * Returns the next dimension following the specified dimension.
+     * Gets a random dimension number.
      * 
-     * @param dimension
-     *            the specified dimension.
-     * @return the next dimension following the specified dimension.
+     * @return the random dimension number.
      */
-    public static int getNextDimension(int dimension) {
-        return (dimension + 1) % CANOverlay.NB_DIMENSIONS;
+    private int getRandomDimension() {
+        return new Random().nextInt(CANOverlay.NB_DIMENSIONS);
     }
 
     /**
-     * Returns the opposite direction of the specified direction.
+     * Gets a random direction number.
      * 
+     * @return the random direction number.
+     */
+    private int getRandomDirection() {
+        return new Random().nextInt(2);
+    }
+
+    /**
+     * Add a split entry to the split history.
+     * 
+     * @param dimension
+     *            the last dimension used to split.
      * @param direction
-     *            the speficied direction.
-     * 
-     * @return the opposite direction.
+     *            the last direction used by the split.
+     * @return <code>true</code> if the save has succeeded, <code>false</code> otherwise.
      */
-    public static int getOppositeDirection(int direction) {
-        return (direction + 1) % 2;
+    private boolean saveSplit(int dimension, int direction) {
+        return this.splitHistory.push(new SplitEntry(dimension, direction)) != null;
     }
 
     /**
-     * Returns the previous dimension following the specified dimension.
+     * Check neighbors list for all dimensions in order to see if a peer is always a neighbor, if
+     * not, it is removed from its neighbors.
+     */
+    private void updateNeighbors() {
+        this.updateNeighbors(-1);
+    }
+
+    /**
+     * Check neighbors list following a dimension in order to see if a peer is always a neighbor, if
+     * it is, the neighbor is updated with the current zone, else, it is removed from its neighbors.
      * 
      * @param dimension
-     *            the specified dimension.
-     * @return the previous dimension following the specified dimension.
+     *            the dimension to not check.
      */
-    public static int getPreviousDimension(int dimension) {
-        int dim = dimension - 1;
-        if (dim < 0) {
-            dim = CANOverlay.NB_DIMENSIONS;
+    private void updateNeighbors(int dimension) {
+        List<Peer> peersToRemove = new ArrayList<Peer>();
+
+        for (int dim = 0; dim < CANOverlay.NB_DIMENSIONS; dim++) {
+            if (dim != dimension) {
+                for (int direction = 0; direction < 2; direction++) {
+                    for (Peer neighbor : this.neighborsDataStructure.getNeighbors(dim, direction)) {
+                        if (this.getZone().getBorderedDimension(
+                                this.neighborsDataStructure.getZoneBy(neighbor)) == -1) {
+                            peersToRemove.add(neighbor);
+                        }
+                    }
+                }
+            }
         }
-        return dim;
+
+        for (Peer peer : peersToRemove) {
+            this.neighborsDataStructure.remove(peer);
+        }
     }
 
     /**
@@ -170,24 +202,6 @@ public class CANOverlay extends StructuredOverlay {
      */
     public NeighborsDataStructure getNeighborsDataStructure() {
         return this.neighborsDataStructure;
-    }
-
-    /**
-     * Gets a random dimension number.
-     * 
-     * @return the random dimension number.
-     */
-    private int getRandomDimension() {
-        return new Random().nextInt(CANOverlay.NB_DIMENSIONS);
-    }
-
-    /**
-     * Gets a random direction number.
-     * 
-     * @return the random direction number.
-     */
-    private int getRandomDirection() {
-        return new Random().nextInt(2);
     }
 
     /**
@@ -328,12 +342,17 @@ public class CANOverlay extends StructuredOverlay {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+
         return new CANJoinResponseMessage(dimension, directionInv, newHistory, newZones[directionInv],
             neighborsOfThePeerWhichJoin, statementsResult);
     }
 
     /**
-     * {@inheritDoc}
+     * Handles a {@code CANLeaveMessage}.
+     * 
+     * @param msg
+     *            the message that is handled.
+     * @return the {@link ActionResponseMessage} response.
      */
     public ActionResponseMessage handleLeaveMessage(CANLeaveMessage msg) {
         boolean result = true;
@@ -392,6 +411,32 @@ public class CANOverlay extends StructuredOverlay {
         this.updateNeighbors();
 
         return new ActionResponseMessage(result);
+    }
+
+    public void handleRDFTriplePatternQuery(RDFQuery query, int nbResponsesToWait) {
+        // Wait while we don't have received all the responses sent from this peer
+        synchronized (this.getLocalPeer().getOneWayResponses()) {
+            while (this.getLocalPeer().getOneWayResponses().get(query.getUUID()) == null ||
+                this.getLocalPeer().getOneWayResponses().get(query.getUUID()).size() != nbResponsesToWait) {
+
+                System.out.println("W " + this.zone + " is waiting for " + nbResponsesToWait +
+                    " response(s) with uuid= " + query.getUUID() + "...");
+                try {
+                    this.getLocalPeer().getOneWayResponses().wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        // At this step all the responses have been received
+        RDFQueryResponse responseToSend = new RDFQueryResponse();
+        responseToSend.incrementNbStepsBy(nbResponsesToWait);
+        for (QueryResponse response : this.getLocalPeer().getOneWayResponses().get(query.getUUID())) {
+            responseToSend.addAll(((RDFQueryResponse) response).getRetrievedStatements());
+        }
+
+        query.route(this);
     }
 
     /**
@@ -571,19 +616,6 @@ public class CANOverlay extends StructuredOverlay {
     }
 
     /**
-     * Add a split entry to the split history.
-     * 
-     * @param dimension
-     *            the last dimension used to split.
-     * @param direction
-     *            the last direction used by the split.
-     * @return <code>true</code> if the save has succeeded, <code>false</code> otherwise.
-     */
-    private boolean saveSplit(int dimension, int direction) {
-        return this.splitHistory.push(new SplitEntry(dimension, direction)) != null;
-    }
-
-    /**
      * {@inheritDoc}
      */
     public void send(Query query) {
@@ -678,38 +710,40 @@ public class CANOverlay extends StructuredOverlay {
     }
 
     /**
-     * Check neighbors list for all dimensions in order to see if a peer is always a neighbor, if
-     * not, it is removed from its neighbors.
+     * Returns the next dimension following the specified dimension.
+     * 
+     * @param dimension
+     *            the specified dimension.
+     * @return the next dimension following the specified dimension.
      */
-    private void updateNeighbors() {
-        this.updateNeighbors(-1);
+    public static int getNextDimension(int dimension) {
+        return (dimension + 1) % CANOverlay.NB_DIMENSIONS;
     }
 
     /**
-     * Check neighbors list following a dimension in order to see if a peer is always a neighbor, if
-     * it is, the neighbor is updated with the current zone, else, it is removed from its neighbors.
+     * Returns the opposite direction of the specified direction.
+     * 
+     * @param direction
+     *            the specified direction.
+     * 
+     * @return the opposite direction.
+     */
+    public static int getOppositeDirection(int direction) {
+        return (direction + 1) % 2;
+    }
+
+    /**
+     * Returns the previous dimension following the specified dimension.
      * 
      * @param dimension
-     *            the dimension to not check.
+     *            the specified dimension.
+     * @return the previous dimension following the specified dimension.
      */
-    private void updateNeighbors(int dimension) {
-        List<Peer> peersToRemove = new ArrayList<Peer>();
-
-        for (int dim = 0; dim < CANOverlay.NB_DIMENSIONS; dim++) {
-            if (dim != dimension) {
-                for (int direction = 0; direction < 2; direction++) {
-                    for (Peer neighbor : this.neighborsDataStructure.getNeighbors(dim, direction)) {
-                        if (this.getZone().getBorderedDimension(
-                                this.neighborsDataStructure.getZoneBy(neighbor)) == -1) {
-                            peersToRemove.add(neighbor);
-                        }
-                    }
-                }
-            }
+    public static int getPreviousDimension(int dimension) {
+        int dim = dimension - 1;
+        if (dim < 0) {
+            dim = CANOverlay.NB_DIMENSIONS;
         }
-
-        for (Peer peer : peersToRemove) {
-            this.neighborsDataStructure.remove(peer);
-        }
+        return dim;
     }
 }

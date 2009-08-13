@@ -1,8 +1,10 @@
 package org.objectweb.proactive.extensions.structuredp2p.core;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -63,7 +65,7 @@ public class Peer implements DataStorage, InitActive, RunActive, Serializable {
     /**
      * Responses associated to the oneWay search on the network.
      */
-    private Map<UUID, QueryResponse> oneWayResponses = new HashMap<UUID, QueryResponse>();
+    private Map<UUID, List<QueryResponse>> oneWayResponses = new HashMap<UUID, List<QueryResponse>>();
 
     /**
      * Peer which are currently not accessible because they are preparing to leave.
@@ -96,40 +98,10 @@ public class Peer implements DataStorage, InitActive, RunActive, Serializable {
      * Constructor.
      * 
      * @param type
-     *            @ the type of the overlay which is used by the peer.
+     *            the type of the overlay which is used by the peer.
      */
     public Peer(OverlayType type) {
         this.type = type;
-    }
-
-    /**
-     * Creates a new Peer ActiveObject.
-     * 
-     * @param type
-     *            the type of the peer, which is one of {@link OverlayType}.
-     * @return the new Peer object created.
-     * @throws ActiveObjectCreationException
-     * @throws NodeException
-     */
-    public static Peer newActivePeer(OverlayType type) throws ActiveObjectCreationException, NodeException {
-        return Peer.newActivePeer(type, null);
-    }
-
-    /**
-     * Creates a new Peer ActiveObject.
-     * 
-     * @param type
-     *            the type of the peer, which is one of {@link OverlayType}.
-     * @param node
-     *            the node used by the peer.
-     * @return the new Peer object created.
-     * @throws ActiveObjectCreationException
-     * @throws NodeException
-     */
-    public static Peer newActivePeer(OverlayType type, Node node) throws ActiveObjectCreationException,
-            NodeException {
-        return (Peer) PAActiveObject.newActive(Peer.class.getName(), null, new Object[] { type }, node, null,
-                new StructuredMetaObjectFactory());
     }
 
     /**
@@ -146,6 +118,23 @@ public class Peer implements DataStorage, InitActive, RunActive, Serializable {
                         .getValue()), valueFactory.createURI(LexicographicCoordinate.random(10).getValue()),
                         valueFactory.createURI(LexicographicCoordinate.random(10).getValue())));
         return true;
+    }
+
+    public void addOneWayResponse(QueryResponse response) {
+        System.out.println("N " + this + " has receipted a new response with uuid=" + response.getUUID());
+
+        synchronized (this.oneWayResponses) {
+            if (this.oneWayResponses.get(response.getUUID()) == null) {
+                List<QueryResponse> responses = new ArrayList<QueryResponse>();
+                responses.add(response);
+                this.oneWayResponses.put(response.getUUID(), responses);
+            } else {
+                this.oneWayResponses.get(response.getUUID()).add(response);
+            }
+
+            this.oneWayResponses.notifyAll();
+        }
+
     }
 
     /**
@@ -198,7 +187,7 @@ public class Peer implements DataStorage, InitActive, RunActive, Serializable {
      * 
      * @return the oneWay responses.
      */
-    public Map<UUID, QueryResponse> getOneWayResponses() {
+    public Map<UUID, List<QueryResponse>> getOneWayResponses() {
         return this.oneWayResponses;
     }
 
@@ -349,10 +338,6 @@ public class Peer implements DataStorage, InitActive, RunActive, Serializable {
         return this.dataStorage.queryV(language, graphQuery);
     }
 
-    /*
-     * DataStorage interface implementation.
-     */
-
     /**
      * Receive a message from an another peer.
      * 
@@ -428,7 +413,7 @@ public class Peer implements DataStorage, InitActive, RunActive, Serializable {
             }
         }
 
-        QueryResponse response = this.oneWayResponses.get(uuid);
+        QueryResponse response = this.oneWayResponses.get(uuid).get(0);
 
         return response;
     }
@@ -452,8 +437,6 @@ public class Peer implements DataStorage, InitActive, RunActive, Serializable {
      *            the message to send.
      * 
      * @return the response in agreement with the type of message sent.
-     * @throws Exception
-     *             this exception appears when a message cannot be send to a peer.
      */
     public ResponseMessage sendTo(Peer remotePeer, Message msg) {
         ResponseMessage response = null;
@@ -520,5 +503,35 @@ public class Peer implements DataStorage, InitActive, RunActive, Serializable {
      */
     public String toString() {
         return this.structuredOverlay.toString();
+    }
+
+    /**
+     * Creates a new Peer ActiveObject.
+     * 
+     * @param type
+     *            the type of the peer, which is one of {@link OverlayType}.
+     * @return the new Peer object created.
+     * @throws ActiveObjectCreationException
+     * @throws NodeException
+     */
+    public static Peer newActivePeer(OverlayType type) throws ActiveObjectCreationException, NodeException {
+        return Peer.newActivePeer(type, null);
+    }
+
+    /**
+     * Creates a new Peer ActiveObject.
+     * 
+     * @param type
+     *            the type of the peer, which is one of {@link OverlayType}.
+     * @param node
+     *            the node used by the peer.
+     * @return the new Peer object created.
+     * @throws ActiveObjectCreationException
+     * @throws NodeException
+     */
+    public static Peer newActivePeer(OverlayType type, Node node) throws ActiveObjectCreationException,
+            NodeException {
+        return (Peer) PAActiveObject.newActive(Peer.class.getName(), null, new Object[] { type }, node, null,
+                new StructuredMetaObjectFactory());
     }
 }

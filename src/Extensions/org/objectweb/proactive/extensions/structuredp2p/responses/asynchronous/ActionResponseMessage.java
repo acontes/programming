@@ -1,5 +1,8 @@
 package org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous;
 
+import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
+
+
 /**
  * Defines a basic response for the {@link Message}.
  * 

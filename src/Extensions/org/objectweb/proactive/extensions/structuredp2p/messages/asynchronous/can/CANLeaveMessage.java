@@ -31,11 +31,13 @@ public class CANLeaveMessage implements Message {
     /**
      * Constructor.
      * 
-     * @param remotePeer
+     * @param peerToRemove
      *            the neighbor to remove.
-     * @param dimension
+     * @param peersToAdd
+     *            the peers to add.
+     * @param dimensionToAdd
      *            the dimension of the neighbor to remove.
-     * @param direction
+     * @param directionToAdd
      *            the direction of the neighbor to remove
      */
     public CANLeaveMessage(Peer peerToRemove, List<Peer> peersToAdd, int dimensionToAdd, int directionToAdd) {

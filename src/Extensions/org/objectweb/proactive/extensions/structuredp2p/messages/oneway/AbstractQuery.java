@@ -60,8 +60,6 @@ public abstract class AbstractQuery<K> implements Query, Serializable {
      * 
      * @param keyToFind
      *            the key to find.
-     * @param keyFromSender
-     *            a key that the sender manages.
      */
     public AbstractQuery(K[] keyToFind) {
         this.keyToReach = keyToFind;
@@ -74,13 +72,13 @@ public abstract class AbstractQuery<K> implements Query, Serializable {
      *            the universally unique identifier associated to the query.
      * @param keyToReach
      *            the key to reach.
-     * @param timestampOfDispatch
+     * @param dispatchTimestamp
      *            the dispatch timestamp of the query.
      */
-    public AbstractQuery(UUID uid, K[] keyToReach, long dispatchTimestamp) {
+    public AbstractQuery(UUID uuid, K[] keyToReach, long dispatchTimestamp) {
         this.keyToReach = keyToReach;
         this.dispatchTimestamp = dispatchTimestamp;
-        this.uuid = uid;
+        this.uuid = uuid;
     }
 
     /**

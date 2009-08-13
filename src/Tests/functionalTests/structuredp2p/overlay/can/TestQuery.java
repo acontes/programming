@@ -7,21 +7,22 @@ import junit.framework.Assert;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates.Coordinate;
 import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.Query;
 import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can.LookupQuery;
 import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can.LookupQueryResponse;
-import org.openrdf.query.MalformedQueryException;
-import org.openrdf.query.parser.ParsedQuery;
-import org.openrdf.query.parser.sparql.SPARQLParser;
+import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can.RDFQueryResponse;
+import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can.RDFTriplePatternQuery;
 
 
 /**
- * Test {@link PingMessage}.
+ * Test the oneway queries.
  * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent
@@ -77,21 +78,8 @@ public class TestQuery {
                 .getStructuredOverlay()).getZone().getCoordinatesMin());
     }
 
-    @Test
-    public void testQueryParsing() {
-        SPARQLParser parser = new SPARQLParser();
-        ParsedQuery pq = null;
-
-        try {
-            pq = parser.parseQuery(
-                    "SELECT ?o ?p ?s WHERE { ?o ?p ?s. FILTER ( str(?o) > \"http://toto\"). }", null);
-        } catch (MalformedQueryException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Test
-    public void testBasicSearch() {
+    @Ignore
+    public void testLookupQuery() {
         LookupQueryResponse response = null;
         try {
             response = (LookupQueryResponse) PAFuture.getFutureValue(TestQuery.firstPeer
@@ -100,14 +88,31 @@ public class TestQuery {
             e.printStackTrace();
         }
 
-        System.out.println("nbStepsForReceipt = " + response.getNbStepsForReceipt());
-        System.out.println("nbStepsForSend = " + response.getNbStepsForSend());
-
         Assert.assertTrue(response.getLatency() > 1);
         Assert.assertTrue(response.getNbSteps() > 0);
         Assert.assertTrue(response.getNbStepsForReceipt() > 0);
         Assert.assertTrue(response.getNbStepsForSend() > 0);
         Assert.assertEquals(TestQuery.thirdPeer, response.getPeerFound());
+    }
+
+    @Test
+    public void testRDFTriplePatternQuery() {
+        RDFQueryResponse response = null;
+
+        Coordinate[] coordinates = ((CANOverlay) TestQuery.thirdPeer.getStructuredOverlay()).getZone()
+                .getCoordinatesMin();
+
+        try {
+            response = (RDFQueryResponse) PAFuture.getFutureValue(TestQuery.firstPeer
+                    .search(new RDFTriplePatternQuery(coordinates[0], coordinates[1], null)));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        Assert.assertTrue(response.getLatency() > 1);
+        Assert.assertTrue(response.getNbSteps() > 0);
+        Assert.assertTrue(response.getNbStepsForReceipt() > 0);
+        Assert.assertTrue(response.getNbStepsForSend() > 0);
     }
 
     @Test

@@ -4,7 +4,7 @@ import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 
 
 /**
- * Defines a basic response for the {@link JoinMessage}.
+ * Defines a basic response for a join message.
  * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent
@@ -36,8 +36,6 @@ public class JoinResponseMessage extends ActionResponseMessage {
     /**
      * Constructor.
      * 
-     * @param creationTimestamp
-     *            the timestamp indicating the time creation of the message which has been sent.
      * @param remotePeer
      *            the remote peer.
      */

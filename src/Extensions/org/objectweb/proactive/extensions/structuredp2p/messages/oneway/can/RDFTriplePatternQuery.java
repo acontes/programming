@@ -1,6 +1,8 @@
 package org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredOverlay;
@@ -9,7 +11,6 @@ import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.Neighbo
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.Zone;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates.Coordinate;
 import org.objectweb.proactive.extensions.structuredp2p.core.requests.BlockingRequestReceiverException;
-import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.Query;
 
 
 /**
@@ -18,6 +19,8 @@ import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.Query;
  */
 @SuppressWarnings("serial")
 public class RDFTriplePatternQuery extends RDFQuery {
+
+    private Set<Peer> lastPeersWhichHaveReceiptTheQuery = new HashSet<Peer>();
 
     public RDFTriplePatternQuery() {
         super();
@@ -29,45 +32,107 @@ public class RDFTriplePatternQuery extends RDFQuery {
 
     public RDFTriplePatternQuery(Coordinate subject, Coordinate predicate, Coordinate object) {
         super(new Coordinate[] { subject, predicate, object });
+
+        if (subject == null && predicate == null && object == null) {
+            throw new IllegalArgumentException(
+                "The three arguments for RDFTriplePatternQuery cannot be null. You must specified two of them.");
+        }
     }
 
     /**
      * {@inheritDoc}
      */
     public void handle(StructuredOverlay overlay) {
-        // TODO Auto-generated method stub
+        NeighborsDataStructure subSetOfNeighbors = new NeighborsDataStructure();
+        subSetOfNeighbors.addAll(((CANOverlay) overlay).getNeighborsDataStructure());
+
+        for (Peer peer : this.lastPeersWhichHaveReceiptTheQuery) {
+            subSetOfNeighbors.remove(peer);
+        }
+
+        for (Peer neighbor : subSetOfNeighbors) {
+            this.lastPeersWhichHaveReceiptTheQuery.add(neighbor);
+        }
+        this.lastPeersWhichHaveReceiptTheQuery.add(overlay.getRemotePeer());
+
+        subSetOfNeighbors.remove(overlay.getRemotePeer());
+
+        int nbSendFromCurrentQuery = 0;
+        for (Peer neighbor : subSetOfNeighbors) {
+            if (this.validKeyConstraints(neighbor.getStructuredOverlay())) {
+                super.addVisitedPeer(overlay.getRemotePeer());
+                super.incrementNbStepsBy(1);
+                neighbor.send(this);
+                nbSendFromCurrentQuery++;
+            }
+        }
+
+        if (nbSendFromCurrentQuery == 0) {
+            RDFQueryResponse response = new RDFQueryResponse(this, this.getKeyToReach(), null, true);
+            System.out.println("* Routing back from " + overlay + " to " +
+                super.getVisitedPeers().lastElement());
+            response.route(overlay);
+        } else {
+            System.out.println("++ send " + nbSendFromCurrentQuery);
+            ((CANOverlay) overlay).handleRDFTriplePatternQuery(this, nbSendFromCurrentQuery);
+        }
     }
 
     /**
      * {@inheritDoc}
      */
     public void route(StructuredOverlay overlay) {
-        CANOverlay CANOverlay = ((CANOverlay) overlay);
+        CANOverlay canOverlay = ((CANOverlay) overlay);
 
         Coordinate[] coordinatesToReach = this.getKeyToReach();
 
+        if (super.getVisitedPeers().size() == 0) {
+            super.addVisitedPeer(overlay.getRemotePeer());
+        }
+
+        // We are on a peer which respects constraints but we need to send request to many other
         if (this.validKeyConstraints(overlay)) {
-            this.handle(overlay);
-        } else {
+            System.out.println("* On peer which valid constraint " + overlay);
+
+            if (super.keyToReachContainsAllCoordinates()) {
+                RDFQueryResponse response = new RDFQueryResponse(this, this.getKeyToReach(), null);
+                response.route(overlay);
+            } else {
+                this.handle(overlay);
+            }
+        } else { // We must found a peer which valid the constraints
+            System.out.println("* Basic Routing");
             int direction;
             int pos;
 
             for (int dim = 0; dim < CANOverlay.NB_DIMENSIONS; dim++) {
+                if (coordinatesToReach[dim] == null) {
+                    continue;
+                }
+
                 direction = NeighborsDataStructure.SUPERIOR_DIRECTION;
-                pos = CANOverlay.contains(dim, coordinatesToReach[dim]);
+                pos = canOverlay.contains(dim, coordinatesToReach[dim]);
 
                 if (pos == -1) {
                     direction = NeighborsDataStructure.INFERIOR_DIRECTION;
                 }
 
                 if (pos != 0) {
-                    List<Peer> neighbors = CANOverlay.getNeighborsDataStructure()
+                    List<Peer> neighbors = canOverlay.getNeighborsDataStructure()
                             .getNeighbors(dim, direction);
 
                     if (neighbors.size() > 0) {
-                        Peer nearestPeer = CANOverlay.getNeighborsDataStructure().getNearestNeighborFrom(
-                                CANOverlay.getZone(), coordinatesToReach[CANOverlay.getNextDimension(dim)],
-                                dim, direction);
+                        Peer nearestPeer;
+
+                        if (coordinatesToReach[CANOverlay.getNextDimension(dim)] == null) {
+                            nearestPeer = canOverlay.getNeighborsDataStructure().getNeighbors(dim, direction)
+                                    .get(0);
+                        } else {
+                            nearestPeer = canOverlay.getNeighborsDataStructure().getNearestNeighborFrom(
+                                    canOverlay.getZone(),
+                                    coordinatesToReach[CANOverlay.getNextDimension(dim)], dim, direction);
+                        }
+
                         this.incrementNbStepsBy(1);
 
                         try {
@@ -83,6 +148,7 @@ public class RDFTriplePatternQuery extends RDFQuery {
                     }
                 }
             }
+
         }
     }
 
@@ -103,14 +169,6 @@ public class RDFTriplePatternQuery extends RDFQuery {
         }
 
         return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void route(StructuredOverlay overlay, Query query) {
-        // TODO Auto-generated method stub
-
     }
 
 }

@@ -137,17 +137,15 @@ public class LexicographicCoordinate extends Coordinate {
     /**
      * Returns the middle coordinate of two Lexicographic Coordinates.
      * 
-     * @param coord1
-     *            the first coordinate.
-     * @param coord2
+     * @param coord
      *            the second coordinate.
      * @return the middle coordinate.
      */
 
-    public Coordinate getMiddleWith(Coordinate coord2) {
+    public Coordinate getMiddleWith(Coordinate coord) {
         ArrayList<Integer> codePtsStr1 = LexicographicCoordinate.fromCoordinateToUnicode(this);
         // System.out.println(this.printInformation(codePtsStr1));
-        ArrayList<Integer> codePtsStr2 = LexicographicCoordinate.fromCoordinateToUnicode(coord2);
+        ArrayList<Integer> codePtsStr2 = LexicographicCoordinate.fromCoordinateToUnicode(coord);
         // System.out.println(this.printInformation(codePtsStr2));
         ArrayList<Integer> sumCodePoints = LexicographicCoordinate.sumUnicodeCodePoints(codePtsStr1,
                 codePtsStr2);
@@ -283,7 +281,6 @@ public class LexicographicCoordinate extends Coordinate {
     /**
      * 
      * @param l
-     * @return
      */
     public String printInformation(ArrayList<?> l) {
         String s = "(";
@@ -295,11 +292,11 @@ public class LexicographicCoordinate extends Coordinate {
     }
 
     /**
-     * generate a random string
+     * Generates a random string.
      * 
      * @param length
-     *            the length of the string
-     * @return the generated string
+     *            the length of the string.
+     * @return the generated string.
      */
     public static String generate(int length) {
         String chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";

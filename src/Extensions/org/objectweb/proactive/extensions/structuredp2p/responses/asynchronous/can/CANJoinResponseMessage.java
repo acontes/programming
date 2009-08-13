@@ -62,7 +62,7 @@ public class CANJoinResponseMessage implements ResponseMessage {
      *            the direction.
      * @param splitHistory
      *            the splitHistory of the remote peer.
-     * @param zone
+     * @param affectedZone
      *            the zone of the new peer.
      * @param affectedNeighbors
      *            the neighbors of the remote peer.

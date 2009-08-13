@@ -96,7 +96,7 @@ public abstract class StructuredOverlay implements Serializable {
      * 
      * @param msg
      *            the message that is handled.
-     * @return the {@link EmptyResponseMessage} response.
+     * @return the {@link ActionResponseMessage} response.
      */
     public abstract ActionResponseMessage handleAddNeighborMessage(AddNeighborMessage msg);
 
@@ -146,14 +146,12 @@ public abstract class StructuredOverlay implements Serializable {
     /**
      * Send a {@link Message} to a known {@link Peer}.
      * 
-     * @param peer
+     * @param remotePeer
      *            the remote peer to which we want to send the message.
      * @param msg
      *            the message to send.
      * 
      * @return the response in agreement with the type of message sent.
-     * @throws Exception
-     *             an exception appears when a message cannot be send to a peer.
      */
     public ResponseMessage sendTo(Peer remotePeer, Message msg) {
         return this.localPeer.sendTo(remotePeer, msg);

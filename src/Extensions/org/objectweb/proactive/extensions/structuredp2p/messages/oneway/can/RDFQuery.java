@@ -21,7 +21,7 @@ import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordin
 @SuppressWarnings("serial")
 public abstract class RDFQuery extends AbstractCANQuery {
 
-    Stack<Peer> visitedPeers = new Stack<Peer>();
+    private Stack<Peer> visitedPeers = new Stack<Peer>();
 
     public RDFQuery() {
         super();
@@ -59,7 +59,13 @@ public abstract class RDFQuery extends AbstractCANQuery {
      *            the peer to add.
      */
     public void addVisitedPeer(Peer remotePeer) {
-        this.visitedPeers.push(remotePeer);
+        if (!this.visitedPeers.contains(remotePeer)) {
+            this.visitedPeers.push(remotePeer);
+        }
+    }
+
+    public boolean hasPeersToVisit() {
+        return this.visitedPeers.size() > 0;
     }
 
     /**
@@ -74,10 +80,32 @@ public abstract class RDFQuery extends AbstractCANQuery {
     /**
      * Removes the last peer visited.
      * 
-     * @return <code>true</code> if the remove has succeeded, <code>false</code> otherwise.
+     * @return the peer removed if the remove has succeeded, <code>null</code> otherwise.
      */
-    public boolean removeLastVisitedPeer() {
-        return this.visitedPeers.remove(this.visitedPeers.lastElement());
+    public Peer removeLastVisitedPeer() {
+        Peer lastPeer = this.visitedPeers.lastElement();
+
+        if (this.visitedPeers.remove(lastPeer)) {
+            return lastPeer;
+        }
+
+        return null;
+    }
+
+    /**
+     * Indicates if the key to reach has all its coordinates fixed with a not <code>null</code>
+     * value or not.
+     * 
+     * @return <code>true</code> if the key to reach has all its coordinates fixed with a not
+     *         <code>null</code>. <code>false</code> otherwise.
+     */
+    public boolean keyToReachContainsAllCoordinates() {
+        for (Coordinate coordinate : super.getKeyToReach()) {
+            if (coordinate == null) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }
