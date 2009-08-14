@@ -7,7 +7,7 @@ import org.objectweb.proactive.examples.structuredp2p.launchers.PeerLauncher;
 import org.objectweb.proactive.examples.structuredp2p.launchers.commands.Command;
 import org.objectweb.proactive.examples.structuredp2p.launchers.commands.JoinCommand;
 import org.objectweb.proactive.examples.structuredp2p.launchers.commands.LeaveCommand;
-import org.objectweb.proactive.examples.structuredp2p.launchers.commands.SearchCommand;
+import org.objectweb.proactive.examples.structuredp2p.launchers.commands.LookupQueryCommand;
 
 
 /**
@@ -30,7 +30,7 @@ public abstract class Manager extends Thread {
 
         this.addAction(new JoinCommand(this));
         this.addAction(new LeaveCommand(this));
-        this.addAction(new SearchCommand(this));
+        this.addAction(new LookupQueryCommand(this));
     }
 
     public void addAction(Command action) {

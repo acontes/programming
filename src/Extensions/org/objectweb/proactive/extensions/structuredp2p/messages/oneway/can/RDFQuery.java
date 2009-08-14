@@ -59,13 +59,7 @@ public abstract class RDFQuery extends AbstractCANQuery {
      *            the peer to add.
      */
     public void addVisitedPeer(Peer remotePeer) {
-        if (!this.visitedPeers.contains(remotePeer)) {
-            this.visitedPeers.push(remotePeer);
-        }
-    }
-
-    public boolean hasPeersToVisit() {
-        return this.visitedPeers.size() > 0;
+        this.visitedPeers.push(remotePeer);
     }
 
     /**
@@ -75,6 +69,16 @@ public abstract class RDFQuery extends AbstractCANQuery {
      */
     public Stack<Peer> getVisitedPeers() {
         return this.visitedPeers;
+    }
+
+    /**
+     * Indicates if the query must be routed to other peers.
+     * 
+     * @return <code>true</code> if the query must be routed to other peers, <code>false</code>
+     *         otherwise.
+     */
+    public boolean hasPeersToVisit() {
+        return this.visitedPeers.size() > 0;
     }
 
     /**

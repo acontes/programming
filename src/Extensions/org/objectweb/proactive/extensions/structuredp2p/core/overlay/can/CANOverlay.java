@@ -22,9 +22,10 @@ import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.ca
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.can.CANMergeMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.can.CANRemoveNeighborMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.Query;
-import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.QueryResponse;
-import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can.RDFQuery;
+import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.QueryResponseEntry;
+import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can.LookupQueryResponse;
 import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can.RDFQueryResponse;
+import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can.RDFTriplePatternQuery;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.ActionResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.ResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.can.CANJoinResponseMessage;
@@ -413,16 +414,16 @@ public class CANOverlay extends StructuredOverlay {
         return new ActionResponseMessage(result);
     }
 
-    public void handleRDFTriplePatternQuery(RDFQuery query, int nbResponsesToWait) {
+    public void handleRDFTriplePatternQuery(RDFTriplePatternQuery query, int nbResponsesToWait) {
         // Wait while we don't have received all the responses sent from this peer
-        synchronized (this.getLocalPeer().getOneWayResponses()) {
-            while (this.getLocalPeer().getOneWayResponses().get(query.getUUID()) == null ||
-                this.getLocalPeer().getOneWayResponses().get(query.getUUID()).size() != nbResponsesToWait) {
+        synchronized (super.getOneWayResponses()) {
+            while (super.getOneWayResponses().get(query.getUUID()) == null &&
+                super.getOneWayResponses().get(query.getUUID()).getNbResponses() != nbResponsesToWait) {
 
                 System.out.println("W " + this.zone + " is waiting for " + nbResponsesToWait +
                     " response(s) with uuid= " + query.getUUID() + "...");
                 try {
-                    this.getLocalPeer().getOneWayResponses().wait();
+                    super.getOneWayResponses().wait();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -430,13 +431,12 @@ public class CANOverlay extends StructuredOverlay {
         }
 
         // At this step all the responses have been received
-        RDFQueryResponse responseToSend = new RDFQueryResponse();
+        RDFQueryResponse responseToSend = new RDFQueryResponse(query, query.getKeyToReach());
         responseToSend.incrementNbStepsBy(nbResponsesToWait);
-        for (QueryResponse response : this.getLocalPeer().getOneWayResponses().get(query.getUUID())) {
-            responseToSend.addAll(((RDFQueryResponse) response).getRetrievedStatements());
-        }
+        responseToSend.addAll(((RDFQueryResponse) this.getOneWayResponses().get(query.getUUID())
+                .getQueryResponse()).getRetrievedStatements());
 
-        query.route(this);
+        responseToSend.getQuery().removeLastVisitedPeer().send(responseToSend);
     }
 
     /**
@@ -668,6 +668,37 @@ public class CANOverlay extends StructuredOverlay {
         }
 
         return responses;
+    }
+
+    public void addOneWayResponse(RDFQueryResponse response) {
+        // System.out.println("N " + this + " has receipted a new response with uuid=" +
+        // response.getUUID());
+
+        synchronized (super.getOneWayResponses()) {
+            if (super.getOneWayResponses().get(response.getUUID()) == null) {
+                super.getOneWayResponses().put(response.getUUID(), new QueryResponseEntry(response));
+            } else {
+                RDFQueryResponse responseToUpdate = (RDFQueryResponse) super.getOneWayResponses().get(
+                        response.getUUID()).getQueryResponse();
+                responseToUpdate.addAll(response.getRetrievedStatements());
+                // TODO update latency, nb steps for send and receipt
+            }
+
+            super.getOneWayResponses().notifyAll();
+        }
+    }
+
+    public void addOneWayResponse(LookupQueryResponse response) {
+        synchronized (super.getOneWayResponses()) {
+            if (super.getOneWayResponses().get(response.getUUID()) == null) {
+                super.getOneWayResponses().put(response.getUUID(), new QueryResponseEntry(response));
+            } else {
+                throw new IllegalArgumentException(
+                    "A LookupQueryResponse has already been received for uuid=" + response.getUUID());
+            }
+
+            super.getOneWayResponses().notifyAll();
+        }
     }
 
     /**

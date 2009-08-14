@@ -13,14 +13,14 @@ import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can.Look
 
 
 /**
- * Performs a lookup command : a lookup command consists in searching a peer on the network and to
- * return the reference of the peer found to the sender of the request in order to print some
- * information.
+ * Performs a lookup query command : a lookup query command performs a {@link LookupQuery} which
+ * consists in searching a peer on the network and to return the reference of the peer found to the
+ * sender of the request in order to print some information.
  * 
  * @author Pellegrino Laurent
  * @version 0.1, 07/27/2009
  */
-public class SearchCommand extends Command {
+public class LookupQueryCommand extends Command {
 
     /**
      * Constructor.
@@ -28,7 +28,7 @@ public class SearchCommand extends Command {
      * @param manager
      *            the manager that will execute this command.
      */
-    public SearchCommand(Manager manager) {
+    public LookupQueryCommand(Manager manager) {
         super(manager, "Search", "Send a lookup message to a random peer", "search", "s");
     }
 

@@ -9,7 +9,7 @@ import org.objectweb.proactive.examples.structuredp2p.launchers.PeerLauncher;
 import org.objectweb.proactive.examples.structuredp2p.launchers.commands.Command;
 import org.objectweb.proactive.examples.structuredp2p.launchers.commands.JoinCommand;
 import org.objectweb.proactive.examples.structuredp2p.launchers.commands.LeaveCommand;
-import org.objectweb.proactive.examples.structuredp2p.launchers.commands.SearchCommand;
+import org.objectweb.proactive.examples.structuredp2p.launchers.commands.LookupQueryCommand;
 
 
 /**
@@ -54,7 +54,7 @@ public class StressTestManager extends Manager {
         }
 
         if (performSearch) {
-            this.operationsAllowed.add(new SearchCommand(this).getName());
+            this.operationsAllowed.add(new LookupQueryCommand(this).getName());
         }
     }
 

@@ -1,13 +1,8 @@
 package org.objectweb.proactive.extensions.structuredp2p.core;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
@@ -63,11 +58,6 @@ public class Peer implements DataStorage, InitActive, RunActive, Serializable {
     private transient DataStorage dataStorage;
 
     /**
-     * Responses associated to the oneWay search on the network.
-     */
-    private Map<UUID, List<QueryResponse>> oneWayResponses = new HashMap<UUID, List<QueryResponse>>();
-
-    /**
      * Peer which are currently not accessible because they are preparing to leave.
      */
     private Set<Peer> peersWhichAreLeaving = new HashSet<Peer>();
@@ -120,23 +110,6 @@ public class Peer implements DataStorage, InitActive, RunActive, Serializable {
         return true;
     }
 
-    public void addOneWayResponse(QueryResponse response) {
-        System.out.println("N " + this + " has receipted a new response with uuid=" + response.getUUID());
-
-        synchronized (this.oneWayResponses) {
-            if (this.oneWayResponses.get(response.getUUID()) == null) {
-                List<QueryResponse> responses = new ArrayList<QueryResponse>();
-                responses.add(response);
-                this.oneWayResponses.put(response.getUUID(), responses);
-            } else {
-                this.oneWayResponses.get(response.getUUID()).add(response);
-            }
-
-            this.oneWayResponses.notifyAll();
-        }
-
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -180,15 +153,6 @@ public class Peer implements DataStorage, InitActive, RunActive, Serializable {
      */
     public DataStorage getDataStorage() {
         return this.dataStorage;
-    }
-
-    /**
-     * Returns the oneWay responses.
-     * 
-     * @return the oneWay responses.
-     */
-    public Map<UUID, List<QueryResponse>> getOneWayResponses() {
-        return this.oneWayResponses;
     }
 
     /**
@@ -389,33 +353,8 @@ public class Peer implements DataStorage, InitActive, RunActive, Serializable {
         }
     }
 
-    /**
-     * Sends a {@link AbstractQuery} on the network from the current peer.
-     * 
-     * @param query
-     *            the message to send.
-     * @return the response in agreement with the type of message sent.
-     */
     public QueryResponse search(Query query) {
-        // TODO To check the type of the query with the peer type
-
-        UUID uuid = UUID.randomUUID();
-        query.setUUID(uuid);
-        this.structuredOverlay.send(query);
-
-        synchronized (this.oneWayResponses) {
-            while (this.oneWayResponses.get(uuid) == null) {
-                try {
-                    this.oneWayResponses.wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        QueryResponse response = this.oneWayResponses.get(uuid).get(0);
-
-        return response;
+        return this.structuredOverlay.search(query);
     }
 
     /**

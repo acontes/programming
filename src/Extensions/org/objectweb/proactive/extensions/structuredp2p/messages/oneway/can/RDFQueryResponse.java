@@ -1,12 +1,15 @@
 package org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can;
 
+import java.util.HashSet;
 import java.util.Set;
 
-import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredOverlay;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates.Coordinate;
 import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.AbstractQueryResponse;
 import org.openrdf.model.Statement;
+import org.openrdf.model.impl.StatementImpl;
+import org.openrdf.model.impl.URIImpl;
 
 
 /**
@@ -16,27 +19,21 @@ import org.openrdf.model.Statement;
 @SuppressWarnings("serial")
 public class RDFQueryResponse extends AbstractQueryResponse<Coordinate, RDFQuery> {
 
-    private Set<Statement> retrievedStatements;
-
-    private Peer lastPeerToVisitRemoved;
-
-    private boolean isOnLeaf = false;
+    private Set<Statement> retrievedStatements = new HashSet<Statement>();
 
     public RDFQueryResponse() {
         super();
     }
 
     public RDFQueryResponse(RDFQuery query, Coordinate[] coordinatesToReach,
-            Set<Statement> retrievedStatements, boolean isOnLeaf) {
+            Set<Statement> retrievedStatements) {
         super(query, coordinatesToReach);
-        this.isOnLeaf = isOnLeaf;
-        this.retrievedStatements = retrievedStatements;
+
+        this.retrievedStatements.addAll(retrievedStatements);
     }
 
-    public RDFQueryResponse(RDFQuery query, Coordinate[] coordinatesToReach,
-            Set<Statement> retrievedStatements) {
-        this(query, coordinatesToReach, retrievedStatements, false);
-
+    public RDFQueryResponse(RDFQuery query, Coordinate[] coordinatesToReach) {
+        super(query, coordinatesToReach);
     }
 
     public Set<Statement> getRetrievedStatements() {
@@ -47,53 +44,38 @@ public class RDFQueryResponse extends AbstractQueryResponse<Coordinate, RDFQuery
         return this.retrievedStatements.addAll(statements);
     }
 
-    public boolean hasPeersToVisit() {
-        return this.getQuery().hasPeersToVisit();
-    }
-
     /**
      * {@inheritDoc}
      */
     public void handle(StructuredOverlay overlay) {
-        overlay.getLocalPeer().addOneWayResponse(this);
-        this.getQuery().removeLastVisitedPeer().send(this);
+
+        URIImpl subject = (this.getKeyToReach()[0] == null) ? null : new URIImpl(this.getKeyToReach()[0]
+                .getValue());
+
+        URIImpl predicate = (this.getKeyToReach()[1] == null) ? null : new URIImpl(this.getKeyToReach()[1]
+                .getValue());
+
+        URIImpl object = (this.getKeyToReach()[2] == null) ? null : new URIImpl(this.getKeyToReach()[2]
+                .getValue());
+
+        this.addAll(overlay.getLocalPeer().query(new StatementImpl(subject, predicate, object)));
+        // overlay.getLocalPeer().addOneWayResponse(this);
+        // this.getQuery().removeLastVisitedPeer().send(this);
+        ((CANOverlay) this.getQuery().removeLastVisitedPeer().getStructuredOverlay()).addOneWayResponse(this);
     }
 
     /**
      * {@inheritDoc}
      */
     public void route(StructuredOverlay overlay) {
-        System.out.println("isOnLeaf = " + this.isOnLeaf);
-        if (!this.hasPeersToVisit()) {
+        if (!super.getQuery().hasPeersToVisit()) {
             System.out.println("  * RDFQueryResponse.route() has no peer to visit : handle last step.");
             this.setDeliveryTime();
-            overlay.getLocalPeer().addOneWayResponse(this);
-        } else if (this.isOnLeaf) {
-            System.out.println("  * RDFQueryResponse.route() is on a leaf. Need to send response.");
-            this.isOnLeaf = false;
-            this.lastPeerToVisitRemoved = this.getQuery().removeLastVisitedPeer();
-            this.lastPeerToVisitRemoved.send(this);
-
-        } else if (!this.isOnLeaf && this.hasPeersToVisit()) {
-            System.out
-                    .println("  * RDFQueryResponse.route() has peers to visit and must send back response.");
-            this.printPeersToVisit(overlay);
-
-            this.handle(overlay);
+            ((CANOverlay) overlay).addOneWayResponse(this);
         } else {
-            System.err.println("ooooops, but why ?");
+            this.handle(overlay);
         }
 
-        this.printPeersToVisit(overlay);
-        System.out.println("  [StateOfRDFQueryResponse: " + this.getQuery().getVisitedPeers().size() +
-            " peers to route back]");
-    }
-
-    public void printPeersToVisit(StructuredOverlay overlay) {
-        // System.out.println("Peers to visit from " + overlay);
-        for (Peer p : this.getQuery().getVisitedPeers()) {
-            System.out.println("  -" + p);
-        }
     }
 
     public boolean validKeyConstraints(StructuredOverlay overlay) {

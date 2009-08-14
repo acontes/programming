@@ -1,7 +1,10 @@
 package org.objectweb.proactive.extensions.structuredp2p.core.overlay;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.Vector;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
@@ -11,6 +14,8 @@ import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.Re
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.can.CANRemoveNeighborMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.AbstractQuery;
 import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.Query;
+import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.QueryResponse;
+import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.QueryResponseEntry;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.ActionResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.JoinResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.ResponseMessage;
@@ -38,6 +43,11 @@ public abstract class StructuredOverlay implements Serializable {
      * Queries which are bufferized when a {@link Peer#sendTo(Peer, Message)} is not accepted.
      */
     private List<Query> bufferizedQueries = new Vector<Query>();
+
+    /**
+     * Responses associated to the oneWay search on the network.
+     */
+    private Map<UUID, QueryResponseEntry> oneWayResponses = new HashMap<UUID, QueryResponseEntry>();
 
     /**
      * The local peer which is associated with the overlay.
@@ -71,6 +81,44 @@ public abstract class StructuredOverlay implements Serializable {
      */
     public List<Query> getBufferizedQueries() {
         return this.bufferizedQueries;
+    }
+
+    /**
+     * Sends a {@link Query} on the network from the current peer.
+     * 
+     * @param query
+     *            the query to send.
+     * @return the response in agreement with the type of query sent.
+     */
+    public QueryResponse search(Query query) {
+        // TODO To check the type of the query with the peer type
+        UUID uuid = UUID.randomUUID();
+        query.setUUID(uuid);
+        this.send(query);
+
+        synchronized (this.oneWayResponses) {
+            while (this.oneWayResponses.get(uuid) == null) {
+                try {
+                    this.oneWayResponses.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        QueryResponse response = this.oneWayResponses.get(uuid).getQueryResponse();
+        this.oneWayResponses.remove(uuid);
+
+        return response;
+    }
+
+    /**
+     * Returns the oneWay responses.
+     * 
+     * @return the oneWay responses.
+     */
+    public Map<UUID, QueryResponseEntry> getOneWayResponses() {
+        return this.oneWayResponses;
     }
 
     /**

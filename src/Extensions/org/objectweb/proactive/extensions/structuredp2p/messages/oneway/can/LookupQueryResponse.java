@@ -37,17 +37,14 @@ public class LookupQueryResponse extends AbstractQueryResponse<Coordinate, Looku
      * @{inheritDoc
      */
     public void handle(StructuredOverlay overlay) {
-        CANOverlay CANOverlay = ((CANOverlay) overlay);
+        CANOverlay canOverlay = ((CANOverlay) overlay);
 
         super.setDeliveryTime();
 
         List<QueryResponse> result = new ArrayList<QueryResponse>();
         result.add(this);
 
-        synchronized (CANOverlay.getLocalPeer().getOneWayResponses()) {
-            CANOverlay.getLocalPeer().getOneWayResponses().put(super.getUUID(), result);
-            CANOverlay.getLocalPeer().getOneWayResponses().notifyAll();
-        }
+        canOverlay.addOneWayResponse(this);
     }
 
     /**
