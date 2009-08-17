@@ -37,7 +37,6 @@ import java.lang.management.ManagementFactory;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -303,7 +302,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
     @Override
     protected int internalReceiveReply(Reply reply) throws java.io.IOException {
         // JMX Notification
-        if (!isProActiveInternalObject && (this.mbean != null)) {
+        if (!isProActiveInternalObject && (this.mbean != null) && reply.getResult().getResultObjet() != null &&  reply.getResult().getException() == null) {
             String tagNotification = createTagNotification(reply.getTags());
             RequestNotificationData requestNotificationData = new RequestNotificationData(
                 BodyImpl.this.bodyID, BodyImpl.this.getNodeURL(), reply.getSourceBodyID(), this.nodeURL,
@@ -607,7 +606,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             }
 
             // JMX Notification
-            if (!isProActiveInternalObject && (mbean != null)) {
+            if (!isProActiveInternalObject && (mbean != null) && reply.getResult().getResultObjet() != null &&  reply.getResult().getException() == null) {
                 String tagNotification = createTagNotification(request.getTags());
                 RequestNotificationData data = new RequestNotificationData(request.getSourceBodyID(), request
                         .getSenderNodeURL(), BodyImpl.this.bodyID, BodyImpl.this.nodeURL, request
