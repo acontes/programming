@@ -1241,12 +1241,6 @@
          <literal>ProActive/src/Examples/org/objectweb/proactive/examples/userguide/primes/distributed/</literal>.
          </para>
 
-         <para>
-         You can find the skeleton codes for this exercise into the <literal>tutorials/src/Examples/org/objectweb/proactive/examples/userguide/primes/distributed/</literal>
-         directory. Full code is also available into the directory
-         <literal>ProActive/src/Examples/org/objectweb/proactive/examples/userguide/primes/distributed/</literal>.
-         </para>
-
 			<!-- FT-TEST -->
 			
 			<para>
