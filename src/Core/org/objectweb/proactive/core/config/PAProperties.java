@@ -480,7 +480,7 @@ public enum PAProperties {
 
     /** Enable or disable the Distributed Service ID Tag */
     PA_TAG_DSI("proactive.tag.dsi", PAPropertiesType.BOOLEAN),
-    
+
     /* ------------------------------------
      *  FILE TRANSFER
      */

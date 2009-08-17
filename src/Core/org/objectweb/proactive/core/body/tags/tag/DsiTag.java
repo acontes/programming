@@ -11,14 +11,14 @@ import org.objectweb.proactive.core.body.tags.Tag;
 public class DsiTag extends Tag {
 
     public static final String IDENTIFIER = "PA_TAG_DSI";
-    
+
     /**
      * Constructor setting the Tag name "PA_TAG_DSI"
      * and an UniqueID concatened with the sequence number of the request
      * as the tag DATA.
      */
     public DsiTag(UniqueID id, long seq) {
-        super(IDENTIFIER, "" + id.getCanonString() + "::" + seq );
+        super(IDENTIFIER, "" + id.getCanonString() + "::" + seq);
     }
 
     /**
@@ -27,5 +27,5 @@ public class DsiTag extends Tag {
     public Tag apply() {
         return this;
     }
-    
+
 }
