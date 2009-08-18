@@ -266,6 +266,11 @@ public enum PAProperties {
      * 
      */
     PA_NET_ROUTER_PORT("proactive.net.router.port", PAPropertiesType.INTEGER),
+    
+    /**  PAMRSSH
+     * when using SSH tunneling, a normal connection should be tried before tunneling
+     * */
+    PA_PAMRSSH_TUNNELING_TRY_NORMAL_FIRST("proactive.net.router.tunneling.try_normal_first", PAPropertiesType.BOOLEAN),
 
     /* ------------------------------------
      *  RMI

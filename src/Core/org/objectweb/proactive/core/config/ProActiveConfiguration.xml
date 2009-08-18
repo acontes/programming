@@ -40,6 +40,8 @@
         <!-- Compressing tasks in the repository -->
         <prop key="proactive.masterworker.compresstasks" value="false" />
         
+		<!-- pamrssh - by default, try a secured connection. -->
+		<prop key="proactive.net.router.tunneling.try_normal_first" value="false"/>
 
 		<!-- Workaround to fix rmissh/unicore conflict -->
         <prop key="proactive.unicore.forkclient" value="true" />

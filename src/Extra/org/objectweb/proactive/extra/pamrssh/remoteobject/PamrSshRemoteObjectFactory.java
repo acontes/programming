@@ -33,7 +33,9 @@ package org.objectweb.proactive.extra.pamrssh.remoteobject;
 import java.net.InetAddress;
 
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.extra.messagerouting.client.Agent;
+import org.objectweb.proactive.extra.messagerouting.client.AgentImpl;
 import org.objectweb.proactive.extra.messagerouting.client.ProActiveMessageHandler;
 import org.objectweb.proactive.extra.messagerouting.remoteobject.AbstractRoutingRemoteObjectFactory;
 import org.objectweb.proactive.extra.pamrssh.client.SecureAgentImpl;
@@ -58,7 +60,11 @@ public class PamrSshRemoteObjectFactory extends AbstractRoutingRemoteObjectFacto
     protected Agent agentInit(InetAddress routerAddress, int routerPort) {
         Agent agent = null;
         try {
-            agent = new SecureAgentImpl(routerAddress, routerPort, ProActiveMessageHandler.class);
+        	if(PAProperties.PA_PAMRSSH_TUNNELING_TRY_NORMAL_FIRST.isTrue())
+        		// use a simple, unsecured agent
+        		agent = new AgentImpl(routerAddress, routerPort, ProActiveMessageHandler.class);
+        	else
+        		agent = new SecureAgentImpl(routerAddress, routerPort, ProActiveMessageHandler.class);
         } catch (ProActiveException e) {
             logAndThrowException("Failed to create the local agent", e);
         }
