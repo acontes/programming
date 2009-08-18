@@ -341,22 +341,25 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             // the futurepool is still needed for remaining ACs
             setLocalBodyImpl(new InactiveLocalBodyStrategy(this.getFuturePool()));
         }
+
+        // terminate all threads for IS
+        // this.requestReceiver.destroy();
     }
 
     public boolean checkMethod(String methodName) {
         return checkMethod(methodName, null);
     }
 
-    public void setImmediateService(String methodName) {
+    public void setImmediateService(String methodName, boolean uniqueThread) {
         // FIXME uncomment this code after PROACTIVE-309 issue has been resolved
         // if (!checkMethod(methodName)) {
         // throw new NoSuchMethodError(methodName + " is not defined in " +
         // getReifiedObject().getClass().getName());
         // }
-        ((RequestReceiverImpl) this.requestReceiver).setImmediateService(methodName);
+        ((RequestReceiverImpl) this.requestReceiver).setImmediateService(methodName, uniqueThread);
     }
 
-    public void setImmediateService(String methodName, Class<?>[] parametersTypes) {
+    public void setImmediateService(String methodName, Class<?>[] parametersTypes, boolean uniqueThread) {
         // FIXME uncomment this code after PROACTIVE-309 issue has been resolved
         // if (!checkMethod(methodName, parametersTypes)) {
         // String signature = methodName+"(";
@@ -368,7 +371,8 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         // getReifiedObject().getClass().getName();
         // throw new NoSuchMethodError(signature);
         // }
-        ((RequestReceiverImpl) this.requestReceiver).setImmediateService(methodName, parametersTypes);
+        ((RequestReceiverImpl) this.requestReceiver).setImmediateService(methodName, parametersTypes,
+                uniqueThread);
     }
 
     public void removeImmediateService(String methodName) {

@@ -1036,6 +1036,57 @@ public class PAActiveObject {
     /**
      * Set an immediate execution for the caller active object of the method methodName, ie request
      * of name methodName will be executed right away upon arrival at the caller AO context.
+     * 
+     * Optionally, an immediate service can be configured with "unique thread mode" : a 
+     * dedicated thread is created for each different caller ; all the methods set as immediate 
+     * service with unique thread called from the same caller object are executed only by this thread. 
+     * This can be useful for methods that use java.util.concurrency.Lock locks, which must be locked 
+     * and unlocked by the same thread.
+     * 
+     * Warning: the execution of an Immediate Service method is achieved in parallel of the current
+     * services, so it is the programmer responsibility to ensure that Immediate Services do not
+     * interfere with any other methods.
+     * 
+     * @param methodName
+     *            the name of the method
+     * @param uniqueThread
+     * 			  true if this immediate service should be always executed by the same thread for 
+     * 			  a given caller, false if any thread can be used.
+     */
+    public static void setImmediateService(String methodName, boolean uniqueThread) {
+        PAActiveObject.getBodyOnThis().setImmediateService(methodName, uniqueThread);
+    }
+
+    /**
+     * Set an immediate execution for the caller active object obj of the method methodName with
+     * parameters parametersType, ie request of name methodName will be executed right away upon
+     * arrival at the caller AO context. 
+     * 
+     * Optionally, an immediate service can be configured with "unique thread mode" : a 
+     * dedicated thread is created for each different caller ; all the methods set as immediate 
+     * service with unique thread called from the same caller object are executed only by this thread. 
+     * This can be useful for methods that use java.util.concurrency.Lock locks, which must be locked 
+     * and unlocked by the same thread.
+     * 
+     * Warning: the execution of an Immediate Service method is
+     * achieved in parallel of the current services, so it is the programmer responsibility to
+     * ensure that Immediate Services do not interfere with any other methods.
+     * 
+     * @param methodName
+     *            the name of the method
+     * @param parametersTypes
+     *            the types of the parameters of the method
+     * @param uniqueThread
+     * 			  true if this immediate service should be always executed by the same thread for 
+     * 			  a given caller, false if any thread can be used.
+     */
+    public static void setImmediateService(String methodName, Class<?>[] parametersTypes, boolean uniqueThread) {
+        PAActiveObject.getBodyOnThis().setImmediateService(methodName, parametersTypes, uniqueThread);
+    }
+
+    /**
+     * Set an immediate execution for the caller active object of the method methodName, ie request
+     * of name methodName will be executed right away upon arrival at the caller AO context.
      * Warning: the execution of an Immediate Service method is achieved in parallel of the current
      * services, so it is the programmer responsibility to ensure that Immediate Services do not
      * interfere with any other methods.
@@ -1044,7 +1095,7 @@ public class PAActiveObject {
      *            the name of the method
      */
     public static void setImmediateService(String methodName) {
-        PAActiveObject.getBodyOnThis().setImmediateService(methodName);
+        PAActiveObject.setImmediateService(methodName, false);
     }
 
     /**
@@ -1060,7 +1111,7 @@ public class PAActiveObject {
      *            the types of the parameters of the method
      */
     public static void setImmediateService(String methodName, Class<?>[] parametersTypes) {
-        PAActiveObject.getBodyOnThis().setImmediateService(methodName, parametersTypes);
+        PAActiveObject.setImmediateService(methodName, parametersTypes, false);
     }
 
     /**
