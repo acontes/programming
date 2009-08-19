@@ -81,6 +81,7 @@ import org.objectweb.proactive.core.event.RuntimeRegistrationEvent;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEventProducerImpl;
 import org.objectweb.proactive.core.filetransfer.FileTransferEngine;
 import org.objectweb.proactive.core.gc.GarbageCollector;
+import org.objectweb.proactive.core.httpserver.ClassServerServlet;
 import org.objectweb.proactive.core.jmx.mbean.JMXClassLoader;
 import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapper;
 import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean;
@@ -152,7 +153,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
 
     // JMX
     private static Logger jmxLogger = ProActiveLogger.getLogger(Loggers.JMX);
-
+    private static final Logger clLogger = ProActiveLogger.getLogger(Loggers.CLASSLOADING);
     static {
         try {
             proActiveRuntime = new ProActiveRuntimeImpl();
@@ -205,6 +206,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
     // singleton
     protected ProActiveRuntimeImpl() throws ProActiveException {
         try {
+
             this.vmInformation = new VMInformationImpl();
             this.proActiveRuntimeMap = new java.util.Hashtable<String, ProActiveRuntime>();
             this.virtualNodesMap = new java.util.Hashtable<String, VirtualNodeInternal>();
@@ -262,6 +264,17 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
             "org.objectweb.proactive.core.runtime.ProActiveRuntime", this,
             ProActiveRuntimeRemoteObjectAdapter.class);
         this.roe.createRemoteObject(vmInformation.getName());
+
+        if (PAProperties.PA_CLASSLOADING_USEHTTP.isTrue()) {
+            // Set the codebase in case of useHTTP is true and the ProActiveRMIClassLoader is in use
+            String codebase = ClassServerServlet.get().getCodeBase();
+            PAProperties.PA_CODEBASE.setValue(codebase);
+        } else {
+            // Publish the URL of this runtime in the ProActive codebase
+            // URL must be prefixed by pa tu use our custom protocol handlers
+            // URL must be terminated by a / according to the RMI specification
+            PAProperties.PA_CODEBASE.setValue("pa" + this.getURL() + "/");
+        }
 
         // logging info
         MDC.remove("runtime");
@@ -1081,64 +1094,48 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
         return runtimeSecurityManager.getPolicy(local, distant);
     }
 
-    public byte[] getClassDataFromParentRuntime(String className) throws ProActiveException {
+    public synchronized byte[] getClassData(String className) {
         byte[] classData = null;
 
-        if (this.parentRuntime != null) {
-            classData = this.parentRuntime.getClassDataFromThisRuntime(className);
-
-            if (classData == null) {
-                // continue searching
-                classData = this.parentRuntime.getClassDataFromParentRuntime(className);
-            }
-
-            if (classData != null) {
-                // caching class
-                ClassDataCache.instance().addClassData(className, classData);
-
-                if (runtimeLogger.isDebugEnabled()) {
-                    runtimeLogger.debug(getURL() + " -- > Returning class " + className + " found in " +
-                        this.parentRuntime.getURL());
-                }
-
-                return classData;
-            }
-        }
-
-        return null;
-    }
-
-    public synchronized byte[] getClassDataFromThisRuntime(String className) throws ProActiveException {
-        byte[] classData = null;
-
-        // 1. look in class cache
-        // this can be redundant if not looking in a parent
+        // Check class data cache (already generated stub)
         classData = ClassDataCache.instance().getClassData(className);
-
-        // found something in classloader or cache...
         if (classData != null) {
             return classData;
+        } else {
+            if (clLogger.isTraceEnabled()) {
+                clLogger.trace(className + " is not in the class data cache");
+            }
         }
 
+        // Look in classpath
         try {
-            // 2. look in classpath
             classData = FileProcess.getBytesFromResource(className);
-        } catch (IOException e2) {
-            e2.printStackTrace();
-        }
-
-        if (classData != null) {
-            ClassDataCache.instance().addClassData(className, classData);
-
-            return classData;
-        }
-
-        if (this.parentRuntime == null) {
-            // top of hierarchy of runtimes
-            classData = generateStub(className);
-
             if (classData != null) {
+                if (clLogger.isTraceEnabled()) {
+                    clLogger.trace("Found " + className + " in the classpath");
+                }
                 return classData;
+            } else {
+                if (clLogger.isTraceEnabled()) {
+                    clLogger.trace("Failed to find " + className + " in classpath");
+                }
+            }
+        } catch (IOException e2) {
+            Logger l = ProActiveLogger.getLogger(Loggers.CLASSLOADING);
+            ProActiveLogger.logEatedException(l, e2);
+        }
+
+        // Generate stub
+        classData = generateStub(className);
+        if (classData != null) {
+            if (clLogger.isTraceEnabled()) {
+                clLogger.trace("Generated " + className + " stub");
+            }
+            return classData;
+        } else {
+            if (clLogger.isTraceEnabled()) {
+
+                clLogger.trace("Failed to generate stub for " + className);
             }
         }
 
@@ -1160,35 +1157,23 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
     }
 
     // tries to generate a stub without using MOP methods
-    public byte[] generateStub(String className) {
+    private byte[] generateStub(String className) {
         byte[] classData = null;
 
         if (Utils.isStubClassName(className)) {
-            // try {
             // do not use directly MOP methods (avoid classloader cycles)
-            // /Logger.getLogger(Loggers.CLASSLOADING).debug("Generating class :
-            // " + className);
-            // e.printStackTrace();
             String classname = Utils.convertStubClassNameToClassName(className);
-
             classData = JavassistByteCodeStubBuilder.create(classname, null);
-
-            // } catch (ClassNotFoundException ignored) {
-            // }
-        }
-
-        if (classData != null) {
-            ClassDataCache.instance().addClassData(className, classData);
-
-            return classData;
+            if (classData != null) {
+                ClassDataCache.instance().addClassData(className, classData);
+                return classData;
+            }
         }
 
         // try to get the class as a generated component interface reference
         classData = org.objectweb.proactive.core.component.gen.Utils.getClassData(className);
-
         if (classData != null) {
             ClassDataCache.instance().addClassData(className, classData);
-
             return classData;
         }
 

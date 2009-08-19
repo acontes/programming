@@ -265,11 +265,11 @@ public class HalfBody extends AbstractBody {
 
             // Create DSI MessageTag
             MessageTags tags = null;
-            if (PAProperties.PA_TAG_DSI.isTrue()){
+            if (PAProperties.PA_TAG_DSI.isTrue()) {
                 tags = messageTagsFactory.newMessageTags();
                 tags.addTag(new DsiTag(bodyID, sequenceID));
             }
-            
+
             Request request = this.internalRequestFactory.newRequest(methodCall, HalfBody.this,
                     future == null, sequenceID, tags);
 

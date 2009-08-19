@@ -108,6 +108,7 @@ import org.objectweb.proactive.core.mop.ObjectReferenceReplacer;
 import org.objectweb.proactive.core.mop.ObjectReplacer;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.security.exceptions.CommunicationForbiddenException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.util.profiling.Profiling;
@@ -290,15 +291,12 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             RenegotiateSessionException {
         // JMX Notification
         if (!isProActiveInternalObject && (this.mbean != null)) {
-            // If the node is not a HalfBody
-            if (!NodeFactory.isHalfBodiesNode(request.getSenderNodeURL())) {
-                String tagNotification = createTagNotification(request.getTags());
-                RequestNotificationData requestNotificationData = new RequestNotificationData(request
-                        .getSourceBodyID(), request.getSenderNodeURL(), this.bodyID, this.nodeURL, request
-                        .getMethodName(), getRequestQueue().size() + 1, request.getSequenceNumber(),
-                    tagNotification);
-                this.mbean.sendNotification(NotificationType.requestReceived, requestNotificationData);
-            }
+            String tagNotification = createTagNotification(request.getTags());
+            RequestNotificationData requestNotificationData = new RequestNotificationData(request
+                    .getSourceBodyID(), request.getSenderNodeURL(), this.bodyID, this.nodeURL, request
+                    .getMethodName(), getRequestQueue().size() + 1, request.getSequenceNumber(),
+                tagNotification);
+            this.mbean.sendNotification(NotificationType.requestReceived, requestNotificationData);
         }
 
         // END JMX Notification
@@ -326,7 +324,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
     	// cruz ... only want to treat replies that have the Future ...
     	if(!reply.isAutomaticContinuation()) {
     		// JMX Notification
-    		if (!isProActiveInternalObject && (this.mbean != null)) {
+    		if (!isProActiveInternalObject && (this.mbean != null) && reply.getResult().getResultObjet() != null &&  reply.getResult().getException() == null) {
     			String tagNotification = createTagNotification(reply.getTags());
     			RequestNotificationData requestNotificationData = new RequestNotificationData(
     					BodyImpl.this.bodyID, BodyImpl.this.getNodeURL(), reply.getSourceBodyID(), this.nodeURL,
@@ -494,8 +492,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
     // -- inner classes -----------------------------------------------
     //
     private class ActiveLocalBodyStrategy implements LocalBodyStrategy, java.io.Serializable {
-
-		/** A pool future that contains the pending future objects */
+        /** A pool future that contains the pending future objects */
         protected FuturePool futures;
 
         /** The reified object target of the request processed by this body */
@@ -584,18 +581,18 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                     tagNotification);
                 mbean.sendNotification(NotificationType.servingStarted, data);
             }
+
             // END JMX Notification
-            
             Reply reply = null;
 
             // If the request is not a "terminate Active Object" request,
             // it is served normally.
             if (!isTerminateAORequest(request)) {
-            	reply = request.serve(BodyImpl.this);
+                reply = request.serve(BodyImpl.this);
             }
 
             if (!isProActiveInternalObject) {
-            	try {
+                try {
                     if (isInImmediateService())
                         debugger.breakpoint(BreakpointType.EndImmediateService, request);
                     else
@@ -632,7 +629,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
 
             // cruz: at this time, the reply has not been sent
             // JMX Notification
-//            if (!isProActiveInternalObject && (mbean != null)) {
+//            if (!isProActiveInternalObject && (mbean != null) && reply.getResult().getResultObjet() != null &&  reply.getResult().getException() == null) {
 //                String tagNotification = createTagNotification(request.getTags());
 //                RequestNotificationData data = new RequestNotificationData(request.getSourceBodyID(), request
 //                        .getSenderNodeURL(), BodyImpl.this.bodyID, BodyImpl.this.nodeURL, request
@@ -707,7 +704,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             
             // cruz: here is when the reply has been really sent
             // JMX Notification
-            if (!isProActiveInternalObject && (mbean != null)) {
+            if (!isProActiveInternalObject && (mbean != null) && reply.getResult().getResultObjet() != null &&  reply.getResult().getException() == null) {
                 String tagNotification = createTagNotification(request.getTags());
                 RequestNotificationData data = new RequestNotificationData(request.getSourceBodyID(), request
                         .getSenderNodeURL(), BodyImpl.this.bodyID, BodyImpl.this.nodeURL, request

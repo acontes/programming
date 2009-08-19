@@ -121,11 +121,24 @@ public abstract class Tag implements Serializable {
     /**
      * Attach a user data on this tag
      * @param data - The User Data
+     * @param toStringChanged - if the toString of the Data has been changed for
+     * the notification
      */
-    public void setData(Object data) {
+    public void setData(Object data, boolean toStringChanged) {
         this.data = data;
+        if(toStringChanged){
+            this.cachedToString = null;
+        }
     }
 
+    /**
+     * Attach a user data on this tag
+     * @param data - The User Data
+     */
+    public void setData(Object data) {
+        setData(data,false);
+    }
+    
     /**
      * Display Tag Information
      */

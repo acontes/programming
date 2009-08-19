@@ -84,6 +84,7 @@ public class ProActiveComponentRepresentativeFactory {
 
     public ProActiveComponentRepresentative createComponentRepresentative(ComponentParameters params,
             Proxy proxy) {
+    	System.out.println("ProActiveComponentRepresentativeFactory.createComponentRepresentative(cp,p)");
         ProActiveComponentRepresentative representative = new ProActiveComponentRepresentativeImpl(params);
         representative.setProxy(proxy);
         return representative;
@@ -116,7 +117,7 @@ public class ProActiveComponentRepresentativeFactory {
      */
     public ProActiveComponentRepresentative createComponentRepresentative(Proxy proxy) throws Throwable {
         // set immediate service for getComponentParameters
-        System.out.println("ProActiveComponentRepresentativeFactory.createComponentRepresentative()");
+        System.out.println("ProActiveComponentRepresentativeFactory.createComponentRepresentative(p)");
         proxy.reify(MethodCall.getComponentMethodCall(ProActiveComponent.class.getDeclaredMethod(
                 "setImmediateServices", new Class[] {}), new Object[] {}, null, Constants.COMPONENT, null,
                 ComponentRequest.STRICT_FIFO_PRIORITY));
