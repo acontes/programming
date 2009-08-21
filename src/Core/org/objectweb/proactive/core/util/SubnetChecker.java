@@ -45,15 +45,22 @@ import java.util.List;
  * proactive.ssh.proxy.gateway.
  * 
  */
-public class SubnetChecker {
-    private static SubnetChecker SingletonPattern = new SubnetChecker();
+public class SubnetChecker implements ConnectionInformation {
+    private static SubnetChecker SingletonPattern;
     private static List<SubnetDefinition> gatewaysTable;
 
     private SubnetChecker() {
         gatewaysTable = new ArrayList<SubnetDefinition>();
     }
 
-    protected static void setGateway(String subnet, String gateway, String port) {
+    public static SubnetChecker getInstance() {
+        if (SingletonPattern == null) {
+            SingletonPattern = new SubnetChecker();
+        }
+        return SingletonPattern;
+    }
+
+    protected void setGateway(String subnet, String gateway, String port) {
         if (logger.isDebugEnabled()) {
             logger.debug("Subnet Infos : " + gateway + " added for subnet " + subnet);
         }
@@ -75,7 +82,7 @@ public class SubnetChecker {
      * 
      * @return The gateway which is the relay to the host.
      */
-    public static String getGatewayName(String ipAddress) {
+    public String getGatewayName(String ipAddress) {
         SubnetDefinition sd = checkIP(ipAddress);
         if (sd != null)
             return sd.getGateway();
@@ -90,14 +97,14 @@ public class SubnetChecker {
      * 
      * @return The port of the gateway where the ssh daemon can be contacted.
      */
-    public static int getGatewayPort(String ipAddress) {
+    public int getGatewayPort(String ipAddress) {
         SubnetDefinition sd = checkIP(ipAddress);
         if (sd != null)
             return sd.getPort();
         return 0;
     }
 
-    private static SubnetDefinition checkIP(String ip) {
+    private SubnetDefinition checkIP(String ip) {
         String[] ip_tab = ip.split("\\.");
         // Because Java's int are only signed and bit to bit shift behavior
         // can be undeterministic depending on implementation.
@@ -128,10 +135,10 @@ public class SubnetChecker {
 
     // Only for test
     public static void main(String[] args) {
-        SubnetChecker.setGateway("138.96.20.0/24", "acces.sop", "22");
+        SubnetChecker.getInstance().setGateway("138.96.20.0/24", "acces.sop", "22");
         String ip = "138.96.20.33";
-        System.out.println(getGatewayName(ip));
-        System.out.println(getGatewayPort(ip));
+        System.out.println(SubnetChecker.getInstance().getGatewayName(ip));
+        System.out.println(SubnetChecker.getInstance().getGatewayPort(ip));
     }
 
 }

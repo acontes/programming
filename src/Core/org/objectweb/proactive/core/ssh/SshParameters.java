@@ -76,6 +76,9 @@ public class SshParameters {
     }
 
     static public String getSshUsername(String hostname) {
+        String name = HostsInfos.getUserName(hostname);
+        if (name == null)
+            return System.getProperty("user.name");
         return HostsInfos.getUserName(hostname);
     }
 

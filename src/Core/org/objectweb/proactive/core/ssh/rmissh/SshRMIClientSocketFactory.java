@@ -36,6 +36,8 @@ import static org.objectweb.proactive.core.ssh.SSH.logger;
 import java.io.IOException;
 import java.net.Socket;
 import java.rmi.server.RMIClientSocketFactory;
+
+import org.objectweb.proactive.core.remoteobject.rmissh.RmiSshConnectionProperties;
 import org.objectweb.proactive.core.ssh.SshProxy;
 import org.objectweb.proactive.core.util.GatewaysInfos;
 import org.objectweb.proactive.core.util.HostsInfos;
@@ -48,10 +50,16 @@ import org.objectweb.proactive.core.util.ProActiveInet;
 public class SshRMIClientSocketFactory implements RMIClientSocketFactory, java.io.Serializable {
     String username;
     String hostname;
+    RmiSshConnectionProperties properties = null;
 
     public SshRMIClientSocketFactory() {
         this.username = System.getProperty("user.name");
         this.hostname = ProActiveInet.getInstance().getInetAddress().getCanonicalHostName();
+    }
+
+    public SshRMIClientSocketFactory(RmiSshConnectionProperties prop) {
+        this();
+        this.properties = prop;
     }
 
     public Socket createSocket(String host, int port) throws IOException {
@@ -60,7 +68,8 @@ public class SshRMIClientSocketFactory implements RMIClientSocketFactory, java.i
         }
 
         Socket socket = null;
-        String gateway = GatewaysInfos.getGatewayName(host);
+        GatewaysInfos checker = GatewaysInfos.getInstance();
+        String gateway = checker.getGatewayName(host);
 
         if (gateway != null) {
 
@@ -68,14 +77,14 @@ public class SshRMIClientSocketFactory implements RMIClientSocketFactory, java.i
                 logger.info("Using the gateway " + gateway + " to contact " + host + ":" + port);
             }
 
-            int gwPort = GatewaysInfos.getGatewayPort(host);
+            int gwPort = checker.getGatewayPort(host);
             socket = new SshProxy(gateway, gwPort, host, port);
 
         } else {
             if (logger.isDebugEnabled()) {
                 logger.debug("Gateway not used for " + host);
             }
-        String realName = HostsInfos.getSecondaryName(host);
+            String realName = HostsInfos.getSecondaryName(host);
             socket = new SshSocket(realName, port);
         }
         return socket;

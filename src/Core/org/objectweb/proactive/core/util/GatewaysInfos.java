@@ -44,8 +44,8 @@ import org.objectweb.proactive.core.ssh.SshProxy;
 
 
 //the Unique instance of GatewaysInfos
-public class GatewaysInfos {
-    private static GatewaysInfos gatewaysInfos = new GatewaysInfos();
+public class GatewaysInfos implements ConnectionInformation {
+    private static GatewaysInfos gatewaysInfos;
     private static Map<String, Map<String, String>> gatewaysTable;
 
     private GatewaysInfos() {
@@ -57,6 +57,12 @@ public class GatewaysInfos {
         }
     }
 
+    public static GatewaysInfos getInstance() {
+        if (gatewaysInfos == null)
+            gatewaysInfos = new GatewaysInfos();
+        return gatewaysInfos;
+    }
+
     /**
      * Return the gateway where a proxy command can be used on to contact the host hostname .
      * 
@@ -64,7 +70,7 @@ public class GatewaysInfos {
      * 
      * @return The gateway which is the relay to the host.
      */
-    public static String getGatewayName(String hostname) {
+    public String getGatewayName(String hostname) {
         String host = hostname;
         String ret = "";
 
@@ -75,7 +81,8 @@ public class GatewaysInfos {
             }
 
             // Try with ip address mapping
-            ret = SubnetChecker.getGatewayName(hostname);
+
+            ret = SubnetChecker.getInstance().getGatewayName(hostname);
 
             if (ret != null)
                 return ret;
@@ -87,19 +94,18 @@ public class GatewaysInfos {
             } catch (UnknownHostException e) {
                 addr = null;
             }
-
             if (addr != null) {
                 host = addr.getHostName();
-                if (host
-                        .equalsIgnoreCase(ProActiveInet.getInstance().getInetAddress().getCanonicalHostName())) {
-                    // local host case (by name)
-                    return null;
-                }
             }
         }
 
+        if (host.equalsIgnoreCase(ProActiveInet.getInstance().getInetAddress().getCanonicalHostName())) {
+            // local host case (by name)
+            return null;
+        }
+
         // Try with hostname (or single ip address definition) mapping
-        Map<String, String> gateway_infos = getGatewayInfos(host);
+        Map<String, String> gateway_infos = this.getGatewayInfos(host);
 
         if (gateway_infos == null)
             return null;
@@ -122,7 +128,7 @@ public class GatewaysInfos {
      * 
      * @return The port of the gateway where the ssh daemon can be contacted.
      */
-    public static int getGatewayPort(String hostname) {
+    public int getGatewayPort(String hostname) {
         String host = hostname;
         int ret = 0;
 
@@ -133,7 +139,7 @@ public class GatewaysInfos {
             }
 
             // Try with ip address mapping
-            ret = SubnetChecker.getGatewayPort(hostname);
+            ret = SubnetChecker.getInstance().getGatewayPort(hostname);
 
             if (ret != 0)
                 return ret;
@@ -148,12 +154,12 @@ public class GatewaysInfos {
 
             if (addr != null) {
                 host = addr.getHostName();
-                if (host
-                        .equalsIgnoreCase(ProActiveInet.getInstance().getInetAddress().getCanonicalHostName())) {
-                    // local host case (by name)
-                    return 0;
-                }
             }
+        }
+
+        if (host.equalsIgnoreCase(ProActiveInet.getInstance().getInetAddress().getCanonicalHostName())) {
+            // local host case (by name)
+            return 0;
         }
 
         // Try with hostname (or single ip address definition) mapping
@@ -177,7 +183,7 @@ public class GatewaysInfos {
      * 
      * @param port The port on the gateway to contact the ssh daemon
      */
-    private static void setGateway(String hostname, String gateway, String port) {
+    private void setGateway(String hostname, String gateway, String port) {
         if (logger.isDebugEnabled()) {
             logger.debug("Gateways Infos : " + gateway + " added for " + hostname);
         }
@@ -208,7 +214,7 @@ public class GatewaysInfos {
         String gatewayNames = PAProperties.PA_SSH_PROXY_GATEWAY.getValue();
         // And parse it
         if (gatewayNames != null)
-            parseGateway(gatewayNames);
+            this.parseGateway(gatewayNames);
     }
 
     /**
@@ -223,14 +229,14 @@ public class GatewaysInfos {
                 case 3:
                     if (gateways[0]
                             .matches("^.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\/[1-3]?[0-9]")) {
-                        SubnetChecker.setGateway(gateways[0], gateways[1], gateways[2]);
+                        SubnetChecker.getInstance().setGateway(gateways[0], gateways[1], gateways[2]);
                     } else {
-                        setGateway(gateways[0], gateways[1], gateways[2]);
+                        this.setGateway(gateways[0], gateways[1], gateways[2]);
                     }
                     break;
                 case 2:
                     if (gateways[1].equalsIgnoreCase("none")) {
-                        setGateway(gateways[0], gateways[1], "0");
+                        this.setGateway(gateways[0], gateways[1], "0");
                         break;
                     }
                 default:
@@ -247,7 +253,7 @@ public class GatewaysInfos {
      * @param hostname The hostname to retrieve.
      * @return A map of (username, port) of the gateway for accessing the host.
      */
-    private static Map<String, String> getGatewayInfos(String hostname) {
+    private Map<String, String> getGatewayInfos(String hostname) {
         Map<String, String> host_infos;
         int index;
         while (hostname.contains(".")) {
@@ -267,11 +273,17 @@ public class GatewaysInfos {
         return host_infos;
     }
 
+    public void addProperties(String properties) {
+        if (properties == null || properties.equals(""))
+            return;
+        parseGateway(properties);
+    }
+
     // Only for test
     public static void main(String[] args) {
         PAProperties.PA_SSH_PROXY_GATEWAY
                 .setValue("*.grid5000.fr:acces.sophia.grid5000.fr:22;*.grid5000.fr:toto:33");
         System.out.println(PAProperties.PA_SSH_PROXY_GATEWAY);
-        System.out.println(GatewaysInfos.getGatewayName("azur-9.sophia.grid5000.fr"));
+        System.out.println(GatewaysInfos.getInstance().getGatewayName("azur-9.sophia.grid5000.fr"));
     }
 }
