@@ -57,6 +57,7 @@
 
         <prop key="proactive.gcmd.unix.shell" value="/bin/sh"/>
 
+ 		<prop key="proactive.mop.writestubondisk" value="false"/>                                        
     </properties>
     <javaProperties>
       <!-- <prop key="java.rmi.server.RMIClassLoaderSpi" value="org.objectweb.proactive.core.classloading.protocols.ProActiveRMIClassLoader"/> -->

@@ -537,7 +537,13 @@ public enum PAProperties {
     /**
      * on unix system, define the shell that the GCM deployment invokes when creating new runtimes.
      */
-    PA_GCMD_UNIX_SHELL("proactive.gcmd.unix.shell", PAPropertiesType.STRING);
+    PA_GCMD_UNIX_SHELL("proactive.gcmd.unix.shell", PAPropertiesType.STRING),
+
+    /**
+     * if true, write the bytecode of the generated stub on the disk
+     * 
+     */
+    PA_MOP_WRITESTUBONDISK("proactive.mop.writestubondisk", PAPropertiesType.BOOLEAN);
 
     static final Logger logger = ProActiveLogger.getLogger(Loggers.CONFIGURATION);
     public static final String TRUE = "true";
