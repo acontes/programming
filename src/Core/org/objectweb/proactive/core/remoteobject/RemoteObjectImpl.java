@@ -43,6 +43,7 @@ import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.mop.MOP;
+import org.objectweb.proactive.core.mop.MOPException;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 import org.objectweb.proactive.core.mop.ReifiedCastException;
 import org.objectweb.proactive.core.mop.StubObject;
@@ -217,6 +218,8 @@ public class RemoteObjectImpl<T> implements RemoteObject<T>, Serializable {
     public T getObjectProxy() {
         try {
             T reifiedObjectStub = (T) MOP.createStubObject(this.className, target.getClass(), new Class[] {});
+//            T reifiedObjectStub = (T) MOP.createStubObject(target, new Object[] { target }, this.className, null);
+                        
             if (adapterClass != null) {
                 Constructor<Adapter<T>> myConstructor = adapterClass.getConstructor(new Class[] { Class
                         .forName(this.className) });
@@ -260,6 +263,7 @@ public class RemoteObjectImpl<T> implements RemoteObject<T>, Serializable {
     public T getObjectProxy(RemoteRemoteObject rro) throws ProActiveException {
         try {
             T reifiedObjectStub = (T) MOP.createStubObject(this.className, target.getClass(), new Class[] {});
+//            T reifiedObjectStub = (T) MOP.createStubObject(target, new Object[] { target }, this.className, null);
             ((StubObject) reifiedObjectStub).setProxy(new SynchronousProxy(null, new Object[] { rro }));
             if (adapterClass != null) {
 
@@ -294,7 +298,7 @@ public class RemoteObjectImpl<T> implements RemoteObject<T>, Serializable {
         } catch (InvocationTargetException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-        }
+        } 
         return null;
     }
 

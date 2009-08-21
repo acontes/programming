@@ -351,9 +351,9 @@ public class JavassistByteCodeStubBuilder {
 
                 if (hasAnnotation(reifiedMethods[i], UnwrapFuture.class)) {
                     UnwrapFuture trp = getAnnotation(reifiedMethods[i], UnwrapFuture.class);
-                    System.out.println("JavassistByteCodeStubBuilder.createReifiedMethods() class " +
-                        generatedClass.getName() + "willl have annotation UnWrapFuture on " +
-                        reifiedMethods[i].getName());
+//                    System.out.println("JavassistByteCodeStubBuilder.createReifiedMethods() class " +
+//                        generatedClass.getName() + "willl have annotation UnWrapFuture on " +
+//                        reifiedMethods[i].getName());
                     int parameterIndex = parameterNameToIndex(reifiedMethods[i], trp.parameterName());
                     body
                             .append("$" + parameterIndex +
@@ -685,8 +685,8 @@ public class JavassistByteCodeStubBuilder {
             Object[] o = method.getAnnotations();
             if (o != null) {
                 for (Object object : o) {
-                    System.out.println("Annotation " + object.toString() + " on method " +
-                        method.getLongName());
+//                    System.out.println("Annotation " + object.toString() + " on method " +
+//                        method.getLongName());
                     if (annotation.isAssignableFrom(object.getClass())) {
                         return true;
                     }
