@@ -94,7 +94,7 @@ public class FutureMap extends Object implements java.io.Serializable {
      * @param futureObject future to register
      */
     public synchronized void receiveFuture(Future futureObject) {
-    	logger.debug("[FutureMap  ] receiveFuture ID:[" + futureObject.getID()+"] creator: ["+ futureObject.getCreatorID()+"] method:["+ futureObject.getMethodName()+"]");
+    	logger.debug("[FutureMap  ] receiveFuture ID:[" + futureObject.getID()+"] creator: ["+ futureObject.getCreatorID()+"] sender:["+ futureObject.getSenderID() +"] method:["+ futureObject.getMethodName()+"]");
         long id = futureObject.getID();
         UniqueID creatorID = futureObject.getCreatorID();
         java.util.HashMap<Long, FuturesAndACs> indexedByID = indexedByBodyID.get(creatorID);
@@ -185,11 +185,21 @@ public class FutureMap extends Object implements java.io.Serializable {
      * @param creatorID UniqueID of the creator body of the future
      */
     public synchronized void removeFutures(long id, UniqueID creatorID) {
-    	logger.debug("[FutureMap  ] removeFuture ID:[" + id+"] creator: ["+ creatorID );
+    	FuturesAndACs t = null;
+    	
         java.util.HashMap<Long, FuturesAndACs> indexedByID = (indexedByBodyID.get(creatorID));
         if (indexedByID != null) {
-            indexedByID.remove(Long.valueOf(id));
+            t = indexedByID.remove(Long.valueOf(id));
         }
+        if(t != null) {
+        	ArrayList<Future> lf = t.getFutures();
+        	for(int i=0; i<lf.size(); i++) {
+        		Future f = lf.get(i);
+        		logger.debug("[FutureMap  ] removeFuture [" + f.getFutureID() +"] Method: ["+ f.getMethodName() +"]");	
+        	}
+        }
+       	logger.debug("[FutureMap  ] removeFuture ID:[" + id+"] creator: ["+ creatorID +"]");
+        	
     }
 
     /**

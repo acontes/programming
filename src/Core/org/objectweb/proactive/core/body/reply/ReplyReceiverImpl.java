@@ -94,7 +94,7 @@ public class ReplyReceiverImpl implements ReplyReceiver, java.io.Serializable {
     		}
     		//System.out.println("-------> [ReplyReceiver]realReplyReceived(futureupdate) " + r.getMethodName() + " [" + className + "]" +  " ["+ name +"] + Awaited? "+ n + "  Tags: "+ r.getTags() );
     	}
-    	logger.debug("[ReplyReceiv] receiveReply for Future ["+ r.getSequenceNumber()+"] from body ["+r.getSourceBodyID()+"] Receiver ["+ receiverBody +"]");
+    	logger.debug("[ReplyReceiv] receiveReply for Future ["+ r.getSequenceNumber()+"] from body ["+r.getSourceBodyID()+"] Receiver ["+ receiverBody +"] + Awaited? "+ n + " Method ["+ r.getMethodName() + "]");
     	int a = futurePool.receiveFutureValue(r.getSequenceNumber(), r.getSourceBodyID(), r.getResult(), r);
     	return a;
     }

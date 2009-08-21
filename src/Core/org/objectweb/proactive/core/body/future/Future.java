@@ -129,8 +129,12 @@ public interface Future extends LocalFuture {
      */
     public void setCopyMode(boolean mode);
     
+    //cruz
     public void setMethodName(String n);
     public String getMethodName();
+    public void setParentMethodName(String n);
+    public String getParentMethodName();
     public UniqueID getSenderID();
+    //--cruz
     
 }

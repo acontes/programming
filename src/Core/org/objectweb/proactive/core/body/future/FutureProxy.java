@@ -135,6 +135,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 
     //cruz
     private String methodName = null;
+    private String parentMethodName = null;
     //--cruz
     
     //
@@ -323,12 +324,14 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         if (body != null) {
             mbean = body.getMBean();
             if (mbean != null) {
+            	//logger.debug("[FutureProxy] ID:"+ id.getID() + " WaitByNecessity, method ["+ methodName+"]");
                 mbean.sendNotification(NotificationType.waitByNecessity, new FutureNotificationData(bodyId,
                     getCreatorID()));
             }
         }
 
         // END JMX Notification
+        logger.debug("[FutureProxy] ID:"+ id.getID() + " WaitByNecessity, method ["+ methodName+"]");
         TimeoutAccounter time = TimeoutAccounter.getAccounter(timeout);
         while (!isAvailable()) {
             if (time.isTimeoutElapsed()) {
@@ -350,7 +353,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         Body b = PAActiveObject.getBodyOnThis();
         if(b != null) {
         	if(target.getResult() != null) {
-        		logger.debug("[FutureProxy] waitFor free ID:["+this.id+"], target type: ["+target.getResult().getClass().getName()+"]. IsAwaited?" + isAwaited(target.getResult()));
+        		logger.debug("[FutureProxy] waitFor free ID:["+this.id+"], target type: ["+target.getResult().getClass().getName()+"]. IsAwaited?" + isAwaited(target.getResult()) + " Method ["+ methodName + "]");
         		if(PAFuture.isAwaited(target.getResult())) {
         			//logger.debug("Received Future Result. ["+b.getName()+"] [type: "+ target.getResult().getClass().getName()+"] method [" + methodName +"]");
         		}
@@ -522,6 +525,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         out.writeObject(writtenUpdater.getRemoteAdapter());
         //cruz
         out.writeObject(methodName);
+        out.writeObject(parentMethodName);
     }
 
     /**
@@ -626,5 +630,13 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 
 	public void setMethodName(String methodName) {
 		this.methodName = methodName;
+	}
+	
+	public String getParentMethodName() {
+		return parentMethodName;
+	}
+
+	public void setParentMethodName(String parentMethodName) {
+		this.parentMethodName = parentMethodName;
 	}
 }

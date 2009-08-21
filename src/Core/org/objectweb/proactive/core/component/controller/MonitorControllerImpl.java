@@ -545,6 +545,9 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
     private void processRequestReceived(Notification notification) {
     	RequestNotificationData data = (RequestNotificationData) notification.getUserData();
     	String cmTag = extractCMTag(data);
+    	if(cmTag == null) {
+    		return;
+    	}
     	String[] cmTagFields = cmTag.split("::");
     	ComponentRequestID parent = new ComponentRequestID(Long.parseLong(cmTagFields[0]));
     	ComponentRequestID current = new ComponentRequestID(Long.parseLong(cmTagFields[1]));

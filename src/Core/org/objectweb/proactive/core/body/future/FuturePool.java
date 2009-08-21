@@ -101,7 +101,7 @@ public class FuturePool extends Object implements java.io.Serializable {
             this.registerACs = false;
             this.sendACs = false;
         }
-        logger.debug("FuturePool ] new FuturePool created");
+        logger.debug("[FuturePool ] new FuturePool created");
     }
 
     //
@@ -374,8 +374,8 @@ public class FuturePool extends Object implements java.io.Serializable {
      * @param futureObject future to register
      */
     public synchronized void receiveFuture(Future futureObject) {
-    	logger.debug("[FuturePool ] receiveFuture. Owner: ["+ownerBody.getName()+" ..." + ownerBody.getID() + "] Received Future for FutureMap ["+ futureObject.getFutureID() +"] sent by ["+futureObject.getSenderID()+"] and calling FutureMap.receiveFuture");
-        futureObject.setSenderID(ownerBody.getID());
+    	logger.debug("[FuturePool ] receiveFuture. Owner: ["+ownerBody.getName()+" ..." + ownerBody.getID() + "] Received Future for FutureMap ["+ futureObject.getFutureID() +"] sent by ["+futureObject.getSenderID()+"] method ["+ futureObject.getMethodName() +"]and calling FutureMap.receiveFuture");
+    	futureObject.setSenderID(ownerBody.getID());
         futures.receiveFuture(futureObject);
         long id = futureObject.getID();
         UniqueID creatorID = futureObject.getCreatorID();
@@ -396,7 +396,9 @@ public class FuturePool extends Object implements java.io.Serializable {
      * @param bodyDest body destination of this continuation
      */
     public void addAutomaticContinuation(FutureID id, UniversalBody bodyDest) {
-    	logger.debug("[FuturePool ] addAutomaticContinuation Owner: ["+ownerBody.getName()+"..."+ownerBody.getID() + "] ID:[" + id.getID() +"] creator: ["+ id.getCreatorID() +"] bodyDest ["+ bodyDest.getID() + "]");
+    	// here I could recover the name of the method that is being served?
+    	
+    	logger.debug("[FuturePool ] addAutomaticContinuation Owner: ["+ownerBody.getName()+"...] ID:[" + id.getID() +"] creator: ["+ id.getCreatorID() +"] bodyDest ["+ bodyDest.getID() + "]");
         futures.addAutomaticContinuation(id.getID(), id.getCreatorID(), bodyDest);
     }
 
@@ -554,7 +556,7 @@ public class FuturePool extends Object implements java.io.Serializable {
          */
         public synchronized void addACRequest(ACService r) {
             //look what info is added here...
-        	
+        	logger.debug("[ActiveACQue] Adding ACService. Owner: "+ FuturePool.this.getOwnerBody().getID() );
         	queue.add(r);
             counter++;
             notifyAll();
@@ -564,7 +566,8 @@ public class FuturePool extends Object implements java.io.Serializable {
          * Return the oldest request in queue and remove it from the queue
          */
         public synchronized ACService removeACRequest() {
-            counter--;
+        	logger.debug("[ActiveACQue] Removing ACService. Owner: "+ FuturePool.this.getOwnerBody().getID() );
+        	counter--;
             return (queue.remove(0));
         }
 
@@ -687,7 +690,7 @@ public class FuturePool extends Object implements java.io.Serializable {
 
                     if (remainingSends > 1) {
                         // create a new reply to keep the original copy unchanged for next sending ... 
-                    	//cruz: reply.getMethodName() was null
+                    	//cruz: reply.getMethodName() was previously set to null
                         toSend = new ReplyImpl(reply.getSourceBodyID(), reply.getSequenceNumber(), reply.getMethodName(),
                             reply.getResult(), psm, true, reply.getTags());
                         //--cruz

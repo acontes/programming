@@ -321,7 +321,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
      */
     @Override
     protected int internalReceiveReply(Reply reply) throws java.io.IOException {
-    	// cruz ... only want to treat replies that have the Future ...
+    	// cruz ... only want to treat replies that have the Future instead of more automatic continuations...
     	if(!reply.isAutomaticContinuation()) {
     		// JMX Notification
     		if (!isProActiveInternalObject && (this.mbean != null) && reply.getResult().getResultObjet() != null &&  reply.getResult().getException() == null) {
@@ -683,6 +683,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                 // (e.g. InvalidClassException)
                 try {
                 	//System.out.println(System.currentTimeMillis() + ": replySendBgn" + request.getMethodName() );
+                	bodyLogger.debug("[BodyImpl   ] Body ["+ BodyImpl.this.getID() + "] Sending reply for method "+ request.getMethodName());
                     reply.send(request.getSender());
                     //System.out.println(System.currentTimeMillis() + ": replySendEnd" + request.getMethodName() );
                 } catch (IOException e1) {
@@ -768,7 +769,9 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                 future.setID(sequenceID);
                 //cruz: maybe I can add here the methodName of the future
                 future.setMethodName(methodCall.getName());
-                BodyImpl.this.bodyLogger.debug("[BodyImpl   ] Body ["+ BodyImpl.this.getName()+"] Calling receiveFuture for making request "+ request.getMethodName() );
+                // now I would need to add the name of the request that is currently being served
+                future.setParentMethodName(LocalBodyStore.getInstance().getContext().getCurrentRequest().getMethodName());
+                BodyImpl.this.bodyLogger.debug("[BodyImpl   ] Body ["+ BodyImpl.this.getName()+"] Calling receiveFuture for making request "+ request.getMethodName() + " while serving "+ LocalBodyStore.getInstance().getContext().getCurrentRequest().getMethodName() );
                 //--cruz
                 this.futures.receiveFuture(future);
             }
