@@ -5,7 +5,7 @@
  *            Concurrent computing with Security and Mobility
  *
  * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,33 +22,39 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- *  Initial developer(s):               The ActiveEon Team
- *                        http://www.activeeon.com/
+ *  Initial developer(s):               The ProActive Team
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
- *
  * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
  */
-package functionalTests.messagerouting.client;
+package org.objectweb.proactive.extra.messagerouting.remoteobject.util.socketfactory;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
-import org.junit.Test;
-import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.extra.messagerouting.client.AgentImpl;
-import org.objectweb.proactive.extra.messagerouting.client.ProActiveMessageHandler;
-import org.objectweb.proactive.extra.messagerouting.remoteobject.util.socketfactory.MessageRoutingPlainSocketFactory;
-
-import unitTests.UnitTests;
+import java.io.IOException;
+import java.net.Socket;
 
 
-public class TestInvalidRouter extends UnitTests {
+/**
+ * Interface for pluggable socket factories
+ * The loaded implementation will be used to provide the socket
+ * that is used by the agent to communicate with the router
+ * 
+ * @since ProActive 4.2.0
+ */
+public interface MessageRoutingSocketFactorySPI {
 
-    @Test(expected = ProActiveException.class)
-    public void test() throws ProActiveException, UnknownHostException {
-        InetAddress localhost = InetAddress.getLocalHost();
-        new AgentImpl(localhost, 12423, ProActiveMessageHandler.class, new MessageRoutingPlainSocketFactory());
-    }
+    /**
+     * Create a client socket connected to the specified host and port.
+     * @param  host   the host name
+     * @param  port   the port number
+     * @return a socket connected to the specified host and port.
+     * @exception IOException if an I/O error occurs during socket creation
+     * @since 1.2
+     */
+    public Socket createSocket(String host, int port) throws IOException;
+
+    /**
+     * @return The alias name of this service provider
+     */
+    public String getAlias();
 }

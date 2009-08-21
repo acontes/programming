@@ -267,6 +267,11 @@ public enum PAProperties {
      */
     PA_NET_ROUTER_PORT("proactive.net.router.port", PAPropertiesType.INTEGER),
 
+    /** The Socket Factory to use by the message routing protocol
+     * 
+     */
+    PA_PAMR_SOCKET_FACTORY("proactive.communication.pamr.socketfactory", PAPropertiesType.STRING),
+
     /* ------------------------------------
      *  RMI
      */
