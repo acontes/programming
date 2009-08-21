@@ -10,6 +10,7 @@
             value="false" />
         <prop key="proactive.mixedlocation.maxMigrationNb" value="-1" />
         <prop key="proactive.mixedlocation.maxTimeOnSite" value="-1" />
+     	<prop key="proactive.implicitgetstubonthis" value="true"/>
     
     	<prop key="proactive.net.disableIPv6" value="true" />
 	    
