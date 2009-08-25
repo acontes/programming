@@ -16,6 +16,7 @@ log4j.logger.org.mortbay = WARN
 #log4j.logger.proactive.events = DEBUG
 #log4j.logger.proactive.runtime = DEBUG
 log4j.logger.proactive.body = DEBUG
+log4j.logger.proactive.future = DEBUG
 #log4j.logger.proactive.mop = DEBUG
 #log4j.logger.proactive.groups = DEBUG
 #log4j.logger.proactive.sync_call = DEBUG
@@ -99,7 +100,8 @@ log4j.logger.proactive.components.requests = DEBUG
 # CONSOLE appender is used by default
 log4j.appender.CONSOLE=org.apache.log4j.ConsoleAppender
 log4j.appender.CONSOLE.layout=org.apache.log4j.PatternLayout
-log4j.appender.CONSOLE.layout.ConversionPattern=%X{shortid@hostname} - [%p %20.20c{2}] %m%n
+#log4j.appender.CONSOLE.layout.ConversionPattern=%X{shortid@hostname} - [%p %20.20c{2}] %m%n
+log4j.appender.CONSOLE.layout.ConversionPattern= - [%p %t %20.15c{2}] %m%n
 
 # Appender FILE writes to the file "tests.log".
 # This file is recreated a file for each run

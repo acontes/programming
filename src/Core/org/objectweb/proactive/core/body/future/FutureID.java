@@ -49,6 +49,10 @@ public class FutureID implements Serializable {
      */
     private long ID;
 
+    /**
+     * Remember that creatorID is the ID of the body that was to "evaluate" the future.
+     * @return
+     */
     public UniqueID getCreatorID() {
         return creatorID;
     }

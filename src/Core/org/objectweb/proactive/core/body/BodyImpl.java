@@ -637,19 +637,14 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
 //                    tagNotification);
 //                mbean.sendNotification(NotificationType.replySent, data);
 //            }
-            MethodCallResult mcr = reply.getResult();
-            if(mcr != null) {
-            	Object res = mcr.getResult();
-            	if(res != null) {
-            		//System.out.println("Got reply for method " + reply.getMethodName() + " and is a "+ res.getClass().getName() + "[" + BodyImpl.this.getName() + "]" + " ... awaited?" + PAFuture.isAwaited(res) + " ... Tags: " + reply.getTags());	
-            	}
-            }
             // END JMX Notification
             
             ArrayList<UniversalBody> destinations = new ArrayList<UniversalBody>();
             destinations.add(request.getSender());
             this.getFuturePool().registerDestinations(destinations);
 
+            // cruz: what is this part for?... why it has to "modify result object?",
+            //       Anyway, it seems that it doesn't have a relation to my problem 
             // Modify result object
             Object initialObject = null;
             Object stubOnActiveObject = null;
@@ -682,10 +677,8 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                 // Useful if the exception is due to the content of the result
                 // (e.g. InvalidClassException)
                 try {
-                	//System.out.println(System.currentTimeMillis() + ": replySendBgn" + request.getMethodName() );
                 	bodyLogger.debug("[BodyImpl   ] Body ["+ BodyImpl.this.getID() + "] Sending reply for method "+ request.getMethodName());
                     reply.send(request.getSender());
-                    //System.out.println(System.currentTimeMillis() + ": replySendEnd" + request.getMethodName() );
                 } catch (IOException e1) {
                     try {
                         this.retrySendReplyWithException(reply, e1, request.getSender());
@@ -771,7 +764,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                 future.setMethodName(methodCall.getName());
                 // now I would need to add the name of the request that is currently being served
                 future.setParentMethodName(LocalBodyStore.getInstance().getContext().getCurrentRequest().getMethodName());
-                BodyImpl.this.bodyLogger.debug("[BodyImpl   ] Body ["+ BodyImpl.this.getName()+"] Calling receiveFuture for making request "+ request.getMethodName() + " while serving "+ LocalBodyStore.getInstance().getContext().getCurrentRequest().getMethodName() );
+                //BodyImpl.this.bodyLogger.debug("[BodyImpl   ] Body ["+ BodyImpl.this.getName()+"] Calling receiveFuture for sending request "+ request.getMethodName() + " while serving "+ LocalBodyStore.getInstance().getContext().getCurrentRequest().getMethodName() );
                 //--cruz
                 this.futures.receiveFuture(future);
             }

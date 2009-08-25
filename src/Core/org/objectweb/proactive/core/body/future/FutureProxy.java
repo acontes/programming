@@ -77,7 +77,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     //
     // -- STATIC MEMBERS -----------------------------------------------
     //
-    final static protected Logger logger = ProActiveLogger.getLogger(Loggers.BODY);
+    final static protected Logger logger = ProActiveLogger.getLogger(Loggers.FUTURE);
 
     //
     // -- PROTECTED MEMBERS -----------------------------------------------
@@ -148,7 +148,6 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
      * is usually called.
      */
     public FutureProxy() throws ConstructionOfReifiedObjectFailedException {
-        logger.debug("[FutureProxy] new FutureProxy created");
     }
 
     /**
@@ -228,8 +227,20 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         if(obj.getResult() != null) {
         	name = obj.getResult().getClass().getName();
         }
-        //System.out.println("-------------> FutureProxy. replyReceived. Is awaited? " + isAwaited(obj.getResult()) + " [" + name + "] ID = "+ id);
-        logger.debug("[FutureProxy] receiveReply ID:" + this.id + ", MethodCallResult type: ["+name+"]. IsAwaited? "+isAwaited(obj.getResult()) + " methodName:["+ methodName +"]" );
+        
+        logger.debug("[FutureProxy] receiveReply. ID:" + this.getID()+ ", MethodCallResult type: ["+name+"]. IsAwaited? "+isAwaited(obj.getResult()) + " methodName:["+ methodName +"]" );
+        if(isAwaited(target.getResult())) {
+        	//long seqID = ((FutureProxy)((StubObject)target.getResult()).getProxy()).getID();
+        	//logger.debug("[FutureProxy] ID: "+ id.getID() + " seqID of the proxy received is "+ seqID);
+        	
+        	// now I can give the name of method I'm still waiting for, to the new pair stub-proxy
+        	FutureProxy futureReceived = ((FutureProxy)((StubObject)target.getResult()).getProxy());
+        	futureReceived.setMethodName(this.methodName);
+        }
+        else {
+        	// TODO now I can generate the JMX notification RealReplyReceived :D
+        	
+        }
         // -- cruz
         
         ExceptionHandler.addResult(this);
@@ -344,24 +355,20 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
             }
         }
 
-        // JMX Notification
+        // JMX Notification.
+        // This receivedFutureResult notification is sent ONLY if WbN was incurred.
+        // If the result was already available (it had been received before doing any wait on it, the execution
+        // won't get to this place (returns in the first if).
+        // To detect all Future updates, we should go to the "receiveReply" method.
         if (mbean != null) {
             mbean.sendNotification(NotificationType.receivedFutureResult, new FutureNotificationData(bodyId,
                 getCreatorID()));
         }
-
-        Body b = PAActiveObject.getBodyOnThis();
-        if(b != null) {
-        	if(target.getResult() != null) {
-        		logger.debug("[FutureProxy] waitFor free ID:["+this.id+"], target type: ["+target.getResult().getClass().getName()+"]. IsAwaited?" + isAwaited(target.getResult()) + " Method ["+ methodName + "]");
-        		if(PAFuture.isAwaited(target.getResult())) {
-        			//logger.debug("Received Future Result. ["+b.getName()+"] [type: "+ target.getResult().getClass().getName()+"] method [" + methodName +"]");
-        		}
-        		else {
-        			//logger.debug("Received REAL Result. ["+b.getName()+"] [type: "+ target.getResult().getClass().getName()+"] method [" + methodName +"]");
-        		}
-        	}
+        if(target.getResult() != null) {
+        	logger.debug("[FutureProxy] Future updated after waiting. ID:["+this.getID() +"], target type: ["+target.getResult().getClass().getName()+"]. IsAwaited?" + isAwaited(target.getResult()) + " Method ["+ methodName + "]");
         }
+        // This is the place to detect WaitByNecessity, but not the place if we want to detect all Future updates,
+        // because, if the value is already available, the execution will not arrive to this place.
 
         // END JMX Notification
         if (Profiling.TIMERS_COMPILED) {
@@ -391,7 +398,9 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         }
         id.setCreatorID(creatorID);
     }
-
+    /**
+     * The creatorID is the ID of the "evaluator" of the Future, not the "creator" of it.
+     */
     public UniqueID getCreatorID() {
         return id.getCreatorID();
     }
@@ -539,6 +548,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         id = (FutureID) in.readObject();
         updater = (UniversalBody) in.readObject();
         methodName = (String) in.readObject();
+        parentMethodName = (String) in.readObject();
         // register all incoming futures, even for migration or checkpointing
         if (this.isAwaited()) {
             FuturePool.registerIncomingFuture(this);

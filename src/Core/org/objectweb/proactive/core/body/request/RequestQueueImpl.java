@@ -190,7 +190,6 @@ public class RequestQueueImpl extends AbstractEventProducer implements java.io.S
     }
 
     public synchronized int add(Request request) {
-        //System.out.println("  --> RequestQueue.add m="+request.getMethodName());
         // FAULT-TOLERANCE  
         int ftres = FTManager.NON_FT;
         FTManager ftm = request.getFTManager();

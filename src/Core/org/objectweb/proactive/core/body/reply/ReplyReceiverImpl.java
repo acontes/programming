@@ -73,11 +73,10 @@ public class ReplyReceiverImpl implements ReplyReceiver, java.io.Serializable {
     			className = r.getResult().getResult().getClass().getName();
     		}
     	}
-    	
-    	//System.out.println("-------> [ReplyReceiver]replyReceived(futureupdate) " + r.getMethodName() + " [" + className + "]" +  " ["+ name +"] + Awaited? "+ n + "  Tags: "+ r.getTags() );
-    	
+    	    	
     	// Here, I know if the result is really available (awaited == false).
     	// If it is, then I should generate a notification realReplyReceived, and read it
+    	// No, it is not here.
     	if(n == 0) {
     		Body body = PAActiveObject.getBodyOnThis();
     		BodyWrapperMBean mbean = null;
@@ -92,9 +91,8 @@ public class ReplyReceiverImpl implements ReplyReceiver, java.io.Serializable {
     				mbean.sendNotification(NotificationType.realReplyReceived, requestNotificationData);
     			}
     		}
-    		//System.out.println("-------> [ReplyReceiver]realReplyReceived(futureupdate) " + r.getMethodName() + " [" + className + "]" +  " ["+ name +"] + Awaited? "+ n + "  Tags: "+ r.getTags() );
     	}
-    	logger.debug("[ReplyReceiv] receiveReply for Future ["+ r.getSequenceNumber()+"] from body ["+r.getSourceBodyID()+"] Receiver ["+ receiverBody +"] + Awaited? "+ n + " Method ["+ r.getMethodName() + "]");
+    	logger.debug("[ReplyReceiv] receiveReply for Future ["+ r.getSequenceNumber()+"] from body ["+r.getSourceBodyID()+"] Receiver ["+ receiverBody +"] Method ["+ r.getMethodName() + "]");
     	int a = futurePool.receiveFutureValue(r.getSequenceNumber(), r.getSourceBodyID(), r.getResult(), r);
     	return a;
     }

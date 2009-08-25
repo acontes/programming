@@ -61,7 +61,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 public class FuturePool extends Object implements java.io.Serializable {
 
-	final static protected Logger logger = ProActiveLogger.getLogger(Loggers.BODY);
+	final static protected Logger logger = ProActiveLogger.getLogger(Loggers.FUTURE);
 	
 	protected boolean newState;
 
@@ -276,15 +276,12 @@ public class FuturePool extends Object implements java.io.Serializable {
     	if(b != null) {
     		bodyName = b.getName();
     	}
-
     	logger.debug("[FuturePool ] receiveFutureValue1. Owner: ["+ownerBody.getName()+" ..." + ownerBody.getID() + "] methodName: ["+ methodName +"] isAwaited? "+ !real);
-    	//System.out.println("[FuturePool] receiveFutureValue in [" + ownerBody.getName()+"] for method ["+ methodName+"] Real reply?"+real+ " ... Tags="+mt);
     	// --cruz
     	
     	// get all aiwated futures
         ArrayList<Future> futuresToUpdate = futures.getFuturesToUpdate(id, creatorID);
         if (futuresToUpdate != null) {
-        	//System.out.println("[FuturePool] receiveFutureValue: there are "+ futuresToUpdate.size() + " futures to update here");
             // FAULT-TOLERANCE
             int ftres = FTManager.NON_FT;
             if ((reply != null) && (reply.getFTManager() != null)) {
@@ -293,11 +290,7 @@ public class FuturePool extends Object implements java.io.Serializable {
 
             Future future = (futuresToUpdate.get(0));
             if (future != null) {
-//            	if(future.getMethodName() == null) {
-//		            System.out.println("Setting methodName to "+ methodName);
-//            		future.setMethodName(methodName);
-//            	}
-            	logger.debug("[FuturePool ] receiveFutureValue2. Owner: ["+ownerBody.getName()+" ..." + ownerBody.getID() + "] Calling receiveReply on FutureProxy ["+ future.getFutureID()+"]");
+            	logger.debug("[FuturePool ] receiveFutureValue2. Owner: ["+ownerBody.getName()+" ..." + ownerBody.getID() + "] Calling receiveReply on FutureProxy ["+ future.getFutureID().getID()+"]");
                 future.receiveReply(result);
             }
 
@@ -310,7 +303,7 @@ public class FuturePool extends Object implements java.io.Serializable {
                 setCopyMode(true);
                 for (int i = 1; i < numOfFuturesToUpdate; i++) {
                     Future otherFuture = (futuresToUpdate.get(i));
-                    logger.debug("[FuturePool ] receiveFutureValue3. Owner: ["+ownerBody.getName()+" ..." + ownerBody.getID() + "] Calling receiveReply on FutureProxy ["+ otherFuture.getFutureID()+"]");
+                    logger.debug("[FuturePool ] receiveFutureValue3. Owner: ["+ownerBody.getName()+" ..." + ownerBody.getID() + "] Calling receiveReply on FutureProxy ["+ otherFuture.getFutureID().getID()+"]");
                     otherFuture.receiveReply((MethodCallResult) Utils.makeDeepCopy(result));
                 }
                 setCopyMode(false);
@@ -349,7 +342,6 @@ public class FuturePool extends Object implements java.io.Serializable {
                     }
                     this.removeDestinations();
 
-                    //System.out.println("Adding AC");
                     // add the deepcopied AC
                     //cruz: reply.getMethodName() was null
                     logger.debug("[FuturePool ] receiveFutureValue4. Owner: ["+ownerBody.getName()+" ..." + ownerBody.getID() + "] Adding AC for method ["+ reply.getMethodName()+"]");
@@ -374,14 +366,14 @@ public class FuturePool extends Object implements java.io.Serializable {
      * @param futureObject future to register
      */
     public synchronized void receiveFuture(Future futureObject) {
-    	logger.debug("[FuturePool ] receiveFuture. Owner: ["+ownerBody.getName()+" ..." + ownerBody.getID() + "] Received Future for FutureMap ["+ futureObject.getFutureID() +"] sent by ["+futureObject.getSenderID()+"] method ["+ futureObject.getMethodName() +"]and calling FutureMap.receiveFuture");
+    	logger.debug("[FuturePool ] receiveFuture. Owner: ["+ownerBody.getName()+" ..." + ownerBody.getID() + "] Received Future for FutureMap ["+ futureObject.getFutureID().getID() +"] sent by ["+futureObject.getSenderID()+"] method ["+ futureObject.getMethodName() +"] and calling FutureMap.receiveFuture");
     	futureObject.setSenderID(ownerBody.getID());
         futures.receiveFuture(futureObject);
         long id = futureObject.getID();
         UniqueID creatorID = futureObject.getCreatorID();
         if (valuesForFutures.get("" + id + creatorID) != null) {
             try {
-            	logger.debug("[FuturePool ] receiveFuture. Owner: ["+ownerBody.getName()+" ..." + ownerBody.getID() + "] Calling receiveFutureValue ["+ futureObject.getFutureID() +"]");
+            	logger.debug("[FuturePool ] receiveFuture (previously arrived). Owner: ["+ownerBody.getName()+" ..." + ownerBody.getID() + "] Calling receiveFutureValue ["+ futureObject.getFutureID().getID() +"]");
                 this.receiveFutureValue(id, creatorID, valuesForFutures.remove("" + id + creatorID), null);
             } catch (java.io.IOException e) {
                 e.printStackTrace();
@@ -395,9 +387,7 @@ public class FuturePool extends Object implements java.io.Serializable {
      * @param creatorID UniqueID of the body which creates futureObject
      * @param bodyDest body destination of this continuation
      */
-    public void addAutomaticContinuation(FutureID id, UniversalBody bodyDest) {
-    	// here I could recover the name of the method that is being served?
-    	
+    public void addAutomaticContinuation(FutureID id, UniversalBody bodyDest) {    	
     	logger.debug("[FuturePool ] addAutomaticContinuation Owner: ["+ownerBody.getName()+"...] ID:[" + id.getID() +"] creator: ["+ id.getCreatorID() +"] bodyDest ["+ bodyDest.getID() + "]");
         futures.addAutomaticContinuation(id.getID(), id.getCreatorID(), bodyDest);
     }
@@ -555,7 +545,6 @@ public class FuturePool extends Object implements java.io.Serializable {
          * Add a ACservice in the active queue.
          */
         public synchronized void addACRequest(ACService r) {
-            //look what info is added here...
         	logger.debug("[ActiveACQue] Adding ACService. Owner: "+ FuturePool.this.getOwnerBody().getID() );
         	queue.add(r);
             counter++;

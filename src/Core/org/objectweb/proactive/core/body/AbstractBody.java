@@ -314,7 +314,6 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     // -- implements UniversalBody -----------------------------------------------
     //
     public int receiveRequest(Request request) throws java.io.IOException, RenegotiateSessionException {
-        // System.out.println("" + this + " --> receiveRequest m="+request.getMethodName());
         // NON_FT is returned if this object is not fault tolerant
         int ftres = FTManager.NON_FT;
         if (this.ftmanager != null) {
@@ -363,7 +362,6 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     }
 
     public int receiveReply(Reply reply) throws java.io.IOException {
-        //System.out.println(" --> receiveReply m="+reply.getMethodName());
         // NON_FT is returned if this object is not fault tolerant
         int ftres = FTManager.NON_FT;
         if (this.ftmanager != null) {
@@ -387,7 +385,6 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                         .getMethodName() : null);
             }
 
-            // System.out.println("Body receives Reply on NODE : " + this.nodeURL);
             if (this.isSecurityOn) {
                 try {
                     if ((this.internalBodySecurity.isLocalBody()) && reply.isCiphered()) {
@@ -425,7 +422,6 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                 java.util.Iterator<Future> it = incomingFutures.iterator();
                 while (it.hasNext()) {
                     Future current = it.next();
-                    bodyLogger.debug("[AbstracBody] Body ["+ getName()+"] Calling receiveFuture from registerIncomingFuture "+ current.getID() );
                     getFuturePool().receiveFuture(current);
                 }
                 FuturePool.removeIncomingFutures();

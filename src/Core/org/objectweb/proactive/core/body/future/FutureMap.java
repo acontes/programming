@@ -56,12 +56,11 @@ public class FutureMap extends Object implements java.io.Serializable {
     // main map
     private Map<UniqueID, HashMap<Long, FuturesAndACs>> indexedByBodyID;
     
-    final static protected Logger logger = ProActiveLogger.getLogger(Loggers.BODY);
+    final static protected Logger logger = ProActiveLogger.getLogger(Loggers.FUTURE);
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
     public FutureMap() {
-    	logger.debug("[FutureMap  ] new FutureMap created");
         indexedByBodyID = new java.util.HashMap<UniqueID, HashMap<Long, FuturesAndACs>>();
     }
 
@@ -195,7 +194,6 @@ public class FutureMap extends Object implements java.io.Serializable {
         	ArrayList<Future> lf = t.getFutures();
         	for(int i=0; i<lf.size(); i++) {
         		Future f = lf.get(i);
-        		logger.debug("[FutureMap  ] removeFuture [" + f.getFutureID() +"] Method: ["+ f.getMethodName() +"]");	
         	}
         }
        	logger.debug("[FutureMap  ] removeFuture ID:[" + id+"] creator: ["+ creatorID +"]");
