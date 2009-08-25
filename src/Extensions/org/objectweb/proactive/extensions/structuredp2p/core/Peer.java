@@ -90,8 +90,9 @@ public class Peer implements DataStorage, InitActive, RunActive, Serializable {
      * @param type
      *            the type of the overlay which is used by the peer.
      */
-    public Peer(OverlayType type) {
+    public Peer(OverlayType type, DataStorage datastore) {
         this.type = type;
+        this.dataStorage = datastore;
     }
 
     /**
@@ -210,8 +211,6 @@ public class Peer implements DataStorage, InitActive, RunActive, Serializable {
      */
     public void initActivity(Body body) {
         try {
-            this.dataStorage = new OWLIMStorage();
-
             switch (this.type) {
                 case CAN:
                     this.structuredOverlay = new CANOverlay(this);
@@ -454,7 +453,23 @@ public class Peer implements DataStorage, InitActive, RunActive, Serializable {
      * @throws NodeException
      */
     public static Peer newActivePeer(OverlayType type) throws ActiveObjectCreationException, NodeException {
-        return Peer.newActivePeer(type, null);
+        return Peer.newActivePeer(type, new OWLIMStorage(), null);
+    }
+
+    /**
+     * Creates a new Peer ActiveObject.
+     * 
+     * @param type
+     *            the type of the peer, which is one of {@link OverlayType}.
+     * @param datastore
+     *            the datastore to use.
+     * @return the new Peer object created.
+     * @throws ActiveObjectCreationException
+     * @throws NodeException
+     */
+    public static Peer newActivePeer(OverlayType type, DataStorage datastore)
+            throws ActiveObjectCreationException, NodeException {
+        return Peer.newActivePeer(type, datastore, null);
     }
 
     /**
@@ -470,7 +485,27 @@ public class Peer implements DataStorage, InitActive, RunActive, Serializable {
      */
     public static Peer newActivePeer(OverlayType type, Node node) throws ActiveObjectCreationException,
             NodeException {
-        return (Peer) PAActiveObject.newActive(Peer.class.getName(), null, new Object[] { type }, node, null,
-                new StructuredMetaObjectFactory());
+        return Peer.newActivePeer(type, new OWLIMStorage(), null);
+    }
+
+    /**
+     * Creates a new Peer ActiveObject.
+     * 
+     * @param type
+     *            the type of the peer, which is one of {@link OverlayType}.
+     * 
+     * @param datastore
+     *            the datastore to use.
+     * @param node
+     *            the node used by the peer.
+     * @return the new Peer object created.
+     * @throws ActiveObjectCreationException
+     * @throws NodeException
+     */
+    public static Peer newActivePeer(OverlayType type, DataStorage datastore, Node node)
+            throws ActiveObjectCreationException, NodeException {
+
+        Peer peer = new Peer(type, datastore);
+        return (Peer) PAActiveObject.turnActive(peer, node, null, new StructuredMetaObjectFactory());
     }
 }
