@@ -1,6 +1,3 @@
-/**
- * 
- */
 package functionalTests.structuredp2p.overlay.can;
 
 import java.util.Random;
@@ -13,8 +10,8 @@ import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
-import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.can.LookupQuery;
-import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.can.LookupQueryResponse;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.can.LookupQueryMessage;
+import org.objectweb.proactive.extensions.structuredp2p.responses.synchronous.can.LookupResponseMessage;
 
 
 /**
@@ -213,10 +210,11 @@ public class TestOverlay {
         Peer toFind = peers[rand.nextInt(peers.length)];
         Peer sender = peers[rand.nextInt(peers.length)];
 
-        LookupQuery msg = new LookupQuery(sender, TestOverlay.getOverlay(toFind).getZone()
+        LookupQueryMessage msg = new LookupQueryMessage(sender, TestOverlay.getOverlay(toFind).getZone()
                 .getCoordinatesMin());
 
-        LookupQueryResponse response = (LookupQueryResponse) PAFuture.getFutureValue(sender.search(msg));
+        LookupResponseMessage response = (LookupResponseMessage) PAFuture.getFutureValue(sender
+                .getStructuredOverlay().search(msg));
 
         Assert.assertEquals(TestOverlay.getOverlay(toFind).getZone(), TestOverlay.getOverlay(
                 response.getPeerFound()).getZone());

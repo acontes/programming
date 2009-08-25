@@ -2,7 +2,7 @@ package org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.c
 
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredOverlay;
-import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.Message;
+import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.AsynchronousMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.can.CANJoinResponseMessage;
 
 
@@ -17,7 +17,7 @@ import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.c
  * @version 0.1
  */
 @SuppressWarnings("serial")
-public class CANJoinMessage implements Message {
+public class CANJoinMessage implements AsynchronousMessage {
 
     /**
      * The remote peer.

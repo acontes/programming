@@ -12,6 +12,7 @@ import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.Neighbo
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.Zone;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates.Coordinate;
 import org.objectweb.proactive.extensions.structuredp2p.core.requests.BlockingRequestReceiverException;
+import org.objectweb.proactive.extensions.structuredp2p.responses.synchronous.can.RDFResponseMessage;
 import org.openrdf.model.Statement;
 import org.openrdf.model.impl.StatementImpl;
 import org.openrdf.model.impl.URIImpl;
@@ -22,7 +23,7 @@ import org.openrdf.model.impl.URIImpl;
  * @version 0.1, 08/04/2009
  */
 @SuppressWarnings("serial")
-public class RDFTriplePatternQuery extends RDFQuery {
+public class RDFTriplePatternQuery extends RDFQueryMessage {
 
     private Set<Peer> lastPeersWhichHaveReceiptTheQuery = new HashSet<Peer>();
 
@@ -73,15 +74,15 @@ public class RDFTriplePatternQuery extends RDFQuery {
                 super.addVisitedPeer(overlay.getRemotePeer());
 
                 super.incrementNbStepsBy(1);
-                neighbor.send(this);
+                neighbor.getStructuredOverlay().send(this);
                 nbOfSends++;
             }
         }
 
         if (nbOfSends == 0) {
-            RDFQueryResponse response = null;
+            RDFResponseMessage response = null;
 
-            response = new RDFQueryResponse(this, this.getKeyToReach());
+            response = new RDFResponseMessage(this, this.getKeyToReach());
 
             // response.getQuery().getVisitedPeers().remove(overlay.getRemotePeer());
 
@@ -114,7 +115,7 @@ public class RDFTriplePatternQuery extends RDFQuery {
             }
 
             response.addAll(stmts);
-            lastPeer.send(response);
+            lastPeer.getStructuredOverlay().send(response);
         } else {
             ((CANOverlay) overlay).handleRDFTriplePatternQuery(this, nbOfSends);
         }
@@ -133,7 +134,7 @@ public class RDFTriplePatternQuery extends RDFQuery {
             System.out.println("* On peer which valid constraint " + overlay);
 
             if (super.keyToReachContainsAllCoordinates()) {
-                RDFQueryResponse response = new RDFQueryResponse(this, this.getKeyToReach(), null);
+                RDFResponseMessage response = new RDFResponseMessage(this, this.getKeyToReach(), null);
                 response.route(overlay);
             } else {
                 this.handle(overlay);
@@ -175,7 +176,7 @@ public class RDFTriplePatternQuery extends RDFQuery {
                         this.incrementNbStepsBy(1);
 
                         try {
-                            nearestPeer.send(this);
+                            nearestPeer.getStructuredOverlay().send(this);
                         } catch (BlockingRequestReceiverException e) {
                             // super.bufferizeQuery(this);
                         } catch (Exception e) {

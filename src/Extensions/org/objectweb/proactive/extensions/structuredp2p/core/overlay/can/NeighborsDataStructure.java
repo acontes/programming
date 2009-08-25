@@ -13,9 +13,9 @@ import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordin
 /**
  * Data structure used in order to store the neighbors of a {@link Peer}.
  * 
- * @author Kilanga Fanny
- * @author Pellegrino Laurent
- * @author Trovato Alexandre
+ * @author Alexandre Trovato
+ * @author Fanny Kilanga
+ * @author Laurent Pellegrino
  * 
  * @version 0.1
  */

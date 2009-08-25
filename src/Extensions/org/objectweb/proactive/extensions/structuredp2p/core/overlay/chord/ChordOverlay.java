@@ -5,9 +5,9 @@ import java.util.HashMap;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.AddNeighborMessage;
-import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.Message;
+import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.AsynchronousMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.RemoveNeighborMessage;
-import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.Query;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.SynchronousMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.ActionResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.JoinResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.ResponseMessage;
@@ -24,14 +24,15 @@ import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.R
  * 
  * The Chord algorithm handles adjusting this mapping as the population of nodes changes over time.
  * 
- * @author Kilanga Fanny
- * @author Pellegrino Laurent
- * @author Trovato Alexandre
+ * @author Alexandre Trovato
+ * @author Fanny Kilanga
+ * @author Laurent Pellegrino
  * 
  * @version 0.1
  */
 @SuppressWarnings("serial")
 public class ChordOverlay extends StructuredOverlay {
+
     private HashMap<String, Peer> fingers;
     private String identifier;
 
@@ -73,7 +74,7 @@ public class ChordOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
-    public JoinResponseMessage handleJoinMessage(Message msg) {
+    public JoinResponseMessage handleJoinMessage(AsynchronousMessage msg) {
         // TODO handleJoinMessage(Message msg)
         return null;
     }
@@ -105,7 +106,7 @@ public class ChordOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
-    public ResponseMessage sendTo(Peer peer, Message msg) {
+    public ResponseMessage sendTo(Peer peer, AsynchronousMessage msg) {
         // TODO sendMessageTo(Peer peer, Message msg)
         return null;
     }
@@ -130,8 +131,8 @@ public class ChordOverlay extends StructuredOverlay {
      * @{inheritDoc
      */
     @Override
-    public void send(Query query) {
+    public void send(SynchronousMessage query) {
         // TODO Auto-generated method stub
-
     }
+
 }

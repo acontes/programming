@@ -1,9 +1,9 @@
 package org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.chord;
 
+import org.objectweb.proactive.extensions.structuredp2p.api.messages.synchronous.Query;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredOverlay;
-import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.AbstractQuery;
-import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.Query;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.AbstractQueryMessage;
 
 
 /**
@@ -14,7 +14,7 @@ import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.Que
  * @version 0.1, 08/05/2009
  */
 @SuppressWarnings("serial")
-public abstract class AbstractChordQuery extends AbstractQuery<String> {
+public abstract class AbstractChordQuery extends AbstractQueryMessage<String> {
 
     public AbstractChordQuery() {
 

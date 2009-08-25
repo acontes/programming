@@ -15,7 +15,7 @@ import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.A
  * @version 0.1
  */
 @SuppressWarnings("serial")
-public abstract class AddNeighborMessage implements Message {
+public abstract class AddNeighborMessage implements AsynchronousMessage {
 
     /**
      * The peer to add as neighbor.

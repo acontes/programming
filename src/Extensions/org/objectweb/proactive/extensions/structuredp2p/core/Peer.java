@@ -13,6 +13,8 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.extensions.structuredp2p.api.messages.synchronous.Query;
+import org.objectweb.proactive.extensions.structuredp2p.api.messages.synchronous.Response;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
@@ -22,10 +24,7 @@ import org.objectweb.proactive.extensions.structuredp2p.core.requests.BlockingRe
 import org.objectweb.proactive.extensions.structuredp2p.core.requests.StructuredMetaObjectFactory;
 import org.objectweb.proactive.extensions.structuredp2p.datastorage.DataStorage;
 import org.objectweb.proactive.extensions.structuredp2p.datastorage.owlim.OWLIMStorage;
-import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.Message;
-import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.AbstractQuery;
-import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.Query;
-import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.QueryResponse;
+import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.AsynchronousMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.ResponseMessage;
 import org.openrdf.model.Statement;
 import org.openrdf.model.ValueFactory;
@@ -308,7 +307,7 @@ public class Peer implements DataStorage, InitActive, RunActive, Serializable {
      *            the message to receive.
      * @return the response in correspondence with the received message.
      */
-    public ResponseMessage receiveMessage(Message msg) {
+    public ResponseMessage receiveMessage(AsynchronousMessage msg) {
         return msg.handle(this.structuredOverlay);
     }
 
@@ -352,22 +351,12 @@ public class Peer implements DataStorage, InitActive, RunActive, Serializable {
         }
     }
 
-    public QueryResponse search(Query query) {
+    public Response search(Query query) {
         return this.structuredOverlay.search(query);
     }
 
     /**
-     * Sends a {@link AbstractQuery} on the network without response.
-     * 
-     * @param query
-     *            the query to send.
-     */
-    public void send(Query query) {
-        this.structuredOverlay.send(query);
-    }
-
-    /**
-     * Sends a {@link Message} to a known {@link Peer}.
+     * Sends a {@link AsynchronousMessage} to a known {@link Peer}.
      * 
      * @param remotePeer
      *            the peer to which we want to send the message.
@@ -376,7 +365,7 @@ public class Peer implements DataStorage, InitActive, RunActive, Serializable {
      * 
      * @return the response in agreement with the type of message sent.
      */
-    public ResponseMessage sendTo(Peer remotePeer, Message msg) {
+    public ResponseMessage sendTo(Peer remotePeer, AsynchronousMessage msg) {
         ResponseMessage response = null;
 
         try {

@@ -1,14 +1,17 @@
-package org.objectweb.proactive.extensions.structuredp2p.messages.synchronous;
+package org.objectweb.proactive.extensions.structuredp2p.responses.synchronous;
 
 import java.util.UUID;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredOverlay;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.AbstractQueryMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.SynchronousMessage;
 
 
 /**
  * An <code>AbstractQueryResponse</code> is an abstract response associated to an abstract
- * {@link AbstractQuery}. In this kind of message (oneway) a response is too a query because the
- * response is sent to reach a key step by step. A response contains some crucial information like :
+ * {@link AbstractQueryMessage}. In this kind of message (oneway) a response is too a query because
+ * the response is sent to reach a key step by step. A response contains some crucial information
+ * like :
  * <ul>
  * <li>the latency in ms;
  * <li>the number of steps for the send;
@@ -20,7 +23,8 @@ import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredO
  * @version 0.1, 08/05/2009
  */
 @SuppressWarnings("serial")
-public abstract class AbstractQueryResponse<K, Q extends AbstractQuery<K>> implements QueryResponse {
+public abstract class AbstractResponseMessage<K, Q extends AbstractQueryMessage<K>> implements
+        SynchronousMessage {
 
     private long deliveryTimestamp;
 
@@ -32,7 +36,7 @@ public abstract class AbstractQueryResponse<K, Q extends AbstractQuery<K>> imple
 
     private Q query;
 
-    public AbstractQueryResponse() {
+    public AbstractResponseMessage() {
         super();
     }
 
@@ -44,7 +48,7 @@ public abstract class AbstractQueryResponse<K, Q extends AbstractQuery<K>> imple
      * @param keyToReach
      *            the key used in order to route the response to it recipient.
      */
-    public AbstractQueryResponse(Q query, K[] keyToReach) {
+    public AbstractResponseMessage(Q query, K[] keyToReach) {
         this.query = query;
         this.query.setKeyToReach(keyToReach);
         this.nbStepsForSend = query.getNbSteps();

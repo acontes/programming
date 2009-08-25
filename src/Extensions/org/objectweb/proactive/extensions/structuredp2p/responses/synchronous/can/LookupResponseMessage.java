@@ -1,4 +1,4 @@
-package org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.can;
+package org.objectweb.proactive.extensions.structuredp2p.responses.synchronous.can;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,8 +7,9 @@ import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates.Coordinate;
-import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.AbstractQueryResponse;
-import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.QueryResponse;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.SynchronousMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.can.LookupQueryMessage;
+import org.objectweb.proactive.extensions.structuredp2p.responses.synchronous.AbstractResponseMessage;
 
 
 /**
@@ -16,15 +17,15 @@ import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.Que
  * @version 0.1, 08/05/2009
  */
 @SuppressWarnings("serial")
-public class LookupQueryResponse extends AbstractQueryResponse<Coordinate, LookupQuery> {
+public class LookupResponseMessage extends AbstractResponseMessage<Coordinate, LookupQueryMessage> {
 
     private Peer peerFound;
 
-    public LookupQueryResponse() {
+    public LookupResponseMessage() {
         super();
     }
 
-    public LookupQueryResponse(LookupQuery query, Peer peerFound) {
+    public LookupResponseMessage(LookupQueryMessage query, Peer peerFound) {
         super(query, query.getCoordinatesBelongToSender());
         this.peerFound = peerFound;
     }
@@ -41,7 +42,7 @@ public class LookupQueryResponse extends AbstractQueryResponse<Coordinate, Looku
 
         super.setDeliveryTime();
 
-        List<QueryResponse> result = new ArrayList<QueryResponse>();
+        List<SynchronousMessage> result = new ArrayList<SynchronousMessage>();
         result.add(this);
 
         canOverlay.addOneWayResponse(this);

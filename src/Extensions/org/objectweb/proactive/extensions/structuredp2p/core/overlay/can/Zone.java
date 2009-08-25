@@ -14,9 +14,9 @@ import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordin
  * correspond to the left higher corner. The maximum coordinates correspond to the corner lower
  * right.
  * 
- * @author Kilanga Fanny
- * @author Pellegrino Laurent
- * @author Trovato Alexandre
+ * @author Alexandre Trovato
+ * @author Fanny Kilanga
+ * @author Laurent Pellegrino
  * 
  * @version 0.1, 07/09/2009
  */

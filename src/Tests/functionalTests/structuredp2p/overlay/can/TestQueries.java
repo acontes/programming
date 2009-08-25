@@ -13,11 +13,11 @@ import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates.Coordinate;
-import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.Query;
-import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.can.LookupQuery;
-import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.can.LookupQueryResponse;
-import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.can.RDFQueryResponse;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.SynchronousMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.can.LookupQueryMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.can.RDFTriplePatternQuery;
+import org.objectweb.proactive.extensions.structuredp2p.responses.synchronous.can.LookupResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.responses.synchronous.can.RDFResponseMessage;
 import org.openrdf.model.Statement;
 
 
@@ -37,7 +37,7 @@ public class TestQueries {
     private static Peer thirdPeer;
     private static Peer fourthPeer;
 
-    private static Query query;
+    private static SynchronousMessage query;
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -74,16 +74,16 @@ public class TestQueries {
             i++;
         }
 
-        TestQueries.query = new LookupQuery(TestQueries.firstPeer, ((CANOverlay) TestQueries.thirdPeer
+        TestQueries.query = new LookupQueryMessage(TestQueries.firstPeer, ((CANOverlay) TestQueries.thirdPeer
                 .getStructuredOverlay()).getZone().getCoordinatesMin());
     }
 
     @Test
     public void testLookupQuery() {
-        LookupQueryResponse response = null;
+        LookupResponseMessage response = null;
         try {
-            response = (LookupQueryResponse) PAFuture.getFutureValue(TestQueries.firstPeer
-                    .search(TestQueries.query));
+            response = (LookupResponseMessage) PAFuture.getFutureValue(TestQueries.firstPeer
+                    .getStructuredOverlay().search(TestQueries.query));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -97,14 +97,15 @@ public class TestQueries {
 
     @Test
     public void testRDFTriplePatternQuery() {
-        RDFQueryResponse response = null;
+        RDFResponseMessage response = null;
 
         Coordinate[] coordinates = ((CANOverlay) TestQueries.thirdPeer.getStructuredOverlay()).getZone()
                 .getCoordinatesMin();
 
         try {
-            response = (RDFQueryResponse) PAFuture.getFutureValue(TestQueries.firstPeer
-                    .search(new RDFTriplePatternQuery(coordinates[0], null, coordinates[2])));
+            response = (RDFResponseMessage) PAFuture.getFutureValue(TestQueries.firstPeer
+                    .getStructuredOverlay().search(
+                            new RDFTriplePatternQuery(coordinates[0], null, coordinates[2])));
         } catch (Exception e) {
             e.printStackTrace();
         }

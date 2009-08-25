@@ -15,7 +15,7 @@ import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.A
  * @version 0.1
  */
 @SuppressWarnings("serial")
-public class RemoveNeighborMessage implements Message {
+public class RemoveNeighborMessage implements AsynchronousMessage {
 
     /**
      * The neighbor peer to remove.

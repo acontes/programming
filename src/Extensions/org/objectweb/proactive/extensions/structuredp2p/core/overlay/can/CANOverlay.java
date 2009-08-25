@@ -14,21 +14,21 @@ import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredO
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates.Coordinate;
 import org.objectweb.proactive.extensions.structuredp2p.core.requests.BlockingRequestReceiver;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.AddNeighborMessage;
-import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.Message;
+import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.AsynchronousMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.RemoveNeighborMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.can.CANAddNeighborMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.can.CANJoinMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.can.CANLeaveMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.can.CANMergeMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.can.CANRemoveNeighborMessage;
-import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.Query;
-import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.QueryResponseEntry;
-import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.can.LookupQueryResponse;
-import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.can.RDFQueryResponse;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.SynchronousMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.SynchronousMessageEntry;
 import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.can.RDFTriplePatternQuery;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.ActionResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.ResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.can.CANJoinResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.responses.synchronous.can.LookupResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.responses.synchronous.can.RDFResponseMessage;
 import org.openrdf.model.Statement;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.query.BindingSet;
@@ -42,9 +42,9 @@ import org.openrdf.query.QueryResult;
  * functionality on Internet-like scales. The CAN is scalable, fault-tolerant and completely
  * self-organizing.
  * 
- * @author Kilanga Fanny
- * @author Pellegrino Laurent
- * @author Trovato Alexandre
+ * @author Alexandre Trovato
+ * @author Fanny Kilanga
+ * @author Laurent Pellegrino
  * 
  * @version 0.1
  */
@@ -240,7 +240,7 @@ public class CANOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
-    public CANJoinResponseMessage handleJoinMessage(Message msg) {
+    public CANJoinResponseMessage handleJoinMessage(AsynchronousMessage msg) {
         int dimension = this.getRandomDimension();
         int direction = this.getRandomDirection();
         int directionInv = CANOverlay.getOppositeDirection(direction);
@@ -378,7 +378,7 @@ public class CANOverlay extends StructuredOverlay {
      *            the message that is handled.
      * @return the {@link ActionResponseMessage} response.
      */
-    public ActionResponseMessage handleMergeMessage(Message msg) {
+    public ActionResponseMessage handleMergeMessage(AsynchronousMessage msg) {
         CANMergeMessage message = (CANMergeMessage) msg;
         boolean result = true;
 
@@ -416,14 +416,14 @@ public class CANOverlay extends StructuredOverlay {
 
     public void handleRDFTriplePatternQuery(RDFTriplePatternQuery query, int nbResponsesToWait) {
         // Wait while we don't have received all the responses sent from this peer
-        synchronized (super.getOneWayResponses()) {
-            while (super.getOneWayResponses().get(query.getUUID()) == null &&
-                super.getOneWayResponses().get(query.getUUID()).getNbResponses() != nbResponsesToWait) {
+        synchronized (super.getSynchronousMessageEntries()) {
+            while (super.getSynchronousMessageEntries().get(query.getUUID()) == null &&
+                super.getSynchronousMessageEntries().get(query.getUUID()).getNbResponses() != nbResponsesToWait) {
 
                 System.out.println("W " + this.zone + " is waiting for " + nbResponsesToWait +
                     " response(s) with uuid= " + query.getUUID() + "...");
                 try {
-                    super.getOneWayResponses().wait();
+                    super.getSynchronousMessageEntries().wait();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -431,12 +431,12 @@ public class CANOverlay extends StructuredOverlay {
         }
 
         // At this step all the responses have been received
-        RDFQueryResponse responseToSend = new RDFQueryResponse(query, query.getKeyToReach());
+        RDFResponseMessage responseToSend = new RDFResponseMessage(query, query.getKeyToReach());
         responseToSend.incrementNbStepsBy(nbResponsesToWait);
-        responseToSend.addAll(((RDFQueryResponse) this.getOneWayResponses().get(query.getUUID())
-                .getQueryResponse()).getRetrievedStatements());
+        responseToSend.addAll(((RDFResponseMessage) super.getSynchronousMessageEntries().get(query.getUUID())
+                .getSynchronousMessage()).getRetrievedStatements());
 
-        responseToSend.getQuery().removeLastVisitedPeer().send(responseToSend);
+        responseToSend.getQuery().removeLastVisitedPeer().getStructuredOverlay().send(responseToSend);
     }
 
     /**
@@ -618,12 +618,12 @@ public class CANOverlay extends StructuredOverlay {
     /**
      * {@inheritDoc}
      */
-    public void send(Query query) {
+    public void send(SynchronousMessage query) {
         query.route(this);
     }
 
     /**
-     * Send a {@link Message} to a list {@link Peer}.
+     * Send a {@link AsynchronousMessage} to a list {@link Peer}.
      * 
      * @param remotePeers
      *            the list of peers to which to send the message.
@@ -634,7 +634,7 @@ public class CANOverlay extends StructuredOverlay {
      * @throws Exception
      *             this exception appears when a message cannot be send to a peer.
      */
-    public List<ResponseMessage> sendTo(List<Peer> remotePeers, Message msg) throws Exception {
+    public List<ResponseMessage> sendTo(List<Peer> remotePeers, AsynchronousMessage msg) throws Exception {
         List<ResponseMessage> responses = new ArrayList<ResponseMessage>(remotePeers.size());
 
         for (Peer remotePeer : remotePeers) {
@@ -645,7 +645,8 @@ public class CANOverlay extends StructuredOverlay {
     }
 
     /**
-     * Send a {@link Message} to a peers that are managed by the {@link NeighborsDataStructure}.
+     * Send a {@link AsynchronousMessage} to a peers that are managed by the
+     * {@link NeighborsDataStructure}.
      * 
      * @param dataStructure
      *            the peers managed by the data structure to which to send the message.
@@ -656,7 +657,8 @@ public class CANOverlay extends StructuredOverlay {
      * @throws Exception
      *             this exception appears when a message cannot be send to a peer.
      */
-    public List<ResponseMessage> sendTo(NeighborsDataStructure dataStructure, Message msg) throws Exception {
+    public List<ResponseMessage> sendTo(NeighborsDataStructure dataStructure, AsynchronousMessage msg)
+            throws Exception {
         List<ResponseMessage> responses = new ArrayList<ResponseMessage>();
 
         for (int dimension = 0; dimension < CANOverlay.NB_DIMENSIONS; dimension++) {
@@ -670,34 +672,36 @@ public class CANOverlay extends StructuredOverlay {
         return responses;
     }
 
-    public void addOneWayResponse(RDFQueryResponse response) {
+    public void addOneWayResponse(RDFResponseMessage response) {
         // System.out.println("N " + this + " has receipted a new response with uuid=" +
         // response.getUUID());
 
-        synchronized (super.getOneWayResponses()) {
-            if (super.getOneWayResponses().get(response.getUUID()) == null) {
-                super.getOneWayResponses().put(response.getUUID(), new QueryResponseEntry(response));
+        synchronized (super.getSynchronousMessageEntries()) {
+            if (super.getSynchronousMessageEntries().get(response.getUUID()) == null) {
+                super.getSynchronousMessageEntries().put(response.getUUID(),
+                        new SynchronousMessageEntry(response));
             } else {
-                RDFQueryResponse responseToUpdate = (RDFQueryResponse) super.getOneWayResponses().get(
-                        response.getUUID()).getQueryResponse();
+                RDFResponseMessage responseToUpdate = (RDFResponseMessage) super
+                        .getSynchronousMessageEntries().get(response.getUUID()).getSynchronousMessage();
                 responseToUpdate.addAll(response.getRetrievedStatements());
                 // TODO update latency, nb steps for send and receipt
             }
 
-            super.getOneWayResponses().notifyAll();
+            super.getSynchronousMessageEntries().notifyAll();
         }
     }
 
-    public void addOneWayResponse(LookupQueryResponse response) {
-        synchronized (super.getOneWayResponses()) {
-            if (super.getOneWayResponses().get(response.getUUID()) == null) {
-                super.getOneWayResponses().put(response.getUUID(), new QueryResponseEntry(response));
+    public void addOneWayResponse(LookupResponseMessage response) {
+        synchronized (super.getSynchronousMessageEntries()) {
+            if (super.getSynchronousMessageEntries().get(response.getUUID()) == null) {
+                super.getSynchronousMessageEntries().put(response.getUUID(),
+                        new SynchronousMessageEntry(response));
             } else {
                 throw new IllegalArgumentException(
                     "A LookupQueryResponse has already been received for uuid=" + response.getUUID());
             }
 
-            super.getOneWayResponses().notifyAll();
+            super.getSynchronousMessageEntries().notifyAll();
         }
     }
 

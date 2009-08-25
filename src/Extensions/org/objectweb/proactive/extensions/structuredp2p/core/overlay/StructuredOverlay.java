@@ -7,26 +7,31 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.Vector;
 
+import org.objectweb.proactive.extensions.structuredp2p.api.messages.synchronous.Query;
+import org.objectweb.proactive.extensions.structuredp2p.api.messages.synchronous.RDFQuery;
+import org.objectweb.proactive.extensions.structuredp2p.api.messages.synchronous.RDFResponse;
+import org.objectweb.proactive.extensions.structuredp2p.api.messages.synchronous.Response;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.AddNeighborMessage;
-import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.Message;
+import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.AsynchronousMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.RemoveNeighborMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.can.CANRemoveNeighborMessage;
-import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.AbstractQuery;
-import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.Query;
-import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.QueryResponse;
-import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.QueryResponseEntry;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.SynchronousMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.SynchronousMessageEntry;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.can.RDFQueryMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.can.RDFTriplePatternQuery;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.ActionResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.JoinResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.ResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.responses.synchronous.can.RDFResponseMessage;
 
 
 /**
  * Defines an abstract class that all structured peer-to-peer protocols must extend.
  * 
- * @author Kilanga Fanny
- * @author Pellegrino Laurent
- * @author Trovato Alexandre
+ * @author Alexandre Trovato
+ * @author Fanny Kilanga
+ * @author Laurent Pellegrino
  * 
  * @version 0.1
  */
@@ -40,14 +45,15 @@ public abstract class StructuredOverlay implements Serializable {
     public static final int UPDATE_TIMEOUT = 500;
 
     /**
-     * Queries which are bufferized when a {@link Peer#sendTo(Peer, Message)} is not accepted.
+     * Queries which are bufferized when a {@link Peer#sendTo(Peer, AsynchronousMessage)} is not
+     * accepted.
      */
-    private List<Query> bufferizedQueries = new Vector<Query>();
+    private List<SynchronousMessage> bufferizedSynchronousMessages = new Vector<SynchronousMessage>();
 
     /**
      * Responses associated to the oneWay search on the network.
      */
-    private Map<UUID, QueryResponseEntry> oneWayResponses = new HashMap<UUID, QueryResponseEntry>();
+    private Map<UUID, SynchronousMessageEntry> synchronousMessageEntries = new HashMap<UUID, SynchronousMessageEntry>();
 
     /**
      * The local peer which is associated with the overlay.
@@ -70,8 +76,8 @@ public abstract class StructuredOverlay implements Serializable {
      * @param query
      *            the query to bufferize.
      */
-    public void bufferizeQuery(Query query) {
-        this.bufferizedQueries.add(query);
+    public void bufferizeSynchronousMessage(SynchronousMessage query) {
+        this.bufferizedSynchronousMessages.add(query);
     }
 
     /**
@@ -79,8 +85,14 @@ public abstract class StructuredOverlay implements Serializable {
      * 
      * @return the queries that are bufferized.
      */
-    public List<Query> getBufferizedQueries() {
-        return this.bufferizedQueries;
+    public List<SynchronousMessage> getBufferizedQueries() {
+        return this.bufferizedSynchronousMessages;
+    }
+
+    private RDFQueryMessage createSynchronousMessage(RDFQuery query) {
+        // TODO Parse query in order to check type and retrieve informations
+
+        return new RDFTriplePatternQuery();
     }
 
     /**
@@ -90,24 +102,43 @@ public abstract class StructuredOverlay implements Serializable {
      *            the query to send.
      * @return the response in agreement with the type of query sent.
      */
-    public QueryResponse search(Query query) {
-        // TODO To check the type of the query with the peer type
-        UUID uuid = UUID.randomUUID();
-        query.setUUID(uuid);
-        this.send(query);
+    public Response search(Query query) {
 
-        synchronized (this.oneWayResponses) {
-            while (this.oneWayResponses.get(uuid) == null) {
+        SynchronousMessage msg = null;
+
+        if (query.getType().equals("RDFQuery")) {
+            msg = this.createSynchronousMessage((RDFQuery) query);
+        } else {
+            throw new IllegalArgumentException("Unknown query type !");
+        }
+
+        msg = this.search(msg);
+
+        if (query.getType().equals("RDFQuery")) {
+            return new RDFResponse((RDFResponseMessage) msg);
+        }
+
+        return null;
+    }
+
+    public SynchronousMessage search(SynchronousMessage msg) {
+
+        UUID uuid = UUID.randomUUID();
+        msg.setUUID(uuid);
+        this.send(msg);
+
+        synchronized (this.synchronousMessageEntries) {
+            while (this.synchronousMessageEntries.get(uuid) == null) {
                 try {
-                    this.oneWayResponses.wait();
+                    this.synchronousMessageEntries.wait();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
         }
 
-        QueryResponse response = this.oneWayResponses.get(uuid).getQueryResponse();
-        this.oneWayResponses.remove(uuid);
+        SynchronousMessage response = this.synchronousMessageEntries.get(uuid).getSynchronousMessage();
+        this.synchronousMessageEntries.remove(uuid);
 
         return response;
     }
@@ -117,8 +148,8 @@ public abstract class StructuredOverlay implements Serializable {
      * 
      * @return the oneWay responses.
      */
-    public Map<UUID, QueryResponseEntry> getOneWayResponses() {
-        return this.oneWayResponses;
+    public Map<UUID, SynchronousMessageEntry> getSynchronousMessageEntries() {
+        return this.synchronousMessageEntries;
     }
 
     /**
@@ -155,7 +186,7 @@ public abstract class StructuredOverlay implements Serializable {
      *            the message that is handled.
      * @return the {@link JoinResponseMessage} response.
      */
-    public abstract ResponseMessage handleJoinMessage(Message msg);
+    public abstract ResponseMessage handleJoinMessage(AsynchronousMessage msg);
 
     /**
      * Handles a {@link CANRemoveNeighborMessage}.
@@ -184,15 +215,15 @@ public abstract class StructuredOverlay implements Serializable {
     public abstract Boolean leave();
 
     /**
-     * Sends a {@link AbstractQuery} on the network without response.
+     * Sends a {@link SynchronousMessage} on the network without response.
      * 
      * @param query
-     *            the query to send.
+     *            the synchronous message to send.
      */
-    public abstract void send(Query query);
+    public abstract void send(SynchronousMessage query);
 
     /**
-     * Send a {@link Message} to a known {@link Peer}.
+     * Send a {@link AsynchronousMessage} to a known {@link Peer}.
      * 
      * @param remotePeer
      *            the remote peer to which we want to send the message.
@@ -201,7 +232,7 @@ public abstract class StructuredOverlay implements Serializable {
      * 
      * @return the response in agreement with the type of message sent.
      */
-    public ResponseMessage sendTo(Peer remotePeer, Message msg) {
+    public ResponseMessage sendTo(Peer remotePeer, AsynchronousMessage msg) {
         return this.localPeer.sendTo(remotePeer, msg);
     }
 
@@ -215,7 +246,7 @@ public abstract class StructuredOverlay implements Serializable {
      */
     public void update() {
         if (this.getBufferizedQueries().size() > 0) {
-            for (Query query : this.getBufferizedQueries()) {
+            for (SynchronousMessage query : this.getBufferizedQueries()) {
                 this.getBufferizedQueries().remove(query);
                 this.send(query);
             }

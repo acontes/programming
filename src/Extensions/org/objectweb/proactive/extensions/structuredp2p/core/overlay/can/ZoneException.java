@@ -3,9 +3,9 @@ package org.objectweb.proactive.extensions.structuredp2p.core.overlay.can;
 /**
  * An {@code ZoneException} is thrown by certain methods of the {@link Zone} class.
  * 
- * @author Kilanga Fanny
- * @author Pellegrino Laurent
- * @author Trovato Alexandre
+ * @author Alexandre Trovato
+ * @author Fanny Kilanga
+ * @author Laurent Pellegrino
  * 
  * @version 0.1
  */

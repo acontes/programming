@@ -8,14 +8,14 @@ import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates.Coordinate;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates.LexicographicCoordinate;
-import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.can.LookupQuery;
-import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.can.LookupQueryResponse;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.can.LookupQueryMessage;
+import org.objectweb.proactive.extensions.structuredp2p.responses.synchronous.can.LookupResponseMessage;
 
 
 /**
- * Performs a lookup query command : a lookup query command performs a {@link LookupQuery} which
- * consists in searching a peer on the network and to return the reference of the peer found to the
- * sender of the request in order to print some information.
+ * Performs a lookup query command : a lookup query command performs a {@link LookupQueryMessage}
+ * which consists in searching a peer on the network and to return the reference of the peer found
+ * to the sender of the request in order to print some information.
  * 
  * @author Pellegrino Laurent
  * @version 0.1, 07/27/2009
@@ -53,8 +53,8 @@ public class LookupQueryCommand extends Command {
         Peer sender = super.getManager().getPeersLauncher().getAvailablePeers().get(
                 rand.nextInt(super.getManager().getPeersLauncher().getAvailablePeers().size()));
 
-        LookupQueryResponse response = (LookupQueryResponse) PAFuture.getFutureValue(sender
-                .search(new LookupQuery(sender, coordinatesToFind)));
+        LookupResponseMessage response = (LookupResponseMessage) PAFuture.getFutureValue(sender
+                .getStructuredOverlay().search(new LookupQueryMessage(sender, coordinatesToFind)));
 
         super
                 .printInfo("Lookup for peer managing " + buf + ".\n    Lookup start from peer managing " +

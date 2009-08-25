@@ -1,4 +1,4 @@
-package org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.can;
+package org.objectweb.proactive.extensions.structuredp2p.responses.synchronous.can;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -6,7 +6,8 @@ import java.util.Set;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates.Coordinate;
-import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.AbstractQueryResponse;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.can.RDFQueryMessage;
+import org.objectweb.proactive.extensions.structuredp2p.responses.synchronous.AbstractResponseMessage;
 import org.openrdf.model.Statement;
 
 
@@ -15,22 +16,22 @@ import org.openrdf.model.Statement;
  * @version 0.1, 08/05/2009
  */
 @SuppressWarnings("serial")
-public class RDFQueryResponse extends AbstractQueryResponse<Coordinate, RDFQuery> {
+public class RDFResponseMessage extends AbstractResponseMessage<Coordinate, RDFQueryMessage> {
 
     private Set<Statement> retrievedStatements = new HashSet<Statement>();
 
-    public RDFQueryResponse() {
+    public RDFResponseMessage() {
         super();
     }
 
-    public RDFQueryResponse(RDFQuery query, Coordinate[] coordinatesToReach,
+    public RDFResponseMessage(RDFQueryMessage query, Coordinate[] coordinatesToReach,
             Set<Statement> retrievedStatements) {
         super(query, coordinatesToReach);
 
         this.retrievedStatements.addAll(retrievedStatements);
     }
 
-    public RDFQueryResponse(RDFQuery query, Coordinate[] coordinatesToReach) {
+    public RDFResponseMessage(RDFQueryMessage query, Coordinate[] coordinatesToReach) {
         super(query, coordinatesToReach);
     }
 

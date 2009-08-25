@@ -5,6 +5,7 @@ import java.util.Stack;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates.Coordinate;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.AbstractQueryMessage;
 
 
 /**
@@ -15,15 +16,15 @@ import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordin
  * 
  * This kind of query can only be used on a CAN structured peer-to-peer network.
  * 
- * @author Pellegrino Laurent
+ * @author Laurent Pellegrino
  * @version 0.1, 08/03/2009
  */
 @SuppressWarnings("serial")
-public abstract class RDFQuery extends AbstractCANQuery {
+public abstract class RDFQueryMessage extends AbstractQueryMessage<Coordinate> {
 
     private Stack<Peer> visitedPeers = new Stack<Peer>();
 
-    public RDFQuery() {
+    public RDFQueryMessage() {
         super();
     }
 
@@ -33,7 +34,7 @@ public abstract class RDFQuery extends AbstractCANQuery {
      * @param coordinatesToFind
      *            the coordinates to reach.
      */
-    public RDFQuery(Coordinate[] coordinatesToFind) {
+    public RDFQueryMessage(Coordinate[] coordinatesToFind) {
         super(coordinatesToFind);
     }
 

@@ -5,23 +5,24 @@ import java.io.Serializable;
 
 /**
  * @author Laurent Pellegrino
- * @version 0.1, Aug 14, 2009
+ * @version 0.1, 08/14/2009
  */
 @SuppressWarnings("serial")
-public class QueryResponseEntry implements Serializable {
+public class SynchronousMessageEntry implements Serializable {
+
+    private SynchronousMessage response;
 
     private int nbResponses = 0;
-    private QueryResponse response;
 
-    public QueryResponseEntry() {
+    public SynchronousMessageEntry() {
 
     }
 
-    public QueryResponseEntry(QueryResponse response) {
+    public SynchronousMessageEntry(SynchronousMessage response) {
         this(response, 1);
     }
 
-    public QueryResponseEntry(QueryResponse response, int nbResponses) {
+    public SynchronousMessageEntry(SynchronousMessage response, int nbResponses) {
         this.response = response;
         this.nbResponses = nbResponses;
     }
@@ -30,7 +31,7 @@ public class QueryResponseEntry implements Serializable {
         return this.nbResponses;
     }
 
-    public QueryResponse getQueryResponse() {
+    public SynchronousMessage getSynchronousMessage() {
         return this.response;
     }
 
@@ -38,7 +39,8 @@ public class QueryResponseEntry implements Serializable {
         this.nbResponses += increment;
     }
 
-    public void setQueryResponse(QueryResponse response) {
+    public void setSynchronousMessage(SynchronousMessage response) {
         this.response = response;
     }
+
 }

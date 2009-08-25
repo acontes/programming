@@ -7,13 +7,10 @@ import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredO
 
 
 /**
- * Interface which must be implemented by all query. It defines some standard operations and some
- * basics operations which may differ depending on the type of query to execute.
- * 
  * @author Laurent Pellegrino
- * @version 0.1, 08/05/2009
+ * @version 0.1, 08/25/2009
  */
-public interface Query extends Serializable {
+public interface SynchronousMessage extends Serializable {
 
     /**
      * Returns the timestamp of the creation of the message.
@@ -21,15 +18,6 @@ public interface Query extends Serializable {
      * @return the timestamp of the creation of the message.
      */
     public abstract long getDispatchTimestamp();
-
-    /**
-     * Returns the number of steps that have been performed in order to reach the
-     * <code>keyToReach</code>.
-     * 
-     * @return the number of steps that have been performed in order to reach the
-     *         <code>keyToReach</code>.
-     */
-    public abstract int getNbSteps();
 
     /**
      * Returns the universally unique identifier used in order to identify the response.
@@ -53,6 +41,15 @@ public interface Query extends Serializable {
      *            the size of the increment.
      */
     public abstract void incrementNbStepsBy(int increment);
+
+    /**
+     * Returns the number of steps that have been performed in order to reach the
+     * <code>keyToReach</code>.
+     * 
+     * @return the number of steps that have been performed in order to reach the
+     *         <code>keyToReach</code>.
+     */
+    public abstract int getNbSteps();
 
     /**
      * Route the query to the proper peer. If the current peer contains the key to reach, the query
@@ -80,4 +77,5 @@ public interface Query extends Serializable {
      *         <code>false</code> otherwise.
      */
     public abstract boolean validKeyConstraints(StructuredOverlay overlay);
+
 }

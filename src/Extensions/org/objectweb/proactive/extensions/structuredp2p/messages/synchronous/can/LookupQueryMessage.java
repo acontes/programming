@@ -8,18 +8,20 @@ import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOver
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.NeighborsDataStructure;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates.Coordinate;
 import org.objectweb.proactive.extensions.structuredp2p.core.requests.BlockingRequestReceiverException;
-import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.QueryResponse;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.AbstractQueryMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.SynchronousMessage;
+import org.objectweb.proactive.extensions.structuredp2p.responses.synchronous.can.LookupResponseMessage;
 
 
 /**
- * A <code>LookupQuery</code> is a query which can be used in order to find a peer which manages a
- * set of known coordinates on a CAN structured peer-to-peer network.
+ * A <code>LookupQueryMessage</code> is a query which can be used in order to find a peer which
+ * manages a set of known coordinates on a CAN structured peer-to-peer network.
  * 
  * @author Laurent Pellegrino
  * @version 0.1, 08/04/2009
  */
 @SuppressWarnings("serial")
-public class LookupQuery extends AbstractCANQuery {
+public class LookupQueryMessage extends AbstractQueryMessage<Coordinate> {
 
     /**
      * The coordinates that are managed by the sender. They are used in order to send the response
@@ -27,11 +29,11 @@ public class LookupQuery extends AbstractCANQuery {
      */
     private Coordinate[] coordinatesBelongToSender;
 
-    public LookupQuery() {
+    public LookupQueryMessage() {
         super();
     }
 
-    public LookupQuery(Peer sender, Coordinate[] coordinatesToReach) {
+    public LookupQueryMessage(Peer sender, Coordinate[] coordinatesToReach) {
         super(coordinatesToReach);
         this.coordinatesBelongToSender = ((CANOverlay) sender.getStructuredOverlay()).getZone()
                 .getCoordinatesMin();
@@ -41,10 +43,10 @@ public class LookupQuery extends AbstractCANQuery {
      * {@inheritDoc}
      */
     public void handle(StructuredOverlay overlay) {
-        new LookupQueryResponse(this, overlay.getRemotePeer()).route(overlay);
+        new LookupResponseMessage(this, overlay.getRemotePeer()).route(overlay);
     }
 
-    public void route(StructuredOverlay overlay, QueryResponse queryResponse) {
+    public void route(StructuredOverlay overlay, SynchronousMessage queryResponse) {
         CANOverlay canOverlay = ((CANOverlay) overlay);
         Coordinate[] coordinatesToReach = this.getKeyToReach();
 
@@ -52,6 +54,7 @@ public class LookupQuery extends AbstractCANQuery {
 
         if (canOverlay.contains(coordinatesToReach)) {
             if (isQueryResponse) {
+                System.out.println("LookupQueryMessage.route() is queryResponse and handle");
                 queryResponse.handle(overlay);
             } else {
                 this.handle(overlay);
@@ -85,15 +88,15 @@ public class LookupQuery extends AbstractCANQuery {
 
                         try {
                             if (isQueryResponse) {
-                                nearestPeer.send(queryResponse);
+                                nearestPeer.getStructuredOverlay().send(queryResponse);
                             } else {
-                                nearestPeer.send(this);
+                                nearestPeer.getStructuredOverlay().send(this);
                             }
                         } catch (BlockingRequestReceiverException e) {
                             if (isQueryResponse) {
-                                overlay.bufferizeQuery(queryResponse);
+                                overlay.bufferizeSynchronousMessage(queryResponse);
                             } else {
-                                overlay.bufferizeQuery(this);
+                                overlay.bufferizeSynchronousMessage(this);
                             }
 
                         } catch (Exception e) {

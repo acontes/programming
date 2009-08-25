@@ -9,7 +9,7 @@ import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordin
  * @version 0.1, 08/05/2009
  */
 @SuppressWarnings("serial")
-public class RDFRangeQuery extends RDFQuery {
+public class RDFRangeQuery extends RDFQueryMessage {
 
     public RDFRangeQuery(Coordinate[] coordinatesToFind) {
         super(coordinatesToFind);

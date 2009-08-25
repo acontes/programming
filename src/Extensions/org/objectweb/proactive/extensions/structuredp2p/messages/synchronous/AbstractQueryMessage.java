@@ -1,15 +1,16 @@
 package org.objectweb.proactive.extensions.structuredp2p.messages.synchronous;
 
-import java.io.Serializable;
 import java.util.UUID;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredOverlay;
+import org.objectweb.proactive.extensions.structuredp2p.responses.synchronous.AbstractResponseMessage;
 
 
 /**
- * An <code>AbstractQuery</code> is an abstraction of a query that can be sent on a structured
- * peer-to-peer network in order to find some data by a key which is an array of type <code>K</code>
- * . In response an object of type {@link AbstractQueryResponse} is returned with the data searched.
+ * An <code>AbstractQueryMessage</code> is an abstraction of a query that can be sent on a
+ * structured peer-to-peer network in order to find some data by a key which is an array of type
+ * <code>K</code> . In response an object of type {@link AbstractResponseMessage} is returned with
+ * the data searched.
  * <p>
  * A query is performed step by step with "oneWay" method. So, we can't say when the response will
  * be returned. Suppose that the peer A is sending a query in order to reach the peer B managing the
@@ -23,11 +24,11 @@ import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredO
  * @author Laurent Pellegrino
  * @version 0.3, 08/05/2009
  * 
- * @see Query
- * @see AbstractQueryResponse
+ * @see SynchronousMessage
+ * @see AbstractResponseMessage
  */
 @SuppressWarnings("serial")
-public abstract class AbstractQuery<K> implements Query, Serializable {
+public abstract class AbstractQueryMessage<K> implements SynchronousMessage {
 
     /**
      * Timestamp of the creation of the message.
@@ -52,7 +53,7 @@ public abstract class AbstractQuery<K> implements Query, Serializable {
     /**
      * Constructor.
      */
-    public AbstractQuery() {
+    public AbstractQueryMessage() {
     }
 
     /**
@@ -61,7 +62,7 @@ public abstract class AbstractQuery<K> implements Query, Serializable {
      * @param keyToFind
      *            the key to find.
      */
-    public AbstractQuery(K[] keyToFind) {
+    public AbstractQueryMessage(K[] keyToFind) {
         this.keyToReach = keyToFind;
     }
 
@@ -75,7 +76,7 @@ public abstract class AbstractQuery<K> implements Query, Serializable {
      * @param dispatchTimestamp
      *            the dispatch timestamp of the query.
      */
-    public AbstractQuery(UUID uuid, K[] keyToReach, long dispatchTimestamp) {
+    public AbstractQueryMessage(UUID uuid, K[] keyToReach, long dispatchTimestamp) {
         this.keyToReach = keyToReach;
         this.dispatchTimestamp = dispatchTimestamp;
         this.uuid = uuid;

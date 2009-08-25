@@ -3,9 +3,9 @@ package org.objectweb.proactive.extensions.structuredp2p.core.overlay;
 /**
  * Defines type of overlay which are available and can be used for implementation and peers.
  * 
- * @author Kilanga Fanny
- * @author Pellegrino Laurent
- * @author Trovato Alexandre
+ * @author Alexandre Trovato
+ * @author Fanny Kilanga
+ * @author Laurent Pellegrino
  * 
  * @version 0.1
  */
