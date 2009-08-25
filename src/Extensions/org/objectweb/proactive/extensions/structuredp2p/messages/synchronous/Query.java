@@ -1,4 +1,4 @@
-package org.objectweb.proactive.extensions.structuredp2p.messages.oneway;
+package org.objectweb.proactive.extensions.structuredp2p.messages.synchronous;
 
 import java.io.Serializable;
 import java.util.UUID;

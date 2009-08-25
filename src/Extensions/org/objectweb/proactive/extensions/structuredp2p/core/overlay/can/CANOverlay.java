@@ -21,11 +21,11 @@ import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.ca
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.can.CANLeaveMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.can.CANMergeMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.can.CANRemoveNeighborMessage;
-import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.Query;
-import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.QueryResponseEntry;
-import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can.LookupQueryResponse;
-import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can.RDFQueryResponse;
-import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can.RDFTriplePatternQuery;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.Query;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.QueryResponseEntry;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.can.LookupQueryResponse;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.can.RDFQueryResponse;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.can.RDFTriplePatternQuery;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.ActionResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.ResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.can.CANJoinResponseMessage;

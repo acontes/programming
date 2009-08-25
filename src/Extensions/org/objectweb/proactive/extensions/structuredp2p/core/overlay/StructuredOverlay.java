@@ -12,10 +12,10 @@ import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.Ad
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.Message;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.RemoveNeighborMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.can.CANRemoveNeighborMessage;
-import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.AbstractQuery;
-import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.Query;
-import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.QueryResponse;
-import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.QueryResponseEntry;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.AbstractQuery;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.Query;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.QueryResponse;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.QueryResponseEntry;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.ActionResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.JoinResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.ResponseMessage;

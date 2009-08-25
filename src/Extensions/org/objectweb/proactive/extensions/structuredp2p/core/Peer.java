@@ -23,9 +23,9 @@ import org.objectweb.proactive.extensions.structuredp2p.core.requests.Structured
 import org.objectweb.proactive.extensions.structuredp2p.datastorage.DataStorage;
 import org.objectweb.proactive.extensions.structuredp2p.datastorage.owlim.OWLIMStorage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.Message;
-import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.AbstractQuery;
-import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.Query;
-import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.QueryResponse;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.AbstractQuery;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.Query;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.QueryResponse;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.ResponseMessage;
 import org.openrdf.model.Statement;
 import org.openrdf.model.ValueFactory;

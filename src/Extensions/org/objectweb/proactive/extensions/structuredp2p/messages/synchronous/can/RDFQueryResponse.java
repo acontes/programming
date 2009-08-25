@@ -1,4 +1,4 @@
-package org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can;
+package org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.can;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -6,7 +6,7 @@ import java.util.Set;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates.Coordinate;
-import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.AbstractQueryResponse;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.AbstractQueryResponse;
 import org.openrdf.model.Statement;
 
 

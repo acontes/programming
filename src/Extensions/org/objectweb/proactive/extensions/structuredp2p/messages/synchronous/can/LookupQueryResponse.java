@@ -1,4 +1,4 @@
-package org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can;
+package org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.can;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,8 +7,8 @@ import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates.Coordinate;
-import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.AbstractQueryResponse;
-import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.QueryResponse;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.AbstractQueryResponse;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.QueryResponse;
 
 
 /**

@@ -1,4 +1,4 @@
-package org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can;
+package org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.can;
 
 import java.util.HashSet;
 import java.util.List;

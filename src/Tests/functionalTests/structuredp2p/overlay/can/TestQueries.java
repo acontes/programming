@@ -13,11 +13,11 @@ import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.OverlayType;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates.Coordinate;
-import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.Query;
-import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can.LookupQuery;
-import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can.LookupQueryResponse;
-import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can.RDFQueryResponse;
-import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can.RDFTriplePatternQuery;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.Query;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.can.LookupQuery;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.can.LookupQueryResponse;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.can.RDFQueryResponse;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.can.RDFTriplePatternQuery;
 import org.openrdf.model.Statement;
 
 

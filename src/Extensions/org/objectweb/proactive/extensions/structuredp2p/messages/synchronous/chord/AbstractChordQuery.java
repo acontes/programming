@@ -1,9 +1,9 @@
-package org.objectweb.proactive.extensions.structuredp2p.messages.oneway.chord;
+package org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.chord;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredOverlay;
-import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.AbstractQuery;
-import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.Query;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.AbstractQuery;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.Query;
 
 
 /**

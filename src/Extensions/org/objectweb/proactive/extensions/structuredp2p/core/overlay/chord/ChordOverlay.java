@@ -7,7 +7,7 @@ import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredO
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.AddNeighborMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.Message;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.RemoveNeighborMessage;
-import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.Query;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.Query;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.ActionResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.JoinResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.ResponseMessage;
