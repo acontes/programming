@@ -8,8 +8,6 @@ import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOver
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates.Coordinate;
 import org.objectweb.proactive.extensions.structuredp2p.messages.oneway.AbstractQueryResponse;
 import org.openrdf.model.Statement;
-import org.openrdf.model.impl.StatementImpl;
-import org.openrdf.model.impl.URIImpl;
 
 
 /**
@@ -49,17 +47,21 @@ public class RDFQueryResponse extends AbstractQueryResponse<Coordinate, RDFQuery
      */
     public void handle(StructuredOverlay overlay) {
 
-        URIImpl subject = (this.getKeyToReach()[0] == null) ? null : new URIImpl(this.getKeyToReach()[0]
-                .getValue());
-
-        URIImpl predicate = (this.getKeyToReach()[1] == null) ? null : new URIImpl(this.getKeyToReach()[1]
-                .getValue());
-
-        URIImpl object = (this.getKeyToReach()[2] == null) ? null : new URIImpl(this.getKeyToReach()[2]
-                .getValue());
-
-        this.addAll(overlay.getLocalPeer().query(new StatementImpl(subject, predicate, object)));
+        // URIImpl subject = (this.getKeyToReach()[0] == null) ? null : new
+        // URIImpl(this.getKeyToReach()[0]
+        // .getValue());
+        //
+        // URIImpl predicate = (this.getKeyToReach()[1] == null) ? null : new
+        // URIImpl(this.getKeyToReach()[1]
+        // .getValue());
+        //
+        // URIImpl object = (this.getKeyToReach()[2] == null) ? null : new
+        // URIImpl(this.getKeyToReach()[2]
+        // .getValue());
+        //
+        // this.addAll(overlay.getLocalPeer().query(new StatementImpl(subject, predicate, object)));
         // overlay.getLocalPeer().addOneWayResponse(this);
+
         // this.getQuery().removeLastVisitedPeer().send(this);
         ((CANOverlay) this.getQuery().removeLastVisitedPeer().getStructuredOverlay()).addOneWayResponse(this);
     }
@@ -68,6 +70,7 @@ public class RDFQueryResponse extends AbstractQueryResponse<Coordinate, RDFQuery
      * {@inheritDoc}
      */
     public void route(StructuredOverlay overlay) {
+        System.out.println("RDFQueryResponse.route()");
         if (!super.getQuery().hasPeersToVisit()) {
             System.out.println("  * RDFQueryResponse.route() has no peer to visit : handle last step.");
             this.setDeliveryTime();

@@ -3,6 +3,7 @@ package org.objectweb.proactive.extensions.structuredp2p.messages.oneway.can;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Stack;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredOverlay;
@@ -59,18 +60,37 @@ public class RDFTriplePatternQuery extends RDFQuery {
         this.lastPeersWhichHaveReceiptTheQuery.add(overlay.getRemotePeer());
 
         int nbOfSends = 0;
+        Stack<Peer> peersToVisit = super.getVisitedPeers();
         for (Peer neighbor : subSetOfNeighbors) {
             if (this.validKeyConstraints(neighbor.getStructuredOverlay())) {
+                System.out.println("Send to Neighbor=" + neighbor);
+
+                super.removeAllVisitedPeers();
+
+                for (Peer peer : peersToVisit) {
+                    super.addVisitedPeer(peer);
+                }
                 super.addVisitedPeer(overlay.getRemotePeer());
+
                 super.incrementNbStepsBy(1);
                 neighbor.send(this);
                 nbOfSends++;
             }
         }
 
-        System.out.println("nbSend = " + nbOfSends);
         if (nbOfSends == 0) {
-            RDFQueryResponse response = new RDFQueryResponse(this, this.getKeyToReach());
+            RDFQueryResponse response = null;
+
+            response = new RDFQueryResponse(this, this.getKeyToReach());
+
+            // response.getQuery().getVisitedPeers().remove(overlay.getRemotePeer());
+
+            // System.out.println("before=" + response.getQuery().getVisitedPeers().size());
+            Peer lastPeer = response.getQuery().removeLastVisitedPeer();
+            // System.out.println("after=" + response.getQuery().getVisitedPeers().size());
+            // System.out.println("On peer " + overlay.getLocalPeer() + " send response to " +
+            // lastPeer +
+            // " with uuid=" + response.getUUID());
 
             URIImpl subject = (this.getKeyToReach()[0] == null) ? null : new URIImpl(this.getKeyToReach()[0]
                     .getValue());
@@ -83,9 +103,18 @@ public class RDFTriplePatternQuery extends RDFQuery {
 
             Set<Statement> stmts = overlay.getLocalPeer()
                     .query(new StatementImpl(subject, predicate, object));
-            System.out.println("SIZE = " + stmts.size());
+
+            System.out.println("NbStatements=" + stmts.size());
+
+            System.out.println("Zone courante=" + overlay);
+
+            System.out.println("Pairs a visiter (" + this.lastPeersWhichHaveReceiptTheQuery.size() + ") :");
+            for (Peer peer : this.lastPeersWhichHaveReceiptTheQuery) {
+                System.out.println("- " + peer);
+            }
+
             response.addAll(stmts);
-            response.getQuery().removeLastVisitedPeer().send(response);
+            lastPeer.send(response);
         } else {
             ((CANOverlay) overlay).handleRDFTriplePatternQuery(this, nbOfSends);
         }

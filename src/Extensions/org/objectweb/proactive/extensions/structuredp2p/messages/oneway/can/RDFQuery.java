@@ -96,6 +96,10 @@ public abstract class RDFQuery extends AbstractCANQuery {
         return null;
     }
 
+    public void removeAllVisitedPeers() {
+        this.visitedPeers.clear();
+    }
+
     /**
      * Indicates if the key to reach has all its coordinates fixed with a not <code>null</code>
      * value or not.
