@@ -10,13 +10,17 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
 public class AgentForIS {
 
+    // static for all active objects Agent <Owner -> <CallerID, ThreadforIS>
+    private static Map<UniqueID, Map<UniqueID, Thread>> threadsForISUnique = new Hashtable<UniqueID, Map<UniqueID, Thread>>();
+
     private Thread serviceThread;
-    private Map<UniqueID, Thread> threadsForISUnique;
+
+    private UniqueID myID;
 
     // IS MT
     public BooleanWrapper foo() {
         return new BooleanWrapper((!Thread.currentThread().equals(this.serviceThread)) &&
-            !(threadsForISUnique.containsValue(Thread.currentThread())));
+            !(threadsForISUnique.get(myID).containsValue(Thread.currentThread())));
     }
 
     // NORMAL
@@ -27,18 +31,19 @@ public class AgentForIS {
     // IS UT
     public BooleanWrapper foo(Long a, Integer b) {
         UniqueID caller = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
-        if (!this.threadsForISUnique.containsKey(caller)) {
+        if (!this.threadsForISUnique.get(myID).containsKey(caller)) {
             // first call for this caller
-            this.threadsForISUnique.put(caller, Thread.currentThread());
+            this.threadsForISUnique.get(myID).put(caller, Thread.currentThread());
         }
-        return new BooleanWrapper(Thread.currentThread().equals(this.threadsForISUnique.get(caller)));
+        return new BooleanWrapper(Thread.currentThread()
+                .equals(this.threadsForISUnique.get(myID).get(caller)));
     }
 
     public void nothing() {
     }
 
-    public boolean checkAllThreadISAreDown() {
-        for (Thread t : threadsForISUnique.values()) {
+    public boolean checkAllThreadISAreDown(UniqueID id) {
+        for (Thread t : threadsForISUnique.get(id == null ? myID : id).values()) {
             //if (!t.getState().equals(State.TERMINATED)){
             if (t.isAlive()) {
                 return false;
@@ -56,9 +61,15 @@ public class AgentForIS {
 
         this.serviceThread = Thread.currentThread();
 
-        this.threadsForISUnique = new Hashtable<UniqueID, Thread>();
+        this.myID = PAActiveObject.getBodyOnThis().getID();
+
+        threadsForISUnique.put(myID, new Hashtable<UniqueID, Thread>());
 
         return 0;
 
+    }
+
+    public UniqueID getID() {
+        return this.myID;
     }
 }

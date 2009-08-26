@@ -74,16 +74,18 @@ public class RequestReceiverImpl implements RequestReceiver, java.io.Serializabl
      * This class wraps arrays of class to redefine hashcode(), so method params can
      * be used as key in a Map.
      */
-    private static class ClassArrayWrapper implements Serializable {
+    private static final class ClassArrayWrapper implements Serializable {
         private final Class<?>[] wrappedClassArray;
+        // cached hashcode since CAW is final
+        private final int myHashcode;
 
         public ClassArrayWrapper(Class<?>[] classArray) {
             this.wrappedClassArray = classArray;
+            this.myHashcode = Arrays.toString(this.wrappedClassArray).hashCode();
         }
 
         public int hashCode() {
-            // TODO : check efficiency... cache ? check nb call
-            return Arrays.toString(this.wrappedClassArray).hashCode();
+            return this.myHashcode;
         }
 
         public boolean equals(Object obj) {
@@ -102,7 +104,7 @@ public class RequestReceiverImpl implements RequestReceiver, java.io.Serializabl
     }
 
     /**
-     * Defines the service mode, i.e. the way the incomin request has to be served.
+     * Defines the service mode, i.e. the way the incoming request has to be served.
      * It could be normal service (request in put in queue), immediate service multi-thread 
      * (request is served by the incoming thread) or immediate service unique thread (request
      * id served by a dedicated thread, which is the same for a given caller).
@@ -116,7 +118,7 @@ public class RequestReceiverImpl implements RequestReceiver, java.io.Serializabl
     // immediate services are currently executed if != 0
     private AtomicInteger inImmediateService;
     // Thread associated to a given caller for immediate service with unique thread
-    private final Map<UniqueID, ThreadForImmediateService> threadsForCallers;
+    private transient Map<UniqueID, ThreadForImmediateService> threadsForCallers;
 
     public RequestReceiverImpl() {
         serviceModes = new Hashtable<String, Map<ClassArrayWrapper, ServiceMode>>(4);
@@ -134,7 +136,7 @@ public class RequestReceiverImpl implements RequestReceiver, java.io.Serializabl
         icd.put(ANY_PARAMETERS, ServiceMode.IMMEDIATE_MULTI_THREAD);
         serviceModes.put("_ImmediateMethodCallDummy", icd);
         this.inImmediateService = new AtomicInteger(0);
-        threadsForCallers = new Hashtable<UniqueID, ThreadForImmediateService>();
+        this.threadsForCallers = new Hashtable<UniqueID, ThreadForImmediateService>();
     }
 
     public int receiveRequest(Request request, Body bodyReceiver) {
@@ -289,22 +291,25 @@ public class RequestReceiverImpl implements RequestReceiver, java.io.Serializabl
         return this.inImmediateService.intValue() > 0;
     }
 
+    public boolean hasThreadsForImmediateService() {
+        return this.threadsForCallers.size() != 0;
+    }
+
     /**
      * Terminate all the ThreadForImmediateService.
-     * TODO cdelbe : not called from outside, should update RequestReceiver
-     * TODO cdelbe : migration / fault-tolerance
      */
-    public void destroyThreadsForIS() {
+    public void terminate() {
         for (ThreadForImmediateService t : this.threadsForCallers.values()) {
             t.kill();
         }
+        this.threadsForCallers.clear();
     }
 
     /**
      * Thread for serving "immediate service with unique thread". 
      * This thread is associated to a given caller.
      */
-    private static class ThreadForImmediateService extends Thread {
+    private class ThreadForImmediateService extends Thread {
 
         private final UniversalBody associatedCaller;
         private final Semaphore callerLock;
@@ -406,6 +411,7 @@ public class RequestReceiverImpl implements RequestReceiver, java.io.Serializabl
                     logger.debug("" + this + " is terminating...");
                 }
                 this.interrupt();
+                RequestReceiverImpl.this.threadsForCallers.remove(this.associatedCaller.getID());
                 this.callerLock.release();
             }
         }
@@ -416,6 +422,7 @@ public class RequestReceiverImpl implements RequestReceiver, java.io.Serializabl
          */
         private boolean pingAssociatedCaller() {
             try {
+                // PROACTIVE-267 : should not use explicitly FT package.
                 Object ping = this.associatedCaller.receiveFTMessage(new Heartbeat());
                 return FaultDetector.OK.equals(ping);
             } catch (IOException e) {
@@ -423,6 +430,17 @@ public class RequestReceiverImpl implements RequestReceiver, java.io.Serializabl
             }
         }
 
+    }
+
+    // Serilization methods are redefined because of threads for caller
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+        out.defaultWriteObject();
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        this.threadsForCallers = new Hashtable<UniqueID, ThreadForImmediateService>();
     }
 
 }

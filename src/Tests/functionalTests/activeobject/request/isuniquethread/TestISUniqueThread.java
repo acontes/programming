@@ -6,6 +6,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
+import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.request.RequestReceiverImpl;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -68,6 +70,8 @@ public class TestISUniqueThread extends GCMFunctionalTestDefaultNodes {
 
         AgentForIS a1 = (AgentForIS) PAActiveObject.newActive(AgentForIS.class.getName(), null, n1);
         a1.init();
+        AgentForIS a2 = (AgentForIS) PAActiveObject.newActive(AgentForIS.class.getName(), null, n1);
+        a2.init();
 
         Caller[] callers = new Caller[NB_CALLER];
         for (int i = 0; i < NB_CALLER; i++) {
@@ -85,20 +89,23 @@ public class TestISUniqueThread extends GCMFunctionalTestDefaultNodes {
 
         for (int i = 0; i < NB_CALLER; i++) {
             foo_void[i] = callers[i].call(a1, NB_CALL, MethodSelector.FOO_VOID);
+            callers[i].call(a2, NB_CALL, MethodSelector.FOO_VOID);
         }
 
         for (int i = 0; i < NB_CALLER; i++) {
             foo_int[i] = callers[i].call(a1, NB_CALL, MethodSelector.FOO_INT);
+            callers[i].call(a2, NB_CALL, MethodSelector.FOO_INT);
         }
 
         for (int i = 0; i < NB_CALLER; i++) {
             foo_long_int[i] = callers[i].call(a1, NB_CALL, MethodSelector.FOO_LONG_INT);
+            callers[i].call(a2, NB_CALL, MethodSelector.FOO_LONG_INT);
         }
 
         for (int i = 0; i < NB_CALLER; i++) {
             callers[i].synchronousBarrier();
         }
-        //checks
+        //checks services
         for (int i = 0; i < NB_CALLER; i++) {
             for (int j = 0; j < NB_CALL; j++) {
                 Assert.assertTrue(foo_void[i].get(j).booleanValue());
@@ -106,6 +113,8 @@ public class TestISUniqueThread extends GCMFunctionalTestDefaultNodes {
                 Assert.assertTrue(foo_long_int[i].get(j).booleanValue());
             }
         }
+
+        // 1) check implicit termination 
 
         // terminate all the callers
         for (int i = 0; i < NB_CALLER; i++) {
@@ -119,7 +128,14 @@ public class TestISUniqueThread extends GCMFunctionalTestDefaultNodes {
             e.printStackTrace();
         }
 
-        Assert.assertTrue(a1.checkAllThreadISAreDown());
+        Assert.assertTrue(a1.checkAllThreadISAreDown(null));
+
+        // 2) check explicit termination
+        UniqueID a2id = a2.getID();
+        PAFuture.waitFor(a2id);
+        PAActiveObject.terminateActiveObject(a2, true);
+        // test a2 threads on a1 because a2 is dead...
+        Assert.assertTrue(a1.checkAllThreadISAreDown(a2id));
 
     }
 

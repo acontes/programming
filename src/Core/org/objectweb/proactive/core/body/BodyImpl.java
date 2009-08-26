@@ -343,8 +343,8 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             setLocalBodyImpl(new InactiveLocalBodyStrategy(this.getFuturePool()));
         }
 
-        // terminate all threads for IS
-        // this.requestReceiver.destroy();
+        // terminate request receiver
+        this.requestReceiver.terminate();
     }
 
     public boolean checkMethod(String methodName) {
@@ -352,30 +352,44 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
     }
 
     public void setImmediateService(String methodName, boolean uniqueThread) {
-        // FIXME see PROACTIVE-309
-        if (!((ComponentBodyImpl) this).isComponent()) {
-            if (!checkMethod(methodName)) {
-                throw new NoSuchMethodError(methodName + " is not defined in " +
-                    getReifiedObject().getClass().getName());
-            }
-        }
+        checkImmediateServiceMode(methodName, null, uniqueThread);
         ((RequestReceiverImpl) this.requestReceiver).setImmediateService(methodName, uniqueThread);
     }
 
     public void setImmediateService(String methodName, Class<?>[] parametersTypes, boolean uniqueThread) {
-        // FIXME see ProActive-309
-        if (!((ComponentBodyImpl) this).isComponent()) {
-            if (!checkMethod(methodName, parametersTypes)) {
-                String signature = methodName + "(";
-                for (int i = 0; i < parametersTypes.length; i++) {
-                    signature += parametersTypes[i] + ((i < parametersTypes.length - 1) ? "," : "");
-                }
-                signature += " is not defined in " + getReifiedObject().getClass().getName();
-                throw new NoSuchMethodError(signature);
-            }
-        }
+        checkImmediateServiceMode(methodName, parametersTypes, uniqueThread);
         ((RequestReceiverImpl) this.requestReceiver).setImmediateService(methodName, parametersTypes,
                 uniqueThread);
+    }
+
+    private void checkImmediateServiceMode(String methodName, Class<?>[] parametersTypes, boolean uniqueThread) {
+        // see PROACTIVE-309
+        if (!((ComponentBodyImpl) this).isComponent()) {
+            if (parametersTypes == null) { // all args
+                if (!((ComponentBodyImpl) this).isComponent()) {
+                    if (!checkMethod(methodName)) {
+                        throw new NoSuchMethodError(methodName + " is not defined in " +
+                            getReifiedObject().getClass().getName());
+                    }
+                }
+            } else { // args are specified
+                if (!checkMethod(methodName, parametersTypes)) {
+                    String signature = methodName + "(";
+                    for (int i = 0; i < parametersTypes.length; i++) {
+                        signature += parametersTypes[i] + ((i < parametersTypes.length - 1) ? "," : "");
+                    }
+                    signature += " is not defined in " + getReifiedObject().getClass().getName();
+                    throw new NoSuchMethodError(signature);
+                }
+            }
+        }
+
+        // cannot use IS with unique thread with fault-tolerant active object
+        if (uniqueThread && this.ftmanager != null) {
+            throw new ProActiveRuntimeException("The method " + methodName +
+                " cannot be set as immediate service with unique thread since the active object " +
+                this.getID() + " has enabled fault-tolerance.");
+        }
     }
 
     public void removeImmediateService(String methodName) {

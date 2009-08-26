@@ -286,7 +286,7 @@ public class RemoteObjectImpl<T> implements RemoteObject<T>, Serializable {
         } catch (InvocationTargetException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-        } 
+        }
         return null;
     }
 
@@ -399,8 +399,8 @@ public class RemoteObjectImpl<T> implements RemoteObject<T>, Serializable {
 
     protected Object createStubObject() throws ClassNotFoundException {
         try {
-            return MOP.turnReified( this.className, SynchronousProxy.class.getName(),
-                    new Object[] { null, new Object[] { this }} , target, new Class[] {});
+            return MOP.turnReified(this.className, SynchronousProxy.class.getName(), new Object[] { null,
+                    new Object[] { this } }, target, new Class[] {});
 
         } catch (MOPException e) {
             // TODO Auto-generated catch block
