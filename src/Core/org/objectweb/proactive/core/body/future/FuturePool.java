@@ -354,6 +354,12 @@ public class FuturePool extends Object implements java.io.Serializable {
             futures.removeFutures(id, creatorID);
             return ftres;
         } else {
+        	// one way for an orphan reply to arrive, is that the reply has arrived through another.
+        	// The Future may have arrived to the caller, f.e. in the case of a request that travels through a Composite AO.
+        	// In that case, as the corresponding Future has already been updated, there's no update to wait for.
+        	// In this implementation, it seems that the awaited case is when the update arrives before the Future.
+        	logger.debug("[FuturePool ] receiveFutureValue. Reply arrived, and there's no future to update. (ORPHAN)");
+        	
             // we have to store the result received by AC until future arrive
             this.valuesForFutures.put("" + id + creatorID, result);
             // OR this reply might be an orphan reply (return value is ignored if not)

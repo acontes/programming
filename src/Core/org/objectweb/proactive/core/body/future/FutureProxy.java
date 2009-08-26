@@ -46,12 +46,14 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.proxy.AbstractProxy;
+import org.objectweb.proactive.core.body.tags.MessageTags;
 import org.objectweb.proactive.core.exceptions.ExceptionHandler;
 import org.objectweb.proactive.core.exceptions.ExceptionMaskLevel;
 import org.objectweb.proactive.core.group.DispatchMonitor;
 import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
 import org.objectweb.proactive.core.jmx.notification.FutureNotificationData;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
+import org.objectweb.proactive.core.jmx.notification.RequestNotificationData;
 import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedException;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.MOP;
@@ -136,6 +138,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     //cruz
     private String methodName = null;
     private String parentMethodName = null;
+    private MessageTags tags;
     //--cruz
     
     //
@@ -228,6 +231,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         	name = obj.getResult().getClass().getName();
         }
         
+        
         logger.debug("[FutureProxy] receiveReply. ID:" + this.getID()+ ", MethodCallResult type: ["+name+"]. IsAwaited? "+isAwaited(obj.getResult()) + " methodName:["+ methodName +"]" );
         if(isAwaited(target.getResult())) {
         	//long seqID = ((FutureProxy)((StubObject)target.getResult()).getProxy()).getID();
@@ -235,11 +239,26 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         	
         	// now I can give the name of method I'm still waiting for, to the new pair stub-proxy
         	FutureProxy futureReceived = ((FutureProxy)((StubObject)target.getResult()).getProxy());
+        	logger.debug("[FutureProxy] receiveReply. ID:" + futureReceived.getID()+ ", was previously for method: [" + futureReceived.getMethodName() +"]");
         	futureReceived.setMethodName(this.methodName);
         }
         else {
         	// TODO now I can generate the JMX notification RealReplyReceived :D
-        	
+        	logger.debug("[FutureProxy] receiveReply. ID:" + this.getID() + ", received REAL REPLY for method "+ methodName);
+        	// generates the JMX RealReplyReceived
+        	Body body = PAActiveObject.getBodyOnThis();
+    		if(body != null) {
+    			// if it's a half body, it won't have an mbean to send notifications
+    			BodyWrapperMBean mbean = body.getMBean();
+    			if(mbean != null) {
+//    				String tagNotification = createTagNotification(r.getTags());
+//    				RequestNotificationData requestNotificationData = new RequestNotificationData(
+//    						body.getID(), body.getNodeURL(), r.getSourceBodyID(), body.getNodeURL(),
+//    						r.getMethodName(), body.getRequestQueue().size() + 1, r.getSequenceNumber(),
+//    						tagNotification);
+//    				mbean.sendNotification(NotificationType.realReplyReceived, requestNotificationData);
+    			}
+    		}
         }
         // -- cruz
         

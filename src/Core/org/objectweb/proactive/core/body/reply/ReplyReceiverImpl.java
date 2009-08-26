@@ -76,7 +76,7 @@ public class ReplyReceiverImpl implements ReplyReceiver, java.io.Serializable {
     	    	
     	// Here, I know if the result is really available (awaited == false).
     	// If it is, then I should generate a notification realReplyReceived, and read it
-    	// No, it is not here.
+    	// No, it is not here, ... it's in FutureProxy.receiveReply ... (TO DELETE)
     	if(n == 0) {
     		Body body = PAActiveObject.getBodyOnThis();
     		BodyWrapperMBean mbean = null;
