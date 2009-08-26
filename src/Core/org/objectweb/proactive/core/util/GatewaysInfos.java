@@ -33,8 +33,13 @@ package org.objectweb.proactive.core.util;
 
 import static org.objectweb.proactive.core.ssh.SSH.logger;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -43,10 +48,10 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.ssh.SshProxy;
 
 
-//the Unique instance of GatewaysInfos
 public class GatewaysInfos implements ConnectionInformation {
+    // the Unique instance of GatewaysInfos      
     private static GatewaysInfos gatewaysInfos;
-    private static Map<String, Map<String, String>> gatewaysTable;
+    private Map<String, Map<String, String>> gatewaysTable;
 
     private GatewaysInfos() {
         ProActiveConfiguration.load();
@@ -279,11 +284,126 @@ public class GatewaysInfos implements ConnectionInformation {
         parseGateway(properties);
     }
 
+    /** 
+     * @see GatewaysInfos#parseSSHConfigFile(String)
+     */
+    public static void parseSSHConfigFile() {
+        parseSSHConfigFile(null);
+    }
+
+    /**
+     * Parse the SSH configuration file for finding some proxyCommand declaration, and
+     * store it into the gatewaysTable
+     * 
+     * @param sshConfigPath the path to the SSH configuration path 
+     */
+    public static void parseSSHConfigFile(String sshConfigPath) {
+        String path;
+        Map<String, String> realHostname = new HashMap<String, String>();
+
+        if (sshConfigPath != null) {
+            path = sshConfigPath;
+        } else {
+            if (!System.getProperty("os.name").equals("Linux"))
+                return;
+            path = System.getProperty("user.home") + "/.ssh/config";
+        }
+        File sshConfig = new File(path);
+
+        FileReader fr;
+        BufferedReader br;
+
+        try {
+            fr = new FileReader(sshConfig);
+            br = new BufferedReader(fr);
+
+            String line = null;
+            line = br.readLine();
+            // EOF
+            if (line == null)
+                return;
+
+            // Iterize on all the Host declaration
+            while (true) {
+                String host;
+                String proxyCommand;
+                String gateway = null;
+                String proxyCommandTable[];
+
+                // Skip comment and SSH options 
+                if (!line.matches("[Hh]ost .*")) {
+                    line = br.readLine();
+                    continue;
+                }
+
+                // Store the host declaration 
+                host = line.substring(line.indexOf("Host") + "Host".length()).trim();
+                // And continue
+                line = br.readLine();
+
+                // EOF
+                if (line == null)
+                    return;
+
+                // Scan the information related to the Host declaration until the
+                // next one
+                while (!line.matches("Host .*")) {
+                    proxyCommand = null;
+                    gateway = null;
+
+                    // Check for a Nickname
+                    if (line.matches("HostName .*")) {
+                        realHostname
+                                .put(host, line.substring(line.indexOf("HostName") + "HostName".length()));
+                    }
+
+                    // Here is the proxyCommand declaration
+                    if (line.matches("ProxyCommand .*")) {
+
+                        proxyCommand = line.substring(line.indexOf("ProxyCommand") + "ProxyCommand".length());
+                        proxyCommand = proxyCommand.substring(proxyCommand.indexOf("ssh") + "ssh".length());
+
+                        // Skip SSH specific options
+                        if (proxyCommand.indexOf("${") > 0) {
+                            proxyCommand = proxyCommand.substring(proxyCommand.indexOf("}") + 1);
+                        }
+
+                        if (proxyCommand != null && !proxyCommand.trim().isEmpty() &&
+                            !proxyCommand.trim().equalsIgnoreCase("none")) {
+
+                            proxyCommandTable = proxyCommand.split(" ");
+                            GatewaysInfos gi = GatewaysInfos.getInstance();
+                            gateway = realHostname.get(proxyCommandTable[1]).trim();
+                            if (gateway == null)
+                                gateway = proxyCommandTable[1].trim();
+
+                            gi.addProperties(host + ":" + gateway + ":" + PAProperties.PA_SSH_PORT);
+
+                        }
+                        // Job is end for this Host declaration
+                        break;
+                    }
+
+                    // Try next line
+                    line = br.readLine();
+                    if (line == null)
+                        return;
+                }
+            }
+        } catch (IOException e) {
+            logger.error("Can't open SSH configuration file" + path, e);
+        }
+    }
+
     // Only for test
     public static void main(String[] args) {
         PAProperties.PA_SSH_PROXY_GATEWAY
                 .setValue("*.grid5000.fr:acces.sophia.grid5000.fr:22;*.grid5000.fr:toto:33");
-        System.out.println(PAProperties.PA_SSH_PROXY_GATEWAY);
+
+        parseSSHConfigFile();
+        //   System.out.println(PAProperties.PA_SSH_PROXY_GATEWAY);
         System.out.println(GatewaysInfos.getInstance().getGatewayName("azur-9.sophia.grid5000.fr"));
+        System.out.println(GatewaysInfos.getInstance().getGatewayName("pipo.unice.fr"));
+
     }
 }
