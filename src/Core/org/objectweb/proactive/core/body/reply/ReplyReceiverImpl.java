@@ -80,17 +80,17 @@ public class ReplyReceiverImpl implements ReplyReceiver, java.io.Serializable {
     	if(n == 0) {
     		Body body = PAActiveObject.getBodyOnThis();
     		BodyWrapperMBean mbean = null;
-    		if(body != null) {
-    			mbean = body.getMBean();
-    			if(mbean != null) {
-    				String tagNotification = createTagNotification(r.getTags());
-    				RequestNotificationData requestNotificationData = new RequestNotificationData(
-    						body.getID(), body.getNodeURL(), r.getSourceBodyID(), body.getNodeURL(),
-    						r.getMethodName(), body.getRequestQueue().size() + 1, r.getSequenceNumber(),
-    						tagNotification);
-    				mbean.sendNotification(NotificationType.realReplyReceived, requestNotificationData);
-    			}
-    		}
+//    		if(body != null) {
+//    			mbean = body.getMBean();
+//    			if(mbean != null) {
+//    				String tagNotification = createTagNotification(r.getTags());
+//    				RequestNotificationData requestNotificationData = new RequestNotificationData(
+//    						body.getID(), body.getNodeURL(), r.getSourceBodyID(), body.getNodeURL(),
+//    						r.getMethodName(), body.getRequestQueue().size() + 1, r.getSequenceNumber(),
+//    						tagNotification);
+//    				mbean.sendNotification(NotificationType.realReplyReceived, requestNotificationData);
+//    			}
+//    		}
     	}
     	logger.debug("[ReplyReceiv] receiveReply for Future ["+ r.getSequenceNumber()+"] from body ["+r.getSourceBodyID()+"] Receiver ["+ receiverBody +"] Method ["+ r.getMethodName() + "]");
     	int a = futurePool.receiveFutureValue(r.getSequenceNumber(), r.getSourceBodyID(), r.getResult(), r);

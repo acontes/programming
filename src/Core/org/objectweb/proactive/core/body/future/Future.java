@@ -34,6 +34,7 @@ package org.objectweb.proactive.core.body.future;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.tags.MessageTags;
 
 
 /**
@@ -135,6 +136,8 @@ public interface Future extends LocalFuture {
     public void setParentMethodName(String n);
     public String getParentMethodName();
     public UniqueID getSenderID();
+    public void setTags(MessageTags m);
+    public MessageTags getTags();
     //--cruz
     
 }

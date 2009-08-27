@@ -344,6 +344,8 @@ public class FuturePool extends Object implements java.io.Serializable {
 
                     // add the deepcopied AC
                     //cruz: reply.getMethodName() was null
+                    // maybe here I can "tweak" the reply that will be later copied by AC, by changing the methodName.
+                    // But for that I should've to find the appropriate methodName ... urgh ... looking at the list of futures ?
                     logger.debug("[FuturePool ] receiveFutureValue4. Owner: ["+ownerBody.getName()+" ..." + ownerBody.getID() + "] Adding AC for method ["+ reply.getMethodName()+"]");
                     queueAC.addACRequest(new ACService(bodiesToContinue, new ReplyImpl(creatorID, id, reply.getMethodName(),
                         newResult, psm, true, reply.getTags())));

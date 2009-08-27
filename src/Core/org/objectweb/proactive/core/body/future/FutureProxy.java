@@ -47,6 +47,7 @@ import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.proxy.AbstractProxy;
 import org.objectweb.proactive.core.body.tags.MessageTags;
+import org.objectweb.proactive.core.body.tags.Tag;
 import org.objectweb.proactive.core.exceptions.ExceptionHandler;
 import org.objectweb.proactive.core.exceptions.ExceptionMaskLevel;
 import org.objectweb.proactive.core.group.DispatchMonitor;
@@ -226,13 +227,13 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         
         
         // cruz
-        String name = "";
+        String resultTypeName = "";
         if(obj.getResult() != null) {
-        	name = obj.getResult().getClass().getName();
+        	resultTypeName = obj.getResult().getClass().getName();
         }
         
         
-        logger.debug("[FutureProxy] receiveReply. ID:" + this.getID()+ ", MethodCallResult type: ["+name+"]. IsAwaited? "+isAwaited(obj.getResult()) + " methodName:["+ methodName +"]" );
+        logger.debug("[FutureProxy] receiveReply. ID:" + this.getID()+ ", MethodCallResult type: ["+resultTypeName+"]. IsAwaited? "+isAwaited(obj.getResult()) + " methodName:["+ methodName +"]" );
         if(isAwaited(target.getResult())) {
         	//long seqID = ((FutureProxy)((StubObject)target.getResult()).getProxy()).getID();
         	//logger.debug("[FutureProxy] ID: "+ id.getID() + " seqID of the proxy received is "+ seqID);
@@ -241,6 +242,8 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         	FutureProxy futureReceived = ((FutureProxy)((StubObject)target.getResult()).getProxy());
         	logger.debug("[FutureProxy] receiveReply. ID:" + futureReceived.getID()+ ", was previously for method: [" + futureReceived.getMethodName() +"]");
         	futureReceived.setMethodName(this.methodName);
+        	// propagation of the tags to the new pair stub-proxy
+        	futureReceived.setTags(this.tags);
         }
         else {
         	// TODO now I can generate the JMX notification RealReplyReceived :D
@@ -251,12 +254,14 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     			// if it's a half body, it won't have an mbean to send notifications
     			BodyWrapperMBean mbean = body.getMBean();
     			if(mbean != null) {
-//    				String tagNotification = createTagNotification(r.getTags());
-//    				RequestNotificationData requestNotificationData = new RequestNotificationData(
-//    						body.getID(), body.getNodeURL(), r.getSourceBodyID(), body.getNodeURL(),
-//    						r.getMethodName(), body.getRequestQueue().size() + 1, r.getSequenceNumber(),
-//    						tagNotification);
-//    				mbean.sendNotification(NotificationType.realReplyReceived, requestNotificationData);
+    				String tagNotification = createTagNotification(this.tags);
+    				// TODO correct the parameters for source and destination
+    				//      the MonitorController is not reading them for the moment
+    				RequestNotificationData requestNotificationData = new RequestNotificationData(
+    						body.getID(), body.getNodeURL(), body.getID(), body.getNodeURL(),
+    						this.methodName, -1, this.id.getID(),
+    						tagNotification);
+    				mbean.sendNotification(NotificationType.realReplyReceived, requestNotificationData);
     			}
     		}
         }
@@ -554,6 +559,8 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         //cruz
         out.writeObject(methodName);
         out.writeObject(parentMethodName);
+        out.writeObject(tags);
+        //--cruz
     }
 
     /**
@@ -566,8 +573,11 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         target = (MethodCallResult) in.readObject();
         id = (FutureID) in.readObject();
         updater = (UniversalBody) in.readObject();
+        //cruz
         methodName = (String) in.readObject();
         parentMethodName = (String) in.readObject();
+        tags = (MessageTags) in.readObject();
+        //--cruz
         // register all incoming futures, even for migration or checkpointing
         if (this.isAwaited()) {
             FuturePool.registerIncomingFuture(this);
@@ -668,4 +678,23 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 	public void setParentMethodName(String parentMethodName) {
 		this.parentMethodName = parentMethodName;
 	}
+	
+	public MessageTags getTags()  {
+		return tags;	
+	}
+	
+	public void setTags(MessageTags messageTags) {
+		this.tags = messageTags;
+	}
+	
+    private String createTagNotification(MessageTags tags) {
+        String result = "";
+        if (tags != null) {
+            for (Tag tag : tags.getTags()) {
+                result += tag.getNotificationMessage();
+            }
+        }
+        return result;
+    }
+
 }
