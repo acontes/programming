@@ -628,15 +628,18 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             }
 
             // cruz: at this time, the reply has not been sent
+            // But! ... when the reply.send() returns, the destinationBody.receiveReply(this)
+            //   has already been called, and the reception notification has been issued.
+            //   So, the JMX notification of ReplyReceived will have a greater timestamp than ReplySent.
             // JMX Notification
-//            if (!isProActiveInternalObject && (mbean != null) && reply.getResult().getResultObjet() != null &&  reply.getResult().getException() == null) {
-//                String tagNotification = createTagNotification(request.getTags());
-//                RequestNotificationData data = new RequestNotificationData(request.getSourceBodyID(), request
-//                        .getSenderNodeURL(), BodyImpl.this.bodyID, BodyImpl.this.nodeURL, request
-//                        .getMethodName(), getRequestQueue().size(), request.getSequenceNumber(),
-//                    tagNotification);
-//                mbean.sendNotification(NotificationType.replySent, data);
-//            }
+            if (!isProActiveInternalObject && (mbean != null) && reply.getResult().getResultObjet() != null &&  reply.getResult().getException() == null) {
+                String tagNotification = createTagNotification(request.getTags());
+                RequestNotificationData data = new RequestNotificationData(request.getSourceBodyID(), request
+                        .getSenderNodeURL(), BodyImpl.this.bodyID, BodyImpl.this.nodeURL, request
+                        .getMethodName(), getRequestQueue().size(), request.getSequenceNumber(),
+                    tagNotification);
+                mbean.sendNotification(NotificationType.replySent, data);
+            }
             // END JMX Notification
             
             ArrayList<UniversalBody> destinations = new ArrayList<UniversalBody>();
@@ -697,15 +700,18 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             }
             
             // cruz: here is when the reply has been really sent
+            // But! ... when the reply.send() has returned, the destinationBody.receiveReply(this)
+            //   has already been called, and the reception notification has been issued.
+            //   So, the JMX notification of ReplyReceived will have a greater timestamp than ReplySent.
             // JMX Notification
-            if (!isProActiveInternalObject && (mbean != null) && reply.getResult().getResultObjet() != null &&  reply.getResult().getException() == null) {
-                String tagNotification = createTagNotification(request.getTags());
-                RequestNotificationData data = new RequestNotificationData(request.getSourceBodyID(), request
-                        .getSenderNodeURL(), BodyImpl.this.bodyID, BodyImpl.this.nodeURL, request
-                        .getMethodName(), getRequestQueue().size(), request.getSequenceNumber(),
-                    tagNotification);
-                mbean.sendNotification(NotificationType.replySent, data);
-            }
+//            if (!isProActiveInternalObject && (mbean != null) && reply.getResult().getResultObjet() != null &&  reply.getResult().getException() == null) {
+//                String tagNotification = createTagNotification(request.getTags());
+//                RequestNotificationData data = new RequestNotificationData(request.getSourceBodyID(), request
+//                        .getSenderNodeURL(), BodyImpl.this.bodyID, BodyImpl.this.nodeURL, request
+//                        .getMethodName(), getRequestQueue().size(), request.getSequenceNumber(),
+//                    tagNotification);
+//                mbean.sendNotification(NotificationType.replySent, data);
+//            }
             // END JMX Notification
 
             if (Profiling.TIMERS_COMPILED) {

@@ -485,6 +485,7 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
             		" NotifSeqNbr: " + notification.getSequenceNumber() +
             		" Tags: " + data.getTags());
             
+            processRealReplyReceived(notification);
 //            String key = keysList.get(data.getMethodName());
 //            if (key != null) {
 //                ((MethodStatisticsAbstract) statistics.get(key)).notifyReplyOfRequestSent(notification
@@ -630,12 +631,41 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
     		// updates the value
     		requestLog.put(current, rs);
     	}
-    	// else, the data should be added (without the arrival time), and be added later,
+    	// else, the data should be added (without the arrival time), and the arrival time added later,
     	// when the corresponding requestReceived notification be processed
     	else {
     		rs = new RequestStats(sourceName, destName, interfaceName, methodName, 0);
     		rs.setReplyTime(notification.getTimeStamp());
     		requestLog.put(current, rs);
+    	}
+    }
+    
+    private void processRealReplyReceived(Notification notification) {
+    	// modifies the request in the callLog, to add the time at which the final reply was received
+    	RequestNotificationData data = (RequestNotificationData) notification.getUserData();
+    	// TODO: Move this processing to the CMTag part
+    	String cmTag = extractCMTag(data);
+    	String[] cmTagFields = cmTag.split("::");
+    	ComponentRequestID parent = new ComponentRequestID(Long.parseLong(cmTagFields[0]));
+    	ComponentRequestID current = new ComponentRequestID(Long.parseLong(cmTagFields[1]));
+    	String destComponentName = cmTagFields[3];
+    	String interfaceName = cmTagFields[4];
+    	String methodName = cmTagFields[5];
+    	if(interfaceName.equals("-")) {
+    		return;
+    	}
+    	CallStats cs;
+    	// checks if the call data has already been entered in the map
+    	if(callLog.containsKey(current)) {
+    		cs = callLog.get(current);
+    		cs.setReplyReceptionTime(notification.getTimeStamp());
+    		// updates the value
+    		callLog.put(current, cs);
+    	}
+    	else {
+    		// the data should be added without the sentTime, which should be added when the notification for RequestSent arrives (later)
+    		cs = new CallStats(parent, destComponentName, interfaceName, methodName, 0, false);
+    		callLog.put(current, cs);
     	}
     }
     
@@ -682,7 +712,9 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
     		cs = callLog.get(crID);
     		System.out.println("[callLog:"+componentName+"] Parent: "+ cs.getParentID() + " Current: "+ crID + 
     				" Call: "+ cs.getCalledComponent() + "." + cs.getInterfaceName()+"."+cs.getMethodName()+ 
-    				" Time: " + cs.getSentTime());
+    				" SentTime: " + cs.getSentTime() + " RealReplyReceivedTime: " + cs.getReplyReceptionTime() +
+    				" WbN: " + cs.getWbnStartTime() + 
+    				" SRV: " + (cs.getReplyReceptionTime() - cs.getSentTime()));
     		
     	}
     }

@@ -45,6 +45,7 @@ import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.proxy.AbstractBodyProxy;
 import org.objectweb.proactive.core.body.proxy.AbstractProxy;
 import org.objectweb.proactive.core.body.tags.MessageTags;
 import org.objectweb.proactive.core.body.tags.Tag;
@@ -246,10 +247,11 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         	futureReceived.setTags(this.tags);
         }
         else {
+        	Body body = LocalBodyStore.getInstance().getLocalBody(senderID);        	
         	// TODO now I can generate the JMX notification RealReplyReceived :D
-        	logger.debug("[FutureProxy] receiveReply. ID:" + this.getID() + ", received REAL REPLY for method "+ methodName);
+        	logger.debug("[FutureProxy] receiveReply. ID:" + this.getID() + ", received REAL REPLY for method "+ methodName + " in body ["+ senderID +"]");
         	// generates the JMX RealReplyReceived
-        	Body body = PAActiveObject.getBodyOnThis();
+        	//Body body = PAActiveObject.getBodyOnThis();
     		if(body != null) {
     			// if it's a half body, it won't have an mbean to send notifications
     			BodyWrapperMBean mbean = body.getMBean();
@@ -258,7 +260,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     				// TODO correct the parameters for source and destination
     				//      the MonitorController is not reading them for the moment
     				RequestNotificationData requestNotificationData = new RequestNotificationData(
-    						body.getID(), body.getNodeURL(), body.getID(), body.getNodeURL(),
+    						null, null, null, null,
     						this.methodName, -1, this.id.getID(),
     						tagNotification);
     				mbean.sendNotification(NotificationType.realReplyReceived, requestNotificationData);
