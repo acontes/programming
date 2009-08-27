@@ -45,7 +45,7 @@ import java.util.List;
  * proactive.ssh.proxy.gateway.
  * 
  */
-public class SubnetChecker implements ConnectionInformation {
+public class SubnetChecker {
     private static SubnetChecker SingletonPattern;
     private List<SubnetDefinition> gatewaysTable;
 

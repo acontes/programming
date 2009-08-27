@@ -91,5 +91,6 @@
 	<classpathentry kind="lib" path="lib/xml-apis.jar"/>
 	<classpathentry kind="lib" path="compile/lib/junit-4.3.jar"/>
 	<classpathentry kind="lib" path="compile/lib/ant.jar"/>
+	<classpathentry kind="lib" path="/DG/ProActive/dist/lib/ProActive.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

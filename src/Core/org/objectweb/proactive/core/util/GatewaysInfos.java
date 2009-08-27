@@ -48,7 +48,7 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.ssh.SshProxy;
 
 
-public class GatewaysInfos implements ConnectionInformation {
+public class GatewaysInfos {
     // the Unique instance of GatewaysInfos      
     private static GatewaysInfos gatewaysInfos;
     private Map<String, Map<String, String>> gatewaysTable;
