@@ -37,7 +37,6 @@ import java.io.IOException;
 import java.net.Socket;
 import java.rmi.server.RMIClientSocketFactory;
 
-import org.objectweb.proactive.core.remoteobject.rmissh.RmiSshConnectionProperties;
 import org.objectweb.proactive.core.ssh.SshProxy;
 import org.objectweb.proactive.core.util.GatewaysInfos;
 import org.objectweb.proactive.core.util.HostsInfos;
@@ -50,16 +49,10 @@ import org.objectweb.proactive.core.util.ProActiveInet;
 public class SshRMIClientSocketFactory implements RMIClientSocketFactory, java.io.Serializable {
     String username;
     String hostname;
-    RmiSshConnectionProperties properties = null;
 
     public SshRMIClientSocketFactory() {
         this.username = System.getProperty("user.name");
         this.hostname = ProActiveInet.getInstance().getInetAddress().getCanonicalHostName();
-    }
-
-    public SshRMIClientSocketFactory(RmiSshConnectionProperties prop) {
-        this();
-        this.properties = prop;
     }
 
     public Socket createSocket(String host, int port) throws IOException {
@@ -105,6 +98,6 @@ public class SshRMIClientSocketFactory implements RMIClientSocketFactory, java.i
 
     private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
-        HostsInfos.setUserName(hostname, username);
+        //  HostsInfos.setUserName(hostname, username);
     }
 }

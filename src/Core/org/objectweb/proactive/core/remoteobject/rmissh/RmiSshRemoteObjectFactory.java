@@ -31,6 +31,8 @@
  */
 package org.objectweb.proactive.core.remoteobject.rmissh;
 
+import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.net.URI;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -43,6 +45,7 @@ import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObjectImpl;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.rmi.AbstractRmiRemoteObjectFactory;
+import org.objectweb.proactive.core.remoteobject.rmi.RmiRemoteObject;
 import org.objectweb.proactive.core.ssh.rmissh.SshRMIClientSocketFactory;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.URIBuilder;
@@ -64,10 +67,14 @@ public class RmiSshRemoteObjectFactory extends AbstractRmiRemoteObjectFactory {
         // register the object on the register
         InternalRemoteRemoteObject irro = new InternalRemoteRemoteObjectImpl(remoteObject, uri);
         RemoteRemoteObject rmo = register(irro, uri, true);
-        RemoteRemoteObject rmoWrapped = new RmiSshConnectionPropertiesWrapper(rmo);  
+        RemoteRemoteObject rmoWrapped = new RmiSshConnectionPropertiesWrapper(rmo);
         irro.setRemoteRemoteObject(rmoWrapped);
-        //irro.setRemoteRemoteObject(rmo);
-
+        irro.setRemoteRemoteObject(rmo);
         return irro;
     }
+
+    //  public RemoteRemoteObject register(InternalRemoteRemoteObject target, URI url,
+    //        boolean replacePreviousBinding) throws ProActiveException {
+    //   return new RmiSshConnectionPropertiesWrapper(super.register(target, url, replacePreviousBinding));
+    //}
 }

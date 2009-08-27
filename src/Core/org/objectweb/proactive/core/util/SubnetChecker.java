@@ -47,7 +47,7 @@ import java.util.List;
  */
 public class SubnetChecker implements ConnectionInformation {
     private static SubnetChecker SingletonPattern;
-    private static List<SubnetDefinition> gatewaysTable;
+    private List<SubnetDefinition> gatewaysTable;
 
     private SubnetChecker() {
         gatewaysTable = new ArrayList<SubnetDefinition>();
@@ -60,6 +60,7 @@ public class SubnetChecker implements ConnectionInformation {
         return SingletonPattern;
     }
 
+    @SuppressWarnings("unchecked")
     protected void setGateway(String subnet, String gateway, String port) {
         if (logger.isDebugEnabled()) {
             logger.debug("Subnet Infos : " + gateway + " added for subnet " + subnet);
@@ -72,6 +73,7 @@ public class SubnetChecker implements ConnectionInformation {
         gatewaysTable.add(gateway_infos);
         // list is scan in inverse direction so sorting it, permit to
         // make definition of subnet with higher cidr more important than other
+
         Collections.sort(gatewaysTable);
     }
 

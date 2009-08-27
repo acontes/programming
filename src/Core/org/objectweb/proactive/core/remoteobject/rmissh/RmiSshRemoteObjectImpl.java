@@ -31,14 +31,32 @@
  */
 package org.objectweb.proactive.core.remoteobject.rmissh;
 
+import java.io.IOException;
+import java.rmi.RemoteException;
+
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.body.reply.Reply;
+import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.rmi.RmiRemoteObjectImpl;
+import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.ssh.rmissh.SshRMIClientSocketFactory;
 import org.objectweb.proactive.core.ssh.rmissh.SshRMIServerSocketFactory;
+import org.objectweb.proactive.core.util.GatewaysInfos;
 
 
 public class RmiSshRemoteObjectImpl extends RmiRemoteObjectImpl {
     public RmiSshRemoteObjectImpl(InternalRemoteRemoteObject target) throws java.rmi.RemoteException {
         super(target, new SshRMIServerSocketFactory(), new SshRMIClientSocketFactory());
+    }
+
+    public Reply receiveMessage(Request message) throws RemoteException, RenegotiateSessionException,
+            ProActiveException, IOException {
+
+        if (message.isOneWay()) {
+            this.internalrrObject.receiveMessage(message);
+            return null;
+        }
+        return this.internalrrObject.receiveMessage(message);
     }
 }

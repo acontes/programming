@@ -412,13 +412,13 @@ public enum PAProperties {
      * 'none' can be precised for prevent usage of proxy command on gateway
      */
     PA_SSH_PROXY_GATEWAY("proactive.ssh.proxy.gateway", PAPropertiesType.STRING),
-  
+
     /**
      * Specify a gateway to use if outgoing connection are forbid
      * 
      */
     PA_SSH_PROXY_OUT_CONN("proactive.ssh.proxy.outgoing_connection", PAPropertiesType.STRING),
-    
+
     /* ------------------------------------
      *  SECURITY
      */

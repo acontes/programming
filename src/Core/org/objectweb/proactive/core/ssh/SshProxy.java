@@ -133,7 +133,7 @@ public class SshProxy extends Socket {
             // Proxy Command executed
             this.output = sess.getStdin();
             this.input = sess.getStdout();
-         
+
         } else {
             // Connection cannot be opened
             if (logger.isInfoEnabled()) {
@@ -164,7 +164,7 @@ public class SshProxy extends Socket {
             // Remote shell command specification
             if (OutGWs.length == 2)
                 this.SSHCLIENTCOMMAND = OutGWs[1];
-            
+
             if (logger.isDebugEnabled()) {
                 logger.debug(localHostname + " need " + this.sshServerHostname +
                     " to relay outgoing connexion");
