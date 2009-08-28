@@ -492,6 +492,19 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
 //                        .getTimeStamp());
 //            }
         }
+        else if(type.equals(NotificationType.requestWbN)) {
+        	RequestNotificationData data = (RequestNotificationData) notification.getUserData();
+        	logger.debug(
+        			" Timestamp: " + notification.getTimeStamp() +
+        			"["+componentName+"][WaitByNeces] " + //From:" + data.getSource() +
+        			//                		" To:"+ data.getDestination() +
+        			" Method:" + data.getMethodName() +
+        			" SeqNumber: " + data.getSequenceNumber() +
+        			" NotifSeqNbr: " + notification.getSequenceNumber() +
+        			" Tags: " + data.getTags());
+        	processWaitByNecessity(notification);
+        	
+        }
         else if (type.equals(NotificationType.setOfNotifications)) {
             @SuppressWarnings("unchecked")
             ConcurrentLinkedQueue<Notification> notificationsList = (ConcurrentLinkedQueue<Notification>) notification
@@ -665,9 +678,41 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
     	else {
     		// the data should be added without the sentTime, which should be added when the notification for RequestSent arrives (later)
     		cs = new CallStats(parent, destComponentName, interfaceName, methodName, 0, false);
+    		cs.setReplyReceptionTime(notification.getTimeStamp());
     		callLog.put(current, cs);
     	}
     }
+
+    private void processWaitByNecessity(Notification notification) {
+    	// modifies the request in the callLog, to add the time at which the WbN happened
+    	RequestNotificationData data = (RequestNotificationData) notification.getUserData();
+    	// TODO: Move this processing to the CMTag part
+    	String cmTag = extractCMTag(data);
+    	String[] cmTagFields = cmTag.split("::");
+    	ComponentRequestID parent = new ComponentRequestID(Long.parseLong(cmTagFields[0]));
+    	ComponentRequestID current = new ComponentRequestID(Long.parseLong(cmTagFields[1]));
+    	String destComponentName = cmTagFields[3];
+    	String interfaceName = cmTagFields[4];
+    	String methodName = cmTagFields[5];
+    	if(interfaceName.equals("-")) {
+    		return;
+    	}
+    	CallStats cs;
+    	// checks if the call data has already been entered in the map
+    	if(callLog.containsKey(current)) {
+    		cs = callLog.get(current);
+    		cs.setWbnStartTime(notification.getTimeStamp());
+    		// updates the value
+    		callLog.put(current, cs);
+    	}
+    	else {
+    		// the data should be added without the sentTime, which should be added when the notification for RequestSent arrives (later)
+    		cs = new CallStats(parent, destComponentName, interfaceName, methodName, 0, false);
+    		cs.setWbnStartTime(notification.getTimeStamp());
+    		callLog.put(current, cs);
+    	}
+    }
+
     
     /**
      * Extracts the CMTag from the complete Tag string (which can include several tags)
@@ -713,7 +758,7 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
     		System.out.println("[callLog:"+componentName+"] Parent: "+ cs.getParentID() + " Current: "+ crID + 
     				" Call: "+ cs.getCalledComponent() + "." + cs.getInterfaceName()+"."+cs.getMethodName()+ 
     				" SentTime: " + cs.getSentTime() + " RealReplyReceivedTime: " + cs.getReplyReceptionTime() +
-    				" WbN: " + cs.getWbnStartTime() + 
+    				" WbN: " + (cs.getWbnStartTime()==0 ? 0 : (cs.getReplyReceptionTime() - cs.getWbnStartTime())) + 
     				" SRV: " + (cs.getReplyReceptionTime() - cs.getSentTime()));
     		
     	}

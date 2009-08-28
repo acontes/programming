@@ -235,10 +235,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         
         
         logger.debug("[FutureProxy] receiveReply. ID:" + this.getID()+ ", MethodCallResult type: ["+resultTypeName+"]. IsAwaited? "+isAwaited(obj.getResult()) + " methodName:["+ methodName +"]" );
-        if(isAwaited(target.getResult())) {
-        	//long seqID = ((FutureProxy)((StubObject)target.getResult()).getProxy()).getID();
-        	//logger.debug("[FutureProxy] ID: "+ id.getID() + " seqID of the proxy received is "+ seqID);
-        	
+        if(isAwaited(target.getResult())) {       	
         	// now I can give the name of method I'm still waiting for, to the new pair stub-proxy
         	FutureProxy futureReceived = ((FutureProxy)((StubObject)target.getResult()).getProxy());
         	logger.debug("[FutureProxy] receiveReply. ID:" + futureReceived.getID()+ ", was previously for method: [" + futureReceived.getMethodName() +"]");
@@ -361,9 +358,17 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         if (body != null) {
             mbean = body.getMBean();
             if (mbean != null) {
-            	//logger.debug("[FutureProxy] ID:"+ id.getID() + " WaitByNecessity, method ["+ methodName+"]");
                 mbean.sendNotification(NotificationType.waitByNecessity, new FutureNotificationData(bodyId,
                     getCreatorID()));
+                // send "custom" requestWbN notification, with info related to the request
+                String tagNotification = createTagNotification(this.tags);
+				// TODO correct the parameters for source and destination
+				//      the MonitorController is not reading them for the moment
+				RequestNotificationData requestNotificationData = new RequestNotificationData(
+						null, null, null, null,
+						this.methodName, -1, this.id.getID(),
+						tagNotification);
+				mbean.sendNotification(NotificationType.requestWbN, requestNotificationData);
             }
         }
 
