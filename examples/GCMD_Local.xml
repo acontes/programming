@@ -4,22 +4,18 @@
 
 	<environment>
 		<javaPropertyVariable name="user.home" />
-
 		<javaPropertyDescriptorDefault name="os" value="windows" />
 	</environment>
 
 	<resources>
 		<host refid="hLocalhost" />
 	</resources>
-
 	<infrastructure>
-
 		<hosts>
 			<host id="hLocalhost" os="${os}" hostCapacity="${hostCapacity}" vmCapacity="${vmCapacity}">
 				<homeDirectory base="root" relpath="${user.home}" />
 			</host>
 
 		</hosts>
-
 	</infrastructure>
 </GCMDeployment>

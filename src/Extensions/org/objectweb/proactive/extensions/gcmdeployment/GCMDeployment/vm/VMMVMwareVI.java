@@ -66,13 +66,14 @@ public class VMMVMwareVI extends AbstractVMM {
 
     @Override
     public void start(CommandBuilderProActive comm, GCMApplicationInternal gcma) {
+    	GCMDeploymentLoggers.GCMD_LOGGER.debug("in " + this.getClass() + ".start()");
         //contact hypervisors & setup environment
         ArrayList<String> uris = super.getUris();
         for (String uri : uris) {
             VMwareVMM vmm;
             try {
                 vmm = new VMwareVMM(uri, getUser(), getPwd());
-            } catch (VirtualServiceException e) {
+            } catch (Throwable e) {
                 GCMDeploymentLoggers.GCMD_LOGGER.error("Unable to connect to " + uri + "'s hypervisor.", e);
                 return;
             }
@@ -81,7 +82,7 @@ public class VMMVMwareVI extends AbstractVMM {
                 VMwareVM temp = null;
                 try {
                     temp = vmm.getNewVM(vm.getId());
-                } catch (VirtualServiceException e) {
+                } catch (Exception e) {
                     GCMDeploymentLoggers.GCMD_LOGGER.error("Unable to get " + vm.getId() +
                         " from VMware hypervisor.", e);
                     continue;
@@ -158,6 +159,7 @@ public class VMMVMwareVI extends AbstractVMM {
      */
     private void startVM(VMwareVM vm, GCMApplicationInternal gcma, CommandBuilderProActive comm,
             HostInfoImpl hostInfo) throws VirtualServiceException {
+    	GCMDeploymentLoggers.GCMD_LOGGER.debug("in " + this.getClass() + ".startVM");
         //register appli within boostrapServlet singleton
         BootstrapServlet bootstrapServlet = BootstrapServlet.get();
         String deploymentIdKey = new Long(gcma.getDeploymentId()).toString();
@@ -166,6 +168,7 @@ public class VMMVMwareVI extends AbstractVMM {
         HashMap<String, String> values = new HashMap<String, String>();
         values.put(BootstrapServlet.PA_RT_COMMAND, comm.buildCommand(hostInfo, gcma));
         String bootstrapAddress = bootstrapServlet.registerAppli(vmKey, values);
+        GCMDeploymentLoggers.GCMD_LOGGER.debug("Starting VM " + vm.getName());
         vm.powerOn();
         try {
             vm.pushData(VMwareVM.DataKey.proacBootstrapURL, bootstrapAddress);

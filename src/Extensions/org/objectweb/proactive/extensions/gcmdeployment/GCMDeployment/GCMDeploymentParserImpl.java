@@ -420,7 +420,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
             if (vmm == null) {
                 throw new RuntimeException("no hypervisor with refid " + refid + " has been defined");
             }
-
+            GCMDeploymentLoggers.GCMD_LOGGER.debug("Hypervisor with refid " + refid + " found");
             resources.addVMM(vmm);
         }
     }
@@ -582,6 +582,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
                 GCMDeploymentLoggers.GCMD_LOGGER.warn("No vm parser registered for node <" +
                     vmNode.getNodeName() + ">");
             } else {
+            	GCMDeploymentLoggers.GCMD_LOGGER.debug("parsing " + vmNode.getNodeName() + ".");
                 AbstractVMM vmm = vmParser.parseVMMNode(vmNode, xpath);
                 infrastructure.addVMM(vmm);
             }

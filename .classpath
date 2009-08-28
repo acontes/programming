@@ -97,7 +97,7 @@
 	<classpathentry kind="lib" path="lib/virtualization-virtualbox-tests.jar"/>
 	<classpathentry kind="lib" path="lib/virtualization-virtualbox.jar"/>
 	<classpathentry kind="lib" path="lib/virtualization-vmware-vi-tests.jar"/>
-	<classpathentry kind="lib" path="lib/virtualization-vmware-vi.jar"/>
+	<classpathentry kind="lib" path="lib/virtualization-vmware-vi.jar" sourcepath="/Virtualizing-trunk"/>
 	<classpathentry kind="lib" path="lib/virtualization-vmware-vix-tests.jar"/>
 	<classpathentry kind="lib" path="lib/virtualization-vmware-vix.jar"/>
 	<classpathentry kind="lib" path="lib/virtualization-xenserver-tests.jar"/>

@@ -132,6 +132,7 @@ public class VMMVirtualbox extends AbstractVMM {
         HashMap<String, String> values = new HashMap<String, String>();
         values.put(BootstrapServlet.PA_RT_COMMAND, comm.buildCommand(hostInfo, gcma));
         String bootstrapAddress = bootstrapServlet.registerAppli(vmKey, values);
+    	GCMDeploymentLoggers.GCMD_LOGGER.info("Powering on " + vm.getName());
         vm.powerOn();
         try {
             vm.pushData(DataKey.proacBootstrapURL, bootstrapAddress);
