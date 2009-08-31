@@ -1,8 +1,7 @@
 package org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.can;
 
-import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.Stack;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
@@ -12,10 +11,8 @@ import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.Neighbo
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.Zone;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates.Coordinate;
 import org.objectweb.proactive.extensions.structuredp2p.core.requests.BlockingRequestReceiverException;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.SynchronousMessageEntry;
 import org.objectweb.proactive.extensions.structuredp2p.responses.synchronous.can.RDFResponseMessage;
-import org.openrdf.model.Statement;
-import org.openrdf.model.impl.StatementImpl;
-import org.openrdf.model.impl.URIImpl;
 
 
 /**
@@ -23,19 +20,17 @@ import org.openrdf.model.impl.URIImpl;
  * @version 0.1, 08/04/2009
  */
 @SuppressWarnings("serial")
-public class RDFTriplePatternQuery extends RDFQueryMessage {
+public class RDFTriplePatternQueryMessage extends RDFQueryMessage {
 
-    private Set<Peer> lastPeersWhichHaveReceiptTheQuery = new HashSet<Peer>();
-
-    public RDFTriplePatternQuery() {
+    public RDFTriplePatternQueryMessage() {
         super();
     }
 
-    public RDFTriplePatternQuery(Coordinate[] coordinatesToFind) {
+    public RDFTriplePatternQueryMessage(Coordinate[] coordinatesToFind) {
         super(coordinatesToFind);
     }
 
-    public RDFTriplePatternQuery(Coordinate subject, Coordinate predicate, Coordinate object) {
+    public RDFTriplePatternQueryMessage(Coordinate subject, Coordinate predicate, Coordinate object) {
         super(new Coordinate[] { subject, predicate, object });
 
         if (subject == null && predicate == null && object == null) {
@@ -51,73 +46,78 @@ public class RDFTriplePatternQuery extends RDFQueryMessage {
         NeighborsDataStructure subSetOfNeighbors = new NeighborsDataStructure();
         subSetOfNeighbors.addAll(((CANOverlay) overlay).getNeighborsDataStructure());
 
-        for (Peer peer : this.lastPeersWhichHaveReceiptTheQuery) {
+        for (Peer peer : super.getLastPeersWhichHaveReceiptTheQuery()) {
             subSetOfNeighbors.remove(peer);
         }
 
-        for (Peer neighbor : subSetOfNeighbors) {
-            this.lastPeersWhichHaveReceiptTheQuery.add(neighbor);
+        for (int dimension = 0; dimension < CANOverlay.NB_DIMENSIONS; dimension++) {
+            for (int direction = 0; direction < 2; direction++) {
+                Iterator<Peer> it = subSetOfNeighbors.getNeighbors(dimension, direction).iterator();
+
+                while (it.hasNext()) {
+                    Peer peer = it.next();
+//                    if (!((ActionResponseMessage) PAFuture.getFutureValue(overlay.sendTo(peer,
+//                            new TestRDFTripplePatternKeyConstraints(this.getKeyToReach())))).hasSucceeded()) {
+                    if (!this.validKeyConstraints(peer.getStructuredOverlay())) {
+                        it.remove();
+                    } else {
+                        super.lastPeersWhichHaveReceiptTheQuery.add(peer);
+                    }
+                }
+            }
         }
-        this.lastPeersWhichHaveReceiptTheQuery.add(overlay.getRemotePeer());
+
+        /*
+         * At this step, subSetOfNeighbors contains the difference between all the neighbors (which
+         * valid constraints) of the current peer manages by the overlay and the peers which have
+         * already been visited (lastpeersWhichHaveReceiptTheQuery).
+         */
+        super.lastPeersWhichHaveReceiptTheQuery.add(overlay.getRemotePeer());
 
         int nbOfSends = 0;
-        Stack<Peer> peersToVisit = super.getVisitedPeers();
-        for (Peer neighbor : subSetOfNeighbors) {
-            if (this.validKeyConstraints(neighbor.getStructuredOverlay())) {
-                System.out.println("Send to Neighbor=" + neighbor);
-
-                super.removeAllVisitedPeers();
-
-                for (Peer peer : peersToVisit) {
-                    super.addVisitedPeer(peer);
-                }
-                super.addVisitedPeer(overlay.getRemotePeer());
-
-                super.incrementNbStepsBy(1);
-                neighbor.getStructuredOverlay().send(this);
-                nbOfSends++;
-            }
+        Stack<Peer> peersToVisit = new Stack<Peer>();
+        for (Peer p : this.getPeersToVisitForStepTwo()) {
+            peersToVisit.add(p);
         }
 
-        if (nbOfSends == 0) {
-            RDFResponseMessage response = null;
+        for (Peer neighbor : subSetOfNeighbors) {
+            super.getPeersToVisitForStepTwo().clear();
 
-            response = new RDFResponseMessage(this, this.getKeyToReach());
-
-            // response.getQuery().getVisitedPeers().remove(overlay.getRemotePeer());
-
-            // System.out.println("before=" + response.getQuery().getVisitedPeers().size());
-            Peer lastPeer = response.getQuery().removeLastVisitedPeer();
-            // System.out.println("after=" + response.getQuery().getVisitedPeers().size());
-            // System.out.println("On peer " + overlay.getLocalPeer() + " send response to " +
-            // lastPeer +
-            // " with uuid=" + response.getUUID());
-
-            URIImpl subject = (this.getKeyToReach()[0] == null) ? null : new URIImpl(this.getKeyToReach()[0]
-                    .getValue());
-
-            URIImpl predicate = (this.getKeyToReach()[1] == null) ? null : new URIImpl(
-                this.getKeyToReach()[1].getValue());
-
-            URIImpl object = (this.getKeyToReach()[2] == null) ? null : new URIImpl(this.getKeyToReach()[2]
-                    .getValue());
-
-            Set<Statement> stmts = overlay.getLocalPeer()
-                    .query(new StatementImpl(subject, predicate, object));
-
-            System.out.println("NbStatements=" + stmts.size());
-
-            System.out.println("Zone courante=" + overlay);
-
-            System.out.println("Pairs a visiter (" + this.lastPeersWhichHaveReceiptTheQuery.size() + ") :");
-            for (Peer peer : this.lastPeersWhichHaveReceiptTheQuery) {
-                System.out.println("- " + peer);
+            for (Peer peer : peersToVisit) {
+                super.getPeersToVisitForStepTwo().push(peer);
             }
+            super.getPeersToVisitForStepTwo().push(overlay.getRemotePeer());
+            super.incrementNbStepsBy(1);
 
-            response.addAll(stmts);
-            lastPeer.getStructuredOverlay().send(response);
+            neighbor.send(this);
+            nbOfSends++;
+        }
+
+        /*
+         * At this step there are two cases : 
+         * - nbOfSends is equals 0 means that we don't have performed send. We are on a leaf and response must be returned;
+         * - nbOfSends > 0 means we have performed one or many send. The current peer must now wait for nbOfSends responses.
+         */
+        if (nbOfSends == 0) {
+            RDFResponseMessage response = new RDFResponseMessage(this, this.getKeyToReach());
+
+//            URIImpl subject = (this.getKeyToReach()[0] == null) ? null : new URIImpl(this.getKeyToReach()[0]
+//                    .getValue());
+//
+//            URIImpl predicate = (this.getKeyToReach()[1] == null) ? null : new URIImpl(
+//                this.getKeyToReach()[1].getValue());
+//
+//            URIImpl object = (this.getKeyToReach()[2] == null) ? null : new URIImpl(this.getKeyToReach()[2]
+//                    .getValue());
+//
+//            Set<Statement> stmts = overlay.getLocalPeer()
+//                    .query(new StatementImpl(subject, predicate, object));
+//
+//            response.addAll(stmts);
+            response.getQuery().removeLastPeerToVisitForStepTwo().send(response);
         } else {
-            ((CANOverlay) overlay).handleRDFTriplePatternQuery(this, nbOfSends);
+            ((CANOverlay) overlay).getSynchronousMessages().put(this.getUUID(),
+                    new SynchronousMessageEntry(nbOfSends));
         }
     }
 
@@ -126,21 +126,11 @@ public class RDFTriplePatternQuery extends RDFQueryMessage {
      */
     public void route(StructuredOverlay overlay) {
         CANOverlay canOverlay = ((CANOverlay) overlay);
-
         Coordinate[] coordinatesToReach = this.getKeyToReach();
 
-        // We are on a peer which respects constraints but we need to send request to many other
         if (this.validKeyConstraints(overlay)) {
-            System.out.println("* On peer which valid constraint " + overlay);
-
-            if (super.keyToReachContainsAllCoordinates()) {
-                RDFResponseMessage response = new RDFResponseMessage(this, this.getKeyToReach(), null);
-                response.route(overlay);
-            } else {
-                this.handle(overlay);
-            }
-        } else { // We must found a peer which valid the constraints
-            System.out.println("* Basic Routing");
+            this.handle(overlay);
+        } else { // we must found a peer which valid the constraints
             int direction;
             int pos;
 
@@ -172,15 +162,16 @@ public class RDFTriplePatternQuery extends RDFQueryMessage {
                                     coordinatesToReach[CANOverlay.getNextDimension(dim)], dim, direction);
                         }
 
-                        this.addVisitedPeer(overlay.getRemotePeer());
+                        this.getPeersToVisitForStepOne().push(overlay.getRemotePeer());
                         this.incrementNbStepsBy(1);
 
+                        overlay.getSynchronousMessages().put(this.getUUID(), new SynchronousMessageEntry(1));
+
                         try {
-                            nearestPeer.getStructuredOverlay().send(this);
+                            nearestPeer.send(this);
                         } catch (BlockingRequestReceiverException e) {
-                            // super.bufferizeQuery(this);
+                            overlay.bufferizeSynchronousMessage(this);
                         } catch (Exception e) {
-                            System.out.println("CANOverlay.send()");
                             e.printStackTrace();
                         }
 

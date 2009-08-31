@@ -82,10 +82,9 @@ public abstract class AbstractResponseMessage<K, Q extends AbstractQueryMessage<
      *         has been received.
      */
     public int getLatency() {
-        // if (this.latency < 0) {
-        // throw new
-        // IllegalStateException("The response has not been receive from network after a query.");
-        // }
+        if (this.latency < 0) {
+            throw new IllegalStateException("The response has not been receive from network after a query.");
+        }
         return this.latency;
     }
 
@@ -170,7 +169,6 @@ public abstract class AbstractResponseMessage<K, Q extends AbstractQueryMessage<
      * is automatically calculated.
      */
     public void setDeliveryTime() {
-        System.out.println("AbstractQueryResponse.setDeliveryTime()");
         this.deliveryTimestamp = System.currentTimeMillis();
         this.latency = (int) (this.deliveryTimestamp - this.query.getDispatchTimestamp());
 

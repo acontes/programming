@@ -10,5 +10,7 @@ import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.R
  * @author Pellegrino Laurent
  */
 public interface AsynchronousMessage extends Serializable {
+
     public abstract ResponseMessage handle(StructuredOverlay overlay);
+
 }

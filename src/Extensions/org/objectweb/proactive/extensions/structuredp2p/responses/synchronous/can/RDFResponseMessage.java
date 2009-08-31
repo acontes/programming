@@ -4,11 +4,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredOverlay;
-import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates.Coordinate;
 import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.can.RDFQueryMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.synchronous.AbstractResponseMessage;
 import org.openrdf.model.Statement;
+import org.openrdf.model.impl.StatementImpl;
+import org.openrdf.model.impl.URIImpl;
 
 
 /**
@@ -40,7 +41,10 @@ public class RDFResponseMessage extends AbstractResponseMessage<Coordinate, RDFQ
     }
 
     public boolean addAll(Set<Statement> statements) {
-        return this.retrievedStatements.addAll(statements);
+        if (statements != null) {
+            return this.retrievedStatements.addAll(statements);
+        }
+        return true;
     }
 
     /**
@@ -48,38 +52,32 @@ public class RDFResponseMessage extends AbstractResponseMessage<Coordinate, RDFQ
      */
     public void handle(StructuredOverlay overlay) {
 
-        // URIImpl subject = (this.getKeyToReach()[0] == null) ? null : new
-        // URIImpl(this.getKeyToReach()[0]
-        // .getValue());
-        //
-        // URIImpl predicate = (this.getKeyToReach()[1] == null) ? null : new
-        // URIImpl(this.getKeyToReach()[1]
-        // .getValue());
-        //
-        // URIImpl object = (this.getKeyToReach()[2] == null) ? null : new
-        // URIImpl(this.getKeyToReach()[2]
-        // .getValue());
-        //
-        // this.addAll(overlay.getLocalPeer().query(new StatementImpl(subject, predicate, object)));
-        // overlay.getLocalPeer().addOneWayResponse(this);
+        URIImpl subject = (this.getKeyToReach()[0] == null) ? null : new URIImpl(this.getKeyToReach()[0]
+                .getValue());
 
-        // this.getQuery().removeLastVisitedPeer().send(this);
-        ((CANOverlay) this.getQuery().removeLastVisitedPeer().getStructuredOverlay()).addOneWayResponse(this);
+        URIImpl predicate = (this.getKeyToReach()[1] == null) ? null : new URIImpl(this.getKeyToReach()[1]
+                .getValue());
+
+        URIImpl object = (this.getKeyToReach()[2] == null) ? null : new URIImpl(this.getKeyToReach()[2]
+                .getValue());
+
+        this.addAll(overlay.getLocalPeer().query(new StatementImpl(subject, predicate, object)));
+        this.getQuery().removeLastPeerToVisitForStepTwo().send(this);
     }
 
     /**
      * {@inheritDoc}
      */
     public void route(StructuredOverlay overlay) {
-        System.out.println("RDFQueryResponse.route()");
-        if (!super.getQuery().hasPeersToVisit()) {
-            System.out.println("  * RDFQueryResponse.route() has no peer to visit : handle last step.");
-            this.setDeliveryTime();
-            ((CANOverlay) overlay).addOneWayResponse(this);
-        } else {
+        if (super.getQuery().getPeersToVisitForStepTwo().size() > 0) {
             this.handle(overlay);
+        } else if (super.getQuery().getPeersToVisitForStepOne().size() > 0) {
+            super.getQuery().removeLastPeerToVisitForStepOne().send(this);
+        } else {
+            synchronized (overlay.getSynchronousMessages()) {
+                overlay.getSynchronousMessages().notifyAll();
+            }
         }
-
     }
 
     public boolean validKeyConstraints(StructuredOverlay overlay) {

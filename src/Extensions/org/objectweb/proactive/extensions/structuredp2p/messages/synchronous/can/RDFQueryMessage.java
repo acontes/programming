@@ -1,5 +1,7 @@
 package org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.can;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Stack;
 
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
@@ -22,7 +24,11 @@ import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.Abs
 @SuppressWarnings("serial")
 public abstract class RDFQueryMessage extends AbstractQueryMessage<Coordinate> {
 
-    private Stack<Peer> visitedPeers = new Stack<Peer>();
+    protected Set<Peer> lastPeersWhichHaveReceiptTheQuery = new HashSet<Peer>();
+
+    private Stack<Peer> peersToVisitForStepOne = new Stack<Peer>();
+
+    private Stack<Peer> peersToVisitForStepTwo = new Stack<Peer>();
 
     public RDFQueryMessage() {
         super();
@@ -53,52 +59,45 @@ public abstract class RDFQueryMessage extends AbstractQueryMessage<Coordinate> {
      */
     public abstract boolean validKeyConstraints(StructuredOverlay overlay);
 
-    /**
-     * Adds a peer to the visited peers stack.
-     * 
-     * @param remotePeer
-     *            the peer to add.
-     */
-    public void addVisitedPeer(Peer remotePeer) {
-        this.visitedPeers.push(remotePeer);
+    private Peer removeLastPeer(Stack<Peer> stack) {
+        Peer lastPeer = stack.lastElement();
+        stack.remove(lastPeer);
+        return lastPeer;
+    }
+
+    public Peer removeLastPeerToVisitForStepOne() {
+        return this.removeLastPeer(this.peersToVisitForStepOne);
+    }
+
+    public Peer removeLastPeerToVisitForStepTwo() {
+        return this.removeLastPeer(this.peersToVisitForStepTwo);
     }
 
     /**
-     * Returns the peers which has been visited.
-     * 
-     * @return the peers which has been visited.
+     * Returns the lastPeersWhichHaveReceiptTheQuery
+     *
+     * @return the lastPeersWhichHaveReceiptTheQuery
      */
-    public Stack<Peer> getVisitedPeers() {
-        return this.visitedPeers;
+    public Set<Peer> getLastPeersWhichHaveReceiptTheQuery() {
+        return this.lastPeersWhichHaveReceiptTheQuery;
     }
 
     /**
-     * Indicates if the query must be routed to other peers.
-     * 
-     * @return <code>true</code> if the query must be routed to other peers, <code>false</code>
-     *         otherwise.
+     * Returns the peersToVisitForStepOne
+     *
+     * @return the peersToVisitForStepOne
      */
-    public boolean hasPeersToVisit() {
-        return this.visitedPeers.size() > 0;
+    public Stack<Peer> getPeersToVisitForStepOne() {
+        return this.peersToVisitForStepOne;
     }
 
     /**
-     * Removes the last peer visited.
-     * 
-     * @return the peer removed if the remove has succeeded, <code>null</code> otherwise.
+     * Returns the peersToVisitForStepTwo
+     *
+     * @return the peersToVisitForStepTwo
      */
-    public Peer removeLastVisitedPeer() {
-        Peer lastPeer = this.visitedPeers.lastElement();
-
-        if (this.visitedPeers.remove(lastPeer)) {
-            return lastPeer;
-        }
-
-        return null;
-    }
-
-    public void removeAllVisitedPeers() {
-        this.visitedPeers.clear();
+    public Stack<Peer> getPeersToVisitForStepTwo() {
+        return this.peersToVisitForStepTwo;
     }
 
     /**

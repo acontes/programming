@@ -10,6 +10,7 @@ import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordin
 import org.objectweb.proactive.extensions.structuredp2p.core.requests.BlockingRequestReceiverException;
 import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.AbstractQueryMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.SynchronousMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.SynchronousMessageEntry;
 import org.objectweb.proactive.extensions.structuredp2p.responses.synchronous.can.LookupResponseMessage;
 
 
@@ -52,13 +53,14 @@ public class LookupQueryMessage extends AbstractQueryMessage<Coordinate> {
 
         boolean isQueryResponse = (queryResponse == null) ? false : true;
 
+        SynchronousMessage msg = (queryResponse == null) ? this : queryResponse;
+
+        if (super.getNbSteps() == 0) {
+            overlay.getSynchronousMessages().put(super.getUUID(), new SynchronousMessageEntry(1));
+        }
+
         if (canOverlay.contains(coordinatesToReach)) {
-            if (isQueryResponse) {
-                System.out.println("LookupQueryMessage.route() is queryResponse and handle");
-                queryResponse.handle(overlay);
-            } else {
-                this.handle(overlay);
-            }
+            msg.handle(overlay);
         } else {
             int direction;
             int pos;
@@ -80,27 +82,15 @@ public class LookupQueryMessage extends AbstractQueryMessage<Coordinate> {
                                 canOverlay.getZone(), coordinatesToReach[CANOverlay.getNextDimension(dim)],
                                 dim, direction);
 
-                        if (isQueryResponse) {
-                            queryResponse.incrementNbStepsBy(1);
-                        } else {
+                        if (!isQueryResponse) {
                             super.incrementNbStepsBy(1);
                         }
 
                         try {
-                            if (isQueryResponse) {
-                                nearestPeer.getStructuredOverlay().send(queryResponse);
-                            } else {
-                                nearestPeer.getStructuredOverlay().send(this);
-                            }
+                            nearestPeer.send(msg);
                         } catch (BlockingRequestReceiverException e) {
-                            if (isQueryResponse) {
-                                overlay.bufferizeSynchronousMessage(queryResponse);
-                            } else {
-                                overlay.bufferizeSynchronousMessage(this);
-                            }
-
+                            overlay.bufferizeSynchronousMessage(msg);
                         } catch (Exception e) {
-                            System.out.println("CANOverlay.send()");
                             e.printStackTrace();
                         }
 

@@ -25,7 +25,10 @@ import org.objectweb.proactive.extensions.structuredp2p.core.requests.Structured
 import org.objectweb.proactive.extensions.structuredp2p.datastorage.DataStorage;
 import org.objectweb.proactive.extensions.structuredp2p.datastorage.owlim.OWLIMStorage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.AsynchronousMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.SynchronousMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.SynchronousMessageEntry;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.ResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.responses.synchronous.can.RDFResponseMessage;
 import org.openrdf.model.Statement;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.query.BindingSet;
@@ -345,14 +348,46 @@ public class Peer implements DataStorage, InitActive, RunActive, Serializable {
                 if (request == null) {
                     this.structuredOverlay.update();
                 } else {
-                    service.serve(request);
+                    if (request.getMethodName().equals("send")) {
+                        if (request.getParameter(0) instanceof RDFResponseMessage) {
+                            RDFResponseMessage response = (RDFResponseMessage) request.getParameter(0);
+
+                            SynchronousMessageEntry entry = this.structuredOverlay.getSynchronousMessages()
+                                    .get(response.getUUID());
+                            if (entry.getSynchronousMessage() == null) {
+                                entry.setSynchronousMessage(response);
+                            } else {
+                                ((RDFResponseMessage) entry.getSynchronousMessage()).addAll(response
+                                        .getRetrievedStatements());
+                            }
+                            entry.incrementNbResponsesReceived(1);
+
+                            if (this.structuredOverlay.getSynchronousMessages().get(response.getUUID())
+                                    .getStatus() == SynchronousMessageEntry.Status.ALL_RESPONSES_RECEIVED) {
+                                service.serve(request);
+                            }
+                        } else {
+                            service.serve(request);
+                        }
+                    } else {
+                        service.serve(request);
+                    }
                 }
             }
+
         }
     }
 
     public Response search(Query query) {
         return this.structuredOverlay.search(query);
+    }
+
+    public SynchronousMessage search(SynchronousMessage msg) {
+        return this.structuredOverlay.search(msg);
+    }
+
+    public void send(SynchronousMessage msg) {
+        this.structuredOverlay.send(msg);
     }
 
     /**
@@ -371,7 +406,6 @@ public class Peer implements DataStorage, InitActive, RunActive, Serializable {
         try {
             response = remotePeer.receiveMessage(msg);
         } catch (BlockingRequestReceiverException e) {
-            System.out.println("Peer.sendTo()");
             e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();

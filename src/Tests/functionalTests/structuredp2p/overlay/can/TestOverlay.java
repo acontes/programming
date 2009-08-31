@@ -213,8 +213,7 @@ public class TestOverlay {
         LookupQueryMessage msg = new LookupQueryMessage(sender, TestOverlay.getOverlay(toFind).getZone()
                 .getCoordinatesMin());
 
-        LookupResponseMessage response = (LookupResponseMessage) PAFuture.getFutureValue(sender
-                .getStructuredOverlay().search(msg));
+        LookupResponseMessage response = (LookupResponseMessage) PAFuture.getFutureValue(sender.search(msg));
 
         Assert.assertEquals(TestOverlay.getOverlay(toFind).getZone(), TestOverlay.getOverlay(
                 response.getPeerFound()).getZone());

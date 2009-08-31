@@ -16,13 +16,15 @@ import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.Ad
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.AsynchronousMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.RemoveNeighborMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.can.CANRemoveNeighborMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.AbstractQueryMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.SynchronousMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.SynchronousMessageEntry;
 import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.can.RDFQueryMessage;
-import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.can.RDFTriplePatternQuery;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.can.RDFTriplePatternQueryMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.ActionResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.JoinResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.ResponseMessage;
+import org.objectweb.proactive.extensions.structuredp2p.responses.synchronous.AbstractResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.synchronous.can.RDFResponseMessage;
 
 
@@ -53,7 +55,7 @@ public abstract class StructuredOverlay implements Serializable {
     /**
      * Responses associated to the oneWay search on the network.
      */
-    private Map<UUID, SynchronousMessageEntry> synchronousMessageEntries = new HashMap<UUID, SynchronousMessageEntry>();
+    private Map<UUID, SynchronousMessageEntry> synchronousMessages = new HashMap<UUID, SynchronousMessageEntry>();
 
     /**
      * The local peer which is associated with the overlay.
@@ -92,7 +94,7 @@ public abstract class StructuredOverlay implements Serializable {
     private RDFQueryMessage createSynchronousMessage(RDFQuery query) {
         // TODO Parse query in order to check type and retrieve informations
 
-        return new RDFTriplePatternQuery();
+        return new RDFTriplePatternQueryMessage();
     }
 
     /**
@@ -122,34 +124,27 @@ public abstract class StructuredOverlay implements Serializable {
     }
 
     public SynchronousMessage search(SynchronousMessage msg) {
-
         UUID uuid = UUID.randomUUID();
         msg.setUUID(uuid);
         this.send(msg);
 
-        synchronized (this.synchronousMessageEntries) {
-            while (this.synchronousMessageEntries.get(uuid) == null) {
+        synchronized (this.synchronousMessages) {
+            while (this.synchronousMessages.get(uuid).getStatus() != SynchronousMessageEntry.Status.ALL_RESPONSES_RECEIVED) {
                 try {
-                    this.synchronousMessageEntries.wait();
+                    this.synchronousMessages.wait();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
         }
 
-        SynchronousMessage response = this.synchronousMessageEntries.get(uuid).getSynchronousMessage();
-        this.synchronousMessageEntries.remove(uuid);
-
+        SynchronousMessage response = this.synchronousMessages.remove(uuid).getSynchronousMessage();
+        ((AbstractResponseMessage<?, AbstractQueryMessage<?>>) response).setDeliveryTime();
         return response;
     }
 
-    /**
-     * Returns the oneWay responses.
-     * 
-     * @return the oneWay responses.
-     */
-    public Map<UUID, SynchronousMessageEntry> getSynchronousMessageEntries() {
-        return this.synchronousMessageEntries;
+    public Map<UUID, SynchronousMessageEntry> getSynchronousMessages() {
+        return this.synchronousMessages;
     }
 
     /**

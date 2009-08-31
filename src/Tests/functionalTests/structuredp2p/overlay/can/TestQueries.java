@@ -15,14 +15,14 @@ import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOver
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates.Coordinate;
 import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.SynchronousMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.can.LookupQueryMessage;
-import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.can.RDFTriplePatternQuery;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.can.RDFTriplePatternQueryMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.synchronous.can.LookupResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.synchronous.can.RDFResponseMessage;
 import org.openrdf.model.Statement;
 
 
 /**
- * Test the oneway queries.
+ * Test the Synchronous queries.
  * 
  * @author Kilanga Fanny
  * @author Pellegrino Laurent
@@ -83,7 +83,7 @@ public class TestQueries {
         LookupResponseMessage response = null;
         try {
             response = (LookupResponseMessage) PAFuture.getFutureValue(TestQueries.firstPeer
-                    .getStructuredOverlay().search(TestQueries.query));
+                    .search(TestQueries.query));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -104,23 +104,17 @@ public class TestQueries {
 
         try {
             response = (RDFResponseMessage) PAFuture.getFutureValue(TestQueries.firstPeer
-                    .getStructuredOverlay().search(
-                            new RDFTriplePatternQuery(coordinates[0], null, coordinates[2])));
+                    .search(new RDFTriplePatternQueryMessage(coordinates[0], null, coordinates[2])));
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        System.out.println("latency = " + response.getLatency());
-        System.out.println("nbStepForReceipt = " + response.getNbStepsForReceipt());
-        System.out.println("nbStepsForSend = " + response.getNbStepsForSend());
-
-        System.out.println("data = ");
-        for (Statement stmt : (response).getRetrievedStatements()) {
+        System.out.println("Data found=");
+        for (Statement stmt : response.getRetrievedStatements()) {
             System.out.println("- <" + stmt.getSubject() + ", " + stmt.getPredicate() + "," +
                 stmt.getObject());
         }
-
-        // Assert.assertTrue(response.getLatency() > 1);
+        Assert.assertTrue(response.getLatency() > 1);
         Assert.assertTrue(response.getNbSteps() > 0);
         Assert.assertTrue(response.getNbStepsForReceipt() > 0);
         Assert.assertTrue(response.getNbStepsForSend() > 0);

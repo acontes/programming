@@ -1,13 +1,9 @@
 package org.objectweb.proactive.extensions.structuredp2p.responses.synchronous.can;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredOverlay;
-import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates.Coordinate;
-import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.SynchronousMessage;
+import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.SynchronousMessageEntry;
 import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.can.LookupQueryMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.synchronous.AbstractResponseMessage;
 
@@ -38,14 +34,16 @@ public class LookupResponseMessage extends AbstractResponseMessage<Coordinate, L
      * @{inheritDoc
      */
     public void handle(StructuredOverlay overlay) {
-        CANOverlay canOverlay = ((CANOverlay) overlay);
+        SynchronousMessageEntry entry = overlay.getSynchronousMessages().get(super.getUUID());
+        entry.incrementNbResponsesReceived(1);
+        entry.setSynchronousMessage(this);
 
-        super.setDeliveryTime();
+        synchronized (overlay.getSynchronousMessages()) {
+            overlay.getSynchronousMessages().notifyAll();
+        }
 
-        List<SynchronousMessage> result = new ArrayList<SynchronousMessage>();
-        result.add(this);
-
-        canOverlay.addOneWayResponse(this);
+        // List<SynchronousMessage> result = new ArrayList<SynchronousMessage>();
+        // result.add(this);
     }
 
     /**

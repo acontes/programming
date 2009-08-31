@@ -22,13 +22,9 @@ import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.ca
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.can.CANMergeMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.asynchronous.can.CANRemoveNeighborMessage;
 import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.SynchronousMessage;
-import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.SynchronousMessageEntry;
-import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.can.RDFTriplePatternQuery;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.ActionResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.ResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.asynchronous.can.CANJoinResponseMessage;
-import org.objectweb.proactive.extensions.structuredp2p.responses.synchronous.can.LookupResponseMessage;
-import org.objectweb.proactive.extensions.structuredp2p.responses.synchronous.can.RDFResponseMessage;
 import org.openrdf.model.Statement;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.query.BindingSet;
@@ -414,31 +410,6 @@ public class CANOverlay extends StructuredOverlay {
         return new ActionResponseMessage(result);
     }
 
-    public void handleRDFTriplePatternQuery(RDFTriplePatternQuery query, int nbResponsesToWait) {
-        // Wait while we don't have received all the responses sent from this peer
-        synchronized (super.getSynchronousMessageEntries()) {
-            while (super.getSynchronousMessageEntries().get(query.getUUID()) == null &&
-                super.getSynchronousMessageEntries().get(query.getUUID()).getNbResponses() != nbResponsesToWait) {
-
-                System.out.println("W " + this.zone + " is waiting for " + nbResponsesToWait +
-                    " response(s) with uuid= " + query.getUUID() + "...");
-                try {
-                    super.getSynchronousMessageEntries().wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        // At this step all the responses have been received
-        RDFResponseMessage responseToSend = new RDFResponseMessage(query, query.getKeyToReach());
-        responseToSend.incrementNbStepsBy(nbResponsesToWait);
-        responseToSend.addAll(((RDFResponseMessage) super.getSynchronousMessageEntries().get(query.getUUID())
-                .getSynchronousMessage()).getRetrievedStatements());
-
-        responseToSend.getQuery().removeLastVisitedPeer().getStructuredOverlay().send(responseToSend);
-    }
-
     /**
      * Handles a {@link CANRemoveNeighborMessage}.
      * 
@@ -670,39 +641,6 @@ public class CANOverlay extends StructuredOverlay {
         }
 
         return responses;
-    }
-
-    public void addOneWayResponse(RDFResponseMessage response) {
-        // System.out.println("N " + this + " has receipted a new response with uuid=" +
-        // response.getUUID());
-
-        synchronized (super.getSynchronousMessageEntries()) {
-            if (super.getSynchronousMessageEntries().get(response.getUUID()) == null) {
-                super.getSynchronousMessageEntries().put(response.getUUID(),
-                        new SynchronousMessageEntry(response));
-            } else {
-                RDFResponseMessage responseToUpdate = (RDFResponseMessage) super
-                        .getSynchronousMessageEntries().get(response.getUUID()).getSynchronousMessage();
-                responseToUpdate.addAll(response.getRetrievedStatements());
-                // TODO update latency, nb steps for send and receipt
-            }
-
-            super.getSynchronousMessageEntries().notifyAll();
-        }
-    }
-
-    public void addOneWayResponse(LookupResponseMessage response) {
-        synchronized (super.getSynchronousMessageEntries()) {
-            if (super.getSynchronousMessageEntries().get(response.getUUID()) == null) {
-                super.getSynchronousMessageEntries().put(response.getUUID(),
-                        new SynchronousMessageEntry(response));
-            } else {
-                throw new IllegalArgumentException(
-                    "A LookupQueryResponse has already been received for uuid=" + response.getUUID());
-            }
-
-            super.getSynchronousMessageEntries().notifyAll();
-        }
     }
 
     /**
