@@ -196,13 +196,15 @@ public class SshProxy extends Socket {
         /* Let's wait until cat has finished */
         // this.sess.waitForCondition(ChannelCondition.EXIT_STATUS, 50);
         this.sess.waitForCondition(ChannelCondition.EOF, 1);
+        
+        /* Now its hopefully safe to close the session */
+        this.sess.close();
+        this.connection.close();
+       
         /* Show exit status, if available (otherwise "null") */
         if (logger.isDebugEnabled())
             logger.debug("Proxy exit code : " + sess.getExitStatus());
-        /* Now its hopefully safe to close the session */
 
-        this.sess.close();
-        this.connection.close();
         this.input = null;
         this.output = null;
         if (logger.isDebugEnabled())
@@ -219,88 +221,5 @@ public class SshProxy extends Socket {
         return this.output;
     }
 
-    // ////////////////////////////////////
-    // After this, override are useless //
-    // ////////////////////////////////////
-
-    // Normally never used
-    public void connect() throws IOException {
-        System.out.println("Connect");
-        // assert false;
-    }
-
-    // Normally never used
-    @Override
-    public void connect(SocketAddress endpoint, int timeout) throws IOException {
-        System.out.println("Connect");
-        // assert false;
-    }
-
-    // Normally never used
-    @Override
-    public void bind(SocketAddress bindpoint) throws IOException {
-        System.out.println("Bind");
-        // assert false;
-    }
-
-    // Normally never used
-    @Override
-    public InetAddress getInetAddress() {
-        if (logger.isDebugEnabled())
-            logger.debug("GetInetAddress");
-        try {
-            return InetAddress.getByName(this.host);
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    // Normally never used
-    @Override
-    public InetAddress getLocalAddress() {
-        if (logger.isDebugEnabled())
-            logger.debug("GetLocalAddress");
-        try {
-            return InetAddress.getLocalHost();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    // Normally never used
-    @Override
-    public SocketAddress getLocalSocketAddress() {
-        System.out.println("GetLocalSocketAddress");
-        return super.getLocalSocketAddress();
-    }
-
-    // Normally never used
-    @Override
-    public SocketAddress getRemoteSocketAddress() {
-        System.out.println("GetRemoteSocketAddress");
-        return super.getRemoteSocketAddress();
-    }
-
-    @Override
-    public boolean getReuseAddress() throws SocketException {
-        return super.getReuseAddress();
-    }
-
-    // Normally never used
-    @Override
-    public int getPort() {
-        if (logger.isDebugEnabled())
-            logger.debug("GetPort");
-        return 0;
-    }
-
-    // Normally never used
-    @Override
-    public int getLocalPort() {
-        if (logger.isDebugEnabled())
-            logger.debug("GetLocalPort");
-        return 0;
-    }
+  
 }

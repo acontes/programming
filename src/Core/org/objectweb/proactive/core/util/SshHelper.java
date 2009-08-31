@@ -48,37 +48,36 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.ssh.SshProxy;
 
 
-public class GatewaysInfos {
-    // the Unique instance of GatewaysInfos      
-    private static GatewaysInfos gatewaysInfos;
+public class SshHelper {
+    // the Unique instance of SshHelper      
+    private static SshHelper sshHelper;
     private Map<String, Map<String, String>> gatewaysTable;
 
-    private GatewaysInfos() {
+    private SshHelper() {
         ProActiveConfiguration.load();
         gatewaysTable = new Hashtable<String, Map<String, String>>();
-        loadProperties();
+        loadProperties();        
         if (logger.isDebugEnabled()) {
             logger.debug("Gateways Infos loaded");
         }
     }
 
-    public static GatewaysInfos getInstance() {
-        if (gatewaysInfos == null)
-            gatewaysInfos = new GatewaysInfos();
-        return gatewaysInfos;
+    // Pattern Singleton
+    public static SshHelper getInstance() {
+        if (sshHelper == null){
+            sshHelper = new SshHelper();
+            parseSSHConfigFile();
+        }
+        return sshHelper;
     }
 
     /**
-     * Return the gateway where a proxy command can be used on to contact the host hostname .
-     * 
-     * @param hostname The hostname to contact.
-     * 
-     * @return The gateway which is the relay to the host.
+     *  Private usage only  
      */
-    public String getGatewayName(String hostname) {
-        String host = hostname;
+    private String getGatewayInformation(String host, String req) {
         String ret = "";
-
+        
+        // First try, the given host is an IPv4 address
         if (host.matches("^.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}")) {
             // local host case (by ip address)
             if (host.equalsIgnoreCase(ProActiveInet.getInstance().getInetAddress().getHostAddress())) {
@@ -86,13 +85,12 @@ public class GatewaysInfos {
             }
 
             // Try with ip address mapping
-
-            ret = SubnetChecker.getInstance().getGatewayName(hostname);
-
+            ret = SubnetChecker.getInstance().getGatewayName(host);
+            
             if (ret != null)
                 return ret;
 
-            // remote host case
+            // Get the fqdn from the IP address
             InetAddress addr;
             try {
                 addr = InetAddress.getByName(host);
@@ -104,6 +102,7 @@ public class GatewaysInfos {
             }
         }
 
+        // host is here a fqdn or an ip address mapped as it (without cidr definition)
         if (host.equalsIgnoreCase(ProActiveInet.getInstance().getInetAddress().getCanonicalHostName())) {
             // local host case (by name)
             return null;
@@ -115,14 +114,26 @@ public class GatewaysInfos {
         if (gateway_infos == null)
             return null;
 
-        ret = gateway_infos.get("gateway");
+        // Get from the information map, the requested information
+        ret = gateway_infos.get(req);
 
-        // Case of the gateway
-        if (ret == null || ret.equals("none")) {
+        // Specific case
+        if (ret == null || ret.equals("none") || ret.equals("0")) {
             return null;
         }
 
         return ret;
+    }
+
+    /**
+     * Return the gateway where a proxy command can be used on to contact the host hostname .
+     * 
+     * @param hostname The hostname to contact.
+     * 
+     * @return The gateway which is the relay to the host.
+     */
+    public String getGatewayName(String hostname) {
+        return getGatewayInformation(hostname, "gateway");
     }
 
     /**
@@ -131,49 +142,21 @@ public class GatewaysInfos {
      * 
      * @param hostname The hostname to contact.
      * 
-     * @return The port of the gateway where the ssh daemon can be contacted.
+     * @return The port of the gateway where the ssh daemon can be contacted as a String.
      */
-    public int getGatewayPort(String hostname) {
-        String host = hostname;
-        int ret = 0;
+    public String getGatewayPort(String hostname) {
+        return getGatewayInformation(hostname, "port");
+    }
 
-        if (host.matches("^.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}")) {
-            // local host case (by ip address)
-            if (host.equalsIgnoreCase(ProActiveInet.getInstance().getInetAddress().getHostAddress())) {
-                return 0;
-            }
-
-            // Try with ip address mapping
-            ret = SubnetChecker.getInstance().getGatewayPort(hostname);
-
-            if (ret != 0)
-                return ret;
-
-            // remote host case
-            InetAddress addr;
-            try {
-                addr = InetAddress.getByName(host);
-            } catch (UnknownHostException e) {
-                addr = null;
-            }
-
-            if (addr != null) {
-                host = addr.getHostName();
-            }
-        }
-
-        if (host.equalsIgnoreCase(ProActiveInet.getInstance().getInetAddress().getCanonicalHostName())) {
-            // local host case (by name)
-            return 0;
-        }
-
-        // Try with hostname (or single ip address definition) mapping
-        Map<String, String> gateway_infos = getGatewayInfos(host);
-
-        if (gateway_infos == null)
-            return 0;
-
-        return Integer.parseInt(gateway_infos.get("port"));
+    /**
+     * Return the username to use for access the hostname 
+     *     
+     * @param hostname The hostname to contact.
+     * 
+     * @return The username as a String.
+     */
+    public String getGatewayUsername(String hostname) {
+        return getGatewayInformation(hostname, "username");
     }
 
     /**
@@ -189,25 +172,55 @@ public class GatewaysInfos {
      * @param port The port on the gateway to contact the ssh daemon
      */
     private void setGateway(String hostname, String gateway, String port) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Gateways Infos : " + gateway + " added for " + hostname);
-        }
-
         if (hostname.contains("*") && hostname.indexOf("*") == 0)
             hostname = hostname.substring(1);
 
         Map<String, String> gateway_infos = gatewaysTable.get(hostname);
 
         if (gateway_infos == null) {
-            // The gateway isn't already record
+            // No information already record for the hostname
             gateway_infos = new Hashtable<String, String>();
-
             gateway_infos.put("gateway", gateway);
             gateway_infos.put("port", port);
             gatewaysTable.put(hostname, gateway_infos);
-        } else {
-            logger.info("Gateways Infos : informations for " + hostname + " are already declared, ignored");
         }
+
+        if (gateway_infos.get("gateway") != null) {
+            logger.info("Gateways Infos : informations for " + hostname + " are already declared, ignored");
+            return;
+        }
+        gateway_infos.put("gateway", gateway);
+        gateway_infos.put("port", port);
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("Gateways Infos : " + gateway + " added for " + hostname);
+        }
+    }
+
+    private void setGateway(String host, String username) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Ssh Username : " + username + " added for " + host);
+        }
+
+        if (host.contains("*") && host.indexOf("*") == 0)
+            host = host.substring(1);
+
+        Map<String, String> gateway_infos = gatewaysTable.get(host);
+
+        if (gateway_infos == null) {
+            // The gateway isn't already record
+            gateway_infos = new Hashtable<String, String>();
+            gateway_infos.put("username", username);
+            gatewaysTable.put(host, gateway_infos);
+        }
+
+        if (gateway_infos.get("username") != null) {
+            logger.info("Gateways Infos : informations for " + host + " are already declared, ignored");
+            return;
+        }
+
+        // Only update
+        gateway_infos.put("username", username);
     }
 
     /**
@@ -285,7 +298,7 @@ public class GatewaysInfos {
     }
 
     /** 
-     * @see GatewaysInfos#parseSSHConfigFile(String)
+     * @see SshHelper#parseSSHConfigFile(String)
      */
     public static void parseSSHConfigFile() {
         parseSSHConfigFile(null);
@@ -323,12 +336,13 @@ public class GatewaysInfos {
             if (line == null)
                 return;
 
+            String host;
+            String proxyCommand;
+            String gateway = null;
+            String proxyCommandTable[];
+            Boolean wildcard = false;
             // Iterize on all the Host declaration
             while (true) {
-                String host;
-                String proxyCommand;
-                String gateway = null;
-                String proxyCommandTable[];
 
                 // Skip comment and SSH options 
                 if (!line.matches("[Hh]ost .*")) {
@@ -337,7 +351,7 @@ public class GatewaysInfos {
                 }
 
                 // Store the host declaration 
-                host = line.substring(line.indexOf("Host") + "Host".length()).trim();
+                host = deleteWord("Host", line);
                 // And continue
                 line = br.readLine();
 
@@ -351,37 +365,49 @@ public class GatewaysInfos {
                     proxyCommand = null;
                     gateway = null;
 
+                    // Don't search for a Nickname, if there is a wildcarded host definition
+                    if (line.contains("*")) {
+                        wildcard = true;
+                    }
+
                     // Check for a Nickname
                     if (line.matches("HostName .*")) {
-                        realHostname
-                                .put(host, line.substring(line.indexOf("HostName") + "HostName".length()));
+                        realHostname.put(host.trim(), deleteWord("HostName", line).trim());
                     }
 
                     // Here is the proxyCommand declaration
                     if (line.matches("ProxyCommand .*")) {
 
-                        proxyCommand = line.substring(line.indexOf("ProxyCommand") + "ProxyCommand".length());
-                        proxyCommand = proxyCommand.substring(proxyCommand.indexOf("ssh") + "ssh".length());
+                        proxyCommand = deleteWord("ProxyCommand", line);
+                        proxyCommand = deleteWord("ssh", proxyCommand);
 
                         // Skip SSH specific options
                         if (proxyCommand.indexOf("${") > 0) {
-                            proxyCommand = proxyCommand.substring(proxyCommand.indexOf("}") + 1);
+                            proxyCommand = deleteWord("}", proxyCommand);
                         }
 
                         if (proxyCommand != null && !proxyCommand.trim().isEmpty() &&
                             !proxyCommand.trim().equalsIgnoreCase("none")) {
 
                             proxyCommandTable = proxyCommand.split(" ");
-                            GatewaysInfos gi = GatewaysInfos.getInstance();
-                            gateway = realHostname.get(proxyCommandTable[1]).trim();
-                            if (gateway == null)
-                                gateway = proxyCommandTable[1].trim();
 
-                            gi.addProperties(host + ":" + gateway + ":" + PAProperties.PA_SSH_PORT);
+                            // Search for a Nickname/Hostname mapping
+                            if (!wildcard) {
+                                gateway = realHostname.get(proxyCommandTable[1].trim());
+                            }
 
+                            if (gateway == null) {
+                                gateway = proxyCommandTable[1];
+                            }
+
+                            sshHelper.addProperties(host.trim() + ":" + gateway.trim() + ":" +
+                                PAProperties.PA_SSH_PORT.getValue());
                         }
-                        // Job is end for this Host declaration
-                        break;
+                    }
+
+                    if (line.matches("User .*")) {
+                        line = deleteWord("User", line);
+                        sshHelper.setGateway(host.trim(), line.trim());
                     }
 
                     // Try next line
@@ -395,15 +421,17 @@ public class GatewaysInfos {
         }
     }
 
+    private static String deleteWord(String word, String line) {
+        return line.substring(line.indexOf(word) + word.length());
+    }
+
     // Only for test
     public static void main(String[] args) {
         PAProperties.PA_SSH_PROXY_GATEWAY
                 .setValue("*.grid5000.fr:acces.sophia.grid5000.fr:22;*.grid5000.fr:toto:33");
-
-        parseSSHConfigFile();
         //   System.out.println(PAProperties.PA_SSH_PROXY_GATEWAY);
-        System.out.println(GatewaysInfos.getInstance().getGatewayName("azur-9.sophia.grid5000.fr"));
-        System.out.println(GatewaysInfos.getInstance().getGatewayName("pipo.unice.fr"));
-
+        System.out.println(SshHelper.getInstance().getGatewayName("azur-9.sophia.grid5000.fr"));
+        System.out.println(SshHelper.getInstance().getGatewayName("test.unice.fr"));
+        System.out.println(SshHelper.getInstance().getGatewayUsername("test.unice.fr"));        
     }
 }

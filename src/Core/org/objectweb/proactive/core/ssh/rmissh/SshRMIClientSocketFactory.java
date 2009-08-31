@@ -38,7 +38,7 @@ import java.net.Socket;
 import java.rmi.server.RMIClientSocketFactory;
 
 import org.objectweb.proactive.core.ssh.SshProxy;
-import org.objectweb.proactive.core.util.GatewaysInfos;
+import org.objectweb.proactive.core.util.SshHelper;
 import org.objectweb.proactive.core.util.HostsInfos;
 import org.objectweb.proactive.core.util.ProActiveInet;
 
@@ -61,7 +61,7 @@ public class SshRMIClientSocketFactory implements RMIClientSocketFactory, java.i
         }
 
         Socket socket = null;
-        GatewaysInfos checker = GatewaysInfos.getInstance();
+        SshHelper checker = SshHelper.getInstance();
         String gateway = checker.getGatewayName(host);
 
         if (gateway != null) {
@@ -70,7 +70,7 @@ public class SshRMIClientSocketFactory implements RMIClientSocketFactory, java.i
                 logger.info("Using the gateway " + gateway + " to contact " + host + ":" + port);
             }
 
-            int gwPort = checker.getGatewayPort(host);
+            int gwPort = Integer.parseInt(checker.getGatewayPort(host));
             socket = new SshProxy(gateway, gwPort, host, port);
 
         } else {

@@ -42,7 +42,7 @@ import org.objectweb.proactive.core.remoteobject.rmi.RmiRemoteObjectImpl;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.ssh.rmissh.SshRMIClientSocketFactory;
 import org.objectweb.proactive.core.ssh.rmissh.SshRMIServerSocketFactory;
-import org.objectweb.proactive.core.util.GatewaysInfos;
+import org.objectweb.proactive.core.util.SshHelper;
 
 
 public class RmiSshRemoteObjectImpl extends RmiRemoteObjectImpl {
