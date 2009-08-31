@@ -63,6 +63,7 @@ public class RDFResponseMessage extends AbstractResponseMessage<Coordinate, RDFQ
 
         this.addAll(overlay.getLocalPeer().query(new StatementImpl(subject, predicate, object)));
         this.getQuery().removeLastPeerToVisitForStepTwo().send(this);
+        overlay.getSynchronousMessages().remove(super.getUUID());
     }
 
     /**

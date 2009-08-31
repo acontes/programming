@@ -116,6 +116,7 @@ public class RDFTriplePatternQueryMessage extends RDFQueryMessage {
 //            response.addAll(stmts);
             response.getQuery().removeLastPeerToVisitForStepTwo().send(response);
         } else {
+            System.out.println("RDFTriplePatternQueryMessage.handle() add entry for " + overlay);
             ((CANOverlay) overlay).getSynchronousMessages().put(this.getUUID(),
                     new SynchronousMessageEntry(nbOfSends));
         }
@@ -129,11 +130,12 @@ public class RDFTriplePatternQueryMessage extends RDFQueryMessage {
         Coordinate[] coordinatesToReach = this.getKeyToReach();
 
         if (this.validKeyConstraints(overlay)) {
+            System.out.println("RDFTriplePatternQueryMessage.route() ROUTING");
             this.handle(overlay);
         } else { // we must found a peer which valid the constraints
             int direction;
             int pos;
-
+            System.out.println("RDFTriplePatternQueryMessage.route() BASIC ROUTING");
             for (int dim = 0; dim < CANOverlay.NB_DIMENSIONS; dim++) {
                 if (coordinatesToReach[dim] == null) {
                     continue;
@@ -165,6 +167,7 @@ public class RDFTriplePatternQueryMessage extends RDFQueryMessage {
                         this.getPeersToVisitForStepOne().push(overlay.getRemotePeer());
                         this.incrementNbStepsBy(1);
 
+                        System.out.println("RDFTriplePatternQueryMessage.route() add entry for " + overlay);
                         overlay.getSynchronousMessages().put(this.getUUID(), new SynchronousMessageEntry(1));
 
                         try {
