@@ -56,7 +56,7 @@ public class SshHelper {
     private SshHelper() {
         ProActiveConfiguration.load();
         gatewaysTable = new Hashtable<String, Map<String, String>>();
-        loadProperties();        
+        loadProperties();
         if (logger.isDebugEnabled()) {
             logger.debug("Gateways Infos loaded");
         }
@@ -64,7 +64,7 @@ public class SshHelper {
 
     // Pattern Singleton
     public static SshHelper getInstance() {
-        if (sshHelper == null){
+        if (sshHelper == null) {
             sshHelper = new SshHelper();
             parseSSHConfigFile();
         }
@@ -76,7 +76,7 @@ public class SshHelper {
      */
     private String getGatewayInformation(String host, String req) {
         String ret = "";
-        
+
         // First try, the given host is an IPv4 address
         if (host.matches("^.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}")) {
             // local host case (by ip address)
@@ -86,7 +86,7 @@ public class SshHelper {
 
             // Try with ip address mapping
             ret = SubnetChecker.getInstance().getGatewayName(host);
-            
+
             if (ret != null)
                 return ret;
 
@@ -432,6 +432,6 @@ public class SshHelper {
         //   System.out.println(PAProperties.PA_SSH_PROXY_GATEWAY);
         System.out.println(SshHelper.getInstance().getGatewayName("azur-9.sophia.grid5000.fr"));
         System.out.println(SshHelper.getInstance().getGatewayName("test.unice.fr"));
-        System.out.println(SshHelper.getInstance().getGatewayUsername("test.unice.fr"));        
+        System.out.println(SshHelper.getInstance().getGatewayUsername("test.unice.fr"));
     }
 }

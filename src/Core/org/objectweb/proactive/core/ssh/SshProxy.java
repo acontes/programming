@@ -196,11 +196,11 @@ public class SshProxy extends Socket {
         /* Let's wait until cat has finished */
         // this.sess.waitForCondition(ChannelCondition.EXIT_STATUS, 50);
         this.sess.waitForCondition(ChannelCondition.EOF, 1);
-        
+
         /* Now its hopefully safe to close the session */
         this.sess.close();
         this.connection.close();
-       
+
         /* Show exit status, if available (otherwise "null") */
         if (logger.isDebugEnabled())
             logger.debug("Proxy exit code : " + sess.getExitStatus());
@@ -221,5 +221,4 @@ public class SshProxy extends Socket {
         return this.output;
     }
 
-  
 }
