@@ -8,8 +8,6 @@ import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordin
 import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.can.RDFQueryMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.synchronous.AbstractResponseMessage;
 import org.openrdf.model.Statement;
-import org.openrdf.model.impl.StatementImpl;
-import org.openrdf.model.impl.URIImpl;
 
 
 /**
@@ -51,17 +49,7 @@ public class RDFResponseMessage extends AbstractResponseMessage<Coordinate, RDFQ
      * {@inheritDoc}
      */
     public void handle(StructuredOverlay overlay) {
-
-        URIImpl subject = (this.getKeyToReach()[0] == null) ? null : new URIImpl(this.getKeyToReach()[0]
-                .getValue());
-
-        URIImpl predicate = (this.getKeyToReach()[1] == null) ? null : new URIImpl(this.getKeyToReach()[1]
-                .getValue());
-
-        URIImpl object = (this.getKeyToReach()[2] == null) ? null : new URIImpl(this.getKeyToReach()[2]
-                .getValue());
-
-        this.addAll(overlay.getLocalPeer().query(new StatementImpl(subject, predicate, object)));
+        this.addAll(super.getQuery().retrieveStatements(overlay));
         this.getQuery().removeLastPeerToVisitForStepTwo().send(this);
         overlay.getSynchronousMessages().remove(super.getUUID());
     }

@@ -2,12 +2,12 @@ package functionalTests.structuredp2p.overlay.can;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import junit.framework.Assert;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
@@ -20,6 +20,7 @@ import org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.can
 import org.objectweb.proactive.extensions.structuredp2p.responses.synchronous.can.LookupResponseMessage;
 import org.objectweb.proactive.extensions.structuredp2p.responses.synchronous.can.RDFResponseMessage;
 import org.openrdf.model.Statement;
+import org.openrdf.model.impl.StatementImpl;
 
 
 /**
@@ -68,9 +69,16 @@ public class TestQueries {
         int i = 1;
         for (Peer peer : peers) {
             System.out.println(i + " " + peer.getStructuredOverlay());
-            for (Peer neighbor : ((CANOverlay) peer.getStructuredOverlay()).getNeighborsDataStructure()) {
-                System.out.println("n = " + neighbor.getStructuredOverlay());
+
+            TestQueries.printNeighborsOf(peer);
+
+            Set<Statement> results = peer.query(new StatementImpl(null, null, null));
+            for (Statement stmt : results) {
+                System.out.println(" - <" + stmt.getSubject() + "," + stmt.getPredicate() + "," +
+                    stmt.getObject() + ">");
             }
+
+            System.out.println();
             System.out.println();
             i++;
         }
@@ -79,7 +87,7 @@ public class TestQueries {
                 .getStructuredOverlay()).getZone().getCoordinatesMin());
     }
 
-    @Ignore
+    @Test
     public void testLookupQuery() {
         LookupResponseMessage response = null;
         try {
@@ -110,11 +118,6 @@ public class TestQueries {
             e.printStackTrace();
         }
 
-        System.out.println("Data found=");
-        for (Statement stmt : response.getRetrievedStatements()) {
-            System.out.println("- <" + stmt.getSubject() + ", " + stmt.getPredicate() + "," +
-                stmt.getObject());
-        }
         Assert.assertTrue(response.getLatency() > 1);
         Assert.assertTrue(response.getNbSteps() > 0);
         Assert.assertTrue(response.getNbStepsForReceipt() > 0);
@@ -138,18 +141,22 @@ public class TestQueries {
         for (Peer peer : peers) {
             System.out.println(i + " " + peer.getStructuredOverlay());
 
-            for (int dim = 0; dim < CANOverlay.NB_DIMENSIONS; dim++) {
-                for (int direction = 0; direction < 2; direction++) {
-                    for (Peer neighbor : ((CANOverlay) peer.getStructuredOverlay())
-                            .getNeighborsDataStructure().getNeighbors(dim, direction)) {
-                        System.out.println("n = " + neighbor.getStructuredOverlay() + " (dim=" + dim + "," +
-                            direction + ")");
-                    }
-                }
-            }
+            TestQueries.printNeighborsOf(peer);
 
             System.out.println();
             i++;
+        }
+    }
+
+    private static void printNeighborsOf(Peer peer) {
+        for (int dim = 0; dim < CANOverlay.NB_DIMENSIONS; dim++) {
+            for (int direction = 0; direction < 2; direction++) {
+                for (Peer neighbor : ((CANOverlay) peer.getStructuredOverlay()).getNeighborsDataStructure()
+                        .getNeighbors(dim, direction)) {
+                    System.out.println("n = " + neighbor.getStructuredOverlay() + " (dim=" + dim + "," +
+                        direction + ")");
+                }
+            }
         }
     }
 

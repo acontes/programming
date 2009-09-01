@@ -1,7 +1,12 @@
 package org.objectweb.proactive.extensions.structuredp2p.messages.synchronous.can;
 
+import java.util.Set;
+
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.StructuredOverlay;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.CANOverlay;
+import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.Zone;
 import org.objectweb.proactive.extensions.structuredp2p.core.overlay.can.coordinates.Coordinate;
+import org.openrdf.model.Statement;
 
 
 /**
@@ -16,19 +21,9 @@ public class RDFRangeQueryMessage extends RDFQueryMessage {
         // TODO Auto-generated constructor stub
     }
 
-    /**
-     * @{inheritDoc
-     */
-    public void handle(StructuredOverlay overlay) {
-        // TODO Auto-generated method stub
-
-    }
-
-    /**
-     * @{inheritDoc
-     */
-    public void route(StructuredOverlay overlay) {
-        // TODO Auto-generated method stub
+    public RDFRangeQueryMessage(Coordinate inferiorBoundForSubject, Coordinate superiorBoundForSubject,
+            Coordinate inferiorBoundForPredicate, Coordinate superiorBoundForPredicate,
+            Coordinate inferiorBoundForObject, Coordinate superiorBoundForObject) {
 
     }
 
@@ -36,8 +31,27 @@ public class RDFRangeQueryMessage extends RDFQueryMessage {
      * @{inheritDoc
      */
     public boolean validKeyConstraints(StructuredOverlay overlay) {
+        Zone zone = ((CANOverlay) overlay).getZone();
+
+        for (int i = 0; i < super.getKeyToReach().length; i++) {
+            // if coordinate is null we skip the test
+            if (super.getKeyToReach()[i] != null) {
+                // the specified overlay does not contains the key
+                if (zone.contains(i, super.getKeyToReach()[i]) != 0) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Set<Statement> retrieveStatements(StructuredOverlay overlay) {
         // TODO Auto-generated method stub
-        return false;
+        return null;
     }
 
 }
