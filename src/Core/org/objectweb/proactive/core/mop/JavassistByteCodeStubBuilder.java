@@ -58,7 +58,9 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.Cache;
 import org.objectweb.proactive.annotation.NoReify;
 import org.objectweb.proactive.annotation.Self;
+import org.objectweb.proactive.annotation.TurnActive;
 import org.objectweb.proactive.annotation.TurnActiveParam;
+import org.objectweb.proactive.annotation.TurnRemote;
 import org.objectweb.proactive.annotation.TurnRemoteParam;
 import org.objectweb.proactive.annotation.UnwrapFuture;
 import org.objectweb.proactive.core.config.PAProperties;
@@ -93,7 +95,7 @@ public class JavassistByteCodeStubBuilder {
         if (genericParameters == null) {
             genericParameters = new Class<?>[0];
         }
-        CtMethod[] reifiedMethodsWithoutGenerics;
+        Method[] reifiedMethodsWithoutGenerics;
         try {
             ClassPool pool = ClassPool.getDefault();
 
@@ -158,7 +160,7 @@ public class JavassistByteCodeStubBuilder {
             generatedCtClass.addField(genericTypesMappingField);
 
             //   This map is used for keeping track of the method signatures / methods that are to be reified
-            java.util.Map<String, CtMethod> temp = new HashMap<String, CtMethod>();
+            java.util.Map<String, Method> temp = new HashMap<String, Method>();
 
             // Recursively calls getDeclaredMethods () on the target type
             // and each of its superclasses, all the way up to java.lang.Object
@@ -177,13 +179,8 @@ public class JavassistByteCodeStubBuilder {
             if (superCtClass.isInterface()) {
                 CtMethod[] allPublicMethods = superCtClass.getMethods();
                 for (int i = 0; i < allPublicMethods.length; i++) {
-                    StringBuilder key = new StringBuilder();
-                    key.append(allPublicMethods[i].getName());
-                    params = allPublicMethods[i].getParameterTypes();
-                    for (int k = 0; k < params.length; k++) {
-                        key.append(params[k].getName());
-                    }
-                    temp.put(key.toString(), allPublicMethods[i]);
+                    String key = generateMethodKey(allPublicMethods[i]);
+                    temp.put(key, new Method(allPublicMethods[i]));
                 }
                 classesIndexer.add("java.lang.Object");
             } else // If the target type is an actual class, we climb up the tree
@@ -202,14 +199,10 @@ public class JavassistByteCodeStubBuilder {
 
                         // Build a key with the simple name of the method
                         // and the names of its parameters in the right order
-                        StringBuilder key = new StringBuilder();
-                        key.append(currentMethod.getName());
-                        params = currentMethod.getParameterTypes();
-                        for (int k = 0; k < params.length; k++) {
-                            key.append(params[k].getName());
-                        }
+                        String key = generateMethodKey(currentMethod);
                         // Tests if we already have met this method in a subclass
-                        exists = temp.get(key.toString());
+                        exists = temp.get(key);
+                        params = currentMethod.getParameterTypes();
                         if (exists == null) {
                             // The only method we ABSOLUTELY want to be called directly
                             // on the stub (and thus not reified) is
@@ -220,11 +213,13 @@ public class JavassistByteCodeStubBuilder {
                                 // If not, adds this method to the Vector that
                                 // holds all the reifiedMethods for this class
                                 //                                tempVector.addElement(currentMethod);
-                                temp.put(key.toString(), currentMethod);
+                                temp.put(key.toString(), new Method(currentMethod));
                             }
                         } else {
                             // We already know this method because it is overriden
-                            // in a subclass. Then do nothing
+                            // in a subclass. Then we just check for annotations
+                            Method met = temp.get(key);
+                            met.grabMethodandParameterAnnotation(currentMethod);
                         }
                     }
                     currentCtClass = currentCtClass.getSuperclass();
@@ -252,36 +247,37 @@ public class JavassistByteCodeStubBuilder {
 
                     // Build a key with the simple name of the method
                     // and the names of its parameters in the right order
-                    StringBuilder key = new StringBuilder();
-                    key.append(currentMethod.getName());
-                    params = currentMethod.getParameterTypes();
-                    for (int k = 0; k < params.length; k++) {
-                        key.append(params[k].getName());
-                    }
+                    String key = generateMethodKey(currentMethod);
 
                     // replace with current one, because this gives the actual declaring Class<?> of this method
-                    temp.put(key.toString(), currentMethod);
+                    Method m = temp.get(key);
+                    m.setCtMethod(currentMethod);
+                    m.grabMethodandParameterAnnotation(currentMethod);
                 }
             }
 
-            reifiedMethodsWithoutGenerics = (temp.values().toArray(new CtMethod[temp.size()]));
+            reifiedMethodsWithoutGenerics = (temp.values().toArray(new Method[temp.size()]));
 
             // Determines which reifiedMethods are valid for reification
             // It is the responsibility of method checkMethod
             // to decide if a method is valid for reification or not
-            Vector<CtMethod> v = new Vector<CtMethod>();
+            Vector<Method> v = new Vector<Method>();
             int initialNumberOfMethods = reifiedMethodsWithoutGenerics.length;
 
             for (int i = 0; i < initialNumberOfMethods; i++) {
-                if (checkMethod(reifiedMethodsWithoutGenerics[i])) {
+                if (checkMethod(reifiedMethodsWithoutGenerics[i].getCtMethod())) {
                     v.addElement(reifiedMethodsWithoutGenerics[i]);
                 }
             }
-            CtMethod[] validMethods = new CtMethod[v.size()];
-            v.copyInto(validMethods);
+            Method[] validMethods = new Method[v.size()];
+            CtMethod[] validCtMethods = new CtMethod[v.size()];
+            //            v.copyInto(validMethods);
 
             // Installs the list of valid reifiedMethods as an instance variable of this object
-            reifiedMethodsWithoutGenerics = validMethods;
+            for (int i = 0; i < validMethods.length; i++) {
+                validMethods[i] = v.get(i);
+                validCtMethods[i] = v.get(i).getCtMethod();
+            }
 
             Class realSuperClass = Class.forName(className);
             TypeVariable<GenericDeclaration>[] tv = realSuperClass.getTypeParameters();
@@ -294,10 +290,10 @@ public class JavassistByteCodeStubBuilder {
             }
 
             // create static block with method initializations
-            createStaticInitializer(generatedCtClass, reifiedMethodsWithoutGenerics, classesIndexer,
-                    className, genericParameters);
+            createStaticInitializer(generatedCtClass, validCtMethods, classesIndexer, className,
+                    genericParameters);
 
-            createReifiedMethods(generatedCtClass, reifiedMethodsWithoutGenerics, superCtClass.isInterface());
+            createReifiedMethods(generatedCtClass, validMethods, superCtClass.isInterface());
 
             //            System.out.println("[JAVASSIST] generated class : " + generatedCtClass.getName());
 
@@ -318,58 +314,80 @@ public class JavassistByteCodeStubBuilder {
         }
     }
 
+    private static String generateMethodKey(CtMethod method) throws NotFoundException {
+        CtClass[] params;
+        StringBuilder key = new StringBuilder();
+        key.append(method.getName());
+        params = method.getParameterTypes();
+        for (int k = 0; k < params.length; k++) {
+            key.append(params[k].getName());
+        }
+
+        return key.toString();
+    }
+
     /**
      * @param generatedClass
      * @param reifiedMethods
      * @throws NotFoundException
      * @throws CannotCompileException
      */
-    private static void createReifiedMethods(CtClass generatedClass, CtMethod[] reifiedMethods,
+    private static void createReifiedMethods(CtClass generatedClass, Method[] reifiedMethods,
             boolean stubOnInterface) throws NotFoundException, CannotCompileException {
         for (int i = 0; i < reifiedMethods.length; i++) {
+            Method reifiedMethod = reifiedMethods[i];
             StringBuilder body = new StringBuilder("{");
 
-            if (hasAnnotation(reifiedMethods[i], Self.class)) {
+            if (hasMethodAnnotation(reifiedMethod.getCtMethod(), Self.class)) {
                 body.append("return this;");
             } else {
 
-                if (hasAnnotation(reifiedMethods[i], TurnRemoteParam.class)) {
-                    TurnRemoteParam trp = getAnnotation(reifiedMethods[i], TurnRemoteParam.class);
-                    int parameterIndex = parameterNameToIndex(reifiedMethods[i], trp.parameterName());
+                handleUnwrapFutureAnnotation(reifiedMethod, body);
+
+                handleTurnRemoteAnnotation(reifiedMethod, body);
+
+                handleTurnActiveAnnotation(reifiedMethod, body);
+
+                if (hasMethodAnnotation(reifiedMethod.getCtMethod(), TurnRemoteParam.class)) {
+                    TurnRemoteParam trp = getMethodAnnotation(reifiedMethod.getCtMethod(),
+                            TurnRemoteParam.class);
+                    int parameterIndex = parameterNameToIndex(reifiedMethod.getCtMethod(), trp
+                            .parameterName());
                     body.append("$" + parameterIndex +
                         " = org.objectweb.proactive.api.PARemoteObject.turnRemote($" + parameterIndex +
                         "); \n");
                 }
 
-                if (hasAnnotation(reifiedMethods[i], TurnActiveParam.class)) {
-                    TurnActiveParam trp = getAnnotation(reifiedMethods[i], TurnActiveParam.class);
-                    int parameterIndex = parameterNameToIndex(reifiedMethods[i], trp.parameterName());
+                if (hasMethodAnnotation(reifiedMethod.getCtMethod(), TurnActiveParam.class)) {
+                    TurnActiveParam trp = getMethodAnnotation(reifiedMethod.getCtMethod(),
+                            TurnActiveParam.class);
+                    int parameterIndex = parameterNameToIndex(reifiedMethod.getCtMethod(), trp
+                            .parameterName());
                     body.append("$" + parameterIndex +
                         " = org.objectweb.proactive.api.PAActiveObject.turnActive($" + parameterIndex +
                         "); \n");
                 }
 
-                if (hasAnnotation(reifiedMethods[i], UnwrapFuture.class)) {
-                    UnwrapFuture trp = getAnnotation(reifiedMethods[i], UnwrapFuture.class);
-                    //                    System.out.println("JavassistByteCodeStubBuilder.createReifiedMethods() class " +
-                    //                        generatedClass.getName() + "willl have annotation UnWrapFuture on " +
-                    //                        reifiedMethods[i].getName());
-                    int parameterIndex = parameterNameToIndex(reifiedMethods[i], trp.parameterName());
-                    body
-                            .append("$" + parameterIndex +
-                                " = org.objectweb.proactive.api.PAFuture.getFutureValue($" + parameterIndex +
-                                "); \n");
-                }
+                //                if (hasMethodAnnotation(reifiedMethod.getCtMethod(), UnwrapFuture.class)) {
+                //                    UnwrapFuture trp = getMethodAnnotation(reifiedMethod.getCtMethod(), UnwrapFuture.class);
+                //                    int parameterIndex = parameterNameToIndex(reifiedMethod.getCtMethod(), trp
+                //                            .parameterName());
+                //                    body
+                //                            .append("$" + parameterIndex +
+                //                                " = org.objectweb.proactive.api.PAFuture.getFutureValue($" + parameterIndex +
+                //                                "); \n");
+                //                }
 
-                boolean fieldToCache = hasAnnotation(reifiedMethods[i], Cache.class);
+                boolean fieldToCache = hasMethodAnnotation(reifiedMethod.getCtMethod(), Cache.class);
                 CtField cachedField = null;
 
                 if (fieldToCache) {
                     // the generated has to cache the method
 
                     cachedField = new CtField(ClassPool.getDefault().get(
-                            reifiedMethods[i].getReturnType().getName()), reifiedMethods[i].getName() + i,
-                        generatedClass);
+                            reifiedMethod.getCtMethod().getReturnType().getName()), reifiedMethod
+                            .getCtMethod().getName() +
+                        i, generatedClass);
 
                     generatedClass.addField(cachedField);
 
@@ -378,12 +396,12 @@ public class JavassistByteCodeStubBuilder {
 
                 //                body.append("\nObject[] parameters = $args;\n");
 
-                CtClass returnType = reifiedMethods[i].getReturnType();
+                CtClass returnType = reifiedMethod.getCtMethod().getReturnType();
 
                 String postWrap = null;
                 String preWrap = null;
 
-                if (hasAnnotation(reifiedMethods[i], NoReify.class)) {
+                if (hasMethodAnnotation(reifiedMethod.getCtMethod(), NoReify.class)) {
                     body
                             .append("if (myProxy instanceof org.objectweb.proactive.core.remoteobject.SynchronousProxy) { return ($r) ((org.objectweb.proactive.core.remoteobject.SynchronousProxy) myProxy).receiveMessage($$); }  \n");
                 }
@@ -418,7 +436,7 @@ public class JavassistByteCodeStubBuilder {
 
                 // the following is for inserting conditional statement for method code executing
                 // within or outside the construction of the object
-                if (!stubOnInterface && !Modifier.isAbstract(reifiedMethods[i].getModifiers())) {
+                if (!stubOnInterface && !Modifier.isAbstract(reifiedMethod.getCtMethod().getModifiers())) {
                     String preReificationCode = "{if (outsideOfConstructor) ";
 
                     // outside of constructor : object is already constructed
@@ -426,10 +444,10 @@ public class JavassistByteCodeStubBuilder {
 
                     // if inside constructor (i.e. in a method called by a
                     // constructor from a super class)
-                    if (!reifiedMethods[i].getReturnType().equals(CtClass.voidType)) {
+                    if (!reifiedMethod.getCtMethod().getReturnType().equals(CtClass.voidType)) {
                         postReificationCode += "return ";
                     }
-                    postReificationCode += ("super." + reifiedMethods[i].getName() + "($$);");
+                    postReificationCode += ("super." + reifiedMethod.getCtMethod().getName() + "($$);");
                     //                    postReificationCode += ("super.$proceed($$);");
                     postReificationCode += "}";
                     body.insert(0, preReificationCode);
@@ -444,9 +462,10 @@ public class JavassistByteCodeStubBuilder {
             //                                    System.out
             //                                          .println("JavassistByteCodeStubBuilder.createReifiedMethods() body " + reifiedMethods[i].getName() + " = " + body);
             try {
-                methodToGenerate = CtNewMethod.make(reifiedMethods[i].getReturnType(), reifiedMethods[i]
-                        .getName(), reifiedMethods[i].getParameterTypes(), reifiedMethods[i]
-                        .getExceptionTypes(), body.toString(), generatedClass);
+                methodToGenerate = CtNewMethod.make(reifiedMethod.getCtMethod().getReturnType(),
+                        reifiedMethod.getCtMethod().getName(), reifiedMethod.getCtMethod()
+                                .getParameterTypes(), reifiedMethod.getCtMethod().getExceptionTypes(), body
+                                .toString(), generatedClass);
             } catch (RuntimeException e) {
                 e.printStackTrace();
             }
@@ -663,10 +682,10 @@ public class JavassistByteCodeStubBuilder {
     }
 
     private static void addSuperInterfaces(CtClass cl, List<CtClass> superItfs) throws NotFoundException {
-        if (!cl.isInterface() && !Modifier.isAbstract(cl.getModifiers())) {
-            // inspect interfaces AND abstract classes
-            return;
-        }
+        //        if (!cl.isInterface() && !Modifier.isAbstract(cl.getModifiers())) {
+        //            // inspect interfaces AND abstract classes
+        //            return;
+        //        }
         CtClass[] super_interfaces = cl.getInterfaces();
         for (int i = 0; i < super_interfaces.length; i++) {
             superItfs.add(super_interfaces[i]);
@@ -680,7 +699,7 @@ public class JavassistByteCodeStubBuilder {
      * @param annotation the annotation to check
      * @return returns true if the annotation <code>annotation</code> is set on the method 
      */
-    private static boolean hasAnnotation(CtMethod method, Class<? extends Annotation> annotation) {
+    private static boolean hasMethodAnnotation(CtMethod method, Class<? extends Annotation> annotation) {
         try {
             Object[] o = method.getAnnotations();
             if (o != null) {
@@ -699,7 +718,7 @@ public class JavassistByteCodeStubBuilder {
         return false;
     }
 
-    private static <T extends Annotation> T getAnnotation(CtMethod method, Class<T> annotation) {
+    private static <T extends Annotation> T getMethodAnnotation(CtMethod method, Class<T> annotation) {
         try {
 
             Object[] o = method.getAnnotations();
@@ -715,6 +734,74 @@ public class JavassistByteCodeStubBuilder {
             return null;
         }
         return null;
+    }
+
+    private static void handleTurnRemoteAnnotation(Method method, StringBuilder body) {
+
+        List<MethodParameter> lmp = method.getListMethodParameters();
+
+        for (int i = 0; i < lmp.size(); i++) {
+            MethodParameter mp = lmp.get(i);
+            List<javassist.bytecode.annotation.Annotation> la = mp.getAnnotations();
+            for (javassist.bytecode.annotation.Annotation annotation : la) {
+                try {
+                    if (TurnRemote.class.isAssignableFrom(annotation.toAnnotationType(
+                            method.getClass().getClassLoader(), ClassPool.getDefault()).getClass())) {
+                        body.append("$" + (i + 1) +
+                            " = org.objectweb.proactive.api.PARemoteObject.turnRemote($" + (i + 1) + "); \n");
+                        break;
+                    }
+                } catch (Exception e) {
+                    // TODO: handle exception
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private static void handleTurnActiveAnnotation(Method method, StringBuilder body) {
+
+        List<MethodParameter> lmp = method.getListMethodParameters();
+
+        for (int i = 0; i < lmp.size(); i++) {
+            MethodParameter mp = lmp.get(i);
+            List<javassist.bytecode.annotation.Annotation> la = mp.getAnnotations();
+            for (javassist.bytecode.annotation.Annotation annotation : la) {
+                try {
+                    if (TurnActive.class.isAssignableFrom(annotation.toAnnotationType(
+                            method.getClass().getClassLoader(), ClassPool.getDefault()).getClass())) {
+                        body.append("$" + (i + 1) +
+                            " = org.objectweb.proactive.api.PAActiveObject.turnActive($" + (i + 1) + "); \n");
+                        break;
+                    }
+                } catch (Exception e) {
+                    // TODO: handle exception
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private static void handleUnwrapFutureAnnotation(Method method, StringBuilder body) {
+        List<MethodParameter> lmp = method.getListMethodParameters();
+
+        for (int i = 0; i < lmp.size(); i++) {
+            MethodParameter mp = lmp.get(i);
+            List<javassist.bytecode.annotation.Annotation> la = mp.getAnnotations();
+            for (javassist.bytecode.annotation.Annotation annotation : la) {
+                try {
+                    if (UnwrapFuture.class.isAssignableFrom(annotation.toAnnotationType(
+                            method.getClass().getClassLoader(), ClassPool.getDefault()).getClass())) {
+                        body.append("$" + (i + 1) +
+                            " = org.objectweb.proactive.api.PAFuture.getFutureValue($" + (i + 1) + "); \n");
+                        break;
+                    }
+                } catch (Exception e) {
+                    // TODO: handle exception
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
 }

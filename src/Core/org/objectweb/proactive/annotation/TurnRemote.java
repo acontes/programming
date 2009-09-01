@@ -10,5 +10,6 @@ import java.lang.annotation.Target;
 @Inherited
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
-public @interface UnwrapFuture {
+public @interface TurnRemote {
+
 }
