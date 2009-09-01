@@ -350,25 +350,20 @@ public class Peer implements DataStorage, InitActive, RunActive, Serializable {
                 } else {
                     if (request.getMethodName().equals("send")) {
                         if (request.getParameter(0) instanceof RDFResponseMessage) {
-                            System.out.println("Peer.runActivity() is RDFResponseMessage");
                             RDFResponseMessage response = (RDFResponseMessage) request.getParameter(0);
 
                             SynchronousMessageEntry entry = this.structuredOverlay.getSynchronousMessages()
                                     .get(response.getUUID());
-                            if (entry == null) {
-                                System.err.println("On " + this + " uuid = " + response.getUUID());
-                            }
 
                             if (entry.getSynchronousMessage() == null) {
                                 entry.setSynchronousMessage(response);
-                            } else {
+                            } else { // merge new response with existing
                                 ((RDFResponseMessage) entry.getSynchronousMessage()).addAll(response
                                         .getRetrievedStatements());
                             }
                             entry.incrementNbResponsesReceived(1);
 
-                            if (this.structuredOverlay.getSynchronousMessages().get(response.getUUID())
-                                    .getStatus() == SynchronousMessageEntry.Status.ALL_RESPONSES_RECEIVED) {
+                            if (entry.getStatus() == SynchronousMessageEntry.Status.ALL_RESPONSES_RECEIVED) {
                                 service.serve(request);
                             }
                         } else {

@@ -7,6 +7,7 @@ import junit.framework.Assert;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.extensions.structuredp2p.core.Peer;
@@ -78,7 +79,7 @@ public class TestQueries {
                 .getStructuredOverlay()).getZone().getCoordinatesMin());
     }
 
-    @Test
+    @Ignore
     public void testLookupQuery() {
         LookupResponseMessage response = null;
         try {

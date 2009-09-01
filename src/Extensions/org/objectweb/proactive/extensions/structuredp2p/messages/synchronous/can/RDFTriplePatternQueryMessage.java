@@ -74,23 +74,9 @@ public class RDFTriplePatternQueryMessage extends RDFQueryMessage {
          */
         super.lastPeersWhichHaveReceiptTheQuery.add(overlay.getRemotePeer());
 
-        int nbOfSends = 0;
         Stack<Peer> peersToVisit = new Stack<Peer>();
         for (Peer p : this.getPeersToVisitForStepTwo()) {
             peersToVisit.add(p);
-        }
-
-        for (Peer neighbor : subSetOfNeighbors) {
-            super.getPeersToVisitForStepTwo().clear();
-
-            for (Peer peer : peersToVisit) {
-                super.getPeersToVisitForStepTwo().push(peer);
-            }
-            super.getPeersToVisitForStepTwo().push(overlay.getRemotePeer());
-            super.incrementNbStepsBy(1);
-
-            neighbor.send(this);
-            nbOfSends++;
         }
 
         /*
@@ -98,27 +84,40 @@ public class RDFTriplePatternQueryMessage extends RDFQueryMessage {
          * - nbOfSends is equals 0 means that we don't have performed send. We are on a leaf and response must be returned;
          * - nbOfSends > 0 means we have performed one or many send. The current peer must now wait for nbOfSends responses.
          */
-        if (nbOfSends == 0) {
+        if (subSetOfNeighbors.size() == 0) {
             RDFResponseMessage response = new RDFResponseMessage(this, this.getKeyToReach());
 
-//            URIImpl subject = (this.getKeyToReach()[0] == null) ? null : new URIImpl(this.getKeyToReach()[0]
-//                    .getValue());
+//          URIImpl subject = (this.getKeyToReach()[0] == null) ? null : new URIImpl(this.getKeyToReach()[0]
+//                  .getValue());
 //
-//            URIImpl predicate = (this.getKeyToReach()[1] == null) ? null : new URIImpl(
-//                this.getKeyToReach()[1].getValue());
+//          URIImpl predicate = (this.getKeyToReach()[1] == null) ? null : new URIImpl(
+//              this.getKeyToReach()[1].getValue());
 //
-//            URIImpl object = (this.getKeyToReach()[2] == null) ? null : new URIImpl(this.getKeyToReach()[2]
-//                    .getValue());
+//          URIImpl object = (this.getKeyToReach()[2] == null) ? null : new URIImpl(this.getKeyToReach()[2]
+//                  .getValue());
 //
-//            Set<Statement> stmts = overlay.getLocalPeer()
-//                    .query(new StatementImpl(subject, predicate, object));
+//          Set<Statement> stmts = overlay.getLocalPeer()
+//                  .query(new StatementImpl(subject, predicate, object));
 //
-//            response.addAll(stmts);
-            response.getQuery().removeLastPeerToVisitForStepTwo().send(response);
+//          response.addAll(stmts);
+
+            Peer p = response.getQuery().removeLastPeerToVisitForStepTwo();
+            p.send(response);
         } else {
-            System.out.println("RDFTriplePatternQueryMessage.handle() add entry for " + overlay);
-            ((CANOverlay) overlay).getSynchronousMessages().put(this.getUUID(),
-                    new SynchronousMessageEntry(nbOfSends));
+            overlay.getSynchronousMessages().put(this.getUUID(),
+                    new SynchronousMessageEntry(subSetOfNeighbors.size()));
+
+            for (Peer neighbor : subSetOfNeighbors) {
+                super.getPeersToVisitForStepTwo().clear();
+
+                for (Peer peer : peersToVisit) {
+                    super.getPeersToVisitForStepTwo().push(peer);
+                }
+                super.getPeersToVisitForStepTwo().push(overlay.getRemotePeer());
+                super.incrementNbStepsBy(1);
+                System.out.println("  - " + neighbor);
+                neighbor.send(this);
+            }
         }
     }
 
@@ -130,12 +129,11 @@ public class RDFTriplePatternQueryMessage extends RDFQueryMessage {
         Coordinate[] coordinatesToReach = this.getKeyToReach();
 
         if (this.validKeyConstraints(overlay)) {
-            System.out.println("RDFTriplePatternQueryMessage.route() ROUTING");
             this.handle(overlay);
         } else { // we must found a peer which valid the constraints
             int direction;
             int pos;
-            System.out.println("RDFTriplePatternQueryMessage.route() BASIC ROUTING");
+
             for (int dim = 0; dim < CANOverlay.NB_DIMENSIONS; dim++) {
                 if (coordinatesToReach[dim] == null) {
                     continue;
@@ -167,7 +165,6 @@ public class RDFTriplePatternQueryMessage extends RDFQueryMessage {
                         this.getPeersToVisitForStepOne().push(overlay.getRemotePeer());
                         this.incrementNbStepsBy(1);
 
-                        System.out.println("RDFTriplePatternQueryMessage.route() add entry for " + overlay);
                         overlay.getSynchronousMessages().put(this.getUUID(), new SynchronousMessageEntry(1));
 
                         try {
