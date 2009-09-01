@@ -358,54 +358,40 @@ public enum PAProperties {
     PA_MIXEDLOCATION_MAXTIMEONSITE("proactive.mixedlocation.maxTimeOnSite", PAPropertiesType.INTEGER),
 
     /* ------------------------------------
-     *  SSH
+     *  RMISSH
      */
-
-    /**
-     * Indicates SSH remote TCP port
-     *
-     * This TCP port will be used to contact a remote SSH server. If not specified the
-     * default IANA assigned port is used (22)
-     *
-     */
-    PA_SSH_PORT("proactive.ssh.port", PAPropertiesType.INTEGER),
 
     /** this property identifies the location of the known host file for the RMISSH transport layer */
-    PA_SSH_KNOWN_HOST("proactive.ssh.known_hosts", PAPropertiesType.STRING),
+    PA_RMISSH_KNOWN_HOST("proactive.communication.rmissh.known_hosts", PAPropertiesType.STRING),
 
     /** this property identifies the location of RMISSH key directory */
-    PA_SSH_KEY_DIR("proactive.ssh.key_directory", PAPropertiesType.STRING),
+    PA_RMISSH_KEY_DIR("proactive.communication.rmissh.key_directory", PAPropertiesType.STRING),
 
     /** this property identifies that when using SSH tunneling, a normal connection should be tried before tunneling */
-    PA_SSH_TUNNELING_TRY_NORMAL_FIRST("proactive.tunneling.try_normal_first", PAPropertiesType.BOOLEAN),
+    PA_RMISSH_TRY_NORMAL_FIRST("proactive.communication.rmissh.try_normal_first", PAPropertiesType.BOOLEAN),
 
-    /** this property identifies if the garbage collector should be turned on when using SSH tunneling */
-    PA_SSH_TUNNELING_USE_GC("proactive.tunneling.use_gc", PAPropertiesType.BOOLEAN),
+    /** this property identifies the SSH garbage collector period
+     *
+     * If set to 0, tunnels and connections are not garbage collected
+     */
+    PA_RMISSH_GC_PERIOD("proactive.communication.rmissh.gc_period", PAPropertiesType.INTEGER),
 
-    /** this property identifies the garbage collector period when using SSH tunneling */
-    PA_SSH_TUNNELING_GC_PERIOD("proactive.tunneling.gc_period", PAPropertiesType.INTEGER),
+    /** this property identifies the maximum idle time before a SSH tunnel or a connection is garbage collected */
+    PA_RMISSH_GC_IDLETIME("proactive.communication.rmissh.gc_idletime", PAPropertiesType.INTEGER),
 
     /** this property identifies the know hosts file location when using ssh tunneling
      *  if undefined, the default value is user.home property concatenated to SSH_TUNNELING_DEFAULT_KNOW_HOSTS
      */
-    PA_SSH_TUNNELING_KNOW_HOSTS("proactive.ssh.known_hosts", PAPropertiesType.STRING),
+    PA_RMISSH_KNOW_HOSTS("proactive.communication.rmissh.known_hosts", PAPropertiesType.STRING),
 
-    /**
-     * SSH Tunnel connect timeout, in ms
+    /** Sock connect timeout, in ms
      *
      * The timeout to be used when a SSH Tunnel is opened. 0 is interpreted
-     * as an infinite timeout.
+     * as an infinite timeout. This timeout is also used for plain socket when try_normal_first is set to true
      *
      * @see Socket
      */
-    PA_SSH_TUNNELING_CONNECT_TIMEOUT("proactive.tunneling.connect_timeout", PAPropertiesType.INTEGER),
-
-    /**
-     * username on remote machines
-     *
-     * If not specified the local username is used.
-     */
-    PA_SSH_USERNAME("proactive.ssh.username", PAPropertiesType.STRING),
+    PA_RMISSH_CONNECT_TIMEOUT("proactive.communication.rmissh.connect_timeout", PAPropertiesType.INTEGER),
 
     /* ------------------------------------
      *  SECURITY
@@ -591,6 +577,10 @@ public enum PAProperties {
         }
 
         return Integer.parseInt(getValue());
+    }
+
+    public static void main(String[] args) {
+        System.out.println(Integer.parseInt(null));
     }
 
     /**

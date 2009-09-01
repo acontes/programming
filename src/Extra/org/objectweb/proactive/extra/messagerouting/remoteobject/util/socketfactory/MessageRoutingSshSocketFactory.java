@@ -33,24 +33,40 @@ package org.objectweb.proactive.extra.messagerouting.remoteobject.util.socketfac
 import java.io.IOException;
 import java.net.Socket;
 
-import org.objectweb.proactive.core.ssh.rmissh.SshSocket;
+import org.objectweb.proactive.core.ssh.SshConfig;
+import org.objectweb.proactive.core.ssh.SshRMIClientSocketFactory;
+import org.objectweb.proactive.core.ssh.SshTunnelPool;
 
 
 /**
  * This implementation for message routing socket factory
  * offers secure SSH sockets
- * @author fabratu
- * @version %G%, %I%
- * @since ProActive 4.10
  */
 public class MessageRoutingSshSocketFactory implements MessageRoutingSocketFactorySPI {
 
+    final private SshConfig config;
+    final private SshTunnelPool tp;
+
+    public MessageRoutingSshSocketFactory() {
+        this.config = new SshConfig();
+
+        // No plain socket, we want to use SSH !
+        this.config.setTryPlainSocket(false);
+
+        this.config.setConnectTimeout(10000);
+
+        // GC is useless, since only one tunnel to the router is opened
+        this.config.setGcIdleTime(60000);
+        this.config.setGcInterval(60000);
+
+        this.tp = new SshTunnelPool(this.config);
+    }
+
     public Socket createSocket(String host, int port) throws IOException {
-        return new SshSocket(host, port);
+        return tp.getSocket(host, port);
     }
 
     public String getAlias() {
         return "ssh";
     }
-
 }
