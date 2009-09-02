@@ -62,7 +62,6 @@ public class ExchangeableArrayPointer {
 
     public ExchangeableArrayPointer(int[] array, int offset, int len) {
         this(offset, len, INT_ARRAY);
-        this.intArray = array;
     }
 
     public ExchangeableArrayPointer(ExchangeableDouble structure) {

@@ -48,7 +48,6 @@ import javax.management.ObjectName;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.Job;
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -80,7 +79,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * This class is a runtime representation of a node
  * and should not be used outside a runtime
  */
-
+@SuppressWarnings("serial")
 public class LocalNode implements SecurityEntity {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.JMX_MBEAN);
     private String name;
@@ -95,7 +94,7 @@ public class LocalNode implements SecurityEntity {
     private NodeWrapperMBean mbean;
 
     public LocalNode(String nodeName, String jobId, ProActiveSecurityManager securityManager,
-            String virtualNodeName) throws ProActiveException {
+            String virtualNodeName) {
         this.name = nodeName;
         this.jobId = ((jobId != null) ? jobId : Job.DEFAULT_JOBID);
         this.securityManager = securityManager;

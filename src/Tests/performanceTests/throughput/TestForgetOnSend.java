@@ -64,6 +64,7 @@ public class TestForgetOnSend extends GCMFunctionalTestDefaultNodes {
         client.startTest();
     }
 
+    @SuppressWarnings("serial")
     static public class Server implements Serializable {
         boolean firstRequest = true;
         long count = 0;
@@ -93,6 +94,7 @@ public class TestForgetOnSend extends GCMFunctionalTestDefaultNodes {
         }
     }
 
+    @SuppressWarnings("serial")
     static public class Client implements Serializable {
         private Server server;
 

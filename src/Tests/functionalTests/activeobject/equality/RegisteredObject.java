@@ -34,7 +34,6 @@ package functionalTests.activeobject.equality;
 import java.io.IOException;
 
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.ProActiveException;
 
 
 public class RegisteredObject {
@@ -54,7 +53,7 @@ public class RegisteredObject {
     public int register() {
         try {
             PAActiveObject.registerByName(PAActiveObject.getStubOnThis(), "A");
-        } catch (ProActiveException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return 0;

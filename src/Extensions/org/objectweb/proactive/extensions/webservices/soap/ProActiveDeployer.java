@@ -227,10 +227,12 @@ public class ProActiveDeployer extends WSConstants {
         props.put(WSDL_FILE, wsdl);
 
         if (componentInterface) {
+            logger.info("INTERFACE");
             props.put(COMPONENT_INTERFACE, "true");
             props.put(PROACTIVE_STUB, HttpMarshaller.marshallObject(o));
 
         } else {
+            logger.info("PAS INTERFACE");
             props.put(COMPONENT_INTERFACE, "false");
             props.put(PROACTIVE_STUB, HttpMarshaller.marshallObject(o));
 

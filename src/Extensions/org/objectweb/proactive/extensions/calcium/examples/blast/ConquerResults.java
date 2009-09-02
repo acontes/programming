@@ -48,7 +48,6 @@ import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 import org.objectweb.proactive.extensions.calcium.system.WSpace;
 
 
-// @snippet-start calcium_ConquerResults
 @PrefetchFilesMatching(name = "merged.*")
 public class ConquerResults implements Conquer<File, File> {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_APPLICATION);
@@ -101,4 +100,3 @@ public class ConquerResults implements Conquer<File, File> {
         bw.close();
     }
 }
-//@snippet-end calcium_ConquerResults

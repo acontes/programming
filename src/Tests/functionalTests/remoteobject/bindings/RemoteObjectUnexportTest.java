@@ -43,7 +43,6 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.fail;
 
 
 /**
@@ -51,7 +50,7 @@ import static junit.framework.Assert.fail;
  */
 public class RemoteObjectUnexportTest extends FunctionalTest {
 
-    @org.junit.Test
+    @org.junit.Test(expected = ProActiveException.class)
     public void unexport() throws Exception {
         // get an object
         ProActiveRuntime p = ProActiveRuntimeImpl.getProActiveRuntime();
@@ -71,18 +70,12 @@ public class RemoteObjectUnexportTest extends FunctionalTest {
 
         assertNotNull(ro);
 
-        // unexport the object located at uri
         roe.unexport(uri);
 
-        // looking for the remote object should fail
-        try {
-            RemoteObjectHelper.lookup(uri);
-        } catch (ProActiveException e) {
-            // this is the expected exception, let's continue
-        } catch (Exception e) {
-            fail("the exception's type is not the one expected, caught " + e.getClass().getName() +
-                ",should be " + ProActiveException.class.getName());
-        }
-    }
+        RemoteObject<ProActiveRuntime> ro1 = null;
 
+        // looking for the remote object, should fail
+        ro1 = RemoteObjectHelper.lookup(uri);
+
+    }
 }

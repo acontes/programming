@@ -39,7 +39,6 @@ import java.lang.annotation.Target;
 
 @Target( { ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
-// @snippet-start calcium_PrefetchFilesMatching
 public @interface PrefetchFilesMatching {
     String name() default "[unassigned]";
 
@@ -47,4 +46,3 @@ public @interface PrefetchFilesMatching {
 
     long sizeBiggerThan() default Long.MAX_VALUE;
 }
-//@snippet-end calcium_PrefetchFilesMatching

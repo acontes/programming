@@ -60,6 +60,7 @@ import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.ProActiveInterface;
+import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.config.ComponentConfigurationHandler;
 import org.objectweb.proactive.core.component.controller.AbstractProActiveController;
 import org.objectweb.proactive.core.component.gen.RepresentativeInterfaceClassGenerator;
@@ -388,12 +389,12 @@ public class ProActiveComponentRepresentativeImpl implements ProActiveComponentR
         if (fcInterfaceReferences.containsKey(interfaceName)) {
             return fcInterfaceReferences.get(interfaceName);
         } else {
-            if (interfaceName.equals(Constants.COMPONENT)) {
+            if (interfaceName.equals("component")) {
                 return this;
             }
 
             // maybe the member of a collection itf?
-            InterfaceType itfType = ((ComponentType) this.getFcType()).getFcInterfaceType(interfaceName);
+            InterfaceType itfType = Utils.getItfType(interfaceName, this);
             if ((itfType != null) && itfType.isFcCollectionItf()) {
                 try {
                     // generate the corresponding interface locally

@@ -62,7 +62,6 @@ import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
  */
 public class Client {
     static final private Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_ROUTER);
-    public static final Logger admin_logger = ProActiveLogger.getLogger(Loggers.FORWARDING_ROUTER_ADMIN);
 
     /** This client represents one remote Agent. */
     final private AgentID agentId;
@@ -93,12 +92,6 @@ public class Client {
         this.attachment.setClient(this);
         this.agentId = agentID;
         this.pendingMessage = new ConcurrentLinkedQueue<ByteBuffer>();
-
-        if (admin_logger.isDebugEnabled()) {
-            admin_logger.debug("AgentID " + this.getAgentId() + " connected from " +
-                this.attachment.getRemoteEndpoint());
-        }
-
     }
 
     public AgentID getAgentId() {
@@ -190,10 +183,6 @@ public class Client {
      */
     public void discardAttachment() {
         synchronized (this.attachment_lock) {
-            if (admin_logger.isDebugEnabled()) {
-                admin_logger.debug("AgentID " + this.getAgentId() + " disconnected");
-            }
-
             logger.debug("Discarded attachment for " + this.agentId);
             this.attachment = null;
         }
@@ -215,12 +204,6 @@ public class Client {
             logger.debug("New attachment for " + this.agentId);
             this.attachment = attachment;
             this.attachment.setClient(this);
-
-            if (admin_logger.isDebugEnabled()) {
-                admin_logger.debug("AgentID " + this.getAgentId() + " reconnected from " +
-                    this.attachment.getRemoteEndpoint());
-            }
-
         }
     }
 

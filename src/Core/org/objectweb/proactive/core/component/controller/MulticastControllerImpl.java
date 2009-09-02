@@ -157,10 +157,8 @@ public class MulticastControllerImpl extends AbstractCollectiveInterfaceControll
                             serverSideItf);
                     if (serverSideMatchingMethod == null) {
                         throw new IllegalBindingException("binding incompatibility between " +
-                            clientSideItfType.getFcItfName() + " (" + clientSideItfType.getFcItfSignature() +
-                            ") and " + serverSideItfType.getFcItfName() + " (" +
-                            serverSideItfType.getFcItfSignature() +
-                            ") interfaces : cannot find matching method");
+                            clientSideItfType.getFcItfName() + " and " + serverSideItfType.getFcItfName() +
+                            " : cannot find matching method");
                     }
                     matchingMethodsForThisServerItf.put(new SerializableMethod(method),
                             new SerializableMethod(serverSideMatchingMethod));

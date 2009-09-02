@@ -29,7 +29,6 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-// @snippet-start calcium_primes_6
 package org.objectweb.proactive.extensions.calcium.examples.findprimes;
 
 import org.objectweb.proactive.extensions.calcium.muscle.Execute;
@@ -58,4 +57,3 @@ public class SearchInterval implements Execute<Interval, Primes> {
         return true;
     }
 }
-//@snippet-end calcium_primes_6

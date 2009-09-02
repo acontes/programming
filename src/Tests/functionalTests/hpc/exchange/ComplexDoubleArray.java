@@ -29,7 +29,6 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-//@snippet-start Exchange_2
 package functionalTests.hpc.exchange;
 
 import org.objectweb.proactive.ext.hpc.exchange.ExchangeableDouble;
@@ -82,4 +81,3 @@ public class ComplexDoubleArray implements ExchangeableDouble {
         putPos += 2;
     }
 }
-//@snippet-end Exchange_2

@@ -1,4 +1,3 @@
-//@tutorial-start
 /*
  * ################################################################
  *
@@ -110,4 +109,3 @@ public class Main {
     }
     //@snippet-end synch_cma_main
 }
-//@tutorial-end

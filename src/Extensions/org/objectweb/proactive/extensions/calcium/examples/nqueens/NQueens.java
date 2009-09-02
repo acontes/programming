@@ -88,11 +88,8 @@ public class NQueens implements Serializable {
         //Environment environment = ProActiveSchedulerEnvironment.factory("localhost","chri", "chri");
 
         Calcium calcium = new Calcium(environment);
-        // @snippet-start calcium_simpleLogMonitor
         Monitor monitor = new SimpleLogMonitor(calcium, 1);
         monitor.start();
-        // ...
-        // @snippet-break calcium_simpleLogMonitor
         calcium.boot();
 
         Stream<Board, Result> stream = calcium.newStream(root);
@@ -112,8 +109,6 @@ public class NQueens implements Serializable {
             e.printStackTrace();
         }
         calcium.shutdown();
-        // @snippet-resume calcium_simpleLogMonitor
         monitor.stop();
-        // @snippet-end calcium_simpleLogMonitor
     }
 }

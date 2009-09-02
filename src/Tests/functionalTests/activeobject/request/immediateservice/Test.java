@@ -34,7 +34,6 @@ package functionalTests.activeobject.request.immediateservice;
 import org.junit.Before;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
 import functionalTests.FunctionalTest;
 
@@ -47,27 +46,24 @@ import static junit.framework.Assert.assertTrue;
 
 public class Test extends FunctionalTest {
     A a;
-    boolean raisedExceptionArgs, raisedExceptionName, synchroCall;
-    BooleanWrapper asynchCall;
+    DummyObject dum;
+    String name;
 
     @Before
     public void action() throws Exception {
         a = (A) PAActiveObject.newActive(A.class.getName(), new Object[] { "toto" });
-        a.init(); // sync call
         // getObject is set as an IS in the runActivity of A
-        synchroCall = a.getBooleanSynchronous();
-        asynchCall = a.getBooleanAsynchronous();
-        raisedExceptionArgs = a.getExceptionMethodArgs();
-        raisedExceptionName = a.getExceptionMethodName();
+        dum = a.getObject();
         PAActiveObject.terminateActiveObject(a, true);
     }
 
     @org.junit.Test
     public void postConditions() throws Exception {
-        assertTrue(!PAFuture.isAwaited(asynchCall));
-        assertTrue(asynchCall.booleanValue());
-        assertTrue(synchroCall);
-        assertTrue(raisedExceptionArgs);
-        assertTrue(raisedExceptionName);
+        if (!PAFuture.isAwaited(dum)) {
+            assertTrue(dum.getName().equals("toto"));
+            return;
+        }
+
+        throw new Exception();
     }
 }

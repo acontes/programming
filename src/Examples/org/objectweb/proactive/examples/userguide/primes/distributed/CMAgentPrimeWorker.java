@@ -1,4 +1,3 @@
-//@tutorial-start
 /*
  * ################################################################
  *
@@ -32,7 +31,6 @@
  * $$ACTIVEEON_INITIAL_DEV$$
  */
 //@snippet-start primes_distributed_worker
-//@snippet-start primes_distributed_worker_skeleton
 package org.objectweb.proactive.examples.userguide.primes.distributed;
 
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
@@ -68,19 +66,13 @@ public class CMAgentPrimeWorker extends CMAgent {
 
         //TODO 4. Return a reifiable wrapper for the Boolean type
         //    for asynchronous calls. 
-        //@snippet-break primes_distributed_worker_skeleton
-        //@tutorial-break
         for (long divider = begin; divider < end; divider++) {
             if ((candidate % divider) == 0) {
                 return new BooleanWrapper(false);
             }
         }
         return new BooleanWrapper(true);
-        //@tutorial-resume
-        //@snippet-resume primes_distributed_worker_skeleton
     }
 
 }
-//@tutorial-end
-//@snippet-end primes_distributed_worker_skeleton
 //@snippet-end primes_distributed_worker

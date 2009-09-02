@@ -347,9 +347,11 @@ public class TestAsync extends FunctionalTest {
         }
     }
 
+    @SuppressWarnings("serial")
     final static public class StaticFinalClass extends Object implements Serializable {
     }
 
+    @SuppressWarnings("serial")
     static public class StaticNonFinalClass extends Object implements Serializable {
     }
 }

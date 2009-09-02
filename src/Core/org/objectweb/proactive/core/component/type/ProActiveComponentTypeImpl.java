@@ -106,20 +106,14 @@ public class ProActiveComponentTypeImpl implements ComponentType, ProActiveInter
     /**
      * @see org.objectweb.fractal.api.type.ComponentType#getFcInterfaceType(String)
      */
-    public InterfaceType getFcInterfaceType(String itfName) throws NoSuchInterfaceException {
+    public InterfaceType getFcInterfaceType(String name) throws NoSuchInterfaceException {
         for (int i = 0; i < interfaceTypes.length; i++) {
-            if (interfaceTypes[i].isFcCollectionItf()) {
-                if (itfName.startsWith(interfaceTypes[i].getFcItfName()) &&
-                    !itfName.equals(interfaceTypes[i].getFcItfName())) {
-                    return interfaceTypes[i];
-                }
-            } else {
-                if (itfName.equals(interfaceTypes[i].getFcItfName())) {
-                    return interfaceTypes[i];
-                }
+            InterfaceType type = interfaceTypes[i];
+            if (type.getFcItfName().equals(name)) {
+                return type;
             }
         }
-        throw new NoSuchInterfaceException(itfName);
+        throw new NoSuchInterfaceException(name);
     }
 
     /**

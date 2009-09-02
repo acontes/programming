@@ -43,18 +43,12 @@ import java.util.List;
 import trywithcatch.java_cup.runtime.Symbol;
 
 
-/**
- * @author The ProActive Team
- *
- */
 public class TryWithCatch {
 
     /* Whether to backup the original file */
     private static boolean backup = true;
 
-    /**
-     * Closes the output stream given as parameter
-     */
+    /* Helper */
     private static void close(OutputStream os) {
         if (os == null) {
             return;

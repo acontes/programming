@@ -64,6 +64,7 @@ public abstract class Bandwidth extends GCMFunctionalTestDefaultNodes {
         HudsonReport.reportToHudson(this.cl, bandwidth);
     }
 
+    @SuppressWarnings("serial")
     static public class Server implements Serializable {
         boolean firstRequest = true;
         long count = 0;
@@ -96,6 +97,7 @@ public abstract class Bandwidth extends GCMFunctionalTestDefaultNodes {
         }
     }
 
+    @SuppressWarnings("serial")
     static public class Client implements Serializable {
         private Server server;
 

@@ -1,4 +1,3 @@
-//@tutorial-start
 /*
  * ################################################################
  *
@@ -31,7 +30,6 @@
  * $$PROACTIVE_INITIAL_DEV$$
  */
 //@snippet-start webservice_cma_full
-//@snippet-start webservice_cma_skeleton
 package org.objectweb.proactive.examples.userguide.cmagent.webservice;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -53,17 +51,15 @@ public class CMAgentService extends CMAgentInitialized {
                     "org.objectweb.proactive.examples.userguide.cmagent.webservice.CMAgentService",
                     new Object[] {});
 
-            //TODO 1.Expose as web service (on URL 'url') the methods   
-            // "getLastRequestServeTime" and "getCurrentState" 
-            // of 'hw' CMAgentService. Name your service  "cmAgentService"
-
+            //TODO 1.
+            /*******************************************************/
+            /* Expose as web service (on URL 'url') the methods   
+            /* "getLastRequestServeTime" and "getCurrentState" 
+            /* of 'hw' CMAgentService. Name your service  "cmAgentService"*/
+            /*******************************************************/
             //@snippet-start ws_call
-            //@tutorial-break
-            //@snippet-break webservice_cma_skeleton
             WebServices.exposeAsWebService(hw, url, "cmAgentService", new String[] {
                     "getLastRequestServeTime", "getCurrentState" });
-            //@snippet-resume webservice_cma_skeleton
-            //@tutorial-resume
             //@snippet-end ws_call
 
         } catch (ActiveObjectCreationException e) {
@@ -72,7 +68,6 @@ public class CMAgentService extends CMAgentInitialized {
             e.printStackTrace();
         }
     }
+
 }
-//@snippet-end webservice_cma_skeleton
 //@snippet-end webservice_cma_full
-//@tutorial-end

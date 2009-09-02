@@ -5,7 +5,7 @@
 
 	<environment>
 		<javaPropertyVariable name="proactive.home" />
-		<javaPropertyVariable name="user.home" />
+		<javaPropertyVariable name="user.dir" />
 		
  	    <programDefaultVariable name="MAX_CINTERPRETERS" value="3"/>
  	    

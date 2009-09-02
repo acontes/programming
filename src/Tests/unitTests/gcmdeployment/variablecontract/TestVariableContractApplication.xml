@@ -15,9 +15,5 @@
 		</proactive>
 	</application>
 
-	<resources> 
-		<nodeProvider id="np">
-			<file path="gcmd.xml"/>
-		</nodeProvider>
-	</resources>	
+	<resources/>
 </GCMApplication>

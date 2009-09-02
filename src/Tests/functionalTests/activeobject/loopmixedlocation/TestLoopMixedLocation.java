@@ -37,7 +37,6 @@ import java.io.IOException;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.proxy.BodyProxy;
 import org.objectweb.proactive.core.config.PAProperties;
@@ -64,7 +63,7 @@ public class TestLoopMixedLocation extends GCMFunctionalTestDefaultNodes {
     SimpleLocationServer server;
     UniqueID idA;
 
-    public TestLoopMixedLocation() throws IOException, ProActiveException {
+    public TestLoopMixedLocation() throws ActiveObjectCreationException, NodeException, IOException {
         super(1, 1);
 
         this.server = (SimpleLocationServer) PAActiveObject.newActive(SimpleLocationServer.class.getName(),

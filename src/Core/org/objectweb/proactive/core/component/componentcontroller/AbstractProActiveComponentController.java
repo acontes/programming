@@ -35,6 +35,7 @@ import java.io.Serializable;
 
 import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -47,6 +48,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  *
  */
 public abstract class AbstractProActiveComponentController implements Serializable, HostComponentSetter {
+    private boolean isInternal = true;
+    private InterfaceType interfaceType;
     protected static Logger controllerLogger = ProActiveLogger.getLogger(Loggers.COMPONENTS_CONTROLLERS);
     ProActiveComponent hostComponent;
 

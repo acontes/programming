@@ -35,7 +35,6 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.rmi.registry.LocateRegistry;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
@@ -105,7 +104,7 @@ public class RemoteObjectExposer<T> implements Serializable {
      * @return a remote reference to the remote object ie a RemoteRemoteObject
      * @throws UnknownProtocolException thrown if the protocol specified within the url is unknow
      */
-    public synchronized RemoteRemoteObject createRemoteObject(URI url) throws ProActiveException {
+    public synchronized RemoteRemoteObject createRemoteObject(URI url) throws UnknownProtocolException {
         String protocol = null;
         // check if the url contains a scheme (protocol)
         if (!url.isAbsolute()) {
@@ -139,12 +138,16 @@ public class RemoteObjectExposer<T> implements Serializable {
             this.activeRemoteRemoteObjects.put(url, irro);
 
             return rmo;
-        } catch (Exception e) {
-            throw new ProActiveException("Failed to create remote object (url=" + url + ")", e);
+        } catch (ProActiveException e) {
+            ProActiveLogger.getLogger(Loggers.REMOTEOBJECT).warn(
+                    "unable to activate a remote object at endpoint " + url.toString(), e);
+
+            e.printStackTrace();
+            return null;
         }
     }
 
-    public synchronized RemoteRemoteObject createRemoteObject(String name) throws ProActiveException {
+    public synchronized RemoteRemoteObject createRemoteObject(String name) {
         try {
             // select the factory matching the required protocol
             RemoteObjectFactory rof = AbstractRemoteObjectFactory.getDefaultRemoteObjectFactory();
@@ -153,7 +156,10 @@ public class RemoteObjectExposer<T> implements Serializable {
             this.activeRemoteRemoteObjects.put(irro.getURI(), irro);
             return irro.getRemoteRemoteObject();
         } catch (Exception e) {
-            throw new ProActiveException("Failed to create remote object (name=" + name + ")", e);
+            ProActiveLogger.getLogger(Loggers.REMOTEOBJECT).warn(
+                    "unable to activate a remote object at endpoint " + name, e);
+
+            return null;
         }
     }
 

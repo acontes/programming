@@ -42,7 +42,6 @@ import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.api.PAMobileAgent;
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.migration.Migratable;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
@@ -229,7 +228,7 @@ public class Chat implements java.io.Serializable, RunActive {
     public void register() {
         try {
             PAActiveObject.registerByName(PAActiveObject.getStubOnThis(), this.name);
-        } catch (ProActiveException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

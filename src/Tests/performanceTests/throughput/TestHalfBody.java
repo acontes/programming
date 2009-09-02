@@ -56,6 +56,7 @@ public class TestHalfBody extends FunctionalTest {
         client.startTest();
     }
 
+    @SuppressWarnings("serial")
     static public class Server implements Serializable {
         boolean firstRequest = true;
         long count = 0;
@@ -74,7 +75,7 @@ public class TestHalfBody extends FunctionalTest {
             count++;
         }
 
-        public boolean finish() {
+        public void finish() {
             long endTime = System.currentTimeMillis();
             double throughput = (1000.0 * count) / (endTime - startTime);
 
@@ -82,10 +83,10 @@ public class TestHalfBody extends FunctionalTest {
             System.out.println("Duration: " + (endTime - startTime));
             System.out.println("Throughput " + throughput);
             HudsonReport.reportToHudson(TestHalfBody.class, throughput);
-            return true;
         }
     }
 
+    @SuppressWarnings("serial")
     static public class Client implements Serializable {
         private Server server;
 

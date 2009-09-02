@@ -29,7 +29,6 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-// @snippet-start calcium_primes_5
 package org.objectweb.proactive.extensions.calcium.examples.findprimes;
 
 import org.objectweb.proactive.extensions.calcium.muscle.Condition;
@@ -41,4 +40,3 @@ public class IntervalDivideCondition implements Condition<Interval> {
         return (params.max - params.min) > params.solvableSize;
     }
 }
-//@snippet-end calcium_primes_5

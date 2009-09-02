@@ -56,7 +56,6 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ProActiveInterface;
-import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
@@ -116,7 +115,8 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
             Interface itf = (Interface) itfs[i];
             InterfaceType itfType = (InterfaceType) itf.getFcItfType();
             try {
-                if (!Utils.isControllerInterfaceName(itf.getFcItfName()) && (!itfType.isFcClientItf())) {
+                if (!itf.getFcItfName().endsWith("-controller") && !itf.getFcItfName().equals("component") &&
+                    (!itfType.isFcClientItf())) {
                     List<MonitorController> subcomponentMonitors = new ArrayList<MonitorController>();
                     if (isComposite()) {
                         Iterator<Component> bindedComponentsIterator = null;

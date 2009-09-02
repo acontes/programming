@@ -79,15 +79,15 @@ public class Tunnel {
         }
     }
 
-    synchronized public void write(byte[] buf) throws IOException {
+    public void write(byte[] buf) throws IOException {
         this.write(buf, 0, buf.length, 0);
     }
 
-    synchronized public void write(byte[] buf, long timeout) throws IOException {
+    public void write(byte[] buf, long timeout) throws IOException {
         this.write(buf, 0, buf.length, timeout);
     }
 
-    synchronized public void write(byte[] buf, int offset, int length, long timeout) throws IOException {
+    public void write(byte[] buf, int offset, int length, long timeout) throws IOException {
         this.socket.getOutputStream().write(buf, offset, length);
         this.socket.getOutputStream().flush();
     }

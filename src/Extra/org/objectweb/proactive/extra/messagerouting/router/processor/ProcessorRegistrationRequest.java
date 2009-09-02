@@ -104,9 +104,7 @@ public class ProcessorRegistrationRequest extends Processor {
 
         if (client == null) {
             // Send an ERR_ message (best effort)
-            logger.warn("AgentId " + agentId +
-                " asked to reconnect but is not known by this router. Remote endpoint is: " +
-                attachment.getRemoteEndpoint());
+            logger.warn("AgentId " + agentId + " asked to reconnect but is not known by this router");
 
             ErrorMessage errMessage = new ErrorMessage(ErrorType.ERR_INVALID_AGENT_ID, agentId, agentId,
                 this.message.getMessageID());
@@ -115,9 +113,6 @@ public class ProcessorRegistrationRequest extends Processor {
             } catch (IOException e) {
                 logger.info("Failed to notify the client that invalid agent has been advertised");
             }
-
-            // Since we disconnect the client, we must free the resources
-            this.attachment.dtor();
         } else {
             // Acknowledge the registration
             client.setAttachment(attachment);

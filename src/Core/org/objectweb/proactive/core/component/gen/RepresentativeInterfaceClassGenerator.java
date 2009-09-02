@@ -106,6 +106,7 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
 
             return reference;
         } catch (Exception e) {
+            // e.printStackTrace();
             throw new InterfaceGenerationFailedException(
                 "Cannot generate representative on interface [" + interfaceName + "] with signature [" +
                     interfaceType.getFcItfSignature() + "] with javassist", e);

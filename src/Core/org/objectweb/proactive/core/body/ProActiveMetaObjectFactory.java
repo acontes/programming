@@ -38,7 +38,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.ft.protocols.FTManagerFactory;
@@ -113,7 +112,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @version 1.0,  2002/05
  * @since   ProActive 0.9.2
  */
-@PublicAPI
 //@snippet-start proactivemetaobjectfactory
 public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Serializable, Cloneable {
     public static final String COMPONENT_PARAMETERS_KEY = "component-parameters";
@@ -364,7 +362,6 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
         }
     }
 
-    //@snippet-break proactivemetaobjectfactory
     // end inner class MigrationManagerFactoryImpl
     //    protected static class RemoteBodyFactoryImpl implements RemoteBodyFactory,
     //        java.io.Serializable {
@@ -408,7 +405,6 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
     //            }
     //        }
     //    }
-    //@snippet-resume proactivemetaobjectfactory
 
     // end inner class RemoteBodyFactoryImpl
     protected static class ThreadStoreFactoryImpl implements ThreadStoreFactory, java.io.Serializable {

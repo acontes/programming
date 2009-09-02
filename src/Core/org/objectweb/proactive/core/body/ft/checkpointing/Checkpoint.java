@@ -80,16 +80,7 @@ public class Checkpoint implements java.io.Serializable {
             // put futures in copy mode
             bodyToCheckpoint.getFuturePool().setCopyMode(true);
             this.bodyID = bodyToCheckpoint.getID();
-            String codebase = null;
-            if (PAProperties.PA_CLASSLOADING_USEHTTP.isTrue()) {
-                codebase = PAProperties.JAVA_RMI_SERVER_CODEBASE.getValue();
-            } else {
-                codebase = PAProperties.PA_CODEBASE.getValue();
-            }
-            if (additionalCodebase != null) {
-                codebase += " " + additionalCodebase;
-            }
-
+            String codebase = PAProperties.JAVA_RMI_SERVER_CODEBASE.getValue();
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             CheckpointingOutputStream objectOutputStream = new CheckpointingOutputStream(
                 byteArrayOutputStream, codebase + " " + additionalCodebase);

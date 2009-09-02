@@ -6,7 +6,7 @@
 	<environment>
         <javaPropertyVariable name="proactive.home" />
         <javaPropertyVariable name="os" />
-        <javaPropertyVariable name="user.home" />
+        <javaPropertyVariable name="user.dir" />
 	</environment>
 
 

@@ -43,7 +43,7 @@ import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.adapter.Adapter;
-import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
+import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -58,11 +58,7 @@ public class PARemoteObject {
     public final static Logger logger = ProActiveLogger.getLogger(Loggers.REMOTEOBJECT);
 
     /* Used to attribute an unique name to RO created by turnRemote */
-    private final static String TURN_REMOTE_PREFIX;
-    static {
-        String vmName = ProActiveRuntimeImpl.getProActiveRuntime().getVMInformation().getName();
-        TURN_REMOTE_PREFIX = "/" + vmName + "/TURN_REMOTE/";
-    }
+    private final static String TURN_REMOTE_PREFIX = "__@@__TURN_REMOTE_";
 
     /* Used to attribute an unique name to RO created by turnRemote */
     private final static AtomicLong counter = new AtomicLong();
@@ -76,9 +72,15 @@ public class PARemoteObject {
         return new RemoteObjectExposer<T>(className, target, targetRemoteObjectAdapter);
     }
 
-    public static <T> T bind(RemoteObjectExposer<T> roe, URI uri) throws ProActiveException {
+    public static <T> T bind(RemoteObjectExposer<T> roe, URI uri) throws UnknownProtocolException {
         RemoteRemoteObject irro = roe.createRemoteObject(uri);
-        return (T) new RemoteObjectAdapter(irro).getObjectProxy();
+        try {
+            return (T) new RemoteObjectAdapter(irro).getObjectProxy();
+        } catch (ProActiveException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return null;
+        }
     }
 
     /**
@@ -117,12 +119,17 @@ public class PARemoteObject {
      *
      * @param object the object to be exported as a remote object
      * @return A remote object that can be called from any JVM
-     * @exception ProActiveException if the remote object cannot be created
      */
     @SuppressWarnings("unchecked")
-    public static <T> T turnRemote(T object) throws ProActiveException {
+    public static <T> T turnRemote(T object) {
         RemoteObjectExposer<T> roe = newRemoteObject(object.getClass().getName(), object);
         RemoteRemoteObject rro = roe.createRemoteObject(TURN_REMOTE_PREFIX + counter.incrementAndGet());
-        return (T) new RemoteObjectAdapter(rro).getObjectProxy();
+        try {
+            return (T) new RemoteObjectAdapter(rro).getObjectProxy();
+        } catch (ProActiveException e) {
+            logger.warn("Turn Remote failed due to", e);
+            return null;
+        }
     }
+
 }

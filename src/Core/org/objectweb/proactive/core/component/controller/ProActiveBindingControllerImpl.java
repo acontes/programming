@@ -114,8 +114,8 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController 
         //        if (((InterfaceType) serverItf.getFcItfType()).isFcClientItf())
         //            throw new IllegalBindingException("The provided server interface is a client interface");
 
-        ProActiveInterfaceType clientItfType = (ProActiveInterfaceType) ((ComponentType) owner.getFcType())
-                .getFcInterfaceType(clientItfName);
+        ProActiveInterfaceType clientItfType = (ProActiveInterfaceType) Utils
+                .getItfType(clientItfName, owner);
 
         // TODO_M handle internal interfaces
         // if (server_itf_type.isFcClientItf()) {
@@ -213,7 +213,7 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController 
         checkLifeCycleIsStopped();
         checkClientInterfaceName(clientItfName);
 
-        if (((ComponentType) owner.getFcType()).getFcInterfaceType(clientItfName).isFcCollectionItf()) {
+        if (Utils.getItfType(clientItfName, owner).isFcCollectionItf()) {
             throw new IllegalBindingException(
                 "In this implementation, for coherency reasons, it is not possible to unbind members of a collection interface");
         }
@@ -372,7 +372,7 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController 
         // composite or parallel
         InterfaceType client_itf_type;
 
-        client_itf_type = ((ComponentType) owner.getFcType()).getFcInterfaceType(clientItfName);
+        client_itf_type = Utils.getItfType(clientItfName, owner);
 
         if (isComposite()) {
             if (Utils.isGathercastItf(sItf)) {
@@ -457,16 +457,29 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController 
         // Thus we have to add the link to the new interface in this group
         // same for client interfaces of parallel components
         if (clientItfType.getFcItfName().equals(clientItfName)) {
+            //            if ((isParallel() && !clientItfType.isFcClientItf())) {
+            //                // collective binding, unnamed interface
+            //                // TODO provide a default name?
+            //                Group itf_group = ProActiveGroup.getGroup(clientItf.getFcItfImpl());
+            //                itf_group.add(serverItf);
+            //            } else {
             // single binding
             clientItf.setFcItfImpl(serverItf);
+            //            }
         } else {
-            if (((ComponentType) owner.getFcType()).getFcInterfaceType(clientItfName).isFcCollectionItf()) {
+            if (Utils.getItfType(clientItfName, owner).isFcCollectionItf()) {
                 clientItf.setFcItfImpl(serverItf);
             } else {
+                //            if ((isParallel() && !clientItfType.isFcClientItf())) {
+                //            		
+                //                Group itf_group = ProActiveGroup.getGroup(clientItf.getFcItfImpl());
+                //                itf_group.addNamedElement(clientItfName, serverItf);
+                //            } else {
                 throw new NoSuchInterfaceException("Cannot bind interface " + clientItfName +
                     " because it does not correspond to the specified type");
             }
         }
+        //        }
         addBinding(new Binding(clientItf, clientItfName, serverItf));
     }
 
@@ -486,7 +499,6 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController 
 
         // remove from bindings and set impl object to null
         if (isPrimitive()) {
-            checkLifeCycleIsStopped();
             // delegate to primitive component
             BindingController user_binding_controller = (BindingController) ((ProActiveComponent) getFcItfOwner())
                     .getReferenceOnBaseObject();

@@ -44,14 +44,14 @@ import java.lang.reflect.Modifier;
 public class ConstructorCallImpl implements ConstructorCall, Serializable {
 
     /**
-     * The array holding the arguments of the constructor
+     * The array holding the arguments og the constructor
      */
-    protected Object[] effectiveArguments;
+    public Object[] effectiveArguments;
 
     /**
      * The corresponding constructor object
      */
-    protected Constructor<?> reifiedConstructor;
+    public Constructor<?> reifiedConstructor;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -206,13 +206,4 @@ public class ConstructorCallImpl implements ConstructorCall, Serializable {
                     ". This may be caused by having different versions of the same class on different VMs. Check your CLASSPATH settings.");
         }
     }
-
-    public Object[] getEffectiveArguments() {
-        return effectiveArguments;
-    }
-
-    public void setEffectiveArguments(Object[] effectiveArguments) {
-        this.effectiveArguments = effectiveArguments;
-    }
-
 }

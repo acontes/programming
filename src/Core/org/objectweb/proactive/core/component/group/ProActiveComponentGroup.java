@@ -98,13 +98,13 @@ public class ProActiveComponentGroup {
 
             return generated;
         } catch (InvalidProxyClassException e) {
-            logger.error("**** InvalidProxyClassException ****", e);
+            logger.error("**** InvalidProxyClassException ****");
         } catch (ConstructionOfProxyObjectFailedException e) {
-            logger.error("**** ConstructionOfProxyObjectFailedException ****", e);
+            logger.error("**** ConstructionOfProxyObjectFailedException ****");
         } catch (ConstructionOfReifiedObjectFailedException e) {
-            logger.error("**** ConstructionOfReifiedObjectFailedException ****", e);
+            logger.error("**** ConstructionOfReifiedObjectFailedException ****");
         } catch (InterfaceGenerationFailedException e) {
-            logger.error("**** Interface could not be generated **** ", e);
+            logger.error("**** Interface could not be generated **** " + e.getMessage());
         }
         return null;
     }

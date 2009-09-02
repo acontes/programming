@@ -29,7 +29,6 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-//@snippet-start TechnicalService_Interface
 package org.objectweb.proactive.core.descriptor.services;
 
 import java.io.Serializable;
@@ -69,4 +68,3 @@ public interface TechnicalService extends Serializable {
      */
     public abstract void apply(Node node);
 }
-//@snippet-end TechnicalService_Interface

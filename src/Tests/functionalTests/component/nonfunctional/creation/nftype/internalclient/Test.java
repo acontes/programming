@@ -52,7 +52,7 @@ import functionalTests.component.creation.ComponentInfo;
 
 
 /**
- * @author The ProActive Team
+ * @author Paul Naoumenko
  *
  *Creates a functional component, by defining among its parameters its non-functional type
  */

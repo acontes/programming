@@ -31,7 +31,6 @@
  */
 package org.objectweb.proactive.core.component.controller;
 
-import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.fractal.api.control.LifeCycleController;
 import org.objectweb.proactive.annotation.PublicAPI;
 
@@ -59,10 +58,10 @@ public interface ProActiveLifeCycleController extends LifeCycleController {
     /**
      * @see org.objectweb.fractal.api.control.LifeCycleController#startFc()
      */
-    public void startFc(short priority) throws IllegalLifeCycleException;
+    public void startFc(short priority);
 
     /**
      * @see org.objectweb.fractal.api.control.LifeCycleController#stopFc()
      */
-    public void stopFc(short priority) throws IllegalLifeCycleException;
+    public void stopFc(short priority);
 }

@@ -893,11 +893,11 @@ public class PAActiveObject {
      *            //localhost/name if port is 1099 or only the name. The registered object will be
      *            reachable with the following url: protocol://machine_name:port/name using
      *            lookupActive method. Protocol and port can be removed if default
-     * @exception ProActiveException
+     * @exception java.io.IOException
      *                if the remote body cannot be registered
      */
     @Deprecated
-    public static void register(Object obj, String url) throws ProActiveException {
+    public static void register(Object obj, String url) throws java.io.IOException {
         UniversalBody body = getRemoteBody(obj);
 
         try {
@@ -906,26 +906,22 @@ public class PAActiveObject {
             if (PAActiveObject.logger.isInfoEnabled()) {
                 PAActiveObject.logger.info("Success at binding url " + url);
             }
-        } catch (Exception e) {
+        } catch (UnknownProtocolException e) {
             e.printStackTrace();
-            throw new ProActiveException("Failed to register active object " + obj + "at " + url, e);
+            throw new IOException(e.getMessage());
         }
     }
 
-    public static String registerByName(Object obj, String name) throws ProActiveException {
-        try {
-            UniversalBody body = getRemoteBody(obj);
+    public static String registerByName(Object obj, String name) throws IOException {
+        UniversalBody body = getRemoteBody(obj);
 
-            String url = body.registerByName(name);
-            body.setRegistered(true);
-            if (PAActiveObject.logger.isInfoEnabled()) {
-                PAActiveObject.logger.info("Success at binding url " + url);
-            }
-
-            return url;
-        } catch (IOException e) {
-            throw new ProActiveException("Failed to register" + obj + " with name " + name, e);
+        String url = body.registerByName(name);
+        body.setRegistered(true);
+        if (PAActiveObject.logger.isInfoEnabled()) {
+            PAActiveObject.logger.info("Success at binding url " + url);
         }
+
+        return url;
     }
 
     /**

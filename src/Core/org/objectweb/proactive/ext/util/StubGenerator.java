@@ -155,15 +155,14 @@ public class StubGenerator {
         // ClassPool.releaseUnmodifiedClassFile = true;
         for (File file : files) {
             String str = file.toString().replaceFirst(Matcher.quoteReplacement(srcDir.toString()), "");
+            try {
+                if (!verbose) {
+                    System.setErr(mute);
+                }
 
-            if (!verbose) {
-                System.setErr(mute);
-            }
-
-            boolean success = StubGenerator.generateClass(str, destDir.toString() + File.separator);
-            if (success) {
-                System.out.println("Generated stub: " +
-                    Utils.convertClassNameToStubClassName(processClassName(str), null));
+                StubGenerator.generateClass(str, destDir.toString() + File.separator);
+            } catch (Throwable e) {
+                System.out.println("Stub generation failed: " + str);
             }
         }
 
@@ -194,13 +193,12 @@ public class StubGenerator {
      * @param arg
      * @param directoryName
      */
-    public static boolean generateClass(String arg, String directoryName) {
+    public static void generateClass(String arg, String directoryName) {
         String className = processClassName(arg);
         String fileName = null;
 
         String stubClassName = null;
 
-        boolean success = false;
         try {
             // Generates the bytecode for the class
             byte[] data;
@@ -221,13 +219,10 @@ public class StubGenerator {
             fos.write(data);
             fos.flush();
             fos.close();
-            success = true;
-        } catch (Throwable e) {
-            System.err.println("Stub generation failed for class: " + className);
-            e.printStackTrace();
+        } catch (Exception e) {
+            System.err.println("Cannot compute stub generation for class " + className);
+            System.err.println("Reason is " + e);
         }
-
-        return success;
     }
 
     /**

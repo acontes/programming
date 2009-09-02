@@ -132,7 +132,6 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
 
     /** Group of sleeping workers */
     private Group<Worker> sleepingGroup;
-    private Set<String> sleepingWorkersName;
 
     /** Group of cleared workers */
     private Set<Worker> clearedWorkers;
@@ -292,23 +291,18 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
                 worker.clear();
             }
         }
-        Worker locWorker = workersByName.get(workerName);
 
         if (emptyPending()) {
             // We say that the worker is sleeping if we don't know it yet or if it's not doing a task
             if (workersActivity.containsKey(workerName)) {
                 // If the worker requests a flooding this means that its penqing queue is empty,
                 // thus, it will sleep
-                if (flooding && !sleepingWorkersName.contains(workerName)) {
-                    sleepingGroup.add(locWorker);
-                    sleepingWorkersName.add(workerName);
+                if (flooding) {
+                    sleepingGroup.add(worker);
                 }
             } else {
-                if (!sleepingWorkersName.contains(workerName)) {
-                    workersActivity.put(workerName, new HashSet<Long>());
-                    sleepingGroup.add(locWorker);
-                    sleepingWorkersName.add(workerName);
-                }
+                workersActivity.put(workerName, new HashSet<Long>());
+                sleepingGroup.add(worker);
             }
             if (debug) {
                 logger.debug("No task given to " + workerName);
@@ -316,9 +310,8 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
             // we return an empty queue, this will cause the worker to sleep for a while
             return new LinkedList<TaskIntern<Serializable>>();
         } else {
-            if (sleepingWorkersName.contains(workerName)) {
-                sleepingGroup.remove(locWorker);
-                sleepingWorkersName.remove(workerName);
+            if (sleepingGroup.contains(worker)) {
+                sleepingGroup.remove(worker);
             }
             Queue<TaskIntern<Serializable>> tasksToDo = new LinkedList<TaskIntern<Serializable>>();
 
@@ -397,7 +390,6 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
             // Group of sleeping workers
             sleepingGroupStub = (Worker) PAGroup.newGroup(workerClassName);
             sleepingGroup = PAGroup.getGroup(sleepingGroupStub);
-            sleepingWorkersName = new HashSet<String>();
             workersActivity = new HashMap<String, Set<Long>>();
             workersByName = new HashMap<String, Worker>();
             workersByNameRev = new HashMap<Worker, String>();
@@ -428,20 +420,18 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
     public boolean isDead(final Worker worker) {
         if (workersByNameRev.containsKey(worker)) {
             String workerName = workersByNameRev.get(worker);
-            Worker locWorker = workersByName.get(workerName);
             if (logger.isInfoEnabled()) {
                 logger.info(workerName + " reported missing... removing it");
             }
 
             // we remove the worker from our lists
-            if (workerGroup.contains(locWorker)) {
-                workerGroup.remove(locWorker);
-                if (sleepingWorkersName.contains(workerName)) {
-                    sleepingGroup.remove(locWorker);
-                    sleepingWorkersName.remove(workerName);
+            if (workerGroup.contains(worker)) {
+                workerGroup.remove(worker);
+                if (sleepingGroup.contains(worker)) {
+                    sleepingGroup.remove(worker);
                 }
-                if (clearedWorkers.contains(locWorker)) {
-                    clearedWorkers.remove(locWorker);
+                if (clearedWorkers.contains(worker)) {
+                    clearedWorkers.remove(worker);
                 }
 
                 // Among our "dictionary of workers", we remove only entries in the reverse dictionary,
@@ -612,10 +602,8 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
             String workerName = workersByNameRev.get(worker);
             logger.debug(workerName + " is cleared");
         }
-        // finding the local worker stub
-        String workerName = workersByNameRev.get(worker);
-        Worker locWorker = workersByName.get(workerName);
-        clearedWorkers.add(locWorker);
+
+        clearedWorkers.add(worker);
     }
 
     /** {@inheritDoc} */
@@ -775,10 +763,6 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
             }
             if (clearedWorkers.size() == workerGroup.size() + spawnedWorkerNames.size()) {
                 sleepingGroup.addAll(clearedWorkers);
-                for (Worker w : clearedWorkers) {
-                    String wname = workersByNameRev.get(w);
-                    sleepingWorkersName.add(wname);
-                }
                 isClearing = false;
                 clearedWorkers.clear();
                 break;
@@ -1020,7 +1004,6 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
         // We clear every sleeping workers registered
         try {
             sleepingGroup.clear();
-            sleepingWorkersName.clear();
         } catch (ExceptionListException exl) {
             for (Exception ex : exl) {
                 ex.printStackTrace();
@@ -1263,7 +1246,6 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
         workerGroupStub = null;
         sleepingGroup.purgeExceptionAndNull();
         sleepingGroup.clear();
-        sleepingWorkersName.clear();
         sleepingGroupStub = null;
 
         clearedWorkers.clear();

@@ -411,7 +411,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
 
         try {
             PAActiveObject.registerByName(PAActiveObject.getStubOnThis(), "Dispatcher");
-        } catch (ProActiveException ioe) {
+        } catch (IOException ioe) {
             logger.error("Coudn't register the Dispatcher! " + ioe.getMessage());
         }
     }

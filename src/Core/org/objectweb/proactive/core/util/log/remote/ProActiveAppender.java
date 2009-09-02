@@ -126,7 +126,6 @@ public final class ProActiveAppender extends AppenderSkeleton {
 
     @Override
     public void close() {
-        this.spi.terminate();
         super.closed = true;
     }
 

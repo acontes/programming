@@ -37,7 +37,6 @@ import junit.framework.Assert;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.proxy.BodyProxy;
 import org.objectweb.proactive.core.config.PAProperties;
@@ -62,7 +61,7 @@ public class TestLocationServer extends GCMFunctionalTestDefaultNodes {
 
     SimpleLocationServer server;
 
-    public TestLocationServer() throws IOException, ProActiveException {
+    public TestLocationServer() throws ActiveObjectCreationException, NodeException, IOException {
         super(1, 1);
 
         this.server = (SimpleLocationServer) PAActiveObject.newActive(SimpleLocationServer.class.getName(),

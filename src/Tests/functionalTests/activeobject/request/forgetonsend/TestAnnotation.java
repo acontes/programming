@@ -35,8 +35,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import junit.framework.Assert;
-
 import org.junit.Test;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -91,6 +89,6 @@ public class TestAnnotation extends FunctionalTest {
             e1.printStackTrace();
         }
 
-        Assert.assertEquals("aahgie", b1.takeFast());
+        assertTrue(b1.takeFast().equals("aahgie"));
     }
 }

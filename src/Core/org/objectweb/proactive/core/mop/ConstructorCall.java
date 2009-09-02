@@ -56,9 +56,4 @@ public interface ConstructorCall {
      */
     public Object execute() throws java.lang.reflect.InvocationTargetException,
             ConstructorCallExecutionFailedException;
-
-    public Object[] getEffectiveArguments();
-
-    public void setEffectiveArguments(Object[] effectiveArguments);
-
 }

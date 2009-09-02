@@ -1,4 +1,3 @@
-//@tutorial-start
 /*
  * ################################################################
  *
@@ -32,7 +31,6 @@
  * $$ACTIVEEON_INITIAL_DEV$$
  */
 //@snippet-start primes_distributed_main
-//@snippet-start primes_distributed_main_skeleton
 package org.objectweb.proactive.examples.userguide.primes.distributed;
 
 import java.io.File;
@@ -103,8 +101,7 @@ public class Main {
 
             //TODO 5:  iterate through all nodes, deploy
             // a worker per node and add it to the manager
-            //@snippet-break primes_distributed_main_skeleton
-            //@tutorial-break
+
             Iterator<Node> nodesIt = vNode.getCurrentNodes().iterator();
             while (nodesIt.hasNext()) {
                 Node node = nodesIt.next();
@@ -112,8 +109,6 @@ public class Main {
                         CMAgentPrimeWorker.class.getName(), new Object[] {}, node);
                 manager.addWorker(worker);
             }
-            //@tutorial-resume
-            //@snippet-resume primes_distributed_main_skeleton
 
             // Check the primality (Send a synchronous method call to the manager)
             boolean isPrime = manager.isPrime(candidate);
@@ -127,7 +122,6 @@ public class Main {
             System.exit(0);
         }
     }
+
 }
-//@tutorial-end
 // @snippet-end primes_distributed_main
-//@snippet-end primes_distributed_main_skeleton
