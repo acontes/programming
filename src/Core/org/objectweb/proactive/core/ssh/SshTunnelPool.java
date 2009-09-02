@@ -169,13 +169,9 @@ public class SshTunnelPool {
                 public synchronized void close() throws IOException {
                     synchronized (SshTunnelPool.this.cache) {
                         unusedSince.set(System.currentTimeMillis());
-                        int i = users.decrementAndGet();
-                        if (i < 0) {
-                            logger.warn("USERS IS NEGATIVE SHOULD NOT BE");
-                        }
-
-                        super.close();
+                        users.decrementAndGet();
                     }
+                    super.close();
                 }
             };
             socket.connect(address);
