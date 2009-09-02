@@ -37,13 +37,18 @@ public class SshConnection {
     public SshConnection(String username, String hostname, int port, String[] keys) throws IOException {
         this.username = username;
 
+        if (keys.length == 0) {
+            throw new IOException("Failed to open a SSH connection to " + username + "@" + hostname + ":" +
+                port + ". No private keys");
+        }
+
         Connection connection = null;
         for (String key : keys) {
             connection = new Connection(hostname, port);
             connection.connect();
             try {
                 if (logger.isDebugEnabled()) {
-                    logger.info("Trying private key " + key + " for " + username + "@" + hostname + ":" +
+                    logger.debug("Trying private key " + key + " for " + username + "@" + hostname + ":" +
                         port);
                 }
                 connection.authenticateWithPublicKey(username, new File(key), null);
