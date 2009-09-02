@@ -54,6 +54,8 @@ public class SshConnection {
                 connection.authenticateWithPublicKey(username, new File(key), null);
                 if (connection.isAuthenticationComplete()) {
                     break;
+                } else {
+                    connection.close();
                 }
             } catch (IOException e) {
                 // Gracefully handle password protected private key
@@ -88,7 +90,6 @@ public class SshConnection {
                 }
                 logger.info(sb.toString());
             }
-            connection.close();
             throw new IOException("Failed to open a SSH connection to " + username + "@" + hostname + ":" +
                 port);
         }

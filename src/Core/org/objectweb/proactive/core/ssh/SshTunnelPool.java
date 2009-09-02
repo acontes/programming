@@ -150,7 +150,7 @@ public class SshTunnelPool {
     /**
      * A SshTunnel which manage statistics about the number of opened sockets
      */
-    private static class SshTunnelStatefull extends SshTunnel {
+    private class SshTunnelStatefull extends SshTunnel {
         /** number of currently open sockets */
         final private AtomicInteger users = new AtomicInteger();
         /** If users == 0, the timestamp of the last call to close() */
@@ -167,13 +167,15 @@ public class SshTunnelPool {
             InetSocketAddress address = new InetSocketAddress(this.getPort());
             Socket socket = new Socket() {
                 public synchronized void close() throws IOException {
-                    unusedSince.set(System.currentTimeMillis());
-                    int i = users.decrementAndGet();
-                    if (i < 0) {
-                        logger.warn("USERS IS NEGATIVE SHOULD NOT BE");
-                    }
+                    synchronized (SshTunnelPool.this.cache) {
+                        unusedSince.set(System.currentTimeMillis());
+                        int i = users.decrementAndGet();
+                        if (i < 0) {
+                            logger.warn("USERS IS NEGATIVE SHOULD NOT BE");
+                        }
 
-                    super.close();
+                        super.close();
+                    }
                 }
             };
             socket.connect(address);
@@ -228,7 +230,7 @@ public class SshTunnelPool {
             while (true) {
                 sleeper.sleep();
 
-                synchronized (cache) {
+                synchronized (SshTunnelPool.this.cache) {
                     logger.trace("Running garbage collection");
                     long ctime = System.currentTimeMillis(); // Avoid too many context switches 
 
