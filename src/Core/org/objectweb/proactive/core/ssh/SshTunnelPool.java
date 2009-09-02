@@ -167,8 +167,12 @@ public class SshTunnelPool {
             InetSocketAddress address = new InetSocketAddress(this.getPort());
             Socket socket = new Socket() {
                 public synchronized void close() throws IOException {
-                    users.decrementAndGet();
                     unusedSince.set(System.currentTimeMillis());
+                    int i = users.decrementAndGet();
+                    if (i < 0) {
+                        logger.warn("USERS IS NEGATIVE SHOULD NOT BE");
+                    }
+
                     super.close();
                 }
             };
