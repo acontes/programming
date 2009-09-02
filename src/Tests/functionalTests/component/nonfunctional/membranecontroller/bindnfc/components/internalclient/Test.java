@@ -58,7 +58,7 @@ import functionalTests.component.nonfunctional.creation.DummyControllerItf;
 
 
 /**
- * @author Paul Naoumenko
+ * @author The ProActive Team
  *
  *Testing non-functional bindings
  */
@@ -81,7 +81,7 @@ public class Test extends ComponentTest {
         ProActiveGenericFactory cf = Fractive.getGenericFactory(boot); /*Getting the Fractal-ProActive generic factory*/
 
         Type fType = type_factory.createFcType(new InterfaceType[] { type_factory.createFcItfType(
-                "componentInfo", ComponentInfo.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
+                "componentInfo", ComponentInfo.class.getName(), TypeFactory.SERVER, TypeFactory.OPTIONAL,
                 TypeFactory.SINGLE), });
 
         Type nfType = type_factory

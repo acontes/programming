@@ -73,7 +73,7 @@ import org.objectweb.proactive.core.security.securityentity.Entity;
  * runtime.
  *  - cache the vmInformation field
  */
-@SuppressWarnings("serial")
+
 public class ProActiveRuntimeRemoteObjectAdapter extends Adapter<ProActiveRuntime> implements
         ProActiveRuntime {
 
@@ -109,9 +109,6 @@ public class ProActiveRuntimeRemoteObjectAdapter extends Adapter<ProActiveRuntim
     }
 
     // =========   Implements ProActiveRuntime ==================
-    public void addAcquaintance(String proActiveRuntimeName) throws ProActiveException {
-        target.addAcquaintance(proActiveRuntimeName);
-    }
 
     public UniversalBody createBody(String nodeName, ConstructorCall bodyConstructorCall, boolean isNodeLocal)
             throws ProActiveException, ConstructorCallExecutionFailedException, InvocationTargetException {
@@ -128,24 +125,12 @@ public class ProActiveRuntimeRemoteObjectAdapter extends Adapter<ProActiveRuntim
         target.createVM(remoteProcess);
     }
 
-    public String[] getAcquaintances() throws ProActiveException {
-        return target.getAcquaintances();
-    }
-
     public List<UniversalBody> getActiveObjects(String nodeName) throws ProActiveException {
         return target.getActiveObjects(nodeName);
     }
 
     public List<UniversalBody> getActiveObjects(String nodeName, String className) throws ProActiveException {
         return target.getActiveObjects(nodeName, className);
-    }
-
-    public byte[] getClassDataFromParentRuntime(String className) throws ProActiveException {
-        return target.getClassDataFromParentRuntime(className);
-    }
-
-    public byte[] getClassDataFromThisRuntime(String className) throws ProActiveException {
-        return target.getClassDataFromThisRuntime(className);
     }
 
     public ProActiveDescriptorInternal getDescriptor(String url, boolean isHierarchicalSearch)
@@ -249,10 +234,6 @@ public class ProActiveRuntimeRemoteObjectAdapter extends Adapter<ProActiveRuntim
         target.registerVirtualNode(virtualNodeName, replacePreviousBinding);
     }
 
-    public void rmAcquaintance(String proActiveRuntimeName) throws ProActiveException {
-        target.rmAcquaintance(proActiveRuntimeName);
-    }
-
     public Object setLocalNodeProperty(String nodeName, String key, String value) throws ProActiveException {
         return target.setLocalNodeProperty(nodeName, key, value);
     }
@@ -331,5 +312,9 @@ public class ProActiveRuntimeRemoteObjectAdapter extends Adapter<ProActiveRuntim
     public Node createGCMNode(ProActiveSecurityManager nodeSecurityManager, String vnName, String jobId,
             List<TechnicalService> tsList) throws NodeException, AlreadyBoundException {
         return target.createGCMNode(nodeSecurityManager, vnName, jobId, tsList);
+    }
+
+    public byte[] getClassData(String className) {
+        return target.getClassData(className);
     }
 }

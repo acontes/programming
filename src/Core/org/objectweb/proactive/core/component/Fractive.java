@@ -61,6 +61,7 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAGroup;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -755,7 +756,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
      *             if the component cannot be registered
      */
     @Deprecated
-    public static void register(Component ref, String url) throws IOException {
+    public static void register(Component ref, String url) throws ProActiveException {
         if (!(ref instanceof ProActiveComponentRepresentative)) {
             throw new IllegalArgumentException("This method can only register ProActive components");
         }
@@ -770,14 +771,16 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
      *            ProActiveComponentRepresentative)
      * @param name
      *            the name of the component
-     * @throws IOException
+     * @return
+     *            The URI at which the component is bound
+     * @throws ProActiveException
      *             if the component cannot be registered
      */
-    public static void registerByName(Component ref, String name) throws IOException {
+    public static String registerByName(Component ref, String name) throws ProActiveException {
         if (!(ref instanceof ProActiveComponentRepresentative)) {
             throw new IllegalArgumentException("This method can only register ProActive components");
         }
-        PAActiveObject.registerByName(ref, name);
+        return PAActiveObject.registerByName(ref, name);
     }
 
     /**
@@ -842,6 +845,14 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
     private ActiveObjectWithComponentParameters commonInstanciation(Type type,
             ControllerDescription controllerDesc, ContentDescription contentDesc, Node node)
             throws InstantiationException, ActiveObjectCreationException, NodeException {
+        ComponentType cType = null;
+        // type must be a component type
+        if (!(type instanceof ComponentType)) {
+            throw new InstantiationException("Argument type must be an instance of ComponentType");
+        } else {
+            cType = (ComponentType) type;
+        }
+
         if (contentDesc == null) {
             // either a parallel or a composite component, no
             // activity/factory/node specified
@@ -851,29 +862,46 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
                 throw new InstantiationException(
                     "Content can be null only if the hierarchical type of the component is composite");
             }
-        } else if (Constants.COMPOSITE.equals(controllerDesc.getHierarchicalType())) {
+        } else {
+            Class<?> contentClass;
             try {
-                Class<?> contentClass = Class.forName(contentDesc.getClassName());
+                contentClass = Class.forName(contentDesc.getClassName());
+            } catch (ClassNotFoundException e) {
+                InstantiationException ie = new InstantiationException(
+                    "Cannot find interface defined in component content : " + e.getMessage());
+                ie.initCause(e);
+                throw ie;
+            }
+
+            if (Constants.COMPOSITE.equals(controllerDesc.getHierarchicalType())) {
                 if ((!contentClass.equals(Composite.class)) &&
                     (!AttributeController.class.isAssignableFrom(contentClass))) {
                     throw new InstantiationException(
                         "Content can be not null for composite component only if it extends AttributeControler");
                 }
-            } catch (ClassNotFoundException e) {
-                InstantiationException ie = new InstantiationException(
-                    "Cannot find interface defined in content : " + e.getMessage());
-                ie.initCause(e);
-                throw ie;
+            } else if (Constants.PRIMITIVE.equals(controllerDesc.getHierarchicalType())) {
+                // Check that the provided content class implements all defined interfaces (server, functional and not mandatory)
+                for (InterfaceType itfType : cType.getFcInterfaceTypes()) {
+                    if (!itfType.isFcClientItf() && !itfType.isFcOptionalItf() &&
+                        !Utils.isControllerInterfaceName(itfType.getFcItfName())) {
+                        try {
+                            if (!Class.forName(itfType.getFcItfSignature()).isAssignableFrom(contentClass)) {
+                                throw new InstantiationException(
+                                    "The provided content class does not implement the " +
+                                        itfType.getFcItfName() + " (" + itfType.getFcItfSignature() +
+                                        ") interface, cancel component creation.");
+                            }
+                        } catch (ClassNotFoundException e) {
+                            logger.debug("Class " + itfType.getFcItfSignature() +
+                                " can not be found; skip verification.", e);
+                        }
+                    }
+                }
             }
         }
-
         // instantiate the component metaobject factory with parameters of
         // the component
 
-        // type must be a component type
-        if (!(type instanceof ComponentType)) {
-            throw new InstantiationException("Argument type must be an instance of ComponentType");
-        }
         ComponentParameters componentParameters = new ComponentParameters((ComponentType) type,
             controllerDesc);
         if (contentDesc.getFactory() == null) {

@@ -29,6 +29,7 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
+// @snippet-start calcium_primes_2
 package org.objectweb.proactive.extensions.calcium.examples.findprimes;
 
 import java.io.Serializable;
@@ -51,6 +52,8 @@ class Interval implements Serializable {
         this.solvableSize = solvableSize;
     }
 
+    // @snippet-break calcium_primes_2
+
     @Override
     public String toString() {
         return "Params: " + min + "<?<" + max;
@@ -60,5 +63,6 @@ class Interval implements Serializable {
 
         return new int[] { 1, 2 };
     }
-
+    // @snippet-resume calcium_primes_2
 }
+//@snippet-end calcium_primes_2

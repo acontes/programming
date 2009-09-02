@@ -81,6 +81,7 @@ import org.objectweb.proactive.core.event.RuntimeRegistrationEvent;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEventProducerImpl;
 import org.objectweb.proactive.core.filetransfer.FileTransferEngine;
 import org.objectweb.proactive.core.gc.GarbageCollector;
+import org.objectweb.proactive.core.httpserver.ClassServerServlet;
 import org.objectweb.proactive.core.jmx.mbean.JMXClassLoader;
 import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapper;
 import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean;
@@ -135,7 +136,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @since ProActive 0.91
  * 
  */
-@SuppressWarnings("serial")
+
 public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl implements ProActiveRuntime,
         LocalProActiveRuntime {
 
@@ -152,12 +153,14 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
 
     // JMX
     private static Logger jmxLogger = ProActiveLogger.getLogger(Loggers.JMX);
-
+    private static final Logger clLogger = ProActiveLogger.getLogger(Loggers.CLASSLOADING);
     static {
         try {
             proActiveRuntime = new ProActiveRuntimeImpl();
             proActiveRuntime.createMBean();
         } catch (UnknownProtocolException e) {
+            e.printStackTrace();
+        } catch (ProActiveException e) {
             e.printStackTrace();
         }
     }
@@ -183,8 +186,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
     // map proActiveRuntime registered on this VM and their names
     private java.util.Hashtable<String, ProActiveRuntime> proActiveRuntimeMap;
 
-    // synchronized set of URL to runtimes in which we are registered
-    private java.util.Set<String> runtimeAcquaintancesURL;
     private ProActiveRuntime parentRuntime;
     protected RemoteObjectExposer<ProActiveRuntime> roe;
 
@@ -195,7 +196,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
 
     /** The MBean representing this ProActive Runtime */
     private ProActiveRuntimeWrapperMBean mbean;
-    private RegistrationForwarder registrationForwarder;
 
     private long gcmNodes;
 
@@ -204,12 +204,11 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
     // -----------------------------------------------------------
     //
     // singleton
-    protected ProActiveRuntimeImpl() throws UnknownProtocolException {
+    protected ProActiveRuntimeImpl() throws ProActiveException {
         try {
+
             this.vmInformation = new VMInformationImpl();
             this.proActiveRuntimeMap = new java.util.Hashtable<String, ProActiveRuntime>();
-            this.runtimeAcquaintancesURL = java.util.Collections
-                    .synchronizedSortedSet(new java.util.TreeSet<String>());
             this.virtualNodesMap = new java.util.Hashtable<String, VirtualNodeInternal>();
             this.descriptorMap = new java.util.Hashtable<String, ProActiveDescriptorInternal>();
             this.nodeMap = new java.util.Hashtable<String, LocalNode>();
@@ -265,6 +264,17 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
             "org.objectweb.proactive.core.runtime.ProActiveRuntime", this,
             ProActiveRuntimeRemoteObjectAdapter.class);
         this.roe.createRemoteObject(vmInformation.getName());
+
+        if (PAProperties.PA_CLASSLOADING_USEHTTP.isTrue()) {
+            // Set the codebase in case of useHTTP is true and the ProActiveRMIClassLoader is in use
+            String codebase = ClassServerServlet.get().getCodeBase();
+            PAProperties.PA_CODEBASE.setValue(codebase);
+        } else {
+            // Publish the URL of this runtime in the ProActive codebase
+            // URL must be prefixed by pa tu use our custom protocol handlers
+            // URL must be terminated by a / according to the RMI specification
+            PAProperties.PA_CODEBASE.setValue("pa" + this.getURL() + "/");
+        }
 
         // logging info
         MDC.remove("runtime");
@@ -335,7 +345,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
     public void setParent(ProActiveRuntime parentPARuntime) {
         if (this.parentRuntime == null) {
             this.parentRuntime = parentPARuntime;
-            this.runtimeAcquaintancesURL.add(parentPARuntime.getURL());
         } else {
             runtimeLogger.error("Parent runtime already set!");
         }
@@ -453,23 +462,27 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
             nodeSecurityManager.setParent(this);
         }
 
-        LocalNode localNode = new LocalNode(nodeName, jobId, nodeSecurityManager, vnName);
-
-        if (replacePreviousBinding && (this.nodeMap.get(nodeName) != null)) {
-            localNode.setActiveObjects(this.nodeMap.get(nodeName).getActiveObjectsId());
-            this.nodeMap.remove(nodeName);
-        }
-
-        this.nodeMap.put(nodeName, localNode);
-
-        Node node = null;
         try {
-            node = new NodeImpl((ProActiveRuntime) PARemoteObject.lookup(URI.create(localNode.getURL())),
-                localNode.getURL(), URIBuilder.getProtocol(localNode.getURL()), jobId);
+            LocalNode localNode = new LocalNode(nodeName, jobId, nodeSecurityManager, vnName);
+            if (replacePreviousBinding && (this.nodeMap.get(nodeName) != null)) {
+                localNode.setActiveObjects(this.nodeMap.get(nodeName).getActiveObjectsId());
+                this.nodeMap.remove(nodeName);
+            }
+
+            this.nodeMap.put(nodeName, localNode);
+
+            Node node = null;
+            try {
+                node = new NodeImpl((ProActiveRuntime) PARemoteObject.lookup(URI.create(localNode.getURL())),
+                    localNode.getURL(), URIBuilder.getProtocol(localNode.getURL()), jobId);
+            } catch (ProActiveException e) {
+                throw new NodeException("Failed to created NodeImpl", e);
+            }
+            return node;
         } catch (ProActiveException e) {
-            throw new NodeException("Failed to created NodeImpl", e);
+            throw new NodeException("Failed to create the LocalNode for " + nodeName, e);
         }
-        return node;
+
     }
 
     public Node createGCMNode(ProActiveSecurityManager nodeSecurityManager, String vnName, String jobId,
@@ -651,38 +664,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
     }
 
     /**
-     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#addAcquaintance(String)
-     */
-    public void addAcquaintance(String proActiveRuntimeName) {
-        this.runtimeAcquaintancesURL.add(proActiveRuntimeName);
-    }
-
-    /**
-     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getAcquaintances()
-     */
-    public String[] getAcquaintances() {
-        String[] urls;
-
-        synchronized (this.runtimeAcquaintancesURL) {
-            urls = new String[this.runtimeAcquaintancesURL.size()];
-
-            java.util.Iterator<String> iter = this.runtimeAcquaintancesURL.iterator();
-
-            for (int i = 0; i < urls.length; i++)
-                urls[i] = iter.next();
-        }
-
-        return urls;
-    }
-
-    /**
-     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#rmAcquaintance(java.lang.String)
-     */
-    public void rmAcquaintance(String proActiveRuntimeName) {
-        this.runtimeAcquaintancesURL.remove(proActiveRuntimeName);
-    }
-
-    /**
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#killRT(boolean)
      */
     public void killRT(boolean softly) {
@@ -767,7 +748,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
     }
 
     public void registerVirtualNode(String virtualNodeName, boolean replacePreviousBinding)
-            throws UnknownProtocolException {
+            throws ProActiveException {
         this.roe.createRemoteObject(virtualNodeName);
     }
 
@@ -1113,64 +1094,48 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
         return runtimeSecurityManager.getPolicy(local, distant);
     }
 
-    public byte[] getClassDataFromParentRuntime(String className) throws ProActiveException {
+    public synchronized byte[] getClassData(String className) {
         byte[] classData = null;
 
-        if (this.parentRuntime != null) {
-            classData = this.parentRuntime.getClassDataFromThisRuntime(className);
-
-            if (classData == null) {
-                // continue searching
-                classData = this.parentRuntime.getClassDataFromParentRuntime(className);
-            }
-
-            if (classData != null) {
-                // caching class
-                ClassDataCache.instance().addClassData(className, classData);
-
-                if (runtimeLogger.isDebugEnabled()) {
-                    runtimeLogger.debug(getURL() + " -- > Returning class " + className + " found in " +
-                        this.parentRuntime.getURL());
-                }
-
-                return classData;
-            }
-        }
-
-        return null;
-    }
-
-    public synchronized byte[] getClassDataFromThisRuntime(String className) throws ProActiveException {
-        byte[] classData = null;
-
-        // 1. look in class cache
-        // this can be redundant if not looking in a parent
+        // Check class data cache (already generated stub)
         classData = ClassDataCache.instance().getClassData(className);
-
-        // found something in classloader or cache...
         if (classData != null) {
             return classData;
+        } else {
+            if (clLogger.isTraceEnabled()) {
+                clLogger.trace(className + " is not in the class data cache");
+            }
         }
 
+        // Look in classpath
         try {
-            // 2. look in classpath
             classData = FileProcess.getBytesFromResource(className);
-        } catch (IOException e2) {
-            e2.printStackTrace();
-        }
-
-        if (classData != null) {
-            ClassDataCache.instance().addClassData(className, classData);
-
-            return classData;
-        }
-
-        if (this.parentRuntime == null) {
-            // top of hierarchy of runtimes
-            classData = generateStub(className);
-
             if (classData != null) {
+                if (clLogger.isTraceEnabled()) {
+                    clLogger.trace("Found " + className + " in the classpath");
+                }
                 return classData;
+            } else {
+                if (clLogger.isTraceEnabled()) {
+                    clLogger.trace("Failed to find " + className + " in classpath");
+                }
+            }
+        } catch (IOException e2) {
+            Logger l = ProActiveLogger.getLogger(Loggers.CLASSLOADING);
+            ProActiveLogger.logEatedException(l, e2);
+        }
+
+        // Generate stub
+        classData = generateStub(className);
+        if (classData != null) {
+            if (clLogger.isTraceEnabled()) {
+                clLogger.trace("Generated " + className + " stub");
+            }
+            return classData;
+        } else {
+            if (clLogger.isTraceEnabled()) {
+
+                clLogger.trace("Failed to generate stub for " + className);
             }
         }
 
@@ -1192,35 +1157,23 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
     }
 
     // tries to generate a stub without using MOP methods
-    public byte[] generateStub(String className) {
+    private byte[] generateStub(String className) {
         byte[] classData = null;
 
         if (Utils.isStubClassName(className)) {
-            // try {
             // do not use directly MOP methods (avoid classloader cycles)
-            // /Logger.getLogger(Loggers.CLASSLOADING).debug("Generating class :
-            // " + className);
-            // e.printStackTrace();
             String classname = Utils.convertStubClassNameToClassName(className);
-
             classData = JavassistByteCodeStubBuilder.create(classname, null);
-
-            // } catch (ClassNotFoundException ignored) {
-            // }
-        }
-
-        if (classData != null) {
-            ClassDataCache.instance().addClassData(className, classData);
-
-            return classData;
+            if (classData != null) {
+                ClassDataCache.instance().addClassData(className, classData);
+                return classData;
+            }
         }
 
         // try to get the class as a generated component interface reference
         classData = org.objectweb.proactive.core.component.gen.Utils.getClassData(className);
-
         if (classData != null) {
             ClassDataCache.instance().addClassData(className, classData);
-
             return classData;
         }
 
@@ -1591,14 +1544,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
     }
 
     public void addDeployment(long deploymentId) {
-        createRegistrationForwarder();
-        registrationForwarder.doNotForward(deploymentId);
-    }
-
-    synchronized private void createRegistrationForwarder() {
-        if (registrationForwarder == null) {
-            this.registrationForwarder = new RegistrationForwarder();
-        }
     }
 
     public void setDeploymentId(long deploymentId) {
