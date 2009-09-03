@@ -13,7 +13,12 @@ import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
 import functionalTests.FunctionalTest;
 
-
+/**
+ * Actually runs a dummy test regarding the handling of virtual envrionnement...
+ * Just tests the schema validity of GCMD descriptor
+ * @author jmguilla
+ *
+ */
 public class TestVM extends FunctionalTest {
 
     @Test

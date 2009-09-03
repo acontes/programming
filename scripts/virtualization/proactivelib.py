@@ -104,12 +104,11 @@ class Abstract_Runtime () :
         """this static method tries to initialize the environment
         returning the goot proactive provider. If you write new
         providers, add yours here"""
-        for i in range(len(Abstract_Runtime.__providers)):
-            x = Abstract_Runtime.__providers[i]
-            res = x.isOk()
+        for index,instance in enumerate(Abstract_Runtime.__providers):
+            res = instance.isOk()
             if res != None:
                 print ("find a matching environment")
-                return x
+                return instance
         print ("no matching environment found")
         return None
     getInstance = staticmethod(getInstance)

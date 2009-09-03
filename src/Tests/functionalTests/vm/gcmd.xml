@@ -6,50 +6,36 @@
 		<javaPropertyVariable name="user.home" />
 	</environment>
 
-	<resources> 
-		<bridge refid="bUbuntu1">
-			<host refid="ubuntu1"/>
-		</bridge>
-	<!-- 	<bridge refid="bUbuntu2">
-			<host refid="ubuntu2"/>
-		</bridge> -->
+	<resources>
+		<host refid="localhost"/>
 	</resources>
 
 	<infrastructure>
 		<hosts>
-			<host os="unix" id="ubuntu1" username="inria">
-				<homeDirectory base="root" relpath="/home/inria"/>
-				<tool id="java" path="/usr/lib/jvm/java-6-sun/jre"/>
-			</host><!--
-			<host os="unix" id="ubuntu2" username="inria">
-				<homeDirectory base="root" relpath="/home/inria"/>
-				<tool id="java" path="/usr/lib/jvm/java-6-sun/jre"/>
-			</host>-->
+			<host os="unix" id="localhost">
+				<homeDirectory base="root" relpath="${user.home}"/>
+			</host>
 		</hosts>
-		<bridges>
-			<sshBridge id="bUbuntu1" hostname="192.168.1.152" username="inria"/>
-		<!-- 	<sshBridge id="bUbuntu2" hostname="192.168.1.165" username="inria"/>	-->
-		</bridges> 
 		<vms>
 			<vmware-vi id="vmware-vi">
 				<hypervisor url="https://slave1.activeeon.com:8333/sdk"/>
 				<authentication user="inria" pwd="inria123"/>
-				<image key="myUbuntu"/>
+				<image key="myUbuntu" os="unix"/>
 			</vmware-vi>
 			<vmware-vix id="vmware-vix" service="vi">
 				<hypervisor url="https://slave1.activeeon.com:8333/sdk"/>
 				<authentication user="inria" pwd="inria123"/>
-				<image key="[standard] VMware-test1/VMware-test1.vmx"/>
+				<image key="[standard] VMware-test1/VMware-test1.vmx" os="unix"/>
 			</vmware-vix>
 			<libxen id="libxen">
 				<hypervisor url="https://slave1.activeeon.com/"/>
 				<authentication user="inria" pwd="inria123"/>
-				<image key="myUbuntu"/>
+				<image key="myUbuntu" os="unix"/>
 			</libxen>
 			<virtualbox-ws id="virtualbox">
 				<hypervisor url="http://slave1.activeeon.com:18083"/>
 				<authentication user="inria" pwd="inria123"/>
-				<image key="myUbuntu"/>
+				<image key="myUbuntu" os="unix"/>
 			</virtualbox-ws>
 		</vms>
 	</infrastructure>

@@ -128,12 +128,9 @@
   &GCMDeployment;
   &Descriptor;
   &VariableContract;
-<<<<<<< HEAD:doc/pa/main.xml
   &Virtualization;
   &FileTransfer;
-=======
   <!--&FileTransfer;-->
->>>>>>> master:doc/pa/main.xml
   &technicalService;
  </part>
  

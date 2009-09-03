@@ -43,19 +43,21 @@
 	</resources>
 	 -->
 	 <environment>
-		<descriptorVariable name="proactive.home" value="/usr/bin/ProActive" />
 		<javaPropertyVariable name="user.dir" />
+		<javaPropertyVariable name="proactive.home"/>
 	</environment>
 
 	<application>
 		<proactive base="root" relpath="${proactive.home}">
 			<configuration>
+				<jvmarg value="-Dproactive.communication.protocol=rmi"/>
+				<jvmarg value="-Dsun.net.spi.nameservice.provider.1=dns,sun"/>
 				<proactiveClasspath type="overwrite">
 					<pathElement base="proactive" relpath="/dist/lib/ProActive.jar" />
-					<pathElement base="proactive" relpath="/dist/lib/ProActive.jar" />
-					<pathElement base="proactive" relpath="/dist/lib/ProActive.jar" />
-					<pathElement base="proactive" relpath="/dist/lib/ProActive.jar" />	
+					<pathElement base="proactive" relpath="/dist/lib/ProActive_tests.jar" />
 				</proactiveClasspath>
+				<securityPolicy base="proactive" relpath="/compile/proactive.java.policy"/>
+				<log4jProperties base="proactive" relpath="/compile/proactive-log4j"/>
 			</configuration>
 			<virtualNode id="Workers">
 				<nodeProvider refid="local" />
