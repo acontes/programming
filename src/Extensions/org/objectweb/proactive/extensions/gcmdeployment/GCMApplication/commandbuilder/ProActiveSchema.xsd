@@ -335,9 +335,6 @@
             </xsd:annotation>
         </xsd:attribute>
 	</xsd:complexType>
-<<<<<<< HEAD:src/Extensions/org/objectweb/proactive/extensions/gcmdeployment/GCMApplication/commandbuilder/ProActiveSchema.xsd
-	
-=======
 
 	<xsd:simpleType name="DataSpacesInputOutputIdType">
 		<xsd:restriction base="idType">
@@ -397,5 +394,4 @@
 		</xsd:sequence>
 	</xsd:complexType>
 
->>>>>>> trunk-svn:src/Extensions/org/objectweb/proactive/extensions/gcmdeployment/GCMApplication/commandbuilder/ProActiveSchema.xsd
 </xsd:schema>
