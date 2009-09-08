@@ -44,6 +44,7 @@
                 <!ENTITY MonteCarlo SYSTEM "monteCarlo.xml">
                 <!ENTITY mpi SYSTEM "mpi.xml">
                 <!ENTITY plugin SYSTEM "development/plugin.xml">
+                <!ENTITY DataSpaces SYSTEM "DataSpaces.xml">
                 <!ENTITY guidedindex SYSTEM "guided_tour/guidedIndex.xml">
                 <!-- <!ENTITY capabilities-intro SYSTEM "guided_tour/capabilities-intro.xml"> -->
                 <!ENTITY capabilities-intro SYSTEM "applicationhandouts.xml">
@@ -63,7 +64,6 @@
                 <!ENTITY biblio SYSTEM "biblio.xml">
                 <!ENTITY referenceCard SYSTEM "ReferenceCard.xml">
                 <!ENTITY srcCodeAppendix SYSTEM "srcCodeAppendix.xml">
-                <!ENTITY loadbalancing SYSTEM "LoadBalancing.xml">
                 <!ENTITY glossary SYSTEM "glossary.xml">
                 <!ENTITY reference SYSTEM "definitions.xml">
                 <!ENTITY HighLevelAPITutorial SYSTEM "high_level_api_tutorial.xml">
@@ -73,7 +73,7 @@
                 <!ENTITY MessageRouting SYSTEM "MessageRouting.xml">
 	        <!ENTITY JMX SYSTEM "Jmx.xml">
          	 <!ENTITY JMXMBean SYSTEM "jmxMBean.xml">
-                 <!ENTITY scilab SYSTEM "scilab/ScilabDoc.xml">
+
                 ]>
                 
 <book xmlns="http://docbook.org/ns/docbook" version="5.0">
@@ -117,6 +117,7 @@
   &Calcium;
   &OOSPMD;
   &mpi;
+  &DataSpaces;
  </part>
  
  <part xml:id="ProActiveConfiguration"><info><title xml:id="ProActiveConfiguration_2">ProActive Configuration</title></info>
@@ -144,7 +145,6 @@
  </part>
  <part xml:id="ProActiveAdvancedFeatures"><info><title xml:id="ServicesandAdvancedFeatures_2">Services and Advanced Features</title></info>
   
-  &loadbalancing;
   &faultTolerance;
   &Security;
   &WSDoc;
@@ -152,7 +152,6 @@
   &OSGi;
   &JMX;
   &JMXMBean;
-  &scilab;
  </part>
  
  <part xml:id="ExtendingProActive"><info><title xml:id="ExtendingProActive_2">Extending ProActive</title></info>
