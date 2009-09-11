@@ -479,7 +479,7 @@ public enum PAProperties {
     PA_MEMORY_TAG_LEASE_PERIOD("proactive.tagmemory.lease.period", PAPropertiesType.INTEGER),
 
     /** Enable or disable the Distributed Service ID Tag */
-    PA_TAG_DSI("proactive.tag.dsi", PAPropertiesType.BOOLEAN),
+    PA_TAG_DSF("proactive.tag.dsf", PAPropertiesType.BOOLEAN),
 
     /* ------------------------------------
      *  FILE TRANSFER

@@ -813,7 +813,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             }
             // Check the presence of the DSI Tag if enabled
             // Ohterwise add it
-            if (PAProperties.PA_TAG_DSI.isTrue()) {
+            if (PAProperties.PA_TAG_DSF.isTrue()) {
                 if (!nextTags.check(DsiTag.IDENTIFIER)) {
                     nextTags.addTag(new DsiTag(bodyID, sequenceID));
                 }
