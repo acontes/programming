@@ -195,19 +195,7 @@ public class PAFaultTolerance implements Serializable {
          * return line
          */
         FTServerInformation server = getServerInformation();
-        try {
-            server.location.getLocation(target).receiveFTMessage(new FTMessage() {
-                private static final long serialVersionUID = -7946796254940775983L;
-
-                @Override
-                public Object handleFTMessage(FTManager ftm) {
-                    ftm.triggerNextCheckpoint();
-                    return null;
-                }
-            });
-        } catch (IOException e) {
-            throw new ProActiveException(e);
-        }
+        triggerLocalCheckpoint(target, getNextWantedLine());
         return server.storage.getLastState(target);
     }
 
@@ -222,15 +210,15 @@ public class PAFaultTolerance implements Serializable {
     public synchronized void triggerLocalCheckpoint(UniqueID target, int lineNumber)
             throws ProActiveException {
         /*
-         * begin
-         *   triggered = trigger_local_checkpoint(target)
-         * end while triggered < number
+         * ao = ft_server.registered_aos[target]
+         * line = ao.ft_manager.trigger_checkpoint_until(line_number)
          */
-        int lastNumber = getLastCheckpointNumber(target);
-        System.out.println("trigger : " + target + " : " + lastNumber + "/" + lineNumber);
-        for (int i = lastNumber; i <= lineNumber; i++) {
-            System.out.println("trigger [" + i + "/" + lineNumber + "] " + target);
-            triggerLocalCheckpoint(target);
+        FTServerInformation server = getServerInformation();
+        try {
+            System.out.println("trigger checkpoint until " + lineNumber + " for " + target);
+            server.location.getLocation(target).receiveFTMessage(new FTMessageForTrigger(lineNumber));
+        } catch (IOException e) {
+            throw new ProActiveException(e);
         }
     }
 
@@ -388,6 +376,21 @@ public class PAFaultTolerance implements Serializable {
     /* ****************************
      * Utilities
      * ****************************/
+
+    private final class FTMessageForTrigger implements FTMessage {
+        private static final long serialVersionUID = -7946796254940775983L;
+        private int max;
+
+        public FTMessageForTrigger(int max) {
+            this.max = max;
+        }
+
+        @Override
+        public Object handleFTMessage(FTManager ftm) {
+            ftm.triggerNextCheckpoints(max);
+            return null;
+        }
+    }
 
     /**
      * This class is used to provide an hook to the asynchronous triggerGlobalCheckpoint() method

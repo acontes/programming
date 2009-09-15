@@ -76,7 +76,6 @@ public class FTManagerCIC extends FTManagerGen {
     protected Checkpoint checkpoint(Request pendingRequest) {
         //stop accepting communication
         (owner).blockCommunication();
-        takeNext = false;
         // synchronized on hisotry to avoid hisot commit during checkpoint
         synchronized (this.historyLock) {
             Checkpoint c;

@@ -520,8 +520,9 @@ public abstract class FTManagerGen extends FTManager {
         int currentCheckpointIndex = this.checkpointIndex;
         int currentNextMax = this.nextMax;
 
-        if (takeNext)
+        if (takeNext > currentCheckpointIndex) {
             return true;
+        }
 
         // checkpoint if next is greater than index
         if (currentNextMax > currentCheckpointIndex) {

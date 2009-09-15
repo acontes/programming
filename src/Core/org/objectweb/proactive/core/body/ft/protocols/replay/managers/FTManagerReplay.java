@@ -110,7 +110,7 @@ public class FTManagerReplay extends FTManagerGen {
         int currentNextMax = this.nextMax;
 
         // force to trigger a checkpoint
-        if (takeNext) {
+        if (takeNext > currentCheckpointIndex) {
             return true;
         }
 
@@ -182,7 +182,6 @@ public class FTManagerReplay extends FTManagerGen {
     protected Checkpoint checkpoint(Request pendingRequest) {
         //stop accepting communication
         (owner).blockCommunication();
-        takeNext = false;
         // synchronized on history to avoid histo commit during checkpoint
         synchronized (this.historyLock) {
             Checkpoint c;

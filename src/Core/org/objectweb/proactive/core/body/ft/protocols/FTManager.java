@@ -109,7 +109,7 @@ public abstract class FTManager implements java.io.Serializable {
     // checkpoint interval (ms)
     protected int ttc;
 
-    protected boolean takeNext;
+    protected int takeNext;
 
     /**
      * Return the selector value for a given protocol.
@@ -181,9 +181,8 @@ public abstract class FTManager implements java.io.Serializable {
         return isACheckpoint;
     }
 
-    public void triggerNextCheckpoint() {
-        System.out.println("Take the next checkpoint");
-        takeNext = true;
+    public void triggerNextCheckpoints(int max) {
+        takeNext = max;
     }
 
     /**
