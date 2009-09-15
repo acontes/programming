@@ -38,7 +38,7 @@ import org.objectweb.proactive.core.event.RequestQueueEventListener;
 import org.objectweb.proactive.core.util.CircularArrayList;
 
 
-public interface RequestQueue {
+public interface RequestQueue extends Iterable<Request> {
 
     /**
      *   Returns an iterator over all the requests in the request queue. It is up to the programmer

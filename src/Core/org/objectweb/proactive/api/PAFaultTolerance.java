@@ -14,10 +14,10 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
+import org.objectweb.proactive.core.body.ft.servers.FTServer;
 import org.objectweb.proactive.core.body.ft.servers.location.LocationServer;
 import org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcess;
 import org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer;
-import org.objectweb.proactive.core.body.ft.servers.util.ActiveQueueJob;
 import org.objectweb.proactive.core.body.ft.service.FaultToleranceTechnicalService;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -41,6 +41,7 @@ public class PAFaultTolerance implements Serializable {
     private static PAFaultTolerance instance;
 
     private int wantedLine = 0;
+    private int lastGlobal = 0;
 
     private PAFaultTolerance() {
     }
@@ -132,6 +133,7 @@ public class PAFaultTolerance implements Serializable {
         int waitTime = 500;
         int totalTime = 10000;
         int currentTime = 0;
+        int last;
 
         FTServerInformation server = getServerInformation();
         int nextLine = getNextWantedLine();
@@ -139,18 +141,19 @@ public class PAFaultTolerance implements Serializable {
             System.out.println("trigger checkpoint for " + body);
             triggerLocalCheckpoint(body.getID(), nextLine);
         }
-        while (getLastGlobalCheckpointNumber() < nextLine && currentTime < totalTime) {
+        while ((last = getLastGlobalCheckpointNumber()) < nextLine && currentTime < totalTime) {
             try {
-                System.out.println("try... " + currentTime + "/" + totalTime);
                 Thread.sleep(waitTime);
                 currentTime += waitTime;
+                System.out.println("replay: waiting (" + currentTime + "/" + totalTime + ")");
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
-        if (getLastGlobalCheckpointNumber() < nextLine) {
-            wantedLine--;
-            throw new ProActiveException("FT: Error during triggering checkpoint");
+        if (last < nextLine) {
+            wantedLine--; // undo the getNextWantedLine
+            throw new ProActiveException("FT: Error during triggering checkpoint " + nextLine +
+                " (last state is " + last + ")");
         }
         return nextLine;
     }
@@ -257,7 +260,10 @@ public class PAFaultTolerance implements Serializable {
          * return line
          */
         int lastLine = getServerInformation().storage.getLastGlobalState();
-        return lastLine;
+        if (lastGlobal < lastLine) {
+            lastGlobal = lastLine;
+        }
+        return lastGlobal;
     }
 
     /**
@@ -351,10 +357,7 @@ public class PAFaultTolerance implements Serializable {
         /*
          * restart_from_checkpoint_number( last_global_checkpoint )
          */
-        //restartFromCheckpointNumber(getLastGlobalCheckpointNumber());.
-        FTServerInformation server = getServerInformation();
-        UniversalBody body = server.location.getAllLocations().get(0);
-        server.recovery.failureDetected(body.getID());
+        restartFromCheckpointNumber(getLastGlobalCheckpointNumber());
     }
 
     /**
@@ -367,11 +370,14 @@ public class PAFaultTolerance implements Serializable {
          * assert { line_number <= last_global_checkpoint }
          * ft_server.restart_from( line_number )
          */
-        if (lineNumber <= getLastGlobalCheckpointNumber()) {
+        int last = getLastGlobalCheckpointNumber();
+        if (lineNumber <= last) {
             FTServerInformation server = getServerInformation();
-            throw new UnsupportedOperationException();
+            System.out.println("Replay: replay from checkpoint " + lineNumber);
+            ((FTServer) server.storage).internalRecover(lineNumber);
         } else {
-            // throw exception ?
+            throw new ProActiveException("Replay: Can't replay from a non-existing checkpoint " + "(" +
+                lineNumber + "). Last global line is " + last);
         }
     }
 

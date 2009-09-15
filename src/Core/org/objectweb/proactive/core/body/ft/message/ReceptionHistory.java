@@ -44,11 +44,9 @@ import org.objectweb.proactive.core.UniqueID;
  * @author The ProActive Team
  * @since 3.0
  */
-public class ReceptionHistory implements Serializable {
+public class ReceptionHistory implements Serializable, Cloneable {
 
-    /**
-     *
-     */
+    private static final long serialVersionUID = 490062375216717743L;
 
     // the elements of the history
     private List<UniqueID> elements;
@@ -71,6 +69,18 @@ public class ReceptionHistory implements Serializable {
         this.lastCommited = -1;
         this.lastRecoverable = -1;
         this.base = 0;
+    }
+
+    public ReceptionHistory clone() {
+        ReceptionHistory res = new ReceptionHistory();
+        res.elements = new Vector<UniqueID>();
+        for (UniqueID id : this.elements) {
+            res.elements.add(id);
+        }
+        res.lastCommited = this.lastCommited;
+        res.base = this.base;
+        res.lastRecoverable = this.lastRecoverable;
+        return res;
     }
 
     /**

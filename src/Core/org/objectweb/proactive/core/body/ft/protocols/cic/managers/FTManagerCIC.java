@@ -32,18 +32,24 @@
 package org.objectweb.proactive.core.body.ft.protocols.cic.managers;
 
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Vector;
 
+import org.objectweb.proactive.api.PAFaultTolerance;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
+import org.objectweb.proactive.core.body.ft.checkpointing.CheckpointInfo;
 import org.objectweb.proactive.core.body.ft.message.ReplyLog;
 import org.objectweb.proactive.core.body.ft.message.RequestLog;
 import org.objectweb.proactive.core.body.ft.protocols.cic.infos.CheckpointInfoCIC;
 import org.objectweb.proactive.core.body.ft.protocols.cic.infos.MessageInfoCIC;
+import org.objectweb.proactive.core.body.ft.protocols.gen.infos.CheckpointInfoGen;
 import org.objectweb.proactive.core.body.ft.protocols.gen.managers.FTManagerGen;
+import org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcess;
 import org.objectweb.proactive.core.body.request.AwaitedRequest;
+import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.Request;
 
 
@@ -148,6 +154,77 @@ public class FTManagerCIC extends FTManagerGen {
             (owner).acceptCommunication();
             return c;
         }
+    }
+
+    // Active Object is created but not started
+    @Override
+    public int beforeRestartAfterRecovery(CheckpointInfo ci, int inc) {
+        CheckpointInfoGen cic = (CheckpointInfoGen) ci;
+        BlockingRequestQueue queue = (owner).getRequestQueue();
+        int index = cic.checkpointIndex;
+        try {
+            index = PAFaultTolerance.getInstance().getLastGlobalCheckpointNumber();
+        } catch (ProActiveException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        //	reinit ft values
+        this.history = new Vector<UniqueID>();
+        this.completingCheckpoint = false;
+        this.lastCommitedIndex = index;//cic.lastCommitedIndex;
+        // historized requests are supposed to be "already received"
+        this.deliveredRequestsCounter = index;//cic.lastCommitedIndex; //cic.lastRcvdRequestIndex;
+        // new history then begin at the end of the history of the checkpoint
+
+        this.historyBaseIndex = index;//cic.lastCommitedIndex + 1; //;cic.lastRcvdRequestIndex+1;
+
+        // HERE, we need a proof that running in "histo mode" is equivalent that
+        // running in normal mode from the end of the histo.
+        this.awaitedRequests = new Vector<AwaitedRequest>();
+        this.replyToResend = new Hashtable<Integer, Vector<ReplyLog>>();
+        this.requestToResend = new Hashtable<Integer, Vector<RequestLog>>();
+        this.checkpointIndex = index;
+        this.nextMax = index;
+        this.checkpointTimer = System.currentTimeMillis();
+        this.historyIndex = index;
+        this.lastRecovery = index;
+        this.incarnation = inc;
+
+        //add pending request to reuqestQueue
+        Request pendingRequest = cic.pendingRequest;
+
+        //pending request could be null with OOSPMD synchronization
+        if (pendingRequest != null) {
+            queue.addToFront(pendingRequest);
+        }
+
+        //add orphan-tagged requests in request queue
+        //this requests are also added to this.awaitedRequests
+        this.filterQueue(queue, cic);
+
+        // building history
+        // System.out.println(""+ this.ownerID + " History size : " + cic.history.size());
+        Iterator<UniqueID> itHistory = cic.history.iterator();
+        while (itHistory.hasNext()) {
+            UniqueID cur = itHistory.next();
+            AwaitedRequest currentAwaitedRequest = new AwaitedRequest(cur);
+            queue.add(currentAwaitedRequest);
+            this.awaitedRequests.add(currentAwaitedRequest);
+        }
+
+        //enable communication
+        //System.out.println("[CIC] enable communication");
+        (owner).acceptCommunication();
+
+        // update servers
+        this.location.updateLocation(ownerID, owner.getRemoteAdapter());
+        this.recovery.updateState(ownerID, RecoveryProcess.RUNNING);
+
+        // resend all in-transit message
+        this.sendLogs((CheckpointInfoGen) ci);
+
+        return 0;
     }
 
 }

@@ -41,6 +41,7 @@ import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
 import org.objectweb.proactive.core.body.ft.checkpointing.CheckpointInfo;
 import org.objectweb.proactive.core.body.ft.message.HistoryUpdater;
 import org.objectweb.proactive.core.body.ft.message.MessageInfo;
+import org.objectweb.proactive.core.body.ft.protocols.replay.servers.CheckpointServerReplay;
 import org.objectweb.proactive.core.body.ft.servers.faultdetection.FaultDetector;
 import org.objectweb.proactive.core.body.ft.servers.location.LocationServer;
 import org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcess;
@@ -139,6 +140,14 @@ public class FTServer implements FaultDetector, LocationServer, RecoveryProcess,
      */
     public void forceDetection() {
         this.faultDetector.forceDetection();
+    }
+
+    public void internalRecover(int i) {
+        if (this.checkpointServer instanceof CheckpointServerReplay) {
+            ((CheckpointServerReplay) this.checkpointServer).internalRecover(i);
+        } else {
+            throw new UnsupportedOperationException();
+        }
     }
 
     /**

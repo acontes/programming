@@ -31,15 +31,24 @@
  */
 package org.objectweb.proactive.core.body.ft.protocols.replay.servers;
 
-import java.util.Enumeration;
+import java.io.IOException;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
+import java.util.Map.Entry;
 
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
+import org.objectweb.proactive.core.body.ft.internalmsg.GlobalStateCompletion;
+import org.objectweb.proactive.core.body.ft.internalmsg.OutputCommit;
+import org.objectweb.proactive.core.body.ft.message.HistoryUpdater;
+import org.objectweb.proactive.core.body.ft.message.MessageInfo;
 import org.objectweb.proactive.core.body.ft.message.ReceptionHistory;
+import org.objectweb.proactive.core.body.ft.protocols.gen.infos.CheckpointInfoGen;
+import org.objectweb.proactive.core.body.ft.protocols.gen.infos.MessageInfoGen;
 import org.objectweb.proactive.core.body.ft.protocols.gen.servers.CheckpointServerGen;
 import org.objectweb.proactive.core.body.ft.protocols.replay.infos.CheckpointInfoReplay;
 import org.objectweb.proactive.core.body.ft.servers.FTServer;
@@ -50,6 +59,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.MutableInteger;
+import org.objectweb.proactive.core.util.MutableLong;
 
 
 /**
@@ -59,51 +69,174 @@ import org.objectweb.proactive.core.util.MutableInteger;
  */
 public class CheckpointServerReplay extends CheckpointServerGen {
 
+    // handling histories
+    protected Hashtable<UniqueID, List<ReceptionHistory>> histories;
+
     public CheckpointServerReplay(FTServer server) {
         super(server);
+        this.histories = new Hashtable<UniqueID, List<ReceptionHistory>>();
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#storeCheckpoint(org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint, int)
+     */
+    public synchronized int storeCheckpoint(Checkpoint c, int incarnation) {
+        if (incarnation < this.globalIncarnation) {
+            logger.warn("** WARNING ** : Object with incarnation " + incarnation +
+                " is trying to store checkpoint");
+            return 0;
+        }
+
+        List<Checkpoint> ckptList = checkpointStorage.get(c.getBodyID());
+
+        // the first checkpoint ...
+        if (ckptList == null) {
+            // new storage slot
+            List<Checkpoint> checkpoints = new ArrayList<Checkpoint>();
+
+            //dummy first checkpoint
+            checkpoints.add(new Checkpoint());
+            UniqueID id = c.getBodyID();
+            checkpointStorage.put(id, checkpoints);
+            checkpoints.add(c);
+            // new history slot
+            List<ReceptionHistory> histList = new ArrayList<ReceptionHistory>();
+            histList.add(new ReceptionHistory());
+            this.histories.put(c.getBodyID(), histList);
+            // new greatestHisto slot
+            this.greatestCommitedHistory.put(c.getBodyID(), new MutableInteger(0));
+        } else {
+            //add checkpoint
+            ckptList.add(c);
+        }
+
+        // updating monitoring
+        int index = ((CheckpointInfoGen) (c.getCheckpointInfo())).checkpointIndex;
+        if (index > this.lastRegisteredCkpt) {
+            this.lastRegisteredCkpt = index;
+        }
+        MutableInteger currentGlobalState = (this.stateMonitor.get(new MutableInteger(index)));
+        if (currentGlobalState == null) {
+            // this is the first checkpoint store for the global state index
+            this.stateMonitor.put(new MutableInteger(index), new MutableInteger(1));
+        } else {
+            currentGlobalState.add(1);
+        }
+
+        //this.checkLastGlobalState();
+        logger.info("[CKPT] Receive checkpoint indexed " + index + " from body " + c.getBodyID() +
+            " (used memory = " + this.getUsedMem() + " Kb)"); // + "[" + System.currentTimeMillis() + "]");
+
+        if (displayCkptSize) {
+            logger.info("[CKPT] Size of ckpt " + index + " before addInfo : " + this.getSize(c) + " bytes");
+        }
+
+        // broadcast history closure if a new globalState is built
+        if (this.checkLastGlobalState()) {
+            // send a GSC message to all
+            for (UniqueID callee : this.checkpointStorage.keySet()) {
+                this.server.submitJob(new GSCESender(this.server, callee, new GlobalStateCompletion(
+                    this.lastGlobalState)));
+            }
+        }
+        return this.lastGlobalState;
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#commitHistory(org.objectweb.proactive.core.body.ft.message.HistoryUpdater)
+     **/
+    public synchronized void commitHistory(HistoryUpdater rh) {
+        if (rh.incarnation < this.globalIncarnation) {
+            logger.warn("** WARNING ** : Object with incarnation " + rh.incarnation +
+                " is trying to store checkpoint infos (Current inc = " + this.globalIncarnation + ")");
+            return;
+        }
+
+        // update the histo if needed
+        if (rh.elements != null) {
+            List<ReceptionHistory> histList = this.histories.get(rh.owner);
+            ReceptionHistory ih = histList.get(histList.size() - 1);
+            ih = ih.clone();
+            histList.add(ih);
+            ih.updateHistory(rh);
+        }
+
+        // update the recovery line monitoring
+        MutableInteger greatestIndexSent = ((this.greatestCommitedHistory.get(rh.owner)));
+        if (greatestIndexSent.getValue() < rh.checkpointIndex) {
+            // must update rc monitoring
+            greatestIndexSent.setValue(rh.checkpointIndex);
+            // inc the rcv counter for the index indexOfCheckpoint
+            MutableInteger counter = (this.recoveryLineMonitor.get(greatestIndexSent));
+            if (counter == null) {
+                // this is the first histo commit with index indexOfCkpt
+                this.recoveryLineMonitor.put(new MutableInteger(rh.checkpointIndex), new MutableInteger(1));
+            } else {
+                counter.add(1);
+            }
+
+            // test if a new recovery line has been created
+            // update histories if any
+            this.checkRecoveryLine();
+        }
+    }
+
+    //return true if the recoveryline has changed
+    protected boolean checkRecoveryLine() {
+        int systemSize = this.server.getSystemSize();
+        MutableInteger nextPossible = (this.recoveryLineMonitor
+                .get(new MutableInteger(this.recoveryLine + 1)));
+
+        // THIS PART MUST BE ATOMIC
+        if ((nextPossible != null) && (nextPossible.getValue() == systemSize)) {
+            // a new recovery line has been created
+            // update histories
+            for (UniqueID key : this.histories.keySet()) {
+                List<ReceptionHistory> histList = this.histories.get(key);
+                ReceptionHistory cur = histList.get(histList.size() - 1);
+                long nextBase = ((CheckpointInfoGen) (this.getCheckpoint(key, this.recoveryLine + 1)
+                        .getCheckpointInfo())).lastRcvdRequestIndex + 1;
+                cur.goToNextBase(nextBase);
+                cur.confirmLastUpdate();
+            }
+
+            // a new rec line has been created
+            this.recoveryLine = this.recoveryLine + 1;
+            logger.info("[CKPT] Recovery line is " + this.recoveryLine);
+            return true;
+        }
+        return false;
+    }
+
+    protected void internalRecover(UniqueID id) {
+        internalRecover(this.recoveryLine);
     }
 
     // protected accessors
-    protected void internalRecover(UniqueID failed) {
+    public void internalRecover(int lineNumber) {
         System.out.println("**********************");
         try {
-            Enumeration<UniqueID> itBodies = null;
             int globalState = 0;
             synchronized (this) {
-                globalState = this.recoveryLine;
+                globalState = lineNumber;
                 this.globalIncarnation++;
                 logger.info("[RECOVERY] Recovering system from " + globalState + " with incarnation " +
                     this.globalIncarnation);
 
-                itBodies = this.checkpointStorage.keys();
-                this.lastGlobalState = globalState;
-                this.lastRegisteredCkpt = globalState;
+                //this.lastGlobalState = globalState;
+                //this.lastRegisteredCkpt = globalState;
                 this.recoveryLine = globalState;
                 this.stateMonitor = new Hashtable<MutableInteger, MutableInteger>();
                 this.recoveryLineMonitor = new Hashtable<MutableInteger, MutableInteger>();
 
-                //                // delete unusable checkpoints
-                //                Iterator<List<Checkpoint>> it = this.checkpointStorage.values().iterator();
-                //                while (it.hasNext()) {
-                //                    List<Checkpoint> ckpts = it.next();
-                //                    while (ckpts.size() > (globalState + 1)) {
-                //                        ckpts.remove(globalState + 1);
-                //                    }
-                //                }
-
                 // set all the system in recovery state
-                while (itBodies.hasMoreElements()) {
-                    UniqueID current = (itBodies.nextElement());
+                for (UniqueID current : this.checkpointStorage.keySet()) {
                     this.server.updateState(current, RecoveryProcess.RECOVERING);
                 }
 
-                //reinit the iterator
-                itBodies = this.checkpointStorage.keys();
-
                 // reinit hisotries; delete not recoverable parts of histories
-                Enumeration<ReceptionHistory> itHistories = this.histories.elements();
-                while (itHistories.hasMoreElements()) {
-                    itHistories.nextElement().compactHistory();
+                for (List<ReceptionHistory> hist : this.histories.values()) {
+                    hist.get(hist.size() - 1).compactHistory();
                 }
             } // end synchronize
 
@@ -111,18 +244,18 @@ public class CheckpointServerReplay extends CheckpointServerGen {
             Vector<JobBarrier> barriers = new Vector<JobBarrier>();
 
             // send checkpoints
-            while (itBodies.hasMoreElements()) {
-                UniqueID current = (itBodies.nextElement());
+            for (UniqueID current : this.checkpointStorage.keySet()) {
 
                 //Checkpoint toSend = this.server.getCheckpoint(current,globalState);
                 Checkpoint toSend = this.getCheckpoint(current, globalState);
 
                 // update history of toSend
-                CheckpointInfoReplay cic = (CheckpointInfoReplay) (toSend.getCheckpointInfo());
-                ReceptionHistory histo = ((this.histories.get(current)));
-                cic.history = histo.getRecoverableHistory();
+                CheckpointInfoReplay replay = (CheckpointInfoReplay) (toSend.getCheckpointInfo());
+                List<ReceptionHistory> histList = this.histories.get(current);
+                ReceptionHistory histo = histList.get(histList.size() - 1);
+                replay.history = histo.getRecoverableHistory();
                 // set the last commited index
-                cic.lastCommitedIndex = histo.getLastRecoverable();
+                replay.lastCommitedIndex = histo.getLastRecoverable();
 
                 UniversalBody toRecover = (this.server.getLocation(current));
 
@@ -135,15 +268,66 @@ public class CheckpointServerReplay extends CheckpointServerGen {
             // MUST WAIT THE TERMINAISON OF THE RECOVERY !
             // FaultDetection thread wait for the completion of the recovery
             // If a failure occurs during rec, it will be detected by an active object
-            Iterator<JobBarrier> itBarriers = barriers.iterator();
-            while (itBarriers.hasNext()) {
-                (itBarriers.next()).waitForJobCompletion();
+            for (JobBarrier barrier : barriers) {
+                barrier.waitForJobCompletion();
             }
         } catch (NodeException e) {
             logger.error("[RECOVERY] **ERROR** Unable to send checkpoint for recovery");
             e.printStackTrace();
         }
         System.out.println("**********************");
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#outputCommit(org.objectweb.proactive.core.body.ft.message.MessageInfo)
+     */
+    public synchronized void outputCommit(MessageInfo mi) {
+        Hashtable<UniqueID, MutableLong> vectorClock = ((MessageInfoGen) mi).vectorClock;
+
+        // must store at least each histo up to vectorClock[id]
+        // <ATOMIC>
+        for (Entry<UniqueID, MutableLong> entry : vectorClock.entrySet()) {
+            UniqueID id = entry.getKey();
+            MutableLong ml = entry.getValue();
+            List<ReceptionHistory> histList = this.histories.get(id);
+            ReceptionHistory ih = histList.get(histList.size() - 1);
+
+            // first test if a history retreiving is necessary
+            // i.e. if vc[id]<=histories[id].lastCommited
+            long lastCommited = ih.getLastCommited();
+            long index = ml.getValue();
+            if (lastCommited < index) {
+                try {
+                    UniversalBody target = this.server.getLocation(id);
+                    HistoryUpdater rh = (HistoryUpdater) (target.receiveFTMessage(new OutputCommit(
+                        lastCommited + 1, index)));
+                    ih.updateHistory(rh);
+                } catch (RemoteException e) {
+                    logger.error("**ERROR** Unable to retreive history of " + id);
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    logger.error("**ERROR** Unable to retreive history of " + id);
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        // </ATOMIC>
+        // wait for completion of histo retreiving
+        // here we can commit alteration on histories
+        for (List<ReceptionHistory> element : this.histories.values()) {
+            element.get(element.size() - 1).confirmLastUpdate();
+        }
+    }
+
+    /**
+     * Reintialize the server.
+     */
+    @Override
+    public void initialize() {
+        super.initialize();
+
+        this.histories = new Hashtable<UniqueID, List<ReceptionHistory>>();
     }
 
 }

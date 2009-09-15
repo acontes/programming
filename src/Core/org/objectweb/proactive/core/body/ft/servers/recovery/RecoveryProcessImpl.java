@@ -85,7 +85,7 @@ public abstract class RecoveryProcessImpl implements RecoveryProcess {
      */
     public void register(UniqueID id) {
         //register with RUNNING default state
-        bodies.put(id, new Integer(RUNNING));
+        bodies.put(id, Integer.valueOf(RUNNING));
 
         //adapt active queues pool
         synchronized (this.activeQueuePool) {
@@ -118,7 +118,7 @@ public abstract class RecoveryProcessImpl implements RecoveryProcess {
         if (currentState == RUNNING) {
             // we can suppose that id is failed
             logger.info("[RECOVERY] Failure is detected for " + id);
-            this.bodies.put(id, new Integer(RECOVERING));
+            this.bodies.put(id, Integer.valueOf(RECOVERING));
             this.recover(id);
         } else if (currentState == RECOVERING) {
             // id is recovering ...  do nothing
@@ -130,7 +130,7 @@ public abstract class RecoveryProcessImpl implements RecoveryProcess {
      */
     public void updateState(UniqueID id, int state) {
         logger.info("[RECOVERY]  " + id + " is updating its state : " + state);
-        this.bodies.put(id, new Integer(state));
+        this.bodies.put(id, Integer.valueOf(state));
     }
 
     /**

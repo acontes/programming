@@ -45,7 +45,6 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
-import org.objectweb.proactive.core.body.ft.checkpointing.CheckpointInfo;
 import org.objectweb.proactive.core.body.ft.exception.ProtocolErrorException;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.ft.internalmsg.GlobalStateCompletion;
@@ -57,7 +56,6 @@ import org.objectweb.proactive.core.body.ft.message.RequestLog;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.ft.protocols.gen.infos.CheckpointInfoGen;
 import org.objectweb.proactive.core.body.ft.protocols.gen.infos.MessageInfoGen;
-import org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcess;
 import org.objectweb.proactive.core.body.future.MethodCallResult;
 import org.objectweb.proactive.core.body.message.Message;
 import org.objectweb.proactive.core.body.reply.Reply;
@@ -355,7 +353,7 @@ public abstract class FTManagerGen extends FTManager {
     }
 
     /*
-     * Return true if the sending of the paramter message is an output commit
+     * Return true if the sending of the parameter message is an output commit
      * ** TEST IMPLEMENTATION **
      */
     private boolean isOutputCommit(Message m) {
@@ -406,7 +404,7 @@ public abstract class FTManagerGen extends FTManager {
                 //}
                 ReplyLog log = new ReplyLog(toLog, destination.getRemoteAdapter());
                 for (int i = currentCheckpointIndex + 1; i <= rdvValue; i++) {
-                    (this.replyToResend.get(new Integer(i))).add(log);
+                    (this.replyToResend.get(Integer.valueOf(i))).add(log);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -448,7 +446,7 @@ public abstract class FTManagerGen extends FTManager {
                 RequestLog log = new RequestLog(request, destination.getRemoteAdapter());
                 for (int i = currentCheckpointIndex + 1; i <= rdvValue; i++) {
                     //System.out.println(""+this.ownerID + " logs a request for " + destination.getID());
-                    this.requestToResend.get(new Integer(i)).add(log);
+                    this.requestToResend.get(Integer.valueOf(i)).add(log);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -479,71 +477,6 @@ public abstract class FTManagerGen extends FTManager {
 
     @Override
     public int onServeRequestAfter(Request request) {
-        return 0;
-    }
-
-    // Active Object is created but not started
-    @Override
-    public int beforeRestartAfterRecovery(CheckpointInfo ci, int inc) {
-        CheckpointInfoGen cic = (CheckpointInfoGen) ci;
-        BlockingRequestQueue queue = (owner).getRequestQueue();
-        int index = cic.checkpointIndex;
-
-        //	reinit ft values
-        this.history = new Vector<UniqueID>();
-        this.completingCheckpoint = false;
-        this.lastCommitedIndex = cic.lastCommitedIndex;
-        // historized requests are supposed to be "already received"
-        this.deliveredRequestsCounter = cic.lastCommitedIndex; //cic.lastRcvdRequestIndex;
-        // new history then begin at the end of the history of the checkpoint
-
-        this.historyBaseIndex = cic.lastCommitedIndex + 1; //;cic.lastRcvdRequestIndex+1;
-
-        // HERE, we need a proof that running in "histo mode" is equivalent that
-        // running in normal mode from the end of the histo.
-        this.awaitedRequests = new Vector<AwaitedRequest>();
-        this.replyToResend = new Hashtable<Integer, Vector<ReplyLog>>();
-        this.requestToResend = new Hashtable<Integer, Vector<RequestLog>>();
-        this.checkpointIndex = index;
-        this.nextMax = index;
-        this.checkpointTimer = System.currentTimeMillis();
-        this.historyIndex = index;
-        this.lastRecovery = index;
-        this.incarnation = inc;
-
-        //add pending request to reuqestQueue
-        Request pendingRequest = cic.pendingRequest;
-
-        //pending request could be null with OOSPMD synchronization
-        if (pendingRequest != null) {
-            queue.addToFront(pendingRequest);
-        }
-
-        //add orphan-tagged requests in request queue
-        //this requests are also added to this.awaitedRequests
-        this.filterQueue(queue, cic);
-
-        // building history
-        // System.out.println(""+ this.ownerID + " History size : " + cic.history.size());
-        Iterator<UniqueID> itHistory = cic.history.iterator();
-        while (itHistory.hasNext()) {
-            UniqueID cur = itHistory.next();
-            AwaitedRequest currentAwaitedRequest = new AwaitedRequest(cur);
-            queue.add(currentAwaitedRequest);
-            this.awaitedRequests.add(currentAwaitedRequest);
-        }
-
-        //enable communication
-        //System.out.println("[CIC] enable communication");
-        (owner).acceptCommunication();
-
-        // update servers
-        this.location.updateLocation(ownerID, owner.getRemoteAdapter());
-        this.recovery.updateState(ownerID, RecoveryProcess.RUNNING);
-
-        // resend all in-transit message
-        this.sendLogs((CheckpointInfoGen) ci);
-
         return 0;
     }
 
@@ -688,7 +621,7 @@ public abstract class FTManagerGen extends FTManager {
      * send logged messages before recovery
      * !!! ALL FT-STATE VARAIBLES MUST BE SET !!!
      */
-    private void sendLogs(CheckpointInfoGen ci) {
+    protected void sendLogs(CheckpointInfoGen ci) {
         //send replies
         //System.out.println("[CIC] Sending logged messages...");
         Vector<ReplyLog> replies = ci.replyToResend;
@@ -727,7 +660,7 @@ public abstract class FTManagerGen extends FTManager {
 
     // replace request that are orphan for cic.checkpointIndex by awaitedRequest
     // and identify existing AwRq in the request queue
-    private void filterQueue(BlockingRequestQueue queue, CheckpointInfoGen cic) {
+    protected void filterQueue(BlockingRequestQueue queue, CheckpointInfoGen cic) {
         CircularArrayList<Request> internalQueue = ((BlockingRequestQueueImpl) queue).getInternalQueue();
         ListIterator<Request> itQueue = internalQueue.listIterator();
         while (itQueue.hasNext()) {
