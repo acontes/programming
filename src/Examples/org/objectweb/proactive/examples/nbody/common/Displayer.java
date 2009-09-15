@@ -31,8 +31,6 @@
  */
 package org.objectweb.proactive.examples.nbody.common;
 
-import java.io.Serializable;
-
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 
@@ -41,7 +39,7 @@ import org.objectweb.proactive.extensions.annotation.ActiveObject;
  * The swing GUI is attached as a field of the Active Object, so it can be recreated
  * from scratch. */
 @ActiveObject
-public class Displayer implements Serializable {
+public class Displayer {
     private static final long serialVersionUID = -4020596699068779668L;
 
     private transient NBodyFrame nbf;

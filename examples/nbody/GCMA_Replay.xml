@@ -4,7 +4,7 @@
     xsi:schemaLocation="urn:gcm:application:1.0 http://proactive.inria.fr/schemas/gcm/1.0/ApplicationDescriptorSchema.xsd">
 
     <environment>
-        <javaPropertyVariable name="proactive.home" />
+        <descriptorVariable name="proactive.home" value="/user/evallett/home/workspaces/workspace/proactive" />
         <javaPropertyVariable name="user.home" />
 
         <descriptorVariable name="hostCapacity" value="2"/>
@@ -25,8 +25,8 @@
 
             <technicalServices>
                 <class name="org.objectweb.proactive.core.body.ft.service.FaultToleranceTechnicalService">
-                    <property name="global" value="rmi://localhost:1100/ReplayServer" />
-                    <property name="resource" value="rmi://localhost:1100/ReplayServer" />
+                    <property name="global" value="rmi://localhost:6663/ReplayServer" />
+                    <property name="resource" value="rmi://localhost:6663/ReplayServer" />
                     <property name="ttc" value="30000" />
                     <property name="protocol" value="replay" />
                 </class>
