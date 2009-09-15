@@ -288,6 +288,6 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
 
     @Override
     public void startBody() {
-        // FIXME @evallett
+        this.wrappedBody.startBody();
     }
 }

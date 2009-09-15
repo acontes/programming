@@ -218,6 +218,5 @@ public class DummySender implements UniversalBody {
 
     @Override
     public void startBody() {
-        // FIXME @evallett
     }
 }

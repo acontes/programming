@@ -110,7 +110,6 @@ public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody> imp
         return bodyID;
     }
 
-    // FIXME @evallett
     public void startBody() {
         target.startBody();
     }
