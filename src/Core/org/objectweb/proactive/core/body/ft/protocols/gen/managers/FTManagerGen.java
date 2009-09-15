@@ -582,7 +582,7 @@ public abstract class FTManagerGen extends FTManager {
     /*
      * return true if this ao have to checkpoint
      */
-    private boolean haveToCheckpoint() {
+    protected boolean haveToCheckpoint() {
         int currentCheckpointIndex = this.checkpointIndex;
         int currentNextMax = this.nextMax;
 

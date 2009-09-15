@@ -64,6 +64,34 @@ public class FTManagerReplay extends FTManagerGen {
     }
 
     /*
+     * return true if this ao have to checkpoint
+     */
+    @Override
+    protected boolean haveToCheckpoint() {
+        int currentCheckpointIndex = this.checkpointIndex;
+        int currentNextMax = this.nextMax;
+
+        // force to trigger a checkpoint
+        if (takeNext)
+            return true;
+
+        // do not trigger if we are in a replay phase
+        if (incarnation > 1)
+            return false;
+
+        // checkpoint if next is greater than index
+        if (currentNextMax > currentCheckpointIndex) {
+            return true;
+        }
+        // checkpoint if TTC is elapsed
+        else if ((this.checkpointTimer + this.ttc) < System.currentTimeMillis()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /*
      * Perform a checkpoint with index = current + 1
      */
     @Override
