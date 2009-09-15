@@ -212,10 +212,12 @@ public class FTManagerReplay extends FTManagerGen {
                 // remove the pending request from the history
                 if (lastRequestReceived == pendingRequest.getSequenceNumber()) {
                     List<UniqueID> hist = requestReceived.get(this.checkpointIndex);
-                    UniqueID lastID = hist.get(hist.size() - 1);
-                    // different requests from different sources can have same sequence number
-                    if (lastID.equals(pendingRequest.getSourceBodyID())) {
-                        hist.remove(hist.size() - 1);
+                    if (!hist.isEmpty()) {
+                        UniqueID lastID = hist.get(hist.size() - 1);
+                        // different requests from different sources can have same sequence number
+                        if (lastID.equals(pendingRequest.getSourceBodyID())) {
+                            hist.remove(hist.size() - 1);
+                        }
                     }
                 }
 
