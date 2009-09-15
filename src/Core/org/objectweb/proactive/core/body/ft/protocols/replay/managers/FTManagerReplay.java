@@ -55,12 +55,31 @@ import org.objectweb.proactive.core.body.request.Request;
  */
 public class FTManagerReplay extends FTManagerGen {
 
+    protected boolean replayMode;
+
     @Override
     public int init(AbstractBody owner) throws ProActiveException {
         super.init(owner);
         this.forSentRequest = new MessageInfoReplay();
         this.forSentReply = new MessageInfoReplay();
+        replayMode = false;
         return 0;
+    }
+
+    public void startReplayMode() {
+        replayMode = true;
+    }
+
+    public void stopReplayMode() {
+        replayMode = false;
+    }
+
+    public void toggleReplayMode() {
+        replayMode = !replayMode;
+    }
+
+    public boolean getReplayMode() {
+        return replayMode;
     }
 
     /*
@@ -72,12 +91,14 @@ public class FTManagerReplay extends FTManagerGen {
         int currentNextMax = this.nextMax;
 
         // force to trigger a checkpoint
-        if (takeNext)
+        if (takeNext) {
             return true;
+        }
 
         // do not trigger if we are in a replay phase
-        if (incarnation > 1)
+        if (replayMode) {
             return false;
+        }
 
         // checkpoint if next is greater than index
         if (currentNextMax > currentCheckpointIndex) {
