@@ -440,7 +440,7 @@ public class CommandBuilderProActive implements CommandBuilder {
                 case unix:
                     String cmd = command.toString();
                     for (int i = 0; i < hostInfo.getHostCapacity(); i++) {
-                        ret.append(cmd.replaceAll(TOKEN, ""+i));
+                        ret.append(cmd.replaceAll(TOKEN, "" + i));
                         ret.append(" &");
                     }
                     ret.deleteCharAt(ret.length() - 1);
