@@ -226,6 +226,8 @@ public class FTManagerReplay extends FTManagerGen {
                 // inc checkpoint index
                 this.checkpointIndex++;
 
+                requestReceived.put(this.checkpointIndex, new ArrayList<UniqueID>());
+
                 // Reset history only if OC is not possible
                 if (!FTManagerGen.isOCEnable) {
                     this.history = new Vector<UniqueID>();

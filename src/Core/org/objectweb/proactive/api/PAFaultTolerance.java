@@ -131,7 +131,7 @@ public class PAFaultTolerance implements Serializable {
          * return next_line
          */
         int waitTime = 500;
-        int totalTime = 10000;
+        int totalTime = 15000;
         int currentTime = 0;
         int last;
 

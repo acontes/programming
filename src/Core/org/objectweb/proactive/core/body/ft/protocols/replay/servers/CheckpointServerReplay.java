@@ -246,14 +246,6 @@ public class CheckpointServerReplay extends CheckpointServerGen {
             return;
         }
 
-        List<ReceptionHistory> histList = this.histories.get(rh.owner);
-        ReceptionHistory ih = histList.get(histList.size() - 1);
-
-        // update the histo if needed
-        if (rh.elements != null) {
-            ih.updateHistory(rh);
-        }
-
         // update the recovery line monitoring
         MutableInteger greatestIndexSent = ((this.greatestCommitedHistory.get(rh.owner)));
         if (greatestIndexSent.getValue() < rh.checkpointIndex) {
@@ -270,7 +262,7 @@ public class CheckpointServerReplay extends CheckpointServerGen {
 
             // test if a new recovery line has been created
             // update histories if any
-            this.checkRecoveryLine();
+            //this.checkRecoveryLine();
         }
     }
 

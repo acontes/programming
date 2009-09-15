@@ -495,10 +495,12 @@ public abstract class FTManagerGen extends FTManager {
      */
     private boolean updateAwaitedRequests(Request r) {
         AwaitedRequest ar = null;
-        for (AwaitedRequest arq : this.awaitedRequests) {
-            if (arq.getAwaitedSender().equals(r.getSourceBodyID())) {
-                ar = arq;
-                break;
+        if (this.awaitedRequests != null) {
+            for (AwaitedRequest arq : this.awaitedRequests) {
+                if (arq.getAwaitedSender().equals(r.getSourceBodyID())) {
+                    ar = arq;
+                    break;
+                }
             }
         }
         if (ar != null) {

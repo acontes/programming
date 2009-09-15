@@ -365,6 +365,8 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
             setBody(newBody);
             this.isLocal = LocalBodyStore.getInstance().getLocalBody(getBodyID()) != null;
         }
+        if (sourceBody instanceof AbstractBody && ((AbstractBody) sourceBody).isKilled())
+            return;
         ArrayList<UniversalBody> destinations = new ArrayList<UniversalBody>();
         destinations.add(this.universalBody.getRemoteAdapter());
         sourceBody.getFuturePool().registerDestinations(destinations);
