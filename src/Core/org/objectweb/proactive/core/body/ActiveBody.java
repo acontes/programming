@@ -54,6 +54,7 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.body.ft.protocols.replay.managers.FTManagerReplay;
 import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.body.ComponentActivity;
@@ -217,7 +218,7 @@ public class ActiveBody extends ComponentBodyImpl implements Runnable, java.io.S
             terminate();
         } finally {
             // execute the end of activity if not after migration
-            if ((!this.hasJustMigrated) && (this.endActive != null)) {
+            if ((!this.hasJustMigrated) && (this.endActive != null) && (!this.isKilled())) {
                 this.endActive.endActivity(this);
             }
 

@@ -68,8 +68,9 @@ import org.objectweb.proactive.core.body.request.RequestImpl;
  */
 public class FTManagerReplay extends FTManagerGen {
     private static final long serialVersionUID = -6984273235123773473L;
-    
+
     protected boolean replayMode;
+    protected boolean isKilled;
     protected Map<Integer, List<UniqueID>> requestReceived;
 
     @Override
@@ -78,6 +79,7 @@ public class FTManagerReplay extends FTManagerGen {
         this.forSentRequest = new MessageInfoReplay();
         this.forSentReply = new MessageInfoReplay();
         replayMode = false;
+        isKilled = false;
         requestReceived = new HashMap<Integer, List<UniqueID>>();
         return 0;
     }

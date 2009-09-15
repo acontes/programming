@@ -151,6 +151,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
 
     // FAULT TOLERANCE
     protected FTManager ftmanager;
+    protected boolean killed;
 
     // FORGET ON SEND
     protected boolean isSterileBody;
@@ -225,6 +226,8 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
 
         this.debugger = factory.newDebuggerFactory().newDebugger();
         this.debugger.setTarget(this);
+
+        this.killed = false;
 
         // SECURITY
         if (reifiedObject instanceof Secure) {
@@ -1195,6 +1198,14 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
 
     public Debugger getDebugger() {
         return debugger;
+    }
+
+    public void setKilled(boolean killed) {
+        this.killed = killed;
+    }
+
+    public boolean isKilled() {
+        return killed;
     }
 
 }

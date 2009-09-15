@@ -300,6 +300,10 @@ public abstract class FTManager implements java.io.Serializable {
         }
     }
 
+    public void killBody() {
+        owner.setKilled(true);
+    }
+
     //////////////////////
     // ABSTRACT METHODS //
     //////////////////////

@@ -371,6 +371,12 @@ public class CheckpointServerReplay extends CheckpointServerGen {
                 String nodeURL = toRecover.getNodeURL();
                 Node node = NodeFactory.getNode(nodeURL);
 
+                try {
+                    toRecover.receiveFTMessage(new FTMessageKillBody());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
                 barriers.add(this.server.submitJobWithBarrier(new RecoveryJob(toSend, this.globalIncarnation,
                     node)));
             }
@@ -496,6 +502,17 @@ public class CheckpointServerReplay extends CheckpointServerGen {
         public Object handleFTMessage(FTManager ftm) {
             FTManagerReplay rm = (FTManagerReplay) ftm;
             return rm.getLastHistory();
+        }
+    }
+
+    public static class FTMessageKillBody implements FTMessage {
+        private static final long serialVersionUID = -7864547755581704712L;
+
+        @Override
+        public Object handleFTMessage(FTManager ftm) {
+            FTManagerReplay rm = (FTManagerReplay) ftm;
+            ftm.killBody();
+            return null;
         }
     }
 
