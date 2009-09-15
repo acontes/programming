@@ -198,7 +198,7 @@ public class PAFaultTolerance implements Serializable {
 
                 @Override
                 public Object handleFTMessage(FTManager ftm) {
-                    ftm.takeNextCheckpoint(); //FIXME s/take/trigger/g
+                    ftm.triggerNextCheckpoint();
                     return null;
                 }
             });

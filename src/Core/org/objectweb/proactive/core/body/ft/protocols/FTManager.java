@@ -181,7 +181,7 @@ public abstract class FTManager implements java.io.Serializable {
         return isACheckpoint;
     }
 
-    public void takeNextCheckpoint() {
+    public void triggerNextCheckpoint() {
         System.out.println("Take the next checkpoint");
         takeNext = true;
     }
