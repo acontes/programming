@@ -38,9 +38,9 @@ import javax.management.ObjectName;
 
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.migration.MigrationException;
+import org.objectweb.proactive.core.debug.debugger.BreakpointType;
+import org.objectweb.proactive.core.debug.debugger.DebugInfo;
 import org.objectweb.proactive.core.debug.debugger.RequestQueueInfo;
-import org.objectweb.proactive.core.debug.stepbystep.BreakpointType;
-import org.objectweb.proactive.core.debug.stepbystep.DebugInfo;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;

@@ -48,7 +48,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAGroup;
-import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.exceptions.BodyTerminatedReplyException;
 import org.objectweb.proactive.core.body.exceptions.BodyTerminatedRequestException;
@@ -59,23 +58,20 @@ import org.objectweb.proactive.core.body.ft.servers.faultdetection.FaultDetector
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FuturePool;
 import org.objectweb.proactive.core.body.future.MethodCallResult;
-import org.objectweb.proactive.core.body.proxy.BodyProxy;
 import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.component.representative.ItfID;
 import org.objectweb.proactive.core.component.request.Shortcut;
-import org.objectweb.proactive.core.debug.stepbystep.BreakpointType;
-import org.objectweb.proactive.core.debug.stepbystep.Debugger;
+import org.objectweb.proactive.core.debug.debugger.BreakpointType;
+import org.objectweb.proactive.core.debug.debugger.Debugger;
 import org.objectweb.proactive.core.gc.GCMessage;
 import org.objectweb.proactive.core.gc.GCResponse;
 import org.objectweb.proactive.core.gc.GarbageCollector;
 import org.objectweb.proactive.core.group.spmd.ProActiveSPMDGroupManager;
 import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
-import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.MethodCall;
-import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.security.DefaultProActiveSecurityManager;
 import org.objectweb.proactive.core.security.InternalBodySecurity;
@@ -957,9 +953,9 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                 }
             }
 
-            // add StepByStep breakpoint
+            // add StepByStep and ExtrendedDebugger breakpoint
             if (!isProActiveInternalObject) {
-                debugger.breakpoint(BreakpointType.SendRequest, null);
+                debugger.breakpoint(BreakpointType.SendRequest, destinationBody);
             }
 
             this.localBodyStrategy.sendRequest(methodCall, future, destinationBody);
