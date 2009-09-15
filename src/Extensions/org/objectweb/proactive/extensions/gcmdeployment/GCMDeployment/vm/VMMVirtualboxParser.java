@@ -1,8 +1,9 @@
 package org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.vm;
 
 import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathExpressionException;
 
+import org.ow2.proactive.virtualizing.core.error.VirtualServiceException;
+import org.ow2.proactive.virtualizing.virtualbox.VirtualboxVMM;
 import org.w3c.dom.Node;
 
 
@@ -14,17 +15,18 @@ public class VMMVirtualboxParser extends AbstractVMMParser {
         return NODE_NAME;
     }
 
-    public AbstractVMM parseVMMNode(Node vmmNode, XPath xpath) throws XPathExpressionException {
-
-        //gathering hypervisor, user, pwd, image info
-        AbstractVMM vmm = parseVMMNodeCommonInfo(vmmNode, xpath);
-
-        return vmm;
-    }
-
-    @Override
-    public AbstractVMM createVMM() {
-        return new VMMVirtualbox();
-    }
+	@Override
+	public void initializeGCMVirtualMachineManager(Node vmmNode, XPath xpath,
+			GCMVirtualMachineManager gcmVMM) throws VirtualServiceException {
+		try {
+			String user = gcmVMM.getUser(), pwd = gcmVMM.getPwd();
+			for(String uri : gcmVMM.getUris()){
+				gcmVMM.addVirtualMachineManager(VirtualboxVMM.class.getName(),
+						new Class<?>[]{String.class,String.class,String.class},new Object[]{uri,user,pwd});
+			}
+		} catch (Exception e) {
+			throw new VirtualServiceException(e , "Cannot initialize GCMVirtualMachineManager.");
+		}		
+	}
 
 }

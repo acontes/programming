@@ -28,6 +28,7 @@ public class TestVM extends FunctionalTest {
         GCMApplication gcmad;
 
         gcmad = PAGCMDeployment.loadApplicationDescriptor(TestVM.class.getResource("gcma.xml"));
+
         gcmad.startDeployment();
         workers = gcmad.getVirtualNode("Workers");
         Node firstNode = workers.getANode();

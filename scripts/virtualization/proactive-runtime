@@ -30,12 +30,13 @@
 PIDFILE=/var/run/proactive-runtime.pid
 LOGFILE=/var/log/proactive-runtime.log
 #change the path of you python & proactive apps here
-EXE="/usr/bin/python /etc/init.d/proactivemain.py ${LOGFILE}"
+EXE="/usr/bin/python /usr/local/share/ProActive/dist/scripts/virtualization/proactivemain.py ${LOGFILE}"
 ARGS=
 
 case "$1" in
   start)
-  	#rsync -avz -e ssh jmguilla@excalibur.activeeon.com:workspace-git/ProActive/dist /usr/bin/ProActive
+  	rsync -avz -e ssh jmguilla@excalibur.activeeon.com:workspace-git/ProActive/dist /usr/bin/ProActive
+  	sync
 	[ -e ${LOGFILE} ] || touch ${LOGFILE} 	
     	log_begin_msg "Starting ProActive-Runtime..."
 	start-stop-daemon --start --exec ${EXE} -b -m --pidfile ${PIDFILE} -- ${ARGS} 

@@ -19,7 +19,8 @@ x = None
 #you can register new Abstract_Runtime implementation here
 proactivelib.Abstract_Runtime.addProvider(vmware.VMware_Runtime())
 proactivelib.Abstract_Runtime.addProvider(virtualbox.Virtualbox_Runtime())
-proactivelib.Abstract_Runtime.addProvider(xenserver.XenServer_Runtime())
+if sys.version_info[0] == 2 :
+    proactivelib.Abstract_Runtime.addProvider(xenserver.XenServer_Runtime())
 
 #iterates registered Abstract_Runtime implementation to find the good
 #environment.

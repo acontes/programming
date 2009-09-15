@@ -34,12 +34,13 @@ package org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.vm;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 
+import org.ow2.proactive.virtualizing.core.error.VirtualServiceException;
 import org.w3c.dom.Node;
 
 
 public interface VMMParser {
 
-    public AbstractVMM parseVMMNode(Node vmmNode, XPath xpath) throws XPathExpressionException;
+    public GCMVirtualMachineManager parseVMMNode(Node vmmNode, XPath xpath) throws XPathExpressionException, VirtualServiceException;
 
     /**
      * Returns the node's name associated to a particular parser
@@ -47,5 +48,4 @@ public interface VMMParser {
      */
     public String getNodeName();
 
-    public AbstractVMM createVMM();
 }

@@ -85,7 +85,7 @@ import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.unsu
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.hostinfo.HostInfoImpl;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.hostinfo.Tool;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.vm.AbstractVMM;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.vm.GCMVirtualMachineManager;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.vm.VMMLibXenParser;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.vm.VMMLibvirtParser;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.vm.VMMParser;
@@ -93,6 +93,7 @@ import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.vm.VMMVMwa
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.vm.VMMVMwareVixParser;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.vm.VMMVirtualboxParser;
 import org.objectweb.proactive.extensions.gcmdeployment.environment.Environment;
+import org.ow2.proactive.virtualizing.core.error.VirtualServiceException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -135,6 +136,9 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     private static final String XPATH_TOOL = "dep:tool";
     private static final String XPATH_HOME_DIRECTORY = "dep:homeDirectory";
     private static final String XPATH_NETWORK_INTERFACE = "dep:networkInterface";
+    private static final String XPATH_SCRATCH = "dep:scratch";
+    private static final String XPATH_REMOTE_ACCESS = "dep:remoteAccess";
+    private static final String XPATH_PATH = "dep:path";
     private static final String XPATH_BRIDGES = "dep:bridges/*";
     private static final String XPATH_GROUPS = "dep:groups/*";
     private static final String XPATH_HOSTS = "dep:hosts/dep:host";
@@ -416,7 +420,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
 
             resources.setHostInfo(hostInfo);
         } else if (nodeName.equals(PA_HYPERVISOR)) {
-            AbstractVMM vmm = getVMM(refid);
+        	GCMVirtualMachineManager vmm = getVMM(refid);
             if (vmm == null) {
                 throw new RuntimeException("no hypervisor with refid " + refid + " has been defined");
             }
@@ -440,9 +444,9 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         return (Bridge) makeDeepCopy(bridge);
     }
 
-    protected AbstractVMM getVMM(String refid) throws IOException {
-        AbstractVMM vmm = infrastructure.getVMM().get(refid);
-        return (AbstractVMM) makeDeepCopy(vmm);
+    protected GCMVirtualMachineManager getVMM(String refid) throws IOException {
+    	GCMVirtualMachineManager vmm = infrastructure.getVMM().get(refid);
+        return (GCMVirtualMachineManager) makeDeepCopy(vmm);
     }
 
     /*
@@ -583,8 +587,13 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
                     vmNode.getNodeName() + ">");
             } else {
             	GCMDeploymentLoggers.GCMD_LOGGER.debug("parsing " + vmNode.getNodeName() + ".");
-                AbstractVMM vmm = vmParser.parseVMMNode(vmNode, xpath);
-                infrastructure.addVMM(vmm);
+                GCMVirtualMachineManager vmm;
+				try {
+					vmm = vmParser.parseVMMNode(vmNode, xpath);
+					infrastructure.addVMM(vmm);
+				} catch (VirtualServiceException e) {
+					GCMDeploymentLoggers.GCMD_LOGGER.error("An error occured while parsing vmm node.",e);
+				}
             }
         }
 
@@ -690,6 +699,11 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
             hostInfo.setNetworkInterface(GCMParserHelper.getAttributeValue(networkInterfaceNode, "name"));
         }
 
+        Node scratchNode = (Node) xpath.evaluate(XPATH_SCRATCH, hostNode, XPathConstants.NODE);
+        if (scratchNode != null) {
+            parseScratchNode(scratchNode, hostInfo);
+        }
+
         NodeList toolNodes = (NodeList) xpath.evaluate(XPATH_TOOL, hostNode, XPathConstants.NODESET);
         for (int i = 0; i < toolNodes.getLength(); ++i) {
             Node toolNode = toolNodes.item(i);
@@ -699,6 +713,24 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         }
 
         return hostInfo;
+    }
+
+    protected void parseScratchNode(Node scratchNode, HostInfoImpl hostInfo) throws XPathExpressionException {
+        Node remoteAccessNode = (Node) xpath.evaluate(XPATH_REMOTE_ACCESS, scratchNode, XPathConstants.NODE);
+        if (remoteAccessNode != null) {
+            hostInfo.setDataSpacesScratchURL(GCMParserHelper.getAttributeValue(remoteAccessNode, "url"));
+        }
+
+        Node pathNode = (Node) xpath.evaluate(XPATH_PATH, scratchNode, XPathConstants.NODE);
+        if (pathNode != null) {
+            hostInfo.setDataSpacesScratchPath(GCMParserHelper.parsePathElementNode(pathNode));
+        }
+
+        if (remoteAccessNode == null && pathNode == null) {
+            // workaround for XSD limitation(?) - lack of disjunction
+            GCMDeploymentLoggers.GCMD_LOGGER
+                    .error("No access specified for host scratch, scratch not configured");
+        }
     }
 
     /*

@@ -44,7 +44,7 @@ import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbu
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.bridge.Bridge;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.Group;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
-import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.vm.AbstractVMM;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.vm.GCMVirtualMachineManager;
 
 
 public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
@@ -116,8 +116,8 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
      */
     private void startVMs(CommandBuilder commandBuilder, GCMApplicationInternal gcma) {
         try {
-            List<AbstractVMM> vmms = resources.getVMM();
-            for (AbstractVMM vmm : vmms) {
+            List<GCMVirtualMachineManager> vmms = resources.getVMM();
+            for (GCMVirtualMachineManager vmm : vmms) {
                 //since deployment with virtualization is meaningless outside of a ProActive application
                 //it is compulsory to downcast the commandBuilder to be able to bootstrap remote PART
             	GCMDeploymentLoggers.GCMD_LOGGER.debug("VMM with refid " + vmm.getId() + " is going to boot");

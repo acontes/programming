@@ -3,45 +3,7 @@
 	xmlns="urn:gcm:application:1.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="urn:gcm:application:1.0 http://proactive.inria.fr/schemas/gcm/1.0/ApplicationDescriptorSchema.xsd">
-<!-- 
-	<environment>
-		<javaPropertyVariable name="proactive.home"/>
-		<javaPropertyVariable name="java.home"/>
-	</environment>
-	
-	<application>
-		
-		<proactive relpath="${proactive.home}" base="root">
-	  <configuration>
-			<applicationClasspath>
-			
-			</applicationClasspath>  
-		    <proactiveClasspath type="append">
-			
-			</proactiveClasspath>
-			<log4jProperties base="proactive" relpath="/compile/proactive-log4j"/>
-			<securityPolicy base="proactive" relpath="/comiple/proactive.java.policy"/>
-			<userProperties base="proactive" relpath=""/>
-			<jvmarg value="-Dproactive.communication.protocol=parm"/>
-			<jvmarg value="-Dproactive.net.router.address=slave1"/>
-			<jvmarg value="-Dproactive.net.router.port=18000"/>
-			
-		</configuration>
-			<configuration>
-				<jvmarg value="-Dsun.net.spi.nameservice.provider.1=dns,sun"/>
-			</configuration>
-			<virtualNode id="vn">
-				<nodeProvider refid="remote" />
-			</virtualNode>
-		</proactive>
-	</application>
 
-	<resources>	
-		<nodeProvider id="remote">
-			<file path="gcmd.xml"/>
-		</nodeProvider>
-	</resources>
-	 -->
 	 <environment>
 		<javaPropertyVariable name="user.dir" />
 		<javaPropertyVariable name="proactive.home"/>
@@ -50,8 +12,7 @@
 	<application>
 		<proactive base="root" relpath="${proactive.home}">
 			<configuration>
-				<jvmarg value="-Dproactive.communication.protocol=rmi"/>
-				<jvmarg value="-Dsun.net.spi.nameservice.provider.1=dns,sun"/>
+				<!-- <jvmarg value="-Dsun.net.spi.nameservice.provider.1=dns,sun"/> -->
 				<proactiveClasspath type="overwrite">
 					<pathElement base="proactive" relpath="/dist/lib/ProActive.jar" />
 					<pathElement base="proactive" relpath="/dist/lib/ProActive_tests.jar" />

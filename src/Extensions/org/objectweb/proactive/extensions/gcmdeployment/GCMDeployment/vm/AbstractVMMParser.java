@@ -37,6 +37,7 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLoggers;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMParserHelper;
+import org.ow2.proactive.virtualizing.core.error.VirtualServiceException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -67,10 +68,10 @@ public abstract class AbstractVMMParser implements VMMParser {
      * @param xpath
      * @return
      * @throws XPathExpressionException
+     * @throws VirtualServiceException 
      */
-    protected AbstractVMM parseVMMNodeCommonInfo(Node vmmNode, XPath xpath) throws XPathExpressionException {
-        AbstractVMM vmm = createVMM();
-
+    public GCMVirtualMachineManager parseVMMNode(Node vmmNode, XPath xpath) throws XPathExpressionException, VirtualServiceException {
+    	GCMVirtualMachineManager vmm = new GCMVirtualMachineManager();
         //setId
         String id = GCMParserHelper.getAttributeValue(vmmNode, PA_VMM_ID);
         vmm.setId(id);
@@ -93,10 +94,10 @@ public abstract class AbstractVMMParser implements VMMParser {
         if (hypervisors != null) {
             for (int i = 0; i < hypervisors.getLength(); ++i) {
                 Node hypervisor = hypervisors.item(i);
-                vmm.addHypervisorBean(GCMParserHelper.getAttributeValue(hypervisor, PA_HYPERVISOR_URI));
+                vmm.addHypervisorURI(GCMParserHelper.getAttributeValue(hypervisor, PA_HYPERVISOR_URI));
             }
         } else {
-            vmm.addHypervisorBean(null);
+            vmm.addHypervisorURI("localhost");
         }
 
         //gathering images info
@@ -110,18 +111,21 @@ public abstract class AbstractVMMParser implements VMMParser {
                 vmm.addVMBean(key, count == null ? 1 : Integer.parseInt(count), os);
             }
         }
+        initializeGCMVirtualMachineManager(vmmNode, xpath, vmm);
         return vmm;
     }
 
     /**
      * to return the associated Virtual machine manager
      * with the good dynamic type.
+     * @throws VirtualServiceException 
      */
-    public abstract AbstractVMM createVMM();
+    public abstract void initializeGCMVirtualMachineManager(Node vmmNode, XPath xpath,GCMVirtualMachineManager gcmVMM) throws VirtualServiceException;
 
     /**
      * get the tag's name that the instanciated
      * parser will have to handle.
      */
     public abstract String getNodeName();
+
 }
