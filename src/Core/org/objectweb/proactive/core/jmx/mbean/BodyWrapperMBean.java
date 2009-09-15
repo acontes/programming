@@ -38,6 +38,7 @@ import javax.management.ObjectName;
 
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.migration.MigrationException;
+import org.objectweb.proactive.core.debug.debugger.RequestQueueInfo;
 import org.objectweb.proactive.core.debug.stepbystep.BreakpointType;
 import org.objectweb.proactive.core.debug.stepbystep.DebugInfo;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
@@ -205,5 +206,39 @@ public interface BodyWrapperMBean extends Serializable {
      * @param types, a table of BreakpointType
      */
     public void disableBreakpointTypes(BreakpointType[] types);
+    
+    //
+	// -- EXTENDED DEBUGGER ------------------------------------------------
+	//
+    /**
+     * enable the stepByStep mode on the sendRequest breakpoint for all
+     * the ActiveObjects in the runtime
+     */
+    public void enableExtendedDebugger();
+    
+    /**
+     * disable the stepByStep mode on the sendRequest breakpoint for all
+     * the ActiveObjects in the runtime
+     */
+    public void disableExtendedDebugger();
 
+    /**
+     * unblock for the debugger connection
+     */
+    public void unblockConnection();
+
+    /**
+     * @return the request queue of the body
+     */
+    public RequestQueueInfo getRequestQueueInfo();
+
+    /**
+     * @param sequenceNumber
+     */
+	public void moveUpRequest(final long sequenceNumber);
+
+	/**
+	 * @param sequenceNumber
+	 */
+	public void moveDownRequest(final long sequenceNumber);
 }

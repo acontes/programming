@@ -54,6 +54,7 @@ import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.migration.Migratable;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.debug.debugger.RequestQueueInfo;
 import org.objectweb.proactive.core.debug.stepbystep.BreakpointType;
 import org.objectweb.proactive.core.debug.stepbystep.DebugInfo;
 import org.objectweb.proactive.core.gc.GarbageCollector;
@@ -472,4 +473,49 @@ public class BodyWrapper extends NotificationBroadcasterSupport implements Seria
         body.getDebugger().disableBreakpointTypes(types);
     }
 
+	//
+	// -- EXTENDED DEBUGGER ------------------------------------------------
+	//
+    /**
+     * @see org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean#enableExtendedDebugger()
+     */
+    public void enableExtendedDebugger(){
+    	body.getDebugger().enableExtendedDebugger();
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean#enableExtendedDebugger()
+     */
+    public void disableExtendedDebugger(){
+    	body.getDebugger().disableExtendedDebugger();
+    }
+
+    
+    /**
+     * @see org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean#unblockConnection()
+     */
+    public void unblockConnection(){
+	body.getDebugger().unblockConnection();
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean#getRequestQueueInfo()
+     */
+    public RequestQueueInfo getRequestQueueInfo(){
+	return body.getDebugger().getRequestQueueInfo();
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean#moveUpRequest(long)
+     */
+	public void moveUpRequest(final long sequenceNumber){
+		body.getDebugger().moveUpRequest(sequenceNumber);
+	}
+
+	/**
+	 * see {@link org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean#moveDownRequest(long)}
+	 */
+	public void moveDownRequest(final long sequenceNumber){
+		body.getDebugger().moveDownRequest(sequenceNumber);
+	}
 }
