@@ -32,12 +32,14 @@
 package org.objectweb.proactive.core.body.ft.service;
 
 import java.net.MalformedURLException;
-import java.rmi.Naming;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.api.PARemoteObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.ft.servers.resource.ResourceServer;
 import org.objectweb.proactive.core.descriptor.services.TechnicalService;
@@ -169,14 +171,12 @@ public class FaultToleranceTechnicalService implements TechnicalService {
 
     public boolean registerResource(Node node) {
         try {
-            ResourceServer rs = (ResourceServer) (Naming.lookup(this.attachedResourceServer));
+            ResourceServer rs = (ResourceServer) (PARemoteObject.lookup(new URI(this.attachedResourceServer)));
             rs.addFreeNode(node);
             return true;
-        } catch (MalformedURLException e) {
-            logger.error("**ERROR** RessourceServer unreachable : ressource is not registred." + e);
-        } catch (RemoteException e) {
+        } catch (ProActiveException e) {
             logger.error("**ERROR** RessourceServer unreachable : ressource is not registred" + e);
-        } catch (NotBoundException e) {
+        } catch (URISyntaxException e) {
             logger.error("**ERROR** RessourceServer unreachable : ressource is not registred" + e);
         }
         return false;

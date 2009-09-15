@@ -67,10 +67,11 @@ public class Start implements Serializable {
     private GCMApplication descriptorPad;
 
     /**
-     * Options should be "java Start xmlFile [-nodisplay|-displayft] totalNbBodies maxIter"
+     * Options should be "java Start xmlFile [-nodisplay|-displayft|-replay] totalNbBodies maxIter"
      * Parameters can be <ul>
      * <li> -nodisplay, which is not compulsory, specifies whether a graphic display is to be created.</li>
      * <li> -displayft, which is not compulsory, specifies whether a fault-generating panel should be created.</li>
+     * <li> -replay, which is not compulsory, specifies whether a fault-generating panel should be created.</li>
      * <li> xmlFile is the xml deployment file..</li>
      * <li> totalNbBodies  The number of Planets in the System.</li>
      * <li> maxIter The number of iterations before the program stops.</li>
@@ -99,7 +100,7 @@ public class Start implements Serializable {
                 if (args[1].equals("-nodisplay")) {
                     display = false;
                     break;
-                } else if (args[1].equals("-displayft")) {
+                } else if (args[1].equals("-displayft") || args[1].equals("-replay")) {
                     displayft = true;
                     break;
                 } else if (args[1].equals("-3d")) {
@@ -120,7 +121,7 @@ public class Start implements Serializable {
                     totalNbBodies = Integer.parseInt(args[2]);
                     maxIter = Integer.parseInt(args[3]);
                     break;
-                } else if (args[1].equals("-displayft")) {
+                } else if (args[1].equals("-displayft") || args[1].equals("-replay")) {
                     displayft = true;
                     totalNbBodies = Integer.parseInt(args[2]);
                     maxIter = Integer.parseInt(args[3]);
@@ -229,7 +230,7 @@ public class Start implements Serializable {
      * Shows what are the possible options to this program.
      */
     private void usage() {
-        String options = "[-nodisplay | -displayft | -3d | -3dft] totalNbBodies maxIter";
+        String options = "[-nodisplay | -displayft | -replay | -3d | -3dft] totalNbBodies maxIter";
         logger.info("        Usage : nbody.[bat|sh] " + options);
         logger.info("        from the command line, it would be   java Start xmlFile " + options);
     }

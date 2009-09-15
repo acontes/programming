@@ -31,9 +31,6 @@
  */
 package org.objectweb.proactive.core.body.ft.servers.resource;
 
-import java.rmi.Remote;
-import java.rmi.RemoteException;
-
 import org.objectweb.proactive.core.node.Node;
 
 

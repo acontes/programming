@@ -14,9 +14,10 @@ echo --- N-body with ProActive ---------------------------------
 workingDir=`dirname $0`
 . $workingDir/../env.sh
 
-if [ "$1" = "-displayft" -o "$1" = "-3dft" ]
-then
+if [ "$1" = "-displayft" -o "$1" = "-3dft" ]; then
 	export XMLDESCRIPTOR=$workingDir/GCMA_FaultTolerance.xml
+elif [ "$1" = "-replay" ]; then
+    export XMLDESCRIPTOR=$workingDir/GCMA_Replay.xml
 else
 	export XMLDESCRIPTOR=$workingDir/GCMA.xml
 fi
