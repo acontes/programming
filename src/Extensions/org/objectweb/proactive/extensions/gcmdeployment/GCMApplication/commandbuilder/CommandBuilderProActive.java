@@ -329,20 +329,6 @@ public class CommandBuilderProActive implements CommandBuilder {
             command.append("true ");
         }
 
-        if (PAProperties.PA_CLASSLOADER.isTrue() ||
-            "org.objectweb.proactive.core.classloader.ProActiveClassLoader".equals(System
-                    .getProperty("java.system.class.loader"))) {
-            command
-                    .append(" -Djava.system.class.loader=org.objectweb.proactive.core.classloader.ProActiveClassLoader ");
-            // the following allows the deserializing of streams that were annotated with rmi utilities
-            command
-                    .append(" -Djava.rmi.server.RMIClassLoaderSpi=org.objectweb.proactive.core.classloader.ProActiveRMIClassLoaderSpi");
-            // to avoid clashes due to multiple classloader, we initiate the
-            // configuration of log4j ourselves 
-            // (see StartRuntime.main)
-            command.append(" -Dlog4j.defaultInitOverride=true ");
-        }
-
         if (withClasspath) {
             //add classpath string surrounded by ", 
             //to deal with OS that accept paths without escaped spaces chars
@@ -395,6 +381,22 @@ public class CommandBuilderProActive implements CommandBuilder {
             command.append(" ");
         }
 
+        if (hostInfo.getDataSpacesScratchURL() != null) {
+            command.append(PAProperties.PA_DATASPACES_SCRATCH_URL.getCmdLine());
+            command.append("\"");
+            command.append(hostInfo.getDataSpacesScratchURL());
+            command.append("\"");
+            command.append(" ");
+        }
+
+        if (hostInfo.getDataSpacesScratchPath() != null) {
+            command.append(PAProperties.PA_DATASPACES_SCRATCH_PATH.getCmdLine());
+            command.append("\"");
+            command.append(hostInfo.getDataSpacesScratchPath().getFullPath(hostInfo, this));
+            command.append("\"");
+            command.append(" ");
+        }
+
         if (isDebugEnabled) {
             command.append(" " + getDebugCommand(hostInfo, gcma.getDeploymentId()) + " ");
         }
@@ -422,10 +424,6 @@ public class CommandBuilderProActive implements CommandBuilder {
         command.append(" ");
 
         command.append("-" + StartPARuntime.Params.deploymentId.shortOpt() + " " + gcma.getDeploymentId());
-        command.append(" ");
-
-        command.append("-" + StartPARuntime.Params.codebase.shortOpt() + " " +
-            ClassServerServlet.get().getCodeBase());
         command.append(" ");
 
         // TODO cdelbe Check FT properties here

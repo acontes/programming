@@ -67,6 +67,7 @@ import org.objectweb.proactive.extra.messagerouting.protocol.message.ErrorMessag
  */
 public class RouterImpl extends RouterInternal implements Runnable {
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_ROUTER);
+    public static final Logger admin_logger = ProActiveLogger.getLogger(Loggers.FORWARDING_ROUTER_ADMIN);
 
     /** Read {@link ByteBuffer} size. */
     private final static int READ_BUFFER_SIZE = 4096;
@@ -271,13 +272,16 @@ public class RouterImpl extends RouterInternal implements Runnable {
         Client client = attachment.getClient();
         if (client != null) {
             client.discardAttachment();
+
+            // Broadcast the disconnection to every client
+            // If client is null, then the handshake has not completed and we
+            // don't need to broadcast the disconnection
+            AgentID disconnectedAgent = client.getAgentId();
+            Collection<Client> clients = clientMap.values();
+            tpe.submit(new DisconnectionBroadcaster(clients, disconnectedAgent));
         }
         logger.debug("Client " + sc.socket() + " disconnected");
 
-        // Broadcast the disconnection to every client
-        Collection<Client> clients = clientMap.values();
-        AgentID disconnectedAgent = attachment.getClient().getAgentId();
-        tpe.submit(new DisconnectionBroadcaster(clients, disconnectedAgent));
     }
 
     /* @@@@@@@@@@ ROUTER PACKAGE INTERFACE 

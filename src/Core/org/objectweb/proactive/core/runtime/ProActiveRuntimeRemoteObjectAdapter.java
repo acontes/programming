@@ -133,14 +133,6 @@ public class ProActiveRuntimeRemoteObjectAdapter extends Adapter<ProActiveRuntim
         return target.getActiveObjects(nodeName, className);
     }
 
-    public byte[] getClassDataFromParentRuntime(String className) throws ProActiveException {
-        return target.getClassDataFromParentRuntime(className);
-    }
-
-    public byte[] getClassDataFromThisRuntime(String className) throws ProActiveException {
-        return target.getClassDataFromThisRuntime(className);
-    }
-
     public ProActiveDescriptorInternal getDescriptor(String url, boolean isHierarchicalSearch)
             throws IOException, ProActiveException {
         return target.getDescriptor(url, isHierarchicalSearch);
@@ -320,5 +312,9 @@ public class ProActiveRuntimeRemoteObjectAdapter extends Adapter<ProActiveRuntim
     public Node createGCMNode(ProActiveSecurityManager nodeSecurityManager, String vnName, String jobId,
             List<TechnicalService> tsList) throws NodeException, AlreadyBoundException {
         return target.createGCMNode(nodeSecurityManager, vnName, jobId, tsList);
+    }
+
+    public byte[] getClassData(String className) {
+        return target.getClassData(className);
     }
 }

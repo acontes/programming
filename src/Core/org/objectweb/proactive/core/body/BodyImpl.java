@@ -50,6 +50,7 @@ import javax.management.ObjectName;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActiveInternalObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.benchmarks.timit.util.CoreTimersContainer;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -69,7 +70,9 @@ import org.objectweb.proactive.core.body.request.RequestFactory;
 import org.objectweb.proactive.core.body.request.RequestQueue;
 import org.objectweb.proactive.core.body.request.RequestReceiver;
 import org.objectweb.proactive.core.body.request.RequestReceiverImpl;
+import org.objectweb.proactive.core.component.body.ComponentBodyImpl;
 import org.objectweb.proactive.core.component.request.ComponentRequestImpl;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.debug.stepbystep.BreakpointType;
 import org.objectweb.proactive.core.gc.GarbageCollector;
 import org.objectweb.proactive.core.jmx.mbean.BodyWrapper;
@@ -77,7 +80,11 @@ import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.jmx.notification.RequestNotificationData;
 import org.objectweb.proactive.core.jmx.server.ServerConnector;
+import org.objectweb.proactive.core.mop.MOP;
+import org.objectweb.proactive.core.mop.MOPException;
 import org.objectweb.proactive.core.mop.MethodCall;
+import org.objectweb.proactive.core.mop.ObjectReferenceReplacer;
+import org.objectweb.proactive.core.mop.ObjectReplacer;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
@@ -326,26 +333,28 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
     }
 
     public void setImmediateService(String methodName) {
-        // FIXME uncomment this code after PROACTIVE-309 issue has been resolved
-        // if (!checkMethod(methodName)) {
-        // throw new NoSuchMethodError(methodName + " is not defined in " +
-        // getReifiedObject().getClass().getName());
-        // }
+        // FIXME see PROACTIVE-309
+        if (!((ComponentBodyImpl) this).isComponent()) {
+            if (!checkMethod(methodName)) {
+                throw new NoSuchMethodError(methodName + " is not defined in " +
+                    getReifiedObject().getClass().getName());
+            }
+        }
         ((RequestReceiverImpl) this.requestReceiver).setImmediateService(methodName);
     }
 
     public void setImmediateService(String methodName, Class<?>[] parametersTypes) {
-        // FIXME uncomment this code after PROACTIVE-309 issue has been resolved
-        // if (!checkMethod(methodName, parametersTypes)) {
-        // String signature = methodName+"(";
-        // for (int i = 0 ; i < parametersTypes.length; i++) {
-        // signature+=parametersTypes[i] + ((i < parametersTypes.length -
-        // 1)?",":"");
-        // }
-        // signature += " is not defined in " +
-        // getReifiedObject().getClass().getName();
-        // throw new NoSuchMethodError(signature);
-        // }
+        // FIXME see ProActive-309
+        if (!((ComponentBodyImpl) this).isComponent()) {
+            if (!checkMethod(methodName, parametersTypes)) {
+                String signature = methodName + "(";
+                for (int i = 0; i < parametersTypes.length; i++) {
+                    signature += parametersTypes[i] + ((i < parametersTypes.length - 1) ? "," : "");
+                }
+                signature += " is not defined in " + getReifiedObject().getClass().getName();
+                throw new NoSuchMethodError(signature);
+            }
+        }
         ((RequestReceiverImpl) this.requestReceiver).setImmediateService(methodName, parametersTypes);
     }
 
@@ -481,10 +490,6 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             return this.reifiedObject.getClass().getName();
         }
 
-        public boolean isImmediate(Request request) {
-            return ((RequestReceiverImpl) requestReceiver).immediateExecution(request);
-        }
-
         /**
          * Serves the request. The request should be removed from the request
          * queue before serving, which is correctly done by all methods of the
@@ -516,7 +521,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             }
 
             if (!isProActiveInternalObject) {
-                if (isImmediate(request)) {
+                if (((RequestReceiverImpl) requestReceiver).immediateExecution(request)) {
                     debugger.breakpoint(BreakpointType.NewImmediateService, request);
                 } else {
                     debugger.breakpoint(BreakpointType.NewService, request);
@@ -541,10 +546,15 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             }
 
             if (!isProActiveInternalObject) {
-                if (isImmediate(request))
-                    debugger.breakpoint(BreakpointType.EndImmediateService, request);
-                else
-                    debugger.breakpoint(BreakpointType.EndService, request);
+                try {
+                    if (isInImmediateService())
+                        debugger.breakpoint(BreakpointType.EndImmediateService, request);
+                    else
+                        debugger.breakpoint(BreakpointType.EndService, request);
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
 
             if (reply == null) {
@@ -582,31 +592,52 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             destinations.add(request.getSender());
             this.getFuturePool().registerDestinations(destinations);
 
-            if (isActive()) {
-                // FAULT-TOLERANCE
-                if (BodyImpl.this.ftmanager != null) {
-                    BodyImpl.this.ftmanager.sendReply(reply, request.getSender());
-                } else {
-                    // if the reply cannot be sent, try to sent the thrown exception
-                    // as result
-                    // Useful if the exception is due to the content of the result
-                    // (e.g. InvalidClassException)
+            // Modify result object
+            Object initialObject = null;
+            Object stubOnActiveObject = null;
+            Object modifiedObject = null;
+            ObjectReplacer objectReplacer = null;
+            if (PAProperties.PA_IMPLICITGETSTUBONTHIS.isTrue()) {
+                initialObject = reply.getResult().getResultObjet();
+                try {
+                    PAActiveObject.getStubOnThis();
+                    stubOnActiveObject = (Object) MOP.createStubObject(BodyImpl.this.getReifiedObject()
+                            .getClass().getName(), BodyImpl.this.getRemoteAdapter());
+                    objectReplacer = new ObjectReferenceReplacer(BodyImpl.this.getReifiedObject(),
+                        stubOnActiveObject);
+                    modifiedObject = objectReplacer.replaceObject(initialObject);
+                    reply.getResult().setResult(modifiedObject);
+                } catch (InactiveBodyException e) {
+                    e.printStackTrace();
+                } catch (MOPException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+
+            }
+            // FAULT-TOLERANCE
+            if (BodyImpl.this.ftmanager != null) {
+                BodyImpl.this.ftmanager.sendReply(reply, request.getSender());
+            } else {
+                // if the reply cannot be sent, try to sent the thrown exception
+                // as result
+                // Useful if the exception is due to the content of the result
+                // (e.g. InvalidClassException)
+                try {
+                    reply.send(request.getSender());
+                } catch (IOException e1) {
                     try {
-                        reply.send(request.getSender());
-                    } catch (IOException e1) {
-                        try {
-                            this.retrySendReplyWithException(reply, e1, request.getSender());
-                        } catch (Exception retryException1) {
-                            // the stacktraced exception must be the first one
-                            sendReplyExceptionsLogger.error(e1.getMessage(), e1);
-                        }
-                    } catch (ProActiveRuntimeException e2) {
-                        try {
-                            this.retrySendReplyWithException(reply, e2, request.getSender());
-                        } catch (Exception retryException2) {
-                            // the stacktraced exception must be the first one
-                            sendReplyExceptionsLogger.error(e2.getMessage(), e2);
-                        }
+                        this.retrySendReplyWithException(reply, e1, request.getSender());
+                    } catch (Exception retryException1) {
+                        // the stacktraced exception must be the first one
+                        sendReplyExceptionsLogger.error(e1.getMessage(), e1);
+                    }
+                } catch (ProActiveRuntimeException e2) {
+                    try {
+                        this.retrySendReplyWithException(reply, e2, request.getSender());
+                    } catch (Exception retryException2) {
+                        // the stacktraced exception must be the first one
+                        sendReplyExceptionsLogger.error(e2.getMessage(), e2);
                     }
                 }
             }
@@ -616,6 +647,19 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             }
 
             this.getFuturePool().removeDestinations();
+
+            // Restore Result Object
+            if (PAProperties.PA_IMPLICITGETSTUBONTHIS.isTrue() && (objectReplacer != null)) {
+                try {
+                    objectReplacer.restoreObject();
+                } catch (IllegalArgumentException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
         }
 
         // If a reply sending has failed, try to send the exception as reply
@@ -772,3 +816,4 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
 
     // end inner class InactiveBodyException
 }
+

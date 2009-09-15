@@ -77,7 +77,6 @@ public class StartPARuntime {
 
     public static void main(String[] args) {
         try {
-            initLog4j();
             ProActiveConfiguration.load();
             StartPARuntime startRuntime = new StartPARuntime(args);
             startRuntime.start();
@@ -100,32 +99,6 @@ public class StartPARuntime {
         abort("");
     }
 
-    static private boolean initLog4j() {
-        boolean ret = true;
-
-        if (PAProperties.LOG4J_DEFAULT_INIT_OVERRIDE.isTrue()) {
-            // configure log4j here to avoid classloading problems with
-            // log4j classes
-            String log4jConfiguration = PAProperties.LOG4J.getValue();
-            if (log4jConfiguration != null) {
-                try {
-                    File f = new File(log4jConfiguration);
-                    PropertyConfigurator.configure(new URL(f.getPath()));
-                } catch (IOException e) {
-                    System.err.println("Error : incorrect path for log4j configuration : " +
-                        PAProperties.LOG4J.getValue());
-                    ret &= false;
-                }
-            } else {
-                System.err
-                        .println("-Dlog4.defaultInitOverride is specified but -Dlog4j.configuration property is missing");
-                ret &= false;
-            }
-        }
-
-        return ret;
-    }
-
     protected StartPARuntime(String[] args) {
         this.args = args;
         parseOptions();
@@ -140,7 +113,6 @@ public class StartPARuntime {
         options.addOption(Params.deploymentId.sOpt, Params.deploymentId.toString(), true,
                 Params.deploymentId.desc);
         options.addOption(Params.topologyId.sOpt, Params.topologyId.toString(), true, Params.topologyId.desc);
-        options.addOption(Params.codebase.sOpt, Params.codebase.toString(), true, Params.codebase.desc);
 
         CommandLine line = null;
 
@@ -173,17 +145,6 @@ public class StartPARuntime {
                 deploymendId = -1;
             }
 
-            arg = line.getOptionValue(Params.codebase.sOpt);
-            if (arg != null) {
-                String oldCodebase = PAProperties.JAVA_RMI_SERVER_CODEBASE.getValue();
-                String newCodebase = null;
-                if (oldCodebase != null) {
-                    newCodebase = oldCodebase + " " + arg;
-                } else {
-                    newCodebase = arg;
-                }
-                PAProperties.JAVA_RMI_SERVER_CODEBASE.setValue(newCodebase);
-            }
         } catch (ParseException e) {
             logger.warn("Cannot parse command line arguments", e);
             abort();
@@ -259,8 +220,7 @@ public class StartPARuntime {
 
     public enum Params {
         parent("p", "URL of the parent ProActive Runtime"), topologyId("i", "Topology Node"), deploymentId(
-                "d", "GCM Application identifier"), capacity("c", "Number of Node to be created"), codebase(
-                "b", "Code base");
+                "d", "GCM Application identifier"), capacity("c", "Number of Node to be created");
         protected String sOpt;
         protected String desc;
 

@@ -147,7 +147,7 @@ public interface Loggers {
     static final public String FORWARDING_CLIENT = FORWARDING + ".client";
     static final public String FORWARDING_CLIENT_TUNNEL = FORWARDING_CLIENT + ".tunnel";
     static final public String FORWARDING_REMOTE_OBJECT = FORWARDING + ".remoteobject";
-
+    static final public String FORWARDING_ROUTER_ADMIN = FORWARDING_ROUTER + ".admin";
     // Exceptions
     public static final String EXCEPTIONS = CORE + ".exceptions";
     public static final String EXCEPTIONS_ONE_WAY = EXCEPTIONS + ".one_way";
@@ -158,4 +158,15 @@ public interface Loggers {
     public static final String UTILS = CORE + ".utils";
     public static final String SLEEPER = UTILS + ".sleeper";
     public static final String WAITER = UTILS + ".waiter";
+
+    // Data Spaces
+    public static final String DATASPACES = CORE + ".dataspaces";
+    public static final String DATASPACES_VFS = DATASPACES + ".vfs";
+    public static final String DATASPACES_MOUNT_MANAGER = DATASPACES + ".mountmanager";
+    public static final String DATASPACES_CONFIGURATOR = DATASPACES + ".configurator";
+    public static final String DATASPACES_NAMING_SERVICE = DATASPACES + ".namingservice";
+
+    // VFS Provider
+    public static final String VFS_PROVIDER = CORE + ".vfsprovider";
+    public static final String VFS_PROVIDER_SERVER = VFS_PROVIDER + ".server";
 }

@@ -93,12 +93,21 @@
 		</else>
 	</if>
 
-	<fileset dir="${cl.test.dir}" id="performancesuite">
-		<include name="performanceTests/**/*Test*.class" />
-		<exclude name="**/*$*.class" />
-	</fileset>
 
-
+	<if name="test">
+		<fileset dir="${cl.test.dir}" id="performancesuite">
+			<include name="${test}" />
+			<exclude name="**/*$*.class" />
+			<exclude name="**/*Ibis*.class" />
+		</fileset>
+		<else>
+			<fileset dir="${cl.test.dir}" id="performancesuite">
+				<include name="performanceTests/**/*Test*.class" />
+				<exclude name="**/*$*.class" />
+				<exclude name="**/*Ibis*.class" />
+			</fileset>
+		</else>
+	</if>
 
 
 	<!-- ************
@@ -117,6 +126,36 @@
 	<!-- <target name="all" depends="compile,docs" description="build the class files and the documentation" />-->
 
 
+	<macrodef name="generate_stub_for_pkg">
+		<attribute name="srcDir"/>
+		<attribute name="package"/>
+		<element name="extra.exclusion.pattern" optional="yes"/>
+		<sequential>
+			<java classname="org.objectweb.proactive.ext.util.StubGenerator" fork="true">
+				<classpath refid="project.classpath" />
+					<arg value="-srcDir"/>
+					<arg value="@{srcDir}"/>
+					<arg value="-pkg"/>
+					<arg value="@{package}"/>
+			</java>
+		</sequential>
+	</macrodef>
+
+	<macrodef name="generate_stub_for_class">
+		<attribute name="srcDir"/>
+		<attribute name="class"/>
+		<element name="extra.exclusion.pattern" optional="yes"/>
+		<sequential>
+			<java classname="org.objectweb.proactive.ext.util.StubGenerator" fork="true">
+				<classpath refid="project.classpath" />
+					<arg value="-srcDir"/>
+					<arg value="@{srcDir}"/>
+					<arg value="-class"/>
+					<arg value="@{class}"/>
+			</java>
+		</sequential>
+	</macrodef>
+
 
 
 
@@ -132,6 +171,7 @@
 		<replaceregexp file="${src.proactive.dir}/${proactive.path}/Main.java" match="\$Id.*\$" replace="${version}" byline="true" />
 		<replaceregexp file="${base.dir}/README.txt" match="\$Id.*\$" replace="${version}" byline="true" />
 
+
 		<javac srcdir="${src.proactive.dir}" destdir="${cl.proactive.dir}" deprecation="on" source="${source}" debug="${debug}">
 			<classpath refid="project.classpath" />
 			<include name="**/*.java" />
@@ -139,36 +179,25 @@
 			<!-- XXX, MicroTimer should be in core or not used by the core-->
 		</javac>
 
+		<copy toDir="${cl.proactive.dir}">
+                        <fileset dir="${compile.dir}" includes="META-INF/**"/>
+		</copy>
+
 		<rmic base="${cl.proactive.dir}" sourcebase="${cl.proactive.dir}" stubversion="1.2">
 			<classpath refid="project.classpath" />
 			<include name="org/objectweb/proactive/core/remoteobject/rmi/RmiRemoteObjectImpl.class" />
 		</rmic>
 
 		<echo message="Java primitive type wrapper stubs generating..." />
-		<java classname="org.objectweb.proactive.ext.util.StubGenerator" fork="true">
-			<classpath refid="project.classpath" />
-			<arg value="-srcDir"/>
-            <arg value="${cl.proactive.dir}"/>
-            <arg value="-pkg"/>
-            <arg value="org.objectweb.proactive.core.util.wrapper"/>
-		</java>
-		<java classname="org.objectweb.proactive.ext.util.StubGenerator" fork="true">
-			<classpath refid="project.classpath" />
-            <arg value="-srcDir"/>
-			<arg value="${cl.proactive.dir}"/>
-            <arg value="-class"/>
-            <arg value="org/objectweb/proactive/core/runtime/ProActiveRuntime" />
-		</java>
+		<generate_stub_for_pkg   srcDir="${cl.proactive.dir}" package="org.objectweb.proactive.core.util.wrapper" />
+		<generate_stub_for_class srcDir="${cl.proactive.dir}" class="org/objectweb/proactive/core/runtime/ProActiveRuntime" />
+		<generate_stub_for_class srcDir="${cl.proactive.dir}" class="org/objectweb/proactive/core/body/UniversalBody" />
+		<generate_stub_for_class srcDir="${cl.proactive.dir}" class="org/objectweb/proactive/core/component/type/Composite" />
+		<generate_stub_for_class srcDir="${cl.proactive.dir}" class="org/objectweb/proactive/core/component/ProActiveInterfaceImpl" />
+		<generate_stub_for_class srcDir="${cl.proactive.dir}" class="org/objectweb/proactive/core/jmx/util/JMXNotificationListener" />
+		<generate_stub_for_class srcDir="${cl.proactive.dir}" class="org/objectweb/proactive/core/util/log/remote/ProActiveLogCollector" />
 
-		<java classname="org.objectweb.proactive.ext.util.StubGenerator" fork="true">
-			<classpath refid="project.classpath" />
-            <arg value="-srcDir"/>
-			<arg value="${cl.proactive.dir}"/>
-            <arg value="-class"/>
-            <arg value="org/objectweb/proactive/core/body/UniversalBody" />
-		</java>
-
-	    <antcall target="ibis"/>
+		<antcall target="ibis"/>
 
 		<!-- XXX: MPI should be in Extensions -->
 		<if>
@@ -360,7 +389,6 @@
 					<include name="*.jar" />
 				</fileset>
 			</indexjars>
-			<fileset dir="${compile.dir}" includes="META-INF/**" />
 		</jar>
 
 		<copy todir="${deploy.lib.dir}">
@@ -838,6 +866,7 @@
 		<delete dir="${test.classes.dir}" />
 		<delete file="tests.log" />
 		<delete dir="${junit.dir}" />
+		<delete dir="${tutorials.dir}" />
 		<subant target="doc.clean" inheritall="true">
 			<fileset dir="../doc/toolchain" includes="doc.xml"/>
 		</subant>
@@ -884,13 +913,7 @@
 	<target name="stub" depends="compile.stubGenerator, compile.core">
 		<property name="stub.classdir" value="${cl.proactive.dir}" />
 
-		<java classname="org.objectweb.proactive.ext.util.StubGenerator" fork="true">
-			<classpath refid="project.classpath" />
-			<arg value="-srcDir"/>
-            <arg value="${cl.proactive.dir}"/>
-            <arg value="-pkg"/>
-            <arg value="org.objectweb.proactive" />
-		</java>
+		<generate_stub_for_pkg   srcDir="${cl.proactive.dir}" package="org.objectweb.proactive" />
 	</target>
 
 
@@ -1071,4 +1094,47 @@
 		</chmod>
 	</target>
 
+    <!-- ====================================== -->
+    <!--          Create the tutorial           -->
+    <!-- ====================================== -->
+    <target name="tutorials" depends="deploy.core" description="Extracts tutorials from sources and creates the tutorials directory with building and launching scripts">
+        <delete quiet="true">
+            <fileset dir="${tutorials.src}"/>
+        </delete>
+        <mkdir dir="${tutorials.src}"/>
+        <java classname="doc.tutorials.Tutorializer" fork="true">
+            <classpath>
+                <fileset dir="${base.dir}/doc/toolchain/lib">
+                    <include name="**/*.jar"/>
+                </fileset>
+            </classpath>
+            <arg value="${src.dir}" />
+            <arg value="${tutorials.src}" />
+        </java>
+        <mkdir dir="${tutorials.dist}"/>
+        <copy toDir="${tutorials.dist}">
+            <fileset dir="${deploy.dir}">
+                <include name="**/*" />
+                <exclude name="ProActive_examples.jar" />
+                <exclude name="ProActive_utils.jar" />
+                <exclude name="ProActive_tests.jar" />
+             </fileset>
+        </copy>
+        <mkdir dir="${tutorials.dir}/scripts"/>
+        <copy toDir="${tutorials.dir}/scripts">
+            <fileset dir="${src.examples.dir}/${examples.path}/userguide/scripts">
+                <include name="**/*" />
+            </fileset>
+        </copy>
+        <chmod dir="${tutorials.dir}/scripts"
+               perm="755"
+               includes="**/*.sh"/>
+        <mkdir dir="${tutorials.dir}/compile"/>
+        <copy toDir="${tutorials.dir}/compile">
+            <fileset dir="${src.examples.dir}/${examples.path}/userguide/compile">
+                <include name="**/*" />
+            </fileset>
+        </copy>
+        <chmod file="${tutorials.dir}/compile/build" perm="755"/>
+    </target>
 </project>
