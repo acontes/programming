@@ -67,22 +67,24 @@ public class StartFTServer {
             String name = "";
             String proto = FTManagerFactory.PROTO_CIC;
 
-            //            if (args.length == 0) {
-            //                System.out
-            //                        .println("Usage : startGlobalFTServer [-proto cic|pml] [-name name] [-port portnumber] [-fdperiod faultDetectionPeriod (sec)]");
-            //            } else {
-            for (int i = 0; i < args.length; i++) {
-                if (args[i].equals("-port")) {
-                    port = Integer.parseInt(args[i + 1]);
-                } else if (args[i].equals("-fdperiod")) {
-                    fdPeriod = Integer.parseInt(args[i + 1]);
-                } else if (args[i].equals("-name")) {
-                    name = args[i + 1];
-                } else if (args[i].equals("-proto")) {
-                    proto = args[i + 1];
+            if (args.length == 0) {
+                //                System.out
+                //                        .println("Usage : startGlobalFTServer [-proto cic|pml] [-name name] [-port portnumber] [-fdperiod faultDetectionPeriod (sec)]");
+                System.out
+                        .println("Usage : startGlobalFTServer [-proto cic|pml] [-name name] [-port portnumber] [-fdperiod faultDetectionPeriod (sec)]");
+            } else {
+                for (int i = 0; i < args.length; i++) {
+                    if (args[i].equals("-port")) {
+                        port = Integer.parseInt(args[i + 1]);
+                    } else if (args[i].equals("-fdperiod")) {
+                        fdPeriod = Integer.parseInt(args[i + 1]);
+                    } else if (args[i].equals("-name")) {
+                        name = args[i + 1];
+                    } else if (args[i].equals("-proto")) {
+                        proto = args[i + 1];
+                    }
                 }
             }
-            //            }
 
             if (port == 0) {
                 port = FTServer.DEFAULT_PORT;

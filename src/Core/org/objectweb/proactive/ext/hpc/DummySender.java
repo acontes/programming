@@ -56,7 +56,6 @@ import org.objectweb.proactive.core.security.securityentity.Entities;
 import org.objectweb.proactive.core.security.securityentity.Entity;
 
 
-@SuppressWarnings("serial")
 public class DummySender implements UniversalBody {
 
     //
@@ -128,7 +127,7 @@ public class DummySender implements UniversalBody {
     }
 
     @Deprecated
-    public void register(String url) throws IOException, UnknownProtocolException {
+    public void register(String url) throws UnknownProtocolException {
         // TODO Auto-generated method stub
 
     }

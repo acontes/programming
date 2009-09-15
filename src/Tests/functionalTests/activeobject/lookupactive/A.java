@@ -34,6 +34,7 @@ package functionalTests.activeobject.lookupactive;
 import java.io.IOException;
 
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.ProActiveException;
 
 
 public class A {
@@ -50,12 +51,12 @@ public class A {
         return name;
     }
 
-    public int register() {
+    public String register() {
         try {
-            PAActiveObject.registerByName(PAActiveObject.getStubOnThis(), "A");
-        } catch (IOException e) {
+            return PAActiveObject.registerByName(PAActiveObject.getStubOnThis(), "A");
+        } catch (ProActiveException e) {
             e.printStackTrace();
+            return null;
         }
-        return 0;
     }
 }

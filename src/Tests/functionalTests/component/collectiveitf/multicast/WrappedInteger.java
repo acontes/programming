@@ -34,7 +34,6 @@ package functionalTests.component.collectiveitf.multicast;
 import java.io.Serializable;
 
 
-@SuppressWarnings("serial")
 public class WrappedInteger implements Serializable {
 
     /**
@@ -46,7 +45,7 @@ public class WrappedInteger implements Serializable {
     }
 
     public WrappedInteger(Integer value) {
-        intValue = new Integer(value);
+        intValue = Integer.valueOf(value);
     }
 
     /**

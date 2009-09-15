@@ -61,6 +61,7 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAGroup;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -755,7 +756,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
      *             if the component cannot be registered
      */
     @Deprecated
-    public static void register(Component ref, String url) throws IOException {
+    public static void register(Component ref, String url) throws ProActiveException {
         if (!(ref instanceof ProActiveComponentRepresentative)) {
             throw new IllegalArgumentException("This method can only register ProActive components");
         }
@@ -770,14 +771,16 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
      *            ProActiveComponentRepresentative)
      * @param name
      *            the name of the component
-     * @throws IOException
+     * @return
+     *            The URI at which the component is bound
+     * @throws ProActiveException
      *             if the component cannot be registered
      */
-    public static void registerByName(Component ref, String name) throws IOException {
+    public static String registerByName(Component ref, String name) throws ProActiveException {
         if (!(ref instanceof ProActiveComponentRepresentative)) {
             throw new IllegalArgumentException("This method can only register ProActive components");
         }
-        PAActiveObject.registerByName(ref, name);
+        return PAActiveObject.registerByName(ref, name);
     }
 
     /**
