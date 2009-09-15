@@ -31,7 +31,6 @@
  */
 package org.objectweb.proactive.core.body.ft.servers.location;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
@@ -45,7 +44,7 @@ import org.objectweb.proactive.core.body.UniversalBody;
  * @author The ProActive Team
  * @since ProActive 2.2
  */
-public interface LocationServer extends Remote {
+public interface LocationServer {
 
     /**
      * Return the current location of object id.
@@ -53,8 +52,7 @@ public interface LocationServer extends Remote {
      * @param oldLocation last known location of the searched object
      * @return the new location of the searched object
      */
-    public UniversalBody searchObject(UniqueID id, UniversalBody oldLocation, UniqueID caller)
-            throws RemoteException;
+    public UniversalBody searchObject(UniqueID id, UniversalBody oldLocation, UniqueID caller);
 
     /**
      * Set the new location of the active object identified by id.
@@ -63,22 +61,22 @@ public interface LocationServer extends Remote {
      * @param newLocation new location of the caller. If this location is null,
      * the body id is removed from the location table.
      */
-    public void updateLocation(UniqueID id, UniversalBody newLocation) throws RemoteException;
+    public void updateLocation(UniqueID id, UniversalBody newLocation);
 
     /**
      * Return the list of locations of all registered bodies.
      * @return the list of locations of all registered bodies.
      */
-    public List<UniversalBody> getAllLocations() throws RemoteException;
+    public List<UniversalBody> getAllLocations();
 
     /**
      * Return the current known location of a registred body.
      * @return the current known location of a registred body.
      */
-    public UniversalBody getLocation(UniqueID id) throws RemoteException;
+    public UniversalBody getLocation(UniqueID id);
 
     /**
      * Reinit the state of the location server.
      */
-    public void initialize() throws RemoteException;;
+    public void initialize();;
 }

@@ -31,11 +31,9 @@
  */
 package org.objectweb.proactive.core.body.ft.servers;
 
-import java.net.MalformedURLException;
-import java.rmi.Naming;
-import java.rmi.RMISecurityManager;
-import java.rmi.RemoteException;
+import java.net.URI;
 
+import org.objectweb.proactive.api.PARemoteObject;
 import org.objectweb.proactive.core.body.ft.protocols.FTManagerFactory;
 import org.objectweb.proactive.core.body.ft.protocols.cic.servers.CheckpointServerCIC;
 import org.objectweb.proactive.core.body.ft.protocols.cic.servers.RecoveryProcessCIC;
@@ -49,28 +47,28 @@ import org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcess;
 import org.objectweb.proactive.core.body.ft.servers.resource.ResourceServer;
 import org.objectweb.proactive.core.body.ft.servers.resource.ResourceServerImpl;
 import org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer;
-import org.objectweb.proactive.core.rmi.RegistryHelper;
+import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.util.ProActiveInet;
 
 
 /**
  * This class is a main that creates and starts a ft.util.FTServer.
- * Usage : ~>startGlobalFTServer [-proto {cic|pml}] [-name name] [-port portnumber] [-fdperiod faultDetectionPeriod (sec)]
+ * Usage : ~>startGlobalFTServer [-proto {cic|pml}] [-name name] [-fdperiod faultDetectionPeriod (sec)]
  * @author The ProActive Team
  * @since ProActive 2.2
  */
 public class StartFTServer {
     public static void main(String[] args) {
+        String url = "rmi://" + ProActiveInet.getInstance().getInetAddress().getHostName() + ":" +
+            PAProperties.PA_RMI_PORT.getValue() + "/";
         try {
-            int port = 0;
             int fdPeriod = 0;
             String name = "";
             String proto = FTManagerFactory.PROTO_CIC;
 
             for (int i = 0; i < args.length; i++) {
-                if (args[i].equals("-port")) {
-                    port = Integer.parseInt(args[i + 1]);
-                } else if (args[i].equals("-fdperiod")) {
+                if (args[i].equals("-fdperiod")) {
                     fdPeriod = Integer.parseInt(args[i + 1]);
                 } else if (args[i].equals("-name")) {
                     name = args[i + 1];
@@ -80,24 +78,16 @@ public class StartFTServer {
             }
             //            }
 
-            if (port == 0) {
-                port = FTServer.DEFAULT_PORT;
-            }
             if ("".equals(name)) {
                 name = FTServer.DEFAULT_SERVER_NAME;
             }
+            url += name;
             if (fdPeriod == 0) {
                 fdPeriod = FTServer.DEFAULT_FDETECT_SCAN_PERIOD;
             }
 
-            // rmi registry
-            RegistryHelper registryHelper = new RegistryHelper();
-            registryHelper.setRegistryPortNumber(port);
-            registryHelper.initializeRegistry();
-
-            System.setSecurityManager(new RMISecurityManager());
-
             // server init
+
             FTServer server = new FTServer();
             LocationServer ls = new LocationServerImpl(server);
             FaultDetector fd = new FaultDetectorImpl(server, fdPeriod);
@@ -116,21 +106,21 @@ public class StartFTServer {
                 System.err.println("ERROR: " + proto + " is not a valid protocol. Aborting.");
                 System.exit(1);
             }
-
             rs = new ResourceServerImpl(server);
 
             // init
             server.init(fd, ls, rp, rs, cs);
             server.startFailureDetector();
 
-            String host = ProActiveInet.getInstance().getInetAddress().getHostName();
-            Naming.rebind("rmi://" + host + ":" + port + "/" + name, server);
-            System.out.println("Fault-tolerance server is bound on rmi://" + host + ":" + port + "/" + name);
-        } catch (RemoteException e) {
-            System.err.println("** ERROR ** Unable to launch FT server : ");
-            e.printStackTrace();
-        } catch (MalformedURLException e) {
-            System.err.println("** ERROR ** Unable to launch FT server : ");
+            RemoteObjectExposer<FTServer> remoteServerExposer;
+            remoteServerExposer = new RemoteObjectExposer<FTServer>(FTServer.class.getName(), server);
+            FTServer remoteServer = PARemoteObject.bind(remoteServerExposer, new URI(url));
+
+            System.out.println("FT: Server is bound on " + url);
+            System.out.println("FT: Server started");
+
+        } catch (Exception e) {
+            System.err.println("FT: ** ERROR ** Unable to launch server on " + url);
             e.printStackTrace();
         }
     }

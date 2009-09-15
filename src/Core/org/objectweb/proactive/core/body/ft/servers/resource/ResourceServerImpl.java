@@ -31,7 +31,6 @@
  */
 package org.objectweb.proactive.core.body.ft.servers.resource;
 
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,7 +69,7 @@ public class ResourceServerImpl implements ResourceServer {
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.resource.ResourceServer#addFreeNode(org.objectweb.proactive.core.node.Node)
      */
-    public void addFreeNode(Node n) throws RemoteException {
+    public void addFreeNode(Node n) {
         logger.info("[RESSOURCE] A node is added : " + n.getNodeInformation().getURL());
         this.freeNodes.add(n);
     }
@@ -78,7 +77,7 @@ public class ResourceServerImpl implements ResourceServer {
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.resource.ResourceServer#getFreeNode()
      */
-    public Node getFreeNode() throws RemoteException {
+    public Node getFreeNode() {
         this.nodeCounter++;
         Node n = null;
         if (this.freeNodes.isEmpty()) {
@@ -104,7 +103,7 @@ public class ResourceServerImpl implements ResourceServer {
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.resource.ResourceServer#initialize()
      */
-    public void initialize() throws RemoteException {
+    public void initialize() {
         this.freeNodes = new ArrayList<Node>();
         this.nodeCounter = 0;
     }

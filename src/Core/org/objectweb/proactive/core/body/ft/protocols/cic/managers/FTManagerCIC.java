@@ -32,7 +32,6 @@
 package org.objectweb.proactive.core.body.ft.protocols.cic.managers;
 
 import java.io.IOException;
-import java.rmi.RemoteException;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -324,15 +323,10 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
 
         // output commit
         if (FTManagerCIC.isOCEnable && this.isOutputCommit(reply)) {
-            try {
-                if (logger.isDebugEnabled()) {
-                    logger.debug(this.ownerID + " is output commiting for reply " + reply);
-                }
-                this.storage.outputCommit(this.forSentReply);
-            } catch (RemoteException e) {
-                logger.error("**ERROR** Cannot perform output commit");
-                e.printStackTrace();
+            if (logger.isDebugEnabled()) {
+                logger.debug(this.ownerID + " is output commiting for reply " + reply);
             }
+            this.storage.outputCommit(this.forSentReply);
         }
 
         return 0;
@@ -354,15 +348,10 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
 
         // output commit
         if (FTManagerCIC.isOCEnable && this.isOutputCommit(request)) {
-            try {
-                if (logger.isDebugEnabled()) {
-                    logger.debug(this.ownerID + " is output commiting for request " + request);
-                }
-                this.storage.outputCommit(this.forSentRequest);
-            } catch (RemoteException e) {
-                logger.error("**ERROR** Cannot perform output commit");
-                e.printStackTrace();
+            if (logger.isDebugEnabled()) {
+                logger.debug(this.ownerID + " is output commiting for request " + request);
             }
+            this.storage.outputCommit(this.forSentRequest);
         }
         return 0;
     }
@@ -550,14 +539,9 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
         //System.out.println("[CIC] enable communication");
         (owner).acceptCommunication();
 
-        try {
-            // update servers
-            this.location.updateLocation(ownerID, owner.getRemoteAdapter());
-            this.recovery.updateState(ownerID, RecoveryProcess.RUNNING);
-        } catch (RemoteException e) {
-            logger.error("Unable to connect with location server");
-            e.printStackTrace();
-        }
+        // update servers
+        this.location.updateLocation(ownerID, owner.getRemoteAdapter());
+        this.recovery.updateState(ownerID, RecoveryProcess.RUNNING);
 
         // resend all in-transit message
         this.sendLogs((CheckpointInfoCIC) ci);
@@ -567,14 +551,9 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
 
     @Override
     public void updateLocationAtServer(UniqueID ownerID, UniversalBody remoteBodyAdapter) {
-        try {
-            // update servers
-            this.location.updateLocation(ownerID, remoteBodyAdapter);
-            //            this.recovery.updateState(ownerID, RecoveryProcess.RUNNING);
-        } catch (RemoteException e) {
-            logger.error("Unable to connect with location server");
-            e.printStackTrace();
-        }
+        // update servers
+        this.location.updateLocation(ownerID, remoteBodyAdapter);
+        //            this.recovery.updateState(ownerID, RecoveryProcess.RUNNING);
     }
 
     /*
@@ -633,84 +612,76 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
 
             //long start;
             //long end;
-            try {
-                //start = System.currentTimeMillis();
-                //System.out.println("BEGIN CHECKPOINT : used mem = " + this.getUsedMem() );
-                synchronized (this) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("[CIC] Checkpointing with index = " + (this.checkpointIndex + 1));
-                    }
-
-                    // create infos for checkpoint
-                    CheckpointInfoCIC ci = new CheckpointInfoCIC();
-                    this.extendReplyLog(this.checkpointIndex + 1);
-                    this.extendRequestLog(this.checkpointIndex + 1);
-                    ci.replyToResend = (this.replyToResend.get(Integer.valueOf(this.checkpointIndex + 1)));
-                    ci.requestToResend = (this.requestToResend.get(Integer.valueOf(this.checkpointIndex + 1)));
-                    ci.pendingRequest = pendingRequest;
-                    ci.checkpointIndex = this.checkpointIndex + 1;
-
-                    // delete logs
-                    this.replyToResend.remove(Integer.valueOf(this.checkpointIndex + 1));
-                    this.requestToResend.remove(Integer.valueOf(this.checkpointIndex + 1));
-
-                    // inc checkpoint index
-                    this.checkpointIndex++;
-
-                    // Reset history only if OC is not possible
-                    if (!FTManagerCIC.isOCEnable) {
-                        this.history = new Vector<UniqueID>();
-                        this.historyBaseIndex = this.deliveredRequestsCounter + 1;
-                        this.lastCommitedIndex = this.deliveredRequestsCounter;
-                    }
-
-                    // current informations must not be stored in the checkpoint
-                    Hashtable<Integer, Vector<RequestLog>> requestToSendTMP = this.requestToResend;
-                    this.requestToResend = null;
-                    Hashtable<Integer, Vector<ReplyLog>> replyToSendTMP = this.replyToResend;
-                    this.replyToResend = null;
-                    Vector<UniqueID> historyTMP = this.history;
-                    this.history = null;
-                    Vector<AwaitedRequest> awaitedRequestTMP = this.awaitedRequests;
-                    this.awaitedRequests = null;
-
-                    // record the next history base index
-                    ci.lastRcvdRequestIndex = this.deliveredRequestsCounter;
-                    // checkpoint the active object
-                    this.setCheckpointTag(true);
-                    c = new Checkpoint(owner, this.additionalCodebase);
-                    // add info to checkpoint
-                    c.setCheckpointInfo(ci);
-
-                    // send it to server
-                    this.storage.storeCheckpoint(c, this.incarnation);
-                    this.setCheckpointTag(false);
-
-                    // restore current informations
-                    this.replyToResend = replyToSendTMP;
-                    this.requestToResend = requestToSendTMP;
-                    this.history = historyTMP;
-                    this.awaitedRequests = awaitedRequestTMP;
-
-                    // this checkpoint has to be completed with its minimal hisotry
-                    this.completingCheckpoint = true;
-
-                    // reninit checkpoint values
-                    this.checkpointTimer = System.currentTimeMillis();
+            //start = System.currentTimeMillis();
+            //System.out.println("BEGIN CHECKPOINT : used mem = " + this.getUsedMem() );
+            synchronized (this) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("[CIC] Checkpointing with index = " + (this.checkpointIndex + 1));
                 }
 
-                //end = System.currentTimeMillis();
-                //System.out.println("[BENCH] Cumulated Ckpt time at " + this.checkpointIndex + " : " + this.cumulatedCheckpointTime + " ms");// + System.currentTimeMillis() + "]");
-                //System.out.println("END CHECKPOINTING : used mem = " + this.getUsedMem());
-                return c;
-            } catch (RemoteException e) {
-                logger.error("[CIC] Unable to send checkpoint to the server");
-                e.printStackTrace();
-            } finally {
-                // allow communication
-                (owner).acceptCommunication();
+                // create infos for checkpoint
+                CheckpointInfoCIC ci = new CheckpointInfoCIC();
+                this.extendReplyLog(this.checkpointIndex + 1);
+                this.extendRequestLog(this.checkpointIndex + 1);
+                ci.replyToResend = (this.replyToResend.get(Integer.valueOf(this.checkpointIndex + 1)));
+                ci.requestToResend = (this.requestToResend.get(Integer.valueOf(this.checkpointIndex + 1)));
+                ci.pendingRequest = pendingRequest;
+                ci.checkpointIndex = this.checkpointIndex + 1;
+
+                // delete logs
+                this.replyToResend.remove(Integer.valueOf(this.checkpointIndex + 1));
+                this.requestToResend.remove(Integer.valueOf(this.checkpointIndex + 1));
+
+                // inc checkpoint index
+                this.checkpointIndex++;
+
+                // Reset history only if OC is not possible
+                if (!FTManagerCIC.isOCEnable) {
+                    this.history = new Vector<UniqueID>();
+                    this.historyBaseIndex = this.deliveredRequestsCounter + 1;
+                    this.lastCommitedIndex = this.deliveredRequestsCounter;
+                }
+
+                // current informations must not be stored in the checkpoint
+                Hashtable<Integer, Vector<RequestLog>> requestToSendTMP = this.requestToResend;
+                this.requestToResend = null;
+                Hashtable<Integer, Vector<ReplyLog>> replyToSendTMP = this.replyToResend;
+                this.replyToResend = null;
+                Vector<UniqueID> historyTMP = this.history;
+                this.history = null;
+                Vector<AwaitedRequest> awaitedRequestTMP = this.awaitedRequests;
+                this.awaitedRequests = null;
+
+                // record the next history base index
+                ci.lastRcvdRequestIndex = this.deliveredRequestsCounter;
+                // checkpoint the active object
+                this.setCheckpointTag(true);
+                c = new Checkpoint(owner, this.additionalCodebase);
+                // add info to checkpoint
+                c.setCheckpointInfo(ci);
+
+                // send it to server
+                this.storage.storeCheckpoint(c, this.incarnation);
+                this.setCheckpointTag(false);
+
+                // restore current informations
+                this.replyToResend = replyToSendTMP;
+                this.requestToResend = requestToSendTMP;
+                this.history = historyTMP;
+                this.awaitedRequests = awaitedRequestTMP;
+
+                // this checkpoint has to be completed with its minimal hisotry
+                this.completingCheckpoint = true;
+
+                // reninit checkpoint values
+                this.checkpointTimer = System.currentTimeMillis();
             }
-            return null;
+
+            //end = System.currentTimeMillis();
+            //System.out.println("[BENCH] Cumulated Ckpt time at " + this.checkpointIndex + " : " + this.cumulatedCheckpointTime + " ms");// + System.currentTimeMillis() + "]");
+            //System.out.println("END CHECKPOINTING : used mem = " + this.getUsedMem());
+            (owner).acceptCommunication();
+            return c;
         }
     }
 
@@ -748,12 +719,7 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
 
             // send to the server if asked
             if (sendToServer) {
-                try {
-                    this.storage.commitHistory(toSend);
-                } catch (RemoteException e) {
-                    logger.error("[ERROR] Storage server is not reachable !");
-                    e.printStackTrace();
-                }
+                this.storage.commitHistory(toSend);
             }
             return toSend;
         }

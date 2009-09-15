@@ -31,8 +31,6 @@
  */
 package org.objectweb.proactive.core.body.ft.protocols.pmlrb.servers;
 
-import java.rmi.RemoteException;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
@@ -67,18 +65,13 @@ public class RecoveryProcessPMLRB extends RecoveryProcessImpl {
      */
     @Override
     protected void recover(UniqueID failed) {
-        try {
-            Checkpoint toSend = this.server.getLastCheckpoint(failed);
+        Checkpoint toSend = this.server.getLastCheckpoint(failed);
 
-            //look for a new Runtime for this oa
-            Node node = this.server.getFreeNode();
+        //look for a new Runtime for this oa
+        Node node = this.server.getFreeNode();
 
-            //if (node==null)return;
-            RecoveryJob job = new RecoveryJob(toSend, FTManager.DEFAULT_TTC_VALUE, node);
-            this.submitJob(job);
-        } catch (RemoteException e) {
-            logger.error("[RECOVERY] **ERROR** Cannot contact other servers : ");
-            e.printStackTrace();
-        }
+        //if (node==null)return;
+        RecoveryJob job = new RecoveryJob(toSend, FTManager.DEFAULT_TTC_VALUE, node);
+        this.submitJob(job);
     }
 }

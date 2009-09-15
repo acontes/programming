@@ -31,7 +31,6 @@
  */
 package org.objectweb.proactive.core.body.ft.servers.recovery;
 
-import java.rmi.RemoteException;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Vector;
@@ -84,7 +83,7 @@ public abstract class RecoveryProcessImpl implements RecoveryProcess {
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcess#register(org.objectweb.proactive.core.UniqueID)
      */
-    public void register(UniqueID id) throws RemoteException {
+    public void register(UniqueID id) {
         //register with RUNNING default state
         bodies.put(id, new Integer(RUNNING));
 
@@ -102,7 +101,7 @@ public abstract class RecoveryProcessImpl implements RecoveryProcess {
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcess#unregister(org.objectweb.proactive.core.UniqueID)
      */
-    public void unregister(UniqueID id) throws RemoteException {
+    public void unregister(UniqueID id) {
         // remove from the register table
         bodies.remove(id);
         // remove from the location table
@@ -113,7 +112,7 @@ public abstract class RecoveryProcessImpl implements RecoveryProcess {
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcess#failureDetected(org.objectweb.proactive.core.UniqueID)
      */
-    public void failureDetected(UniqueID id) throws RemoteException {
+    public void failureDetected(UniqueID id) {
         // id is recovering ??
         int currentState = (this.bodies.get(id)).intValue();
         if (currentState == RUNNING) {
@@ -129,7 +128,7 @@ public abstract class RecoveryProcessImpl implements RecoveryProcess {
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcess#updateState(org.objectweb.proactive.core.UniqueID, int)
      */
-    public void updateState(UniqueID id, int state) throws RemoteException {
+    public void updateState(UniqueID id, int state) {
         logger.info("[RECOVERY]  " + id + " is updating its state : " + state);
         this.bodies.put(id, new Integer(state));
     }
@@ -162,14 +161,14 @@ public abstract class RecoveryProcessImpl implements RecoveryProcess {
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcess#getSystemSize()
      */
-    public int getSystemSize() throws RemoteException {
+    public int getSystemSize() {
         return this.bodies.size();
     }
 
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcess#initialize()
      */
-    public void initialize() throws RemoteException {
+    public void initialize() {
         this.bodies = new Hashtable<UniqueID, Integer>();
 
         // killing activeQueues

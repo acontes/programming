@@ -31,7 +31,6 @@
  */
 package org.objectweb.proactive.core.body.ft.servers.faultdetection;
 
-import java.rmi.RemoteException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -76,7 +75,7 @@ public class FaultDetectorImpl implements FaultDetector {
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.faultdetection.FaultDetector#isUnreachable(org.objectweb.proactive.core.body.UniversalBody)
      */
-    public boolean isUnreachable(UniversalBody body) throws RemoteException {
+    public boolean isUnreachable(UniversalBody body) {
         Object res = null;
         try {
             res = body.receiveFTMessage(FaultDetectorImpl.hbe);
@@ -96,28 +95,28 @@ public class FaultDetectorImpl implements FaultDetector {
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.faultdetection.FaultDetector#startFailureDetector()
      */
-    public void startFailureDetector() throws RemoteException {
+    public void startFailureDetector() {
         this.fdt.start();
     }
 
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.faultdetection.FaultDetector#suspendFailureDetector()
      */
-    public void suspendFailureDetector() throws RemoteException {
+    public void suspendFailureDetector() {
         throw new NotImplementedException();
     }
 
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.faultdetection.FaultDetector#stopFailureDetector()
      */
-    public void stopFailureDetector() throws RemoteException {
+    public void stopFailureDetector() {
         throw new NotImplementedException();
     }
 
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.faultdetection.FaultDetector#forceDetection()
      */
-    public void forceDetection() throws RemoteException {
+    public void forceDetection() {
         this.fdt.wakeUp();
     }
 
@@ -157,39 +156,35 @@ public class FaultDetectorImpl implements FaultDetector {
         @Override
         public void run() {
             while (true) {
-                try {
-                    if (kill) {
-                        break;
-                    }
-
-                    //synchronized (FaultDetectorImpl.this.server){
-                    List<UniversalBody> al = FaultDetectorImpl.this.server.getAllLocations();
-                    Iterator<UniversalBody> it = al.iterator();
-                    logger.info("[FAULT DETECTOR] Scanning " + al.size() + " objects ...");
-                    while (it.hasNext()) {
-                        if (kill) {
-                            break;
-                        }
-                        if (wakeUpCalled) {
-                            // a detection is forced, restart...
-                            it = al.iterator();
-                            this.wakeUpCalled = false;
-                        }
-                        UniversalBody current = (it.next());
-                        if (FaultDetectorImpl.this.server.isUnreachable(current)) {
-                            FaultDetectorImpl.this.server.failureDetected(current.getID());
-                            // other failures may be detected by the recoveryProcess
-                            break;
-                        }
-                    }
-                    logger.info("[FAULT DETECTOR] End scanning.");
-                    if (kill) {
-                        break;
-                    }
-                    this.pause();
-                } catch (RemoteException e) {
-                    e.printStackTrace();
+                if (kill) {
+                    break;
                 }
+
+                //synchronized (FaultDetectorImpl.this.server){
+                List<UniversalBody> al = FaultDetectorImpl.this.server.getAllLocations();
+                Iterator<UniversalBody> it = al.iterator();
+                logger.info("[FAULT DETECTOR] Scanning " + al.size() + " objects ...");
+                while (it.hasNext()) {
+                    if (kill) {
+                        break;
+                    }
+                    if (wakeUpCalled) {
+                        // a detection is forced, restart...
+                        it = al.iterator();
+                        this.wakeUpCalled = false;
+                    }
+                    UniversalBody current = (it.next());
+                    if (FaultDetectorImpl.this.server.isUnreachable(current)) {
+                        FaultDetectorImpl.this.server.failureDetected(current.getID());
+                        // other failures may be detected by the recoveryProcess
+                        break;
+                    }
+                }
+                logger.info("[FAULT DETECTOR] End scanning.");
+                if (kill) {
+                    break;
+                }
+                this.pause();
             }
         }
     }
@@ -197,7 +192,7 @@ public class FaultDetectorImpl implements FaultDetector {
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.faultdetection.FaultDetector#initialize()
      */
-    public void initialize() throws RemoteException {
+    public void initialize() {
         this.fdt.killMe();
         this.fdt = new FaultDetectorThread();
     }

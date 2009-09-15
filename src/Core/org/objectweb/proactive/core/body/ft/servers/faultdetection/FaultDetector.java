@@ -45,7 +45,7 @@ import org.objectweb.proactive.core.body.UniversalBody;
  * @author The ProActive Team
  * @since ProActive 2.2
  */
-public interface FaultDetector extends Remote {
+public interface FaultDetector {
 
     /**
      * This value is return by an alive and reachable active object that receive a
@@ -66,7 +66,7 @@ public interface FaultDetector extends Remote {
      * @return true if body is unreachable, false otherwise
      * @throws RemoteException
      */
-    public boolean isUnreachable(UniversalBody body) throws RemoteException;
+    public boolean isUnreachable(UniversalBody body);
 
     /**
      * Start the tread that periodically test the reachability of objects that are registred in
@@ -74,28 +74,28 @@ public interface FaultDetector extends Remote {
 
      * @throws RemoteException
      */
-    public void startFailureDetector() throws RemoteException;
+    public void startFailureDetector();
 
     /**
      * Temporarily suspend the failure detector thread.
      * @throws RemoteException
      */
-    public void suspendFailureDetector() throws RemoteException;
+    public void suspendFailureDetector();
 
     /**
      * Stop the the failure detector thread.
      * @throws RemoteException
      */
-    public void stopFailureDetector() throws RemoteException;
+    public void stopFailureDetector();
 
     /**
      * Force a failure detection even if the failure detector thread is waiting.
      * @throws RemoteException
      */
-    public void forceDetection() throws RemoteException;
+    public void forceDetection();
 
     /**
      * Reinit the state of the fault detector
      */
-    public void initialize() throws RemoteException;
+    public void initialize();
 }

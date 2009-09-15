@@ -44,22 +44,22 @@ import org.objectweb.proactive.core.node.Node;
  * @author The ProActive Team
  * @since ProActive 2.2
  */
-public interface ResourceServer extends Remote {
+public interface ResourceServer {
 
     /**
      * Add a new node usable for recovery.
      * @param n the node to add
      */
-    public void addFreeNode(Node n) throws RemoteException;
+    public void addFreeNode(Node n);
 
     /**
      * Return the next available node for recovery
      * @return an available node
      */
-    public Node getFreeNode() throws RemoteException;
+    public Node getFreeNode();
 
     /**
      * Reinit the state of the resource server.
      */
-    public void initialize() throws RemoteException;
+    public void initialize();
 }

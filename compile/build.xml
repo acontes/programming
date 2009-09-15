@@ -141,7 +141,6 @@
 
 		<rmic base="${cl.proactive.dir}" sourcebase="${cl.proactive.dir}" stubversion="1.2">
 			<classpath refid="project.classpath" />
-			<include name="org/objectweb/proactive/core/body/ft/servers/FTServer.class" />
 			<include name="org/objectweb/proactive/core/remoteobject/rmi/RmiRemoteObjectImpl.class" />
 		</rmic>
 

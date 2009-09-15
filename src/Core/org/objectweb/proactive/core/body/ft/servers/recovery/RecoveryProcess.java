@@ -31,7 +31,6 @@
  */
 package org.objectweb.proactive.core.body.ft.servers.recovery;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 import org.objectweb.proactive.core.UniqueID;
@@ -45,7 +44,7 @@ import org.objectweb.proactive.core.body.ft.servers.util.JobBarrier;
  * @author The ProActive Team
  * @since ProActive 2.2
  */
-public interface RecoveryProcess extends Remote {
+public interface RecoveryProcess {
 
     /**
      * Active objects possible states.
@@ -59,20 +58,20 @@ public interface RecoveryProcess extends Remote {
      * Default state is RUNNING.
      * @param id the registered body id
      */
-    public void register(UniqueID id) throws RemoteException;
+    public void register(UniqueID id);
 
     /**
      * Unregister the AO identified by id.
      * @param id the unregistered body id
      * @throws RemoteException
      */
-    public void unregister(UniqueID id) throws RemoteException;
+    public void unregister(UniqueID id);
 
     /**
      * Notify the recovery process that the body passed in paramater is suspected to be failed.
      * @param id the id of the suspected AO
      */
-    public void failureDetected(UniqueID id) throws RemoteException;
+    public void failureDetected(UniqueID id);
 
     /**
      * Update the current state of the active object id.
@@ -80,14 +79,14 @@ public interface RecoveryProcess extends Remote {
      * @param id id of the AO to update
      * @param state state of the active object
      */
-    public void updateState(UniqueID id, int state) throws RemoteException;
+    public void updateState(UniqueID id, int state);
 
     /**
      * to submit a job to recovery process
      * @param job the job to submit
      * @throws RemoteException
      */
-    public void submitJob(ActiveQueueJob job) throws RemoteException;
+    public void submitJob(ActiveQueueJob job);
 
     /**
      * to submit a job to recovery process, with a barrier for waiting its completion
@@ -95,17 +94,17 @@ public interface RecoveryProcess extends Remote {
      * @return the barrier on which waiting for the completion of the job
      * @throws RemoteException
      */
-    public JobBarrier submitJobWithBarrier(ActiveQueueJob job) throws RemoteException;
+    public JobBarrier submitJobWithBarrier(ActiveQueueJob job);
 
     /**
      * Return the size of the system, i.e. the number of registred bodies.
      * @return the number of registred bodies
      * @throws RemoteException
      */
-    public int getSystemSize() throws RemoteException;
+    public int getSystemSize();
 
     /**
      * Reinit the state of the recovery process.
      */
-    public void initialize() throws RemoteException;
+    public void initialize();
 }

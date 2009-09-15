@@ -35,7 +35,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.rmi.RemoteException;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -92,7 +91,7 @@ public abstract class CheckpointServerImpl implements CheckpointServer {
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#getServerCodebase()
      */
-    public String getServerCodebase() throws RemoteException {
+    public String getServerCodebase() {
         return this.codebase;
     }
 
@@ -122,7 +121,7 @@ public abstract class CheckpointServerImpl implements CheckpointServer {
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#initialize()
      */
-    public void initialize() throws RemoteException {
+    public void initialize() {
         this.checkpointStorage = new Hashtable<UniqueID, List<Checkpoint>>();
     }
 }

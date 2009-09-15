@@ -72,10 +72,6 @@ public class KillerJob implements ActiveQueueJob {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        try {
-            this.server.forceDetection();
-        } catch (RemoteException e1) {
-            e1.printStackTrace();
-        }
+        this.server.forceDetection();
     }
 }

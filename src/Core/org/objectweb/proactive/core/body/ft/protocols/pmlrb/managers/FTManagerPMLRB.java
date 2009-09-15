@@ -32,7 +32,6 @@
 package org.objectweb.proactive.core.body.ft.protocols.pmlrb.managers;
 
 import java.io.IOException;
-import java.rmi.RemoteException;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -177,14 +176,10 @@ public class FTManagerPMLRB extends FTManager {
     public int onDeliverReply(Reply reply) {
         // if the ao is recovering, message are not logged
         if (!this.isRecovering) {
-            try {
-                // log the message
-                this.storage.storeReply(this.ownerID, reply);
-                // update latestIndex table
-                this.updateLatestRvdIndexTable(reply);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
+            // log the message
+            this.storage.storeReply(this.ownerID, reply);
+            // update latestIndex table
+            this.updateLatestRvdIndexTable(reply);
         }
         return 0;
     }
@@ -198,14 +193,10 @@ public class FTManagerPMLRB extends FTManager {
     public int onDeliverRequest(Request request) {
         // if the ao is recovering, message are not logged
         if (!this.isRecovering) {
-            try {
-                // log the message
-                this.storage.storeRequest(this.ownerID, request);
-                // update latestIndex table
-                this.updateLatestRvdIndexTable(request);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
+            // log the message
+            this.storage.storeRequest(this.ownerID, request);
+            // update latestIndex table
+            this.updateLatestRvdIndexTable(request);
         }
         return 0;
     }
@@ -360,14 +351,9 @@ public class FTManagerPMLRB extends FTManager {
         // enable communication
         this.owner.acceptCommunication();
 
-        try {
-            // update servers
-            this.location.updateLocation(ownerID, owner.getRemoteAdapter());
-            this.recovery.updateState(ownerID, RecoveryProcess.RUNNING);
-        } catch (RemoteException e) {
-            logger.error("Unable to connect with location server");
-            e.printStackTrace();
-        }
+        // update servers
+        this.location.updateLocation(ownerID, owner.getRemoteAdapter());
+        this.recovery.updateState(ownerID, RecoveryProcess.RUNNING);
 
         this.checkpointTimer = System.currentTimeMillis();
 
@@ -393,27 +379,22 @@ public class FTManagerPMLRB extends FTManager {
         //System.out.println("[PMLRB] Checkpointing...");
         owner.blockCommunication();
         // checkpoint the active object
-        try {
-            this.setCheckpointTag(true);
-            // create a checkpoint
-            Checkpoint c = new Checkpoint(owner, this.additionalCodebase);
+        this.setCheckpointTag(true);
+        // create a checkpoint
+        Checkpoint c = new Checkpoint(owner, this.additionalCodebase);
 
-            // create checkpoint info with the pending request
-            CheckpointInfoPMLRB ci = new CheckpointInfoPMLRB(pending);
+        // create checkpoint info with the pending request
+        CheckpointInfoPMLRB ci = new CheckpointInfoPMLRB(pending);
 
-            // attach infos
-            c.setCheckpointInfo(ci);
-            // send it to server
-            this.storage.storeCheckpoint(c, FTManager.DEFAULT_TTC_VALUE); // SEE INC VALUE !
+        // attach infos
+        c.setCheckpointInfo(ci);
+        // send it to server
+        this.storage.storeCheckpoint(c, FTManager.DEFAULT_TTC_VALUE); // SEE INC VALUE !
 
-            // reninit checkpoint values
-            this.checkpointTimer = System.currentTimeMillis();
+        // reninit checkpoint values
+        this.checkpointTimer = System.currentTimeMillis();
 
-            this.setCheckpointTag(false);
-        } catch (RemoteException e) {
-            logger.error("[PMLRB] Unable to send checkpoint to the server");
-            e.printStackTrace();
-        }
+        this.setCheckpointTag(false);
 
         owner.acceptCommunication();
     }

@@ -31,7 +31,6 @@
  */
 package org.objectweb.proactive.core.body.ft.protocols.pmlrb.servers;
 
-import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Vector;
 
@@ -71,7 +70,7 @@ public class CheckpointServerPMLRB extends CheckpointServerImpl {
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#storeCheckpoint(org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint, int)
      */
-    public int storeCheckpoint(Checkpoint c, int incarnation) throws RemoteException {
+    public int storeCheckpoint(Checkpoint c, int incarnation) {
         logger.info("[STORAGE] " + c.getBodyID() + " is checkpointing..." + " (used memory = " +
             this.getUsedMem() + " Kb)");
         UniqueID caller = c.getBodyID();
@@ -95,14 +94,14 @@ public class CheckpointServerPMLRB extends CheckpointServerImpl {
      * Not implemented for this procotol.
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#getCheckpoint(org.objectweb.proactive.core.UniqueID, int)
      */
-    public Checkpoint getCheckpoint(UniqueID id, int sequenceNumber) throws RemoteException {
+    public Checkpoint getCheckpoint(UniqueID id, int sequenceNumber) {
         throw new NotImplementedException();
     }
 
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#getLastCheckpoint(org.objectweb.proactive.core.UniqueID)
      */
-    public Checkpoint getLastCheckpoint(UniqueID id) throws RemoteException {
+    public Checkpoint getLastCheckpoint(UniqueID id) {
         List<Checkpoint> lck = this.checkpointStorage.get(id);
         if (lck != null) {
             return lck.get(0);
@@ -114,8 +113,7 @@ public class CheckpointServerPMLRB extends CheckpointServerImpl {
      * Not implemented for this protocol.
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#addInfoToCheckpoint(org.objectweb.proactive.core.body.ft.checkpointing.CheckpointInfo, org.objectweb.proactive.core.UniqueID, int, int)
      */
-    public void addInfoToCheckpoint(CheckpointInfo ci, UniqueID id, int sequenceNumber, int incarnation)
-            throws RemoteException {
+    public void addInfoToCheckpoint(CheckpointInfo ci, UniqueID id, int sequenceNumber, int incarnation) {
         throw new NotImplementedException();
     }
 
@@ -123,14 +121,14 @@ public class CheckpointServerPMLRB extends CheckpointServerImpl {
      * Not implemented for this protocol.
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#getInfoFromCheckpoint(org.objectweb.proactive.core.UniqueID, int)
      */
-    public CheckpointInfo getInfoFromCheckpoint(UniqueID id, int sequenceNumber) throws RemoteException {
+    public CheckpointInfo getInfoFromCheckpoint(UniqueID id, int sequenceNumber) {
         throw new NotImplementedException();
     }
 
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#storeRequest(org.objectweb.proactive.core.UniqueID, org.objectweb.proactive.core.body.request.Request)
      */
-    public void storeRequest(UniqueID receiverId, Request request) throws RemoteException {
+    public void storeRequest(UniqueID receiverId, Request request) {
         List<Checkpoint> lck = this.checkpointStorage.get(receiverId);
         if (lck != null) {
             Checkpoint c = this.checkpointStorage.get(receiverId).get(0);
@@ -148,7 +146,7 @@ public class CheckpointServerPMLRB extends CheckpointServerImpl {
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#storeReply(org.objectweb.proactive.core.UniqueID, org.objectweb.proactive.core.body.reply.Reply)
      */
-    public void storeReply(UniqueID receiverID, Reply reply) throws RemoteException {
+    public void storeReply(UniqueID receiverID, Reply reply) {
         // checkpoint could not be null : if this oa receive a repy, it thus has already
         // served a request, and has checkpointed before.
         CheckpointInfoPMLRB ci = (CheckpointInfoPMLRB) (this.checkpointStorage.get(receiverID).get(0))
@@ -159,14 +157,14 @@ public class CheckpointServerPMLRB extends CheckpointServerImpl {
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#outputCommit(org.objectweb.proactive.core.body.ft.message.MessageInfo)
      */
-    public void outputCommit(MessageInfo mi) throws RemoteException {
+    public void outputCommit(MessageInfo mi) {
         throw new NotImplementedException("outputCommit(MessageInfo mi)");
     }
 
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#commitHistory(org.objectweb.proactive.core.body.ft.message.HistoryUpdater)
      */
-    public void commitHistory(HistoryUpdater rh) throws RemoteException {
+    public void commitHistory(HistoryUpdater rh) {
         // nothing to do
     }
 }

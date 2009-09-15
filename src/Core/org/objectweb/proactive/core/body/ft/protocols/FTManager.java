@@ -38,6 +38,9 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFaultTolerance;
+import org.objectweb.proactive.api.PAFaultTolerance.FTServerInformation;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.AbstractBody;
@@ -132,50 +135,27 @@ public abstract class FTManager implements java.io.Serializable {
         this.ownerID = owner.getID();
         Node node = NodeFactory.getNode(this.owner.getNodeURL());
 
-        try {
-            String ttcValue = node.getProperty(FaultToleranceTechnicalService.TTC);
-            if (ttcValue != null) {
-                this.ttc = Integer.parseInt(ttcValue) * 1000;
-            } else {
-                this.ttc = FTManager.DEFAULT_TTC_VALUE;
-            }
-            String urlGlobal = node.getProperty(FaultToleranceTechnicalService.GLOBAL_SERVER);
-            if (urlGlobal != null) {
-                this.storage = (CheckpointServer) (Naming.lookup(urlGlobal));
-                this.location = (LocationServer) (Naming.lookup(urlGlobal));
-                this.recovery = (RecoveryProcess) (Naming.lookup(urlGlobal));
-            } else {
-                String urlCheckpoint = node.getProperty(FaultToleranceTechnicalService.CKPT_SERVER);
-                String urlRecovery = node.getProperty(FaultToleranceTechnicalService.RECOVERY_SERVER);
-                String urlLocation = node.getProperty(FaultToleranceTechnicalService.LOCATION_SERVER);
-                if ((urlCheckpoint != null) && (urlRecovery != null) && (urlLocation != null)) {
-                    this.storage = (CheckpointServer) (Naming.lookup(urlCheckpoint));
-                    this.location = (LocationServer) (Naming.lookup(urlLocation));
-                    this.recovery = (RecoveryProcess) (Naming.lookup(urlRecovery));
-                } else {
-                    throw new ProActiveException("Unable to init FTManager : servers are not correctly set");
-                }
-            }
-
-            // the additional codebase is added to normal codebase
-            // ONLY during serialization for checkpoint !
-            this.additionalCodebase = this.storage.getServerCodebase();
-
-            // registration in the recovery process and in the localisation server
-            try {
-                this.recovery.register(ownerID);
-                this.location.updateLocation(ownerID, owner.getRemoteAdapter());
-            } catch (RemoteException e) {
-                logger.error("**ERROR** Unable to register in location server");
-                throw new ProActiveException("Unable to register in location server", e);
-            }
-        } catch (MalformedURLException e) {
-            throw new ProActiveException("Unable to init FTManager : FT is disable.", e);
-        } catch (RemoteException e) {
-            throw new ProActiveException("Unable to init FTManager : FT is disable.", e);
-        } catch (NotBoundException e) {
-            throw new ProActiveException("Unable to init FTManager : FT is disable.", e);
+        String ttcValue = node.getProperty(FaultToleranceTechnicalService.TTC);
+        if (ttcValue != null) {
+            this.ttc = Integer.parseInt(ttcValue) * 1000;
+        } else {
+            this.ttc = FTManager.DEFAULT_TTC_VALUE;
         }
+        FTServerInformation infos = null;
+        PAFaultTolerance apiFT = PAFaultTolerance.getInstance();
+        apiFT.setServerInformation(node);
+        infos = apiFT.getServerInformation();
+        this.storage = infos.storage;
+        this.location = infos.location;
+        this.recovery = infos.recovery;
+
+        // the additional codebase is added to normal codebase
+        // ONLY during serialization for checkpoint !
+        this.additionalCodebase = this.storage.getServerCodebase();
+
+        // registration in the recovery process and in the localisation server
+        this.recovery.register(ownerID);
+        this.location.updateLocation(ownerID, owner.getRemoteAdapter());
         return 0;
     }
 
@@ -184,12 +164,7 @@ public abstract class FTManager implements java.io.Serializable {
      * when an active object ends its activity normally.
      */
     public void termination() throws ProActiveException {
-        try {
-            this.recovery.unregister(this.ownerID);
-        } catch (RemoteException e) {
-            logger.error("**ERROR** Unable to register in location server");
-            throw new ProActiveException("Unable to unregister in location server", e);
-        }
+        this.recovery.unregister(this.ownerID);
     }
 
     /**
@@ -219,36 +194,30 @@ public abstract class FTManager implements java.io.Serializable {
      * @return the actual location of the callee
      */
     public UniversalBody communicationFailed(UniqueID suspect, UniversalBody suspectLocation, Exception e) {
-        try {
-            // send an adapter to suspectLocation: the suspected body could be local
-            UniversalBody newLocation = this.location.searchObject(suspect, suspectLocation
-                    .getRemoteAdapter(), this.ownerID);
+        // send an adapter to suspectLocation: the suspected body could be local
+        UniversalBody newLocation = this.location.searchObject(suspect, suspectLocation.getRemoteAdapter(),
+                this.ownerID);
 
-            if (newLocation == null) {
-                while (newLocation == null) {
-                    try {
-                        // suspected is failed or is recovering
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("[CIC] Waiting for recovery of " + suspect);
-                        }
-                        Thread.sleep(TIME_TO_RESEND);
-                    } catch (InterruptedException e2) {
-                        e2.printStackTrace();
+        if (newLocation == null) {
+            while (newLocation == null) {
+                try {
+                    // suspected is failed or is recovering
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("[CIC] Waiting for recovery of " + suspect);
                     }
-                    newLocation = this.location.searchObject(suspect, suspectLocation.getRemoteAdapter(),
-                            this.ownerID);
+                    Thread.sleep(TIME_TO_RESEND);
+                } catch (InterruptedException e2) {
+                    e2.printStackTrace();
                 }
-                return newLocation;
-            } else {
-                System.out.println("FTManager.communicationFailed() : new location is not null ");
-
-                // newLocation is the new location of suspect
-                return newLocation;
+                newLocation = this.location.searchObject(suspect, suspectLocation.getRemoteAdapter(),
+                        this.ownerID);
             }
-        } catch (RemoteException e1) {
-            logger.error("**ERROR** Location server unreachable");
-            e1.printStackTrace();
-            return null;
+            return newLocation;
+        } else {
+            System.out.println("FTManager.communicationFailed() : new location is not null ");
+
+            // newLocation is the new location of suspect
+            return newLocation;
         }
     }
 

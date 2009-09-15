@@ -32,7 +32,6 @@
 package org.objectweb.proactive.core.body.ft.servers;
 
 import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -62,8 +61,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @author The ProActive Team
  * @since 3.0
  */
-public class FTServer extends UnicastRemoteObject implements FaultDetector, LocationServer, RecoveryProcess,
-        ResourceServer, CheckpointServer {
+public class FTServer implements FaultDetector, LocationServer, RecoveryProcess, ResourceServer,
+        CheckpointServer {
     //logger
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.FAULT_TOLERANCE);
 
@@ -86,8 +85,7 @@ public class FTServer extends UnicastRemoteObject implements FaultDetector, Loca
     /**
      * @throws RemoteException
      */
-    public FTServer() throws RemoteException {
-        super();
+    public FTServer() {
         // this.killingQueue.start();
     }
 
@@ -111,198 +109,196 @@ public class FTServer extends UnicastRemoteObject implements FaultDetector, Loca
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.faultdetection.FaultDetector#isUnreachable(org.objectweb.proactive.core.body.UniversalBody)
      */
-    public boolean isUnreachable(UniversalBody body) throws RemoteException {
+    public boolean isUnreachable(UniversalBody body) {
         return this.faultDetector.isUnreachable(body);
     }
 
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.faultdetection.FaultDetector#startFailureDetector()
      */
-    public void startFailureDetector() throws RemoteException {
+    public void startFailureDetector() {
         this.faultDetector.startFailureDetector();
     }
 
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.faultdetection.FaultDetector#suspendFailureDetector()
      */
-    public void suspendFailureDetector() throws RemoteException {
+    public void suspendFailureDetector() {
         this.faultDetector.suspendFailureDetector();
     }
 
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.faultdetection.FaultDetector#stopFailureDetector()
      */
-    public void stopFailureDetector() throws RemoteException {
+    public void stopFailureDetector() {
         this.faultDetector.stopFailureDetector();
     }
 
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.faultdetection.FaultDetector#forceDetection()
      */
-    public void forceDetection() throws RemoteException {
+    public void forceDetection() {
         this.faultDetector.forceDetection();
     }
 
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.location.LocationServer#searchObject(org.objectweb.proactive.core.UniqueID, org.objectweb.proactive.core.body.UniversalBody, org.objectweb.proactive.core.UniqueID)
      */
-    public UniversalBody searchObject(UniqueID id, UniversalBody oldLocation, UniqueID caller)
-            throws RemoteException {
+    public UniversalBody searchObject(UniqueID id, UniversalBody oldLocation, UniqueID caller) {
         return this.locationServer.searchObject(id, oldLocation, caller);
     }
 
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.location.LocationServer#updateLocation(org.objectweb.proactive.core.UniqueID, org.objectweb.proactive.core.body.UniversalBody)
      */
-    public void updateLocation(UniqueID id, UniversalBody newLocation) throws RemoteException {
+    public void updateLocation(UniqueID id, UniversalBody newLocation) {
         this.locationServer.updateLocation(id, newLocation);
     }
 
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.location.LocationServer#getAllLocations()
      */
-    public List<UniversalBody> getAllLocations() throws RemoteException {
+    public List<UniversalBody> getAllLocations() {
         return this.locationServer.getAllLocations();
     }
 
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.location.LocationServer#getLocation(org.objectweb.proactive.core.UniqueID)
      */
-    public UniversalBody getLocation(UniqueID id) throws RemoteException {
+    public UniversalBody getLocation(UniqueID id) {
         return this.locationServer.getLocation(id);
     }
 
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcess#register(org.objectweb.proactive.core.UniqueID)
      */
-    public void register(UniqueID id) throws RemoteException {
+    public void register(UniqueID id) {
         this.recoveryProcess.register(id);
     }
 
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcess#unregister(org.objectweb.proactive.core.UniqueID)
      */
-    public void unregister(UniqueID id) throws RemoteException {
+    public void unregister(UniqueID id) {
         this.recoveryProcess.unregister(id);
     }
 
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcess#failureDetected(org.objectweb.proactive.core.UniqueID)
      */
-    public void failureDetected(UniqueID id) throws RemoteException {
+    public void failureDetected(UniqueID id) {
         this.recoveryProcess.failureDetected(id);
     }
 
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcess#updateState(org.objectweb.proactive.core.UniqueID, int)
      */
-    public void updateState(UniqueID id, int state) throws RemoteException {
+    public void updateState(UniqueID id, int state) {
         this.recoveryProcess.updateState(id, state);
     }
 
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcess#getSystemSize()
      */
-    public int getSystemSize() throws RemoteException {
+    public int getSystemSize() {
         return this.recoveryProcess.getSystemSize();
     }
 
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcess#submitJob(org.objectweb.proactive.core.body.ft.servers.util.ActiveQueueJob)
      */
-    public void submitJob(ActiveQueueJob job) throws RemoteException {
+    public void submitJob(ActiveQueueJob job) {
         this.recoveryProcess.submitJob(job);
     }
 
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcess#submitJobWithBarrier(org.objectweb.proactive.core.body.ft.servers.util.ActiveQueueJob)
      */
-    public JobBarrier submitJobWithBarrier(ActiveQueueJob job) throws RemoteException {
+    public JobBarrier submitJobWithBarrier(ActiveQueueJob job) {
         return this.recoveryProcess.submitJobWithBarrier(job);
     }
 
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.resource.ResourceServer#addFreeNode(org.objectweb.proactive.core.node.Node)
      */
-    public void addFreeNode(Node n) throws RemoteException {
+    public void addFreeNode(Node n) {
         this.resourceServer.addFreeNode(n);
     }
 
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.resource.ResourceServer#getFreeNode()
      */
-    public Node getFreeNode() throws RemoteException {
+    public Node getFreeNode() {
         return this.resourceServer.getFreeNode();
     }
 
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#storeCheckpoint(org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint, int)
      */
-    public int storeCheckpoint(Checkpoint c, int incarnation) throws RemoteException {
+    public int storeCheckpoint(Checkpoint c, int incarnation) {
         return this.checkpointServer.storeCheckpoint(c, incarnation);
     }
 
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#getCheckpoint(org.objectweb.proactive.core.UniqueID, int)
      */
-    public Checkpoint getCheckpoint(UniqueID id, int sequenceNumber) throws RemoteException {
+    public Checkpoint getCheckpoint(UniqueID id, int sequenceNumber) {
         return this.checkpointServer.getCheckpoint(id, sequenceNumber);
     }
 
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#getLastCheckpoint(org.objectweb.proactive.core.UniqueID)
      */
-    public Checkpoint getLastCheckpoint(UniqueID id) throws RemoteException {
+    public Checkpoint getLastCheckpoint(UniqueID id) {
         return this.checkpointServer.getLastCheckpoint(id);
     }
 
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#addInfoToCheckpoint(org.objectweb.proactive.core.body.ft.checkpointing.CheckpointInfo, org.objectweb.proactive.core.UniqueID, int, int)
      */
-    public void addInfoToCheckpoint(CheckpointInfo ci, UniqueID id, int sequenceNumber, int incarnation)
-            throws RemoteException {
+    public void addInfoToCheckpoint(CheckpointInfo ci, UniqueID id, int sequenceNumber, int incarnation) {
         this.checkpointServer.addInfoToCheckpoint(ci, id, sequenceNumber, incarnation);
     }
 
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#getInfoFromCheckpoint(org.objectweb.proactive.core.UniqueID, int)
      */
-    public CheckpointInfo getInfoFromCheckpoint(UniqueID id, int sequenceNumber) throws RemoteException {
+    public CheckpointInfo getInfoFromCheckpoint(UniqueID id, int sequenceNumber) {
         return this.checkpointServer.getInfoFromCheckpoint(id, sequenceNumber);
     }
 
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#commitHistory(org.objectweb.proactive.core.body.ft.message.HistoryUpdater)
      */
-    public void commitHistory(HistoryUpdater rh) throws RemoteException {
+    public void commitHistory(HistoryUpdater rh) {
         this.checkpointServer.commitHistory(rh);
     }
 
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#outputCommit(org.objectweb.proactive.core.body.ft.message.MessageInfo)
      */
-    public void outputCommit(MessageInfo mi) throws RemoteException {
+    public void outputCommit(MessageInfo mi) {
         this.checkpointServer.outputCommit(mi);
     }
 
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#getServerCodebase()
      */
-    public String getServerCodebase() throws RemoteException {
+    public String getServerCodebase() {
         return this.checkpointServer.getServerCodebase();
     }
 
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#storeRequest(org.objectweb.proactive.core.UniqueID, org.objectweb.proactive.core.body.request.Request)
      */
-    public void storeRequest(UniqueID receiverId, Request request) throws RemoteException {
+    public void storeRequest(UniqueID receiverId, Request request) {
         this.checkpointServer.storeRequest(receiverId, request);
     }
 
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#storeReply(org.objectweb.proactive.core.UniqueID, org.objectweb.proactive.core.body.reply.Reply)
      */
-    public void storeReply(UniqueID receiverID, Reply reply) throws RemoteException {
+    public void storeReply(UniqueID receiverID, Reply reply) {
         this.checkpointServer.storeReply(receiverID, reply);
     }
 
@@ -383,7 +379,7 @@ public class FTServer extends UnicastRemoteObject implements FaultDetector, Loca
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.location.LocationServer#initialize()
      */
-    public void initialize() throws RemoteException {
+    public void initialize() {
         logger.info("[GLOBAL] Reinitializing server ...");
         this.checkpointServer.initialize();
         this.locationServer.initialize();
