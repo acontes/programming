@@ -43,6 +43,7 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.reply.ReplyReceiver;
 import org.objectweb.proactive.core.body.request.RequestReceiver;
 import org.objectweb.proactive.core.event.MigrationEventListener;
+import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
@@ -72,6 +73,9 @@ public class MigratableBody extends BodyImpl implements Migratable, java.io.Seri
 
     /** signal that the body has just migrated */
     protected transient boolean hasJustMigrated;
+
+    protected boolean isInMigration;
+    protected BodyWrapperMBean migratableMbean;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -275,6 +279,7 @@ public class MigratableBody extends BodyImpl implements Migratable, java.io.Seri
             this.getFuturePool().setCopyMode(true);
 
             // try to migrate
+            isInMigration = true;
             migratedBody = migrationManager.migrateTo(node, this);
 
             if (isSecurityOn) {
@@ -297,6 +302,8 @@ public class MigratableBody extends BodyImpl implements Migratable, java.io.Seri
             }
             acceptCommunication();
             throw e;
+        } finally {
+            isInMigration = false;
         }
 
         if (!byCopy) {
@@ -318,7 +325,15 @@ public class MigratableBody extends BodyImpl implements Migratable, java.io.Seri
         if (migrationLogger.isDebugEnabled()) {
             migrationLogger.debug("stream =  " + out);
         }
-        out.defaultWriteObject();
+        if (this.isInMigration)
+            this.migratableMbean = this.mbean;
+        try {
+            out.defaultWriteObject();
+        } finally {
+            this.migratableMbean = null;
+        }
+        if (this.isInMigration)
+            this.mbean = null;
     }
 
     private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
@@ -326,7 +341,9 @@ public class MigratableBody extends BodyImpl implements Migratable, java.io.Seri
             migrationLogger.debug("stream =  " + in);
         }
         in.defaultReadObject();
-        hasJustMigrated = true;
+        this.mbean = this.migratableMbean;
+        this.migratableMbean = null;
+        this.hasJustMigrated = true;
         if (this.isSecurityOn) {
             internalBodySecurity = new InternalBodySecurity(null);
             // securityManager.setBody(this);

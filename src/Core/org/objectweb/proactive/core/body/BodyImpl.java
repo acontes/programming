@@ -42,6 +42,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import javax.management.InstanceAlreadyExistsException;
+import javax.management.InstanceNotFoundException;
 import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
 import javax.management.NotCompliantMBeanException;
@@ -226,24 +227,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
 
         this.gc = new GarbageCollector(this);
 
-        // JMX registration
-        if (!super.isProActiveInternalObject) {
-            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-            ObjectName oname = FactoryName.createActiveObjectName(this.bodyID);
-            if (!mbs.isRegistered(oname)) {
-                super.mbean = new BodyWrapper(oname, this);
-                try {
-                    mbs.registerMBean(mbean, oname);
-                } catch (InstanceAlreadyExistsException e) {
-                    bodyLogger.error("A MBean with the object name " + oname + " already exists", e);
-                } catch (MBeanRegistrationException e) {
-                    bodyLogger.error("Can't register the MBean of the body", e);
-                } catch (NotCompliantMBeanException e) {
-                    bodyLogger.error("The MBean of the body is not JMX compliant", e);
-                }
-            }
-        }
-
+        registerToJMX();
     }
 
     //

@@ -39,9 +39,11 @@ import java.security.PublicKey;
 import java.util.Collection;
 import java.util.HashSet;
 
+import javax.management.InstanceAlreadyExistsException;
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
+import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
 
 import org.apache.log4j.Logger;
@@ -70,7 +72,9 @@ import org.objectweb.proactive.core.gc.GCMessage;
 import org.objectweb.proactive.core.gc.GCResponse;
 import org.objectweb.proactive.core.gc.GarbageCollector;
 import org.objectweb.proactive.core.group.spmd.ProActiveSPMDGroupManager;
+import org.objectweb.proactive.core.jmx.mbean.BodyWrapper;
 import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
+import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.security.DefaultProActiveSecurityManager;
@@ -164,7 +168,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
 
     // JMX
     /** The MBean representing this body */
-    protected BodyWrapperMBean mbean;
+    protected transient BodyWrapperMBean mbean;
     protected boolean isProActiveInternalObject = false;
 
     //
@@ -1149,8 +1153,6 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     //
     private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
         out.defaultWriteObject();
-
-        mbean = null;
     }
 
     private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
@@ -1201,11 +1203,64 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     }
 
     public void setKilled(boolean killed) {
+        if (killed && !this.killed) {
+            this.unregisterFromJMX();
+        } else if (this.killed && !killed) {
+            this.registerToJMX();
+        }
         this.killed = killed;
     }
 
     public boolean isKilled() {
         return killed;
+    }
+
+    public boolean registerToJMX() {
+        boolean res = false;
+        if (!isProActiveInternalObject) {
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            ObjectName oname = FactoryName.createActiveObjectName(this.bodyID);
+            if (!mbs.isRegistered(oname)) {
+                mbean = new BodyWrapper(oname, this);
+                try {
+                    mbs.registerMBean(mbean, oname);
+                    res = true;
+                } catch (InstanceAlreadyExistsException e) {
+                    bodyLogger.error("A MBean with the object name " + oname + " already exists", e);
+                } catch (MBeanRegistrationException e) {
+                    bodyLogger.error("Can't register the MBean of the body", e);
+                } catch (NotCompliantMBeanException e) {
+                    bodyLogger.error("The MBean of the body is not JMX compliant", e);
+                }
+            }
+        } else {
+            res = true;
+        }
+        //        System.out.println(this+" is"+(res ? " " : " not ")+"registered to JMX !!!");
+        return res;
+    }
+
+    public boolean unregisterFromJMX() {
+        boolean res = false;
+        ObjectName oname = FactoryName.createActiveObjectName(this.bodyID);
+        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+        if (mbs.isRegistered(oname)) {
+            try {
+                mbs.unregisterMBean(oname);
+                mbean = null;
+                res = true;
+            } catch (InstanceNotFoundException e) {
+                bodyLogger.error("The objectName " + oname +
+                    " was not found during the serialization of the MBean", e);
+            } catch (MBeanRegistrationException e) {
+                bodyLogger.error("The MBean " + oname +
+                    " can't be unregistered from the MBean server during the serialization of the MBean", e);
+            }
+        } else {
+            res = true;
+        }
+        //        System.out.println(this+" is"+(res ? " " : " not ")+"unregistered to JMX !!!");
+        return res;
     }
 
 }

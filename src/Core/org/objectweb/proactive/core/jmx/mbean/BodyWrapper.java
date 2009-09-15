@@ -293,18 +293,7 @@ public class BodyWrapper extends NotificationBroadcasterSupport implements Seria
         }
 
         // Unregister the MBean from the MBean Server.
-        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-        if (mbs.isRegistered(this.objectName)) {
-            try {
-                mbs.unregisterMBean(objectName);
-            } catch (InstanceNotFoundException e) {
-                logger.error("The objectName " + objectName +
-                    " was not found during the serialization of the MBean", e);
-            } catch (MBeanRegistrationException e) {
-                logger.error("The MBean " + objectName +
-                    " can't be unregistered from the MBean server during the serialization of the MBean", e);
-            }
-        }
+        body.unregisterFromJMX();
 
         // Default Serialization
         out.defaultWriteObject();
@@ -333,16 +322,7 @@ public class BodyWrapper extends NotificationBroadcasterSupport implements Seria
         this.notifications = new ConcurrentLinkedQueue<Notification>();
 
         // Register the MBean into the MBean Server
-        try {
-            ManagementFactory.getPlatformMBeanServer().registerMBean(this, objectName);
-        } catch (InstanceAlreadyExistsException e) {
-            logger.error("A Mean is already registered with this objectName " + objectName, e);
-        } catch (MBeanRegistrationException e) {
-            logger.error("The MBean " + objectName +
-                " can't be registered on the MBean server during the deserialization of the MBean", e);
-        } catch (NotCompliantMBeanException e) {
-            logger.error("Exception throws during the deserialization of the MBean", e);
-        }
+        body.registerToJMX();
 
         launchNotificationsThread();
     }
