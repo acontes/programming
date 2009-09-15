@@ -494,10 +494,8 @@ public abstract class FTManagerGen extends FTManager {
      */
     private boolean updateAwaitedRequests(Request r) {
         AwaitedRequest ar = null;
-        Iterator<AwaitedRequest> it = this.awaitedRequests.iterator();
-        while (it.hasNext()) {
-            AwaitedRequest arq = (it.next());
-            if ((arq.getAwaitedSender()).equals(r.getSourceBodyID())) {
+        for (AwaitedRequest arq : this.awaitedRequests) {
+            if (arq.getAwaitedSender().equals(r.getSourceBodyID())) {
                 ar = arq;
                 break;
             }

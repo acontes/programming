@@ -36,6 +36,7 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.exception.ProtocolErrorException;
@@ -115,7 +116,11 @@ public class AwaitedRequest implements Request, java.io.Serializable {
      */
     public Reply serve(Body targetBody) {
         waitForRequest();
-        return wrappedRequest.serve(targetBody);
+        if (wrappedRequest != null) {
+            return wrappedRequest.serve(targetBody);
+        } else {
+            return null;
+        }
     }
 
     /*
@@ -132,8 +137,17 @@ public class AwaitedRequest implements Request, java.io.Serializable {
                 this.wait(3000);
 
                 if (!isArrived) {
-                    UniqueID waiter = PAActiveObject.getBodyOnThis().getID();
-                    logger.info("[WAIT] " + waiter + " is waiting for a request from " + this.awaitedSender);
+                    Body body = PAActiveObject.getBodyOnThis();
+                    UniqueID waiter = body.getID();
+                    boolean active = true;
+                    if (body.isAlive() && (active = body.isActive())) {
+                        logger.info("[WAIT] " + waiter + " is waiting for a request from " +
+                            this.awaitedSender);
+                    } else {
+                        logger.info("[WAIT] " + waiter + " is " + (active ? "dead" : "inactive") +
+                            " but was waiting for a request from " + this.awaitedSender);
+                        break;
+                    }
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
