@@ -42,7 +42,7 @@ public interface FTManagerFactory {
 
     /** Pessimistic message logging protocol name. */
     public static final String PROTO_PML = "pml";
-    
+
     /** Replay specific protocol name. */
     public static final String PROTO_REPLAY = "replay";
 
@@ -51,7 +51,7 @@ public interface FTManagerFactory {
 
     /** Pessimistic message logging protocol selector value. */
     public static final int PROTO_PML_ID = 2;
-    
+
     /** Replay specific protocol selector value. */
     public static final int PROTO_REPLAY_ID = 3;
 

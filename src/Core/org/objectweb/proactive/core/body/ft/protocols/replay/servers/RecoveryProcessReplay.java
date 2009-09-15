@@ -31,9 +31,8 @@
  */
 package org.objectweb.proactive.core.body.ft.protocols.replay.servers;
 
-import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.ft.protocols.gen.servers.RecoveryProcessGen;
 import org.objectweb.proactive.core.body.ft.servers.FTServer;
-import org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcessImpl;
 
 
 /**
@@ -41,7 +40,7 @@ import org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcessImpl
  * @author The ProActive Team
  * @since 2.2
  */
-public class RecoveryProcessReplay extends RecoveryProcessImpl {
+public class RecoveryProcessReplay extends RecoveryProcessGen {
 
     /**
      * @param server
@@ -50,12 +49,4 @@ public class RecoveryProcessReplay extends RecoveryProcessImpl {
         super(server);
     }
 
-    /**
-     * @see org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcessImpl#recover(org.objectweb.proactive.core.UniqueID)
-     */
-    @Override
-    protected void recover(UniqueID failed) {
-        CheckpointServerReplay ckptServer = (CheckpointServerReplay) (this.server.getCheckpointServer());
-        ckptServer.internalRecover(failed);
-    }
 }

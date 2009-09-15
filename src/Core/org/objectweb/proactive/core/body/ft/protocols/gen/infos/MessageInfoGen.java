@@ -29,30 +29,41 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.core.body.ft.protocols.replay.managers;
+package org.objectweb.proactive.core.body.ft.protocols.gen.infos;
 
-import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.body.AbstractBody;
-import org.objectweb.proactive.core.body.ft.protocols.gen.managers.HalfFTManagerGen;
-import org.objectweb.proactive.core.body.ft.protocols.replay.infos.MessageInfoReplay;
+import java.util.Hashtable;
+
+import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.ft.message.MessageInfo;
+import org.objectweb.proactive.core.util.MutableLong;
 
 
 /**
- * This class implements a Communication Induced Checkpointing protocol for ProActive.
- * This FTManager is linked non active object communicating with fault-tolerant active objects.
  * @author The ProActive Team
- * @since ProActive 2.2
+ * @since 2.2
  */
-public class HalfFTManagerReplay extends HalfFTManagerGen {
+public abstract class MessageInfoGen implements MessageInfo {
 
     /**
-     * @see org.objectweb.proactive.core.body.ft.protocols.FTManager#init(org.objectweb.proactive.core.body.AbstractBody)
+     *
      */
-    @Override
-    public int init(AbstractBody owner) throws ProActiveException {
-        super.init(owner);
-        this.forSentMessage = new MessageInfoReplay();
-        this.forSentMessage.fromHalfBody = true;
-        return 0;
+
+    // checkpointing protocol
+    public char checkpointIndex;
+    public char historyIndex;
+    public char incarnation;
+    public char lastRecovery;
+    public char isOrphanFor;
+    public boolean fromHalfBody;
+
+    // output commit protocol
+    public long positionInHistory;
+    public Hashtable<UniqueID, MutableLong> vectorClock;
+
+    /**
+     * @see org.objectweb.proactive.core.body.ft.message.MessageInfo#isFromHalfBody()
+     */
+    public boolean isFromHalfBody() {
+        return this.fromHalfBody;
     }
 }

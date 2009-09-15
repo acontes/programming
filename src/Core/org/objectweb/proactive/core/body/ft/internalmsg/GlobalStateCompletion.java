@@ -61,13 +61,13 @@ public class GlobalStateCompletion implements FTMessage {
     }
 
     public Object handleFTMessage(FTManager ftm) {
-    	if (ftm instanceof FTManagerCIC) {
-    		return ((FTManagerCIC) ftm).handlingGSCEEvent(this);
-    	} else if (ftm instanceof FTManagerReplay) {
-    		return ((FTManagerReplay) ftm).handlingGSCEEvent(this);
-    	} else {
-    		// FIXME evallett throw exception
-    		return null;
-    	}
+        if (ftm instanceof FTManagerCIC) {
+            return ((FTManagerCIC) ftm).handlingGSCEEvent(this);
+        } else if (ftm instanceof FTManagerReplay) {
+            return ((FTManagerReplay) ftm).handlingGSCEEvent(this);
+        } else {
+            // FIXME evallett throw exception
+            return null;
+        }
     }
 }

@@ -122,7 +122,7 @@ public abstract class FTManager implements java.io.Serializable {
         } else if (FTManagerFactory.PROTO_PML.equals(protoName)) {
             return FTManagerFactory.PROTO_PML_ID;
         } else if (FTManagerFactory.PROTO_REPLAY.equals(protoName)) {
-        	return FTManagerFactory.PROTO_REPLAY_ID;
+            return FTManagerFactory.PROTO_REPLAY_ID;
         }
         return 0;
     }

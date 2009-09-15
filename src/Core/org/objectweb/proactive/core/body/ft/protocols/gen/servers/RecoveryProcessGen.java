@@ -29,30 +29,33 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.core.body.ft.protocols.replay.managers;
+package org.objectweb.proactive.core.body.ft.protocols.gen.servers;
 
-import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.body.AbstractBody;
-import org.objectweb.proactive.core.body.ft.protocols.gen.managers.HalfFTManagerGen;
-import org.objectweb.proactive.core.body.ft.protocols.replay.infos.MessageInfoReplay;
+import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.ft.servers.FTServer;
+import org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcessImpl;
 
 
 /**
- * This class implements a Communication Induced Checkpointing protocol for ProActive.
- * This FTManager is linked non active object communicating with fault-tolerant active objects.
+ * Defines the recovery behavior for the CIC protocol.
  * @author The ProActive Team
- * @since ProActive 2.2
+ * @since 2.2
  */
-public class HalfFTManagerReplay extends HalfFTManagerGen {
+public abstract class RecoveryProcessGen extends RecoveryProcessImpl {
 
     /**
-     * @see org.objectweb.proactive.core.body.ft.protocols.FTManager#init(org.objectweb.proactive.core.body.AbstractBody)
+     * @param server
+     */
+    public RecoveryProcessGen(FTServer server) {
+        super(server);
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcessImpl#recover(org.objectweb.proactive.core.UniqueID)
      */
     @Override
-    public int init(AbstractBody owner) throws ProActiveException {
-        super.init(owner);
-        this.forSentMessage = new MessageInfoReplay();
-        this.forSentMessage.fromHalfBody = true;
-        return 0;
+    protected void recover(UniqueID failed) {
+        CheckpointServerGen ckptServer = (CheckpointServerGen) (this.server.getCheckpointServer());
+        ckptServer.internalRecover(failed);
     }
 }

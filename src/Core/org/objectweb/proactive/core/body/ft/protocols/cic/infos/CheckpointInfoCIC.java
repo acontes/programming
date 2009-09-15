@@ -31,14 +31,7 @@
  */
 package org.objectweb.proactive.core.body.ft.protocols.cic.infos;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Vector;
-
-import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.body.ft.message.ReplyLog;
-import org.objectweb.proactive.core.body.ft.message.RequestLog;
-import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.body.ft.protocols.gen.infos.CheckpointInfoGen;
 
 
 /**
@@ -47,47 +40,6 @@ import org.objectweb.proactive.core.body.request.Request;
  * @author The ProActive Team
  * @since ProActive 2.2
  */
-public class CheckpointInfoCIC implements org.objectweb.proactive.core.body.ft.checkpointing.CheckpointInfo {
+public class CheckpointInfoCIC extends CheckpointInfoGen {
 
-    /**
-     *
-     */
-
-    /** The index of the linked checkpoint */
-    public int checkpointIndex;
-
-    /** The logged requests, i.e. requests that have to be resend on recovery from the linked checkpoint */
-    public Vector<RequestLog> requestToResend;
-
-    /** The logged replies, i.e. replies that have to be resend on recovery from the linked checkpoint */
-    public Vector<ReplyLog> replyToResend;
-
-    /** The pending request when the checkpoint has occured, This request must be first served on recovery from the linked checkpoint */
-    public Request pendingRequest;
-
-    /** The history of the linked checkpoint, i.e. a list of awaited request that have to be append to the request queue on recovery from the linked checkpoint */
-    public List<UniqueID> history;
-
-    /** The reception index of the latest received request when the checkpoint has occured */
-    public long lastRcvdRequestIndex; //set by the owner
-
-    /** The index of the last element of the latest commited history */
-    public long lastCommitedIndex; //set by the server
-
-    /**
-     * "Pretty" printing
-     */
-    @Override
-    public String toString() {
-        StringBuffer r = new StringBuffer();
-        r.append("---------------------------------------------\n");
-        r.append("CkptIndex      : " + this.checkpointIndex + "\n");
-        Iterator<ReplyLog> itrep = replyToResend.iterator();
-        r.append("Logged replies :\n");
-        while (itrep.hasNext()) {
-            r.append("   >" + itrep.next().getReply().getResult() + "\n");
-        }
-        r.append("---------------------------------------------\n");
-        return r.toString();
-    }
 }

@@ -446,7 +446,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
                 case FTManagerFactory.PROTO_PML_ID:
                     return new FTManagerPMLRB();
                 case FTManagerFactory.PROTO_REPLAY_ID:
-                	return new FTManagerReplay();
+                    return new FTManagerReplay();
                 default:
                     logger.error("Error while creating fault-tolerance manager : " +
                         "no protocol is associated to selector value " + protocolSelector);
@@ -461,7 +461,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
                 case FTManagerFactory.PROTO_PML_ID:
                     return new HalfFTManagerPMLRB();
                 case FTManagerFactory.PROTO_REPLAY_ID:
-                	return new HalfFTManagerReplay();
+                    return new HalfFTManagerReplay();
                 default:
                     logger.error("Error while creating fault-tolerance manager : " +
                         "no protocol is associated to selector value " + protocolSelector);

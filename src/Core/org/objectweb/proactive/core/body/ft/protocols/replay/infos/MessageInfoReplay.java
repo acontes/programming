@@ -31,47 +31,21 @@
  */
 package org.objectweb.proactive.core.body.ft.protocols.replay.infos;
 
-import java.util.Hashtable;
-
-import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.body.ft.message.MessageInfo;
 import org.objectweb.proactive.core.body.ft.protocols.FTManagerFactory;
-import org.objectweb.proactive.core.util.MutableLong;
+import org.objectweb.proactive.core.body.ft.protocols.gen.infos.MessageInfoGen;
 
 
 /**
  * @author The ProActive Team
  * @since 2.2
  */
-public class MessageInfoReplay implements MessageInfo {
-
-    /**
-     *
-     */
-
-    // checkpointing protocol
-    public char checkpointIndex;
-    public char historyIndex;
-    public char incarnation;
-    public char lastRecovery;
-    public char isOrphanFor;
-    public boolean fromHalfBody;
-
-    // output commit protocol
-    public long positionInHistory;
-    public Hashtable<UniqueID, MutableLong> vectorClock;
+public class MessageInfoReplay extends MessageInfoGen {
 
     /**
      * @see org.objectweb.proactive.core.body.ft.message.MessageInfo#getProtocolType()
      */
     public int getProtocolType() {
-        return FTManagerFactory.PROTO_CIC_ID;
+        return FTManagerFactory.PROTO_REPLAY_ID;
     }
 
-    /**
-     * @see org.objectweb.proactive.core.body.ft.message.MessageInfo#isFromHalfBody()
-     */
-    public boolean isFromHalfBody() {
-        return this.fromHalfBody;
-    }
 }
