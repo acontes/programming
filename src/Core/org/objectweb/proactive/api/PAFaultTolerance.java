@@ -1,10 +1,22 @@
 package org.objectweb.proactive.api;
 
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.Remote;
+import java.rmi.RemoteException;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
+import org.objectweb.proactive.core.body.ft.protocols.FTManager;
+import org.objectweb.proactive.core.body.ft.servers.location.LocationServer;
+import org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcess;
+import org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer;
+import org.objectweb.proactive.core.body.ft.service.FaultToleranceTechnicalService;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -36,9 +48,58 @@ public class PAFaultTolerance {
      * Variables
      * ****************************/
 
-    /*
-     * ft_server
-     */
+    FTServerInformation ftServer;
+
+    /* ****************************
+     * Contact server
+     * ****************************/
+
+    public void contactServer() throws ProActiveException {
+        if (ftServer != null)
+            return;
+        Exception error = null;
+        FTServerInformation info = new FTServerInformation();
+        try {
+            PAProperties ttcValue = PAProperties.getProperty(FaultToleranceTechnicalService.TTC);
+            if (ttcValue != null) {
+                info.ttc = ttcValue.getValueAsInt() * 1000;
+            } else {
+                info.ttc = FTManager.DEFAULT_TTC_VALUE;
+            }
+            PAProperties urlGlobal = PAProperties.getProperty(FaultToleranceTechnicalService.GLOBAL_SERVER);
+            if (urlGlobal != null) {
+                Remote server = Naming.lookup(urlGlobal.getValue());
+                info.storage = (CheckpointServer) server;
+                info.location = (LocationServer) server;
+                info.recovery = (RecoveryProcess) server;
+            } else {
+                PAProperties urlCheckpoint = PAProperties
+                        .getProperty(FaultToleranceTechnicalService.CKPT_SERVER);
+                PAProperties urlRecovery = PAProperties
+                        .getProperty(FaultToleranceTechnicalService.RECOVERY_SERVER);
+                PAProperties urlLocation = PAProperties
+                        .getProperty(FaultToleranceTechnicalService.LOCATION_SERVER);
+                if ((urlCheckpoint != null) && (urlRecovery != null) && (urlLocation != null)) {
+                    info.storage = (CheckpointServer) (Naming.lookup(urlCheckpoint.getValue()));
+                    info.location = (LocationServer) (Naming.lookup(urlLocation.getValue()));
+                    info.recovery = (RecoveryProcess) (Naming.lookup(urlRecovery.getValue()));
+                } else {
+                    error = new ProActiveException("Servers are not correctly set");
+                }
+            }
+        } catch (MalformedURLException e) {
+            error = e;
+        } catch (RemoteException e) {
+            error = e;
+        } catch (NotBoundException e) {
+            error = e;
+        }
+        if (error != null) {
+            throw new ProActiveException("Unable to contact FTServer", error);
+        } else {
+            ftServer = info;
+        }
+    }
 
     /* ****************************
      * Trigger Checkpoint
@@ -66,11 +127,16 @@ public class PAFaultTolerance {
      * 
      * @param hook The hook to execute when checkpoint is stored
      */
-    public void triggerGlobalCheckpoint(CheckpointReceiver hook) {
+    public void triggerGlobalCheckpoint(final CheckpointReceiver hook) {
         /*
          * Thread.new { hook.receive_checkpoint(trigger_global_checkpoint) }
          */
-        throw new UnsupportedOperationException();
+        new Thread() {
+            @Override
+            public void run() {
+                hook.receiveCheckpoint(triggerGlobalCheckpoint());
+            }
+        }.start();
     }
 
     /* local */
@@ -181,9 +247,9 @@ public class PAFaultTolerance {
      */
     public void restartFromLastCheckpoint() {
         /*
-         * restart_from_checkpoint_number( ft_server.last_line )
+         * restart_from_checkpoint_number( last_global_checkpoint )
          */
-        throw new UnsupportedOperationException();
+        restartFromCheckpointNumber(getLastGlobalCheckpointNumber());
     }
 
     /**
@@ -193,10 +259,14 @@ public class PAFaultTolerance {
      */
     public void restartFromCheckpointNumber(int lineNumber) {
         /*
-         * assert { line_number >= ft_server.last_line }
+         * assert { line_number >= last_global_checkpoint }
          * ft_server.restart_from( line_number )
          */
-        throw new UnsupportedOperationException();
+        if (lineNumber >= getLastGlobalCheckpointNumber()) {
+            throw new UnsupportedOperationException();
+        } else {
+            // throw exception ?
+        }
     }
 
     /* ****************************
@@ -212,6 +282,13 @@ public class PAFaultTolerance {
          * @param lineNumber The number of the returned line
          */
         void receiveCheckpoint(int lineNumber);
+    }
+
+    public class FTServerInformation {
+        public int ttc;
+        public CheckpointServer storage;
+        public LocationServer location;
+        public RecoveryProcess recovery;
     }
 
 }
