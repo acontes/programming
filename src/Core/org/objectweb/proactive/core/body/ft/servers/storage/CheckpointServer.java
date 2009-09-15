@@ -100,6 +100,12 @@ public interface CheckpointServer {
     public CheckpointInfo getInfoFromCheckpoint(UniqueID id, int sequenceNumber);
 
     /**
+     * Return the number of the last line
+     * @return number of the last line
+     */
+    public int getLastGlobalState();
+
+    /**
      * Add an history to a checkpoint. Informations about the corresponding checkpoint
      * are stored in the HistoryUpdater object.
      * @param rh the history updater.

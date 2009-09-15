@@ -209,6 +209,13 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
     }
 
     /**
+     * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#getLastGlobalState()
+     */
+    public int getLastGlobalState() {
+        return lastGlobalState;
+    }
+
+    /**
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#addInfoToCheckpoint(org.objectweb.proactive.core.body.ft.checkpointing.CheckpointInfo, org.objectweb.proactive.core.UniqueID, int, int)
      */
     public synchronized void addInfoToCheckpoint(CheckpointInfo ci, UniqueID id, int sequenceNumber,

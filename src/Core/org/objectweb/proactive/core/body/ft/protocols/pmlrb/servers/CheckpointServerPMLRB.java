@@ -110,6 +110,13 @@ public class CheckpointServerPMLRB extends CheckpointServerImpl {
     }
 
     /**
+     * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#getLastGlobalState()
+     */
+    public int getLastGlobalState() {
+        throw new NotImplementedException();
+    }
+
+    /**
      * Not implemented for this protocol.
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#addInfoToCheckpoint(org.objectweb.proactive.core.body.ft.checkpointing.CheckpointInfo, org.objectweb.proactive.core.UniqueID, int, int)
      */

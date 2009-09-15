@@ -119,8 +119,7 @@ public class PAFaultTolerance {
          */
         FTServerInformation server = getServerInformation();
         System.out.println("Replay: server: " + server);
-        return server.storage.toString().hashCode();
-        //throw new UnsupportedOperationException();
+        return server.storage.getLastGlobalState();
     }
 
     /**
