@@ -129,18 +129,28 @@ public class PAFaultTolerance implements Serializable {
          * aos.each {|ao| trigger_local_checkpoint(ao, next_line) }
          * return next_line
          */
+        int waitTime = 500;
+        int totalTime = 10000;
+        int currentTime = 0;
+
         FTServerInformation server = getServerInformation();
         int nextLine = getNextWantedLine();
         for (UniversalBody body : server.location.getAllLocations()) {
             System.out.println("trigger checkpoint for " + body);
             triggerLocalCheckpoint(body.getID(), nextLine);
         }
-        while (getLastGlobalCheckpointNumber() < nextLine) {
+        while (getLastGlobalCheckpointNumber() < nextLine && currentTime < totalTime) {
             try {
-                Thread.sleep(1000);
+                System.out.println("try... " + currentTime + "/" + totalTime);
+                Thread.sleep(waitTime);
+                currentTime += waitTime;
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+        }
+        if (getLastGlobalCheckpointNumber() < nextLine) {
+            wantedLine--;
+            throw new ProActiveException("FT: Error during triggering checkpoint");
         }
         return nextLine;
     }
