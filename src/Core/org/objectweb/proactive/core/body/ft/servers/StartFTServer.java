@@ -50,6 +50,7 @@ import org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.util.ProActiveInet;
+import org.objectweb.proactive.core.util.URIBuilder;
 
 
 /**
@@ -60,12 +61,12 @@ import org.objectweb.proactive.core.util.ProActiveInet;
  */
 public class StartFTServer {
     public static void main(String[] args) {
-        String url = "rmi://" + ProActiveInet.getInstance().getInetAddress().getHostName() + ":" +
-            PAProperties.PA_RMI_PORT.getValue() + "/";
+        URI uri = null;
         try {
             int fdPeriod = 0;
             String name = "";
             String proto = FTManagerFactory.PROTO_CIC;
+            String host = ProActiveInet.getInstance().getInetAddress().getHostName();
 
             for (int i = 0; i < args.length; i++) {
                 if (args[i].equals("-fdperiod")) {
@@ -81,7 +82,7 @@ public class StartFTServer {
             if ("".equals(name)) {
                 name = FTServer.DEFAULT_SERVER_NAME;
             }
-            url += name;
+            uri = URIBuilder.buildURI(host, name);
             if (fdPeriod == 0) {
                 fdPeriod = FTServer.DEFAULT_FDETECT_SCAN_PERIOD;
             }
@@ -114,13 +115,13 @@ public class StartFTServer {
 
             RemoteObjectExposer<FTServer> remoteServerExposer;
             remoteServerExposer = new RemoteObjectExposer<FTServer>(FTServer.class.getName(), server);
-            FTServer remoteServer = PARemoteObject.bind(remoteServerExposer, new URI(url));
+            FTServer remoteServer = PARemoteObject.bind(remoteServerExposer, uri);
 
-            System.out.println("FT: Server is bound on " + url);
+            System.out.println("FT: Server is bound on " + uri);
             System.out.println("FT: Server started");
 
         } catch (Exception e) {
-            System.err.println("FT: ** ERROR ** Unable to launch server on " + url);
+            System.err.println("FT: ** ERROR ** Unable to launch server on " + uri);
             e.printStackTrace();
         }
     }

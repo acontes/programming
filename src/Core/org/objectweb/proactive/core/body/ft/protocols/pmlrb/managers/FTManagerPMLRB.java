@@ -372,7 +372,7 @@ public class FTManagerPMLRB extends FTManager {
     // private methods //
     /////////////////////
     private boolean haveToCheckpoint() {
-        return ((this.checkpointTimer + this.ttc) < System.currentTimeMillis());
+        return takeNext || ((this.checkpointTimer + this.ttc) < System.currentTimeMillis());
     }
 
     private void checkpoint(Request pending) {
@@ -397,6 +397,8 @@ public class FTManagerPMLRB extends FTManager {
         this.setCheckpointTag(false);
 
         owner.acceptCommunication();
+
+        takeNext = false;
     }
 
     private synchronized char getNextSendNumber() {

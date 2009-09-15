@@ -209,6 +209,15 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
     }
 
     /**
+     * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#getLastState(org.objectweb.proactive.core.UniqueID)
+     */
+    public int getLastState(UniqueID id) {
+        List<Checkpoint> checkpoints = checkpointStorage.get(id);
+        int size = checkpoints.size();
+        return size;
+    }
+
+    /**
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#getLastGlobalState()
      */
     public int getLastGlobalState() {

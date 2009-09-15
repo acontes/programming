@@ -109,6 +109,8 @@ public abstract class FTManager implements java.io.Serializable {
     // checkpoint interval (ms)
     protected int ttc;
 
+    protected boolean takeNext;
+
     /**
      * Return the selector value for a given protocol.
      * @param protoName the name of the protocol (cic or pml).
@@ -175,6 +177,11 @@ public abstract class FTManager implements java.io.Serializable {
      */
     public boolean isACheckpoint() {
         return isACheckpoint;
+    }
+
+    public void takeNextCheckpoint() {
+        System.out.println("Take the next checkpoint");
+        takeNext = true;
     }
 
     /**

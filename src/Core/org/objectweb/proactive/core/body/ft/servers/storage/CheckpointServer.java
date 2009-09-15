@@ -106,6 +106,13 @@ public interface CheckpointServer {
     public int getLastGlobalState();
 
     /**
+     * Return the number of the last checkpoint
+     * @param id owner of the considered checkpoint
+     * @return number of the last checkpoint
+     */
+    public int getLastState(UniqueID id);
+
+    /**
      * Add an history to a checkpoint. Informations about the corresponding checkpoint
      * are stored in the HistoryUpdater object.
      * @param rh the history updater.
@@ -153,4 +160,5 @@ public interface CheckpointServer {
      * Reinit the state of the location server.
      */
     public void initialize();
+
 }

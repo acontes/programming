@@ -1,22 +1,30 @@
 package org.objectweb.proactive.api;
 
+import java.io.IOException;
+import java.io.Serializable;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
+import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
+import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.ft.servers.location.LocationServer;
 import org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcess;
 import org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer;
+import org.objectweb.proactive.core.body.ft.servers.util.ActiveQueueJob;
 import org.objectweb.proactive.core.body.ft.service.FaultToleranceTechnicalService;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
-public class PAFaultTolerance {
+public class PAFaultTolerance implements Serializable {
 
     /* ****************************
      * Implementation specificities
@@ -24,11 +32,15 @@ public class PAFaultTolerance {
 
     /* log */
 
+    private static final long serialVersionUID = 318973729783053229L;
+
     protected final static Logger logger = ProActiveLogger.getLogger(Loggers.CORE);
 
     /* Singleton pattern */
 
     private static PAFaultTolerance instance;
+
+    private int wantedLine = 0;
 
     private PAFaultTolerance() {
     }
@@ -49,7 +61,7 @@ public class PAFaultTolerance {
      * Contact server
      * ****************************/
 
-    public void setServerInformation(String urlGlobal) throws ProActiveException {
+    public synchronized void setServerInformation(String urlGlobal) throws ProActiveException {
         FTServerInformation info = new FTServerInformation();
         try {
             Object server = PARemoteObject.lookup(new URI(urlGlobal));
@@ -62,7 +74,7 @@ public class PAFaultTolerance {
         }
     }
 
-    public void setServerInformation(String urlCheckpoint, String urlLocation, String urlRecovery)
+    public synchronized void setServerInformation(String urlCheckpoint, String urlLocation, String urlRecovery)
             throws ProActiveException {
         FTServerInformation info = new FTServerInformation();
         try {
@@ -79,7 +91,7 @@ public class PAFaultTolerance {
         }
     }
 
-    public void setServerInformation(Node node) throws ProActiveException {
+    public synchronized void setServerInformation(Node node) throws ProActiveException {
         String urlGlobal = node.getProperty(FaultToleranceTechnicalService.GLOBAL_SERVER);
         if (urlGlobal != null) {
             setServerInformation(urlGlobal);
@@ -91,7 +103,7 @@ public class PAFaultTolerance {
         }
     }
 
-    public FTServerInformation getServerInformation() throws ProActiveException {
+    public synchronized FTServerInformation getServerInformation() throws ProActiveException {
         if (ftServer == null) {
             throw new ProActiveException("FT: no server defined");
         }
@@ -110,7 +122,7 @@ public class PAFaultTolerance {
      * @return The line number of the triggered checkpoint
      * @throws ProActiveException 
      */
-    public int triggerGlobalCheckpoint() throws ProActiveException {
+    public synchronized int triggerGlobalCheckpoint() throws ProActiveException {
         /*
          * next_line = last_global_checkpoint + 1
          * aos = ft_server.registered_aos
@@ -118,8 +130,19 @@ public class PAFaultTolerance {
          * return next_line
          */
         FTServerInformation server = getServerInformation();
-        System.out.println("Replay: server: " + server);
-        return server.storage.getLastGlobalState();
+        int nextLine = getNextWantedLine();
+        for (UniversalBody body : server.location.getAllLocations()) {
+            System.out.println("trigger checkpoint for " + body);
+            triggerLocalCheckpoint(body.getID(), nextLine);
+        }
+        while (getLastGlobalCheckpointNumber() < nextLine) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        return nextLine;
     }
 
     /**
@@ -127,7 +150,7 @@ public class PAFaultTolerance {
      * 
      * @param hook The hook to execute when checkpoint is stored
      */
-    public void triggerGlobalCheckpoint(final CheckpointReceiver hook) {
+    public synchronized void triggerGlobalCheckpoint(final CheckpointReceiver hook) {
         /*
          * Thread.new { hook.receive_checkpoint(trigger_global_checkpoint) }
          */
@@ -152,13 +175,27 @@ public class PAFaultTolerance {
      * @param target The active object that will trigger a checkpoint
      * @return The number of the triggered checkpoint
      */
-    public int triggerLocalCheckpoint(UniqueID target) {
+    public synchronized int triggerLocalCheckpoint(UniqueID target) throws ProActiveException {
         /*
          * ao = ft_server.registered_aos[target]
          * line = ao.ft_manager.trigger_checkpoint
          * return line
          */
-        throw new UnsupportedOperationException();
+        FTServerInformation server = getServerInformation();
+        try {
+            server.location.getLocation(target).receiveFTMessage(new FTMessage() {
+                private static final long serialVersionUID = -7946796254940775983L;
+
+                @Override
+                public Object handleFTMessage(FTManager ftm) {
+                    ftm.takeNextCheckpoint(); //FIXME s/take/trigger/g
+                    return null;
+                }
+            });
+        } catch (IOException e) {
+            throw new ProActiveException(e);
+        }
+        return server.storage.getLastState(target);
     }
 
     /**
@@ -169,14 +206,19 @@ public class PAFaultTolerance {
      * @param target The active object that will trigger a checkpoint
      * @param lineNumber
      */
-    public void triggerLocalCheckpoint(UniqueID target, int lineNumber) {
+    public synchronized void triggerLocalCheckpoint(UniqueID target, int lineNumber)
+            throws ProActiveException {
         /*
-         * next_line = last_global_checkpoint + 1
          * begin
          *   triggered = trigger_local_checkpoint(target)
-         * end while triggered < next_line
+         * end while triggered < number
          */
-        throw new UnsupportedOperationException();
+        int lastNumber = getLastCheckpointNumber(target);
+        System.out.println("trigger : " + target + " : " + lastNumber + "/" + lineNumber);
+        for (int i = lastNumber; i <= lineNumber; i++) {
+            System.out.println("trigger [" + i + "/" + lineNumber + "] " + target);
+            triggerLocalCheckpoint(target);
+        }
     }
 
     /* ****************************
@@ -185,30 +227,74 @@ public class PAFaultTolerance {
 
     /* global */
 
+    private synchronized int getNextWantedLine() throws ProActiveException {
+        int lastLine = getLastGlobalCheckpointNumber();
+        if (lastLine > wantedLine) {
+            wantedLine = lastLine;
+        }
+        wantedLine++;
+        return wantedLine;
+    }
+
     /**
      * Get the number of the last line
      * 
      * @return The number of last global checkpoint
      */
-    public int getLastGlobalCheckpointNumber() {
+    public synchronized int getLastGlobalCheckpointNumber() throws ProActiveException {
         /*
          * line = ft_server.last_line
          * return line
          */
-        throw new UnsupportedOperationException();
+        int lastLine = getServerInformation().storage.getLastGlobalState();
+        return lastLine;
     }
 
     /**
-     * Get the list of all stored checkpoints
+     * Get the number of a object
      * 
-     * @return The list of checkpoints
+     * @return The number of last global checkpoint
      */
-    public List<Checkpoint> getCheckpointsList() {
+    public synchronized int getLastCheckpointNumber(UniqueID target) throws ProActiveException {
+        /*
+         * line = ft_server.last_line_of target
+         * return line
+         */
+        FTServerInformation server = getServerInformation();
+        return server.storage.getLastState(target);
+    }
+
+    /**
+     * Get the map of all stored checkpoints
+     * 
+     * @return The map of checkpoints
+     */
+    public synchronized Map<UniqueID, Checkpoint> getAvailableCheckpointsMap() throws ProActiveException {
         /*
          * list = ft_server.checkpoints
          * return list
          */
         throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Get the list of all stored checkpoints of an object
+     * 
+     * @return The list of checkpoints
+     */
+    public synchronized List<Checkpoint> getAvailableCheckpointsList(UniqueID target)
+            throws ProActiveException {
+        /*
+         * list = ft_server.checkpoints[target]
+         * return list
+         */
+        FTServerInformation server = getServerInformation();
+        int lastState = server.storage.getLastState(target);
+        List<Checkpoint> list = new ArrayList<Checkpoint>(lastState);
+        for (int i = 0; i < lastState; i++) {
+            list.add(server.storage.getCheckpoint(target, i));
+        }
+        return list;
     }
 
     /* ****************************
@@ -221,7 +307,7 @@ public class PAFaultTolerance {
      * @param target
      * @param checkpoint
      */
-    public void addCheckpoint(UniqueID target, Checkpoint checkpoint) {
+    public synchronized void addCheckpoint(UniqueID target, Checkpoint checkpoint) throws ProActiveException {
         /*
          * ao = ft_server.registered_aos[target]
          * ao.ft_manager.checkpoints << checkpoint
@@ -236,7 +322,8 @@ public class PAFaultTolerance {
      * @param target
      * @param checkpoints
      */
-    public void addAllCheckpoint(UniqueID target, List<Checkpoint> checkpoints) {
+    public synchronized void addAllCheckpoint(UniqueID target, List<Checkpoint> checkpoints)
+            throws ProActiveException {
         /*
          * checkpoints.each {|checkpoint| add_checkpoint(target, checkpoint) }
          */
@@ -250,11 +337,14 @@ public class PAFaultTolerance {
     /**
      * Restart application from the last global checkpoint
      */
-    public void restartFromLastCheckpoint() {
+    public synchronized void restartFromLastCheckpoint() throws ProActiveException {
         /*
          * restart_from_checkpoint_number( last_global_checkpoint )
          */
-        restartFromCheckpointNumber(getLastGlobalCheckpointNumber());
+        //restartFromCheckpointNumber(getLastGlobalCheckpointNumber());.
+        FTServerInformation server = getServerInformation();
+        UniversalBody body = server.location.getAllLocations().get(0);
+        server.recovery.failureDetected(body.getID());
     }
 
     /**
@@ -262,12 +352,13 @@ public class PAFaultTolerance {
      * 
      * @param lineNumber The line number to restarting from
      */
-    public void restartFromCheckpointNumber(int lineNumber) {
+    public synchronized void restartFromCheckpointNumber(int lineNumber) throws ProActiveException {
         /*
-         * assert { line_number >= last_global_checkpoint }
+         * assert { line_number <= last_global_checkpoint }
          * ft_server.restart_from( line_number )
          */
-        if (lineNumber >= getLastGlobalCheckpointNumber()) {
+        if (lineNumber <= getLastGlobalCheckpointNumber()) {
+            FTServerInformation server = getServerInformation();
             throw new UnsupportedOperationException();
         } else {
             // throw exception ?
@@ -291,7 +382,8 @@ public class PAFaultTolerance {
         void catchException(ProActiveException e);
     }
 
-    public class FTServerInformation {
+    public class FTServerInformation implements Serializable {
+        private static final long serialVersionUID = 4922386730966662943L;
         public CheckpointServer storage;
         public LocationServer location;
         public RecoveryProcess recovery;

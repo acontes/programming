@@ -588,6 +588,9 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
         int currentCheckpointIndex = this.checkpointIndex;
         int currentNextMax = this.nextMax;
 
+        if (takeNext)
+            return true;
+
         // checkpoint if next is greater than index
         if (currentNextMax > currentCheckpointIndex) {
             return true;
@@ -606,6 +609,7 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
     private Checkpoint checkpoint(Request pendingRequest) {
         //stop accepting communication
         (owner).blockCommunication();
+        takeNext = false;
         // synchronized on hisotry to avoid hisot commit during checkpoint
         synchronized (this.historyLock) {
             Checkpoint c;
