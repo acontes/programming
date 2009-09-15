@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.body.ft.internalmsg;
 
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.ft.protocols.cic.managers.FTManagerCIC;
+import org.objectweb.proactive.core.body.ft.protocols.replay.managers.FTManagerReplay;
 
 
 /**
@@ -60,6 +61,13 @@ public class GlobalStateCompletion implements FTMessage {
     }
 
     public Object handleFTMessage(FTManager ftm) {
-        return ((FTManagerCIC) ftm).handlingGSCEEvent(this);
+    	if (ftm instanceof FTManagerCIC) {
+    		return ((FTManagerCIC) ftm).handlingGSCEEvent(this);
+    	} else if (ftm instanceof FTManagerReplay) {
+    		return ((FTManagerReplay) ftm).handlingGSCEEvent(this);
+    	} else {
+    		// FIXME evallett throw exception
+    		return null;
+    	}
     }
 }

@@ -100,6 +100,7 @@ public interface Loggers {
     public static final String FAULT_TOLERANCE = CORE + ".ft";
     public static final String FAULT_TOLERANCE_CIC = FAULT_TOLERANCE + ".cic";
     public static final String FAULT_TOLERANCE_PML = FAULT_TOLERANCE + ".pml";
+    public static final String FAULT_TOLERANCE_REPLAY = FAULT_TOLERANCE + ".replay";
 
     // MPI loggers
     static final public String MPI = CORE + ".mpi";

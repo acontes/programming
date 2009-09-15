@@ -29,43 +29,33 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.core.body.ft.protocols;
+package org.objectweb.proactive.core.body.ft.protocols.replay.servers;
+
+import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.ft.servers.FTServer;
+import org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcessImpl;
+
 
 /**
- * Factory for creating Fault-tolerance manager
+ * Defines the recovery behavior for the Replay protocol.
  * @author The ProActive Team
+ * @since 2.2
  */
-public interface FTManagerFactory {
-
-    /** Communication induced checkpointing protocol name */
-    public static final String PROTO_CIC = "cic";
-
-    /** Pessimistic message logging protocol name. */
-    public static final String PROTO_PML = "pml";
-    
-    /** Replay specific protocol name. */
-    public static final String PROTO_REPLAY = "replay";
-
-    /** Communication induced checkpointing protocol selector value. */
-    public static final int PROTO_CIC_ID = 1;
-
-    /** Pessimistic message logging protocol selector value. */
-    public static final int PROTO_PML_ID = 2;
-    
-    /** Replay specific protocol selector value. */
-    public static final int PROTO_REPLAY_ID = 3;
+public class RecoveryProcessReplay extends RecoveryProcessImpl {
 
     /**
-     * Return a fault-tolerance manager for a body
-     * @param protocolSelector specify the protocol that must be handled by the returned manager
-     * @return a fault-tolerance manager for a body
+     * @param server
      */
-    public FTManager newFTManager(int protocolSelector);
+    public RecoveryProcessReplay(FTServer server) {
+        super(server);
+    }
 
     /**
-     * Return a fault-tolerance manager for a halfbody
-     * @param protocolSelector specify the protocol that must be handled by the returned manager
-     * @return a fault-tolerance manager for a halfbody
+     * @see org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcessImpl#recover(org.objectweb.proactive.core.UniqueID)
      */
-    public FTManager newHalfFTManager(int protocolSelector);
+    @Override
+    protected void recover(UniqueID failed) {
+        CheckpointServerReplay ckptServer = (CheckpointServerReplay) (this.server.getCheckpointServer());
+        ckptServer.internalRecover(failed);
+    }
 }

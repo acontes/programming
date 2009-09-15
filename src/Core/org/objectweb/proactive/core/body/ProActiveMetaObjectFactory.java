@@ -45,6 +45,8 @@ import org.objectweb.proactive.core.body.ft.protocols.cic.managers.FTManagerCIC;
 import org.objectweb.proactive.core.body.ft.protocols.cic.managers.HalfFTManagerCIC;
 import org.objectweb.proactive.core.body.ft.protocols.pmlrb.managers.FTManagerPMLRB;
 import org.objectweb.proactive.core.body.ft.protocols.pmlrb.managers.HalfFTManagerPMLRB;
+import org.objectweb.proactive.core.body.ft.protocols.replay.managers.FTManagerReplay;
+import org.objectweb.proactive.core.body.ft.protocols.replay.managers.HalfFTManagerReplay;
 import org.objectweb.proactive.core.body.migration.MigrationManager;
 import org.objectweb.proactive.core.body.migration.MigrationManagerFactory;
 import org.objectweb.proactive.core.body.reply.ReplyReceiver;
@@ -443,6 +445,8 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
                     return new FTManagerCIC();
                 case FTManagerFactory.PROTO_PML_ID:
                     return new FTManagerPMLRB();
+                case FTManagerFactory.PROTO_REPLAY_ID:
+                	return new FTManagerReplay();
                 default:
                     logger.error("Error while creating fault-tolerance manager : " +
                         "no protocol is associated to selector value " + protocolSelector);
@@ -456,6 +460,8 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
                     return new HalfFTManagerCIC();
                 case FTManagerFactory.PROTO_PML_ID:
                     return new HalfFTManagerPMLRB();
+                case FTManagerFactory.PROTO_REPLAY_ID:
+                	return new HalfFTManagerReplay();
                 default:
                     logger.error("Error while creating fault-tolerance manager : " +
                         "no protocol is associated to selector value " + protocolSelector);
