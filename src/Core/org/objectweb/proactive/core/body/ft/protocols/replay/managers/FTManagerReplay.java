@@ -43,6 +43,7 @@ import org.objectweb.proactive.api.PAFaultTolerance;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.AbstractBody;
+import org.objectweb.proactive.core.body.BodyImpl;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
 import org.objectweb.proactive.core.body.ft.checkpointing.CheckpointInfo;
@@ -340,7 +341,7 @@ public class FTManagerReplay extends FTManagerGen {
             queue.add(currentAwaitedRequest);
             this.awaitedRequests.add(currentAwaitedRequest);
         }
-        /*/
+        /* /
         if (histList != null) {
             System.out.println("Replay: " + ownerID + " add history: " + histList);
             for (UniqueID cur : histList) {
@@ -355,12 +356,14 @@ public class FTManagerReplay extends FTManagerGen {
         //System.out.println("[CIC] enable communication");
         owner.acceptCommunication();
 
+        owner.registerToJMX();
+
         // update servers
         this.location.updateLocation(ownerID, owner.getRemoteAdapter());
         this.recovery.updateState(ownerID, RecoveryProcess.RUNNING);
 
         // resend all in-transit message
-        //this.sendLogs((CheckpointInfoReplay) ci);
+        this.sendLogs((CheckpointInfoReplay) ci);
 
         return 0;
     }
@@ -368,22 +371,36 @@ public class FTManagerReplay extends FTManagerGen {
     public void updateLogsLocations(Map<UniversalBody, UniversalBody> newLocations) {
         for (Vector<RequestLog> requests : requestToResend.values()) {
             for (RequestLog request : requests) {
-                UniversalBody from = request.getDestination();
-                UniversalBody to = newLocations.get(from);
-                request.setDestination(to);
+                try {
+                    UniversalBody from = request.getDestination();
+                    UniversalBody to = newLocations.get(from);
+                    request.setDestination(to);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
         for (Vector<ReplyLog> replies : replyToResend.values()) {
             for (ReplyLog reply : replies) {
-                UniversalBody from = reply.getDestination();
-                UniversalBody to = newLocations.get(from);
-                reply.setDestination(to);
+                try {
+                    UniversalBody from = reply.getDestination();
+                    UniversalBody to = newLocations.get(from);
+                    reply.setDestination(to);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
         for (Request request : owner.getRequestQueue()) {
-            UniversalBody from = request.getSender();
-            UniversalBody to = newLocations.get(from);
-            ((RequestImpl) request).setSender(to);
+            if (request instanceof RequestImpl) {
+                try {
+                    UniversalBody from = request.getSender();
+                    UniversalBody to = newLocations.get(from);
+                    ((RequestImpl) request).setSender(to);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 

@@ -283,7 +283,11 @@ public class AwaitedRequest implements Request, java.io.Serializable {
      * @see org.objectweb.proactive.core.body.request.Request#getSenderNodeURI()
      */
     public String getSenderNodeURL() {
-        return this.wrappedRequest.getSenderNodeURL();
+        if (wrappedRequest == null) {
+            return null;
+        } else {
+            return this.wrappedRequest.getSenderNodeURL();
+        }
     }
 
     public String toString() {
