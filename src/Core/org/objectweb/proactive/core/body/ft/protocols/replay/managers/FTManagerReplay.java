@@ -344,9 +344,9 @@ public class FTManagerReplay extends FTManagerGen {
             queue.add(currentAwaitedRequest);
             this.awaitedRequests.add(currentAwaitedRequest);
         }
-        /* /
+        /*/
         if (histList != null) {
-            System.out.println("Replay: " + ownerID + " add history: " + histList);
+            System.out.println("Replay: " + ownerID + " add history");
             for (UniqueID cur : histList) {
                 AwaitedRequest currentAwaitedRequest = new AwaitedRequest(cur);
                 queue.add(currentAwaitedRequest);

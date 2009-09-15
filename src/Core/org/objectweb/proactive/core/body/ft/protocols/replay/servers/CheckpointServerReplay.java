@@ -94,13 +94,6 @@ public class CheckpointServerReplay extends CheckpointServerGen {
     }
 
     public int getParentIndexOf(int line) {
-        if (line > parents.size()) {
-            System.err.println("parents(" + line + "):");
-            for (int i = 0; i < parents.size(); i++) {
-                System.out.println(i + " => " + parents.get(i));
-            }
-            System.err.println("parents done");
-        }
         return parents.get(line);
     }
 
@@ -135,15 +128,6 @@ public class CheckpointServerReplay extends CheckpointServerGen {
     public synchronized void storeHistory(List<UniqueID> hist, UniqueID owner, int index) {
         if (++receivedHistoruesCount > 4) {
             receivedHistoruesCount = 0;
-            String str = "";
-            str += "Received histories";
-            for (Entry<UniqueID, Map<Integer, List<UniqueID>>> histOfObj : receivedHistories.entrySet()) {
-                str += "\n  " + histOfObj.getKey() + ":";
-                for (Entry<Integer, List<UniqueID>> histOfObjAtIndex : histOfObj.getValue().entrySet()) {
-                    str += "\n    " + histOfObjAtIndex;
-                }
-            }
-            System.out.println(str);
         }
         if (receivedHistories == null) {
             receivedHistories = Collections
@@ -153,7 +137,7 @@ public class CheckpointServerReplay extends CheckpointServerGen {
             receivedHistories.put(owner, Collections.synchronizedMap(new HashMap<Integer, List<UniqueID>>()));
         }
         receivedHistories.get(owner).put(index, hist);
-        System.out.println("Received history #" + index + " of " + owner + ": " + hist);
+        System.out.println("Received history #" + index + " of " + owner);
     }
 
     public List<UniqueID> getHistory(UniqueID owner, int index) {
@@ -402,7 +386,6 @@ public class CheckpointServerReplay extends CheckpointServerGen {
                             newLocationsUB.put(oldLocations.get(curID), cur);
                         }
                         try {
-                            System.out.println(toModifyID + ".updateLocation(" + curID + ", " + cur + ")");
                             toModify.updateLocation(curID, cur);
                         } catch (IOException e) {
                             // TODO Auto-generated catch block

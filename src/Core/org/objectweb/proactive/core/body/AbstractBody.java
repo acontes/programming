@@ -298,7 +298,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
 
         if (this.localBodyStrategy != null) {
             return "Body for " + this.localBodyStrategy.getName() + " node=" + this.nodeURL + " id=" +
-                this.bodyID + inc;
+                this.bodyID + inc + (killed ? " killed" : "");
         }
 
         return "Method call called during Body construction -- the body is not yet initialized ";

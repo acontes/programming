@@ -248,4 +248,8 @@ public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody> imp
         this.target.setProActiveSecurityManager(user, policyServer);
     }
 
+    public String toString() {
+        return this.target.toString();
+    }
+
 }

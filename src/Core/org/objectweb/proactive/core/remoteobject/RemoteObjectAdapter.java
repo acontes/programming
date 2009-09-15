@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.TypeVariable;
 import java.net.URI;
+import java.rmi.UnmarshalException;
 import java.security.AccessControlException;
 import java.security.PublicKey;
 import java.util.HashMap;
@@ -162,6 +163,10 @@ public class RemoteObjectAdapter implements RemoteObject {
             IOException {
         try {
             return this.remoteObject.receiveMessage(message);
+        } catch (UnmarshalException e) {
+            ProActiveLogger.getLogger(Loggers.REMOTEOBJECT).debug(
+                    "UnmarshalException while calling method " + message.getMethodName());
+            return new SynchronousReplyImpl();
         } catch (EOFException e) {
             ProActiveLogger.getLogger(Loggers.REMOTEOBJECT).debug(
                     "EOFException while calling method " + message.getMethodName());
