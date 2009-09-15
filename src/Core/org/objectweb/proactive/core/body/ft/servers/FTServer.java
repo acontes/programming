@@ -241,6 +241,22 @@ public class FTServer implements FaultDetector, LocationServer, RecoveryProcess,
         return this.resourceServer.getFreeNode();
     }
 
+    public void storeHistory(List<UniqueID> hist, UniqueID owner, int index) {
+        if (checkpointServer instanceof CheckpointServerReplay) {
+            ((CheckpointServerReplay) checkpointServer).storeHistory(hist, owner, index);
+        } else {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    public List<UniqueID> getHistory(UniqueID owner, int index) {
+        if (checkpointServer instanceof CheckpointServerReplay) {
+            return ((CheckpointServerReplay) checkpointServer).getHistory(owner, index);
+        } else {
+            throw new UnsupportedOperationException();
+        }
+    }
+
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#storeCheckpoint(org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint, int)
      */

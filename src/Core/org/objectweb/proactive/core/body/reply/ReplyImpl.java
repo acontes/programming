@@ -37,6 +37,7 @@ import java.io.Serializable;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.ft.protocols.replay.managers.FTManagerReplay;
 import org.objectweb.proactive.core.body.future.MethodCallResult;
 import org.objectweb.proactive.core.body.message.MessageImpl;
 import org.objectweb.proactive.core.mop.Utils;
@@ -92,6 +93,9 @@ public class ReplyImpl extends MessageImpl implements Reply, Serializable {
     }
 
     public int send(UniversalBody destinationBody) throws IOException {
+        if (destinationBody == null) {
+            return FTManagerReplay.ORPHAN_REPLY;
+        }
         // if destination body is on the same VM that the sender, we must
         // perform
         // a deep copy of result in order to preserve ProActive model.

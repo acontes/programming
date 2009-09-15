@@ -161,6 +161,10 @@ public class RequestImpl extends MessageImpl implements Request, java.io.Seriali
         return this.sender;
     }
 
+    public void setSender(UniversalBody sender) {
+        this.sender = sender;
+    }
+
     public Reply serve(Body targetBody) {
         if (logger.isDebugEnabled()) {
             logger.debug("Serving " + this.getMethodName());

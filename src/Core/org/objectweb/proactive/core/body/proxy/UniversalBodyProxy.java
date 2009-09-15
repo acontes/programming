@@ -31,14 +31,12 @@
  */
 package org.objectweb.proactive.core.body.proxy;
 
-import java.lang.annotation.Annotation;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Vector;
-
-import javassist.scopedpool.ScopedClassPool;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Active;
@@ -104,8 +102,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
     }
 
     public UniversalBodyProxy(UniversalBody body) {
-        this.universalBody = body;
-        System.out.println("UniversalBodyProxy.UniversalBodyProxy(UniversalBody body)");
+        setBody(body);
         // this.isLocal = LocalBodyStore.getInstance().getLocalBody(getBodyID()) != null;
     }
 
@@ -123,7 +120,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
             // Determines whether the body is local or remote
             if (p0 instanceof UniversalBody) {
                 // This is simple connection to an existant local body
-                this.universalBody = (UniversalBody) p0;
+                setBody((UniversalBody) p0);
                 this.isLocal = LocalBodyStore.getInstance().getLocalBody(getBodyID()) != null;
                 if (logger.isDebugEnabled()) {
                     // logger.debug("UniversalBodyProxy created from UniversalBody bodyID="+bodyID+"
@@ -155,10 +152,10 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
                     // added line -------------------------
                     // if (RuntimeFactory.isRuntimeLocal(part)){
                     // added line -------------------------
-                    this.universalBody = createLocalBody(bodyConstructorCall, constructorCall, node);
+                    setBody(createLocalBody(bodyConstructorCall, constructorCall, node));
                     this.isLocal = true;
                 } else {
-                    this.universalBody = createRemoteBody(bodyConstructorCall, node);
+                    setBody(createRemoteBody(bodyConstructorCall, node));
                     // added line -------------------------
                     // this.universalBody = createRemoteBody(bodyConstructorCall, part , node);
                     // added line -------------------------
@@ -186,12 +183,12 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
         }
 
         UniversalBodyProxy proxy = (UniversalBodyProxy) o;
-        return this.universalBody.equals(proxy.universalBody);
+        return getBody().equals(proxy.universalBody);
     }
 
     @Override
     public int hashCode() {
-        return this.universalBody.hashCode();
+        return getBody().hashCode();
     }
 
     //
@@ -199,6 +196,10 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
     //
     public UniversalBody getBody() {
         return this.universalBody;
+    }
+
+    protected void setBody(UniversalBody universalBody) {
+        this.universalBody = universalBody;
     }
 
     //
@@ -361,7 +362,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
         // UniqueID id = universalBody.getID();
         UniversalBody newBody = sourceBody.checkNewLocation(getBodyID());
         if (newBody != null) {
-            this.universalBody = newBody;
+            setBody(newBody);
             this.isLocal = LocalBodyStore.getInstance().getLocalBody(getBodyID()) != null;
         }
         ArrayList<UniversalBody> destinations = new ArrayList<UniversalBody>();
@@ -452,27 +453,32 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
     }
 
     private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
-        in.defaultReadObject();
-        this.universalBody = (UniversalBody) in.readObject();
-        Body localBody = LocalBodyStore.getInstance().getLocalBody(getBodyID());
+        try {
+            in.defaultReadObject();
+            setBody((UniversalBody) in.readObject());
+            Body localBody = LocalBodyStore.getInstance().getLocalBody(getBodyID());
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Local body is " + localBody);
-        }
-        if (localBody != null) {
-            // the body is local
-            this.universalBody = localBody;
-            this.isLocal = true;
-        } else {
-            // the body is not local
-            this.isLocal = false;
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug("universalBody is " + this.universalBody);
-        }
+            if (logger.isDebugEnabled()) {
+                logger.debug("Local body is " + localBody);
+            }
+            if (localBody != null) {
+                // the body is local
+                setBody(localBody);
+                this.isLocal = true;
+            } else {
+                // the body is not local
+                this.isLocal = false;
+            }
+            if (logger.isDebugEnabled()) {
+                logger.debug("universalBody is " + getBody());
+            }
 
-        if (GarbageCollector.dgcIsEnabled()) {
-            incomingReferences.get().add(this);
+            if (GarbageCollector.dgcIsEnabled()) {
+                incomingReferences.get().add(this);
+            }
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            throw new IOException(e);
         }
     }
 

@@ -285,4 +285,9 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
             throws SecurityNotAvailableException, AccessControlException, IOException {
         this.wrappedBody.setProActiveSecurityManager(user, policyServer);
     }
+
+    @Override
+    public void startBody() {
+        // FIXME @evallett
+    }
 }

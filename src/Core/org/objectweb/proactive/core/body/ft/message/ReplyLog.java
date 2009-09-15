@@ -69,6 +69,10 @@ public class ReplyLog implements MessageLog {
         return reply;
     }
 
+    public void setDestination(UniversalBody destination) {
+        this.destination = destination;
+    }
+
     /**
      * Return the destination of this reply
      * @return the destination of this reply

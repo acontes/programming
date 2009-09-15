@@ -65,7 +65,6 @@ import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.AbstractBody;
-import org.objectweb.proactive.core.body.ActiveBody;
 import org.objectweb.proactive.core.body.Context;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -915,7 +914,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
             runtimeLogger.debug(ret.getID() + " is restarting activity...");
         }
 
-        ((ActiveBody) ret).startBody();
+        //((ActiveBody) ret).startBody();
 
         // no more need to return the recovered body
         return null;

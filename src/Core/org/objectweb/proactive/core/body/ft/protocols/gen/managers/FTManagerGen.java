@@ -37,6 +37,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -180,7 +181,7 @@ public abstract class FTManagerGen extends FTManager {
      * This method test if the message m has to be take into account by the receiver;
      * If not, set the ignore tag in m.
      */
-    private int incarnationTest(Message m) {
+    protected int incarnationTest(Message m) {
         if (this.isSignificant(m)) {
             MessageInfoGen mi = (MessageInfoGen) m.getMessageInfo();
             int localInt = this.incarnation;
@@ -619,29 +620,23 @@ public abstract class FTManagerGen extends FTManager {
      * send logged messages before recovery
      * !!! ALL FT-STATE VARAIBLES MUST BE SET !!!
      */
-    protected void sendLogs(CheckpointInfoGen ci) {
+    public void sendLogs(CheckpointInfoGen ci) {
         //send replies
         //System.out.println("[CIC] Sending logged messages...");
-        Vector<ReplyLog> replies = ci.replyToResend;
-        Iterator<ReplyLog> itReplies = replies.iterator();
-        while (itReplies.hasNext()) {
+        for (ReplyLog rl : ci.replyToResend) {
             //System.out.println( this.owner.getID() + "      SEND REPLY");
             UniversalBody destination = null;
             Reply r = null;
-            ReplyLog rl = (itReplies.next());
             r = rl.getReply();
             destination = rl.getDestination();
             this.sendReply(r, destination);
         }
 
         //send requests
-        Vector<RequestLog> requests = ci.requestToResend;
-        Iterator<RequestLog> itRequests = requests.iterator();
-        while (itRequests.hasNext()) {
+        for (RequestLog lr : ci.requestToResend) {
             try {
                 //System.out.println( this.owner.getID() + "      SEND REQUEST");
                 UniversalBody destination = null;
-                RequestLog lr = itRequests.next();
                 Request loggedRequest = lr.getRequest();
                 destination = lr.getDestination();
                 // must create a new req : the sender must be this.owner
@@ -708,7 +703,7 @@ public abstract class FTManagerGen extends FTManager {
 
     @Override
     public String toString() {
-        String ret = " Incarnation = ";
+        String ret = " incarnation=";
         ret += this.incarnation;
         return ret;
     }

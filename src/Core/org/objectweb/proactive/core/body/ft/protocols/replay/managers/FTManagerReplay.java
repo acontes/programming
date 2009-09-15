@@ -31,9 +31,12 @@
  */
 package org.objectweb.proactive.core.body.ft.protocols.replay.managers;
 
-import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import org.objectweb.proactive.api.PAFaultTolerance;
@@ -41,7 +44,6 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.body.exceptions.BodyTerminatedException;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
 import org.objectweb.proactive.core.body.ft.checkpointing.CheckpointInfo;
 import org.objectweb.proactive.core.body.ft.message.ReplyLog;
@@ -50,13 +52,12 @@ import org.objectweb.proactive.core.body.ft.protocols.gen.infos.CheckpointInfoGe
 import org.objectweb.proactive.core.body.ft.protocols.gen.managers.FTManagerGen;
 import org.objectweb.proactive.core.body.ft.protocols.replay.infos.CheckpointInfoReplay;
 import org.objectweb.proactive.core.body.ft.protocols.replay.infos.MessageInfoReplay;
+import org.objectweb.proactive.core.body.ft.servers.FTServer;
 import org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcess;
-import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.AwaitedRequest;
 import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.core.security.exceptions.CommunicationForbiddenException;
-import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
+import org.objectweb.proactive.core.body.request.RequestImpl;
 
 
 /**
@@ -66,8 +67,10 @@ import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionExcept
  * @since ProActive 2.2
  */
 public class FTManagerReplay extends FTManagerGen {
-
+    private static final long serialVersionUID = -6984273235123773473L;
+    
     protected boolean replayMode;
+    protected Map<Integer, List<UniqueID>> requestReceived;
 
     @Override
     public int init(AbstractBody owner) throws ProActiveException {
@@ -75,6 +78,7 @@ public class FTManagerReplay extends FTManagerGen {
         this.forSentRequest = new MessageInfoReplay();
         this.forSentReply = new MessageInfoReplay();
         replayMode = false;
+        requestReceived = new HashMap<Integer, List<UniqueID>>();
         return 0;
     }
 
@@ -128,6 +132,46 @@ public class FTManagerReplay extends FTManagerGen {
         return incarnation;
     }
 
+    public static class HistoryInfo implements Serializable {
+        private static final long serialVersionUID = 1804783174683221164L;
+        public int index;
+        public List<UniqueID> hist;
+
+        public HistoryInfo(int index, List<UniqueID> hist) {
+            this.index = index;
+            this.hist = hist;
+        }
+    }
+
+    public HistoryInfo getLastHistory() {
+        HistoryInfo info;
+        synchronized (this.historyLock) {
+            info = new HistoryInfo(checkpointIndex, requestReceived.get(checkpointIndex));
+        }
+        return info;
+    }
+
+    private long lastRequestReceived;
+
+    @Override
+    public int onReceiveRequest(Request request) {
+        request.setFTManager(this);
+        int res = this.incarnationTest(request);
+        if (!request.ignoreIt()) {
+            lastRequestReceived = request.getSequenceNumber();
+            // store the request in the history
+            synchronized (this.historyLock) {
+                List<UniqueID> histList = requestReceived.get(checkpointIndex);
+                if (histList == null) {
+                    histList = new ArrayList<UniqueID>();
+                    requestReceived.put(checkpointIndex, histList);
+                }
+                histList.add(request.getSourceBodyID());
+            }
+        }
+        return res;
+    }
+
     /*
      * Perform a checkpoint with index = current + 1
      */
@@ -161,6 +205,20 @@ public class FTManagerReplay extends FTManagerGen {
                 // delete logs
                 this.replyToResend.remove(Integer.valueOf(this.checkpointIndex + 1));
                 this.requestToResend.remove(Integer.valueOf(this.checkpointIndex + 1));
+
+                // remove the pending request from the history
+                if (lastRequestReceived == pendingRequest.getSequenceNumber()) {
+                    List<UniqueID> hist = requestReceived.get(this.checkpointIndex);
+                    UniqueID lastID = hist.get(hist.size() - 1);
+                    // different requests from different sources can have same sequence number
+                    if (lastID.equals(pendingRequest.getSourceBodyID())) {
+                        hist.remove(hist.size() - 1);
+                    }
+                }
+
+                // store the history
+                ((FTServer) storage).storeHistory(requestReceived.get(this.checkpointIndex), this.ownerID,
+                        this.checkpointIndex);
 
                 // inc checkpoint index
                 this.checkpointIndex++;
@@ -242,6 +300,15 @@ public class FTManagerReplay extends FTManagerGen {
         this.awaitedRequests = new Vector<AwaitedRequest>();
         this.replyToResend = new Hashtable<Integer, Vector<ReplyLog>>();
         this.requestToResend = new Hashtable<Integer, Vector<RequestLog>>();
+        List<UniqueID> histList;
+        synchronized (this.historyLock) {
+            // must be performed BEFORE changing checkpointIndex
+            requestReceived.clear();
+            histList = ((FTServer) storage).getHistory(ownerID, index);
+            if (histList != null) {
+                requestReceived.put(index, histList);
+            }
+        }
         this.checkpointIndex = index;
         this.nextMax = index;
         this.checkpointTimer = System.currentTimeMillis();
@@ -249,7 +316,7 @@ public class FTManagerReplay extends FTManagerGen {
         this.lastRecovery = index;
         this.incarnation = inc;
 
-        //add pending request to reuqestQueue
+        //add pending request to requestQueue
         Request pendingRequest = cic.pendingRequest;
 
         //pending request could be null with OOSPMD synchronization
@@ -262,6 +329,7 @@ public class FTManagerReplay extends FTManagerGen {
         this.filterQueue(queue, cic);
 
         // building history
+        /*/
         // System.out.println(""+ this.ownerID + " History size : " + cic.history.size());
         Iterator<UniqueID> itHistory = cic.history.iterator();
         while (itHistory.hasNext()) {
@@ -270,19 +338,51 @@ public class FTManagerReplay extends FTManagerGen {
             queue.add(currentAwaitedRequest);
             this.awaitedRequests.add(currentAwaitedRequest);
         }
+        /*/
+        if (histList != null) {
+            System.out.println("Replay: " + ownerID + " add history: " + histList);
+            for (UniqueID cur : histList) {
+                AwaitedRequest currentAwaitedRequest = new AwaitedRequest(cur);
+                queue.add(currentAwaitedRequest);
+                this.awaitedRequests.add(currentAwaitedRequest);
+            }
+        }
+        /**/
 
         //enable communication
         //System.out.println("[CIC] enable communication");
-        (owner).acceptCommunication();
+        owner.acceptCommunication();
 
         // update servers
         this.location.updateLocation(ownerID, owner.getRemoteAdapter());
         this.recovery.updateState(ownerID, RecoveryProcess.RUNNING);
 
         // resend all in-transit message
-        this.sendLogs((CheckpointInfoReplay) ci);
+        //this.sendLogs((CheckpointInfoReplay) ci);
 
         return 0;
+    }
+
+    public void updateLogsLocations(Map<UniversalBody, UniversalBody> newLocations) {
+        for (Vector<RequestLog> requests : requestToResend.values()) {
+            for (RequestLog request : requests) {
+                UniversalBody from = request.getDestination();
+                UniversalBody to = newLocations.get(from);
+                request.setDestination(to);
+            }
+        }
+        for (Vector<ReplyLog> replies : replyToResend.values()) {
+            for (ReplyLog reply : replies) {
+                UniversalBody from = reply.getDestination();
+                UniversalBody to = newLocations.get(from);
+                reply.setDestination(to);
+            }
+        }
+        for (Request request : owner.getRequestQueue()) {
+            UniversalBody from = request.getSender();
+            UniversalBody to = newLocations.get(from);
+            ((RequestImpl) request).setSender(to);
+        }
     }
 
 }

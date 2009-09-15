@@ -285,4 +285,8 @@ public class AwaitedRequest implements Request, java.io.Serializable {
     public String getSenderNodeURL() {
         return this.wrappedRequest.getSenderNodeURL();
     }
+
+    public String toString() {
+        return "awaited=" + awaitedSender;
+    }
 }

@@ -76,4 +76,8 @@ public class RequestLog implements MessageLog {
     public UniversalBody getDestination() {
         return destination;
     }
+
+    public void setDestination(UniversalBody destination) {
+        this.destination = destination;
+    }
 }

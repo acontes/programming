@@ -46,7 +46,6 @@ import org.objectweb.proactive.core.remoteobject.RemoteObjectAdapter;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
-import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 
 
 /**
@@ -135,6 +134,10 @@ public abstract class AbstractUniversalBody implements UniversalBody, Serializab
         return this.jobID;
     }
 
+    public void startBody() {
+        ((ActiveBody) this).startBody();
+    }
+
     public String getNodeURL() {
         return this.nodeURL;
     }
@@ -162,23 +165,28 @@ public abstract class AbstractUniversalBody implements UniversalBody, Serializab
     }
 
     private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
-        in.defaultReadObject();
-        if (this.bodyID == null) {
-            // it may happen that the bodyID is set to null before serialization if we want to
-            // create a copy of the Body that is distinct from the original
-            this.bodyID = new UniqueID();
-        }
-
-        // remoteBody is transient so we recreate it here
-        this.roe = new RemoteObjectExposer<UniversalBody>(UniversalBody.class.getName(), this,
-            UniversalBodyRemoteObjectAdapter.class);
-
         try {
-            RemoteRemoteObject rro = this.roe.createRemoteObject(this.bodyID.toString());
-            this.remoteBody = (UniversalBody) new RemoteObjectAdapter(rro).getObjectProxy();
-        } catch (ProActiveException e) {
-            // TODO Auto-generated catch block
+            in.defaultReadObject();
+            if (this.bodyID == null) {
+                // it may happen that the bodyID is set to null before serialization if we want to
+                // create a copy of the Body that is distinct from the original
+                this.bodyID = new UniqueID();
+            }
+
+            // remoteBody is transient so we recreate it here
+            this.roe = new RemoteObjectExposer<UniversalBody>(UniversalBody.class.getName(), this,
+                UniversalBodyRemoteObjectAdapter.class);
+
+            try {
+                RemoteRemoteObject rro = this.roe.createRemoteObject(this.bodyID.toString());
+                this.remoteBody = (UniversalBody) new RemoteObjectAdapter(rro).getObjectProxy();
+            } catch (ProActiveException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        } catch (RuntimeException e) {
             e.printStackTrace();
+            throw new IOException(e);
         }
     }
 

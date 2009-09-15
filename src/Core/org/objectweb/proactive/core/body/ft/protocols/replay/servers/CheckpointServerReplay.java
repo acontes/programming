@@ -34,8 +34,13 @@ package org.objectweb.proactive.core.body.ft.protocols.replay.servers;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 import java.util.Map.Entry;
 
@@ -51,11 +56,13 @@ import org.objectweb.proactive.core.body.ft.message.ReceptionHistory;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.ft.protocols.gen.infos.CheckpointInfoGen;
 import org.objectweb.proactive.core.body.ft.protocols.gen.infos.MessageInfoGen;
+import org.objectweb.proactive.core.body.ft.protocols.gen.managers.FTManagerGen;
 import org.objectweb.proactive.core.body.ft.protocols.gen.servers.CheckpointServerGen;
 import org.objectweb.proactive.core.body.ft.protocols.replay.infos.CheckpointInfoReplay;
 import org.objectweb.proactive.core.body.ft.protocols.replay.managers.FTManagerReplay;
 import org.objectweb.proactive.core.body.ft.servers.FTServer;
 import org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryJob;
+import org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryJobAfter;
 import org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcess;
 import org.objectweb.proactive.core.body.ft.servers.util.JobBarrier;
 import org.objectweb.proactive.core.node.Node;
@@ -120,6 +127,43 @@ public class CheckpointServerReplay extends CheckpointServerGen {
         } else {
             return false;
         }
+    }
+
+    private Map<UniqueID, Map<Integer, List<UniqueID>>> receivedHistories;
+    private int receivedHistoruesCount = 0;
+
+    public synchronized void storeHistory(List<UniqueID> hist, UniqueID owner, int index) {
+        if (++receivedHistoruesCount > 4) {
+            receivedHistoruesCount = 0;
+            String str = "";
+            str += "Received histories";
+            for (Entry<UniqueID, Map<Integer, List<UniqueID>>> histOfObj : receivedHistories.entrySet()) {
+                str += "\n  " + histOfObj.getKey() + ":";
+                for (Entry<Integer, List<UniqueID>> histOfObjAtIndex : histOfObj.getValue().entrySet()) {
+                    str += "\n    " + histOfObjAtIndex;
+                }
+            }
+            System.out.println(str);
+        }
+        if (receivedHistories == null) {
+            receivedHistories = Collections
+                    .synchronizedMap(new HashMap<UniqueID, Map<Integer, List<UniqueID>>>());
+        }
+        if (!receivedHistories.containsKey(owner)) {
+            receivedHistories.put(owner, Collections.synchronizedMap(new HashMap<Integer, List<UniqueID>>()));
+        }
+        receivedHistories.get(owner).put(index, hist);
+        System.out.println("Received history #" + index + " of " + owner + ": " + hist);
+    }
+
+    public List<UniqueID> getHistory(UniqueID owner, int index) {
+        if (!receivedHistories.containsKey(owner)) {
+            return null;
+        }
+        if (receivedHistories.get(owner) == null) {
+            return null;
+        }
+        return receivedHistories.get(owner).get(index);
     }
 
     /**
@@ -202,12 +246,11 @@ public class CheckpointServerReplay extends CheckpointServerGen {
             return;
         }
 
+        List<ReceptionHistory> histList = this.histories.get(rh.owner);
+        ReceptionHistory ih = histList.get(histList.size() - 1);
+
         // update the histo if needed
         if (rh.elements != null) {
-            List<ReceptionHistory> histList = this.histories.get(rh.owner);
-            ReceptionHistory ih = histList.get(histList.size() - 1);
-            ih = ih.clone();
-            histList.add(ih);
             ih.updateHistory(rh);
         }
 
@@ -293,8 +336,26 @@ public class CheckpointServerReplay extends CheckpointServerGen {
             // for waiting the end of the recovery
             Vector<JobBarrier> barriers = new Vector<JobBarrier>();
 
+            Map<UniqueID, UniversalBody> oldLocations = new HashMap<UniqueID, UniversalBody>();
+
             // send checkpoints
             for (UniqueID current : this.checkpointStorage.keySet()) {
+
+                UniversalBody toRecover = (this.server.getLocation(current));
+                oldLocations.put(current, toRecover);
+
+                // store the history
+                FTManagerReplay.HistoryInfo histInfo = null;
+                try {
+                    Object res = toRecover.receiveFTMessage(new FTMessageGetLastHistory());
+                    histInfo = (FTManagerReplay.HistoryInfo) res;
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                if (histInfo != null) {
+                    storeHistory(histInfo.hist, current, histInfo.index);
+                }
 
                 //Checkpoint toSend = this.server.getCheckpoint(current,globalState);
                 Checkpoint toSend = this.getCheckpoint(current, globalState);
@@ -307,10 +368,9 @@ public class CheckpointServerReplay extends CheckpointServerGen {
                 // set the last commited index
                 replay.lastCommitedIndex = histo.getLastRecoverable();
 
-                UniversalBody toRecover = (this.server.getLocation(current));
-
                 String nodeURL = toRecover.getNodeURL();
                 Node node = NodeFactory.getNode(nodeURL);
+
                 barriers.add(this.server.submitJobWithBarrier(new RecoveryJob(toSend, this.globalIncarnation,
                     node)));
             }
@@ -323,6 +383,53 @@ public class CheckpointServerReplay extends CheckpointServerGen {
             for (JobBarrier barrier : barriers) {
                 barrier.waitForJobCompletion();
             }
+
+            Set<UniqueID> locations1ID = new HashSet<UniqueID>(this.checkpointStorage.keySet());
+            Set<UniqueID> locations2ID = new HashSet<UniqueID>(this.checkpointStorage.keySet());
+            Map<UniqueID, UniversalBody> newLocations = new HashMap<UniqueID, UniversalBody>();
+            Map<UniversalBody, UniversalBody> newLocationsUB = new HashMap<UniversalBody, UniversalBody>();
+            for (UniqueID toModifyID : locations1ID) {
+                UniversalBody toModify = newLocations.get(toModifyID);
+                if (toModify == null) {
+                    toModify = (this.server.getLocation(toModifyID));
+                    newLocations.put(toModifyID, toModify);
+                    newLocationsUB.put(oldLocations.get(toModifyID), toModify);
+                }
+                for (UniqueID curID : locations2ID) {
+                    if (!toModifyID.equals(curID)) {
+                        UniversalBody cur = newLocations.get(curID);
+                        if (cur == null) {
+                            cur = (this.server.getLocation(curID));
+                            newLocations.put(curID, cur);
+                            newLocationsUB.put(oldLocations.get(curID), cur);
+                        }
+                        try {
+                            System.out.println(toModifyID + ".updateLocation(" + curID + ", " + cur + ")");
+                            toModify.updateLocation(curID, cur);
+                        } catch (IOException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                try {
+                    toModify.receiveFTMessage(new FTMessageUpdateLogsLocations(newLocationsUB));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            synchronized (this) {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            for (Entry<UniqueID, UniversalBody> loc : newLocations.entrySet()) {
+                Checkpoint toSend = this.getCheckpoint(loc.getKey(), globalState);
+                this.server.submitJob(new RecoveryJobAfter(toSend, loc.getValue()));
+            }
+
         } catch (NodeException e) {
             logger.error("[RECOVERY] **ERROR** Unable to send checkpoint for recovery");
             e.printStackTrace();
@@ -373,7 +480,7 @@ public class CheckpointServerReplay extends CheckpointServerGen {
     }
 
     /**
-     * Reintialize the server.
+     * Reinitialize the server.
      */
     @Override
     public void initialize() {
@@ -382,4 +489,30 @@ public class CheckpointServerReplay extends CheckpointServerGen {
         this.histories = new Hashtable<UniqueID, List<ReceptionHistory>>();
     }
 
+    public static class FTMessageGetLastHistory implements FTMessage {
+        private static final long serialVersionUID = -7864547755581704712L;
+
+        @Override
+        public Object handleFTMessage(FTManager ftm) {
+            FTManagerReplay rm = (FTManagerReplay) ftm;
+            return rm.getLastHistory();
+        }
+    }
+
+    public static class FTMessageUpdateLogsLocations implements FTMessage {
+        private static final long serialVersionUID = 6260345611419713170L;
+
+        private Map<UniversalBody, UniversalBody> newLocations;
+
+        public FTMessageUpdateLogsLocations(Map<UniversalBody, UniversalBody> newLocations) {
+            this.newLocations = newLocations;
+        }
+
+        @Override
+        public Object handleFTMessage(FTManager ftm) {
+            FTManagerReplay rm = (FTManagerReplay) ftm;
+            rm.updateLogsLocations(newLocations);
+            return null;
+        }
+    }
 }

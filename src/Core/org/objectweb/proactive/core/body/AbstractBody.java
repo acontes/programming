@@ -48,19 +48,16 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAGroup;
-import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.exceptions.BodyTerminatedReplyException;
 import org.objectweb.proactive.core.body.exceptions.BodyTerminatedRequestException;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.ft.internalmsg.Heartbeat;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
-import org.objectweb.proactive.core.body.ft.protocols.gen.managers.FTManagerGen;
 import org.objectweb.proactive.core.body.ft.servers.faultdetection.FaultDetector;
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FuturePool;
 import org.objectweb.proactive.core.body.future.MethodCallResult;
-import org.objectweb.proactive.core.body.proxy.BodyProxy;
 import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
@@ -74,9 +71,7 @@ import org.objectweb.proactive.core.gc.GCResponse;
 import org.objectweb.proactive.core.gc.GarbageCollector;
 import org.objectweb.proactive.core.group.spmd.ProActiveSPMDGroupManager;
 import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
-import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.MethodCall;
-import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.security.DefaultProActiveSecurityManager;
 import org.objectweb.proactive.core.security.InternalBodySecurity;
@@ -414,9 +409,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             // if futurePool is not null, we are in an Active Body
             if (getFuturePool() != null) {
                 // some futures have to be registered in the local futurePool
-                java.util.Iterator<Future> it = incomingFutures.iterator();
-                while (it.hasNext()) {
-                    Future current = it.next();
+                for (Future current : incomingFutures) {
                     getFuturePool().receiveFuture(current);
                 }
                 FuturePool.removeIncomingFutures();
@@ -1158,25 +1151,29 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     }
 
     private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
-        this.gc = new GarbageCollector(this);
-        in.defaultReadObject();
-        // FAULT TOLERANCE
-        if (this.ftmanager != null) {
-            if (this.ftmanager.isACheckpoint()) {
-                // re-use remote view of the old body if any
-                Body toKill = LocalBodyStore.getInstance().getLocalBody(this.bodyID);
-                if (toKill != null) {
-                    // this body is still alive
-                    toKill.blockCommunication();
-                    RemoteObjectExposer<UniversalBody> toKillRoe = ((AbstractBody) toKill)
-                            .getRemoteObjectExposer();
-                    toKillRoe.getRemoteObject().setTarget(this);
+        try {
+            this.gc = new GarbageCollector(this);
+            in.defaultReadObject();
+            // FAULT TOLERANCE
+            if (this.ftmanager != null) {
+                if (this.ftmanager.isACheckpoint()) {
+                    // re-use remote view of the old body if any
+                    Body toKill = LocalBodyStore.getInstance().getLocalBody(this.bodyID);
+                    if (toKill != null) {
+                        // this body is still alive
+                        toKill.blockCommunication();
+                        RemoteObjectExposer<UniversalBody> toKillRoe = ((AbstractBody) toKill)
+                                .getRemoteObjectExposer();
+                        toKillRoe.getRemoteObject().setTarget(this);
 
-                    this.roe = toKillRoe;
-                    toKill.terminate(false);
-                    toKill.acceptCommunication();
+                        this.roe = toKillRoe;
+                        toKill.terminate(false);
+                        toKill.acceptCommunication();
+                    }
                 }
             }
+        } catch (RuntimeException e) {
+            throw new IOException(e);
         }
     }
 

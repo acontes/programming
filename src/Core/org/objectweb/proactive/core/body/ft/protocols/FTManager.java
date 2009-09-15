@@ -223,8 +223,8 @@ public abstract class FTManager implements java.io.Serializable {
             }
             return newLocation;
         } else {
-            System.out.println("FTManager.communicationFailed() : new location is not null ");
-
+            logger.info("" + ownerID + ": FTManager.communicationFailed(" + suspect +
+                ") : new location is not null ");
             // newLocation is the new location of suspect
             return newLocation;
         }

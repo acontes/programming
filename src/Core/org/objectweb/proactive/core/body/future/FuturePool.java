@@ -250,7 +250,7 @@ public class FuturePool extends Object implements java.io.Serializable {
      */
     public synchronized int receiveFutureValue(long id, UniqueID creatorID, MethodCallResult result,
             Reply reply) throws java.io.IOException {
-        // get all aiwated futures
+        // get all awaited futures
         ArrayList<Future> futuresToUpdate = futures.getFuturesToUpdate(id, creatorID);
 
         if (futuresToUpdate != null) {

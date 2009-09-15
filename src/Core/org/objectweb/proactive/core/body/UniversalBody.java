@@ -98,6 +98,8 @@ public interface UniversalBody extends Job, Serializable, SecurityEntity {
      */
     public UniqueID getID();
 
+    public void startBody();
+
     /**
      * Signals to this body that the body identified by id is now to a new
      * remote location. The body given in parameter is a new stub pointing

@@ -497,6 +497,10 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             return this.reifiedObject.getClass().getName();
         }
 
+        public boolean isImmediate(Request request) {
+            return ((RequestReceiverImpl) requestReceiver).immediateExecution(request);
+        }
+
         /**
          * Serves the request. The request should be removed from the request
          * queue before serving, which is correctly done by all methods of the
@@ -528,7 +532,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             }
 
             if (!isProActiveInternalObject) {
-                if (((RequestReceiverImpl) requestReceiver).immediateExecution(request)) {
+                if (isImmediate(request)) {
                     debugger.breakpoint(BreakpointType.NewImmediateService, request);
                 } else {
                     debugger.breakpoint(BreakpointType.NewService, request);
@@ -553,15 +557,10 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             }
 
             if (!isProActiveInternalObject) {
-                try {
-                    if (isInImmediateService())
-                        debugger.breakpoint(BreakpointType.EndImmediateService, request);
-                    else
-                        debugger.breakpoint(BreakpointType.EndService, request);
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
+                if (isImmediate(request))
+                    debugger.breakpoint(BreakpointType.EndImmediateService, request);
+                else
+                    debugger.breakpoint(BreakpointType.EndService, request);
             }
 
             if (reply == null) {
@@ -599,29 +598,31 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             destinations.add(request.getSender());
             this.getFuturePool().registerDestinations(destinations);
 
-            // FAULT-TOLERANCE
-            if (BodyImpl.this.ftmanager != null) {
-                BodyImpl.this.ftmanager.sendReply(reply, request.getSender());
-            } else {
-                // if the reply cannot be sent, try to sent the thrown exception
-                // as result
-                // Useful if the exception is due to the content of the result
-                // (e.g. InvalidClassException)
-                try {
-                    reply.send(request.getSender());
-                } catch (IOException e1) {
+            if (isActive()) {
+                // FAULT-TOLERANCE
+                if (BodyImpl.this.ftmanager != null) {
+                    BodyImpl.this.ftmanager.sendReply(reply, request.getSender());
+                } else {
+                    // if the reply cannot be sent, try to sent the thrown exception
+                    // as result
+                    // Useful if the exception is due to the content of the result
+                    // (e.g. InvalidClassException)
                     try {
-                        this.retrySendReplyWithException(reply, e1, request.getSender());
-                    } catch (Exception retryException1) {
-                        // the stacktraced exception must be the first one
-                        sendReplyExceptionsLogger.error(e1.getMessage(), e1);
-                    }
-                } catch (ProActiveRuntimeException e2) {
-                    try {
-                        this.retrySendReplyWithException(reply, e2, request.getSender());
-                    } catch (Exception retryException2) {
-                        // the stacktraced exception must be the first one
-                        sendReplyExceptionsLogger.error(e2.getMessage(), e2);
+                        reply.send(request.getSender());
+                    } catch (IOException e1) {
+                        try {
+                            this.retrySendReplyWithException(reply, e1, request.getSender());
+                        } catch (Exception retryException1) {
+                            // the stacktraced exception must be the first one
+                            sendReplyExceptionsLogger.error(e1.getMessage(), e1);
+                        }
+                    } catch (ProActiveRuntimeException e2) {
+                        try {
+                            this.retrySendReplyWithException(reply, e2, request.getSender());
+                        } catch (Exception retryException2) {
+                            // the stacktraced exception must be the first one
+                            sendReplyExceptionsLogger.error(e2.getMessage(), e2);
+                        }
                     }
                 }
             }

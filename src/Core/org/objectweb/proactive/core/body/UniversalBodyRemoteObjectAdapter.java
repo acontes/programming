@@ -110,6 +110,11 @@ public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody> imp
         return bodyID;
     }
 
+    // FIXME @evallett
+    public void startBody() {
+        target.startBody();
+    }
+
     /**
      * @see org.objectweb.proactive.core.body.UniversalBody#createShortcut(org.objectweb.proactive.core.component.request.Shortcut)
      */
