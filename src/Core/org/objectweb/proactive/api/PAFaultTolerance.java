@@ -266,6 +266,10 @@ public class PAFaultTolerance implements Serializable {
         return lastGlobal;
     }
 
+    public synchronized int getParentIndexOf(int line) throws ProActiveException {
+        return ((FTServer) getServerInformation().storage).getParentIndexOf(line);
+    }
+
     /**
      * Get the number of a object
      * 

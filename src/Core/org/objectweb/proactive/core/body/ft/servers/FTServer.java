@@ -269,6 +269,10 @@ public class FTServer implements FaultDetector, LocationServer, RecoveryProcess,
         return this.checkpointServer.getLastGlobalState();
     }
 
+    public int getParentIndexOf(int line) {
+        return this.checkpointServer.getParentIndexOf(line);
+    }
+
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#getLastState(org.objectweb.proactive.core.UniqueID)
      */

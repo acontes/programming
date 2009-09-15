@@ -80,6 +80,8 @@ public interface CheckpointServer {
      */
     public Checkpoint getLastCheckpoint(UniqueID id);
 
+    public int getParentIndexOf(int line);
+
     /**
      * Add informations to an already stored checkpoint
      * @param ci informations that have to be added

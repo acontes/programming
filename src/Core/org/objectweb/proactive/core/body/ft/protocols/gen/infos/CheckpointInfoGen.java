@@ -50,9 +50,7 @@ import org.objectweb.proactive.core.body.request.Request;
  */
 public abstract class CheckpointInfoGen implements CheckpointInfo {
 
-    /**
-     *
-     */
+    private static final long serialVersionUID = -8349196747369258432L;
 
     /** The index of the linked checkpoint */
     public int checkpointIndex;

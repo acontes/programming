@@ -42,4 +42,6 @@ import org.objectweb.proactive.core.body.ft.protocols.gen.infos.CheckpointInfoGe
  */
 public class CheckpointInfoReplay extends CheckpointInfoGen {
 
+    private static final long serialVersionUID = -5597917401558443353L;
+
 }

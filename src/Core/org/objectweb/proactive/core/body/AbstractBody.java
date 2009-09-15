@@ -55,6 +55,7 @@ import org.objectweb.proactive.core.body.exceptions.BodyTerminatedRequestExcepti
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.ft.internalmsg.Heartbeat;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
+import org.objectweb.proactive.core.body.ft.protocols.gen.managers.FTManagerGen;
 import org.objectweb.proactive.core.body.ft.servers.faultdetection.FaultDetector;
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FuturePool;

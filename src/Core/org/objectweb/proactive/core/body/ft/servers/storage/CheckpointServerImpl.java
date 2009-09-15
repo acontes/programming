@@ -95,6 +95,11 @@ public abstract class CheckpointServerImpl implements CheckpointServer {
         return this.codebase;
     }
 
+    public int getParentIndexOf(int line) {
+        // FIXME evallett
+        throw new UnsupportedOperationException();
+    }
+
     // UTIL METHODS
     protected long getSize(Serializable c) {
         try {

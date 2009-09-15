@@ -31,6 +31,7 @@
  */
 package org.objectweb.proactive.core.body.ft.protocols.replay.managers;
 
+import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Vector;
@@ -39,6 +40,8 @@ import org.objectweb.proactive.api.PAFaultTolerance;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.AbstractBody;
+import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.exceptions.BodyTerminatedException;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
 import org.objectweb.proactive.core.body.ft.checkpointing.CheckpointInfo;
 import org.objectweb.proactive.core.body.ft.message.ReplyLog;
@@ -48,9 +51,12 @@ import org.objectweb.proactive.core.body.ft.protocols.gen.managers.FTManagerGen;
 import org.objectweb.proactive.core.body.ft.protocols.replay.infos.CheckpointInfoReplay;
 import org.objectweb.proactive.core.body.ft.protocols.replay.infos.MessageInfoReplay;
 import org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcess;
+import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.AwaitedRequest;
 import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.security.exceptions.CommunicationForbiddenException;
+import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 
 
 /**
@@ -116,6 +122,10 @@ public class FTManagerReplay extends FTManagerGen {
         } else {
             return false;
         }
+    }
+
+    public int getIncarnation() {
+        return incarnation;
     }
 
     /*

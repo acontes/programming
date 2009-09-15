@@ -42,15 +42,18 @@ import java.util.Map.Entry;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
+import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.ft.internalmsg.GlobalStateCompletion;
 import org.objectweb.proactive.core.body.ft.internalmsg.OutputCommit;
 import org.objectweb.proactive.core.body.ft.message.HistoryUpdater;
 import org.objectweb.proactive.core.body.ft.message.MessageInfo;
 import org.objectweb.proactive.core.body.ft.message.ReceptionHistory;
+import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.ft.protocols.gen.infos.CheckpointInfoGen;
 import org.objectweb.proactive.core.body.ft.protocols.gen.infos.MessageInfoGen;
 import org.objectweb.proactive.core.body.ft.protocols.gen.servers.CheckpointServerGen;
 import org.objectweb.proactive.core.body.ft.protocols.replay.infos.CheckpointInfoReplay;
+import org.objectweb.proactive.core.body.ft.protocols.replay.managers.FTManagerReplay;
 import org.objectweb.proactive.core.body.ft.servers.FTServer;
 import org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryJob;
 import org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcess;
@@ -69,12 +72,54 @@ import org.objectweb.proactive.core.util.MutableLong;
  */
 public class CheckpointServerReplay extends CheckpointServerGen {
 
+    protected List<Integer> parents;
+    protected int parent;
+
     // handling histories
     protected Hashtable<UniqueID, List<ReceptionHistory>> histories;
 
     public CheckpointServerReplay(FTServer server) {
         super(server);
         this.histories = new Hashtable<UniqueID, List<ReceptionHistory>>();
+        this.parents = new ArrayList<Integer>();
+        parents.add(0);
+        parent = 0;
+    }
+
+    public int getParentIndexOf(int line) {
+        if (line > parents.size()) {
+            System.err.println("parents(" + line + "):");
+            for (int i = 0; i < parents.size(); i++) {
+                System.out.println(i + " => " + parents.get(i));
+            }
+            System.err.println("parents done");
+        }
+        return parents.get(line);
+    }
+
+    // return true if the global incarnation must be decreased
+    protected boolean checkGlobalIncarnation() {
+        int global = -1;
+        // looking for the biggest incarnation
+        for (UniversalBody body : server.getLocationServer().getAllLocations()) {
+            try {
+                int local = (Integer) body.receiveFTMessage(new FTMessageGetIncarnation());
+                if (local > global) {
+                    global = local;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        // decrease if all object have an incarnation inferior to the global
+        if (global < this.globalIncarnation) {
+            logger.warn("[Replay] Updated global incarnation (from " + this.globalIncarnation + " to " +
+                global + ")");
+            this.globalIncarnation = global;
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -82,9 +127,12 @@ public class CheckpointServerReplay extends CheckpointServerGen {
      */
     public synchronized int storeCheckpoint(Checkpoint c, int incarnation) {
         if (incarnation < this.globalIncarnation) {
-            logger.warn("** WARNING ** : Object with incarnation " + incarnation +
-                " is trying to store checkpoint");
-            return 0;
+            logger.warn("** WARNING ** : Object " + c.getBodyID() + " with incarnation " + incarnation +
+                " is trying to store checkpoint (global incarnation is " + globalIncarnation + ")");
+            // check if the global incarnation needs to be decreased
+            if (!checkGlobalIncarnation()) {
+                return 0;
+            }
         }
 
         List<Checkpoint> ckptList = checkpointStorage.get(c.getBodyID());
@@ -133,6 +181,8 @@ public class CheckpointServerReplay extends CheckpointServerGen {
 
         // broadcast history closure if a new globalState is built
         if (this.checkLastGlobalState()) {
+            parents.add(this.parent);
+            parent = this.lastGlobalState;
             // send a GSC message to all
             for (UniqueID callee : this.checkpointStorage.keySet()) {
                 this.server.submitJob(new GSCESender(this.server, callee, new GlobalStateCompletion(
@@ -264,6 +314,8 @@ public class CheckpointServerReplay extends CheckpointServerGen {
                 barriers.add(this.server.submitJobWithBarrier(new RecoveryJob(toSend, this.globalIncarnation,
                     node)));
             }
+
+            parent = lineNumber;
 
             // MUST WAIT THE TERMINAISON OF THE RECOVERY !
             // FaultDetection thread wait for the completion of the recovery
