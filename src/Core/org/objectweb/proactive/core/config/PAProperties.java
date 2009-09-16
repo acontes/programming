@@ -393,6 +393,29 @@ public enum PAProperties {
      */
     PA_RMISSH_CONNECT_TIMEOUT("proactive.communication.rmissh.connect_timeout", PAPropertiesType.INTEGER),
 
+    /**
+     * gateway to use on grid access
+     * 
+     * syntax : *.domain:gateway:port;...
+     *   
+     * or     : 192.168.15.0/24  
+     * 
+     * 'none' can be precised for prevent usage of proxy command on gateway/unfirewalled host
+     */
+    PA_RMISSH_PROXY_GATEWAY("proactive.communication.rmissh.proxy.gateway", PAPropertiesType.STRING),
+
+    /**
+     * Specify a gateway to use if outgoing connection are forbid
+     * 
+     */
+    PA_RMISSH_PROXY_OUT_CONN("proactive.communication.rmissh.proxy.outgoing_connection",
+            PAPropertiesType.STRING),
+
+    /**
+     * Try to connect using the proxycommand if normal socket failed 
+     */
+    PA_RMISSH_TRY_PROXY_COMMAND("proactive.communication.rmissh.try.proxycommand", PAPropertiesType.BOOLEAN),
+
     /* ------------------------------------
      *  SECURITY
      */
