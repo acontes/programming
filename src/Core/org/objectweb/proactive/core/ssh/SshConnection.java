@@ -61,7 +61,7 @@ public class SshConnection {
                 // Gracefully handle password protected private key
                 boolean isPasswordProtected = false;
                 Throwable t = e;
-                while (t != null || !isPasswordProtected) {
+                while (t != null && !isPasswordProtected) {
                     if (t.getMessage().contains("PEM is encrypted, but no password was specified") ||
                     // discard RSA-1 key
                         t.getMessage().contains("Invalid PEM structure")) {
