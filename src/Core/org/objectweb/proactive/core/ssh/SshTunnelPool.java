@@ -59,13 +59,19 @@ public class SshTunnelPool {
                     // Try direct connection (never tried or was successful)
                     InetSocketAddress address = new InetSocketAddress(host, port);
                     socket = new Socket();
-                    socket.connect(address, this.config.getConnectTimeout());
+                    socket.connect(address, 1000); // this.config.getConnectTimeout());
                     this.tryCache.recordTrySuccess(host, port);
                 } catch (IOException e) {
                     this.tryCache.recordTryFailure(host, port);
                     socket = null;
                 }
             }
+        }
+
+        if (socket == null) {
+            if (config.tryProxyCommand())
+                if (SshHelper.getInstance().getGatewayName(host) != null)
+                    socket = new SshProxy(host, port);
         }
 
         if (socket == null) {
@@ -115,6 +121,8 @@ public class SshTunnelPool {
         }
 
         private String getKey(String host, int port) {
+            // port changes a lot, if normal socket works 
+            // on one port shouldn't it works on all ?            
             return host + ":" + port;
         }
 
