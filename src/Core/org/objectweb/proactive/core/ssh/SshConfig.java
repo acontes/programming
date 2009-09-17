@@ -2,9 +2,6 @@ package org.objectweb.proactive.core.ssh;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.ssh.SshHelper;
-
 
 public class SshConfig {
     private final AtomicBoolean readOnly = new AtomicBoolean(false);
@@ -17,16 +14,14 @@ public class SshConfig {
     private int port;
     private String knowHostFile;
     private String keyDir;
-    private boolean tryProxyCommand;
 
     public SshConfig() {
         this.username = System.getProperty("user.name");
-        this.tryPlainSocket = true;
+        this.tryPlainSocket = false;
         this.keyDir = System.getProperty("user.home") + "/.ssh";
         this.port = 22;
         this.gcInterval = 5000;
         this.gcIdleTime = 10000;
-        this.tryProxyCommand = PAProperties.PA_RMISSH_TRY_PROXY_COMMAND.isTrue();
     }
 
     /** Seals the configuration */
@@ -42,9 +37,7 @@ public class SshConfig {
 
     /** Returns the user name to be used for this host:port */
     final public String getUsername(String host, int port) {
-        String uname = SshHelper.getInstance().getGatewayUsername(host);
-        if (uname != null)
-            return uname;
+        // FIXME: Parse the configuration file ?
         return username;
     }
 
@@ -85,9 +78,7 @@ public class SshConfig {
 
     /** Returns the port on which the SSH server is listening */
     public int getPort(String host) {
-        String portt = SshHelper.getInstance().getGatewayUsername(host);
-        if (portt != null)
-            return Integer.parseInt(portt);
+        // FIXME: Parse the configuration file ?
         return port;
     }
 
@@ -124,9 +115,5 @@ public class SshConfig {
     public void setGcIdleTime(long gcIdleTime) {
         checkReadOnly();
         this.gcIdleTime = gcIdleTime;
-    }
-
-    public boolean tryProxyCommand() {
-        return this.tryProxyCommand;
     }
 }
