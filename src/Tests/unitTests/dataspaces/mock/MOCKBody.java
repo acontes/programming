@@ -317,4 +317,8 @@ public class MOCKBody implements Body {
 
     }
 
+    public void startBody() {
+
+    }
+
 }
