@@ -33,12 +33,12 @@ package org.objectweb.proactive.core.jmx.mbean;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Map;
 
 import javax.management.ObjectName;
 
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.migration.MigrationException;
-import org.objectweb.proactive.core.debug.debugger.BreakpointType;
 import org.objectweb.proactive.core.debug.debugger.DebugInfo;
 import org.objectweb.proactive.core.debug.debugger.RequestQueueInfo;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
@@ -199,13 +199,7 @@ public interface BodyWrapperMBean extends Serializable {
      * enable some breakpointTypes used by stepByStep
      * @param types, a table of BreakpointType
      */
-    public void enableBreakpointTypes(BreakpointType[] types);
-
-    /**
-     * disable some breakpointTypes used by stepByStep
-     * @param types, a table of BreakpointType
-     */
-    public void disableBreakpointTypes(BreakpointType[] types);
+    public void updateBreakpointTypes(Map<String, Boolean> values);
     
     //
 	// -- EXTENDED DEBUGGER ------------------------------------------------

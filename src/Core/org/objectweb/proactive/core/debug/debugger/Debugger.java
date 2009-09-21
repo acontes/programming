@@ -39,11 +39,7 @@ import java.util.Set;
 
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.body.future.Future;
-import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean;
-import org.objectweb.proactive.core.mop.MethodCall;
 
 
 public interface Debugger extends Serializable {
@@ -57,13 +53,7 @@ public interface Debugger extends Serializable {
      * enable some breakpointTypes used by stepByStep
      * @param types, a table of BreakpointType
      */
-    public void enableBreakpointTypes(BreakpointType[] types);
-
-    /**
-     * disable some breakpointTypes used by stepByStep
-     * @param types, a table of BreakpointType
-     */
-    public void disableBreakpointTypes(BreakpointType[] types);
+    public void updateBreakpointTypes(Map<String, Boolean> types);
 
     public Set<BreakpointType> getBreakpointTypeFilter();
 

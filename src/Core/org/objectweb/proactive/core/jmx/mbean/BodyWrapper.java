@@ -36,6 +36,7 @@ import java.io.Serializable;
 import java.lang.management.ManagementFactory;
 import java.security.AccessControlException;
 import java.util.Collection;
+import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.management.InstanceAlreadyExistsException;
@@ -54,7 +55,6 @@ import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.migration.Migratable;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.core.debug.debugger.BreakpointType;
 import org.objectweb.proactive.core.debug.debugger.DebugInfo;
 import org.objectweb.proactive.core.debug.debugger.RequestQueueInfo;
 import org.objectweb.proactive.core.gc.GarbageCollector;
@@ -460,17 +460,10 @@ public class BodyWrapper extends NotificationBroadcasterSupport implements Seria
     }
 
     /**
-     * @see org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean#enableBreakpointTypes(BreakpointType[])
+     * @see org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean#updateBreakpointTypes(Map<String, Boolean> types)
      */
-    public void enableBreakpointTypes(BreakpointType[] types) {
-        body.getDebugger().enableBreakpointTypes(types);
-    }
-
-    /**
-     * @see org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean#disableBreakpointTypes(BreakpointType[])
-     */
-    public void disableBreakpointTypes(BreakpointType[] types) {
-        body.getDebugger().disableBreakpointTypes(types);
+    public void updateBreakpointTypes(Map<String, Boolean> values){
+        body.getDebugger().updateBreakpointTypes(values);
     }
 
 	//

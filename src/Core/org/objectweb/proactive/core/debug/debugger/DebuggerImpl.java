@@ -52,7 +52,6 @@ import org.objectweb.proactive.core.body.request.RequestImpl;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.debug.tools.ArrayListSynchronized;
 import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
-import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -103,7 +102,6 @@ public class DebuggerImpl implements Debugger {
 	//
 	public DebuggerImpl() {
 		initBreakpointTypes();
-		disableBreakpointTypes(new BreakpointType[] { BreakpointType.SendRequest });
 		setStepByStep(PAProperties.PA_DEBUG.isTrue());
 	}
 
@@ -161,26 +159,24 @@ public class DebuggerImpl implements Debugger {
 	 */
 	public void initBreakpointTypes() {
 		disableAllBreakpointTypes();
-		enableBreakpointTypes(BreakpointType.values());
+		for (BreakpointType type : BreakpointType.values()) {
+			if(!type.equals(BreakpointType.SendRequest))
+				breakpointTypeFilter.add(type);
+		}
 	}
 
 	/**
-	 * @see org.objectweb.proactive.core.debug.debugger.Debugger#addBreakpointTypes(BreakpointType[])
+	 * @see org.objectweb.proactive.core.debug.debugger.Debugger#updateBreakpointTypes(Map<String, Boolean> types)
 	 */
-	public void enableBreakpointTypes(BreakpointType[] types) {
-		for (BreakpointType type : types) {
-			breakpointTypeFilter.add(type);
+	public void updateBreakpointTypes(Map<String, Boolean> values){
+		for (BreakpointType type : BreakpointType.values()) {
+			if(values.get(type.name())){
+				breakpointTypeFilter.add(type);
+			} else {
+				breakpointTypeFilter.remove(type);
+			}
 		}
 		updateInfo();
-	}
-
-	/**
-	 * @see org.objectweb.proactive.core.debug.debugger.Debugger#removeBreakpointTypes(BreakpointType[])
-	 */
-	public void disableBreakpointTypes(BreakpointType[] types) {
-		for (BreakpointType type : types) {
-			breakpointTypeFilter.remove(type);
-		}
 	}
 
 	/**
@@ -200,7 +196,14 @@ public class DebuggerImpl implements Debugger {
 			this.destinationBody = destinationBody;
 			new Thread(new Runnable() {
 				public void run() {
-					sendNotification(NotificationType.connectDebugger);
+					while(!notificationReceived){ // if the notification is lost
+						sendNotification(NotificationType.connectDebugger);
+						try {
+							Thread.sleep(5000);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					}
 				}
 			}).start();
 			try {
@@ -375,7 +378,7 @@ public class DebuggerImpl implements Debugger {
 	 *
 	 * @param sequenceNumber
 	 */
-	private void moveRequest(final long sequenceNumber, int way){
+	private synchronized void moveRequest(final long sequenceNumber, int way){
 		BlockingRequestQueue brq = body.getRequestQueue();
 		Iterator<Request> i = brq.iterator();
 
