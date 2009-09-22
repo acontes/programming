@@ -1,4 +1,4 @@
-package org.objectweb.proactive.core.ssl.rmissl;
+package org.objectweb.proactive.extra.rmissl;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -13,6 +13,9 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
+/** 
+ * @since ProActive 4.2.0
+ */
 public class SslRmiClientSocketFactory implements RMIClientSocketFactory, java.io.Serializable {
 
     static final public Logger logger = ProActiveLogger.getLogger(Loggers.SSH);

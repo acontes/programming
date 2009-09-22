@@ -1,4 +1,4 @@
-package org.objectweb.proactive.core.remoteobject.rmissl;
+package org.objectweb.proactive.extra.rmissl;
 
 import java.net.URI;
 import java.rmi.RemoteException;
@@ -9,6 +9,10 @@ import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.remoteobject.rmi.AbstractRmiRemoteObjectFactory;
 
 
+/**
+ * 
+ * @since ProActive 4.2.0
+ */
 public class RmiSslRemoteObjectFactory extends AbstractRmiRemoteObjectFactory {
 
     public RmiSslRemoteObjectFactory() {

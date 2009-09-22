@@ -1,4 +1,4 @@
-package org.objectweb.proactive.core.ssl.rmissl;
+package org.objectweb.proactive.extra.rmissl;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -10,9 +10,10 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 
-import org.objectweb.proactive.core.config.PAProperties;
 
-
+/** 
+ * @since ProActive 4.2.0
+ */
 public class SslRmiServerSocketFactory implements RMIServerSocketFactory, java.io.Serializable {
 
     private static SSLServerSocketFactory sslServerSocketFactory = null;
