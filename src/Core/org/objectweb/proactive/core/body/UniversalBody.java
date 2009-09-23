@@ -178,7 +178,6 @@ public interface UniversalBody extends Job, Serializable, SecurityEntity {
     @Deprecated
     public void register(String url) throws ProActiveException;
 
-
     public String registerByName(String name) throws IOException, ProActiveException;
 
     /**
