@@ -106,10 +106,10 @@ public class GCMVirtualMachineManager implements Serializable {
 				}
 				if(temp instanceof VirtualMachine2){
 					if (vm.isClone()) {
-						VirtualMachine2 temp2 = (VirtualMachine2) temp;
 						try {
-							temp = temp2.clone(vm.getName());
-							toDestroy.add(temp2);
+							VirtualMachine2 clone = ((VirtualMachine2)temp).clone(vm.getName());
+							toDestroy.add(clone);
+							temp = clone;
 						} catch (Throwable e) {
 							GCMDeploymentLoggers.GCMD_LOGGER.error("Unable to clone " + vm.getId(), e);
 							continue;
