@@ -177,6 +177,17 @@
 						</xsd:unique>
 					</xsd:element>
 
+					<xsd:element name="data" type="dataType" minOccurs="0" maxOccurs="1">
+						<xsd:unique name="inputConstraint">
+							<xsd:selector xpath="input"></xsd:selector>
+							<xsd:field xpath="@id"></xsd:field>
+						</xsd:unique>
+						<xsd:unique name="outputConstraint">
+							<xsd:selector xpath="output"></xsd:selector>
+							<xsd:field xpath="@id"></xsd:field>
+						</xsd:unique>
+					</xsd:element>
+
 				</xsd:sequence>
 
 				<xsd:attribute name="relpath" type="pathElementGeneralType" use="required">
