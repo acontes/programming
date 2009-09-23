@@ -177,7 +177,18 @@ public interface UniversalBody extends Job, Serializable, SecurityEntity {
      */
     @Deprecated
     public void register(String url) throws ProActiveException;
+<<<<<<< HEAD:src/Core/org/objectweb/proactive/core/body/UniversalBody.java
 
     public String registerByName(String name) throws IOException, ProActiveException;
+=======
+
+    public String registerByName(String name) throws IOException, ProActiveException;
+
+    /**
+     * @return The URL of this body (using the default remote object factory)
+     */
+    public String getUrl();
+
+>>>>>>> trunk-svn:src/Core/org/objectweb/proactive/core/body/UniversalBody.java
 }
 //@snippet-end universalbody

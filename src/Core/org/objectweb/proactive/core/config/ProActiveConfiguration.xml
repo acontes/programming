@@ -27,14 +27,33 @@
         <prop key="proactive.tunneling.try_normal_first" value="true" />
         <prop key="proactive.tunneling.use_gc" value="true" />
         <prop key="proactive.tunneling.gc_period" value="10000" />
+<<<<<<< HEAD:src/Core/org/objectweb/proactive/core/config/ProActiveConfiguration.xml
 		<prop key="proactive.classloading.useHTTP" value="true"/>            
+=======
+		<prop key="proactive.classloading.useHTTP" value="true"/>
+
+		<!-- SSL cipher suites used for RMISSL communications.
+	List of cipher suites used for RMISSL, separated by commas.
+	default is SSL_DH_anon_WITH_RC4_128_MD5. This cipher suite is used only
+	to have encrypted communications, without authentication, and works with default
+	JVM's keyStore/TrustStore
+
+	Many others cipher suites can be used. for implementing a certificate authentication...
+	see http://java.sun.com/javase/6/docs/technotes/guides/security/jsse/JSSERefGuide.html -->
+		<prop key="proactive.ssl.cipher.suites" value="SSL_DH_anon_WITH_RC4_128_MD5"/>
+
+
+>>>>>>> trunk-svn:src/Core/org/objectweb/proactive/core/config/ProActiveConfiguration.xml
 		<!-- <prop key="proactive.ssh.known_hosts" value="/user/mlacage/home/.ssh/known_hosts"/> -->
 		<!-- <prop key="proactive.ssh.key_directory" value="/user/mlacage/home/.ssh/"/> -->
 		<!-- <prop key="proactive.ssh.port" value="22"/> -->
 		<!-- <prop key="proactive.ssh.username" value="mlacage"/> -->
+<<<<<<< HEAD:src/Core/org/objectweb/proactive/core/config/ProActiveConfiguration.xml
 		<prop key="proactive.tagmemory.lease.max" value="60" />
 		<prop key="proactive.tagmemory.lease.period" value="21" />
 		<prop key="proactive.tag.dsf" value="false" />
+=======
+>>>>>>> trunk-svn:src/Core/org/objectweb/proactive/core/config/ProActiveConfiguration.xml
         <prop key="components.creation.timeout" value="10000" /> <!-- timeout in seconds for parallel creation of components -->		
 		<!-- ***************************************************** -->
 		<!-- MASTER/WORKER PROPERTIES VALUE -->

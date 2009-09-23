@@ -244,4 +244,8 @@ public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody> imp
         this.target.setProActiveSecurityManager(user, policyServer);
     }
 
+    public String getUrl() {
+        return this.target.getUrl();
+    }
+
 }

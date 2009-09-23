@@ -22,40 +22,31 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
+ *  Initial developer(s):               The ActiveEon Team
+ *                        http://www.activeeon.com/
  *  Contributor(s):
  *
+ *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.objectweb.proactive.extensions.security.loginmodule;
+package org.objectweb.proactive.extra.rmissl;
 
-import java.io.Serializable;
-import java.util.Map;
-
-import javax.security.auth.callback.Callback;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectFactorySPI;
 
 
 /**
- * Actually does no callback. It is given its information by a
- * <code>NoCallbackHandler</code>.
- *
- * @author The ProActive Team
- *
+ * @since ProActive 4.2.0
  */
-public class NoCallback implements Callback, Serializable {
-    private Map<String, Object> values;
+public class RmiSslRemoteObjectFactorySPI implements RemoteObjectFactorySPI {
 
-    protected void set(Map<String, Object> values) {
-        this.values = values;
+    public Class<? extends RemoteObjectFactory> getFactoryClass() {
+        return RmiSslRemoteObjectFactory.class;
     }
 
-    protected Map<String, Object> get() {
-        return values;
+    public String getProtocolId() {
+        return "rmissl";
     }
 
-    protected void clear() {
-        values = null;
-    }
 }
