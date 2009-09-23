@@ -21,7 +21,7 @@ else :
 
 PA_RT_COMMAND = "runtimeCommand"
 
-class Abstract_Runtime () :
+class Abstract_Runtime :
     
     __providers = [] #to keep known implementations
     __runtimes = [] #to keep known runtimes
@@ -44,7 +44,7 @@ class Abstract_Runtime () :
                 time.sleep(10)
         for ligne in lignes:
             ligne = ligne.decode("utf-8").strip()
-            key, sep, val = ligne.partition("=")
+            key, val = ligne.split("=",1)
             res[key.strip()] = val.strip()
         return res
 
@@ -61,9 +61,6 @@ class Abstract_Runtime () :
             tmp = cmdList[i]
             tmp = tmp.strip()
             tmp = tmp.replace("\"","")
-            #if tmp.endswith("\"") and tmp.find("\"") == 0 :
-            #    tmp = tmp.lstrip("\" \t\r\n")
-            #    tmp = tmp.rstrip("\" \t\r\n")
             cmdList[i] = tmp
         print ("Matching: ",command)
         print ("Submitting: ",cmdList)

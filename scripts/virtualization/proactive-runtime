@@ -35,7 +35,7 @@ ARGS=
 
 case "$1" in
   start)
-  	rsync -avz -e ssh jmguilla@excalibur.activeeon.com:workspace-git/ProActive/dist /usr/bin/ProActive
+  	rsync -avz -e ssh jmguilla@excalibur.activeeon.com:workspace-git/ProActive/dist /usr/local/share/ProActive
   	sync
 	[ -e ${LOGFILE} ] || touch ${LOGFILE} 	
     	log_begin_msg "Starting ProActive-Runtime..."

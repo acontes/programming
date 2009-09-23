@@ -28,7 +28,7 @@
 
 	<resources>
 		<nodeProvider id="local">
-				<file path="gcmd.xml" />
+				<file path="hypervisorGCMD.xml" />
 		</nodeProvider>
 	</resources>
 </GCMApplication>
