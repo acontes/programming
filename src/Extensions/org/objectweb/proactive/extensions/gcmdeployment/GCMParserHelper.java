@@ -53,7 +53,6 @@ import org.objectweb.proactive.extensions.dataspaces.exceptions.ConfigurationExc
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.w3c.dom.Element;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
