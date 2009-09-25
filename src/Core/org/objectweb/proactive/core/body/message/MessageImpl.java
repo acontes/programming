@@ -91,6 +91,7 @@ public class MessageImpl implements Message, java.io.Serializable {
      * @param sequenceNumber the unique sequence number of this message
      * @param isOneWay <code>true</code> if oneWay
      * @param methodName the method name of the method call
+     * @param tags container of all tags for this message
      */
     public MessageImpl(UniqueID sourceID, long sequenceNumber, boolean isOneWay, String methodName,
             MessageTags tags) {
@@ -168,6 +169,12 @@ public class MessageImpl implements Message, java.io.Serializable {
     }
 
     public MessageTags getTags() {
+        if (this.tags == null) {
+            // Check if there is already a tag container attached on this message
+            // otherwise, create it.
+            // TODO : use the Metaobject Factory to create it instead of a direct creation
+            this.tags = new MessageTags();
+        }
         return tags;
     }
 }
