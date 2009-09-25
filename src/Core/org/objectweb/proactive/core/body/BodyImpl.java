@@ -303,7 +303,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
     @Override
     protected int internalReceiveReply(Reply reply) throws java.io.IOException {
         // JMX Notification
-        if (!isProActiveInternalObject && (this.mbean != null) && reply.getResult().getResultObjet() != null &&  reply.getResult().getException() == null) {
+        if (!isProActiveInternalObject && (this.mbean != null) && reply.getResult().getException() == null) {
             String tagNotification = createTagNotification(reply.getTags());
             RequestNotificationData requestNotificationData = new RequestNotificationData(
                 BodyImpl.this.bodyID, BodyImpl.this.getNodeURL(), reply.getSourceBodyID(), this.nodeURL,
@@ -610,7 +610,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             }
 
             // JMX Notification
-            if (!isProActiveInternalObject && (mbean != null) && reply.getResult().getResultObjet() != null &&  reply.getResult().getException() == null) {
+            if (!isProActiveInternalObject && (mbean != null) && reply.getResult().getException() == null) {
                 String tagNotification = createTagNotification(request.getTags());
                 RequestNotificationData data = new RequestNotificationData(request.getSourceBodyID(), request
                         .getSenderNodeURL(), BodyImpl.this.bodyID, BodyImpl.this.nodeURL, request
