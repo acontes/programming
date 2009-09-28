@@ -86,7 +86,9 @@ public class SshConfigFileParser {
     public SshConfigFileParser(SshConfigStorer storer, String path) {
         this();
         parse(path, storer);
-        parseProperties(PAProperties.PA_SSH_PROXY_GATEWAY.getValue(), storer);
+        String properties = PAProperties.PA_SSH_PROXY_GATEWAY.getValue();
+        if (properties != null)
+        parseProperties(properties, storer);
     }
 
     /**
