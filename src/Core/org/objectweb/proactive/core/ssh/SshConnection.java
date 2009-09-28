@@ -112,7 +112,7 @@ public class SshConnection {
      */
     public void close() {
         if (logger.isDebugEnabled()) {
-            logger.debug("Closing SSH Connection" + toString());
+            logger.debug("Closing SSH Connection " + toString());
         }
         this.connection.close();
     }

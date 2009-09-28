@@ -8,6 +8,7 @@ public class SshConfig {
 
     private String username;
     private boolean tryPlainSocket;
+    private boolean tryProxyCommand;
     private long gcInterval;
     private long gcIdleTime;
     private int connectTimeout;
@@ -115,5 +116,14 @@ public class SshConfig {
     public void setGcIdleTime(long gcIdleTime) {
         checkReadOnly();
         this.gcIdleTime = gcIdleTime;
+    }
+
+    public boolean tryProxyCommand() {
+        return tryProxyCommand;
+    }
+
+    public void setTryProxyCommand(boolean b) {
+        checkReadOnly();
+        this.tryProxyCommand = b;
     }
 }

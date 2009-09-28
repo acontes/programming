@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.Sleeper;
 
 
@@ -59,11 +60,48 @@ public class SshTunnelPool {
                     // Try direct connection (never tried or was successful)
                     InetSocketAddress address = new InetSocketAddress(host, port);
                     socket = new Socket();
-                    socket.connect(address, this.config.getConnectTimeout());
+                    socket.connect(address, 1000); // this.config.getConnectTimeout());
                     this.tryCache.recordTrySuccess(host, port);
                 } catch (IOException e) {
                     this.tryCache.recordTryFailure(host, port);
                     socket = null;
+                }
+            }
+        }
+
+        // Try proxy command 
+        if (socket == null && config.tryProxyCommand()) {
+            String localhost = ProActiveInet.getInstance().getHostname();
+            // localhost can't open outgoing connection
+            String localhostGW = ((SshConfigStorer) config).getGateway(localhost);
+            // 
+            String hostGW = ((SshConfigStorer) config).getGateway(host);
+            // if proxyCommand command mechanism is needed
+            if ((localhostGW != null) || (hostGW != null)) {
+                String gw = localhostGW != null ? localhostGW : hostGW;
+                synchronized (this.cache) {
+                    SshConnection cnx = null;
+                    Pair pair = this.cache.get(gw);
+                    String[] keys = new SSHKeys(this.config.getKeyDir()).getKeys();
+                    if (pair == null) {
+                        try {
+                            cnx = SshProxyConnection.getInstance(hostGW, localhostGW,
+                                    (SshConfigStorer) config, keys);
+                        } catch (IOException e) {
+                            // Ssh Connection has failed 
+                            e.printStackTrace();
+                        }
+                        pair = new Pair(cnx);
+                        this.cache.put(gw, pair);
+                    }
+                    cnx = pair.cnx;
+                    SshTunnelStateFullInterface tunnel = pair.getTunnel(host, port);
+                    if (tunnel == null) {
+                        tunnel = ((SshProxyConnection) cnx).getSession(host, port);
+                        pair.registerTunnel(tunnel);
+                    }
+                    // Grab a socket 
+                    socket = tunnel.getSocket();
                 }
             }
         }
@@ -82,7 +120,7 @@ public class SshTunnelPool {
                     this.cache.put(host, pair);
                 }
 
-                SshTunnelStatefull tunnel = pair.getTunnel(host, port);
+                SshTunnelStateFullInterface tunnel = pair.getTunnel(host, port);
                 if (tunnel == null) {
                     // Open a tunnel
                     tunnel = new SshTunnelStatefull(pair.cnx, host, port);
@@ -115,6 +153,8 @@ public class SshTunnelPool {
         }
 
         private String getKey(String host, int port) {
+            // port changes a lot, if normal socket works 
+            // on one port shouldn't it works on all ?            
             return host + ":" + port;
         }
 
@@ -150,7 +190,7 @@ public class SshTunnelPool {
     /**
      * A SshTunnel which manage statistics about the number of opened sockets
      */
-    private class SshTunnelStatefull extends SshTunnel {
+    private class SshTunnelStatefull extends SshTunnel implements SshTunnelStateFullInterface {
         /** number of currently open sockets */
         final private AtomicInteger users = new AtomicInteger();
         /** If users == 0, the timestamp of the last call to close() */
@@ -189,18 +229,18 @@ public class SshTunnelPool {
 
     private static class Pair {
         final private SshConnection cnx;
-        final private Map<String, SshTunnelStatefull> tunnels;
+        final private Map<String, SshTunnelStateFullInterface> tunnels;
 
         private Pair(SshConnection cnx) {
             this.cnx = cnx;
-            this.tunnels = new HashMap<String, SshTunnelStatefull>();
+            this.tunnels = new HashMap<String, SshTunnelStateFullInterface>();
         }
 
-        public SshTunnelStatefull getTunnel(String host, int port) {
+        public SshTunnelStateFullInterface getTunnel(String host, int port) {
             return this.tunnels.get(buildKey(host, port));
         }
 
-        public void registerTunnel(SshTunnelStatefull tunnel) {
+        public void registerTunnel(SshTunnelStateFullInterface tunnel) {
             String host = tunnel.getDistantHost();
             int port = tunnel.getDistantPort();
 
@@ -232,8 +272,9 @@ public class SshTunnelPool {
 
                     // Purge unused tunnels
                     for (Pair p : cache.values()) {
-                        for (Iterator<SshTunnelStatefull> iT = p.tunnels.values().iterator(); iT.hasNext();) {
-                            SshTunnelStatefull t = iT.next();
+                        for (Iterator<SshTunnelStateFullInterface> iT = p.tunnels.values().iterator(); iT
+                                .hasNext();) {
+                            SshTunnelStateFullInterface t = iT.next();
                             if (ctime - t.unusedSince() > config.getGcInterval()) {
                                 try {
                                     t.close();

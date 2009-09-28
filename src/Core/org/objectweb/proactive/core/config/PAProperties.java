@@ -358,6 +358,22 @@ public enum PAProperties {
     PA_MIXEDLOCATION_MAXTIMEONSITE("proactive.mixedlocation.maxTimeOnSite", PAPropertiesType.INTEGER),
 
     /* ------------------------------------
+     *  SSH
+     */
+
+    /**
+     * gateway to use on grid access
+     * 
+     * syntax : *.domain:gateway:port;...
+     *   
+     * or     : 192.168.15.0/24  
+     * 
+     * 'none' can be precised for prevent usage of proxy command, 
+     *  on gateway for example
+     */
+    PA_SSH_PROXY_GATEWAY("proactive.communication.ssh.proxy.gateway", PAPropertiesType.STRING),
+
+    /* ------------------------------------
      *  RMISSH
      */
 

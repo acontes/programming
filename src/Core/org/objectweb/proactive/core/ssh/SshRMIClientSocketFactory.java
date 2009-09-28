@@ -8,7 +8,10 @@ import java.rmi.server.RMIClientSocketFactory;
 
 public class SshRMIClientSocketFactory implements RMIClientSocketFactory, Serializable {
 
-    static final private SshTunnelPool tunnelPool = new SshTunnelPool(new SshConfig());
+    static SshConfigStorer storer = new SshConfigStorer();
+    static SshConfigFileParser parser = new SshConfigFileParser(storer);
+
+    static final private SshTunnelPool tunnelPool = new SshTunnelPool(storer);
 
     public SshRMIClientSocketFactory(SshConfig config) {
 

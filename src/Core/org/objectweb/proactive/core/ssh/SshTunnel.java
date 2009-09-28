@@ -82,7 +82,7 @@ public class SshTunnel {
         return "localport=" + localPort + " distanthost=" + distantHost + " distantport=" + distantPort;
     }
 
-    public void close() throws Exception {
+    public void close() throws IOException {
         if (logger.isDebugEnabled()) {
             logger.debug("Closing tunnel from " +
                 ProActiveInet.getInstance().getInetAddress().getHostAddress() + ":" + localPort + " to " +
