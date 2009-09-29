@@ -22,10 +22,10 @@ import org.apache.log4j.Logger;
 
 
 /**
- * @author The ProActive Team
- *
  * This class is in charge of calling the ServiceDeployer service on hosts specified
  * by urls and invokes its deploy and unDeploy methods with the needed arguments.
+ *
+ * @author The ProActive Team
  */
 public class PADeployer {
 
@@ -43,8 +43,20 @@ public class PADeployer {
      */
     static public void deploy(Object o, String url, String urn, String[] methods, boolean isComponent) {
         try {
+            String correctUrl = "";
+
+            if (!url.endsWith("/")) {
+                correctUrl = url + "/";
+            } else {
+                correctUrl = url;
+            }
+
+            if (!correctUrl.startsWith("http://")) {
+                correctUrl = "http://" + correctUrl;
+            }
+
             RPCServiceClient serviceClient = new RPCServiceClient();
-            EndpointReference targetEPR = new EndpointReference(url + WSConstants.AXIS_SERVICES_PATH +
+            EndpointReference targetEPR = new EndpointReference(correctUrl + WSConstants.AXIS_SERVICES_PATH +
                 "ServiceDeployer");
 
             Options options = serviceClient.getOptions();
@@ -58,7 +70,7 @@ public class PADeployer {
 
             serviceClient.invokeRobust(op, opArgs);
 
-            logger.info("Called the deployer service to deploy " + urn + " to " + url);
+            logger.info("Called the deployer service to deploy " + urn + " to " + correctUrl);
 
         } catch (AxisFault axisFault) {
             axisFault.printStackTrace();
@@ -82,7 +94,7 @@ public class PADeployer {
      * @param component Component to be deployed
      * @param url Url of the host
      * @param componentName Name of the component
-     * @param interfacesName Names of the interfaces we want to deploy.
+     * @param interfaceNames Names of the interfaces we want to deploy.
      * 						 	 If null, then all the interfaces will be deployed
      */
     static public void deployComponent(Component component, String url, String componentName,
@@ -149,8 +161,20 @@ public class PADeployer {
      */
     static public void unDeploy(String url, String serviceName) {
         try {
+            String correctUrl = "";
+
+            if (!url.endsWith("/")) {
+                correctUrl = url + "/";
+            } else {
+                correctUrl = url;
+            }
+
+            if (!correctUrl.startsWith("http://")) {
+                correctUrl = "http://" + correctUrl;
+            }
+
             RPCServiceClient serviceClient = new RPCServiceClient();
-            EndpointReference targetEPR = new EndpointReference(url + WSConstants.AXIS_SERVICES_PATH +
+            EndpointReference targetEPR = new EndpointReference(correctUrl + WSConstants.AXIS_SERVICES_PATH +
                 "ServiceDeployer");
 
             Options options = serviceClient.getOptions();
@@ -164,7 +188,8 @@ public class PADeployer {
 
             serviceClient.invokeRobust(op, opArgs);
 
-            logger.info("Called the deployer to " + url + " to undeploy the " + serviceName + " service");
+            logger.info("Called the deployer to " + correctUrl + " to undeploy the " + serviceName +
+                " service");
         } catch (AxisFault axisFault) {
             axisFault.printStackTrace();
         }

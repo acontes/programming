@@ -66,8 +66,7 @@ public class TestHelloWorld {
 
         HelloWorld hw = (HelloWorld) PAActiveObject.newActive(
                 "functionalTests.activeobject.webservices.HelloWorld", new Object[] {});
-        WebServices.exposeAsWebService(hw, this.url, "HelloWorld", new String[] { "putHelloWorld",
-                "putTextToSay", "sayText", "contains" });
+        WebServices.exposeAsWebService(hw, this.url, "HelloWorld");
     }
 
     @org.junit.Test
@@ -140,6 +139,18 @@ public class TestHelloWorld {
         text = (String) response[0];
         logger.info("Called the method 'sayText': one return is expected but not argument");
         logger.info("'sayText' returned " + text);
+
+        // Call sayHello
+        options.setAction("sayHello");
+        op = new QName("sayHello");
+        opArgs = new Object[] {};
+        returnTypes = new Class[] { String.class };
+
+        response = serviceClient.invokeBlocking(op, opArgs, returnTypes);
+
+        text = (String) response[0];
+        logger.info("Called the method 'sayHello': inherited method");
+        logger.info("'sayHello' returned " + text);
     }
 
     @After

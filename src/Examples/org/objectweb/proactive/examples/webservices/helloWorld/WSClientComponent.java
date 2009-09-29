@@ -64,6 +64,10 @@ public class WSClientComponent {
                 url = "http://" + url;
             }
 
+            if (!url.endsWith("/")) {
+                url = url + "/";
+            }
+
             RPCServiceClient serviceClient = new RPCServiceClient();
 
             Options options = serviceClient.getOptions();

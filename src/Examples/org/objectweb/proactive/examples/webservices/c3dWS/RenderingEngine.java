@@ -31,44 +31,19 @@
  */
 package org.objectweb.proactive.examples.webservices.c3dWS;
 
-public class PAUser implements User {
-    private String name;
-    private C3DUser c3duser;
+import org.objectweb.proactive.examples.c3d.geom.Scene;
 
-    public PAUser(String name, C3DUser c3duser) {
-        this.name = name;
-        this.c3duser = c3duser;
-    }
 
-    public String getName() {
-        return name;
-    }
+/** Methods proposed by Objects which can render scenes */
+public interface RenderingEngine {
 
-    public Object getObject() {
-        return c3duser;
-    }
+    /** Creates the local objects used in the rendering */
+    public abstract void setScene(Scene scene);
 
-    public void setPixels(int[] newPix, Interval inter) {
-        this.c3duser.setPixels(newPix, inter);
-    }
+    /** Draw the scene and send back the result to the dispatcher. <i>Heavily optimized!!!</i>
+     * @return the partial Image that was asked for */
+    public abstract Image2D render(int engineNb, Interval interval);
 
-    public void showMessage(String s) {
-        this.c3duser.showMessage(s);
-    }
-
-    public void showUserMessage(String s) {
-        this.c3duser.showUserMessage(s);
-    }
-
-    public void dialogMessage(String subject, String msg) {
-        this.c3duser.dialogMessage(subject, msg);
-    }
-
-    public void informNewUser(int i, String name) {
-        this.c3duser.informNewUser(i, name);
-    }
-
-    public void informUserLeft(String name) {
-        this.c3duser.informUserLeft(name);
-    }
+    /** A textual representation of the renderer */
+    public abstract String toString();
 }

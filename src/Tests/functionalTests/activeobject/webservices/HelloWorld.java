@@ -33,10 +33,6 @@ package functionalTests.activeobject.webservices;
 
 import java.util.LinkedList;
 
-import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.extensions.webservices.WebServices;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 
 
@@ -46,7 +42,7 @@ import org.objectweb.proactive.extensions.annotation.ActiveObject;
  * @author The ProActive Team
  */
 @ActiveObject
-public class HelloWorld {
+public class HelloWorld extends HelloWorldSuperClass {
 
     LinkedList<String> textsToSay = new LinkedList<String>();
 
@@ -71,33 +67,5 @@ public class HelloWorld {
 
     public Boolean contains(String textToCheck) {
         return new Boolean(textsToSay.contains(textToCheck));
-    }
-
-    public static void main(String[] args) {
-        try {
-            String url = "";
-            if (args.length == 0) {
-                url = "http://localhost:8080/";
-            } else if (args.length == 1) {
-                url = args[0];
-            } else {
-                System.out.println("Wrong number of arguments:");
-                System.out.println("Usage: java HelloWorld [url]");
-                return;
-            }
-
-            if (!url.startsWith("http://")) {
-                url = "http://" + url;
-            }
-
-            HelloWorld hw = (HelloWorld) PAActiveObject.newActive(
-                    "org.objectweb.proactive.examples.webservices.helloWorld.HelloWorld", new Object[] {});
-            WebServices.exposeAsWebService(hw, url, "HelloWorld", new String[] { "putTextToSay", "sayText",
-                    "helloWorld" });
-        } catch (ActiveObjectCreationException e) {
-            e.printStackTrace();
-        } catch (NodeException e) {
-            e.printStackTrace();
-        }
     }
 }

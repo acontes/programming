@@ -164,6 +164,18 @@ public class TestHelloWorldComponent {
         text = (String) response[0];
         logger.info("Called the method 'sayText': one return is expected but not argument");
         logger.info("'sayText' returned " + text);
+
+        // Call sayText
+        options.setAction("sayHello");
+        op = new QName("sayHello");
+        opArgs = new Object[] {};
+        returnTypes = new Class[] { String.class };
+
+        response = serviceClient.invokeBlocking(op, opArgs, returnTypes);
+
+        text = (String) response[0];
+        logger.info("Called the method 'sayHello': inherited method");
+        logger.info("'sayHello' returned " + text);
     }
 
     @After

@@ -9,9 +9,6 @@ public class Weather implements Serializable {
     private boolean rain;
     private float howMuchRain;
 
-    public Weather() {
-    }
-
     public void setTemperature(float temp) {
         temperature = temp;
     }

@@ -56,10 +56,6 @@ public class Undeploy {
             return;
         }
 
-        if (!url.startsWith("http://")) {
-            url = "http://" + url;
-        }
-
         PADeployer.unDeploy(url, serviceName);
     }
 }

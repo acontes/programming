@@ -59,10 +59,6 @@ public class UndeployComponent {
             return;
         }
 
-        if (!url.startsWith("http://")) {
-            url = "http://" + url;
-        }
-
         PADeployer.unDeployComponent(url, componentName, new String[] { interfaceName });
     }
 }

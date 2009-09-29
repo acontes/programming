@@ -8,12 +8,9 @@ import java.util.Iterator;
 import org.apache.axis2.engine.MessageReceiver;
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.deployment.util.Utils;
-import org.apache.axis2.description.Parameter;
 import org.apache.axis2.description.WSDL2Constants;
 import org.apache.axis2.util.Loader;
 import org.apache.axis2.description.AxisService;
-import org.apache.axis2.description.java2wsdl.DefaultSchemaGenerator;
-import org.apache.axis2.description.java2wsdl.DocLitBareSchemaGenerator;
 import org.apache.axis2.description.java2wsdl.Java2WSDLConstants;
 import org.apache.axis2.description.java2wsdl.SchemaGenerator;
 import org.apache.axis2.context.MessageContext;
@@ -32,11 +29,11 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
- * @author The ProActive Team
- *
  * This class implements the service which will be deployed on the server at the
  * same time that the proactive web application. This service is used to deploy and undeploy
  * Active Object and components on the server side.
+ *
+ * @author The ProActive Team
  */
 public class ServiceDeployer {
 
@@ -73,7 +70,7 @@ public class ServiceDeployer {
         if (methodsName.length == 0)
             return excludedOperations;
 
-        Method[] methodsTable = objectClass.getDeclaredMethods();
+        Method[] methodsTable = objectClass.getMethods();
 
         ArrayList<String> methodsNameArray = new ArrayList<String>();
         for (String name : methodsName) {
@@ -102,8 +99,7 @@ public class ServiceDeployer {
      * @return
      */
     private AxisService customCreateService(String implClass, String serviceName,
-            AxisConfiguration axisConfiguration, ClassLoader loader, ArrayList<String> excludedOperations,
-            String[] methods) {
+            AxisConfiguration axisConfiguration, ClassLoader loader, ArrayList<String> excludedOperations) {
 
         try {
             // Create the message receivers map to be passed in the service creation
@@ -124,14 +120,22 @@ public class ServiceDeployer {
             service.setParent(axisConfiguration);
             service.setName(serviceName);
 
-            Parameter generateBare = service.getParameter(Java2WSDLConstants.DOC_LIT_BARE_PARAMETER);
-            if (generateBare != null && "true".equals(generateBare.getValue())) {
-                schemaGenerator = new DocLitBareSchemaGenerator(loader, implClass, null,
-                    Java2WSDLConstants.SCHEMA_NAMESPACE_PRFIX, service);
-            } else {
-                schemaGenerator = new DefaultSchemaGenerator(loader, implClass, null,
-                    Java2WSDLConstants.SCHEMA_NAMESPACE_PRFIX, service);
-            }
+            /**
+             * Uncomment the following lines if you want the deployer to be able to handle document/literal
+             * format.
+             * In this case, the default DocLitBareSchemaGenerator class does not handle inherited methods as
+             * it extends the DefaultSchemaGenerator class and not the CustomDefaultSchemaGenerator one.
+             * N.B.: document/literal format is more restrictive. for instance, using this format, you
+             * 		 cannot generate the wsdl of a class having two methods with a same argument's name.
+             */
+            //            Parameter generateBare = service.getParameter(Java2WSDLConstants.DOC_LIT_BARE_PARAMETER);
+            //            if (generateBare != null && "true".equals(generateBare.getValue())) {
+            //                schemaGenerator = new DocLitBareSchemaGenerator(loader, implClass, null,
+            //                    Java2WSDLConstants.SCHEMA_NAMESPACE_PRFIX, service);
+            //            } else {
+            schemaGenerator = new CustomDefaultSchemaGenerator(loader, implClass, null,
+                Java2WSDLConstants.SCHEMA_NAMESPACE_PRFIX, service);
+            //            }
             schemaGenerator.setElementFormDefault(Java2WSDLConstants.FORM_DEFAULT_UNQUALIFIED);
             Utils.addExcludeMethods(excludedOperations);
             schemaGenerator.setExcludeMethods(excludedOperations);
@@ -146,12 +150,12 @@ public class ServiceDeployer {
     }
 
     /**
-      * Expose the marshalled active object as a web service
+     * Expose the marshalled active object as a web service
      *
      * @param marshalledObject marshalled object
-      * @param serviceName Name of the service
+     * @param serviceName Name of the service
      * @param methods methods to be exposed
-      * @param isComponent Boolean saying whether it is a component
+     * @param isComponent Boolean saying whether it is a component
      */
     public void deploy(byte[] marshalledObject, String serviceName, String[] methods, boolean isComponent) {
         try {
@@ -187,7 +191,7 @@ public class ServiceDeployer {
 
             // Create the service
             AxisService axisService = this.customCreateService(implClass, serviceName, axisConfiguration,
-                    loader, excludedOperations, methods);
+                    loader, excludedOperations);
 
             // Add the marshalled object to the service in order to be used
             // by the message receiver.
@@ -205,7 +209,7 @@ public class ServiceDeployer {
     }
 
     /**
-      * Undeploy the service whose name is serviceName
+     * Undeploy the service whose name is serviceName
      *
      * @param serviceName
      */

@@ -37,8 +37,9 @@ import org.objectweb.proactive.core.config.PAProperties;
 
 
 /**
- * @author The ProActive Team
  * Utility constants for deploying active objects and components as Web Services
+ *
+ * @author The ProActive Team
  */
 public class WSConstants {
 

@@ -89,10 +89,6 @@ public class HelloWorld {
                 return;
             }
 
-            if (!url.startsWith("http://")) {
-                url = "http://" + url;
-            }
-
             HelloWorld hw = (HelloWorld) PAActiveObject.newActive(
                     "org.objectweb.proactive.examples.webservices.helloWorld.HelloWorld", new Object[] {});
             WebServices.exposeAsWebService(hw, url, "HelloWorld", new String[] { "putTextToSay", "sayText",

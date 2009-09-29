@@ -65,4 +65,8 @@ public class HelloWorldComponent implements HelloWorldItf {
     public Boolean contains(String textToCheck) {
         return new Boolean(textsToSay.contains(textToCheck));
     }
+
+    public String sayHello() {
+        return "Hello!";
+    }
 }
