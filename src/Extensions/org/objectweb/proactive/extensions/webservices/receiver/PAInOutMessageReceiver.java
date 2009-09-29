@@ -115,7 +115,7 @@ public class PAInOutMessageReceiver extends AbstractInOutMessageReceiver {
 
                 int pointIndex = serviceName.indexOf('.');
                 if (pointIndex != -1) {
-			serviceName = serviceName.substring(0, pointIndex);
+                    serviceName = serviceName.substring(0, pointIndex);
                 }
 
                 int lastIndex = serviceName.indexOf('/');

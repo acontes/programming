@@ -127,7 +127,7 @@ public class HTTPServer {
             logger.error("Failed to load jetty configuration file: " + configUrl, e);
         }
 
-        this.context = new Context(server, "/", Context.SESSIONS);
+        this.context = new Context(server, "/proactive", Context.SESSIONS);
 
         this.server.start();
         // If a random port is used we have to set it

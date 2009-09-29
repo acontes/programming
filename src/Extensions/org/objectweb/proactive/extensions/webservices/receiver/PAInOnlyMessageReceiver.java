@@ -73,7 +73,7 @@ public class PAInOnlyMessageReceiver extends AbstractInMessageReceiver {
 
                 int pointIndex = serviceName.indexOf('.');
                 if (pointIndex != -1) {
-			serviceName = serviceName.substring(0, pointIndex);
+                    serviceName = serviceName.substring(0, pointIndex);
                 }
 
                 int lastIndex = serviceName.indexOf('/');
@@ -96,8 +96,8 @@ public class PAInOnlyMessageReceiver extends AbstractInMessageReceiver {
             // namespace of the method element in the message context
             OMElement methodElement = inMessageContext.getEnvelope().getBody().getFirstElement();
             if (methodElement != null) {
-		OMFactory factory = OMAbstractFactory.getOMFactory();
-		methodElement.setNamespace(factory.createOMNamespace(axisService.getTargetNamespace(), null));
+                OMFactory factory = OMAbstractFactory.getOMFactory();
+                methodElement.setNamespace(factory.createOMNamespace(axisService.getTargetNamespace(), null));
             }
 
             AxisMessage inAxisMessage = op.getMessage(WSDLConstants.MESSAGE_LABEL_IN_VALUE);

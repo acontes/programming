@@ -50,7 +50,7 @@ public class WSConstants {
     public static final String AXIS_REPOSITORY_DIR = WS_PATH + "axis2/repository/";
     public static final String AXIS_SERVICES_DIR = AXIS_REPOSITORY_DIR + "services/";
     public static final String AXIS_SERVICES_PATH = "proactive/services/";
-    public static final String AXIS_SERVLET = "/" + AXIS_SERVICES_PATH + "*";
+    public static final String AXIS_SERVLET = "/services/*";
 
     public static final Vector<String> disallowedMethods = new Vector<String>();
 
