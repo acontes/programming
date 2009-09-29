@@ -31,11 +31,6 @@
  */
 package functionalTests.component.webservices.cxf;
 
-import javax.xml.namespace.QName;
-
-import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.client.Options;
-import org.apache.axis2.rpc.client.RPCServiceClient;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;

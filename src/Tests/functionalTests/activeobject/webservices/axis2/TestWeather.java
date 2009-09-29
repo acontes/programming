@@ -64,7 +64,6 @@ public class TestWeather {
             // port number
             HTTPServer httpServer = HTTPServer.get();
             String port = PAProperties.PA_XMLHTTP_PORT.getValue();
-            //        String port = "8081";
             this.url = "http://localhost:" + port + "/";
 
             WeatherService weatherService = (WeatherService) PAActiveObject.newActive(
