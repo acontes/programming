@@ -1186,9 +1186,9 @@
         <copy toDir="${tutorials.dist}">
             <fileset dir="${deploy.dir}">
                 <include name="**/*" />
-                <exclude name="ProActive_examples.jar" />
-                <exclude name="ProActive_utils.jar" />
-                <exclude name="ProActive_tests.jar" />
+                <exclude name="lib/ProActive_examples.jar" />
+                <exclude name="lib/ProActive_utils.jar" />
+                <exclude name="lib/ProActive_tests.jar" />
              </fileset>
         </copy>
         <mkdir dir="${tutorials.dir}/scripts"/>

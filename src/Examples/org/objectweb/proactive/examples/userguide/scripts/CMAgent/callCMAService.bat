@@ -15,8 +15,6 @@ IF NOT DEFINED PROACTIVE set PROACTIVE=%CD%\..\..
 
 call "..\init.bat"
 
-set CLASSPATH=%CLASSPATH%;%PROACTIVE%\src\Extensions\org\objectweb\proactive\extensions\webservices\cxf\lib\cxf-manifest.jar
-
 %JAVA_CMD% org.objectweb.proactive.examples.userguide.cmagent.webservice.CMAgentWebServiceClient %*
 ENDLOCAL
 

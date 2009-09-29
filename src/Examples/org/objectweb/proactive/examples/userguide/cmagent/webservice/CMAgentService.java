@@ -93,14 +93,14 @@ public class CMAgentService extends CMAgentInitialized {
             // Name your service  "cmAgentService" and use the web service framework given
             // in argument.
 
-            //@snippet-start ws_call
-            //@tutorial-break
             //@snippet-break webservice_cma_skeleton
+            //@tutorial-break
+            //@snippet-start ws_call
             WebServices.exposeAsWebService(wsFrameWork, hw, url, "cmAgentService", new String[] {
                     "waitLastRequestServeTime", "getCurrentState" });
-            //@snippet-resume webservice_cma_skeleton
-            //@tutorial-resume
             //@snippet-end ws_call
+            //@tutorial-resume
+            //@snippet-resume webservice_cma_skeleton
 
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
