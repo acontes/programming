@@ -89,8 +89,10 @@ public class PAInOnlyMessageReceiver extends AbstractInMessageReceiver {
             // Retrieve the good namespace from the service and give this value to the
             // namespace of the method element in the message context
             OMElement methodElement = inMessageContext.getEnvelope().getBody().getFirstElement();
-            OMFactory factory = OMAbstractFactory.getOMFactory();
-            methodElement.setNamespace(factory.createOMNamespace(axisService.getTargetNamespace(), null));
+            if (methodElement != null) {
+		OMFactory factory = OMAbstractFactory.getOMFactory();
+		methodElement.setNamespace(factory.createOMNamespace(axisService.getTargetNamespace(), null));
+            }
 
             AxisMessage inAxisMessage = op.getMessage(WSDLConstants.MESSAGE_LABEL_IN_VALUE);
 
