@@ -11,11 +11,12 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.webservices.WSConstants;
 
+
 public class WSDispatcherCaller {
 
-	private static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
+    private static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
-	public static void call(String url, String method, Object[] args) throws AxisFault {
+    public static void call(String url, String method, Object[] args) throws AxisFault {
         RPCServiceClient serviceClient = new RPCServiceClient();
         Options options = serviceClient.getOptions();
 
@@ -31,9 +32,10 @@ public class WSDispatcherCaller {
 
         logger.info("Called the method " + method + " of the dispatcher hosted at " + url);
 
-	}
+    }
 
-	public static Object[] call(String url, String method, Object[] args, Class<?>[] returnTypes) throws AxisFault {
+    public static Object[] call(String url, String method, Object[] args, Class<?>[] returnTypes)
+            throws AxisFault {
         RPCServiceClient serviceClient = new RPCServiceClient();
         Options options = serviceClient.getOptions();
 
@@ -52,6 +54,6 @@ public class WSDispatcherCaller {
         logger.info("Called the method " + method + " of the dispatcher hosted at " + url);
 
         return response;
-	}
+    }
 
 }

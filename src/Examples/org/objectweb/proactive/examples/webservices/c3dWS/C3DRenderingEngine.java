@@ -242,9 +242,9 @@ public class C3DRenderingEngine implements java.io.Serializable, RenderingEngine
                         spec = Vec.dot(R, this.tmpVec);
                         if (spec > 1e-6) {
                             spec = Math.pow(spec, surf.getShine());
-                            col.setX( col.getX() + spec );
-                            col.setY( col.getY() + spec );
-                            col.setZ( col.getZ() + spec );
+                            col.setX(col.getX() + spec);
+                            col.setY(col.getY() + spec);
+                            col.setZ(col.getZ() + spec);
                         }
                     }
                 }

@@ -73,10 +73,10 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
     private User me;
 
     public User getMe() {
-		return me;
-	}
+        return me;
+    }
 
-	/** reference to the dispatcher logic, for image generation and message forwarding */
+    /** reference to the dispatcher logic, for image generation and message forwarding */
     private Dispatcher c3ddispatcher;
 
     /** The chosen name of the user */
@@ -119,7 +119,8 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
             System.exit(-1);
         }
 
-        return new Object[] { dispUrl, userAndHostNameDialog.getValidatedUserName(), userAndHostNameDialog.getValidatedDispatcher() };
+        return new Object[] { dispUrl, userAndHostNameDialog.getValidatedUserName(),
+                userAndHostNameDialog.getValidatedDispatcher() };
     }
 
     /**
@@ -131,11 +132,11 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
     public void rebuild() {
         this.me = (User) org.objectweb.proactive.api.PAActiveObject.getStubOnThis();
         try {
-			WSDispatcherCaller.call(this.dispatcherUrl, "wsRegisterMigratedUser", new Object[] {i_user});
-		} catch (AxisFault e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+            WSDispatcherCaller.call(this.dispatcherUrl, "wsRegisterMigratedUser", new Object[] { i_user });
+        } catch (AxisFault e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         createGUI();
     }
 
@@ -171,22 +172,22 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
         this.me = (User) org.objectweb.proactive.api.PAActiveObject.getStubOnThis();
 
         Object[] callReturn = null;
-		try {
-			/**
-			 * The following lines should work but it seems that there is
-			 * a bug in axis2. To get round this problem, we serialize the object and
-			 * deserialize it at the reception.
-			 */
-			callReturn = WSDispatcherCaller.call(this.dispatcherUrl, "wsRegisterUser",
-					new Object[] { HttpMarshaller.marshallObject(this.getMe()), this.getUserName() },
-					new Class<?>[] { int.class });
-		} catch (AxisFault e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        try {
+            /**
+             * The following lines should work but it seems that there is
+             * a bug in axis2. To get round this problem, we serialize the object and
+             * deserialize it at the reception.
+             */
+            callReturn = WSDispatcherCaller.call(this.dispatcherUrl, "wsRegisterUser", new Object[] {
+                    HttpMarshaller.marshallObject(this.getMe()), this.getUserName() },
+                    new Class<?>[] { int.class });
+        } catch (AxisFault e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
         int user_id = (Integer) callReturn[0];
-//        int user_id = this.c3ddispatcher.registerUser(this.me, this.userName);
+        //        int user_id = this.c3ddispatcher.registerUser(this.me, this.userName);
         this.i_user = user_id;
 
         wait.destroy();
@@ -257,12 +258,12 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
      * Exit the application
      */
     public void terminate() {
-	try {
-			WSDispatcherCaller.call(this.dispatcherUrl, "wsUnregisterConsumer", new Object[] {i_user});
-		} catch (AxisFault e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        try {
+            WSDispatcherCaller.call(this.dispatcherUrl, "wsUnregisterConsumer", new Object[] { i_user });
+        } catch (AxisFault e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         this.gui.trash();
         PAActiveObject.terminateActiveObject(true);
     }
@@ -298,39 +299,36 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
         }
     }
 
-
-
     /** Ask the dispatcher to revert to original scene */
     public void resetScene() {
-	try {
-			WSDispatcherCaller.call(this.dispatcherUrl, "wsResetScene", new Object[] {});
-		} catch (AxisFault e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        try {
+            WSDispatcherCaller.call(this.dispatcherUrl, "wsResetScene", new Object[] {});
+        } catch (AxisFault e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     /** Ask the dispatcher to add a sphere */
     public void addSphere() {
-	try {
-			WSDispatcherCaller.call(this.dispatcherUrl, "wsAddSphere", new Object[] {});
-		} catch (AxisFault e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        try {
+            WSDispatcherCaller.call(this.dispatcherUrl, "wsAddSphere", new Object[] {});
+        } catch (AxisFault e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     /** Displays the list of users connected to the dispatcher */
     public void getUserList() {
         Object[] callReturn = null;
-	try {
-			callReturn = WSDispatcherCaller.call(this.dispatcherUrl, "wsGetUserList",
-					new Object[] {},
-					new Class<?>[] {String.class});
-		} catch (AxisFault e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        try {
+            callReturn = WSDispatcherCaller.call(this.dispatcherUrl, "wsGetUserList", new Object[] {},
+                    new Class<?>[] { String.class });
+        } catch (AxisFault e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         String list = (String) callReturn[0];
         this.gui.log("List of current users:\n" + list.toString());
     }
@@ -342,24 +340,23 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
         if (talkId == null) {
             // BroadCast
             gui.writeMessage("<to all> " + message + '\n');
-		try {
-			WSDispatcherCaller.call(this.dispatcherUrl, "wsUserWriteMessageExcept",
-					new Object[] {this.i_user, "[from " + this.userName + "] " + message});
-		} catch (AxisFault e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+            try {
+                WSDispatcherCaller.call(this.dispatcherUrl, "wsUserWriteMessageExcept", new Object[] {
+                        this.i_user, "[from " + this.userName + "] " + message });
+            } catch (AxisFault e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         } else {
             // Private message
             gui.writeMessage("<to " + recipientName + "> " + message + '\n');
-		try {
-			WSDispatcherCaller.call(this.dispatcherUrl, "wsUserWriteMessage",
-					new Object[] {talkId.intValue(), "[Private from " + this.userName + "] " +
-	                message});
-		} catch (AxisFault e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+            try {
+                WSDispatcherCaller.call(this.dispatcherUrl, "wsUserWriteMessage", new Object[] {
+                        talkId.intValue(), "[Private from " + this.userName + "] " + message });
+            } catch (AxisFault e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
     }
 
@@ -371,13 +368,13 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
      *            and finally z radians along the z axis
      */
     public void rotateScene(Vec rotationAngle) {
-	try {
-			WSDispatcherCaller.call(this.dispatcherUrl, "wsRotateScene",
-					new Object[] {i_user, rotationAngle});
-		} catch (AxisFault e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        try {
+            WSDispatcherCaller.call(this.dispatcherUrl, "wsRotateScene",
+                    new Object[] { i_user, rotationAngle });
+        } catch (AxisFault e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     public void setUserName(String newName) {

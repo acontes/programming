@@ -405,9 +405,10 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
     }
 
     public void wsRotateScene(int i_user, Vec angle) {
-	System.out.println(angle.toString());
-	rotateScene(i_user, angle);
+        System.out.println(angle.toString());
+        rotateScene(i_user, angle);
     }
+
     /** Tells what are the operations to perform before starting the activity of the AO.
      * Here, we state that if migration asked, procedure  is : leaveHost, migrate */
     public void initActivity(Body body) {
@@ -449,7 +450,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
     }
 
     public void wsUserWriteMessage(int i_user, String s_message) {
-	userWriteMessage(i_user, s_message);
+        userWriteMessage(i_user, s_message);
     }
 
     /** Ask users & dispatcher log s_message, except one  */
@@ -479,7 +480,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
     }
 
     public void wsUserWriteMessageExcept(int i_user, String s_message) {
-	userWriteMessageExcept(i_user, s_message);
+        userWriteMessageExcept(i_user, s_message);
     }
 
     /** Ask all users & dispatcher to log s_message */
@@ -546,10 +547,9 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
     }
 
     public int wsRegisterUser(byte[] userBytes, String userName) {
-	User user = (User) HttpMarshaller.unmarshallObject(userBytes);
-	return registerUser(user, userName);
+        User user = (User) HttpMarshaller.unmarshallObject(userBytes);
+        return registerUser(user, userName);
     }
-
 
     public void registerMigratedUser(int userNumber) {
         String name = this.userBag.getName(userNumber);
@@ -566,7 +566,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
     }
 
     public void wsRegisterMigratedUser(int userNumber) {
-	registerMigratedUser(userNumber);
+        registerMigratedUser(userNumber);
     }
 
     /** removes user from userList, so he cannot receive any more messages or images */
@@ -608,7 +608,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
     }
 
     public void wsUnregisterConsumer(int number) {
-	unregisterConsumer(number);
+        unregisterConsumer(number);
     }
 
     public void resetScene() {
@@ -618,7 +618,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
     }
 
     public void wsResetScene() {
-	resetScene();
+        resetScene();
     }
 
     /**
@@ -685,7 +685,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
     }
 
     public StringMutableWrapper wsGetUserList() {
-	return getUserList();
+        return getUserList();
     }
 
     public void addSphere(Sphere s) {
@@ -705,7 +705,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
         double radius = (Math.random()) * 10.0;
         Sphere sphere = new Sphere(Vec.random(20), radius);
         sphere.setSurface(Surface.random());
-	addSphere(sphere);
+        addSphere(sphere);
     }
 
     /** Shut down everything, send warning messages to users */
@@ -998,9 +998,9 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
                 System.out.println("url of deployment = " + url);
             }
 
-            String[] methods = new String[] { "wsRegisterUser","wsUnregisterConsumer", "wsResetScene",
-			"wsAddSphere", "wsGetUserList", "wsUserWriteMessageExcept",
-                    "wsUserWriteMessage", "wsRotateScene", "wsRegisterMigratedUser"};
+            String[] methods = new String[] { "wsRegisterUser", "wsUnregisterConsumer", "wsResetScene",
+                    "wsAddSphere", "wsGetUserList", "wsUserWriteMessageExcept", "wsUserWriteMessage",
+                    "wsRotateScene", "wsRegisterMigratedUser" };
 
             WebServices.exposeAsWebService(c3dd, url, "C3DDispatcher", methods);
 

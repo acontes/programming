@@ -42,7 +42,7 @@ import org.objectweb.proactive.examples.webservices.c3dWS.geom.Vec;
  */
 public class Surface implements java.io.Serializable {
     private Vec color;
-	private double kd;
+    private double kd;
     private double ks;
     private double shine;
     private double kt;
@@ -99,27 +99,27 @@ public class Surface implements java.io.Serializable {
         return "Surface { color=" + color + "}";
     }
 
-	public double getIor() {
-		return this.ior;
-	}
+    public double getIor() {
+        return this.ior;
+    }
 
-	public double getShine() {
-		return this.shine;
-	}
+    public double getShine() {
+        return this.shine;
+    }
 
-	public double getKd() {
-		return this.kd;
-	}
+    public double getKd() {
+        return this.kd;
+    }
 
-	public double getKs() {
-		return this.ks;
-	}
+    public double getKs() {
+        return this.ks;
+    }
 
-	public double getKt() {
-		return this.kt;
-	}
+    public double getKt() {
+        return this.kt;
+    }
 
     public Vec getColor() {
-		return color;
-	}
+        return color;
+    }
 }
