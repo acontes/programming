@@ -1008,7 +1008,6 @@
 	<!--                          Performance test                        -->
 	<!-- ================================================================ -->
 
-
 	<target name="runPerformanceTest" depends="tests" description="Run performance test on the current host.">
 
 		<property name="n" value="" />
