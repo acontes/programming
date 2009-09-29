@@ -88,7 +88,7 @@ public class SshConfigFileParser {
         parse(path, storer);
         String properties = PAProperties.PA_SSH_PROXY_GATEWAY.getValue();
         if (properties != null)
-        parseProperties(properties, storer);
+            parseProperties(properties, storer);
     }
 
     /**
@@ -100,7 +100,7 @@ public class SshConfigFileParser {
      *            the path to the SSH configuration path
      */
     public void parse(String path, SshConfigStorer storer) {
-        if (path.isEmpty())
+        if (path.length() == 0)
             path = System.getProperty("user.home") + "/.ssh/config";
 
         SshToken[] capabilities = storer.getCapabilities();
@@ -221,7 +221,7 @@ public class SshConfigFileParser {
 
                 case UNKNOW:
                     // Do nothing except debug notification                
-                    if (logger.isDebugEnabled() && !line.isEmpty()) {
+                    if (logger.isDebugEnabled() && line.length() != 0) {
                         logger.debug("Ssh parser : unhandled field at line : " + line);
                     }
                     break;

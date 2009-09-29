@@ -186,8 +186,8 @@ public class SshConfigStorer extends SshConfig {
     public String getPrivateKeyPath(String host) {
         return getInformation(host, SshToken.PRIVATEKEY);
     }
-    
-    public void addSubnetInformation(String subnet, String gateway){
+
+    public void addSubnetInformation(String subnet, String gateway) {
         this.subnetChecker.setGateway(subnet, gateway);
     }
 }
