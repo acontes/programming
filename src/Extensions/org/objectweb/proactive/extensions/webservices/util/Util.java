@@ -1,3 +1,34 @@
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://proactive.inria.fr/team_members.htm
+ *  Contributor(s):
+ *
+ * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
+ */
 package org.objectweb.proactive.extensions.webservices.util;
 
 import java.io.BufferedOutputStream;
@@ -16,6 +47,12 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
+/**
+ * This class provides methods to extract files or directory from a jar archive
+ * Used in particular by Jetty to get the axi2 configuration file and the axis2 repository
+ *
+ * @author The proActive Team
+ */
 public class Util {
 
     public static Logger logger = ProActiveLogger.getLogger(Loggers.WEB_SERVICES);
@@ -35,6 +72,15 @@ public class Util {
         return entryName;
     }
 
+    /**
+     * Extracts a file from a jar archive to the directory located at destPath
+     *
+     * @param jarPath path to the jar file
+     * @param entryPath relative path of the file into the jar archive
+     * @param destPath path of the directory where file will be extracted
+     * @param insertRandom if true, then inserts a random number before the file name.
+     * @return the absolute path the extracted file
+     */
     public static String extractFileFromJar(String jarPath, String entryPath, String destPath,
             boolean insertRandom) {
         try {
@@ -76,6 +122,15 @@ public class Util {
         return null;
     }
 
+    /**
+     * Extracts a file or a directory from a jar archive to the directory located at destPath
+     *
+     * @param jarPath path to the jar file
+     * @param entryPath relative path of the file or the directory into the jar archive
+     * @param destPath path of the directory where file/direcotry will be extracted
+     * @param insertRandom if true, then inserts a random number before the file/directory name.
+     * @return the absolute path the extracted file
+     */
     public static String extractFromJar(String jarPath, String entryPath, String destPath,
             boolean insertRandom) {
 

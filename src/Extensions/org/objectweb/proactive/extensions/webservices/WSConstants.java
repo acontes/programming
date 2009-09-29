@@ -31,11 +31,7 @@
  */
 package org.objectweb.proactive.extensions.webservices;
 
-import java.net.URL;
 import java.util.Vector;
-
-import org.objectweb.proactive.core.config.PAProperties;
-
 
 /**
  * Utility constants for deploying active objects and components as Web Services
@@ -86,6 +82,6 @@ public class WSConstants {
         disallowedMethods.addElement("getFcItfImpl");
         disallowedMethods.addElement("setFcType");
         disallowedMethods.addElement("getFcItfImpl");
-        disallowedMethods.addElement("getFcItfImpl");
+        disallowedMethods.addElement("setFcItfImpl");
     }
 }

@@ -32,12 +32,9 @@
 package org.objectweb.proactive.extensions.webservices;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
 
 import org.apache.axis2.transport.http.AxisServlet;
 import org.apache.log4j.Logger;
-import org.globus.ogce.beans.filetransfer.util.FileToTransfer;
 import org.mortbay.jetty.servlet.ServletHolder;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.proactive.annotation.PublicAPI;
@@ -72,10 +69,12 @@ public final class WebServices extends WSConstants {
 
         String tempDir = System.getProperty("java.io.tmpdir");
 
-        String axis2XML = Util.extractFromJar(WSConstants.PROACTIVE_JAR, WSConstants.AXIS_XML_ENTRY, tempDir,
-                true);
+        // Extracts the axis2.xml file from the proactive.jar archive and return its path
+        String axis2XML = Util.extractFromJar(WSConstants.PROACTIVE_JAR, WSConstants.AXIS_XML_ENTRY,
+                                              tempDir, true);
         axisServletHolder.setInitParameter("axis2.xml.path", axis2XML);
 
+        // Extracts the axis2 repository from the proactive.jar archive and return its path
         String axis2Repo = Util.extractFromJar(WSConstants.PROACTIVE_JAR, WSConstants.AXIS_REPOSITORY_ENTRY,
                 tempDir, true);
         axisServletHolder.setInitParameter("axis2.repository.path", axis2Repo);
@@ -83,6 +82,7 @@ public final class WebServices extends WSConstants {
         // Register the Axis Servlet to Jetty
         httpServer.registerServlet(axisServletHolder, WSConstants.AXIS_SERVLET);
 
+        // Erases the _axis2 directory created by axis2 when used by jetty
         logger.info("Erasing temporary files created by axis2 servlet...");
         File f = new File((File) axisServlet.getServletContext()
                 .getAttribute("javax.servlet.context.tempdir"), "_axis2");
