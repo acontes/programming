@@ -42,6 +42,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.httpserver.HTTPServer;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.webservices.WSConstants;
@@ -56,16 +57,18 @@ public class TestWeather {
 
     @Before
     public void deployWeatherService() throws Exception {
-        // Loading the WebServices class enables us to retrieve the jetty
+
+        // Get the HTTP server enabling us to retrieve the jetty
         // port number
-        Class.forName("org.objectweb.proactive.extensions.webservices.WebServices");
+        HTTPServer httpServer = HTTPServer.get();
         String port = PAProperties.PA_XMLHTTP_PORT.getValue();
         //        String port = "8081";
         this.url = "http://localhost:" + port + "/";
 
         WeatherService weatherService = (WeatherService) PAActiveObject.newActive(
                 "functionalTests.activeobject.webservices.WeatherService", new Object[] {});
-        WebServices.exposeAsWebService(weatherService, this.url, "WeatherService");
+        WebServices.exposeAsWebService(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER, weatherService, this.url,
+                "WeatherService");
     }
 
     @org.junit.Test
@@ -75,7 +78,7 @@ public class TestWeather {
 
         Options options = serviceClient.getOptions();
 
-        EndpointReference targetEPR = new EndpointReference(url + WSConstants.AXIS_SERVICES_PATH +
+        EndpointReference targetEPR = new EndpointReference(url + WSConstants.SERVICES_PATH +
             "WeatherService");
         options.setTo(targetEPR);
 
@@ -120,6 +123,6 @@ public class TestWeather {
 
     @After
     public void undeployWeatherService() throws Exception {
-        WebServices.unExposeAsWebService(this.url, "WeatherService");
+        WebServices.unExposeAsWebService(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER, this.url, "WeatherService");
     }
 }

@@ -44,6 +44,7 @@ import org.junit.Before;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.httpserver.HTTPServer;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.webservices.WSConstants;
@@ -59,15 +60,15 @@ public class TestHelloWorld {
     @Before
     public void deployHelloWorld() throws Exception {
 
-        // Loading the WebServices class enables us to retrieve the jetty
+        // Get the HTTP server enabling us to retrieve the jetty
         // port number
-        Class.forName("org.objectweb.proactive.extensions.webservices.WebServices");
+        HTTPServer httpServer = HTTPServer.get();
         String port = PAProperties.PA_XMLHTTP_PORT.getValue();
         this.url = "http://localhost:" + port + "/";
 
         HelloWorld hw = (HelloWorld) PAActiveObject.newActive(
                 "functionalTests.activeobject.webservices.HelloWorld", new Object[] {});
-        WebServices.exposeAsWebService(hw, this.url, "HelloWorld");
+        WebServices.exposeAsWebService(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER, hw, this.url, "HelloWorld");
     }
 
     @org.junit.Test
@@ -76,7 +77,7 @@ public class TestHelloWorld {
 
         Options options = serviceClient.getOptions();
 
-        EndpointReference targetEPR = new EndpointReference(this.url + WSConstants.AXIS_SERVICES_PATH +
+        EndpointReference targetEPR = new EndpointReference(this.url + WSConstants.SERVICES_PATH +
             "HelloWorld");
         options.setTo(targetEPR);
 
@@ -183,8 +184,8 @@ public class TestHelloWorld {
         logger.info("test2 = " + test2.getStr1() + ", " + test2.getMyInt());
     }
 
-    @After
+    //@After
     public void undeployHelloWorld() throws Exception {
-        WebServices.unExposeAsWebService(this.url, "HelloWorld");
+        WebServices.unExposeAsWebService(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER, this.url, "HelloWorld");
     }
 }

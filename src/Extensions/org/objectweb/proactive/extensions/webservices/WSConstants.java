@@ -33,6 +33,7 @@ package org.objectweb.proactive.extensions.webservices;
 
 import java.util.Vector;
 
+
 /**
  * Utility constants for deploying active objects and components as Web Services
  *
@@ -40,18 +41,13 @@ import java.util.Vector;
  */
 public class WSConstants {
 
-    public static final String PROACTIVE_JAR;
-    static {
-        String temp = WSConstants.class.getResource("/org").getPath();
-        temp = temp.substring(0, temp.indexOf('!'));
-        PROACTIVE_JAR = temp.substring(temp.indexOf(':') + 1);
-    }
-    public static final String AXIS_XML_ENTRY = "org/objectweb/proactive/extensions/webservices/axis2/conf/axis2.xml";
-    public static final String AXIS_REPOSITORY_ENTRY = "org/objectweb/proactive/extensions/webservices/axis2/repository/";
-    public static final String AXIS_SERVICES_PATH = "proactive/services/";
-    public static final String AXIS_SERVLET = "/services/*";
+    public static String SERVICES_PATH = "proactive/services/";
+    public static String SERVLET_PATH = "/services/*";
 
-    public static final Vector<String> disallowedMethods = new Vector<String>();
+    public static String AXIS2_FRAMEWORK_IDENTIFIER = "axis2";
+    public static String CXF_FRAMEWORK_IDENTIFIER = "cxf";
+
+    public static Vector<String> disallowedMethods = new Vector<String>();
 
     static {
         // Object methods

@@ -40,10 +40,12 @@ import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.fractal.util.Fractal;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.extensions.webservices.WebServices;
+import org.objectweb.proactive.extensions.webservices.WSConstants;
 
 
 /**
@@ -119,8 +121,12 @@ public class HelloWorldComponent implements HelloWorldItf, GoodByeWorldItf {
             e.printStackTrace();
         }
 
-        WebServices.exposeComponentAsWebService(comp, url, "server", new String[] { "hello-world",
-                "goodbye-world" });
+        try {
+            WebServices.exposeComponentAsWebService(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER, comp, url,
+                    "server", new String[] { "hello-world", "goodbye-world" });
+        } catch (ProActiveException e) {
+            e.printStackTrace();
+        }
     }
 }
 //@snippet-end helloworldcomponent

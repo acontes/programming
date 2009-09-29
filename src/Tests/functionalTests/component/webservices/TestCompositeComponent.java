@@ -51,6 +51,7 @@ import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.httpserver.HTTPServer;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.webservices.WSConstants;
@@ -72,8 +73,9 @@ public class TestCompositeComponent extends FunctionalTest {
 
     @Before
     public void deployComposite() throws Exception {
-        // Retrieves the port number of the local Jetty server
-        Class.forName("org.objectweb.proactive.extensions.webservices.WebServices");
+        // Get the HTTP server enabling us to retrieve the jetty
+        // port number
+        HTTPServer httpServer = HTTPServer.get();
         String port = PAProperties.PA_XMLHTTP_PORT.getValue();
         url = "http://localhost:" + port + "/";
 
@@ -116,7 +118,8 @@ public class TestCompositeComponent extends FunctionalTest {
         bc.bindFc("choose-name", chooseName.getFcInterface("choose-name"));
         Fractal.getLifeCycleController(comp).startFc();
 
-        WebServices.exposeComponentAsWebService(comp, url, "composite", new String[] { "hello-world" });
+        WebServices.exposeComponentAsWebService(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER, comp, url,
+                "composite", new String[] { "hello-world" });
 
         logger.info("Deploy a composite as a webservice service on : " + url);
 
@@ -129,7 +132,7 @@ public class TestCompositeComponent extends FunctionalTest {
 
         Options options = serviceClient.getOptions();
 
-        EndpointReference targetEPR = new EndpointReference(url + WSConstants.AXIS_SERVICES_PATH +
+        EndpointReference targetEPR = new EndpointReference(url + WSConstants.SERVICES_PATH +
             "composite_hello-world");
 
         options.setTo(targetEPR);
@@ -151,6 +154,7 @@ public class TestCompositeComponent extends FunctionalTest {
 
     @After
     public void undeployComposite() throws Exception {
-        WebServices.unExposeComponentAsWebService(this.url, "composite", new String[] { "hello-world" });
+        WebServices.unExposeComponentAsWebService(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER, this.url,
+                "composite", new String[] { "hello-world" });
     }
 }

@@ -74,7 +74,7 @@ public class WSClientComponent {
 
             EndpointReference targetEPR;
 
-            targetEPR = new EndpointReference(url + WSConstants.AXIS_SERVICES_PATH + "server_hello-world");
+            targetEPR = new EndpointReference(url + WSConstants.SERVICES_PATH + "server_hello-world");
 
             options.setTo(targetEPR);
 
@@ -111,7 +111,7 @@ public class WSClientComponent {
 
             System.out.println("sayText returned: " + result);
 
-            targetEPR = new EndpointReference(url + WSConstants.AXIS_SERVICES_PATH + "server_goodbye-world");
+            targetEPR = new EndpointReference(url + WSConstants.SERVICES_PATH + "server_goodbye-world");
             options.setTo(targetEPR);
 
             op = new QName("goodByeWorld");

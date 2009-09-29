@@ -45,6 +45,7 @@ import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
+import org.objectweb.proactive.extensions.webservices.WSConstants;
 import org.objectweb.proactive.extensions.webservices.WebServices;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
@@ -359,10 +360,9 @@ public class PiBBP implements Serializable {
                     new Object[] { args });
 
             if (piApplication.isWebService()) {
-                WebServices
-                        .exposeAsWebService(piApplication, "http://localhost:8080/", "piComputation",
-                                new String[] { "runSimple", "runParallel", "runParallelDistributed",
-                                        "setNbDecimals" });
+                WebServices.exposeAsWebService(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER, piApplication,
+                        "http://localhost:8080/", "piComputation", new String[] { "runSimple", "runParallel",
+                                "runParallelDistributed", "setNbDecimals" });
             } else {
                 piApplication.start();
             }

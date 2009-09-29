@@ -51,8 +51,7 @@ public class WSDispatcherCaller {
         RPCServiceClient serviceClient = new RPCServiceClient();
         Options options = serviceClient.getOptions();
 
-        EndpointReference targetEPR = new EndpointReference(url + WSConstants.AXIS_SERVICES_PATH +
-            "C3DDispatcher");
+        EndpointReference targetEPR = new EndpointReference(url + WSConstants.SERVICES_PATH + "C3DDispatcher");
 
         System.out.println(targetEPR.getAddress());
         options.setTo(targetEPR);
@@ -70,8 +69,7 @@ public class WSDispatcherCaller {
         RPCServiceClient serviceClient = new RPCServiceClient();
         Options options = serviceClient.getOptions();
 
-        EndpointReference targetEPR = new EndpointReference(url + WSConstants.AXIS_SERVICES_PATH +
-            "C3DDispatcher");
+        EndpointReference targetEPR = new EndpointReference(url + WSConstants.SERVICES_PATH + "C3DDispatcher");
         System.out.println(targetEPR.getAddress());
 
         options.setTo(targetEPR);

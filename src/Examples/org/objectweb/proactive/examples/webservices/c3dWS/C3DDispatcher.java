@@ -66,6 +66,7 @@ import org.objectweb.proactive.examples.webservices.c3dWS.prim.View;
 import org.objectweb.proactive.examples.webservices.c3dWS.gui.DispatcherGUI;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
+import org.objectweb.proactive.extensions.webservices.WSConstants;
 import org.objectweb.proactive.extensions.webservices.WebServices;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
@@ -1000,7 +1001,8 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
                     "wsAddSphere", "wsGetUserList", "wsUserWriteMessageExcept", "wsUserWriteMessage",
                     "wsRotateScene", "wsRegisterMigratedUser" };
 
-            WebServices.exposeAsWebService(c3dd, url, "C3DDispatcher", methods);
+            WebServices.exposeAsWebService(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER, c3dd, url,
+                    "C3DDispatcher", methods);
 
         } catch (ProActiveException e) {
             logger.error(e);

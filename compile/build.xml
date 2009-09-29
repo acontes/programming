@@ -622,7 +622,7 @@
 		</sequential>
 	</macrodef>
 
-	<target name="junit" depends="compile.tests, deploy.all, proActiveWar" description="Run all non regression tests on the current host only">
+	<target name="junit" depends="compile.tests, deploy.all, proActiveWarAxis2" description="Run all non regression tests on the current host only">
 		<junitMacro nodedescriptor="/functionalTests/descriptor/defaultnodes/NodesLocal.xml" testsuite="testsuite"/>
 	</target>
 
@@ -873,7 +873,7 @@
 		<delete dir="${junit.dir}" />
 		<property name="webservices.dir" value="${src.extensions.dir}/org/objectweb/proactive/extensions/webservices/" />
 		<delete dir="${webservices.dir}/servicedeployer/build" />
-		<delete file="${src.extensions.dir}/org/objectweb/proactive/extensions/webservices/axis2/repository/services/ServiceDeployer.aar" />
+		<delete file="${axis2.dir}/repository/services/ServiceDeployer.aar" />
 		<delete dir="${tutorials.dir}" />
 		<subant target="doc.clean" inheritall="true">
 			<fileset dir="../doc/toolchain" includes="doc.xml"/>
@@ -1059,15 +1059,7 @@
 	<!-- ================================================================================ -->
 	<!--    Create the proactive Web Archive to be used with the web service framework    -->
 	<!-- ================================================================================ -->
-	<target name="proActiveWar" depends="deploy.all">
-
-		<!--<subant target="generate.service" inheritall="true" failonerror="true">
-			<fileset dir="${webservices.dir}" includes="**/build.xml" />
-		</subant>
-
-		<subant target="prepare.repo" inheritall="true" failonerror="true">
-			<fileset dir="${webservices.dir}" includes="**/build.xml" />
-		</subant>-->
+	<target name="proActiveWarAxis2" depends="deploy.all">
 
 		<war destfile="${deploy.dir}/proactive.war" webxml="${axis2.dir}/webapp/WEB-INF/web.xml">
 			<lib dir="${axis2.dir}/lib">
@@ -1091,6 +1083,26 @@
 		</war>
 		<delete dir="${temp.class.dir}" />
 	</target>
+
+	<target name="proActiveWarCXF" depends="deploy.all">
+        <war destfile="${deploy.dir}/proactive.war" webxml="${cxf.dir}/etc/web.xml">
+            <classes dir="${cl.extensions.dir}" includes="**/cxf/servicedeployer/*.class"/>
+            <webinf dir="${cxf.dir}/wsdl">
+                <include name="cxf-servlet.xml"/>
+            </webinf>
+		<lib dir="${deploy.dir}/lib">
+                <include name="ProActive.jar" />
+            </lib>
+            <lib dir="${cxf.dir}/lib">
+                <include name="*.jar"/>
+                <exclude name="servlet-api-*.jar" />
+                <exclude name="geronimo-servlet_*.jar" />
+                <exclude name="jetty-*.jar"/>
+                <exclude name="WHICH_JARS" />
+            </lib>
+        </war>
+	</target>
+
 
 	<!-- MUST BE CALLED FROM AN INRIA MACHINE ON PRODUCTION NETWORK -->
 	<target name="uploadSchemas" description="upload schemas on web site">

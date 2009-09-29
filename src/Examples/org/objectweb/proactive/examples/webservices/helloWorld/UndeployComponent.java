@@ -31,7 +31,7 @@
  */
 package org.objectweb.proactive.examples.webservices.helloWorld;
 
-import org.objectweb.proactive.extensions.webservices.deployer.PADeployer;
+import org.objectweb.proactive.extensions.webservices.axis2.deployer.PADeployer;
 
 
 /**

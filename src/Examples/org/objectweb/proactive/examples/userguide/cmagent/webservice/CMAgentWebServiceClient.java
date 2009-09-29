@@ -69,7 +69,7 @@ public class CMAgentWebServiceClient {
 
             Options options = serviceClient.getOptions();
 
-            EndpointReference targetEPR = new EndpointReference(url + WSConstants.AXIS_SERVICES_PATH +
+            EndpointReference targetEPR = new EndpointReference(url + WSConstants.SERVICES_PATH +
                 "cmAgentService");
 
             options.setTo(targetEPR);

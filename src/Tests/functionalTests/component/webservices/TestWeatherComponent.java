@@ -50,6 +50,7 @@ import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.httpserver.HTTPServer;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.webservices.WSConstants;
@@ -65,9 +66,9 @@ public class TestWeatherComponent {
     @Before
     public void deployWeatherService() throws Exception {
 
-        // Loading the WebServices class enables us to retrieve the jetty
+        // Get the HTTP server enabling us to retrieve the jetty
         // port number
-        Class.forName("org.objectweb.proactive.extensions.webservices.WebServices");
+        HTTPServer httpServer = HTTPServer.get();
         String port = PAProperties.PA_XMLHTTP_PORT.getValue();
         this.url = "http://localhost:" + port + "/";
 
@@ -87,7 +88,8 @@ public class TestWeatherComponent {
 
         Fractal.getLifeCycleController(comp).startFc();
 
-        WebServices.exposeComponentAsWebService(comp, url, "server", new String[] { "weather-service" });
+        WebServices.exposeComponentAsWebService(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER, comp, url, "server",
+                new String[] { "weather-service" });
 
         logger.info("Deployed an weather-service interface as a webservice service on : " + url);
     }
@@ -99,7 +101,7 @@ public class TestWeatherComponent {
 
         Options options = serviceClient.getOptions();
 
-        EndpointReference targetEPR = new EndpointReference(url + WSConstants.AXIS_SERVICES_PATH +
+        EndpointReference targetEPR = new EndpointReference(url + WSConstants.SERVICES_PATH +
             "server_weather-service");
         options.setTo(targetEPR);
 
@@ -144,6 +146,7 @@ public class TestWeatherComponent {
 
     @After
     public void undeployWeatherService() throws Exception {
-        WebServices.unExposeComponentAsWebService(this.url, "server", new String[] { "weather-service" });
+        WebServices.unExposeComponentAsWebService(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER, this.url, "server",
+                new String[] { "weather-service" });
     }
 }
