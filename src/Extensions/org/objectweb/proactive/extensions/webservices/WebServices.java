@@ -32,9 +32,12 @@
 package org.objectweb.proactive.extensions.webservices;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
 
 import org.apache.axis2.transport.http.AxisServlet;
 import org.apache.log4j.Logger;
+import org.globus.ogce.beans.filetransfer.util.FileToTransfer;
 import org.mortbay.jetty.servlet.ServletHolder;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.proactive.annotation.PublicAPI;
@@ -42,6 +45,7 @@ import org.objectweb.proactive.core.httpserver.HTTPServer;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.webservices.deployer.PADeployer;
+import org.objectweb.proactive.extensions.webservices.util.Util;
 
 
 /**
@@ -66,11 +70,15 @@ public final class WebServices extends WSConstants {
 
         ServletHolder axisServletHolder = new ServletHolder(axisServlet);
 
-        // Define axis2 configuration file and repository where services and modules
-        // are stored. The repository path is mandatory since it contains the ServiceDeployer
-        // service which is used to expose our active objects as webservice.
-        axisServletHolder.setInitParameter("axis2.xml.path", WSConstants.AXIS_XML_PATH);
-        axisServletHolder.setInitParameter("axis2.repository.path", WSConstants.AXIS_REPOSITORY_DIR);
+        String tempDir = System.getProperty("java.io.tmpdir");
+
+        String axis2XML = Util.extractFromJar(WSConstants.PROACTIVE_JAR, WSConstants.AXIS_XML_ENTRY, tempDir,
+                true);
+        axisServletHolder.setInitParameter("axis2.xml.path", axis2XML);
+
+        String axis2Repo = Util.extractFromJar(WSConstants.PROACTIVE_JAR, WSConstants.AXIS_REPOSITORY_ENTRY,
+                tempDir, true);
+        axisServletHolder.setInitParameter("axis2.repository.path", axis2Repo);
 
         // Register the Axis Servlet to Jetty
         httpServer.registerServlet(axisServletHolder, WSConstants.AXIS_SERVLET);
