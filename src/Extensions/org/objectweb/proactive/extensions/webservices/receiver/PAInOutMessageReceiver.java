@@ -108,9 +108,16 @@ public class PAInOutMessageReceiver extends AbstractInOutMessageReceiver {
                 // Extract the interface name form the address
                 Object component = HttpMarshaller.unmarshallObject(marshallObject);
                 String address = inMessageContext.getTo().getAddress();
+                logger.info("Address = " + address);
                 int firstIndex = address.lastIndexOf(WSConstants.AXIS_SERVICES_PATH);
                 firstIndex += WSConstants.AXIS_SERVICES_PATH.length();
                 String serviceName = address.substring(firstIndex);
+
+                int pointIndex = serviceName.indexOf('.');
+                if (pointIndex != -1) {
+			serviceName = serviceName.substring(0, pointIndex);
+                }
+
                 int lastIndex = serviceName.indexOf('/');
 
                 if (lastIndex != -1) {

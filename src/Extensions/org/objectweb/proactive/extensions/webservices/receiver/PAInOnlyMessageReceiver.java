@@ -70,6 +70,12 @@ public class PAInOnlyMessageReceiver extends AbstractInMessageReceiver {
                 int firstIndex = address.lastIndexOf(WSConstants.AXIS_SERVICES_PATH);
                 firstIndex += WSConstants.AXIS_SERVICES_PATH.length();
                 String serviceName = address.substring(firstIndex);
+
+                int pointIndex = serviceName.indexOf('.');
+                if (pointIndex != -1) {
+			serviceName = serviceName.substring(0, pointIndex);
+                }
+
                 int lastIndex = serviceName.indexOf('/');
 
                 if (lastIndex != -1) {
