@@ -80,6 +80,7 @@ public class TestWeather {
         ClientFactoryBean factory = new ClientFactoryBean();
         factory.setServiceClass(WeatherService.class);
         factory.setAddress(url + WSConstants.SERVICES_PATH + "WeatherService");
+        factory.getServiceFactory().setQualifyWrapperSchema(false);
         Client client = factory.create();
 
         try {

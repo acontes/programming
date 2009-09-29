@@ -36,11 +36,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ServerFactoryBean;
+import org.apache.cxf.interceptor.ClientFaultConverter;
+import org.apache.cxf.interceptor.ClientOutFaultObserver;
+import org.apache.cxf.interceptor.FaultOutInterceptor;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.interceptor.PrettyLoggingOutInterceptor;
+import org.apache.cxf.interceptor.StaxOutInterceptor;
+import org.apache.cxf.interceptor.WrappedOutInterceptor;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
@@ -54,6 +61,8 @@ import org.objectweb.proactive.core.util.SerializableMethod;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.webservices.common.MethodUtils;
+import org.objectweb.proactive.extensions.webservices.cxf.interceptors.NameSpaceInInterceptor;
+import org.objectweb.proactive.extensions.webservices.cxf.interceptors.NameSpaceOutInterceptor;
 
 
 /**
@@ -106,6 +115,11 @@ public class ServiceDeployer implements ServiceDeployerItf {
             superclass = o.getClass().getSuperclass();
             implClass = superclass.getName();
 
+            // This method is called to force element to be unqualified
+            // It is the default behaviour but if you want to expose an active
+            // object using a set of methods, element forms become qualified.
+            serviceFactory.setQualifyWrapperSchema(false);
+
             ArrayList<SerializableMethod> serializableMethods = (ArrayList<SerializableMethod>) HttpMarshaller
                     .unmarshallObject(marshalledSerializedMethods);
 
@@ -114,11 +128,6 @@ public class ServiceDeployer implements ServiceDeployerItf {
             List<Method> ignoredMethods = mc.getExcludedMethods(methods);
 
             serviceFactory.setIgnoredMethods(ignoredMethods);
-
-            // This method is called to force element to be unqualified
-            // It is the default behaviour but if you want to expose an active
-            // object using a set of methods, element forms become qualified.
-            serviceFactory.setQualifyWrapperSchema(false);
 
             svrFactory = new ServerFactoryBean(serviceFactory);
             svrFactory.setServiceBean(superclass.cast(o));
@@ -130,6 +139,7 @@ public class ServiceDeployer implements ServiceDeployerItf {
                 interface_ = (Interface) ((Component) o).getFcInterface(interfaceName);
                 implClass = ((InterfaceType) interface_.getFcItfType()).getFcItfSignature();
                 superclass = Class.forName(implClass, true, interface_.getClass().getClassLoader());
+                System.out.println(superclass.getName());
 
                 MethodUtils mc = new MethodUtils(superclass);
                 List<Method> ignoredMethods = mc.getExcludedMethods(null);
@@ -144,6 +154,9 @@ public class ServiceDeployer implements ServiceDeployerItf {
             } catch (ClassNotFoundException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
+            } catch (SecurityException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
             }
         }
 
@@ -154,20 +167,27 @@ public class ServiceDeployer implements ServiceDeployerItf {
          * Attaches a list of in-interceptors
          */
         List<Interceptor> inInterceptors = new ArrayList<Interceptor>();
+
+        NameSpaceInInterceptor nameSpaceInInterceptor = new NameSpaceInInterceptor();
         LoggingInInterceptor loggingInInterceptor = new LoggingInInterceptor();
+        //inInterceptors.add(nameSpaceInInterceptor);
         inInterceptors.add(loggingInInterceptor);
         svrFactory.setInInterceptors(inInterceptors);
 
         /*
          * Attaches a list of out-interceptors
          */
+        NameSpaceOutInterceptor nameSpaceOutInterceptor = new NameSpaceOutInterceptor();
         List<Interceptor> outInterceptors = new ArrayList<Interceptor>();
         LoggingOutInterceptor loggingOutInterceptor = new LoggingOutInterceptor();
+        // outInterceptors.add(nameSpaceOutInterceptor);
         outInterceptors.add(loggingOutInterceptor);
         svrFactory.setOutInterceptors(outInterceptors);
 
         svrFactory.create();
 
+        System.out.println("QualifyWrapperSchema = " +
+            svrFactory.getServiceFactory().getQualifyWrapperSchema());
         serverList.put(serviceName, svrFactory.getServer());
 
         logger.info("The service " + serviceName + " has been deployed");

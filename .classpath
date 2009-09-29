@@ -126,7 +126,7 @@
 	<classpathentry kind="lib" path="/home/ffonteno/proactive-git/programming/src/Extensions/org/objectweb/proactive/extensions/webservices/cxf/lib/commons-lang-2.4.jar"/>
 	<classpathentry kind="lib" path="/home/ffonteno/proactive-git/programming/src/Extensions/org/objectweb/proactive/extensions/webservices/cxf/lib/commons-logging-1.1.1.jar"/>
 	<classpathentry kind="lib" path="/home/ffonteno/proactive-git/programming/src/Extensions/org/objectweb/proactive/extensions/webservices/cxf/lib/commons-pool-1.3.jar"/>
-	<classpathentry kind="lib" path="/home/ffonteno/proactive-git/programming/src/Extensions/org/objectweb/proactive/extensions/webservices/cxf/lib/cxf-2.2.2.jar"/>
+	<classpathentry kind="lib" path="/home/ffonteno/proactive-git/programming/src/Extensions/org/objectweb/proactive/extensions/webservices/cxf/lib/cxf-2.2.2.jar" sourcepath="/home/ffonteno/src/cxf-src/trunk"/>
 	<classpathentry kind="lib" path="/home/ffonteno/proactive-git/programming/src/Extensions/org/objectweb/proactive/extensions/webservices/cxf/lib/cxf-manifest.jar"/>
 	<classpathentry kind="lib" path="/home/ffonteno/proactive-git/programming/src/Extensions/org/objectweb/proactive/extensions/webservices/cxf/lib/FastInfoset-1.2.3.jar"/>
 	<classpathentry kind="lib" path="/home/ffonteno/proactive-git/programming/src/Extensions/org/objectweb/proactive/extensions/webservices/cxf/lib/geronimo-activation_1.1_spec-1.0.2.jar"/>

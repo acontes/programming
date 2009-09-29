@@ -6,11 +6,8 @@ echo --- Undeploy Active Object Web Service ------------------------------------
 workingDir=`dirname $0`
 . ${workingDir}/../env.sh
 
-for i in `ls $PROACTIVE/lib/cxf`
-do
-   CLASSPATH=$CLASSPATH:$PROACTIVE/lib/cxf/$i
-done
-
+CXF_HOME=$PROACTIVE/src/Extensions/org/objectweb/proactive/extensions/webservices/cxf
+CLASSPATH=$CLASSPATH:$CXF_HOME/lib/cxf-manifest.jar
 $JAVACMD org.objectweb.proactive.examples.webservices.helloWorld.Undeploy "$@"
 
 echo

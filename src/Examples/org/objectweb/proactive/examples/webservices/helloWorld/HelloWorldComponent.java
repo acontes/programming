@@ -63,6 +63,7 @@ public class HelloWorldComponent implements HelloWorldItf, GoodByeWorldItf {
     }
 
     public void setText(String text) {
+        System.out.println("text = " + text);
         this.text = text;
     }
 

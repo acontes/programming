@@ -36,6 +36,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Method;
 
+import javax.xml.namespace.QName;
+
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientFactoryBean;
 import org.apache.log4j.Logger;
@@ -62,24 +64,34 @@ public class TestHelloWorld {
         try {
             // Get the HTTP server enabling us to retrieve the jetty
             // port number
+            PAProperties.PA_XMLHTTP_PORT.setValue(8080);
             HTTPServer httpServer = HTTPServer.get();
             String port = PAProperties.PA_XMLHTTP_PORT.getValue();
             this.url = "http://localhost:" + port + "/";
 
-            HelloWorld hw = (HelloWorld) PAActiveObject.newActive(
+            HelloWorld hw1 = (HelloWorld) PAActiveObject.newActive(
                     "functionalTests.activeobject.webservices.common.HelloWorld", new Object[] {});
-            WebServices.exposeAsWebService(WSConstants.CXF_FRAMEWORK_IDENTIFIER, hw, this.url, "HelloWorld");
+            WebServices.exposeAsWebService(WSConstants.CXF_FRAMEWORK_IDENTIFIER, hw1, this.url, "HelloWorld");
 
-            Method m1 = hw.getClass().getSuperclass().getMethod("sayText");
-            Method m2 = hw.getClass().getSuperclass().getMethod("putTextToSay",
+            HelloWorld hw2 = (HelloWorld) PAActiveObject.newActive(
+                    "functionalTests.activeobject.webservices.common.HelloWorld", new Object[] {});
+            Method m1 = hw2.getClass().getSuperclass().getMethod("sayText");
+            Method m2 = hw2.getClass().getSuperclass().getMethod("putTextToSay",
                     new Class<?>[] { String.class });
             Method[] methods = new Method[] { m1, m2 };
-            WebServices.exposeAsWebService(WSConstants.CXF_FRAMEWORK_IDENTIFIER, hw, this.url,
+            WebServices.exposeAsWebService(WSConstants.CXF_FRAMEWORK_IDENTIFIER, hw2, this.url,
                     "HelloWorldMethods", methods);
+            //            WebServices.exposeAsWebService(WSConstants.CXF_FRAMEWORK_IDENTIFIER, hw2, this.url,
+            //                    "HelloWorldMethods");
 
+            HelloWorld hw3 = (HelloWorld) PAActiveObject.newActive(
+                    "functionalTests.activeobject.webservices.common.HelloWorld", new Object[] {});
             String[] methodNames = new String[] { "putTextToSay", "sayText" };
-            WebServices.exposeAsWebService(WSConstants.CXF_FRAMEWORK_IDENTIFIER, hw, this.url,
+            WebServices.exposeAsWebService(WSConstants.CXF_FRAMEWORK_IDENTIFIER, hw3, this.url,
                     "HelloWorldMethodNames", methodNames);
+            //            WebServices.exposeAsWebService(WSConstants.CXF_FRAMEWORK_IDENTIFIER, hw3, this.url,
+            //                    "HelloWorldMethodNames");
+
         } catch (Exception e) {
             e.printStackTrace();
             assertTrue(false);
@@ -92,6 +104,7 @@ public class TestHelloWorld {
         ClientFactoryBean factory = new ClientFactoryBean();
         factory.setServiceClass(HelloWorld.class);
         factory.setAddress(url + WSConstants.SERVICES_PATH + "HelloWorld");
+        factory.getServiceFactory().setQualifyWrapperSchema(false);
         Client client = factory.create();
 
         Object[] res;
@@ -162,16 +175,18 @@ public class TestHelloWorld {
         ClientFactoryBean factoryMethods = new ClientFactoryBean();
         factoryMethods.setServiceClass(HelloWorld.class);
         factoryMethods.setAddress(url + WSConstants.SERVICES_PATH + "HelloWorldMethods");
+        factory.getServiceFactory().setQualifyWrapperSchema(false);
         Client clientMethods = factoryMethods.create();
 
         try {
-            clientMethods.invoke("putTextToSay", new Object[] { "Hi ProActive Team!" });
+            clientMethods.invoke("putTextToSay", "Hi ProActive Team!");
             logger.info("Called the method putTextToSay: " + "one argument is expected but no return");
 
             res = clientMethods.invoke("sayText");
             logger.info("Called the method 'sayText': one return is expected but not argument");
 
             text = (String) res[0];
+            System.err.println("text2 = " + text);
             assertTrue(text.equals("Hi ProActive Team!"));
 
             res = clientMethods.invoke("sayText");
@@ -198,6 +213,7 @@ public class TestHelloWorld {
         ClientFactoryBean factoryMethodNames = new ClientFactoryBean();
         factoryMethodNames.setServiceClass(HelloWorld.class);
         factoryMethodNames.setAddress(url + WSConstants.SERVICES_PATH + "HelloWorldMethodNames");
+        factory.getServiceFactory().setQualifyWrapperSchema(false);
         Client clientMethodNames = factoryMethodNames.create();
 
         try {

@@ -113,6 +113,7 @@ public final class PADeployer {
         byte[] marshalledObject = HttpMarshaller.marshallObject(o);
         ServiceDeployerItf client = getClient(correctUrl);
         ArrayList<SerializableMethod> serializableMethods = MethodUtils.getSerializableMethods(methods);
+        // test without serializing arraylist
         byte[] marshalledSerializedMethods = HttpMarshaller.marshallObject(serializableMethods);
         client.deploy(marshalledObject, urn, marshalledSerializedMethods, isComponent);
     }

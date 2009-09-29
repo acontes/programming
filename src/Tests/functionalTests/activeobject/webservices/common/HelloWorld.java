@@ -52,26 +52,35 @@ public class HelloWorld extends HelloWorldSuperClass implements java.io.Serializ
 
     public void putHelloWorld() {
         this.textsToSay.add("Hello world!");
+        System.err.println("Last inserted element = " + this.textsToSay.getLast());
     }
 
     public void putTextToSay(String textToSay) {
+        System.err.println("textToSay = " + textToSay);
         this.textsToSay.add(textToSay);
+        System.err.println("Last inserted element = " + this.textsToSay.getLast());
     }
 
     public String sayText() {
+        String str;
         if (this.textsToSay.isEmpty()) {
-            return "The list is empty";
+            str = "The list is empty";
         } else {
-            return this.textsToSay.poll();
+            str = this.textsToSay.poll();
         }
+        System.err.println("Returned string is " + str);
+        return str;
     }
 
-    public Boolean contains(String textToCheck) {
-        return new Boolean(textsToSay.contains(textToCheck));
+    public boolean contains(String textToCheck) {
+        System.err.println("textToCheck = " + textToCheck);
+        boolean response = new Boolean(this.textsToSay.contains(textToCheck));
+        System.err.println("response = " + response);
+        return response;
     }
 
     public LinkedList<String> getTextsToSay() {
-        return textsToSay;
+        return this.textsToSay;
     }
 
     public void setTextsToSay(LinkedList<String> textsToSay) {
