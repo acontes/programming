@@ -40,7 +40,7 @@ public interface HelloWorldItf {
 
     public String sayText();
 
-	public void setText(String text);
+    public void setText(String text);
 
 }
 //@snippet-end helloworlditfcomponent
