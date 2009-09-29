@@ -29,7 +29,7 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package functionalTests.activeobject.webservices;
+package functionalTests.activeobject.webservices.common;
 
 import java.io.Serializable;
 

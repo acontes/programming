@@ -29,31 +29,52 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package functionalTests.activeobject.webservices;
+package functionalTests.activeobject.webservices.common;
 
-import java.io.Serializable;
+import java.util.LinkedList;
+
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 
 
-public class Couple implements Serializable {
-    private String str1;
-    private int myInt;
+/**
+ * A simple example to expose an active object as a web service.
+ *
+ * @author The ProActive Team
+ */
+@ActiveObject
+public class HelloWorld extends HelloWorldSuperClass implements java.io.Serializable {
 
-    public Couple() {
+    LinkedList<String> textsToSay = new LinkedList<String>();
+    Couple[] couples;
+
+    public HelloWorld() {
     }
 
-    public String getStr1() {
-        return str1;
+    public void putHelloWorld() {
+        this.textsToSay.add("Hello world!");
     }
 
-    public void setStr1(String str) {
-        this.str1 = str;
+    public void putTextToSay(String textToSay) {
+        this.textsToSay.add(textToSay);
     }
 
-    public int getMyInt() {
-        return myInt;
+    public String sayText() {
+        if (this.textsToSay.isEmpty()) {
+            return "The list is empty";
+        } else {
+            return this.textsToSay.poll();
+        }
     }
 
-    public void setMyInt(int myInt) {
-        this.myInt = myInt;
+    public Boolean contains(String textToCheck) {
+        return new Boolean(textsToSay.contains(textToCheck));
+    }
+
+    public void setCouples(Couple[] couples) {
+        this.couples = couples;
+    }
+
+    public Couple[] getCouples() {
+        return couples;
     }
 }

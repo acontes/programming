@@ -29,12 +29,31 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package functionalTests.activeobject.webservices;
+package functionalTests.activeobject.webservices.common;
 
-public class HelloWorldSuperClass {
+import java.io.Serializable;
 
-    public String sayHello() {
-        return "Hello!";
+
+public class Couple implements Serializable {
+    private String str1;
+    private int myInt;
+
+    public Couple() {
     }
 
+    public String getStr1() {
+        return str1;
+    }
+
+    public void setStr1(String str) {
+        this.str1 = str;
+    }
+
+    public int getMyInt() {
+        return myInt;
+    }
+
+    public void setMyInt(int myInt) {
+        this.myInt = myInt;
+    }
 }

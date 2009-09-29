@@ -135,6 +135,7 @@
 		<pathelement location="${cl.utils.dir}" />
 		<pathelement location="${cl.test.dir}"/>
 		<path refid="compile.libs"/>
+        <path refid="cxf.libs" />
 	</path>
 
 	<macrodef name="compile_extra">

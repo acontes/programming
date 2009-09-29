@@ -29,52 +29,12 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package functionalTests.activeobject.webservices;
+package functionalTests.activeobject.webservices.common;
 
-import java.util.LinkedList;
+public class HelloWorldSuperClass {
 
-import org.objectweb.proactive.extensions.annotation.ActiveObject;
-
-
-/**
- * A simple example to expose an active object as a web service.
- *
- * @author The ProActive Team
- */
-@ActiveObject
-public class HelloWorld extends HelloWorldSuperClass implements java.io.Serializable {
-
-    LinkedList<String> textsToSay = new LinkedList<String>();
-    Couple[] couples;
-
-    public HelloWorld() {
+    public String sayHello() {
+        return "Hello!";
     }
 
-    public void putHelloWorld() {
-        this.textsToSay.add("Hello world!");
-    }
-
-    public void putTextToSay(String textToSay) {
-        this.textsToSay.add(textToSay);
-    }
-
-    public String sayText() {
-        if (this.textsToSay.isEmpty()) {
-            return "The list is empty";
-        } else {
-            return this.textsToSay.poll();
-        }
-    }
-
-    public Boolean contains(String textToCheck) {
-        return new Boolean(textsToSay.contains(textToCheck));
-    }
-
-    public void setCouples(Couple[] couples) {
-        this.couples = couples;
-    }
-
-    public Couple[] getCouples() {
-        return couples;
-    }
 }
