@@ -84,6 +84,13 @@
 	<!-- Common web service properties -->
 	<property name="webservices.dir" value="${src.extensions.dir}/org/objectweb/proactive/extensions/webservices" />
 	<property name="webservices.class.dir" value="${cl.extensions.dir}/${extensions.path}/webservices" />
+    <property name="ws.common.lib.dir" value="${lib.dir}/ws-common" />
+    <path id="ws.common.libs">
+        <fileset dir="${ws.common.lib.dir}">
+            <include name="*.jar" />
+        </fileset>
+    </path>
+
 
 	<!-- Axis2 properties -->
     <property name="axis2.dir" value="${webservices.dir}/axis2" />
@@ -109,13 +116,6 @@
         </fileset>
     </path>
 
-    <!-- Web Service general properties -->
-	<property name="ws.common.lib.dir" value="${lib.dir}/ws-common" />
-	<path id="ws.common.libs">
-        <fileset dir="${ws.common.lib.dir}">
-            <include name="*.jar" />
-        </fileset>
-    </path>
 
 	<!-- ================================================================ -->
 	<!--                   define the different classpaths                -->
@@ -176,7 +176,7 @@
 
 	<macrodef name="compile_extension">
 		<attribute name="module" />
-		<element name="appendclasspath2" optional="yes" />
+		<element name="additionalclasspath" optional="yes" />
 		<sequential>
 			<compile_module 
 				module="@{module}" 
@@ -184,7 +184,7 @@
 				package="${extensions.path}"
 				dest="${cl.extensions.dir}">
 				<appendclasspath>
-                    <appendclasspath2 />
+                    <additionalclasspath />
                 </appendclasspath>
 			</compile_module>
 		</sequential>
