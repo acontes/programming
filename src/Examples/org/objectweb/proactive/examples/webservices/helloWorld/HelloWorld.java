@@ -131,12 +131,12 @@ public class HelloWorld implements Serializable, InitActive {
             } else if (args.length == 3) {
                 url = args[0];
                 GCMDeployment = true;
-                onANode = false;
+                onANode = true;
                 wsFrameWork = args[2];
             } else if (args.length == 4) {
                 url = args[0];
                 GCMDeployment = true;
-                onANode = true;
+                onANode = new Boolean(args[2]);
                 wsFrameWork = args[3];
             } else {
                 logger.info("Wrong number of arguments:");
