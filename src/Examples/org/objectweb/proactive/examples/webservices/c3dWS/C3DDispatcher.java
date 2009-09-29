@@ -963,11 +963,28 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
      * Instantiates a new active C3DDispatcher on the local machine
      * @param argv Name of the descriptor file
      */
-    public static void main(String[] argv) throws NodeException {
+    public static void main(String[] args) throws NodeException {
 
         try {
+            String url = "";
+            String fileName = "";
+            String wsFrameWork = "";
+            if (args.length == 2) {
+                url = "http://localhost:8080/";
+                fileName = args[0];
+                wsFrameWork = args[1];
+            } else if (args.length == 3) {
+                url = args[0];
+                fileName = args[1];
+                wsFrameWork = args[2];
+            } else {
+                System.out.println("Wrong number of arguments:");
+                System.out.println("Usage: java C3DDispatcher [url] GCMA wsFrameWork");
+                System.out.println("with wsFrameWork should be either \"axis2\" or \"cxf\" ");
+                return;
+            }
 
-            File applicationDescriptor = new File(argv[0]);
+            File applicationDescriptor = new File(fileName);
             ProActiveConfiguration.load();
             GCMApplication gcmad = PAGCMDeployment.loadApplicationDescriptor(applicationDescriptor);
             gcmad.startDeployment();
@@ -991,18 +1008,11 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
             C3DDispatcher c3dd = (C3DDispatcher) PAActiveObject.newActive(C3DDispatcher.class.getName(),
                     param, dispatcherNode);
 
-            String url = "http://localhost:8080/";
-
-            if (argv.length == 2) {
-                url = argv[1];
-            }
-
             String[] methods = new String[] { "wsRegisterUser", "wsUnregisterConsumer", "wsResetScene",
                     "wsAddSphere", "wsGetUserList", "wsUserWriteMessageExcept", "wsUserWriteMessage",
                     "wsRotateScene", "wsRegisterMigratedUser" };
 
-            WebServices.exposeAsWebService(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER, c3dd, url,
-                    "C3DDispatcher", methods);
+            WebServices.exposeAsWebService(wsFrameWork, c3dd, url, "C3DDispatcher", methods);
 
         } catch (ProActiveException e) {
             logger.error(e);

@@ -37,6 +37,7 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.rpc.client.RPCServiceClient;
 import org.objectweb.proactive.extensions.webservices.WSConstants;
+import org.objectweb.proactive.extensions.webservices.common.ClientUtils;
 
 
 /**
@@ -67,20 +68,12 @@ public class WSClientAXIS2 {
                 url = url + "/";
             }
 
-            RPCServiceClient serviceClient = new RPCServiceClient();
-
-            Options options = serviceClient.getOptions();
-
-            EndpointReference targetEPR = new EndpointReference(url + WSConstants.SERVICES_PATH +
-                "HelloWorld");
-
-            options.setTo(targetEPR);
+            RPCServiceClient serviceClient = ClientUtils.getAxis2Client(url, "HelloWorld");
 
             // Call putTextToSay
             QName op = new QName("putTextToSay");
             String textArg = "Bonjour";
             Object[] opArgs = new Object[] { textArg };
-
             serviceClient.invokeRobust(op, opArgs);
 
             System.out.println("Client added " + textArg + " into the list of texts");
@@ -88,33 +81,27 @@ public class WSClientAXIS2 {
             // Call putTextToSay
             textArg = "Au revoir";
             opArgs = new Object[] { textArg };
-
             serviceClient.invokeRobust(op, opArgs);
 
             System.out.println("Client added " + textArg + " into the list of texts");
 
             // Call sayText
             op = new QName("sayText");
-
             opArgs = new Object[] {};
             Class<?>[] returnTypes = new Class[] { String.class };
-
             Object[] response = serviceClient.invokeBlocking(op, opArgs, returnTypes);
-
             String result = (String) response[0];
 
             System.out.println("Client returned " + result);
 
             // Call sayText
             response = serviceClient.invokeBlocking(op, opArgs, returnTypes);
-
             result = (String) response[0];
 
             System.out.println("Client returned " + result);
 
             // Call sayText
             response = serviceClient.invokeBlocking(op, opArgs, returnTypes);
-
             result = (String) response[0];
 
             System.out.println("Client returned " + result);

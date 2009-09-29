@@ -38,6 +38,7 @@ import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.rpc.client.RPCServiceClient;
 import org.objectweb.proactive.extensions.webservices.WSConstants;
+import org.objectweb.proactive.extensions.webservices.common.ClientUtils;
 
 
 /**
@@ -68,24 +69,13 @@ public class WSClientComponentAXIS2 {
                 url = url + "/";
             }
 
-            RPCServiceClient serviceClient = new RPCServiceClient();
-
-            Options options = serviceClient.getOptions();
-
-            EndpointReference targetEPR;
-
-            targetEPR = new EndpointReference(url + WSConstants.SERVICES_PATH + "server_hello-world");
-
-            options.setTo(targetEPR);
+            RPCServiceClient serviceClient = ClientUtils.getAxis2Client(url, "server_hello-world");
 
             // Call helloWorld
             QName op = new QName("helloWorld");
-
             Object[] opArgs = new Object[] { "ProActive Team" };
             Class<?>[] returnTypes = new Class[] { String.class };
-
             Object[] response = serviceClient.invokeBlocking(op, opArgs, returnTypes);
-
             String result = (String) response[0];
 
             System.out.println("helloWorld returned: " + result);
@@ -94,32 +84,25 @@ public class WSClientComponentAXIS2 {
             op = new QName("setText");
             String text = "A text has been inserted";
             opArgs = new Object[] { text };
-
             serviceClient.invokeRobust(op, opArgs);
 
             System.out.println("setText(" + text + ") has been called");
 
             // Call helloWorld
             op = new QName("sayText");
-
             opArgs = new Object[] {};
             returnTypes = new Class[] { String.class };
-
             response = serviceClient.invokeBlocking(op, opArgs, returnTypes);
-
             result = (String) response[0];
 
             System.out.println("sayText returned: " + result);
 
-            targetEPR = new EndpointReference(url + WSConstants.SERVICES_PATH + "server_goodbye-world");
-            options.setTo(targetEPR);
+            serviceClient = ClientUtils.getAxis2Client(url, "server_goodbye-world");
 
             op = new QName("goodByeWorld");
             opArgs = new Object[] { "ProActive Team" };
             returnTypes = new Class[] { String.class };
-
             response = serviceClient.invokeBlocking(op, opArgs, returnTypes);
-
             result = (String) response[0];
 
             System.out.println("goodByeWorld returned: " + result);

@@ -68,6 +68,8 @@ public class WSNameAndHostDialog extends JDialog implements ActionListener, Prop
     private String cancelButtonString = "Cancel";
     protected Dispatcher c3dDispatcher;
     protected JTextField dispatcherUrl;
+    private String wsFrameWork = "cxf";
+    private JTextField wsFWTextField;
 
     /** This is NOT an Active Object: constructor is configurable! */
     public WSNameAndHostDialog() {
@@ -89,9 +91,13 @@ public class WSNameAndHostDialog extends JDialog implements ActionListener, Prop
         this.dispatcherUrl = new JTextField(localHostUrlService, 10);
         this.dispatcherUrl.addActionListener(this);
 
+        this.wsFWTextField = new JTextField(this.wsFrameWork, 3);
+        this.wsFWTextField.addActionListener(this);
+
         //Create an array of the text and components to be displayed.
         Object[] array = { "Please enter your name,", this.userTextField, "and the C3DDispatcher host",
-                this.hostNameTextField, "and the C3DDispatcher Service url", this.dispatcherUrl };
+                this.hostNameTextField, "and the C3DDispatcher Service url", this.dispatcherUrl,
+                "and the web service framework", this.wsFWTextField };
 
         //Create an array specifying the number of dialog buttons and their text.
         Object[] options = { this.enterButtonString, this.cancelButtonString };
@@ -236,6 +242,10 @@ public class WSNameAndHostDialog extends JDialog implements ActionListener, Prop
 
     public String getValidatedDispatcherService() {
         return this.dispatcherUrl.getText();
+    }
+
+    public String getWsFrameWork() {
+        return this.wsFrameWork;
     }
 
     /** Gets the name of the machine this is running on.

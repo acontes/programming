@@ -61,8 +61,6 @@ import org.objectweb.proactive.core.util.SerializableMethod;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.webservices.common.MethodUtils;
-import org.objectweb.proactive.extensions.webservices.cxf.interceptors.NameSpaceInInterceptor;
-import org.objectweb.proactive.extensions.webservices.cxf.interceptors.NameSpaceOutInterceptor;
 
 
 /**

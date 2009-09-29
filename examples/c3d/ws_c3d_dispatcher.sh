@@ -19,6 +19,9 @@ workingDir=`dirname $0`
 . ${workingDir}/../env.sh
 
 export XMLDESCRIPTOR=$workingDir/GCMA_Renderer.xml
-$JAVACMD -Dproactive.http.port=8080 org.objectweb.proactive.examples.webservices.c3dWS.C3DDispatcher $XMLDESCRIPTOR "$@"
+
+CLASSPATH=$CLASSPATH:$PROACTIVE_HOME/src/Extensions/org/objectweb/proactive/extensions/webservices/cxf/lib/cxf-manifest.jar
+JAVACMD=$JAVACMD" -Djava.rmi.server.RMIClassLoaderSpi=org.objectweb.proactive.core.classloading.protocols.ProActiveRMIClassLoader"
+$JAVACMD -Dproactive.http.port=8080 org.objectweb.proactive.examples.webservices.c3dWS.C3DDispatcher "$@"
 echo
 echo ---------------------------------------------------------

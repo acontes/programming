@@ -52,6 +52,8 @@ import org.objectweb.proactive.examples.webservices.c3dWS.gui.WSNameAndHostDialo
 import org.objectweb.proactive.examples.webservices.c3dWS.gui.WaitFrame;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
+import org.objectweb.proactive.extensions.webservices.WSConstants;
+import org.objectweb.proactive.extensions.webservices.common.ClientUtils;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
@@ -68,6 +70,8 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
 
     /** url of the host where the C3DDispatcher is deployed */
     private String dispatcherUrl;
+
+    private String wsFrameWork;
 
     /** AsyncRefto self, needed to add method on own queue */
     private User me;
@@ -102,10 +106,11 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
     public WSUser() {
     }
 
-    public WSUser(String dispatcherUrl, String name, Dispatcher disp) {
+    public WSUser(String dispatcherUrl, String name, Dispatcher disp, String wsFrameWork) {
         this.dispatcherUrl = dispatcherUrl;
         this.userName = name;
         this.c3ddispatcher = disp;
+        this.wsFrameWork = wsFrameWork;
     }
 
     /** Returns the C3DUser constructor arguments, after a dialog has popped up */
@@ -120,7 +125,7 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
         }
 
         return new Object[] { dispUrl, userAndHostNameDialog.getValidatedUserName(),
-                userAndHostNameDialog.getValidatedDispatcher() };
+                userAndHostNameDialog.getValidatedDispatcher(), userAndHostNameDialog.getWsFrameWork() };
     }
 
     /**
@@ -132,8 +137,14 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
     public void rebuild() {
         this.me = (User) org.objectweb.proactive.api.PAActiveObject.getStubOnThis();
         try {
-            WSDispatcherCaller.call(this.dispatcherUrl, "wsRegisterMigratedUser", new Object[] { i_user });
-        } catch (AxisFault e) {
+            if (this.wsFrameWork == WSConstants.AXIS2_FRAMEWORK_IDENTIFIER) {
+                ClientUtils.oneWayCall(this.wsFrameWork, this.dispatcherUrl, "C3DDispatcher",
+                        "wsRegisterMigratedUser", new Object[] { i_user }, null);
+            } else {
+                ClientUtils.oneWayCall(this.wsFrameWork, this.dispatcherUrl, "C3DDispatcher",
+                        "wsRegisterMigratedUser", new Object[] { i_user }, C3DDispatcher.class);
+            }
+        } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -172,16 +183,23 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
         this.me = (User) org.objectweb.proactive.api.PAActiveObject.getStubOnThis();
 
         Object[] callReturn = null;
+
         try {
-            /**
-             * The following lines should work but it seems that there is
-             * a bug in axis2. To get round this problem, we serialize the object and
-             * deserialize it at the reception.
-             */
-            callReturn = WSDispatcherCaller.call(this.dispatcherUrl, "wsRegisterUser", new Object[] {
-                    HttpMarshaller.marshallObject(this.getMe()), this.getUserName() },
-                    new Class<?>[] { int.class });
-        } catch (AxisFault e) {
+            if (this.wsFrameWork == WSConstants.AXIS2_FRAMEWORK_IDENTIFIER) {
+                /**
+                 * The following lines should work but it seems that there is
+                 * a bug in axis2. To get round this problem, we serialize the object and
+                 * deserialize it at the reception.
+                 */
+                callReturn = ClientUtils.call(this.wsFrameWork, this.dispatcherUrl, "C3DDispatcher",
+                        "wsRegisterUser", new Object[] { HttpMarshaller.marshallObject(this.getMe()),
+                                this.getUserName() }, new Class<?>[] { int.class });
+            } else {
+                callReturn = ClientUtils.call(this.wsFrameWork, this.dispatcherUrl, "C3DDispatcher",
+                        "wsRegisterUser", new Object[] { HttpMarshaller.marshallObject(this.getMe()),
+                                this.getUserName() }, C3DDispatcher.class);
+            }
+        } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -259,8 +277,14 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
      */
     public void terminate() {
         try {
-            WSDispatcherCaller.call(this.dispatcherUrl, "wsUnregisterConsumer", new Object[] { i_user });
-        } catch (AxisFault e) {
+            if (this.wsFrameWork == WSConstants.AXIS2_FRAMEWORK_IDENTIFIER) {
+                ClientUtils.oneWayCall(this.wsFrameWork, this.dispatcherUrl, "C3DDispatcher",
+                        "wsUnregisterConsumer", new Object[] { i_user }, null);
+            } else {
+                ClientUtils.oneWayCall(this.wsFrameWork, this.dispatcherUrl, "C3DDispatcher",
+                        "wsUnregisterConsumer", new Object[] { i_user }, C3DDispatcher.class);
+            }
+        } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -271,13 +295,25 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
     /**
      * Entry point of the program
      */
-    public static void main(String[] argv) {
-        GCMApplication proActiveDescriptor = null;
+    public static void main(String[] args) {
+        String fileDescriptor = "";
+        String wsFW = "";
 
+        if (args.length == 2) {
+            fileDescriptor = args[0];
+            wsFW = args[1];
+        } else {
+            System.out.println("Wrong number of arguments:");
+            System.out.println("Usage: java WSUser GCMA wsFrameWork");
+            System.out.println("where wsFrameWork should be either 'axis2' or 'cxf'");
+            return;
+        }
+
+        GCMApplication proActiveDescriptor = null;
         ProActiveConfiguration.load();
 
         try {
-            proActiveDescriptor = PAGCMDeployment.loadApplicationDescriptor(new File(argv[0]));
+            proActiveDescriptor = PAGCMDeployment.loadApplicationDescriptor(new File(fileDescriptor));
         } catch (Exception e) {
             logger.error("Trouble loading descriptor file");
             e.printStackTrace();
@@ -302,8 +338,14 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
     /** Ask the dispatcher to revert to original scene */
     public void resetScene() {
         try {
-            WSDispatcherCaller.call(this.dispatcherUrl, "wsResetScene", new Object[] {});
-        } catch (AxisFault e) {
+            if (this.wsFrameWork == WSConstants.AXIS2_FRAMEWORK_IDENTIFIER) {
+                ClientUtils.oneWayCall(this.wsFrameWork, this.dispatcherUrl, "C3DDispatcher", "wsResetScene",
+                        new Object[] { i_user }, null);
+            } else {
+                ClientUtils.oneWayCall(this.wsFrameWork, this.dispatcherUrl, "C3DDispatcher", "wsResetScene",
+                        new Object[] { i_user }, C3DDispatcher.class);
+            }
+        } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -312,8 +354,14 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
     /** Ask the dispatcher to add a sphere */
     public void addSphere() {
         try {
-            WSDispatcherCaller.call(this.dispatcherUrl, "wsAddSphere", new Object[] {});
-        } catch (AxisFault e) {
+            if (this.wsFrameWork == WSConstants.AXIS2_FRAMEWORK_IDENTIFIER) {
+                ClientUtils.oneWayCall(this.wsFrameWork, this.dispatcherUrl, "C3DDispatcher", "wsAddSphere",
+                        new Object[] { i_user }, null);
+            } else {
+                ClientUtils.oneWayCall(this.wsFrameWork, this.dispatcherUrl, "C3DDispatcher", "wsAddSphere",
+                        new Object[] { i_user }, C3DDispatcher.class);
+            }
+        } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -323,9 +371,14 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
     public void getUserList() {
         Object[] callReturn = null;
         try {
-            callReturn = WSDispatcherCaller.call(this.dispatcherUrl, "wsGetUserList", new Object[] {},
-                    new Class<?>[] { String.class });
-        } catch (AxisFault e) {
+            if (this.wsFrameWork == WSConstants.AXIS2_FRAMEWORK_IDENTIFIER) {
+                callReturn = ClientUtils.call(this.wsFrameWork, this.dispatcherUrl, "C3DDispatcher",
+                        "wsGetUserList", new Object[] {}, String.class);
+            } else {
+                ClientUtils.oneWayCall(this.wsFrameWork, this.dispatcherUrl, "C3DDispatcher",
+                        "wsGetUserList", new Object[] {}, C3DDispatcher.class);
+            }
+        } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -340,23 +393,40 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
         if (talkId == null) {
             // BroadCast
             gui.writeMessage("<to all> " + message + '\n');
+
             try {
-                WSDispatcherCaller.call(this.dispatcherUrl, "wsUserWriteMessageExcept", new Object[] {
-                        this.i_user, "[from " + this.userName + "] " + message });
-            } catch (AxisFault e) {
+                if (this.wsFrameWork == WSConstants.AXIS2_FRAMEWORK_IDENTIFIER) {
+                    ClientUtils.oneWayCall(this.wsFrameWork, this.dispatcherUrl, "C3DDispatcher",
+                            "wsUserWriteMessageExcept", new Object[] { this.i_user,
+                                    "[from " + this.userName + "] " + message }, null);
+                } else {
+                    ClientUtils.oneWayCall(this.wsFrameWork, this.dispatcherUrl, "C3DDispatcher",
+                            "wsUserWriteMessageExcept", new Object[] { this.i_user,
+                                    "[from " + this.userName + "] " + message }, C3DDispatcher.class);
+                }
+            } catch (Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
+
         } else {
             // Private message
             gui.writeMessage("<to " + recipientName + "> " + message + '\n');
             try {
-                WSDispatcherCaller.call(this.dispatcherUrl, "wsUserWriteMessage", new Object[] {
-                        talkId.intValue(), "[Private from " + this.userName + "] " + message });
-            } catch (AxisFault e) {
+                if (this.wsFrameWork == WSConstants.AXIS2_FRAMEWORK_IDENTIFIER) {
+                    ClientUtils.oneWayCall(this.wsFrameWork, this.dispatcherUrl, "C3DDispatcher",
+                            "wsUserWriteMessage", new Object[] { this.i_user,
+                                    "[from " + this.userName + "] " + message }, null);
+                } else {
+                    ClientUtils.oneWayCall(this.wsFrameWork, this.dispatcherUrl, "C3DDispatcher",
+                            "wsUserWriteMessage", new Object[] { this.i_user,
+                                    "[from " + this.userName + "] " + message }, C3DDispatcher.class);
+                }
+            } catch (Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
+
         }
     }
 
@@ -369,9 +439,14 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
      */
     public void rotateScene(Vec rotationAngle) {
         try {
-            WSDispatcherCaller.call(this.dispatcherUrl, "wsRotateScene",
-                    new Object[] { i_user, rotationAngle });
-        } catch (AxisFault e) {
+            if (this.wsFrameWork == WSConstants.AXIS2_FRAMEWORK_IDENTIFIER) {
+                ClientUtils.oneWayCall(this.wsFrameWork, this.dispatcherUrl, "C3DDispatcher",
+                        "wsRotateScene", new Object[] { i_user, rotationAngle }, null);
+            } else {
+                ClientUtils.oneWayCall(this.wsFrameWork, this.dispatcherUrl, "C3DDispatcher",
+                        "wsRotateScene", new Object[] { i_user, rotationAngle }, C3DDispatcher.class);
+            }
+        } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }

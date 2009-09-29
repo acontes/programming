@@ -3,6 +3,7 @@ package org.objectweb.proactive.examples.webservices.helloWorld;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientFactoryBean;
 import org.objectweb.proactive.extensions.webservices.WSConstants;
+import org.objectweb.proactive.extensions.webservices.common.ClientUtils;
 
 
 public class WSClientCXF {
@@ -32,11 +33,7 @@ public class WSClientCXF {
             url = url + "/";
         }
 
-        ClientFactoryBean factory = new ClientFactoryBean();
-        factory.setServiceClass(HelloWorld.class);
-        factory.setAddress(url + WSConstants.SERVICES_PATH + "HelloWorld");
-        factory.getServiceFactory().setQualifyWrapperSchema(false);
-        Client client = factory.create();
+        Client client = ClientUtils.getCxfClient(url, HelloWorld.class, "HelloWorld");
 
         Object[] res;
         try {
