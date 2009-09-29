@@ -35,10 +35,6 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.LinkedList;
 
-import javax.xml.namespace.QName;
-
-import org.apache.cxf.endpoint.Client;
-import org.apache.cxf.frontend.ClientFactoryBean;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
@@ -52,7 +48,6 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
-import org.objectweb.proactive.extensions.webservices.WSConstants;
 import org.objectweb.proactive.extensions.webservices.WebServices;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
@@ -85,14 +80,11 @@ public class HelloWorld implements Serializable, InitActive {
     }
 
     public void putTextToSay(String textToSay) {
-        System.out.println("textToSay = " + textToSay);
         this.textsToSay.add(textToSay);
-        System.out.println("last inserted element = " + this.textsToSay.getLast());
     }
 
     public void putHelloWorld() {
         this.textsToSay.add("Hello World!");
-        System.out.println("last inserted element = " + this.textsToSay.getLast());
     }
 
     public String sayText() {
@@ -106,9 +98,7 @@ public class HelloWorld implements Serializable, InitActive {
     }
 
     public String putTextToSayAndConfirm(String textToSay) {
-        System.out.println("textToSay = " + textToSay);
         this.textsToSay.add(textToSay);
-        System.out.println("last inserted element = " + this.textsToSay.getLast());
         return "The text \"" + textToSay + "\" has been inserted into the list";
     }
 

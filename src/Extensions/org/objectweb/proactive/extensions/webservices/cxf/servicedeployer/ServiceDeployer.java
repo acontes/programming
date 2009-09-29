@@ -167,27 +167,20 @@ public class ServiceDeployer implements ServiceDeployerItf {
          * Attaches a list of in-interceptors
          */
         List<Interceptor> inInterceptors = new ArrayList<Interceptor>();
-
-        NameSpaceInInterceptor nameSpaceInInterceptor = new NameSpaceInInterceptor();
         LoggingInInterceptor loggingInInterceptor = new LoggingInInterceptor();
-        //inInterceptors.add(nameSpaceInInterceptor);
         inInterceptors.add(loggingInInterceptor);
         svrFactory.setInInterceptors(inInterceptors);
 
         /*
          * Attaches a list of out-interceptors
          */
-        NameSpaceOutInterceptor nameSpaceOutInterceptor = new NameSpaceOutInterceptor();
         List<Interceptor> outInterceptors = new ArrayList<Interceptor>();
         LoggingOutInterceptor loggingOutInterceptor = new LoggingOutInterceptor();
-        // outInterceptors.add(nameSpaceOutInterceptor);
         outInterceptors.add(loggingOutInterceptor);
         svrFactory.setOutInterceptors(outInterceptors);
 
         svrFactory.create();
 
-        System.out.println("QualifyWrapperSchema = " +
-            svrFactory.getServiceFactory().getQualifyWrapperSchema());
         serverList.put(serviceName, svrFactory.getServer());
 
         logger.info("The service " + serviceName + " has been deployed");

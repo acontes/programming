@@ -45,7 +45,6 @@ import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.extensions.webservices.WebServices;
-import org.objectweb.proactive.extensions.webservices.WSConstants;
 
 
 /**
@@ -63,7 +62,6 @@ public class HelloWorldComponent implements HelloWorldItf, GoodByeWorldItf {
     }
 
     public void setText(String text) {
-        System.out.println("text = " + text);
         this.text = text;
     }
 

@@ -1,7 +1,5 @@
 package org.objectweb.proactive.examples.webservices.helloWorld;
 
-import org.apache.cxf.endpoint.Client;
-import org.apache.cxf.frontend.ClientFactoryBean;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.objectweb.proactive.extensions.webservices.cxf.WSConstants;
 

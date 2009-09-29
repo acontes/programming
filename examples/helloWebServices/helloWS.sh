@@ -19,9 +19,11 @@ echo
 
 CXF_HOME=$PROACTIVE/src/Extensions/org/objectweb/proactive/extensions/webservices/cxf
 CLASSPATH=$CLASSPATH:$CXF_HOME/lib/cxf-manifest.jar
+JAVACMD=$JAVACMD" -Dproactive.http.port=8080"
+JAVACMD=$JAVACMD" -Djava.rmi.server.RMIClassLoaderSpi=org.objectweb.proactive.core.classloading.protocols.ProActiveRMIClassLoader"
 
 #$JAVACMD $HTTP_OPT org.objectweb.proactive.examples.webservices.helloWorld.HelloWorld "$@"
-$JAVACMD -Dproactive.http.port=8080 -Djava.rmi.server.RMIClassLoaderSpi="org.objectweb.proactive.core.classloading.protocols.ProActiveRMIClassLoader" org.objectweb.proactive.examples.webservices.helloWorld.HelloWorld "$@"
+$JAVACMD  org.objectweb.proactive.examples.webservices.helloWorld.HelloWorld "$@"
 
 echo
 echo ------------------------------------------------------------

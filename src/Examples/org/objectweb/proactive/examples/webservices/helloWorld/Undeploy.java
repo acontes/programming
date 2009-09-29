@@ -33,7 +33,6 @@ package org.objectweb.proactive.examples.webservices.helloWorld;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.extensions.webservices.WebServices;
-import org.objectweb.proactive.extensions.webservices.axis2.deployer.PADeployer;
 
 
 /**

@@ -9,6 +9,7 @@ workingDir=`dirname $0`
 CXF_HOME=$PROACTIVE/src/Extensions/org/objectweb/proactive/extensions/webservices/cxf
 CLASSPATH=$CLASSPATH:$CXF_HOME/lib/cxf-manifest.jar
 JAVACMD=$JAVACMD" -Dproactive.http.port=8080 -Dfractal.provider=org.objectweb.proactive.core.component.Fractive"
+JAVACMD=$JAVACMD" -Djava.rmi.server.RMIClassLoaderSpi=org.objectweb.proactive.core.classloading.protocols.ProActiveRMIClassLoader"
 
 $JAVACMD org.objectweb.proactive.examples.webservices.helloWorld.HelloWorldComponent "$@"
 

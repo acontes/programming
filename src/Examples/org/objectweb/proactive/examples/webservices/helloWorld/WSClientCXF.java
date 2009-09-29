@@ -1,12 +1,7 @@
 package org.objectweb.proactive.examples.webservices.helloWorld;
 
-import javax.xml.namespace.QName;
-
 import org.apache.cxf.endpoint.Client;
-import org.apache.cxf.endpoint.Endpoint;
-import org.apache.cxf.endpoint.EndpointImpl;
 import org.apache.cxf.frontend.ClientFactoryBean;
-import org.apache.cxf.service.model.BindingOperationInfo;
 import org.objectweb.proactive.extensions.webservices.WSConstants;
 
 
@@ -41,17 +36,11 @@ public class WSClientCXF {
         factory.setServiceClass(HelloWorld.class);
         factory.setAddress(url + WSConstants.SERVICES_PATH + "HelloWorld");
         factory.getServiceFactory().setQualifyWrapperSchema(false);
-        boolean isQualify = factory.getServiceFactory().getQualifyWrapperSchema();
         Client client = factory.create();
 
         Object[] res;
-        System.out.println("isQualify returns " + isQualify);
         try {
 
-            //            Set<Entry<String,Object>> entries = client.getRequestContext().entrySet();
-            //            for (Entry<String, Object> entry : entries) {
-            //                System.out.println(entry.getKey());
-            //            }
             res = client.invoke("sayText");
             String text = (String) res[0];
             System.out.println(text);

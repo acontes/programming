@@ -6,7 +6,7 @@ echo --- Hello World Web Service Call ------------------------------------------
 workingDir=`dirname $0`
 . ${workingDir}/../env.sh
 
-$JAVACMD org.objectweb.proactive.examples.webservices.helloWorld.WSClient "$@"
+$JAVACMD org.objectweb.proactive.examples.webservices.helloWorld.WSClientAXIS2 "$@"
 
 echo
 echo ------------------------------------------------------------
