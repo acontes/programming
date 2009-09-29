@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -29,21 +29,37 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.examples.webservices.c3dWS;
+package org.objectweb.proactive.examples.webservices.c3dWS.geom;
 
-import org.objectweb.proactive.examples.webservices.c3dWS.geom.Scene;
+/**
+ * A class for making rays (lines in 3D), which have a start point, and a direction.
+ */
+final public class Ray implements java.io.Serializable {
+    public Vec P;
+    public Vec D;
 
+    public Ray(Vec pnt, Vec dir) {
+        P = new Vec(pnt.getX(), pnt.getY(), pnt.getZ());
+        D = new Vec(dir.getX(), dir.getY(), dir.getZ());
+        D.normalize();
+    }
 
-/** Methods proposed by Objects which can render scenes */
-public interface RenderingEngine {
+    /** This is very dangerous to use, as a 0,0 line is not a line ! */
+    public Ray() {
+        P = new Vec();
+        D = new Vec();
+    }
 
-    /** Creates the local objects used in the rendering */
-    public abstract void setScene(Scene scene);
+    /**
+     * Works out the point which lies on this line, at distance t from origine.
+     * @returns V = P + D * t
+     */
+    public Vec point(double t) {
+        return new Vec(P.getX() + (D.getX() * t), P.getY() + (D.getY() * t), P.getZ() + (D.getZ() * t));
+    }
 
-    /** Draw the scene and send back the result to the dispatcher. <i>Heavily optimized!!!</i>
-     * @return the partial Image that was asked for */
-    public abstract Image2D render(int engineNb, Interval interval);
-
-    /** A textual representation of the renderer */
-    public abstract String toString();
+    @Override
+    public String toString() {
+        return "{ Po = " + P.toString() + " dir= " + D.toString() + "}";
+    }
 }

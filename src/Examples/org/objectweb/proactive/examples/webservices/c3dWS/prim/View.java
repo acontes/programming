@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -29,21 +29,30 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.examples.webservices.c3dWS;
+package org.objectweb.proactive.examples.webservices.c3dWS.prim;
 
-import org.objectweb.proactive.examples.webservices.c3dWS.geom.Scene;
+import org.objectweb.proactive.examples.webservices.c3dWS.geom.Vec;
 
 
-/** Methods proposed by Objects which can render scenes */
-public interface RenderingEngine {
+/**
+ * Represents a punctual 3D viewpoint
+ */
+@SuppressWarnings("serial")
+public class View implements java.io.Serializable {
+    public Vec from;
+    public Vec at;
+    public Vec up;
+    public double dist;
+    public double angle;
+    public double aspect;
 
-    /** Creates the local objects used in the rendering */
-    public abstract void setScene(Scene scene);
-
-    /** Draw the scene and send back the result to the dispatcher. <i>Heavily optimized!!!</i>
-     * @return the partial Image that was asked for */
-    public abstract Image2D render(int engineNb, Interval interval);
-
-    /** A textual representation of the renderer */
-    public abstract String toString();
+    /** Default location */
+    public View() {
+        this.from = new Vec(0, 0, -30);
+        this.at = new Vec(0, 0, -15);
+        this.up = new Vec(0, 1, 0);
+        this.angle = (35.0 * 3.14159265) / 180.0;
+        this.aspect = 1.0;
+        this.dist = 1.0;
+    }
 }

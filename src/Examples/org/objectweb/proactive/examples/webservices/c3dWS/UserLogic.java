@@ -31,7 +31,7 @@
  */
 package org.objectweb.proactive.examples.webservices.c3dWS;
 
-import org.objectweb.proactive.examples.c3d.geom.Vec;
+import org.objectweb.proactive.examples.webservices.c3dWS.geom.Vec;
 
 
 /** These are the methods accessible by the User Gui classes, which somewhat control the User active

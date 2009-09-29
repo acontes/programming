@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -29,21 +29,29 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.examples.webservices.c3dWS;
+package org.objectweb.proactive.examples.webservices.c3dWS.prim;
 
-import org.objectweb.proactive.examples.webservices.c3dWS.geom.Scene;
+/**
+ * Representation of the intersection between a Ray and a Primitive.
+ * Would be set to null if Ray does not hit Primitive.
+ */
+public class Isect implements java.io.Serializable {
 
+    /**
+     * Remember, the ray has two vecs that define it : P and D.
+     * This t is the value so that P + tD = point of collision which Primitive
+     */
+    public double t;
 
-/** Methods proposed by Objects which can render scenes */
-public interface RenderingEngine {
+    /**
+     * The Primitive which was checked for intersection
+     */
+    public Primitive prim;
 
-    /** Creates the local objects used in the rendering */
-    public abstract void setScene(Scene scene);
-
-    /** Draw the scene and send back the result to the dispatcher. <i>Heavily optimized!!!</i>
-     * @return the partial Image that was asked for */
-    public abstract Image2D render(int engineNb, Interval interval);
-
-    /** A textual representation of the renderer */
-    public abstract String toString();
+    /**
+     * Is this a ray that comes frmo the inside of the Primitive, or from the outside?
+     * enter = true means from outside -->  inside
+     * HERM, sort of... In fact, I'm not sure what this is...
+     */
+    public boolean enter;
 }

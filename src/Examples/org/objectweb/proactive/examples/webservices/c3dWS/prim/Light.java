@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -29,21 +29,23 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.examples.webservices.c3dWS;
+package org.objectweb.proactive.examples.webservices.c3dWS.prim;
 
-import org.objectweb.proactive.examples.webservices.c3dWS.geom.Scene;
+import org.objectweb.proactive.examples.webservices.c3dWS.geom.Vec;
 
 
-/** Methods proposed by Objects which can render scenes */
-public interface RenderingEngine {
+/**
+ * Represents a punctual light source
+ */
+public class Light implements java.io.Serializable {
+    public Vec pos;
+    public double brightness;
 
-    /** Creates the local objects used in the rendering */
-    public abstract void setScene(Scene scene);
+    public Light() {
+    }
 
-    /** Draw the scene and send back the result to the dispatcher. <i>Heavily optimized!!!</i>
-     * @return the partial Image that was asked for */
-    public abstract Image2D render(int engineNb, Interval interval);
-
-    /** A textual representation of the renderer */
-    public abstract String toString();
+    public Light(double x, double y, double z, double brightness) {
+        this.pos = new Vec(x, y, z);
+        this.brightness = brightness;
+    }
 }
