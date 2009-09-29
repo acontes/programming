@@ -33,9 +33,15 @@ package org.objectweb.proactive.extensions.webservices;
 
 import java.lang.reflect.Method;
 
+import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.api.Interface;
+import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -48,6 +54,7 @@ import org.objectweb.proactive.core.ProActiveException;
 public final class WebServices extends WSConstants {
 
     private static String DEFAULT_FRAMEWORK_IDENTIFIER = "axis2";
+    static private Logger logger = ProActiveLogger.getLogger(Loggers.WEB_SERVICES);
 
     /**
      * Expose an active object as a web service with the methods specified in <code>methods</code>
@@ -71,6 +78,8 @@ public final class WebServices extends WSConstants {
         } else {
             throw new ProActiveException("Unknown web service framework identifier: " + wsFrameWork);
         }
+        logger.info("The service '" + urn + "' has been deployed on " + url + WSConstants.SERVICES_PATH +
+            urn + "?wsdl using " + wsFrameWork);
     }
 
     /**
@@ -95,6 +104,8 @@ public final class WebServices extends WSConstants {
         } else {
             throw new ProActiveException("Unknown web service framework identifier: " + wsFrameWork);
         }
+        logger.info("The service '" + urn + "' has been deployed on " + url + WSConstants.SERVICES_PATH +
+            urn + "?wsdl using " + wsFrameWork);
     }
 
     /**
@@ -115,6 +126,8 @@ public final class WebServices extends WSConstants {
         } else {
             throw new ProActiveException("Unknown web service framework identifier: " + wsFrameWork);
         }
+        logger.info("The service '" + urn + "' has been deployed on " + url + WSConstants.SERVICES_PATH +
+            urn + "?wsdl using " + wsFrameWork);
     }
 
     /**
@@ -134,6 +147,8 @@ public final class WebServices extends WSConstants {
         } else {
             throw new ProActiveException("Unknown web service framework identifier: " + wsFrameWork);
         }
+        logger.info("The service '" + urn + "' located at " + url + WSConstants.SERVICES_PATH + urn +
+            "?wsdl has been undeployed " + " using " + wsFrameWork);
     }
 
     /**
@@ -161,6 +176,25 @@ public final class WebServices extends WSConstants {
         } else {
             throw new ProActiveException("Unknown web service framework identifier: " + wsFrameWork);
         }
+
+        for (String interfaceName : interfaceNames) {
+            Interface interface_;
+            try {
+                interface_ = (Interface) component.getFcInterface(interfaceName);
+            } catch (NoSuchInterfaceException e) {
+                e.printStackTrace();
+                continue;
+            }
+
+            if (!interfaceName.contains("-controller") && !interfaceName.equals("component")) {
+                if (!((ProActiveInterfaceType) interface_.getFcItfType()).isFcClientItf()) {
+
+                    logger.info("The interface '" + interfaceName + "' of the component '" + componentName +
+                        "' has been deployed at " + url + WSConstants.SERVICES_PATH + componentName + "_" +
+                        interfaceName + "?wsdl");
+                }
+            }
+        }
     }
 
     /**
@@ -184,6 +218,20 @@ public final class WebServices extends WSConstants {
                     component, url, componentName);
         } else {
             throw new ProActiveException("Unknown web service framework identifier: " + wsFrameWork);
+        }
+        Object[] interfaces = component.getFcInterfaces();
+        for (Object object : interfaces) {
+            Interface interface_ = (Interface) object;
+            String interfaceName = interface_.getFcItfName();
+
+            if (!interfaceName.contains("-controller") && !interfaceName.equals("component")) {
+                if (!((ProActiveInterfaceType) interface_.getFcItfType()).isFcClientItf()) {
+
+                    logger.info("The interface '" + interfaceName + "' of the component '" + componentName +
+                        "' has been deployed at " + url + WSConstants.SERVICES_PATH + componentName + "_" +
+                        interfaceName + "?wsdl");
+                }
+            }
         }
     }
 
@@ -210,6 +258,21 @@ public final class WebServices extends WSConstants {
         } else {
             throw new ProActiveException("Unknown web service framework identifier: " + wsFrameWork);
         }
+
+        Object[] interfaces = component.getFcInterfaces();
+        for (Object object : interfaces) {
+            Interface interface_ = (Interface) object;
+            String interfaceName = interface_.getFcItfName();
+
+            if (!interfaceName.contains("-controller") && !interfaceName.equals("component")) {
+                if (!((ProActiveInterfaceType) interface_.getFcItfType()).isFcClientItf()) {
+
+                    logger.info("The interface '" + interfaceName + "' of the component '" + componentName +
+                        "' deployed at " + url + WSConstants.SERVICES_PATH + componentName + "_" +
+                        interfaceName + "?wsdl has been undeployed");
+                }
+            }
+        }
     }
 
     /**
@@ -231,6 +294,12 @@ public final class WebServices extends WSConstants {
                     componentName, interfaceNames);
         } else {
             throw new ProActiveException("Unknown web service framework identifier: " + wsFrameWork);
+        }
+
+        for (String interfaceName : interfaceNames) {
+            logger.info("The interface '" + interfaceName + "' of the component '" + componentName +
+                "' deployed at " + url + WSConstants.SERVICES_PATH + componentName + "_" + interfaceName +
+                "?wsdl has been undeployed");
         }
     }
 

@@ -40,6 +40,7 @@ import org.apache.log4j.Logger;
 import org.mortbay.jetty.servlet.ServletHolder;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.httpserver.HTTPServer;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -107,7 +108,9 @@ public final class WebServices extends WSConstants {
             }
         }
 
-        logger.info("Deployed axis servlet on the local Jetty server");
+        logger.info("Axis servlet has been deployed on the local Jetty server " +
+            "with its embedded ServiceDeployer service located at " + "http://localhost:" +
+            PAProperties.PA_XMLHTTP_PORT.getValue() + "/" + WSConstants.SERVICES_PATH + "ServiceDeployer");
     }
 
     /**

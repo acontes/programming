@@ -40,10 +40,11 @@ public class WSConstants extends org.objectweb.proactive.extensions.webservices.
 
     public static final String PROACTIVE_JAR;
     static {
-        String temp = WSConstants.class.getResource("/org").getPath();
+        String temp = WSConstants.class.getResource("/org/objectweb/proactive").getPath();
         temp = temp.substring(0, temp.indexOf('!'));
         PROACTIVE_JAR = temp.substring(temp.indexOf(':') + 1);
     }
+
     public static final String AXIS_XML_ENTRY = "org/objectweb/proactive/extensions/webservices/axis2/conf/axis2.xml";
     public static final String AXIS_REPOSITORY_ENTRY = "org/objectweb/proactive/extensions/webservices/axis2/repository/";
 

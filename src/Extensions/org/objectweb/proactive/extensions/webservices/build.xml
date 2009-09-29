@@ -6,15 +6,21 @@
 	<target name="compile" depends="core,-compile"/>
 
 	<target name="-compile">
+
+		<subant target="-compile" inheritall="yes" failonerror="true">
+            <fileset dir="${axis2.dir}" includes="build-axis2.xml" />
+        </subant>
+
+		<subant target="-compile" inheritall="yes" failonerror="true">
+            <fileset dir="${cxf.dir}" includes="build-cxf.xml" />
+        </subant>
+
 		<compile_extension module="webservices">
-			<appendclasspath2>
-				<path refid="cxf.libs"/>
-			</appendclasspath2>
+		    <appendclasspath2>
+                <path refid="axis2.libs"/>
+                <path refid="cxf.libs" />
+                <path refid="ws.common.libs" />
+            </appendclasspath2>
 		</compile_extension>
-
-		<subant target="compile-axis2" inheritall="true" failonerror="true">
-			  <fileset dir="${axis2.dir}" includes="build-axis2.xml" />
-		</subant>
-
 	</target>
 </project>

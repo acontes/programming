@@ -120,10 +120,9 @@ public final class WebServices extends WSConstants {
             svrFactory.create();
 
             logger
-                    .info("The service ServiceDeployer has been deployed on the jetty server located at http://localhost:" +
-                        PAProperties.PA_XMLHTTP_PORT.getValue() +
-                        "/" +
-                        WSConstants.SERVICES_PATH +
+                    .info("Cxf servlet has been deployed on the local Jetty server " +
+                        "with its embedded ServiceDeployer service located at " + "http://localhost:" +
+                        PAProperties.PA_XMLHTTP_PORT.getValue() + "/" + WSConstants.SERVICES_PATH +
                         "ServiceDeployer");
 
         } catch (Exception e) {
@@ -142,8 +141,6 @@ public final class WebServices extends WSConstants {
      *					 If null, then all methods will be exposed
      */
     public static void exposeAsWebService(Object o, String url, String urn, Method[] methods) {
-        logger.info("Trying to expose " + o.getClass().getSuperclass().getName() + " at " + url +
-            WSConstants.SERVICES_PATH + urn);
         try {
             MethodUtils.checkMethodsClass(methods);
             PADeployer.deploy(o, url, urn, methods, false);
@@ -162,8 +159,6 @@ public final class WebServices extends WSConstants {
      *                   If null, then all methods will be exposed
      */
     public static void exposeAsWebService(Object o, String url, String urn, String[] methodsName) {
-        logger.info("Trying to expose " + o.getClass().getSuperclass().getName() + " at " + url +
-            WSConstants.SERVICES_PATH + urn);
         try {
             // Transforms the array methods' name into an array of
             // methods (of type Method)
@@ -186,8 +181,6 @@ public final class WebServices extends WSConstants {
      * @param urn The name of the object
      */
     public static void exposeAsWebService(Object o, String url, String urn) {
-        logger.info("Trying to expose " + o.getClass().getSuperclass().getName() + " at " + url +
-            WSConstants.SERVICES_PATH + urn);
         PADeployer.deploy(o, url, urn, null, false);
     }
 
@@ -198,7 +191,6 @@ public final class WebServices extends WSConstants {
      * @param url The url of the web server
      */
     public static void unExposeAsWebService(String url, String urn) {
-        logger.info("Trying to unexpose the service " + urn + " at " + url + WSConstants.SERVICES_PATH + urn);
         PADeployer.undeploy(url, urn);
     }
 

@@ -194,7 +194,6 @@ public class ServiceDeployer {
 
             // Add the service to the axis configuration
             axisConfiguration.addService(axisService);
-            logger.info("The deployer service has deployed the service " + serviceName);
         } catch (Exception e) {
             e.printStackTrace();
         }

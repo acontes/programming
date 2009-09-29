@@ -276,16 +276,16 @@
 		</if>
 
 		<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" includes="unitTests/**" deprecation="on" source="${source}" debug="${debug}">
-			<classpath refid="project.classpath" />
+			<classpath refid="project.with.ws.classpath" />
 		</javac>
 		<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" 
 			includes="functionalTests/**"
 			excludes="functionalTests/annotations/*/inputs/**,${annotations_tests_exec_exclude}"
 			deprecation="on" source="${source}" debug="${debug}">
-			<classpath refid="project.classpath" />
+			<classpath refid="project.with.ws.classpath" />
 		</javac>
 		<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" includes="performanceTests/**" deprecation="on" source="${source}" debug="${debug}">
-			<classpath refid="project.classpath" />
+			<classpath refid="project.with.ws.classpath" />
 		</javac>
 		<copy toDir="${cl.test.dir}">
 			<fileset dir="${src.test.dir}">
@@ -307,8 +307,7 @@
 		<!-- XXX, MicroTimer should be in core or not used by examples-->
 		<javac srcdir="${src.examples.dir}" destdir="${cl.examples.dir}" includes="**/*.java" excludes="${proactive.path}/examples/nbody/common/NBody3DFrame.java" deprecation="on" source="${source}" debug="${debug}" encoding="UTF-8">
 			<classpath>
-			    <path refid="project.classpath"/>
-				<path refid="cxf.libs" />
+			    <path refid="project.with.ws.classpath"/>
 			</classpath>
 		</javac>
 
@@ -322,7 +321,7 @@
 		<if name="java3d_present">
 			<echo message="Info: Java3D installed." />
 			<javac srcdir="${src.examples.dir}" destdir="${cl.examples.dir}" includes="${proactive.path}/examples/nbody/common/NBody3DFrame.java" deprecation="on" source="${source}" debug="${debug}">
-				<classpath refid="project.classpath" />
+				<classpath refid="project.with.ws.classpath" />
 			</javac>
 			<else>
 				<echo level="warning" message="Info: Java 3D dependencies were not resolved." />
@@ -387,21 +386,41 @@
 			<fileset dir="${cl.extra.dir}" includes="**" />
 			<fileset dir="${config.dir}" includes="ProActiveConfiguration.xml" />
 			<fileset dir="${osgi.res.dir}" includes="metadata.xml" />
-
+			<fileset dir="${cxf.dir}/etc">
+                <include name="META-INF/cxf/**"/>
+			</fileset>
 			<indexjars>
 				<fileset dir="${lib.dir}">
-					<include name="*.jar" />
+                    <include name="*.jar" />
 				</fileset>
+				<fileset dir="${ws.common.lib.dir}">
+                    <include name="*.jar" />
+                </fileset>
+				<fileset dir="${cxf.lib.dir}">
+                    <include name="*.jar" />
+                </fileset>
+				<fileset dir="${axis2.lib.dir}">
+                    <include name="*.jar" />
+                </fileset>
 			</indexjars>
 		</jar>
 
 		<copy todir="${deploy.lib.dir}">
 			<!-- Copy all libs -->
 			<fileset dir="${lib.dir}">
-				<include name="**/*.jar" />
+				<include name="*.jar" />
 				<include name="**/*.so" />
 				<include name="**/*.dll" />
 			</fileset>
+			<fileset dir="${cxf.lib.dir}">
+			    <include name="*.jar"/>
+			</fileset>
+            <fileset dir="${axis2.lib.dir}">
+                <include name="*.jar"/>
+            </fileset>
+			<fileset dir="${ws.common.lib.dir}">
+                <include name="*.jar" />
+            </fileset>
 		</copy>
 
 		<copy todir="${deploy.scripts.dir}">
@@ -1065,7 +1084,7 @@
 	<target name="proActiveWarAxis2" depends="deploy.all" description="build the proactive.war archive with Axis2 embedded" >
 
 		<war destfile="${deploy.dir}/proactive.war" webxml="${axis2.dir}/webapp/WEB-INF/web.xml">
-			<lib dir="${axis2.dir}/lib">
+			<lib dir="${axis2.lib.dir}">
 				<include name="**" />
 				<exclude name="**servlet**" />
 				<exclude name="ant*.jar" />
@@ -1073,8 +1092,8 @@
 				<exclude name="axis2-codegen*.jar"/>
 				<exclude name="jibx-bind*.jar"/>
 			</lib>
-			<lib dir="${lib.dir}">
-				<include name="**" />
+			<lib dir="${ws.common.lib.dir}">
+			    <include name="**" />
 			</lib>
 			<lib dir="${deploy.dir}/lib">
 				<include name="ProActive.jar" />
@@ -1089,20 +1108,25 @@
 
 	<target name="proActiveWarCXF" depends="deploy.all" description="build the proactive.war archive with CXF embedded" >
         <war destfile="${deploy.dir}/proactive.war" webxml="${cxf.dir}/etc/web.xml">
-            <classes dir="${cl.extensions.dir}" includes="**/cxf/servicedeployer/*.class"/>
             <webinf dir="${cxf.dir}/wsdl">
                 <include name="cxf-servlet.xml"/>
             </webinf>
             <lib dir="${deploy.dir}/lib">
                 <include name="ProActive.jar" />
             </lib>
-            <lib dir="${cxf.dir}/lib">
+            <lib dir="${cxf.lib.dir}">
                 <include name="*.jar"/>
                 <exclude name="servlet-api-*.jar" />
                 <exclude name="geronimo-servlet_*.jar" />
                 <exclude name="jetty-*.jar"/>
                 <exclude name="WHICH_JARS" />
             </lib>
+		<lib dir="${ws.common.lib.dir}">
+			<include name="*.jar" />
+		</lib>
+		<fileset dir="${cxf.dir}/etc">
+			<include name="META-INF/**" />
+		</fileset>
         </war>
 	</target>
 
