@@ -952,14 +952,6 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
         rotateScene(user, new Vec(0, 0, -Math.PI / 4));
     }
 
-    public void addSphereByUser(int user) {
-        ((C3DUser) userBag.getUser(user)).addSphere();
-    }
-
-    public void resetSceneByUser(int user) {
-        ((C3DUser) userBag.getUser(user)).resetScene();
-    }
-
     /**
      * Instantiates a new active C3DDispatcher on the local machine
      * @param argv Name of the descriptor file

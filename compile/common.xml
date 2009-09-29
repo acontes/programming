@@ -108,8 +108,6 @@
     <!-- CXF properties -->
     <property name="cxf.dir" value="${webservices.dir}/cxf" />
     <property name="cxf.lib.dir" value="${lib.dir}/cxf" />
-    <property name="cxf.servicedeployer.class.dir" value="${webservices.class.dir}/cxf/servicedeployer" />
-    <property name="cxf.class.dir" value="${webservices.class.dir}/cxf" />
 	<path id="cxf.libs">
         <fileset dir="${cxf.lib.dir}">
             <include name="*.jar" />
