@@ -45,6 +45,7 @@ import org.objectweb.proactive.extensions.annotation.ActiveObject;
 public class HelloWorld extends HelloWorldSuperClass implements java.io.Serializable {
 
     LinkedList<String> textsToSay = new LinkedList<String>();
+    Couple[] couples;
 
     public HelloWorld() {
     }
@@ -69,13 +70,11 @@ public class HelloWorld extends HelloWorldSuperClass implements java.io.Serializ
         return new Boolean(textsToSay.contains(textToCheck));
     }
 
-    public ClassTest[] getTable() {
-        ClassTest ct1 = new ClassTest();
-        ct1.setMyInt(12);
-        ct1.setStr1("bonjour");
-        ClassTest ct2 = new ClassTest();
-        ct2.setMyInt(13);
-        ct2.setStr1("au revoir");
-        return new ClassTest[] { ct1, ct2 };
+    public void setCouples(Couple[] couples) {
+        this.couples = couples;
+    }
+
+    public Couple[] getCouples() {
+        return couples;
     }
 }

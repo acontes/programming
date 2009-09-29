@@ -104,13 +104,20 @@ public class HelloWorld implements Serializable {
             String url = "";
             boolean GCMDeployment;
             boolean onANode;
-            if (args.length == 1) {
+            if (args.length == 0) {
+                url = "http://localhost:8080/";
+                GCMDeployment = false;
+                onANode = false;
+            } else if (args.length == 1) {
+                url = args[0];
                 GCMDeployment = false;
                 onANode = false;
             } else if (args.length == 2) {
+                url = args[0];
                 GCMDeployment = true;
                 onANode = false;
             } else if (args.length == 3) {
+                url = args[0];
                 GCMDeployment = true;
                 onANode = true;
             } else {
@@ -118,7 +125,6 @@ public class HelloWorld implements Serializable {
                 logger.info("Usage: java HelloWorld [url]");
                 return;
             }
-            url = args[0];
             HelloWorld hw;
 
             if (GCMDeployment) {

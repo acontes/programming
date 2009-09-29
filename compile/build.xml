@@ -1059,18 +1059,15 @@
 	<!-- ================================================================================ -->
 	<!--    Create the proactive Web Archive to be used with the web service framework    -->
 	<!-- ================================================================================ -->
-	<target name="proActiveWar" depends="deploy.core">
-		<property name="webservices.dir" value="${src.extensions.dir}/org/objectweb/proactive/extensions/webservices/" />
-		<property name="axis2.dir" value="${webservices.dir}/axis2" />
-		<property name="temp" value="${axis2.dir}/temp" />
+	<target name="proActiveWar" depends="deploy.all">
 
-		<subant target="generate.service" inheritall="true" failonerror="true">
+		<!--<subant target="generate.service" inheritall="true" failonerror="true">
 			<fileset dir="${webservices.dir}" includes="**/build.xml" />
 		</subant>
 
 		<subant target="prepare.repo" inheritall="true" failonerror="true">
 			<fileset dir="${webservices.dir}" includes="**/build.xml" />
-		</subant>
+		</subant>-->
 
 		<war destfile="${deploy.dir}/proactive.war" webxml="${axis2.dir}/webapp/WEB-INF/web.xml">
 			<lib dir="${axis2.dir}/lib">
@@ -1087,12 +1084,12 @@
 			<lib dir="${deploy.dir}/lib">
 				<include name="ProActive.jar" />
 			</lib>
-			<webinf dir="${temp}/WEB-INF" />
-			<fileset dir="${temp}">
+			<webinf dir="${temp.class.dir}/WEB-INF" />
+			<fileset dir="${temp.class.dir}">
 				<include name="**/axis2-web/**" />
 			</fileset>
 		</war>
-		<delete dir="${temp}" />
+		<delete dir="${temp.class.dir}" />
 	</target>
 
 	<!-- MUST BE CALLED FROM AN INRIA MACHINE ON PRODUCTION NETWORK -->

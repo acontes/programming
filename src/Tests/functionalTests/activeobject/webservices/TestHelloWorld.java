@@ -153,19 +153,32 @@ public class TestHelloWorld {
         logger.info("Called the method 'sayHello': inherited method");
         logger.info("'sayHello' returned " + text);
 
-        // Call getHelloTable
-        options.setAction("getTable");
-        op = new QName("getTable");
+        Couple cpl1 = new Couple();
+        cpl1.setMyInt(1);
+        cpl1.setStr1("First");
+        Couple cpl2 = new Couple();
+        cpl2.setMyInt(2);
+        cpl2.setStr1("Second");
+        Couple[] couples = new Couple[] { cpl1, cpl2 };
+
+        // Call setCouples
+        options.setAction("setCouples");
+        op = new QName("setCouples");
+        opArgs = new Object[] { couples };
+        serviceClient.invokeRobust(op, opArgs);
+
+        // Call getCouples
+        options.setAction("getCouples");
+        op = new QName("getCouples");
         opArgs = new Object[] {};
-        System.out.println("type =" + Array.newInstance(ClassTest.class, 2).getClass().getName());
-        returnTypes = new Class[] { Array.newInstance(ClassTest.class, 2).getClass() };
+        returnTypes = new Class[] { Array.newInstance(Couple.class, 2).getClass() };
         response = serviceClient.invokeBlocking(op, opArgs, returnTypes);
 
-        ClassTest[] table = (ClassTest[]) response[0];
-        ClassTest test1 = table[0];
-        ClassTest test2 = table[1];
+        Couple[] table = (Couple[]) response[0];
+        Couple test1 = table[0];
+        Couple test2 = table[1];
 
-        logger.info("Called the method 'getTable': return Table of ClassTest");
+        logger.info("Called the method 'getCouples': return a table of Couple");
         logger.info("test1 = " + test1.getStr1() + ", " + test1.getMyInt());
         logger.info("test2 = " + test2.getStr1() + ", " + test2.getMyInt());
     }

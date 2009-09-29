@@ -419,9 +419,9 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
         try {
             PAActiveObject.registerByName(PAActiveObject.getStubOnThis(), "Dispatcher");
         } catch (ProActiveException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     /** ProActive queue handling */
@@ -987,16 +987,13 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
 
             Node dispatcherNode = deployer.getDispatcherNode();
 
-            System.out.println("1");
             C3DDispatcher c3dd = (C3DDispatcher) PAActiveObject.newActive(C3DDispatcher.class.getName(),
                     param, dispatcherNode);
-            System.out.println("2");
 
             String url = "http://localhost:8080/";
 
             if (argv.length == 2) {
                 url = argv[1];
-                System.out.println("url of deployment = " + url);
             }
 
             String[] methods = new String[] { "wsRegisterUser", "wsUnregisterConsumer", "wsResetScene",

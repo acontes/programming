@@ -32,8 +32,6 @@
 
 package functionalTests.activeobject.webservices;
 
-import java.lang.reflect.Array;
-
 import javax.xml.namespace.QName;
 
 import org.apache.axis2.addressing.EndpointReference;
