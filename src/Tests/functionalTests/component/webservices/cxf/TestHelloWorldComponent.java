@@ -52,6 +52,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.webservices.WSConstants;
 import org.objectweb.proactive.extensions.webservices.WebServices;
 
+import functionalTests.component.webservices.common.GoodByeWorldItf;
 import functionalTests.component.webservices.common.HelloWorldComponent;
 import functionalTests.component.webservices.common.HelloWorldItf;
 
@@ -61,6 +62,7 @@ public class TestHelloWorldComponent {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.WEB_SERVICES);
 
     private String url;
+    private Component comp;
 
     @org.junit.Before
     public void deployHelloWorldComponent() {
@@ -72,16 +74,16 @@ public class TestHelloWorldComponent {
             String port = PAProperties.PA_XMLHTTP_PORT.getValue();
             this.url = "http://localhost:" + port + "/";
 
-            Component boot = null;
-            Component comp = null;
-
-            boot = org.objectweb.fractal.api.Fractal.getBootstrapComponent();
+            Component boot = org.objectweb.fractal.api.Fractal.getBootstrapComponent();
 
             TypeFactory tf = Fractal.getTypeFactory(boot);
             GenericFactory cf = Fractal.getGenericFactory(boot);
 
-            ComponentType typeComp = tf.createFcType(new InterfaceType[] { tf.createFcItfType("hello-world",
-                    HelloWorldItf.class.getName(), false, false, false) });
+            ComponentType typeComp = tf.createFcType(new InterfaceType[] {
+                    tf.createFcItfType("hello-world", HelloWorldItf.class.getName(), false, false, false),
+                    tf
+                            .createFcItfType("good-bye-world", GoodByeWorldItf.class.getName(), false, false,
+                                    false) });
 
             comp = cf.newFcInstance(typeComp, new ControllerDescription("server", Constants.PRIMITIVE),
                     new ContentDescription(HelloWorldComponent.class.getName(), null));
@@ -90,6 +92,9 @@ public class TestHelloWorldComponent {
 
             WebServices.exposeComponentAsWebService(WSConstants.CXF_FRAMEWORK_IDENTIFIER, comp, url,
                     "server", new String[] { "hello-world" });
+
+            WebServices.exposeComponentAsWebService(WSConstants.CXF_FRAMEWORK_IDENTIFIER, comp, url,
+                    "server2");
 
             logger.info("Deployed an hello-world interface as a webservice service on : " + url);
 
@@ -101,12 +106,13 @@ public class TestHelloWorldComponent {
 
     @org.junit.Test
     public void testHelloWorldComponent() {
-        ClientProxyFactoryBean factory = new ClientProxyFactoryBean();
-        factory.setServiceClass(HelloWorldItf.class);
-        factory.setAddress(url + WSConstants.SERVICES_PATH + "server_hello-world");
-        HelloWorldItf client = (HelloWorldItf) factory.create();
 
         try {
+
+            ClientProxyFactoryBean factory = new ClientProxyFactoryBean();
+            factory.setServiceClass(HelloWorldItf.class);
+            factory.setAddress(url + WSConstants.SERVICES_PATH + "server_hello-world");
+            HelloWorldItf client = (HelloWorldItf) factory.create();
 
             client.putHelloWorld();
             logger.info("Called the method putHelloWorld: no argument and no return is expected");
@@ -135,6 +141,41 @@ public class TestHelloWorldComponent {
             assertTrue(false);
         }
 
+        try {
+
+            ClientProxyFactoryBean factory = new ClientProxyFactoryBean();
+            factory.setServiceClass(HelloWorldItf.class);
+            factory.setAddress(url + WSConstants.SERVICES_PATH + "server2_hello-world");
+            HelloWorldItf client = (HelloWorldItf) factory.create();
+
+            client.putTextToSay("Hi ProActive Team!");
+            logger.info("Called the method putTextToSay: " + "one argument is expected but no return");
+
+            String text = client.sayText();
+            assertTrue(text.equals("Hi ProActive Team!"));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertTrue(false);
+        }
+
+        try {
+
+            ClientProxyFactoryBean factory = new ClientProxyFactoryBean();
+            factory.setServiceClass(GoodByeWorldItf.class);
+            factory.setAddress(url + WSConstants.SERVICES_PATH + "server2_good-bye-world");
+            GoodByeWorldItf client = (GoodByeWorldItf) factory.create();
+
+            client.putGoodByeWorld();
+            logger.info("Called the method 'putGoodByeWorld': " + "one argument is expected but no return");
+
+            String text = client.sayText();
+            assertTrue(text.equals("Good bye world!"));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertTrue(false);
+        }
     }
 
     @org.junit.After
@@ -142,6 +183,10 @@ public class TestHelloWorldComponent {
         try {
             WebServices.unExposeComponentAsWebService(WSConstants.CXF_FRAMEWORK_IDENTIFIER, this.url,
                     "server", new String[] { "hello-world" });
+            //            WebServices.unExposeComponentAsWebService(WSConstants.CXF_FRAMEWORK_IDENTIFIER, this.url,
+            //                    "server2", new String[] { "hello-world", "good-bye-world" });
+            WebServices.unExposeComponentAsWebService(WSConstants.CXF_FRAMEWORK_IDENTIFIER, this.comp,
+                    this.url, "server2");
         } catch (Exception e) {
             e.printStackTrace();
             assertTrue(false);

@@ -190,7 +190,13 @@ public final class PADeployer {
     static public void undeployComponent(Component component, String url, String componentName) {
         Object[] interfaces = component.getFcInterfaces();
         for (Object o : interfaces) {
-            undeploy(url, componentName + "_" + ((Interface) o).getFcItfName());
+            String interfaceName = ((Interface) o).getFcItfName();
+
+            /* only expose server interfaces and not the attributes controller */
+            if (!interfaceName.contains("-controller") && !interfaceName.equals("component") &&
+                !((ProActiveInterfaceType) ((Interface) o).getFcItfType()).isFcClientItf())
+                undeploy(url, componentName + "_" + interfaceName);
+
         }
     }
 

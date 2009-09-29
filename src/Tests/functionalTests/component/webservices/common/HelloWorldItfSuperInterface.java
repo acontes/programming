@@ -32,5 +32,8 @@
 package functionalTests.component.webservices.common;
 
 public interface HelloWorldItfSuperInterface {
+
     public String sayHello();
+
+    public String sayText();
 }
