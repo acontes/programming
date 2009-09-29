@@ -100,5 +100,14 @@
 	<classpathentry kind="lib" path="lib/xml-apis.jar"/>
 	<classpathentry kind="lib" path="compile/lib/junit-4.3.jar"/>
 	<classpathentry kind="lib" path="compile/lib/ant.jar"/>
+	<classpathentry kind="lib" path="lib/axis2-kernel-1.4.1.jar"/>
+	<classpathentry kind="lib" path="lib/axiom.jar"/>
+	<classpathentry kind="lib" path="lib/axis2-adb-1.4.1.jar"/>
+	<classpathentry kind="lib" path="lib/XmlSchema-1.4.2.jar"/>
+	<classpathentry kind="lib" path="lib/backport-util-concurrent-3.1.jar"/>
+	<classpathentry kind="lib" path="lib/commons-fileupload-1.2.jar"/>
+	<classpathentry kind="lib" path="lib/commons-httpclient-3.1.jar"/>
+	<classpathentry kind="lib" path="lib/neethi-2.0.4.jar"/>
+	<classpathentry kind="lib" path="lib/woden-api-1.0M8.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
