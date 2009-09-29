@@ -44,8 +44,8 @@ import org.objectweb.proactive.extensions.annotation.ActiveObject;
 @ActiveObject
 public class HelloWorld extends HelloWorldSuperClass implements java.io.Serializable {
 
-    LinkedList<String> textsToSay = new LinkedList<String>();
-    Couple[] couples;
+    private LinkedList<String> textsToSay = new LinkedList<String>();
+    private Couple[] couples;
 
     public HelloWorld() {
     }
@@ -68,6 +68,14 @@ public class HelloWorld extends HelloWorldSuperClass implements java.io.Serializ
 
     public Boolean contains(String textToCheck) {
         return new Boolean(textsToSay.contains(textToCheck));
+    }
+
+    public LinkedList<String> getTextsToSay() {
+        return textsToSay;
+    }
+
+    public void setTextsToSay(LinkedList<String> textsToSay) {
+        this.textsToSay = textsToSay;
     }
 
     public void setCouples(Couple[] couples) {

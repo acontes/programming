@@ -29,15 +29,8 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package functionalTests.component.webservices;
+package functionalTests.component.webservices.common;
 
-public interface HelloWorldItf extends HelloWorldItfSuperInterface {
-
-    public void putHelloWorld();
-
-    public void putTextToSay(String textToSay);
-
-    public String sayText();
-
-    public Boolean contains(String textToCheck);
+public interface HelloWorldItfSuperInterface {
+    public String sayHello();
 }

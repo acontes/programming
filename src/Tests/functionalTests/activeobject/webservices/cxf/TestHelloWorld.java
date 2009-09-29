@@ -34,6 +34,8 @@ package functionalTests.activeobject.webservices.cxf;
 
 import static org.junit.Assert.assertTrue;
 
+import java.lang.reflect.Method;
+
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientFactoryBean;
 import org.apache.log4j.Logger;
@@ -67,6 +69,17 @@ public class TestHelloWorld {
             HelloWorld hw = (HelloWorld) PAActiveObject.newActive(
                     "functionalTests.activeobject.webservices.common.HelloWorld", new Object[] {});
             WebServices.exposeAsWebService(WSConstants.CXF_FRAMEWORK_IDENTIFIER, hw, this.url, "HelloWorld");
+
+            Method m1 = hw.getClass().getSuperclass().getMethod("sayText");
+            Method m2 = hw.getClass().getSuperclass().getMethod("putTextToSay",
+                    new Class<?>[] { String.class });
+            Method[] methods = new Method[] { m1, m2 };
+            WebServices.exposeAsWebService(WSConstants.CXF_FRAMEWORK_IDENTIFIER, hw, this.url,
+                    "HelloWorldMethods", methods);
+
+            String[] methodNames = new String[] { "putTextToSay", "sayText" };
+            WebServices.exposeAsWebService(WSConstants.CXF_FRAMEWORK_IDENTIFIER, hw, this.url,
+                    "HelloWorldMethodNames", methodNames);
         } catch (Exception e) {
             e.printStackTrace();
             assertTrue(false);
@@ -75,12 +88,14 @@ public class TestHelloWorld {
 
     @org.junit.Test
     public void testHelloWorld() {
+
         ClientFactoryBean factory = new ClientFactoryBean();
         factory.setServiceClass(HelloWorld.class);
         factory.setAddress(url + WSConstants.SERVICES_PATH + "HelloWorld");
         Client client = factory.create();
 
         Object[] res;
+        String text;
         try {
 
             client.invoke("putHelloWorld");
@@ -96,7 +111,7 @@ public class TestHelloWorld {
             res = client.invoke("sayText");
             logger.info("Called the method 'sayText': one return is expected but not argument");
 
-            String text = (String) res[0];
+            text = (String) res[0];
             assertTrue(text.equals("Hello world!"));
 
             res = client.invoke("sayText");
@@ -143,12 +158,90 @@ public class TestHelloWorld {
             e.printStackTrace();
             assertTrue(false);
         }
+
+        ClientFactoryBean factoryMethods = new ClientFactoryBean();
+        factoryMethods.setServiceClass(HelloWorld.class);
+        factoryMethods.setAddress(url + WSConstants.SERVICES_PATH + "HelloWorldMethods");
+        Client clientMethods = factoryMethods.create();
+
+        try {
+            clientMethods.invoke("putTextToSay", new Object[] { "Hi ProActive Team!" });
+            logger.info("Called the method putTextToSay: " + "one argument is expected but no return");
+
+            res = clientMethods.invoke("sayText");
+            logger.info("Called the method 'sayText': one return is expected but not argument");
+
+            text = (String) res[0];
+            assertTrue(text.equals("Hi ProActive Team!"));
+
+            res = clientMethods.invoke("sayText");
+            logger.info("Called the method 'sayText': one return is expected but not argument");
+
+            text = (String) res[0];
+            assertTrue(text.equals("The list is empty"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertTrue(false);
+        }
+
+        try {
+            logger.info("Called the method putHelloWorld: this method should not be exposed");
+            logger.info("The normal behaviour is to raise an exception");
+            clientMethods.invoke("putHelloWorld");
+
+            assertTrue(false);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.info("This exception was expected");
+        }
+
+        ClientFactoryBean factoryMethodNames = new ClientFactoryBean();
+        factoryMethodNames.setServiceClass(HelloWorld.class);
+        factoryMethodNames.setAddress(url + WSConstants.SERVICES_PATH + "HelloWorldMethodNames");
+        Client clientMethodNames = factoryMethodNames.create();
+
+        try {
+
+            clientMethodNames.invoke("putTextToSay", "Hi ProActive Team!");
+            logger.info("Called the method 'putTextToSay': " + "one argument is expected but no return");
+
+            res = clientMethodNames.invoke("sayText");
+            logger.info("Called the method 'sayText': one return is expected but not argument");
+
+            text = (String) res[0];
+            assertTrue(text.equals("Hi ProActive Team!"));
+
+            res = clientMethodNames.invoke("sayText");
+            logger.info("Called the method 'sayText': one return is expected but not argument");
+
+            text = (String) res[0];
+            assertTrue(text.equals("The list is empty"));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertTrue(false);
+        }
+
+        try {
+            logger.info("Called the method putHelloWorld: this method should not be exposed");
+            logger.info("The normal behaviour is to raise an exception");
+            clientMethodNames.invoke("putHelloWorld");
+
+            assertTrue(false);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.info("This exception was expected");
+        }
     }
 
     @org.junit.After
     public void undeployHelloWorld() {
         try {
             WebServices.unExposeAsWebService(WSConstants.CXF_FRAMEWORK_IDENTIFIER, this.url, "HelloWorld");
+            WebServices.unExposeAsWebService(WSConstants.CXF_FRAMEWORK_IDENTIFIER, this.url,
+                    "HelloWorldMethods");
+            WebServices.unExposeAsWebService(WSConstants.CXF_FRAMEWORK_IDENTIFIER, this.url,
+                    "HelloWorldMethodNames");
         } catch (Exception e) {
             e.printStackTrace();
             assertTrue(false);

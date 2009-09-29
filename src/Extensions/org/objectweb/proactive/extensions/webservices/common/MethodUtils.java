@@ -167,10 +167,6 @@ public class MethodUtils {
                 excludedMethodsName.add(m.getName());
             }
         }
-        logger.info("Excluded method names are the following ones:");
-        for (String name : excludedMethodsName) {
-            logger.info(name);
-        }
         return excludedMethodsName;
     }
 

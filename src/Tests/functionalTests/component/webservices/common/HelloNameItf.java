@@ -29,44 +29,10 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package functionalTests.component.webservices;
+package functionalTests.component.webservices.common;
 
-import java.util.LinkedList;
+public interface HelloNameItf {
 
+    public String helloName(int index);
 
-/**
- * A simple example to expose an active object as a web service.
- *
- * @author The ProActive Team
- */
-public class HelloWorldComponent implements HelloWorldItf {
-
-    LinkedList<String> textsToSay = new LinkedList<String>();
-
-    public HelloWorldComponent() {
-    }
-
-    public void putHelloWorld() {
-        this.textsToSay.add("Hello world!");
-    }
-
-    public void putTextToSay(String textToSay) {
-        this.textsToSay.add(textToSay);
-    }
-
-    public String sayText() {
-        if (this.textsToSay.isEmpty()) {
-            return "The list is empty";
-        } else {
-            return this.textsToSay.poll();
-        }
-    }
-
-    public Boolean contains(String textToCheck) {
-        return new Boolean(textsToSay.contains(textToCheck));
-    }
-
-    public String sayHello() {
-        return "Hello!";
-    }
 }

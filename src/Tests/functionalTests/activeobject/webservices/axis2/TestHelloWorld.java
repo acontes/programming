@@ -36,6 +36,7 @@ import static org.junit.Assert.assertTrue;
 
 import javax.xml.namespace.QName;
 import java.lang.reflect.Array;
+import java.lang.reflect.Method;
 
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
@@ -72,6 +73,17 @@ public class TestHelloWorld {
                     "functionalTests.activeobject.webservices.common.HelloWorld", new Object[] {});
             WebServices
                     .exposeAsWebService(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER, hw, this.url, "HelloWorld");
+
+            Method m1 = hw.getClass().getSuperclass().getMethod("sayText");
+            Method m2 = hw.getClass().getSuperclass().getMethod("putTextToSay",
+                    new Class<?>[] { String.class });
+            Method[] methods = new Method[] { m1, m2 };
+            WebServices.exposeAsWebService(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER, hw, this.url,
+                    "HelloWorldMethods", methods);
+
+            String[] methodNames = new String[] { "putTextToSay", "sayText" };
+            WebServices.exposeAsWebService(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER, hw, this.url,
+                    "HelloWorldMethodNames", methodNames);
         } catch (Exception e) {
             e.printStackTrace();
             assertTrue(false);
@@ -189,12 +201,136 @@ public class TestHelloWorld {
             e.printStackTrace();
             assertTrue(false);
         }
+
+        try {
+            RPCServiceClient serviceClient = new RPCServiceClient();
+
+            Options options = serviceClient.getOptions();
+            EndpointReference targetEPR = new EndpointReference(this.url + WSConstants.SERVICES_PATH +
+                "HelloWorldMethods");
+            options.setTo(targetEPR);
+
+            // Call putTextToSay
+            options.setAction("putTextToSay");
+            QName op = new QName("putTextToSay");
+            Object[] opArgs = new Object[] { "Hi ProActive Team!" };
+
+            serviceClient.invokeRobust(op, opArgs);
+            logger.info("Called the method putTextToSay: " + "one argument is expected but no return");
+
+            options.setAction("sayText");
+            op = new QName("sayText");
+            opArgs = new Object[] {};
+            Class<?>[] returnTypes = new Class[] { String.class };
+
+            Object[] response = serviceClient.invokeBlocking(op, opArgs, returnTypes);
+            logger.info("Called the method 'sayText': one return is expected but not argument");
+
+            String text = (String) response[0];
+            assertTrue(text.equals("Hi ProActive Team!"));
+
+            response = serviceClient.invokeBlocking(op, opArgs, returnTypes);
+            logger.info("Called the method 'sayText': one return is expected but not argument");
+
+            text = (String) response[0];
+            assertTrue(text.equals("The list is empty"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertTrue(false);
+        }
+
+        try {
+            RPCServiceClient serviceClient = new RPCServiceClient();
+
+            Options options = serviceClient.getOptions();
+            EndpointReference targetEPR = new EndpointReference(this.url + WSConstants.SERVICES_PATH +
+                "HelloWorldMethods");
+            options.setTo(targetEPR);
+
+            options.setAction("putHelloWorld");
+            QName op = new QName("putHelloWorld");
+
+            Object[] opArgs = new Object[] {};
+
+            logger.info("Called the method putHelloWorld: this method should not be exposed");
+            logger.info("The normal behaviour is to raise an exception");
+            serviceClient.invokeRobust(op, opArgs);
+
+            assertTrue(false);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.info("This exception was expected");
+        }
+
+        try {
+            RPCServiceClient serviceClient = new RPCServiceClient();
+
+            Options options = serviceClient.getOptions();
+            EndpointReference targetEPR = new EndpointReference(this.url + WSConstants.SERVICES_PATH +
+                "HelloWorldMethodNames");
+            options.setTo(targetEPR);
+
+            // Call putTextToSay
+            options.setAction("putTextToSay");
+            QName op = new QName("putTextToSay");
+            Object[] opArgs = new Object[] { "Hi ProActive Team!" };
+
+            serviceClient.invokeRobust(op, opArgs);
+            logger.info("Called the method putTextToSay: " + "one argument is expected but no return");
+
+            options.setAction("sayText");
+            op = new QName("sayText");
+            opArgs = new Object[] {};
+            Class<?>[] returnTypes = new Class[] { String.class };
+
+            Object[] response = serviceClient.invokeBlocking(op, opArgs, returnTypes);
+            logger.info("Called the method 'sayText': one return is expected but not argument");
+
+            String text = (String) response[0];
+            assertTrue(text.equals("Hi ProActive Team!"));
+
+            response = serviceClient.invokeBlocking(op, opArgs, returnTypes);
+            logger.info("Called the method 'sayText': one return is expected but not argument");
+
+            text = (String) response[0];
+            assertTrue(text.equals("The list is empty"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertTrue(false);
+        }
+
+        try {
+            RPCServiceClient serviceClient = new RPCServiceClient();
+
+            Options options = serviceClient.getOptions();
+            EndpointReference targetEPR = new EndpointReference(this.url + WSConstants.SERVICES_PATH +
+                "HelloWorldMethodNames");
+            options.setTo(targetEPR);
+
+            options.setAction("putHelloWorld");
+            QName op = new QName("putHelloWorld");
+
+            Object[] opArgs = new Object[] {};
+
+            logger.info("Called the method putHelloWorld: this method should not be exposed");
+            logger.info("The normal behaviour is to raise an exception");
+            serviceClient.invokeRobust(op, opArgs);
+
+            assertTrue(false);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.info("This exception was expected");
+        }
     }
 
     @org.junit.After
     public void undeployHelloWorld() {
         try {
             WebServices.unExposeAsWebService(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER, this.url, "HelloWorld");
+            WebServices.unExposeAsWebService(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER, this.url,
+                    "HelloWorldMehtods");
+            WebServices.unExposeAsWebService(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER, this.url,
+                    "HelloWorldMethodNames");
         } catch (Exception e) {
             e.printStackTrace();
             assertTrue(false);

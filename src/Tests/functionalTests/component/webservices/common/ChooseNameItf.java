@@ -29,19 +29,11 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package functionalTests.component.webservices;
+package functionalTests.component.webservices.common;
 
-public class WeatherServiceComponent implements WeatherServiceItf {
-    private Weather weather;
+public interface ChooseNameItf {
 
-    public WeatherServiceComponent() {
-    }
+    public String chooseName(int index);
 
-    public void setWeather(Weather weather) {
-        this.weather = weather;
-    }
-
-    public Weather getWeather() {
-        return this.weather;
-    }
+    public String chooseRandomName();
 }

@@ -29,8 +29,11 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package functionalTests.component.webservices;
+package functionalTests.component.webservices.common;
 
-public interface HelloWorldItfSuperInterface {
-    public String sayHello();
+public interface WeatherServiceItf {
+
+    public void setWeather(Weather weather);
+
+    public Weather getWeather();
 }

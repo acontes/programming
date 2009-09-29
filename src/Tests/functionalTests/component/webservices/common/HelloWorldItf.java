@@ -29,55 +29,15 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package functionalTests.component.webservices;
+package functionalTests.component.webservices.common;
 
-import org.objectweb.fractal.api.control.BindingController;
+public interface HelloWorldItf extends HelloWorldItfSuperInterface {
 
+    public void putHelloWorld();
 
-/**
- * A simple example to expose an active object as a web service.
- *
- * @author The ProActive Team
- */
-public class HelloNameComponent implements HelloNameItf, BindingController {
-    ChooseNameItf chooseName;
+    public void putTextToSay(String textToSay);
 
-    public HelloNameComponent() {
-    }
+    public String sayText();
 
-    public String helloName(int index) {
-        String name;
-        if (index == -1) {
-            name = chooseName.chooseRandomName();
-        } else {
-            name = chooseName.chooseName(index);
-        }
-        return "Hello " + name + " !";
-    }
-
-    public String[] listFc() {
-        String[] result = new String[1];
-        result[0] = "choose-name";
-        return result;
-    }
-
-    public Object lookupFc(String s) {
-        if (s.equals("choose-name")) {
-            return chooseName;
-        }
-        return null;
-    }
-
-    public void bindFc(String s, Object o) {
-        if (s.equals("choose-name")) {
-            chooseName = (ChooseNameItf) o;
-        }
-    }
-
-    public void unbindFc(String s) {
-        if (s.equals("choose-name")) {
-            chooseName = null;
-        }
-    }
-
+    public Boolean contains(String textToCheck);
 }

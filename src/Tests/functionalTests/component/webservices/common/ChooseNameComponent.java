@@ -29,46 +29,35 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package functionalTests.component.webservices;
+package functionalTests.component.webservices.common;
 
-import java.io.Serializable;
+import java.lang.Math;
 
 
-public class Weather implements Serializable {
-    private float temperature;
-    private String forecast;
-    private boolean rain;
-    private float howMuchRain;
+/**
+ * A simple example to expose an active object as a web service.
+ *
+ * @author The ProActive Team
+ */
+public class ChooseNameComponent implements ChooseNameItf {
 
-    public void setTemperature(float temp) {
-        temperature = temp;
+    private String[] names = new String[] { "Abhijeet Gaikwad", "Bastien Sauvan", "Brian Amedro",
+            "Elaine Isnard", "Elton Mathias", "Eric Madelaine", "Etienne Vallette-De-Osia", "Fabien Viale",
+            "Fabrice Huet", "Fabrice Fontenoy", "Florin-Alexandru Bratu", "Francoise Baude",
+            "Germain Sigety", "Guilherme Perretti Pezzi", "Imen Filiali", "Jonathan Martin", "Khan Muhammad",
+            "Laurent Vanni", "Ludovic Henrio", "Marcela Rivera", "Nicolas Dodelin", "Paul Naoumenko",
+            "Regis Gascon", "Vasile Jureschi", "Viet Dong Doan", "Virginie Contes", "Yu Feng",
+            "Franca Perrina" };
+
+    public ChooseNameComponent() {
     }
 
-    public float getTemperature() {
-        return temperature;
+    public String chooseName(int index) {
+        return names[index];
     }
 
-    public void setForecast(String fore) {
-        forecast = fore;
-    }
-
-    public String getForecast() {
-        return forecast;
-    }
-
-    public void setRain(boolean r) {
-        rain = r;
-    }
-
-    public boolean getRain() {
-        return rain;
-    }
-
-    public void setHowMuchRain(float howMuch) {
-        howMuchRain = howMuch;
-    }
-
-    public float getHowMuchRain() {
-        return howMuchRain;
+    public String chooseRandomName() {
+        int index = (int) Math.floor(names.length * Math.random());
+        return names[index];
     }
 }

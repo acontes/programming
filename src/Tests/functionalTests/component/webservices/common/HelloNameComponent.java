@@ -29,9 +29,9 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package functionalTests.component.webservices;
+package functionalTests.component.webservices.common;
 
-import java.lang.Math;
+import org.objectweb.fractal.api.control.BindingController;
 
 
 /**
@@ -39,24 +39,45 @@ import java.lang.Math;
  *
  * @author The ProActive Team
  */
-public class ChooseNameComponent implements ChooseNameItf {
+public class HelloNameComponent implements HelloNameItf, BindingController {
+    ChooseNameItf chooseName;
 
-    private String[] names = new String[] { "Abhijeet Gaikwad", "Bastien Sauvan", "Brian Amedro",
-            "Elaine Isnard", "Elton Mathias", "Eric Madelaine", "Etienne Vallette-De-Osia", "Fabien Viale",
-            "Fabrice Huet", "Florin-Alexandru Bratu", "Francoise Baude", "Germain Sigety",
-            "Guilherme Perretti Pezzi", "Imen Filiali", "Jonathan Martin", "Khan Muhammad", "Laurent Vanni",
-            "Ludovic Henrio", "Marcela Rivera", "Nicolas Dodelin", "Paul Naoumenko", "Regis Gascon",
-            "Vasile Jureschi", "Viet Dong Doan", "Virginie Contes", "Yu Feng", "Franca Perrina" };
-
-    public ChooseNameComponent() {
+    public HelloNameComponent() {
     }
 
-    public String chooseName(int index) {
-        return names[index];
+    public String helloName(int index) {
+        String name;
+        if (index == -1) {
+            name = chooseName.chooseRandomName();
+        } else {
+            name = chooseName.chooseName(index);
+        }
+        return "Hello " + name + "!";
     }
 
-    public String chooseRandomName() {
-        int index = (int) Math.floor(names.length * Math.random());
-        return names[index];
+    public String[] listFc() {
+        String[] result = new String[1];
+        result[0] = "choose-name";
+        return result;
     }
+
+    public Object lookupFc(String s) {
+        if (s.equals("choose-name")) {
+            return chooseName;
+        }
+        return null;
+    }
+
+    public void bindFc(String s, Object o) {
+        if (s.equals("choose-name")) {
+            chooseName = (ChooseNameItf) o;
+        }
+    }
+
+    public void unbindFc(String s) {
+        if (s.equals("choose-name")) {
+            chooseName = null;
+        }
+    }
+
 }

@@ -48,7 +48,6 @@ import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative;
 import org.objectweb.proactive.core.remoteobject.http.util.HttpMarshaller;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.SerializableMethod;
@@ -113,13 +112,18 @@ public class ServiceDeployer implements ServiceDeployerItf {
             Method[] methods = MethodUtils.getMethodsFromSerializableMethods(serializableMethods);
             MethodUtils mc = new MethodUtils(superclass);
             List<Method> ignoredMethods = mc.getExcludedMethods(methods);
+
             serviceFactory.setIgnoredMethods(ignoredMethods);
+
+            // This method is called to force element to be unqualified
+            // It is the default behaviour but if you want to expose an active
+            // object using a set of methods, element forms become qualified.
+            serviceFactory.setQualifyWrapperSchema(false);
 
             svrFactory = new ServerFactoryBean(serviceFactory);
             svrFactory.setServiceBean(superclass.cast(o));
+
         } else {
-            logger.info(o.getClass().getName());
-            logger.info(o.getClass().getSuperclass().getName());
             String interfaceName = serviceName.substring(serviceName.lastIndexOf('_') + 1);
             Interface interface_;
             try {
@@ -155,7 +159,9 @@ public class ServiceDeployer implements ServiceDeployerItf {
         LoggingOutInterceptor loggingOutInterceptor = new LoggingOutInterceptor();
         outInterceptors.add(loggingOutInterceptor);
         svrFactory.setOutInterceptors(outInterceptors);
+
         svrFactory.create();
+
         serverList.put(serviceName, svrFactory.getServer());
 
         logger.info("The service " + serviceName + " has been deployed");
