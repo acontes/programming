@@ -185,5 +185,7 @@
 	<classpathentry kind="lib" path="lib/trilead-ssh2.jar"/>
 	<classpathentry kind="lib" path="lib/winp-1.5.jar"/>
 	<classpathentry kind="lib" path="lib/xercesImpl-2.8.1.jar"/>
+	<classpathentry kind="lib" path="compile/lib/ant.jar"/>
+	<classpathentry kind="lib" path="compile/lib/junit-4.3.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
