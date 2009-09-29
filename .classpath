@@ -11,7 +11,6 @@
 	<classpathentry kind="lib" path="lib/activation.jar"/>
 	<classpathentry kind="lib" path="lib/ajo.jar"/>
 	<classpathentry kind="lib" path="lib/asm-2.2.1.jar"/>
-	<classpathentry kind="lib" path="lib/axis.jar"/>
 	<classpathentry kind="lib" path="lib/batik-awt-util.jar"/>
 	<classpathentry kind="lib" path="lib/batik-dom.jar"/>
 	<classpathentry kind="lib" path="lib/batik-svggen.jar"/>
