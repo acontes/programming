@@ -39,21 +39,16 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.IOException;
 
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
-import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.URIBuilder;
-import org.objectweb.proactive.examples.webservices.c3dWS.C3DDispatcher;
-import org.objectweb.proactive.examples.webservices.c3dWS.Dispatcher;
 import org.objectweb.proactive.extensions.webservices.WSConstants;
 import org.objectweb.proactive.extensions.webservices.WebServices;
 

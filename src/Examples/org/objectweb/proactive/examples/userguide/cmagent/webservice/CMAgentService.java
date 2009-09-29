@@ -39,17 +39,49 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.examples.userguide.cmagent.initialized.CMAgentInitialized;
-import org.objectweb.proactive.extensions.webservices.WSConstants;
-import org.objectweb.proactive.extensions.webservices.WebServices;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
+import org.objectweb.proactive.extensions.webservices.WebServices;
 
 
 @ActiveObject
 public class CMAgentService extends CMAgentInitialized {
 
+    // we cannot use the getLastRequestServeTime() method
+    // directly since LongWrapper is not recognize
+    // TODO: See why
+    public long waitLastRequestServeTime() {
+        return this.getLastRequestServeTime().longValue();
+        //        LongWrapper res = this.getLastRequestServeTime();
+        //        PAFuture.waitFor(res);
+        //        return res;
+    }
+
     public static void main(String[] args) {
-        String url = "http://localhost:8080/";
+
+        String url = "";
+        String wsFrameWork = "";
+        if (args.length == 1) {
+            url = "http://localhost:8080/";
+            wsFrameWork = args[0];
+        } else if (args.length == 2) {
+            url = args[0];
+            wsFrameWork = args[1];
+        } else {
+            System.out.println("Wrong number of arguments:");
+            System.out.println("Usage: java CMAgentService [url] wsFrameWork");
+            System.out.println("where wsFrameWork is either 'axis2' or 'cxf'");
+            return;
+        }
+
+        if (!url.startsWith("http://")) {
+            url = "http://" + url;
+        }
+        if (!url.endsWith("/")) {
+            url += "/";
+        }
+
         System.out.println("Started a monitoring agent on : " + url);
+
         try {
             CMAgentService hw = (CMAgentService) PAActiveObject.newActive(
                     "org.objectweb.proactive.examples.userguide.cmagent.webservice.CMAgentService",
@@ -57,13 +89,15 @@ public class CMAgentService extends CMAgentInitialized {
 
             //TODO 1.Expose as web service (on URL 'url') the methods   
             // "getLastRequestServeTime" and "getCurrentState" 
-            // of 'hw' CMAgentService. Name your service  "cmAgentService"
+            // of 'hw' CMAgentService.
+            // Name your service  "cmAgentService" and use the web service framework given
+            // in argument.
 
             //@snippet-start ws_call
             //@tutorial-break
             //@snippet-break webservice_cma_skeleton
-            WebServices.exposeAsWebService(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER, hw, url, "cmAgentService",
-                    new String[] { "getLastRequestServeTime", "getCurrentState" });
+            WebServices.exposeAsWebService(wsFrameWork, hw, url, "cmAgentService", new String[] {
+                    "waitLastRequestServeTime", "getCurrentState" });
             //@snippet-resume webservice_cma_skeleton
             //@tutorial-resume
             //@snippet-end ws_call
