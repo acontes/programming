@@ -32,6 +32,8 @@
 package org.objectweb.proactive.extensions.webservices.axis2;
 
 import java.io.File;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 
 import org.apache.axis2.transport.http.AxisServlet;
 import org.apache.log4j.Logger;
@@ -44,6 +46,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.webservices.axis2.deployer.PADeployer;
 import org.objectweb.proactive.extensions.webservices.axis2.util.Util;
 import org.objectweb.proactive.extensions.webservices.axis2.WSConstants;
+import org.objectweb.proactive.extensions.webservices.common.MethodUtils;
 
 
 /**
@@ -118,6 +121,20 @@ public final class WebServices extends WSConstants {
      */
     public static void exposeAsWebService(Object o, String url, String urn, String[] methods) {
         PADeployer.deploy(o, url, urn, methods, false);
+    }
+
+    /**
+     * Expose an active object as a web service with the methods specified in <code>methods</code>
+     *
+     * @param o The object to expose as a web service
+     * @param url The url of the host where the object will be deployed  (typically http://localhost:8080/)
+     * @param urn The name of the object
+     * @param methods The methods that will be exposed as web services functionalities
+     *                   If null, then all methods will be exposed
+     */
+    public static void exposeAsWebService(Object o, String url, String urn, Method[] methods) {
+        ArrayList<String> methodsName = MethodUtils.getCorrespondingMethodsName(methods);
+        PADeployer.deploy(o, url, urn, methodsName.toArray(new String[methodsName.size()]), false);
     }
 
     /**

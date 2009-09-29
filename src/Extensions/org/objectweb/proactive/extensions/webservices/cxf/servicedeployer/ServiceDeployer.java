@@ -19,41 +19,34 @@
 
 package org.objectweb.proactive.extensions.webservices.cxf.servicedeployer;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.List;
 
-import javax.xml.namespace.QName;
-import javax.xml.ws.Endpoint;
-
-import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
-import org.apache.cxf.endpoint.EndpointImpl;
 import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
-import org.apache.cxf.interceptor.FaultOutInterceptor;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
-import org.apache.cxf.service.Service;
-import org.apache.cxf.service.ServiceImpl;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
-import org.apache.cxf.tools.wsdlto.frontend.jaxws.generators.ServiceGenerator;
-import org.apache.cxf.transport.ConduitInitiatorManager;
-import org.apache.cxf.transport.DestinationFactoryManager;
-import org.apache.cxf.transport.local.LocalTransportFactory;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.remoteobject.http.util.HttpMarshaller;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
+import org.objectweb.proactive.core.util.SerializableMethod;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extensions.webservices.WSConstants;
+import org.objectweb.proactive.extensions.webservices.common.MethodUtils;
 
 
+/**
+ * This class implements the service which will be deployed on the server at the
+ * same time as the proactive web application. This service is used to deploy and undeploy
+ * Active Object and components on the server side.
+ *
+ * @author The ProActive Team
+ */
 public class ServiceDeployer implements ServiceDeployerItf {
 
     private static Logger logger = ProActiveLogger.getLogger(Loggers.WEB_SERVICES);
@@ -68,76 +61,37 @@ public class ServiceDeployer implements ServiceDeployerItf {
         }
     }
 
+    // Map of servers corresponding to service servers
+    // It is used to undeploy a service. In that case, we just need
+    // to retrieve the corresponding Server and to stop it.
+    private HashMap<String, Server> serverList = new HashMap<String, Server>();
+
     /**
-     * Returns the methods to be excluded. These methods are methods defined in the
-     * WSConstants.disallowedMethods vector and methods which are not in methodsName.
-     * In case of a null methodsName, only methods in dissallowdMethods vector are
-     * returned.
+     * Expose the marshalled active object as a web service
      *
-     * @param objectClass
-     * @param methodsName
-     * @return
+     * @param marshalledObject marshalled object
+     * @param serviceName Name of the service
+     * @param marshalledSerializedMethods byte array representing the methods (of type Method)
+     *        to be exposed
      */
-    private ArrayList<Method> getIgnoredMethods(Class<?> objectClass, String[] methodsName) {
-        ArrayList<Method> ignoredMethods = new ArrayList<Method>();
-
-        //        try {
-        //            Method m1 = objectClass.getMethod("setHello", null);
-        //            Method m2 = objectClass.getMethod("setTextAndReturn", String.class);
-        //            ignoredMethods.add(m1);
-        //            ignoredMethods.add(m2);
-        //        } catch (SecurityException e) {
-        //            // TODO Auto-generated catch block
-        //            e.printStackTrace();
-        //        } catch (NoSuchMethodException e) {
-        //            // TODO Auto-generated catch block
-        //            e.printStackTrace();
-        //        }
-
-        //        Iterator<String> it = WSConstants.disallowedMethods.iterator();
-        //
-        //        while (it.hasNext()) {
-        //            try {
-        //                Method method = objectClass.getMethod(it.next());
-        //                ignoredMethods.add(method);
-        //            } catch (NoSuchMethodException nsme) {
-        //
-        //            }
-        //        }
-        //
-        //        if (methodsName.length == 0)
-        //            return ignoredMethods;
-        //
-        //        Method[] methodsTable = objectClass.getMethods();
-        //
-        //        ArrayList<Method> methodsArray = new ArrayList<Method>();
-        //        for (String name : methodsName) {
-        //            methodsArray.add(objectClass.getMethod;
-        //        }
-        //
-        //        for (Method m : methodsTable) {
-        //            if (!methodsNameArray.contains(m.getName())) {
-        //                ignoredMethods.add(m);
-        //            }
-        //        }
-
-        return ignoredMethods;
-    }
-
-    public void deploy(byte[] marshalledObject, String serviceName) {
-        this.deploy(marshalledObject, serviceName, null);
-    }
-
-    public void deploy(byte[] marshalledObject, String serviceName, String[] methods) {
-        logger.info("Entering into the deploy method");
+    @SuppressWarnings("unchecked")
+    public void deploy(byte[] marshalledObject, String serviceName, byte[] marshalledSerializedMethods) {
 
         Object o = HttpMarshaller.unmarshallObject(marshalledObject);
-        Class superclass = o.getClass().getSuperclass();
+        Class<?> superclass = o.getClass().getSuperclass();
 
         ReflectionServiceFactoryBean serviceFactory = new ReflectionServiceFactoryBean();
         serviceFactory.setServiceClass(superclass);
-        List<Method> ignoredMethods = this.getIgnoredMethods(superclass, methods);
-        serviceFactory.setIgnoredMethods(ignoredMethods);
+
+        ArrayList<SerializableMethod> serializableMethods = (ArrayList<SerializableMethod>) HttpMarshaller
+                .unmarshallObject(marshalledSerializedMethods);
+        Method[] methods = MethodUtils.getMethodsFromSerializableMethods(serializableMethods);
+        if (methods != null) {
+            MethodUtils mc = new MethodUtils(superclass);
+            List<Method> ignoredMethods;
+            ignoredMethods = mc.getExcludedMethods(methods);
+            serviceFactory.setIgnoredMethods(ignoredMethods);
+        }
 
         ServerFactoryBean svrFactory = new ServerFactoryBean(serviceFactory);
         svrFactory.setAddress("/" + serviceName);
@@ -158,22 +112,22 @@ public class ServiceDeployer implements ServiceDeployerItf {
         LoggingOutInterceptor loggingOutInterceptor = new LoggingOutInterceptor();
         outInterceptors.add(loggingOutInterceptor);
         svrFactory.setOutInterceptors(outInterceptors);
-
         svrFactory.create();
+        serverList.put(serviceName, svrFactory.getServer());
 
-        String address = "http://localhost:8081/" + WSConstants.SERVICES_PATH + serviceName;
-        String implClass = superclass.getName();
-        logger.info("Object of type " + implClass + " has been deployed on " + address);
+        logger.info("The service " + serviceName + " has been deployed");
 
     }
 
-    public String sayHi() {
-        System.out.println("Called sayHi()");
-        return "Hi";
-    }
-
-    public String sayHiWithName(String name) {
-        System.out.println("Called sayHi(String name)");
-        return "Hi " + name;
+    /**
+     * Undeploy the service whose name is serviceName
+     *
+     * @param serviceName name of the service
+     */
+    public void undeploy(String serviceName) {
+        Server serviceServer = serverList.get(serviceName);
+        serviceServer.stop();
+        serverList.remove(serviceName);
+        logger.info("The service " + serviceName + " has been undeployed");
     }
 }

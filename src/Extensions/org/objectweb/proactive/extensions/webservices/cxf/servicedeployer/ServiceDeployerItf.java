@@ -19,11 +19,29 @@
 
 package org.objectweb.proactive.extensions.webservices.cxf.servicedeployer;
 
+/**
+ * Interface of the service which will be deployed on the server at the
+ * same time as the proactive web application. This service is used to deploy and undeploy
+ * Active Object and components on the server side.
+ *
+ * @author The ProActive Team
+ */
 public interface ServiceDeployerItf {
 
-    public void deploy(byte[] marshalledObject, String serviceName);
+    /**
+     * Expose the marshalled active object as a web service
+     *
+     * @param marshalledObject marshalled object
+     * @param serviceName Name of the service
+     * @param marshalledSerializedMethods byte array representing the methods (of type Method)
+     *        to be exposed
+     */
+    public void deploy(byte[] marshalledObject, String serviceName, byte[] marshalledSerializedMethods);
 
-    public String sayHi();
-
-    public String sayHiWithName(String name);
+    /**
+     * Undeploy the service whose name is serviceName
+     *
+     * @param serviceName name of the service
+     */
+    public void undeploy(String serviceName);
 }

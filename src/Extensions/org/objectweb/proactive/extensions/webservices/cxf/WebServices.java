@@ -31,18 +31,34 @@
  */
 package org.objectweb.proactive.extensions.webservices.cxf;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.frontend.ServerFactoryBean;
+import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.interceptor.LoggingInInterceptor;
+import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.transport.servlet.CXFServlet;
 import org.apache.log4j.Logger;
+import org.mortbay.jetty.servlet.ServletHolder;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.httpserver.HTTPServer;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extensions.webservices.cxf.WSConstants;
+import org.objectweb.proactive.extensions.webservices.common.MethodUtils;
 import org.objectweb.proactive.extensions.webservices.cxf.deployer.PADeployer;
+import org.objectweb.proactive.extensions.webservices.cxf.servicedeployer.ServiceDeployer;
+import org.objectweb.proactive.extensions.webservices.cxf.servicedeployer.ServiceDeployerItf;
 
 
 /**
- * Deploy and undeploy active objects and components. Methods of this class
- * just call methods of the PADeployer class.
+ * Deploy and undeploy active objects and components using CXF.
+ * Methods of this class just call methods of the PADeployer class.
  *
  * @author The ProActive Team
  */
@@ -51,41 +67,71 @@ public final class WebServices extends WSConstants {
 
     static private Logger logger = ProActiveLogger.getLogger(Loggers.WEB_SERVICES);
 
-    //    static {
-    //
-    //        // Retrieve or launch a Jetty server
-    //        // in case of a local exposition
-    //        HTTPServer httpServer = HTTPServer.get();
-    //
-    //        // Setup the system properties to use the CXFBusFactory not the SpringBusFactory
-    //        String busFactory = System.getProperty(BusFactory.BUS_FACTORY_PROPERTY_NAME);
-    //        System.setProperty(BusFactory.BUS_FACTORY_PROPERTY_NAME, "org.apache.cxf.bus.CXFBusFactory");
-    //        try {
-    ////            ContextHandlerCollection contexts = new ContextHandlerCollection();
-    ////            httpServer.setHandler(contexts);
-    ////
-    ////            Context root = new Context(contexts, "/", Context.SESSIONS);
-    //
-    //            CXFServlet cxf = new CXFServlet();
-    //            ServletHolder CXFServletHolder = new ServletHolder(cxf);
-    //
-    //            httpServer.registerServlet(CXFServletHolder, WSConstants.SERVLET_PATH);
-    //
-    //            Bus bus = cxf.getBus();
-    //            BusFactory.setDefaultBus(bus);
-    //            ServiceDeployerImpl impl = new ServiceDeployerImpl();
-    //            Endpoint.publish("/ServiceDeployer", impl);
-    //        } catch (Exception e) {
-    //            throw new RuntimeException(e);
-    //        } finally {
-    //            // clean up the system properties
-    //            if (busFactory != null) {
-    //                System.setProperty(BusFactory.BUS_FACTORY_PROPERTY_NAME, busFactory);
-    //            } else {
-    //                System.clearProperty(BusFactory.BUS_FACTORY_PROPERTY_NAME);
-    //            }
-    //        }
-    //    }
+    /**
+     * Static block in charge of deploying the ServiceDeployer service into the jetty server
+     */
+    static {
+
+        // Retrieve or launch a Jetty server
+        // in case of a local exposition
+        HTTPServer httpServer = HTTPServer.get();
+
+        try {
+
+            // Creates a CXF servlet and register it
+            // to the Jetty server
+            CXFServlet cxf = new CXFServlet();
+            ServletHolder CXFServletHolder = new ServletHolder(cxf);
+            httpServer.registerServlet(CXFServletHolder, WSConstants.SERVLET_PATH);
+
+            // Configures the bus
+            Bus bus = cxf.getBus();
+            BusFactory.setDefaultBus(bus);
+
+            /*
+             * Configure the service
+             */
+            ServerFactoryBean svrFactory = new ServerFactoryBean();
+            svrFactory.setAddress("/ServiceDeployer");
+            svrFactory.setServiceClass(ServiceDeployerItf.class);
+            svrFactory.setServiceBean(new ServiceDeployer());
+
+            /*
+             * Attaches a list of in-interceptors
+             * In our case, only a logger is attached in order to be able
+             * to see input soap messages
+             */
+            List<Interceptor> inInterceptors = new ArrayList<Interceptor>();
+            LoggingInInterceptor loggingInInterceptor = new LoggingInInterceptor();
+            inInterceptors.add(loggingInInterceptor);
+            svrFactory.setInInterceptors(inInterceptors);
+
+            /*
+             * Attaches a list of out-interceptors
+             * In our case, only a logger is attached in order to be able
+             * to see output soap messages
+             */
+            List<Interceptor> outInterceptors = new ArrayList<Interceptor>();
+            LoggingOutInterceptor loggingOutInterceptor = new LoggingOutInterceptor();
+            outInterceptors.add(loggingOutInterceptor);
+            svrFactory.setOutInterceptors(outInterceptors);
+
+            // Creates the service
+            svrFactory.create();
+
+            logger
+                    .info("The service ServiceDeployer has been deployed on the jetty server located at http://localhost:" +
+                        PAProperties.PA_XMLHTTP_PORT.getValue() +
+                        "/" +
+                        WSConstants.SERVICES_PATH +
+                        "ServiceDeployer");
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
     /**
      * Expose an active object as a web service with the methods specified in <code>methods</code>
      *
@@ -95,9 +141,43 @@ public final class WebServices extends WSConstants {
      * @param methods The methods that will be exposed as web services functionalities
      *					 If null, then all methods will be exposed
      */
-    public static void exposeAsWebService(Object o, String url, String urn, String[] methods) {
-        //PADeployer.deploy(o, url, urn, methods, false);
-        System.out.println("Trying to expose " + o.getClass().getName() + " at " + url + urn);
+    public static void exposeAsWebService(Object o, String url, String urn, Method[] methods) {
+        logger.info("Trying to expose " + o.getClass().getSuperclass().getName() + " at " + url +
+            WSConstants.SERVICES_PATH + urn);
+        try {
+            MethodUtils.checkMethodsClass(methods);
+            PADeployer.deploy(o, url, urn, methods, false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Expose an active object as a web service with the methods specified in <code>methods</code>
+     *
+     * @param o The object to expose as a web service
+     * @param url The url of the host where the object will be deployed  (typically http://localhost:8080/)
+     * @param urn The name of the object
+     * @param methods The methods that will be exposed as web services functionalities
+     *                   If null, then all methods will be exposed
+     */
+    public static void exposeAsWebService(Object o, String url, String urn, String[] methodsName) {
+        logger.info("Trying to expose " + o.getClass().getSuperclass().getName() + " at " + url +
+            WSConstants.SERVICES_PATH + urn);
+        try {
+            MethodUtils mc = new MethodUtils(o.getClass().getSuperclass());
+            ArrayList<Method> methodsArrayList = mc.getCorrespondingMethods(methodsName);
+            Method[] methods = new Method[methodsArrayList.size()];
+            methodsArrayList.toArray(methods);
+            logger.info("Exposed methods:");
+            for (Method method : methods) {
+                logger.info(method.getName());
+                logger.info(method.toString());
+            }
+            PADeployer.deploy(o, url, urn, methods, false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -108,14 +188,9 @@ public final class WebServices extends WSConstants {
      * @param urn The name of the object
      */
     public static void exposeAsWebService(Object o, String url, String urn) {
-        try {
-            PADeployer.deploy(o, url, urn);
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
         logger.info("Trying to expose " + o.getClass().getSuperclass().getName() + " at " + url +
             WSConstants.SERVICES_PATH + urn);
+        PADeployer.deploy(o, url, urn, null, false);
     }
 
     /**
@@ -125,7 +200,8 @@ public final class WebServices extends WSConstants {
      * @param url The url of the web server
      */
     public static void unExposeAsWebService(String url, String urn) {
-        //PADeployer.unDeploy(url, urn);
+        logger.info("Trying to unexpose the service " + urn + " at " + url + WSConstants.SERVICES_PATH + urn);
+        PADeployer.undeploy(url, urn);
     }
 
     /**

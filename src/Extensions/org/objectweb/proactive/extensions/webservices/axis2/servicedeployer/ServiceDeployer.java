@@ -31,10 +31,8 @@
  */
 package org.objectweb.proactive.extensions.webservices.axis2.servicedeployer;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
@@ -55,7 +53,7 @@ import org.objectweb.proactive.core.remoteobject.http.util.HttpMarshaller;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extensions.webservices.axis2.WSConstants;
+import org.objectweb.proactive.extensions.webservices.common.MethodUtils;
 
 
 /**
@@ -77,44 +75,6 @@ public class ServiceDeployer {
         } catch (ProActiveException e) {
             e.printStackTrace();
         }
-    }
-
-    /**
-     * Returns the methods to be excluded. These methods are methods defined in the
-     * WSConstants.disallowedMethods vector and methods which are not in methodsName.
-     * In case of a null methodsName, only methods in dissallowdMethods vector are
-     * returned.
-     *
-     * @param objectClass
-     * @param methodsName
-     * @return
-     */
-    private ArrayList<String> getExcludedOperations(Class<?> objectClass, String[] methodsName) {
-        ArrayList<String> excludedOperations = new ArrayList<String>();
-
-        Iterator<String> it = WSConstants.disallowedMethods.iterator();
-
-        while (it.hasNext()) {
-            excludedOperations.add(it.next());
-        }
-
-        if (methodsName.length == 0)
-            return excludedOperations;
-
-        Method[] methodsTable = objectClass.getMethods();
-
-        ArrayList<String> methodsNameArray = new ArrayList<String>();
-        for (String name : methodsName) {
-            methodsNameArray.add(name);
-        }
-
-        for (Method m : methodsTable) {
-            if (!methodsNameArray.contains(m.getName())) {
-                excludedOperations.add(m.getName());
-            }
-        }
-
-        return excludedOperations;
     }
 
     /**
@@ -218,7 +178,8 @@ public class ServiceDeployer {
             }
 
             // Retrieve methods we don't want
-            ArrayList<String> excludedOperations = this.getExcludedOperations(superclass, methods);
+            MethodUtils mc = new MethodUtils(superclass);
+            ArrayList<String> excludedOperations = mc.getExcludedMethodsName(methods);
 
             // Create the service
             AxisService axisService = this.customCreateService(implClass, serviceName, axisConfiguration,

@@ -31,6 +31,8 @@
  */
 package org.objectweb.proactive.extensions.webservices;
 
+import java.lang.reflect.Method;
+
 import org.objectweb.fractal.api.Component;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveException;
@@ -54,6 +56,7 @@ public final class WebServices extends WSConstants {
      * @param urn The name of the object
      * @param methods The methods that will be exposed as web services functionalities
      *					 If null, then all methods will be exposed
+     * @throws ProActiveException throws a ProActiveException if the web service framework is not authorized
      */
     public static void exposeAsWebService(String wsFrameWork, Object o, String url, String urn,
             String[] methods) throws ProActiveException {
@@ -64,7 +67,31 @@ public final class WebServices extends WSConstants {
             org.objectweb.proactive.extensions.webservices.cxf.WebServices.exposeAsWebService(o, url, urn,
                     methods);
         } else {
-            throw new ProActiveException("Unknown web service framework identifier");
+            throw new ProActiveException("Unknown web service framework identifier: " + wsFrameWork);
+        }
+    }
+
+    /**
+     * Expose an active object as a web service with the methods specified in <code>methods</code>
+     *
+     * @param wsFrameWork web service framework which will be used to deploy the service (e.g. "axis2", "cxf")
+     * @param o The object to expose as a web service
+     * @param url The url of the host where the object will be deployed  (typically http://localhost:8080/)
+     * @param urn The name of the object
+     * @param methods The methods that will be exposed as web services functionalities
+     *                   If null, then all methods will be exposed
+     * @throws ProActiveException throws a ProActiveException if the web service framework is not authorized
+     */
+    public static void exposeAsWebService(String wsFrameWork, Object o, String url, String urn,
+            Method[] methods) throws ProActiveException {
+        if (WSConstants.AXIS2_FRAMEWORK_IDENTIFIER.equals(wsFrameWork)) {
+            org.objectweb.proactive.extensions.webservices.axis2.WebServices.exposeAsWebService(o, url, urn,
+                    methods);
+        } else if (WSConstants.CXF_FRAMEWORK_IDENTIFIER.equals(wsFrameWork)) {
+            org.objectweb.proactive.extensions.webservices.cxf.WebServices.exposeAsWebService(o, url, urn,
+                    methods);
+        } else {
+            throw new ProActiveException("Unknown web service framework identifier: " + wsFrameWork);
         }
     }
 
@@ -75,6 +102,7 @@ public final class WebServices extends WSConstants {
      * @param o The object to expose as a web service
      * @param url The url of the host where the object will be deployed  (typically http://localhost:8080/)
      * @param urn The name of the object
+     * @throws ProActiveException throws a ProActiveException if the web service framework is not authorized
      */
     public static void exposeAsWebService(String wsFrameWork, Object o, String url, String urn)
             throws ProActiveException {
@@ -83,7 +111,7 @@ public final class WebServices extends WSConstants {
         } else if (WSConstants.CXF_FRAMEWORK_IDENTIFIER.equals(wsFrameWork)) {
             org.objectweb.proactive.extensions.webservices.cxf.WebServices.exposeAsWebService(o, url, urn);
         } else {
-            throw new ProActiveException("Unknown web service framework identifier");
+            throw new ProActiveException("Unknown web service framework identifier: " + wsFrameWork);
         }
     }
 
@@ -93,6 +121,7 @@ public final class WebServices extends WSConstants {
      * @param wsFrameWork web service framework which will be used to deploy the service (e.g. "axis2", "cxf")
      * @param urn The name of the object
      * @param url The url of the web server
+     * @throws ProActiveException throws a ProActiveException if the web service framework is not authorized
      */
     public static void unExposeAsWebService(String wsFrameWork, String url, String urn)
             throws ProActiveException {
@@ -101,7 +130,7 @@ public final class WebServices extends WSConstants {
         } else if (WSConstants.CXF_FRAMEWORK_IDENTIFIER.equals(wsFrameWork)) {
             org.objectweb.proactive.extensions.webservices.cxf.WebServices.unExposeAsWebService(url, urn);
         } else {
-            throw new ProActiveException("Unknown web service framework identifier");
+            throw new ProActiveException("Unknown web service framework identifier: " + wsFrameWork);
         }
     }
 
@@ -117,6 +146,7 @@ public final class WebServices extends WSConstants {
      * @param componentName Name of the component
      * @param interfaceNames Names of the interfaces we want to deploy.
       *							  If null, then all the interfaces will be deployed
+     * @throws ProActiveException throws a ProActiveException if the web service framework is not authorized
      */
     public static void exposeComponentAsWebService(String wsFrameWork, Component component, String url,
             String componentName, String[] interfaceNames) throws ProActiveException {
@@ -127,7 +157,7 @@ public final class WebServices extends WSConstants {
             org.objectweb.proactive.extensions.webservices.cxf.WebServices.exposeComponentAsWebService(
                     component, url, componentName, interfaceNames);
         } else {
-            throw new ProActiveException("Unknown web service framework identifier");
+            throw new ProActiveException("Unknown web service framework identifier: " + wsFrameWork);
         }
     }
 
@@ -140,6 +170,7 @@ public final class WebServices extends WSConstants {
      * @param component The component owning the interfaces that will be deployed as web services.
      * @param url  Web server url  where to deploy the service - typically "http://localhost:8080"
      * @param componentName Name of the component
+     * @throws ProActiveException throws a ProActiveException if the web service framework is not authorized
      */
     public static void exposeComponentAsWebService(String wsFrameWork, Component component, String url,
             String componentName) throws ProActiveException {
@@ -150,7 +181,7 @@ public final class WebServices extends WSConstants {
             org.objectweb.proactive.extensions.webservices.cxf.WebServices.exposeComponentAsWebService(
                     component, url, componentName);
         } else {
-            throw new ProActiveException("Unknown web service framework identifier");
+            throw new ProActiveException("Unknown web service framework identifier: " + wsFrameWork);
         }
     }
 
@@ -161,6 +192,7 @@ public final class WebServices extends WSConstants {
      * @param component  The component owning the services interfaces
      * @param url The url of the web server
      * @param componentName The name of the component
+     * @throws ProActiveException throws a ProActiveException if the web service framework is not authorized
      */
     public static void unExposeComponentAsWebService(String wsFrameWork, Component component, String url,
             String componentName) throws ProActiveException {
@@ -171,7 +203,7 @@ public final class WebServices extends WSConstants {
             org.objectweb.proactive.extensions.webservices.cxf.WebServices.unExposeComponentAsWebService(
                     component, url, componentName);
         } else {
-            throw new ProActiveException("Unknown web service framework identifier");
+            throw new ProActiveException("Unknown web service framework identifier: " + wsFrameWork);
         }
     }
 
@@ -182,6 +214,7 @@ public final class WebServices extends WSConstants {
      * @param url The url of the web server
      * @param componentName The name of the component
      * @param interfaceNames Interfaces to be undeployed
+     * @throws ProActiveException throws a ProActiveException if the web service framework is not authorized
      */
     public static void unExposeComponentAsWebService(String wsFrameWork, String url, String componentName,
             String[] interfaceNames) throws ProActiveException {
@@ -192,7 +225,7 @@ public final class WebServices extends WSConstants {
             org.objectweb.proactive.extensions.webservices.cxf.WebServices.unExposeComponentAsWebService(url,
                     componentName, interfaceNames);
         } else {
-            throw new ProActiveException("Unknown web service framework identifier");
+            throw new ProActiveException("Unknown web service framework identifier: " + wsFrameWork);
         }
     }
 }
