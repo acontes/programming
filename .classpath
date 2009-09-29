@@ -185,5 +185,18 @@
 	<classpathentry kind="lib" path="/home/ffonteno/proactive-git/programming/lib/cxf/wss4j-1.5.7.jar"/>
 	<classpathentry kind="lib" path="/home/ffonteno/proactive-git/programming/lib/cxf/xmlsec-1.4.2.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="/home/ffonteno/proactive-git/programming/compile/lib/ant.jar"/>
+	<classpathentry kind="lib" path="/home/ffonteno/proactive-git/programming/compile/lib/AntelopeTasks_3.2.19.jar"/>
+	<classpathentry kind="lib" path="/home/ffonteno/proactive-git/programming/compile/lib/ant-javah.jar"/>
+	<classpathentry kind="lib" path="/home/ffonteno/proactive-git/programming/compile/lib/ant-jdepend.jar"/>
+	<classpathentry kind="lib" path="/home/ffonteno/proactive-git/programming/compile/lib/ant-junit.jar"/>
+	<classpathentry kind="lib" path="/home/ffonteno/proactive-git/programming/compile/lib/ant-launcher.jar"/>
+	<classpathentry kind="lib" path="/home/ffonteno/proactive-git/programming/compile/lib/ant-replaceregexp.jar"/>
+	<classpathentry kind="lib" path="/home/ffonteno/proactive-git/programming/compile/lib/ant-trax.jar"/>
+	<classpathentry kind="lib" path="/home/ffonteno/proactive-git/programming/compile/lib/clover.jar"/>
+	<classpathentry kind="lib" path="/home/ffonteno/proactive-git/programming/compile/lib/emma.jar"/>
+	<classpathentry kind="lib" path="/home/ffonteno/proactive-git/programming/compile/lib/emma_ant.jar"/>
+	<classpathentry kind="lib" path="/home/ffonteno/proactive-git/programming/compile/lib/jdepend.jar"/>
+	<classpathentry kind="lib" path="/home/ffonteno/proactive-git/programming/compile/lib/junit-4.3.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

@@ -54,6 +54,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class HTTPServer {
     final private static Logger logger = ProActiveLogger.getLogger(Loggers.HTTP_SERVER);
 
+    final public static String SERVER_CONTEXT = "/proactive";
+
     private static HTTPServer httpServer;
 
     /* The Jetty server */
@@ -127,7 +129,7 @@ public class HTTPServer {
             logger.error("Failed to load jetty configuration file: " + configUrl, e);
         }
 
-        this.context = new Context(server, "/proactive", Context.SESSIONS);
+        this.context = new Context(server, HTTPServer.SERVER_CONTEXT, Context.SESSIONS);
 
         this.server.start();
         // If a random port is used we have to set it
