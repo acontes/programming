@@ -17,7 +17,7 @@
 		<messageReceiver
 			class="org.apache.axis2.rpc.receivers.RPCInOnlyMessageReceiver"/>
 	</operation>
-	<operation name="unDeploy">
+	<operation name="undeploy">
 		<messageReceiver
 			class="org.apache.axis2.rpc.receivers.RPCInOnlyMessageReceiver"/>
 	</operation>

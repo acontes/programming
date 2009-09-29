@@ -155,7 +155,7 @@ public final class WebServices extends WSConstants {
      * @param url The url of the web server
      */
     public static void unExposeAsWebService(String url, String urn) {
-        PADeployer.unDeploy(url, urn);
+        PADeployer.undeploy(url, urn);
     }
 
     /**
@@ -196,7 +196,7 @@ public final class WebServices extends WSConstants {
      * @param componentName The name of the component
      */
     public static void unExposeComponentAsWebService(Component component, String url, String componentName) {
-        PADeployer.unDeployComponent(component, url, componentName);
+        PADeployer.undeployComponent(component, url, componentName);
     }
 
     /**
@@ -207,6 +207,6 @@ public final class WebServices extends WSConstants {
      * @param interfaceNames Interfaces to be undeployed
      */
     public static void unExposeComponentAsWebService(String url, String componentName, String[] interfaceNames) {
-        PADeployer.unDeployComponent(url, componentName, interfaceNames);
+        PADeployer.undeployComponent(url, componentName, interfaceNames);
     }
 }

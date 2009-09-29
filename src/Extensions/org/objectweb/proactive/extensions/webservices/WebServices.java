@@ -186,7 +186,10 @@ public final class WebServices extends WSConstants {
     }
 
     /**
-     * Undeploy all the interfaces of a component deployed on a web server
+     * Undeploy all the client interfaces of a component deployed on a web server. With CXF, this method
+     * can only be used if you have previously deployed all the client interfaces of the component.
+     * Otherwise, it will raise an exception trying to undeploy a client interface which has not been
+     * deployed before.
      *
      * @param wsFrameWork web service framework which will be used to deploy the service (e.g. "axis2", "cxf")
      * @param component  The component owning the services interfaces

@@ -205,7 +205,7 @@ public class ServiceDeployer {
      *
      * @param serviceName
      */
-    public void unDeploy(String serviceName) {
+    public void undeploy(String serviceName) {
         try {
             // Get the axis configuration
             MessageContext msgCtx = MessageContext.getCurrentMessageContext();

@@ -52,7 +52,7 @@ import org.objectweb.fractal.api.NoSuchInterfaceException;
 
 /**
  * This class is in charge of calling the ServiceDeployer service on hosts specified
- * by urls and invokes its deploy and unDeploy methods with the needed arguments.
+ * by urls and invokes its deploy and undeploy methods with the needed arguments.
  *
  * @author The ProActive Team
  */
@@ -180,7 +180,7 @@ public final class PADeployer {
     }
 
     /**
-     * Call the method unDeploy of the ServiceDeployer service
+     * Call the method undeploy of the ServiceDeployer service
      * deployed on the host for every interface of component.
      *
      * @param component Component to undeploy
@@ -201,7 +201,7 @@ public final class PADeployer {
     }
 
     /**
-     * Call the method unDeploy of the ServiceDeployer service
+     * Call the method undeploy of the ServiceDeployer service
      * deployed on the host for interfaces of component specified in
      * interfaceNames.
      *

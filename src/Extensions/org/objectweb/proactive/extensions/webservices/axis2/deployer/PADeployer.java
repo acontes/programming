@@ -54,7 +54,7 @@ import org.apache.log4j.Logger;
 
 /**
  * This class is in charge of calling the ServiceDeployer service on hosts specified
- * by urls and invokes its deploy and unDeploy methods with the needed arguments.
+ * by urls and invokes its deploy and undeploy methods with the needed arguments.
  *
  * @author The ProActive Team
  */
@@ -184,13 +184,13 @@ public class PADeployer {
     }
 
     /**
-     * Call the method unDeploy of the ServiceDeployer service
+     * Call the method undeploy of the ServiceDeployer service
      * deployed on the host.
      *
      * @param url Url of the host where the service is deployed
      * @param serviceName Name of the service.
      */
-    static public void unDeploy(String url, String serviceName) {
+    static public void undeploy(String url, String serviceName) {
         try {
             String correctUrl = "";
 
@@ -210,10 +210,10 @@ public class PADeployer {
 
             Options options = serviceClient.getOptions();
             options.setTo(targetEPR);
-            options.setAction("unDeploy");
+            options.setAction("undeploy");
 
             QName op = new QName(
-                "http://servicedeployer.axis2.webservices.extensions.proactive.objectweb.org", "unDeploy");
+                "http://servicedeployer.axis2.webservices.extensions.proactive.objectweb.org", "undeploy");
 
             Object[] opArgs = new Object[] { serviceName };
 
@@ -227,14 +227,14 @@ public class PADeployer {
     }
 
     /**
-     * Call the method unDeploy of the ServiceDeployer service
+     * Call the method undeploy of the ServiceDeployer service
      * deployed on the host for every interface of component.
      *
      * @param component Component to undeploy
      * @param url Url of the host where interfaces are deployed
      * @param componentName Name of the component
      */
-    static public void unDeployComponent(Component component, String url, String componentName) {
+    static public void undeployComponent(Component component, String url, String componentName) {
         Object[] interfaces = component.getFcInterfaces();
         for (Object o : interfaces) {
             String interfaceName = ((Interface) o).getFcItfName();
@@ -242,12 +242,12 @@ public class PADeployer {
             /* only expose server interfaces and not the attributes controller */
             if (!interfaceName.contains("-controller") && !interfaceName.equals("component") &&
                 !((ProActiveInterfaceType) ((Interface) o).getFcItfType()).isFcClientItf())
-                unDeploy(url, componentName + "_" + interfaceName);
+                undeploy(url, componentName + "_" + interfaceName);
         }
     }
 
     /**
-     * Call the method unDeploy of the ServiceDeployer service
+     * Call the method undeploy of the ServiceDeployer service
      * deployed on the host for interfaces of component specified in
      * interfaceNames.
      *
@@ -255,9 +255,9 @@ public class PADeployer {
      * @param componentName Name of the component
      * @param interfaceNames Interfaces we want to undeploy.
      */
-    static public void unDeployComponent(String url, String componentName, String[] interfaceNames) {
+    static public void undeployComponent(String url, String componentName, String[] interfaceNames) {
         for (String s : interfaceNames) {
-            unDeploy(url, componentName + "_" + s);
+            undeploy(url, componentName + "_" + s);
         }
     }
 }
