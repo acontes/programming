@@ -406,7 +406,6 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
     }
 
     public void wsRotateScene(int arg0, Vec arg1) {
-        System.out.println(arg1.toString());
         rotateScene(arg0, arg1);
     }
 
@@ -499,7 +498,6 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
 
     //SYNCHRONOUS CALL. All "c3duser." calls in this method happen AFTER the int[] is returned
     public int registerUser(User c3duser, String userName) {
-        System.out.println(">>>>> Begining of registerUser <<<<<");
 
         c3duser.log("-> Remote call-back: dispatcher found, user registered");
         log("New user " + userName + "(" + this.lastUserID + ") has joined");
@@ -545,13 +543,14 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
 
             election.setNbUsers(nbUsers);
         }
-        System.out.println(">>>>> End of registerUser <<<<<");
         // return user_id
         return this.lastUserID++;
     }
 
     public int wsRegisterUser(byte[] arg0, String arg1) {
+        System.out.println("wsRegisterUser begins");
         User user = (User) HttpMarshaller.unmarshallObject(arg0);
+        System.out.println("user has been created");
         return registerUser(user, arg1);
     }
 

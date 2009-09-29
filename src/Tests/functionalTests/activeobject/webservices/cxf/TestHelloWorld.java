@@ -64,7 +64,6 @@ public class TestHelloWorld {
         try {
             // Get the HTTP server enabling us to retrieve the jetty
             // port number
-            PAProperties.PA_XMLHTTP_PORT.setValue(8080);
             HTTPServer httpServer = HTTPServer.get();
             String port = PAProperties.PA_XMLHTTP_PORT.getValue();
             this.url = "http://localhost:" + port + "/";

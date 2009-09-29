@@ -36,18 +36,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.apache.cxf.BusFactory;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ServerFactoryBean;
-import org.apache.cxf.interceptor.ClientFaultConverter;
-import org.apache.cxf.interceptor.ClientOutFaultObserver;
-import org.apache.cxf.interceptor.FaultOutInterceptor;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
-import org.apache.cxf.interceptor.PrettyLoggingOutInterceptor;
-import org.apache.cxf.interceptor.StaxOutInterceptor;
-import org.apache.cxf.interceptor.WrappedOutInterceptor;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
@@ -137,7 +130,6 @@ public class ServiceDeployer implements ServiceDeployerItf {
                 interface_ = (Interface) ((Component) o).getFcInterface(interfaceName);
                 implClass = ((InterfaceType) interface_.getFcItfType()).getFcItfSignature();
                 superclass = Class.forName(implClass, true, interface_.getClass().getClassLoader());
-                System.out.println(superclass.getName());
 
                 MethodUtils mc = new MethodUtils(superclass);
                 List<Method> ignoredMethods = mc.getExcludedMethods(null);
