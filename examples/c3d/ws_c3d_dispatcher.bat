@@ -16,6 +16,8 @@ IF NOT DEFINED PROACTIVE set PROACTIVE=%CD%\..\..
 
 call "..\init.bat"
 
+set CLASSPATH="%CLASSPATH%:%PROACTIVE%/src/Extensions/org/objectweb/proactive/extensions/webservices/cxf/lib/cxf-manifest.jar"
+%JAVA_CMD%="%JAVA_CMD% -Djava.rmi.server.RMIClassLoaderSpi=org.objectweb.proactive.core.classloading.protocols.ProActiveRMIClassLoader"
 set XMLDESCRIPTOR=GCMA_Renderer.xml
 %JAVA_CMD%  org.objectweb.proactive.examples.webservices.c3dWS.C3DDispatcher %XMLDESCRIPTOR% %*
 ENDLOCAL

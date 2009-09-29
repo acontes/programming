@@ -56,6 +56,7 @@ public class ClientUtils {
 
         EndpointReference targetEPR = new EndpointReference(url + WSConstants.SERVICES_PATH + serviceName);
 
+        serviceClient.getAxisService().setElementFormDefault(false);
         options.setTo(targetEPR);
 
         return serviceClient;

@@ -405,9 +405,9 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
         render();
     }
 
-    public void wsRotateScene(int i_user, Vec angle) {
-        System.out.println(angle.toString());
-        rotateScene(i_user, angle);
+    public void wsRotateScene(int arg0, Vec arg1) {
+        System.out.println(arg1.toString());
+        rotateScene(arg0, arg1);
     }
 
     /** Tells what are the operations to perform before starting the activity of the AO.
@@ -451,8 +451,8 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
         this.userBag.getUser(i_user).message(s_message);
     }
 
-    public void wsUserWriteMessage(int i_user, String s_message) {
-        userWriteMessage(i_user, s_message);
+    public void wsUserWriteMessage(int arg0, String arg1) {
+        userWriteMessage(arg0, arg1);
     }
 
     /** Ask users & dispatcher log s_message, except one  */
@@ -481,8 +481,8 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
         }
     }
 
-    public void wsUserWriteMessageExcept(int i_user, String s_message) {
-        userWriteMessageExcept(i_user, s_message);
+    public void wsUserWriteMessageExcept(int arg0, String arg1) {
+        userWriteMessageExcept(arg0, arg1);
     }
 
     /** Ask all users & dispatcher to log s_message */
@@ -499,6 +499,8 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
 
     //SYNCHRONOUS CALL. All "c3duser." calls in this method happen AFTER the int[] is returned
     public int registerUser(User c3duser, String userName) {
+        System.out.println(">>>>> Begining of registerUser <<<<<");
+
         c3duser.log("-> Remote call-back: dispatcher found, user registered");
         log("New user " + userName + "(" + this.lastUserID + ") has joined");
 
@@ -543,21 +545,21 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
 
             election.setNbUsers(nbUsers);
         }
-
+        System.out.println(">>>>> End of registerUser <<<<<");
         // return user_id
         return this.lastUserID++;
     }
 
-    public int wsRegisterUser(byte[] userBytes, String userName) {
-        User user = (User) HttpMarshaller.unmarshallObject(userBytes);
-        return registerUser(user, userName);
+    public int wsRegisterUser(byte[] arg0, String arg1) {
+        User user = (User) HttpMarshaller.unmarshallObject(arg0);
+        return registerUser(user, arg1);
     }
 
-    public void registerMigratedUser(int userNumber) {
-        String name = this.userBag.getName(userNumber);
-        log("User " + name + "(" + userNumber + ") has migrated ");
+    public void registerMigratedUser(int arg0) {
+        String name = this.userBag.getName(arg0);
+        log("User " + name + "(" + arg0 + ") has migrated ");
 
-        User c3duser = this.userBag.getUser(userNumber);
+        User c3duser = this.userBag.getUser(arg0);
 
         /*
          * Initializes the image of the migrated consumer (user's copy of image is destroyed before
@@ -567,29 +569,29 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
         c3duser.setPixels(new Image2D(this.localCopyOfImage, inter, 0));
     }
 
-    public void wsRegisterMigratedUser(int userNumber) {
-        registerMigratedUser(userNumber);
+    public void wsRegisterMigratedUser(int arg0) {
+        registerMigratedUser(arg0);
     }
 
     /** removes user from userList, so he cannot receive any more messages or images */
-    public void unregisterConsumer(int number) {
-        String nameOfUser = this.userBag.getName(number);
-        allLogExcept(number, "User " + nameOfUser + " has left");
+    public void unregisterConsumer(int arg0) {
+        String nameOfUser = this.userBag.getName(arg0);
+        allLogExcept(arg0, "User " + nameOfUser + " has left");
 
         // Inform all users one left
         for (this.userBag.newIterator(); this.userBag.hasNext();) {
             this.userBag.next();
 
-            if (this.userBag.currentKey() != number) {
+            if (this.userBag.currentKey() != arg0) {
                 this.userBag.currentUser().informUserLeft(nameOfUser);
             }
         }
 
         // remove that name from the Dispatcher frame
-        this.gui.removeUser(nameOfUser + " (" + number + ")");
+        this.gui.removeUser(nameOfUser + " (" + arg0 + ")");
 
         // remove from internal list of users.
-        this.userBag.remove(number);
+        this.userBag.remove(arg0);
 
         int nbUsers = this.userBag.size();
 
@@ -609,8 +611,8 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
         }
     }
 
-    public void wsUnregisterConsumer(int number) {
-        unregisterConsumer(number);
+    public void wsUnregisterConsumer(int arg0) {
+        unregisterConsumer(arg0);
     }
 
     public void resetScene() {
@@ -686,8 +688,8 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
         return new StringMutableWrapper(s_list.toString());
     }
 
-    public StringMutableWrapper wsGetUserList() {
-        return getUserList();
+    public String wsGetUserList() {
+        return getUserList().stringValue();
     }
 
     public void addSphere(Sphere s) {
@@ -974,12 +976,12 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
                 fileName = args[0];
                 wsFrameWork = args[1];
             } else if (args.length == 3) {
-                url = args[0];
-                fileName = args[1];
+                fileName = args[0];
+                url = args[1];
                 wsFrameWork = args[2];
             } else {
                 System.out.println("Wrong number of arguments:");
-                System.out.println("Usage: java C3DDispatcher [url] GCMA wsFrameWork");
+                System.out.println("Usage: java C3DDispatcher GCMA [url] wsFrameWork");
                 System.out.println("with wsFrameWork should be either \"axis2\" or \"cxf\" ");
                 return;
             }

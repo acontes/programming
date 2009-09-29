@@ -1062,7 +1062,7 @@
 	<!-- ================================================================================ -->
 	<!--    Create the proactive Web Archive to be used with the web service framework    -->
 	<!-- ================================================================================ -->
-	<target name="proActiveWarAxis2" depends="deploy.all">
+	<target name="proActiveWarAxis2" depends="deploy.all" description="build the proactive.war archive with Axis2 embedded" >
 
 		<war destfile="${deploy.dir}/proactive.war" webxml="${axis2.dir}/webapp/WEB-INF/web.xml">
 			<lib dir="${axis2.dir}/lib">
@@ -1087,7 +1087,7 @@
 		<delete dir="${temp.class.dir}" />
 	</target>
 
-	<target name="proActiveWarCXF" depends="deploy.all">
+	<target name="proActiveWarCXF" depends="deploy.all" description="build the proactive.war archive with CXF embedded" >
         <war destfile="${deploy.dir}/proactive.war" webxml="${cxf.dir}/etc/web.xml">
             <classes dir="${cl.extensions.dir}" includes="**/cxf/servicedeployer/*.class"/>
             <webinf dir="${cxf.dir}/wsdl">

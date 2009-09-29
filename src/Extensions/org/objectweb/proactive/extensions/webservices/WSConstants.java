@@ -41,13 +41,13 @@ import java.util.Vector;
  */
 public class WSConstants {
 
-    public static String SERVICES_PATH = "proactive/services/";
-    public static String SERVLET_PATH = "/services/*";
+    public static final String SERVICES_PATH = "proactive/services/";
+    public static final String SERVLET_PATH = "/services/*";
 
-    public static String AXIS2_FRAMEWORK_IDENTIFIER = "axis2";
-    public static String CXF_FRAMEWORK_IDENTIFIER = "cxf";
+    public static final String AXIS2_FRAMEWORK_IDENTIFIER = "axis2";
+    public static final String CXF_FRAMEWORK_IDENTIFIER = "cxf";
 
-    public static Vector<String> disallowedMethods = new Vector<String>();
+    public static final Vector<String> disallowedMethods = new Vector<String>();
 
     static {
         // Object methods

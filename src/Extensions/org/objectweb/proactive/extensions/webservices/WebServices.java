@@ -47,6 +47,8 @@ import org.objectweb.proactive.core.ProActiveException;
 @PublicAPI
 public final class WebServices extends WSConstants {
 
+    private static String DEFAULT_FRAMEWORK_IDENTIFIER = "axis2";
+
     /**
      * Expose an active object as a web service with the methods specified in <code>methods</code>
      *
@@ -229,6 +231,99 @@ public final class WebServices extends WSConstants {
                     componentName, interfaceNames);
         } else {
             throw new ProActiveException("Unknown web service framework identifier: " + wsFrameWork);
+        }
+    }
+
+    /**
+     * The following methods have been written to keep compatibility with the previous version
+     * of web service exposition. They use by default the axis2 framework but it is possible to
+     * easily switch form one framework to an other using the <code>setDefaultFrameWork(string wsFrameWork)</code>
+     * setter.
+     */
+
+    /**
+     * DEFAULT_FRAMEWORK_IDENTIFIER getter
+     *
+     * @return WebServices.DEFAULT_FRAMEWORK_IDENTIFIER
+     *
+     */
+    public static String getDefaultFrameWork() {
+        return WebServices.DEFAULT_FRAMEWORK_IDENTIFIER;
+    }
+
+    /**
+     * DEFAULT_FRAMEWORK_IDENTIFIER getter
+     *
+     * @param wsFrameWork
+     * @throws ProActiveException if wsFrameWork is not an allowed framework identifier
+     */
+    public static void setDefaultFrameWork(String wsFrameWork) throws ProActiveException {
+        if (WSConstants.AXIS2_FRAMEWORK_IDENTIFIER.equals(wsFrameWork) ||
+            WSConstants.CXF_FRAMEWORK_IDENTIFIER.equals(wsFrameWork)) {
+            WebServices.DEFAULT_FRAMEWORK_IDENTIFIER = wsFrameWork;
+        } else {
+            throw new ProActiveException("Unknown web service framework identifier: " + wsFrameWork);
+        }
+    }
+
+    /**
+     * Expose an active object as a web service
+     * @param o The object to expose as a web service
+     * @param url The url of the host where the object will be deployed  (typically http://localhost:8080)
+     * @param urn The name of the object
+     * @param methods The methods that will be exposed as web services functionnalities
+     */
+    public static void exposeAsWebService(Object o, String url, String urn, String[] methods) {
+        try {
+            exposeAsWebService(getDefaultFrameWork(), o, url, urn, methods);
+        } catch (ProActiveException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Delete the service on a web server
+     * @param urn The name of the object
+     * @param url The url of the web server
+     */
+    public static void unExposeAsWebService(String urn, String url) {
+        try {
+            unExposeAsWebService(getDefaultFrameWork(), url, urn);
+        } catch (ProActiveException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Expose a component as webservice. Each server and controller
+     * interface of the component will be accessible by  the urn
+     * [componentName]_[interfaceName]in order to identify the component an
+     * interface belongs to.
+     * All the interfaces public methods will be exposed.
+     *
+     * @param componentName The name of the component
+     * @param url  The web server url  where to deploy the service - typically "http://localhost:8080"
+     * @param component The component owning the interfaces that will be deployed as web services.
+     */
+    public static void exposeComponentAsWebService(Component component, String url, String componentName) {
+        try {
+            exposeComponentAsWebService(getDefaultFrameWork(), component, url, componentName);
+        } catch (ProActiveException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Undeploy component interfaces on a web server
+     * @param componentName The name of the component
+     * @param url The url of the web server
+     * @param component  The component owning the services interfaces
+     */
+    public static void unExposeComponentAsWebService(String componentName, String url, Component component) {
+        try {
+            unExposeComponentAsWebService(getDefaultFrameWork(), component, url, componentName);
+        } catch (ProActiveException e) {
+            e.printStackTrace();
         }
     }
 }

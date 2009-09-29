@@ -80,9 +80,6 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
         return me;
     }
 
-    /** reference to the dispatcher logic, for image generation and message forwarding */
-    private Dispatcher c3ddispatcher;
-
     /** The chosen name of the user */
     private String userName;
 
@@ -106,10 +103,9 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
     public WSUser() {
     }
 
-    public WSUser(String dispatcherUrl, String name, Dispatcher disp, String wsFrameWork) {
+    public WSUser(String dispatcherUrl, String name, String wsFrameWork) {
         this.dispatcherUrl = dispatcherUrl;
         this.userName = name;
-        this.c3ddispatcher = disp;
         this.wsFrameWork = wsFrameWork;
     }
 
@@ -117,15 +113,15 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
     public static Object[] getDispatcherAndUserName() {
         // ask user through Dialog for userName & host
         WSNameAndHostDialog userAndHostNameDialog = new WSNameAndHostDialog();
-        String dispUrl = userAndHostNameDialog.getValidatedDispatcherService();
+        String dispUrl = userAndHostNameDialog.getDispatcherService();
 
         if (dispUrl == null) {
             logger.error("Could not find a dispatcher. Closing.");
             System.exit(-1);
         }
 
-        return new Object[] { dispUrl, userAndHostNameDialog.getValidatedUserName(),
-                userAndHostNameDialog.getValidatedDispatcher(), userAndHostNameDialog.getWsFrameWork() };
+        return new Object[] { dispUrl, userAndHostNameDialog.getUserName(),
+                userAndHostNameDialog.getWsFrameWork() };
     }
 
     /**
@@ -137,7 +133,7 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
     public void rebuild() {
         this.me = (User) org.objectweb.proactive.api.PAActiveObject.getStubOnThis();
         try {
-            if (this.wsFrameWork == WSConstants.AXIS2_FRAMEWORK_IDENTIFIER) {
+            if (this.wsFrameWork.equals(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER)) {
                 ClientUtils.oneWayCall(this.wsFrameWork, this.dispatcherUrl, "C3DDispatcher",
                         "wsRegisterMigratedUser", new Object[] { i_user }, null);
             } else {
@@ -185,7 +181,7 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
         Object[] callReturn = null;
 
         try {
-            if (this.wsFrameWork == WSConstants.AXIS2_FRAMEWORK_IDENTIFIER) {
+            if (this.wsFrameWork.equals(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER)) {
                 /**
                  * The following lines should work but it seems that there is
                  * a bug in axis2. To get round this problem, we serialize the object and
@@ -205,7 +201,6 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
         }
 
         int user_id = (Integer) callReturn[0];
-        //        int user_id = this.c3ddispatcher.registerUser(this.me, this.userName);
         this.i_user = user_id;
 
         wait.destroy();
@@ -277,7 +272,7 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
      */
     public void terminate() {
         try {
-            if (this.wsFrameWork == WSConstants.AXIS2_FRAMEWORK_IDENTIFIER) {
+            if (this.wsFrameWork.equals(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER)) {
                 ClientUtils.oneWayCall(this.wsFrameWork, this.dispatcherUrl, "C3DDispatcher",
                         "wsUnregisterConsumer", new Object[] { i_user }, null);
             } else {
@@ -297,15 +292,12 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
      */
     public static void main(String[] args) {
         String fileDescriptor = "";
-        String wsFW = "";
 
-        if (args.length == 2) {
+        if (args.length == 1) {
             fileDescriptor = args[0];
-            wsFW = args[1];
         } else {
             System.out.println("Wrong number of arguments:");
-            System.out.println("Usage: java WSUser GCMA wsFrameWork");
-            System.out.println("where wsFrameWork should be either 'axis2' or 'cxf'");
+            System.out.println("Usage: java WSUser GCMA");
             return;
         }
 
@@ -325,7 +317,6 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
         Object[] params = WSUser.getDispatcherAndUserName();
 
         try {
-            //C3DUser c3duser = (C3DUser)
             user.waitReady();
             org.objectweb.proactive.api.PAActiveObject.newActive(WSUser.class.getName(), params, user
                     .getANode());
@@ -338,7 +329,7 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
     /** Ask the dispatcher to revert to original scene */
     public void resetScene() {
         try {
-            if (this.wsFrameWork == WSConstants.AXIS2_FRAMEWORK_IDENTIFIER) {
+            if (this.wsFrameWork.equals(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER)) {
                 ClientUtils.oneWayCall(this.wsFrameWork, this.dispatcherUrl, "C3DDispatcher", "wsResetScene",
                         new Object[] { i_user }, null);
             } else {
@@ -354,7 +345,7 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
     /** Ask the dispatcher to add a sphere */
     public void addSphere() {
         try {
-            if (this.wsFrameWork == WSConstants.AXIS2_FRAMEWORK_IDENTIFIER) {
+            if (this.wsFrameWork.equals(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER)) {
                 ClientUtils.oneWayCall(this.wsFrameWork, this.dispatcherUrl, "C3DDispatcher", "wsAddSphere",
                         new Object[] { i_user }, null);
             } else {
@@ -371,11 +362,11 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
     public void getUserList() {
         Object[] callReturn = null;
         try {
-            if (this.wsFrameWork == WSConstants.AXIS2_FRAMEWORK_IDENTIFIER) {
+            if (this.wsFrameWork.equals(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER)) {
                 callReturn = ClientUtils.call(this.wsFrameWork, this.dispatcherUrl, "C3DDispatcher",
                         "wsGetUserList", new Object[] {}, String.class);
             } else {
-                ClientUtils.oneWayCall(this.wsFrameWork, this.dispatcherUrl, "C3DDispatcher",
+                callReturn = ClientUtils.call(this.wsFrameWork, this.dispatcherUrl, "C3DDispatcher",
                         "wsGetUserList", new Object[] {}, C3DDispatcher.class);
             }
         } catch (Exception e) {
@@ -395,7 +386,7 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
             gui.writeMessage("<to all> " + message + '\n');
 
             try {
-                if (this.wsFrameWork == WSConstants.AXIS2_FRAMEWORK_IDENTIFIER) {
+                if (this.wsFrameWork.equals(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER)) {
                     ClientUtils.oneWayCall(this.wsFrameWork, this.dispatcherUrl, "C3DDispatcher",
                             "wsUserWriteMessageExcept", new Object[] { this.i_user,
                                     "[from " + this.userName + "] " + message }, null);
@@ -413,13 +404,13 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
             // Private message
             gui.writeMessage("<to " + recipientName + "> " + message + '\n');
             try {
-                if (this.wsFrameWork == WSConstants.AXIS2_FRAMEWORK_IDENTIFIER) {
+                if (this.wsFrameWork.equals(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER)) {
                     ClientUtils.oneWayCall(this.wsFrameWork, this.dispatcherUrl, "C3DDispatcher",
-                            "wsUserWriteMessage", new Object[] { this.i_user,
+                            "wsUserWriteMessage", new Object[] { talkId,
                                     "[from " + this.userName + "] " + message }, null);
                 } else {
                     ClientUtils.oneWayCall(this.wsFrameWork, this.dispatcherUrl, "C3DDispatcher",
-                            "wsUserWriteMessage", new Object[] { this.i_user,
+                            "wsUserWriteMessage", new Object[] { talkId,
                                     "[from " + this.userName + "] " + message }, C3DDispatcher.class);
                 }
             } catch (Exception e) {
@@ -439,7 +430,7 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
      */
     public void rotateScene(Vec rotationAngle) {
         try {
-            if (this.wsFrameWork == WSConstants.AXIS2_FRAMEWORK_IDENTIFIER) {
+            if (this.wsFrameWork.equals(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER)) {
                 ClientUtils.oneWayCall(this.wsFrameWork, this.dispatcherUrl, "C3DDispatcher",
                         "wsRotateScene", new Object[] { i_user, rotationAngle }, null);
             } else {
