@@ -33,10 +33,12 @@ package org.objectweb.proactive.extensions.webservices.cxf.deployer;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Vector;
 
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.log4j.Logger;
+import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.api.Interface;
+import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.remoteobject.http.util.HttpMarshaller;
 import org.objectweb.proactive.core.util.SerializableMethod;
@@ -45,9 +47,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.webservices.WSConstants;
 import org.objectweb.proactive.extensions.webservices.common.MethodUtils;
 import org.objectweb.proactive.extensions.webservices.cxf.servicedeployer.ServiceDeployerItf;
-import org.objectweb.fractal.api.Component;
-import org.objectweb.fractal.api.Interface;
-import org.objectweb.fractal.api.NoSuchInterfaceException;
 
 
 /**

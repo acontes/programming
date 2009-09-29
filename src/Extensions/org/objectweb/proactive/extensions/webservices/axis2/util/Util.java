@@ -127,7 +127,7 @@ public class Util {
      *
      * @param jarPath path to the jar file
      * @param entryPath relative path of the file or the directory into the jar archive
-     * @param destPath path of the directory where file/direcotry will be extracted
+     * @param destPath path of the directory where file/directory will be extracted
      * @param insertRandom if true, then inserts a random number before the file/directory name.
      * @return the absolute path the extracted file
      */

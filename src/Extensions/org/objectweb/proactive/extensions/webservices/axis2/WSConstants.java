@@ -38,6 +38,8 @@ package org.objectweb.proactive.extensions.webservices.axis2;
  */
 public class WSConstants extends org.objectweb.proactive.extensions.webservices.WSConstants {
 
+    // Path to the ProActive.jar archive
+    // Used to retrieve Axis2 configuration file
     public static final String PROACTIVE_JAR;
     static {
         String temp = WSConstants.class.getResource("/org/objectweb/proactive").getPath();
@@ -45,6 +47,7 @@ public class WSConstants extends org.objectweb.proactive.extensions.webservices.
         PROACTIVE_JAR = temp.substring(temp.indexOf(':') + 1);
     }
 
+    // Files to extract from the ProActive.jar
     public static final String AXIS_XML_ENTRY = "org/objectweb/proactive/extensions/webservices/axis2/conf/axis2.xml";
     public static final String AXIS_REPOSITORY_ENTRY = "org/objectweb/proactive/extensions/webservices/axis2/repository/";
 

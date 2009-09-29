@@ -155,7 +155,7 @@ public final class WebServices extends WSConstants {
      * @param o The object to expose as a web service
      * @param url The url of the host where the object will be deployed  (typically http://localhost:8080/)
      * @param urn The name of the object
-     * @param methods The methods that will be exposed as web services functionalities
+     * @param methodsName The methods that will be exposed as web services functionalities
      *                   If null, then all methods will be exposed
      */
     public static void exposeAsWebService(Object o, String url, String urn, String[] methodsName) {

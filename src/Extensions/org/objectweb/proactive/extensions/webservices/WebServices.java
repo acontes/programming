@@ -46,14 +46,14 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 /**
  * Deploy and undeploy active objects and components. Methods of this class
- * just call methods of the PADeployer class.
+ * just call methods of the WebServices class of the specified framework.
  *
  * @author The ProActive Team
  */
 @PublicAPI
 public final class WebServices extends WSConstants {
 
-    private static String DEFAULT_FRAMEWORK_IDENTIFIER = "axis2";
+    static private String DEFAULT_FRAMEWORK_IDENTIFIER = "axis2";
     static private Logger logger = ProActiveLogger.getLogger(Loggers.WEB_SERVICES);
 
     /**
@@ -152,7 +152,7 @@ public final class WebServices extends WSConstants {
     }
 
     /**
-     * Expose a component as web service. Each server interface of the component
+     * Expose a component as a web service. Each server interface of the component
      * will be accessible by  the urn [componentName]_[interfaceName].
      * Only the interfaces public methods of the specified interfaces in
      * <code>interfaceNames</code> will be exposed.
@@ -321,7 +321,7 @@ public final class WebServices extends WSConstants {
     }
 
     /**
-     * DEFAULT_FRAMEWORK_IDENTIFIER getter
+     * DEFAULT_FRAMEWORK_IDENTIFIER setter
      *
      * @param wsFrameWork
      * @throws ProActiveException if wsFrameWork is not an allowed framework identifier
@@ -340,7 +340,7 @@ public final class WebServices extends WSConstants {
      * @param o The object to expose as a web service
      * @param url The url of the host where the object will be deployed  (typically http://localhost:8080)
      * @param urn The name of the object
-     * @param methods The methods that will be exposed as web services functionnalities
+     * @param methods The methods that will be exposed as web services functionalities
      */
     public static void exposeAsWebService(Object o, String url, String urn, String[] methods) {
         try {

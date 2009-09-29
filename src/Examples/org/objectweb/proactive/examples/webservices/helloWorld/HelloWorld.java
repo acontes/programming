@@ -195,7 +195,6 @@ public class HelloWorld implements Serializable, InitActive {
         } catch (ProActiveException e) {
             e.printStackTrace();
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }

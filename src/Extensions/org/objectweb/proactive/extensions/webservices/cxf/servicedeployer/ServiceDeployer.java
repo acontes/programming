@@ -89,7 +89,7 @@ public class ServiceDeployer implements ServiceDeployerItf {
      * @param serviceName Name of the service
      * @param marshalledSerializedMethods byte array representing the methods (of type Method)
      *        to be exposed
-     * @throws NoSuchInterfaceException
+     * @param isComponent Specify whether the object we want to expose is a component.
      */
     @SuppressWarnings("unchecked")
     public void deploy(byte[] marshalledObject, String serviceName, byte[] marshalledSerializedMethods,
@@ -139,13 +139,10 @@ public class ServiceDeployer implements ServiceDeployerItf {
                 svrFactory = new ServerFactoryBean(serviceFactory);
                 svrFactory.setServiceBean(superclass.cast(interface_));
             } catch (NoSuchInterfaceException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             } catch (ClassNotFoundException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             } catch (SecurityException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }

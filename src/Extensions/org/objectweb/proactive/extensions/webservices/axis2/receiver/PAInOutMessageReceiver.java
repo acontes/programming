@@ -66,7 +66,7 @@ import org.objectweb.proactive.extensions.webservices.axis2.WSConstants;
 
 
 /**
- * When ServiceDeployer create a service for an active object or a component,
+ * When ServiceDeployer creates a service for an active object or a component,
  * it specifies a custom message receiver which is in charge of unmarshalling
  * the object representing the service and to invoke the asked method.
  * This class implements this custom message receiver for in-out methods and

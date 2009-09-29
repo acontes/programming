@@ -47,6 +47,7 @@ public interface ServiceDeployerItf {
      * @param serviceName Name of the service
      * @param marshalledSerializedMethods byte array representing the methods (of type Method)
      *        to be exposed
+     * @param isComponent Specify whether the object we want to expose is a component
      */
     public void deploy(byte[] marshalledObject, String serviceName, byte[] marshalledSerializedMethods,
             boolean isComponent);
