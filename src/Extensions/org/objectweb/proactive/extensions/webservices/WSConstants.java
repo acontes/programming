@@ -54,6 +54,8 @@ public class WSConstants {
         disallowedMethods.addElement("equals");
         disallowedMethods.addElement("toString");
         disallowedMethods.addElement("runActivity");
+        disallowedMethods.addElement("initActivity");
+        disallowedMethods.addElement("endActivity");
         disallowedMethods.addElement("setProxy");
         disallowedMethods.addElement("getProxy");
         disallowedMethods.addElement("wait");

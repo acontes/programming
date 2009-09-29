@@ -6,7 +6,11 @@
 	<target name="compile" depends="core,-compile"/>
 
 	<target name="-compile">
-		<compile_extension module="webservices" />
+		<compile_extension module="webservices">
+			<appendclasspath2>
+				<path refid="cxf.libs"/>
+			</appendclasspath2>
+		</compile_extension>
 
 		<subant target="compile-axis2" inheritall="true" failonerror="true">
 			  <fileset dir="${axis2.dir}" includes="build-axis2.xml" />

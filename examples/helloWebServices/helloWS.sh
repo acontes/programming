@@ -17,6 +17,9 @@ fi
 echo
 echo
 
+CXF_HOME=$PROACTIVE/src/Extensions/org/objectweb/proactive/extensions/webservices/cxf
+CLASSPATH=$CLASSPATH:$CXF_HOME/lib/cxf-manifest.jar
+
 #$JAVACMD $HTTP_OPT org.objectweb.proactive.examples.webservices.helloWorld.HelloWorld "$@"
 $JAVACMD -Dproactive.http.port=8080 org.objectweb.proactive.examples.webservices.helloWorld.HelloWorld "$@"
 

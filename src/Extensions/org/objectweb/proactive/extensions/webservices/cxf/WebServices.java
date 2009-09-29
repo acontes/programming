@@ -165,15 +165,13 @@ public final class WebServices extends WSConstants {
         logger.info("Trying to expose " + o.getClass().getSuperclass().getName() + " at " + url +
             WSConstants.SERVICES_PATH + urn);
         try {
+            // Transforms the array methods' name into an array of
+            // methods (of type Method)
             MethodUtils mc = new MethodUtils(o.getClass().getSuperclass());
             ArrayList<Method> methodsArrayList = mc.getCorrespondingMethods(methodsName);
             Method[] methods = new Method[methodsArrayList.size()];
             methodsArrayList.toArray(methods);
-            logger.info("Exposed methods:");
-            for (Method method : methods) {
-                logger.info(method.getName());
-                logger.info(method.toString());
-            }
+
             PADeployer.deploy(o, url, urn, methods, false);
         } catch (Exception e) {
             e.printStackTrace();
@@ -218,7 +216,7 @@ public final class WebServices extends WSConstants {
      */
     public static void exposeComponentAsWebService(Component component, String url, String componentName,
             String[] interfaceNames) {
-        //PADeployer.deployComponent(component, url, componentName, interfaceNames);
+        PADeployer.deployComponent(component, url, componentName, interfaceNames);
     }
 
     /**
@@ -231,7 +229,7 @@ public final class WebServices extends WSConstants {
      * @param componentName Name of the component
      */
     public static void exposeComponentAsWebService(Component component, String url, String componentName) {
-        //PADeployer.deployComponent(component, url, componentName, null);
+        PADeployer.deployComponent(component, url, componentName, null);
     }
 
     /**
@@ -242,7 +240,7 @@ public final class WebServices extends WSConstants {
      * @param componentName The name of the component
      */
     public static void unExposeComponentAsWebService(Component component, String url, String componentName) {
-        //PADeployer.unDeployComponent(component, url, componentName);
+        PADeployer.undeployComponent(component, url, componentName);
     }
 
     /**
@@ -253,6 +251,6 @@ public final class WebServices extends WSConstants {
      * @param interfaceNames Interfaces to be undeployed
      */
     public static void unExposeComponentAsWebService(String url, String componentName, String[] interfaceNames) {
-        //PADeployer.unDeployComponent(url, componentName, interfaceNames);
+        PADeployer.undeployComponent(url, componentName, interfaceNames);
     }
 }

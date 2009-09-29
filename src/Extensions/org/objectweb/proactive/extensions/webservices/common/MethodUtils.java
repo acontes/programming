@@ -55,15 +55,6 @@ public class MethodUtils {
         this.objectMethods = objectClass.getMethods();
         this.disallowedMethods = getCorrespondingMethods(WSConstants.disallowedMethods
                 .toArray(new String[WSConstants.disallowedMethods.size()]));
-
-        logger.info("Class " + objectClass.getName() + " contains the following methods:");
-        for (Method method : this.objectMethods) {
-            logger.info(method.getName());
-        }
-        logger.info("Disallowed methods are the following ones:");
-        for (Method method : this.disallowedMethods) {
-            logger.info(method.getName());
-        }
     }
 
     private boolean contains(Object[] objects, Object o) {
@@ -192,73 +183,20 @@ public class MethodUtils {
      * @param methodsName
      * @return
      */
-    //    public ArrayList<Method> getExcludedMethods(String[] deployedMethods) {
-    //
-    //        ArrayList<String> excludedMethodsName = getExcludedMethodsName(deployedMethods);
-    //        ArrayList<Method> excludedMethods = getCorrespondingMethods(excludedMethodsName.toArray(new String[excludedMethodsName.size()]));
-    //
-    //        logger.info("Excluded methods are the following ones:");
-    //        for (Method method : excludedMethods) {
-    //            logger.info(method.getName());
-    //        }
-    //        return excludedMethods;
-    //    }
-    /**
-     * Returns the methods to be excluded in the shape of a Method array. These methods are methods defined in the
-     * WSConstants.disallowedMethods vector and methods which are not in deployedMethods.
-     * In case of a null methodsName, only methods in dissallowdMethods vector are
-     * returned.
-     *
-     * @param methodsName
-     * @return
-     */
     public ArrayList<Method> getExcludedMethods(Method[] deployedMethods) {
         ArrayList<Method> excludedMethods = new ArrayList<Method>();
 
-        logger.info("Methods to be deployed are the following ones:");
-        for (Method method : deployedMethods) {
-            logger.info(method.getName());
-            logger.info(method.toString());
-        }
         excludedMethods.addAll(this.disallowedMethods);
 
         if ((deployedMethods == null) || (deployedMethods.length == 0))
             return excludedMethods;
 
         for (Method m : this.objectMethods) {
-            logger.info("Examaning method " + m.getName());
             if (!contains(deployedMethods, m)) {
-                logger.info(m.getName() + " is not in the array of methods to be deployed ===> removed it");
-                logger.info(m.toString());
                 excludedMethods.add(m);
             }
-        }
-        logger.info("Excluded methods are the following ones:");
-        for (Method method : excludedMethods) {
-            logger.info(method.getName());
         }
         return excludedMethods;
     }
 
-    /**
-     * Returns the methods to be excluded in the shape of a String array. These methods are methods defined in the
-     * WSConstants.disallowedMethods vector and methods which are not in deployedMethods.
-     * In case of a null methodsName, only methods in dissallowdMethods vector are
-     * returned.
-     *
-     * @param methodsName
-     * @return
-     */
-    //    public ArrayList<String> getExcludedMethodsName(Method[] deployedMethods) {
-    //
-    //        ArrayList<Method> excludedMethods = getExcludedMethods(deployedMethods);
-    //        ArrayList<String> excludedMethodsName = getCorrespondingMethodsName(excludedMethods.toArray(new Method[excludedMethods.size()]));
-    //
-    //        logger.info("Excluded method names are the following ones:");
-    //        for (String name : excludedMethodsName) {
-    //            logger.info(name);
-    //        }
-    //
-    //        return excludedMethodsName;
-    //    }
 }

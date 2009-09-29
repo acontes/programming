@@ -33,9 +33,11 @@ package org.objectweb.proactive.extensions.webservices.cxf.deployer;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Vector;
 
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.remoteobject.http.util.HttpMarshaller;
 import org.objectweb.proactive.core.util.SerializableMethod;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -43,6 +45,9 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.webservices.WSConstants;
 import org.objectweb.proactive.extensions.webservices.common.MethodUtils;
 import org.objectweb.proactive.extensions.webservices.cxf.servicedeployer.ServiceDeployerItf;
+import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.api.Interface;
+import org.objectweb.fractal.api.NoSuchInterfaceException;
 
 
 /**
@@ -109,7 +114,7 @@ public final class PADeployer {
         ServiceDeployerItf client = getClient(correctUrl);
         ArrayList<SerializableMethod> serializableMethods = MethodUtils.getSerializableMethods(methods);
         byte[] marshalledSerializedMethods = HttpMarshaller.marshallObject(serializableMethods);
-        client.deploy(marshalledObject, urn, marshalledSerializedMethods);
+        client.deploy(marshalledObject, urn, marshalledSerializedMethods, isComponent);
     }
 
     /**
@@ -123,5 +128,84 @@ public final class PADeployer {
         String correctUrl = getCorrectURL(url);
         ServiceDeployerItf client = getClient(correctUrl);
         client.undeploy(urn);
+    }
+
+    /**
+     * Deploy a component. This method retrieve interfaces we want to deploy as well as their methods
+     * and call the method deploy.
+     *
+     * @param component Component to be deployed
+     * @param url Url of the host
+     * @param componentName Name of the component
+     * @param interfaceNames Names of the interfaces we want to deploy.
+     *                           If null, then all the interfaces will be deployed
+     */
+    static public void deployComponent(Component component, String url, String componentName,
+            String[] interfaceNames) {
+
+        Object[] interfaces;
+        if (interfaceNames == null || interfaceNames.length == 0) {
+            interfaces = component.getFcInterfaces();
+            logger.info("Deploying all interfaces of " + componentName);
+        } else {
+            interfaces = new Object[interfaceNames.length];
+            for (int i = 0; i < interfaceNames.length; i++) {
+                try {
+                    logger.info("Deploying the interface " + interfaceNames[i] + " of " + componentName);
+                    interfaces[i] = component.getFcInterface(interfaceNames[i]);
+                } catch (NoSuchInterfaceException e) {
+                    logger.error("Impossible to retrieve the interface whose name is " + interfaceNames[i]);
+                    logger.error("Retrieve all interfaces");
+                    interfaces = component.getFcInterfaces();
+                    break;
+                }
+            }
+        }
+
+        for (int i = 0; i < interfaces.length; i++) {
+            Interface interface_ = ((Interface) interfaces[i]);
+            String interfaceName = interface_.getFcItfName();
+
+            /* only expose server interfaces and not the attributes controller */
+            if (!interfaceName.contains("-controller") && !interfaceName.equals("component")) {
+
+                if (!((ProActiveInterfaceType) interface_.getFcItfType()).isFcClientItf()) {
+
+                    String wsName = componentName + "_" + interfaceName;
+                    deploy(component, url, wsName, null, true);
+
+                }
+            }
+        }
+    }
+
+    /**
+     * Call the method unDeploy of the ServiceDeployer service
+     * deployed on the host for every interface of component.
+     *
+     * @param component Component to undeploy
+     * @param url Url of the host where interfaces are deployed
+     * @param componentName Name of the component
+     */
+    static public void undeployComponent(Component component, String url, String componentName) {
+        Object[] interfaces = component.getFcInterfaces();
+        for (Object o : interfaces) {
+            undeploy(url, componentName + "_" + ((Interface) o).getFcItfName());
+        }
+    }
+
+    /**
+     * Call the method unDeploy of the ServiceDeployer service
+     * deployed on the host for interfaces of component specified in
+     * interfaceNames.
+     *
+     * @param url Url of the host where interfaces are deployed
+     * @param componentName Name of the component
+     * @param interfaceNames Interfaces we want to undeploy.
+     */
+    static public void undeployComponent(String url, String componentName, String[] interfaceNames) {
+        for (String s : interfaceNames) {
+            undeploy(url, componentName + "_" + s);
+        }
     }
 }

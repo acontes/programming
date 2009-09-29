@@ -37,6 +37,8 @@ import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAMobileAgent;
 import org.objectweb.proactive.core.ProActiveException;
@@ -46,7 +48,6 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
-import org.objectweb.proactive.extensions.webservices.WSConstants;
 import org.objectweb.proactive.extensions.webservices.WebServices;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
@@ -58,7 +59,7 @@ import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
  * @author The ProActive Team
  */
 @ActiveObject
-public class HelloWorld implements Serializable {
+public class HelloWorld implements Serializable, InitActive {
 
     private final static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
@@ -82,12 +83,21 @@ public class HelloWorld implements Serializable {
         this.textsToSay.add(textToSay);
     }
 
+    public void putHelloWorld() {
+        this.textsToSay.add("Hello World!");
+    }
+
     public String sayText() {
         if (this.textsToSay.isEmpty()) {
             return "The list is empty";
         } else {
             return this.textsToSay.poll();
         }
+    }
+
+    public String putTextToSayAndConfirm(String textToSay) {
+        this.textsToSay.add(textToSay);
+        return "The text \"" + textToSay + "\" has been inserted into the list";
     }
 
     public void moveTo(String origin, String destination) {
@@ -105,25 +115,32 @@ public class HelloWorld implements Serializable {
             String url = "";
             boolean GCMDeployment;
             boolean onANode;
-            if (args.length == 0) {
+            String wsFrameWork = "";
+            if (args.length == 1) {
                 url = "http://localhost:8080/";
                 GCMDeployment = false;
                 onANode = false;
-            } else if (args.length == 1) {
+                wsFrameWork = args[0];
+            } else if (args.length == 2) {
                 url = args[0];
                 GCMDeployment = false;
                 onANode = false;
-            } else if (args.length == 2) {
-                url = args[0];
-                GCMDeployment = true;
-                onANode = false;
+                wsFrameWork = args[1];
             } else if (args.length == 3) {
                 url = args[0];
                 GCMDeployment = true;
+                onANode = false;
+                wsFrameWork = args[2];
+            } else if (args.length == 4) {
+                url = args[0];
+                GCMDeployment = true;
                 onANode = true;
+                wsFrameWork = args[3];
             } else {
                 logger.info("Wrong number of arguments:");
-                logger.info("Usage: java HelloWorld [url]");
+                logger
+                        .info("Usage: java HelloWorld [url] [GCMA.xml] [using deployment: true or false] wsFrameWork");
+                System.out.println("with wsFrameWork should be either \"axis2\" or \"cxf\" ");
                 return;
             }
             HelloWorld hw;
@@ -166,15 +183,19 @@ public class HelloWorld implements Serializable {
                                 new Object[] {});
             }
 
-            WebServices.exposeAsWebService(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER, hw, url, "HelloWorld",
-                    new String[] { "putTextToSay", "sayText", "helloWorld" });
+            //            WebServices.exposeAsWebService(wsFrameWork, hw, url, "HelloWorld",
+            //                    new String[] { "putTextToSay", "sayText", "helloWorld" });
+            WebServices.exposeAsWebService(wsFrameWork, hw, url, "HelloWorld");
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
         } catch (NodeException e) {
             e.printStackTrace();
         } catch (ProActiveException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
+    }
+
+    public void initActivity(Body body) {
+        logger.info("Acitve Object has been initiated !");
     }
 }

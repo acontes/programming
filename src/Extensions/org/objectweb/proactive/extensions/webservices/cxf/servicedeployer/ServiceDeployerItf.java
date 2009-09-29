@@ -48,7 +48,8 @@ public interface ServiceDeployerItf {
      * @param marshalledSerializedMethods byte array representing the methods (of type Method)
      *        to be exposed
      */
-    public void deploy(byte[] marshalledObject, String serviceName, byte[] marshalledSerializedMethods);
+    public void deploy(byte[] marshalledObject, String serviceName, byte[] marshalledSerializedMethods,
+            boolean isComponent);
 
     /**
      * Undeploy the service whose name is serviceName

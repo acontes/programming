@@ -86,11 +86,19 @@ public class HelloWorldComponent implements HelloWorldItf, GoodByeWorldItf {
     }
 
     public static void main(String[] args) {
-        String url;
-        if (args.length == 0) {
+        String url = "";
+        String wsFramWork = "";
+        if (args.length == 1) {
             url = "http://localhost:8080/";
-        } else {
+            wsFramWork = args[0];
+        } else if (args.length == 2) {
             url = args[0];
+            wsFramWork = args[1];
+        } else {
+            System.out.println("Wrong number of arguments");
+            System.out.println("Usage: HelloWorldComponent [url] wsFrameWork");
+            System.out.println("with wsFrameWork should be either \"axis2\" or \"cxf\" ");
+            System.exit(0);
         }
 
         Component boot = null;
@@ -122,8 +130,7 @@ public class HelloWorldComponent implements HelloWorldItf, GoodByeWorldItf {
         }
 
         try {
-            WebServices.exposeComponentAsWebService(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER, comp, url,
-                    "server", new String[] { "hello-world", "goodbye-world" });
+            WebServices.exposeComponentAsWebService(wsFramWork, comp, url, "server");
         } catch (ProActiveException e) {
             e.printStackTrace();
         }

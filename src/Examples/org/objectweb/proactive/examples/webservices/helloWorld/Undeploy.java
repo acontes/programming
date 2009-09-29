@@ -43,7 +43,7 @@ import org.objectweb.proactive.extensions.webservices.axis2.deployer.PADeployer;
  */
 public class Undeploy {
 
-    public static void main(String[] args) throws ProActiveException {
+    public static void main(String[] args) {
         String url = "";
         String serviceName = "";
         String wsFrameWork = "";
@@ -62,6 +62,10 @@ public class Undeploy {
             return;
         }
 
-        WebServices.unExposeAsWebService(wsFrameWork, url, serviceName);
+        try {
+            WebServices.unExposeAsWebService(wsFrameWork, url, serviceName);
+        } catch (ProActiveException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -31,7 +31,8 @@
  */
 package org.objectweb.proactive.examples.webservices.helloWorld;
 
-import org.objectweb.proactive.extensions.webservices.axis2.deployer.PADeployer;
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.extensions.webservices.WebServices;
 
 
 /**
@@ -45,20 +46,29 @@ public class UndeployComponent {
         String url = "";
         String componentName = "";
         String interfaceName = "";
-        if (args.length == 2) {
+        String wsFrameWork = "";
+        if (args.length == 3) {
             url = "http://localhost:8080/";
             componentName = args[0];
             interfaceName = args[1];
-        } else if (args.length == 3) {
+            wsFrameWork = args[2];
+        } else if (args.length == 4) {
             url = args[0];
             componentName = args[1];
             interfaceName = args[2];
+            wsFrameWork = args[3];
         } else {
             System.out.println("Wrong number of arguments:");
-            System.out.println("Usage: java UndeployComponent [url] serviceName interfaceName");
+            System.out.println("Usage: java UndeployComponent [url] componentName interfaceName wsFrameWork");
+            System.out.println("where wsFramWork should be either \"axis2\" or \"cxf\"");
             return;
         }
 
-        PADeployer.unDeployComponent(url, componentName, new String[] { interfaceName });
+        try {
+            WebServices.unExposeComponentAsWebService(wsFrameWork, url, componentName,
+                    new String[] { interfaceName });
+        } catch (ProActiveException e) {
+            e.printStackTrace();
+        }
     }
 }

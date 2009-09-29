@@ -96,6 +96,11 @@
     <property name="cxf.dir" value="${webservices.dir}/cxf" />
     <property name="cxf.servicedeployer.class.dir" value="${webservices.class.dir}/cxf/servicedeployer" />
     <property name="cxf.class.dir" value="${webservices.class.dir}/cxf" />
+	<path id="cxf.libs">
+        <fileset dir="${cxf.dir}/lib">
+            <include name="*.jar" />
+        </fileset>
+    </path>
 
 	<!-- ================================================================ -->
 	<!--                   define the different classpaths                -->
@@ -104,7 +109,6 @@
 	<path id="compile.libs">
 		<fileset dir="${lib.dir}">
 			<include name="*.jar" />
-			<include name="cxf/*.jar" />
 		</fileset>
 		<!-- XXX ${dev.dir} is not included in the source release ! -->
 		<pathelement location="${base.dir}/compile/lib/junit-4.3.jar"/>
@@ -150,12 +154,17 @@
 
 	<macrodef name="compile_extension">
 		<attribute name="module" />
+		<element name="appendclasspath2" optional="yes" />
 		<sequential>
 			<compile_module 
 				module="@{module}" 
 				sourcepath="${src.extensions.dir}"
 				package="${extensions.path}"
-				dest="${cl.extensions.dir}"/>
+				dest="${cl.extensions.dir}">
+				<appendclasspath>
+                    <appendclasspath2 />
+                </appendclasspath>
+			</compile_module>
 		</sequential>
 	</macrodef>
 

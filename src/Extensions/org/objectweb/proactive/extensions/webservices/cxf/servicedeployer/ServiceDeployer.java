@@ -43,7 +43,12 @@ import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.log4j.Logger;
+import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.api.Interface;
+import org.objectweb.fractal.api.NoSuchInterfaceException;
+import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative;
 import org.objectweb.proactive.core.remoteobject.http.util.HttpMarshaller;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.SerializableMethod;
@@ -85,29 +90,55 @@ public class ServiceDeployer implements ServiceDeployerItf {
      * @param serviceName Name of the service
      * @param marshalledSerializedMethods byte array representing the methods (of type Method)
      *        to be exposed
+     * @throws NoSuchInterfaceException
      */
     @SuppressWarnings("unchecked")
-    public void deploy(byte[] marshalledObject, String serviceName, byte[] marshalledSerializedMethods) {
+    public void deploy(byte[] marshalledObject, String serviceName, byte[] marshalledSerializedMethods,
+            boolean isComponent) {
 
         Object o = HttpMarshaller.unmarshallObject(marshalledObject);
-        Class<?> superclass = o.getClass().getSuperclass();
+        Class<?> superclass = null;
+        String implClass = null;
 
         ReflectionServiceFactoryBean serviceFactory = new ReflectionServiceFactoryBean();
-        serviceFactory.setServiceClass(superclass);
+        ServerFactoryBean svrFactory = null;
 
-        ArrayList<SerializableMethod> serializableMethods = (ArrayList<SerializableMethod>) HttpMarshaller
-                .unmarshallObject(marshalledSerializedMethods);
-        Method[] methods = MethodUtils.getMethodsFromSerializableMethods(serializableMethods);
-        if (methods != null) {
+        if (!isComponent) {
+            superclass = o.getClass().getSuperclass();
+            implClass = superclass.getName();
+
+            ArrayList<SerializableMethod> serializableMethods = (ArrayList<SerializableMethod>) HttpMarshaller
+                    .unmarshallObject(marshalledSerializedMethods);
+
+            Method[] methods = MethodUtils.getMethodsFromSerializableMethods(serializableMethods);
             MethodUtils mc = new MethodUtils(superclass);
-            List<Method> ignoredMethods;
-            ignoredMethods = mc.getExcludedMethods(methods);
+            List<Method> ignoredMethods = mc.getExcludedMethods(methods);
             serviceFactory.setIgnoredMethods(ignoredMethods);
+
+            svrFactory = new ServerFactoryBean(serviceFactory);
+            svrFactory.setServiceBean(superclass.cast(o));
+        } else {
+            logger.info(o.getClass().getName());
+            logger.info(o.getClass().getSuperclass().getName());
+            String interfaceName = serviceName.substring(serviceName.lastIndexOf('_') + 1);
+            Interface interface_;
+            try {
+                interface_ = (Interface) ((Component) o).getFcInterface(interfaceName);
+                implClass = ((InterfaceType) interface_.getFcItfType()).getFcItfSignature();
+                superclass = Class.forName(implClass);
+                svrFactory = new ServerFactoryBean(serviceFactory);
+                svrFactory.setServiceBean(interface_);
+            } catch (NoSuchInterfaceException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
 
-        ServerFactoryBean svrFactory = new ServerFactoryBean(serviceFactory);
+        svrFactory.setServiceClass(superclass);
         svrFactory.setAddress("/" + serviceName);
-        svrFactory.setServiceBean(superclass.cast(o));
 
         /*
          * Attaches a list of in-interceptors
