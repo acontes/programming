@@ -76,6 +76,10 @@ public class HelloWorld {
         }
     }
 
+    public Boolean contains(String textToCheck) {
+        return new Boolean(textsToSay.contains(textToCheck));
+    }
+
     public static void main(String[] args) {
         try {
             String url = "";
@@ -92,7 +96,7 @@ public class HelloWorld {
             HelloWorld hw = (HelloWorld) PAActiveObject.newActive(
                     "org.objectweb.proactive.examples.webservices.helloWorld.HelloWorld", new Object[] {});
             WebServices.exposeAsWebService(hw, url, "HelloWorld", new String[] { "putTextToSay", "sayText",
-                    "helloWorld" });
+                    "helloWorld", "contains" });
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
         } catch (NodeException e) {
