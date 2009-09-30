@@ -79,9 +79,6 @@ public class AwaitedRequest implements Request, java.io.Serializable {
     protected boolean isNFRequest = false;
     protected int nfRequestPriority;
 
-    // Request Tags
-    protected MessageTags tags;
-
     /**
      * Create a new awaited request.
      * @param awaitedSender the id of the awaited sender.
@@ -281,6 +278,6 @@ public class AwaitedRequest implements Request, java.io.Serializable {
      * @return tags
      */
     public MessageTags getTags() {
-        return tags;
+        return this.wrappedRequest.getTags();
     }
 }
