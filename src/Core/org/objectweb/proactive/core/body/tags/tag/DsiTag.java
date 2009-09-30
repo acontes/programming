@@ -19,7 +19,7 @@ public class DsiTag extends Tag {
      * as the tag DATA.
      */
     public DsiTag(UniqueID id, long seq) {
-        super(IDENTIFIER, "" + id.getCanonString() + "::" + seq + "::" + null + "::" + 0 );
+        super(IDENTIFIER, "" + id.getCanonString() + "::" + seq + "::" + null + "::" + 0);
     }
 
     /**
@@ -30,7 +30,7 @@ public class DsiTag extends Tag {
         String[] dataInfos = data.toString().split("::");
         String currentId = PAActiveObject.getBodyOnThis().getID().getCanonString();
         long currentSeq = PAActiveObject.getContext().getCurrentRequest().getSequenceNumber();
-        setData(dataInfos[0]+"::"+dataInfos[1]+"::"+currentId+"::"+currentSeq, true);
+        setData(dataInfos[0] + "::" + dataInfos[1] + "::" + currentId + "::" + currentSeq, true);
         return this;
     }
 

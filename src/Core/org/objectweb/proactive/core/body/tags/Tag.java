@@ -126,7 +126,7 @@ public abstract class Tag implements Serializable {
      */
     public void setData(Object data, boolean toStringChanged) {
         this.data = data;
-        if(toStringChanged){
+        if (toStringChanged) {
             this.cachedToString = null;
         }
     }
@@ -136,9 +136,9 @@ public abstract class Tag implements Serializable {
      * @param data - The User Data
      */
     public void setData(Object data) {
-        setData(data,false);
+        setData(data, false);
     }
-    
+
     /**
      * Display Tag Information
      */
