@@ -151,7 +151,7 @@ public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFacto
      */
     public RemoteRemoteObject register(InternalRemoteRemoteObject ro, URI uri, boolean replacePrevious)
             throws ProActiveException {
-        this.registry.bind(uri, ro);
+        this.registry.bind(uri, ro, replacePrevious); // throw a ProActiveException if needed
         MessageRoutingRemoteObject rro = new MessageRoutingRemoteObject(ro, uri, agent);
         if (logger.isDebugEnabled()) {
             logger.debug("Registered remote object at endpoint " + uri);
@@ -233,17 +233,17 @@ public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFacto
     public int getPort() {
         // Reverse connections are used with message routing so this method is
         // irrelevant
-        throw new UnsupportedOperationException();
+        return -1;
     }
 
-    public InternalRemoteRemoteObject createRemoteObject(RemoteObject<?> remoteObject, String name)
-            throws ProActiveException {
+    public InternalRemoteRemoteObject createRemoteObject(RemoteObject<?> remoteObject, String name,
+            boolean rebind) throws ProActiveException {
 
         URI uri = URI.create(this.getProtocolId() + "://" + this.agent.getAgentID() + "/" + name);
 
         // register the object on the register
         InternalRemoteRemoteObject irro = new InternalRemoteRemoteObjectImpl(remoteObject, uri);
-        RemoteRemoteObject rmo = register(irro, uri, true);
+        RemoteRemoteObject rmo = register(irro, uri, rebind);
         irro.setRemoteRemoteObject(rmo);
 
         return irro;

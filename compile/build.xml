@@ -93,12 +93,21 @@
 		</else>
 	</if>
 
-	<fileset dir="${cl.test.dir}" id="performancesuite">
-		<include name="performanceTests/**/*Test*.class" />
-		<exclude name="**/*$*.class" />
-	</fileset>
 
-
+	<if name="test">
+		<fileset dir="${cl.test.dir}" id="performancesuite">
+			<include name="${test}" />
+			<exclude name="**/*$*.class" />
+			<exclude name="**/*Ibis*.class" />
+		</fileset>
+		<else>
+			<fileset dir="${cl.test.dir}" id="performancesuite">
+				<include name="performanceTests/**/*Test*.class" />
+				<exclude name="**/*$*.class" />
+				<exclude name="**/*Ibis*.class" />
+			</fileset>
+		</else>
+	</if>
 
 
 	<!-- ************
@@ -627,6 +636,10 @@
 
 	<target name="junit.rmi" depends="compile.tests, deploy.all" description="Run all non regression tests on the current host only">
 		<junitMacro communication.protocol="rmi" nodedescriptor="/functionalTests/descriptor/defaultnodes/NodesLocal.xml" testsuite="testsuite"/>
+	</target>
+
+	<target name="junit.rmissl" depends="compile.tests, deploy.all" description="Run all non regression tests on the current host only">
+		<junitMacro communication.protocol="rmissl" nodedescriptor="/functionalTests/descriptor/defaultnodes/NodesLocal.xml" testsuite="testsuite"/>
 	</target>
 
 	<target name="junit.ibis" depends="deploy.all">

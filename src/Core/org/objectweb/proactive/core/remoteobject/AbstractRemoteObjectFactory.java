@@ -44,7 +44,7 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
  * This class provides helper methods for manipulation remote objects.
  *
  */
-public abstract class AbstractRemoteObjectFactory {
+public abstract class AbstractRemoteObjectFactory implements RemoteObjectFactory {
     final protected static Hashtable<String, RemoteObjectFactory> activatedRemoteObjectFactories;
 
     static {
@@ -84,11 +84,15 @@ public abstract class AbstractRemoteObjectFactory {
     }
 
     /**
-     * @param protocol
+     * @param protocol The protocol schema or null to use the default protocol
      * @return return the remote object factory associated to the given protocol
      * @throws UnknownProtocolException
      */
     public static RemoteObjectFactory getRemoteObjectFactory(String protocol) throws UnknownProtocolException {
+        if (protocol == null) {
+            protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
+        }
+
         try {
             RemoteObjectFactory rof = activatedRemoteObjectFactories.get(protocol);
             if (rof != null) {
