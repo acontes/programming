@@ -593,7 +593,6 @@ public enum PAProperties {
      */
     PA_MOP_GENERATEDCLASSES_DIR("proactive.mop.generatedclassesdir", PAPropertiesType.STRING);
 
-    
     static final Logger logger = ProActiveLogger.getLogger(Loggers.CONFIGURATION);
     public static final String TRUE = "true";
     public static final String FALSE = "false";

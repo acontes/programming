@@ -99,11 +99,11 @@ public class Method {
     public void grabMethodandParameterAnnotation(CtBehavior ctBehavior) {
 
         //get method annotations 
-        Object[] methodAnn= ctBehavior.getAvailableAnnotations();
+        Object[] methodAnn = ctBehavior.getAvailableAnnotations();
         for (Object object : methodAnn) {
-            methodAnnotation.add((Annotation)object);
+            methodAnnotation.add((Annotation) object);
         }
-        
+
         // get parameter annotations
 
         ParameterAnnotationsAttribute attr = toParameterAnnotationsAttribute(ctBehavior);
@@ -130,18 +130,16 @@ public class Method {
             }
         }
     }
-    
+
     public boolean hasMethodAnnotation(Class<?> annotation) {
-    
-      
-        for (Object object :  methodAnnotation.toArray() ) {
+
+        for (Object object : methodAnnotation.toArray()) {
             if (annotation.isAssignableFrom(object.getClass())) {
                 return true;
             }
         }
-    
-    return false;
+
+        return false;
     }
-    
 
 }

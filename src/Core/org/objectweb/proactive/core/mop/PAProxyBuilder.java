@@ -30,37 +30,34 @@ import org.objectweb.proactive.core.mop.lock.RemoteLocksManager;
 import org.objectweb.proactive.core.mop.proxy.PAProxy;
 
 
-
 public class PAProxyBuilder {
 
-    
-    public static String PAPROXY_CLASSNAME_SUFFIX =  "_PAProxy";
+    public static String PAPROXY_CLASSNAME_SUFFIX = "_PAProxy";
 
-    
     public static String generatePAProxyClassName(String baseClass) {
         return baseClass + PAPROXY_CLASSNAME_SUFFIX;
     }
-    
+
     public static String getBaseClassNameFromPAProxyName(String paproxyClassName) {
         int i = paproxyClassName.indexOf(PAPROXY_CLASSNAME_SUFFIX);
-        
+
         return paproxyClassName.substring(0, i);
     }
-    
+
     public static boolean doesClassNameEndWithPAProxySuffix(String className) {
-        return  className.endsWith(PAPROXY_CLASSNAME_SUFFIX);
+        return className.endsWith(PAPROXY_CLASSNAME_SUFFIX);
     }
-    
+
     public static boolean isPAProxy(Class<?> clazz) {
         return PAProxy.class.isAssignableFrom(clazz);
     }
-    
+
     public static boolean hasPAProxyAnnotation(Class<?> clazz) throws NotFoundException {
-            CtClass ctClass = ClassPool.getDefault().get(clazz.getName());
-            return JavassistByteCodeStubBuilder.hasAnnotation(ctClass, org.objectweb.proactive.annotation.PAProxy.class);
+        CtClass ctClass = ClassPool.getDefault().get(clazz.getName());
+        return JavassistByteCodeStubBuilder.hasAnnotation(ctClass,
+                org.objectweb.proactive.annotation.PAProxy.class);
     }
-    
-    
+
     public static byte[] generatePAProxy(String superClazzName) throws NotFoundException,
             CannotCompileException, IOException {
         ClassPool pool = ClassPool.getDefault();
@@ -131,14 +128,14 @@ public class PAProxyBuilder {
             if (!Modifier.isPrivate(ctMethod.getModifiers()) && !Modifier.isNative(ctMethod.getModifiers()) &&
                 !Modifier.isFinal(ctMethod.getModifiers()) &&
                 !JavassistByteCodeStubBuilder.hasAnnotation(ctMethod, PAProxyDoNotReifyMethod.class)) {
-//                System.out.println("adding " + m.getCtMethod().getLongName() + " attr " +
-//                    Modifier.toString(m.getCtMethod().getModifiers()));
+                //                System.out.println("adding " + m.getCtMethod().getLongName() + " attr " +
+                //                    Modifier.toString(m.getCtMethod().getModifiers()));
                 filtered.put(key, m);
-            } 
-//            else {
-//                System.out.println("discarding " + m.getCtMethod().getLongName() + " attr " +
-//                    Modifier.toString(m.getCtMethod().getModifiers()));
-//            }
+            }
+            //            else {
+            //                System.out.println("discarding " + m.getCtMethod().getLongName() + " attr " +
+            //                    Modifier.toString(m.getCtMethod().getModifiers()));
+            //            }
         }
 
         temp = filtered;
@@ -171,8 +168,8 @@ public class PAProxyBuilder {
                 methodToGenerate = CtNewMethod.copy(ctMethod, generatedCtClass, null);
                 methodToGenerate.setBody(body.toString());
                 methodToGenerate.setModifiers(methodToGenerate.getModifiers() & ~Modifier.ABSTRACT);
-//                System.out.println("PAProxyBuilder.generatePAProxy()" + methodToGenerate.getLongName() +
-//                    " attr " + Modifier.toString(methodToGenerate.getModifiers()));
+                //                System.out.println("PAProxyBuilder.generatePAProxy()" + methodToGenerate.getLongName() +
+                //                    " attr " + Modifier.toString(methodToGenerate.getModifiers()));
                 generatedCtClass.addMethod(methodToGenerate);
             } catch (RuntimeException e) {
                 e.printStackTrace();
@@ -181,7 +178,7 @@ public class PAProxyBuilder {
         }
 
         //// initactivity
-        
+
         CtMethod initActivity = CtNewMethod.make(
                 " public void initActivity(org.objectweb.proactive.Body body) { " +
                     "java.lang.reflect.Method[] m = " + generatedCtClass.getName() +
@@ -193,10 +190,9 @@ public class PAProxyBuilder {
 
         //// getWrapper.
 
-        generatedCtClass.addMethod(CtNewMethod.make("public Object "  +
-            " getTarget() { return this.proxiedModel; }", generatedCtClass));
+        generatedCtClass.addMethod(CtNewMethod.make("public Object "
+            + " getTarget() { return this.proxiedModel; }", generatedCtClass));
 
-        
         // RemoteLockManager 
 
         temp = JavassistByteCodeStubBuilder.methodsIndexer(superCtClass, classesIndexer);
@@ -220,8 +216,7 @@ public class PAProxyBuilder {
 
                 try {
                     methodToGenerate = CtNewMethod.copy(ctMethod2, generatedCtClass, null);
-                   
-                    
+
                     methodToGenerate.setModifiers(methodToGenerate.getModifiers() & ~Modifier.ABSTRACT);
                 } catch (RuntimeException e) {
                     e.printStackTrace();
@@ -233,7 +228,6 @@ public class PAProxyBuilder {
 
         generatedCtClass.debugWriteFile(PAProperties.PA_MOP_GENERATEDCLASSES_DIR.getValue());
 
-        
         byte[] bytecode = generatedCtClass.toBytecode();
 
         generatedCtClass.detach();

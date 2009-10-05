@@ -211,8 +211,7 @@ public class JavassistByteCodeStubBuilder {
             byte[] bytecode = generatedCtClass.toBytecode();
 
             if (PAProperties.PA_MOP_WRITESTUBONDISK.isTrue()) {
-            	
-            	
+
                 generatedCtClass.debugWriteFile(PAProperties.PA_MOP_GENERATEDCLASSES_DIR.getValue());
             }
 
@@ -735,9 +734,8 @@ public class JavassistByteCodeStubBuilder {
             }
         }
         return false;
-    }  
-    
-    
+    }
+
     public static <T extends Annotation> T getAnnotation(CtMember member, Class<T> annotation) {
         Object[] o = member.getAvailableAnnotations();
         if (o != null) {
@@ -750,7 +748,6 @@ public class JavassistByteCodeStubBuilder {
         return null;
     }
 
-    
     public static <T extends Annotation> T getAnnotation(CtClass ctClass, Class<T> annotation) {
         Object[] o = ctClass.getAvailableAnnotations();
         if (o != null) {
@@ -762,7 +759,7 @@ public class JavassistByteCodeStubBuilder {
         }
         return null;
     }
-    
+
     private static void handleTurnRemoteAnnotation(Method method, StringBuilder body) {
 
         List<MethodParameter> lmp = method.getListMethodParameters();

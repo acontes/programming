@@ -323,12 +323,12 @@ public class MOCKBody implements Body {
 
     public void setImmediateService(String methodName, boolean uniqueThread) {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void setImmediateService(String methodName, Class<?>[] parametersTypes, boolean uniqueThread) {
         // TODO Auto-generated method stub
-        
+
     }
 
 }

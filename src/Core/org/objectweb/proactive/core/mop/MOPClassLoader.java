@@ -189,18 +189,18 @@ public class MOPClassLoader extends URLClassLoader {
                 return Class.forName(name);
             }
         } catch (ClassNotFoundException e) {
-            if (PAProxyBuilder.doesClassNameEndWithPAProxySuffix(name) && 
-                    ! (Utils.isStubClassName(name))) {
+            if (PAProxyBuilder.doesClassNameEndWithPAProxySuffix(name) && !(Utils.isStubClassName(name))) {
                 try {
-                    byte[] data = PAProxyBuilder.generatePAProxy(PAProxyBuilder.getBaseClassNameFromPAProxyName(name));
+                    byte[] data = PAProxyBuilder.generatePAProxy(PAProxyBuilder
+                            .getBaseClassNameFromPAProxyName(name));
                     return callDefineClassUsingReflection(name, data);
                 } catch (Exception ex) {
                     logger.debug(ex);
                     throw new ClassNotFoundException(ex.getMessage());
                 }
-               
+
             }
-            
+
             if (Utils.isStubClassName(name)) {
                 // Test if the name of the class is actually a request for
                 // a stub class to be created
@@ -217,9 +217,9 @@ public class MOPClassLoader extends URLClassLoader {
                 // class Access checking. This method is supposed to be protected which means 
                 // we should not be accessing it but the access policy file allows us to access it freely.
                 try {
-                   Class<?> clazz = callDefineClassUsingReflection(name, data);
-                   logger.info("Generated class : " + name);
-                   return clazz;
+                    Class<?> clazz = callDefineClassUsingReflection(name, data);
+                    logger.info("Generated class : " + name);
+                    return clazz;
                 } catch (Exception ex) {
                     logger.debug(ex);
                     throw new ClassNotFoundException(ex.getMessage());
@@ -230,9 +230,10 @@ public class MOPClassLoader extends URLClassLoader {
             }
         }
     }
-    
-    
-    protected Class<?> callDefineClassUsingReflection(String name, byte[] data) throws ClassNotFoundException, SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+
+    protected Class<?> callDefineClassUsingReflection(String name, byte[] data)
+            throws ClassNotFoundException, SecurityException, NoSuchMethodException,
+            IllegalArgumentException, IllegalAccessException, InvocationTargetException {
         Class<?> clc = Class.forName("java.lang.ClassLoader");
         Class<?>[] argumentTypes = new Class<?>[5];
         argumentTypes[0] = name.getClass();
@@ -254,8 +255,7 @@ public class MOPClassLoader extends URLClassLoader {
         //  we have been loaded through the bootclasspath
         // so we use the context classloader
         if (this.getParent() == null) {
-            return (Class<?>) m.invoke(Thread.currentThread().getContextClassLoader(),
-                    effectiveArguments);
+            return (Class<?>) m.invoke(Thread.currentThread().getContextClassLoader(), effectiveArguments);
         } else {
             return (Class<?>) m.invoke(this.getParent(), effectiveArguments);
         }
