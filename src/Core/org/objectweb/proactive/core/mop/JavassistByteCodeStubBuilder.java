@@ -706,27 +706,37 @@ public class JavassistByteCodeStubBuilder {
      * @return returns true if the annotation <code>annotation</code> is set on the method 
      */
     public static boolean hasAnnotation(CtMember member, Class<? extends Annotation> annotation) {
-        //        try {
         Object[] o = member.getAvailableAnnotations();
         if (o != null) {
             for (Object object : o) {
-                //                    System.out.println("Annotation " + object.toString() + " on method " +
-                //                        method.getLongName());
                 if (annotation.isAssignableFrom(object.getClass())) {
                     return true;
                 }
             }
         }
-        //        } catch (Exception e) {
-        //            e.printStackTrace();
-        //            return false;
-        //        }
         return false;
     }
 
+    /**
+     * return true if the annotation <code>annotation</code> is set on the member (field, constructor, method) 
+     * @param member the member (field, constructor, method) onto check the annotation's presence
+     * @param annotation the annotation to check
+     * @return returns true if the annotation <code>annotation</code> is set on the method 
+     */
+    public static boolean hasAnnotation(CtClass ctClass, Class<? extends Annotation> annotation) {
+        Object[] o = ctClass.getAvailableAnnotations();
+        if (o != null) {
+            for (Object object : o) {
+                if (annotation.isAssignableFrom(object.getClass())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }  
+    
+    
     public static <T extends Annotation> T getAnnotation(CtMember member, Class<T> annotation) {
-        //        try {
-
         Object[] o = member.getAvailableAnnotations();
         if (o != null) {
             for (Object object : o) {
@@ -735,13 +745,22 @@ public class JavassistByteCodeStubBuilder {
                 }
             }
         }
-        //        } catch (Exception e) {
-        //            e.printStackTrace();
-        //            return null;
-        //        }
         return null;
     }
 
+    
+    public static <T extends Annotation> T getAnnotation(CtClass ctClass, Class<T> annotation) {
+        Object[] o = ctClass.getAvailableAnnotations();
+        if (o != null) {
+            for (Object object : o) {
+                if (annotation.isAssignableFrom(object.getClass())) {
+                    return annotation.cast(object);
+                }
+            }
+        }
+        return null;
+    }
+    
     private static void handleTurnRemoteAnnotation(Method method, StringBuilder body) {
 
         List<MethodParameter> lmp = method.getListMethodParameters();

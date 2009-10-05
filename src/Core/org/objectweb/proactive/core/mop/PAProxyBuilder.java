@@ -33,6 +33,9 @@ import functionalTests.activeobject.creation.A;
 
 public class PAProxyBuilder {
 
+    
+    public static String PAPROXY_CLASSNAME_SUFFIX =  "_PAProxy";
+    
     /**
      * @param args
      * @throws NotFoundException 
@@ -43,11 +46,43 @@ public class PAProxyBuilder {
         generatePAProxy(A.class.getName());
     }
 
+    
+    public static String generatePAProxyClassName(String baseClass) {
+        return baseClass + PAPROXY_CLASSNAME_SUFFIX;
+    }
+    
+    public static String getBaseClassNameFromPAProxyName(String paproxyClassName) {
+        int i = paproxyClassName.indexOf(PAPROXY_CLASSNAME_SUFFIX);
+        
+        return paproxyClassName.substring(0, i);
+    }
+    
+    public static boolean doesClassNameEndWithPAProxySuffix(String className) {
+        return  className.endsWith(PAPROXY_CLASSNAME_SUFFIX);
+    }
+    
+    public static boolean isPAProxy(Class<?> clazz) {
+        return PAProxy.class.isAssignableFrom(clazz);
+    }
+    
+    public static boolean hasPAProxyAnnotation(Class<?> clazz) {
+        
+        try {
+            CtClass ctClass = ClassPool.getDefault().get(clazz.getName());
+            return JavassistByteCodeStubBuilder.hasAnnotation(ctClass, org.objectweb.proactive.annotation.PAProxy.class);
+        } catch (NotFoundException e) {
+            // TODO Auto-generated catch block
+            
+            return false;
+        }
+    }
+    
+    
     public static byte[] generatePAProxy(String superClazzName) throws NotFoundException,
             CannotCompileException, IOException {
         ClassPool pool = ClassPool.getDefault();
 
-        CtClass generatedCtClass = pool.makeClass(superClazzName + "_PAProxy");
+        CtClass generatedCtClass = pool.makeClass(generatePAProxyClassName(superClazzName));
 
         // insert super class
         CtClass superCtClass = pool.get(superClazzName);

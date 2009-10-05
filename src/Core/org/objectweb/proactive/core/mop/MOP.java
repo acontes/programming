@@ -31,6 +31,7 @@
  */
 package org.objectweb.proactive.core.mop;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Array;
@@ -44,6 +45,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.TreeMap;
+
+import javassist.CannotCompileException;
+import javassist.NotFoundException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Active;
@@ -214,6 +218,19 @@ public abstract class MOP {
         // Throws a ClassNotFoundException
         Class<?> targetClass = forName(nameOfClass);
 
+        
+      
+        if (PAProxyBuilder.hasPAProxyAnnotation(targetClass)) {
+            String proxyName = PAProxyBuilder.generatePAProxyClassName(targetClass.getName());
+            Class<?> cl = MOPClassLoader.getMOPClassLoader().loadClass(proxyName);
+            targetClass = cl;
+            nameOfClass = targetClass.getName();
+            nameOfStubClass = PAProxyBuilder.getBaseClassNameFromPAProxyName(targetClass.getName());
+            
+            System.out.println("PAPROXY  " +  nameOfClass +"? " );
+            
+        }
+        
         // Class<?> stubClass = null;
         //        try {
         //            targetClass = forName(nameOfStubClass);
@@ -373,6 +390,29 @@ public abstract class MOP {
         // Throws a ClassNotFoundException
         Class<?> targetClass = target.getClass();
 
+        
+        boolean isPAProxy =  PAProxyBuilder.hasPAProxyAnnotation(targetClass);
+        
+        if (isPAProxy) {
+            byte[] PAproxyClass;
+            try {
+                PAproxyClass = PAProxyBuilder.generatePAProxy(targetClass.getName());
+                String proxyName = PAProxyBuilder.generatePAProxyClassName(targetClass.getName());
+                MOPClassLoader.classDataCache.put(proxyName, PAproxyClass);
+            } catch (NotFoundException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (CannotCompileException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        
+        }
+        
+        
         // Instanciates the stub object
         StubObject stub = createStubObject(nameOfStubClass, targetClass, genericParameters);
 
