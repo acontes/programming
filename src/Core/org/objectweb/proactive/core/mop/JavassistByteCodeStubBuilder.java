@@ -711,7 +711,7 @@ public class JavassistByteCodeStubBuilder {
      * @param annotation the annotation to check
      * @return returns true if the annotation <code>annotation</code> is set on the method 
      */
-    private static boolean hasMethodAnnotation(CtMethod method, Class<? extends Annotation> annotation) {
+    public static boolean hasMethodAnnotation(CtMethod method, Class<? extends Annotation> annotation) {
         try {
             Object[] o = method.getAnnotations();
             if (o != null) {
