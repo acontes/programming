@@ -29,23 +29,12 @@ import org.objectweb.proactive.core.mop.lock.AbstractRemoteLocksManager;
 import org.objectweb.proactive.core.mop.lock.RemoteLocksManager;
 import org.objectweb.proactive.core.mop.proxy.PAProxy;
 
-import functionalTests.activeobject.creation.A;
 
 
 public class PAProxyBuilder {
 
     
     public static String PAPROXY_CLASSNAME_SUFFIX =  "_PAProxy";
-    
-    /**
-     * @param args
-     * @throws NotFoundException 
-     * @throws CannotCompileException 
-     * @throws IOException 
-     */
-    public static void main(String[] args) throws NotFoundException, CannotCompileException, IOException {
-        generatePAProxy(A.class.getName());
-    }
 
     
     public static String generatePAProxyClassName(String baseClass) {
