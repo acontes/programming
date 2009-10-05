@@ -182,8 +182,8 @@ public class PAProxyBuilder {
                 methodToGenerate = CtNewMethod.copy(ctMethod, generatedCtClass, null);
                 methodToGenerate.setBody(body.toString());
                 methodToGenerate.setModifiers(methodToGenerate.getModifiers() & ~Modifier.ABSTRACT);
-                System.out.println("PAProxyBuilder.generatePAProxy()" + methodToGenerate.getLongName() +
-                    " attr " + Modifier.toString(methodToGenerate.getModifiers()));
+//                System.out.println("PAProxyBuilder.generatePAProxy()" + methodToGenerate.getLongName() +
+//                    " attr " + Modifier.toString(methodToGenerate.getModifiers()));
                 generatedCtClass.addMethod(methodToGenerate);
             } catch (RuntimeException e) {
                 e.printStackTrace();
@@ -193,10 +193,12 @@ public class PAProxyBuilder {
 
         //// initactivity
 
+        System.out.println("PAProxyBuilder.generatePAProxy() =========> " + generatedCtClass.getName());
+        
         CtMethod initActivity = CtNewMethod.make(
                 " public void initActivity(org.objectweb.proactive.Body body) { " +
-                    "java.lang.reflect.Method[] m = " + generatedCtClass.getName().replace('/', '.') +
-                    ".class.getDeclaredMethods();" + "for ( int i = 0 ; i< m.length; i++) { " +
+                    "java.lang.reflect.Method[] m = " + generatedCtClass.getName() +
+                    ".class.getDeclaredMethods();\n" + "for ( int i = 0 ; i< m.length; i++) { " +
                     " org.objectweb.proactive.api.PAActiveObject.setImmediateService(m[i].getName(),true);" +
                     " } " + " } ", generatedCtClass);
 
@@ -204,9 +206,10 @@ public class PAProxyBuilder {
 
         //// getWrapper.
 
-        generatedCtClass.addMethod(CtNewMethod.make("public " + superCtClass.getName().replace('/', '.') +
+        generatedCtClass.addMethod(CtNewMethod.make("public Object "  +
             " getTarget() { return this.proxiedModel; }", generatedCtClass));
 
+        
         // RemoteLockManager 
 
         temp = JavassistByteCodeStubBuilder.methodsIndexer(superCtClass, classesIndexer);

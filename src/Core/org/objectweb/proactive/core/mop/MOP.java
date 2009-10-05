@@ -409,11 +409,21 @@ public abstract class MOP {
 		try {
 			boolean isPAProxy = PAProxyBuilder.hasPAProxyAnnotation(targetClass);
 			if (isPAProxy) {
-	            byte[] PAproxyClass;
+	            byte[] paproxyByteCode;
 	            try {
-	                PAproxyClass = PAProxyBuilder.generatePAProxy(targetClass.getName());
+	                paproxyByteCode = PAProxyBuilder.generatePAProxy(targetClass.getName());
 	                String proxyName = PAProxyBuilder.generatePAProxyClassName(targetClass.getName());
-	                MOPClassLoader.classDataCache.put(proxyName, PAproxyClass);
+	                MOPClassLoader.classDataCache.put(proxyName, paproxyByteCode);
+	                
+	                Class<?> proxyClass =  Class.forName(proxyName);
+	                
+	                Constructor<?> construct =  proxyClass.getConstructor(new Class<?>[] {targetClass});
+	                
+	                target = construct.newInstance(target);
+	                
+	                System.out.println("MOP.turnReified() " + "" + "");
+	                
+	                
 	            } catch (NotFoundException e) {
 	                // TODO Auto-generated catch block
 	                e.printStackTrace();
@@ -423,7 +433,25 @@ public abstract class MOP {
 	            } catch (IOException e) {
 	                // TODO Auto-generated catch block
 	                e.printStackTrace();
-	            }
+	            } catch (SecurityException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (NoSuchMethodException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (IllegalArgumentException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (InstantiationException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
 	        
 	        }
 		} catch (NotFoundException e1) {
