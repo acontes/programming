@@ -32,10 +32,13 @@ public class PAProxyBuilder {
      * @throws CannotCompileException 
      */
     public static void main(String[] args) throws NotFoundException, CannotCompileException {
-      ClassPool pool = ClassPool.getDefault();
+      generatePAProxy( A.class.getName()); 
+    }
+    
+    public static void generatePAProxy (String superClazzName) throws NotFoundException, CannotCompileException {	
+    	ClassPool pool = ClassPool.getDefault();
         
       
-      String superClazzName =  A.class.getName();
       
         CtClass generatedCtClass = pool.makeClass(superClazzName+"_PAProxy");
         
