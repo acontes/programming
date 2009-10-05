@@ -142,13 +142,14 @@ public class PAProxyBuilder {
             if (!Modifier.isPrivate(ctMethod.getModifiers()) && !Modifier.isNative(ctMethod.getModifiers()) &&
                 !Modifier.isFinal(ctMethod.getModifiers()) &&
                 !JavassistByteCodeStubBuilder.hasAnnotation(ctMethod, PAProxyDoNotReifyMethod.class)) {
-                System.out.println("adding " + m.getCtMethod().getLongName() + " attr " +
-                    Modifier.toString(m.getCtMethod().getModifiers()));
+//                System.out.println("adding " + m.getCtMethod().getLongName() + " attr " +
+//                    Modifier.toString(m.getCtMethod().getModifiers()));
                 filtered.put(key, m);
-            } else {
-                System.out.println("discarding " + m.getCtMethod().getLongName() + " attr " +
-                    Modifier.toString(m.getCtMethod().getModifiers()));
-            }
+            } 
+//            else {
+//                System.out.println("discarding " + m.getCtMethod().getLongName() + " attr " +
+//                    Modifier.toString(m.getCtMethod().getModifiers()));
+//            }
         }
 
         temp = filtered;
@@ -264,11 +265,11 @@ public class PAProxyBuilder {
 
         }
 
-        for (CtMethod m : generatedCtClass.getMethods()) {
-            System.out.println(m.getLongName() + " attr " + Modifier.toString(m.getModifiers()));
-        }
+//        for (CtMethod m : generatedCtClass.getMethods()) {
+//            System.out.println(m.getLongName() + " attr " + Modifier.toString(m.getModifiers()));
+//        }
 
-        System.out.println("PAProxyBuilder.generatePAProxy() + saving class at " + PAProperties.PA_MOP_GENERATEDCLASSES_DIR.getValue());
+//        System.out.println("PAProxyBuilder.generatePAProxy() + saving class at " + PAProperties.PA_MOP_GENERATEDCLASSES_DIR.getValue());
         generatedCtClass.debugWriteFile(PAProperties.PA_MOP_GENERATEDCLASSES_DIR.getValue());
 
         
