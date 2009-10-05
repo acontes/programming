@@ -160,9 +160,9 @@ public class PAProxyBuilder {
             CtMethod ctMethod = m.getCtMethod();
             CtClass returnType = ctMethod.getReturnType();
             String body = "";
-            if (JavassistByteCodeStubBuilder.hasAnnotation(ctMethod, PAProxyEmptyMethod.class)) {
+            if (m.hasMethodAnnotation(PAProxyEmptyMethod.class)) {
                 body = "{}";
-            } else if (JavassistByteCodeStubBuilder.hasAnnotation(ctMethod, PAProxyCustomBodyMethod.class)) {
+            } else if (m.hasMethodAnnotation(PAProxyCustomBodyMethod.class)) {
                 PAProxyCustomBodyMethod papcbm = JavassistByteCodeStubBuilder.getAnnotation(ctMethod,
                         PAProxyCustomBodyMethod.class);
                 String b = papcbm.getBody();
@@ -192,8 +192,6 @@ public class PAProxyBuilder {
         }
 
         //// initactivity
-
-        System.out.println("PAProxyBuilder.generatePAProxy() =========> " + generatedCtClass.getName());
         
         CtMethod initActivity = CtNewMethod.make(
                 " public void initActivity(org.objectweb.proactive.Body body) { " +
@@ -225,33 +223,7 @@ public class PAProxyBuilder {
 
         for (CtMethod ctMethod2 : rlmDeclaredMethods) {
 
-            //        while (iterateLockManagerMethod.hasNext()) {
-            //            Entry<String, Method> entry = iterateLockManagerMethod.next();
-            //            Method m = entry.getValue();
-            //            
-            //            CtMethod ctMethod =  m.getCtMethod();
-            //            CtClass returnType = ctMethod.getReturnType();
-            //            String preWrap = "";
-            //            if (returnType != CtClass.voidType) {
-            //                if (!returnType.isPrimitive()) {
-            //                    preWrap = "($r)";
-            //                } else {
-            //                    preWrap = "($w)";
-            //                }
-            //            
-            //            }
-            //            
-            //            String body = " { Object o = ($r) ($w) this.locks.get(($w)$1). " + ctMethod.getName() + "($$); return ($r) o ;} ";
-            //            
-
-            //            public void initActivity(Body b)
-
             CtClass bodyClass = pool.get(Body.class.getName());
-
-            //            initActivity.setName("initActivity");
-            //            initActivity.addParameter(bodyClass);
-
-            //         
 
             CtMethod methodToGenerate = null;
 
@@ -259,6 +231,8 @@ public class PAProxyBuilder {
 
                 try {
                     methodToGenerate = CtNewMethod.copy(ctMethod2, generatedCtClass, null);
+                   
+                    
                     methodToGenerate.setModifiers(methodToGenerate.getModifiers() & ~Modifier.ABSTRACT);
                 } catch (RuntimeException e) {
                     e.printStackTrace();
@@ -268,11 +242,6 @@ public class PAProxyBuilder {
 
         }
 
-//        for (CtMethod m : generatedCtClass.getMethods()) {
-//            System.out.println(m.getLongName() + " attr " + Modifier.toString(m.getModifiers()));
-//        }
-
-//        System.out.println("PAProxyBuilder.generatePAProxy() + saving class at " + PAProperties.PA_MOP_GENERATEDCLASSES_DIR.getValue());
         generatedCtClass.debugWriteFile(PAProperties.PA_MOP_GENERATEDCLASSES_DIR.getValue());
 
         
