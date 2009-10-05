@@ -98,7 +98,10 @@ public class Method {
 
     public void grabMethodandParameterAnnotation(CtBehavior ctBehavior) {
 
-        //        Object[][] annotations = ctBehavior.getAvailableParameterAnnotations();
+        //get method annotations 
+        ctBehavior.getAvailableAnnotations();
+
+        // get parameter annotations
 
         ParameterAnnotationsAttribute attr = toParameterAnnotationsAttribute(ctBehavior);
         if (attr == null) {

@@ -47,6 +47,7 @@ import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtConstructor;
 import javassist.CtField;
+import javassist.CtMember;
 import javassist.CtMethod;
 import javassist.CtNewMethod;
 import javassist.Modifier;
@@ -159,15 +160,11 @@ public class JavassistByteCodeStubBuilder {
             genericTypesMappingField.setModifiers(Modifier.STATIC);
             generatedCtClass.addField(genericTypesMappingField);
 
-            
-            
             //   This map is used for keeping track of the method signatures / methods that are to be reified
             java.util.Map<String, Method> temp = new HashMap<String, Method>();
             List<String> classesIndexer = new Vector<String>();
-            
-            temp = methodsIndexer(superCtClass,classesIndexer);
-            
-            
+
+            temp = methodsIndexer(superCtClass, classesIndexer);
 
             reifiedMethodsWithoutGenerics = (temp.values().toArray(new Method[temp.size()]));
 
@@ -227,17 +224,17 @@ public class JavassistByteCodeStubBuilder {
         }
     }
 
-    static Map<String, Method> methodsIndexer(CtClass superCtClass, List<String> classesIndexer) throws NotFoundException {
-     // Recursively calls getDeclaredMethods () on the target type
+    static Map<String, Method> methodsIndexer(CtClass superCtClass, List<String> classesIndexer)
+            throws NotFoundException {
+        // Recursively calls getDeclaredMethods () on the target type
         // and each of its superclasses, all the way up to java.lang.Object
         // We have to be careful and only take into account overriden methods once
         CtClass currentCtClass = superCtClass;
-        
+
         java.util.Map<String, Method> temp = new HashMap<String, Method>();
 
         CtClass[] params;
         Object exists;
-
 
         classesIndexer.add(superCtClass.getName());
 
@@ -297,8 +294,7 @@ public class JavassistByteCodeStubBuilder {
         List<CtClass> superInterfaces = new Vector<CtClass>();
         addSuperInterfaces(superCtClass, superInterfaces);
 
-        CtClass[] implementedInterfacesTable = (superInterfaces.toArray(new CtClass[superInterfaces
-                .size()]));
+        CtClass[] implementedInterfacesTable = (superInterfaces.toArray(new CtClass[superInterfaces.size()]));
 
         for (int itfsIndex = 0; itfsIndex < implementedInterfacesTable.length; itfsIndex++) {
             if (!classesIndexer.contains(implementedInterfacesTable[itfsIndex].getName())) {
@@ -322,7 +318,7 @@ public class JavassistByteCodeStubBuilder {
                 m.grabMethodandParameterAnnotation(currentMethod);
             }
         }
-        
+
         return temp;
     }
 
@@ -350,7 +346,7 @@ public class JavassistByteCodeStubBuilder {
             Method reifiedMethod = reifiedMethods[i];
             StringBuilder body = new StringBuilder("{");
 
-            if (hasMethodAnnotation(reifiedMethod.getCtMethod(), Self.class)) {
+            if (hasAnnotation(reifiedMethod.getCtMethod(), Self.class)) {
                 body.append("return this;");
             } else {
 
@@ -360,9 +356,8 @@ public class JavassistByteCodeStubBuilder {
 
                 handleTurnActiveAnnotation(reifiedMethod, body);
 
-                if (hasMethodAnnotation(reifiedMethod.getCtMethod(), TurnRemoteParam.class)) {
-                    TurnRemoteParam trp = getMethodAnnotation(reifiedMethod.getCtMethod(),
-                            TurnRemoteParam.class);
+                if (hasAnnotation(reifiedMethod.getCtMethod(), TurnRemoteParam.class)) {
+                    TurnRemoteParam trp = getAnnotation(reifiedMethod.getCtMethod(), TurnRemoteParam.class);
                     int parameterIndex = parameterNameToIndex(reifiedMethod.getCtMethod(), trp
                             .parameterName());
                     body.append("$" + parameterIndex +
@@ -370,9 +365,8 @@ public class JavassistByteCodeStubBuilder {
                         "); \n");
                 }
 
-                if (hasMethodAnnotation(reifiedMethod.getCtMethod(), TurnActiveParam.class)) {
-                    TurnActiveParam trp = getMethodAnnotation(reifiedMethod.getCtMethod(),
-                            TurnActiveParam.class);
+                if (hasAnnotation(reifiedMethod.getCtMethod(), TurnActiveParam.class)) {
+                    TurnActiveParam trp = getAnnotation(reifiedMethod.getCtMethod(), TurnActiveParam.class);
                     int parameterIndex = parameterNameToIndex(reifiedMethod.getCtMethod(), trp
                             .parameterName());
                     body.append("$" + parameterIndex +
@@ -390,7 +384,7 @@ public class JavassistByteCodeStubBuilder {
                 //                                "); \n");
                 //                }
 
-                boolean fieldToCache = hasMethodAnnotation(reifiedMethod.getCtMethod(), Cache.class);
+                boolean fieldToCache = hasAnnotation(reifiedMethod.getCtMethod(), Cache.class);
                 CtField cachedField = null;
 
                 if (fieldToCache) {
@@ -413,7 +407,7 @@ public class JavassistByteCodeStubBuilder {
                 String postWrap = null;
                 String preWrap = null;
 
-                if (hasMethodAnnotation(reifiedMethod.getCtMethod(), NoReify.class)) {
+                if (hasAnnotation(reifiedMethod.getCtMethod(), NoReify.class)) {
                     body
                             .append("if (myProxy instanceof org.objectweb.proactive.core.remoteobject.SynchronousProxy) { return ($r) ((org.objectweb.proactive.core.remoteobject.SynchronousProxy) myProxy).receiveMessage($$); }  \n");
                 }
@@ -706,45 +700,45 @@ public class JavassistByteCodeStubBuilder {
     }
 
     /**
-     * return true if the annotation <code>annotation</code> is set on the method 
-     * @param method the method onto check the annotation's presence
+     * return true if the annotation <code>annotation</code> is set on the member (field, constructor, method) 
+     * @param member the member (field, constructor, method) onto check the annotation's presence
      * @param annotation the annotation to check
      * @return returns true if the annotation <code>annotation</code> is set on the method 
      */
-    public static boolean hasMethodAnnotation(CtMethod method, Class<? extends Annotation> annotation) {
-        try {
-            Object[] o = method.getAnnotations();
-            if (o != null) {
-                for (Object object : o) {
-                    //                    System.out.println("Annotation " + object.toString() + " on method " +
-                    //                        method.getLongName());
-                    if (annotation.isAssignableFrom(object.getClass())) {
-                        return true;
-                    }
+    public static boolean hasAnnotation(CtMember member, Class<? extends Annotation> annotation) {
+        //        try {
+        Object[] o = member.getAvailableAnnotations();
+        if (o != null) {
+            for (Object object : o) {
+                //                    System.out.println("Annotation " + object.toString() + " on method " +
+                //                        method.getLongName());
+                if (annotation.isAssignableFrom(object.getClass())) {
+                    return true;
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
         }
+        //        } catch (Exception e) {
+        //            e.printStackTrace();
+        //            return false;
+        //        }
         return false;
     }
 
-    private static <T extends Annotation> T getMethodAnnotation(CtMethod method, Class<T> annotation) {
-        try {
+    public static <T extends Annotation> T getAnnotation(CtMember member, Class<T> annotation) {
+        //        try {
 
-            Object[] o = method.getAnnotations();
-            if (o != null) {
-                for (Object object : o) {
-                    if (annotation.isAssignableFrom(object.getClass())) {
-                        return annotation.cast(object);
-                    }
+        Object[] o = member.getAvailableAnnotations();
+        if (o != null) {
+            for (Object object : o) {
+                if (annotation.isAssignableFrom(object.getClass())) {
+                    return annotation.cast(object);
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
         }
+        //        } catch (Exception e) {
+        //            e.printStackTrace();
+        //            return null;
+        //        }
         return null;
     }
 
