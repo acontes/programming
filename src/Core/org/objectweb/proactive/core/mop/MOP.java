@@ -1179,7 +1179,7 @@ public abstract class MOP {
     }
 
     /**
-     * replaceObject performs a in-depth parse of an object in order to find if the object
+     * replaceObject performs an in-depth parse of an object in order to find if the object
      * contains some references to the object 'from' and replace these references by the object 'to'
      * @param objectToAnalyse the object in which some replacement must be performed
      * @param from the object that has to be replaced

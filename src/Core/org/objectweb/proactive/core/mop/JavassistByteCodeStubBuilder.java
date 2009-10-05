@@ -159,102 +159,15 @@ public class JavassistByteCodeStubBuilder {
             genericTypesMappingField.setModifiers(Modifier.STATIC);
             generatedCtClass.addField(genericTypesMappingField);
 
+            
+            
             //   This map is used for keeping track of the method signatures / methods that are to be reified
             java.util.Map<String, Method> temp = new HashMap<String, Method>();
-
-            // Recursively calls getDeclaredMethods () on the target type
-            // and each of its superclasses, all the way up to java.lang.Object
-            // We have to be careful and only take into account overriden methods once
-            CtClass currentCtClass = superCtClass;
-
-            CtClass[] params;
-            Object exists;
-
             List<String> classesIndexer = new Vector<String>();
-
-            classesIndexer.add(superCtClass.getName());
-
-            // If the target type is an interface, the only thing we have to do is to
-            // get the list of all its public reifiedMethods.
-            if (superCtClass.isInterface()) {
-                CtMethod[] allPublicMethods = superCtClass.getMethods();
-                for (int i = 0; i < allPublicMethods.length; i++) {
-                    String key = generateMethodKey(allPublicMethods[i]);
-                    temp.put(key, new Method(allPublicMethods[i]));
-                }
-                classesIndexer.add("java.lang.Object");
-            } else // If the target type is an actual class, we climb up the tree
-            {
-                do {
-                    if (!classesIndexer.contains(currentCtClass.getName())) {
-                        classesIndexer.add(currentCtClass.getName());
-                    }
-
-                    // The declared reifiedMethods for the current class
-                    CtMethod[] declaredCtMethods = currentCtClass.getDeclaredMethods();
-
-                    // For each method declared in this class
-                    for (int i = 0; i < declaredCtMethods.length; i++) {
-                        CtMethod currentMethod = declaredCtMethods[i];
-
-                        // Build a key with the simple name of the method
-                        // and the names of its parameters in the right order
-                        String key = generateMethodKey(currentMethod);
-                        // Tests if we already have met this method in a subclass
-                        exists = temp.get(key);
-                        params = currentMethod.getParameterTypes();
-                        if (exists == null) {
-                            // The only method we ABSOLUTELY want to be called directly
-                            // on the stub (and thus not reified) is
-                            // the protected void finalize () throws Throwable
-                            if ((key.toString().equals("finalize")) && (params.length == 0)) {
-                                // Do nothing, simply avoid adding this method to the list
-                            } else {
-                                // If not, adds this method to the Vector that
-                                // holds all the reifiedMethods for this class
-                                //                                tempVector.addElement(currentMethod);
-                                temp.put(key.toString(), new Method(currentMethod));
-                            }
-                        } else {
-                            // We already know this method because it is overriden
-                            // in a subclass. Then we just check for annotations
-                            Method met = temp.get(key);
-                            met.grabMethodandParameterAnnotation(currentMethod);
-                        }
-                    }
-                    currentCtClass = currentCtClass.getSuperclass();
-                } while (currentCtClass != null); // Continue until we ask for the superclass of java.lang.Object
-            }
-
-            // now get the methods from implemented interfaces
-            List<CtClass> superInterfaces = new Vector<CtClass>();
-            addSuperInterfaces(superCtClass, superInterfaces);
-
-            CtClass[] implementedInterfacesTable = (superInterfaces.toArray(new CtClass[superInterfaces
-                    .size()]));
-
-            for (int itfsIndex = 0; itfsIndex < implementedInterfacesTable.length; itfsIndex++) {
-                if (!classesIndexer.contains(implementedInterfacesTable[itfsIndex].getName())) {
-                    classesIndexer.add(implementedInterfacesTable[itfsIndex].getName());
-                }
-
-                //              The declared methods for the current interface
-                CtMethod[] declaredMethods = implementedInterfacesTable[itfsIndex].getDeclaredMethods();
-
-                // For each method declared in this class
-                for (int i = 0; i < declaredMethods.length; i++) {
-                    CtMethod currentMethod = declaredMethods[i];
-
-                    // Build a key with the simple name of the method
-                    // and the names of its parameters in the right order
-                    String key = generateMethodKey(currentMethod);
-
-                    // replace with current one, because this gives the actual declaring Class<?> of this method
-                    Method m = temp.get(key);
-                    m.setCtMethod(currentMethod);
-                    m.grabMethodandParameterAnnotation(currentMethod);
-                }
-            }
+            
+            temp = methodsIndexer(superCtClass,classesIndexer);
+            
+            
 
             reifiedMethodsWithoutGenerics = (temp.values().toArray(new Method[temp.size()]));
 
@@ -312,6 +225,105 @@ public class JavassistByteCodeStubBuilder {
             throw new RuntimeException("Failed to generate stub for class " + className +
                 " with javassist : " + e.getMessage(), e);
         }
+    }
+
+    static Map<String, Method> methodsIndexer(CtClass superCtClass, List<String> classesIndexer) throws NotFoundException {
+     // Recursively calls getDeclaredMethods () on the target type
+        // and each of its superclasses, all the way up to java.lang.Object
+        // We have to be careful and only take into account overriden methods once
+        CtClass currentCtClass = superCtClass;
+        
+        java.util.Map<String, Method> temp = new HashMap<String, Method>();
+
+        CtClass[] params;
+        Object exists;
+
+
+        classesIndexer.add(superCtClass.getName());
+
+        // If the target type is an interface, the only thing we have to do is to
+        // get the list of all its public reifiedMethods.
+        if (superCtClass.isInterface()) {
+            CtMethod[] allPublicMethods = superCtClass.getMethods();
+            for (int i = 0; i < allPublicMethods.length; i++) {
+                String key = generateMethodKey(allPublicMethods[i]);
+                temp.put(key, new Method(allPublicMethods[i]));
+            }
+            classesIndexer.add("java.lang.Object");
+        } else // If the target type is an actual class, we climb up the tree
+        {
+            do {
+                if (!classesIndexer.contains(currentCtClass.getName())) {
+                    classesIndexer.add(currentCtClass.getName());
+                }
+
+                // The declared reifiedMethods for the current class
+                CtMethod[] declaredCtMethods = currentCtClass.getDeclaredMethods();
+
+                // For each method declared in this class
+                for (int i = 0; i < declaredCtMethods.length; i++) {
+                    CtMethod currentMethod = declaredCtMethods[i];
+
+                    // Build a key with the simple name of the method
+                    // and the names of its parameters in the right order
+                    String key = generateMethodKey(currentMethod);
+                    // Tests if we already have met this method in a subclass
+                    exists = temp.get(key);
+                    params = currentMethod.getParameterTypes();
+                    if (exists == null) {
+                        // The only method we ABSOLUTELY want to be called directly
+                        // on the stub (and thus not reified) is
+                        // the protected void finalize () throws Throwable
+                        if ((key.toString().equals("finalize")) && (params.length == 0)) {
+                            // Do nothing, simply avoid adding this method to the list
+                        } else {
+                            // If not, adds this method to the Vector that
+                            // holds all the reifiedMethods for this class
+                            //                                tempVector.addElement(currentMethod);
+                            temp.put(key.toString(), new Method(currentMethod));
+                        }
+                    } else {
+                        // We already know this method because it is overriden
+                        // in a subclass. Then we just check for annotations
+                        Method met = temp.get(key);
+                        met.grabMethodandParameterAnnotation(currentMethod);
+                    }
+                }
+                currentCtClass = currentCtClass.getSuperclass();
+            } while (currentCtClass != null); // Continue until we ask for the superclass of java.lang.Object
+        }
+
+        // now get the methods from implemented interfaces
+        List<CtClass> superInterfaces = new Vector<CtClass>();
+        addSuperInterfaces(superCtClass, superInterfaces);
+
+        CtClass[] implementedInterfacesTable = (superInterfaces.toArray(new CtClass[superInterfaces
+                .size()]));
+
+        for (int itfsIndex = 0; itfsIndex < implementedInterfacesTable.length; itfsIndex++) {
+            if (!classesIndexer.contains(implementedInterfacesTable[itfsIndex].getName())) {
+                classesIndexer.add(implementedInterfacesTable[itfsIndex].getName());
+            }
+
+            //              The declared methods for the current interface
+            CtMethod[] declaredMethods = implementedInterfacesTable[itfsIndex].getDeclaredMethods();
+
+            // For each method declared in this class
+            for (int i = 0; i < declaredMethods.length; i++) {
+                CtMethod currentMethod = declaredMethods[i];
+
+                // Build a key with the simple name of the method
+                // and the names of its parameters in the right order
+                String key = generateMethodKey(currentMethod);
+
+                // replace with current one, because this gives the actual declaring Class<?> of this method
+                Method m = temp.get(key);
+                m.setCtMethod(currentMethod);
+                m.grabMethodandParameterAnnotation(currentMethod);
+            }
+        }
+        
+        return temp;
     }
 
     private static String generateMethodKey(CtMethod method) throws NotFoundException {
