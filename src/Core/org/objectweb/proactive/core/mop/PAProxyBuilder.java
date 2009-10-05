@@ -24,6 +24,7 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.annotation.PAProxyCustomBodyMethod;
 import org.objectweb.proactive.annotation.PAProxyDoNotReifyMethod;
 import org.objectweb.proactive.annotation.PAProxyEmptyMethod;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.mop.lock.AbstractRemoteLocksManager;
 import org.objectweb.proactive.core.mop.lock.RemoteLocksManager;
 import org.objectweb.proactive.core.mop.proxy.PAProxy;
@@ -65,16 +66,9 @@ public class PAProxyBuilder {
         return PAProxy.class.isAssignableFrom(clazz);
     }
     
-    public static boolean hasPAProxyAnnotation(Class<?> clazz) {
-        
-        try {
+    public static boolean hasPAProxyAnnotation(Class<?> clazz) throws NotFoundException {
             CtClass ctClass = ClassPool.getDefault().get(clazz.getName());
             return JavassistByteCodeStubBuilder.hasAnnotation(ctClass, org.objectweb.proactive.annotation.PAProxy.class);
-        } catch (NotFoundException e) {
-            // TODO Auto-generated catch block
-            
-            return false;
-        }
     }
     
     
@@ -274,7 +268,10 @@ public class PAProxyBuilder {
             System.out.println(m.getLongName() + " attr " + Modifier.toString(m.getModifiers()));
         }
 
-        generatedCtClass.debugWriteFile();
+        System.out.println("PAProxyBuilder.generatePAProxy() + saving class at " + PAProperties.PA_MOP_GENERATEDCLASSES_DIR.getValue());
+        generatedCtClass.debugWriteFile(PAProperties.PA_MOP_GENERATEDCLASSES_DIR.getValue());
+
+        
         byte[] bytecode = generatedCtClass.toBytecode();
 
         generatedCtClass.detach();

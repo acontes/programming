@@ -220,16 +220,30 @@ public abstract class MOP {
 
         
       
-        if (PAProxyBuilder.hasPAProxyAnnotation(targetClass)) {
-            String proxyName = PAProxyBuilder.generatePAProxyClassName(targetClass.getName());
-            Class<?> cl = MOPClassLoader.getMOPClassLoader().loadClass(proxyName);
-            targetClass = cl;
-            nameOfClass = targetClass.getName();
-            nameOfStubClass = PAProxyBuilder.getBaseClassNameFromPAProxyName(targetClass.getName());
-            
-            System.out.println("PAPROXY  " +  nameOfClass +"? " );
-            
-        }
+        try {
+			if (PAProxyBuilder.hasPAProxyAnnotation(targetClass)) {
+			    String proxyName = PAProxyBuilder.generatePAProxyClassName(targetClass.getName());
+			    Class<?> cl = MOPClassLoader.getMOPClassLoader().loadClass(proxyName);
+			    targetClass = cl;
+			    nameOfClass = targetClass.getName();
+			    nameOfStubClass = PAProxyBuilder.getBaseClassNameFromPAProxyName(targetClass.getName());
+			    
+			    System.out.println("PAPROXY  " +  nameOfClass +"? " );
+			    
+			}
+		} catch (NotFoundException e) {
+			// We could land here if we are trying to
+			// generate a _PAProxy on a runtime that does not
+			// have yet generated a paproxy for that class
+			if (PAProxyBuilder.doesClassNameEndWithPAProxySuffix(targetClass.getName())) {
+				Class<?> cl = MOPClassLoader.getMOPClassLoader().loadClass(targetClass.getName());
+			    targetClass = cl;
+			    nameOfClass = targetClass.getName();
+			    nameOfStubClass = PAProxyBuilder.getBaseClassNameFromPAProxyName(targetClass.getName());
+			    
+			    System.out.println("PAPROXY  " +  nameOfClass +"? " );
+			}
+		}
         
         // Class<?> stubClass = null;
         //        try {
@@ -391,26 +405,33 @@ public abstract class MOP {
         Class<?> targetClass = target.getClass();
 
         
-        boolean isPAProxy =  PAProxyBuilder.hasPAProxyAnnotation(targetClass);
+       
+		try {
+			boolean isPAProxy = PAProxyBuilder.hasPAProxyAnnotation(targetClass);
+			if (isPAProxy) {
+	            byte[] PAproxyClass;
+	            try {
+	                PAproxyClass = PAProxyBuilder.generatePAProxy(targetClass.getName());
+	                String proxyName = PAProxyBuilder.generatePAProxyClassName(targetClass.getName());
+	                MOPClassLoader.classDataCache.put(proxyName, PAproxyClass);
+	            } catch (NotFoundException e) {
+	                // TODO Auto-generated catch block
+	                e.printStackTrace();
+	            } catch (CannotCompileException e) {
+	                // TODO Auto-generated catch block
+	                e.printStackTrace();
+	            } catch (IOException e) {
+	                // TODO Auto-generated catch block
+	                e.printStackTrace();
+	            }
+	        
+	        }
+		} catch (NotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
         
-        if (isPAProxy) {
-            byte[] PAproxyClass;
-            try {
-                PAproxyClass = PAProxyBuilder.generatePAProxy(targetClass.getName());
-                String proxyName = PAProxyBuilder.generatePAProxyClassName(targetClass.getName());
-                MOPClassLoader.classDataCache.put(proxyName, PAproxyClass);
-            } catch (NotFoundException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (CannotCompileException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
         
-        }
         
         
         // Instanciates the stub object

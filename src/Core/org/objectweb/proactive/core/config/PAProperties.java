@@ -543,8 +543,15 @@ public enum PAProperties {
      * if true, write the bytecode of the generated stub on the disk
      * 
      */
-    PA_MOP_WRITESTUBONDISK("proactive.mop.writestubondisk", PAPropertiesType.BOOLEAN);
+    PA_MOP_WRITESTUBONDISK("proactive.mop.writestubondisk", PAPropertiesType.BOOLEAN),
 
+    /**
+     * Specifies the location where to write the classes generated 
+     * using the mop
+     */
+    PA_MOP_GENERATEDCLASSES_DIR("proactive.mop.generatedclassesdir", PAPropertiesType.STRING);
+
+    
     static final Logger logger = ProActiveLogger.getLogger(Loggers.CONFIGURATION);
     public static final String TRUE = "true";
     public static final String FALSE = "false";

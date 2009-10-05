@@ -211,7 +211,9 @@ public class JavassistByteCodeStubBuilder {
             byte[] bytecode = generatedCtClass.toBytecode();
 
             if (PAProperties.PA_MOP_WRITESTUBONDISK.isTrue()) {
-                generatedCtClass.debugWriteFile();
+            	
+            	
+                generatedCtClass.debugWriteFile(PAProperties.PA_MOP_GENERATEDCLASSES_DIR.getValue());
             }
 
             generatedCtClass.detach();
