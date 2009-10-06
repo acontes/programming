@@ -44,7 +44,9 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
+import org.objectweb.proactive.extensions.webservices.AbstractWebServicesFactory;
 import org.objectweb.proactive.extensions.webservices.WebServices;
+import org.objectweb.proactive.extensions.webservices.WebServicesFactory;
 
 
 /**
@@ -86,13 +88,13 @@ public class HelloWorldComponent implements HelloWorldItf, GoodByeWorldItf {
 
     public static void main(String[] args) {
         String url = "";
-        String wsFramWork = "";
+        String wsFrameWork = "";
         if (args.length == 1) {
             url = "http://localhost:8080/";
-            wsFramWork = args[0];
+            wsFrameWork = args[0];
         } else if (args.length == 2) {
             url = args[0];
-            wsFramWork = args[1];
+            wsFrameWork = args[1];
         } else {
             System.out.println("Wrong number of arguments");
             System.out.println("Usage: HelloWorldComponent [url] wsFrameWork");
@@ -129,7 +131,9 @@ public class HelloWorldComponent implements HelloWorldItf, GoodByeWorldItf {
         }
 
         try {
-            WebServices.exposeComponentAsWebService(wsFramWork, comp, url, "server");
+            WebServicesFactory wsf = AbstractWebServicesFactory.getWebServicesFactory(wsFrameWork);
+            WebServices ws = wsf.newWebServices(url);
+            ws.exposeComponentAsWebService(comp, "server");
         } catch (ProActiveException e) {
             e.printStackTrace();
         }

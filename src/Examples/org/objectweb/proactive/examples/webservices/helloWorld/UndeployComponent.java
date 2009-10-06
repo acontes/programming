@@ -32,7 +32,9 @@
 package org.objectweb.proactive.examples.webservices.helloWorld;
 
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.extensions.webservices.AbstractWebServicesFactory;
 import org.objectweb.proactive.extensions.webservices.WebServices;
+import org.objectweb.proactive.extensions.webservices.WebServicesFactory;
 
 
 /**
@@ -65,8 +67,9 @@ public class UndeployComponent {
         }
 
         try {
-            WebServices.unExposeComponentAsWebService(wsFrameWork, url, componentName,
-                    new String[] { interfaceName });
+            WebServicesFactory wsf = AbstractWebServicesFactory.getWebServicesFactory(wsFrameWork);
+            WebServices ws = wsf.newWebServices(url);
+            ws.unExposeComponentAsWebService(componentName, new String[] { interfaceName });
         } catch (ProActiveException e) {
             e.printStackTrace();
         }

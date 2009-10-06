@@ -2,13 +2,13 @@ package org.objectweb.proactive.examples.documentation.webservices;
 
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
-import org.objectweb.fractal.util.Fractal;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
+import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
@@ -20,8 +20,9 @@ import org.objectweb.proactive.examples.documentation.classes.B;
 import org.objectweb.proactive.examples.documentation.components.A;
 import org.objectweb.proactive.examples.documentation.components.AImpl;
 import org.objectweb.proactive.examples.webservices.helloWorld.HelloWorld;
+import org.objectweb.proactive.extensions.webservices.AbstractWebServicesFactory;
 import org.objectweb.proactive.extensions.webservices.WebServices;
-import org.objectweb.proactive.extensions.webservices.axis2.WSConstants;
+import org.objectweb.proactive.extensions.webservices.WebServicesFactory;
 
 
 public class Main {
@@ -55,8 +56,9 @@ public class Main {
             HelloWorld hw = (HelloWorld) PAActiveObject
                     .newActive(HelloWorld.class.getName(), new Object[] {});
 
-            WebServices.exposeAsWebService(WSConstants.CXF_FRAMEWORK_IDENTIFIER, hw,
-                    "http://localhost:8080/", "MyHelloWorldService", new String[] { "helloWorld" });
+            WebServicesFactory wsf = AbstractWebServicesFactory.getWebServicesFactory("cxf");
+            WebServices ws = wsf.newWebServices("http://localhost:8080/");
+            ws.exposeAsWebService(hw, "MyHelloWorldService", new String[] { "helloWorld" });
             //@snippet-end webservices_AO_2
         } catch (ActiveObjectCreationException e) {
             // TODO Auto-generated catch block

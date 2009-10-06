@@ -32,8 +32,10 @@
 
 package functionalTests.activeobject.webservices.axis2;
 
-import javax.xml.namespace.QName;
 import static org.junit.Assert.assertTrue;
+
+import javax.xml.namespace.QName;
+
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.rpc.client.RPCServiceClient;
@@ -43,8 +45,10 @@ import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.httpserver.HTTPServer;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.webservices.AbstractWebServicesFactory;
 import org.objectweb.proactive.extensions.webservices.WSConstants;
 import org.objectweb.proactive.extensions.webservices.WebServices;
+import org.objectweb.proactive.extensions.webservices.WebServicesFactory;
 
 import functionalTests.activeobject.webservices.common.Weather;
 import functionalTests.activeobject.webservices.common.WeatherService;
@@ -54,7 +58,8 @@ public class TestWeather {
 
     private static Logger logger = ProActiveLogger.getLogger(Loggers.WEB_SERVICES);
 
-    String url;
+    private String url;
+    private WebServices ws;
 
     @org.junit.Before
     public void deployWeatherService() {
@@ -68,8 +73,11 @@ public class TestWeather {
 
             WeatherService weatherService = (WeatherService) PAActiveObject.newActive(
                     "functionalTests.activeobject.webservices.common.WeatherService", new Object[] {});
-            WebServices.exposeAsWebService(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER, weatherService, this.url,
-                    "WeatherService");
+
+            WebServicesFactory wsf = AbstractWebServicesFactory.getWebServicesFactory("axis2");
+            ws = wsf.newWebServices(url);
+
+            ws.exposeAsWebService(weatherService, "WeatherService");
         } catch (Exception e) {
             e.printStackTrace();
             assertTrue(false);
@@ -134,8 +142,7 @@ public class TestWeather {
     @org.junit.After
     public void undeployWeatherService() {
         try {
-            WebServices.unExposeAsWebService(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER, this.url,
-                    "WeatherService");
+            ws.unExposeAsWebService("WeatherService");
         } catch (Exception e) {
             e.printStackTrace();
             assertTrue(false);

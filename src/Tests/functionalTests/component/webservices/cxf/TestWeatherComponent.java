@@ -49,8 +49,10 @@ import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.httpserver.HTTPServer;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.webservices.AbstractWebServicesFactory;
 import org.objectweb.proactive.extensions.webservices.WSConstants;
 import org.objectweb.proactive.extensions.webservices.WebServices;
+import org.objectweb.proactive.extensions.webservices.WebServicesFactory;
 
 import functionalTests.component.webservices.common.Weather;
 import functionalTests.component.webservices.common.WeatherServiceComponent;
@@ -61,7 +63,8 @@ public class TestWeatherComponent {
 
     private static Logger logger = ProActiveLogger.getLogger(Loggers.WEB_SERVICES);
 
-    String url;
+    private String url;
+    private WebServices ws;
 
     @org.junit.Before
     public void deployWeatherService() {
@@ -88,8 +91,9 @@ public class TestWeatherComponent {
 
             Fractal.getLifeCycleController(comp).startFc();
 
-            WebServices.exposeComponentAsWebService(WSConstants.CXF_FRAMEWORK_IDENTIFIER, comp, url,
-                    "server", new String[] { "weather-service" });
+            WebServicesFactory wsf = AbstractWebServicesFactory.getWebServicesFactory("cxf");
+            ws = wsf.newWebServices(url);
+            ws.exposeComponentAsWebService(comp, "server", new String[] { "weather-service" });
 
             logger.info("Deployed an weather-service interface as a webservice service on : " + url);
         } catch (Exception e) {
@@ -140,8 +144,7 @@ public class TestWeatherComponent {
     @org.junit.After
     public void undeployWeatherService() {
         try {
-            WebServices.unExposeComponentAsWebService(WSConstants.CXF_FRAMEWORK_IDENTIFIER, this.url,
-                    "server", new String[] { "weather-service" });
+            ws.unExposeComponentAsWebService("server", new String[] { "weather-service" });
         } catch (Exception e) {
             e.printStackTrace();
             assertTrue(false);

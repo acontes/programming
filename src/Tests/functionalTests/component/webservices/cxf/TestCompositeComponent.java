@@ -48,8 +48,10 @@ import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.httpserver.HTTPServer;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.webservices.AbstractWebServicesFactory;
 import org.objectweb.proactive.extensions.webservices.WSConstants;
 import org.objectweb.proactive.extensions.webservices.WebServices;
+import org.objectweb.proactive.extensions.webservices.WebServicesFactory;
 
 import functionalTests.FunctionalTest;
 import functionalTests.component.webservices.common.ChooseNameComponent;
@@ -67,9 +69,8 @@ import static org.junit.Assert.assertTrue;
  */
 public class TestCompositeComponent extends FunctionalTest {
 
-    private static Logger logger = ProActiveLogger.getLogger(Loggers.WEB_SERVICES);
-
     private String url;
+    private WebServices ws;
 
     @org.junit.Before
     public void deployComposite() {
@@ -119,10 +120,10 @@ public class TestCompositeComponent extends FunctionalTest {
             bc.bindFc("choose-name", chooseName.getFcInterface("choose-name"));
             Fractal.getLifeCycleController(comp).startFc();
 
-            WebServices.exposeComponentAsWebService(WSConstants.CXF_FRAMEWORK_IDENTIFIER, comp, url,
-                    "composite", new String[] { "hello-world" });
+            WebServicesFactory wsf = AbstractWebServicesFactory.getWebServicesFactory("cxf");
+            ws = wsf.newWebServices(url);
+            ws.exposeComponentAsWebService(comp, "composite", new String[] { "hello-world" });
 
-            logger.info("Deploy a composite as a webservice service on : " + url);
         } catch (Exception e) {
             e.printStackTrace();
             assertTrue(false);
@@ -149,8 +150,7 @@ public class TestCompositeComponent extends FunctionalTest {
     @org.junit.After
     public void undeployComposite() {
         try {
-            WebServices.unExposeComponentAsWebService(WSConstants.CXF_FRAMEWORK_IDENTIFIER, this.url,
-                    "composite", new String[] { "hello-world" });
+            ws.unExposeComponentAsWebService("composite", new String[] { "hello-world" });
         } catch (Exception e) {
             e.printStackTrace();
             assertTrue(false);

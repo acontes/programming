@@ -47,8 +47,10 @@ import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.httpserver.HTTPServer;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.webservices.AbstractWebServicesFactory;
 import org.objectweb.proactive.extensions.webservices.WSConstants;
 import org.objectweb.proactive.extensions.webservices.WebServices;
+import org.objectweb.proactive.extensions.webservices.WebServicesFactory;
 
 import functionalTests.activeobject.webservices.common.Couple;
 import functionalTests.activeobject.webservices.common.HelloWorld;
@@ -59,6 +61,7 @@ public class TestHelloWorld {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.WEB_SERVICES);
 
     private String url;
+    private WebServices ws;
 
     @org.junit.Before
     public void deployHelloWorld() {
@@ -71,19 +74,23 @@ public class TestHelloWorld {
 
             HelloWorld hw = (HelloWorld) PAActiveObject.newActive(
                     "functionalTests.activeobject.webservices.common.HelloWorld", new Object[] {});
-            WebServices
-                    .exposeAsWebService(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER, hw, this.url, "HelloWorld");
+
+            WebServicesFactory wsf = AbstractWebServicesFactory.getWebServicesFactory("axis2");
+            ws = wsf.newWebServices(url);
+
+            ws.exposeAsWebService(hw, "HelloWorld");
 
             Method m1 = hw.getClass().getSuperclass().getMethod("sayText");
             Method m2 = hw.getClass().getSuperclass().getMethod("putTextToSay",
                     new Class<?>[] { String.class });
             Method[] methods = new Method[] { m1, m2 };
-            WebServices.exposeAsWebService(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER, hw, this.url,
-                    "HelloWorldMethods", methods);
+
+            ws.exposeAsWebService(hw, "HelloWorldMethods", methods);
 
             String[] methodNames = new String[] { "putTextToSay", "sayText" };
-            WebServices.exposeAsWebService(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER, hw, this.url,
-                    "HelloWorldMethodNames", methodNames);
+
+            ws.exposeAsWebService(hw, "HelloWorldMethodNames", methodNames);
+
         } catch (Exception e) {
             e.printStackTrace();
             assertTrue(false);
@@ -326,11 +333,9 @@ public class TestHelloWorld {
     @org.junit.After
     public void undeployHelloWorld() {
         try {
-            WebServices.unExposeAsWebService(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER, this.url, "HelloWorld");
-            WebServices.unExposeAsWebService(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER, this.url,
-                    "HelloWorldMehtods");
-            WebServices.unExposeAsWebService(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER, this.url,
-                    "HelloWorldMethodNames");
+            ws.unExposeAsWebService("HelloWorld");
+            ws.unExposeAsWebService("HelloWorldMehtods");
+            ws.unExposeAsWebService("HelloWorldMethodNames");
         } catch (Exception e) {
             e.printStackTrace();
             assertTrue(false);

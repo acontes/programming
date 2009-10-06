@@ -53,8 +53,10 @@ import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.httpserver.HTTPServer;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.webservices.AbstractWebServicesFactory;
 import org.objectweb.proactive.extensions.webservices.WSConstants;
 import org.objectweb.proactive.extensions.webservices.WebServices;
+import org.objectweb.proactive.extensions.webservices.WebServicesFactory;
 
 import functionalTests.component.webservices.common.GoodByeWorldItf;
 import functionalTests.component.webservices.common.HelloWorldComponent;
@@ -67,6 +69,7 @@ public class TestHelloWorldComponent {
 
     private String url;
     private Component comp;
+    private WebServices ws;
 
     @org.junit.Before
     public void deployHelloWorldComponent() {
@@ -94,11 +97,11 @@ public class TestHelloWorldComponent {
 
             Fractal.getLifeCycleController(comp).startFc();
 
-            WebServices.exposeComponentAsWebService(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER, comp, url,
-                    "server", new String[] { "hello-world" });
+            WebServicesFactory wsf = AbstractWebServicesFactory.getWebServicesFactory("axis2");
+            ws = wsf.newWebServices(url);
+            ws.exposeComponentAsWebService(comp, "server", new String[] { "hello-world" });
 
-            WebServices.exposeComponentAsWebService(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER, comp, url,
-                    "server2");
+            ws.exposeComponentAsWebService(comp, "server2");
 
             logger.info("Deployed an hello-world interface as a webservice service on : " + url);
 
@@ -303,12 +306,8 @@ public class TestHelloWorldComponent {
     @org.junit.After
     public void undeployHelloWorldComponent() {
         try {
-            WebServices.unExposeComponentAsWebService(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER, this.url,
-                    "server", new String[] { "hello-world" });
-            // WebServices.unExposeComponentAsWebService(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER, this.url,
-            //         "server2", new String[] { "hello-world", "good-bye-world" });
-            WebServices.unExposeComponentAsWebService(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER, this.comp,
-                    this.url, "server2");
+            ws.unExposeComponentAsWebService("server", new String[] { "hello-world" });
+            ws.unExposeComponentAsWebService(this.comp, "server2");
         } catch (Exception e) {
             e.printStackTrace();
             assertTrue(false);

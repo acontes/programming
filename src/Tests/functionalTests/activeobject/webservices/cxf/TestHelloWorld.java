@@ -46,8 +46,10 @@ import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.httpserver.HTTPServer;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.webservices.AbstractWebServicesFactory;
 import org.objectweb.proactive.extensions.webservices.WSConstants;
 import org.objectweb.proactive.extensions.webservices.WebServices;
+import org.objectweb.proactive.extensions.webservices.WebServicesFactory;
 
 import functionalTests.activeobject.webservices.common.Couple;
 import functionalTests.activeobject.webservices.common.HelloWorld;
@@ -58,6 +60,7 @@ public class TestHelloWorld {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.WEB_SERVICES);
 
     private String url;
+    private WebServices ws;
 
     @org.junit.Before
     public void deployHelloWorld() throws Exception {
@@ -70,7 +73,9 @@ public class TestHelloWorld {
 
             HelloWorld hw1 = (HelloWorld) PAActiveObject.newActive(
                     "functionalTests.activeobject.webservices.common.HelloWorld", new Object[] {});
-            WebServices.exposeAsWebService(WSConstants.CXF_FRAMEWORK_IDENTIFIER, hw1, this.url, "HelloWorld");
+            WebServicesFactory wsf = AbstractWebServicesFactory.getWebServicesFactory("cxf");
+            ws = wsf.getWebServices(url);
+            ws.exposeAsWebService(hw1, "HelloWorld");
 
             HelloWorld hw2 = (HelloWorld) PAActiveObject.newActive(
                     "functionalTests.activeobject.webservices.common.HelloWorld", new Object[] {});
@@ -78,18 +83,12 @@ public class TestHelloWorld {
             Method m2 = hw2.getClass().getSuperclass().getMethod("putTextToSay",
                     new Class<?>[] { String.class });
             Method[] methods = new Method[] { m1, m2 };
-            WebServices.exposeAsWebService(WSConstants.CXF_FRAMEWORK_IDENTIFIER, hw2, this.url,
-                    "HelloWorldMethods", methods);
-            //            WebServices.exposeAsWebService(WSConstants.CXF_FRAMEWORK_IDENTIFIER, hw2, this.url,
-            //                    "HelloWorldMethods");
+            ws.exposeAsWebService(hw2, "HelloWorldMethods", methods);
 
             HelloWorld hw3 = (HelloWorld) PAActiveObject.newActive(
                     "functionalTests.activeobject.webservices.common.HelloWorld", new Object[] {});
             String[] methodNames = new String[] { "putTextToSay", "sayText" };
-            WebServices.exposeAsWebService(WSConstants.CXF_FRAMEWORK_IDENTIFIER, hw3, this.url,
-                    "HelloWorldMethodNames", methodNames);
-            //            WebServices.exposeAsWebService(WSConstants.CXF_FRAMEWORK_IDENTIFIER, hw3, this.url,
-            //                    "HelloWorldMethodNames");
+            ws.exposeAsWebService(hw3, "HelloWorldMethodNames", methodNames);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -252,11 +251,9 @@ public class TestHelloWorld {
     @org.junit.After
     public void undeployHelloWorld() {
         try {
-            WebServices.unExposeAsWebService(WSConstants.CXF_FRAMEWORK_IDENTIFIER, this.url, "HelloWorld");
-            WebServices.unExposeAsWebService(WSConstants.CXF_FRAMEWORK_IDENTIFIER, this.url,
-                    "HelloWorldMethods");
-            WebServices.unExposeAsWebService(WSConstants.CXF_FRAMEWORK_IDENTIFIER, this.url,
-                    "HelloWorldMethodNames");
+            ws.unExposeAsWebService("HelloWorld");
+            ws.unExposeAsWebService("HelloWorldMethods");
+            ws.unExposeAsWebService("HelloWorldMethodNames");
         } catch (Exception e) {
             e.printStackTrace();
             assertTrue(false);

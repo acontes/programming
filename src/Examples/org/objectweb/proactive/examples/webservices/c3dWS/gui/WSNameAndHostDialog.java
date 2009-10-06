@@ -47,12 +47,11 @@ import javax.swing.JTextField;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
-import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.extensions.webservices.WSConstants;
-import org.objectweb.proactive.extensions.webservices.WebServices;
+import org.objectweb.proactive.extensions.webservices.WebServicesFrameWorkFactoryRegistry;
 
 
 /** A dialog with two text fields, which handles incorrect entries.
@@ -65,7 +64,7 @@ public class WSNameAndHostDialog extends JDialog implements ActionListener, Prop
     private String enterButtonString = "Enter";
     private String cancelButtonString = "Cancel";
     protected JTextField dispatcherUrl;
-    private String wsFrameWork = WebServices.getDefaultFrameWork();
+    private String wsFrameWork = PAProperties.PA_WEBSERVICES_FRAMEWORK.getValue();
     private JTextField wsFWTextField;
 
     /** This is NOT an Active Object: constructor is configurable! */
@@ -157,9 +156,8 @@ public class WSNameAndHostDialog extends JDialog implements ActionListener, Prop
 
                 this.wsFrameWork = this.wsFWTextField.getText();
 
-                if (!this.wsFrameWork.equals(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER) &&
-                    !this.wsFrameWork.equals(WSConstants.CXF_FRAMEWORK_IDENTIFIER)) {
-                    this.wsFrameWork = WebServices.getDefaultFrameWork();
+                if (!WebServicesFrameWorkFactoryRegistry.isValidFrameWork(this.wsFrameWork)) {
+                    this.wsFrameWork = PAProperties.PA_WEBSERVICES_FRAMEWORK.getValue();
                 }
 
             } else { //user closed dialog or clicked cancel

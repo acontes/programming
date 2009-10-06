@@ -48,7 +48,9 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
+import org.objectweb.proactive.extensions.webservices.AbstractWebServicesFactory;
 import org.objectweb.proactive.extensions.webservices.WebServices;
+import org.objectweb.proactive.extensions.webservices.WebServicesFactory;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
@@ -185,8 +187,12 @@ public class HelloWorld implements Serializable, InitActive {
                                 new Object[] {});
             }
 
-            WebServices.exposeAsWebService(wsFrameWork, hw, url, "HelloWorld", new String[] { "putTextToSay",
-                    "sayText", "putHelloWorld", "putTextToSayAndConfirm" });
+            WebServicesFactory wsf;
+            wsf = AbstractWebServicesFactory.getWebServicesFactory(wsFrameWork);
+            WebServices ws = wsf.getWebServices(url);
+
+            ws.exposeAsWebService(hw, "HelloWorld", new String[] { "putTextToSay", "sayText",
+                    "putHelloWorld", "putTextToSayAndConfirm" });
             //            WebServices.exposeAsWebService(wsFrameWork, hw, url, "HelloWorld");
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
@@ -200,6 +206,6 @@ public class HelloWorld implements Serializable, InitActive {
     }
 
     public void initActivity(Body body) {
-        logger.info("Acitve Object has been initiated !");
+        logger.info("Active Object has been initiated !");
     }
 }
