@@ -38,12 +38,10 @@ import org.objectweb.proactive.extensions.webservices.client.ClientFactory;
 
 public class CXFClientFactory extends AbstractClientFactory implements ClientFactory {
 
-    @Override
     public String getFrameWorkId() {
         return "cxf";
     }
 
-    @Override
     protected Client newClient(String url, String serviceName, Class<?> serviceClass) {
         return new CXFClient(url, serviceName, serviceClass);
     }

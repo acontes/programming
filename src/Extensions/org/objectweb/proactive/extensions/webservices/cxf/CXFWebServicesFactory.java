@@ -42,12 +42,10 @@ public class CXFWebServicesFactory extends AbstractWebServicesFactory implements
         super();
     }
 
-    @Override
     public String getFrameWorkId() {
         return "cxf";
     }
 
-    @Override
     protected WebServices newWebServices(String url) {
         return new CXFWebServices(url);
     }

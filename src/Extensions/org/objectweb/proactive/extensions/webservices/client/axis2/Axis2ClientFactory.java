@@ -39,12 +39,10 @@ import org.objectweb.proactive.extensions.webservices.exceptions.WebServicesExce
 
 public class Axis2ClientFactory extends AbstractClientFactory implements ClientFactory {
 
-    @Override
     public String getFrameWorkId() {
         return "axis2";
     }
 
-    @Override
     protected Client newClient(String url, String serviceName, Class<?> serviceClass)
             throws WebServicesException {
         return new Axis2Client(url, serviceName, serviceClass);

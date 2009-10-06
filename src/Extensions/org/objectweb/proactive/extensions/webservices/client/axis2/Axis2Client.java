@@ -77,7 +77,6 @@ public class Axis2Client extends AbstractClient implements Client {
         return serviceClient;
     }
 
-    @Override
     public Object[] call(String method, Object[] args, Class<?>... returnTypes) throws WebServicesException {
 
         if (args == null)
@@ -97,7 +96,6 @@ public class Axis2Client extends AbstractClient implements Client {
         }
     }
 
-    @Override
     public void oneWayCall(String method, Object[] args) throws WebServicesException {
 
         if (args == null)

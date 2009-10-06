@@ -43,12 +43,10 @@ public class Axis2WebServicesFactory extends AbstractWebServicesFactory implemen
         super();
     }
 
-    @Override
     public String getFrameWorkId() {
         return "axis2";
     }
 
-    @Override
     protected WebServices newWebServices(String url) throws WebServicesException {
         return new Axis2WebServices(url);
     }
