@@ -47,6 +47,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.webservices.WSConstants;
 import org.objectweb.proactive.extensions.webservices.common.MethodUtils;
 import org.objectweb.proactive.extensions.webservices.cxf.servicedeployer.ServiceDeployerItf;
+import org.objectweb.proactive.extensions.webservices.exceptions.WebServicesException;
 
 
 /**
@@ -58,29 +59,6 @@ import org.objectweb.proactive.extensions.webservices.cxf.servicedeployer.Servic
 public final class PADeployer {
 
     private static Logger logger = ProActiveLogger.getLogger(Loggers.WEB_SERVICES);
-
-    /**
-     * From an URL, checks whether it begins with "http://"
-     * and ends with "/". If it is not the case, then it returns
-     * the correct URL.
-     *
-     * @param url
-     * @return the correct URL
-     */
-    private static String getCorrectURL(String url) {
-        String correctUrl = "";
-
-        if (!url.endsWith("/")) {
-            correctUrl = url + "/";
-        } else {
-            correctUrl = url;
-        }
-
-        if (!correctUrl.startsWith("http://")) {
-            correctUrl = "http://" + correctUrl;
-        }
-        return correctUrl;
-    }
 
     /**
      * Creates a client for the ServiceDeployer service
@@ -105,16 +83,22 @@ public final class PADeployer {
      * @param urn Name of the service
      * @param methods Methods to be deployed
      * @param isComponent Boolean saying whether it is a component
+     * @throws WebServicesException 
      */
-    public static void deploy(Object o, String url, String urn, Method[] methods, boolean isComponent) {
+    public static void deploy(Object o, String url, String urn, Method[] methods, boolean isComponent)
+            throws WebServicesException {
 
-        String correctUrl = getCorrectURL(url);
         byte[] marshalledObject = HttpMarshaller.marshallObject(o);
-        ServiceDeployerItf client = getClient(correctUrl);
+        ServiceDeployerItf client = getClient(url);
         ArrayList<SerializableMethod> serializableMethods = MethodUtils.getSerializableMethods(methods);
         // TO DO: test without serializing arraylist
         byte[] marshalledSerializedMethods = HttpMarshaller.marshallObject(serializableMethods);
-        client.deploy(marshalledObject, urn, marshalledSerializedMethods, isComponent);
+        try {
+            client.deploy(marshalledObject, urn, marshalledSerializedMethods, isComponent);
+        } catch (Exception e) {
+            throw new WebServicesException("An exception occured while trying to call the " +
+                " ServiceDeployer located at " + url, e);
+        }
     }
 
     /**
@@ -125,8 +109,7 @@ public final class PADeployer {
      * @param urn Name of the service.
      */
     public static void undeploy(String url, String urn) {
-        String correctUrl = getCorrectURL(url);
-        ServiceDeployerItf client = getClient(correctUrl);
+        ServiceDeployerItf client = getClient(url);
         client.undeploy(urn);
     }
 
@@ -139,19 +122,20 @@ public final class PADeployer {
      * @param componentName Name of the component
      * @param interfaceNames Names of the interfaces we want to deploy.
      *                           If null, then all the interfaces will be deployed
+     * @throws WebServicesException 
      */
     static public void deployComponent(Component component, String url, String componentName,
-            String[] interfaceNames) {
+            String[] interfaceNames) throws WebServicesException {
 
         Object[] interfaces;
         if (interfaceNames == null || interfaceNames.length == 0) {
             interfaces = component.getFcInterfaces();
-            logger.info("Deploying all interfaces of " + componentName);
+            logger.debug("Deploying all interfaces of " + componentName);
         } else {
             interfaces = new Object[interfaceNames.length];
             for (int i = 0; i < interfaceNames.length; i++) {
                 try {
-                    logger.info("Deploying the interface " + interfaceNames[i] + " of " + componentName);
+                    logger.debug("Deploying the interface " + interfaceNames[i] + " of " + componentName);
                     interfaces[i] = component.getFcInterface(interfaceNames[i]);
                 } catch (NoSuchInterfaceException e) {
                     logger.error("Impossible to retrieve the interface whose name is " + interfaceNames[i]);

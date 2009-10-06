@@ -34,26 +34,21 @@ package functionalTests.activeobject.webservices.cxf;
 
 import static org.junit.Assert.assertTrue;
 
-import org.apache.cxf.endpoint.Client;
-import org.apache.cxf.frontend.ClientFactoryBean;
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.httpserver.HTTPServer;
-import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.webservices.AbstractWebServicesFactory;
-import org.objectweb.proactive.extensions.webservices.WSConstants;
 import org.objectweb.proactive.extensions.webservices.WebServices;
 import org.objectweb.proactive.extensions.webservices.WebServicesFactory;
+import org.objectweb.proactive.extensions.webservices.client.AbstractClientFactory;
+import org.objectweb.proactive.extensions.webservices.client.Client;
+import org.objectweb.proactive.extensions.webservices.client.ClientFactory;
+import org.objectweb.proactive.extensions.webservices.exceptions.UnknownFrameWorkException;
+import org.objectweb.proactive.extensions.webservices.exceptions.WebServicesException;
 
 import functionalTests.activeobject.webservices.common.Weather;
 import functionalTests.activeobject.webservices.common.WeatherService;
 
 
 public class TestWeather {
-
-    private static Logger logger = ProActiveLogger.getLogger(Loggers.WEB_SERVICES);
 
     private String url;
     private WebServices ws;
@@ -62,17 +57,13 @@ public class TestWeather {
     public void deployWeatherService() {
 
         try {
-            // Get the HTTP server enabling us to retrieve the jetty
-            // port number
-            HTTPServer httpServer = HTTPServer.get();
-            String port = PAProperties.PA_XMLHTTP_PORT.getValue();
-            this.url = "http://localhost:" + port + "/";
+            this.url = AbstractWebServicesFactory.getLocalUrl();
 
             WeatherService weatherService = (WeatherService) PAActiveObject.newActive(
                     "functionalTests.activeobject.webservices.common.WeatherService", new Object[] {});
 
             WebServicesFactory wsf = AbstractWebServicesFactory.getWebServicesFactory("cxf");
-            ws = wsf.newWebServices(url);
+            ws = wsf.getWebServices(url);
             ws.exposeAsWebService(weatherService, "WeatherService");
         } catch (Exception e) {
             e.printStackTrace();
@@ -82,11 +73,21 @@ public class TestWeather {
 
     @org.junit.Test
     public void TestWeatherService() {
-        ClientFactoryBean factory = new ClientFactoryBean();
-        factory.setServiceClass(WeatherService.class);
-        factory.setAddress(url + WSConstants.SERVICES_PATH + "WeatherService");
-        factory.getServiceFactory().setQualifyWrapperSchema(false);
-        Client client = factory.create();
+
+        ClientFactory cf = null;
+        try {
+            cf = AbstractClientFactory.getClientFactory("cxf");
+        } catch (UnknownFrameWorkException e1) {
+            e1.printStackTrace();
+            assertTrue(false);
+        }
+        Client client = null;
+        try {
+            client = cf.getClient(this.url, "WeatherService", WeatherService.class);
+        } catch (WebServicesException e1) {
+            e1.printStackTrace();
+            assertTrue(false);
+        }
 
         try {
 
@@ -97,17 +98,11 @@ public class TestWeather {
             w.setRain(true);
             w.setHowMuchRain((float) 4.5);
 
-            client.invoke("setWeather", new Object[] { w });
+            client.oneWayCall("setWeather", new Object[] { w });
 
-            Object[] response = client.invoke("getWeather");
+            Object[] response = client.call("getWeather", null);
 
             Weather result = (Weather) response[0];
-
-            // Displaying the result
-            logger.info("Temperature               : " + result.getTemperature());
-            logger.info("Forecast                  : " + result.getForecast());
-            logger.info("Rain                      : " + result.getRain());
-            logger.info("How much rain (in inches) : " + result.getHowMuchRain());
 
             assertTrue(((Float) result.getTemperature()).equals(new Float(39.3)));
             assertTrue(result.getForecast().equals("Cloudy with showers"));

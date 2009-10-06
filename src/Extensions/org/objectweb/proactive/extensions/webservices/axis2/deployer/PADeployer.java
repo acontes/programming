@@ -40,7 +40,7 @@ import org.apache.axis2.AxisFault;
 import org.apache.axis2.addressing.EndpointReference;
 import org.apache.axis2.client.Options;
 import org.apache.axis2.rpc.client.RPCServiceClient;
-
+import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
@@ -49,7 +49,7 @@ import org.objectweb.proactive.core.remoteobject.http.util.HttpMarshaller;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.webservices.axis2.WSConstants;
-import org.apache.log4j.Logger;
+import org.objectweb.proactive.extensions.webservices.exceptions.WebServicesException;
 
 
 /**
@@ -60,7 +60,7 @@ import org.apache.log4j.Logger;
  */
 public class PADeployer {
 
-    private static Logger logger = ProActiveLogger.getLogger(Loggers.WEB_SERVICES);
+    static private Logger logger = ProActiveLogger.getLogger(Loggers.WEB_SERVICES);
 
     /**
      * Call the method deploy of the ServiceDeployer service
@@ -71,23 +71,14 @@ public class PADeployer {
      * @param urn Name of the service
      * @param methods Methods to be deployed
      * @param isComponent Boolean saying whether it is a component
+     * @throws WebServicesException 
      */
-    static public void deploy(Object o, String url, String urn, String[] methods, boolean isComponent) {
+    static public void deploy(Object o, String url, String urn, String[] methods, boolean isComponent)
+            throws WebServicesException {
         try {
-            String correctUrl = "";
-
-            if (!url.endsWith("/")) {
-                correctUrl = url + "/";
-            } else {
-                correctUrl = url;
-            }
-
-            if (!correctUrl.startsWith("http://")) {
-                correctUrl = "http://" + correctUrl;
-            }
 
             RPCServiceClient serviceClient = new RPCServiceClient();
-            EndpointReference targetEPR = new EndpointReference(correctUrl + WSConstants.SERVICES_PATH +
+            EndpointReference targetEPR = new EndpointReference(url + WSConstants.SERVICES_PATH +
                 "ServiceDeployer");
 
             Options options = serviceClient.getOptions();
@@ -101,10 +92,12 @@ public class PADeployer {
 
             serviceClient.invokeRobust(op, opArgs);
 
-            logger.info("Called the deployer service to deploy " + urn + " to " + correctUrl);
+            logger.debug("The service '" + urn + "' has been deployed on " + url +
+                " and its wsdl is located at " + url + WSConstants.SERVICES_PATH + urn + "?wsdl");
 
         } catch (AxisFault axisFault) {
-            axisFault.printStackTrace();
+            throw new WebServicesException("An AxisFault occured when trying to deploy the service " + urn +
+                " on " + url, axisFault);
         }
     }
 
@@ -127,25 +120,23 @@ public class PADeployer {
      * @param componentName Name of the component
      * @param interfaceNames Names of the interfaces we want to deploy.
      * 						 	 If null, then all the interfaces will be deployed
+     * @throws WebServicesException 
      */
     static public void deployComponent(Component component, String url, String componentName,
-            String[] interfaceNames) {
+            String[] interfaceNames) throws WebServicesException {
 
         Object[] interfaces;
         if (interfaceNames == null) {
             interfaces = component.getFcInterfaces();
-            logger.info("Deploying all interfaces of " + componentName);
         } else {
             interfaces = new Object[interfaceNames.length];
             for (int i = 0; i < interfaceNames.length; i++) {
                 try {
-                    logger.info("Deploying the interface " + interfaceNames[i] + " of " + componentName);
                     interfaces[i] = component.getFcInterface(interfaceNames[i]);
                 } catch (NoSuchInterfaceException e) {
-                    logger.error("Impossible to retrieve the interface whose name is " + interfaceNames[i]);
-                    logger.error("Retrieve all interfaces");
-                    interfaces = component.getFcInterfaces();
-                    break;
+                    throw new WebServicesException(
+                        "An NoSuchInterfaceException occured when trying to deploy" + " the interface " +
+                            interfaceNames[i] + " of the component " + component.getClass().getName(), e);
                 }
             }
         }
@@ -189,23 +180,13 @@ public class PADeployer {
      *
      * @param url Url of the host where the service is deployed
      * @param serviceName Name of the service.
+     * @throws WebServicesException 
      */
-    static public void undeploy(String url, String serviceName) {
+    static public void undeploy(String url, String serviceName) throws WebServicesException {
         try {
-            String correctUrl = "";
-
-            if (!url.endsWith("/")) {
-                correctUrl = url + "/";
-            } else {
-                correctUrl = url;
-            }
-
-            if (!correctUrl.startsWith("http://")) {
-                correctUrl = "http://" + correctUrl;
-            }
 
             RPCServiceClient serviceClient = new RPCServiceClient();
-            EndpointReference targetEPR = new EndpointReference(correctUrl + WSConstants.SERVICES_PATH +
+            EndpointReference targetEPR = new EndpointReference(url + WSConstants.SERVICES_PATH +
                 "ServiceDeployer");
 
             Options options = serviceClient.getOptions();
@@ -219,10 +200,10 @@ public class PADeployer {
 
             serviceClient.invokeRobust(op, opArgs);
 
-            logger.info("Called the deployer to " + correctUrl + " to undeploy the " + serviceName +
-                " service");
+            logger.debug("The service '" + serviceName + "' deployed on " + url + " has been undeploy");
         } catch (AxisFault axisFault) {
-            axisFault.printStackTrace();
+            throw new WebServicesException("An AxisFault occured when trying to undeploy the service " +
+                serviceName + " on " + url, axisFault);
         }
     }
 
@@ -233,8 +214,10 @@ public class PADeployer {
      * @param component Component to undeploy
      * @param url Url of the host where interfaces are deployed
      * @param componentName Name of the component
+     * @throws WebServicesException 
      */
-    static public void undeployComponent(Component component, String url, String componentName) {
+    static public void undeployComponent(Component component, String url, String componentName)
+            throws WebServicesException {
         Object[] interfaces = component.getFcInterfaces();
         for (Object o : interfaces) {
             String interfaceName = ((Interface) o).getFcItfName();
@@ -254,8 +237,10 @@ public class PADeployer {
      * @param url Url of the host where interfaces are deployed
      * @param componentName Name of the component
      * @param interfaceNames Interfaces we want to undeploy.
+     * @throws WebServicesException 
      */
-    static public void undeployComponent(String url, String componentName, String[] interfaceNames) {
+    static public void undeployComponent(String url, String componentName, String[] interfaceNames)
+            throws WebServicesException {
         for (String s : interfaceNames) {
             undeploy(url, componentName + "_" + s);
         }

@@ -45,6 +45,7 @@ import java.util.zip.ZipEntry;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.webservices.exceptions.WebServicesException;
 
 
 /**
@@ -80,9 +81,10 @@ public class Util {
      * @param destPath path of the directory where file will be extracted
      * @param insertRandom if true, then inserts a random number before the file name.
      * @return the absolute path the extracted file
+     * @throws WebServicesException 
      */
     public static String extractFileFromJar(String jarPath, String entryPath, String destPath,
-            boolean insertRandom) {
+            boolean insertRandom) throws WebServicesException {
         try {
             JarFile jar = new JarFile(jarPath);
             ZipEntry entry = jar.getEntry(entryPath);
@@ -114,12 +116,12 @@ public class Util {
             out.close();
             in.close();
 
-            logger.info("Extracted file " + entryName + " to " + destPath);
+            logger.debug("Extracted file " + entryName + " to " + destPath);
             return createdFile;
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new WebServicesException("An exception occured when trying to extract " + entryPath +
+                " from " + jarPath, e);
         }
-        return null;
     }
 
     /**
@@ -130,9 +132,10 @@ public class Util {
      * @param destPath path of the directory where file/directory will be extracted
      * @param insertRandom if true, then inserts a random number before the file/directory name.
      * @return the absolute path the extracted file
+     * @throws WebServicesException 
      */
     public static String extractFromJar(String jarPath, String entryPath, String destPath,
-            boolean insertRandom) {
+            boolean insertRandom) throws WebServicesException {
 
         try {
             JarFile jar = new JarFile(jarPath);
@@ -166,7 +169,7 @@ public class Util {
                         if (slashIndex != -1) {
                             filePath += "/" + simpleName.substring(0, simpleName.lastIndexOf('/'));
                             new File(filePath).mkdirs();
-                            logger.info("Created the directory: " + filePath);
+                            logger.debug("Created the directory: " + filePath);
                         }
                         Util.extractFileFromJar(jarPath, name, filePath, false);
                     }
@@ -176,8 +179,8 @@ public class Util {
             return createdDir;
         } catch (IOException e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new WebServicesException("An IOException occured when trying to extract " + entryPath +
+                " from " + jarPath, e);
         }
-        return null;
     }
 }

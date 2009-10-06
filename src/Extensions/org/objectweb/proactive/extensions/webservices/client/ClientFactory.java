@@ -29,26 +29,16 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.extensions.webservices.exceptions;
+package org.objectweb.proactive.extensions.webservices.client;
 
-import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.extensions.webservices.exceptions.WebServicesException;
 
 
-public class WebServicesException extends ProActiveException {
+public interface ClientFactory {
 
-    public WebServicesException() {
-        super();
-    }
+    public Client getClient(String url, String serviceName, Class<?> serviceClass)
+            throws WebServicesException;
 
-    public WebServicesException(String message) {
-        super(message);
-    }
+    public String getFrameWorkId();
 
-    public WebServicesException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public WebServicesException(Throwable cause) {
-        super(cause);
-    }
 }

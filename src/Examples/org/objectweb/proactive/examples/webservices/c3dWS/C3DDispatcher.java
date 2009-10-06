@@ -963,7 +963,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
             String fileName = "";
             String wsFrameWork = "";
             if (args.length == 2) {
-                url = "http://localhost:8080/";
+                url = AbstractWebServicesFactory.getLocalUrl();
                 fileName = args[0];
                 wsFrameWork = args[1];
             } else if (args.length == 3) {
@@ -1006,7 +1006,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
                     "wsRotateScene", "wsRegisterMigratedUser" };
 
             WebServices ws = AbstractWebServicesFactory.getWebServicesFactory(wsFrameWork)
-                    .newWebServices(url);
+                    .getWebServices(url);
             ws.exposeAsWebService(c3dd, "C3DDispatcher", methods);
 
         } catch (ProActiveException e) {

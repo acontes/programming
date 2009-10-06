@@ -57,7 +57,7 @@ public class Main {
                     .newActive(HelloWorld.class.getName(), new Object[] {});
 
             WebServicesFactory wsf = AbstractWebServicesFactory.getWebServicesFactory("cxf");
-            WebServices ws = wsf.newWebServices("http://localhost:8080/");
+            WebServices ws = wsf.getWebServices("http://localhost:8080/");
             ws.exposeAsWebService(hw, "MyHelloWorldService", new String[] { "helloWorld" });
             //@snippet-end webservices_AO_2
         } catch (ActiveObjectCreationException e) {

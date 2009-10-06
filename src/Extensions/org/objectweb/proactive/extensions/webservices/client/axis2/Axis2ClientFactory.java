@@ -29,26 +29,25 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.extensions.webservices.exceptions;
+package org.objectweb.proactive.extensions.webservices.client.axis2;
 
-import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.extensions.webservices.client.AbstractClientFactory;
+import org.objectweb.proactive.extensions.webservices.client.Client;
+import org.objectweb.proactive.extensions.webservices.client.ClientFactory;
+import org.objectweb.proactive.extensions.webservices.exceptions.WebServicesException;
 
 
-public class WebServicesException extends ProActiveException {
+public class Axis2ClientFactory extends AbstractClientFactory implements ClientFactory {
 
-    public WebServicesException() {
-        super();
+    @Override
+    public String getFrameWorkId() {
+        return "axis2";
     }
 
-    public WebServicesException(String message) {
-        super(message);
+    @Override
+    protected Client newClient(String url, String serviceName, Class<?> serviceClass)
+            throws WebServicesException {
+        return new Axis2Client(url, serviceName, serviceClass);
     }
 
-    public WebServicesException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public WebServicesException(Throwable cause) {
-        super(cause);
-    }
 }

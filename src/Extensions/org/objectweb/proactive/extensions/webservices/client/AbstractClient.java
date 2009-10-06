@@ -29,26 +29,25 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.extensions.webservices.exceptions;
+package org.objectweb.proactive.extensions.webservices.client;
 
-import org.objectweb.proactive.core.ProActiveException;
+public abstract class AbstractClient implements Client {
 
+    protected String url;
+    protected String serviceName;
+    protected Class<?> serviceClass;
 
-public class WebServicesException extends ProActiveException {
-
-    public WebServicesException() {
-        super();
+    protected AbstractClient(String url, String serviceName, Class<?> serviceClass) {
+        this.url = url;
+        this.serviceName = serviceName;
+        this.serviceClass = serviceClass;
     }
 
-    public WebServicesException(String message) {
-        super(message);
+    public String getServiceName() {
+        return this.serviceName;
     }
 
-    public WebServicesException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public WebServicesException(Throwable cause) {
-        super(cause);
+    public String getUrl() {
+        return this.url;
     }
 }

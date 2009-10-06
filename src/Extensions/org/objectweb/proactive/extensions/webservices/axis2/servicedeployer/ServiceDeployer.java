@@ -44,15 +44,12 @@ import org.apache.axis2.description.java2wsdl.SchemaGenerator;
 import org.apache.axis2.engine.AxisConfiguration;
 import org.apache.axis2.engine.MessageReceiver;
 import org.apache.axis2.util.Loader;
-import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.remoteobject.http.util.HttpMarshaller;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
-import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.webservices.common.MethodUtils;
 
 
@@ -64,8 +61,6 @@ import org.objectweb.proactive.extensions.webservices.common.MethodUtils;
  * @author The ProActive Team
  */
 public class ServiceDeployer {
-
-    private static Logger logger = ProActiveLogger.getLogger(Loggers.WEB_SERVICES);
 
     static {
         if (System.getSecurityManager() == null)
@@ -88,56 +83,53 @@ public class ServiceDeployer {
      * @param loader
      * @param excludedOperations
      * @return
+     * @throws Exception 
      */
     private AxisService customCreateService(String implClass, String serviceName,
-            AxisConfiguration axisConfiguration, ClassLoader loader, ArrayList<String> excludedOperations) {
+            AxisConfiguration axisConfiguration, ClassLoader loader, ArrayList<String> excludedOperations)
+            throws Exception {
 
-        try {
-            // Create the message receivers map to be passed in the service creation
-            //	in order to make the service sue our custom message receivers
-            HashMap<String, MessageReceiver> messageReceiverMap = new HashMap<String, MessageReceiver>();
-            Class<?> inOnlyMessageReceiver = Loader
-                    .loadClass("org.objectweb.proactive.extensions.webservices.axis2.receiver.PAInOnlyMessageReceiver");
-            MessageReceiver messageReceiver = (MessageReceiver) inOnlyMessageReceiver.newInstance();
-            messageReceiverMap.put(WSDL2Constants.MEP_URI_IN_ONLY, messageReceiver);
-            Class<?> inoutMessageReceiver = Loader
-                    .loadClass("org.objectweb.proactive.extensions.webservices.axis2.receiver.PAInOutMessageReceiver");
-            MessageReceiver inOutmessageReceiver = (MessageReceiver) inoutMessageReceiver.newInstance();
-            messageReceiverMap.put(WSDL2Constants.MEP_URI_IN_OUT, inOutmessageReceiver);
-            messageReceiverMap.put(WSDL2Constants.MEP_URI_ROBUST_IN_ONLY, inOutmessageReceiver);
+        // Create the message receivers map to be passed in the service creation
+        //	in order to make the service sue our custom message receivers
+        HashMap<String, MessageReceiver> messageReceiverMap = new HashMap<String, MessageReceiver>();
+        Class<?> inOnlyMessageReceiver = Loader
+                .loadClass("org.objectweb.proactive.extensions.webservices.axis2.receiver.PAInOnlyMessageReceiver");
+        MessageReceiver messageReceiver = (MessageReceiver) inOnlyMessageReceiver.newInstance();
+        messageReceiverMap.put(WSDL2Constants.MEP_URI_IN_ONLY, messageReceiver);
+        Class<?> inoutMessageReceiver = Loader
+                .loadClass("org.objectweb.proactive.extensions.webservices.axis2.receiver.PAInOutMessageReceiver");
+        MessageReceiver inOutmessageReceiver = (MessageReceiver) inoutMessageReceiver.newInstance();
+        messageReceiverMap.put(WSDL2Constants.MEP_URI_IN_OUT, inOutmessageReceiver);
+        messageReceiverMap.put(WSDL2Constants.MEP_URI_ROBUST_IN_ONLY, inOutmessageReceiver);
 
-            SchemaGenerator schemaGenerator;
-            AxisService service = new AxisService();
-            service.setParent(axisConfiguration);
-            service.setName(serviceName);
+        SchemaGenerator schemaGenerator;
+        AxisService service = new AxisService();
+        service.setParent(axisConfiguration);
+        service.setName(serviceName);
 
-            /**
-             * Uncomment the following lines if you want the deployer to be able to handle document/literal
-             * format.
-             * In this case, the default DocLitBareSchemaGenerator class does not handle inherited methods as
-             * it extends the DefaultSchemaGenerator class and not the CustomDefaultSchemaGenerator one.
-             * N.B.: document/literal format is more restrictive. for instance, using this format, you
-             * 		 cannot generate the wsdl of a class having two methods with a same argument's name.
-             */
-            //            Parameter generateBare = service.getParameter(Java2WSDLConstants.DOC_LIT_BARE_PARAMETER);
-            //            if (generateBare != null && "true".equals(generateBare.getValue())) {
-            //                schemaGenerator = new DocLitBareSchemaGenerator(loader, implClass, null,
-            //                    Java2WSDLConstants.SCHEMA_NAMESPACE_PRFIX, service);
-            //            } else {
-            schemaGenerator = new CustomDefaultSchemaGenerator(loader, implClass, null,
-                Java2WSDLConstants.SCHEMA_NAMESPACE_PRFIX, service);
-            //            }
-            schemaGenerator.setElementFormDefault(Java2WSDLConstants.FORM_DEFAULT_UNQUALIFIED);
-            Utils.addExcludeMethods(excludedOperations);
-            schemaGenerator.setExcludeMethods(excludedOperations);
+        /**
+         * Uncomment the following lines if you want the deployer to be able to handle document/literal
+         * format.
+         * In this case, the default DocLitBareSchemaGenerator class does not handle inherited methods as
+         * it extends the DefaultSchemaGenerator class and not the CustomDefaultSchemaGenerator one.
+         * N.B.: document/literal format is more restrictive. for instance, using this format, you
+         * 		 cannot generate the wsdl of a class having two methods with a same argument's name.
+         */
+        //            Parameter generateBare = service.getParameter(Java2WSDLConstants.DOC_LIT_BARE_PARAMETER);
+        //            if (generateBare != null && "true".equals(generateBare.getValue())) {
+        //                schemaGenerator = new DocLitBareSchemaGenerator(loader, implClass, null,
+        //                    Java2WSDLConstants.SCHEMA_NAMESPACE_PRFIX, service);
+        //            } else {
+        schemaGenerator = new CustomDefaultSchemaGenerator(loader, implClass, null,
+            Java2WSDLConstants.SCHEMA_NAMESPACE_PRFIX, service);
+        //            }
+        schemaGenerator.setElementFormDefault(Java2WSDLConstants.FORM_DEFAULT_UNQUALIFIED);
+        Utils.addExcludeMethods(excludedOperations);
+        schemaGenerator.setExcludeMethods(excludedOperations);
 
-            return AxisService.createService(implClass, serviceName, axisConfiguration, messageReceiverMap,
-                    null, loader, schemaGenerator, service);
+        return AxisService.createService(implClass, serviceName, axisConfiguration, messageReceiverMap, null,
+                loader, schemaGenerator, service);
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
     }
 
     /**
@@ -147,74 +139,68 @@ public class ServiceDeployer {
      * @param serviceName Name of the service
      * @param methods methods to be exposed
      * @param isComponent Boolean saying whether it is a component
+     * @throws Exception 
      */
-    public void deploy(byte[] marshalledObject, String serviceName, String[] methods, boolean isComponent) {
-        try {
+    public void deploy(byte[] marshalledObject, String serviceName, String[] methods, boolean isComponent)
+            throws Exception {
 
-            // Retrieve the axis configuration to enable to deploy a service
-            MessageContext msgCtx = MessageContext.getCurrentMessageContext();
-            AxisConfiguration axisConfiguration = msgCtx.getRootContext().getAxisConfiguration();
+        // Retrieve the axis configuration to enable to deploy a service
+        MessageContext msgCtx = MessageContext.getCurrentMessageContext();
+        AxisConfiguration axisConfiguration = msgCtx.getRootContext().getAxisConfiguration();
 
-            // Get original class and its name
-            Class<?> superclass;
-            String implClass;
-            Object o = null;
-            Object component = null;
-            ClassLoader loader = null;
-            if (!isComponent) {
-                // Unmarshalled object
-                o = HttpMarshaller.unmarshallObject(marshalledObject);
-                superclass = o.getClass().getSuperclass();
-                loader = o.getClass().getClassLoader();
-                implClass = superclass.getName();
-            } else {
-                // Unmarshalled object
-                component = HttpMarshaller.unmarshallObject(marshalledObject);
-                String interfaceName = serviceName.substring(serviceName.lastIndexOf('_') + 1);
-                Interface interface_ = (Interface) ((Component) component).getFcInterface(interfaceName);
-                superclass = interface_.getClass();
-                loader = superclass.getClassLoader();
-                implClass = ((InterfaceType) interface_.getFcItfType()).getFcItfSignature();
-            }
-
-            // Retrieve methods we don't want
-            MethodUtils mc = new MethodUtils(superclass);
-            ArrayList<String> excludedOperations = mc.getExcludedMethodsName(methods);
-
-            // Create the service
-            AxisService axisService = this.customCreateService(implClass, serviceName, axisConfiguration,
-                    loader, excludedOperations);
-
-            // Add the marshalled object to the service in order to be used
-            // by the message receiver.
-            axisService.addParameter("MarshalledObject", marshalledObject);
-
-            // Add the variable isComponent to the service
-            axisService.addParameter("isComponent", Boolean.toString(isComponent));
-
-            // Add the service to the axis configuration
-            axisConfiguration.addService(axisService);
-        } catch (Exception e) {
-            e.printStackTrace();
+        // Get original class and its name
+        Class<?> superclass;
+        String implClass;
+        Object o = null;
+        Object component = null;
+        ClassLoader loader = null;
+        if (!isComponent) {
+            // Unmarshalled object
+            o = HttpMarshaller.unmarshallObject(marshalledObject);
+            superclass = o.getClass().getSuperclass();
+            loader = o.getClass().getClassLoader();
+            implClass = superclass.getName();
+        } else {
+            // Unmarshalled object
+            component = HttpMarshaller.unmarshallObject(marshalledObject);
+            String interfaceName = serviceName.substring(serviceName.lastIndexOf('_') + 1);
+            Interface interface_ = (Interface) ((Component) component).getFcInterface(interfaceName);
+            superclass = interface_.getClass();
+            loader = superclass.getClassLoader();
+            implClass = ((InterfaceType) interface_.getFcItfType()).getFcItfSignature();
         }
+
+        // Retrieve methods we don't want
+        MethodUtils mc = new MethodUtils(superclass);
+        ArrayList<String> excludedOperations = mc.getExcludedMethodsName(methods);
+
+        // Create the service
+        AxisService axisService = this.customCreateService(implClass, serviceName, axisConfiguration, loader,
+                excludedOperations);
+
+        // Add the marshalled object to the service in order to be used
+        // by the message receiver.
+        axisService.addParameter("MarshalledObject", marshalledObject);
+
+        // Add the variable isComponent to the service
+        axisService.addParameter("isComponent", Boolean.toString(isComponent));
+
+        // Add the service to the axis configuration
+        axisConfiguration.addService(axisService);
     }
 
     /**
      * Undeploy the service whose name is serviceName
      *
      * @param serviceName
+     * @throws AxisFault 
      */
-    public void undeploy(String serviceName) {
-        try {
-            // Get the axis configuration
-            MessageContext msgCtx = MessageContext.getCurrentMessageContext();
-            AxisConfiguration axisConfig = msgCtx.getRootContext().getAxisConfiguration();
+    public void undeploy(String serviceName) throws AxisFault {
+        // Get the axis configuration
+        MessageContext msgCtx = MessageContext.getCurrentMessageContext();
+        AxisConfiguration axisConfig = msgCtx.getRootContext().getAxisConfiguration();
 
-            // Remove the service from the axis configuration
-            axisConfig.removeService(serviceName);
-            logger.info("The deployer service has undeployed the service " + serviceName);
-        } catch (AxisFault e) {
-            e.printStackTrace();
-        }
+        // Remove the service from the axis configuration
+        axisConfig.removeService(serviceName);
     }
 }

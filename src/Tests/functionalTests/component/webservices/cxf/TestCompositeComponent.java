@@ -31,8 +31,8 @@
  */
 package functionalTests.component.webservices.cxf;
 
-import org.apache.cxf.frontend.ClientProxyFactoryBean;
-import org.apache.log4j.Logger;
+import static org.junit.Assert.assertTrue;
+
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.control.ContentController;
@@ -44,22 +44,18 @@ import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
-import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.httpserver.HTTPServer;
-import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.webservices.AbstractWebServicesFactory;
-import org.objectweb.proactive.extensions.webservices.WSConstants;
 import org.objectweb.proactive.extensions.webservices.WebServices;
 import org.objectweb.proactive.extensions.webservices.WebServicesFactory;
+import org.objectweb.proactive.extensions.webservices.client.AbstractClientFactory;
+import org.objectweb.proactive.extensions.webservices.client.Client;
+import org.objectweb.proactive.extensions.webservices.client.ClientFactory;
 
 import functionalTests.FunctionalTest;
 import functionalTests.component.webservices.common.ChooseNameComponent;
 import functionalTests.component.webservices.common.ChooseNameItf;
 import functionalTests.component.webservices.common.HelloNameComponent;
 import functionalTests.component.webservices.common.HelloNameItf;
-
-import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -75,11 +71,7 @@ public class TestCompositeComponent extends FunctionalTest {
     @org.junit.Before
     public void deployComposite() {
         try {
-            // Get the HTTP server enabling us to retrieve the jetty
-            // port number
-            HTTPServer httpServer = HTTPServer.get();
-            String port = PAProperties.PA_XMLHTTP_PORT.getValue();
-            url = "http://localhost:" + port + "/";
+            url = AbstractWebServicesFactory.getLocalUrl();
 
             Component boot = null;
             Component comp = null;
@@ -92,11 +84,11 @@ public class TestCompositeComponent extends FunctionalTest {
             GenericFactory cf = Fractal.getGenericFactory(boot);
 
             // type of server component
-            ComponentType typeComp = tf.createFcType(new InterfaceType[] { tf.createFcItfType("hello-world",
+            ComponentType typeComp = tf.createFcType(new InterfaceType[] { tf.createFcItfType("hello-name",
                     HelloNameItf.class.getName(), false, false, false) });
 
             ComponentType typeHello = tf.createFcType(new InterfaceType[] {
-                    tf.createFcItfType("hello-world", HelloNameItf.class.getName(), false, false, false),
+                    tf.createFcItfType("hello-name", HelloNameItf.class.getName(), false, false, false),
                     tf.createFcItfType("choose-name", ChooseNameItf.class.getName(), true, false, false) });
 
             ComponentType typeChoose = tf.createFcType(new InterfaceType[] { tf.createFcItfType(
@@ -115,14 +107,14 @@ public class TestCompositeComponent extends FunctionalTest {
             cc.addFcSubComponent(hello);
             cc.addFcSubComponent(chooseName);
             BindingController bc = Fractal.getBindingController(comp);
-            bc.bindFc("hello-world", hello.getFcInterface("hello-world"));
+            bc.bindFc("hello-name", hello.getFcInterface("hello-name"));
             bc = Fractal.getBindingController(hello);
             bc.bindFc("choose-name", chooseName.getFcInterface("choose-name"));
             Fractal.getLifeCycleController(comp).startFc();
 
             WebServicesFactory wsf = AbstractWebServicesFactory.getWebServicesFactory("cxf");
-            ws = wsf.newWebServices(url);
-            ws.exposeComponentAsWebService(comp, "composite", new String[] { "hello-world" });
+            ws = wsf.getWebServices(url);
+            ws.exposeComponentAsWebService(comp, "composite", new String[] { "hello-name" });
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -133,14 +125,12 @@ public class TestCompositeComponent extends FunctionalTest {
     @org.junit.Test
     public void testComposite() {
 
-        ClientProxyFactoryBean factory = new ClientProxyFactoryBean();
-        factory.setServiceClass(HelloNameItf.class);
-        factory.setAddress(url + WSConstants.SERVICES_PATH + "composite_hello-world");
-        HelloNameItf client = (HelloNameItf) factory.create();
         try {
-            int index = 9;
-            String result = client.helloName(index);
-            assertTrue(result.equals("Hello Fabrice Fontenoy!"));
+            ClientFactory cf = AbstractClientFactory.getClientFactory("cxf");
+            Client client = cf.getClient(url, "composite_hello-name", HelloNameItf.class);
+            int index = 0;
+            String result = (String) client.call("helloName", new Object[] { index }, String.class)[0];
+            assertTrue(result.equals("Hello ProActive Team!"));
         } catch (Exception e) {
             e.printStackTrace();
             assertTrue(false);
@@ -150,7 +140,7 @@ public class TestCompositeComponent extends FunctionalTest {
     @org.junit.After
     public void undeployComposite() {
         try {
-            ws.unExposeComponentAsWebService("composite", new String[] { "hello-world" });
+            ws.unExposeComponentAsWebService("composite", new String[] { "hello-name" });
         } catch (Exception e) {
             e.printStackTrace();
             assertTrue(false);

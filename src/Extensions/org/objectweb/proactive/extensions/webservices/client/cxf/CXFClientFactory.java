@@ -29,26 +29,23 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.extensions.webservices.exceptions;
+package org.objectweb.proactive.extensions.webservices.client.cxf;
 
-import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.extensions.webservices.client.AbstractClientFactory;
+import org.objectweb.proactive.extensions.webservices.client.Client;
+import org.objectweb.proactive.extensions.webservices.client.ClientFactory;
 
 
-public class WebServicesException extends ProActiveException {
+public class CXFClientFactory extends AbstractClientFactory implements ClientFactory {
 
-    public WebServicesException() {
-        super();
+    @Override
+    public String getFrameWorkId() {
+        return "cxf";
     }
 
-    public WebServicesException(String message) {
-        super(message);
+    @Override
+    protected Client newClient(String url, String serviceName, Class<?> serviceClass) {
+        return new CXFClient(url, serviceName, serviceClass);
     }
 
-    public WebServicesException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public WebServicesException(Throwable cause) {
-        super(cause);
-    }
 }

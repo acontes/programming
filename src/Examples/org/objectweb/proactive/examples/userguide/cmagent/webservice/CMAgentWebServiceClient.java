@@ -33,8 +33,9 @@
 package org.objectweb.proactive.examples.userguide.cmagent.webservice;
 
 import org.objectweb.proactive.examples.userguide.cmagent.simple.State;
-import org.objectweb.proactive.extensions.webservices.WSConstants;
-import org.objectweb.proactive.extensions.webservices.common.ClientUtils;
+import org.objectweb.proactive.extensions.webservices.client.AbstractClientFactory;
+import org.objectweb.proactive.extensions.webservices.client.Client;
+import org.objectweb.proactive.extensions.webservices.client.ClientFactory;
 
 
 /**
@@ -62,32 +63,14 @@ public class CMAgentWebServiceClient {
                 return;
             }
 
-            if (!url.startsWith("http://")) {
-                url = "http://" + url;
-            }
-            if (!url.endsWith("/")) {
-                url += "/";
-            }
+            ClientFactory cf = AbstractClientFactory.getClientFactory(wsFrameWork);
+            Client client = cf.getClient(url, "cmAgentService", CMAgentService.class);
 
-            Object[] response;
-
-            if (wsFrameWork.equals(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER)) {
-                response = ClientUtils.call(wsFrameWork, url, "cmAgentService", "getCurrentState",
-                        new Object[] {}, State.class);
-            } else {
-                response = ClientUtils.call(wsFrameWork, url, "cmAgentService", "getCurrentState",
-                        new Object[] {}, CMAgentService.class);
-            }
+            Object[] response = client.call("getCurrentState", null, State.class);
 
             System.out.println("Current state is:\n" + ((State) response[0]).toString());
 
-            if (wsFrameWork.equals(WSConstants.AXIS2_FRAMEWORK_IDENTIFIER)) {
-                response = ClientUtils.call(wsFrameWork, url, "cmAgentService", "waitLastRequestServeTime",
-                        new Object[] {}, long.class);
-            } else {
-                response = ClientUtils.call(wsFrameWork, url, "cmAgentService", "waitLastRequestServeTime",
-                        new Object[] {}, CMAgentService.class);
-            }
+            response = client.call("waitLastRequestServeTime", null, long.class);
 
             System.out.println("Last request serve time = " + response[0]);
 

@@ -34,23 +34,18 @@ package functionalTests.activeobject.webservices.axis2;
 
 import static org.junit.Assert.assertTrue;
 
-import javax.xml.namespace.QName;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 
-import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.client.Options;
-import org.apache.axis2.rpc.client.RPCServiceClient;
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.httpserver.HTTPServer;
-import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.webservices.AbstractWebServicesFactory;
-import org.objectweb.proactive.extensions.webservices.WSConstants;
 import org.objectweb.proactive.extensions.webservices.WebServices;
 import org.objectweb.proactive.extensions.webservices.WebServicesFactory;
+import org.objectweb.proactive.extensions.webservices.client.AbstractClientFactory;
+import org.objectweb.proactive.extensions.webservices.client.Client;
+import org.objectweb.proactive.extensions.webservices.client.ClientFactory;
+import org.objectweb.proactive.extensions.webservices.exceptions.UnknownFrameWorkException;
+import org.objectweb.proactive.extensions.webservices.exceptions.WebServicesException;
 
 import functionalTests.activeobject.webservices.common.Couple;
 import functionalTests.activeobject.webservices.common.HelloWorld;
@@ -58,25 +53,18 @@ import functionalTests.activeobject.webservices.common.HelloWorld;
 
 public class TestHelloWorld {
 
-    private static Logger logger = ProActiveLogger.getLogger(Loggers.WEB_SERVICES);
-
     private String url;
     private WebServices ws;
 
     @org.junit.Before
     public void deployHelloWorld() {
         try {
-            // Get the HTTP server enabling us to retrieve the jetty
-            // port number
-            HTTPServer httpServer = HTTPServer.get();
-            String port = PAProperties.PA_XMLHTTP_PORT.getValue();
-            this.url = "http://localhost:" + port + "/";
-
+            this.url = AbstractWebServicesFactory.getLocalUrl();
             HelloWorld hw = (HelloWorld) PAActiveObject.newActive(
                     "functionalTests.activeobject.webservices.common.HelloWorld", new Object[] {});
 
             WebServicesFactory wsf = AbstractWebServicesFactory.getWebServicesFactory("axis2");
-            ws = wsf.newWebServices(url);
+            ws = wsf.getWebServices(url);
 
             ws.exposeAsWebService(hw, "HelloWorld");
 
@@ -90,7 +78,6 @@ public class TestHelloWorld {
             String[] methodNames = new String[] { "putTextToSay", "sayText" };
 
             ws.exposeAsWebService(hw, "HelloWorldMethodNames", methodNames);
-
         } catch (Exception e) {
             e.printStackTrace();
             assertTrue(false);
@@ -99,75 +86,43 @@ public class TestHelloWorld {
 
     @org.junit.Test
     public void testHelloWorld() {
+
+        ClientFactory cf = null;
         try {
-            RPCServiceClient serviceClient = new RPCServiceClient();
+            cf = AbstractClientFactory.getClientFactory("axis2");
+        } catch (UnknownFrameWorkException e1) {
+            e1.printStackTrace();
+            assertTrue(false);
+        }
 
-            Options options = serviceClient.getOptions();
+        try {
 
-            EndpointReference targetEPR = new EndpointReference(this.url + WSConstants.SERVICES_PATH +
-                "HelloWorld");
-            options.setTo(targetEPR);
+            Client client = cf.getClient(this.url, "HelloWorld", HelloWorld.class);
 
-            // Call putHelloWorld
-            options.setAction("putHelloWorld");
-            QName op = new QName("putHelloWorld");
-            Object[] opArgs = new Object[] {};
+            client.oneWayCall("putHelloWorld", null);
 
-            serviceClient.invokeRobust(op, opArgs);
-
-            logger.info("Called the method putHelloWorld: no argument and no return is expected");
-
-            // Call contains
-            options.setAction("contains");
-            op = new QName("contains");
-            opArgs = new Object[] { "Hello world!" };
-            Class<?>[] returnTypes = new Class[] { boolean.class };
-
-            Object[] response = serviceClient.invokeBlocking(op, opArgs, returnTypes);
-            logger.info("Called the method contains: one argument and one return are expected");
+            Object[] response = client.call("contains", new Object[] { "Hello world!" }, boolean.class);
 
             assertTrue((Boolean) response[0]);
 
-            // Call putTextToSay
-            options.setAction("putTextToSay");
-            op = new QName("putTextToSay");
-            opArgs = new Object[] { "Good bye world!" };
+            client.oneWayCall("putTextToSay", new Object[] { "Good bye world!" });
 
-            serviceClient.invokeRobust(op, opArgs);
-            logger.info("Called the method putTextToSay: " + "one argument is expected but no return");
-
-            // Call sayText
-            options.setAction("sayText");
-            op = new QName("sayText");
-            opArgs = new Object[] {};
-            returnTypes = new Class[] { String.class };
-
-            response = serviceClient.invokeBlocking(op, opArgs, returnTypes);
-            logger.info("Called the method 'sayText': one return is expected but not argument");
+            response = client.call("sayText", null, String.class);
 
             String text = (String) response[0];
             assertTrue(text.equals("Hello world!"));
 
-            response = serviceClient.invokeBlocking(op, opArgs, returnTypes);
-            logger.info("Called the method 'sayText': one return is expected but not argument");
+            response = client.call("sayText", null, String.class);
 
             text = (String) response[0];
             assertTrue(text.equals("Good bye world!"));
 
-            response = serviceClient.invokeBlocking(op, opArgs, returnTypes);
-            logger.info("Called the method 'sayText': one return is expected but not argument");
+            response = client.call("sayText", null, String.class);
 
             text = (String) response[0];
             assertTrue(text.equals("The list is empty"));
 
-            // Call sayHello
-            options.setAction("sayHello");
-            op = new QName("sayHello");
-            opArgs = new Object[] {};
-            returnTypes = new Class[] { String.class };
-
-            response = serviceClient.invokeBlocking(op, opArgs, returnTypes);
-            logger.info("Called the method 'sayHello': inherited method");
+            response = client.call("sayHello", null, String.class);
 
             text = (String) response[0];
             assertTrue(text.equals("Hello!"));
@@ -180,20 +135,9 @@ public class TestHelloWorld {
             cpl2.setStr1("Second");
             Couple[] couples = new Couple[] { cpl1, cpl2 };
 
-            // Call setCouples
-            options.setAction("setCouples");
-            op = new QName("setCouples");
-            opArgs = new Object[] { couples };
-            serviceClient.invokeRobust(op, opArgs);
-            logger.info("Called the method 'setCouples': one argument of type Couple[]");
+            client.oneWayCall("setCouples", new Object[] { couples });
 
-            // Call getCouples
-            options.setAction("getCouples");
-            op = new QName("getCouples");
-            opArgs = new Object[] {};
-            returnTypes = new Class[] { Array.newInstance(Couple.class, 2).getClass() };
-            response = serviceClient.invokeBlocking(op, opArgs, returnTypes);
-            logger.info("Called the method 'getCouples': return a table of Couple");
+            response = client.call("getCouples", null, Array.newInstance(Couple.class, 2).getClass());
 
             Couple[] table = (Couple[]) response[0];
             Couple test1 = table[0];
@@ -210,34 +154,17 @@ public class TestHelloWorld {
         }
 
         try {
-            RPCServiceClient serviceClient = new RPCServiceClient();
 
-            Options options = serviceClient.getOptions();
-            EndpointReference targetEPR = new EndpointReference(this.url + WSConstants.SERVICES_PATH +
-                "HelloWorldMethods");
-            options.setTo(targetEPR);
+            Client client = cf.getClient(this.url, "HelloWorldMethods", HelloWorld.class);
 
-            // Call putTextToSay
-            options.setAction("putTextToSay");
-            QName op = new QName("putTextToSay");
-            Object[] opArgs = new Object[] { "Hi ProActive Team!" };
+            client.oneWayCall("putTextToSay", new Object[] { "Hi ProActive Team!" });
 
-            serviceClient.invokeRobust(op, opArgs);
-            logger.info("Called the method putTextToSay: " + "one argument is expected but no return");
-
-            options.setAction("sayText");
-            op = new QName("sayText");
-            opArgs = new Object[] {};
-            Class<?>[] returnTypes = new Class[] { String.class };
-
-            Object[] response = serviceClient.invokeBlocking(op, opArgs, returnTypes);
-            logger.info("Called the method 'sayText': one return is expected but not argument");
+            Object[] response = client.call("sayText", null, String.class);
 
             String text = (String) response[0];
             assertTrue(text.equals("Hi ProActive Team!"));
 
-            response = serviceClient.invokeBlocking(op, opArgs, returnTypes);
-            logger.info("Called the method 'sayText': one return is expected but not argument");
+            response = client.call("sayText", null, String.class);
 
             text = (String) response[0];
             assertTrue(text.equals("The list is empty"));
@@ -247,57 +174,29 @@ public class TestHelloWorld {
         }
 
         try {
-            RPCServiceClient serviceClient = new RPCServiceClient();
+            Client client = cf.getClient(this.url, "HelloWorldMethods", HelloWorld.class);
 
-            Options options = serviceClient.getOptions();
-            EndpointReference targetEPR = new EndpointReference(this.url + WSConstants.SERVICES_PATH +
-                "HelloWorldMethods");
-            options.setTo(targetEPR);
-
-            options.setAction("putHelloWorld");
-            QName op = new QName("putHelloWorld");
-
-            Object[] opArgs = new Object[] {};
-
-            logger.info("Called the method putHelloWorld: this method should not be exposed");
-            logger.info("The normal behaviour is to raise an exception");
-            serviceClient.invokeRobust(op, opArgs);
-
+            // This call should raise an exception
+            // since the method putHelloWorld has not been
+            // exposed
+            client.oneWayCall("putHelloWorld", null);
             assertTrue(false);
         } catch (Exception e) {
             e.printStackTrace();
-            logger.info("This exception was expected");
         }
 
         try {
-            RPCServiceClient serviceClient = new RPCServiceClient();
 
-            Options options = serviceClient.getOptions();
-            EndpointReference targetEPR = new EndpointReference(this.url + WSConstants.SERVICES_PATH +
-                "HelloWorldMethodNames");
-            options.setTo(targetEPR);
+            Client client = cf.getClient(this.url, "HelloWorldMethodNames", HelloWorld.class);
 
-            // Call putTextToSay
-            options.setAction("putTextToSay");
-            QName op = new QName("putTextToSay");
-            Object[] opArgs = new Object[] { "Hi ProActive Team!" };
+            client.oneWayCall("putTextToSay", new Object[] { "Hi ProActive Team!" });
 
-            serviceClient.invokeRobust(op, opArgs);
-            logger.info("Called the method putTextToSay: " + "one argument is expected but no return");
-
-            options.setAction("sayText");
-            op = new QName("sayText");
-            opArgs = new Object[] {};
-            Class<?>[] returnTypes = new Class[] { String.class };
-
-            Object[] response = serviceClient.invokeBlocking(op, opArgs, returnTypes);
-            logger.info("Called the method 'sayText': one return is expected but not argument");
+            Object[] response = client.call("sayText", null, String.class);
 
             String text = (String) response[0];
             assertTrue(text.equals("Hi ProActive Team!"));
 
-            response = serviceClient.invokeBlocking(op, opArgs, returnTypes);
-            logger.info("Called the method 'sayText': one return is expected but not argument");
+            response = client.call("sayText", null, String.class);
 
             text = (String) response[0];
             assertTrue(text.equals("The list is empty"));
@@ -307,26 +206,15 @@ public class TestHelloWorld {
         }
 
         try {
-            RPCServiceClient serviceClient = new RPCServiceClient();
+            Client client = cf.getClient(this.url, "HelloWorldMethodNames", HelloWorld.class);
 
-            Options options = serviceClient.getOptions();
-            EndpointReference targetEPR = new EndpointReference(this.url + WSConstants.SERVICES_PATH +
-                "HelloWorldMethodNames");
-            options.setTo(targetEPR);
-
-            options.setAction("putHelloWorld");
-            QName op = new QName("putHelloWorld");
-
-            Object[] opArgs = new Object[] {};
-
-            logger.info("Called the method putHelloWorld: this method should not be exposed");
-            logger.info("The normal behaviour is to raise an exception");
-            serviceClient.invokeRobust(op, opArgs);
-
+            // This call should raise an exception
+            // since the putHelloWorld method has
+            // not been exposed
+            client.oneWayCall("putHelloWorld", null);
             assertTrue(false);
-        } catch (Exception e) {
+        } catch (WebServicesException e) {
             e.printStackTrace();
-            logger.info("This exception was expected");
         }
     }
 
@@ -334,7 +222,7 @@ public class TestHelloWorld {
     public void undeployHelloWorld() {
         try {
             ws.unExposeAsWebService("HelloWorld");
-            ws.unExposeAsWebService("HelloWorldMehtods");
+            ws.unExposeAsWebService("HelloWorldMethods");
             ws.unExposeAsWebService("HelloWorldMethodNames");
         } catch (Exception e) {
             e.printStackTrace();

@@ -41,9 +41,9 @@ import java.lang.Math;
  */
 public class ChooseNameComponent implements ChooseNameItf {
 
-    private String[] names = new String[] { "Abhijeet Gaikwad", "Bastien Sauvan", "Brian Amedro",
-            "Elaine Isnard", "Elton Mathias", "Eric Madelaine", "Etienne Vallette-De-Osia", "Fabien Viale",
-            "Fabrice Huet", "Fabrice Fontenoy", "Florin-Alexandru Bratu", "Francoise Baude",
+    private String[] names = new String[] { "ProActive Team", "Abhijeet Gaikwad", "Bastien Sauvan",
+            "Brian Amedro", "Elaine Isnard", "Elton Mathias", "Eric Madelaine", "Etienne Vallette-De-Osia",
+            "Fabien Viale", "Fabrice Huet", "Fabrice Fontenoy", "Florin-Alexandru Bratu", "Francoise Baude",
             "Germain Sigety", "Guilherme Perretti Pezzi", "Imen Filiali", "Jonathan Martin", "Khan Muhammad",
             "Laurent Vanni", "Ludovic Henrio", "Marcela Rivera", "Nicolas Dodelin", "Paul Naoumenko",
             "Regis Gascon", "Vasile Jureschi", "Viet Dong Doan", "Virginie Contes", "Yu Feng",

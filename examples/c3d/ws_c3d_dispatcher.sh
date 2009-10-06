@@ -20,6 +20,8 @@ workingDir=`dirname $0`
 
 export XMLDESCRIPTOR=$workingDir/GCMA_Renderer.xml
 
-$JAVACMD -Dproactive.http.port=8080 org.objectweb.proactive.examples.webservices.c3dWS.C3DDispatcher $XMLDESCRIPTOR "$@"
+JETTY_PORT=-Dproactive.http.port=8080
+
+$JAVACMD $JETTY_PORT org.objectweb.proactive.examples.webservices.c3dWS.C3DDispatcher $XMLDESCRIPTOR "$@"
 echo
 echo ---------------------------------------------------------

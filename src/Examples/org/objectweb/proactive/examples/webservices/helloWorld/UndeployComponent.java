@@ -68,7 +68,7 @@ public class UndeployComponent {
 
         try {
             WebServicesFactory wsf = AbstractWebServicesFactory.getWebServicesFactory(wsFrameWork);
-            WebServices ws = wsf.newWebServices(url);
+            WebServices ws = wsf.getWebServices(url);
             ws.unExposeComponentAsWebService(componentName, new String[] { interfaceName });
         } catch (ProActiveException e) {
             e.printStackTrace();

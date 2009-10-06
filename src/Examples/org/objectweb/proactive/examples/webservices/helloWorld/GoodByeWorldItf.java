@@ -34,10 +34,10 @@ package org.objectweb.proactive.examples.webservices.helloWorld;
 //@snippet-start helloworlditfcomponent
 public interface GoodByeWorldItf {
 
-    public String goodByeWorld(String name);
+    public String goodByeWorld(String arg0);
 
     public String sayGoodBye();
 
-    public void setText(String text);
+    public void setText(String arg0);
 }
 //@snippet-end helloworlditfcomponent

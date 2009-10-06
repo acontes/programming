@@ -31,8 +31,6 @@
  */
 package org.objectweb.proactive.extensions.webservices.axis2.receiver;
 
-import java.lang.IllegalAccessException;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.apache.axiom.om.OMAbstractFactory;
@@ -41,7 +39,6 @@ import org.apache.axiom.om.OMFactory;
 import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
-
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisMessage;
@@ -54,14 +51,18 @@ import org.apache.axis2.receivers.AbstractInOutMessageReceiver;
 import org.apache.axis2.rpc.receivers.RPCUtil;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.log4j.Logger;
-
 import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.remoteobject.http.util.HttpMarshaller;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.core.util.wrapper.*;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.core.util.wrapper.DoubleWrapper;
+import org.objectweb.proactive.core.util.wrapper.FloatWrapper;
+import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+import org.objectweb.proactive.core.util.wrapper.LongWrapper;
+import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.objectweb.proactive.extensions.webservices.axis2.WSConstants;
 
 
@@ -120,7 +121,7 @@ public class PAInOutMessageReceiver extends AbstractInOutMessageReceiver {
             throws AxisFault {
         try {
             // Display the received soap message to be treated
-            logger.info("Got the message ==> " + inMessageContext.getEnvelope().toString());
+            logger.debug("Got the message ==> " + inMessageContext.getEnvelope().toString());
 
             // Get the axis service corresponding to this call
             AxisService axisService = inMessageContext.getServiceContext().getAxisService();
@@ -139,7 +140,6 @@ public class PAInOutMessageReceiver extends AbstractInOutMessageReceiver {
                 // Extract the interface name form the address
                 Object component = HttpMarshaller.unmarshallObject(marshallObject);
                 String address = inMessageContext.getTo().getAddress();
-                logger.info("Address = " + address);
                 int firstIndex = address.lastIndexOf(WSConstants.SERVICES_PATH);
                 firstIndex += WSConstants.SERVICES_PATH.length();
                 String serviceName = address.substring(firstIndex);
@@ -251,13 +251,10 @@ public class PAInOutMessageReceiver extends AbstractInOutMessageReceiver {
             outMessageContext.setEnvelope(envelope);
 
             // Display the returned soap message
-            logger.info("returned the message ==> " + outMessageContext.getEnvelope().toString());
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
+            logger.debug("returned the message ==> " + outMessageContext.getEnvelope().toString());
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new AxisFault("An exception occured while treating the following message:\n" +
+                inMessageContext.getEnvelope().toString(), e);
         }
     }
 }

@@ -7,7 +7,7 @@ workingDir=`dirname $0`
 . ${workingDir}/../env.sh
 
 
-$JAVACMD -Dproactive.http.port=8080 org.objectweb.proactive.examples.webservices.helloWorld.WSClientCXF "$@"
+$JAVACMD org.objectweb.proactive.examples.webservices.helloWorld.HelloWorldClient "$@"
 
 echo
 echo ------------------------------------------------------------

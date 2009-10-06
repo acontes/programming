@@ -70,12 +70,12 @@ public class HelloWorldComponent implements HelloWorldItf, GoodByeWorldItf {
     public HelloWorldComponent() {
     }
 
-    public String helloWorld(String name) {
-        return "Hello " + name + " !";
+    public String helloWorld(String arg0) {
+        return "Hello " + arg0 + " !";
     }
 
-    public String goodByeWorld(String name) {
-        return "Good Bye " + name + " !";
+    public String goodByeWorld(String arg0) {
+        return "Good Bye " + arg0 + " !";
     }
 
     public String sayHello() {
@@ -90,7 +90,7 @@ public class HelloWorldComponent implements HelloWorldItf, GoodByeWorldItf {
         String url = "";
         String wsFrameWork = "";
         if (args.length == 1) {
-            url = "http://localhost:8080/";
+            url = AbstractWebServicesFactory.getLocalUrl();
             wsFrameWork = args[0];
         } else if (args.length == 2) {
             url = args[0];
@@ -132,7 +132,7 @@ public class HelloWorldComponent implements HelloWorldItf, GoodByeWorldItf {
 
         try {
             WebServicesFactory wsf = AbstractWebServicesFactory.getWebServicesFactory(wsFrameWork);
-            WebServices ws = wsf.newWebServices(url);
+            WebServices ws = wsf.getWebServices(url);
             ws.exposeComponentAsWebService(comp, "server");
         } catch (ProActiveException e) {
             e.printStackTrace();

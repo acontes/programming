@@ -1,8 +1,40 @@
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://proactive.inria.fr/team_members.htm
+ *  Contributor(s):
+ *
+ * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
+ */
 package org.objectweb.proactive.extensions.webservices;
 
 import java.lang.reflect.Method;
 
 import org.objectweb.fractal.api.Component;
+import org.objectweb.proactive.extensions.webservices.exceptions.WebServicesException;
 
 
 public interface WebServices {
@@ -16,7 +48,7 @@ public interface WebServices {
      * @param methods The methods that will be exposed as web services functionalities
      *                   If null, then all methods will be exposed
      */
-    public void exposeAsWebService(Object o, String urn, String[] methods);
+    public void exposeAsWebService(Object o, String urn, String[] methods) throws WebServicesException;
 
     /**
      * Expose an active object as a web service with the methods specified in <code>methods</code>
@@ -27,7 +59,7 @@ public interface WebServices {
      * @param methods The methods that will be exposed as web services functionalities
      *                   If null, then all methods will be exposed
      */
-    public void exposeAsWebService(Object o, String urn, Method[] methods);
+    public void exposeAsWebService(Object o, String urn, Method[] methods) throws WebServicesException;
 
     /**
      * Expose an active object with all its methods as a web service
@@ -36,7 +68,7 @@ public interface WebServices {
      * @param url The url of the host where the object will be deployed  (typically http://localhost:8080/)
      * @param urn The name of the object
      */
-    public void exposeAsWebService(Object o, String urn);
+    public void exposeAsWebService(Object o, String urn) throws WebServicesException;
 
     /**
      * Undeploy a service
@@ -44,7 +76,7 @@ public interface WebServices {
      * @param urn The name of the object
      * @param url The url of the web server
      */
-    public void unExposeAsWebService(String urn);
+    public void unExposeAsWebService(String urn) throws WebServicesException;
 
     /**
      * Expose a component as a web service. Each server interface of the component
@@ -58,7 +90,8 @@ public interface WebServices {
      * @param interfaceNames Names of the interfaces we want to deploy.
       *                           If null, then all the interfaces will be deployed
      */
-    public void exposeComponentAsWebService(Component component, String componentName, String[] interfaceNames);
+    public void exposeComponentAsWebService(Component component, String componentName, String[] interfaceNames)
+            throws WebServicesException;
 
     /**
      * Expose a component as web service. Each server interface of the component
@@ -69,7 +102,8 @@ public interface WebServices {
      * @param url  Web server url  where to deploy the service - typically "http://localhost:8080"
      * @param componentName Name of the component
      */
-    public void exposeComponentAsWebService(Component component, String componentName);
+    public void exposeComponentAsWebService(Component component, String componentName)
+            throws WebServicesException;
 
     /**
      * Undeploy all the client interfaces of a component deployed on a web server. With CXF, this method
@@ -81,7 +115,8 @@ public interface WebServices {
      * @param url The url of the web server
      * @param componentName The name of the component
      */
-    public void unExposeComponentAsWebService(Component component, String componentName);
+    public void unExposeComponentAsWebService(Component component, String componentName)
+            throws WebServicesException;
 
     /**
      * Undeploy specified interfaces of a component deployed on a web server
@@ -90,5 +125,6 @@ public interface WebServices {
      * @param componentName The name of the component
      * @param interfaceNames Interfaces to be undeployed
      */
-    public void unExposeComponentAsWebService(String componentName, String[] interfaceNames);
+    public void unExposeComponentAsWebService(String componentName, String[] interfaceNames)
+            throws WebServicesException;
 }

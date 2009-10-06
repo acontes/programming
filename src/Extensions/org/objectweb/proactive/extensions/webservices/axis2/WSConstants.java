@@ -42,7 +42,8 @@ public class WSConstants extends org.objectweb.proactive.extensions.webservices.
     // Used to retrieve Axis2 configuration file
     public static final String PROACTIVE_JAR;
     static {
-        String temp = WSConstants.class.getResource("/org/objectweb/proactive").getPath();
+        String temp = WSConstants.class.getResource("/org/objectweb/proactive/extensions/webservices/axis2")
+                .getPath();
         temp = temp.substring(0, temp.indexOf('!'));
         PROACTIVE_JAR = temp.substring(temp.indexOf(':') + 1);
     }

@@ -1,22 +1,62 @@
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://proactive.inria.fr/team_members.htm
+ *  Contributor(s):
+ *
+ * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
+ */
 package org.objectweb.proactive.extensions.webservices;
 
+import java.net.URI;
 import java.util.HashMap;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.httpserver.HTTPServer;
+import org.objectweb.proactive.core.util.URIBuilder;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.webservices.exceptions.UnknownFrameWorkException;
+import org.objectweb.proactive.extensions.webservices.exceptions.WebServicesException;
 
 
 public abstract class AbstractWebServicesFactory implements WebServicesFactory {
 
+    static private Logger logger = ProActiveLogger.getLogger(Loggers.WEB_SERVICES);
+
     final protected static HashMap<String, WebServicesFactory> activatedWebServicesFactory;
-    final protected HashMap<String, WebServices> activatedWebServices;
+    final protected static HashMap<URI, WebServices> activatedWebServices;
 
     static {
         activatedWebServicesFactory = new HashMap<String, WebServicesFactory>();
+        activatedWebServices = new HashMap<URI, WebServices>();
     }
 
     protected AbstractWebServicesFactory() {
-        activatedWebServices = new HashMap<String, WebServices>();
     }
 
     public static WebServicesFactory getWebServicesFactory(String frameWorkId)
@@ -28,8 +68,10 @@ public abstract class AbstractWebServicesFactory implements WebServicesFactory {
         try {
             WebServicesFactory wsf = activatedWebServicesFactory.get(frameWorkId);
             if (wsf != null) {
+                logger.debug("Getting the WebServicesFactory instance from the hashmap");
                 return wsf;
             } else {
+                logger.debug("Creating a new WebServicesFactory instance");
                 Class<?> wsfClazz = WebServicesFrameWorkFactoryRegistry.get(frameWorkId);
 
                 if (wsfClazz != null) {
@@ -60,21 +102,39 @@ public abstract class AbstractWebServicesFactory implements WebServicesFactory {
         return getWebServicesFactory(protocol);
     }
 
-    public static String getLocalUrl() {
-        return "http://localhost:" + PAProperties.PA_XMLHTTP_PORT.getValue() + "/";
+    public static String getLocalPort() {
+        // Get the HTTP server enabling us to retrieve the jetty
+        // port number
+        HTTPServer httpServer = HTTPServer.get();
+        return PAProperties.PA_XMLHTTP_PORT.getValue();
     }
 
-    public abstract WebServices newWebServices(String url);
+    public static String getLocalUrl() {
+        return "http://localhost:" + getLocalPort() + "/";
+    }
 
-    public final WebServices getWebServices(String url) {
-        WebServices ws = activatedWebServices.get(url);
+    abstract protected WebServices newWebServices(String url) throws WebServicesException;
+
+    public final WebServices getWebServices(String url) throws WebServicesException {
+        URI uriKey = null;
+        try {
+            URI uri = new URI(url);
+            uriKey = URIBuilder.buildURI(uri.getHost(), null, uri.toURL().getProtocol(), uri.getPort(), true);
+        } catch (Exception e) {
+            throw new WebServicesException("An exception occured while reading the web service url", e);
+        }
+        WebServices ws = activatedWebServices.get(uriKey);
         if (ws != null) {
-            System.out.println("already got");
+            logger.debug("Getting the WebServices instance from the hashmap");
+            logger.debug("the new WebServices instance has been put into the HashMap using the uri key: " +
+                uriKey.toString());
             return ws;
         } else {
-            System.out.println("never got");
+            logger.debug("Creating a new WebServices instance");
             ws = newWebServices(url);
-            activatedWebServices.put(url, ws);
+            activatedWebServices.put(uriKey, ws);
+            logger.debug("The new WebServices instance has been put into the HashMap using the uri key: " +
+                uriKey.toString());
             return ws;
         }
     }

@@ -31,6 +31,9 @@
  */
 package org.objectweb.proactive.extensions.webservices.cxf.servicedeployer;
 
+import org.objectweb.fractal.api.NoSuchInterfaceException;
+
+
 /**
  * Interface of the service which will be deployed on the server at the
  * same time as the proactive web application. This service is used to deploy and undeploy
@@ -50,7 +53,7 @@ public interface ServiceDeployerItf {
      * @param isComponent Specify whether the object we want to expose is a component
      */
     public void deploy(byte[] marshalledObject, String serviceName, byte[] marshalledSerializedMethods,
-            boolean isComponent);
+            boolean isComponent) throws NoSuchInterfaceException, ClassNotFoundException;
 
     /**
      * Undeploy the service whose name is serviceName

@@ -59,13 +59,13 @@ public class Deployer {
     }
 
     public Node[] getRendererNodes() {
-        logger.info("Waiting Renderer virtual node to be ready");
+        logger.debug("Waiting Renderer virtual node to be ready");
         renderer.waitReady();
         return renderer.getCurrentNodes().toArray(new Node[0]);
     }
 
     public Node getDispatcherNode() {
-        logger.info("Waiting Dispatcher virtual node to be ready");
+        logger.debug("Waiting Dispatcher virtual node to be ready");
         dispatcher.waitReady();
         return dispatcher.getANode();
     }

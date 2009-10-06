@@ -34,8 +34,6 @@ package functionalTests.component.webservices.cxf;
 
 import static org.junit.Assert.assertTrue;
 
-import org.apache.cxf.frontend.ClientProxyFactoryBean;
-import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.ComponentType;
@@ -45,14 +43,13 @@ import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
-import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.httpserver.HTTPServer;
-import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.webservices.AbstractWebServicesFactory;
-import org.objectweb.proactive.extensions.webservices.WSConstants;
 import org.objectweb.proactive.extensions.webservices.WebServices;
 import org.objectweb.proactive.extensions.webservices.WebServicesFactory;
+import org.objectweb.proactive.extensions.webservices.client.AbstractClientFactory;
+import org.objectweb.proactive.extensions.webservices.client.Client;
+import org.objectweb.proactive.extensions.webservices.client.ClientFactory;
+import org.objectweb.proactive.extensions.webservices.exceptions.UnknownFrameWorkException;
 
 import functionalTests.component.webservices.common.GoodByeWorldItf;
 import functionalTests.component.webservices.common.HelloWorldComponent;
@@ -60,8 +57,6 @@ import functionalTests.component.webservices.common.HelloWorldItf;
 
 
 public class TestHelloWorldComponent {
-
-    private static Logger logger = ProActiveLogger.getLogger(Loggers.WEB_SERVICES);
 
     private String url;
     private Component comp;
@@ -71,11 +66,7 @@ public class TestHelloWorldComponent {
     public void deployHelloWorldComponent() {
 
         try {
-            // Get the HTTP server enabling us to retrieve the jetty
-            // port number
-            HTTPServer httpServer = HTTPServer.get();
-            String port = PAProperties.PA_XMLHTTP_PORT.getValue();
-            this.url = "http://localhost:" + port + "/";
+            url = AbstractWebServicesFactory.getLocalUrl();
 
             Component boot = org.objectweb.fractal.api.Fractal.getBootstrapComponent();
 
@@ -94,13 +85,11 @@ public class TestHelloWorldComponent {
             Fractal.getLifeCycleController(comp).startFc();
 
             WebServicesFactory wsf = AbstractWebServicesFactory.getWebServicesFactory("cxf");
-            ws = wsf.newWebServices(url);
+            ws = wsf.getWebServices(url);
 
             ws.exposeComponentAsWebService(comp, "server", new String[] { "hello-world" });
 
             ws.exposeComponentAsWebService(comp, "server2");
-
-            logger.info("Deployed an hello-world interface as a webservice service on : " + url);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -111,34 +100,35 @@ public class TestHelloWorldComponent {
     @org.junit.Test
     public void testHelloWorldComponent() {
 
+        ClientFactory cf = null;
+        try {
+            cf = AbstractClientFactory.getClientFactory("cxf");
+        } catch (UnknownFrameWorkException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+            assertTrue(false);
+        }
+
         try {
 
-            ClientProxyFactoryBean factory = new ClientProxyFactoryBean();
-            factory.setServiceClass(HelloWorldItf.class);
-            factory.setAddress(url + WSConstants.SERVICES_PATH + "server_hello-world");
-            HelloWorldItf client = (HelloWorldItf) factory.create();
+            Client client = cf.getClient(url, "server_hello-world", HelloWorldItf.class);
 
-            client.putHelloWorld();
-            logger.info("Called the method putHelloWorld: no argument and no return is expected");
+            client.oneWayCall("putHelloWorld", null);
 
-            boolean containsHello = client.contains("Hello world!");
-            logger.info("Called the method contains: one argument and one return are expected");
+            boolean containsHello = (Boolean) client.call("contains", new Object[] { "Hello world!" },
+                    boolean.class)[0];
 
             assertTrue(containsHello);
 
-            client.putTextToSay("Good bye world!");
-            logger.info("Called the method 'putTextToSay': one argument is expected but no return");
+            client.oneWayCall("putTextToSay", new Object[] { "Good bye world!" });
 
-            String text = client.sayText();
-            logger.info("Called the method 'sayText': one return is expected but not argument");
+            String text = (String) client.call("sayText", null, String.class)[0];
             assertTrue(text.equals("Hello world!"));
 
-            text = client.sayText();
-            logger.info("Called the method 'sayText': one return is expected but not argument");
+            text = (String) client.call("sayText", null, String.class)[0];
             assertTrue(text.equals("Good bye world!"));
 
-            text = client.sayText();
-            logger.info("Called the method 'sayText': one return is expected but not argument");
+            text = (String) client.call("sayText", null, String.class)[0];
             assertTrue(text.equals("The list is empty"));
         } catch (Exception e) {
             e.printStackTrace();
@@ -147,15 +137,11 @@ public class TestHelloWorldComponent {
 
         try {
 
-            ClientProxyFactoryBean factory = new ClientProxyFactoryBean();
-            factory.setServiceClass(HelloWorldItf.class);
-            factory.setAddress(url + WSConstants.SERVICES_PATH + "server2_hello-world");
-            HelloWorldItf client = (HelloWorldItf) factory.create();
+            Client client = cf.getClient(url, "server2_hello-world", HelloWorldItf.class);
 
-            client.putTextToSay("Hi ProActive Team!");
-            logger.info("Called the method putTextToSay: " + "one argument is expected but no return");
+            client.oneWayCall("putTextToSay", new Object[] { "Hi ProActive Team!" });
 
-            String text = client.sayText();
+            String text = (String) client.call("sayText", null, String.class)[0];
             assertTrue(text.equals("Hi ProActive Team!"));
 
         } catch (Exception e) {
@@ -164,16 +150,11 @@ public class TestHelloWorldComponent {
         }
 
         try {
+            Client client = cf.getClient(url, "server2_good-bye-world", GoodByeWorldItf.class);
 
-            ClientProxyFactoryBean factory = new ClientProxyFactoryBean();
-            factory.setServiceClass(GoodByeWorldItf.class);
-            factory.setAddress(url + WSConstants.SERVICES_PATH + "server2_good-bye-world");
-            GoodByeWorldItf client = (GoodByeWorldItf) factory.create();
+            client.oneWayCall("putGoodByeWorld", null);
 
-            client.putGoodByeWorld();
-            logger.info("Called the method 'putGoodByeWorld': " + "one argument is expected but no return");
-
-            String text = client.sayText();
+            String text = (String) client.call("sayText", null, String.class)[0];
             assertTrue(text.equals("Good bye world!"));
 
         } catch (Exception e) {

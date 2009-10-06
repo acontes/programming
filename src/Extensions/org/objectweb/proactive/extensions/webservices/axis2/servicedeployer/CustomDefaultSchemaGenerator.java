@@ -50,8 +50,6 @@ import org.apache.axis2.deployment.util.Utils;
 import org.apache.axis2.description.AxisService;
 import org.apache.axis2.description.java2wsdl.AnnotationConstants;
 import org.apache.axis2.description.java2wsdl.DefaultSchemaGenerator;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaComplexContent;
 import org.apache.ws.commons.schema.XmlSchemaComplexContentExtension;
@@ -82,8 +80,6 @@ import org.w3c.dom.Document;
  */
 public class CustomDefaultSchemaGenerator extends DefaultSchemaGenerator {
 
-    private static final Log log = LogFactory.getLog(CustomDefaultSchemaGenerator.class);
-
     /**
      * @param loader
      * @param className
@@ -96,7 +92,6 @@ public class CustomDefaultSchemaGenerator extends DefaultSchemaGenerator {
     public CustomDefaultSchemaGenerator(ClassLoader loader, String className, String schematargetNamespace,
             String schematargetNamespacePrefix, AxisService service) throws Exception {
         super(loader, className, schematargetNamespace, schematargetNamespacePrefix, service);
-        // TODO Auto-generated constructor stub
     }
 
     /**
@@ -104,50 +99,38 @@ public class CustomDefaultSchemaGenerator extends DefaultSchemaGenerator {
      */
     //This will locate the custom schema file and add that into the schema map
     @SuppressWarnings("unchecked")
-    private void loadCustomSchemaFile() {
+    private void loadCustomSchemaFile() throws Exception {
         if (customSchemaLocation != null) {
-            try {
-                DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-                documentBuilderFactory.setNamespaceAware(true);
-                Document doc = documentBuilderFactory.newDocumentBuilder().parse(
-                        new File(customSchemaLocation));
-                XmlSchema schema = xmlSchemaCollection.read(doc, null);
-                schemaMap.put(schema.getTargetNamespace(), schema);
-            } catch (Exception e) {
-                log.info(e.getMessage());
-            }
+            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+            documentBuilderFactory.setNamespaceAware(true);
+            Document doc = documentBuilderFactory.newDocumentBuilder().parse(new File(customSchemaLocation));
+            XmlSchema schema = xmlSchemaCollection.read(doc, null);
+            schemaMap.put(schema.getTargetNamespace(), schema);
         }
     }
 
     /**
      * @see org.apache.axis2.description.java2wsdl.DefaultSchemaGenerator
      */
-    private void loadMappingFile() {
+    private void loadMappingFile() throws IOException {
         if (mappingFileLocation != null) {
             File file = new File(mappingFileLocation);
             BufferedReader input = null;
-            try {
-                input = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-                String line;
-                while ((line = input.readLine()) != null) {
-                    line = line.trim();
-                    if (line.length() > 0 && line.charAt(0) != '#') {
-                        String values[] = line.split("\\|");
-                        if (values != null && values.length > 2) {
-                            typeTable.addComplexSchema(values[0], new QName(values[1], values[2]));
-                        }
+
+            input = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+            String line;
+            while ((line = input.readLine()) != null) {
+                line = line.trim();
+                if (line.length() > 0 && line.charAt(0) != '#') {
+                    String values[] = line.split("\\|");
+                    if (values != null && values.length > 2) {
+                        typeTable.addComplexSchema(values[0], new QName(values[1], values[2]));
                     }
                 }
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            } finally {
-                try {
-                    if (input != null) {
-                        input.close();
-                    }
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
+            }
+
+            if (input != null) {
+                input.close();
             }
         }
     }

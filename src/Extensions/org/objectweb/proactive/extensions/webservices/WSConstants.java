@@ -44,9 +44,6 @@ public class WSConstants {
     public static final String SERVICES_PATH = "proactive/services/";
     public static final String SERVLET_PATH = "/services/*";
 
-    public static final String AXIS2_FRAMEWORK_IDENTIFIER = "axis2";
-    public static final String CXF_FRAMEWORK_IDENTIFIER = "cxf";
-
     public static final Vector<String> disallowedMethods = new Vector<String>();
 
     static {

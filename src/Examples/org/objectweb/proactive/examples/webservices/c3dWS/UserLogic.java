@@ -32,6 +32,7 @@
 package org.objectweb.proactive.examples.webservices.c3dWS;
 
 import org.objectweb.proactive.examples.webservices.c3dWS.geom.Vec;
+import org.objectweb.proactive.extensions.webservices.exceptions.WebServicesException;
 
 
 /** These are the methods accessible by the User Gui classes, which somewhat control the User active
@@ -39,24 +40,24 @@ import org.objectweb.proactive.examples.webservices.c3dWS.geom.Vec;
 public interface UserLogic {
 
     /** Exit the application */
-    public void terminate();
+    public void terminate() throws WebServicesException;
 
     /** Displays the list of users connected to the dispatcher */
-    public void getUserList();
+    public void getUserList() throws WebServicesException;
 
     /** Ask the dispatcher to revert to original scene*/
-    public void resetScene();
+    public void resetScene() throws WebServicesException;
 
     /** Ask the dispatcher to add a sphere*/
-    public void addSphere();
+    public void addSphere() throws WebServicesException;
 
     /**  Send a mesage to a given other user, or to all */
-    public void sendMessage(String message, String recipientName);
+    public void sendMessage(String message, String recipientName) throws WebServicesException;
 
     /**
      * ask for the scene to be rotated by some angle
      * @param rotationAngle = <x y z> means rotate x radians along the x axis,
      *         then y radians along the y axis, and finally  z radians along the z axis
      */
-    public void rotateScene(Vec rotationAngle);
+    public void rotateScene(Vec rotationAngle) throws WebServicesException;
 }

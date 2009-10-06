@@ -65,7 +65,7 @@ public class Undeploy {
 
         try {
             WebServicesFactory wsf = AbstractWebServicesFactory.getWebServicesFactory(wsFrameWork);
-            WebServices ws = wsf.newWebServices(url);
+            WebServices ws = wsf.getWebServices(url);
             ws.unExposeAsWebService(serviceName);
         } catch (ProActiveException e) {
             e.printStackTrace();

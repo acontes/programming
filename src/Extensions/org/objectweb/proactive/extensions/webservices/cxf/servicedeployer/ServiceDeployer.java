@@ -42,6 +42,7 @@ import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
@@ -90,10 +91,12 @@ public class ServiceDeployer implements ServiceDeployerItf {
      * @param marshalledSerializedMethods byte array representing the methods (of type Method)
      *        to be exposed
      * @param isComponent Specify whether the object we want to expose is a component.
+     * @throws NoSuchInterfaceException 
+     * @throws ClassNotFoundException 
      */
     @SuppressWarnings("unchecked")
     public void deploy(byte[] marshalledObject, String serviceName, byte[] marshalledSerializedMethods,
-            boolean isComponent) {
+            boolean isComponent) throws NoSuchInterfaceException, ClassNotFoundException {
 
         Object o = HttpMarshaller.unmarshallObject(marshalledObject);
         Class<?> superclass = null;
@@ -102,14 +105,14 @@ public class ServiceDeployer implements ServiceDeployerItf {
         ReflectionServiceFactoryBean serviceFactory = new ReflectionServiceFactoryBean();
         ServerFactoryBean svrFactory = null;
 
+        // This method is called to force element to be unqualified
+        // It is the default behaviour but if you want to expose an active
+        // object using a set of methods, element forms become qualified.
+        serviceFactory.setQualifyWrapperSchema(false);
+
         if (!isComponent) {
             superclass = o.getClass().getSuperclass();
             implClass = superclass.getName();
-
-            // This method is called to force element to be unqualified
-            // It is the default behaviour but if you want to expose an active
-            // object using a set of methods, element forms become qualified.
-            serviceFactory.setQualifyWrapperSchema(false);
 
             ArrayList<SerializableMethod> serializableMethods = (ArrayList<SerializableMethod>) HttpMarshaller
                     .unmarshallObject(marshalledSerializedMethods);
@@ -126,51 +129,46 @@ public class ServiceDeployer implements ServiceDeployerItf {
         } else {
             String interfaceName = serviceName.substring(serviceName.lastIndexOf('_') + 1);
             Interface interface_;
-            try {
-                interface_ = (Interface) ((Component) o).getFcInterface(interfaceName);
-                implClass = ((InterfaceType) interface_.getFcItfType()).getFcItfSignature();
-                superclass = Class.forName(implClass, true, interface_.getClass().getClassLoader());
+            interface_ = (Interface) ((Component) o).getFcInterface(interfaceName);
+            implClass = ((InterfaceType) interface_.getFcItfType()).getFcItfSignature();
+            superclass = Class.forName(implClass, true, interface_.getClass().getClassLoader());
 
-                MethodUtils mc = new MethodUtils(superclass);
-                List<Method> ignoredMethods = mc.getExcludedMethods(null);
+            MethodUtils mc = new MethodUtils(superclass);
+            List<Method> ignoredMethods = mc.getExcludedMethods(null);
 
-                serviceFactory.setIgnoredMethods(ignoredMethods);
+            serviceFactory.setIgnoredMethods(ignoredMethods);
 
-                svrFactory = new ServerFactoryBean(serviceFactory);
-                svrFactory.setServiceBean(superclass.cast(interface_));
-            } catch (NoSuchInterfaceException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            } catch (SecurityException e) {
-                e.printStackTrace();
-            }
+            svrFactory = new ServerFactoryBean(serviceFactory);
+            svrFactory.setServiceBean(superclass.cast(interface_));
         }
 
         svrFactory.setServiceClass(superclass);
         svrFactory.setAddress("/" + serviceName);
 
-        /*
-         * Attaches a list of in-interceptors
-         */
-        List<Interceptor> inInterceptors = new ArrayList<Interceptor>();
-        LoggingInInterceptor loggingInInterceptor = new LoggingInInterceptor();
-        inInterceptors.add(loggingInInterceptor);
-        svrFactory.setInInterceptors(inInterceptors);
+        if (logger.getLevel() != null && logger.getLevel() == Level.DEBUG) {
 
-        /*
-         * Attaches a list of out-interceptors
-         */
-        List<Interceptor> outInterceptors = new ArrayList<Interceptor>();
-        LoggingOutInterceptor loggingOutInterceptor = new LoggingOutInterceptor();
-        outInterceptors.add(loggingOutInterceptor);
-        svrFactory.setOutInterceptors(outInterceptors);
+            /*
+             * Attaches a list of in-interceptors
+             */
+            List<Interceptor> inInterceptors = new ArrayList<Interceptor>();
+            LoggingInInterceptor loggingInInterceptor = new LoggingInInterceptor();
+            inInterceptors.add(loggingInInterceptor);
+            svrFactory.setInInterceptors(inInterceptors);
+
+            /*
+             * Attaches a list of out-interceptors
+             */
+            List<Interceptor> outInterceptors = new ArrayList<Interceptor>();
+            LoggingOutInterceptor loggingOutInterceptor = new LoggingOutInterceptor();
+            outInterceptors.add(loggingOutInterceptor);
+            svrFactory.setOutInterceptors(outInterceptors);
+        }
 
         svrFactory.create();
 
         serverList.put(serviceName, svrFactory.getServer());
 
-        logger.info("The service " + serviceName + " has been deployed");
+        logger.debug("The service " + serviceName + " has been deployed");
 
     }
 
@@ -183,6 +181,6 @@ public class ServiceDeployer implements ServiceDeployerItf {
         Server serviceServer = serverList.get(serviceName);
         serviceServer.stop();
         serverList.remove(serviceName);
-        logger.info("The service " + serviceName + " has been undeployed");
+        logger.debug("The service " + serviceName + " has been undeployed");
     }
 }

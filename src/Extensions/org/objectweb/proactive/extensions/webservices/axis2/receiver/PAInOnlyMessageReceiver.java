@@ -31,13 +31,11 @@
  */
 package org.objectweb.proactive.extensions.webservices.axis2.receiver;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.apache.axiom.om.OMAbstractFactory;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMFactory;
-
 import org.apache.axis2.AxisFault;
 import org.apache.axis2.context.MessageContext;
 import org.apache.axis2.description.AxisMessage;
@@ -46,9 +44,7 @@ import org.apache.axis2.description.AxisService;
 import org.apache.axis2.receivers.AbstractInMessageReceiver;
 import org.apache.axis2.rpc.receivers.RPCUtil;
 import org.apache.axis2.wsdl.WSDLConstants;
-
 import org.apache.log4j.Logger;
-
 import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative;
 import org.objectweb.proactive.core.remoteobject.http.util.HttpMarshaller;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -79,7 +75,7 @@ public class PAInOnlyMessageReceiver extends AbstractInMessageReceiver {
     protected void invokeBusinessLogic(MessageContext inMessageContext) throws AxisFault {
         try {
             // Display the received message to be treated
-            logger.info("Got the message ==> " + inMessageContext.getEnvelope().toString());
+            logger.debug("Got the message ==> " + inMessageContext.getEnvelope().toString());
 
             // Get the axis service corresponding to this call
             AxisService axisService = inMessageContext.getServiceContext().getAxisService();
@@ -162,12 +158,9 @@ public class PAInOnlyMessageReceiver extends AbstractInMessageReceiver {
                         methodElement, inMessageContext);
             }
             replicateState(inMessageContext);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new AxisFault("An exception occured while treating the following message:\n" +
+                inMessageContext.getEnvelope().toString(), e);
         }
     }
 }

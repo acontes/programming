@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.util.SerializableMethod;
 import org.objectweb.proactive.extensions.webservices.WSConstants;
+import org.objectweb.proactive.extensions.webservices.exceptions.WebServicesException;
 
 
 /**
@@ -87,10 +88,10 @@ public class MethodUtils {
      * @param method Method to be checked
      * @throws ProActiveException
      */
-    public static void checkMethodClass(Method method) throws ProActiveException {
+    public static void checkMethodClass(Method method) throws WebServicesException {
         if (method.getDeclaringClass().getName().startsWith(
                 org.objectweb.proactive.core.mop.Utils.STUB_DEFAULT_PACKAGE))
-            throw new ProActiveException("Method " + method.getName() +
+            throw new WebServicesException("Method " + method.getName() +
                 " is a method form the stub not from the class. \n" + "This method will not be exposed. \n" +
                 "Use <class name>.class.getMethod(String methodName, Class<?>... parameters) to solve this issue");
     }
@@ -101,7 +102,7 @@ public class MethodUtils {
      * @param methods Methods to be checked
      * @throws ProActiveException
      */
-    public static void checkMethodsClass(Method[] methods) throws ProActiveException {
+    public static void checkMethodsClass(Method[] methods) throws WebServicesException {
         if (methods != null) {
             for (Method method : methods) {
                 checkMethodClass(method);

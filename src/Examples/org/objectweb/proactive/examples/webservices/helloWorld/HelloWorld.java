@@ -121,7 +121,7 @@ public class HelloWorld implements Serializable, InitActive {
             boolean onANode;
             String wsFrameWork = "";
             if (args.length == 1) {
-                url = "http://localhost:8080/";
+                url = AbstractWebServicesFactory.getLocalUrl();
                 GCMDeployment = false;
                 onANode = false;
                 wsFrameWork = args[0];
@@ -166,7 +166,6 @@ public class HelloWorld implements Serializable, InitActive {
                     GCMVirtualNode hello = gcmad.getVirtualNode("Hello");
                     Node node1 = hello.getANode();
                     String origin = node1.getNodeInformation().getURL();
-                    logger.info("Node Address = " + origin);
 
                     if (hello == null)
                         throw new ProActiveException("Hello virtual node is not defined");
@@ -193,7 +192,7 @@ public class HelloWorld implements Serializable, InitActive {
 
             ws.exposeAsWebService(hw, "HelloWorld", new String[] { "putTextToSay", "sayText",
                     "putHelloWorld", "putTextToSayAndConfirm" });
-            //            WebServices.exposeAsWebService(wsFrameWork, hw, url, "HelloWorld");
+
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
         } catch (NodeException e) {

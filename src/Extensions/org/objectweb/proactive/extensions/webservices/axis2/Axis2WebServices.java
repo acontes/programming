@@ -17,17 +17,21 @@ import org.objectweb.proactive.extensions.webservices.WebServices;
 import org.objectweb.proactive.extensions.webservices.axis2.deployer.PADeployer;
 import org.objectweb.proactive.extensions.webservices.axis2.util.Util;
 import org.objectweb.proactive.extensions.webservices.common.MethodUtils;
+import org.objectweb.proactive.extensions.webservices.exceptions.WebServicesException;
 
 
 public class Axis2WebServices extends AbstractWebServices implements WebServices {
 
     static private Logger logger = ProActiveLogger.getLogger(Loggers.WEB_SERVICES);
 
-    private void initializeServlet() {
+    private synchronized void initializeServlet() throws WebServicesException {
 
         // Retrieve or launch a Jetty server
         // in case of a local exposition
         HTTPServer httpServer = HTTPServer.get();
+
+        if (httpServer.isMapped(WSConstants.SERVLET_PATH))
+            return;
 
         // Create an Axis servlet
         AxisServlet axisServlet = new AxisServlet();
@@ -50,32 +54,32 @@ public class Axis2WebServices extends AbstractWebServices implements WebServices
         httpServer.registerServlet(axisServletHolder, WSConstants.SERVLET_PATH);
 
         // Erases the _axis2 directory created by axis2 when used by jetty
-        logger.info("Erasing temporary files created by axis2 servlet...");
+        logger.debug("Erasing temporary files created by axis2 servlet...");
         File f = new File((File) axisServlet.getServletContext()
                 .getAttribute("javax.servlet.context.tempdir"), "_axis2");
         if (f.isDirectory()) {
             File[] files = f.listFiles();
             for (File child : files) {
                 if (child.delete()) {
-                    logger.info("   - " + child.getAbsolutePath() + " has been deleted");
+                    logger.debug("   - " + child.getAbsolutePath() + " has been deleted");
                 } else {
-                    logger.info("   - " + child.getAbsolutePath() + " has not been deleted");
+                    logger.debug("   - " + child.getAbsolutePath() + " has not been deleted");
                 }
             }
 
             if (f.delete()) {
-                logger.info("   - " + f.getAbsolutePath() + " has been deleted");
+                logger.debug("   - " + f.getAbsolutePath() + " has been deleted");
             } else {
-                logger.info("   - " + f.getAbsolutePath() + " has not been deleted");
+                logger.debug("   - " + f.getAbsolutePath() + " has not been deleted");
             }
         }
 
-        logger.info("Axis servlet has been deployed on the local Jetty server " +
+        logger.debug("Axis servlet has been deployed on the local Jetty server " +
             "with its embedded ServiceDeployer service located at " + "http://localhost:" +
             PAProperties.PA_XMLHTTP_PORT.getValue() + "/" + WSConstants.SERVICES_PATH + "ServiceDeployer");
     }
 
-    public Axis2WebServices(String url) {
+    public Axis2WebServices(String url) throws WebServicesException {
         super(url);
         initializeServlet();
     }
@@ -88,8 +92,9 @@ public class Axis2WebServices extends AbstractWebServices implements WebServices
      * @param urn The name of the object
      * @param methods The methods that will be exposed as web services functionalities
      *                   If null, then all methods will be exposed
+     * @throws WebServicesException 
      */
-    public void exposeAsWebService(Object o, String urn, String[] methods) {
+    public void exposeAsWebService(Object o, String urn, String[] methods) throws WebServicesException {
         PADeployer.deploy(o, this.url, urn, methods, false);
     }
 
@@ -101,8 +106,9 @@ public class Axis2WebServices extends AbstractWebServices implements WebServices
      * @param urn The name of the object
      * @param methods The methods that will be exposed as web services functionalities
      *                   If null, then all methods will be exposed
+     * @throws WebServicesException 
      */
-    public void exposeAsWebService(Object o, String urn, Method[] methods) {
+    public void exposeAsWebService(Object o, String urn, Method[] methods) throws WebServicesException {
         ArrayList<String> methodsName = MethodUtils.getCorrespondingMethodsName(methods);
         PADeployer.deploy(o, this.url, urn, methodsName.toArray(new String[methodsName.size()]), false);
     }
@@ -113,8 +119,9 @@ public class Axis2WebServices extends AbstractWebServices implements WebServices
      * @param o The object to expose as a web service
      * @param url The url of the host where the object will be deployed  (typically http://localhost:8080/)
      * @param urn The name of the object
+     * @throws WebServicesException 
      */
-    public void exposeAsWebService(Object o, String urn) {
+    public void exposeAsWebService(Object o, String urn) throws WebServicesException {
         PADeployer.deploy(o, this.url, urn, null, false);
     }
 
@@ -123,8 +130,9 @@ public class Axis2WebServices extends AbstractWebServices implements WebServices
      *
      * @param urn The name of the object
      * @param url The url of the web server
+     * @throws WebServicesException 
      */
-    public void unExposeAsWebService(String urn) {
+    public void unExposeAsWebService(String urn) throws WebServicesException {
         PADeployer.undeploy(this.url, urn);
     }
 
@@ -139,8 +147,10 @@ public class Axis2WebServices extends AbstractWebServices implements WebServices
      * @param componentName Name of the component
      * @param interfaceNames Names of the interfaces we want to deploy.
       *                           If null, then all the interfaces will be deployed
+     * @throws WebServicesException 
      */
-    public void exposeComponentAsWebService(Component component, String componentName, String[] interfaceNames) {
+    public void exposeComponentAsWebService(Component component, String componentName, String[] interfaceNames)
+            throws WebServicesException {
         PADeployer.deployComponent(component, this.url, componentName, interfaceNames);
     }
 
@@ -152,8 +162,10 @@ public class Axis2WebServices extends AbstractWebServices implements WebServices
      * @param component The component owning the interfaces that will be deployed as web services.
      * @param url  Web server url  where to deploy the service - typically "http://localhost:8080"
      * @param componentName Name of the component
+     * @throws WebServicesException 
      */
-    public void exposeComponentAsWebService(Component component, String componentName) {
+    public void exposeComponentAsWebService(Component component, String componentName)
+            throws WebServicesException {
         PADeployer.deployComponent(component, this.url, componentName, null);
     }
 
@@ -163,8 +175,10 @@ public class Axis2WebServices extends AbstractWebServices implements WebServices
      * @param component  The component owning the services interfaces
      * @param url The url of the web server
      * @param componentName The name of the component
+     * @throws WebServicesException 
      */
-    public void unExposeComponentAsWebService(Component component, String componentName) {
+    public void unExposeComponentAsWebService(Component component, String componentName)
+            throws WebServicesException {
         PADeployer.undeployComponent(component, this.url, componentName);
     }
 
@@ -174,8 +188,10 @@ public class Axis2WebServices extends AbstractWebServices implements WebServices
      * @param url The url of the web server
      * @param componentName The name of the component
      * @param interfaceNames Interfaces to be undeployed
+     * @throws WebServicesException 
      */
-    public void unExposeComponentAsWebService(String componentName, String[] interfaceNames) {
+    public void unExposeComponentAsWebService(String componentName, String[] interfaceNames)
+            throws WebServicesException {
         PADeployer.undeployComponent(this.url, componentName, interfaceNames);
     }
 

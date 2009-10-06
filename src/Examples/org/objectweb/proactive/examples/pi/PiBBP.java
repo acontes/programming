@@ -363,7 +363,7 @@ public class PiBBP implements Serializable {
 
             if (piApplication.isWebService()) {
                 WebServicesFactory wsf = AbstractWebServicesFactory.getDefaultWebServicesFactory();
-                WebServices ws = wsf.newWebServices("http://localhost:8080/");
+                WebServices ws = wsf.getWebServices("http://localhost:8080/");
                 ws.exposeAsWebService(piApplication, "piComputation", new String[] { "runSimple",
                         "runParallel", "runParallelDistributed", "setNbDecimals" });
             } else {

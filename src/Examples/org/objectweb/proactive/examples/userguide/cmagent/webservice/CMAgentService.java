@@ -99,7 +99,7 @@ public class CMAgentService extends CMAgentInitialized {
             //@tutorial-break
             //@snippet-start ws_call
             WebServicesFactory wsf = AbstractWebServicesFactory.getWebServicesFactory(wsFrameWork);
-            WebServices ws = wsf.newWebServices(url);
+            WebServices ws = wsf.getWebServices(url);
             ws.exposeAsWebService(hw, "cmAgentService", new String[] { "waitLastRequestServeTime",
                     "getCurrentState" });
             //@snippet-end ws_call

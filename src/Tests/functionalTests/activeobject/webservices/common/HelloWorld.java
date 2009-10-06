@@ -52,13 +52,10 @@ public class HelloWorld extends HelloWorldSuperClass implements java.io.Serializ
 
     public void putHelloWorld() {
         this.textsToSay.add("Hello world!");
-        System.err.println("Last inserted element = " + this.textsToSay.getLast());
     }
 
     public void putTextToSay(String textToSay) {
-        System.err.println("textToSay = " + textToSay);
         this.textsToSay.add(textToSay);
-        System.err.println("Last inserted element = " + this.textsToSay.getLast());
     }
 
     public String sayText() {
@@ -68,14 +65,11 @@ public class HelloWorld extends HelloWorldSuperClass implements java.io.Serializ
         } else {
             str = this.textsToSay.poll();
         }
-        System.err.println("Returned string is " + str);
         return str;
     }
 
     public boolean contains(String textToCheck) {
-        System.err.println("textToCheck = " + textToCheck);
         boolean response = new Boolean(this.textsToSay.contains(textToCheck));
-        System.err.println("response = " + response);
         return response;
     }
 
