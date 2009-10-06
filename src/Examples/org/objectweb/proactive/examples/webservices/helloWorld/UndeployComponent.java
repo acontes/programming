@@ -47,21 +47,20 @@ public class UndeployComponent {
     public static void main(String[] args) {
         String url = "";
         String componentName = "";
-        String interfaceName = "";
+        String[] interfaceName = null;
         String wsFrameWork = "";
-        if (args.length == 3) {
-            url = "http://localhost:8080/";
-            componentName = args[0];
-            interfaceName = args[1];
-            wsFrameWork = args[2];
-        } else if (args.length == 4) {
+        if (args.length >= 4) {
             url = args[0];
-            componentName = args[1];
-            interfaceName = args[2];
-            wsFrameWork = args[3];
+            wsFrameWork = args[1];
+            componentName = args[2];
+            interfaceName = new String[args.length - 3];
+            for (int i = 0; i < interfaceName.length; i++) {
+                interfaceName[i] = args[3 + i];
+            }
         } else {
             System.out.println("Wrong number of arguments:");
-            System.out.println("Usage: java UndeployComponent [url] componentName interfaceName wsFrameWork");
+            System.out
+                    .println("Usage: java UndeployComponent url wsFrameWork componentName interfaceNames+ ");
             System.out.println("where wsFramWork should be either \"axis2\" or \"cxf\"");
             return;
         }
@@ -69,7 +68,7 @@ public class UndeployComponent {
         try {
             WebServicesFactory wsf = AbstractWebServicesFactory.getWebServicesFactory(wsFrameWork);
             WebServices ws = wsf.getWebServices(url);
-            ws.unExposeComponentAsWebService(componentName, new String[] { interfaceName });
+            ws.unExposeComponentAsWebService(componentName, interfaceName);
         } catch (ProActiveException e) {
             e.printStackTrace();
         }

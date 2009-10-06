@@ -128,7 +128,8 @@ public final class PADeployer {
             String[] interfaceNames) throws WebServicesException {
 
         Object[] interfaces;
-        if (interfaceNames == null || interfaceNames.length == 0) {
+        boolean deployAllInterfaces = interfaceNames == null || interfaceNames.length == 0;
+        if (deployAllInterfaces) {
             interfaces = component.getFcInterfaces();
             logger.debug("Deploying all interfaces of " + componentName);
         } else {
@@ -138,10 +139,8 @@ public final class PADeployer {
                     logger.debug("Deploying the interface " + interfaceNames[i] + " of " + componentName);
                     interfaces[i] = component.getFcInterface(interfaceNames[i]);
                 } catch (NoSuchInterfaceException e) {
-                    logger.error("Impossible to retrieve the interface whose name is " + interfaceNames[i]);
-                    logger.error("Retrieve all interfaces");
-                    interfaces = component.getFcInterfaces();
-                    break;
+                    throw new WebServicesException("Impossible to retrieve the interface whose name is " +
+                        interfaceNames[i], e);
                 }
             }
         }
@@ -151,14 +150,15 @@ public final class PADeployer {
             String interfaceName = interface_.getFcItfName();
 
             /* only expose server interfaces and not the attributes controller */
-            if (!interfaceName.contains("-controller") && !interfaceName.equals("component")) {
+            if (!interfaceName.contains("-controller") && !interfaceName.equals("component") &&
+                !((ProActiveInterfaceType) interface_.getFcItfType()).isFcClientItf()) {
 
-                if (!((ProActiveInterfaceType) interface_.getFcItfType()).isFcClientItf()) {
+                String wsName = componentName + "_" + interfaceName;
+                deploy(component, url, wsName, null, true);
 
-                    String wsName = componentName + "_" + interfaceName;
-                    deploy(component, url, wsName, null, true);
-
-                }
+            } else if (!deployAllInterfaces) {
+                logger.error("The interface '" + interfaceName + "' is not a valid interface:");
+                logger.error("Only the non-controller server interfaces can be exposed as a web service.");
             }
         }
     }

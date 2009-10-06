@@ -8,6 +8,8 @@ import org.apache.axis2.transport.http.AxisServlet;
 import org.apache.log4j.Logger;
 import org.mortbay.jetty.servlet.ServletHolder;
 import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.api.Interface;
+import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.httpserver.HTTPServer;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -75,8 +77,8 @@ public class Axis2WebServices extends AbstractWebServices implements WebServices
         }
 
         logger.debug("Axis servlet has been deployed on the local Jetty server " +
-            "with its embedded ServiceDeployer service located at " + "http://localhost:" +
-            PAProperties.PA_XMLHTTP_PORT.getValue() + "/" + WSConstants.SERVICES_PATH + "ServiceDeployer");
+            "with its embedded ServiceDeployer service located at " + this.url + WSConstants.SERVICES_PATH +
+            "ServiceDeployer");
     }
 
     public Axis2WebServices(String url) throws WebServicesException {
@@ -96,6 +98,13 @@ public class Axis2WebServices extends AbstractWebServices implements WebServices
      */
     public void exposeAsWebService(Object o, String urn, String[] methods) throws WebServicesException {
         PADeployer.deploy(o, this.url, urn, methods, false);
+
+        logger.debug("The object of type '" + o.getClass().getSuperclass().getName() +
+            "' has been deployed on " + this.url + WSConstants.SERVICES_PATH + urn + "?wsdl");
+        logger.debug("Only the following methods of this object have been deployed: ");
+        for (String method : methods) {
+            logger.debug(" - " + method);
+        }
     }
 
     /**
@@ -111,6 +120,13 @@ public class Axis2WebServices extends AbstractWebServices implements WebServices
     public void exposeAsWebService(Object o, String urn, Method[] methods) throws WebServicesException {
         ArrayList<String> methodsName = MethodUtils.getCorrespondingMethodsName(methods);
         PADeployer.deploy(o, this.url, urn, methodsName.toArray(new String[methodsName.size()]), false);
+
+        logger.debug("The object of type '" + o.getClass().getSuperclass().getName() +
+            "' has been deployed on " + this.url + WSConstants.SERVICES_PATH + urn + "?wsdl");
+        logger.debug("Only the following methods of this object have been deployed: ");
+        for (Method method : methods) {
+            logger.debug(" - " + method.getName());
+        }
     }
 
     /**
@@ -123,6 +139,9 @@ public class Axis2WebServices extends AbstractWebServices implements WebServices
      */
     public void exposeAsWebService(Object o, String urn) throws WebServicesException {
         PADeployer.deploy(o, this.url, urn, null, false);
+
+        logger.debug("The object of type '" + o.getClass().getSuperclass().getName() +
+            "' has been deployed on " + this.url + WSConstants.SERVICES_PATH + urn + "?wsdl");
     }
 
     /**
@@ -134,6 +153,9 @@ public class Axis2WebServices extends AbstractWebServices implements WebServices
      */
     public void unExposeAsWebService(String urn) throws WebServicesException {
         PADeployer.undeploy(this.url, urn);
+
+        logger.debug("The service '" + urn + "' previously deployed on " + this.url +
+            WSConstants.SERVICES_PATH + urn + "?wsdl " + "has been undeployed");
     }
 
     /**
@@ -152,6 +174,11 @@ public class Axis2WebServices extends AbstractWebServices implements WebServices
     public void exposeComponentAsWebService(Component component, String componentName, String[] interfaceNames)
             throws WebServicesException {
         PADeployer.deployComponent(component, this.url, componentName, interfaceNames);
+
+        for (String name : interfaceNames) {
+            logger.debug("The component interface '" + name + "' has been deployed on " + this.url +
+                WSConstants.SERVICES_PATH + componentName + "_" + name + "?wsdl");
+        }
     }
 
     /**
@@ -167,6 +194,18 @@ public class Axis2WebServices extends AbstractWebServices implements WebServices
     public void exposeComponentAsWebService(Component component, String componentName)
             throws WebServicesException {
         PADeployer.deployComponent(component, this.url, componentName, null);
+
+        Object[] interfaces = component.getFcInterfaces();
+        for (Object o : interfaces) {
+            Interface interface_ = (Interface) o;
+            String interfaceName = interface_.getFcItfName();
+            if (!interfaceName.contains("-controller") && !interfaceName.equals("component") &&
+                !((ProActiveInterfaceType) interface_.getFcItfType()).isFcClientItf()) {
+
+                logger.debug("The component interface '" + interfaceName + "' has been deployed on " +
+                    this.url + WSConstants.SERVICES_PATH + componentName + "_" + interfaceName + "?wsdl");
+            }
+        }
     }
 
     /**
@@ -180,6 +219,18 @@ public class Axis2WebServices extends AbstractWebServices implements WebServices
     public void unExposeComponentAsWebService(Component component, String componentName)
             throws WebServicesException {
         PADeployer.undeployComponent(component, this.url, componentName);
+
+        Object[] interfaces = component.getFcInterfaces();
+        for (Object o : interfaces) {
+            Interface interface_ = (Interface) o;
+            String interfaceName = interface_.getFcItfName();
+            if (!interfaceName.contains("-controller") && !interfaceName.equals("component") &&
+                !((ProActiveInterfaceType) interface_.getFcItfType()).isFcClientItf()) {
+                logger.debug("The component interface '" + interfaceName + "' previously deployed on " +
+                    this.url + WSConstants.SERVICES_PATH + componentName + "_" + interfaceName +
+                    "?wsdl has been undeployed");
+            }
+        }
     }
 
     /**
@@ -193,6 +244,11 @@ public class Axis2WebServices extends AbstractWebServices implements WebServices
     public void unExposeComponentAsWebService(String componentName, String[] interfaceNames)
             throws WebServicesException {
         PADeployer.undeployComponent(this.url, componentName, interfaceNames);
+
+        for (String name : interfaceNames) {
+            logger.debug("The component interface '" + name + "' previously deployed on " + this.url +
+                WSConstants.SERVICES_PATH + componentName + "_" + name + "?wsdl has been undeployed");
+        }
     }
 
 }

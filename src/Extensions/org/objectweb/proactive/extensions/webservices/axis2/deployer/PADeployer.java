@@ -92,9 +92,6 @@ public class PADeployer {
 
             serviceClient.invokeRobust(op, opArgs);
 
-            logger.debug("The service '" + urn + "' has been deployed on " + url +
-                " and its wsdl is located at " + url + WSConstants.SERVICES_PATH + urn + "?wsdl");
-
         } catch (AxisFault axisFault) {
             throw new WebServicesException("An AxisFault occured when trying to deploy the service " + urn +
                 " on " + url, axisFault);
@@ -126,49 +123,52 @@ public class PADeployer {
             String[] interfaceNames) throws WebServicesException {
 
         Object[] interfaces;
-        if (interfaceNames == null) {
+        boolean deployAllInterfaces = interfaceNames == null || interfaceNames.length == 0;
+        if (deployAllInterfaces) {
             interfaces = component.getFcInterfaces();
+            logger.debug("Deploying all interfaces of " + componentName);
         } else {
             interfaces = new Object[interfaceNames.length];
             for (int i = 0; i < interfaceNames.length; i++) {
                 try {
                     interfaces[i] = component.getFcInterface(interfaceNames[i]);
+                    logger.debug("Deploying the interface " + interfaceNames[i] + " of " + componentName);
                 } catch (NoSuchInterfaceException e) {
-                    throw new WebServicesException(
-                        "An NoSuchInterfaceException occured when trying to deploy" + " the interface " +
-                            interfaceNames[i] + " of the component " + component.getClass().getName(), e);
+                    throw new WebServicesException("Impossible to retrieve the interface whose name is " +
+                        interfaceNames[i], e);
                 }
             }
         }
 
         for (int i = 0; i < interfaces.length; i++) {
             Interface interface_ = ((Interface) interfaces[i]);
+            String name = interface_.getFcItfName();
 
             /* only expose server interfaces and not the attributes controller */
             if (!(interface_.getFcItfName().contains("-controller")) &&
-                !interface_.getFcItfName().equals("component")) {
+                !interface_.getFcItfName().equals("component") &&
+                !((ProActiveInterfaceType) interface_.getFcItfType()).isFcClientItf()) {
 
-                if (!((ProActiveInterfaceType) interface_.getFcItfType()).isFcClientItf()) {
+                Method[] methods = interface_.getClass().getMethods();
+                Vector<String> meths = new Vector<String>();
 
-                    String name = interface_.getFcItfName();
+                for (int j = 0; j < methods.length; j++) {
+                    String methodName = methods[j].getName();
 
-                    Method[] methods = interface_.getClass().getMethods();
-                    Vector<String> meths = new Vector<String>();
-
-                    for (int j = 0; j < methods.length; j++) {
-                        String methodName = methods[j].getName();
-
-                        if (isAllowedMethod(methodName)) {
-                            meths.addElement(methodName);
-                        }
+                    if (isAllowedMethod(methodName)) {
+                        meths.addElement(methodName);
                     }
-
-                    String[] methsArray = new String[meths.size()];
-                    meths.toArray(methsArray);
-                    String wsName = componentName + "_" + name;
-
-                    deploy(component, url, wsName, methsArray, true);
                 }
+
+                String[] methsArray = new String[meths.size()];
+                meths.toArray(methsArray);
+                String wsName = componentName + "_" + name;
+
+                deploy(component, url, wsName, methsArray, true);
+
+            } else if (!deployAllInterfaces) {
+                logger.error("The interface '" + name + "' is not a valid interface:");
+                logger.error("Only the non-controller server interfaces can be exposed as a web service.");
             }
         }
 
@@ -200,7 +200,6 @@ public class PADeployer {
 
             serviceClient.invokeRobust(op, opArgs);
 
-            logger.debug("The service '" + serviceName + "' deployed on " + url + " has been undeploy");
         } catch (AxisFault axisFault) {
             throw new WebServicesException("An AxisFault occured when trying to undeploy the service " +
                 serviceName + " on " + url, axisFault);
