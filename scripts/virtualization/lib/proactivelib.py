@@ -4,6 +4,9 @@ Created on 5 mai 2009
 @author: jmguilla
 '''
 
+#this module is the python library for use with ProActive
+#GCMDeployment on virtualized infrastructures.
+
 import os
 import re
 import sys

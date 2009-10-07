@@ -14,6 +14,7 @@ from subprocess import *
 
 #you have to set the following info to be able to
 #bootstrap proactive runtime
+
 xenServerAddress = "http://192.168.1.193"
 xenServerUserID = "root"
 xenServerUserPWD = "root123"
@@ -21,9 +22,6 @@ xenServerUserPWD = "root123"
 class XenServer_Runtime( proactivelib.Abstract_Runtime ):
 
     def isOk(self):
-        """This method is used to check if the current environment
-        matches xenserver requirements to be used. If it is the case, an
-        instance of VMware_Runtime will be returned"""
         """This method is used to check if the current environment
         matches xenserver requirements to be used. If it is the case, an
         instance of VMware_Runtime will be returned"""

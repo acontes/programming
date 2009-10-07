@@ -4,6 +4,9 @@ import re
 import traceback
 from subprocess import *
 
+#This module encompass the lib-xen python api to bring it to a more
+#object oriented architecture corresponding to our needs.
+
 class XenServer_Helper :
     
     #Here are developpers data
@@ -71,6 +74,10 @@ class XenServer_Helper :
         return False
 
     def __getHoldingVM(self):
+        """This private method is used to determine the virtual
+        machine in which one this programm is running. This is done
+        by iterating on all vm registered within the remote XenServer
+        instance until a vm with the same MAC Address is found"""
         res = self.__fixHoldingVirtualMachine()
         if res == True:
             return self.holdingVM
@@ -78,6 +85,7 @@ class XenServer_Helper :
             return None
 
     def getData(self,key):
+        """To get a data saved thanks to pushData method"""
         vm = self.__getHoldingVM()
         if vm == None:
             raise EnvironmentError("No holding VM found")
@@ -91,6 +99,7 @@ class XenServer_Helper :
             return None
 
     def pushData(self,key,value):
+        """To write a data in the virtual machine environment"""
         vm = self.__getHoldingVM()
         if vm == None:
             raise EnvironmentError("No holding VM found")

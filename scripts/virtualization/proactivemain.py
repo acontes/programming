@@ -1,10 +1,28 @@
 import sys
-import proactivelib
-import vmware
-import virtualbox
-if sys.version_info[0] == 2 :
-    import xenserver
+import os
 import time
+pathname = os.path.dirname(sys.argv[0])
+#updating lib path
+sys.path.append(os.path.abspath(pathname + os.path.sep +  "lib"))
+import proactivelib
+#updating vmware path
+sys.path.append(os.path.abspath(pathname + os.path.sep + "vmware"))
+import vmware
+#updating virtualbox path
+sys.path.append(os.path.abspath(pathname + os.path.sep + "virtualbox"))
+import virtualbox
+#updating xenserver path
+if sys.version_info[0] == 2 :
+    sys.path.append(os.path.abspath(pathname + os.path.sep + "xenserver"))
+    sys.path.append(os.path.abspath(pathname + os.path.sep + "xenserver" + os.path.sep + "ext"))
+    import xenserver
+
+#This module is the main entry point to bootstrap
+#ProActive environment when deploying through GCM
+#on virtualized infrastructures.
+
+#Can be called with an argument which is the absolute file path
+#that will be used as logfile.
 
 if len(sys.argv) >= 2 :
     logFile = sys.argv[1]

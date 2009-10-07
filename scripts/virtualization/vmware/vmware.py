@@ -7,6 +7,8 @@ import sys
 import proactivelib
 from subprocess import *
 
+#This module is the implementation of proativelib.Abstract_Runtime
+#to be able to handle VMware virtualized environments.
 
 class VMware_Runtime ( proactivelib.Abstract_Runtime ) :
 
