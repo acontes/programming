@@ -44,7 +44,8 @@ import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.vm.GCMVirt
 public class GCMDeploymentResources {
     private List<Group> groups = Collections.synchronizedList(new ArrayList<Group>());
     private List<Bridge> bridges = Collections.synchronizedList(new ArrayList<Bridge>());
-    private List<GCMVirtualMachineManager> vmms = Collections.synchronizedList(new ArrayList<GCMVirtualMachineManager>());
+    private List<GCMVirtualMachineManager> vmms = Collections
+            .synchronizedList(new ArrayList<GCMVirtualMachineManager>());
     private HostInfo hostInfo;
 
     public List<Group> getGroups() {

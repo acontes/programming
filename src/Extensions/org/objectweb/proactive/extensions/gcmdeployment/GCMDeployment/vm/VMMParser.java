@@ -40,7 +40,8 @@ import org.w3c.dom.Node;
 
 public interface VMMParser {
 
-    public GCMVirtualMachineManager parseVMMNode(Node vmmNode, XPath xpath) throws XPathExpressionException, VirtualServiceException;
+    public GCMVirtualMachineManager parseVMMNode(Node vmmNode, XPath xpath) throws XPathExpressionException,
+            VirtualServiceException;
 
     /**
      * Returns the node's name associated to a particular parser

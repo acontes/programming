@@ -15,17 +15,16 @@ public class VMMVMwareVIParser extends AbstractVMMParser {
         return NODE_NAME;
     }
 
-	@Override
-	public void initializeGCMVirtualMachineManager(Node vmmNode, XPath xpath,
-			GCMVirtualMachineManager gcmVMM) throws VirtualServiceException {
-		try {
-			String user = gcmVMM.getUser(), pwd = gcmVMM.getPwd();
-			for(String uri : gcmVMM.getUris()){
-				gcmVMM.addVirtualMachineManager(VMwareVMM.class.getName(),
-						new Class<?>[]{String.class,String.class,String.class}, new Object[]{uri,user,pwd});
-			}
-		} catch (Exception e) {
-			throw new VirtualServiceException(e , "Cannot initialize GCMVirtualMachineManager.");
-		}		
-	}
+    @Override
+    public void initializeGCMVirtualMachineManager(Node vmmNode, XPath xpath, GCMVirtualMachineManager gcmVMM)
+            throws VirtualServiceException {
+        try {
+            String user = gcmVMM.getUser(), pwd = gcmVMM.getPwd();
+            for (String uri : gcmVMM.getUris()) {
+                gcmVMM.addVirtualMachineManager(new VMwareVIVMMBean(uri,user,pwd));
+            }
+        } catch (Exception e) {
+            throw new VirtualServiceException(e, "Cannot initialize GCMVirtualMachineManager.");
+        }
+    }
 }

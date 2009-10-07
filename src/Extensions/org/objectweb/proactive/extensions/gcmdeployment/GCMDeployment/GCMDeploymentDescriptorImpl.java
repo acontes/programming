@@ -120,7 +120,7 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
             for (GCMVirtualMachineManager vmm : vmms) {
                 //since deployment with virtualization is meaningless outside of a ProActive application
                 //it is compulsory to downcast the commandBuilder to be able to bootstrap remote PART
-            	GCMDeploymentLoggers.GCMD_LOGGER.debug("VMM with refid " + vmm.getId() + " is going to boot");
+                GCMDeploymentLoggers.GCMD_LOGGER.debug("VMM with refid " + vmm.getId() + " is going to boot");
                 vmm
                         .start(
                                 commandBuilder instanceof CommandBuilderProActive ? (CommandBuilderProActive) commandBuilder

@@ -420,7 +420,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
 
             resources.setHostInfo(hostInfo);
         } else if (nodeName.equals(PA_HYPERVISOR)) {
-        	GCMVirtualMachineManager vmm = getVMM(refid);
+            GCMVirtualMachineManager vmm = getVMM(refid);
             if (vmm == null) {
                 throw new RuntimeException("no hypervisor with refid " + refid + " has been defined");
             }
@@ -445,7 +445,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     }
 
     protected GCMVirtualMachineManager getVMM(String refid) throws IOException {
-    	GCMVirtualMachineManager vmm = infrastructure.getVMM().get(refid);
+        GCMVirtualMachineManager vmm = infrastructure.getVMM().get(refid);
         return (GCMVirtualMachineManager) makeDeepCopy(vmm);
     }
 
@@ -586,14 +586,14 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
                 GCMDeploymentLoggers.GCMD_LOGGER.warn("No vm parser registered for node <" +
                     vmNode.getNodeName() + ">");
             } else {
-            	GCMDeploymentLoggers.GCMD_LOGGER.debug("parsing " + vmNode.getNodeName() + ".");
+                GCMDeploymentLoggers.GCMD_LOGGER.debug("parsing " + vmNode.getNodeName() + ".");
                 GCMVirtualMachineManager vmm;
-				try {
-					vmm = vmParser.parseVMMNode(vmNode, xpath);
-					infrastructure.addVMM(vmm);
-				} catch (VirtualServiceException e) {
-					GCMDeploymentLoggers.GCMD_LOGGER.error("An error occured while parsing vmm node.",e);
-				}
+                try {
+                    vmm = vmParser.parseVMMNode(vmNode, xpath);
+                    infrastructure.addVMM(vmm);
+                } catch (VirtualServiceException e) {
+                    GCMDeploymentLoggers.GCMD_LOGGER.error("An error occured while parsing vmm node.", e);
+                }
             }
         }
 

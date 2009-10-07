@@ -1,10 +1,11 @@
-package org.objectweb.proactive.core.httpserver;
+package org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.vm;
 
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -15,13 +16,14 @@ import org.apache.log4j.Logger;
 import org.mortbay.jetty.servlet.ServletHolder;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.httpserver.HTTPServer;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
-public class BootstrapServlet extends HttpServlet {
+public final class BootstrapServlet extends HttpServlet {
     final static public String NS = "/bootstrap";
     final static public String MAPPING = NS + "/*";
     final static public String VM_ID = "vmid";
@@ -39,14 +41,22 @@ public class BootstrapServlet extends HttpServlet {
 
     static BootstrapServlet servlet = null;
 
-    static public synchronized BootstrapServlet get() {
-        if (servlet == null) {
-            HTTPServer server = HTTPServer.get();
-            servlet = new BootstrapServlet();
-            server.registerServlet(new ServletHolder(servlet), BootstrapServlet.MAPPING);
-        }
+    private static final ReentrantLock serviceLock = new ReentrantLock();
 
-        return servlet;
+    static public BootstrapServlet get() {
+        try {
+            serviceLock.lock();
+            if (servlet == null) {
+                HTTPServer server = HTTPServer.get();
+                servlet = new BootstrapServlet();
+                server.registerServlet(new ServletHolder(servlet), BootstrapServlet.MAPPING);
+                logger.debug("Bootstrap Servlet initialized, mapped: " + BootstrapServlet.MAPPING);
+            }
+
+            return servlet;
+        } finally {
+            serviceLock.unlock();
+        }
     }
 
     private BootstrapServlet() {
@@ -55,33 +65,31 @@ public class BootstrapServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException,
             IOException {
-        synchronized (get()) {
-            if (logger.isDebugEnabled()) {
-                String pathInfo = req.getPathInfo();
-                logger.warn("Serving request from " + pathInfo);
+        if (logger.isDebugEnabled()) {
+            String pathInfo = req.getPathInfo();
+            String from = req.getLocalAddr() + ":" + req.getLocalPort();
+            logger.debug("Serving request " + pathInfo + " from " + from);
+        }
+        resp.setContentType("text/plain");
+        resp.setCharacterEncoding("UTF-8");
+        String vmid = req.getParameter(VM_ID);
+        HashMap<String, String> values = applis.get(vmid.trim());
+        if (values != null) {
+            Set<String> keys = values.keySet();
+            for (String key : keys) {
+                resp.getOutputStream().println(key + " = " + values.get(key));
             }
-            resp.setContentType("text/plain");
-            resp.setCharacterEncoding("UTF-8");
-            String vmid = req.getParameter(VM_ID);
-            HashMap<String, String> values = applis.get(vmid.trim());
-            if (values != null) {
-                Set<String> keys = values.keySet();
-                for (String key : keys) {
-                    resp.getOutputStream().println(key + " = " + values.get(key));
-                }
-            } else
-                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-
-            if (logger.isDebugEnabled()) {
-                final String from = req.getLocalAddr() + ":" + req.getLocalPort();
-                logger.warn("Serving request from " + from);
-            }
+        } else {
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
     }
 
     public boolean isRegistered(String deploymentId) {
-        synchronized (get()) {
+        try {
+            serviceLock.lock();
             return applis.get(deploymentId) != null;
+        } finally {
+            serviceLock.unlock();
         }
     }
 
@@ -104,11 +112,14 @@ public class BootstrapServlet extends HttpServlet {
      * @return the address where you'll be able to display required information.
      */
     public String registerAppli(String id, HashMap<String, String> values) {
-        synchronized (get()) {
+        try {
+            serviceLock.lock();
             applis.put(id, values);
             String res = getBaseURI() + "?" + BootstrapServlet.VM_ID + "=" + id;
-            logger.info("Bootstrap servlet registered an app on:  " + res);
+            logger.debug("Bootstrap servlet registered an app on:  " + res);
             return res;
+        } finally {
+            serviceLock.unlock();
         }
     }
 }

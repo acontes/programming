@@ -70,8 +70,9 @@ public abstract class AbstractVMMParser implements VMMParser {
      * @throws XPathExpressionException
      * @throws VirtualServiceException 
      */
-    public GCMVirtualMachineManager parseVMMNode(Node vmmNode, XPath xpath) throws XPathExpressionException, VirtualServiceException {
-    	GCMVirtualMachineManager vmm = new GCMVirtualMachineManager();
+    public GCMVirtualMachineManager parseVMMNode(Node vmmNode, XPath xpath) throws XPathExpressionException,
+            VirtualServiceException {
+        GCMVirtualMachineManager vmm = new GCMVirtualMachineManager();
         //setId
         String id = GCMParserHelper.getAttributeValue(vmmNode, PA_VMM_ID);
         vmm.setId(id);
@@ -120,7 +121,8 @@ public abstract class AbstractVMMParser implements VMMParser {
      * with the good dynamic type.
      * @throws VirtualServiceException 
      */
-    public abstract void initializeGCMVirtualMachineManager(Node vmmNode, XPath xpath,GCMVirtualMachineManager gcmVMM) throws VirtualServiceException;
+    public abstract void initializeGCMVirtualMachineManager(Node vmmNode, XPath xpath,
+            GCMVirtualMachineManager gcmVMM) throws VirtualServiceException;
 
     /**
      * get the tag's name that the instanciated

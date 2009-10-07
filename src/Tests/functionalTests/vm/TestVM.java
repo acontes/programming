@@ -9,6 +9,7 @@ import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 
 import functionalTests.FunctionalTest;
 
+
 /**
  * just test the xml schema validation
  * @author jmguilla

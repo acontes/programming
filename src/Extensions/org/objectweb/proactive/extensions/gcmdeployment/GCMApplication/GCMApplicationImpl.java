@@ -85,14 +85,6 @@ import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeInter
 import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeRemoteObjectAdapter;
 import org.objectweb.proactive.extensions.gcmdeployment.core.TopologyImpl;
 import org.objectweb.proactive.extensions.gcmdeployment.core.TopologyRootImpl;
-import org.objectweb.proactive.extensions.dataspaces.core.InputOutputSpaceConfiguration;
-import org.objectweb.proactive.extensions.dataspaces.core.SpaceInstanceInfo;
-import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingService;
-import org.objectweb.proactive.extensions.dataspaces.core.naming.NamingServiceDeployer;
-import org.objectweb.proactive.extensions.dataspaces.exceptions.ApplicationAlreadyRegisteredException;
-import org.objectweb.proactive.extensions.dataspaces.exceptions.ConfigurationException;
-import org.objectweb.proactive.extensions.dataspaces.exceptions.WrongApplicationIdException;
-import org.objectweb.proactive.extensions.dataspaces.service.DataSpacesTechnicalService;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 import org.objectweb.proactive.gcmdeployment.Topology;
@@ -358,16 +350,13 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
         for (String key : keys) {
             NodeProvider np = nodeProviders.get(key);
             for (GCMDeploymentDescriptor dd : np.getDescriptors()) {
-                if (dd instanceof GCMDeploymentDescriptorImpl) {
-                    try {
-                        GCMDeploymentResources resources = ((GCMDeploymentDescriptorImpl) dd).getResources();
-                        for (GCMVirtualMachineManager vmm : resources.getVMM()) {
-                            vmm.stop();
-                        }
-                    } catch (Exception e) {
-                        GCMA_LOGGER
-                                .warn("GCM Deployment failed to clean the virtual machine environment.", e);
+                try {
+                    GCMDeploymentResources resources = dd.getResources();
+                    for (GCMVirtualMachineManager vmm : resources.getVMM()) {
+                        vmm.stop();
                     }
+                } catch (Exception e) {
+                    GCMA_LOGGER.warn("GCM Deployment failed to clean the virtual machine environment.", e);
                 }
             }
         }
@@ -497,8 +486,9 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
                     buildBridgeTree(rootNode, rootNode, bridge, nodeProvider, gdd);
                 }
 
+                TopologyImpl node = new TopologyImpl();//a unique topologyID for all vms...
                 for (GCMVirtualMachineManager vmm : resources.getVMM()) {
-                    buildVMMTree(rootNode, rootNode, vmm, nodeProvider, gdd);
+                    buildVMMTree(rootNode, rootNode, vmm, nodeProvider, gdd, node);
                 }
             }
         }
@@ -576,11 +566,10 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
      * @param nodeProvider
      * @param gcmd
      */
-    private void buildVMMTree(TopologyRootImpl rootNode, TopologyRootImpl rootNode2, GCMVirtualMachineManager vmm,
-            NodeProvider nodeProvider, GCMDeploymentDescriptor gcmd) {
+    private void buildVMMTree(TopologyRootImpl rootNode, TopologyRootImpl parentNode,
+            GCMVirtualMachineManager vmm, NodeProvider nodeProvider, GCMDeploymentDescriptor gcmd, TopologyImpl node) {
         pushDeploymentPath(vmm.getId());
         for (VMBean vm : vmm.getVms()) {
-            TopologyImpl node = new TopologyImpl();
             node.setDeploymentDescriptorPath(gcmd.getDescriptorURL().toExternalForm());
             node.setApplicationDescriptorPath(rootNode.getApplicationDescriptorPath());
             node.setDeploymentPath(getCurrentDeploymentPath());
@@ -588,6 +577,7 @@ public class GCMApplicationImpl implements GCMApplicationInternal {
             topologyIdToNodeProviderMapping.put(node.getId(), nodeProvider);
             vm.setNode(node);
         }
+        rootNode.addNode(node, parentNode);
         popDeploymentPath(); // ???		
     }
 
