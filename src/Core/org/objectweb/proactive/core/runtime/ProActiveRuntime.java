@@ -180,28 +180,6 @@ public interface ProActiveRuntime extends SecurityEntity {
     public ProActiveRuntime getProActiveRuntime(String proActiveRuntimeName) throws ProActiveException;
 
     /**
-     * <i><font size="-1" color="#FF0000">**For internal use only** </font></i>
-     * Tells this runtime that it's registered in another one
-     * @param proActiveRuntimeName the name of the remote ProActiveRuntime in which this runtime is registered
-     */
-    void addAcquaintance(String proActiveRuntimeName) throws ProActiveException;
-
-    /**
-     * Returns all the ProActiveRuntime URL in which this runtime is registered
-     * @return all the ProActiveRuntime URL in which this runtime is registered
-     * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
-     */
-    public String[] getAcquaintances() throws ProActiveException;
-
-    /**
-     * <i><font size="-1" color="#FF0000">**For internal use only** </font></i>.
-     * Tell to this runtime that is no more registered in <code>proActiveRuntimeName</code>.
-     * @param proActiveRuntimeName the name of the remote ProActiveRuntime.
-     * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
-     */
-    public void rmAcquaintance(String proActiveRuntimeName) throws ProActiveException;
-
-    /**
      * Kills this ProActiveRuntime and this VM
      * @param softly if false, this Runtime is killed abruptely
      * if true, if that runtime originates the creation of  a rmi registry, it waits until the registry is empty before
@@ -326,23 +304,13 @@ public interface ProActiveRuntime extends SecurityEntity {
     public String getVNName(String Nodename) throws ProActiveException;
 
     /**
-     * Looks for class bytecode in the current runtime.
-     * If current runtime has no father, stub generation can be intented to
-     * get the class bytecode
+     * Looks for class bytecode in the current runtime. Stub generation can be intented
+     * to get the class bytecode.
+     *
      * @param className name of the class
      * @return the bytecode corresponding to the given class, or null if not found
-     * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
      */
-    public byte[] getClassDataFromThisRuntime(String className) throws ProActiveException;
-
-    /**
-     * Looks for class bytecode in the ancestors of the current runtime : first it tries in the father runtime,
-     * then in the grand-father etc...
-     * @param className name of the class
-     * @return the bytecode corresponding to the given class, or null if not found
-     * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
-     */
-    public byte[] getClassDataFromParentRuntime(String className) throws ProActiveException;
+    public byte[] getClassData(String className);
 
     /**
      * launch the main method of the main class with parameters

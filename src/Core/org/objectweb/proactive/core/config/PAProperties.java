@@ -125,17 +125,6 @@ public enum PAProperties {
     LOG4J("log4j.configuration", PAPropertiesType.STRING),
 
     /**
-     * Skip the default initialization procedure
-     *
-     * <strong>Internal Property</strong>
-     *
-     * Used to skip the default log4j initialization procedure when the ProActive classloader is
-     * activated. See log4j documentation
-     * @see StartRuntime
-     */
-    LOG4J_DEFAULT_INIT_OVERRIDE("log4j.defaultInitOverride", PAPropertiesType.BOOLEAN),
-
-    /**
      * URI of the remote log collector
      * 
      */
@@ -145,11 +134,6 @@ public enum PAProperties {
      * Qualified name of the flushing provider to use
      */
     PA_LOG4J_APPENDER_PROVIDER("proactive.log4j.appender.provider", PAPropertiesType.STRING),
-
-    /**
-     * Activates ProActive classloader
-     */
-    PA_CLASSLOADER("proactive.classloader", PAPropertiesType.BOOLEAN),
 
     /**
      * Specifies the name of the ProActive Runtime
@@ -295,6 +279,9 @@ public enum PAProperties {
     PA_RMI_PORT("proactive.rmi.port", PAPropertiesType.INTEGER), JAVA_RMI_SERVER_CODEBASE(
             "java.rmi.server.codebase", PAPropertiesType.STRING, true),
 
+    PA_CODEBASE("proactive.codebase", PAPropertiesType.STRING, true),
+
+    PA_CLASSLOADING_USEHTTP("proactive.classloading.useHTTP", PAPropertiesType.BOOLEAN, false),
     /* ------------------------------------
      *  HTTP
      */
@@ -368,6 +355,18 @@ public enum PAProperties {
     /* ------------------------------------
      *  SSH
      */
+
+    /** SSL cipher suites used for RMISSL communications.
+     * List of cipher suites used for RMISSL, separated by commas.
+     * default is SSL_DH_anon_WITH_RC4_128_MD5. This cipher suite is used only
+     * to have encrypted communications, without authentication, and works with default
+     * JVM's keyStore/TrustStore
+     *
+     * Many others can be used. for implementing a certificate authentication...
+     * see http://java.sun.com/javase/6/docs/technotes/guides/security/jsse/JSSERefGuide.html
+     *
+     * */
+    PA_SSL_CIPHER_SUITES("proactive.ssl.cipher.suites", PAPropertiesType.STRING),
 
     /**
      * Indicates SSH remote TCP port
@@ -508,6 +507,36 @@ public enum PAProperties {
      */
     PA_FILETRANSFER_MAX_BUFFER_SIZE("proactive.filetransfer.buffer_size_kb", PAPropertiesType.INTEGER),
 
+    // -------------- DATA SPACES
+
+    /**
+     * This property indicates an access URL to the scratch data space. If scratch is going to be
+     * used on host, this property and/or {@link #PA_DATASPACES_SCRATCH_PATH} should be set.
+     */
+    PA_DATASPACES_SCRATCH_URL("proactive.dataspaces.scratch_url", PAPropertiesType.STRING),
+
+    /**
+     * This property indicates a location of the scratch data space. If scratch is going to be used
+     * on host, this property and/or {@link #PA_DATASPACES_SCRATCH_URL} should be set.
+     */
+    PA_DATASPACES_SCRATCH_PATH("proactive.dataspaces.scratch_path", PAPropertiesType.STRING),
+
+    // -------------- VFS PROVIDER
+
+    /**
+     * This property indicates how often an auto closing mechanism is started to collect and close
+     * all unused streams open trough file system server interface.
+     */
+    PA_VFSPROVIDER_SERVER_STREAM_AUTOCLOSE_CHECKING_INTERVAL_MILLIS(
+            "proactive.vfsprovider.server.stream_autoclose_checking_millis", PAPropertiesType.INTEGER),
+
+    /**
+     * This property indicates a period after that a stream is perceived as unused and therefore can
+     * be closed by auto closing mechanism.
+     */
+    PA_VFSPROVIDER_SERVER_STREAM_OPEN_MAXIMUM_PERIOD_MILLIS(
+            "proactive.vfsprovider.server.stream_open_maximum_period_millis", PAPropertiesType.INTEGER),
+
     // -------------- Misc
 
     /**
@@ -537,7 +566,21 @@ public enum PAProperties {
     /**
      * TODO
      */
-    PA_UNICORE_FORKCLIENT("proactive.unicore.forkclient", PAPropertiesType.BOOLEAN);
+    PA_UNICORE_FORKCLIENT("proactive.unicore.forkclient", PAPropertiesType.BOOLEAN),
+
+    /**
+     * if true, any reference on the reified object within an outgoing request or reply is
+     * replaced by a reference on the active object. This feature can be used when activating 
+     * an object whose source code cannot be modified to replace the code that return <code>this</code>
+     * by the reference on the active object using <code>PAActiveObject.getStubOnThis()</code>
+     */
+    PA_IMPLICITGETSTUBONTHIS("proactive.implicitgetstubonthis", PAPropertiesType.BOOLEAN),
+
+    /**
+     * on unix system, define the shell that the GCM deployment invokes when creating new runtimes.
+     */
+    PA_GCMD_UNIX_SHELL("proactive.gcmd.unix.shell", PAPropertiesType.STRING);
+
     static final Logger logger = ProActiveLogger.getLogger(Loggers.CONFIGURATION);
     public static final String TRUE = "true";
     public static final String FALSE = "false";

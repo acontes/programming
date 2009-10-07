@@ -34,7 +34,6 @@ package functionalTests.component.conform;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
@@ -57,7 +56,7 @@ public class TestLifeCycleController extends Conformtest {
     protected Component d;
 
     // -------------------------------------------------------------------------
-    // Constructor ans setup
+    // Constructor and setup
     // -------------------------------------------------------------------------
     @Before
     public void setUp() throws Exception {
@@ -114,7 +113,6 @@ public class TestLifeCycleController extends Conformtest {
     // Test errors in start
     // -------------------------------------------------------------------------
     @Test
-    @Ignore
     public void testMandatoryInterfaceNotBound() throws Exception {
         try {
             Fractal.getLifeCycleController(c).startFc();
@@ -128,7 +126,6 @@ public class TestLifeCycleController extends Conformtest {
     // Test invalid operations in started state
     // -------------------------------------------------------------------------
     @Test
-    @Ignore
     public void testUnbindNotStopped() throws Exception {
         Fractal.getBindingController(c).bindFc("client", d.getFcInterface("server"));
         Fractal.getBindingController(c).bindFc("clients0", d.getFcInterface("server"));

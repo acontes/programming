@@ -59,7 +59,6 @@ import org.objectweb.proactive.core.security.securityentity.Entities;
 import org.objectweb.proactive.core.security.securityentity.Entity;
 
 
-@SuppressWarnings("serial")
 public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody> implements UniversalBody {
 
     /**
@@ -178,8 +177,8 @@ public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody> imp
         target.register(url);
     }
 
-    public String registerByName(String name) throws IOException, ProActiveException {
-        return target.registerByName(name);
+    public String registerByName(String name, boolean rebind) throws IOException, ProActiveException {
+        return target.registerByName(name, rebind);
     }
 
     public void setRegistered(boolean registered) throws IOException {
@@ -242,6 +241,10 @@ public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody> imp
     public void setProActiveSecurityManager(Entity user, PolicyServer policyServer)
             throws SecurityNotAvailableException, AccessControlException, IOException {
         this.target.setProActiveSecurityManager(user, policyServer);
+    }
+
+    public String getUrl() {
+        return this.target.getUrl();
     }
 
 }

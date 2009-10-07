@@ -91,7 +91,6 @@ public class TestLifeCycleControllerComposite extends TestLifeCycleController {
 
     @Override
     @Test
-    @Ignore
     public void testMandatoryInterfaceNotBound() throws Exception {
         super.testMandatoryInterfaceNotBound();
         ContentController cc = Fractal.getContentController(r);
@@ -100,6 +99,18 @@ public class TestLifeCycleControllerComposite extends TestLifeCycleController {
         Fractal.getBindingController(r).bindFc("client", r.getFcInterface("server"));
         try {
             Fractal.getLifeCycleController(c).startFc();
+            fail();
+        } catch (IllegalLifeCycleException e) {
+        }
+    }
+
+    @Test
+    public void testCompositeMandatoryServerInterfaceNotBound() throws Exception {
+        Fractal.getBindingController(r).bindFc("client", r.getFcInterface("server"));
+        Fractal.getBindingController(c).bindFc("client", d.getFcInterface("server"));
+        Fractal.getBindingController(d).bindFc("client", c.getFcInterface("server"));
+        try {
+            Fractal.getLifeCycleController(r).startFc();
             fail();
         } catch (IllegalLifeCycleException e) {
         }
@@ -117,6 +128,9 @@ public class TestLifeCycleControllerComposite extends TestLifeCycleController {
 
         // TODO test issue: adding a sub-component in a started composite automatically starts the added one?
         cc.addFcSubComponent(d);
+        //crash here
+        //due to org.objectweb.proactive.core.component.controller.AbstractProActiveController.checkLifeCycleIsStopped() 
+        //first line which impose the composite to be in stopped state
         try {
             cc.removeFcSubComponent(d);
             // fail();

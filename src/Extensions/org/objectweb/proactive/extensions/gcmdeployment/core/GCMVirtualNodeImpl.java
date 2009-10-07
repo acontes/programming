@@ -150,7 +150,6 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
         }
 
         long ret = Math.max(Math.max(capacity, acc), 0);
-        System.out.println("getNbRequiredNodes " + id + " " + ret);
         return ret;
     }
 
@@ -663,7 +662,13 @@ public class GCMVirtualNodeImpl implements GCMVirtualNodeInternal {
         this.nodeTechnicalServicesProperties = technicalServices;
     }
 
+    public void addTechnicalServiceProperties(TechnicalServicesProperties technicalServices) {
+        this.nodeTechnicalServicesProperties = this.nodeTechnicalServicesProperties
+                .getCombinationWith(technicalServices);
+    }
+
     public UniqueID getUniqueID() {
         return uniqueID;
     }
+
 }

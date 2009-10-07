@@ -80,7 +80,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * This class is a runtime representation of a node
  * and should not be used outside a runtime
  */
-@SuppressWarnings("serial")
+
 public class LocalNode implements SecurityEntity {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.JMX_MBEAN);
     private String name;
@@ -117,7 +117,7 @@ public class LocalNode implements SecurityEntity {
         this.runtimeRoe = new RemoteObjectExposer<ProActiveRuntime>(
             "org.objectweb.proactive.core.runtime.ProActiveRuntime", ProActiveRuntimeImpl
                     .getProActiveRuntime(), ProActiveRuntimeRemoteObjectAdapter.class);
-        this.runtimeRoe.createRemoteObject(name);
+        this.runtimeRoe.createRemoteObject(name, false);
 
         // JMX registration
         //        if (PAProperties.PA_JMX_MBEAN.isTrue()) {

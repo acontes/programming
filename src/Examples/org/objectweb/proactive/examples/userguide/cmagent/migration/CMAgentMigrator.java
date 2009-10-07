@@ -1,3 +1,4 @@
+//@tutorial-start
 /*
  * ################################################################
  *
@@ -30,6 +31,8 @@
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
  */
+//@snippet-start migrate_cma_skeleton
+//@snippet-start migrate_cma_full
 package org.objectweb.proactive.examples.userguide.cmagent.migration;
 
 import java.io.Serializable;
@@ -49,11 +52,18 @@ public class CMAgentMigrator extends CMAgentInitialized implements Serializable 
     public void migrateTo(Node whereTo) {
         try {
             //TODO 1. Migrate the active object to the Node received as parameter
+            //@snippet-break migrate_cma_skeleton
+            //@tutorial-break
             //should be the last call in this method
             //instructions after a call to PAMobileAgent.migrateTo are NOT executed 
             PAMobileAgent.migrateTo(whereTo);
+            //@snippet-resume migrate_cma_skeleton
+            //@tutorial-resume
         } catch (ProActiveException moveExcep) {
             System.err.println(moveExcep.getMessage());
         }
     }
 }
+//@snippet-end migrate_cma_skeleton
+//@snippet-end migrate_cma_full
+//@tutorial-end

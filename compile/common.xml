@@ -18,9 +18,8 @@
 	<property name="junit.dir"          value="${base.dir}/junitReports" />
 	<property name="emma.dir"           value="${base.dir}/emmaReports" />
 
-	<property name="deploy.dir"        	value="${base.dir}/dist" />
+	<property name="deploy.dir"         value="${base.dir}/dist" />
 	<property name="deploy.lib.dir"     value="${deploy.dir}/lib" />
-	<property name="deploy.lib.native.dir"     value="${deploy.lib.dir}/native" />
 	<property name="deploy.scripts.dir" value="${deploy.dir}/scripts" />
 	
 	<property name="release.dir"        value="${base.dir}/release" />
@@ -45,6 +44,7 @@
 	<property name="proactive.core.path" value="${proactive.path}/core" />
 	<property name="proactive.ext.path" value="${proactive.path}/ext" />
 	<property name="extensions.path"    value="${proactive.path}/extensions"/>
+	<property name="examples.path"    value="${proactive.path}/examples"/>
 	<property name="extra.path"    		value="${proactive.path}/extra"/>
 
 	<!-- Javac properties -->
@@ -66,10 +66,6 @@
 	<property name="manifest.example.management.dir" value="${src.examples.dir}/org/objectweb/proactive/examples/jmx/remote/management/osgi/Manifest/"/>
 	<property name="example.management.classes.dir" value="${classes.dir}/Examples/org/objectweb/proactive/examples/jmx/remote/management/"/>	
 	
-	<!-- IC2d properties -->
-	<property name="ic2d-plugin.dir" value="${base.dir}/ic2d-plugins-src" />
-	<property name="plugin.lib" value="org.objectweb.proactive.ic2d.lib" />
-	
 	<property name="stubgenerator.class" value="org.objectweb.proactive.ext.util.StubGenerator" />
 	
 	<!-- junit properties -->
@@ -78,6 +74,11 @@
 	<!-- Performance test properties -->
 	<property name="performanceTestClass" value="performanceTests.simple.PerformanceTest" />
 	<property name="config.dir" value="${cl.proactive.dir}/${proactive.core.path}/config" />
+
+   <!-- Tutorial properties -->
+   <property name="tutorials.dir"		value="${base.dir}/tutorials" />
+   <property name="tutorials.src"		value="${tutorials.dir}/src" />
+   <property name="tutorials.dist"       value="${tutorials.dir}/dist" />
 
 	<!-- ================================================================ -->
 	<!--                   define the different classpaths                -->
@@ -181,7 +182,6 @@
 					<appendclasspath />
 				</classpath>
 				<include name="@{package}/@{module}/**/*.java" />
-				<include name="@{package}/@{module}/**/**/*.java" />
 			</javac>
 
 			<copy todir="@{dest}" includeEmptyDirs="no">

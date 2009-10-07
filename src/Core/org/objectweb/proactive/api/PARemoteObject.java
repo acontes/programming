@@ -43,7 +43,7 @@ import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.adapter.Adapter;
-import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -58,7 +58,11 @@ public class PARemoteObject {
     public final static Logger logger = ProActiveLogger.getLogger(Loggers.REMOTEOBJECT);
 
     /* Used to attribute an unique name to RO created by turnRemote */
-    private final static String TURN_REMOTE_PREFIX = "__@@__TURN_REMOTE_";
+    private final static String TURN_REMOTE_PREFIX;
+    static {
+        String vmName = ProActiveRuntimeImpl.getProActiveRuntime().getVMInformation().getName();
+        TURN_REMOTE_PREFIX = "/" + vmName + "/TURN_REMOTE/";
+    }
 
     /* Used to attribute an unique name to RO created by turnRemote */
     private final static AtomicLong counter = new AtomicLong();
@@ -118,7 +122,8 @@ public class PARemoteObject {
     @SuppressWarnings("unchecked")
     public static <T> T turnRemote(T object) throws ProActiveException {
         RemoteObjectExposer<T> roe = newRemoteObject(object.getClass().getName(), object);
-        RemoteRemoteObject rro = roe.createRemoteObject(TURN_REMOTE_PREFIX + counter.incrementAndGet());
+        RemoteRemoteObject rro = roe
+                .createRemoteObject(TURN_REMOTE_PREFIX + counter.incrementAndGet(), false);
         return (T) new RemoteObjectAdapter(rro).getObjectProxy();
     }
 }

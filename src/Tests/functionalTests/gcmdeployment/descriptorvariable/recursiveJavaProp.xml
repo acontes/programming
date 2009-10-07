@@ -16,7 +16,9 @@
 		</executable>
 	</application>
 	
-	<resources>
-	
+	<resources> 
+		<nodeProvider id="np">
+			<file path="var_gcmd.xml"/>
+		</nodeProvider>
 	</resources>	
 </GCMApplication>

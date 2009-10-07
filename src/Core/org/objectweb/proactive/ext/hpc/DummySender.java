@@ -56,7 +56,6 @@ import org.objectweb.proactive.core.security.securityentity.Entities;
 import org.objectweb.proactive.core.security.securityentity.Entity;
 
 
-@SuppressWarnings("serial")
 public class DummySender implements UniversalBody {
 
     //
@@ -212,7 +211,12 @@ public class DummySender implements UniversalBody {
 
     }
 
-    public String registerByName(String name) throws IOException {
+    public String registerByName(String name, boolean rebind) throws IOException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public String getUrl() {
         // TODO Auto-generated method stub
         return null;
     }

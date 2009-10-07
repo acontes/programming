@@ -71,7 +71,6 @@ public class RemoteObjectProtocolFactoryRegistry {
                 remoteObjectFactories.put(protoId, cl);
             }
         }
-
     }
 
     public static void put(String protocol, Class<? extends RemoteObjectFactory> factory) {

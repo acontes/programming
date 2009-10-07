@@ -60,6 +60,7 @@ public interface Loggers {
     static final public String STUB_GENERATION = CORE + ".mop.stubgeneration";
     static final public String RMI = CORE + ".communication.rmi";
     static final public String SSH = CORE + ".communication.ssh";
+    static final public String SSL = CORE + ".communication.ssl";
     static final public String COMPONENTS = CORE + ".components";
     static final public String COMPONENTS_CONTROLLERS = COMPONENTS + ".controllers";
     static final public String COMPONENTS_REQUESTS = COMPONENTS + ".requests";
@@ -138,7 +139,6 @@ public interface Loggers {
     static final public String JMX = CORE + ".jmx";
     static final public String JMX_MBEAN = JMX + ".mbean";
     static final public String JMX_NOTIFICATION = JMX + ".notification";
-    
 
     // Forwarding
     static final public String FORWARDING = CORE + ".forwarding";
@@ -147,12 +147,7 @@ public interface Loggers {
     static final public String FORWARDING_CLIENT = FORWARDING + ".client";
     static final public String FORWARDING_CLIENT_TUNNEL = FORWARDING_CLIENT + ".tunnel";
     static final public String FORWARDING_REMOTE_OBJECT = FORWARDING + ".remoteobject";
-    
-    //Native Code Wrapping
-    static final public String NATIVE = CORE + ".native";
-    static final public String NATIVE_MANAGER = NATIVE + ".manager";
-    static final public String NATIVE_COUPLING = NATIVE + ".coupling";
-
+    static final public String FORWARDING_ROUTER_ADMIN = FORWARDING_ROUTER + ".admin";
     // Exceptions
     public static final String EXCEPTIONS = CORE + ".exceptions";
     public static final String EXCEPTIONS_ONE_WAY = EXCEPTIONS + ".one_way";
@@ -163,4 +158,15 @@ public interface Loggers {
     public static final String UTILS = CORE + ".utils";
     public static final String SLEEPER = UTILS + ".sleeper";
     public static final String WAITER = UTILS + ".waiter";
+
+    // Data Spaces
+    public static final String DATASPACES = CORE + ".dataspaces";
+    public static final String DATASPACES_VFS = DATASPACES + ".vfs";
+    public static final String DATASPACES_MOUNT_MANAGER = DATASPACES + ".mountmanager";
+    public static final String DATASPACES_CONFIGURATOR = DATASPACES + ".configurator";
+    public static final String DATASPACES_NAMING_SERVICE = DATASPACES + ".namingservice";
+
+    // VFS Provider
+    public static final String VFS_PROVIDER = CORE + ".vfsprovider";
+    public static final String VFS_PROVIDER_SERVER = VFS_PROVIDER + ".server";
 }

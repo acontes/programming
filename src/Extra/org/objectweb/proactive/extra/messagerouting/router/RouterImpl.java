@@ -50,8 +50,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.ProActiveRandom;
+import org.objectweb.proactive.core.util.SweetCountDownLatch;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
@@ -65,12 +68,17 @@ import org.objectweb.proactive.extra.messagerouting.protocol.message.ErrorMessag
  */
 public class RouterImpl extends RouterInternal implements Runnable {
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_ROUTER);
+    public static final Logger admin_logger = ProActiveLogger.getLogger(Loggers.FORWARDING_ROUTER_ADMIN);
 
     /** Read {@link ByteBuffer} size. */
     private final static int READ_BUFFER_SIZE = 4096;
 
     /** True is the router must stop or is stopped*/
-    private AtomicBoolean stopped = new AtomicBoolean(false);
+    private final AtomicBoolean stopped = new AtomicBoolean(false);
+    /** Can pass when the router has been successfully shutdown */
+    private final SweetCountDownLatch isStopped = new SweetCountDownLatch(1);
+    /** The thread running the select loop */
+    private final AtomicReference<Thread> selectThread = new AtomicReference<Thread>();
 
     /** Thread pool used to execute all asynchronous tasks */
     private final ExecutorService tpe;
@@ -86,6 +94,9 @@ public class RouterImpl extends RouterInternal implements Runnable {
     private Selector selector = null;
     private ServerSocketChannel ssc = null;
     private ServerSocket serverSocket = null;
+
+    /** An unique identifier for this router */
+    private final long routerId;
 
     /** Create a new router
      * 
@@ -107,6 +118,12 @@ public class RouterImpl extends RouterInternal implements Runnable {
 
         init(config);
         tpe = Executors.newFixedThreadPool(config.getNbWorkerThreads());
+
+        long rand = 0;
+        while (rand == 0) {
+            rand = ProActiveRandom.nextPosLong(); // can be 0
+        }
+        this.routerId = rand;
     }
 
     private void init(RouterConfig config) throws IOException {
@@ -132,6 +149,13 @@ public class RouterImpl extends RouterInternal implements Runnable {
     }
 
     public void run() {
+        boolean r = this.selectThread.compareAndSet(null, Thread.currentThread());
+        if (r == false) {
+            logger.error("A select thread has already been started, aborting the current thread ",
+                    new Exception());
+            return;
+        }
+
         Set<SelectionKey> selectedKeys = null;
         Iterator<SelectionKey> it;
         SelectionKey key;
@@ -180,7 +204,7 @@ public class RouterImpl extends RouterInternal implements Runnable {
         } catch (IOException e) {
             ProActiveLogger.logEatedException(logger, e);
         }
-
+        this.isStopped.countDown();
     }
 
     /** Accept a new connection */
@@ -258,13 +282,16 @@ public class RouterImpl extends RouterInternal implements Runnable {
         Client client = attachment.getClient();
         if (client != null) {
             client.discardAttachment();
+
+            // Broadcast the disconnection to every client
+            // If client is null, then the handshake has not completed and we
+            // don't need to broadcast the disconnection
+            AgentID disconnectedAgent = client.getAgentId();
+            Collection<Client> clients = clientMap.values();
+            tpe.submit(new DisconnectionBroadcaster(clients, disconnectedAgent));
         }
         logger.debug("Client " + sc.socket() + " disconnected");
 
-        // Broadcast the disconnection to every client
-        Collection<Client> clients = clientMap.values();
-        AgentID disconnectedAgent = attachment.getClient().getAgentId();
-        tpe.submit(new DisconnectionBroadcaster(clients, disconnectedAgent));
     }
 
     /* @@@@@@@@@@ ROUTER PACKAGE INTERFACE 
@@ -304,6 +331,12 @@ public class RouterImpl extends RouterInternal implements Runnable {
             throw new IllegalStateException("Router already stopped");
 
         this.stopped.set(true);
+
+        Thread t = this.selectThread.get();
+        if (t != null) {
+            t.interrupt();
+            this.isStopped.await();
+        }
     }
 
     private static class DisconnectionBroadcaster implements Runnable {
@@ -326,5 +359,9 @@ public class RouterImpl extends RouterInternal implements Runnable {
                 }
             }
         }
+    }
+
+    public long getId() {
+        return this.routerId;
     }
 }
