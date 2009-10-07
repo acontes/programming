@@ -146,9 +146,9 @@ public interface Debugger extends Serializable {
      */
     public void setStepByStep(boolean activated);
 
-	//
-	// -- EXTENDED DEBUGGER ------------------------------------------------
-	//
+    //
+    // -- EXTENDED DEBUGGER ------------------------------------------------
+    //
     /**
      * define a sendRequest breakpoint
      */
@@ -177,10 +177,10 @@ public interface Debugger extends Serializable {
     /**
      * @param sequenceNumber
      */
-	public void moveUpRequest(final long sequenceNumber);
+    public void moveUpRequest(final long sequenceNumber);
 
-	/**
-	 * @param sequenceNumber
-	 */
-	public void moveDownRequest(final long sequenceNumber);
+    /**
+     * @param sequenceNumber
+     */
+    public void moveDownRequest(final long sequenceNumber);
 }

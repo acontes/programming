@@ -6,34 +6,35 @@ import java.util.List;
 
 import org.objectweb.proactive.core.body.request.Request;
 
-public class RequestQueueInfo implements Serializable{
 
-	private static final long serialVersionUID = -8635066918170945239L;
-	private List<RequestInfo> requestQueueInfo = new ArrayList<RequestInfo>();
-	private RequestInfo currentRequestInfo = null;
-	private List<RequestInfo> requestsToServe = new ArrayList<RequestInfo>();
+public class RequestQueueInfo implements Serializable {
 
-	public RequestQueueInfo(List<Request> requestQueue, Request currentRequest){
-		// requestQueue
-		for(Request r : requestQueue){
-			requestQueueInfo.add(new RequestInfo(r));
-		}
+    private static final long serialVersionUID = -8635066918170945239L;
+    private List<RequestInfo> requestQueueInfo = new ArrayList<RequestInfo>();
+    private RequestInfo currentRequestInfo = null;
+    private List<RequestInfo> requestsToServe = new ArrayList<RequestInfo>();
 
-		//currentRequest
-		if(currentRequest != null){
-			this.currentRequestInfo = new RequestInfo(currentRequest);
-		}
-	}
+    public RequestQueueInfo(List<Request> requestQueue, Request currentRequest) {
+        // requestQueue
+        for (Request r : requestQueue) {
+            requestQueueInfo.add(new RequestInfo(r));
+        }
 
-	public List<RequestInfo> getRequestQueueInfo() {
-		return requestQueueInfo;
-	}
+        //currentRequest
+        if (currentRequest != null) {
+            this.currentRequestInfo = new RequestInfo(currentRequest);
+        }
+    }
 
-	public RequestInfo getCurrentRequest() {
-		return currentRequestInfo;
-	}
+    public List<RequestInfo> getRequestQueueInfo() {
+        return requestQueueInfo;
+    }
 
-	public List<RequestInfo> getRequestsToServe() {
-		return requestsToServe;
-	}
+    public RequestInfo getCurrentRequest() {
+        return currentRequestInfo;
+    }
+
+    public List<RequestInfo> getRequestsToServe() {
+        return requestsToServe;
+    }
 }

@@ -6,65 +6,66 @@ import java.util.List;
 
 import org.objectweb.proactive.core.body.request.Request;
 
-public class RequestInfo implements Serializable{
 
-	private static final long serialVersionUID = -3263437546419006443L;
-	private String senderID;
-	private long sequenceNumber;
+public class RequestInfo implements Serializable {
 
-	private String methodCalled;
-	private List<String> parameters = new ArrayList<String>();
-	private String returnType;
+    private static final long serialVersionUID = -3263437546419006443L;
+    private String senderID;
+    private long sequenceNumber;
 
-	public RequestInfo(Request r) {
-		// Sender
-		if(r.getSender() != null){
-			senderID = r.getSender().getID().getCanonString();
-		} else {
-			senderID = "no sender";
-		}
-		sequenceNumber = r.getSequenceNumber();
+    private String methodCalled;
+    private List<String> parameters = new ArrayList<String>();
+    private String returnType;
 
-		// MethodCalled
-		if(r.getMethodName() != null){
-			methodCalled = r.getMethodName();
-		} else {
-			methodCalled = "not methodName";
-		}
-		if(r.getMethodCall() != null){
-			int sizeOfParams = r.getMethodCall().getNumberOfParameter();
-			for(int i=0 ; i < sizeOfParams ; i++){
-				parameters.add(r.getParameter(i).getClass().getSimpleName());
-			}
-		}
-		if(r.getMethodCall().getReifiedMethod() != null){
-			returnType = r.getMethodCall().getReifiedMethod().getReturnType().getSimpleName();
-		} else {
-			returnType = "no reifiedMethod";
-		}
-	}
+    public RequestInfo(Request r) {
+        // Sender
+        if (r.getSender() != null) {
+            senderID = r.getSender().getID().getCanonString();
+        } else {
+            senderID = "no sender";
+        }
+        sequenceNumber = r.getSequenceNumber();
 
-	//
-	// -- GETTERS AND SETTERS -----------------------------------------------
-	//
-	public String getMethodCalled() {
-		return methodCalled;
-	}
+        // MethodCalled
+        if (r.getMethodName() != null) {
+            methodCalled = r.getMethodName();
+        } else {
+            methodCalled = "not methodName";
+        }
+        if (r.getMethodCall() != null) {
+            int sizeOfParams = r.getMethodCall().getNumberOfParameter();
+            for (int i = 0; i < sizeOfParams; i++) {
+                parameters.add(r.getParameter(i).getClass().getSimpleName());
+            }
+        }
+        if (r.getMethodCall().getReifiedMethod() != null) {
+            returnType = r.getMethodCall().getReifiedMethod().getReturnType().getSimpleName();
+        } else {
+            returnType = "no reifiedMethod";
+        }
+    }
 
-	public String getSenderID() {
-		return senderID;
-	}
+    //
+    // -- GETTERS AND SETTERS -----------------------------------------------
+    //
+    public String getMethodCalled() {
+        return methodCalled;
+    }
 
-	public List<String> getParameters() {
-		return parameters;
-	}
+    public String getSenderID() {
+        return senderID;
+    }
 
-	public String getReturnType() {
-		return returnType;
-	}
+    public List<String> getParameters() {
+        return parameters;
+    }
 
-	public long getSequenceNumber() {
-		return sequenceNumber;
-	}
+    public String getReturnType() {
+        return returnType;
+    }
+
+    public long getSequenceNumber() {
+        return sequenceNumber;
+    }
 
 }

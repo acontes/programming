@@ -32,13 +32,15 @@
  */
 package org.objectweb.proactive.core.debug.dconnection;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
+import java.lang.reflect.Method;
 import java.security.SecureRandom;
+import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.management.Notification;
 import javax.management.NotificationListener;
@@ -61,175 +63,199 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 public class DebuggerConnection implements Serializable, NotificationListener {
 
-	private static final long serialVersionUID = 2591499219438855959L;
+    private static DebuggerConnection debuggerConnection = null;
+    private static Logger debuggerLogger = ProActiveLogger.getLogger(Loggers.DEBUGGER);
+    private String nodeName;
+    private ProActiveRuntime tunnelRuntime;
+    private boolean created = false;
+    private boolean creating = false;
+    private int listeningPort = -1;
+    private Node debugNode;
+    private int debugDeployementId = 54136432;
+    private int timeout = 10;
 
-	private static DebuggerConnection debuggerConnection = null;
-	private static Logger debuggerLogger = ProActiveLogger.getLogger(Loggers.DEBUGGER);
-	private String nodeName;
-	private ProActiveRuntime tunnelRuntime;
-	private boolean created = false;
-	private boolean creating = false;
-	private int listeningPort = 0;
-	private Node debugNode;
-	private int debugDeployementId = 54136432;
-	private int timeout = 10;
+    public static synchronized DebuggerConnection getDebuggerConnection() {
+        if (debuggerConnection == null)
+            debuggerConnection = new DebuggerConnection();
+        return debuggerConnection;
+    }
 
-	public static synchronized DebuggerConnection getDebuggerConnection() {
-		if(debuggerConnection == null)
-			debuggerConnection = new DebuggerConnection();
-		return debuggerConnection;
-	}
+    public DebuggerConnection() {
+        nodeName = "DebugNode_" + System.getProperty("debugID") + "_" + new SecureRandom().nextInt();
+        subscribeJMXRuntimeEvent();
+    }
 
-	public DebuggerConnection() {
-		nodeName = "DebugNode_" + System.getProperty("debugID") + "_" + new SecureRandom().nextInt();
-		parseDebuggingPort();
-		subscribeJMXRuntimeEvent();
-	}
+    public void update() {
+        creating = false;
+        created = false;
+    }
 
-	public void update(){
-		creating = false;
-		created = false;
-		parseDebuggingPort();
-	}
+    private static Integer tryPattern1(String processName) {
+        Integer result = null;
 
-	private void parseDebuggingPort() {
-		String sPort;
-		int iPort = -1;
-		File file;
-		BufferedReader reader = null;
+        /* tested on: */
+        /* - windows xp sp 2, java 1.5.0_13 */
+        /* - mac os x 10.4.10, java 1.5.0 */
+        /* - debian linux, java 1.5.0_13 */
+        /* all return pid@host, e.g 2204@antonius */
 
-		String name = System.getProperty("debugID");
-		/*+ "_" +
-            ProActiveRuntimeImpl.getProActiveRuntime().getVMInformation().getVMID();*/
-		if (name == null) {
-			return;
-		}
-		try {
-			file = new File(System.getProperty("java.io.tmpdir") + File.separator + name);
-			reader = new BufferedReader(new FileReader(file));
-			if (!file.delete()) {
-				throw new IOException(
-				"the IC2DExtendedDebuggerConnection file is not successfully deleted!");
-			}
-			sPort = reader.readLine();
-			iPort = Integer.parseInt(sPort);
-		} catch (FileNotFoundException e) {
-			System.err.println("FileNotFournd: " + name);
-			System.err.println("\t-> parseDebuggingPort again....");
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e1) {
-				e1.printStackTrace();
-			}
-			timeout--;
-			if(timeout > 0){
-				parseDebuggingPort();
-			} else {
-				System.err.println("parseDebuggingPort: Time out!");
-				timeout = 10;
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				reader.close();
-			} catch (IOException e) {}
-		}
-		this.listeningPort = iPort;
-	}
+        Pattern pattern = Pattern.compile("^([0-9]+)@.+$", Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(processName);
+        if (matcher.matches()) {
+            result = new Integer(Integer.parseInt(matcher.group(1)));
+        }
+        return result;
+    }
 
-	/**
-	 * Get the information for connect a debugger. Create the debug node if it
-	 * does not exist.
-	 *
-	 * @return DebuggerInformation
-	 */
-	public synchronized DebuggerInformation getDebugInfo() {
-		getOrCreateNode();
-		while (creating) {
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		return new DebuggerInformation(debugNode, listeningPort);
-	}
+    private int findDebuggerPort() throws ProActiveException {
+        RuntimeMXBean rtb = ManagementFactory.getRuntimeMXBean();
+        String processName = rtb.getName();
+        Integer pid = tryPattern1(processName);
 
-	private synchronized void getOrCreateNode() {
-		if (!created && !creating) {
-			JVMProcessImpl vm = new JVMProcessImpl(new StandardOutputMessageLogger());
-			vm.setClassname(StartPARuntime.class.getName());
-			try {
-				vm.setParameters("-d " + debugDeployementId + " -p " +
-						RuntimeFactory.getDefaultRuntime().getURL());
-				creating = true;
-				vm.startProcess();
-				ProActiveRuntimeImpl.getProActiveRuntime().getMBean().sendNotification(
-						NotificationType.debuggerConnectionActivated);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ProActiveException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-		}
+        String address = null;
 
-	}
+        try {
+            Class<?> virtualMachineCl = Class.forName("com.sun.tools.attach.VirtualMachine");
+            try {
+                Method attachMethod = virtualMachineCl.getMethod("attach", String.class);
+                Object vm = null;
 
-	/**
-	 * Kill the runtime hsting the debug node
-	 */
-	public void removeDebugger() {
-		try {
-			tunnelRuntime.killRT(true);
-			ProActiveRuntimeImpl.getProActiveRuntime().getMBean().sendNotification(
-					NotificationType.debuggerConnectionTerminated);
-		} catch (Exception e) {
-			//            e.printStackTrace();
-		} finally {
-			tunnelRuntime = null;
-			created = false;
-			creating = false;
-		}
-	}
+                try {
+                    vm = attachMethod.invoke(null, pid.toString());
+                } catch (Exception e) {
+                    // Failed to attach 
+                    throw new ProActiveException("Failed to attach to the current JVM", e);
+                }
 
-	/**
-	 * @return true if there is a debugger connected, false otherwise
-	 */
-	public boolean hasDebuggerConnected() {
-		return tunnelRuntime != null;
-	}
+                Method getAgentPropertiesMethod = vm.getClass().getMethod("getAgentProperties");
+                try {
+                    Properties props = (Properties) getAgentPropertiesMethod.invoke(vm);
+                    address = props.getProperty("sun.jdwp.listenerAddress");
+                } catch (Exception e) {
+                    // Probably an IOException
+                    throw new ProActiveException("Failed to get the sun.jdwp.listenerAddress property", e);
+                } finally {
+                    Method detachMethod = vm.getClass().getMethod("detach");
+                    detachMethod.invoke(vm);
+                }
+            } catch (Exception e) {
+                // Java 6 but something gone wrong
+                throw new ProActiveException("Failed to attach to the current VM", e);
+            }
 
-	private void subscribeJMXRuntimeEvent() {
-		ProActiveRuntimeImpl part = ProActiveRuntimeImpl.getProActiveRuntime();
-		part.addDeployment(debugDeployementId);
-		JMXNotificationManager.getInstance().subscribe(part.getMBean().getObjectName(), this);
-	}
+        } catch (ClassNotFoundException e) {
+            String version = System.getProperty("java.specification.version");
+            if ("1.5".equals(version)) { // Java 4 and older are not supported
+                throw new ProActiveException(
+                    "Remote debugging not yet available with Java 5. Please use a JDK 6");
+            } else {
+                throw new ProActiveException(
+                    "Remote debbuging not available. Attach API not found in the classpath. $JDK6/lib/tools.jar must be in the classpath",
+                    e);
+            }
+        }
 
-	public void handleNotification(Notification notification, Object handback) {
-		try {
-			String type = notification.getType();
+        int port = Integer.parseInt(address.split(":")[1]);
+        return port;
+    }
 
-			if (NotificationType.GCMRuntimeRegistered.equals(type)) {
-				GCMRuntimeRegistrationNotificationData data = (GCMRuntimeRegistrationNotificationData) notification
-				.getUserData();
-				if (data.getDeploymentId() != debugDeployementId) {
-					return;
-				}
+    /**
+     * Get the information for connect a debugger. Create the debug node if it
+     * does not exist.
+     *
+     * @return DebuggerInformation
+     */
+    public synchronized DebuggerInformation getDebugInfo() {
+        try {
+            findDebuggerPort();
+        } catch (ProActiveException e1) {
+            e1.printStackTrace();
+        }
+        getOrCreateNode();
+        while (creating) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        return new DebuggerInformation(debugNode, listeningPort);
+    }
 
-				tunnelRuntime = data.getChildRuntime();
-				debugNode = tunnelRuntime.createLocalNode(nodeName, false, null, "PA_DebugVN", null);
-				created = true;
-				creating = false;
-			}
-		} catch (Exception e) {
-			// If not handled by us, JMX eats the Exception !
-			debuggerLogger.warn(e);
-		} finally {
-			notifyAll();
-		}
-	}
+    private synchronized void getOrCreateNode() {
+        if (!created && !creating) {
+            JVMProcessImpl vm = new JVMProcessImpl(new StandardOutputMessageLogger());
+            vm.setClassname(StartPARuntime.class.getName());
+            try {
+                vm.setParameters("-d " + debugDeployementId + " -p " +
+                    RuntimeFactory.getDefaultRuntime().getURL());
+                creating = true;
+                vm.startProcess();
+                ProActiveRuntimeImpl.getProActiveRuntime().getMBean().sendNotification(
+                        NotificationType.debuggerConnectionActivated);
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (ProActiveException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+        }
+
+    }
+
+    /**
+     * Kill the runtime hsting the debug node
+     */
+    public void removeDebugger() {
+        try {
+            tunnelRuntime.killRT(true);
+            ProActiveRuntimeImpl.getProActiveRuntime().getMBean().sendNotification(
+                    NotificationType.debuggerConnectionTerminated);
+        } catch (Exception e) {
+            //            e.printStackTrace();
+        } finally {
+            tunnelRuntime = null;
+            created = false;
+            creating = false;
+        }
+    }
+
+    /**
+     * @return true if there is a debugger connected, false otherwise
+     */
+    public boolean hasDebuggerConnected() {
+        return tunnelRuntime != null;
+    }
+
+    private void subscribeJMXRuntimeEvent() {
+        ProActiveRuntimeImpl part = ProActiveRuntimeImpl.getProActiveRuntime();
+        part.addDeployment(debugDeployementId);
+        JMXNotificationManager.getInstance().subscribe(part.getMBean().getObjectName(), this);
+    }
+
+    public void handleNotification(Notification notification, Object handback) {
+        try {
+            String type = notification.getType();
+
+            if (NotificationType.GCMRuntimeRegistered.equals(type)) {
+                GCMRuntimeRegistrationNotificationData data = (GCMRuntimeRegistrationNotificationData) notification
+                        .getUserData();
+                if (data.getDeploymentId() != debugDeployementId) {
+                    return;
+                }
+
+                tunnelRuntime = data.getChildRuntime();
+                debugNode = tunnelRuntime.createLocalNode(nodeName, false, null, "PA_DebugVN", null);
+                created = true;
+                creating = false;
+            }
+        } catch (Exception e) {
+            // If not handled by us, JMX eats the Exception !
+            debuggerLogger.warn(e);
+        } finally {
+            notifyAll();
+        }
+    }
 
 }

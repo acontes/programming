@@ -32,6 +32,7 @@
 package org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder;
 
 import static org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLoggers.GCMD_LOGGER;
+import static org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLoggers.GCMA_LOGGER;
 
 import java.io.File;
 import java.io.IOException;
@@ -57,7 +58,7 @@ import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeInter
 public class CommandBuilderProActive implements CommandBuilder {
 
     final static String PROACTIVE_JAR = "ProActive.jar";
-    
+
     final static String TOKEN = "___TOKEN___";
 
     /** Path to the ProActive installation */
@@ -263,6 +264,36 @@ public class CommandBuilderProActive implements CommandBuilder {
             sb.append(fs);
             sb.append(PROACTIVE_JAR);
             sb.append(hostInfo.getOS().pathSeparator());
+
+            if (isDebugEnabled) {
+                String javaCommand = null;
+
+                if (javaPath != null) {
+                    javaCommand = javaPath.getFullPath(hostInfo, this);
+                } else {
+                    Tool javaTool = hostInfo.getTool(Tools.JAVA.id);
+                    if (javaTool != null) {
+                        javaCommand = javaTool.getPath();
+                    }
+                }
+
+                if (javaCommand == null) {
+                    // Java location must be set when the debug mode is enabled
+                    // TODO throw an exception
+                    GCMA_LOGGER
+                            .warn("GCMApplication/application/proactive/configuration/java is NOT set. Remote debbuging will fail");
+                } else {
+
+                    sb.append(javaCommand.substring(0, javaCommand.lastIndexOf(fs)));
+                    sb.append(fs);
+                    sb.append("..");
+                    sb.append(fs);
+                    sb.append("lib");
+                    sb.append(fs);
+                    sb.append("tools.jar");
+                    sb.append(hostInfo.getOS().pathSeparator());
+                }
+            }
         }
 
         if (proactiveClasspath != null) {
@@ -433,9 +464,9 @@ public class CommandBuilderProActive implements CommandBuilder {
         } else {
             switch (hostInfo.getOS()) {
                 case unix:
-                	String cmd = command.toString();
+                    String cmd = command.toString();
                     for (int i = 0; i < hostInfo.getHostCapacity(); i++) {
-                        ret.append(cmd.replaceAll(TOKEN, ""+i));
+                        ret.append(cmd.replaceAll(TOKEN, "" + i));
                         ret.append(" &");
                     }
                     ret.deleteCharAt(ret.length() - 1);
@@ -523,20 +554,15 @@ public class CommandBuilderProActive implements CommandBuilder {
     }
 
     protected String getDebugCommand(HostInfo hostInfo, long deploymentId) {
-    	Tool javaTool = hostInfo.getTool(Tools.JAVA.id);
+        Tool javaTool = hostInfo.getTool(Tools.JAVA.id);
         String java = "java";
-    	if (javaTool != null) {
+        if (javaTool != null) {
             java = javaTool.getPath();
         }
         if (debugCommandLine == null) {
             String token = "padebug_" + deploymentId + "_" + TOKEN;
             debugCommandLine = "-DdebugID=" + token +
-                " -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=0,launch='"+
-                java +
-                " -cp " +
-                this.getPath(hostInfo) +
-                "/dist/lib/ProActive.jar org.objectweb.proactive.core.debug.dconnection.DebuggeePortSetter " +
-                token + "'";
+                " -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=0";
         }
         return debugCommandLine;
     }

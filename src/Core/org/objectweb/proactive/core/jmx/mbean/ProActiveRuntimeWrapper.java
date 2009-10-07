@@ -80,7 +80,7 @@ public class ProActiveRuntimeWrapper extends NotificationBroadcasterSupport impl
 
     /** Used by the JMX notifications */
     private long counter = 0;
-    
+
     private boolean eclipseDebugger = false;
 
     public ProActiveRuntimeWrapper() {
@@ -235,26 +235,26 @@ public class ProActiveRuntimeWrapper extends NotificationBroadcasterSupport impl
     public DebuggerInformation getDebugInfo() {
         return DebuggerConnection.getDebuggerConnection().getDebugInfo();
     }
-    
+
     /**
      * @see org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean#updateDebugInfo()
      */
-    public void updateDebugInfo(){
-    	DebuggerConnection.getDebuggerConnection().update();
+    public void updateDebugInfo() {
+        DebuggerConnection.getDebuggerConnection().update();
     }
 
     /**
      * @see org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean#removeDebugger()
      */
     public void removeDebugger() {
-    	DebuggerConnection.getDebuggerConnection().removeDebugger();
+        DebuggerConnection.getDebuggerConnection().removeDebugger();
     }
 
-    public void removeEclipseDebugger(){
-    	eclipseDebugger = false;
-    	sendNotification(NotificationType.disconnectDebugger);
+    public void removeEclipseDebugger() {
+        eclipseDebugger = false;
+        sendNotification(NotificationType.disconnectDebugger);
     }
-    
+
     /**
      * @see org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean#hasDebuggerConnected()
      */
@@ -272,18 +272,18 @@ public class ProActiveRuntimeWrapper extends NotificationBroadcasterSupport impl
     /**
      * @see org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean#getDebugID()
      */
-    public String getDebugID(){
-    	return  System.getProperty("debugID");
+    public String getDebugID() {
+        return System.getProperty("debugID");
     }
-    
+
     /**
      * @see org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean#isExtendedDebugger()
      */
     public boolean isExtendedDebugger() {
-		return eclipseDebugger;
-	}
+        return eclipseDebugger;
+    }
 
-	public void setExtendedDebugger(boolean extendedDebugger) {
-		this.eclipseDebugger = extendedDebugger;
-	}
+    public void setExtendedDebugger(boolean extendedDebugger) {
+        this.eclipseDebugger = extendedDebugger;
+    }
 }

@@ -200,16 +200,16 @@ public interface BodyWrapperMBean extends Serializable {
      * @param types, a table of BreakpointType
      */
     public void updateBreakpointTypes(Map<String, Boolean> values);
-    
+
     //
-	// -- EXTENDED DEBUGGER ------------------------------------------------
-	//
+    // -- EXTENDED DEBUGGER ------------------------------------------------
+    //
     /**
      * enable the stepByStep mode on the sendRequest breakpoint for all
      * the ActiveObjects in the runtime
      */
     public void enableExtendedDebugger();
-    
+
     /**
      * disable the stepByStep mode on the sendRequest breakpoint for all
      * the ActiveObjects in the runtime
@@ -229,10 +229,10 @@ public interface BodyWrapperMBean extends Serializable {
     /**
      * @param sequenceNumber
      */
-	public void moveUpRequest(final long sequenceNumber);
+    public void moveUpRequest(final long sequenceNumber);
 
-	/**
-	 * @param sequenceNumber
-	 */
-	public void moveDownRequest(final long sequenceNumber);
+    /**
+     * @param sequenceNumber
+     */
+    public void moveDownRequest(final long sequenceNumber);
 }

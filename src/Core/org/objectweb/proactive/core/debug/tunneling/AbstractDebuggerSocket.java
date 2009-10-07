@@ -68,7 +68,7 @@ public abstract class AbstractDebuggerSocket {
                             }
                         }
                     } catch (Exception e) {
-//                        e.printStackTrace();
+                        //                        e.printStackTrace();
                         stopRead();
                         closeConnection();
                     }

@@ -462,53 +462,52 @@ public class BodyWrapper extends NotificationBroadcasterSupport implements Seria
     /**
      * @see org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean#updateBreakpointTypes(Map<String, Boolean> types)
      */
-    public void updateBreakpointTypes(Map<String, Boolean> values){
+    public void updateBreakpointTypes(Map<String, Boolean> values) {
         body.getDebugger().updateBreakpointTypes(values);
     }
 
-	//
-	// -- EXTENDED DEBUGGER ------------------------------------------------
-	//
+    //
+    // -- EXTENDED DEBUGGER ------------------------------------------------
+    //
     /**
      * @see org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean#enableExtendedDebugger()
      */
-    public void enableExtendedDebugger(){
-    	body.getDebugger().enableExtendedDebugger();
+    public void enableExtendedDebugger() {
+        body.getDebugger().enableExtendedDebugger();
     }
 
     /**
      * @see org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean#enableExtendedDebugger()
      */
-    public void disableExtendedDebugger(){
-    	body.getDebugger().disableExtendedDebugger();
+    public void disableExtendedDebugger() {
+        body.getDebugger().disableExtendedDebugger();
     }
 
-    
     /**
      * @see org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean#unblockConnection()
      */
-    public void unblockConnection(){
-	body.getDebugger().unblockConnection();
+    public void unblockConnection() {
+        body.getDebugger().unblockConnection();
     }
 
     /**
      * @see org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean#getRequestQueueInfo()
      */
-    public RequestQueueInfo getRequestQueueInfo(){
-	return body.getDebugger().getRequestQueueInfo();
+    public RequestQueueInfo getRequestQueueInfo() {
+        return body.getDebugger().getRequestQueueInfo();
     }
 
     /**
      * @see org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean#moveUpRequest(long)
      */
-	public void moveUpRequest(final long sequenceNumber){
-		body.getDebugger().moveUpRequest(sequenceNumber);
-	}
+    public void moveUpRequest(final long sequenceNumber) {
+        body.getDebugger().moveUpRequest(sequenceNumber);
+    }
 
-	/**
-	 * see {@link org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean#moveDownRequest(long)}
-	 */
-	public void moveDownRequest(final long sequenceNumber){
-		body.getDebugger().moveDownRequest(sequenceNumber);
-	}
+    /**
+     * see {@link org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean#moveDownRequest(long)}
+     */
+    public void moveDownRequest(final long sequenceNumber) {
+        body.getDebugger().moveDownRequest(sequenceNumber);
+    }
 }

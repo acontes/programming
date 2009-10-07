@@ -37,6 +37,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+
 public class DebuggerSocketClient extends AbstractDebuggerSocket {
     private static final long serialVersionUID = -3968459071256257021L;
 
@@ -87,8 +88,8 @@ public class DebuggerSocketClient extends AbstractDebuggerSocket {
      */
     public void connect() throws UnknownHostException, IOException {
         if (!connected) {
-        	System.err.println("********host: " + host);
-        	System.err.println("********port: " + port);
+            System.err.println("********host: " + host);
+            System.err.println("********port: " + port);
             connected = true;
             InetSocketAddress sa = new InetSocketAddress(host, port);
             Socket socket = new Socket();

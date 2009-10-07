@@ -43,7 +43,7 @@ public class Connection implements Serializable {
 
     private static final long serialVersionUID = 4143722330891057902L;
     private transient Socket socket;
-    private transient  InputStream reader;
+    private transient InputStream reader;
     private transient OutputStream writer;
     private boolean activated = false;
 

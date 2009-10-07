@@ -98,7 +98,7 @@ public class NotificationType {
     public final static String stepByStepSlowMotionDisabled = "stepByStepSlowMotionDisabled";
     public final static String stepByStepISEnabled = "stepByStepISEnabled";
     public final static String stepByStepISDisabled = "stepByStepISDisabled";
-    
+
     // ExtendedDebugger
     public final static String connectDebugger = "connectDebugger";
     public final static String disconnectDebugger = "disconnectDebugger";

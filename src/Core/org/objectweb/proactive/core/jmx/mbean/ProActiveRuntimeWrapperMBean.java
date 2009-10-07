@@ -174,7 +174,7 @@ public interface ProActiveRuntimeWrapperMBean extends Serializable {
      * @return DebuggerInformation
      */
     public DebuggerInformation getDebugInfo();
-    
+
     /**
      * Force to parse a new port number if exist.
      */
@@ -184,9 +184,9 @@ public interface ProActiveRuntimeWrapperMBean extends Serializable {
      * Kill the debug node if the number of active objects <= 0
      */
     public void removeDebugger();
-    
+
     public void removeEclipseDebugger();
-    
+
     /**
      * @return true if there is a debugger connected, false otherwise
      */
@@ -201,12 +201,12 @@ public interface ProActiveRuntimeWrapperMBean extends Serializable {
      * @return the DebugID of this runtime
      */
     public String getDebugID();
-    
+
     /**
      * 
      * @return true if the eclipse debugger is connected to this runtime. false otherwise
      */
     public boolean isExtendedDebugger();
 
-	public void setExtendedDebugger(boolean extendedDebugger); 
+    public void setExtendedDebugger(boolean extendedDebugger);
 }
