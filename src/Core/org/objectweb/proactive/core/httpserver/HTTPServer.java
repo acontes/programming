@@ -107,6 +107,7 @@ public class HTTPServer {
         }
         connector.setPort(port);
         this.server.addConnector(connector);
+
         UnboundedThreadPool utp = new UnboundedThreadPool();
         this.server.setThreadPool(utp);
 
