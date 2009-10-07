@@ -78,6 +78,11 @@ log4j.logger.org.mortbay = WARN
 #log4j.logger.proactive.jmx.mbean = DEBUG
 #log4j.logger.proactive.jmx.notification = DEBUG
 
+#log4j.logger.proactive.native = DEBUG
+#log4j.logger.proactive.native.control = DEBUG
+#log4j.logger.proactive.native.control.manager = DEBUG
+#log4j.logger.proactive.native.control.coupling = DEBUG
+
 
 ################ Appenders ####################
 #
