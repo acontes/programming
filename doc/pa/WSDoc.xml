@@ -101,42 +101,51 @@
 
 	
 
-  <section xml:id="Stepstoexposeanactiveobjectasa_29"><info><title>Steps to expose an active object as a web services</title></info>
+  <section xml:id="Stepstoexposeanactiveobjectasa_29"><info><title>Steps to expose or unexpose an active object as a web services</title></info>
     
 
     <para>The steps for exporting and using an active object as a web service
     are the following:</para>
 
     <itemizedlist>
-      <listitem>
-        <para>Write your active object or your component in a classic way as below:</para>
+		<listitem>
+			<para>Write your active object or your component in a classic way as below:</para>
 
-        <programlisting language="java"><textobject><textdata fileref="automatic_snippets/webservices_AO_1.snip" /></textobject></programlisting>
-        <programlisting language="java"><textobject><textdata fileref="automatic_snippets/webservices_Component_1.snip" /></textobject></programlisting>
+			<programlisting language="java"><textobject><textdata fileref="automatic_snippets/webservices_AO_1.snip" /></textobject></programlisting>
+			<para>
+				or
+			</para>
+			<programlisting language="java"><textobject><textdata fileref="automatic_snippets/webservices_Component_1.snip" /></textobject></programlisting>
       </listitem>
 
       <listitem>
-        <para>Once the element is created and activated, deploy it onto a web
-        server using one of the methods of <emphasis role="bold">org.objectweb.proactive.extensions.webservices.WebServices</emphasis>:</para>
-
-        <programlisting language="java">public static void exposeAsWebService(String wsFrameWork, Object o, String url, String urn, String[] methods) throws ProActiveException;
-public static void exposeAsWebService(String wsFrameWork, Object o, String url, String urn, Method[] methods) throws ProActiveException;
-public static void exposeAsWebService(String wsFrameWork, Object o, String url, String urn) throws ProActiveException;
-public static void exposeComponentAsWebService(String wsFrameWork, Component component, String componentName, String urn, String[] interfaceNames) throws ProActiveException;
-public static void exposeComponentAsWebService(String wsFrameWork, Component component, String url, String componentName) throws ProActiveException;</programlisting>
-
+			<para>Once the element created and activated, a <emphasis role="bold">WebServicesFactory</emphasis> object has to be instantiated: </para>
+			<programlisting language="java">WebServicesFactory wsf = AbstractWebServicesFactory.getWebServicesFactory("axis2");</programlisting>
+			<para>or</para>
+			<programlisting language="java">WebServicesFactory wsf = AbstractWebServicesFactory.getWebServicesFactory("cxf");</programlisting>
+			<para>or else</para>
+			<programlisting language="java">WebServicesFactory wsf = AbstractWebServicesFactory.getDefaultWebServicesFactory();</programlisting>
+		</listitem>
+		<listitem>
+			<para>Then, you have to instantiate a <emphasis role="bold">WebServices</emphasis> object as follows: </para>
+			<programlisting language="java">WebServices ws = wsf.getWebServices(myUrl);</programlisting>
+			<para>If you want to use the local Jetty server to expose your active object or your component, you can use the following line
+			to retrieve the good URL:</para>
+			<programlisting language="java">String myUrl = AbstractWebServicesFactory.getLocalUrl();</programlisting>
+			<para>This will get the Jetty port which is a random port and build the url.</para>
+		</listitem>
+		<listitem>
+			<para>And finally, you can used one of the <literal>WebServices</literal> methods: </para>
+			<programlisting language="java"><textobject><textdata fileref="automatic_snippets/WebServices_Methods.snip" /></textobject></programlisting>
+		  
         <para>where:</para>
 
         <itemizedlist>
-    	    <listitem>
-                <para><emphasis role="bold">wsFrameWork</emphasis> is the web service framework you want to use:
-                it should be either 'axis2' or 'cxf'.</para>
-            </listitem>
 	      <listitem>
                 <para><emphasis role="bold">o</emphasis> is the active
                 object</para>
             </listitem>
-	      <listitem>
+				<listitem>
                 <para><emphasis role="bold">component</emphasis> is the component</para>
             </listitem>
 
@@ -172,56 +181,17 @@ public static void exposeComponentAsWebService(String wsFrameWork, Component com
     </itemizedlist>
   </section>
 
-  <section xml:id="Undeploytheservices_29"><info><title>Undeploy the services</title></info>
-    
-
-    <para>To undeploy an active object as a service, use one of the following ProActive static
-    method:</para>
-
-    <programlisting language="java">public static void unExposeAsWebService(String wsFrameWork, String url, String urn) throws ProActiveException;
-public static void unExposeComponentAsWebService(String wsFrameWork, Component component, String url, String componentName) throws ProActiveException;
-public static void unExposeComponentAsWebService(String wsFrameWork, String url, String componentName, String[] interfaceNames) throws ProActiveException;</programlisting>
-
-    <para>where:</para>
-
-    <itemizedlist>
-       <listitem>
-             <para><emphasis role="bold">wsFrameWork</emphasis> is the web service framework you want to use:
-             it should be either 'axis2' or 'cxf'.</para>
-         </listitem>
-      <listitem>
-        <para><emphasis role="bold">urn</emphasis> is the service name</para>
-      </listitem>
-
-      <listitem>
-        <para><emphasis role="bold">url</emphasis> the url of the server where
-        the service is deployed</para>
-      </listitem>
-      <listitem>
-         <para><emphasis role="bold">component</emphasis> the component to undeploy</para>
-      </listitem>
-      <listitem>
-        <para><emphasis role="bold">componentName</emphasis> the name of your component
-        as it has been exposed</para>
-      </listitem>
-      <listitem>
-         <para><emphasis role="bold">interfaceNames</emphasis> a String array containing
-         the interfaces of the component you want to undeploy</para>
-      </listitem>
-    </itemizedlist>
-  </section>
-
   <section xml:id="Accessingtheservices_29"><info><title>Accessing the services</title></info>
     
 
-    <para>Once the active object or the component is deployed, you can access it via any web service enabled client (such as C#) or with your favorite browser
-    (if the returned type of your service methods are primitive types).</para>
+    <para>Once the active object or the component deployed, you can access it via any web service client (such as C#, SoapUI, Axis2 API, CXF API...) or with your favorite browser
+    (only if the returned type of your service methods are primitive types).</para>
 
     <para>First of all, the client will get the WSDL file matching this active
     object. This WSDL file is the 'identity card' of the service. It contains
     the web service public interfaces and its location. Generally, WSDL files
     are used to generate a proxy to the service. For example, for a given
-    service, say 'compute', you can get the WSDL document at <code>http://localhost:8080/proactive/services/compute?wsdl></code>.</para>
+    service, say 'compute', you can get the WSDL document at <code>http://localhost:8080/proactive/services/compute?wsdl</code>.</para>
 
     <para>Now that this client knows what and where to call the service, it
     will send a SOAP message to the web server. The web server looks into the
@@ -254,15 +224,21 @@ public static void unExposeComponentAsWebService(String wsFrameWork, String url,
       service on the web server located at
       <literal>http://localhost:8080/proactive/services/</literal> and its service name is
 		<literal>"MyHelloWorldService"</literal>. The accessible service
-      method is <literal>helloWorld</literal>. You can see its wsdl file through the
+      method are <literal>putTextToSayAndConfirm, putTextToSay and sayText</literal>. 
+		You can see its wsdl file through the
       <literal>http://localhost:8080/proactive/services/MyHelloWorldService?wsdl</literal> and you
-      call the <literal>helloWorld</literal> method with your browser through
-      <literal>http://localhost:8080/proactive/services/MyHelloWorldService/helloWorld</literal>.</para>
+      call the <literal>helloWorld</literal> method with your browser through, for example,
+      <literal>http://localhost:8080/proactive/services/MyHelloWorldService/sayText</literal>.</para>
 
 
       <para>If you want to expose a method which requires arguments, you can call using the same link as previously but
       adding <literal>?[arg0]=[value]&amp;[arg1]=[value]...</literal> where [argn] is the name of the n-th argument
       as written in the wsdl file.</para>
+
+		<para>You can also call a webservice using the ProActive client which uses, depending on the chosen framework, either a axis2 or a cxf client.
+		Here is an example:</para>
+
+      <programlisting language="java"><textobject><textdata fileref="automatic_snippets/webservices_AO_3.snip" /></textobject></programlisting>
 
       <para>Now that the server-side Web service is deployed, we can create a
       new client application in Visual Studio .NET.</para>

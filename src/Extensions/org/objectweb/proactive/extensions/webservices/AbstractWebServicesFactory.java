@@ -95,11 +95,11 @@ public abstract class AbstractWebServicesFactory implements WebServicesFactory {
     /** Return the default WebServicesFactory
      * 
      * @return return the web service factory associated to the default framework
-     * @throws UnknownFrameWorkException if the default communication protocol is not known
+     * @throws UnknownFrameWorkException if the default framework is not known
      */
     public static WebServicesFactory getDefaultWebServicesFactory() throws UnknownFrameWorkException {
-        String protocol = PAProperties.PA_WEBSERVICES_FRAMEWORK.getValue();
-        return getWebServicesFactory(protocol);
+        String frameWork = PAProperties.PA_WEBSERVICES_FRAMEWORK.getValue();
+        return getWebServicesFactory(frameWork);
     }
 
     public static String getLocalPort() {

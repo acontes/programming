@@ -95,12 +95,12 @@ public abstract class AbstractClientFactory implements ClientFactory {
             frameWorkId);
     }
 
-    /** Return the default WebServicesFactory
+    /** Return the default ClientFactory
      * 
-     * @return return the web service factory associated to the default framework
-     * @throws UnknownFrameWorkException if the default communication protocol is not known
+     * @return return the client factory associated to the default framework
+     * @throws UnknownFrameWorkException if the default framework is not known
      */
-    public static ClientFactory getDefaultWebServicesFactory() throws UnknownFrameWorkException {
+    public static ClientFactory getDefaultClientFactory() throws UnknownFrameWorkException {
         String frameWork = PAProperties.PA_WEBSERVICES_FRAMEWORK.getValue();
         return getClientFactory(frameWork);
     }

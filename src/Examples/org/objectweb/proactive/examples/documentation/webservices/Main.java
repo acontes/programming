@@ -23,6 +23,9 @@ import org.objectweb.proactive.examples.webservices.helloWorld.HelloWorld;
 import org.objectweb.proactive.extensions.webservices.AbstractWebServicesFactory;
 import org.objectweb.proactive.extensions.webservices.WebServices;
 import org.objectweb.proactive.extensions.webservices.WebServicesFactory;
+import org.objectweb.proactive.extensions.webservices.client.AbstractClientFactory;
+import org.objectweb.proactive.extensions.webservices.client.Client;
+import org.objectweb.proactive.extensions.webservices.client.ClientFactory;
 
 
 public class Main {
@@ -52,14 +55,67 @@ public class Main {
             Fractal.getLifeCycleController(a).startFc();
             //@snippet-end webservices_Component_1
 
+            //@snippet-start webservices_Component_2
+            // If you want the default WebServicesFactory, you can use
+            // WebServicesFactory.getDefaultWebServicesFactory()
+            WebServicesFactory wsFactory = AbstractWebServicesFactory.getWebServicesFactory("cxf");
+
+            // If you want to use the local Jetty server, you can use
+            // AbstractWebServicesFactory.getLocalUrl() to get its url with
+            // its port number (which is random except if you have set the
+            // proactive.http.port variable)
+            WebServices webServices = wsFactory.getWebServices("http://localhost:8080/");
+
+            webServices.exposeComponentAsWebService(a, "myComponent");
+            //@snippet-end webservices_Component_2
+            //@snippet-start webservices_Component_3
+            webServices.unExposeComponentAsWebService(a, "myComponent");
+            //@snippet-end webservices_Component_3
+
             //@snippet-start webservices_AO_2
             HelloWorld hw = (HelloWorld) PAActiveObject
                     .newActive(HelloWorld.class.getName(), new Object[] {});
 
+            // If you want the default WebServicesFactory, you can use
+            // WebServicesFactory.getDefaultWebServicesFactory()
             WebServicesFactory wsf = AbstractWebServicesFactory.getWebServicesFactory("cxf");
+
+            // If you want to use the local Jetty server, you can use
+            // AbstractWebServicesFactory.getLocalUrl() to get its url with
+            // its port number (which is random except if you have set the
+            // proactive.http.port variable)
             WebServices ws = wsf.getWebServices("http://localhost:8080/");
-            ws.exposeAsWebService(hw, "MyHelloWorldService", new String[] { "helloWorld" });
+
+            ws.exposeAsWebService(hw, "MyHelloWorldService", new String[] { "putTextToSayAndConfirm",
+                    "putTextToSay", "sayText" });
             //@snippet-end webservices_AO_2
+
+            //@snippet-start webservices_AO_3
+            // Instead of using "cxf", you can also use wsf.getFrameWorkId()
+            // in order to be sure to get the same framework as the service
+            // has used to be exposed. However, you can call a cxf service
+            // using an axis2 client but there exists some incompatibility
+            // between these two framework.
+            // If you want the default ClientFactory, you can use
+            // ClientFactory.getDefaultClientFactory()
+            ClientFactory clientFactory = AbstractClientFactory.getClientFactory("cxf");
+
+            // Instead of using "http://localhost:8080/", you can use ws.getUrl() to
+            // ensure to get to good service address.
+            Client client = clientFactory.getClient("http://localhost:8080/", "MyHelloWorldService",
+                    HelloWorld.class);
+
+            // Call which returns a result
+            Object[] res = client.call("putTextToSayAndConfirm", new Object[] { "Hello World!" },
+                    String.class);
+            System.out.println((String) res[0]);
+
+            // Call which does not return a result
+            client.oneWayCall("putTextToSay", new Object[] { "Hi ProActive Team!" });
+
+            // Call with no argument
+            res = client.call("sayText", null, String.class);
+            //@snippet-end webservices_AO_3
         } catch (ActiveObjectCreationException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

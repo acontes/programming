@@ -922,7 +922,10 @@
   			
   			<itemizedlist><info><title xml:id="NewClasses_2">New Classes</title></info>
   				
+  				<listitem><para><literal>org.objectweb.proactive.extensions.webservices.AbstractWebServicesFactory</literal> - used to get a WebServicesFactory depending on the framework (axis2 or cxf)</para></listitem>
+  				<listitem><para><literal>org.objectweb.proactive.extensions.webservices.WebServicesFactory</literal> - used to get a WebServices corresponding to a specified url</para></listitem>
   				<listitem><para><literal>org.objectweb.proactive.extensions.webservices.WebServices</literal> - used to transform the active object into a web service</para></listitem>
+  				<listitem><para><literal>org.objectweb.proactive.extensions.webservices.exceptions.WebServicesException</literal> - used to report web service exceptions</para></listitem>
   			</itemizedlist>
   			
   			<itemizedlist><info><title xml:id="Previouslyusedclasses_6">Previously used classes</title></info>
@@ -940,11 +943,11 @@
 			and create a <literal>CMAgentWebService</literal> that we expose through the main method. </para>
   			
 			<para>Since the usage of the webservice is independent of the underlying implementation, we give
-			here only a Java example of how to access the webservice. This client enables in particular to call eitheir axis2 or cxf services.
+			here only a Java example of how to access the webservice. This client enables in particular to call either axis2 or cxf services.
          However, you can simply use your favorite browser.</para>
   			<programlisting language="java"><textobject><textdata fileref="automatic_snippets/webservice_cma_client_full.snip"/></textobject></programlisting>
       		
-		   <para>In the <literal>CMAgentWebService</literal>, we only need to write one line of code to use the
+		   <para>In the <literal>CMAgentWebService</literal>, we need to write 3 lines of code to use the
       	active object as an webservice.</para>
       
          <programlisting language="java"><textobject><textdata fileref="automatic_snippets/webservice_cma_skeleton.snip"/></textobject></programlisting>		
@@ -959,7 +962,9 @@
          </para>
 
   			<orderedlist>
-  			<listitem><para>Deploy the agent as a web service</para> </listitem>
+  			<listitem><para>Get a WebServicesFactory using a static method of the AbstractWebServicesFactory class</para> </listitem>
+  			<listitem><para>Get a WebServices using the WebServicesFactory instance you have just got</para></listitem>
+  			<listitem><para>Expose your active object using this WebServices instance</para></listitem>
   			</orderedlist>
 
          <para>
@@ -972,13 +977,9 @@
   		<section xml:id="SolutionAndCode_1"><info><title>Solution And Code</title></info>
   			
 
-			<para>There are several parameters that are needed for creating the webservice.
-			The first parameter passed is the framework to use (axis2 or cxf), then the active object, the server URL,
-			the name we want for the webservice, and finally, an
-			array of <literal>String</literal> with the list of methods we want to expose.
-         However, there are other way to expose active object as a web service. Refer to <xref linkend="ExportingActiveObjectsasWebServices_29" /> to discover them.</para>
   			<programlisting language="java"><textobject><textdata fileref="automatic_snippets/ws_call.snip"/></textobject></programlisting>
 			<para>
+				Refer to <xref linkend="WSDoc"/> to get more information about web services exposition.
 			</para>
   		</section>
   	</section>

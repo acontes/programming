@@ -29,6 +29,7 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
+//@snippet-start wsclientcomponent
 package org.objectweb.proactive.examples.webservices.helloWorld;
 
 import org.objectweb.proactive.extensions.webservices.client.AbstractClientFactory;
@@ -110,5 +111,5 @@ public class HelloWorldComponentClient {
             e.printStackTrace();
         }
     }
-
 }
+//@snippet-end wsclientcomponent

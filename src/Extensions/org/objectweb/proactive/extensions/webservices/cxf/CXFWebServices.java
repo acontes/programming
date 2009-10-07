@@ -263,6 +263,10 @@ public class CXFWebServices extends AbstractWebServices implements WebServices {
     /**
      * Undeploy all the interfaces of a component deployed on a web server
      *
+     * With CXF, this method
+     * can only be used if you have previously deployed all the client interfaces of the component.
+     * Otherwise, it will raise an exception trying to undeploy a client interface which has not been
+     * deployed before.
      * @param component  The component owning the services interfaces
      * @param url The url of the web server
      * @param componentName The name of the component

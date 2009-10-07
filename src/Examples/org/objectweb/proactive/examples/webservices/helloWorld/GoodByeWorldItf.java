@@ -31,7 +31,7 @@
  */
 package org.objectweb.proactive.examples.webservices.helloWorld;
 
-//@snippet-start helloworlditfcomponent
+//@snippet-start goodbyeworlditfcomponent
 public interface GoodByeWorldItf {
 
     public String goodByeWorld(String arg0);
@@ -40,4 +40,4 @@ public interface GoodByeWorldItf {
 
     public void setText(String arg0);
 }
-//@snippet-end helloworlditfcomponent
+//@snippet-end goodbyeworlditfcomponent
