@@ -122,9 +122,8 @@ public class RemoteObjectExposer<T> implements Serializable {
             int port = url.getPort();
             if (port == -1) {
                 try {
-                    url = new URI(url.getScheme(), url.getUserInfo(), url.getHost(), RemoteObjectHelper
-                            .getDefaultPortForProtocol(protocol), url.getPath(), url.getQuery(), url
-                            .getFragment());
+                    url = new URI(url.getScheme(), url.getUserInfo(), url.getHost(), rof.getPort(), url
+                            .getPath(), url.getQuery(), url.getFragment());
                 } catch (URISyntaxException e) {
                     e.printStackTrace();
                 }
@@ -144,12 +143,13 @@ public class RemoteObjectExposer<T> implements Serializable {
         }
     }
 
-    public synchronized RemoteRemoteObject createRemoteObject(String name) throws ProActiveException {
+    public synchronized RemoteRemoteObject createRemoteObject(String name, boolean rebind)
+            throws ProActiveException, AlreadyBoundException {
         try {
             // select the factory matching the required protocol
             RemoteObjectFactory rof = AbstractRemoteObjectFactory.getDefaultRemoteObjectFactory();
 
-            InternalRemoteRemoteObject irro = rof.createRemoteObject(this.remoteObject, name);
+            InternalRemoteRemoteObject irro = rof.createRemoteObject(this.remoteObject, name, rebind);
             this.activeRemoteRemoteObjects.put(irro.getURI(), irro);
             return irro.getRemoteRemoteObject();
         } catch (Exception e) {

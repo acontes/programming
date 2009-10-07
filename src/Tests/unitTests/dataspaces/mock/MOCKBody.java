@@ -237,7 +237,7 @@ public class MOCKBody implements Body {
 
     }
 
-    public String registerByName(String name) throws IOException {
+    public String registerByName(String name, boolean rebind) throws IOException {
 
         return null;
     }
@@ -315,6 +315,10 @@ public class MOCKBody implements Body {
 
     public void terminateSession(long sessionID) throws SecurityNotAvailableException, IOException {
 
+    }
+
+    public String getUrl() {
+        return null;
     }
 
 }
