@@ -211,7 +211,7 @@ public class DummySender implements UniversalBody {
 
     }
 
-    public String registerByName(String name) throws IOException {
+    public String registerByName(String name, boolean rebind) throws IOException {
         // TODO Auto-generated method stub
         return null;
     }
@@ -220,4 +220,5 @@ public class DummySender implements UniversalBody {
         // TODO Auto-generated method stub
         return null;
     }
+
 }

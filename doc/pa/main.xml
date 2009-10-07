@@ -73,7 +73,7 @@
                 <!ENTITY MessageRouting SYSTEM "MessageRouting.xml">
 	        <!ENTITY JMX SYSTEM "Jmx.xml">
          	 <!ENTITY JMXMBean SYSTEM "jmxMBean.xml">
-
+				<!ENTITY Virtualization SYSTEM "Virtualization.xml">
                 ]>
                 
 <book xmlns="http://docbook.org/ns/docbook" version="5.0">
