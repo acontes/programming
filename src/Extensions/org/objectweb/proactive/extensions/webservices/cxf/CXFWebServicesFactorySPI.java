@@ -35,12 +35,22 @@ import org.objectweb.proactive.extensions.webservices.WebServicesFactory;
 import org.objectweb.proactive.extensions.webservices.WebServicesFactorySPI;
 
 
+/**
+ * @author The ProActive Team
+ *
+ */
 public class CXFWebServicesFactorySPI implements WebServicesFactorySPI {
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.extensions.webservices.WebServicesFactorySPI#getFrameWorkId()
+     */
     public String getFrameWorkId() {
         return "cxf";
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.extensions.webservices.WebServicesFactorySPI#getFactoryClass()
+     */
     public Class<? extends WebServicesFactory> getFactoryClass() {
         return CXFWebServicesFactory.class;
     }

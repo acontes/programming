@@ -51,6 +51,8 @@ public interface ServiceDeployerItf {
      * @param marshalledSerializedMethods byte array representing the methods (of type Method)
      *        to be exposed
      * @param isComponent Specify whether the object we want to expose is a component
+     * @throws NoSuchInterfaceException 
+     * @throws ClassNotFoundException 
      */
     public void deploy(byte[] marshalledObject, String serviceName, byte[] marshalledSerializedMethods,
             boolean isComponent) throws NoSuchInterfaceException, ClassNotFoundException;

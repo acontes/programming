@@ -34,7 +34,6 @@ package org.objectweb.proactive.extensions.webservices.common;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.util.SerializableMethod;
 import org.objectweb.proactive.extensions.webservices.WSConstants;
 import org.objectweb.proactive.extensions.webservices.exceptions.WebServicesException;
@@ -86,7 +85,7 @@ public class MethodUtils {
      * corresponding object method.
      *
      * @param method Method to be checked
-     * @throws ProActiveException
+     * @throws WebServicesException 
      */
     public static void checkMethodClass(Method method) throws WebServicesException {
         if (method.getDeclaringClass().getName().startsWith(
@@ -100,7 +99,7 @@ public class MethodUtils {
      * The same as checkMethodClass but for an array of Method.
      *
      * @param methods Methods to be checked
-     * @throws ProActiveException
+     * @throws WebServicesException 
      */
     public static void checkMethodsClass(Method[] methods) throws WebServicesException {
         if (methods != null) {

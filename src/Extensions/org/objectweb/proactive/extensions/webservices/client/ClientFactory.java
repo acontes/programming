@@ -34,11 +34,28 @@ package org.objectweb.proactive.extensions.webservices.client;
 import org.objectweb.proactive.extensions.webservices.exceptions.WebServicesException;
 
 
+/**
+ * @author The ProActive Team
+ *
+ */
 public interface ClientFactory {
 
+    /**
+     * Gets a client corresponding to a service whose name is serviceName and
+     * whose URL is url.
+     * 
+     * @param url URL of the service
+     * @param serviceName Name of the service
+     * @param serviceClass Class of the service
+     * @return a client
+     * @throws WebServicesException
+     */
     public Client getClient(String url, String serviceName, Class<?> serviceClass)
             throws WebServicesException;
 
+    /**
+     * @return the framework id of the ClientFactory instance
+     */
     public String getFrameWorkId();
 
 }

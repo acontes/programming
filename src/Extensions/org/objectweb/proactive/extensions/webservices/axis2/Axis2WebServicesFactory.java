@@ -37,16 +37,26 @@ import org.objectweb.proactive.extensions.webservices.WebServicesFactory;
 import org.objectweb.proactive.extensions.webservices.exceptions.WebServicesException;
 
 
+/**
+ * @author The ProActive Team
+ *
+ */
 public class Axis2WebServicesFactory extends AbstractWebServicesFactory implements WebServicesFactory {
 
     public Axis2WebServicesFactory() {
         super();
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.extensions.webservices.WebServicesFactory#getFrameWorkId()
+     */
     public String getFrameWorkId() {
         return "axis2";
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.extensions.webservices.AbstractWebServicesFactory#newWebServices(java.lang.String)
+     */
     protected WebServices newWebServices(String url) throws WebServicesException {
         return new Axis2WebServices(url);
     }

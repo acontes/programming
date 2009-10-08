@@ -49,7 +49,6 @@ import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
-import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.httpserver.HTTPServer;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -62,12 +61,17 @@ import org.objectweb.proactive.extensions.webservices.cxf.servicedeployer.Servic
 import org.objectweb.proactive.extensions.webservices.exceptions.WebServicesException;
 
 
+/**
+ * @author The ProActive Team
+ *
+ */
 public class CXFWebServices extends AbstractWebServices implements WebServices {
 
     static private Logger logger = ProActiveLogger.getLogger(Loggers.WEB_SERVICES);
 
     /**
-     * Static block in charge of deploying the ServiceDeployer service into the jetty server
+     * Add the CXF servlet to the jetty server and set the initial parameters.
+     * 
      */
     private synchronized void initializeServlet() {
         // Retrieve or launch a Jetty server
@@ -127,21 +131,16 @@ public class CXFWebServices extends AbstractWebServices implements WebServices {
             "ServiceDeployer");
     }
 
+    /**
+     * @param url
+     */
     public CXFWebServices(String url) {
         super(url);
         initializeServlet();
     }
 
-    /**
-     * Expose an active object as a web service with the methods specified in <code>methods</code>
-     *
-     * @param o The object to expose as a web service
-     * @param url The url of the host where the object will be deployed  (typically http://localhost:8080/)
-     * @param urn The name of the object
-     * @param methods The methods that will be exposed as web services functionalities
-     *                   If null, then all methods will be exposed
-     * @throws WebServicesException 
-     * @throws ProActiveException 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.extensions.webservices.WebServices#exposeAsWebService(java.lang.Object, java.lang.String, java.lang.reflect.Method[])
      */
     public void exposeAsWebService(Object o, String urn, Method[] methods) throws WebServicesException {
         MethodUtils.checkMethodsClass(methods);
@@ -155,15 +154,8 @@ public class CXFWebServices extends AbstractWebServices implements WebServices {
         }
     }
 
-    /**
-     * Expose an active object as a web service with the methods specified in <code>methods</code>
-     *
-     * @param o The object to expose as a web service
-     * @param url The url of the host where the object will be deployed  (typically http://localhost:8080/)
-     * @param urn The name of the object
-     * @param methodsName The methods that will be exposed as web services functionalities
-     *                   If null, then all methods will be exposed
-     * @throws WebServicesException 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.extensions.webservices.WebServices#exposeAsWebService(java.lang.Object, java.lang.String, java.lang.String[])
      */
     public void exposeAsWebService(Object o, String urn, String[] methodsName) throws WebServicesException {
         // Transforms the array methods' name into an array of
@@ -182,13 +174,8 @@ public class CXFWebServices extends AbstractWebServices implements WebServices {
         }
     }
 
-    /**
-     * Expose an active object with all its methods as a web service
-     *
-     * @param o The object to expose as a web service
-     * @param url The url of the host where the object will be deployed  (typically http://localhost:8080/)
-     * @param urn The name of the object
-     * @throws WebServicesException 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.extensions.webservices.WebServices#exposeAsWebService(java.lang.Object, java.lang.String)
      */
     public void exposeAsWebService(Object o, String urn) throws WebServicesException {
         PADeployer.deploy(o, this.url, urn, null, false);
@@ -197,11 +184,8 @@ public class CXFWebServices extends AbstractWebServices implements WebServices {
             "' has been deployed on " + this.url + WSConstants.SERVICES_PATH + urn + "?wsdl");
     }
 
-    /**
-     * Undeploy a service
-     *
-     * @param urn The name of the object
-     * @param url The url of the web server
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.extensions.webservices.WebServices#unExposeAsWebService(java.lang.String)
      */
     public void unExposeAsWebService(String urn) {
         PADeployer.undeploy(this.url, urn);
@@ -210,18 +194,8 @@ public class CXFWebServices extends AbstractWebServices implements WebServices {
             WSConstants.SERVICES_PATH + urn + "?wsdl " + "has been undeployed");
     }
 
-    /**
-     * Expose a component as web service. Each server interface of the component
-     * will be accessible by  the urn [componentName]_[interfaceName].
-     * Only the interfaces public methods of the specified interfaces in
-     * <code>interfaceNames</code> will be exposed.
-     *
-     * @param component The component owning the interfaces that will be deployed as web services.
-     * @param url  Web server url  where to deploy the service - typically "http://localhost:8080"
-     * @param componentName Name of the component
-     * @param interfaceNames Names of the interfaces we want to deploy.
-      *                           If null, then all the interfaces will be deployed
-     * @throws WebServicesException 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.extensions.webservices.WebServices#exposeComponentAsWebService(org.objectweb.fractal.api.Component, java.lang.String, java.lang.String[])
      */
     public void exposeComponentAsWebService(Component component, String componentName, String[] interfaceNames)
             throws WebServicesException {
@@ -233,15 +207,8 @@ public class CXFWebServices extends AbstractWebServices implements WebServices {
         }
     }
 
-    /**
-     * Expose a component as web service. Each server interface of the component
-     * will be accessible by  the urn [componentName]_[interfaceName].
-     * All the interfaces public methods of all interfaces will be exposed.
-     *
-     * @param component The component owning the interfaces that will be deployed as web services.
-     * @param url  Web server url  where to deploy the service - typically "http://localhost:8080"
-     * @param componentName Name of the component
-     * @throws WebServicesException 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.extensions.webservices.WebServices#exposeComponentAsWebService(org.objectweb.fractal.api.Component, java.lang.String)
      */
     public void exposeComponentAsWebService(Component component, String componentName)
             throws WebServicesException {
@@ -260,16 +227,14 @@ public class CXFWebServices extends AbstractWebServices implements WebServices {
         }
     }
 
-    /**
-     * Undeploy all the interfaces of a component deployed on a web server
-     *
+    /* (non-Javadoc)
+     * 
      * With CXF, this method
      * can only be used if you have previously deployed all the client interfaces of the component.
      * Otherwise, it will raise an exception trying to undeploy a client interface which has not been
      * deployed before.
-     * @param component  The component owning the services interfaces
-     * @param url The url of the web server
-     * @param componentName The name of the component
+     * 
+     * @see org.objectweb.proactive.extensions.webservices.WebServices#unExposeComponentAsWebService(org.objectweb.fractal.api.Component, java.lang.String)
      */
     public void unExposeComponentAsWebService(Component component, String componentName) {
         PADeployer.undeployComponent(component, this.url, componentName);
@@ -287,12 +252,8 @@ public class CXFWebServices extends AbstractWebServices implements WebServices {
         }
     }
 
-    /**
-     * Undeploy specified interfaces of a component deployed on a web server
-     *
-     * @param url The url of the web server
-     * @param componentName The name of the component
-     * @param interfaceNames Interfaces to be undeployed
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.extensions.webservices.WebServices#unExposeComponentAsWebService(java.lang.String, java.lang.String[])
      */
     public void unExposeComponentAsWebService(String componentName, String[] interfaceNames) {
         PADeployer.undeployComponent(this.url, componentName, interfaceNames);

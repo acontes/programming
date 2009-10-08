@@ -44,6 +44,10 @@ import org.objectweb.proactive.extensions.webservices.exceptions.UnknownFrameWor
 import org.objectweb.proactive.extensions.webservices.exceptions.WebServicesException;
 
 
+/**
+ * @author The ProActive Team
+ *
+ */
 public abstract class AbstractWebServicesFactory implements WebServicesFactory {
 
     static private Logger logger = ProActiveLogger.getLogger(Loggers.WEB_SERVICES);
@@ -59,8 +63,14 @@ public abstract class AbstractWebServicesFactory implements WebServicesFactory {
     protected AbstractWebServicesFactory() {
     }
 
+    /**
+     * @param frameWorkId web service framework
+     * @return the unique instance of WebServicesFactory corresponding to the given framework
+     * @throws UnknownFrameWorkException
+     */
     public static WebServicesFactory getWebServicesFactory(String frameWorkId)
             throws UnknownFrameWorkException {
+
         if (frameWorkId == null) {
             frameWorkId = PAProperties.PA_WEBSERVICES_FRAMEWORK.getValue();
         }
@@ -92,7 +102,8 @@ public abstract class AbstractWebServicesFactory implements WebServicesFactory {
             frameWorkId);
     }
 
-    /** Return the default WebServicesFactory
+    /** 
+     * Return the default WebServicesFactory
      * 
      * @return return the web service factory associated to the default framework
      * @throws UnknownFrameWorkException if the default framework is not known
@@ -102,19 +113,34 @@ public abstract class AbstractWebServicesFactory implements WebServicesFactory {
         return getWebServicesFactory(frameWork);
     }
 
+    /**
+     * @return the local Jetty port which is a random (except if proactive.http.port is set)
+     */
     public static String getLocalPort() {
-        // Get the HTTP server enabling us to retrieve the jetty
-        // port number
         HTTPServer httpServer = HTTPServer.get();
         return PAProperties.PA_XMLHTTP_PORT.getValue();
     }
 
+    /**
+     * @return the local Jetty URL
+     */
     public static String getLocalUrl() {
         return "http://localhost:" + getLocalPort() + "/";
     }
 
+    /**
+     * Creates a new WebServices instance. Used in case when a WebServices object corresponding
+     * to the given URL has not been instantiated yet.
+     * 
+     * @param url
+     * @return
+     * @throws WebServicesException
+     */
     abstract protected WebServices newWebServices(String url) throws WebServicesException;
 
+    /** (non-Javadoc)
+     * @see org.objectweb.proactive.extensions.webservices.WebServicesFactory#getWebServices(java.lang.String)
+     */
     public final WebServices getWebServices(String url) throws WebServicesException {
         URI uriKey = null;
         try {

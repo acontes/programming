@@ -31,6 +31,12 @@
  */
 package org.objectweb.proactive.extensions.webservices.exceptions;
 
+/**
+ * Exception raised when a given framework is not a valid one
+ * 
+ * @author The ProActive Team
+ *
+ */
 public class UnknownFrameWorkException extends WebServicesException {
 
     public UnknownFrameWorkException() {

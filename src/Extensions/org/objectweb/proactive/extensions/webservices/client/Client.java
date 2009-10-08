@@ -34,13 +34,39 @@ package org.objectweb.proactive.extensions.webservices.client;
 import org.objectweb.proactive.extensions.webservices.exceptions.WebServicesException;
 
 
+/**
+ * @author The ProActive Team
+ *
+ */
 public interface Client {
 
+    /**
+     * Performs a call to a web service method whose return type is void 
+     * 
+     * @param method Name of the method
+     * @param args Arguments of the methods
+     * @throws WebServicesException
+     */
     public void oneWayCall(String method, Object[] args) throws WebServicesException;
 
+    /**
+     * Performs a call to a web service method whose return type is not void 
+     * 
+     * @param method Name of the method
+     * @param args Arguments of the method
+     * @param returnTypes Return type of the method 
+     * @return the response of the call
+     * @throws WebServicesException
+     */
     public Object[] call(String method, Object[] args, Class<?>... returnTypes) throws WebServicesException;
 
+    /**
+     * @return The URL of the service
+     */
     public String getUrl();
 
+    /**
+     * @return The name of the service
+     */
     public String getServiceName();
 }

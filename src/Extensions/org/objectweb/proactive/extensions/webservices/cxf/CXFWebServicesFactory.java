@@ -36,16 +36,26 @@ import org.objectweb.proactive.extensions.webservices.WebServices;
 import org.objectweb.proactive.extensions.webservices.WebServicesFactory;
 
 
+/**
+ * @author The ProActive Team
+ *
+ */
 public class CXFWebServicesFactory extends AbstractWebServicesFactory implements WebServicesFactory {
 
     public CXFWebServicesFactory() {
         super();
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.extensions.webservices.WebServicesFactory#getFrameWorkId()
+     */
     public String getFrameWorkId() {
         return "cxf";
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.extensions.webservices.AbstractWebServicesFactory#newWebServices(java.lang.String)
+     */
     protected WebServices newWebServices(String url) {
         return new CXFWebServices(url);
     }

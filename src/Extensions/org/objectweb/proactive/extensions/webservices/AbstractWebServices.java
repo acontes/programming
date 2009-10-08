@@ -31,6 +31,10 @@
  */
 package org.objectweb.proactive.extensions.webservices;
 
+/**
+ * @author The ProActive Team
+ *
+ */
 public abstract class AbstractWebServices implements WebServices {
 
     protected String url;

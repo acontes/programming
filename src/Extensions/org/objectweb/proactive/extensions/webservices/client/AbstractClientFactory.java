@@ -46,6 +46,10 @@ import org.objectweb.proactive.extensions.webservices.exceptions.UnknownFrameWor
 import org.objectweb.proactive.extensions.webservices.exceptions.WebServicesException;
 
 
+/**
+ * @author The ProActive Team
+ *
+ */
 public abstract class AbstractClientFactory implements ClientFactory {
 
     static private Logger logger = ProActiveLogger.getLogger(Loggers.WEB_SERVICES);
@@ -65,6 +69,13 @@ public abstract class AbstractClientFactory implements ClientFactory {
     protected AbstractClientFactory() {
     }
 
+    /**
+     * Gets a ClientFactory instance corresponding to the framework id
+     * 
+     * @param frameWorkId id of the framework
+     * @return a instance of a ClientFactory
+     * @throws UnknownFrameWorkException
+     */
     public static ClientFactory getClientFactory(String frameWorkId) throws UnknownFrameWorkException {
         if (frameWorkId == null) {
             frameWorkId = PAProperties.PA_WEBSERVICES_FRAMEWORK.getValue();
@@ -105,6 +116,15 @@ public abstract class AbstractClientFactory implements ClientFactory {
         return getClientFactory(frameWork);
     }
 
+    /**
+     * Gets the wsdl address corresponding to the service. This method is in particular used
+     * to generate the HashMap key for the client.
+     * 
+     * @param url
+     * @param serviceName
+     * @return the wsdl address
+     * @throws WebServicesException
+     */
     public URI getWsdl(String url, String serviceName) throws WebServicesException {
         String wsdl = url + WSConstants.SERVICES_PATH + serviceName + "?wsdl";
         try {
@@ -117,9 +137,21 @@ public abstract class AbstractClientFactory implements ClientFactory {
         }
     }
 
+    /**
+     * Creates a new instance of Client.
+     * 
+     * @param url Url of the service
+     * @param serviceName Name of the service
+     * @param serviceClass Class of the service
+     * @return
+     * @throws WebServicesException
+     */
     abstract protected Client newClient(String url, String serviceName, Class<?> serviceClass)
             throws WebServicesException;
 
+    /** (non-Javadoc)
+     * @see org.objectweb.proactive.extensions.webservices.client.ClientFactory#getClient(java.lang.String, java.lang.String, java.lang.Class)
+     */
     public final Client getClient(String url, String serviceName, Class<?> serviceClass)
             throws WebServicesException {
         URI wsdlUri = getWsdl(url, serviceName);

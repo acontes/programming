@@ -90,6 +90,7 @@ log4j.logger.ibis= WARN
 #log4j.logger.proactive.jmx.mbean = DEBUG
 #log4j.logger.proactive.jmx.notification = DEBUG
 
+#log4j.logger.proactive.webservices = DEBUG
 
 ################ Appenders ####################
 #

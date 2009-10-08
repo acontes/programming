@@ -37,6 +37,10 @@ import org.objectweb.fractal.api.Component;
 import org.objectweb.proactive.extensions.webservices.exceptions.WebServicesException;
 
 
+/**
+ * @author The ProActive Team
+ *
+ */
 public interface WebServices {
 
     /**

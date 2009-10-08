@@ -36,12 +36,22 @@ import org.objectweb.proactive.extensions.webservices.client.Client;
 import org.objectweb.proactive.extensions.webservices.client.ClientFactory;
 
 
+/**
+ * @author The ProActive Team
+ *
+ */
 public class CXFClientFactory extends AbstractClientFactory implements ClientFactory {
 
+    /** (non-Javadoc)
+     * @see org.objectweb.proactive.extensions.webservices.client.ClientFactory#getFrameWorkId()
+     */
     public String getFrameWorkId() {
         return "cxf";
     }
 
+    /**
+     * @see org.objectweb.proactive.extensions.webservices.client.AbstractClientFactory#newClient(java.lang.String, java.lang.String, java.lang.Class<?>)
+     */
     protected Client newClient(String url, String serviceName, Class<?> serviceClass) {
         return new CXFClient(url, serviceName, serviceClass);
     }

@@ -31,9 +31,21 @@
  */
 package org.objectweb.proactive.extensions.webservices;
 
+/**
+ * This factory SPI is used to retrieve WebServicesFactory at runtime 
+ * 
+ * @author The ProActive Team
+ *
+ */
 public interface WebServicesFactorySPI {
 
+    /**
+     * @return the framework id of the WebServicesFactory
+     */
     public String getFrameWorkId();
 
+    /**
+     * @return the class implementing WebServicesFactory 
+     */
     public Class<? extends WebServicesFactory> getFactoryClass();
 }

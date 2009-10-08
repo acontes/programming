@@ -31,6 +31,10 @@
  */
 package org.objectweb.proactive.extensions.webservices.client;
 
+/**
+ * @author The ProAcive Team
+ *
+ */
 public abstract class AbstractClient implements Client {
 
     protected String url;
@@ -43,10 +47,16 @@ public abstract class AbstractClient implements Client {
         this.serviceClass = serviceClass;
     }
 
+    /** (non-Javadoc)
+     * @see org.objectweb.proactive.extensions.webservices.client.Client#getServiceName()
+     */
     public String getServiceName() {
         return this.serviceName;
     }
 
+    /** (non-Javadoc)
+     * @see org.objectweb.proactive.extensions.webservices.client.Client#getUrl()
+     */
     public String getUrl() {
         return this.url;
     }

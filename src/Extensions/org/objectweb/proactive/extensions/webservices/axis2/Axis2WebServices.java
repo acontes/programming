@@ -10,7 +10,6 @@ import org.mortbay.jetty.servlet.ServletHolder;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
-import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.httpserver.HTTPServer;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -22,10 +21,19 @@ import org.objectweb.proactive.extensions.webservices.common.MethodUtils;
 import org.objectweb.proactive.extensions.webservices.exceptions.WebServicesException;
 
 
+/**
+ * @author The ProActive Team
+ *
+ */
 public class Axis2WebServices extends AbstractWebServices implements WebServices {
 
     static private Logger logger = ProActiveLogger.getLogger(Loggers.WEB_SERVICES);
 
+    /**
+     * Add the Axis2 servlet to the jetty server and set the initial parameters.
+     * 
+     * @throws WebServicesException
+     */
     private synchronized void initializeServlet() throws WebServicesException {
 
         // Retrieve or launch a Jetty server
@@ -81,20 +89,19 @@ public class Axis2WebServices extends AbstractWebServices implements WebServices
             "ServiceDeployer");
     }
 
+    /**
+     * Constructor
+     * 
+     * @param url
+     * @throws WebServicesException
+     */
     public Axis2WebServices(String url) throws WebServicesException {
         super(url);
         initializeServlet();
     }
 
-    /**
-     * Expose an active object as a web service with the methods specified in <code>methods</code>
-     *
-     * @param o The object to expose as a web service
-     * @param url The url of the host where the object will be deployed  (typically http://localhost:8080/)
-     * @param urn The name of the object
-     * @param methods The methods that will be exposed as web services functionalities
-     *                   If null, then all methods will be exposed
-     * @throws WebServicesException 
+    /** (non-Javadoc)
+     * @see org.objectweb.proactive.extensions.webservices.WebServices#exposeAsWebService(java.lang.Object, java.lang.String, java.lang.String[])
      */
     public void exposeAsWebService(Object o, String urn, String[] methods) throws WebServicesException {
         PADeployer.deploy(o, this.url, urn, methods, false);
@@ -107,15 +114,8 @@ public class Axis2WebServices extends AbstractWebServices implements WebServices
         }
     }
 
-    /**
-     * Expose an active object as a web service with the methods specified in <code>methods</code>
-     *
-     * @param o The object to expose as a web service
-     * @param url The url of the host where the object will be deployed  (typically http://localhost:8080/)
-     * @param urn The name of the object
-     * @param methods The methods that will be exposed as web services functionalities
-     *                   If null, then all methods will be exposed
-     * @throws WebServicesException 
+    /** (non-Javadoc)
+     * @see org.objectweb.proactive.extensions.webservices.WebServices#exposeAsWebService(java.lang.Object, java.lang.String, java.lang.reflect.Method[])
      */
     public void exposeAsWebService(Object o, String urn, Method[] methods) throws WebServicesException {
         ArrayList<String> methodsName = MethodUtils.getCorrespondingMethodsName(methods);
@@ -129,13 +129,8 @@ public class Axis2WebServices extends AbstractWebServices implements WebServices
         }
     }
 
-    /**
-     * Expose an active object with all its methods as a web service
-     *
-     * @param o The object to expose as a web service
-     * @param url The url of the host where the object will be deployed  (typically http://localhost:8080/)
-     * @param urn The name of the object
-     * @throws WebServicesException 
+    /** (non-Javadoc)
+     * @see org.objectweb.proactive.extensions.webservices.WebServices#exposeAsWebService(java.lang.Object, java.lang.String)
      */
     public void exposeAsWebService(Object o, String urn) throws WebServicesException {
         PADeployer.deploy(o, this.url, urn, null, false);
@@ -144,12 +139,8 @@ public class Axis2WebServices extends AbstractWebServices implements WebServices
             "' has been deployed on " + this.url + WSConstants.SERVICES_PATH + urn + "?wsdl");
     }
 
-    /**
-     * Undeploy a service
-     *
-     * @param urn The name of the object
-     * @param url The url of the web server
-     * @throws WebServicesException 
+    /** (non-Javadoc)
+     * @see org.objectweb.proactive.extensions.webservices.WebServices#unExposeAsWebService(java.lang.String)
      */
     public void unExposeAsWebService(String urn) throws WebServicesException {
         PADeployer.undeploy(this.url, urn);
@@ -158,18 +149,8 @@ public class Axis2WebServices extends AbstractWebServices implements WebServices
             WSConstants.SERVICES_PATH + urn + "?wsdl " + "has been undeployed");
     }
 
-    /**
-     * Expose a component as web service. Each server interface of the component
-     * will be accessible by  the urn [componentName]_[interfaceName].
-     * Only the interfaces public methods of the specified interfaces in
-     * <code>interfaceNames</code> will be exposed.
-     *
-     * @param component The component owning the interfaces that will be deployed as web services.
-     * @param url  Web server url  where to deploy the service - typically "http://localhost:8080"
-     * @param componentName Name of the component
-     * @param interfaceNames Names of the interfaces we want to deploy.
-      *                           If null, then all the interfaces will be deployed
-     * @throws WebServicesException 
+    /** (non-Javadoc)
+     * @see org.objectweb.proactive.extensions.webservices.WebServices#exposeComponentAsWebService(org.objectweb.fractal.api.Component, java.lang.String, java.lang.String[])
      */
     public void exposeComponentAsWebService(Component component, String componentName, String[] interfaceNames)
             throws WebServicesException {
@@ -181,15 +162,8 @@ public class Axis2WebServices extends AbstractWebServices implements WebServices
         }
     }
 
-    /**
-     * Expose a component as web service. Each server interface of the component
-     * will be accessible by  the urn [componentName]_[interfaceName].
-     * All the interfaces public methods of all interfaces will be exposed.
-     *
-     * @param component The component owning the interfaces that will be deployed as web services.
-     * @param url  Web server url  where to deploy the service - typically "http://localhost:8080"
-     * @param componentName Name of the component
-     * @throws WebServicesException 
+    /** (non-Javadoc)
+     * @see org.objectweb.proactive.extensions.webservices.WebServices#exposeComponentAsWebService(org.objectweb.fractal.api.Component, java.lang.String)
      */
     public void exposeComponentAsWebService(Component component, String componentName)
             throws WebServicesException {
@@ -208,13 +182,8 @@ public class Axis2WebServices extends AbstractWebServices implements WebServices
         }
     }
 
-    /**
-     * Undeploy all the interfaces of a component deployed on a web server
-     *
-     * @param component  The component owning the services interfaces
-     * @param url The url of the web server
-     * @param componentName The name of the component
-     * @throws WebServicesException 
+    /** (non-Javadoc)
+     * @see org.objectweb.proactive.extensions.webservices.WebServices#unExposeComponentAsWebService(org.objectweb.fractal.api.Component, java.lang.String)
      */
     public void unExposeComponentAsWebService(Component component, String componentName)
             throws WebServicesException {
@@ -233,13 +202,8 @@ public class Axis2WebServices extends AbstractWebServices implements WebServices
         }
     }
 
-    /**
-     * Undeploy specified interfaces of a component deployed on a web server
-     *
-     * @param url The url of the web server
-     * @param componentName The name of the component
-     * @param interfaceNames Interfaces to be undeployed
-     * @throws WebServicesException 
+    /** (non-Javadoc)
+     * @see org.objectweb.proactive.extensions.webservices.WebServices#unExposeComponentAsWebService(java.lang.String, java.lang.String[])
      */
     public void unExposeComponentAsWebService(String componentName, String[] interfaceNames)
             throws WebServicesException {

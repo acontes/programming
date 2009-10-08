@@ -43,6 +43,10 @@ import org.objectweb.proactive.extensions.webservices.client.Client;
 import org.objectweb.proactive.extensions.webservices.exceptions.WebServicesException;
 
 
+/**
+ * @author The ProActive Team
+ *
+ */
 public class Axis2Client extends AbstractClient implements Client {
 
     private RPCServiceClient client;
@@ -77,6 +81,9 @@ public class Axis2Client extends AbstractClient implements Client {
         return serviceClient;
     }
 
+    /** (non-Javadoc)
+     * @see org.objectweb.proactive.extensions.webservices.client.Client#call(java.lang.String, java.lang.Object[], java.lang.Class<?>[])
+     */
     public Object[] call(String method, Object[] args, Class<?>... returnTypes) throws WebServicesException {
 
         if (args == null)
@@ -96,6 +103,9 @@ public class Axis2Client extends AbstractClient implements Client {
         }
     }
 
+    /** (non-Javadoc)
+     * @see org.objectweb.proactive.extensions.webservices.client.Client#oneWayCall(java.lang.String, java.lang.Object[])
+     */
     public void oneWayCall(String method, Object[] args) throws WebServicesException {
 
         if (args == null)

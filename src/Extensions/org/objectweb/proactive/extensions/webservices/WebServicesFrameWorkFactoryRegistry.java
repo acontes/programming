@@ -44,17 +44,22 @@ import org.objectweb.proactive.extensions.webservices.axis2.Axis2WebServicesFact
 import org.objectweb.proactive.extensions.webservices.cxf.CXFWebServicesFactory;
 
 
+/**
+ * @author The ProActive Team
+ *
+ */
 public class WebServicesFrameWorkFactoryRegistry {
 
     private static Logger logger = ProActiveLogger.getLogger(Loggers.WEB_SERVICES);
     protected static Hashtable<String, Class<? extends WebServicesFactory>> webServicesFactories;
 
     static {
-        // set the default supported protocols
+        // set the default supported framework
         webServicesFactories = new Hashtable<String, Class<? extends WebServicesFactory>>();
         webServicesFactories.put("axis2", Axis2WebServicesFactory.class);
         webServicesFactories.put("cxf", CXFWebServicesFactory.class);
 
+        // add the WebServicesFactory at runtime using the WebServicesFactorySPI class
         Iterator<WebServicesFactorySPI> iter = ServiceRegistry.lookupProviders(WebServicesFactorySPI.class);
         while (iter.hasNext()) {
             WebServicesFactorySPI webServicesFactorySPI = iter.next();

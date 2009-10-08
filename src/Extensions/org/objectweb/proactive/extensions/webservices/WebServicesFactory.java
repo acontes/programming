@@ -34,10 +34,26 @@ package org.objectweb.proactive.extensions.webservices;
 import org.objectweb.proactive.extensions.webservices.exceptions.WebServicesException;
 
 
+/**
+ * This factory is used to get a WebServices instance corresponding to its framework (axis2 or cxf)
+ * and a given URL.
+ * 
+ * @author The ProActive Team
+ *
+ */
 public interface WebServicesFactory {
 
+    /**
+     * @param url URL of the web service
+     * @return a WebService instance which allows to expose active object or component
+     * @throws WebServicesException
+     */
     public WebServices getWebServices(String url) throws WebServicesException;
 
+    /**
+     * 
+     * @return the frameWorkId of the factory
+     */
     public String getFrameWorkId();
 
 }

@@ -34,6 +34,12 @@ package org.objectweb.proactive.extensions.webservices.exceptions;
 import org.objectweb.proactive.core.ProActiveException;
 
 
+/**
+ * Exception raised when an exception occurs while using the webservices extension
+ * 
+ * @author The ProActive Team
+ *
+ */
 public class WebServicesException extends ProActiveException {
 
     public WebServicesException() {

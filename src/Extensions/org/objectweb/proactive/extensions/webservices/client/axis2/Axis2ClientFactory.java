@@ -37,12 +37,22 @@ import org.objectweb.proactive.extensions.webservices.client.ClientFactory;
 import org.objectweb.proactive.extensions.webservices.exceptions.WebServicesException;
 
 
+/**
+ * @author The ProActive Team
+ *
+ */
 public class Axis2ClientFactory extends AbstractClientFactory implements ClientFactory {
 
+    /** (non-Javadoc)
+     * @see org.objectweb.proactive.extensions.webservices.client.ClientFactory#getFrameWorkId()
+     */
     public String getFrameWorkId() {
         return "axis2";
     }
 
+    /**
+     * @see org.objectweb.proactive.extensions.webservices.client.AbstractClientFactory#newClient(java.lang.String, java.lang.String, java.lang.Class<?>)
+     */
     protected Client newClient(String url, String serviceName, Class<?> serviceClass)
             throws WebServicesException {
         return new Axis2Client(url, serviceName, serviceClass);

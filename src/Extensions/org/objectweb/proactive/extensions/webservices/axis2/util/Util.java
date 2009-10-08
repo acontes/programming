@@ -178,7 +178,6 @@ public class Util {
 
             return createdDir;
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             throw new WebServicesException("An IOException occured when trying to extract " + entryPath +
                 " from " + jarPath, e);
         }
