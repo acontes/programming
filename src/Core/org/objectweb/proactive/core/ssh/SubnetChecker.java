@@ -46,13 +46,12 @@ import java.util.List;
  * 
  */
 public class SubnetChecker {
-    private List<SubnetDefinition> gatewaysTable;
+    private List<IPMatcher> gatewaysTable;
 
     public SubnetChecker() {
-        gatewaysTable = new ArrayList<SubnetDefinition>();
+        gatewaysTable = new ArrayList<IPMatcher>();
     }
 
-    @SuppressWarnings("unchecked")
     protected void setGateway(String subnet, String gateway) {
         if (logger.isDebugEnabled()) {
             logger.debug("Subnet Infos : " + gateway + " as " + "gateway" + " added for subnet " + subnet);
@@ -60,13 +59,16 @@ public class SubnetChecker {
 
         // separate network address and cidr
         String[] subnetDef = subnet.split("\\/");
-        SubnetDefinition gateway_infos = new SubnetDefinition(subnetDef[0], Integer.parseInt(subnetDef[1]),
-            gateway);
-        gatewaysTable.add(gateway_infos);
-        // list is scan in inverse direction so sorting it, permit to
-        // make definition of subnet with higher cidr more important than other
+        try {
+            IPMatcher gateway_infos = new IPMatcher(subnetDef[0], Integer.parseInt(subnetDef[1]), gateway);
+            gatewaysTable.add(gateway_infos);
+            // list is scan in inverse direction so sorting it, permit to
+            // make definition of subnet with higher cidr more important than other
+            Collections.sort(gatewaysTable);
 
-        Collections.sort(gatewaysTable);
+        } catch (IllegalArgumentException e) {
+            logger.error(e.getMessage());
+        }
     }
 
     /**
@@ -75,44 +77,86 @@ public class SubnetChecker {
      * @param ipAddress The host IP address.
      * 
      * @return The gateway which is the relay to the host.
+     * @throws Exception 
      */
     public String getGateway(String ipAddress) {
-        SubnetDefinition sd = checkIP(ipAddress);
+        IPMatcher sd = checkIP(ipAddress);
         if (sd != null)
             return sd.getGateway();
         return null;
     }
 
-    private SubnetDefinition checkIP(String ip) {
-        String[] ip_tab = ip.split("\\.");
-        // Because Java's int are only signed and bit to bit shift behavior
-        // can be undeterministic depending on implementation.
-        long ip_int = 0;
-        ip_int += (Long.parseLong(ip_tab[0]) & 0xFF) << 24;
-        ip_int += (Long.parseLong(ip_tab[1]) & 0xFF) << 16;
-        ip_int += (Long.parseLong(ip_tab[2]) & 0xFF) << 8;
-        ip_int += (Long.parseLong(ip_tab[3]) & 0xFF);
-
+    private IPMatcher checkIP(String ip) {
         // Began by the end for CIDR classification
+        IPMatcher matcher;
         for (int i = gatewaysTable.size() - 1; i >= 0; i--) {
-            SubnetDefinition sd = gatewaysTable.get(i);
-            String net = sd.getSubnet();
-            int cidr = sd.getCidr();
-            String[] net_tab = net.split("\\.");
-            long net_int = 0;
-            net_int += (Long.parseLong(net_tab[0]) & 0xFF) << 24;
-            net_int += (Long.parseLong(net_tab[1]) & 0xFF) << 16;
-            net_int += (Long.parseLong(net_tab[2]) & 0xFF) << 8;
-            net_int += (Long.parseLong(net_tab[3]) & 0xFF);
-
-            // Check if networks are the same
-            if (ip_int >>> (32 - cidr) == net_int >>> (32 - cidr))
-                return sd;
+            matcher = gatewaysTable.get(i);
+            if (matcher.match(ip)) {
+                return matcher;
+            }
         }
         return null;
     }
 
-    // Only for test
-    public static void main(String[] args) {
+    /**
+     * This class store the gateway for a sub network 
+     * define by network/cidr : xxx.xxx.xxx.xxx/xx   
+     */
+    static private class IPMatcher implements Comparable<IPMatcher> {
+
+        final private int networkPortion;
+        final private int mask;
+
+        private String gateway = null;
+
+        public IPMatcher(String network, int cidr, String gateway) {
+            this.gateway = gateway;
+            this.mask = computeMask(cidr);
+            this.networkPortion = stringToInt(network) & this.mask;
+        }
+
+        public String getGateway() {
+            return this.gateway;
+        }
+
+        private int computeMask(int mask) {
+            int shift = Integer.SIZE - mask;
+            return (~0 >> shift) << shift;
+        }
+
+        public boolean match(String ip) {
+            return match(stringToInt(ip));
+        }
+
+        public boolean match(int ip) {
+            return (ip & mask) == networkPortion;
+        }
+
+        private int stringToInt(String ip) throws IllegalArgumentException {
+            String[] parts = ip.split("\\.");
+            int tmp = 0;
+            if (parts.length != 4) {
+                throw new IllegalArgumentException("An IPv4 address must like xxx.xxx.xxx.xxx : " + ip);
+            }
+            for (int i = 0; i < 4; i++) {
+                int parsedInt = Integer.parseInt(parts[i]);
+                if (parsedInt > 255 || parsedInt < 0) {
+                    throw new IllegalArgumentException("An octet must be a number between 0 and 255.");
+                }
+                tmp |= parsedInt << ((3 - i) * 8);
+            }
+            return tmp;
+        }
+
+        /**
+         * IPMatcher are ordered by CIDR
+         * 
+         * The higher CIDR is the more specific so the prefered one
+         * 
+         *  The higher the cidr is, the higher the mask will be 
+         */
+        public int compareTo(IPMatcher other) {
+            return other.mask - this.mask;
+        }
     }
 }
