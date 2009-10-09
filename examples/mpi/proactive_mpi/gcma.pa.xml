@@ -6,7 +6,7 @@
     <environment>
         <javaPropertyVariable name="proactive.home"/>
         <descriptorVariable name="descriptor.dir" value="${proactive.home}/examples/mpi/proactive_mpi"/>
-        <descriptorVariable name="java.cmd" value="/user/emathias/home/bin/jdk/bin/java"/>
+        <descriptorVariable name="java.cmd" value="java"/>
         <descriptorVariable name="proactive.properties" value="-Djava.library.path=${proactive.home}/dist/lib/native"/>       
 		<descriptorVariable name="deployment.pa1.gcmd" value="${descriptor.dir}/gcmd.pa1.xml"/>
 		<descriptorVariable name="deployment.pa2.gcmd" value="${descriptor.dir}/gcmd.pa2.xml"/>
@@ -19,9 +19,10 @@
 				<jvmarg value="${proactive.properties}" />
 				<applicationClasspath>
 					<pathElement base="proactive" relpath="dist/lib/ProActive_examples.jar"/>
+					<pathElement base="proactive" relpath="dist/lib/ProActive.jar"/>
 				</applicationClasspath>
-				<securityPolicy base="proactive" relpath="scripts/proactive.java.policy"/>
-				<log4jProperties base="proactive" relpath="scripts/proactive-log4j"/>	
+				<securityPolicy base="proactive" relpath="examples/proactive.java.policy"/>
+				<log4jProperties base="proactive" relpath="examples/proactive-log4j"/>	
 			</configuration>
 			<virtualNode id="mpivn1" capacity="1">
 					<nodeProvider refid="provider1" capacity="1"/>

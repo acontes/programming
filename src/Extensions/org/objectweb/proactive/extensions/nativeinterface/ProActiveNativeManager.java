@@ -83,20 +83,18 @@ public class ProActiveNativeManager implements Serializable {
     public ProActiveNativeManager() {
     }
     
+    /**
+     * Test whether the deployment is finished or not
+     * @return true if the deployment is finished without errors
+     */
     public boolean deploymentFinished() {
     	return jobReady == currentNumberOfJob;
     }
     
-    public void deploy(List<NativeSpmd> spmdList, boolean componentBased) {
-    	this.deploy(spmdList);
-    	
-    	if(componentBased) {
-    		//deploy components, using in/outboundproxies
-    		//set-up references <->
-    	}
-    	
-    	
-    }
+    /**
+     * Deploy and wrapp a list of SPMD GCMA
+     * @param spmdList
+     */
     public void deploy(List<NativeSpmd> spmdList) {
         this.spmdList = spmdList;
         this.inboundProxyArrayMap = new Hashtable<Integer, InboundProxy[]>();

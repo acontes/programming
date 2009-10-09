@@ -1,7 +1,11 @@
 package org.objectweb.proactive.extensions.nativeinterface.coupling;
 
 
-
+/**
+ *  Basic implamemtation which contains native methods capable of 
+ *  communicating through IPC or socket
+ *
+ */
 public class NativeInterfaceImpl implements NativeInterface {
 
 	public int init() {

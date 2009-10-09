@@ -10,6 +10,9 @@ import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.extensions.nativeinterface.application.NativeMessage;
 
+/**
+ *  Inplements a message sender proxy
+ */
 public class OutboundProxy  implements Serializable, InitActive {
 	
 	Map<Integer, InboundProxy[]> inboundProxyMap;
@@ -39,6 +42,10 @@ public class OutboundProxy  implements Serializable, InitActive {
 		}
 	}
 
+	/**
+	 * send message to native process
+	 * @param m_r native mesage containing data to be sent and recipient process identification
+	 */
     public void sendToNative(NativeMessage m_r) {
         int rank = m_r.getDestRank();
         int jobId = m_r.getDestJobId();
@@ -49,6 +56,12 @@ public class OutboundProxy  implements Serializable, InitActive {
         nb_call++;
     }
 
+    /**
+     * Get a target wrapper object based on hierarchical identification
+     * @param jobId hierarchical id
+     * @param rank primary id
+     * @return
+     */
     private InboundProxy getTarget(int jobId, int rank) {
         if (jobId < inboundProxyMap.size()) {
             InboundProxy[] arrayComm = (InboundProxy[]) inboundProxyMap.get(jobId);
@@ -63,6 +76,10 @@ public class OutboundProxy  implements Serializable, InitActive {
         throw new IndexOutOfBoundsException(" No Native job exists with num " + jobId);
     }
     
+    /**
+     * Send a group of messages in parallel by bulding a group communication
+     * @param messages
+     */
 	public void sendToNativeInParallel(NativeMessage[] messages) {
 		// cleaning previous invocation
 		Group<InboundProxy> g = PAGroup.getGroup(groupComm);

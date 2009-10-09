@@ -5,7 +5,7 @@
 	<environment>
 		<javaPropertyVariable name="user.home" />
 		<javaPropertyVariable name="proactive.home" />
-		<descriptorVariable name="mpi.home" value="/user/emathias/desktop/home/bin/gridmpi/"/>
+		<descriptorVariable name="mpi.home" value="/usr/"/>
 		<descriptorVariable name="mpi.cmd.path" value="${proactive.home}/scripts/gcmdeployment/executable_mpi_gridmpi.sh"/>
 		<descriptorVariable name="host.list" value="caipira"/>
 	</environment>

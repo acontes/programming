@@ -4,6 +4,10 @@ import org.objectweb.proactive.extensions.nativeinterface.application.NativeMess
 import org.objectweb.proactive.extensions.nativeinterface.coupling.ProActiveNativeConstants;
 import org.objectweb.proactive.extensions.nativeinterface.utils.ProActiveNativeUtil;
 
+/**
+ *  Implementation of @link org.objectweb.proactive.extensions.nativeinterface.application.NativeMessageAdapter
+ *
+ */
 public class ProActiveMPIMessageAdapter implements NativeMessageAdapter {
 
     // Data types

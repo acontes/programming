@@ -30,6 +30,10 @@
  */
 package org.objectweb.proactive.extensions.nativeinterface.coupling;
 
+/**
+ *  Defines the baseic operations of a native to-couple application
+ *
+ */
 public interface NativeInterface {
 	
 	public int init();

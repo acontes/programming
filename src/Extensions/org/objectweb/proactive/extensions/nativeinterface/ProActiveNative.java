@@ -42,7 +42,7 @@ import org.objectweb.proactive.extensions.nativeinterface.spmd.NativeSpmd;
 public class ProActiveNative {
     private static ProActiveNativeManager manager;
     
-    public static Vector<?> deploy(List<NativeSpmd> spmdList, boolean componentBased) {
+    public static Vector<?> deploy(List<NativeSpmd> spmdList) {
         if (manager == null) {
             // create manager
             try {
@@ -55,7 +55,7 @@ public class ProActiveNative {
             }
         } 
         
-        manager.deploy(spmdList, componentBased);
+        manager.deploy(spmdList);
         return null;
     }
 

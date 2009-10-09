@@ -40,7 +40,9 @@ import org.objectweb.proactive.extensions.nativeinterface.application.NativeMess
 import org.objectweb.proactive.extensions.nativeinterface.application.NativeMessageAdapter;
 import org.objectweb.proactive.extensions.nativeinterface.application.NativeMessageHandler;
 
-
+/**
+ * Main implementation of a native interface, containing proxies and message handlers
+ */
 public class ProActiveNativeInterface {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.NATIVE_CONTROL_COUPLING);
     private String hostname = "NULL";
@@ -79,6 +81,13 @@ public class ProActiveNativeInterface {
     public ProActiveNativeInterface() {
     }
 
+    /**
+     * Creates a native interface
+     * @param libName native library responsible for handling Java<->native communication, 
+     * implementing @link {@link org.objectweb.proactive.extensions.nativeinterface.coupling.NativeInterface}  
+     * @param uniqueID
+     * @param factory
+     */
     public ProActiveNativeInterface(String libName, int uniqueID, NativeApplicationFactory factory) {
         hostname = ProActiveInet.getInstance().getInetAddress().getHostName();
         if (logger.isInfoEnabled()) {
@@ -172,9 +181,6 @@ public class ProActiveNativeInterface {
         if (logger.isDebugEnabled()) {
             logger.debug("[REMOTE PROXY] [" + this.hostname + "]  receiveFromMpi> received message" + m_r);
         }
-        
-//        ProActiveMPIMessage m = (ProActiveMPIMessage) m_r;
-//        msg_acc  += (System.currentTimeMillis() - m.getTimer());
 
         long start = System.currentTimeMillis();
         this.nativeInterface.sendMessage(m_r.getSerializedMessage());
@@ -247,7 +253,6 @@ public class ProActiveNativeInterface {
             System.out.println("timer_msg_deserialize milli " + timer_msg_deserialize);
             System.out.println("timer_send_to_native_nb_call " + timer_send_to_native_nb_call);
             System.out.println("timer_send_debug milli " + timer_send_debug);
-//            System.out.println("timer_msg_acc milli " + msg_acc + " moy " + ((timer_send_to_native_nb_call != 0) ? (msg_acc/timer_send_to_native_nb_call) : 0));
 
             /* Exiting */
         	nativeInterface.terminate();

@@ -44,7 +44,9 @@ import org.objectweb.proactive.extensions.nativeinterface.ProActiveNativeManager
 import org.objectweb.proactive.extensions.nativeinterface.application.NativeApplicationFactory;
 import org.objectweb.proactive.extensions.nativeinterface.application.NativeMessage;
 
-
+/**
+ *  Inplements a message receiver proxy
+ */
 public class InboundProxy implements Serializable, InitActive {
 
     /** global Manager*/
@@ -63,6 +65,19 @@ public class InboundProxy implements Serializable, InitActive {
     public InboundProxy() {
     }
 
+    /**
+     * Create a message receiver
+     * @param libName name of the library that implements the native side
+     * @param manager central point that holds wrappers references
+     * @param jobNum hierarchical identifier that distinguish the different group of processes 
+     * @param pa_rank primary id of the receiver 
+     * @param factory NativeApplicationFactory that will provide the implementation of message handler and adaper
+     * @throws ActiveObjectCreationException 
+     * @throws NodeException
+     * @throws ClassNotFoundException
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     */
     public InboundProxy(String libName, ProActiveNativeManager manager, Integer jobNum, 
     							   Integer pa_rank, NativeApplicationFactory factory)
             throws ActiveObjectCreationException, NodeException, ClassNotFoundException,

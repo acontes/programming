@@ -40,6 +40,4 @@ public interface ProActiveNativeConstants {
 	public static final int COMM_MSG_BCAST = 16;
     public static final int COMM_MSG_NF = 20;
 
-
-
 }

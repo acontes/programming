@@ -8,6 +8,10 @@ import org.objectweb.proactive.extensions.nativeinterface.application.NativeMess
 import org.objectweb.proactive.extensions.nativeinterface.coupling.ProActiveNativeConstants;
 import org.objectweb.proactive.extensions.nativeinterface.coupling.ProActiveNativeInterface;
 
+/**
+ *  MPI implementation of message handler
+ *  implements mpi <-> java communication + collective operations
+ */
 public class ProActiveMPIMessageHandler implements NativeMessageHandler {
 	private static Logger logger = ProActiveLogger
 			.getLogger(Loggers.NATIVE_CONTROL_COUPLING);

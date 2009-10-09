@@ -1,5 +1,8 @@
 package org.objectweb.proactive.extensions.nativeinterface.coupling;
 
+/**
+ *  Native wrapper that hold inbound and outbound proxies
+ */
 public class ProActiveNativeWrapper {
 	
 	private InboundProxy inboundProxy;
