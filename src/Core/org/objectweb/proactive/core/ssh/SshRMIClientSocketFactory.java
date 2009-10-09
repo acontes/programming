@@ -8,13 +8,11 @@ import java.rmi.server.RMIClientSocketFactory;
 
 public class SshRMIClientSocketFactory implements RMIClientSocketFactory, Serializable {
 
-    static SshConfigStorer storer = new SshConfigStorer();
-    static SshConfigFileParser parser = new SshConfigFileParser(storer);
-
-    static final private SshTunnelPool tunnelPool = new SshTunnelPool(storer);
+    static final private SshTunnelPool tunnelPool = new SshTunnelPool();
 
     public SshRMIClientSocketFactory(SshConfig config) {
-
+        tunnelPool.setSshConfig(config);
+        tunnelPool.createAndStartGCThread();
     }
 
     public Socket createSocket(String host, int port) throws IOException {

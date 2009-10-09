@@ -41,6 +41,7 @@ import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.remoteobject.rmi.AbstractRmiRemoteObjectFactory;
 import org.objectweb.proactive.core.ssh.SshConfig;
+import org.objectweb.proactive.core.ssh.SshConfigFileParser;
 import org.objectweb.proactive.core.ssh.SshRMIClientSocketFactory;
 
 
@@ -49,7 +50,10 @@ public class RmiSshRemoteObjectFactory extends AbstractRmiRemoteObjectFactory {
 
     static {
         SshConfig sshConfig = new SshConfig();
+        SshConfigFileParser parser = new SshConfigFileParser();
+
         sshConfig.setTryPlainSocket(PAProperties.PA_RMISSH_TRY_NORMAL_FIRST.isTrue());
+        sshConfig.setTryProxyCommand(PAProperties.PA_RMISSH_TRY_PROXY_COMMAND.isTrue());
 
         int gcInterval = 10000;
         if (PAProperties.PA_RMISSH_GC_PERIOD.isSet()) {
@@ -81,6 +85,16 @@ public class RmiSshRemoteObjectFactory extends AbstractRmiRemoteObjectFactory {
             keyDir = PAProperties.PA_RMISSH_KEY_DIR.getValue();
         }
         sshConfig.setKeyDir(keyDir);
+
+        if (PAProperties.PA_SSH_PROXY_GATEWAY.isSet()) {
+            String property = PAProperties.PA_SSH_PROXY_GATEWAY.getValue();
+            sshConfig.setUserProperty(property);
+        }
+
+        // Parse the ssh configuration file and store information in the sshConfig
+        parser.parse(sshConfig);
+        // Parse ProActive Property and store information in the sshConfig         
+        parser.parseProperties(sshConfig);
 
         sf = new SshRMIClientSocketFactory(sshConfig);
     }

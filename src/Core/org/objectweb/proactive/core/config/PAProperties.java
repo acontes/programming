@@ -386,6 +386,9 @@ public enum PAProperties {
     /** this property identifies that when using SSH tunneling, a normal connection should be tried before tunneling */
     PA_RMISSH_TRY_NORMAL_FIRST("proactive.communication.rmissh.try_normal_first", PAPropertiesType.BOOLEAN),
 
+    //TODO Comment
+    PA_RMISSH_TRY_PROXY_COMMAND("proactive.communication.rmissh.try_proxy_command", PAPropertiesType.BOOLEAN),
+
     /** this property identifies the SSH garbage collector period
      *
      * If set to 0, tunnels and connections are not garbage collected
