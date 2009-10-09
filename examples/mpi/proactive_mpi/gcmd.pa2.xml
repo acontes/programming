@@ -22,7 +22,7 @@
 		</hosts>
 		
 		<groups>
-			<sshGroup id="LAN_PA1" hostList="caipira" /> 
+			<sshGroup id="LAN_PA1" hostList="mac" /> 
         </groups>
 	</infrastructure>
 </GCMDeployment>

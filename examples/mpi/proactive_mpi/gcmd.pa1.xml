@@ -22,7 +22,7 @@
 		</hosts>
 		
 		<groups>
-			<sshGroup id="LAN_PA1" hostList="tche" /> 
+			<sshGroup id="LAN_PA1" hostList="cobreloa" /> 
         </groups>
 	</infrastructure>
 </GCMDeployment>

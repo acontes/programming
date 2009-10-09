@@ -1,7 +1,15 @@
 #!/bin/sh
 
 echo
-echo --- GCM native execution of MPI application: HelloWorld example -----------------------
+echo --- GCM execution of ProActiveMPI application: HelloWorld example --------
+
+if [[  -n `which mpicc | grep no`  ||  `which mpicc | wc -l` -eq 0  ]]
+then
+	#no mpicc found
+    echo "Error: this example requires an MPI installation"
+	echo "--------------------------------------------------------------------------"
+	exit 1
+fi 2>/dev/null
 
 export PROACTIVE_HOME="../../../"
 workingDir=`dirname $0`

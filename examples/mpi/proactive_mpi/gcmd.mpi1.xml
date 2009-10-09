@@ -7,7 +7,7 @@
 		<javaPropertyVariable name="proactive.home" />
 		<descriptorVariable name="mpi.home" value="/usr/"/>
 		<descriptorVariable name="mpi.cmd.path" value="${proactive.home}/scripts/gcmdeployment/executable_mpi_gridmpi.sh"/>
-		<descriptorVariable name="host.list" value="tche"/>
+		<descriptorVariable name="host.list" value="cobreloa"/>
 	</environment>
 	
 	<resources>

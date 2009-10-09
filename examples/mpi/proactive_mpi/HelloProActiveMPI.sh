@@ -3,10 +3,19 @@
 echo
 echo --- GCM native execution of ProActive/MPI application: HelloWorld example -----------------------
 
-export PROACTIVE_HOME="/user/emathias/desktop/home/SHORT_MPI_Extension"
+if [[  -n `which mpicc | grep no`  ||  `which mpicc | wc -l` -eq 0  ]]
+then
+    #no mpicc found
+    echo "Error: this example requires an MPI installation"
+    exit 1
+fi
+
+
+export PROACTIVE_HOME="$HOME/SHORT_MPI_Extension"
 
 workingDir=`dirname $0`
 . ${workingDir}/../../env.sh
+export LD_LIBRARY_PATH="${PROACTIVE_HOME}/dist/lib/native/"
 
 
 #########################
