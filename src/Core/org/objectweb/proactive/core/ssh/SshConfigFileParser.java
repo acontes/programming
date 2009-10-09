@@ -43,14 +43,12 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import org.objectweb.proactive.core.config.PAProperties;
-
 
 public class SshConfigFileParser {
 
     public enum SshToken {
         HOST("Host"), HOSTNAME("HostName"), GATEWAY("ProxyCommand"), USERNAME("User"), PRIVATEKEY(
-                "IdentifyFile"), PORT("Port"), UNKNOW("");
+                "IdentityFile"), PORT("Port"), UNKNOW("");
 
         private String key;
         private boolean wanted;
@@ -79,29 +77,14 @@ public class SshConfigFileParser {
         this.realHostName = new Hashtable<String, String>();
     }
 
-    public SshConfigFileParser(SshConfigStorer storer) {
-        this(storer, "");
-    }
-
-    public SshConfigFileParser(SshConfigStorer storer, String path) {
-        this();
-        parse(path, storer);
-        String properties = PAProperties.PA_SSH_PROXY_GATEWAY.getValue();
-        if (properties != null)
-            parseProperties(properties, storer);
-    }
-
     /**
      * Parse the SSH configuration
      * 
      * @param config       
      * 
-     * @param path
-     *            the path to the SSH configuration path
      */
-    public void parse(String path, SshConfigStorer storer) {
-        if (path.length() == 0)
-            path = System.getProperty("user.home") + "/.ssh/config";
+    public void parse(SshConfig storer) {
+        String path = storer.getSshDirPath() + File.separator + "config";
 
         SshToken[] capabilities = storer.getCapabilities();
         for (int i = 0; i < capabilities.length; i++) {
@@ -131,13 +114,14 @@ public class SshConfigFileParser {
                 List<String> definitions = new ArrayList<String>();
 
                 // Host declaration find, save the Host name 
-                if (line.matches(SshToken.HOST.getValue() + " .*")) {
+                if (line.toLowerCase().matches(SshToken.HOST.getValue().toLowerCase() + "[ \t].*")) {
                     host = cutAt(SshToken.HOST.getValue(), line);
                     host = getRealHostname(host);
                     line = br.readLine();
 
                     // Get all information about the Host                    
-                    while (line != null && !line.matches(SshToken.HOST.getValue() + " .*")) {
+                    while (line != null &&
+                        !line.toLowerCase().matches(SshToken.HOST.getValue().toLowerCase() + "[ \t].*")) {
                         if (line.startsWith("#")) {
                             line = br.readLine();
                             continue;
@@ -165,11 +149,17 @@ public class SshConfigFileParser {
         }
     }
 
+    public void parseProperties(SshConfig storer) {
+        if (storer.getPAProperty() != null) {
+            this.parseProperties(storer.getPAProperty(), storer);
+        }
+    }
+
     /**
      * Split the hosts and it's gateway/port and store it in the <code>storer</code>'s map table
      * @return 
      */
-    public void parseProperties(String properties, SshConfigStorer storer) {
+    public void parseProperties(String properties, SshConfig storer) {
         String[] proxies = properties.split(";");
         for (int i = 0; i < proxies.length; i++) {
             String[] gateways = proxies[i].split(":");
@@ -204,7 +194,7 @@ public class SshConfigFileParser {
         return host;
     }
 
-    private void processHostDefinition(String host, List<String> definitions, SshConfigStorer storer) {
+    private void processHostDefinition(String host, List<String> definitions, SshConfig storer) {
         String line = null;
         SshToken tok;
         for (int i = 0; i < definitions.size(); i++) {
@@ -240,7 +230,7 @@ public class SshConfigFileParser {
 
     // This method is the default one to use when no extra processing is needed
     // this will simply store the value in the right place
-    private void defaultStore(String host, String line, SshToken tok, SshConfigStorer storer) {
+    private void defaultStore(String host, String line, SshToken tok, SshConfig storer) {
         storer.addHostInformation(host, tok, cutAt(tok.getValue(), line));
     }
 
@@ -248,12 +238,12 @@ public class SshConfigFileParser {
 
     // Store the real host name for <code> host </code>
     // And change the old one if stored 
-    private void storeHostname(String host, String hostname, SshConfigStorer storer) {
+    private void storeHostname(String host, String hostname, SshConfig storer) {
         this.realHostName.put(host, hostname);
         storer.changeHostname(host, hostname);
     }
 
-    private void storeProxyCommand(String host, String proxyCommand, SshConfigStorer storer) {
+    private void storeProxyCommand(String host, String proxyCommand, SshConfig storer) {
 
         // Skip SSH command  
         proxyCommand = cutAt("ssh", proxyCommand);
@@ -261,6 +251,8 @@ public class SshConfigFileParser {
         while (proxyCommand.indexOf("${") >= 0) {
             proxyCommand = cutAt("}", proxyCommand);
         }
+        //TODO Store the full proxy command definition, don't suppose 
+        //     that nc is used
 
         if (proxyCommand.equalsIgnoreCase("none")) {
             storer.addHostInformation(host, SshToken.GATEWAY, proxyCommand);
@@ -298,7 +290,7 @@ public class SshConfigFileParser {
      */
     private static SshToken getToken(String line) {
         SshToken[] tokens = SshToken.values();
-        String firstWord = line.trim().split(" ")[0];
+        String firstWord = line.trim().split("[ \t]")[0];
         for (int i = 0; i < tokens.length; i++) {
             if (tokens[i].getValue().equalsIgnoreCase(firstWord) && tokens[i].isWanted())
                 return tokens[i];
@@ -307,14 +299,4 @@ public class SshConfigFileParser {
     }
 
     /////////////////////////////////////////////////////////////
-
-    // Only for test
-    public static void main(String[] args) {
-        SshConfigStorer storer = new SshConfigStorer();
-        SshConfigFileParser parser = new SshConfigFileParser(storer);
-
-        System.out.println(storer.getGateway("azur-7.sophia.grid5000.fr"));
-        System.out.println(storer.getUsername("foo.grid5000.fr"));
-        System.out.println(storer.getGateway("bar.inria.fr"));
-    }
 }
