@@ -48,7 +48,7 @@
 		}
          } else{
      %>
-    <h2><font color="blue">There are no modules engaged globally</font></h2> 
+    <h2><font color="blue">There are no modules engaged globally</font></h2>
                  <%
          }
                  %>

@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -73,13 +73,13 @@ public class Election implements RunActive, Serializable {
         while (body.isActive()) {
             if (this.startTime == 0) { // election not yet started
                 service.blockingServeOldest(); // just wait for first vote to trigger timer.
-            } else { // An election was started, let's use a timer.   
-                long time = // time is in milliseconds 
+            } else { // An election was started, let's use a timer.
+                long time = // time is in milliseconds
                 this.startTime - System.currentTimeMillis() + WAITMSECS;
                 if (time < 0) {
                     voteOver("time's up");
                 } else {
-                    // serve one request, or return if time given is up 
+                    // serve one request, or return if time given is up
                     service.blockingServeOldest(time);
                 }
             }
@@ -101,7 +101,7 @@ public class Election implements RunActive, Serializable {
         this.voters.add(new Integer(i_user));
         this.ballots.add(wish);
 
-        //  We should be starting a new election, if startime=0 <==> ballots.size=0 <==> voters.size=0 
+        //  We should be starting a new election, if startime=0 <==> ballots.size=0 <==> voters.size=0
         if (this.startTime == 0) {
             this.startTime = System.currentTimeMillis();
             this.c3ddispatcher.userLog(i_user, "Request 'rotate " + wish.direction() + "' submitted, \nnew " +
@@ -110,7 +110,7 @@ public class Election implements RunActive, Serializable {
                     .allLogExcept(i_user, "New " + (WAITMSECS / 1000) + " second election started:");
         }
         this.c3ddispatcher.allLogExcept(i_user, "   User " + name + " wants to rotate " + wish.direction());
-        // Has everybody voted ? 
+        // Has everybody voted ?
         if (this.voters.size() == this.nbUsers) {
             voteOver("everybody voted");
         }

@@ -37,6 +37,8 @@ import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAMobileAgent;
 import org.objectweb.proactive.core.ProActiveException;
@@ -46,7 +48,9 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
+import org.objectweb.proactive.extensions.webservices.AbstractWebServicesFactory;
 import org.objectweb.proactive.extensions.webservices.WebServices;
+import org.objectweb.proactive.extensions.webservices.WebServicesFactory;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
@@ -57,11 +61,11 @@ import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
  * @author The ProActive Team
  */
 @ActiveObject
-public class HelloWorld implements Serializable {
+public class HelloWorld implements Serializable, InitActive {
 
     private final static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
-    LinkedList<String> textsToSay = new LinkedList<String>();
+    private LinkedList<String> textsToSay = new LinkedList<String>();
 
     public HelloWorld() {
     }
@@ -81,12 +85,23 @@ public class HelloWorld implements Serializable {
         this.textsToSay.add(textToSay);
     }
 
+    public void putHelloWorld() {
+        this.textsToSay.add("Hello World!");
+    }
+
     public String sayText() {
+        String str;
         if (this.textsToSay.isEmpty()) {
-            return "The list is empty";
+            str = "The list is empty";
         } else {
-            return this.textsToSay.poll();
+            str = this.textsToSay.poll();
         }
+        return str;
+    }
+
+    public String putTextToSayAndConfirm(String textToSay) {
+        this.textsToSay.add(textToSay);
+        return "The text \"" + textToSay + "\" has been inserted into the list";
     }
 
     public void moveTo(String origin, String destination) {
@@ -104,25 +119,32 @@ public class HelloWorld implements Serializable {
             String url = "";
             boolean GCMDeployment;
             boolean onANode;
-            if (args.length == 0) {
-                url = "http://localhost:8080/";
+            String wsFrameWork = "";
+            if (args.length == 1) {
+                url = AbstractWebServicesFactory.getLocalUrl();
                 GCMDeployment = false;
                 onANode = false;
-            } else if (args.length == 1) {
-                url = args[0];
-                GCMDeployment = false;
-                onANode = false;
+                wsFrameWork = args[0];
             } else if (args.length == 2) {
                 url = args[0];
-                GCMDeployment = true;
+                GCMDeployment = false;
                 onANode = false;
+                wsFrameWork = args[1];
             } else if (args.length == 3) {
                 url = args[0];
                 GCMDeployment = true;
                 onANode = true;
+                wsFrameWork = args[2];
+            } else if (args.length == 4) {
+                url = args[0];
+                GCMDeployment = true;
+                onANode = new Boolean(args[2]);
+                wsFrameWork = args[3];
             } else {
                 logger.info("Wrong number of arguments:");
-                logger.info("Usage: java HelloWorld [url]");
+                logger
+                        .info("Usage: java HelloWorld [url] [GCMA.xml] [using deployment: true or false] wsFrameWork");
+                System.out.println("with wsFrameWork should be either \"axis2\" or \"cxf\" ");
                 return;
             }
             HelloWorld hw;
@@ -144,7 +166,6 @@ public class HelloWorld implements Serializable {
                     GCMVirtualNode hello = gcmad.getVirtualNode("Hello");
                     Node node1 = hello.getANode();
                     String origin = node1.getNodeInformation().getURL();
-                    logger.info("Node Address = " + origin);
 
                     if (hello == null)
                         throw new ProActiveException("Hello virtual node is not defined");
@@ -165,15 +186,25 @@ public class HelloWorld implements Serializable {
                                 new Object[] {});
             }
 
-            WebServices.exposeAsWebService(hw, url, "HelloWorld", new String[] { "putTextToSay", "sayText",
-                    "helloWorld" });
+            WebServicesFactory wsf;
+            wsf = AbstractWebServicesFactory.getWebServicesFactory(wsFrameWork);
+            WebServices ws = wsf.getWebServices(url);
+
+            ws.exposeAsWebService(hw, "HelloWorld", new String[] { "putTextToSay", "sayText",
+                    "putHelloWorld", "putTextToSayAndConfirm" });
+
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
         } catch (NodeException e) {
             e.printStackTrace();
         } catch (ProActiveException e) {
-            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void initActivity(Body body) {
+        logger.info("Active Object has been initiated !");
     }
 }

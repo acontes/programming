@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -39,21 +39,20 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.IOException;
 
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
-import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
+import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.URIBuilder;
-import org.objectweb.proactive.examples.webservices.c3dWS.C3DDispatcher;
-import org.objectweb.proactive.examples.webservices.c3dWS.Dispatcher;
+import org.objectweb.proactive.extensions.webservices.AbstractWebServicesFactory;
+import org.objectweb.proactive.extensions.webservices.WSConstants;
+import org.objectweb.proactive.extensions.webservices.WebServicesFrameWorkFactoryRegistry;
 
 
 /** A dialog with two text fields, which handles incorrect entries.
@@ -62,12 +61,12 @@ import org.objectweb.proactive.examples.webservices.c3dWS.Dispatcher;
 public class WSNameAndHostDialog extends JDialog implements ActionListener, PropertyChangeListener {
     private String userName = "Bob";
     private JTextField userTextField;
-    protected JTextField hostNameTextField;
     private JOptionPane optionPane;
     private String enterButtonString = "Enter";
     private String cancelButtonString = "Cancel";
-    protected Dispatcher c3dDispatcher;
     protected JTextField dispatcherUrl;
+    private String wsFrameWork = PAProperties.PA_WEBSERVICES_FRAMEWORK.getValue();
+    private JTextField wsFWTextField;
 
     /** This is NOT an Active Object: constructor is configurable! */
     public WSNameAndHostDialog() {
@@ -83,15 +82,15 @@ public class WSNameAndHostDialog extends JDialog implements ActionListener, Prop
         this.userTextField = new JTextField(this.userName, 10);
         this.userTextField.addActionListener(this);
 
-        this.hostNameTextField = new JTextField(localHostUrl, 10);
-        this.hostNameTextField.addActionListener(this);
-
         this.dispatcherUrl = new JTextField(localHostUrlService, 10);
         this.dispatcherUrl.addActionListener(this);
 
+        this.wsFWTextField = new JTextField(this.wsFrameWork, 4);
+        this.wsFWTextField.addActionListener(this);
+
         //Create an array of the text and components to be displayed.
-        Object[] array = { "Please enter your name,", this.userTextField, "and the C3DDispatcher host",
-                this.hostNameTextField, "and the C3DDispatcher Service url", this.dispatcherUrl };
+        Object[] array = { "Please enter your name, ", this.userTextField, "the C3DDispatcher Service url",
+                this.dispatcherUrl, "and the web service framework", this.wsFWTextField };
 
         //Create an array specifying the number of dialog buttons and their text.
         Object[] options = { this.enterButtonString, this.cancelButtonString };
@@ -156,86 +155,30 @@ public class WSNameAndHostDialog extends JDialog implements ActionListener, Prop
                     this.userName = "Bob";
                 }
 
-                // OK, now we've received enough information from the user. Let's try the lookup.
-                tryTheLookup();
+                this.wsFrameWork = this.wsFWTextField.getText();
+
+                if (!WebServicesFrameWorkFactoryRegistry.isValidFrameWork(this.wsFrameWork)) {
+                    this.wsFrameWork = PAProperties.PA_WEBSERVICES_FRAMEWORK.getValue();
+                }
+
             } else { //user closed dialog or clicked cancel
                 this.userName = null;
-                setVisible(false);
             }
-        }
-    }
-
-    /** Really try to find a dispatcher, using the provided address in the hostNameTextField. */
-    protected void tryTheLookup() {
-        String url = this.hostNameTextField.getText();
-        String hostName = null;
-        String[] registeredObjects;
-
-        this.c3dDispatcher = null;
-        // First try with the provided url, if the user entered the exact url for the dispatcher
-        try {
-            this.c3dDispatcher = (Dispatcher) PAActiveObject.lookupActive(C3DDispatcher.class.getName(), url);
             setVisible(false);
-            return;
-        } catch (Exception e) {
-            //e.printStackTrace();
-            // do nothing, it's just not a correct dispatcher url
         }
-
-        // Second, check the url given does map to a machine, and get list of registered objects on it
-        try {
-            hostName = URIBuilder.getHostNameFromUrl(url);
-            registeredObjects = PAActiveObject.listActive(url);
-        } catch (IOException e) {
-            treatException(e, "Sorry, could not find a registered C3DDispatcher on host \"" + hostName +
-                "\".");
-            return;
-        }
-
-        // third, for every registered object, try to save it as a dispatcher
-        for (int i = 0; i < registeredObjects.length; i++) {
-            String name = URIBuilder.getNameFromURI(registeredObjects[i]);
-
-            if (name.equals("Dispatcher") && (name.indexOf("_VN") == -1)) { // replace by (java 1.5 String.contains)
-                try {
-                    this.c3dDispatcher = (Dispatcher) PAActiveObject.lookupActive(C3DDispatcher.class
-                            .getName(), registeredObjects[i]);
-                    setVisible(false);
-                    return;
-                } catch (ActiveObjectCreationException e) {
-                    treatException(e, "Sorry, could not create stub for C3DDispatcher on host \"" + hostName +
-                        "\".");
-                } catch (IOException e) {
-                }
-            }
-        }
-
-        treatException(new IOException("No such Active Object in registered Active Objects."),
-                "Sorry, could not find a registered Dispatcher on host \"" + hostName + "\".");
-    }
-
-    /** Take action against failed connections to Dispatcher. */
-    protected void treatException(Exception exception, String message) {
-        this.hostNameTextField.selectAll();
-        JOptionPane.showMessageDialog(WSNameAndHostDialog.this, message + "\nError is \n " +
-            exception.getMessage(), "Try again", JOptionPane.ERROR_MESSAGE);
-        this.hostNameTextField.requestFocusInWindow();
     }
 
     /** Always contains some characters, default value is Bob. */
-    public String getValidatedUserName() {
+    public String getUserName() {
         return this.userName;
     }
 
-    /** Get the dispatcher which was found on url provided by the user.
-     * @return a dispatcher if information provided was correct, and null if one wasn't properly selected.
-     * It is up to the programmer to check for null values. */
-    public Dispatcher getValidatedDispatcher() {
-        return this.c3dDispatcher;
+    public String getDispatcherService() {
+        return this.dispatcherUrl.getText();
     }
 
-    public String getValidatedDispatcherService() {
-        return this.dispatcherUrl.getText();
+    public String getWsFrameWork() {
+        return this.wsFrameWork;
     }
 
     /** Gets the name of the machine this is running on.
@@ -247,7 +190,8 @@ public class WSNameAndHostDialog extends JDialog implements ActionListener, Prop
         String protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
 
         try {
-            port = RemoteObjectHelper.getDefaultPortForProtocol(protocol);
+            RemoteObjectFactory rof = AbstractRemoteObjectFactory.getRemoteObjectFactory(protocol);
+            port = rof.getPort();
         } catch (UnknownProtocolException e) {
             // Well should not happen ...
             e.printStackTrace();

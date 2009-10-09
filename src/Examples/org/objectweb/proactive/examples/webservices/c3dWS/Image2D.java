@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -41,7 +41,7 @@ import java.io.Serializable;
  * the complete image being made up of the sum of all these partial images.
  */
 public class Image2D implements Serializable {
-    // integer array representing the pixels, starting from interval.yfrom * interval.width 
+    // integer array representing the pixels, starting from interval.yfrom * interval.width
     private int[] pixels;
 
     // positioning of the above pixels in the image

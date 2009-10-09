@@ -31,16 +31,16 @@
     <table class="FULL_BLANK">
       <tr>
         <td valign="top">
-        	<h2>Welcome :</h2>
-        	<p>Welcome to the Axis2 administration console. From inside the Axis2 administration console you can :</p>
-	    	<ul style="list-style: none;" class="loginUL">
-	       		<li>Check on the health of your Axis2 deployment.</li>
- 	       		<li>Change any parameters at run time.</li>
- 	       		<li>Upload new services into Axis2 [Service hot-deployment].</li>
- 	   		</ul>
+		<h2>Welcome :</h2>
+		<p>Welcome to the Axis2 administration console. From inside the Axis2 administration console you can :</p>
+		<ul style="list-style: none;" class="loginUL">
+			<li>Check on the health of your Axis2 deployment.</li>
+			<li>Change any parameters at run time.</li>
+			<li>Upload new services into Axis2 [Service hot-deployment].</li>
+			</ul>
 	        <font color="orange">Warning: Please note that configuration changes done through the administration console
-    	    will be lost when the server is restarted.</font>
-    	</td>
+	    will be lost when the server is restarted.</font>
+	</td>
         <td valign="top" align="left">
           <form method="post" name="LoginForm" action="axis2-admin/login">
             <table class="LOG_IN_FORM">
@@ -86,5 +86,3 @@
     <jsp:include page="include/footer.inc"/>
   </body>
 </html>
-
-

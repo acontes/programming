@@ -69,7 +69,6 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
-import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 import org.objectweb.proactive.core.util.NonFunctionalServices;
@@ -913,10 +912,14 @@ public class PAActiveObject {
     }
 
     public static String registerByName(Object obj, String name) throws ProActiveException {
+        return registerByName(obj, name, true);
+    }
+
+    public static String registerByName(Object obj, String name, boolean rebind) throws ProActiveException {
         try {
             UniversalBody body = getRemoteBody(obj);
 
-            String url = body.registerByName(name);
+            String url = body.registerByName(name, rebind);
             body.setRegistered(true);
             if (PAActiveObject.logger.isInfoEnabled()) {
                 PAActiveObject.logger.info("Success at binding url " + url);
@@ -1281,6 +1284,18 @@ public class PAActiveObject {
     }
 
     /**
+     * Return the URL of a given remote object using the default remote object factory
+     * 
+     * @param ao An active object
+     * @return the URL of the remote object
+     * @throws ProActiveRuntimeException if ao is not an active object
+     */
+    public static String getUrl(Object ao) {
+        UniversalBody body = getRemoteBody(ao);
+        return body.getUrl();
+    }
+
+    /**
      * When an active object is created, it is associated with a Body that takes care of all non
      * fonctionnal properties. Assuming that the active object is only accessed by the different
      * Stub objects, all method calls end-up as Requests sent to this Body. Therefore the only
@@ -1296,6 +1311,15 @@ public class PAActiveObject {
      */
     public static Body getBodyOnThis() {
         return LocalBodyStore.getInstance().getContext().getBody();
+    }
+
+    /**
+     * Indicate if the caller is executing in an active object
+     * 
+     * @return true if in an active object, false otherwise (half body or plain java thread)
+     */
+    public static boolean isInActiveObject() {
+        return LocalBodyStore.getInstance().isInAo();
     }
 
     /**

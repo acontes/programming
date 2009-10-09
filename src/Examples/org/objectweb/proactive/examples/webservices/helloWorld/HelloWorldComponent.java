@@ -40,10 +40,13 @@ import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.fractal.util.Fractal;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
+import org.objectweb.proactive.extensions.webservices.AbstractWebServicesFactory;
 import org.objectweb.proactive.extensions.webservices.WebServices;
+import org.objectweb.proactive.extensions.webservices.WebServicesFactory;
 
 
 /**
@@ -67,12 +70,12 @@ public class HelloWorldComponent implements HelloWorldItf, GoodByeWorldItf {
     public HelloWorldComponent() {
     }
 
-    public String helloWorld(String name) {
-        return "Hello " + name + " !";
+    public String helloWorld(String arg0) {
+        return "Hello " + arg0 + " !";
     }
 
-    public String goodByeWorld(String name) {
-        return "Good Bye " + name + " !";
+    public String goodByeWorld(String arg0) {
+        return "Good Bye " + arg0 + " !";
     }
 
     public String sayHello() {
@@ -84,11 +87,19 @@ public class HelloWorldComponent implements HelloWorldItf, GoodByeWorldItf {
     }
 
     public static void main(String[] args) {
-        String url;
-        if (args.length == 0) {
-            url = "http://localhost:8080/";
-        } else {
+        String url = "";
+        String wsFrameWork = "";
+        if (args.length == 1) {
+            url = AbstractWebServicesFactory.getLocalUrl();
+            wsFrameWork = args[0];
+        } else if (args.length == 2) {
             url = args[0];
+            wsFrameWork = args[1];
+        } else {
+            System.out.println("Wrong number of arguments");
+            System.out.println("Usage: HelloWorldComponent [url] wsFrameWork");
+            System.out.println("with wsFrameWork should be either \"axis2\" or \"cxf\" ");
+            System.exit(0);
         }
 
         Component boot = null;
@@ -119,8 +130,13 @@ public class HelloWorldComponent implements HelloWorldItf, GoodByeWorldItf {
             e.printStackTrace();
         }
 
-        WebServices.exposeComponentAsWebService(comp, url, "server", new String[] { "hello-world",
-                "goodbye-world" });
+        try {
+            WebServicesFactory wsf = AbstractWebServicesFactory.getWebServicesFactory(wsFrameWork);
+            WebServices ws = wsf.getWebServices(url);
+            ws.exposeComponentAsWebService(comp, "server");
+        } catch (ProActiveException e) {
+            e.printStackTrace();
+        }
     }
 }
 //@snippet-end helloworldcomponent

@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -59,6 +59,7 @@ import javax.swing.border.TitledBorder;
 import org.objectweb.proactive.examples.webservices.c3dWS.Image2D;
 import org.objectweb.proactive.examples.webservices.c3dWS.UserLogic;
 import org.objectweb.proactive.examples.webservices.c3dWS.geom.Vec;
+import org.objectweb.proactive.extensions.webservices.exceptions.WebServicesException;
 
 
 /**
@@ -105,7 +106,13 @@ public class UserGUI implements ActionListener {
         mainFrame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                c3dUser.terminate();
+                try {
+                    c3dUser.terminate();
+                } catch (WebServicesException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                    System.exit(-1);
+                }
                 trash();
             }
         });
@@ -114,7 +121,7 @@ public class UserGUI implements ActionListener {
     /** Generates the menu bar which contains list, clear, quit and about items*/
     private JMenuBar createMenuBar() {
         //      menuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, ActionEvent.ALT_MASK));
-        //First, the menu items 
+        //First, the menu items
         userInfoItem = new JMenuItem("User info", KeyEvent.VK_U);
         listUsersMenuItem = new JMenuItem("List Users", KeyEvent.VK_L);
         clearMenuItem = new JMenuItem("Clear Log", KeyEvent.VK_C);
@@ -196,7 +203,7 @@ public class UserGUI implements ActionListener {
         sendMessageButton = new JButton("Send");
         sendMessageButton.addActionListener(this);
 
-        // these 3 are on 2 rows, text alone, but combo & button on same line   
+        // these 3 are on 2 rows, text alone, but combo & button on same line
         Box receiveTextBox = Box.createVerticalBox();
         receiveTextBox.add(localMessageField);
 
@@ -368,46 +375,51 @@ public class UserGUI implements ActionListener {
     /** Event handler, which transforms events into method calls */
     public void actionPerformed(ActionEvent e) {
         Object source = e.getSource();
-        if (source == rightButton) { // Request 'rotate right' with button click
-            c3dUser.rotateScene(new Vec(0, Math.PI / 4, 0));
-        } else if (source == leftButton) {
-            c3dUser.rotateScene(new Vec(0, -Math.PI / 4, 0));
-        } else if (source == upButton) {
-            c3dUser.rotateScene(new Vec(Math.PI / 4, 0, 0));
-        } else if (source == downButton) {
-            c3dUser.rotateScene(new Vec(-Math.PI / 4, 0, 0));
-        } else if (source == spinRight) {
-            c3dUser.rotateScene(new Vec(0, 0, Math.PI / 4));
-        } else if (source == spinLeft) {
-            c3dUser.rotateScene(new Vec(0, 0, -Math.PI / 4));
-        } else if ((source == exitMenuItem)) {
-            this.c3dUser.terminate();
-            trash();
-        } else if ((source == this.localMessageField) || (source == this.sendMessageButton)) {
-            String message = this.localMessageField.getText();
-            if (message.length() > 0) {
-                String recipient = (String) sendToComboBox.getSelectedItem();
-                c3dUser.sendMessage(message, recipient);
-                localMessageField.setText("");
+        try {
+            if (source == rightButton) { // Request 'rotate right' with button click
+                c3dUser.rotateScene(new Vec(0, Math.PI / 4, 0));
+            } else if (source == leftButton) {
+                c3dUser.rotateScene(new Vec(0, -Math.PI / 4, 0));
+            } else if (source == upButton) {
+                c3dUser.rotateScene(new Vec(Math.PI / 4, 0, 0));
+            } else if (source == downButton) {
+                c3dUser.rotateScene(new Vec(-Math.PI / 4, 0, 0));
+            } else if (source == spinRight) {
+                c3dUser.rotateScene(new Vec(0, 0, Math.PI / 4));
+            } else if (source == spinLeft) {
+                c3dUser.rotateScene(new Vec(0, 0, -Math.PI / 4));
+            } else if ((source == exitMenuItem)) {
+                this.c3dUser.terminate();
+                trash();
+            } else if ((source == this.localMessageField) || (source == this.sendMessageButton)) {
+                String message = this.localMessageField.getText();
+                if (message.length() > 0) {
+                    String recipient = (String) sendToComboBox.getSelectedItem();
+                    c3dUser.sendMessage(message, recipient);
+                    localMessageField.setText("");
+                } else {
+                    localMessageField.setText("Enter text to send");
+                    localMessageField.selectAll();
+                }
+            } else if (source == this.addSphereButton) {
+                c3dUser.addSphere();
+            } else if (source == this.resetSceneButton) {
+                c3dUser.resetScene();
+            } else if (source == userInfoItem) {
+                showUserInfo();
+            } else if (source == listUsersMenuItem) {
+                c3dUser.getUserList();
+            } else if (source == clearMenuItem) {
+                logArea.setText("");
+            } else if (source == aboutMenuItem) {
+                new DialogBox(this.mainFrame, "About ProActive", "The ProActive Grid Middleware",
+                    "http://ProActive.ObjectWeb.org/");
             } else {
-                localMessageField.setText("Enter text to send");
-                localMessageField.selectAll();
+                log("EVENT not handled : " + source);
             }
-        } else if (source == this.addSphereButton) {
-            c3dUser.addSphere();
-        } else if (source == this.resetSceneButton) {
-            c3dUser.resetScene();
-        } else if (source == userInfoItem) {
-            showUserInfo();
-        } else if (source == listUsersMenuItem) {
-            c3dUser.getUserList();
-        } else if (source == clearMenuItem) {
-            logArea.setText("");
-        } else if (source == aboutMenuItem) {
-            new DialogBox(this.mainFrame, "About ProActive", "The ProActive Grid Middleware",
-                "http://ProActive.ObjectWeb.org/");
-        } else {
-            log("EVENT not handled : " + source);
+        } catch (WebServicesException exception) {
+            exception.printStackTrace();
+            System.exit(-1);
         }
     }
 }

@@ -134,4 +134,3 @@
 	}
 %>
 <jsp:include page="include/adminfooter.inc"></jsp:include>
-

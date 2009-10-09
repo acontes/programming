@@ -66,7 +66,7 @@ public class C3DRenderingEngine implements java.io.Serializable, RenderingEngine
     private Ray tRay = new Ray();
     private Vec tmpVec = new Vec();
 
-    // used by toString to show a better value than C3DRenderingEngine@11d2572 
+    // used by toString to show a better value than C3DRenderingEngine@11d2572
     protected String name = "name not set";
 
     /** Default constructor needed by ProActive */
@@ -167,7 +167,7 @@ public class C3DRenderingEngine implements java.io.Serializable, RenderingEngine
             // uses global temporary Prim (tp) as temp.object for speedup
             Isect tp = this.scene.getPrimitive(i).intersect(r);
             if ((tp != null) && (tp.t < this.inter.t)) {
-                // Fixme : this is a clone, no ? Hide this in Isect.java 
+                // Fixme : this is a clone, no ? Hide this in Isect.java
                 this.inter.t = tp.t;
                 this.inter.prim = tp.prim;
                 this.inter.enter = tp.enter;

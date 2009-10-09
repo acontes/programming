@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -31,7 +31,10 @@
  */
 package org.objectweb.proactive.examples.webservices.helloWorld;
 
-import org.objectweb.proactive.extensions.webservices.deployer.PADeployer;
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.extensions.webservices.AbstractWebServicesFactory;
+import org.objectweb.proactive.extensions.webservices.WebServices;
+import org.objectweb.proactive.extensions.webservices.WebServicesFactory;
 
 
 /**
@@ -44,21 +47,30 @@ public class UndeployComponent {
     public static void main(String[] args) {
         String url = "";
         String componentName = "";
-        String interfaceName = "";
-        if (args.length == 2) {
-            url = "http://localhost:8080/";
-            componentName = args[0];
-            interfaceName = args[1];
-        } else if (args.length == 3) {
+        String[] interfaceName = null;
+        String wsFrameWork = "";
+        if (args.length >= 4) {
             url = args[0];
-            componentName = args[1];
-            interfaceName = args[2];
+            wsFrameWork = args[1];
+            componentName = args[2];
+            interfaceName = new String[args.length - 3];
+            for (int i = 0; i < interfaceName.length; i++) {
+                interfaceName[i] = args[3 + i];
+            }
         } else {
             System.out.println("Wrong number of arguments:");
-            System.out.println("Usage: java UndeployComponent [url] serviceName interfaceName");
+            System.out
+                    .println("Usage: java UndeployComponent url wsFrameWork componentName interfaceNames+ ");
+            System.out.println("where wsFramWork should be either \"axis2\" or \"cxf\"");
             return;
         }
 
-        PADeployer.unDeployComponent(url, componentName, new String[] { interfaceName });
+        try {
+            WebServicesFactory wsf = AbstractWebServicesFactory.getWebServicesFactory(wsFrameWork);
+            WebServices ws = wsf.getWebServices(url);
+            ws.unExposeComponentAsWebService(componentName, interfaceName);
+        } catch (ProActiveException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -52,6 +52,10 @@ import org.objectweb.proactive.examples.webservices.c3dWS.gui.WSNameAndHostDialo
 import org.objectweb.proactive.examples.webservices.c3dWS.gui.WaitFrame;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
+import org.objectweb.proactive.extensions.webservices.client.AbstractClientFactory;
+import org.objectweb.proactive.extensions.webservices.client.Client;
+import org.objectweb.proactive.extensions.webservices.client.ClientFactory;
+import org.objectweb.proactive.extensions.webservices.exceptions.WebServicesException;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
@@ -69,15 +73,14 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
     /** url of the host where the C3DDispatcher is deployed */
     private String dispatcherUrl;
 
+    private String wsFrameWork;
+
     /** AsyncRefto self, needed to add method on own queue */
     private User me;
 
     public User getMe() {
         return me;
     }
-
-    /** reference to the dispatcher logic, for image generation and message forwarding */
-    private Dispatcher c3ddispatcher;
 
     /** The chosen name of the user */
     private String userName;
@@ -98,45 +101,47 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
     private String[] savedGuiValues;
     private String dispMachineAndOS;
 
+    private Client client;
+
     /** ProActive requirement : empty no-arg constructor */
     public WSUser() {
     }
 
-    public WSUser(String dispatcherUrl, String name, Dispatcher disp) {
+    public WSUser(String dispatcherUrl, String name, String wsFrameWork) throws WebServicesException {
         this.dispatcherUrl = dispatcherUrl;
         this.userName = name;
-        this.c3ddispatcher = disp;
+        this.wsFrameWork = wsFrameWork;
+
+        ClientFactory cf = AbstractClientFactory.getClientFactory(wsFrameWork);
+        this.client = cf.getClient(this.dispatcherUrl, "C3DDispatcher", C3DDispatcher.class);
     }
 
     /** Returns the C3DUser constructor arguments, after a dialog has popped up */
     public static Object[] getDispatcherAndUserName() {
-        // ask user through Dialog for userName & host 
+        // ask user through Dialog for userName & host
         WSNameAndHostDialog userAndHostNameDialog = new WSNameAndHostDialog();
-        String dispUrl = userAndHostNameDialog.getValidatedDispatcherService();
+        String dispUrl = userAndHostNameDialog.getDispatcherService();
 
         if (dispUrl == null) {
             logger.error("Could not find a dispatcher. Closing.");
             System.exit(-1);
         }
 
-        return new Object[] { dispUrl, userAndHostNameDialog.getValidatedUserName(),
-                userAndHostNameDialog.getValidatedDispatcher() };
+        return new Object[] { dispUrl, userAndHostNameDialog.getUserName(),
+                userAndHostNameDialog.getWsFrameWork() };
     }
 
     /**
      * called after migration, to reconstruct the logic. In the initActivity :
      * myStrategyManager.onArrival("rebuild");
+     * @throws WebServicesException 
      */
 
-    // shouldn't be called from outside the class. 
-    public void rebuild() {
+    // shouldn't be called from outside the class.
+    public void rebuild() throws WebServicesException {
         this.me = (User) org.objectweb.proactive.api.PAActiveObject.getStubOnThis();
-        try {
-            WSDispatcherCaller.call(this.dispatcherUrl, "wsRegisterMigratedUser", new Object[] { i_user });
-        } catch (AxisFault e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+
+        client.oneWayCall("wsRegisterMigratedUser", new Object[] { i_user });
         createGUI();
     }
 
@@ -145,7 +150,7 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
      * myStrategyManager.onDeparture("leaveHost");
      */
 
-    // shouldn't be called from outside the class. 
+    // shouldn't be called from outside the class.
     public void leaveHost() {
         this.savedGuiValues = this.gui.getValues();
         this.gui.trash();
@@ -155,10 +160,10 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
      * Tells what are the operations to perform before starting the activity of the AO. Here, we
      * state that if migration asked, procedure is : saveData, migrate, rebuild. We also set some
      * other variables.
-     * @throws AxisFault 
+     * @throws AxisFault
      */
     public void initActivity(Body body) {
-        if (body != null) { // FIXME: this is a component bug: sometimes body is null!    
+        if (body != null) { // FIXME: this is a component bug: sometimes body is null!
             MigrationStrategyManagerImpl myStrategyManager = new MigrationStrategyManagerImpl(
                 (org.objectweb.proactive.core.body.migration.Migratable) body);
             myStrategyManager.onArrival("rebuild");
@@ -168,32 +173,26 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
         // register user to dispatcher, while asking user to be patient
         WaitFrame wait = new WaitFrame("C3D : please wait!", "Please wait...",
             "Waiting for information from Dispatcher");
-        // get the stub, which is a long operation, while the wait window is displayed 
+        // get the stub, which is a long operation, while the wait window is displayed
         this.me = (User) org.objectweb.proactive.api.PAActiveObject.getStubOnThis();
 
         Object[] callReturn = null;
         try {
-            /**
-             * The following lines should work but it seems that there is
-             * a bug in axis2. To get round this problem, we serialize the object and
-             * deserialize it at the reception.
-             */
-            callReturn = WSDispatcherCaller.call(this.dispatcherUrl, "wsRegisterUser", new Object[] {
-                    HttpMarshaller.marshallObject(this.getMe()), this.getUserName() },
-                    new Class<?>[] { int.class });
-        } catch (AxisFault e) {
-            // TODO Auto-generated catch block
+            callReturn = client.call("wsRegisterUser", new Object[] {
+                    HttpMarshaller.marshallObject(this.getMe()), this.getUserName() }, int.class);
+        } catch (WebServicesException e) {
+            logger.error("A problem occured while trying o register");
             e.printStackTrace();
+            System.exit(-1);
         }
 
         int user_id = (Integer) callReturn[0];
-        //        int user_id = this.c3ddispatcher.registerUser(this.me, this.userName);
         this.i_user = user_id;
 
         wait.destroy();
 
         this.savedGuiValues = null;
-        // Create user Frame  
+        // Create user Frame
         createGUI();
     }
 
@@ -217,7 +216,7 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
 
     /**
      * Informs the user that a new user has joined the party!!
-     * 
+     *
      * @param nUser
      *            The new user's ID
      * @param sName
@@ -230,7 +229,7 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
 
     /**
      * Informs the user that another user left
-     * 
+     *
      * @param nUser
      *            The id of the old user
      */
@@ -244,7 +243,7 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
 
     /**
      * Display an interval of newly calculated pixels
-     * 
+     *
      * @param newpix
      *            The pixels as int array
      * @param interval
@@ -256,14 +255,10 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
 
     /**
      * Exit the application
+     * @throws WebServicesException 
      */
-    public void terminate() {
-        try {
-            WSDispatcherCaller.call(this.dispatcherUrl, "wsUnregisterConsumer", new Object[] { i_user });
-        } catch (AxisFault e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+    public void terminate() throws WebServicesException {
+        client.oneWayCall("wsUnregisterConsumer", new Object[] { i_user });
         this.gui.trash();
         PAActiveObject.terminateActiveObject(true);
     }
@@ -271,13 +266,22 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
     /**
      * Entry point of the program
      */
-    public static void main(String[] argv) {
-        GCMApplication proActiveDescriptor = null;
+    public static void main(String[] args) {
+        String fileDescriptor = "";
 
+        if (args.length == 1) {
+            fileDescriptor = args[0];
+        } else {
+            System.out.println("Wrong number of arguments:");
+            System.out.println("Usage: java WSUser GCMA");
+            return;
+        }
+
+        GCMApplication proActiveDescriptor = null;
         ProActiveConfiguration.load();
 
         try {
-            proActiveDescriptor = PAGCMDeployment.loadApplicationDescriptor(new File(argv[0]));
+            proActiveDescriptor = PAGCMDeployment.loadApplicationDescriptor(new File(fileDescriptor));
         } catch (Exception e) {
             logger.error("Trouble loading descriptor file");
             e.printStackTrace();
@@ -289,7 +293,6 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
         Object[] params = WSUser.getDispatcherAndUserName();
 
         try {
-            //C3DUser c3duser = (C3DUser)
             user.waitReady();
             org.objectweb.proactive.api.PAActiveObject.newActive(WSUser.class.getName(), params, user
                     .getANode());
@@ -299,82 +302,57 @@ public class WSUser implements InitActive, java.io.Serializable, User, UserLogic
         }
     }
 
-    /** Ask the dispatcher to revert to original scene */
-    public void resetScene() {
-        try {
-            WSDispatcherCaller.call(this.dispatcherUrl, "wsResetScene", new Object[] {});
-        } catch (AxisFault e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+    /** Ask the dispatcher to revert to original scene 
+     * @throws WebServicesException */
+    public void resetScene() throws WebServicesException {
+        client.oneWayCall("wsResetScene", new Object[] { i_user });
     }
 
-    /** Ask the dispatcher to add a sphere */
-    public void addSphere() {
-        try {
-            WSDispatcherCaller.call(this.dispatcherUrl, "wsAddSphere", new Object[] {});
-        } catch (AxisFault e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+    /** Ask the dispatcher to add a sphere 
+     * @throws WebServicesException */
+    public void addSphere() throws WebServicesException {
+        client.oneWayCall("wsAddSphere", new Object[] { i_user });
     }
 
-    /** Displays the list of users connected to the dispatcher */
-    public void getUserList() {
-        Object[] callReturn = null;
-        try {
-            callReturn = WSDispatcherCaller.call(this.dispatcherUrl, "wsGetUserList", new Object[] {},
-                    new Class<?>[] { String.class });
-        } catch (AxisFault e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+    /** Displays the list of users connected to the dispatcher 
+     * @throws WebServicesException */
+    public void getUserList() throws WebServicesException {
+        Object[] callReturn = client.call("wsGetUserList", null, String.class);
         String list = (String) callReturn[0];
         this.gui.log("List of current users:\n" + list.toString());
     }
 
-    /** Send a message to a given other user, or to all */
-    public void sendMessage(String message, String recipientName) {
+    /** Send a message to a given other user, or to all 
+     * @throws WebServicesException */
+    public void sendMessage(String message, String recipientName) throws WebServicesException {
         Integer talkId = (Integer) h_users.get(recipientName);
 
         if (talkId == null) {
             // BroadCast
             gui.writeMessage("<to all> " + message + '\n');
-            try {
-                WSDispatcherCaller.call(this.dispatcherUrl, "wsUserWriteMessageExcept", new Object[] {
-                        this.i_user, "[from " + this.userName + "] " + message });
-            } catch (AxisFault e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+
+            client.oneWayCall("wsUserWriteMessageExcept", new Object[] { this.i_user,
+                    "[from " + this.userName + "] " + message });
+
         } else {
             // Private message
             gui.writeMessage("<to " + recipientName + "> " + message + '\n');
-            try {
-                WSDispatcherCaller.call(this.dispatcherUrl, "wsUserWriteMessage", new Object[] {
-                        talkId.intValue(), "[Private from " + this.userName + "] " + message });
-            } catch (AxisFault e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+
+            client.oneWayCall("wsUserWriteMessage", new Object[] { talkId,
+                    "[from " + this.userName + "] " + message });
         }
     }
 
     /**
      * ask for the scene to be rotated by some angle
-     * 
+     *
      * @param rotationAngle =
      *            <x y z> means rotate x radians along the x axis, then y radians along the y axis,
      *            and finally z radians along the z axis
+     * @throws WebServicesException 
      */
-    public void rotateScene(Vec rotationAngle) {
-        try {
-            WSDispatcherCaller.call(this.dispatcherUrl, "wsRotateScene",
-                    new Object[] { i_user, rotationAngle });
-        } catch (AxisFault e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+    public void rotateScene(Vec rotationAngle) throws WebServicesException {
+        client.oneWayCall("wsRotateScene", new Object[] { i_user, rotationAngle });
     }
 
     public void setUserName(String newName) {

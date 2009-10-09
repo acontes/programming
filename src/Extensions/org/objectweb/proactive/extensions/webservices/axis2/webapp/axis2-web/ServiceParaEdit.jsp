@@ -112,9 +112,9 @@
                  </table>
                  <%
              } else {
-            	%>
-            	<p><%=request.getAttribute("status")%></p>
-            	<%
+		%>
+		<p><%=request.getAttribute("status")%></p>
+		<%
              }
 
        %>

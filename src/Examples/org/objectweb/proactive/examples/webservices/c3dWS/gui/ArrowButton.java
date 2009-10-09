@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2008 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -72,7 +72,7 @@ public class ArrowButton extends JButton {
             icon = null;
         }
 
-        if ((icon == null) || (icon.getIconWidth() == 0)) { // if trouble loading Image 
+        if ((icon == null) || (icon.getIconWidth() == 0)) { // if trouble loading Image
             logger.error("Image file not found " + fileName);
             setText(direction);
             this.dimension = getPreferredSize();
@@ -83,7 +83,7 @@ public class ArrowButton extends JButton {
         }
     }
 
-    // Implemented so that the button stays with the original size ==> Button has fixed size 
+    // Implemented so that the button stays with the original size ==> Button has fixed size
     @Override
     public Dimension getMaximumSize() {
         return dimension;

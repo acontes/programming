@@ -358,11 +358,11 @@
             return false;
         }
     }
-    
+
     public String getFormatedSystemProperty(String systemProperty){
         if (systemProperty == null)
             return "";
-    	return  systemProperty.replaceAll(":", ": ");
+	return  systemProperty.replaceAll(":", ": ");
     }
 %>
 
@@ -504,5 +504,3 @@
 <jsp:include page="include/footer.inc"/>
 </body>
 </html>
-
-

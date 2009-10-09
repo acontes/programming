@@ -32,6 +32,8 @@
 package org.objectweb.proactive.core.httpserver;
 
 import java.io.File;
+import java.net.URL;
+import java.util.Arrays;
 
 import org.apache.log4j.Logger;
 import org.mortbay.jetty.Connector;
@@ -39,6 +41,7 @@ import org.mortbay.jetty.Server;
 import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
+import org.mortbay.jetty.servlet.ServletMapping;
 import org.mortbay.xml.XmlConfiguration;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -52,6 +55,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public class HTTPServer {
     final private static Logger logger = ProActiveLogger.getLogger(Loggers.HTTP_SERVER);
+
+    final public static String SERVER_CONTEXT = "/proactive";
 
     private static HTTPServer httpServer;
 
@@ -111,17 +116,22 @@ public class HTTPServer {
         this.server.setThreadPool(utp);
 
         /* Lets users customize Jetty if needed */
+        final URL configUrl;
         if (PAProperties.PA_HTTP_JETTY_XML.isSet()) {
             final String fileLoc = PAProperties.PA_HTTP_JETTY_XML.getValue();
-            try {
-                final XmlConfiguration configuration = new XmlConfiguration(new File(fileLoc).toURI().toURL());
-                configuration.configure(server);
-            } catch (Exception e) {
-                logger.error("Failed to load jetty configuration file: " + fileLoc, e);
-            }
+            configUrl = new File(fileLoc).toURI().toURL();
+        } else {
+            configUrl = this.getClass().getResource("jetty.xml");
         }
 
-        this.context = new Context(server, "/proactive", Context.SESSIONS);
+        try {
+            final XmlConfiguration configuration = new XmlConfiguration(configUrl);
+            configuration.configure(server);
+        } catch (Exception e) {
+            logger.error("Failed to load jetty configuration file: " + configUrl, e);
+        }
+
+        this.context = new Context(server, HTTPServer.SERVER_CONTEXT, Context.SESSIONS);
 
         this.server.start();
         // If a random port is used we have to set it
@@ -136,6 +146,17 @@ public class HTTPServer {
      */
     public void stop() throws Exception {
         this.server.stop();
+    }
+
+    public boolean isMapped(String mapping) {
+        ServletMapping[] servletMapping = this.context.getServletHandler().getServletMappings();
+        if (servletMapping == null)
+            return false;
+        for (ServletMapping sm : servletMapping) {
+            if (Arrays.asList(sm.getPathSpecs()).contains(mapping))
+                return true;
+        }
+        return false;
     }
 
     /**

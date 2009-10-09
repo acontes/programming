@@ -1,3 +1,4 @@
+//@tutorial-start
 /*
  * ################################################################
  *
@@ -31,13 +32,10 @@
  */
 package org.objectweb.proactive.examples.userguide.cmagent.webservice;
 
-import javax.xml.namespace.QName;
-
-import org.apache.axis2.AxisFault;
-import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.client.Options;
-import org.apache.axis2.rpc.client.RPCServiceClient;
-import org.objectweb.proactive.extensions.webservices.WSConstants;
+import org.objectweb.proactive.examples.userguide.cmagent.simple.State;
+import org.objectweb.proactive.extensions.webservices.client.AbstractClientFactory;
+import org.objectweb.proactive.extensions.webservices.client.Client;
+import org.objectweb.proactive.extensions.webservices.client.ClientFactory;
 
 
 /**
@@ -46,48 +44,40 @@ import org.objectweb.proactive.extensions.webservices.WSConstants;
  */
 //@snippet-start webservice_cma_client_full
 public class CMAgentWebServiceClient {
+
     public static void main(String[] args) {
 
         try {
             String url = "";
-            if (args.length == 0) {
+            String wsFrameWork = "";
+            if (args.length == 1) {
                 url = "http://localhost:8080/";
-            } else if (args.length == 1) {
+                wsFrameWork = args[0];
+            } else if (args.length == 2) {
                 url = args[0];
+                wsFrameWork = args[1];
             } else {
                 System.out.println("Wrong number of arguments:");
-                System.out.println("Usage: java HelloWorld [url]");
+                System.out.println("Usage: java CMAgentWebServiceClient [url] wsFrameWork");
+                System.out.println("where wsFrameWork is either 'axis2' or 'cxf'");
                 return;
             }
 
-            if (!url.startsWith("http://")) {
-                url = "http://" + url;
-            }
+            ClientFactory cf = AbstractClientFactory.getClientFactory(wsFrameWork);
+            Client client = cf.getClient(url, "cmAgentService", CMAgentService.class);
 
-            RPCServiceClient serviceClient = new RPCServiceClient();
+            Object[] response = client.call("getCurrentState", null, State.class);
 
-            Options options = serviceClient.getOptions();
+            System.out.println("Current state is:\n" + ((State) response[0]).toString());
 
-            EndpointReference targetEPR = new EndpointReference(url + WSConstants.AXIS_SERVICES_PATH +
-                "cmAgentService");
+            response = client.call("waitLastRequestServeTime", null, long.class);
 
-            options.setTo(targetEPR);
-            options.setAction("getLastRequestServeTime");
+            System.out.println("Last request serve time = " + response[0]);
 
-            QName op = new QName("getLastRequestServeTime");
-
-            Object[] opArgs = new Object[] {};
-            Class<?>[] returnTypes = new Class[] { String.class };
-
-            Object[] response = serviceClient.invokeBlocking(op, opArgs, returnTypes);
-
-            String name = (String) response[0];
-
-            System.out.println(name);
-
-        } catch (AxisFault e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 }
 //@snippet-end webservice_cma_client_full
+//@tutorial-end

@@ -5,7 +5,7 @@
 
 	<environment>
 		<javaPropertyVariable name="proactive.home" />
-		<javaPropertyVariable name="user.dir" />
+		<javaPropertyVariable name="user.home" />
 
 		<descriptorVariable name="hostCapacity" value="1"/>
 		<descriptorVariable name="vmCapacity" value="1"/>
@@ -20,10 +20,11 @@
 					<pathElement base="proactive" relpath="dist/lib/ibis-1.4.jar"/>
 					<pathElement base="proactive" relpath="dist/lib/ibis-connect-1.0.jar"/>
 					<pathElement base="proactive" relpath="dist/lib/ibis-util-1.0.jar"/>
+					<pathElement base="proactive" relpath="src/Extensions/org/objectweb/proactive/extensions/webservices/cxf/lib/cxf-manifest.jar"/>
 				</applicationClasspath>
 			</configuration>
 
-			<virtualNode id="User" capacity="1"/>
+			<virtualNode id="User" capacity="1" />
 		</proactive>
 	</application>
 

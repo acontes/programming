@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?><chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="WSDoc"><info><title xml:id="ExportingActiveObjectsasWebServices_29">Exporting Active Objects as Web Services</title></info>
+<?xml version="1.0" encoding="utf-8"?><chapter xmlns="http://docbook.org/ns/docbook" version="5.0" xml:id="WSDoc"><info><title xml:id="ExportingActiveObjectsasWebServices_29">Exporting active objects and components as Web Services</title></info>
   
 
   <section xml:id="WS_Overwiew"><info><title xml:id="Overview_290">Overview</title></info>
     
 
-    <para>This feature allows the call and the monitoring of active objects
+    <para>This feature allows to expose an active object or a component as a web service and thus, to call it
     from any client written in any foreign language.</para>
 
     <para>Indeed, applications written in C#, for instance, cannot communicate
@@ -50,11 +50,9 @@
 
         <para>A SOAP Engine is the mechanism responsible of making transparent
         the unmarshalling of the request and the marshalling of the response.
-        Thus, the service developer doesn't have to worry with SOAP. 
-		  In our case, we use Axis2 which can be installed into any HTTP server. 
-		  Moreover, Axis2 contains a web based administration tool
-        that provides you in particular with an easy way to list, 
-		  deploy, undeploy services (non-ProActive web services).</para>
+        Thus, the service developer doesn't have to worry with SOAP.
+		  In our case, we can use Axis2 or CXF which can be installed into any HTTP server.
+		  </para>
       </listitem>
 
       <listitem>
@@ -79,95 +77,106 @@
   </section>
 
   <section xml:id="PrerequisiteInstallingtheWebServerandtheSOAP"><info><title>Pre-requisite: Installing the Web Server and the SOAP engine</title></info>
-  
-  <para>First of all, you have to generate the 'proactive.war' web application that will enable you to expose active objects as web services.
-  For this, you have to go into your compile/ directory of your ProActive home and type 'build proActiveWar'.</para>
+
+  <para>
+  If you want to expose your active objects or components to th elocal embedded Jetty server, you just have to deploy proactive using
+  the <literal>build deploy</literal> command into the <literal>compile</literal> directory. If you want to expose them on an other http
+  server, you have to build the <literal>proactive.war</literal> archive.
+  For this, you have to go into your <literal>compile</literal> directory of your ProActive home and type <literal>build proActiveWar</literal>.
+  The <literal>proactive.war</literal> file will be built into the <literal>dist</literal> directory.</para>
 
   <para>If you have chosen to use the default Jetty server, then you have nothing else to do. Jetty server will automatically take files it needs.</para>
 
-  <para>If you have chosen to use your own HTTP server, then you just have to copy the 'proactive.war' file into the webapp/ directory of your HTTP server. 
-  This 'proactive.war' file has been created into the lib/dist/ directory of your ProActive home. Some HTTP servers need to be restarted to take into account
-  this new web application but somes like Tomcat can handle hot deployment and, thus, do not need to be restarted.</para>
+  <para>If you have chosen to use your own HTTP server, then you just have to copy the proactive.war file into the <literal>webapp</literal> directory of your HTTP server.
+  Some HTTP servers need to be restarted to take into account
+  this new web application but some others like Tomcat can handle hot deployment and, thus, do not need to be restarted.</para>
 
-  <para>N.B.: if you use your own HTTP server, you have to be aware that the Jetty server will be launched. Most of ProActive examples are launched
+  <warning>
+  <para>if you use your own HTTP server, you have to be aware that the Jetty server will be launched. Most of ProActive examples are launched
   with the option '-Dproactive.http.port=8080' which specifies Jetty port. So, if you want to use your own server on port 8080, you have to modify the jetty port in
-  launching scripts.</para>
+  launching scripts or to change the port of your own server.</para>
+   </warning>
 
   </section>
 
 	
 
-  <section xml:id="Stepstoexposeanactiveobjectasa_29"><info><title>Steps to expose an active object as a web services</title></info>
+  <section xml:id="Stepstoexposeanactiveobjectasa_29"><info><title>Steps to expose or unexpose an active object as a web services</title></info>
     
 
     <para>The steps for exporting and using an active object as a web service
     are the following:</para>
 
     <itemizedlist>
-      <listitem>
-        <para>Write your active object in a classic way as below:</para>
+		<listitem>
+			<para>Write your active object or your component in a classic way as below:</para>
 
-        <programlisting language="java"> A a = (A)PAActiveObject.newActive("A", new Object [] {}); </programlisting>
+			<programlisting language="java"><textobject><textdata fileref="automatic_snippets/webservices_AO_1.snip" /></textobject></programlisting>
+			<para>
+				or
+			</para>
+			<programlisting language="java"><textobject><textdata fileref="automatic_snippets/webservices_Component_1.snip" /></textobject></programlisting>
       </listitem>
 
       <listitem>
-        <para>Once the element is created and activated, deploy it onto a web
-        server by using <emphasis role="bold">org.objectweb.proactive.extensions.webservices.WebServices</emphasis> API:</para>
-
-        <programlisting language="java"> <emphasis role="bold">WebServices.exposeAsWebService(Object o, String url, String urn, String [] methods); </emphasis></programlisting>
-
+			<para>Once the element created and activated, a <emphasis role="bold">WebServicesFactory</emphasis> object has to be instantiated: </para>
+			<programlisting language="java">WebServicesFactory wsf = AbstractWebServicesFactory.getWebServicesFactory("axis2");</programlisting>
+			<para>or</para>
+			<programlisting language="java">WebServicesFactory wsf = AbstractWebServicesFactory.getWebServicesFactory("cxf");</programlisting>
+			<para>or else</para>
+			<programlisting language="java">WebServicesFactory wsf = AbstractWebServicesFactory.getDefaultWebServicesFactory();</programlisting>
+		</listitem>
+		<listitem>
+			<para>Then, you have to instantiate a <emphasis role="bold">WebServices</emphasis> object as follows: </para>
+			<programlisting language="java">WebServices ws = wsf.getWebServices(myUrl);</programlisting>
+			<para>If you want to use the local Jetty server to expose your active object or your component, you can use the following line
+			to retrieve the good URL:</para>
+			<programlisting language="java">String myUrl = AbstractWebServicesFactory.getLocalUrl();</programlisting>
+			<para>This will get the Jetty port which is a random port and build the url.</para>
+		</listitem>
+		<listitem>
+			<para>And finally, you can used one of the <literal>WebServices</literal> methods: </para>
+			<programlisting language="java"><textobject><textdata fileref="automatic_snippets/WebServices_Methods.snip" /></textobject></programlisting>
+		  
         <para>where:</para>
 
         <itemizedlist>
-    	    <listitem>
+	      <listitem>
                 <para><emphasis role="bold">o</emphasis> is the active
                 object</para>
+            </listitem>
+				<listitem>
+                <para><emphasis role="bold">component</emphasis> is the component</para>
             </listitem>
 
             <listitem>
                 <para><emphasis role="bold">url</emphasis> is the url of the
-                web server; typically http://localhost:8080/.</para>
+                web server (typically http://localhost:8080/).</para>
             </listitem>
 
             <listitem>
                 <para><emphasis role="bold">urn</emphasis> is the service name
-                which identify the active object on the server.</para>
+                which will identify the active object on the server.</para>
             </listitem>
 
             <listitem>
-                <para><emphasis role="bold">methods</emphasis> a String array
-                containing the methods name you want to make accessible. If
-                this parameter is null, all the public methods will be
+                <para><emphasis role="bold">methods</emphasis> is a String or a Method array
+                containing the methods you want to make accessible. If
+                this parameter is null (or is absent), all the public methods will be
                 exposed.</para>
+            </listitem>
+            <listitem>
+               <para><emphasis role="bold">componentName</emphasis> the first part of the service name
+               which will identify the component on the server. The service will be exposed at the address
+               http://[host]:[port]/proactive/services/componentName_interfaceName</para>
+            </listitem>
+            <listitem>
+                <para><emphasis role="bold">interfaceNames</emphasis> is a String array
+                containing the interfaces of the component you want to make accessible. If
+                this parameters is null (or is absent), all the functional server interfaces of the component will be exposed.</para>
             </listitem>
         </itemizedlist>
 
-        <para>If you want to expose all methods of the active object, you can simply proceed like this:</para>
-
-        <programlisting language="java"> <emphasis role="bold">WebServices.exposeAsWebService(Object o, String url, String urn); </emphasis></programlisting>
-
-      </listitem>
-    </itemizedlist>
-  </section>
-
-  <section xml:id="Undeploytheservices_29"><info><title>Undeploy the services</title></info>
-    
-
-    <para>To undeploy an active object as a service, use the ProActive static
-    method:</para>
-
-    <programlisting language="java"><emphasis role="bold">WebServices.unExposeAsWebService ( String urn, String url );  </emphasis></programlisting>
-
-    <para>where:</para>
-
-    <itemizedlist>
-      <listitem>
-        <para><emphasis role="bold">urn</emphasis> is the service name</para>
-      </listitem>
-
-      <listitem>
-        <para><emphasis role="bold">url</emphasis> the url of the server where
-        the service is deployed</para>
       </listitem>
     </itemizedlist>
   </section>
@@ -175,25 +184,28 @@
   <section xml:id="Accessingtheservices_29"><info><title>Accessing the services</title></info>
     
 
-    <para>Once the active object is deployed, you can access it via any web service enabled client (such as C#).</para>
+    <para>Once the active object or the component deployed, you can access it via any web service client (such as C#, SoapUI, Axis2 API, CXF API...) or with your favorite browser
+    (only if the returned type of your service methods are primitive types).</para>
 
     <para>First of all, the client will get the WSDL file matching this active
     object. This WSDL file is the 'identity card' of the service. It contains
     the web service public interfaces and its location. Generally, WSDL files
     are used to generate a proxy to the service. For example, for a given
-    service, say 'compute', you can get the WSDL document at <code>http://localhost:8080/proactive/services/compute?wsdl></code>.</para>
+    service, say 'compute', you can get the WSDL document at <code>http://localhost:8080/proactive/services/compute?wsdl</code>.</para>
 
     <para>Now that this client knows what and where to call the service, it
-    will send a SOAP message to the web server, the web server looks into the
+    will send a SOAP message to the web server. The web server looks into the
     message and performs the right call. Then, it returns the response into another
     SOAP message to the client.</para>
   </section>
 
   <section xml:id="Limitations_29"><info><title>Limitations</title></info>
     
-    <para>Contrary to the previous version of the active object exposition using Apache SOAP, this new version which uses Axis2 can handle complex types.
+    <para>Contrary to the previous version of the active object exposition using Apache SOAP, this new version which uses Axis2 or cxf can handle complex types.
 	 That is, with this version, you can implement a service which exposes a method returning or taking in argument an instance of any class.
 	 However, as this instance will be inserted into the response (or into the call), this class has to be serializable.</para>
+
+    <para>Axis2 and CXF are not fully compatible. It will only work for primitive return types.</para>
 
   </section>
 
@@ -206,28 +218,27 @@
       <para>Let's start with a simple example, an Hello world active object
       exposed as a web service:</para>
 
-      <programlisting language="java">public class HelloWorld{
-   public HelloWorld () {}
-   public String helloWorld (String name) {
-   	return "Hello world !";
-   }
-   public static void main (String [] args) {
-		try {
-   		HelloWorld hw = (HelloWorld) PAActiveObject.newActive("HelloWorld", new Object []{});
-   		WebServices.exposeAsWebService(hw, "HelloWorld","http://localhost:8080/", new String [] { "helloWorld" }); 
-    	} catch (ActiveObjectCreationException e) {
-         e.printStackTrace();
-    	} catch (NodeException e) {
-      	e.printStackTrace();
-    	}
-   }
-}</programlisting>
+      <programlisting language="java"><textobject><textdata fileref="automatic_snippets/webservices_AO_2.snip" /></textobject></programlisting>
 
       <para>The active object <literal>hw</literal> has been deployed as a web
       service on the web server located at
-      <literal>"http://localhost:8080/"</literal> and its service name is
-		<literal>"HelloWorld"</literal>. The accessible service
-      method is <literal>helloWorld</literal>.</para>
+      <literal>http://localhost:8080/proactive/services/</literal> and its service name is
+		<literal>"MyHelloWorldService"</literal>. The accessible service
+      method are <literal>putTextToSayAndConfirm, putTextToSay and sayText</literal>. 
+		You can see its wsdl file through the
+      <literal>http://localhost:8080/proactive/services/MyHelloWorldService?wsdl</literal> and you
+      call the <literal>helloWorld</literal> method with your browser through, for example,
+      <literal>http://localhost:8080/proactive/services/MyHelloWorldService/sayText</literal>.</para>
+
+
+      <para>If you want to expose a method which requires arguments, you can call using the same link as previously but
+      adding <literal>?[arg0]=[value]&amp;[arg1]=[value]...</literal> where [argn] is the name of the n-th argument
+      as written in the wsdl file.</para>
+
+		<para>You can also call a webservice using the ProActive client which uses, depending on the chosen framework, either a axis2 or a cxf client.
+		Here is an example:</para>
+
+      <programlisting language="java"><textobject><textdata fileref="automatic_snippets/webservices_AO_3.snip" /></textobject></programlisting>
 
       <para>Now that the server-side Web service is deployed, we can create a
       new client application in Visual Studio .NET.</para>

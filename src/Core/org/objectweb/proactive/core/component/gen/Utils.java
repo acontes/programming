@@ -89,7 +89,6 @@ public class Utils {
     public static final String GATHERCAST_ITF_PROXY_DEFAULT_SUFFIX = GEN_ESCAPE_CHAR + "gathercastItfProxy";
     public static final String COMPOSITE_REPRESENTATIVE_SUFFIX = GEN_ESCAPE_CHAR + "composite";
     public static final String OUTPUT_INTERCEPTOR_SUFFIX = GEN_ESCAPE_CHAR + "outputInterceptor";
-    public static final String WEBSERVICE_PROXY_SUFFIX = GEN_ESCAPE_CHAR + "webServiceProxy";
 
     // packages
     public static final String STUB_DEFAULT_PACKAGE = null;
@@ -116,9 +115,7 @@ public class Utils {
     }
 
     /**
-     * Parse a representative classname and rebuild the interface signature i.e. the Java
-     * interface name.
-     *
+     * Parse a representative classname and rebuild the interface signature i.e. the Java interface name.
      * @param className
      * @return the interface signature
      */
@@ -174,12 +171,6 @@ public class Utils {
             String javaInterfaceName) {
         // just a way to have an identifier (possibly not unique ... but readable)
         return (getMetaObjectClassName(functionalInterfaceName, javaInterfaceName) + OUTPUT_INTERCEPTOR_SUFFIX);
-    }
-
-    public static String getWSProxyClassName(String functionalInterfaceName, String javaInterfaceName,
-            String wsCallerClassName) {
-        return (getMetaObjectClassName(functionalInterfaceName, javaInterfaceName) + GEN_MIDDLE_SEPARATOR +
-            escapeString(wsCallerClassName.substring(wsCallerClassName.lastIndexOf('.'))) + WEBSERVICE_PROXY_SUFFIX);
     }
 
     public static Class<?> defineClass(final String className, final byte[] bytes)
@@ -269,9 +260,7 @@ public class Utils {
     }
 
     /**
-     * Escape classname, interface name and definition to use it in generated classname and
-     * retrieve allinformation.
-     *
+     * Escape classname, interface name and definition to use it in generated classname and retrieve allinformation.
      * @param str a name
      * @return an escaped String
      */
@@ -296,10 +285,8 @@ public class Utils {
         return sb.toString();
     }
 
-    /**
-     * Gives all the real classname contains in a Stub classname. The First element of the result
-     * is the classname of the
-     *
+    /** Gives all the real classname contains in a Stub classname.
+     * The First element of the result is the classname of the
      * @param generatedClassName
      * @return
      * @throws IllegalArgumentException if the given escapedClassesName aren't well escaped

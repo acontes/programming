@@ -33,24 +33,16 @@ package org.objectweb.proactive.extensions.webservices;
 
 import java.util.Vector;
 
-import org.objectweb.proactive.core.config.PAProperties;
-
 
 /**
  * Utility constants for deploying active objects and components as Web Services
- * 
+ *
  * @author The ProActive Team
  */
 public class WSConstants {
 
-    // Define axis2 paths
-    public static final String WS_PATH = PAProperties.PA_HOME.getValue() +
-        "/src/Extensions/org/objectweb/proactive/extensions/webservices/";
-    public static final String AXIS_XML_PATH = WS_PATH + "axis2/conf/axis2.xml";
-    public static final String AXIS_REPOSITORY_DIR = WS_PATH + "axis2/repository/";
-    public static final String AXIS_SERVICES_DIR = AXIS_REPOSITORY_DIR + "services/";
-    public static final String AXIS_SERVICES_PATH = "proactive/services/";
-    public static final String AXIS_SERVLET = "/services/*";
+    public static final String SERVICES_PATH = "proactive/services/";
+    public static final String SERVLET_PATH = "/services/*";
 
     public static final Vector<String> disallowedMethods = new Vector<String>();
 
@@ -59,6 +51,8 @@ public class WSConstants {
         disallowedMethods.addElement("equals");
         disallowedMethods.addElement("toString");
         disallowedMethods.addElement("runActivity");
+        disallowedMethods.addElement("initActivity");
+        disallowedMethods.addElement("endActivity");
         disallowedMethods.addElement("setProxy");
         disallowedMethods.addElement("getProxy");
         disallowedMethods.addElement("wait");
@@ -83,6 +77,6 @@ public class WSConstants {
         disallowedMethods.addElement("getFcItfImpl");
         disallowedMethods.addElement("setFcType");
         disallowedMethods.addElement("getFcItfImpl");
-        disallowedMethods.addElement("getFcItfImpl");
+        disallowedMethods.addElement("setFcItfImpl");
     }
 }

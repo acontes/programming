@@ -57,15 +57,16 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.StringMutableWrapper;
 import org.objectweb.proactive.examples.webservices.c3dWS.geom.Scene;
 import org.objectweb.proactive.examples.webservices.c3dWS.geom.Vec;
+import org.objectweb.proactive.examples.webservices.c3dWS.gui.DispatcherGUI;
 import org.objectweb.proactive.examples.webservices.c3dWS.prim.Light;
 import org.objectweb.proactive.examples.webservices.c3dWS.prim.Plane;
 import org.objectweb.proactive.examples.webservices.c3dWS.prim.Primitive;
 import org.objectweb.proactive.examples.webservices.c3dWS.prim.Sphere;
 import org.objectweb.proactive.examples.webservices.c3dWS.prim.Surface;
 import org.objectweb.proactive.examples.webservices.c3dWS.prim.View;
-import org.objectweb.proactive.examples.webservices.c3dWS.gui.DispatcherGUI;
 import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
+import org.objectweb.proactive.extensions.webservices.AbstractWebServicesFactory;
 import org.objectweb.proactive.extensions.webservices.WebServices;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
@@ -150,7 +151,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
             for (Node node : rendererNodes) {
                 String engineName = node.getNodeInformation().getURL();
 
-                // toString() is to express the change, even though rendererNodes are Strings... 
+                // toString() is to express the change, even though rendererNodes are Strings...
                 Object[] param = { engineName }; // engine name = engineNode name
                 RenderingEngine tmpEngine;
 
@@ -176,7 +177,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
                 ++i;
             }
         } else {
-            // the GUI shows the engines being used.  
+            // the GUI shows the engines being used.
             for (int i = 0; i < this.engineAndStringTable.size(); i++) {
                 Object[] engineAndString = this.engineAndStringTable.get(i);
 
@@ -226,7 +227,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
 
         int intheight = IMAGE_HEIGHT / nbTasks;
 
-        // Create the interval stack 
+        // Create the interval stack
         Interval[] intervalsToDraw = new Interval[nbTasks];
         boolean[] received = new boolean[nbTasks];
 
@@ -243,10 +244,10 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
 
         // To store future ImagePart values
         Vector<Image2D> images = new Vector<Image2D>();
-        int counter = 0; // says which interval is to assign next 
+        int counter = 0; // says which interval is to assign next
 
         for (int i = 0; i < nbTasks; i++)
-            // no value has come back yet    
+            // no value has come back yet
 
             received[i] = false;
 
@@ -370,8 +371,8 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
             this.userBag.currentUser().setPixels(image);
         }
 
-        // Stores the newly rendered interval in this.localCopyOfImage. 
-        // this.localCopyOfImage is later used to initialize the images of newcoming consumers 
+        // Stores the newly rendered interval in this.localCopyOfImage.
+        // this.localCopyOfImage is later used to initialize the images of newcoming consumers
         System.arraycopy(image.getPixels(), 0, this.localCopyOfImage, image.getInterval().totalImageWidth *
             image.getInterval().yfrom, image.getPixels().length);
     }
@@ -380,12 +381,12 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
      * Rotate every object by the given angle
      */
     public void rotateScene(int i_user, Vec angle) {
-        // If there is more than one user, proceed with a vote. 
-        // i_user < 0 means the election trigerred the rotation  
+        // If there is more than one user, proceed with a vote.
+        // i_user < 0 means the election trigerred the rotation
         if ((i_user >= 0) && (this.userBag.size() > 1)) {
             this.election.vote(i_user, this.userBag.getName(i_user), angle);
 
-            // election cannot be null, it should be created by registerUser & by migration rebuild 
+            // election cannot be null, it should be created by registerUser & by migration rebuild
             return;
         }
 
@@ -404,9 +405,8 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
         render();
     }
 
-    public void wsRotateScene(int i_user, Vec angle) {
-        System.out.println(angle.toString());
-        rotateScene(i_user, angle);
+    public void wsRotateScene(int arg0, Vec arg1) {
+        rotateScene(arg0, arg1);
     }
 
     /** Tells what are the operations to perform before starting the activity of the AO.
@@ -426,7 +426,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
 
     /** ProActive queue handling */
     public void runActivity(Body body) {
-        // Creates the rendering engines 
+        // Creates the rendering engines
         go();
         service = new Service(body);
         service.fifoServing();
@@ -437,7 +437,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
     public void leaveHost() {
         this.gui.trash();
 
-        // should we call a ProActive.unregister("//localhost/Dispatcher"); ? 
+        // should we call a ProActive.unregister("//localhost/Dispatcher"); ?
     }
 
     /** Sends a [log] message to given user */
@@ -450,8 +450,8 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
         this.userBag.getUser(i_user).message(s_message);
     }
 
-    public void wsUserWriteMessage(int i_user, String s_message) {
-        userWriteMessage(i_user, s_message);
+    public void wsUserWriteMessage(int arg0, String arg1) {
+        userWriteMessage(arg0, arg1);
     }
 
     /** Ask users & dispatcher log s_message, except one  */
@@ -480,8 +480,8 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
         }
     }
 
-    public void wsUserWriteMessageExcept(int i_user, String s_message) {
-        userWriteMessageExcept(i_user, s_message);
+    public void wsUserWriteMessageExcept(int arg0, String arg1) {
+        userWriteMessageExcept(arg0, arg1);
     }
 
     /** Ask all users & dispatcher to log s_message */
@@ -498,6 +498,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
 
     //SYNCHRONOUS CALL. All "c3duser." calls in this method happen AFTER the int[] is returned
     public int registerUser(User c3duser, String userName) {
+
         c3duser.log("-> Remote call-back: dispatcher found, user registered");
         log("New user " + userName + "(" + this.lastUserID + ") has joined");
 
@@ -508,7 +509,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
             c3duser.informNewUser(this.userBag.currentKey(), this.userBag.currentName());
         }
 
-        // Adds this User to the list 
+        // Adds this User to the list
         this.userBag.add(this.lastUserID, c3duser, userName);
         this.gui.addUser(userName + " (" + this.lastUserID + ")");
 
@@ -542,21 +543,22 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
 
             election.setNbUsers(nbUsers);
         }
-
         // return user_id
         return this.lastUserID++;
     }
 
-    public int wsRegisterUser(byte[] userBytes, String userName) {
-        User user = (User) HttpMarshaller.unmarshallObject(userBytes);
-        return registerUser(user, userName);
+    public int wsRegisterUser(byte[] arg0, String arg1) {
+        System.out.println("wsRegisterUser begins");
+        User user = (User) HttpMarshaller.unmarshallObject(arg0);
+        System.out.println("user has been created");
+        return registerUser(user, arg1);
     }
 
-    public void registerMigratedUser(int userNumber) {
-        String name = this.userBag.getName(userNumber);
-        log("User " + name + "(" + userNumber + ") has migrated ");
+    public void registerMigratedUser(int arg0) {
+        String name = this.userBag.getName(arg0);
+        log("User " + name + "(" + arg0 + ") has migrated ");
 
-        User c3duser = this.userBag.getUser(userNumber);
+        User c3duser = this.userBag.getUser(arg0);
 
         /*
          * Initializes the image of the migrated consumer (user's copy of image is destroyed before
@@ -566,40 +568,40 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
         c3duser.setPixels(new Image2D(this.localCopyOfImage, inter, 0));
     }
 
-    public void wsRegisterMigratedUser(int userNumber) {
-        registerMigratedUser(userNumber);
+    public void wsRegisterMigratedUser(int arg0) {
+        registerMigratedUser(arg0);
     }
 
     /** removes user from userList, so he cannot receive any more messages or images */
-    public void unregisterConsumer(int number) {
-        String nameOfUser = this.userBag.getName(number);
-        allLogExcept(number, "User " + nameOfUser + " has left");
+    public void unregisterConsumer(int arg0) {
+        String nameOfUser = this.userBag.getName(arg0);
+        allLogExcept(arg0, "User " + nameOfUser + " has left");
 
         // Inform all users one left
         for (this.userBag.newIterator(); this.userBag.hasNext();) {
             this.userBag.next();
 
-            if (this.userBag.currentKey() != number) {
+            if (this.userBag.currentKey() != arg0) {
                 this.userBag.currentUser().informUserLeft(nameOfUser);
             }
         }
 
         // remove that name from the Dispatcher frame
-        this.gui.removeUser(nameOfUser + " (" + number + ")");
+        this.gui.removeUser(nameOfUser + " (" + arg0 + ")");
 
         // remove from internal list of users.
-        this.userBag.remove(number);
+        this.userBag.remove(arg0);
 
         int nbUsers = this.userBag.size();
 
-        // depending on nb users left, reset fields  
+        // depending on nb users left, reset fields
         switch (nbUsers) {
             case 0:
                 this.lastUserID = 0;
                 break;
             case 1:
                 this.election.terminate();
-                this.election = null; // when only one user in simulation, election should not be used, 
+                this.election = null; // when only one user in simulation, election should not be used,
 
                 break;
             default:
@@ -608,8 +610,8 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
         }
     }
 
-    public void wsUnregisterConsumer(int number) {
-        unregisterConsumer(number);
+    public void wsUnregisterConsumer(int arg0) {
+        unregisterConsumer(arg0);
     }
 
     public void resetScene() {
@@ -685,8 +687,8 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
         return new StringMutableWrapper(s_list.toString());
     }
 
-    public StringMutableWrapper wsGetUserList() {
-        return getUserList();
+    public String wsGetUserList() {
+        return getUserList().stringValue();
     }
 
     public void addSphere(Sphere s) {
@@ -950,23 +952,32 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
         rotateScene(user, new Vec(0, 0, -Math.PI / 4));
     }
 
-    public void addSphereByUser(int user) {
-        ((C3DUser) userBag.getUser(user)).addSphere();
-    }
-
-    public void resetSceneByUser(int user) {
-        ((C3DUser) userBag.getUser(user)).resetScene();
-    }
-
     /**
      * Instantiates a new active C3DDispatcher on the local machine
      * @param argv Name of the descriptor file
      */
-    public static void main(String[] argv) throws NodeException {
+    public static void main(String[] args) throws NodeException {
 
         try {
+            String url = "";
+            String fileName = "";
+            String wsFrameWork = "";
+            if (args.length == 2) {
+                url = AbstractWebServicesFactory.getLocalUrl();
+                fileName = args[0];
+                wsFrameWork = args[1];
+            } else if (args.length == 3) {
+                fileName = args[0];
+                url = args[1];
+                wsFrameWork = args[2];
+            } else {
+                System.out.println("Wrong number of arguments:");
+                System.out.println("Usage: java C3DDispatcher GCMA [url] wsFrameWork");
+                System.out.println("with wsFrameWork should be either \"axis2\" or \"cxf\" ");
+                return;
+            }
 
-            File applicationDescriptor = new File(argv[0]);
+            File applicationDescriptor = new File(fileName);
             ProActiveConfiguration.load();
             GCMApplication gcmad = PAGCMDeployment.loadApplicationDescriptor(applicationDescriptor);
             gcmad.startDeployment();
@@ -990,17 +1001,13 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
             C3DDispatcher c3dd = (C3DDispatcher) PAActiveObject.newActive(C3DDispatcher.class.getName(),
                     param, dispatcherNode);
 
-            String url = "http://localhost:8080/";
-
-            if (argv.length == 2) {
-                url = argv[1];
-            }
-
             String[] methods = new String[] { "wsRegisterUser", "wsUnregisterConsumer", "wsResetScene",
                     "wsAddSphere", "wsGetUserList", "wsUserWriteMessageExcept", "wsUserWriteMessage",
                     "wsRotateScene", "wsRegisterMigratedUser" };
 
-            WebServices.exposeAsWebService(c3dd, url, "C3DDispatcher", methods);
+            WebServices ws = AbstractWebServicesFactory.getWebServicesFactory(wsFrameWork)
+                    .getWebServices(url);
+            ws.exposeAsWebService(c3dd, "C3DDispatcher", methods);
 
         } catch (ProActiveException e) {
             logger.error(e);
