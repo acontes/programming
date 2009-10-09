@@ -201,12 +201,35 @@
 
   <section xml:id="Limitations_29"><info><title>Limitations</title></info>
     
-    <para>Contrary to the previous version of the active object exposition using Apache SOAP, this new version which uses Axis2 or cxf can handle complex types.
+    <para>Contrary to the previous version of the active object exposition using Apache SOAP, this new version which uses Axis2 or CXF can handle complex types.
 	 That is, with this version, you can implement a service which exposes a method returning or taking in argument an instance of any class.
-	 However, as this instance will be inserted into the response (or into the call), this class has to be serializable.</para>
+	 However, the class of this instance has to respect some criterion due to the serialization and CXF/Axis2 restrictions:</para>
+	 <itemizedlist>
+		 <listitem><para>This class has to be serializable</para></listitem>
+		 <listitem><para>This class has to supply a no-args constructor and preferably empty</para></listitem>
+		 <listitem><para>All the fields of this class has to be private or protected</para></listitem>
+		 <listitem><para>This class has to supply public getters and setters for each field. 
+		 These getter and setter methods have to be in this class and not in one of its super classes.</para></listitem>
+	 </itemizedlist>
+	 
 
-    <para>Axis2 and CXF are not fully compatible. It will only work for primitive return types.</para>
+    <para>
+		Axis2 and CXF are not fully compatible. In particular, clients behave differently.
+		Axis2 client uses to send SOAP requests using "argn" as name for the n-th argument of the requested method. However, CXF creates the WSDL
+		service using parameter names as written into the Java code. Thus, there is a difference of names and the service cannot find argument names in the SOAP
+		message matching with the argument names of the requested method. Null value is therefore used as parameters.
+		To easily solve this issue, you can change the argument names of your service to match with "argn". If you cannot change the service, you have to
+		use another client as those used in the ProActive extension.
+	 </para>
+	 <para>
+	 	If you want to use the CXF client provided by ProActive for calling an Axis2 service, you will also face difficulties since this client waits for a returned SOAP message
+		that the Axis2 service will not return for a void method. One thing but not the best you can do, is to modify ProActive CXF client in order to eat the exception
+		for oneWayCall. This is not the best solution since other exceptions will be eaten too.
+	 </para>
 
+	 <para>
+		 In a general manner, we advise you to use the same framework for the exposition as a web service and for the client consuming this service.
+	 </para>
   </section>
 
   <section xml:id="AsimpleexampleHelloWorld_29"><info><title>A simple example: Hello World</title></info>
