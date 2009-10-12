@@ -250,4 +250,23 @@ public class Client {
             }
         }
     }
+
+    /* @@@@@@@@@@@@@@@ Direct Connection information @@@@@@@@@@@@@@@@@@@ */
+
+    /** The Direct Connection address which other Agents should contact
+     *  null if the current client did not advertise any
+     *  */
+    private InetSocketAddress directConnectionEndpoint = null;
+
+    public void setDirectConnectionEndpoint(InetSocketAddress endpoint) {
+        this.directConnectionEndpoint = endpoint;
+    }
+
+    public InetSocketAddress getDirectConnectionEndpoint() {
+        return directConnectionEndpoint;
+    }
+
+    public boolean acceptsDirectConnections() {
+        return directConnectionEndpoint != null;
+    }
 }

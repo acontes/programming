@@ -44,6 +44,8 @@ import org.objectweb.proactive.extra.messagerouting.router.processor.Processor;
 import org.objectweb.proactive.extra.messagerouting.router.processor.ProcessorDataReply;
 import org.objectweb.proactive.extra.messagerouting.router.processor.ProcessorDataRequest;
 import org.objectweb.proactive.extra.messagerouting.router.processor.ProcessorDebug;
+import org.objectweb.proactive.extra.messagerouting.router.processor.ProcessorDirectConnectionAdvertise;
+import org.objectweb.proactive.extra.messagerouting.router.processor.ProcessorDirectConnectionRequest;
 import org.objectweb.proactive.extra.messagerouting.router.processor.ProcessorRegistrationRequest;
 
 
@@ -96,6 +98,14 @@ class TopLevelProcessor implements Runnable {
                     break;
                 case DATA_REQUEST:
                     processor = new ProcessorDataRequest(this.message, this.router);
+                    break;
+                case DIRECT_CONNECTION_ADVERTISE:
+                    processor = new ProcessorDirectConnectionAdvertise(this.message, this.router,
+                        this.attachment.getClient());
+                    break;
+                case DIRECT_CONNECTION_REQUEST:
+                    processor = new ProcessorDirectConnectionRequest(this.message, this.router,
+                        this.attachment);
                     break;
                 case DEBUG_:
                     processor = new ProcessorDebug(this.message, this.attachment, this.router);
