@@ -112,6 +112,7 @@ public class TestAgentImpl extends AgentImpl {
         this.tunnelStopped = true;
     }
 
+    // send an oneway message and wait until it arrives succesfully to the remote agent
     public boolean onewaySend(byte[] msg, TestAgentImpl remoteAgent, long timeout)
             throws MessageRoutingException {
         remoteAgent.registerMessageWait();
@@ -120,10 +121,11 @@ public class TestAgentImpl extends AgentImpl {
         return remoteAgent.messageReceived();
     }
 
-    public byte[] bidirectionalSend(DataRequestMessage msg, TestAgentImpl remoteAgent, long timeout)
-            throws MessageRoutingException {
+    // wait until the remote agent tries to send a reply for the request
+    public boolean waitReply(TestAgentImpl remoteAgent, long timeout) {
         remoteAgent.registerMessageReply();
-        return this.sendMsg(remoteAgent.getAgentID(), msg.toByteArray(), true); // TODO this blocks; if not unblocked, how to test that the reply was really sent???
+        remoteAgent.waitForReply(timeout);
+        return remoteAgent.replySent();
     }
 
     private volatile boolean received = false;
@@ -138,12 +140,14 @@ public class TestAgentImpl extends AgentImpl {
                 try {
                     this.wait(timeout);
                 } catch (InterruptedException e) {
+                    // get out
+                    break;
                 }
             }
         }
     }
 
-    private boolean messageReceived() {
+    public boolean messageReceived() {
         return received;
     }
 
@@ -171,7 +175,7 @@ public class TestAgentImpl extends AgentImpl {
         }
     }
 
-    private boolean replySent() {
+    public boolean replySent() {
         return replied;
     }
 
@@ -199,7 +203,7 @@ public class TestAgentImpl extends AgentImpl {
                     Helpers.byteArrayToString(data));
                 try {
                     // we are "working very hard" to calculate the reply
-                    new Sleeper(1000).sleep();
+                    new Sleeper(300).sleep();
                     // we will reply with "reply"
                     byte[] reply = Helpers.stringToByteArray(Helpers.REPLY_PAYLOAD);
                     this.agent.sendReply(message, reply);
