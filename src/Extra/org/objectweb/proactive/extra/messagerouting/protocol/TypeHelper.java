@@ -32,6 +32,8 @@
  */
 package org.objectweb.proactive.extra.messagerouting.protocol;
 
+import java.net.Inet4Address;
+
 /** Helper class to allows int/long to byte array conversion
  *
  * Theses functions do not depend on the endianess of the machine
@@ -103,4 +105,35 @@ public class TypeHelper {
         buf[offset + 2] = (byte) (val >>> 8);
         buf[offset + 3] = (byte) (val);
     }
+
+	public static void inetAddressToByteArray(Inet4Address endpointAddress,
+			byte[] buff, int i) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public static void shortToByteArray(short port, byte[] buff, int i) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public static short intToShort(int endpointPort) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	public static Inet4Address byteArrayToInetAddr(byte[] byteArray, int i) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static short byteArrayToShort(byte[] byteArray, int i) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	public static int shortToInt(short port) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }

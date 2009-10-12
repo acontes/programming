@@ -64,6 +64,12 @@ public abstract class Message {
         REGISTRATION_REQUEST,
         /** A registration reply send the router to a client */
         REGISTRATION_REPLY,
+        /** A direct connection request sent by a client to the router */
+        DIRECT_CONNECTION_REQUEST,
+        /** A direct connection reply sent by the router to the client in the case that a direct connection can be established*/
+        DIRECT_CONNECTION_ACK,
+        /** A direct connection reply sent by the router to the client in the case that a direct connection cannot be established*/
+        DIRECT_CONNECTION_NACK,
         /** A data message which encapsulate a {@link Request} */
         DATA_REQUEST,
         /** A data message which encapsulate a {@link SynchronousReplyImpl} */
@@ -101,6 +107,12 @@ public abstract class Message {
                     return "DATA_REQ";
                 case DATA_REPLY:
                     return "DATA_REP";
+                case DIRECT_CONNECTION_REQUEST:
+			return "DC_REQ";
+                case DIRECT_CONNECTION_ACK:
+			return "DC_ACK";
+                case DIRECT_CONNECTION_NACK:
+			return "DC_NACK";
                 case ERR_:
                     return "ERR";
                 case DEBUG_:
@@ -251,6 +263,12 @@ public abstract class Message {
                 return new DataRequestMessage(buf, offset);
             case DATA_REPLY:
                 return new DataReplyMessage(buf, offset);
+            case DIRECT_CONNECTION_REQUEST:
+		return new DirectConnectionRequestMessage(buf,offset);
+            case DIRECT_CONNECTION_ACK:
+		return new DirectConnectionReplyACKMessage(buf,offset);
+            case DIRECT_CONNECTION_NACK:
+		return new DirectConnectionReplyNACKMessage(buf,offset);
             case ERR_:
                 return new ErrorMessage(buf, offset);
             case DEBUG_:
