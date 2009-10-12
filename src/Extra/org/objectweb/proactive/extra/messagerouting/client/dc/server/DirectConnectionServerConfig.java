@@ -97,14 +97,14 @@ public class DirectConnectionServerConfig {
 
     }
 
-    public class DirectConnectionDisabledException extends Exception {
+    public static class DirectConnectionDisabledException extends Exception {
 
         public DirectConnectionDisabledException(String string) {
             super(string);
         }
     }
 
-    public class MissingPortException extends Exception {
+    public static class MissingPortException extends Exception {
 
         public MissingPortException(String string) {
             super(string);

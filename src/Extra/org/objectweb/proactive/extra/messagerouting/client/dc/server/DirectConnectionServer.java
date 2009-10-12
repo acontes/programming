@@ -181,7 +181,7 @@ public class DirectConnectionServer implements Runnable {
         return new Thread(new ShutdownHook(this));
     }
 
-    private class ShutdownHook implements Runnable {
+    private static class ShutdownHook implements Runnable {
 
         private final DirectConnectionServer dcServer;
 
