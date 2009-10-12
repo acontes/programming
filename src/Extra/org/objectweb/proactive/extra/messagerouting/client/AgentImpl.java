@@ -750,6 +750,9 @@ public class AgentImpl implements Agent, AgentImplMBean {
                      * unlock all thread that are waiting a response from this agent
                      */
                     mailboxes.unlockDueToDisconnection(error.getSender());
+                    // cleanup DC info for the disconnected client
+                    if (dcManager.isEnabled())
+                        dcManager.agentDisconnected(error.getSender());
                     break;
                 case ERR_NOT_CONNECTED_RCPT:
                     /*
@@ -901,6 +904,21 @@ public class AgentImpl implements Agent, AgentImplMBean {
                     remoteAgent);
 
             return this.connectedAgents.get(remoteAgent);
+        }
+
+        public void agentDisconnected(AgentID disconnected) {
+            // this agent has been disconnected. Remove any trace of him.
+            if (!this.seenAgents.remove(disconnected))
+                if (!this.knownAgents.remove(disconnected)) {
+                    DirectConnection connection = this.connectedAgents.remove(disconnected);
+                    if (connection != null)
+                        try {
+                            connection.close();
+                        } catch (IOException e) {
+                            ProActiveLogger.logEatedException(logger, "Error while closing " +
+                                "the connection for the " + disconnected + " agent:", e);
+                        }
+                }
         }
 
         public boolean knows(AgentID remoteAgent) {

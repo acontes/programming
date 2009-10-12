@@ -59,6 +59,10 @@ public class DirectConnection {
         socket.getOutputStream().flush();
     }
 
+    public void close() throws IOException {
+        socket.close();
+    }
+
     @Override
     public String toString() {
         return socket.toString();
