@@ -32,6 +32,7 @@
  */
 package org.objectweb.proactive.extra.messagerouting.protocol.message;
 
+import org.objectweb.proactive.extra.messagerouting.exceptions.MalformedMessageException;
 import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
 import org.objectweb.proactive.extra.messagerouting.protocol.TypeHelper;
 
@@ -129,8 +130,8 @@ public abstract class RegistrationMessage extends Message {
      * @param byteArray the byte array from which to read
      * @param offset the offset at which to find the message in the byte array
      */
-    public RegistrationMessage(byte[] byteArray, int offset) {
-        super(byteArray, offset);
+    public RegistrationMessage(byte[] byteArray, int offset) throws MalformedMessageException {
+        super(byteArray, offset, Field.getTotalOffset());
 
         this.agentID = readAgentID(byteArray, offset);
         this.routerID = readRouterID(byteArray, offset);
