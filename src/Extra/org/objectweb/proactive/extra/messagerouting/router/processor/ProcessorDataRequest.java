@@ -36,9 +36,9 @@ import java.nio.ByteBuffer;
 
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
+import org.objectweb.proactive.extra.messagerouting.protocol.message.DataMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.DataRequestMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.ErrorMessage;
-import org.objectweb.proactive.extra.messagerouting.protocol.message.DataMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.Message;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.ErrorMessage.ErrorType;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.Message.MessageType;
@@ -51,17 +51,14 @@ import org.objectweb.proactive.extra.messagerouting.router.RouterImpl;
  * @since ProActive 4.1.0
  */
 public class ProcessorDataRequest extends Processor {
-    final private ByteBuffer messageAsByteBuffer;
-    final private RouterImpl router;
 
     public ProcessorDataRequest(ByteBuffer messageAsByteBuffer, RouterImpl router) {
-        this.messageAsByteBuffer = messageAsByteBuffer;
-        this.router = router;
+        super(messageAsByteBuffer, router);
     }
 
     @Override
     public void process() {
-        AgentID recipient = DataMessage.readRecipient(messageAsByteBuffer.array(), 0);
+        AgentID recipient = DataMessage.readRecipient(rawMessage.array(), 0);
         Client destClient = this.router.getClient(recipient);
 
         if (destClient != null) {
@@ -69,14 +66,14 @@ public class ProcessorDataRequest extends Processor {
              * If an error occurs while sending the message, notify the sender
              */
             try {
-                destClient.sendMessage(this.messageAsByteBuffer);
+                destClient.sendMessage(this.rawMessage);
             } catch (Exception e) {
                 /* Notify the sender of the failure.
                  * If the error message cannot be send, the message is cached to be re-send
                  * later. If this message is lost, the caller will be blocked forever.
                  */
-                AgentID sender = DataMessage.readSender(messageAsByteBuffer.array(), 0);
-                long messageId = Message.readMessageID(messageAsByteBuffer.array(), 0);
+                AgentID sender = DataMessage.readSender(rawMessage.array(), 0);
+                long messageId = Message.readMessageID(rawMessage.array(), 0);
                 ErrorMessage error = new ErrorMessage(ErrorType.ERR_NOT_CONNECTED_RCPT, sender, recipient,
                     messageId);
 
@@ -88,10 +85,10 @@ public class ProcessorDataRequest extends Processor {
              * If the sender is known an error message is sent (or cached) to unblock it.
              * Otherwise the message is dropped (unknown sender & recipient: game over)
              */
-            AgentID sender = DataMessage.readSender(messageAsByteBuffer.array(), 0);
+            AgentID sender = DataMessage.readSender(rawMessage.array(), 0);
             Client client = router.getClient(sender);
             if (client != null) {
-                long messageId = Message.readMessageID(messageAsByteBuffer.array(), 0);
+                long messageId = Message.readMessageID(rawMessage.array(), 0);
                 ErrorMessage error = new ErrorMessage(ErrorType.ERR_UNKNOW_RCPT, sender, recipient, messageId);
                 // Cache on error to avoid a blocked a sender
                 client.sendMessageOrCache(error.toByteArray());
@@ -101,7 +98,7 @@ public class ProcessorDataRequest extends Processor {
                 // Something is utterly broken: Unknown sender & recipient
                 try {
                     Message message;
-                    message = new DataRequestMessage(messageAsByteBuffer.array(), 0);
+                    message = new DataRequestMessage(rawMessage.array(), 0);
                     logger.error("Dropped invalid data request: unknown sender and recipient. " + message);
                 } catch (IllegalArgumentException e) {
                     ProActiveLogger.logImpossibleException(logger, e);
