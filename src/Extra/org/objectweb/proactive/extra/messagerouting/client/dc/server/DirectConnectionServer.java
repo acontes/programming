@@ -77,6 +77,8 @@ public class DirectConnectionServer implements Runnable {
     private final SweetCountDownLatch isStopped = new SweetCountDownLatch(1);
     private final AtomicReference<Thread> selectThread = new AtomicReference<Thread>();
     private static final long CLEANUP_WAITING_TIME = 500L;
+    // provide a shutdown hook for users
+    private final Thread shutdownHook;
 
     /** We need a reference to the local Agent because:
      *  - it has methods to send messages to the router
@@ -89,6 +91,7 @@ public class DirectConnectionServer implements Runnable {
         this.tpe = Executors.newFixedThreadPool(config.getNbWorkerThreads());
         this.localAgent = agent;
         init(config);
+        this.shutdownHook = new Thread(new ShutdownHook(this));
     }
 
     private void init(DirectConnectionServerConfig config) throws IOException {
@@ -184,9 +187,8 @@ public class DirectConnectionServer implements Runnable {
         super.finalize();
     }
 
-    // provide a shutdown hook for users
     public Thread getShutdownHook() {
-        return new Thread(new ShutdownHook(this));
+        return this.shutdownHook;
     }
 
     private static class ShutdownHook implements Runnable {
@@ -199,7 +201,8 @@ public class DirectConnectionServer implements Runnable {
 
         @Override
         public void run() {
-            this.dcServer.stop();
+            if (dcServer.stopped.get() == false)
+                this.dcServer.stop();
         }
 
     }
