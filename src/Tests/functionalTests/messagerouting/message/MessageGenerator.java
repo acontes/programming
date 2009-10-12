@@ -139,8 +139,6 @@ public abstract class MessageGenerator {
         }
     }
 
-=======
->>>>>>> df64938... No need for extreme values testing in the general case, only for registration message used:src/Tests/functionalTests/messagerouting/message/MessageGenerator.java
     protected byte[] alterLength() {
         byte[] ret = this.msg.toByteArray();
         // read prev length

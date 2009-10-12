@@ -51,6 +51,7 @@ import org.objectweb.proactive.core.util.SweetCountDownLatch;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.messagerouting.client.AgentImpl;
+import org.objectweb.proactive.extra.messagerouting.exceptions.MalformedMessageException;
 import org.objectweb.proactive.extra.messagerouting.exceptions.MessageRoutingException;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.Message;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.Message.MessageType;
@@ -248,10 +249,10 @@ public class DirectConnectionServer implements Runnable {
             if (byteRead == -1) {
                 clientDisconnected(key);
             }
-        } catch (IOException e) {
-            clientDisconnected(key);
-        } catch (IllegalStateException e) {
+        } catch (MalformedMessageException e) {
             // Disconnect the client to avoid a disaster
+            clientDisconnected(key);
+        } catch (IOException e) {
             clientDisconnected(key);
         }
     }

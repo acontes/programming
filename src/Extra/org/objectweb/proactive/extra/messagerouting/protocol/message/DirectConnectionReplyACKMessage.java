@@ -267,9 +267,6 @@ public class DirectConnectionReplyACKMessage extends DirectConnectionReplyMessag
         short sPort = TypeHelper.byteArrayToShort(byteArray, offset + Message.Field.getTotalOffset() +
             Field.PORT.getOffset());
         int port = TypeHelper.shortToInt(sPort);
-        if (port == 0)
-            throw new MalformedMessageException("Malformed" + MessageType.DIRECT_CONNECTION_ACK +
-                " message:" + "Invalid value for the " + Field.PORT + " field:" + port);
 
         if (port == 0)
             throw new MalformedMessageException("Invalid value for the " + Field.PORT + " field:" + port);

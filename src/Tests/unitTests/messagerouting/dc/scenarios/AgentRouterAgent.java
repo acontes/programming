@@ -39,7 +39,7 @@ import junit.framework.Assert;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.extra.messagerouting.client.AgentImpl;
+import org.objectweb.proactive.extra.messagerouting.client.Agent;
 import org.objectweb.proactive.extra.messagerouting.router.Router;
 import org.objectweb.proactive.extra.messagerouting.router.RouterConfig;
 

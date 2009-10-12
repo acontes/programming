@@ -38,6 +38,7 @@ import java.nio.channels.SocketChannel;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.messagerouting.exceptions.MalformedMessageException;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.Message;
 
 
@@ -76,7 +77,7 @@ public class MessageAssembler {
         this.lengthAndProto = null;
     }
 
-    synchronized public void pushBuffer(ByteBuffer buffer) throws IllegalStateException {
+    synchronized public void pushBuffer(ByteBuffer buffer) throws MalformedMessageException {
 
         while (buffer.remaining() != 0) {
 
@@ -100,10 +101,10 @@ public class MessageAssembler {
                     if (proto != Message.PROTOV11) {
                         logger.error("Invalid protocol ID received from " + sc.socket() + ": expected=" +
                             Message.PROTOV11 + " received=" + proto);
-                        throw new IllegalStateException("Invalid protocol ID");
+                        throw new MalformedMessageException("Invalid protocol ID");
                     } else if (l < Message.Field.getTotalOffset()) {
                         logger.error("Invalid message length received from " + sc.socket() + ": " + l);
-                        throw new IllegalStateException("Invalid message length");
+                        throw new MalformedMessageException("Invalid message length");
                     }
 
                     // Allocate a buffer for the reassembled message

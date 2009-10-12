@@ -87,7 +87,8 @@ public class AgentRouterAgentProbes extends AgentRouterAgent {
         }
     }
 
-    public boolean testRemoteAgentState(AgentID remoteAgent, AgentState expectedState) {
+    public boolean testRemoteAgentState(AgentState expectedState) {
+        AgentID remoteAgent = this.r_agent.getAgentID();
         List<String> seenList = Arrays.asList(this.agentMBean.getCandidateAgents());
         List<String> connectedList = Arrays.asList(this.agentMBean.getOutboundAgents());
         List<String> failedList = Arrays.asList(this.agentMBean.getFailedAgents());
@@ -125,7 +126,7 @@ public class AgentRouterAgentProbes extends AgentRouterAgent {
     }
 
     public boolean testLocalAgentState(AgentState expectedState) {
-	AgentID localAgent = this.agent.getAgentID();
+        AgentID localAgent = this.agent.getAgentID();
         List<String> seenList = Arrays.asList(this.r_agentMBean.getCandidateAgents());
         List<String> connectedList = Arrays.asList(this.r_agentMBean.getOutboundAgents());
         List<String> failedList = Arrays.asList(this.r_agentMBean.getFailedAgents());
@@ -150,41 +151,6 @@ public class AgentRouterAgentProbes extends AgentRouterAgent {
                 expected = !seenList.contains(localAgent.toString()) &&
                     connectedList.contains(localAgent.toString()) &&
                     !failedList.contains(localAgent.toString());
-                break;
-            default:
-                expected = true;
-                break;
-        }
-        return expected;
-    }
-
-
-    public boolean testRemoteAgentState(AgentState expectedState) {
-	AgentID remoteAgent = this.agent.getAgentID();
-        List<String> seenList = Arrays.asList(this.agentMBean.getCandidateAgents());
-        List<String> connectedList = Arrays.asList(this.agentMBean.getOutboundAgents());
-        List<String> failedList = Arrays.asList(this.agentMBean.getFailedAgents());
-        boolean expected;
-        switch (expectedState) {
-            case NOT_SEEN:
-                expected = !seenList.contains(remoteAgent.toString()) &&
-                    !connectedList.contains(remoteAgent.toString()) &&
-                    !failedList.contains(remoteAgent.toString());
-                break;
-            case SEEN:
-                expected = seenList.contains(remoteAgent.toString()) &&
-                    !connectedList.contains(remoteAgent.toString()) &&
-                    !failedList.contains(remoteAgent.toString());
-                break;
-            case SEEN_OR_CONNECTED:
-                expected = seenList.contains(remoteAgent.toString()) ||
-                    connectedList.contains(remoteAgent.toString()) &&
-                    !failedList.contains(remoteAgent.toString());
-                break;
-            case CONNECTED:
-                expected = !seenList.contains(remoteAgent.toString()) &&
-                    connectedList.contains(remoteAgent.toString()) &&
-                    !failedList.contains(remoteAgent.toString());
                 break;
             default:
                 expected = true;

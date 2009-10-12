@@ -256,10 +256,8 @@ public class DirectConnectionRequestMessage extends DirectConnectionMessage {
 
     @Override
     public String toString() {
-	return super.toString() +
-		Field.AGENT_ID + ":" + this.agentID + ";" +
-		Field.REMOTE_AGENT_ID + ":" + this.remoteAgentID + ";"
-	;
+        return super.toString() + Field.AGENT_ID + ":" + this.agentID + ";" + Field.REMOTE_AGENT_ID + ":" +
+            this.remoteAgentID + ";";
     }
 
 }
