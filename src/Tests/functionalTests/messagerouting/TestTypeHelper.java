@@ -32,6 +32,8 @@
  */
 package functionalTests.messagerouting;
 
+import java.net.Inet4Address;
+import java.net.UnknownHostException;
 import java.util.Random;
 
 import junit.framework.Assert;
@@ -110,6 +112,104 @@ public class TestTypeHelper {
 
             Assert.assertEquals(val, retval);
         }
+    }
+
+    @Test
+    public void testInvalidShortInt() {
+        // invalid values for intToShort
+        Random rand = new Random();
+
+        int val;
+        // value > 65535
+        for (int i = 0; i < 100000; i++) {
+            val = rand.nextInt(Integer.MAX_VALUE - 65535) + 65535;
+            try {
+                TypeHelper.intToShort(val);
+                Assert.fail("Calling TypeHelper.intToShort(" + val +
+                    ") should have generated an IllegalArgumentException.");
+            } catch (IllegalArgumentException e) {
+                // success!
+            }
+        }
+
+        // value < 0
+        for (int i = 0; i < 100000; i++) {
+            val = -rand.nextInt(Integer.MAX_VALUE);
+            try {
+                TypeHelper.intToShort(val);
+                Assert.fail("Calling TypeHelper.intToShort(" + val +
+                    ") should have generated an IllegalArgumentException.");
+            } catch (IllegalArgumentException e) {
+                // success!
+            }
+        }
+    }
+
+    @Test
+    public void testValidShortInt() {
+
+        // intToShort
+        for (int testVal = 0; testVal < 65535; testVal++) {
+            int retval;
+            retval = TypeHelper.shortToInt(TypeHelper.intToShort(testVal));
+            Assert.assertEquals(testVal, retval);
+        }
+
+        // shortToInt
+        for (int testVal = 0; testVal < 65535; testVal++) {
+            short retval;
+            // we need short representation
+            short val = (short) (testVal & 0xffff);
+            retval = TypeHelper.intToShort(TypeHelper.shortToInt(val));
+            Assert.assertEquals(val, retval);
+        }
+
+    }
+
+    @Test
+    public void testAllShorts() {
+        Random rand = new Random();
+        byte[] buf = new byte[32];
+
+        for (int testVal = 0; testVal < 65535; testVal++) {
+            short retval;
+            short val = (short) (testVal & 0xffff);
+            int offset = rand.nextInt(30);
+
+            TypeHelper.shortToByteArray(val, buf, offset);
+            retval = TypeHelper.byteArrayToShort(buf, offset);
+
+            Assert.assertEquals(val, retval);
+        }
+    }
+
+    @Test
+    public void testRandomInet4Addr() {
+        Random rand = new Random();
+        byte[] buf = new byte[32];
+
+        for (int i = 0; i < 100000; i++) {
+            Inet4Address retval;
+            Inet4Address val = intToInet4Addr(rand.nextInt());
+            int offset = rand.nextInt(28);
+
+            TypeHelper.inetAddrToByteArray(val, buf, offset);
+            retval = TypeHelper.byteArrayToInetAddr(buf, offset);
+
+            Assert.assertEquals(val, retval);
+        }
+    }
+
+    private Inet4Address intToInet4Addr(int val) {
+        byte[] ipBytes = new byte[4];
+        TypeHelper.intToByteArray(val, ipBytes, 0);
+        try {
+            return (Inet4Address) Inet4Address.getByAddress(ipBytes);
+        } catch (Exception e) {
+            Assert.fail("Exception occured while generating test IP addresses:" + e.getMessage());
+            return null;
+        }
+
     }
 
 }

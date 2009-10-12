@@ -33,14 +33,23 @@
 package org.objectweb.proactive.extra.messagerouting.protocol;
 
 import java.net.Inet4Address;
+import java.net.UnknownHostException;
 
-/** Helper class to allows int/long to byte array conversion
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+
+
+/** Helper class that offer conversion operations between various Java types
+ * 		to a byte array
  *
  * Theses functions do not depend on the endianess of the machine
  * 
  * @since ProActive 4.1.0
  */
 public class TypeHelper {
+
+    private static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_MESSAGE);
 
     /** Converts the byte representation of a long into its value.
      * 
@@ -106,34 +115,105 @@ public class TypeHelper {
         buf[offset + 3] = (byte) (val);
     }
 
-	public static void inetAddressToByteArray(Inet4Address endpointAddress,
-			byte[] buff, int i) {
-		// TODO Auto-generated method stub
+    /** Copies the byte representation of an {@link Inet4Address} into a byte array starting at the given offset
+     * The byte representation will be put in Network Byte Order
+     *
+     * @param val the {@linkInet4Address} to convert
+     * @param buf the byte array in which to copy the byte representation
+     * @param offset the index of the array at which to start copying
+     */
+    public static void inetAddrToByteArray(Inet4Address val, byte[] buf, int offset) {
+        byte[] ipNBO = val.getAddress();
+        for (int i = 0; i < ipNBO.length; i++) {
+            buf[offset + i] = ipNBO[i];
+        }
+    }
 
-	}
+    /** Converts the byte representation of an {@link Inet4Address} into its object value.
+     * It is assumed(but not verified!) that the address is stored in the buffer in Network Byte Order.
+     *
+     * @param buf the byte array in which to find the byte representation
+     * @param offset the offset in the byte array at which to find the byte representation
+     * @return the represented {@link Inet4Address} object
+     */
+    public static Inet4Address byteArrayToInetAddr(byte[] buf, int offset) {
 
-	public static void shortToByteArray(short port, byte[] buff, int i) {
-		// TODO Auto-generated method stub
+        byte[] ipNBO = new byte[4];
+        for (int i = 0; i < ipNBO.length; i++) {
+            ipNBO[i] = buf[offset + i];
+        }
 
-	}
+        try {
+            return (Inet4Address) Inet4Address.getByAddress(ipNBO);
+        } catch (UnknownHostException e) {
+            // only thrown when arg is not 4 bytes long. Obviously not the case here.
+            ProActiveLogger
+                    .logEatedException(
+                            logger,
+                            "Problem with Inet4Address.getByAddress() implementation - "
+                                + "calling it with a 4-bytes array throws UnknownHostException, in spite of the javadoc",
+                            e);
+            return null;
+        } catch (ClassCastException e) {
+            // it is obviously expected that the result of a getByAddress call with an 4-bytes array to be an Inet4Address
+            ProActiveLogger.logEatedException(logger,
+                    "Problem with Inet4Address.getByAddress() implementation - "
+                        + "calling it with an raw ipv4 argument does NOT return an Inet4Address", e);
+            return null;
+        }
+    }
 
-	public static short intToShort(int endpointPort) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+    /** Copies the byte representation of a short into a byte array starting at the given offset
+     *
+     * @param val the short to convert
+     * @param buf the byte array in which to copy the byte representation
+     * @param offset the index of the array at which to start copying
+     */
+    public static void shortToByteArray(short val, byte[] buf, int offset) {
+        // unfortunately shift ops are only performed at minimum int level, see the JLS
+        int intVal = shortToInt(val);
+        buf[offset + 0] = (byte) (intVal >>> 8);
+        buf[offset + 1] = (byte) (intVal);
+    }
 
-	public static Inet4Address byteArrayToInetAddr(byte[] byteArray, int i) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /** converts the byte representation of a short into its value as a short.
+     *
+     * @param buf the byte array in which to find the byte representation
+     * @param offset the offset in the byte array at which to find the byte representation
+     * @return the represented short value
+     */
+    public static short byteArrayToShort(byte[] buf, int offset) {
+        // unfortunately shift ops are only performed at minimum int level, see the JLS
+        int intRet = 0;
+        int shr_offset = 8;
+        for (int index = 0; index < 2; index++) {
+            int intBuf = (int) buf[offset + index] & 0xFF;
+            intRet |= intBuf << shr_offset;
+            shr_offset -= 8;
+        }
 
-	public static short byteArrayToShort(byte[] byteArray, int i) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+        return intToShort(intRet);
+    }
 
-	public static int shortToInt(short port) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+    /**
+     * Convert an integer to a short representation.
+     * Precondition: 0 <= val < 65535
+     * @param val the integer value to be converted to a short
+     * @return the short representation
+     * @throws IllegalArgumentException if the precondition is not met
+     */
+    public static final short intToShort(int val) {
+        if (!(0 <= val && val < 65536))
+            throw new IllegalArgumentException("Invalid short value: " + val);
+        return (short) (val & 0xFFFF);
+    }
+
+    /** Convert a short number to an integer
+     * Postcondition: 0 <= retval < 65535
+     * @param val the short to be converted
+     * @return the integer representations
+     */
+    public static final int shortToInt(short val) {
+        return (int) val & 0xFFFF;
+    }
 }
