@@ -13,16 +13,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.extra.messagerouting.client.ProActiveMessageHandler;
-import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
 import org.objectweb.proactive.extra.messagerouting.router.Router;
 import org.objectweb.proactive.extra.messagerouting.router.RouterConfig;
 
-import functionalTests.ft.Agent;
-
 import unitTests.UnitTests;
 import unitTests.messagerouting.dc.TestAgentImpl;
+import functionalTests.ft.Agent;
 
 
 /*
@@ -97,12 +94,14 @@ public class TestAgentStartup extends UnitTests {
         startRouterAgent();
         Assert.assertFalse(agent.getDCManager().isEnabled());
         router.stop();
+        agent.shutdown();
 
         // explicitly set DC flag to false
         PAProperties.PA_NET_ROUTER_DIRECT_CONNECTION.setValue(false);
         startRouterAgent();
         Assert.assertFalse(agent.getDCManager().isEnabled());
         router.stop();
+        agent.shutdown();
     }
 
     // start DC but "forget" to put the mandatory DC port
@@ -142,7 +141,7 @@ public class TestAgentStartup extends UnitTests {
         releasePort();
         Assert.assertTrue(agent.getDCManager().isEnabled());
         Assert.assertFalse(checkDCServerStarted(InetAddress.getLocalHost(), DC_PORT));
-        agent.getDCManager().stop();
+        agent.shutdown();
         router.stop();
 
         if (oldPort != null)
@@ -174,8 +173,7 @@ public class TestAgentStartup extends UnitTests {
         Assert.assertTrue(agent.getDCManager().isEnabled());
         boolean serverStarted = checkDCServerStarted(InetAddress.getLocalHost(), DC_PORT);
         Assert.assertEquals(serverStartedExpect, serverStarted);
-        // now stop; call it even though serverStarted == false; it will stop the negotiator thread
-        agent.getDCManager().stop();
+        agent.shutdown();
         if (serverStartedExpect)
             // after we stopped, we are expecting not to have any DC server up and running!
             Assert.assertFalse(checkDCServerStarted(InetAddress.getLocalHost(), DC_PORT));

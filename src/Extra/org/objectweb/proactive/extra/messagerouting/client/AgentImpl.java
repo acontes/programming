@@ -692,12 +692,15 @@ public class AgentImpl implements Agent, AgentImplMBean {
     public class MessageReader implements Runnable {
         /** The local Agent */
         final AgentImpl agent;
+        private final AtomicReference<Thread> runningThread;
 
         public MessageReader(AgentImpl agent) {
             this.agent = agent;
+            this.runningThread = new AtomicReference<Thread>();
         }
 
         public void run() {
+            this.runningThread.compareAndSet(null, Thread.currentThread());
             while (true) {
                 Message msg = readMessage();
 
@@ -711,6 +714,14 @@ public class AgentImpl implements Agent, AgentImplMBean {
 
                 handleMessage(msg);
             }
+        }
+
+        public void stop() {
+            // this is a hack. the message handler desperately needs
+            // a clean shutdown code.
+            // do NOT call this unless you know for sure that this Agent is no longer used
+            if (this.runningThread.get() != null)
+                this.runningThread.get().stop();
         }
 
         /**
@@ -979,6 +990,7 @@ public class AgentImpl implements Agent, AgentImplMBean {
                 } else {
                     this.dcNegotiator = null;
                 }
+
             }
         }
 
@@ -1300,7 +1312,6 @@ public class AgentImpl implements Agent, AgentImplMBean {
                 }
             }
         }
-
     }
 
     /* @@@@@@@@@@@@@@@@@@@@@@@@@@@ MBean @@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */

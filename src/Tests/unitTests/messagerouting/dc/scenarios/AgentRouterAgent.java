@@ -53,9 +53,9 @@ import unitTests.messagerouting.dc.TestAgentImpl;
  * @version %G%, %I%
  * @since ProActive 4.10
  */
-public class AgentRouterAgent{
+public class AgentRouterAgent {
 
-	static final public Logger logger = Logger.getLogger("testsuite");
+    static final public Logger logger = Logger.getLogger("testsuite");
 
     protected Router router;
     protected TestAgentImpl agent;
@@ -80,8 +80,7 @@ public class AgentRouterAgent{
     public static final int DC_PORT = 18989;
     public static final int R_DC_PORT = 28989;
 
-    public void startInfrastructure() throws IOException,
-            ProActiveException {
+    public void startInfrastructure() throws IOException, ProActiveException {
         router = Router.createAndStart(new RouterConfig());
         try {
             PAProperties.PA_NET_ROUTER_DIRECT_CONNECTION.setValue(localIsDC);
@@ -110,12 +109,8 @@ public class AgentRouterAgent{
     }
 
     public void stopInfrastructure() {
-        if (this.localIsDC)
-            agent.getDCManager().stop();
-        agent.getTheTunnel().shutdown();
-        if (this.remoteIsDC)
-            r_agent.getDCManager().stop();
-        r_agent.getTheTunnel().shutdown();
+        agent.shutdown();
+        r_agent.shutdown();
         router.stop();
     }
 

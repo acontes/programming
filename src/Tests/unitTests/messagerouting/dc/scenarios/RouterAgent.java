@@ -34,6 +34,7 @@ import java.io.IOException;
 
 import junit.framework.Assert;
 
+import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.core.ProActiveException;
@@ -56,19 +57,24 @@ import functionalTests.ft.Agent;
  * @version %G%, %I%
  * @since ProActive 4.10
  */
-public class RouterAgent extends UnitTests {
+public class RouterAgent {
+
+    static final public Logger logger = Logger.getLogger("testsuite");
 
     protected Router router;
     protected TestAgentImpl agent;
-    private boolean agentIsDC;
+    private final boolean agentIsDC;
+
+    public RouterAgent(boolean dcAgent) {
+        this.agentIsDC = dcAgent;
+    }
 
     protected static final int DC_PORT = 18989;
 
-    public void startInfrastructure(boolean dcAgent) throws IOException, ProActiveException {
-        this.agentIsDC = dcAgent;
+    public void startInfrastructure() throws IOException, ProActiveException {
         router = Router.createAndStart(new RouterConfig());
         try {
-            PAProperties.PA_NET_ROUTER_DIRECT_CONNECTION.setValue(dcAgent);
+            PAProperties.PA_NET_ROUTER_DIRECT_CONNECTION.setValue(agentIsDC);
             PAProperties.PA_NET_ROUTER_DC_PORT.setValue(DC_PORT);
             agent = new TestAgentImpl(router.getInetAddr(), router.getPort(), ProActiveMessageHandler.class);
         } catch (SecurityException e) {
@@ -92,9 +98,7 @@ public class RouterAgent extends UnitTests {
     }
 
     public void stopInfrastructure() {
-        if (agentIsDC)
-            agent.getDCManager().stop();
-        agent.getTheTunnel().shutdown();
+        agent.shutdown();
         router.stop();
     }
 }
