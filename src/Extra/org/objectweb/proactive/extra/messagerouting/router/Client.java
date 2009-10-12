@@ -33,6 +33,7 @@
 package org.objectweb.proactive.extra.messagerouting.router;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -96,7 +97,7 @@ public class Client {
 
         if (admin_logger.isDebugEnabled()) {
             admin_logger.debug("AgentID " + this.getAgentId() + " connected from " +
-                this.attachment.getRemoteEndpoint());
+                this.attachment.getRemoteEndpointName());
         }
 
     }
@@ -218,7 +219,7 @@ public class Client {
 
             if (admin_logger.isDebugEnabled()) {
                 admin_logger.debug("AgentID " + this.getAgentId() + " reconnected from " +
-                    this.attachment.getRemoteEndpoint());
+                    this.attachment.getRemoteEndpointName());
             }
 
         }

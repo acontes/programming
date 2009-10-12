@@ -33,6 +33,7 @@
 package org.objectweb.proactive.extra.messagerouting.router;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
@@ -157,8 +158,16 @@ public class Attachment {
         }
     }
 
-    public String getRemoteEndpoint() {
-        String unknown = "unknown";
+    public String getRemoteEndpointName() {
+        SocketAddress sa = getRemoteEndpoint();
+        if (sa == null)
+            return "unknown";
+        else
+            return sa.toString();
+    }
+
+    public InetSocketAddress getRemoteEndpoint() {
+        InetSocketAddress unknown = null;
 
         if (socketChannel == null)
             return unknown;
@@ -166,8 +175,13 @@ public class Attachment {
         SocketAddress sa = socketChannel.socket().getRemoteSocketAddress();
         if (sa == null)
             return unknown;
+        if (!(sa instanceof InetSocketAddress)) {
+            // InetSocketAddress is THE implementation for SocketAddress
+            return (InetSocketAddress) sa;
+        }
 
-        return sa.toString();
+        return unknown;
+
     }
 
     public void send(ByteBuffer byteBuffer) throws IOException {
