@@ -124,4 +124,37 @@ public class AgentRouterAgentProbes extends AgentRouterAgent {
         NOT_SEEN, SEEN, SEEN_OR_CONNECTED, CONNECTED
     }
 
+    public boolean testLocalAgentState(AgentID localAgent, AgentState expectedState) {
+        List<String> seenList = Arrays.asList(this.r_agentMBean.getCandidateAgents());
+        List<String> connectedList = Arrays.asList(this.r_agentMBean.getOutboundAgents());
+        List<String> failedList = Arrays.asList(this.r_agentMBean.getFailedAgents());
+        boolean expected;
+        switch (expectedState) {
+            case NOT_SEEN:
+                expected = !seenList.contains(localAgent.toString()) &&
+                    !connectedList.contains(localAgent.toString()) &&
+                    !failedList.contains(localAgent.toString());
+                break;
+            case SEEN:
+                expected = seenList.contains(localAgent.toString()) &&
+                    !connectedList.contains(localAgent.toString()) &&
+                    !failedList.contains(localAgent.toString());
+                break;
+            case SEEN_OR_CONNECTED:
+                expected = seenList.contains(localAgent.toString()) ||
+                    connectedList.contains(localAgent.toString()) &&
+                    !failedList.contains(localAgent.toString());
+                break;
+            case CONNECTED:
+                expected = !seenList.contains(localAgent.toString()) &&
+                    connectedList.contains(localAgent.toString()) &&
+                    !failedList.contains(localAgent.toString());
+                break;
+            default:
+                expected = true;
+                break;
+        }
+        return expected;
+    }
+
 }

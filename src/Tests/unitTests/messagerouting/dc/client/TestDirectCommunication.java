@@ -43,6 +43,7 @@ import org.objectweb.proactive.extra.messagerouting.exceptions.MessageRoutingExc
 import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
 
 import unitTests.UnitTests;
+import unitTests.messagerouting.dc.Helpers;
 import unitTests.messagerouting.dc.scenarios.AgentRouterAgentProbes;
 import unitTests.messagerouting.dc.scenarios.AgentRouterAgentProbes.AgentState;
 
@@ -90,6 +91,38 @@ public class TestDirectCommunication extends UnitTests {
                 TIMEOUT));
         // nothing should change in the Agent state
         Assert.assertTrue(infrastructure.testRemoteAgentState(remoteAgentID, AgentState.CONNECTED));
+    }
+
+    // bidirectional direct communication
+    @Test
+    public void testBidirectional() throws MessageRoutingException, IOException, ClassNotFoundException {
+        Sleeper paSleeper = new Sleeper(TIMEOUT);
+        AgentID localAgentID = infrastructure.getLocalAgent().getAgentID();
+        AgentID remoteAgentID = infrastructure.getRemoteAgent().getAgentID();
+        // the DC_AD message was sent; test if it was processed by the router
+        paSleeper.sleep();
+        Assert.assertTrue(infrastructure.routerMBean.supportsDirectConnections(remoteAgentID.getId()));
+        Assert.assertTrue(infrastructure.routerMBean.supportsDirectConnections(localAgentID.getId()));
+        // the remote agent is taken into account for DC only at message transmission
+        Assert.assertTrue(infrastructure.testRemoteAgentState(remoteAgentID, AgentState.NOT_SEEN));
+        Assert.assertTrue(infrastructure.testLocalAgentState(localAgentID, AgentState.NOT_SEEN));
+        // send a DATA_REQ message with an actual payload
+        byte[] data = Helpers.stringToByteArray(Helpers.REQUEST_PAYLOAD);
+        byte[] reply = infrastructure.getLocalAgent().sendMsg(remoteAgentID, data, false);
+        String replyStr = Helpers.byteArrayToString(reply);
+        if (replyStr.equals(Helpers.REPLY_PAYLOAD)) {
+            logger.info("Got reply:" + replyStr);
+        } else {
+            Assert.fail("Received invalid reply:" + replyStr);
+        }
+        // at this point, the remoteAgentID should have been taken into account by the negotiator
+        Assert.assertTrue(infrastructure.testRemoteAgentState(remoteAgentID, AgentState.SEEN_OR_CONNECTED));
+        paSleeper.sleep();
+        Assert.assertTrue(infrastructure.testRemoteAgentState(remoteAgentID, AgentState.CONNECTED));
+        // same for localAgentID
+        Assert.assertTrue(infrastructure.testLocalAgentState(localAgentID, AgentState.SEEN_OR_CONNECTED));
+        paSleeper.sleep();
+        Assert.assertTrue(infrastructure.testLocalAgentState(localAgentID, AgentState.CONNECTED));
     }
 
     @After

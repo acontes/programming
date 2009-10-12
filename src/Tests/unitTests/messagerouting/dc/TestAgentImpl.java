@@ -200,8 +200,9 @@ public class TestAgentImpl extends AgentImpl {
                 try {
                     // we are "working very hard" to calculate the reply
                     new Sleeper(1000).sleep();
-                    // we will reply with null
-                    this.agent.sendReply(message, null);
+                    // we will reply with "reply"
+                    byte[] reply = Helpers.stringToByteArray(Helpers.REPLY_PAYLOAD);
+                    this.agent.sendReply(message, reply);
                     agent.notifyMessageReply(true);
                 } catch (MessageRoutingException e) {
                     // could not send the reply
