@@ -77,7 +77,8 @@ public abstract class DirectConnectionMessage extends Message {
      * @param fieldsOffset the size of the additional fields added by the messages
      * @throws MalformedMessageException if the byte buffer does not contain a valid message
      */
-    public DirectConnectionMessage(byte[] byteArray, int offset, int fieldsOffset) throws MalformedMessageException {
+    public DirectConnectionMessage(byte[] byteArray, int offset, int fieldsOffset)
+            throws MalformedMessageException {
         super(byteArray, offset, fieldsOffset);
     }
 }

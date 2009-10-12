@@ -112,26 +112,25 @@ public abstract class MessageGenerator {
 
     }
 
-
-    private Message construct(byte[] corruptedMsg) throws MalformedMessageException{
-	switch (type) {
-        case REGISTRATION_REQUEST:
-            return new RegistrationRequestMessage(corruptedMsg, 0);
-        case REGISTRATION_REPLY:
-            return new RegistrationReplyMessage(corruptedMsg, 0);
-        case DATA_REQUEST:
-            return new DataRequestMessage(corruptedMsg, 0);
-        case DATA_REPLY:
-            return new DataReplyMessage(corruptedMsg, 0);
-        case DIRECT_CONNECTION_REQUEST:
-		return new DirectConnectionRequestMessage(corruptedMsg, 0);
-        case DIRECT_CONNECTION_ACK:
-		return new DirectConnectionReplyACKMessage(corruptedMsg, 0);
-        case DIRECT_CONNECTION_NACK:
-		return new DirectConnectionReplyNACKMessage(corruptedMsg, 0);
-        default:
-		return null;
-	}
+    private Message construct(byte[] corruptedMsg) throws MalformedMessageException {
+        switch (type) {
+            case REGISTRATION_REQUEST:
+                return new RegistrationRequestMessage(corruptedMsg, 0);
+            case REGISTRATION_REPLY:
+                return new RegistrationReplyMessage(corruptedMsg, 0);
+            case DATA_REQUEST:
+                return new DataRequestMessage(corruptedMsg, 0);
+            case DATA_REPLY:
+                return new DataReplyMessage(corruptedMsg, 0);
+            case DIRECT_CONNECTION_REQUEST:
+                return new DirectConnectionRequestMessage(corruptedMsg, 0);
+            case DIRECT_CONNECTION_ACK:
+                return new DirectConnectionReplyACKMessage(corruptedMsg, 0);
+            case DIRECT_CONNECTION_NACK:
+                return new DirectConnectionReplyNACKMessage(corruptedMsg, 0);
+            default:
+                return null;
+        }
     }
 
 =======

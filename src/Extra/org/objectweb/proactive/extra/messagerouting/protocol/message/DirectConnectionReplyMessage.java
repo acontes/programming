@@ -69,7 +69,8 @@ public abstract class DirectConnectionReplyMessage extends DirectConnectionMessa
      * @param fieldsOffset the size of the additional fields added by the messages
      * @throws MalformedMessageException for malformed messages
      */
-    public DirectConnectionReplyMessage(byte[] byteArray, int offset, int fieldsOffset) throws MalformedMessageException {
+    public DirectConnectionReplyMessage(byte[] byteArray, int offset, int fieldsOffset)
+            throws MalformedMessageException {
         super(byteArray, offset, fieldsOffset);
     }
 

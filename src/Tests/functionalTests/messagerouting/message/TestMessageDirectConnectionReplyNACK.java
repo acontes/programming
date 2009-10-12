@@ -44,61 +44,61 @@ import org.objectweb.proactive.extra.messagerouting.protocol.message.Message.Mes
  */
 public class TestMessageDirectConnectionReplyNACK extends MessageFunctionalTest {
 
-	@Test
-	public void test() {
+    @Test
+    public void test() {
 
-		DirectConnectionReplyNACKGenerator msgGen = new DirectConnectionReplyNACKGenerator();
-		try{
-			for (int i = 0; i < NB_CHECK; i++) {
-				msgGen.buildValidMessage();
-				msgGen.testFields();
-				msgGen.testConversion();
-				msgGen.testInvalidMessage();
-			}
-		} catch (MalformedMessageException e) {
-			Assert.fail("There is a problem in the " + MessageType.DIRECT_CONNECTION_NACK + " implementation:" +
-					" the message " + msgGen.getMessage() + " cannot be reconstructed from its " +
-					"raw byte form, because:" + e.getMessage());
-		}
+        DirectConnectionReplyNACKGenerator msgGen = new DirectConnectionReplyNACKGenerator();
+        try {
+            for (int i = 0; i < NB_CHECK; i++) {
+                msgGen.buildValidMessage();
+                msgGen.testFields();
+                msgGen.testConversion();
+                msgGen.testInvalidMessage();
+            }
+        } catch (MalformedMessageException e) {
+            Assert.fail("There is a problem in the " + MessageType.DIRECT_CONNECTION_NACK +
+                " implementation:" + " the message " + msgGen.getMessage() +
+                " cannot be reconstructed from its " + "raw byte form, because:" + e.getMessage());
+        }
 
-	}
+    }
 
-	private class DirectConnectionReplyNACKGenerator extends MessageGenerator {
+    private class DirectConnectionReplyNACKGenerator extends MessageGenerator {
 
-		private long msgId;
+        private long msgId;
 
-		public DirectConnectionReplyNACKGenerator() {
-			this(MessageType.DIRECT_CONNECTION_NACK);
-		}
+        public DirectConnectionReplyNACKGenerator() {
+            this(MessageType.DIRECT_CONNECTION_NACK);
+        }
 
-		public DirectConnectionReplyNACKGenerator(MessageType type) {
-			super(type);
-		}
+        public DirectConnectionReplyNACKGenerator(MessageType type) {
+            super(type);
+        }
 
-		@Override
-		protected void buildValidMessage() {
-			msgId = ProActiveRandom.nextPosLong();
-			logger.debug("msgId " + msgId);
-			msg = new DirectConnectionReplyNACKMessage(msgId);
-		}
+        @Override
+        protected void buildValidMessage() {
+            msgId = ProActiveRandom.nextPosLong();
+            logger.debug("msgId " + msgId);
+            msg = new DirectConnectionReplyNACKMessage(msgId);
+        }
 
-		@Override
-		protected void testFields() {
-			Assert.assertEquals(Message.PROTOV1, msg.getProtoID());
-	        Assert.assertEquals(MessageType.DIRECT_CONNECTION_NACK, msg.getType());
-	        Assert.assertEquals(msgId, msg.getMessageID());
-		}
+        @Override
+        protected void testFields() {
+            Assert.assertEquals(Message.PROTOV1, msg.getProtoID());
+            Assert.assertEquals(MessageType.DIRECT_CONNECTION_NACK, msg.getType());
+            Assert.assertEquals(msgId, msg.getMessageID());
+        }
 
-		@Override
-		protected void testConversion() throws MalformedMessageException {
-			byte[] buf = msg.toByteArray();
-			DirectConnectionReplyNACKMessage convMsg = new DirectConnectionReplyNACKMessage(buf,0);
+        @Override
+        protected void testConversion() throws MalformedMessageException {
+            byte[] buf = msg.toByteArray();
+            DirectConnectionReplyNACKMessage convMsg = new DirectConnectionReplyNACKMessage(buf, 0);
 
-			Assert.assertEquals(msg.getProtoID(), convMsg.getProtoID());
-			Assert.assertEquals(msg.getLength(), convMsg.getLength());
-			Assert.assertEquals(msg.getType(), convMsg.getType());
-			Assert.assertEquals(msg.getMessageID(), convMsg.getMessageID());
-		}
+            Assert.assertEquals(msg.getProtoID(), convMsg.getProtoID());
+            Assert.assertEquals(msg.getLength(), convMsg.getLength());
+            Assert.assertEquals(msg.getType(), convMsg.getType());
+            Assert.assertEquals(msg.getMessageID(), convMsg.getMessageID());
+        }
 
-	}
+    }
 }
