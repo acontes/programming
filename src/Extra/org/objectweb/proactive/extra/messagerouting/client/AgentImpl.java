@@ -37,6 +37,7 @@ import java.lang.management.ManagementFactory;
 import java.lang.reflect.Constructor;
 import java.net.InetAddress;
 import java.net.URI;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -58,6 +59,10 @@ import org.objectweb.proactive.core.util.SweetCountDownLatch;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.messagerouting.client.dc.client.DirectConnection;
+import org.objectweb.proactive.extra.messagerouting.client.dc.server.DirectConnectionServer;
+import org.objectweb.proactive.extra.messagerouting.client.dc.server.DirectConnectionServerConfig;
+import org.objectweb.proactive.extra.messagerouting.client.dc.server.DirectConnectionServerConfig.DirectConnectionDisabledException;
+import org.objectweb.proactive.extra.messagerouting.client.dc.server.DirectConnectionServerConfig.MissingPortException;
 import org.objectweb.proactive.extra.messagerouting.exceptions.MalformedMessageException;
 import org.objectweb.proactive.extra.messagerouting.exceptions.MessageRoutingException;
 import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
@@ -178,7 +183,7 @@ public class AgentImpl implements Agent, AgentImplMBean {
         }
 
         // start the direct connections manager
-        this.dcManager = new DirectConnectionManager();
+        this.dcManager = new DirectConnectionManager(this);
 
         // Start the message receiver even if connection failed
         // Message reader will try to open the tunnel later
@@ -362,16 +367,19 @@ public class AgentImpl implements Agent, AgentImplMBean {
         Long requestID = requestIDGenerator.getAndIncrement();
         DataRequestMessage msg = new DataRequestMessage(agentID, targetID, requestID, data);
 
-        try {
-            if (this.dcManager.isConnected(targetID)) {
-                return this.dcManager.sendRequest(msg, oneWay);
-            } else if (!this.dcManager.knows(targetID)) {
-                this.dcManager.seen(targetID);
+        // try direct connection
+        if (this.dcManager.isEnabled()) {
+            try {
+                if (this.dcManager.isConnected(targetID)) {
+                    return this.dcManager.sendRequest(msg, oneWay);
+                } else if (!this.dcManager.knows(targetID)) {
+                    this.dcManager.seen(targetID);
+                }
+            } catch (MessageRoutingException e) {
+                logger.warn("Could not send the message " + msg + " to the remote agent " + msg.getSender() +
+                    " using a direct connection", e);
+                // could not send it directly - try by the tunnel?
             }
-        } catch (MessageRoutingException e) {
-            logger.warn("Could not send the message " + msg + " to the remote agent " + msg.getSender() +
-                " using a direct connection", e);
-            // could not send it directly - try by the tunnel?
         }
 
         byte[] response = null;
@@ -397,17 +405,20 @@ public class AgentImpl implements Agent, AgentImplMBean {
         DataReplyMessage reply = new DataReplyMessage(this.getAgentID(), request.getSender(), request
                 .getMessageID(), data);
 
-        try {
-            if (this.dcManager.isConnected(request.getSender())) {
-                this.dcManager.sendReply(reply);
-                return;
-            } else if (!this.dcManager.knows(request.getSender())) {
-                this.dcManager.seen(request.getSender());
+        // try direct connection
+        if (this.dcManager.isEnabled()) {
+            try {
+                if (this.dcManager.isConnected(request.getSender())) {
+                    this.dcManager.sendReply(reply);
+                    return;
+                } else if (!this.dcManager.knows(request.getSender())) {
+                    this.dcManager.seen(request.getSender());
+                }
+            } catch (MessageRoutingException e) {
+                logger.warn("Could not send the message " + request + " to the remote agent " +
+                    request.getSender() + " using a direct connection", e);
+                // could not send it directly - try by the tunnel?
             }
-        } catch (MessageRoutingException e) {
-            logger.warn("Could not send the message " + request + " to the remote agent " +
-                request.getSender() + " using a direct connection", e);
-            // could not send it directly - try by the tunnel?
         }
 
         internalSendMsg(reply);
@@ -803,11 +814,59 @@ public class AgentImpl implements Agent, AgentImplMBean {
         private final Set<AgentID> knownAgents;
         /** the remote agents to which a direct connection has already been established */
         private final Map<AgentID, DirectConnection> connectedAgents;
+        /** the server for processing incoming direct connection communications*/
+        private final DirectConnectionServer dcServer;
 
-        public DirectConnectionManager() {
+        private final boolean disabled;
+        private final boolean noServer;
+
+        public DirectConnectionManager(AgentImpl localAgent) {
             this.connectedAgents = new HashMap<AgentID, DirectConnection>();
             this.seenAgents = new HashSet<AgentID>();
             this.knownAgents = new HashSet<AgentID>();
+
+            // (try to) start the direct connection server
+            DirectConnectionServer dcServer = null;
+            boolean disabled = true;
+            boolean noServer = true;
+            try {
+                DirectConnectionServerConfig config = new DirectConnectionServerConfig();
+                disabled = false;
+                // create the Server
+                dcServer = new DirectConnectionServer(localAgent, config);
+                // start its Thread
+                Thread dcServerThread = new Thread(dcServer);
+                dcServerThread.setDaemon(true);
+                dcServerThread.setName("Direct Connection Server: main select thread");
+                dcServerThread.start();
+                // kill on JVM exit
+                Runtime.getRuntime().addShutdownHook(dcServer.getShutdownHook());
+                noServer = false;
+            } catch (UnknownHostException e) {
+                logger
+                        .error(
+                                "Direct connection server is disabled, reason: Problem with the IP address used to bind the server ",
+                                e);
+                disabled = false;
+            } catch (DirectConnectionDisabledException e) {
+                logger.debug("Direct connection mode is disabled, reason:" + e.getMessage(), e);
+            } catch (MissingPortException e) {
+                logger.error("Direct connection server is disabled, reason:" + e.getMessage(), e);
+                disabled = false;
+            } catch (IOException e) {
+                logger.error(
+                        "Direct connection server is disabled, reason: Could not initialize the server: " +
+                            e.getMessage(), e);
+            } finally {
+                this.dcServer = dcServer;
+                this.disabled = disabled;
+                this.noServer = noServer;
+            }
+
+        }
+
+        public boolean isEnabled() {
+            return !disabled;
         }
 
         public boolean isConnected(AgentID remoteAgent) {

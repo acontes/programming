@@ -33,6 +33,8 @@ package org.objectweb.proactive.extra.messagerouting.client.dc.server;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import org.objectweb.proactive.core.config.PAProperties;
+
 
 /**
  * Configuration options for the direct connection server
@@ -42,14 +44,76 @@ import java.net.UnknownHostException;
  */
 public class DirectConnectionServerConfig {
 
-    private int port;
+    private final int port;
 
-    private int nbWorkerThreads;
+    private final int nbWorkerThreads;
 
-    private InetAddress inetAddress;
+    private static final int DEFAULT_NB_WORKER_THREADS = 4;
+
+    private final InetAddress inetAddress;
+
+    /**
+     * Read the configuration from the ProActive properties set on this virtual machine
+     * @throws UnknownHostException if the IP address set on the {@link PAProperties#PA_NET_ROUTER_DC_ADDRESS} is unknown
+     * @throws DirectConnectionDisabledException if the {@link PAProperties#PA_NET_ROUTER_DIRECT_CONNECTION} property is not set
+     * @throws MissingPortException if the mandatory port {@link PAProperties#PA_NET_ROUTER_DC_PORT} is missing
+     */
+    public DirectConnectionServerConfig() throws UnknownHostException, DirectConnectionDisabledException,
+            MissingPortException {
+
+        if (!(PAProperties.PA_NET_ROUTER_DIRECT_CONNECTION.isSet() && PAProperties.PA_NET_ROUTER_DIRECT_CONNECTION
+                .isTrue()))
+            throw new DirectConnectionDisabledException(" The direct connection flag " +
+                PAProperties.PA_NET_ROUTER_DIRECT_CONNECTION.getKey() +
+                " is not set as a ProActive property ");
+
+        if (PAProperties.PA_NET_ROUTER_DC_ADDRESS.isSet()) {
+            String addr = PAProperties.PA_NET_ROUTER_DC_ADDRESS.getValue();
+            try {
+                this.inetAddress = InetAddress.getByName(addr);
+            } catch (UnknownHostException e) {
+                throw new UnknownHostException("Problem with the value of the " +
+                    PAProperties.PA_NET_ROUTER_DC_ADDRESS.getKey() + " ProActive Property: " +
+                    " cannot get the IP address of the host " + addr + " reason: " + e.getMessage());
+            }
+        } else {
+            try {
+                this.inetAddress = InetAddress.getLocalHost();
+            } catch (UnknownHostException e) {
+                throw new UnknownHostException("Cannot get the IP address of the local host!");
+            }
+        }
+
+        if (PAProperties.PA_NET_ROUTER_DC_PORT.isSet()) {
+            this.port = PAProperties.PA_NET_ROUTER_DC_PORT.getValueAsInt();
+        } else
+            throw new MissingPortException("Mandatory option " + PAProperties.PA_NET_ROUTER_DC_PORT.getKey() +
+                " is not set as a ProActive property ");
+
+        if (PAProperties.PA_NET_ROUTER_DC_WORKERS_NO.isSet())
+            this.nbWorkerThreads = PAProperties.PA_NET_ROUTER_DC_WORKERS_NO.getValueAsInt();
+        else
+            this.nbWorkerThreads = DEFAULT_NB_WORKER_THREADS;
+
+    }
+
+    public class DirectConnectionDisabledException extends Exception {
+
+        public DirectConnectionDisabledException(String string) {
+            super(string);
+        }
+    }
+
+    public class MissingPortException extends Exception {
+
+        public MissingPortException(String string) {
+            super(string);
+        }
+
+    }
 
     public DirectConnectionServerConfig(int port) throws UnknownHostException {
-        this(port, 4, InetAddress.getLocalHost());
+        this(port, DEFAULT_NB_WORKER_THREADS, InetAddress.getLocalHost());
     }
 
     public DirectConnectionServerConfig(int port, int nbWorkerThreads, InetAddress inetAddress) {
@@ -72,24 +136,12 @@ public class DirectConnectionServerConfig {
         return port;
     }
 
-    public void setPort(int port) {
-        this.port = port;
-    }
-
     public int getNbWorkerThreads() {
         return nbWorkerThreads;
     }
 
-    public void setNbWorkerThreads(int nbWorkerThreads) {
-        this.nbWorkerThreads = nbWorkerThreads;
-    }
-
     public InetAddress getInetAddress() {
         return inetAddress;
-    }
-
-    public void setInetAddress(InetAddress inetAddress) {
-        this.inetAddress = inetAddress;
     }
 
 }

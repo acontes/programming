@@ -176,6 +176,26 @@ public class DirectConnectionServer implements Runnable {
         super.finalize();
     }
 
+    // provide a shutdown hook for users
+    public Thread getShutdownHook() {
+        return new Thread(new ShutdownHook(this));
+    }
+
+    private class ShutdownHook implements Runnable {
+
+        private final DirectConnectionServer dcServer;
+
+        public ShutdownHook(DirectConnectionServer dcServer) {
+            this.dcServer = dcServer;
+        }
+
+        @Override
+        public void run() {
+            this.dcServer.stop();
+        }
+
+    }
+
     private void handleAccept(SelectionKey key) {
         SocketChannel sc;
         try {

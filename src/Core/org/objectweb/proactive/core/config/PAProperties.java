@@ -267,6 +267,25 @@ public enum PAProperties {
      */
     PA_NET_ROUTER_PORT("proactive.net.router.port", PAPropertiesType.INTEGER),
 
+    /**
+     * Enable pamr direct connections
+     */
+    PA_NET_ROUTER_DIRECT_CONNECTION("proactive.net.router.dc", PAPropertiesType.BOOLEAN),
+    /**
+     * The IP address to which the server for the pamr direct connections binds.
+     *    Optional property. Defaults to the localhost address
+     */
+    PA_NET_ROUTER_DC_ADDRESS("proactive.net.router.dc.address", PAPropertiesType.STRING),
+    /**
+     * The TCP port to which the server for the pamr direct connections binds. Mandatory
+     */
+    PA_NET_ROUTER_DC_PORT("proactive.net.router.dc.port", PAPropertiesType.INTEGER),
+    /**
+     * The number of worker threads which handle pamr direct connections.
+     * 		Optional property. Defaults to 4
+     */
+    PA_NET_ROUTER_DC_WORKERS_NO("proactive.net.router.workers", PAPropertiesType.INTEGER),
+
     /* ------------------------------------
      *  RMI
      */
