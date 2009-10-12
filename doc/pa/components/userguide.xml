@@ -564,77 +564,24 @@
 			</para>
 		</section>
 
-		<section xml:id="Prioritycontroller_53"><info><title>Priority controller</title>
-			</info>
-
-			<para>
-				In order to define non functional prioritized requests
-				(useful for instance for life cycle management,
-				reconfiguration, ...), a partial order between each kind
-				of request is available to specify when an incoming
-				request can pass requests already in the queue.
-			</para>
-
-			<para>
-				Here are the different priorities available for the
-				requests:
-				<itemizedlist>
-					<listitem>
-						<para>
-							F: Functional request. Always goes at the
-							end of the requests queue.
-						</para>
-					</listitem>
-					<listitem>
-						<para>
-							NF1: Standard Non Functional request. Also
-							always goes at the end of the requests
-							queue.
-						</para>
-					</listitem>
-					<listitem>
-						<para>
-							NF2: Non Functional prioritized request.
-							Pass the Functional requests into the
-							requests queue but respect the order of the
-							other Non Functional requests.
-						</para>
-					</listitem>
-					<listitem>
-						<para>
-							NF3: Non Functional most prioritized
-							request. Pass all the other requests into
-							the requests queue.
-						</para>
-					</listitem>
-				</itemizedlist>
-			</para>
-
-         <para>The following picture represents the addition of non functional requests depending on their priorities:</para>
-         <figure xml:id="NF_priority_controller"><info><title>Addition of non functional prioritized request</title></info>
-            <mediaobject>
-               <imageobject>
-                  <imagedata scalefit="1" width="100%" contentdepth="100%" fileref="images/NF-priority-controller.png" format="PNG"/>
-               </imageobject>
-            </mediaobject>
-         </figure>
-			<para>
-				Thus, for prioritize non functional requests, a new
-				controller,
-				<literal>
-					org.objectweb.proactive.core.component.controller.PriorityController
-				</literal>,
-				has to be used:
-				<programlisting language="java"><textobject><textdata fileref="automatic_snippets/prioritycontroller.snip"/></textobject></programlisting>
-			</para>
-		</section>
-
 		<section xml:id="Webservicebindings_53"><info><title>Web service bindings</title>
 			</info>
 
 			<para>
 				ProActive also gives the possibility to bind a functional
 				client interface of a component to a web service.
+			</para>
+			<para>
+				For	instance, this feature is useful to enable
+				communication between SCA (Service Component Architecture)
+				components and GCM/ProActive components by using the web
+				service communication protocol. Effectively, communication
+				from SCA component to GCM/ProActive component can be done
+				thanks to the ability of exposing GCM server interface as
+				web service (See
+				<xref linkend="Exporting_components_as_Web_Services"/>)
+				and communication from GCM/ProActive component to SCA
+				component can be done by using this feature.
 			</para>
 			<para>
 				The only requirement for binding a client interface to a
@@ -700,6 +647,71 @@
 						</para>
 					</listitem>
 				</itemizedlist>
+			</para>
+		</section>
+
+		<section xml:id="Prioritycontroller_53"><info><title>Priority controller</title>
+			</info>
+
+			<para>
+				In order to define non functional prioritized requests
+				(useful for instance for life cycle management,
+				reconfiguration, ...), a partial order between each kind
+				of request is available to specify when an incoming
+				request can pass requests already in the queue.
+			</para>
+
+			<para>
+				Here are the different priorities available for the
+				requests:
+				<itemizedlist>
+					<listitem>
+						<para>
+							F: Functional request. Always goes at the
+							end of the requests queue.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							NF1: Standard Non Functional request. Also
+							always goes at the end of the requests
+							queue.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							NF2: Non Functional prioritized request.
+							Pass the Functional requests into the
+							requests queue but respect the order of the
+							other Non Functional requests.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							NF3: Non Functional most prioritized
+							request. Pass all the other requests into
+							the requests queue.
+						</para>
+					</listitem>
+				</itemizedlist>
+			</para>
+
+         <para>The following picture represents the addition of non functional requests depending on their priorities:</para>
+         <figure xml:id="NF_priority_controller"><info><title>Addition of non functional prioritized request</title></info>
+            <mediaobject>
+               <imageobject>
+                  <imagedata scalefit="1" width="100%" contentdepth="100%" fileref="images/NF-priority-controller.png" format="PNG"/>
+               </imageobject>
+            </mediaobject>
+         </figure>
+			<para>
+				Thus, for prioritize non functional requests, a new
+				controller,
+				<literal>
+					org.objectweb.proactive.core.component.controller.PriorityController
+				</literal>,
+				has to be used:
+				<programlisting language="java"><textobject><textdata fileref="automatic_snippets/prioritycontroller.snip"/></textobject></programlisting>
 			</para>
 		</section>
 
