@@ -92,6 +92,10 @@ log4j.logger.ibis= WARN
 
 #log4j.logger.proactive.webservices = DEBUG
 
+#log4j.logger.proactive.messagetagging = DEBUG    
+#log4j.logger.proactive.messagetagging.localmemory = DEBUG
+#log4j.logger.proactive.messagetagging.localmemory.leasing = DEBUG
+
 ################ Appenders ####################
 #
 # Appender output can be configured by using a pattern layout
