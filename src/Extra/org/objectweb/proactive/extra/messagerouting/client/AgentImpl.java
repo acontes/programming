@@ -39,6 +39,7 @@ import java.net.InetAddress;
 import java.net.URI;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -47,7 +48,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -69,6 +72,8 @@ import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.DataReplyMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.DataRequestMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.DirectConnectionAdvertiseMessage;
+import org.objectweb.proactive.extra.messagerouting.protocol.message.DirectConnectionReplyACKMessage;
+import org.objectweb.proactive.extra.messagerouting.protocol.message.DirectConnectionRequestMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.ErrorMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.Message;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.RegistrationMessage;
@@ -433,6 +438,30 @@ public class AgentImpl implements Agent, AgentImplMBean {
         internalSendMsg(dcAdMessage);
     }
 
+    // identifies a slot in the mailbox which will not be used by
+    // any other DATA messages
+    private static final AgentID UNUSED_MAILBOX_SLOT = new AgentID(-1);
+
+    // send a direct connection request to the router for connecting to remoteAgent
+    // wait for the router reply
+    public byte[] sendDCRequest(AgentID remoteAgent) throws MessageRoutingException {
+
+        long reqId = this.requestIDGenerator.getAndIncrement();
+        DirectConnectionRequestMessage dcReq = new DirectConnectionRequestMessage(reqId, this.agentID,
+            remoteAgent);
+
+        Patient mb = mailboxes.enter(UNUSED_MAILBOX_SLOT, reqId);
+        internalSendMsg(dcReq);
+
+        // block until the result arrives
+        try {
+            return mb.waitForResponse(0);
+        } catch (TimeoutException e) {
+            throw new MessageRoutingException("Timeout reached", e);
+        }
+
+    }
+
     /**
      * Apply each valve to the message and write it into the tunnel
      * 
@@ -736,6 +765,10 @@ public class AgentImpl implements Agent, AgentImplMBean {
                     ErrorMessage error = (ErrorMessage) msg;
                     handleError(error);
                     break;
+                case DIRECT_CONNECTION_ACK:
+                case DIRECT_CONNECTION_NACK:
+                    handleDirectConnection(msg);
+                    break;
                 default:
                     // Bad message type. Log it.
                     logger.error("Invalid Message received, wrong type: " + msg);
@@ -796,28 +829,71 @@ public class AgentImpl implements Agent, AgentImplMBean {
             messageHandler.pushMessage(request);
         }
 
+        private void handleDirectConnection(Message msg) {
+
+            Patient mbox = mailboxes.remove(UNUSED_MAILBOX_SLOT, msg.getMessageID());
+            if (mbox == null) {
+                logger.error(" Received reply for an unknown direct connection request: " + msg);
+                return;
+            } else {
+                if (logger.isTraceEnabled()) {
+                    logger.trace("Received direct connection reply: " + msg);
+                }
+            }
+
+            switch (msg.getType()) {
+                case DIRECT_CONNECTION_ACK:
+                    mbox.setAndUnlock(msg.toByteArray());
+                    break;
+                case DIRECT_CONNECTION_NACK:
+                    mbox.setAndUnlock(new MessageRoutingException(
+                        "Router refused the direct connection request;" + " the message from the router is" +
+                            msg));
+                    break;
+                default:
+                    throw new IllegalArgumentException("Not a direct connection reply message:" + msg);
+            }
+        }
+
     }
 
     /**
      * Direct Connection communications manager.
-     * Maintains the information related to the agents
-     * to which we are directly connected.
+     * Maintains the information related to the direct
+     * 	connection support at the Agent level
+     *
+     * The Manager aggregates the following entities
+     * <ul>
+     * <li>A {@link DirectConnectionServer} which listens for incoming
+     * 	direct connections coming from other remote agents
+     * </li>
+     * <li>A {@link DirectConnectionNegotiator} which is responsible for establishing
+     * 	new outgoing direct connections to other remote agents
+     * </li>
+     * <li>Data structures containing state information
+     * 	about outgoing direct connection attempts
+     * </li>
+     * </ul>
+     *
+     * Cleanup will be done using shutdown hooks. This is because there
+     * 	is no other pointcut where the cleanup code can be called.
      *
      * It sends messages using direct connections with the Remote Agents,
      * instead of forwarding the messages to the router
      *
      * A direct connection manager can hold the following
      *   information on a Remote Agent(RA):
-     *   * the RA was contacted by the local agent at least once, by
-     *   	sending a message to it. We call this a "seen" agent
-     *   * a direct connection was established with the RA.
-     *      We call this a "connected" agent
-     *   * the RA was seen and we have tried to establish
+     *   <ul>
+     *   <li>the RA was contacted by the local agent at least once, by
+     *   	sending a message to it. We call this a "seen" agent</li>
+     *   <li>a direct connection was established with the RA.
+     *      We call this a "connected" agent</li>
+     *   <li>the RA was seen and we have tried to establish
      *   	a connection with it, but failed for whatever reason.
-     *   	We call this a "known" agent
-     *
+     *   	We call this a "known" agent</li>
+     * 	</ul>
      */
-    class DirectConnectionManager {
+    public class DirectConnectionManager {
 
         public final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_CLIENT_DC);
         /** the remote agents which were "seen" by the local agent */
@@ -828,14 +904,16 @@ public class AgentImpl implements Agent, AgentImplMBean {
         private final Map<AgentID, DirectConnection> connectedAgents;
         /** the server for processing incoming direct connection communications*/
         private final DirectConnectionServer dcServer;
+        /** the negotiator which tries to establish direct connections with remote agents  */
+        private final DirectConnectionNegotiator dcNegotiator;
 
         private final boolean disabled;
         private final boolean noServer;
 
         public DirectConnectionManager(AgentImpl localAgent) {
-            this.connectedAgents = new HashMap<AgentID, DirectConnection>();
-            this.seenAgents = new HashSet<AgentID>();
-            this.knownAgents = new HashSet<AgentID>();
+            this.connectedAgents = Collections.synchronizedMap(new HashMap<AgentID, DirectConnection>());
+            this.seenAgents = Collections.synchronizedSet(new HashSet<AgentID>());
+            this.knownAgents = Collections.synchronizedSet(new HashSet<AgentID>());
 
             // (try to) start the direct connection server
             DirectConnectionServer dcServer = null;
@@ -879,11 +957,210 @@ public class AgentImpl implements Agent, AgentImplMBean {
                                     ".As a consequence, this endpoint cannot be contacted for direct communication with other Agents.",
                                 e);
                 // shut down the server
-                dcServer.stop();
+                try {
+                    dcServer.stop();
+                } catch (IllegalStateException exp) {
+                    // already stopped. good.
+                }
             } finally {
                 this.dcServer = dcServer;
                 this.disabled = disabled;
                 this.noServer = noServer;
+                if (!this.disabled) {
+                    // start the Direct Connection Negotiator
+                    this.dcNegotiator = new DirectConnectionNegotiator(this, localAgent);
+                    // start its Thread
+                    Thread dcNegotiatorThread = new Thread(this.dcNegotiator);
+                    dcNegotiatorThread.setDaemon(true);
+                    dcNegotiatorThread.setName("Direct Connection Negotiator Thread");
+                    dcNegotiatorThread.start();
+                    // shutdown hook - kill on JVM exit
+                    Runtime.getRuntime().addShutdownHook(this.dcNegotiator.getShutdownHook());
+                } else {
+                    this.dcNegotiator = null;
+                }
+            }
+        }
+
+        private class DirectConnectionNegotiator implements Runnable {
+
+            // the local agent
+            private final AgentImpl localAgent;
+            // true if we have done resource cleanup
+            private final AtomicBoolean stopped = new AtomicBoolean(false);
+            private final SweetCountDownLatch isStopped = new SweetCountDownLatch(1);
+            private final AtomicReference<Thread> negotiatorThread = new AtomicReference<Thread>();
+            private static final long CLEANUP_WAITING_TIME = 100L;
+            // provide a shutdown hook for users
+            private final Thread shutdownHook;
+
+            private final DirectConnectionManager dcManager;
+
+            public DirectConnectionNegotiator(DirectConnectionManager dcMan, AgentImpl currentAgent) {
+                this.dcManager = dcMan;
+                this.localAgent = currentAgent;
+                this.shutdownHook = new Thread(new ShutdownHook(this));
+            }
+
+            public Thread getShutdownHook() {
+                return this.shutdownHook;
+            }
+
+            private class ShutdownHook implements Runnable {
+
+                private final DirectConnectionNegotiator dcNegotiator;
+
+                public ShutdownHook(DirectConnectionNegotiator dcNegotiator) {
+                    this.dcNegotiator = dcNegotiator;
+                }
+
+                @Override
+                public void run() {
+                    if (dcNegotiator.stopped.get() == false)
+                        this.dcNegotiator.stop();
+                }
+
+            }
+
+            @Override
+            public void run() {
+
+                boolean r = this.negotiatorThread.compareAndSet(null, Thread.currentThread());
+                if (r == false) {
+                    logger
+                            .error(
+                                    "A direct connections negotiator thread has already been started, aborting the current thread ",
+                                    new Exception());
+                    return;
+                }
+
+                while (this.stopped.get() == false) {
+                    try {
+                        AgentID seenAgent;
+                        synchronized (dcManager.seenAgents) {
+                            while (dcManager.seenAgents.isEmpty()) {
+                                dcManager.seenAgents.wait();
+                            }
+                            // take one agent
+                            seenAgent = dcManager.seenAgents.iterator().next();
+                        }
+                        // negotiate direct connection for the taken agent
+                        // keep the agent in the seen list, so that if we see it
+                        // again it will not be added to the set
+                        negotiateDirectConnection(seenAgent);
+                    } catch (InterruptedException e) {
+                        // interrupted => give time to check the stopped field
+                    }
+                }
+
+                // clean up the mess
+                this.cleanup();
+            }
+
+            /*
+             * Negotiate with the remote router for obtaining
+             * 	a direct connection to the given agent
+             * Negotiating means sending a DC_REQ message to the router
+             * 	and waiting for the router reply. If the router replies with
+             *  DC_ACK then direct communication is allowed.
+             * In all other cases - problems while sending the message
+             * 	to the router, router replies with DC_NACK,
+             *  direct connection cannot be established with the
+             *  remote agent - it is supposed that direct connection
+             *  is not possible with the remote agent. In this case,
+             *  the agent is put in the known (black)list
+             */
+            private void negotiateDirectConnection(AgentID seenAgent) {
+                try {
+                    byte[] result = this.localAgent.sendDCRequest(seenAgent);
+                    DirectConnectionReplyACKMessage replyMsg = (DirectConnectionReplyACKMessage) Message
+                            .constructMessage(result, 0);
+                    InetAddress inetAddr = replyMsg.getInetAddress();
+                    int port = replyMsg.getPort();
+                    DirectConnection connection = tryConnection(seenAgent, inetAddr, port);
+                    directConnectionAllowed(seenAgent, connection);
+                    return;
+                } catch (MessageRoutingException e) {
+                    logger.info("Direct connection refused for agent " + seenAgent + " reason:" +
+                        e.getMessage());
+                    directConnectionRefused(seenAgent);
+                } catch (MalformedMessageException e) {
+                    logger.error(" Cannot reconstruct a " + MessageType.DIRECT_CONNECTION_ACK +
+                        " message from its raw byte representation, reason: " + e.getMessage());
+                    logger.error("This is probably a bug. Check out also the stacktrace:", e);
+                    directConnectionRefused(seenAgent);
+                } catch (ClassCastException e) {
+                    logger.error(" Cannot reconstruct a " + MessageType.DIRECT_CONNECTION_ACK +
+                        " message from its raw byte representation, reason: " + e.getMessage());
+                    logger.error("This is probably a bug. Check out also the stacktrace:", e);
+                    directConnectionRefused(seenAgent);
+                } catch (IOException e) {
+                    logger.info("All attempts to directly connect to remote router " + seenAgent +
+                        " failed." + "Direct connection will be disallowed for agent " + seenAgent);
+                    directConnectionRefused(seenAgent);
+                }
+            }
+
+            // this method will be called if the router replied with a DC_ACK message
+            // and we got the endpoint address of the seenAgent
+            private void directConnectionAllowed(AgentID remoteAgent, DirectConnection connection) {
+                synchronized (remoteAgent) {
+                    dcManager.seenAgents.remove(remoteAgent);
+                    dcManager.connectedAgents.put(remoteAgent, connection);
+                }
+            }
+
+            // this method will be called after we tried to connect directly to the
+            // remote agent, but failed
+            private void directConnectionRefused(AgentID remoteAgent) {
+                synchronized (remoteAgent) {
+                    dcManager.seenAgents.remove(remoteAgent);
+                    dcManager.knownAgents.add(remoteAgent);
+                }
+            }
+
+            // try to establish a direct connection
+            // it will try two times in a interval of 3s
+            // if both attempts will fail, will throw an IOException
+            private DirectConnection tryConnection(AgentID remoteAgent, InetAddress inetAddr, int port)
+                    throws IOException {
+                try {
+                    return new DirectConnection(inetAddr, port);
+                } catch (IOException e) {
+                    logger.warn("First attempt to establish a direct connection with agent " + remoteAgent +
+                        " failed, because " + e.getMessage());
+                    logger.debug("Stacktrace is:", e);
+                    logger.warn("Trying again in 3 seconds...");
+                    new Sleeper(3000).sleep();
+                    try {
+                        return new DirectConnection(inetAddr, port);
+                    } catch (IOException e1) {
+                        logger.warn("Second attempt to establish a direct connection with agent " +
+                            remoteAgent + " failed, because " + e.getMessage());
+                        logger.debug("Stacktrace is:", e);
+                        logger.warn("Agent " + remoteAgent + " will be considered unreachable");
+                        throw e1;
+                    }
+                }
+            }
+
+            private void cleanup() {
+                // NOTE additional cleanup here
+
+                this.isStopped.countDown();
+            }
+
+            public void stop() {
+                if (this.stopped.get() == true)
+                    throw new IllegalStateException("Already stopped");
+
+                this.stopped.set(true);
+
+                Thread t = this.negotiatorThread.get();
+                if (t != null) {
+                    t.interrupt();
+                    this.isStopped.await(CLEANUP_WAITING_TIME, TimeUnit.MILLISECONDS);
+                }
             }
 
         }
@@ -899,34 +1176,50 @@ public class AgentImpl implements Agent, AgentImplMBean {
         }
 
         public DirectConnection getConnection(AgentID remoteAgent) {
-            if (!isConnected(remoteAgent))
-                throw new IllegalArgumentException("There is no direct connection with the remote agent " +
-                    remoteAgent);
+            synchronized (connectedAgents) {
+                // synchronized needed because we (potentially) make two successive ops on the map
+                if (!isConnected(remoteAgent))
+                    throw new IllegalArgumentException(
+                        "There is no direct connection with the remote agent " + remoteAgent);
 
-            return this.connectedAgents.get(remoteAgent);
+                return this.connectedAgents.get(remoteAgent);
+            }
         }
 
         public void agentDisconnected(AgentID disconnected) {
             // this agent has been disconnected. Remove any trace of him.
-            if (!this.seenAgents.remove(disconnected))
-                if (!this.knownAgents.remove(disconnected)) {
-                    DirectConnection connection = this.connectedAgents.remove(disconnected);
-                    if (connection != null)
-                        try {
-                            connection.close();
-                        } catch (IOException e) {
-                            ProActiveLogger.logEatedException(logger, "Error while closing " +
-                                "the connection for the " + disconnected + " agent:", e);
-                        }
+            DirectConnection connection = null;
+            synchronized (disconnected) {
+                if (!this.seenAgents.remove(disconnected))
+                    if (!this.knownAgents.remove(disconnected)) {
+                        connection = this.connectedAgents.remove(disconnected);
+                    }
+            }
+            // if there were a connection, close it
+            if (connection != null)
+                try {
+                    connection.close();
+                } catch (IOException e) {
+                    ProActiveLogger.logEatedException(logger, "Error while closing " +
+                        "the connection for the " + disconnected + " agent:", e);
                 }
         }
 
         public boolean knows(AgentID remoteAgent) {
-            return this.knownAgents.contains(remoteAgent);
+            synchronized (remoteAgent) {
+                return this.knownAgents.contains(remoteAgent);
+            }
         }
 
         public void seen(AgentID remoteAgent) {
-            this.seenAgents.add(remoteAgent);
+            synchronized (remoteAgent) {
+                this.seenAgents.add(remoteAgent);
+            }
+            // put the negotiator to work
+            synchronized (this.seenAgents) {
+                if (this.seenAgents.size() == 1)
+                    this.seenAgents.notifyAll();
+            }
         }
 
         public byte[] sendRequest(DataRequestMessage msg, boolean oneWay) throws MessageRoutingException {
@@ -974,6 +1267,36 @@ public class AgentImpl implements Agent, AgentImplMBean {
                 // Fail fast
                 throw new MessageRoutingException("Failed to send a message using the direct connection " +
                     connection, e);
+            }
+        }
+
+        // release all acquired resources
+        public void stop() {
+
+            if (!this.disabled) {
+                // shut down the DC negotiator
+                this.dcNegotiator.stop();
+                // also remove the shutdown hook
+                try {
+                    Runtime.getRuntime().removeShutdownHook(dcNegotiator.getShutdownHook());
+                } catch (IllegalStateException e) {
+                    // JVM already stoppping. Leave it to die...
+                }
+            }
+
+            // shut down the DC server
+            try {
+                if (!this.noServer)
+                    dcServer.stop();
+            } catch (IllegalStateException exp) {
+                // already stopped. good.
+            } finally {
+                // also remove the shutdown hook
+                try {
+                    Runtime.getRuntime().removeShutdownHook(dcServer.getShutdownHook());
+                } catch (IllegalStateException e) {
+                    // JVM already stoppping. Leave it to die...
+                }
             }
         }
 
