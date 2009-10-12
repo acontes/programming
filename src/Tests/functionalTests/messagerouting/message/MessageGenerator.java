@@ -38,6 +38,10 @@ import org.objectweb.proactive.extra.messagerouting.protocol.TypeHelper;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.DataMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.DataReplyMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.DataRequestMessage;
+import org.objectweb.proactive.extra.messagerouting.protocol.message.DirectConnectionAdvertiseMessage;
+import org.objectweb.proactive.extra.messagerouting.protocol.message.DirectConnectionReplyACKMessage;
+import org.objectweb.proactive.extra.messagerouting.protocol.message.DirectConnectionReplyNACKMessage;
+import org.objectweb.proactive.extra.messagerouting.protocol.message.DirectConnectionRequestMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.Message;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.RegistrationReplyMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.RegistrationRequestMessage;
@@ -122,6 +126,8 @@ public abstract class MessageGenerator {
                 return new DataRequestMessage(corruptedMsg, 0);
             case DATA_REPLY:
                 return new DataReplyMessage(corruptedMsg, 0);
+            case DIRECT_CONNECTION_ADVERTISE:
+                return new DirectConnectionAdvertiseMessage(corruptedMsg, 0);
             case DIRECT_CONNECTION_REQUEST:
                 return new DirectConnectionRequestMessage(corruptedMsg, 0);
             case DIRECT_CONNECTION_ACK:

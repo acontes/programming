@@ -64,6 +64,9 @@ public abstract class Message {
         REGISTRATION_REQUEST,
         /** A registration reply send the router to a client */
         REGISTRATION_REPLY,
+        /** A direct connection advertisment sent by a client
+         * which is able to receive direct connections to the router*/
+        DIRECT_CONNECTION_ADVERTISE,
         /** A direct connection request sent by a client to the router */
         DIRECT_CONNECTION_REQUEST,
         /** A direct connection reply sent by the router to the client in the case that a direct connection can be established*/
@@ -107,6 +110,8 @@ public abstract class Message {
                     return "DATA_REQ";
                 case DATA_REPLY:
                     return "DATA_REP";
+                case DIRECT_CONNECTION_ADVERTISE:
+                    return "DC_AD";
                 case DIRECT_CONNECTION_REQUEST:
                     return "DC_REQ";
                 case DIRECT_CONNECTION_ACK:
@@ -263,6 +268,8 @@ public abstract class Message {
                 return new DataRequestMessage(buf, offset);
             case DATA_REPLY:
                 return new DataReplyMessage(buf, offset);
+            case DIRECT_CONNECTION_ADVERTISE:
+                return new DirectConnectionAdvertiseMessage(buf, offset);
             case DIRECT_CONNECTION_REQUEST:
                 return new DirectConnectionRequestMessage(buf, offset);
             case DIRECT_CONNECTION_ACK:
