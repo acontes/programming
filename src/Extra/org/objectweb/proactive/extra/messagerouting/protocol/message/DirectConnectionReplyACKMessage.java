@@ -230,7 +230,7 @@ public class DirectConnectionReplyACKMessage extends DirectConnectionReplyMessag
             Message.Field.getTotalOffset() + Field.IP_ADDR.getOffset());
 
         // validate
-        if (!validIPAddr(inetAddr))
+        if (validIPAddr(inetAddr))
             return inetAddr;
         else
             throw new MalformedMessageException("Invalid " + Field.IP_ADDR + " value:" +
@@ -239,26 +239,19 @@ public class DirectConnectionReplyACKMessage extends DirectConnectionReplyMessag
 
     /**
      * Validate an IP address read from a {@link MessageType#DIRECT_CONNECTION_ACK} message
+     * Validation phase consists of the following steps
+     * * test if the IP address identifies an <b>unique</b> communication endpoint.
+     *  For instance, a multicast address does not identify a single communication endpoint.
      * @param inetAddr - the IP address to validate
      * @return true if "valid"; false if something weird is detected
      */
     private static boolean validIPAddr(Inet4Address inetAddr) {
-        // no loopback address
-        if (inetAddr.isLoopbackAddress())
-            return false;
         // no multicast address
         if (inetAddr.isMulticastAddress())
             return false;
-        // see if it is reachable? TODO how reliable is this?
-        /*
-        try {
-		if(!inetAddr.isReachable(100))
-			return false;
-        } catch (IOException e) {
-		// assume ok
-		return true;
-        }
-         */
+        // no anylocal address
+        if(inetAddr.isAnyLocalAddress())
+		return false;
         // TODO other tests?
         return true;
     }
@@ -270,10 +263,13 @@ public class DirectConnectionReplyACKMessage extends DirectConnectionReplyMessag
      * @return the port, converted to an positive int value.
      * @throws MalformedMessageException if the port value is invalid
      */
-    static public int readPort(byte[] byteArray, int offset) {
+    static public int readPort(byte[] byteArray, int offset) throws MalformedMessageException {
         short sPort = TypeHelper.byteArrayToShort(byteArray, offset + Message.Field.getTotalOffset() +
             Field.PORT.getOffset());
         int port = TypeHelper.shortToInt(sPort);
+        if(port==0)
+		throw new MalformedMessageException("Malformed" + MessageType.DIRECT_CONNECTION_ACK + " message:" +
+				"Invalid value for the " + Field.PORT + " field:" + port);
 
         if (port == 0)
             throw new MalformedMessageException("Invalid value for the " + Field.PORT + " field:" + port);
