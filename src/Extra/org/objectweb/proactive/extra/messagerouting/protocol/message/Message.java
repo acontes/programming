@@ -108,11 +108,11 @@ public abstract class Message {
                 case DATA_REPLY:
                     return "DATA_REP";
                 case DIRECT_CONNECTION_REQUEST:
-			return "DC_REQ";
+                    return "DC_REQ";
                 case DIRECT_CONNECTION_ACK:
-			return "DC_ACK";
+                    return "DC_ACK";
                 case DIRECT_CONNECTION_NACK:
-			return "DC_NACK";
+                    return "DC_NACK";
                 case ERR_:
                     return "ERR";
                 case DEBUG_:
@@ -264,11 +264,11 @@ public abstract class Message {
             case DATA_REPLY:
                 return new DataReplyMessage(buf, offset);
             case DIRECT_CONNECTION_REQUEST:
-		return new DirectConnectionRequestMessage(buf,offset);
+                return new DirectConnectionRequestMessage(buf, offset);
             case DIRECT_CONNECTION_ACK:
-		return new DirectConnectionReplyACKMessage(buf,offset);
+                return new DirectConnectionReplyACKMessage(buf, offset);
             case DIRECT_CONNECTION_NACK:
-		return new DirectConnectionReplyNACKMessage(buf,offset);
+                return new DirectConnectionReplyNACKMessage(buf, offset);
             case ERR_:
                 return new ErrorMessage(buf, offset);
             case DEBUG_:

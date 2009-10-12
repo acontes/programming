@@ -35,6 +35,7 @@ import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
 import org.objectweb.proactive.extra.messagerouting.protocol.TypeHelper;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.Message.MessageType;
 
+
 /** A {@link MessageType#DIRECT_CONNECTION_REQUEST} message
  * Will be sent by a client wishing to establish a direct connection with another client
  *
@@ -68,11 +69,11 @@ public class DirectConnectionRequestMessage extends DirectConnectionMessage {
     public DirectConnectionRequestMessage(long messageId, AgentID agentID, AgentID remoteAgentID) {
         super(MessageType.DIRECT_CONNECTION_REQUEST, messageId);
 
-        if(agentID == null)
-		throw new IllegalArgumentException("Non-null value required for the agentID argument");
+        if (agentID == null)
+            throw new IllegalArgumentException("Non-null value required for the agentID argument");
 
-        if(remoteAgentID == null)
-		throw new IllegalArgumentException("Non-null value required for the remoteAgentID argument");
+        if (remoteAgentID == null)
+            throw new IllegalArgumentException("Non-null value required for the remoteAgentID argument");
 
         this.agentID = agentID;
         this.remoteAgentID = remoteAgentID;
@@ -91,15 +92,15 @@ public class DirectConnectionRequestMessage extends DirectConnectionMessage {
         super(byteArray, offset, Field.getTotalOffset());
 
         if (this.getType() != MessageType.DIRECT_CONNECTION_REQUEST) {
-            throw new MalformedMessageException("Malformed " + MessageType.DIRECT_CONNECTION_REQUEST + " message:" +
-					"Invalid " + Message.Field.MSG_TYPE + " field " + this.getType());
+            throw new MalformedMessageException("Malformed " + MessageType.DIRECT_CONNECTION_REQUEST +
+                " message:" + "Invalid " + Message.Field.MSG_TYPE + " field " + this.getType());
         }
 
-        try{
-		this.agentID = readAgentID(byteArray, offset);
-		this.remoteAgentID = readRemoteAgentID(byteArray, offset);
-        } catch(MalformedMessageException e){
-		throw new MalformedMessageException("Malformed " + this.getType() + " message:" + e.getMessage());
+        try {
+            this.agentID = readAgentID(byteArray, offset);
+            this.remoteAgentID = readRemoteAgentID(byteArray, offset);
+        } catch (MalformedMessageException e) {
+            throw new MalformedMessageException("Malformed " + this.getType() + " message:" + e.getMessage());
         }
     }
 
@@ -150,14 +151,14 @@ public class DirectConnectionRequestMessage extends DirectConnectionMessage {
 
         @Override
         public String toString() {
-		switch (this) {
-			case AGENT_ID:
-				return "AGENT_ID";
-			case REMOTE_AGENT_ID:
-				return "R_AGENT_ID";
-			default:
-				return super.toString();
-			}
+            switch (this) {
+                case AGENT_ID:
+                    return "AGENT_ID";
+                case REMOTE_AGENT_ID:
+                    return "R_AGENT_ID";
+                default:
+                    return super.toString();
+            }
         }
     }
 
@@ -198,13 +199,13 @@ public class DirectConnectionRequestMessage extends DirectConnectionMessage {
      * @return the AgentID of the formatted message
      * @throws MalformedMessageException when an illegal value is encountered in the agentID field of the message
      */
-    static public AgentID readAgentID(byte[] byteArray, int offset) throws MalformedMessageException{
+    static public AgentID readAgentID(byte[] byteArray, int offset) throws MalformedMessageException {
         long id = TypeHelper.byteArrayToLong(byteArray, offset + Message.Field.getTotalOffset() +
             Field.AGENT_ID.getOffset());
-        if(id >= 0)
-		return new AgentID(id);
+        if (id >= 0)
+            return new AgentID(id);
         else
-		throw new MalformedMessageException("Invalid " + Field.AGENT_ID + " value:" + id);
+            throw new MalformedMessageException("Invalid " + Field.AGENT_ID + " value:" + id);
     }
 
     /**
@@ -214,13 +215,13 @@ public class DirectConnectionRequestMessage extends DirectConnectionMessage {
      * @return the Router ID of the formatted message
      * @throws IllegalArgumentException when an illegal value is encountered in the agentID field of the message
      */
-    static public AgentID readRemoteAgentID(byte[] byteArray, int offset) throws MalformedMessageException{
+    static public AgentID readRemoteAgentID(byte[] byteArray, int offset) throws MalformedMessageException {
         long id = TypeHelper.byteArrayToLong(byteArray, offset + Message.Field.getTotalOffset() +
             Field.REMOTE_AGENT_ID.getOffset());
-        if(id >= 0)
-		return new AgentID(id);
+        if (id >= 0)
+            return new AgentID(id);
         else
-		throw new MalformedMessageException("Invalid " + Field.REMOTE_AGENT_ID + " value:" + id);
+            throw new MalformedMessageException("Invalid " + Field.REMOTE_AGENT_ID + " value:" + id);
     }
 
     @Override
@@ -245,12 +246,11 @@ public class DirectConnectionRequestMessage extends DirectConnectionMessage {
                 return false;
         } else if (!agentID.equals(other.agentID))
             return false;
-        if( remoteAgentID == null) {
-		if(other.remoteAgentID != null)
-			return false;
-        }
-        else if(!remoteAgentID.equals(other.remoteAgentID))
-		return false;
+        if (remoteAgentID == null) {
+            if (other.remoteAgentID != null)
+                return false;
+        } else if (!remoteAgentID.equals(other.remoteAgentID))
+            return false;
         return true;
     }
 

@@ -33,6 +33,7 @@ package org.objectweb.proactive.extra.messagerouting.protocol.message;
 import org.objectweb.proactive.extra.messagerouting.exceptions.MalformedMessageException;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.Message.MessageType;
 
+
 /** A {@link MessageType#DIRECT_CONNECTION_NACK} message.
  *
  * Sent by the router to the client when a direct connection
@@ -44,12 +45,12 @@ import org.objectweb.proactive.extra.messagerouting.protocol.message.Message.Mes
  */
 public class DirectConnectionReplyNACKMessage extends DirectConnectionReplyMessage {
 
-	/** Create a {@link MessageType#DIRECT_CONNECTION_NACK} message.
+    /** Create a {@link MessageType#DIRECT_CONNECTION_NACK} message.
      *
      * @param messageId
      * 		The message ID of the message.
      */
-	public DirectConnectionReplyNACKMessage(long messageId) {
+    public DirectConnectionReplyNACKMessage(long messageId) {
         super(MessageType.DIRECT_CONNECTION_NACK, messageId);
         super.setLength(Message.Field.getTotalOffset());
     }
@@ -65,19 +66,19 @@ public class DirectConnectionReplyNACKMessage extends DirectConnectionReplyMessa
         super(byteArray, offset, 0);
 
         if (this.getType() != MessageType.DIRECT_CONNECTION_NACK) {
-            throw new MalformedMessageException("Malformed " + MessageType.DIRECT_CONNECTION_NACK + " message:" +
-                "Invalid value for the " + Message.Field.MSG_TYPE + " field:" + this.getType());
+            throw new MalformedMessageException("Malformed " + MessageType.DIRECT_CONNECTION_NACK +
+                " message:" + "Invalid value for the " + Message.Field.MSG_TYPE + " field:" + this.getType());
         }
     }
 
-	/* Marker message. Nothing special to do - just write the header! */
-	@Override
-	public byte[] toByteArray() {
+    /* Marker message. Nothing special to do - just write the header! */
+    @Override
+    public byte[] toByteArray() {
         int length = super.getLength();
         byte[] buff = new byte[length];
 
         super.writeHeader(buff, 0);
         return buff;
-	}
+    }
 
 }

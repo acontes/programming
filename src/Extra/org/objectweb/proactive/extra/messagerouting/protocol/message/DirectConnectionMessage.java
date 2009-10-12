@@ -33,6 +33,7 @@ package org.objectweb.proactive.extra.messagerouting.protocol.message;
 import org.objectweb.proactive.extra.messagerouting.exceptions.MalformedMessageException;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.Message.MessageType;
 
+
 /** Direct Connection generic message
  *
  * Used during the process of negotiation between the {@link Agent} and the {@link Router}

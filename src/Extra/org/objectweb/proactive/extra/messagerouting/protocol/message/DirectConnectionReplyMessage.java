@@ -33,6 +33,7 @@ package org.objectweb.proactive.extra.messagerouting.protocol.message;
 import org.objectweb.proactive.extra.messagerouting.exceptions.MalformedMessageException;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.Message.MessageType;
 
+
 /** A DirectConnectionReply message
  *
  * Sent back by the router to the client in response to a previous
@@ -49,7 +50,7 @@ import org.objectweb.proactive.extra.messagerouting.protocol.message.Message.Mes
  */
 public abstract class DirectConnectionReplyMessage extends DirectConnectionMessage {
 
-	/** Create a DirectConnectionReply message
+    /** Create a DirectConnectionReply message
      *
      * @param type
      * 		Type of the message {@link MessageType#DIRECT_CONNECTION_ACK}
