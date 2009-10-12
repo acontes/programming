@@ -33,6 +33,7 @@
 package org.objectweb.proactive.extra.messagerouting.router;
 
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
@@ -52,6 +53,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.core.util.SweetCountDownLatch;
@@ -67,7 +71,7 @@ import org.objectweb.proactive.extra.messagerouting.protocol.message.ErrorMessag
  * 
  * @since ProActive 4.1.0
  */
-public class RouterImpl extends RouterInternal implements Runnable {
+public class RouterImpl extends RouterInternal implements Runnable, RouterImplMBean {
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_ROUTER);
     public static final Logger admin_logger = ProActiveLogger.getLogger(Loggers.FORWARDING_ROUTER_ADMIN);
 
@@ -125,6 +129,18 @@ public class RouterImpl extends RouterInternal implements Runnable {
             rand = ProActiveRandom.nextPosLong(); // can be 0
         }
         this.routerId = rand;
+
+        // register the MBean
+        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+        ObjectName name = null;
+        try {
+            // Uniquely identify the MBeans and register them with the platform MBeanServer
+            name = new ObjectName(
+                "org.objectweb.proactive.extra.messagerouting.router:type=RouterImpl,name=" + this.routerId);
+            mbs.registerMBean(this, name);
+        } catch (Exception e) {
+            logger.warn("Failed to register a JMX MBean for router " + this.routerId);
+        }
     }
 
     private void init(RouterConfig config) throws IOException {
@@ -365,4 +381,27 @@ public class RouterImpl extends RouterInternal implements Runnable {
     public long getId() {
         return this.routerId;
     }
+
+    /* @@@@@@@@@@@@@@@@@@@@@@@@@@@ MBean @@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */
+    public String[] getRegisteredAgents() {
+        Set<AgentID> agentSet;
+        synchronized (this.clientMap) {
+            agentSet = this.clientMap.keySet();
+        }
+        AgentID[] registeredAgents = agentSet.toArray(new AgentID[0]);
+        String[] ret = new String[registeredAgents.length];
+        for (int i = 0; i < registeredAgents.length; i++) {
+            ret[i] = registeredAgents[i].toString();
+        }
+        return ret;
+    }
+
+    public boolean supportsDirectConnections(long agentID) throws IllegalArgumentException {
+        AgentID agent = new AgentID(agentID);
+        if (!clientMap.containsKey(agent))
+            throw new IllegalArgumentException("Agent " + agentID + " is not registered with the router");
+        Client cli = getClient(agent);
+        return cli.acceptsDirectConnections();
+    }
+
 }
