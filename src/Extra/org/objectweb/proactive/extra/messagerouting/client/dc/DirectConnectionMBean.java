@@ -5,7 +5,7 @@
  *            Concurrent computing with Security and Mobility
  *
  * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,40 +22,34 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- *  Initial developer(s):               The ActiveEon Team
- *                        http://www.activeeon.com/
+ *  Initial developer(s):               The ProActive Team
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
- *
  * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.objectweb.proactive.extra.messagerouting.client;
+package org.objectweb.proactive.extra.messagerouting.client.dc;
 
-public interface AgentImplMBean {
-
-    public long getLocalAgentID();
-
-    public String getLocalAddress();
-
-    public int getLocalPort();
-
-    public String getRemoteAddress();
-
-    public int getRemotePort();
-
-    public String[] getMailboxes();
+/**
+ * MBean offering information about
+ * the Direct Connection infrastructure
+ *
+ * @author fabratu
+ * @version %G%, %I%
+ * @since ProActive 4.10
+ */
+public interface DirectConnectionMBean {
 
     // indicates if Direct Connection is enabled
-    public boolean isDCEnabled();
+    public boolean isEnabled();
 
     // indicates if the Direct Connection server is started
-    public boolean isDCServerStarted();
+    public boolean serverStarted();
 
     // get the list of remote agents to which we are directly connected
     public String[] getOutboundAgents() throws IllegalStateException;
 
-    // get the list of candidates for direct connection
+    // get the list of candidate for remote connection
     public String[] getCandidateAgents() throws IllegalStateException;
 
     // get the list of agents to which we tried to connect directly but failed

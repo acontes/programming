@@ -716,6 +716,7 @@ public class AgentImpl implements Agent, AgentImplMBean {
             }
         }
 
+        @SuppressWarnings("deprecation")
         public void stop() {
             // this is a hack. the message handler desperately needs
             // a clean shutdown code.
@@ -990,7 +991,6 @@ public class AgentImpl implements Agent, AgentImplMBean {
                 } else {
                     this.dcNegotiator = null;
                 }
-
             }
         }
 
@@ -1312,6 +1312,58 @@ public class AgentImpl implements Agent, AgentImplMBean {
                 }
             }
         }
+
+        /* @@@@@@@@@@@@@@@@@@@@@@@@@@@ MBean @@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */
+        public String[] getOutboundAgents() throws IllegalStateException {
+            if (this.disabled)
+                throw new IllegalStateException("This agent started with no direct connection support");
+
+            AgentID agentArray[];
+            synchronized (this.connectedAgents) {
+                Set<AgentID> agentSet = this.connectedAgents.keySet();
+                agentArray = agentSet.toArray(new AgentID[0]);
+            }
+            String[] ret = new String[agentArray.length];
+            for (int i = 0; i < agentArray.length; i++) {
+                ret[i] = agentArray[i].toString();
+            }
+            return ret;
+        }
+
+        public String[] getCandidateAgents() throws IllegalStateException {
+            if (this.disabled)
+                throw new IllegalStateException("This agent started with no direct connection support");
+
+            AgentID agentArray[];
+            synchronized (this.seenAgents) {
+                agentArray = seenAgents.toArray(new AgentID[0]);
+            }
+            String[] ret = new String[agentArray.length];
+            for (int i = 0; i < agentArray.length; i++) {
+                ret[i] = agentArray[i].toString();
+            }
+            return ret;
+        }
+
+        public String[] getFailedAgents() throws IllegalStateException {
+            if (this.disabled)
+                throw new IllegalStateException("This agent started with no direct connection support");
+
+            AgentID agentArray[];
+            synchronized (this.knownAgents) {
+                agentArray = knownAgents.toArray(new AgentID[0]);
+            }
+            String[] ret = new String[agentArray.length];
+            for (int i = 0; i < agentArray.length; i++) {
+                ret[i] = agentArray[i].toString();
+            }
+            return ret;
+        }
+
+        public boolean isServerStarted() {
+            return !this.noServer;
+        }
+
     }
 
     /* @@@@@@@@@@@@@@@@@@@@@@@@@@@ MBean @@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */
@@ -1368,6 +1420,27 @@ public class AgentImpl implements Agent, AgentImplMBean {
     public String[] getMailboxes() {
         return this.mailboxes.getBlockedCallers();
 
+    }
+
+    /* DC related  */
+    public String[] getCandidateAgents() throws IllegalStateException {
+        return this.dcManager.getCandidateAgents();
+    }
+
+    public String[] getFailedAgents() throws IllegalStateException {
+        return this.dcManager.getFailedAgents();
+    }
+
+    public String[] getOutboundAgents() throws IllegalStateException {
+        return this.dcManager.getOutboundAgents();
+    }
+
+    public boolean isDCEnabled() {
+        return this.dcManager.isEnabled();
+    }
+
+    public boolean isDCServerStarted() {
+        return this.dcManager.isServerStarted();
     }
 
 }
