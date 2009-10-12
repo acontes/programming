@@ -68,16 +68,19 @@ public class FunctionalTest {
             // Configure the Message routing
             if (MessageRoutingRemoteObjectFactory.PROTOCOL_ID.equals(PAProperties.PA_COMMUNICATION_PROTOCOL
                     .getValue())) {
-                RouterConfig config = new RouterConfig();
+		// if router not already started
+		if(!PAProperties.PA_TEST_PAMR_ROUTER_STARTED.isTrue()) {
+		    RouterConfig config = new RouterConfig();
 
-                if (!PAProperties.PA_NET_ROUTER_PORT.isSet() ||
-                    PAProperties.PA_NET_ROUTER_PORT.getValueAsInt() == 0) {
-                    router = Router.createAndStart(config);
-                    PAProperties.PA_NET_ROUTER_PORT.setValue(router.getPort());
-                } else {
-                    config.setPort(PAProperties.PA_NET_ROUTER_PORT.getValueAsInt());
-                    router = Router.createAndStart(config);
-                }
+		    if (!PAProperties.PA_NET_ROUTER_PORT.isSet() ||
+			    PAProperties.PA_NET_ROUTER_PORT.getValueAsInt() == 0) {
+			router = Router.createAndStart(config);
+			PAProperties.PA_NET_ROUTER_PORT.setValue(router.getPort());
+		    } else {
+			config.setPort(PAProperties.PA_NET_ROUTER_PORT.getValueAsInt());
+			router = Router.createAndStart(config);
+		    }
+		}
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

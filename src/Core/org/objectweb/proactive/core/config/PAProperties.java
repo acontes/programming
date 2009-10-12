@@ -582,6 +582,11 @@ public enum PAProperties {
     /** Duration of each performance test in ms */
     PA_TEST_PERF_DURATION("proactive.test.perf.duration", PAPropertiesType.INTEGER),
 
+    /** PAMR: indicate if the tests should use an already-started router, or a new router
+     * should be started
+     * */
+    PA_TEST_PAMR_ROUTER_STARTED("proactive.test.pamr.routerAlreadyStarted", PAPropertiesType.BOOLEAN),
+
     /**
      * Functional test timeout in ms
      *

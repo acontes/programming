@@ -68,6 +68,9 @@
         <prop key="proactive.filetransfer.buffer_size_kb" value="256" />
 
         <prop key="proactive.test.perf.duration" value="30000" />
+
+		<!-- pamr(ssh) unit tests - by default, assume router inside JVM -->
+		<prop key="proactive.test.pamr.routerAlreadyStarted" value="false"/>
         
         <prop key="proactive.log4j.appender.provider" value="org.objectweb.proactive.core.util.log.remote.ThrottlingProvider" />
 
