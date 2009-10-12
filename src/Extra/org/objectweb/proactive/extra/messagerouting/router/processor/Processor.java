@@ -37,6 +37,7 @@ import java.nio.ByteBuffer;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.messagerouting.exceptions.MalformedMessageException;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.Message.MessageType;
 import org.objectweb.proactive.extra.messagerouting.router.RouterImpl;
 
@@ -56,5 +57,9 @@ public abstract class Processor {
         this.rawMessage = rawMessage;
     }
 
-    abstract public void process();
+    /**
+     * The implementations will provide the logic of handling the messages
+     * @throws MalformedMessageException - if the message received from the client does not comply with the message routing protocol
+     */
+    abstract public void process() throws MalformedMessageException;
 }

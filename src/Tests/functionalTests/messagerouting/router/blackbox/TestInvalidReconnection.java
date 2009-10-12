@@ -38,6 +38,7 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.objectweb.proactive.core.util.ProActiveRandom;
+import org.objectweb.proactive.extra.messagerouting.exceptions.MalformedMessageException;
 import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.ErrorMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.Message;
@@ -58,7 +59,7 @@ public class TestInvalidReconnection extends BlackBox {
      * An error message is expected is expected
      */
     @Test
-    public void testInvalidAgentId() throws IOException {
+    public void testInvalidAgentId() throws IOException, MalformedMessageException {
         AgentID agentID = new AgentID(0xcafe);
         long messageID = ProActiveRandom.nextPosLong();
         Message message = new RegistrationRequestMessage(agentID, messageID, 0);
@@ -80,7 +81,7 @@ public class TestInvalidReconnection extends BlackBox {
      * An error message is expected is expected
      */
     @Test
-    public void testInvalidAgentId2() throws IOException {
+    public void testInvalidAgentId2() throws IOException, MalformedMessageException {
         Message message = new RegistrationRequestMessage(null, ProActiveRandom.nextPosLong(), 0);
         tunnel.write(message.toByteArray());
 
@@ -101,7 +102,7 @@ public class TestInvalidReconnection extends BlackBox {
     }
 
     @Test
-    public void testInvalidRouterID() throws IOException, InstantiationException {
+    public void testInvalidRouterID() throws IOException, InstantiationException, MalformedMessageException {
         Message message = new RegistrationRequestMessage(null, ProActiveRandom.nextLong(), 0);
         tunnel.write(message.toByteArray());
 

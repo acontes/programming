@@ -38,6 +38,7 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.objectweb.proactive.core.util.ProActiveRandom;
+import org.objectweb.proactive.extra.messagerouting.exceptions.MalformedMessageException;
 import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.Message;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.RegistrationReplyMessage;
@@ -49,7 +50,7 @@ import functionalTests.messagerouting.BlackBox;
 public class TestReconnection extends BlackBox {
 
     @Test
-    public void test() throws IOException, InstantiationException {
+    public void test() throws IOException, MalformedMessageException {
         Message message = new RegistrationRequestMessage(null, ProActiveRandom.nextLong(), 0);
         tunnel.write(message.toByteArray());
 

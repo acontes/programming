@@ -39,6 +39,7 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.objectweb.proactive.core.util.ProActiveRandom;
+import org.objectweb.proactive.extra.messagerouting.exceptions.MalformedMessageException;
 import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.DataReplyMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.DataRequestMessage;
@@ -75,7 +76,7 @@ public class TestMessageData extends UnitTests {
     /* Construct a data request with a null payload
      */
     @Test
-    public void testRequestNullData() throws InstantiationException {
+    public void testRequestNullData() throws MalformedMessageException {
         AgentID srcAgent = new AgentID(ProActiveRandom.nextPosLong());
         AgentID dstAgent = new AgentID(ProActiveRandom.nextPosLong());
         long msgId = ProActiveRandom.nextPosLong();
@@ -90,7 +91,7 @@ public class TestMessageData extends UnitTests {
     /* Construct a data reply with a null payload
      */
     @Test
-    public void testReplyNullData() throws InstantiationException {
+    public void testReplyNullData() throws MalformedMessageException {
         AgentID srcAgent = new AgentID(ProActiveRandom.nextPosLong());
         AgentID dstAgent = new AgentID(ProActiveRandom.nextPosLong());
         long msgId = ProActiveRandom.nextPosLong();

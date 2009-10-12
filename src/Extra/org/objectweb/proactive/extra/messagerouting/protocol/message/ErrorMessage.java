@@ -33,8 +33,10 @@
 package org.objectweb.proactive.extra.messagerouting.protocol.message;
 
 import org.objectweb.proactive.core.remoteobject.http.util.HttpMarshaller;
+import org.objectweb.proactive.extra.messagerouting.exceptions.MalformedMessageException;
 import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
 import org.objectweb.proactive.extra.messagerouting.protocol.TypeHelper;
+import org.objectweb.proactive.extra.messagerouting.protocol.message.Message.MessageType;
 
 
 /** A {@link MessageType#ERR_} message
@@ -115,6 +117,24 @@ public class ErrorMessage extends DataMessage {
             TypeHelper.intToByteArray(this.ordinal(), buf, 0);
             return buf;
         }
+
+        @Override
+        public String toString() {
+            switch (this) {
+                case ERR_DISCONNECTION_BROADCAST:
+                    return "ERR_DISCONNECTION_BROADCAST";
+                case ERR_INVALID_AGENT_ID:
+                    return "ERR_INVALID_AGENT_ID";
+                case ERR_INVALID_ROUTER_ID:
+                    return "ERR_INVALID_ROUTER_ID";
+                case ERR_NOT_CONNECTED_RCPT:
+                    return "ERR_NOT_CONNECTED_RCPT";
+                case ERR_UNKNOW_RCPT:
+                    return "ERR_UNKNOW_RCPT";
+                default:
+                    return super.toString();
+            }
+        }
     }
 
     /** The type of this error message */
@@ -143,19 +163,22 @@ public class ErrorMessage extends DataMessage {
      *            the byte array from which to read
      * @param offset
      *            the offset at which to find the message in the byte array
-     * @throws InstantiationException
+     * @throws MalformedMessageException
+     * 			If the buffer does not contain a valid error message
      */
-    public ErrorMessage(byte[] byteArray, int offset) throws IllegalArgumentException {
+    public ErrorMessage(byte[] byteArray, int offset) throws MalformedMessageException {
         super(byteArray, offset);
 
         if (this.getType() != MessageType.ERR_) {
-            throw new IllegalArgumentException("Invalid message type " + this.getType());
+            throw new MalformedMessageException("Malformed" + MessageType.ERR_ + " message:" +
+                "Invalid value for the " + Message.Field.MSG_TYPE + " field:" + this.getType());
         }
 
         try {
             this.error = (ErrorType) HttpMarshaller.unmarshallObject(this.getData());
         } catch (ClassCastException e) {
-            throw new IllegalArgumentException("Invalid error type:" + e);
+            throw new MalformedMessageException("Malformed" + MessageType.ERR_ + " message:" +
+                "Invalid error type:", e);
         }
     }
 
@@ -191,6 +214,11 @@ public class ErrorMessage extends DataMessage {
         } else if (!error.equals(other.error))
             return false;
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + " Error code:" + this.error;
     }
 
 }

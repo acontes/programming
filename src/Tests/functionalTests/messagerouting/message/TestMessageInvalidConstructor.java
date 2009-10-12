@@ -34,6 +34,7 @@ package functionalTests.messagerouting.message;
 
 import org.junit.Test;
 import org.objectweb.proactive.core.util.ProActiveRandom;
+import org.objectweb.proactive.extra.messagerouting.exceptions.MalformedMessageException;
 import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.DataReplyMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.DataRequestMessage;
@@ -51,8 +52,8 @@ public class TestMessageInvalidConstructor extends UnitTests {
 
     /* Data reply -> byte [] -> Data request must throw an IllegalArgumentException
      */
-    @Test(expected = IllegalArgumentException.class)
-    public void test1() throws InstantiationException {
+    @Test(expected = MalformedMessageException.class)
+    public void test1() throws MalformedMessageException {
         AgentID srcAgent = new AgentID(ProActiveRandom.nextPosLong());
         AgentID dstAgent = new AgentID(ProActiveRandom.nextPosLong());
         long msgId = ProActiveRandom.nextPosLong();
@@ -63,8 +64,8 @@ public class TestMessageInvalidConstructor extends UnitTests {
 
     /* Data reply -> byte [] -> Registration reply must throw an IllegalArgumentException
      */
-    @Test(expected = IllegalArgumentException.class)
-    public void test2() throws InstantiationException {
+    @Test(expected = MalformedMessageException.class)
+    public void test2() throws MalformedMessageException {
         AgentID srcAgent = new AgentID(ProActiveRandom.nextPosLong());
         AgentID dstAgent = new AgentID(ProActiveRandom.nextPosLong());
         long msgId = ProActiveRandom.nextPosLong();
@@ -75,8 +76,8 @@ public class TestMessageInvalidConstructor extends UnitTests {
 
     /* Data reply -> byte [] -> Registration request must throw an IllegalArgumentException
      */
-    @Test(expected = IllegalArgumentException.class)
-    public void test3() throws InstantiationException {
+    @Test(expected = MalformedMessageException.class)
+    public void test3() throws MalformedMessageException {
         AgentID srcAgent = new AgentID(ProActiveRandom.nextPosLong());
         AgentID dstAgent = new AgentID(ProActiveRandom.nextPosLong());
         long msgId = ProActiveRandom.nextPosLong();
