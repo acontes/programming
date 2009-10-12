@@ -978,6 +978,7 @@
 					<emphasis>
 						<phrase>This section concerns products compatible with LibXen ( SDK for web service access for XenServer ). </phrase>
 						<phrase>Note that the associated python script launcher doesn't work with python 3 due to XenAPI.py incompatibility. </phrase>
+						<phrase>You must modify the associated python script (dist/scripts/virtualization/xenserver/xenserver.py) to fix XenServer authentication credentials. </phrase>
 						<phrase>You need to reference every Virtualizing/src/xenserver/lib/ jars in the classpath. </phrase>
 					</emphasis>
 				</para>
