@@ -35,15 +35,13 @@ import java.io.IOException;
 import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
-import org.junit.After;
-import org.junit.Before;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.extra.messagerouting.client.ProActiveMessageHandler;
 import org.objectweb.proactive.extra.messagerouting.router.Router;
 import org.objectweb.proactive.extra.messagerouting.router.RouterConfig;
+import org.objectweb.proactive.extra.messagerouting.router.RouterImplMBean;
 
-import unitTests.UnitTests;
 import unitTests.messagerouting.dc.TestAgentImpl;
 import unitTests.messagerouting.dc.client.TestAgentStartup;
 import functionalTests.ft.Agent;
@@ -62,6 +60,7 @@ public class RouterAgent {
     static final public Logger logger = Logger.getLogger("testsuite");
 
     protected Router router;
+    protected RouterImplMBean routerMBean;
     protected TestAgentImpl agent;
     private final boolean agentIsDC;
 
@@ -69,11 +68,20 @@ public class RouterAgent {
         this.agentIsDC = dcAgent;
     }
 
+    public TestAgentImpl getAgent() {
+        return agent;
+    }
+
+    public RouterImplMBean getRouterMBean() {
+        return routerMBean;
+    }
+
     protected static final int DC_PORT = 18989;
 
     public void startInfrastructure() throws IOException, ProActiveException {
         router = Router.createAndStart(new RouterConfig());
         try {
+            routerMBean = (RouterImplMBean) router;
             PAProperties.PA_NET_ROUTER_DIRECT_CONNECTION.setValue(agentIsDC);
             PAProperties.PA_NET_ROUTER_DC_PORT.setValue(DC_PORT);
             agent = new TestAgentImpl(router.getInetAddr(), router.getPort(), ProActiveMessageHandler.class);
@@ -92,6 +100,10 @@ public class RouterAgent {
         } catch (IllegalAccessException e) {
             logger.error(e.getMessage(), e);
             Assert.fail(Agent.class.getName() +
+                " implementation changed. This unit test should also be re-implemented.");
+        } catch (ClassCastException e) {
+            logger.error(e.getMessage(), e);
+            Assert.fail(RouterImplMBean.class.getName() +
                 " implementation changed. This unit test should also be re-implemented.");
         }
 
