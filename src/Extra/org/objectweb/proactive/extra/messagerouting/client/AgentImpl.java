@@ -39,9 +39,11 @@ import java.net.InetAddress;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
@@ -55,6 +57,7 @@ import org.objectweb.proactive.core.util.Sleeper;
 import org.objectweb.proactive.core.util.SweetCountDownLatch;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.messagerouting.client.dc.client.DirectConnection;
 import org.objectweb.proactive.extra.messagerouting.exceptions.MalformedMessageException;
 import org.objectweb.proactive.extra.messagerouting.exceptions.MessageRoutingException;
 import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
@@ -108,6 +111,12 @@ public class AgentImpl implements Agent, AgentImplMBean {
     /** List of Valves that will process each message */
     final private List<Valve> valves;
 
+    /** Manager of direct communications */
+    final private DirectConnectionManager dcManager;
+
+    /** the handler of incoming messages*/
+    final private MessageReader incomingHandler;
+
     /**
      * Create a routing agent
      * 
@@ -153,6 +162,7 @@ public class AgentImpl implements Agent, AgentImplMBean {
         this.mailboxes = new WaitingRoom();
         this.requestIDGenerator = new AtomicLong(0);
         this.failedTunnels = new LinkedList<Tunnel>();
+        this.incomingHandler = new MessageReader(this);
 
         try {
             Constructor<? extends MessageHandler> mhConstructor;
@@ -167,9 +177,12 @@ public class AgentImpl implements Agent, AgentImplMBean {
             throw new ProActiveException("Failed to create the tunnel to " + routerAddr + ":" + routerPort);
         }
 
+        // start the direct connections manager
+        this.dcManager = new DirectConnectionManager();
+
         // Start the message receiver even if connection failed
         // Message reader will try to open the tunnel later
-        Thread mrThread = new Thread(new MessageReader(this));
+        Thread mrThread = new Thread(this.incomingHandler);
         mrThread.setDaemon(true);
         mrThread.setName("Message routing: message reader for agent " + this.agentID);
         mrThread.start();
@@ -349,6 +362,18 @@ public class AgentImpl implements Agent, AgentImplMBean {
         Long requestID = requestIDGenerator.getAndIncrement();
         DataRequestMessage msg = new DataRequestMessage(agentID, targetID, requestID, data);
 
+        try {
+            if (this.dcManager.isConnected(targetID)) {
+                return this.dcManager.sendRequest(msg, oneWay);
+            } else if (!this.dcManager.knows(targetID)) {
+                this.dcManager.seen(targetID);
+            }
+        } catch (MessageRoutingException e) {
+            logger.warn("Could not send the message " + msg + " to the remote agent " + msg.getSender() +
+                " using a direct connection", e);
+            // could not send it directly - try by the tunnel?
+        }
+
         byte[] response = null;
         if (oneWay) { // No response needed, just send it.
             internalSendMsg(msg);
@@ -371,6 +396,19 @@ public class AgentImpl implements Agent, AgentImplMBean {
     public void sendReply(DataRequestMessage request, byte[] data) throws MessageRoutingException {
         DataReplyMessage reply = new DataReplyMessage(this.getAgentID(), request.getSender(), request
                 .getMessageID(), data);
+
+        try {
+            if (this.dcManager.isConnected(request.getSender())) {
+                this.dcManager.sendReply(reply);
+                return;
+            } else if (!this.dcManager.knows(request.getSender())) {
+                this.dcManager.seen(request.getSender());
+            }
+        } catch (MessageRoutingException e) {
+            logger.warn("Could not send the message " + request + " to the remote agent " +
+                request.getSender() + " using a direct connection", e);
+            // could not send it directly - try by the tunnel?
+        }
 
         internalSendMsg(reply);
     }
@@ -597,8 +635,12 @@ public class AgentImpl implements Agent, AgentImplMBean {
         }
     }
 
+    public MessageReader getIncomingHandler() {
+        return this.incomingHandler;
+    }
+
     /** Read incoming messages from the tunnel */
-    class MessageReader implements Runnable {
+    public class MessageReader implements Runnable {
         /** The local Agent */
         final AgentImpl agent;
 
@@ -660,7 +702,7 @@ public class AgentImpl implements Agent, AgentImplMBean {
             }
         }
 
-        private void handleMessage(Message msg) {
+        public void handleMessage(Message msg) {
             switch (msg.getType()) {
                 case DATA_REPLY:
                     DataReplyMessage reply = (DataReplyMessage) msg;
@@ -729,6 +771,113 @@ public class AgentImpl implements Agent, AgentImplMBean {
 
         private void handleDataRequest(DataRequestMessage request) {
             messageHandler.pushMessage(request);
+        }
+
+    }
+
+    /**
+     * Direct Connection communications manager.
+     * Maintains the information related to the agents
+     * to which we are directly connected.
+     *
+     * It sends messages using direct connections with the Remote Agents,
+     * instead of forwarding the messages to the router
+     *
+     * A direct connection manager can hold the following
+     *   information on a Remote Agent(RA):
+     *   * the RA was contacted by the local agent at least once, by
+     *   	sending a message to it. We call this a "seen" agent
+     *   * a direct connection was established with the RA.
+     *      We call this a "connected" agent
+     *   * the RA was seen and we have tried to establish
+     *   	a connection with it, but failed for whatever reason.
+     *   	We call this a "known" agent
+     *
+     */
+    class DirectConnectionManager {
+
+        public final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_CLIENT_DC);
+        /** the remote agents which were "seen" by the local agent */
+        private final Set<AgentID> seenAgents;
+        /** the remote agents which are "known" by the local agent*/
+        private final Set<AgentID> knownAgents;
+        /** the remote agents to which a direct connection has already been established */
+        private final Map<AgentID, DirectConnection> connectedAgents;
+
+        public DirectConnectionManager() {
+            this.connectedAgents = new HashMap<AgentID, DirectConnection>();
+            this.seenAgents = new HashSet<AgentID>();
+            this.knownAgents = new HashSet<AgentID>();
+        }
+
+        public boolean isConnected(AgentID remoteAgent) {
+            if (remoteAgent == null)
+                throw new IllegalArgumentException("remoteAgent must be non-null");
+            return this.connectedAgents.containsKey(remoteAgent);
+        }
+
+        public DirectConnection getConnection(AgentID remoteAgent) {
+            if (!isConnected(remoteAgent))
+                throw new IllegalArgumentException("There is no direct connection with the remote agent " +
+                    remoteAgent);
+
+            return this.connectedAgents.get(remoteAgent);
+        }
+
+        public boolean knows(AgentID remoteAgent) {
+            return this.knownAgents.contains(remoteAgent);
+        }
+
+        public void seen(AgentID remoteAgent) {
+            this.seenAgents.add(remoteAgent);
+        }
+
+        public byte[] sendRequest(DataRequestMessage msg, boolean oneWay) throws MessageRoutingException {
+            AgentID remoteAgent = msg.getRecipient();
+            // get the direct connection
+            DirectConnection connection = getConnection(remoteAgent);
+
+            byte[] response = null;
+            if (oneWay) { // No response needed, just send it.
+                sendRoutingProtocolMessage(msg, connection);
+            } else {
+                Patient mb = mailboxes.enter(remoteAgent, msg.getMessageID());
+                sendRoutingProtocolMessage(msg, connection);
+
+                // block until the result arrives
+                try {
+                    response = mb.waitForResponse(0);
+                } catch (TimeoutException e) {
+                    throw new MessageRoutingException("Timeout reached", e);
+                }
+            }
+
+            return response;
+        }
+
+        public void sendReply(DataReplyMessage reply) throws MessageRoutingException {
+
+            // get the direct connection
+            AgentID remoteAgent = reply.getRecipient();
+            DirectConnection connection = this.getConnection(remoteAgent);
+
+            sendRoutingProtocolMessage(reply, connection);
+        }
+
+        // generic one-way send of a pamr protocol message
+        private void sendRoutingProtocolMessage(Message message, DirectConnection connection)
+                throws MessageRoutingException {
+            byte[] msgBuf = message.toByteArray();
+            try {
+                connection.push(msgBuf);
+                if (logger.isTraceEnabled()) {
+                    logger.trace("Sent message " + message + " using the direct connection " + connection);
+                }
+            } catch (IOException e) {
+                // Fail fast
+                throw new MessageRoutingException("Failed to send a message using the direct connection " +
+                    connection, e);
+            }
         }
 
     }

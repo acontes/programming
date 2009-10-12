@@ -153,8 +153,11 @@ public interface Loggers {
     static final public String FORWARDING_ROUTER = FORWARDING + ".router";
     static final public String FORWARDING_CLIENT = FORWARDING + ".client";
     static final public String FORWARDING_CLIENT_TUNNEL = FORWARDING_CLIENT + ".tunnel";
+    static final public String FORWARDING_CLIENT_DC = FORWARDING_CLIENT + ".dc";
+    static final public String FORWARDING_SERVER_DC = FORWARDING + ".dc.server";
     static final public String FORWARDING_REMOTE_OBJECT = FORWARDING + ".remoteobject";
     static final public String FORWARDING_ROUTER_ADMIN = FORWARDING_ROUTER + ".admin";
+
     // Exceptions
     public static final String EXCEPTIONS = CORE + ".exceptions";
     public static final String EXCEPTIONS_ONE_WAY = EXCEPTIONS + ".one_way";
