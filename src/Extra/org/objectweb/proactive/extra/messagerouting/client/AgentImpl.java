@@ -319,7 +319,7 @@ public class AgentImpl implements Agent, AgentImplMBean {
     private class RouterHandshakeException extends Exception {
 
         public RouterHandshakeException() {
-		super();
+            super();
         }
 
         public RouterHandshakeException(String msg) {
@@ -1285,17 +1285,18 @@ public class AgentImpl implements Agent, AgentImplMBean {
             }
 
             // shut down the DC server
-            try {
-                if (!this.noServer)
-                    dcServer.stop();
-            } catch (IllegalStateException exp) {
-                // already stopped. good.
-            } finally {
-                // also remove the shutdown hook
+            if (!this.noServer) {
                 try {
-                    Runtime.getRuntime().removeShutdownHook(dcServer.getShutdownHook());
-                } catch (IllegalStateException e) {
-                    // JVM already stoppping. Leave it to die...
+                    dcServer.stop();
+                } catch (IllegalStateException exp) {
+                    // already stopped. good.
+                } finally {
+                    // also remove the shutdown hook
+                    try {
+                        Runtime.getRuntime().removeShutdownHook(dcServer.getShutdownHook());
+                    } catch (IllegalStateException e) {
+                        // JVM already stoppping. Leave it to die...
+                    }
                 }
             }
         }
