@@ -62,9 +62,12 @@ import org.objectweb.proactive.extra.messagerouting.protocol.message.DataReplyMe
 import org.objectweb.proactive.extra.messagerouting.protocol.message.DataRequestMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.ErrorMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.Message;
+import org.objectweb.proactive.extra.messagerouting.protocol.message.RegistrationMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.RegistrationReplyMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.RegistrationRequestMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.ErrorMessage.ErrorType;
+import org.objectweb.proactive.extra.messagerouting.protocol.message.Message.MessageType;
+import org.objectweb.proactive.extra.messagerouting.router.Router;
 
 
 /**
@@ -203,7 +206,7 @@ public class AgentImpl implements Agent, AgentImplMBean {
      * on the first call. If the agent cannot reconnect to the router, this.t is
      * set to null.
      * 
-     * <b>This method must only be called by getNewTunnel</b>
+     * <b>This method must only be called by getTunnel</b>
      */
     private void __reconnectToRouter() {
         try {
@@ -216,7 +219,6 @@ public class AgentImpl implements Agent, AgentImplMBean {
 			logger.error("Failed to reconnect to the router: the router handshake procedure failed. Reason: " + e.getMessage(), e);
 			tunnel.shutdown();
 			}
-
             this.t = tunnel;
         } catch (IOException exception) {
             logger.debug("Failed to reconnect to the router", exception);
