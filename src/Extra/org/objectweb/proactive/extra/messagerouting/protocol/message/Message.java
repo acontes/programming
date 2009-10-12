@@ -57,6 +57,9 @@ public abstract class Message {
     /** Protocol version implemented by this class */
     public static final int PROTOV1 = 1;
 
+    /** PAMR version 1.1 - support for direct connections between agents */
+    public static final int PROTOV11 = 2;
+
     /** All the message types supported by the ProActive message routing protocol */
     /* ORDER MATTERS ! ordinal() is used to attribute an id to each message type */
     public enum MessageType {
@@ -359,7 +362,7 @@ public abstract class Message {
      */
     protected Message(MessageType type, long messageId) {
         this.type = type;
-        this.protoId = PROTOV1;
+        this.protoId = PROTOV11;
         this.messageId = messageId;
     }
 
@@ -386,7 +389,7 @@ public abstract class Message {
                 "Invalid value for " + Field.LENGTH + " field:" + this.length);
         }
 
-        if (this.protoId != PROTOV1) {
+        if (this.protoId != PROTOV11) {
             throw new MalformedMessageException("Malformed " + type.toString() + " message: " +
                 "Invalid value for " + Field.PROTO_ID + " field:" + this.protoId);
         }

@@ -97,9 +97,9 @@ public class MessageAssembler {
 
                     // Check the protocol is correct. Otherwise something fucked up
                     // and the connection is closed to avoid a disaster
-                    if (proto != Message.PROTOV1) {
+                    if (proto != Message.PROTOV11) {
                         logger.error("Invalid protocol ID received from " + sc.socket() + ": expected=" +
-                            Message.PROTOV1 + " received=" + proto);
+                            Message.PROTOV11 + " received=" + proto);
                         throw new IllegalStateException("Invalid protocol ID");
                     } else if (l < Message.Field.getTotalOffset()) {
                         logger.error("Invalid message length received from " + sc.socket() + ": " + l);

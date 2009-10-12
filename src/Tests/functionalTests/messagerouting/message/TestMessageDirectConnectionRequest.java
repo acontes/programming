@@ -94,7 +94,7 @@ public class TestMessageDirectConnectionRequest extends MessageFunctionalTest {
         @Override
         protected void testFields() {
             DirectConnectionRequestMessage msg = (DirectConnectionRequestMessage) this.msg;
-            Assert.assertEquals(Message.PROTOV1, msg.getProtoID());
+            Assert.assertEquals(Message.PROTOV11, msg.getProtoID());
             Assert.assertEquals(MessageType.DIRECT_CONNECTION_REQUEST, msg.getType());
             Assert.assertEquals(msgId, msg.getMessageID());
             Assert.assertEquals(agent, msg.getAgentID());

@@ -84,7 +84,7 @@ public class TestMessageDirectConnectionReplyNACK extends MessageFunctionalTest 
 
         @Override
         protected void testFields() {
-            Assert.assertEquals(Message.PROTOV1, msg.getProtoID());
+            Assert.assertEquals(Message.PROTOV11, msg.getProtoID());
             Assert.assertEquals(MessageType.DIRECT_CONNECTION_NACK, msg.getType());
             Assert.assertEquals(msgId, msg.getMessageID());
         }

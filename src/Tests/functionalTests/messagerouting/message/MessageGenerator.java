@@ -156,7 +156,7 @@ public abstract class MessageGenerator {
 
     protected byte[] alterProtoId() {
         byte[] ret = this.msg.toByteArray();
-        int badProto = nextIntNeq(Message.PROTOV1);
+        int badProto = nextIntNeq(Message.PROTOV11);
         logger.debug("invalid protoId " + badProto);
         TypeHelper.intToByteArray(badProto, ret, Field.PROTO_ID.getOffset());
         return ret;
