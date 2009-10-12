@@ -51,7 +51,10 @@ import org.objectweb.proactive.core.util.SweetCountDownLatch;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.messagerouting.client.AgentImpl;
+import org.objectweb.proactive.extra.messagerouting.exceptions.MessageRoutingException;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.Message;
+import org.objectweb.proactive.extra.messagerouting.protocol.message.Message.MessageType;
+import org.objectweb.proactive.extra.messagerouting.router.Router;
 
 
 /**
@@ -75,6 +78,11 @@ public class DirectConnectionServer implements Runnable {
     private final AtomicReference<Thread> selectThread = new AtomicReference<Thread>();
     private static final long CLEANUP_WAITING_TIME = 500L;
 
+    /** We need a reference to the local Agent because:
+     *  - it has methods to send messages to the router
+     *  - it has the reference to the incoming messages handler
+     *  - it has the references to the synchronization primitives
+     *  */
     private final AgentImpl localAgent;
 
     public DirectConnectionServer(AgentImpl agent, DirectConnectionServerConfig config) throws IOException {
@@ -279,6 +287,17 @@ public class DirectConnectionServer implements Runnable {
         IncomingMessageDispatcher tlp = new IncomingMessageDispatcher(currentMessage, localAgent
                 .getIncomingHandler());
         tpe.execute(tlp);
+    }
+
+    /**
+     * This method is used to sent a {@link MessageType#DIRECT_CONNECTION_ADVERTISE}
+     * message to the {@link Router} in order to mark that the local agent
+     * is ready to receive Direct Connections
+     * @param config - the information needed to construct the message
+     * @throws MessageRoutingException if the advertisment could not be sent
+     */
+    public void advertise(DirectConnectionServerConfig config) throws MessageRoutingException {
+        this.localAgent.advertiseDirectConnection(config.getInetAddress(), config.getPort());
     }
 
 }

@@ -68,6 +68,7 @@ import org.objectweb.proactive.extra.messagerouting.exceptions.MessageRoutingExc
 import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.DataReplyMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.DataRequestMessage;
+import org.objectweb.proactive.extra.messagerouting.protocol.message.DirectConnectionAdvertiseMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.ErrorMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.Message;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.RegistrationMessage;
@@ -422,6 +423,14 @@ public class AgentImpl implements Agent, AgentImplMBean {
         }
 
         internalSendMsg(reply);
+    }
+
+    public void advertiseDirectConnection(InetAddress dcAddress, int dcPort) throws MessageRoutingException {
+        Long messageID = requestIDGenerator.getAndIncrement();
+        DirectConnectionAdvertiseMessage dcAdMessage = new DirectConnectionAdvertiseMessage(messageID,
+            dcAddress, dcPort);
+        // one-way send; no need to wait for reply
+        internalSendMsg(dcAdMessage);
     }
 
     /**
@@ -839,6 +848,8 @@ public class AgentImpl implements Agent, AgentImplMBean {
                 dcServerThread.setDaemon(true);
                 dcServerThread.setName("Direct Connection Server: main select thread");
                 dcServerThread.start();
+                // advertise to the Router
+                dcServer.advertise(config);
                 // kill on JVM exit
                 Runtime.getRuntime().addShutdownHook(dcServer.getShutdownHook());
                 noServer = false;
@@ -857,6 +868,15 @@ public class AgentImpl implements Agent, AgentImplMBean {
                 logger.error(
                         "Direct connection server is disabled, reason: Could not initialize the server: " +
                             e.getMessage(), e);
+            } catch (MessageRoutingException e) {
+                logger
+                        .error(
+                                "The Direct Connection could not be advertised to the Router, reason: " +
+                                    e.getMessage() +
+                                    ".As a consequence, this endpoint cannot be contacted for direct communication with other Agents.",
+                                e);
+                // shut down the server
+                dcServer.stop();
             } finally {
                 this.dcServer = dcServer;
                 this.disabled = disabled;
