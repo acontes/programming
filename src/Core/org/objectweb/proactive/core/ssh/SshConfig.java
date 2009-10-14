@@ -1,3 +1,65 @@
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://proactive.inria.fr/team_members.htm
+ *  Contributor(s):
+ *
+ * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
+ */
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://proactive.inria.fr/team_members.htm
+ *  Contributor(s):
+ *
+ * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
+ */
 package org.objectweb.proactive.core.ssh;
 
 import static org.objectweb.proactive.core.ssh.SSH.logger;
@@ -31,7 +93,7 @@ public class SshConfig {
      * information are stored for host (key of the global map table) and for each host,
      * each field of the ssh configuration file are represent by a SshToken in an inner map table
      * 
-     * easily extensible, only add a new token the SshToken, and fill if special processing is needed 
+     * easily extensible, only add a new token the SshToken, and fill, if special processing is needed, 
      * the switch/case with the right method.         
      */
     private Map<String, Map<SshToken, String>> sshInfos;
@@ -60,7 +122,7 @@ public class SshConfig {
 
     /** 
      *  This class represent all the information about ssh connection.
-     *  All fields have to be set, classicaly by using the SshConfigFileParser
+     *  All fields have to be set, classically by using the SshConfigFileParser
      *   
      * @param sshDirPath
      *          The complete path to the directory where configuration file and
@@ -82,11 +144,11 @@ public class SshConfig {
     }
 
     /**
-     * Method call by the parser to know whose fields have to 
+     * Method call by the parser to know which fields have to 
      * be processed 
      *  
      * @return 
-     *        A table of the SshTokens which represent wanted field
+     *        A table of the SshTokens which represents wanted field
      *             
      * @see SshConfigFileParser
      */
@@ -104,7 +166,7 @@ public class SshConfig {
      *            The host to contact
      * 
      * @param request
-     *            The field to set (username,port,gateway, ...) declare with an enum SshToken
+     *            The field to set (username,port,gateway, ...) declare using an enum SshToken
      * 
      * @param information
      *            The value of the field
@@ -225,6 +287,12 @@ public class SshConfig {
         return user;
     }
 
+    /**
+     * Return the hostname of the gateway to use to contact to host <code> hostname </code>
+     * 
+     * @param host
+     *          The host to contact
+     */
     public String getGateway(String host) {
         String hostname = host;
 

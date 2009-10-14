@@ -32,13 +32,6 @@
 package org.objectweb.proactive.core.ssh;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.Socket;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
-
-import com.trilead.ssh2.ChannelCondition;
 import com.trilead.ssh2.Session;
 
 
@@ -76,7 +69,11 @@ public class SshProxyConnection extends SshConnection {
         String proxyCommand = "";
         String hostname = null;
 
-        if (localhostGW != null && 101010 == 42) {
+        if (localhostGW != null) {
+            if (hostGW == null) {
+                return null;
+            }
+
             hostname = localhostGW;
             proxyCommand = FORWARDER_COMMAND + " " + "%h" + " " + "%p";
             if (hostGW != null) {
@@ -101,7 +98,7 @@ public class SshProxyConnection extends SshConnection {
     }
 
     /**
-     * Return an Ssh Tunnel for contacting host on port which use the 
+     * Return an Ssh Session for contacting host on port which use the 
      *     proxyCommand mechanism
      * 
      * @param host

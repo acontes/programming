@@ -1,3 +1,34 @@
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://proactive.inria.fr/team_members.htm
+ *  Contributor(s):
+ *
+ * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
+ */
 package org.objectweb.proactive.core.ssh;
 
 import static org.objectweb.proactive.core.ssh.SSH.logger;
@@ -30,6 +61,13 @@ public class SshTunnelPool {
     /** The thread in charge of tunnel & connection garbage collection */
     private Thread gcThread = null;
 
+    /**
+     * The garbage collector thread isn't launch by this constructor because 
+     * of lack of SshConfig
+     * 
+     * @see SshTunnelPool#setSshConfig(SshConfig)
+     * @see SshTunnelPool#createAndStartGCThread()
+     */
     public SshTunnelPool() {
         logger.debug("Created a new SSH tunnel pool");
 
@@ -38,6 +76,9 @@ public class SshTunnelPool {
         this.proxyCommandCache = new HashMap<String, List<ProxyPair>>();
     }
 
+    /**
+     * If the GCThread hasn't been created and launch before do it 
+     */
     public void createAndStartGCThread() {
         if (config == null && gcThread == null) {
             // Throw an exception ?
@@ -56,6 +97,12 @@ public class SshTunnelPool {
         this.config = config;
     }
 
+    /**
+     * This constructor launch the garbage collector thread, no need to call 
+     * method SshTunnelPool#createAndStartGCThread() after instantiation.
+     * 
+     * @param config
+     */
     public SshTunnelPool(SshConfig config) {
         this();
         this.config = config;
@@ -86,7 +133,7 @@ public class SshTunnelPool {
                     // Try direct connection (never tried or was successful)
                     InetSocketAddress address = new InetSocketAddress(host, port);
                     socket = new Socket();
-                    socket.connect(address, 1000); // this.config.getConnectTimeout());
+                    socket.connect(address, this.config.getConnectTimeout());
                     this.tryCache.recordTrySuccess(host, port);
                 } catch (IOException ioe) {
                     this.tryCache.recordTryFailure(host, port);
@@ -299,6 +346,10 @@ public class SshTunnelPool {
             this.sessions = new ArrayList<SshProxySession>();
         }
 
+        /**
+         * Sessions are stored in order to check if they are used or not
+         * and garbage collect them
+         */
         public void registerSession(SshProxySession sess) {
             this.sessions.add(sess);
         }
