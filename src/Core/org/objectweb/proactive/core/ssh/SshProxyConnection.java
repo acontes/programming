@@ -27,11 +27,14 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_CONTRIBUTORS$$
  */
 package org.objectweb.proactive.core.ssh;
 
 import java.io.IOException;
+
+import org.objectweb.proactive.core.config.PAProperties;
+
 import com.trilead.ssh2.Session;
 
 
@@ -46,7 +49,7 @@ public class SshProxyConnection extends SshConnection {
     private String proxyCommandTemplate = "";
 
     /**
-     * Because special processing is needed before parent call
+     * Because special processing is needed before constructor call
      * 
      * @param hostGW
      *          The gateway to use for contacting the host (if needed)
@@ -62,29 +65,30 @@ public class SshProxyConnection extends SshConnection {
      *          
      * @throws IOException
      */
-    public static SshProxyConnection getInstance(String hostGW, String localhostGW, SshConfig config)
+    public static SshProxyConnection getInstance(String gateway, String outGateway, SshConfig config)
             throws IOException {
         String username;
         int port;
-        String proxyCommand = "";
-        String hostname = null;
-
-        if (localhostGW != null) {
-            if (hostGW == null) {
-                return null;
-            }
-
-            hostname = localhostGW;
-            proxyCommand = FORWARDER_COMMAND + " " + "%h" + " " + "%p";
-            if (hostGW != null) {
-                String user = config.getUsername(hostGW);
-                proxyCommand = SSHCLIENTCOMMAND + " " + user + "@" + hostGW + " " + FORWARDER_COMMAND + " " +
+        String proxyCommand = FORWARDER_COMMAND + " " + "%h" + " " + "%p";
+        String hostname = null;        
+        
+        if (outGateway != null) {
+            if (gateway == null || outGateway.equalsIgnoreCase(gateway)) {
+                hostname = outGateway;
+            } else { 
+                String user = config.getUsername(gateway);
+                hostname = outGateway;
+                proxyCommand = SSHCLIENTCOMMAND + " " + user + "@" + gateway + " " + FORWARDER_COMMAND + " " +
                     "%h" + " " + "%p";
             }
         } else {
-            proxyCommand = FORWARDER_COMMAND + " " + "%h" + " " + "%p";
-            hostname = hostGW;
-        }
+            if (gateway != null) {
+                hostname = gateway;
+            } else {
+                return null;
+            }
+        } 
+
         username = config.getUsername(hostname);
         port = config.getPort(hostname);
         String key[] = { config.getPrivateKeyPath(hostname) };

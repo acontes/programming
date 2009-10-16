@@ -36,6 +36,7 @@ import static org.objectweb.proactive.core.ssh.SSH.logger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 
 //the Unique instance of SubnetChecker
@@ -56,7 +57,7 @@ public class SubnetChecker {
         if (logger.isDebugEnabled()) {
             logger.debug("Subnet Infos : " + gateway + " as " + "gateway" + " added for subnet " + subnet);
         }
-
+      
         // separate network address and cidr
         String[] subnetDef = subnet.split("\\/");
         try {
@@ -104,15 +105,21 @@ public class SubnetChecker {
      */
     static private class IPMatcher implements Comparable<IPMatcher> {
 
+        // Store for getRule method
+        final private int cidr;
+        final private String network;       
+        
         final private int networkPortion;
         final private int mask;
-
+        
         private String gateway = null;
 
         public IPMatcher(String network, int cidr, String gateway) {
             this.gateway = gateway;
             this.mask = computeMask(cidr);
             this.networkPortion = stringToInt(network) & this.mask;
+            this.cidr = cidr;
+            this.network = network;
         }
 
         public String getGateway() {
@@ -158,5 +165,20 @@ public class SubnetChecker {
         public int compareTo(IPMatcher other) {
             return other.mask - this.mask;
         }
+
+        public String getRule() {            
+            return this.network+"/"+this.cidr;
+        }
+    }
+
+    public String getRule(String gateway) {
+        StringBuilder sb = new StringBuilder("");  
+        for (IPMatcher ipm : gatewaysTable){
+              if (ipm.getGateway().equalsIgnoreCase(gateway)){
+                  sb.append(ipm.getRule());                  
+                  sb.append(";");
+              }
+          }
+        return sb.toString();
     }
 }

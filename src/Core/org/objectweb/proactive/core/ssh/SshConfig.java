@@ -27,38 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
- */
-/*
- * ################################################################
- *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
- *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
- *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
- *
- * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_CONTRIBUTORS$$
  */
 package org.objectweb.proactive.core.ssh;
 
@@ -80,6 +49,8 @@ import org.objectweb.proactive.core.ssh.SshConfigFileParser.SshToken;
 public class SshConfig {
     private final static String defaultPath = System.getProperty("user.home") + File.separator + ".ssh" +
         File.separator;
+    private final static String IPv4Regexp = "^.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}";
+
     private final AtomicBoolean readOnly = new AtomicBoolean(false);
     private boolean tryPlainSocket;
     private boolean tryProxyCommand;
@@ -203,36 +174,6 @@ public class SshConfig {
     }
 
     /**
-     * Do a wildcarded search in the maptable and return all the information
-     * related to the machine <code> hostname </code>
-     * 
-     * @param hostname
-     *          the name of the machine on which information are requested   
-     * @return 
-     *          all information stored as a Map table of SshToken and String
-     *           
-     */
-    public Map<SshToken, String> getHostInformation(String hostname) {
-        Map<SshToken, String> hostInfos;
-        int index;
-        while (hostname.contains(".")) {
-            hostInfos = sshInfos.get(hostname);
-            if (hostInfos != null) {
-                return hostInfos;
-            } else {
-                // eat the first point
-                hostname = hostname.substring(1);
-                index = hostname.indexOf('.');
-                if (index < 0)
-                    break;
-                hostname = hostname.substring(hostname.indexOf('.'));
-            }
-        }
-        hostInfos = sshInfos.get(hostname);
-        return hostInfos;
-    }
-
-    /**
      * Replace host by hostname in the map table because 
      * ssh allow to use nickname in it configuration file 
      * 
@@ -266,13 +207,37 @@ public class SshConfig {
     // ACCESS METHOD 
     //////////////////////////////////////////////////////////////////////////////////
 
-    // Default method    
-    public String getInformation(String host, SshToken tok) {
+    // Default method        
+    /**
+     * Do a wildcarded search in the maptable and return all the information
+     * related to the machine <code> hostname </code>
+     * 
+     * @param hostname
+     *          the name of the machine on which information are requested   
+     * @return 
+     *          all information stored as a Map table of SshToken and String
+     *           
+     */
+    public String getInformation(String hostname, SshToken tok) {
         if (tok.isWanted()) {
-            Map<SshToken, String> hostsInfos = getHostInformation(host);
-            if (hostsInfos != null) {
-                return hostsInfos.get(tok);
+            Map<SshToken, String> hostInfos;
+            int index;
+            while (hostname.contains(".")) {
+                hostInfos = sshInfos.get(hostname);
+                if (hostInfos != null && hostInfos.get(tok) != null) {
+                    return hostInfos.get(tok);
+                } else {
+                    // eat the first point
+                    hostname = hostname.substring(1);
+                    index = hostname.indexOf('.');
+                    if (index < 0)
+                        break;
+                    hostname = hostname.substring(hostname.indexOf('.'));
+                }
             }
+            hostInfos = sshInfos.get(hostname);
+            if (hostInfos != null && hostInfos.get(tok) != null)
+                return hostInfos.get(tok);
         }
         return null;
     }
@@ -297,7 +262,7 @@ public class SshConfig {
         String hostname = host;
 
         // Special case for protocol like RMI, which use ip address for answer
-        if (host.matches("^.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}")) {
+        if (host.matches(IPv4Regexp)) {
             String subnetTest = subnetChecker.getGateway(host);
             if (subnetTest != null)
                 return subnetTest;
@@ -329,6 +294,40 @@ public class SshConfig {
             return key;
         else
             return getKeyDir() + "id_rsa";
+    }
+
+    /**
+     * Search the gateway to use for the host and return all rules related to this gateway
+     */
+    public String getRule(String host) {
+        String gateway = this.getInformation(host, SshToken.GATEWAY);
+        StringBuilder sb = new StringBuilder();
+
+        // Add all rules defined by regular expression on hostname for this gateway
+        for (String rule : sshInfos.keySet()) {
+            String gatewayTest = sshInfos.get(rule).get(SshToken.GATEWAY);  
+            if (gatewayTest != null && gatewayTest.equalsIgnoreCase(gateway)) {
+                sb.append(rule);
+                sb.append(":");
+                sb.append(gateway);
+                sb.append(":");
+                sb.append(getInformation(gateway, SshToken.PORT));
+                sb.append(";");
+            }
+        }
+
+        // Add all rules defined by ip address and cidr definition for this gateway
+        for (String rule : subnetChecker.getRule(gateway).split(";")) {
+            if (rule != null && !rule.isEmpty()) {
+                sb.append(rule);
+                sb.append(":");
+                sb.append(gateway);
+                sb.append(":");
+                sb.append(getInformation(gateway, SshToken.PORT));
+                sb.append(";");
+            }
+        }
+        return sb.toString();
     }
 
     /////////////////////////////////////////////////////////////////////////////
@@ -429,6 +428,5 @@ public class SshConfig {
 
     public String getKeyDir() {
         return this.keyDir;
-    }
-
+    }  
 }

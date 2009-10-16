@@ -27,7 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_CONTRIBUTORS$$
  */
 
 package org.objectweb.proactive.core.ssh;
@@ -208,7 +208,11 @@ public class SshConfigFileParser {
                 case GATEWAY:
                     storeProxyCommand(host, cutAt(SshToken.GATEWAY.getValue(), line), storer);
                     break;
-
+                    
+                case PRIVATEKEY:
+                    storePrivateKey(host, cutAt(SshToken.GATEWAY.getValue(), line), storer);
+                    break;
+                    
                 case UNKNOW:
                     // Do nothing except debug notification                
                     if (logger.isDebugEnabled() && line.length() != 0) {
@@ -264,6 +268,12 @@ public class SshConfigFileParser {
         }
     }
 
+    /*
+     * Replace the binding '~' by the user home directory
+     */
+    private void storePrivateKey(String host, String line, SshConfig storer) {
+        defaultStore(host, line.replace("~", System.getProperty("user.home")), SshToken.PRIVATEKEY, storer);
+    }
     ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /////////////////////////////////////////////////////////////

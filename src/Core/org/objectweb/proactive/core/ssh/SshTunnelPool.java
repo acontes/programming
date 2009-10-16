@@ -27,7 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_CONTRIBUTORS$$
  */
 package org.objectweb.proactive.core.ssh;
 
@@ -45,6 +45,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.Sleeper;
 
@@ -144,22 +145,19 @@ public class SshTunnelPool {
 
         // Try proxy command 
         if (socket == null && config.tryProxyCommand()) {
-            String localhost = ProActiveInet.getInstance().getHostname();
-            // localhost can't open outgoing connection
-            String localhostGW = config.getGateway(localhost);
-            String hostGW = config.getGateway(host);
+            String gateway = config.getGateway(host);
+            String outGateway = PAProperties.PA_SSH_PROXY_USE_GATEWAY_OUT.isSet() ? PAProperties.PA_SSH_PROXY_USE_GATEWAY_OUT.getValue() : null;
             // if proxyCommand command mechanism is needed
-            if ((localhostGW != null) || (hostGW != null)) {
-                String gw = localhostGW != null ? localhostGW : hostGW;
+            if (gateway != null || outGateway != null) {
                 synchronized (this.proxyCommandCache) {
                     SshProxyConnection cnx = null;
-                    List<ProxyPair> pairs = this.proxyCommandCache.get(gw);
+                    List<ProxyPair> pairs = this.proxyCommandCache.get(gateway);
                     if (pairs == null) {
-                        cnx = SshProxyConnection.getInstance(hostGW, localhostGW, (SshConfig) config);
+                        cnx = SshProxyConnection.getInstance(gateway, outGateway, config);
                         pairs = new ArrayList<ProxyPair>();
                         ProxyPair p = new ProxyPair(cnx);
                         pairs.add(p);
-                        this.proxyCommandCache.put(gw, pairs);
+                        this.proxyCommandCache.put(gateway, pairs);
                     }
 
                     SshProxySession session = null;
@@ -179,7 +177,7 @@ public class SshTunnelPool {
                     if (session == null) {
                         // No Connections permit to open a new session
                         // Create a new connection
-                        cnx = SshProxyConnection.getInstance(hostGW, localhostGW, (SshConfig) config);
+                        cnx = SshProxyConnection.getInstance(gateway, outGateway, (SshConfig) config);
                         session = cnx.getSession(host, port);
                         ProxyPair pair = new ProxyPair(cnx);
                         pair.registerSession(session);

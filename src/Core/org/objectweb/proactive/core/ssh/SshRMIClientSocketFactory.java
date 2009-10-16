@@ -27,7 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_CONTRIBUTORS$$
  */
 package org.objectweb.proactive.core.ssh;
 
@@ -40,13 +40,22 @@ import java.rmi.server.RMIClientSocketFactory;
 public class SshRMIClientSocketFactory implements RMIClientSocketFactory, Serializable {
 
     static final private SshTunnelPool tunnelPool = new SshTunnelPool();
-
+    static SshConfig sshConfig;
+    private String specificGatewayRule = "";    
+    
     public SshRMIClientSocketFactory(SshConfig config) {
-        tunnelPool.setSshConfig(config);
+        sshConfig = config;
+        tunnelPool.setSshConfig(sshConfig);
         tunnelPool.createAndStartGCThread();
     }
 
     public Socket createSocket(String host, int port) throws IOException {
+        if(specificGatewayRule.isEmpty()){ 
+            specificGatewayRule = sshConfig.getRule(host); 
+        }else{
+            SshConfigFileParser parser = new SshConfigFileParser();
+            parser.parseProperties(specificGatewayRule, sshConfig);
+        }
         return tunnelPool.getSocket(host, port);
     }
 
