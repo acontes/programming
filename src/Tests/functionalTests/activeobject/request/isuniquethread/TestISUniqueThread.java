@@ -1,3 +1,35 @@
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive@ow2.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version
+ * 2 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ActiveEon Team
+ *                        http://www.activeeon.com/
+ *  Contributor(s):
+ *
+ *
+ * ################################################################
+ * $$ACTIVEEON_INITIAL_DEV$$
+ */
 package functionalTests.activeobject.request.isuniquethread;
 
 import java.util.Vector;
@@ -68,14 +100,14 @@ public class TestISUniqueThread extends GCMFunctionalTestDefaultNodes {
         Node n1 = super.getANode();
         Node n2 = super.getANode();
 
-        AgentForIS a1 = (AgentForIS) PAActiveObject.newActive(AgentForIS.class.getName(), null, n1);
+        AgentForIS a1 = PAActiveObject.newActive(AgentForIS.class, null, n1);
         a1.init();
-        AgentForIS a2 = (AgentForIS) PAActiveObject.newActive(AgentForIS.class.getName(), null, n1);
+        AgentForIS a2 = PAActiveObject.newActive(AgentForIS.class, null, n1);
         a2.init();
 
         Caller[] callers = new Caller[NB_CALLER];
         for (int i = 0; i < NB_CALLER; i++) {
-            callers[i] = (Caller) PAActiveObject.newActive(Caller.class.getName(), new Object[] {}, n2);
+            callers[i] = PAActiveObject.newActive(Caller.class, new Object[] {}, n2);
         }
 
         // create RMI threads

@@ -24,11 +24,12 @@
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
+ *  Contributor(s): ActiveEon Team - http://www.activeeon.com
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_CONTRIBUTOR$$
  */
+
 package org.objectweb.proactive.core.mop;
 
 import java.io.IOException;
@@ -55,10 +56,8 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.body.ActiveBody;
-import org.objectweb.proactive.core.body.BodyImpl;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.mop.proxy.PAProxy;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;

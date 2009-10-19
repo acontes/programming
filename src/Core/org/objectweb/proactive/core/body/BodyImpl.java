@@ -24,16 +24,18 @@
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
+ *  Contributor(s): ActiveEon Team - http://www.activeeon.com
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_CONTRIBUTOR$$
  */
+
 package org.objectweb.proactive.core.body;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.management.ManagementFactory;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,6 +51,7 @@ import javax.management.ObjectName;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActiveInternalObject;
+import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.benchmarks.timit.util.CoreTimersContainer;
 import org.objectweb.proactive.core.ProActiveException;
@@ -253,6 +256,8 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             }
         }
 
+        // ImmediateService 
+        initializeImmediateService(reifiedObject);
     }
 
     //
@@ -361,6 +366,17 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         checkImmediateServiceMode(methodName, parametersTypes, uniqueThread);
         ((RequestReceiverImpl) this.requestReceiver).setImmediateService(methodName, parametersTypes,
                 uniqueThread);
+    }
+
+    protected void initializeImmediateService(Object reifiedObject) {
+        Method[] methods = reifiedObject.getClass().getMethods();
+        for (int i = 0; i < methods.length; i++) {
+            Method m = methods[i];
+            ImmediateService is = m.getAnnotation(ImmediateService.class);
+            if (is != null) {
+                setImmediateService(m.getName(), m.getParameterTypes(), is.uniqueThread());
+            }
+        }
     }
 
     private void checkImmediateServiceMode(String methodName, Class<?>[] parametersTypes, boolean uniqueThread) {

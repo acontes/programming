@@ -24,10 +24,10 @@
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
+ *  Contributor(s): ActiveEon Team - http://www.activeeon.com
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package org.objectweb.proactive.core.mop;
 
@@ -302,7 +302,7 @@ public class JavassistByteCodeStubBuilder {
                 classesIndexer.add(implementedInterfacesTable[itfsIndex].getName());
             }
 
-            //              The declared methods for the current interface
+            // The declared methods for the current interface
             CtMethod[] declaredMethods = implementedInterfacesTable[itfsIndex].getDeclaredMethods();
 
             // For each method declared in this class
@@ -315,6 +315,10 @@ public class JavassistByteCodeStubBuilder {
 
                 // replace with current one, because this gives the actual declaring Class<?> of this method
                 Method m = temp.get(key);
+                if (m == null) {
+                    m = new Method(currentMethod);
+                    temp.put(key.toString(), m);
+                }
                 m.setCtMethod(currentMethod);
                 m.grabMethodandParameterAnnotation(currentMethod);
             }
