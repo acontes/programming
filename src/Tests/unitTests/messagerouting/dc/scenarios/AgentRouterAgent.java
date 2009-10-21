@@ -36,7 +36,6 @@ import java.net.Socket;
 
 import junit.framework.Assert;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.extra.messagerouting.client.Agent;
@@ -53,18 +52,17 @@ import unitTests.messagerouting.dc.TestAgentImpl;
  * @version %G%, %I%
  * @since ProActive 4.10
  */
-public class AgentRouterAgent {
-
-    static final public Logger logger = Logger.getLogger("testsuite");
+public class AgentRouterAgent extends Infrastructure {
 
     protected Router router;
     protected TestAgentImpl agent;
     protected TestAgentImpl r_agent;
 
-    private boolean localIsDC = false;
-    private boolean remoteIsDC = false;
+    protected boolean localIsDC = false;
+    protected boolean remoteIsDC = false;
 
     public AgentRouterAgent(boolean localDC, boolean remoteDC) {
+        super();
         this.localIsDC = localDC;
         this.remoteIsDC = remoteDC;
     }
@@ -89,6 +87,11 @@ public class AgentRouterAgent {
             PAProperties.PA_NET_ROUTER_DIRECT_CONNECTION.setValue(remoteIsDC);
             PAProperties.PA_NET_ROUTER_DC_PORT.setValue(R_DC_PORT);
             r_agent = new TestAgentImpl(router.getInetAddr(), router.getPort());
+            // if any of the agents is DC
+            if (localIsDC || remoteIsDC) {
+                logger.info("Waiting for " + TIMEOUT + " ms, so that the router processes the DC_ADs");
+                sleeper.sleep();
+            }
         } catch (SecurityException e) {
             logger.error(e.getMessage(), e);
             Assert.fail(Agent.class.getName() +

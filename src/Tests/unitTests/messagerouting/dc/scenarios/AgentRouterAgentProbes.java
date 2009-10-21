@@ -85,6 +85,15 @@ public class AgentRouterAgentProbes extends AgentRouterAgent {
             Assert.fail(AgentImplMBean.class.getName() +
                 " implementation changed. This unit test should also be re-implemented.");
         }
+
+        // test the DC_ADs were taken into account
+        if (this.localIsDC) {
+            Assert.assertTrue(this.routerMBean.supportsDirectConnections(this.agent.getAgentID().getId()));
+        }
+
+        if (this.remoteIsDC) {
+            Assert.assertTrue(this.routerMBean.supportsDirectConnections(this.r_agent.getAgentID().getId()));
+        }
     }
 
     public boolean testRemoteAgentState(AgentState expectedState) {

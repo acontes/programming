@@ -39,13 +39,13 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.util.Sleeper;
 import org.objectweb.proactive.extra.messagerouting.exceptions.MessageRoutingException;
 import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
 
 import unitTests.UnitTests;
 import unitTests.messagerouting.dc.Helpers;
 import unitTests.messagerouting.dc.scenarios.AgentRouterAgentProbes;
+import unitTests.messagerouting.dc.scenarios.Infrastructure;
 import unitTests.messagerouting.dc.scenarios.AgentRouterAgentProbes.AgentState;
 
 
@@ -60,7 +60,6 @@ import unitTests.messagerouting.dc.scenarios.AgentRouterAgentProbes.AgentState;
 public class TestDirectCommunication extends UnitTests {
 
     private AgentRouterAgentProbes infrastructure;
-    private static final long TIMEOUT = 300;
 
     @Before
     public void before() throws IOException, ProActiveException {
@@ -72,11 +71,7 @@ public class TestDirectCommunication extends UnitTests {
     // from local agent to remote agent
     @Test
     public void testOneway() throws MessageRoutingException {
-        Sleeper paSleeper = new Sleeper(TIMEOUT);
         AgentID remoteAgentID = infrastructure.getRemoteAgent().getAgentID();
-        // the DC_AD message was sent; test if it was processed by the router
-        paSleeper.sleep();
-        Assert.assertTrue(infrastructure.routerMBean.supportsDirectConnections(remoteAgentID.getId()));
         // the remote agent is taken into account for DC at message transmission
         Assert.assertTrue(infrastructure.testRemoteAgentState(AgentState.NOT_SEEN));
         // send a DATA_REQ message with empty payload
@@ -84,12 +79,12 @@ public class TestDirectCommunication extends UnitTests {
         // at this point, the remoteAgentID should have been taken into account by the negotiator
         Assert.assertTrue(infrastructure.testRemoteAgentState(AgentState.SEEN_OR_CONNECTED));
         // after a while, a direct connection should have been established
-        paSleeper.sleep();
+        infrastructure.sleep();
         Assert.assertTrue(infrastructure.testRemoteAgentState(AgentState.CONNECTED));
         // now, sending a second DATA_REQ message should pass through the direct communication channel
         infrastructure.getLocalAgent().tunnelShutdown();
         Assert.assertTrue(infrastructure.getLocalAgent().onewaySend(null, infrastructure.getRemoteAgent(),
-                TIMEOUT));
+                Infrastructure.TIMEOUT));
         // nothing should change in the Agent state
         Assert.assertTrue(infrastructure.testRemoteAgentState(AgentState.CONNECTED));
     }
@@ -99,13 +94,6 @@ public class TestDirectCommunication extends UnitTests {
     @Ignore
     @Test
     public void testBidirectional() throws MessageRoutingException, IOException, ClassNotFoundException {
-        Sleeper paSleeper = new Sleeper(TIMEOUT);
-        AgentID localAgentID = infrastructure.getLocalAgent().getAgentID();
-        AgentID remoteAgentID = infrastructure.getRemoteAgent().getAgentID();
-        // the DC_AD message was sent; test if it was processed by the router
-        paSleeper.sleep();
-        Assert.assertTrue(infrastructure.routerMBean.supportsDirectConnections(remoteAgentID.getId()));
-        Assert.assertTrue(infrastructure.routerMBean.supportsDirectConnections(localAgentID.getId()));
         // the remote agent is taken into account for DC only at message transmission
         Assert.assertTrue(infrastructure.testRemoteAgentState(AgentState.NOT_SEEN));
         Assert.assertTrue(infrastructure.testLocalAgentState(AgentState.NOT_SEEN));
@@ -115,7 +103,7 @@ public class TestDirectCommunication extends UnitTests {
 
         Assert.assertTrue(infrastructure.testRemoteAgentState(AgentState.SEEN_OR_CONNECTED));
         Assert.assertTrue(infrastructure.testLocalAgentState(AgentState.SEEN_OR_CONNECTED));
-        paSleeper.sleep();
+        infrastructure.sleep();
         Assert.assertTrue(infrastructure.testRemoteAgentState(AgentState.CONNECTED));
         Assert.assertTrue(infrastructure.testLocalAgentState(AgentState.CONNECTED));
 
@@ -136,9 +124,9 @@ public class TestDirectCommunication extends UnitTests {
         MessageSender ms = new MessageSender(infrastructure);
         Thread senderThread = new Thread(ms);
         senderThread.start();
-        if (infrastructure.getLocalAgent().waitReply(infrastructure.getRemoteAgent(), TIMEOUT)) {
+        if (infrastructure.getLocalAgent().waitReply(infrastructure.getRemoteAgent(), Infrastructure.TIMEOUT)) {
             // did the sender thread finish?
-            if (ms.waitToFinish(TIMEOUT)) {
+            if (ms.waitToFinish(Infrastructure.TIMEOUT)) {
                 Assert.assertFalse("Attempt to send the message to the remote endpoint failed ", ms
                         .failedSend());
                 Assert.assertTrue("Received unexpected reply", ms.gotExpectedReply());

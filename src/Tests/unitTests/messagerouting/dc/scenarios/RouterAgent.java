@@ -34,7 +34,6 @@ import java.io.IOException;
 
 import junit.framework.Assert;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.extra.messagerouting.client.ProActiveMessageHandler;
@@ -55,16 +54,14 @@ import functionalTests.ft.Agent;
  * @version %G%, %I%
  * @since ProActive 4.10
  */
-public class RouterAgent {
-
-    static final public Logger logger = Logger.getLogger("testsuite");
+public class RouterAgent extends Infrastructure {
 
     protected Router router;
-    protected RouterImplMBean routerMBean;
     protected TestAgentImpl agent;
-    private final boolean agentIsDC;
+    protected final boolean agentIsDC;
 
     public RouterAgent(boolean dcAgent) {
+        super();
         this.agentIsDC = dcAgent;
     }
 
@@ -72,19 +69,18 @@ public class RouterAgent {
         return agent;
     }
 
-    public RouterImplMBean getRouterMBean() {
-        return routerMBean;
-    }
-
     protected static final int DC_PORT = 18989;
 
     public void startInfrastructure() throws IOException, ProActiveException {
         router = Router.createAndStart(new RouterConfig());
         try {
-            routerMBean = (RouterImplMBean) router;
             PAProperties.PA_NET_ROUTER_DIRECT_CONNECTION.setValue(agentIsDC);
             PAProperties.PA_NET_ROUTER_DC_PORT.setValue(DC_PORT);
             agent = new TestAgentImpl(router.getInetAddr(), router.getPort(), ProActiveMessageHandler.class);
+            if (agentIsDC) {
+                // wait for the router to process the DC_AD
+                this.sleeper.sleep();
+            }
         } catch (SecurityException e) {
             logger.error(e.getMessage(), e);
             Assert.fail(Agent.class.getName() +

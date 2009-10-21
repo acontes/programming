@@ -28,47 +28,35 @@
  *
  * ################################################################
  */
-package unitTests.messagerouting.dc.router;
+package unitTests.messagerouting.dc.scenarios;
 
 import java.io.IOException;
 
-import junit.framework.Assert;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
-
-import unitTests.UnitTests;
-import unitTests.messagerouting.dc.scenarios.Infrastructure;
-import unitTests.messagerouting.dc.scenarios.RouterAgent;
+import org.objectweb.proactive.core.util.Sleeper;
 
 
 /**
- * Test how the router processes a DC_AD message
- * @author fabratu
- * @version %G%, %I%
- * @since ProActive 4.10
+ * Generic description of a pamr infrastructure
  */
-public class TestDCAdvertise extends UnitTests {
+public abstract class Infrastructure {
 
-    private Infrastructure infrastructure;
+    static final protected Logger logger = Logger.getLogger("testsuite");
 
-    @Before
-    public void before() throws IOException, ProActiveException {
-        infrastructure = new RouterAgent(true);
-        infrastructure.startInfrastructure();
+    static final public long TIMEOUT = 300;
+
+    final protected Sleeper sleeper;
+
+    public Infrastructure() {
+        this.sleeper = new Sleeper(TIMEOUT);
     }
 
-    @Test
-    public void test() {
-        // the tests are done at infrastructure startup
-        logger.info("success");
+    public void sleep() {
+        this.sleeper.sleep();
     }
 
-    @After
-    public void after() {
-        infrastructure.stopInfrastructure();
-    }
+    public abstract void startInfrastructure() throws IOException, ProActiveException;
 
+    public abstract void stopInfrastructure();
 }

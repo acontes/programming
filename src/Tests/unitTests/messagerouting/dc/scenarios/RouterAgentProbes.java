@@ -28,47 +28,42 @@
  *
  * ################################################################
  */
-package unitTests.messagerouting.dc.router;
+package unitTests.messagerouting.dc.scenarios;
 
 import java.io.IOException;
 
 import junit.framework.Assert;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 import org.objectweb.proactive.core.ProActiveException;
-
-import unitTests.UnitTests;
-import unitTests.messagerouting.dc.scenarios.Infrastructure;
-import unitTests.messagerouting.dc.scenarios.RouterAgent;
+import org.objectweb.proactive.extra.messagerouting.router.RouterImplMBean;
 
 
 /**
- * Test how the router processes a DC_AD message
- * @author fabratu
- * @version %G%, %I%
- * @since ProActive 4.10
+ * Same as RouterAgent, but with probes for gathering
+ * 	additional information:
+ * 	- Router MBean
+ * 	- MBean for the agent
  */
-public class TestDCAdvertise extends UnitTests {
+public class RouterAgentProbes extends RouterAgent {
 
-    private Infrastructure infrastructure;
+    protected RouterImplMBean routerMBean;
 
-    @Before
-    public void before() throws IOException, ProActiveException {
-        infrastructure = new RouterAgent(true);
-        infrastructure.startInfrastructure();
+    public RouterAgentProbes(boolean dcAgent) {
+        super(dcAgent);
     }
 
-    @Test
-    public void test() {
-        // the tests are done at infrastructure startup
-        logger.info("success");
+    public RouterImplMBean getRouterMBean() {
+        return routerMBean;
     }
 
-    @After
-    public void after() {
-        infrastructure.stopInfrastructure();
+    public void startInfrastructure() throws IOException, ProActiveException {
+        super.startInfrastructure();
+        this.routerMBean = (RouterImplMBean) router;
+
+        // test if the DC_AD was taken into account
+        if (this.agentIsDC) {
+            Assert.assertTrue(this.routerMBean.supportsDirectConnections(this.agent.getAgentID().getId()));
+        }
     }
 
 }
