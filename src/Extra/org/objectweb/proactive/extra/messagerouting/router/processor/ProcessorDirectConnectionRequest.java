@@ -101,52 +101,64 @@ public class ProcessorDirectConnectionRequest extends Processor {
     @Override
     public void process() throws MalformedMessageException {
 
-        DirectConnectionRequestMessage dcReq = new DirectConnectionRequestMessage(this.rawMessage.array(), 0);
+        try {
+            DirectConnectionRequestMessage dcReq = new DirectConnectionRequestMessage(
+                this.rawMessage.array(), 0);
 
-        AgentID targetId = dcReq.getRemoteAgentID();
-        AgentID senderId = dcReq.getAgentID();
-        long messageId = dcReq.getMessageID();
+            AgentID targetId = dcReq.getRemoteAgentID();
+            AgentID senderId = dcReq.getAgentID();
+            long messageId = dcReq.getMessageID();
 
-        DirectConnectionReplyMessage reply;
+            DirectConnectionReplyMessage reply;
 
-        Client sender = this.router.getClient(senderId);
-        if (sender == null)
-            throw new MalformedMessageException("Malformed " + MessageType.DIRECT_CONNECTION_REQUEST +
-                " message " + dcReq + ":Invalid value in the " +
-                DirectConnectionRequestMessage.Field.AGENT_ID + " field: " +
-                " The router knows no agent with ID " + senderId);
+            Client sender = this.router.getClient(senderId);
+            if (sender == null)
+                throw new MalformedMessageException("Malformed " + MessageType.DIRECT_CONNECTION_REQUEST +
+                    " message " + dcReq + ":Invalid value in the " +
+                    DirectConnectionRequestMessage.Field.AGENT_ID + " field: " +
+                    " The router knows no agent with ID " + senderId);
 
-        Client target = this.router.getClient(targetId);
-        if (target == null) {
-            // unknown remote endpoint
-            logger.info("Got a " + MessageType.DIRECT_CONNECTION_REQUEST + " message for an unknown agent: " +
-                targetId);
-            // NACK the sender
-            reply = new DirectConnectionReplyNACKMessage(messageId);
-        } else {
-            if (!target.acceptsDirectConnections()) {
-                // agent known, but did not register for direct connections
-                logger.info("Agent " + targetId + " is known but has not sent a " +
-                    MessageType.DIRECT_CONNECTION_ADVERTISE + " message to the router ");
+            Client target = this.router.getClient(targetId);
+            if (target == null) {
+                // unknown remote endpoint
+                logger.info("Got a " + MessageType.DIRECT_CONNECTION_REQUEST +
+                    " message for an unknown agent: " + targetId);
+                // NACK the sender
                 reply = new DirectConnectionReplyNACKMessage(messageId);
             } else {
-                InetSocketAddress dcEndpoint = target.getDirectConnectionEndpoint();
-                if (sameNetworkSegment(dcEndpoint)) {
-                    reply = new DirectConnectionReplyACKMessage(messageId, dcEndpoint.getAddress(),
-                        dcEndpoint.getPort());
-                } else {
-                    logger.info("Remote endpoint " + dcEndpoint +
-                        " is not considered to be on the same network segment as the " + " client " + sender +
-                        " that requested the direct connection to that remote endpoint ");
+                if (!target.acceptsDirectConnections()) {
+                    // agent known, but did not register for direct connections
+                    logger.info("Agent " + targetId + " is known but has not sent a " +
+                        MessageType.DIRECT_CONNECTION_ADVERTISE + " message to the router ");
                     reply = new DirectConnectionReplyNACKMessage(messageId);
+                } else {
+                    InetSocketAddress dcEndpoint = target.getDirectConnectionEndpoint();
+                    if (sameNetworkSegment(dcEndpoint)) {
+                        reply = new DirectConnectionReplyACKMessage(messageId, dcEndpoint.getAddress(),
+                            dcEndpoint.getPort());
+                    } else {
+                        logger.info("Remote endpoint " + dcEndpoint +
+                            " is not considered to be on the same network segment as the " + " client " +
+                            sender + " that requested the direct connection to that remote endpoint ");
+                        reply = new DirectConnectionReplyNACKMessage(messageId);
+                    }
                 }
             }
+
+            if (logger.isDebugEnabled())
+                logger.debug("Sending the direct connection reply " + reply + " to the client " + sender);
+
+            sender.sendMessageOrCache(reply.toByteArray());
+        } catch (MalformedMessageException e) {
+            AgentID recipient;
+            try {
+                recipient = DirectConnectionRequestMessage.readAgentID(this.rawMessage.array(), 0);
+            } catch (MalformedMessageException e1) {
+                // don't know the sender
+                recipient = null;
+            }
+            throw new MalformedMessageException(e, recipient);
         }
-
-        if (logger.isDebugEnabled())
-            logger.debug("Sending the direct connection reply " + reply + " to the client " + sender);
-
-        sender.sendMessageOrCache(reply.toByteArray());
 
     }
 

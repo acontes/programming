@@ -110,7 +110,13 @@ public class ErrorMessage extends DataMessage {
          * with an unknown router ID. A such error happens when a router is restarted.
          * Existing clients try to reconnect the endpoint.
          */
-        ERR_INVALID_ROUTER_ID;
+        ERR_INVALID_ROUTER_ID,
+
+        /** A corrupted message was received, and cannot be
+         * properly treated by the receiver.
+         *
+         */
+        ERR_MALFORMED_MESSAGE;
 
         public byte[] toByteArray() {
             byte[] buf = new byte[4];
@@ -131,6 +137,8 @@ public class ErrorMessage extends DataMessage {
                     return "ERR_NOT_CONNECTED_RCPT";
                 case ERR_UNKNOW_RCPT:
                     return "ERR_UNKNOW_RCPT";
+                case ERR_MALFORMED_MESSAGE:
+                    return "ERR_MALFORMED_MESSAGE";
                 default:
                     return super.toString();
             }
