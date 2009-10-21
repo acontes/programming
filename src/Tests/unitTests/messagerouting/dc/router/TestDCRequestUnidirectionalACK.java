@@ -83,7 +83,7 @@ public class TestDCRequestUnidirectionalACK extends UnitTests {
         int replyPort = replyAck.getPort();
 
         Assert.assertEquals(replyAddr, InetAddress.getLocalHost());
-        Assert.assertEquals(replyPort, AgentRouterAgent.R_DC_PORT);
+        Assert.assertTrue(infrastructure.checkPortBounds(replyPort));
 
         // try to connect directly, it should be possible
         Assert.assertTrue(infrastructure.checkDCServerStarted(replyAddr, replyPort));

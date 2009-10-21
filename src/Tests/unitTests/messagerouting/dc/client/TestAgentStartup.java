@@ -2,8 +2,8 @@ package unitTests.messagerouting.dc.client;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.Properties;
 
 import junit.framework.Assert;
@@ -67,23 +67,6 @@ public class TestAgentStartup extends UnitTests {
         }
     }
 
-    private ServerSocket ss;
-
-    private void releasePort() throws IOException {
-        ss.close();
-    }
-
-    private void occupyPort(int dcPort) throws IOException {
-        ss = new ServerSocket(dcPort);
-    }
-
-    private Properties sysProps;
-
-    @Before
-    public void stashPAProperties() {
-        sysProps = System.getProperties();
-    }
-
     // start with DC disabled
     @Test
     public void startNoDC() throws IOException, ProActiveException {
@@ -122,32 +105,13 @@ public class TestAgentStartup extends UnitTests {
     // start with DC enabled for server and client also
     @Test
     public void startDC() throws IOException, ProActiveException {
+        // run the test only if DC_PORT is free; we don't test here port election
+        if (!freePort(DC_PORT)) {
+            return;
+        }
         PAProperties.PA_NET_ROUTER_DIRECT_CONNECTION.setValue(true);
         PAProperties.PA_NET_ROUTER_DC_PORT.setValue(DC_PORT);
         inspectDCState(true);
-    }
-
-    // start DC but try to bind to an already-bound port.
-    @Test
-    public void startDCInvalidBind() throws IOException, ProActiveException {
-        PAProperties.PA_NET_ROUTER_DIRECT_CONNECTION.setValue(true);
-        String oldPort = System.getProperty(PAProperties.PA_NET_ROUTER_DC_PORT.getKey());
-        PAProperties.PA_NET_ROUTER_DC_PORT.setValue(DC_PORT);
-
-        // bind to an already-occupied port
-        occupyPort(DC_PORT);
-        startRouterAgent();
-        logger.info("If you just saw a stacktrace, it's normal.");
-        releasePort();
-        Assert.assertTrue(agent.getDCManager().isEnabled());
-        Assert.assertFalse(checkDCServerStarted(InetAddress.getLocalHost(), DC_PORT));
-        agent.shutdown();
-        router.stop();
-
-        if (oldPort != null)
-            PAProperties.PA_NET_ROUTER_DC_PORT.setValue(oldPort);
-        else
-            System.clearProperty(PAProperties.PA_NET_ROUTER_DC_PORT.getKey());
     }
 
     // start DC but try to bind to an invalid IP address
@@ -173,7 +137,7 @@ public class TestAgentStartup extends UnitTests {
         Assert.assertTrue(agent.getDCManager().isEnabled());
         boolean serverStarted = checkDCServerStarted(InetAddress.getLocalHost(), DC_PORT);
         Assert.assertEquals(serverStartedExpect, serverStarted);
-        agent.shutdown();
+        agent.shutdownWait();
         if (serverStartedExpect)
             // after we stopped, we are expecting not to have any DC server up and running!
             Assert.assertFalse(checkDCServerStarted(InetAddress.getLocalHost(), DC_PORT));
@@ -181,9 +145,32 @@ public class TestAgentStartup extends UnitTests {
         router.stop();
     }
 
+    private Properties sysProps;
+
+    @Before
+    public void stashPAProperties() {
+        sysProps = System.getProperties();
+    }
+
     @After
     public void revertPAProperties() {
         System.setProperties(sysProps);
+    }
+
+    // test if the given port is not occupied on the localhost
+    private boolean freePort(int port) {
+        try {
+            InetAddress localhost = InetAddress.getLocalHost();
+            Socket socket = new Socket(localhost, port);
+            socket.close();
+            return false;
+        } catch (UnknownHostException e) {
+            // cannot get the localhost address => we cannot test => assume ok
+            return true;
+        } catch (IOException e) {
+            // expect to fail
+            return true;
+        }
     }
 
 }

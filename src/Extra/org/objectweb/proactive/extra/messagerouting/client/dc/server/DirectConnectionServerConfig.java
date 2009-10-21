@@ -30,10 +30,13 @@
  */
 package org.objectweb.proactive.extra.messagerouting.client.dc.server;
 
+import java.io.IOException;
 import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.net.UnknownHostException;
 
 import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.util.ProActiveRandom;
 
 
 /**
@@ -51,6 +54,13 @@ public class DirectConnectionServerConfig {
     private static final int DEFAULT_NB_WORKER_THREADS = 4;
 
     private final InetAddress inetAddress;
+
+    // the real value of the port onto which the Server should bind
+    private final int realPort;
+
+    // configuration options for rebind attempts
+    public static final int DEFAULT_BIND_ATTEMPTS = 3;
+    public static final int DEFAULT_BIND_PORT_RANGE = 5;
 
     /**
      * Read the configuration from the ProActive properties set on this virtual machine
@@ -95,6 +105,63 @@ public class DirectConnectionServerConfig {
         else
             this.nbWorkerThreads = DEFAULT_NB_WORKER_THREADS;
 
+        // TODO config with PAProperties?
+        int bindAttempts = DEFAULT_BIND_ATTEMPTS;
+        int bindPortRange = DEFAULT_BIND_PORT_RANGE;
+        this.realPort = searchAvailablePort(this.port, bindAttempts, bindPortRange);
+
+    }
+
+    /**
+     * Attempt to find an available port on the local machine.
+     *
+     * First, the initial port value is tried. If that does not succeed, random port values
+     * within the range
+     * ( initialPort - bindPortRange, initialPort + bindPortRange )
+     * are tried. The total number of attempts - including the initial atempt
+     * for the original port value - is specified by the bindAttempts parameter.
+     *
+     * If all attempts fail, a {@link MissingPortException} is thrown
+     */
+    private static int searchAvailablePort(int initialPort, int bindPortRange, int bindAttempts)
+            throws MissingPortException {
+
+        if (!(0 <= initialPort && initialPort < 65535))
+            throw new IllegalArgumentException("Invalid initial port value: ");
+        int lower = initialPort - bindPortRange;
+        if (lower <= 0)
+            throw new IllegalArgumentException("The bind port range goes below the valid port values range");
+        int upper = initialPort + bindPortRange;
+        if (upper > 65535)
+            throw new IllegalArgumentException("The bind port range goes above the valid port values range");
+
+        int portToTry = initialPort;
+        for (int attemptNo = 0; attemptNo < bindAttempts; attemptNo++) {
+            // tentative bind
+            try {
+                ServerSocket ss = new ServerSocket(portToTry);
+                // bind succeeded
+                try {
+                    ss.close();
+                    return portToTry;
+                } catch (IOException e) {
+                    // the error reason could cause a next bind to fail. keep trying
+                    continue;
+                }
+            } catch (IOException e) {
+                // prepare the next attempt
+                portToTry = nextIntBetween(lower, upper);
+            }
+        }
+        throw new MissingPortException("The value of the " + PAProperties.PA_NET_ROUTER_DC_PORT.getKey() +
+            " ProActive property specifies an unavailable port, and all " + bindAttempts +
+            " attempts to find a free port within the range of ( " + lower + " , " + upper + " ) failed.");
+    }
+
+    private static final int nextIntBetween(int lower, int upper) {
+        if (lower == upper)
+            return lower;
+        return lower + ProActiveRandom.nextInt(upper - lower);
     }
 
     public static class DirectConnectionDisabledException extends Exception {
@@ -112,14 +179,19 @@ public class DirectConnectionServerConfig {
 
     }
 
-    public DirectConnectionServerConfig(int port) throws UnknownHostException {
-        this(port, DEFAULT_NB_WORKER_THREADS, InetAddress.getLocalHost());
+    public DirectConnectionServerConfig(int port, int bindPortRange, int bindAttempts)
+            throws UnknownHostException, MissingPortException {
+        this(port, searchAvailablePort(port, bindPortRange, bindAttempts), DEFAULT_NB_WORKER_THREADS,
+                InetAddress.getLocalHost());
     }
 
-    public DirectConnectionServerConfig(int port, int nbWorkerThreads, InetAddress inetAddress) {
+    public DirectConnectionServerConfig(int port, int realPort, int nbWorkerThreads, InetAddress inetAddress) {
 
         if (port < 0 || port > 65535)
             throw new IllegalArgumentException("Invalid port value:" + port);
+
+        if (realPort < 0 || realPort > 65535)
+            throw new IllegalArgumentException("Invalid (real) port value:" + realPort);
 
         if (nbWorkerThreads <= 0)
             throw new IllegalArgumentException("Invalid number of worker threads: " + nbWorkerThreads);
@@ -128,12 +200,13 @@ public class DirectConnectionServerConfig {
             throw new IllegalArgumentException("The inetAddress argument is null");
 
         this.port = port;
+        this.realPort = realPort;
         this.nbWorkerThreads = nbWorkerThreads;
         this.inetAddress = inetAddress;
     }
 
     public int getPort() {
-        return port;
+        return realPort;
     }
 
     public int getNbWorkerThreads() {

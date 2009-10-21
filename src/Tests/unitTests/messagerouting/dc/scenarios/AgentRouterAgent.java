@@ -39,6 +39,7 @@ import junit.framework.Assert;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.extra.messagerouting.client.Agent;
+import org.objectweb.proactive.extra.messagerouting.client.dc.server.DirectConnectionServerConfig;
 import org.objectweb.proactive.extra.messagerouting.router.Router;
 import org.objectweb.proactive.extra.messagerouting.router.RouterConfig;
 
@@ -76,16 +77,14 @@ public class AgentRouterAgent extends Infrastructure {
     }
 
     public static final int DC_PORT = 18989;
-    public static final int R_DC_PORT = 28989;
 
     public void startInfrastructure() throws IOException, ProActiveException {
         router = Router.createAndStart(new RouterConfig());
+        PAProperties.PA_NET_ROUTER_DC_PORT.setValue(DC_PORT);
         try {
             PAProperties.PA_NET_ROUTER_DIRECT_CONNECTION.setValue(localIsDC);
-            PAProperties.PA_NET_ROUTER_DC_PORT.setValue(DC_PORT);
             agent = new TestAgentImpl(router.getInetAddr(), router.getPort());
             PAProperties.PA_NET_ROUTER_DIRECT_CONNECTION.setValue(remoteIsDC);
-            PAProperties.PA_NET_ROUTER_DC_PORT.setValue(R_DC_PORT);
             r_agent = new TestAgentImpl(router.getInetAddr(), router.getPort());
             // if any of the agents is DC
             if (localIsDC || remoteIsDC) {
@@ -128,4 +127,10 @@ public class AgentRouterAgent extends Infrastructure {
         }
     }
 
+    // test a port value onto which a DC server supposedly listens
+    public final boolean checkPortBounds(int port) {
+        int lower = DC_PORT - DirectConnectionServerConfig.DEFAULT_BIND_PORT_RANGE;
+        int upper = DC_PORT + DirectConnectionServerConfig.DEFAULT_BIND_PORT_RANGE;
+        return lower <= port && port <= upper;
+    }
 }

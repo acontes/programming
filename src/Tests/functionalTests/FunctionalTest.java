@@ -119,6 +119,17 @@ public class FunctionalTest {
             jvmParameters.append(PAProperties.PA_NET_ROUTER_PORT.getCmdLine());
             jvmParameters.append(PAProperties.PA_NET_ROUTER_PORT.getValue());
             jvmParameters.append(" ");
+
+            if (PAProperties.PA_NET_ROUTER_DIRECT_CONNECTION.isSet()) {
+                jvmParameters.append(PAProperties.PA_NET_ROUTER_DIRECT_CONNECTION.getCmdLine());
+                jvmParameters.append(PAProperties.PA_NET_ROUTER_DIRECT_CONNECTION.getValue());
+                jvmParameters.append(" ");
+
+                jvmParameters.append(PAProperties.PA_NET_ROUTER_DC_PORT.getCmdLine());
+                jvmParameters.append(PAProperties.PA_NET_ROUTER_DC_PORT.getValue());
+                jvmParameters.append(" ");
+            }
+
         }
 
         return jvmParameters.toString();

@@ -44,6 +44,8 @@ import org.objectweb.proactive.extra.messagerouting.client.Tunnel;
 import org.objectweb.proactive.extra.messagerouting.exceptions.MessageRoutingException;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.DataRequestMessage;
 
+import unitTests.messagerouting.dc.scenarios.Infrastructure;
+
 
 /**
  * Decorator of AgentImpl which offers extra access
@@ -104,6 +106,13 @@ public class TestAgentImpl extends AgentImpl {
             this.testTunnel.shutdown();
         this.mr.stop();
         this.tunnel.shutdown();
+    }
+
+    // send the shutdown signal && wait a bit, so that
+    // it is processed by the receiving threads
+    public void shutdownWait() {
+        shutdown();
+        new Sleeper(Infrastructure.TIMEOUT).sleep();
     }
 
     public void injectTestTunnel(InetAddress routerAddr, int routerPort) throws IOException,

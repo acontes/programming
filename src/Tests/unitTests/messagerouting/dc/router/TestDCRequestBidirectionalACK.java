@@ -85,7 +85,8 @@ public class TestDCRequestBidirectionalACK extends UnitTests {
         int replyPort = replyAck.getPort();
 
         Assert.assertEquals(replyAddr, InetAddress.getLocalHost());
-        Assert.assertEquals(replyPort, AgentRouterAgent.R_DC_PORT);
+        // we don't know the port onto which the server bound; but we know its range
+        Assert.assertTrue(infrastructure.checkPortBounds(replyPort));
 
         // try to connect directly, it should be possible
         Assert.assertTrue(infrastructure.checkDCServerStarted(replyAddr, replyPort));
@@ -100,7 +101,7 @@ public class TestDCRequestBidirectionalACK extends UnitTests {
         replyPort = replyAck.getPort();
 
         Assert.assertEquals(replyAddr, InetAddress.getLocalHost());
-        Assert.assertEquals(replyPort, AgentRouterAgent.DC_PORT);
+        Assert.assertTrue(infrastructure.checkPortBounds(replyPort));
 
         // try to connect directly, it should be possible
         Assert.assertTrue(infrastructure.checkDCServerStarted(replyAddr, replyPort));
