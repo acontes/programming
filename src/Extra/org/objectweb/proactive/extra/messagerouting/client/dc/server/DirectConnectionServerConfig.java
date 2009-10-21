@@ -49,12 +49,9 @@ public class DirectConnectionServerConfig {
 
     private int port;
 
-    private final int nbWorkerThreads;
-
-    private static final int DEFAULT_NB_WORKER_THREADS = 4;
-    private static final String PORT_RANGE_SEPARATOR = "-";
-
     private final InetAddress inetAddress;
+
+    private static final String PORT_RANGE_SEPARATOR = "-";
 
     /**
      * Read the configuration from the ProActive properties set on this virtual machine
@@ -115,11 +112,6 @@ public class DirectConnectionServerConfig {
             this.port = 0;
         }
 
-        if (PAProperties.PA_PAMR_DC_WORKERS_NO.isSet())
-            this.nbWorkerThreads = PAProperties.PA_PAMR_DC_WORKERS_NO.getValueAsInt();
-        else
-            this.nbWorkerThreads = DEFAULT_NB_WORKER_THREADS;
-
     }
 
     /**
@@ -166,23 +158,18 @@ public class DirectConnectionServerConfig {
     }
 
     public DirectConnectionServerConfig(int lowerRange, int upperRange) throws UnknownHostException {
-        this(searchAvailablePort(lowerRange, upperRange), DEFAULT_NB_WORKER_THREADS, InetAddress
-                .getLocalHost());
+        this(searchAvailablePort(lowerRange, upperRange), InetAddress.getLocalHost());
     }
 
-    public DirectConnectionServerConfig(int port, int nbWorkerThreads, InetAddress inetAddress) {
+    public DirectConnectionServerConfig(int port, InetAddress inetAddress) {
 
         if (port < 0 || port > 65535)
             throw new IllegalArgumentException("Invalid port value:" + port);
-
-        if (nbWorkerThreads <= 0)
-            throw new IllegalArgumentException("Invalid number of worker threads: " + nbWorkerThreads);
 
         if (inetAddress == null)
             throw new IllegalArgumentException("The inetAddress argument is null");
 
         this.port = port;
-        this.nbWorkerThreads = nbWorkerThreads;
         this.inetAddress = inetAddress;
     }
 
@@ -192,10 +179,6 @@ public class DirectConnectionServerConfig {
 
     public void setPort(int realPort) {
         this.port = realPort;
-    }
-
-    public int getNbWorkerThreads() {
-        return nbWorkerThreads;
     }
 
     public InetAddress getInetAddress() {

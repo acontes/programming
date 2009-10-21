@@ -287,12 +287,6 @@ public enum PAProperties {
      */
     PA_PAMR_DC_PORT_RANGE("proactive.communication.pamr.dc.portrange", PAPropertiesType.STRING),
 
-    /**
-     * The number of worker threads which handle pamr direct connections.
-     * 		Optional property. Defaults to 4
-     */
-    PA_PAMR_DC_WORKERS_NO("proactive.communication.pamr.dc.workers", PAPropertiesType.INTEGER),
-
     /* ------------------------------------
      *  RMI
      */
