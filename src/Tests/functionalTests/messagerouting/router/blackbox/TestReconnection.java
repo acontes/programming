@@ -33,11 +33,14 @@
 package functionalTests.messagerouting.router.blackbox;
 
 import java.io.IOException;
+import java.net.InetAddress;
 
 import junit.framework.Assert;
 
 import org.junit.Test;
 import org.objectweb.proactive.core.util.ProActiveRandom;
+import org.objectweb.proactive.core.util.Sleeper;
+import org.objectweb.proactive.extra.messagerouting.client.Tunnel;
 import org.objectweb.proactive.extra.messagerouting.exceptions.MalformedMessageException;
 import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.Message;
@@ -60,6 +63,10 @@ public class TestReconnection extends BlackBox {
         long routerID = reply.getRouterID();
 
         // Ok it's time to reconnect
+        tunnel.shutdown();
+        tunnel = new Tunnel(InetAddress.getLocalHost(), this.router.getPort());
+        // wait a bit, for the router to finish the processing
+        new Sleeper(200).sleep();
 
         message = new RegistrationRequestMessage(reply.getAgentID(), ProActiveRandom.nextLong(), routerID);
         tunnel.write(message.toByteArray());
