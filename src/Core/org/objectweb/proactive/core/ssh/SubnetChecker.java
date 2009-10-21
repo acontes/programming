@@ -27,46 +27,50 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package org.objectweb.proactive.core.ssh;
 
 import static org.objectweb.proactive.core.ssh.SSH.logger;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
-
-//the Unique instance of SubnetChecker
 
 /**
  * This class store the mapping subnetwork definition/gateway:port specified with the parameter
  * proactive.ssh.proxy.gateway.
  * 
+ * Only support IPv4 address
  */
 public class SubnetChecker {
-    private List<IPMatcher> gatewaysTable;
+    // Where the network definition and the related gateway are stored
+    private Set<IPMatcher> gatewaysSet;
 
     public SubnetChecker() {
-        gatewaysTable = new ArrayList<IPMatcher>();
+        // TreeSet is use because no copy are wanted 
+        // And network definition are sorted by CIDR
+        gatewaysSet = new TreeSet<IPMatcher>();
     }
 
+    /**
+     * Add an entry to the Set
+     * 
+     * @param subnet
+     *          The network definition as an IPv4 address, the character '/' and then the CIDR like 
+     *          xxx.xxx.xxx.xxx/yy
+     * @param gateway
+     *          The gateway to use to access the hosts of this network
+     */
     protected void setGateway(String subnet, String gateway) {
         if (logger.isDebugEnabled()) {
             logger.debug("Subnet Infos : " + gateway + " as " + "gateway" + " added for subnet " + subnet);
         }
-      
         // separate network address and cidr
         String[] subnetDef = subnet.split("\\/");
         try {
             IPMatcher gateway_infos = new IPMatcher(subnetDef[0], Integer.parseInt(subnetDef[1]), gateway);
-            gatewaysTable.add(gateway_infos);
-            // list is scan in inverse direction so sorting it, permit to
-            // make definition of subnet with higher cidr more important than other
-            Collections.sort(gatewaysTable);
-
+            gatewaysSet.add(gateway_infos);
         } catch (IllegalArgumentException e) {
             logger.error(e.getMessage());
         }
@@ -82,16 +86,20 @@ public class SubnetChecker {
      */
     public String getGateway(String ipAddress) {
         IPMatcher sd = checkIP(ipAddress);
-        if (sd != null)
+        if (sd != null) {
             return sd.getGateway();
+        }
         return null;
     }
 
+    /**
+     * Search in the set a network definition for this IPv4 address 
+     * 
+     * @param ip 
+     *          IPv4 address as a String
+     */
     private IPMatcher checkIP(String ip) {
-        // Began by the end for CIDR classification
-        IPMatcher matcher;
-        for (int i = gatewaysTable.size() - 1; i >= 0; i--) {
-            matcher = gatewaysTable.get(i);
+        for (IPMatcher matcher : gatewaysSet) {
             if (matcher.match(ip)) {
                 return matcher;
             }
@@ -101,17 +109,19 @@ public class SubnetChecker {
 
     /**
      * This class store the gateway for a sub network 
-     * define by network/cidr : xxx.xxx.xxx.xxx/xx   
+     * define by network/cidr : xxx.xxx.xxx.xxx/yy
+     * 
+     * Only support IPv4 address
      */
     static private class IPMatcher implements Comparable<IPMatcher> {
 
-        // Store for getRule method
+        // Store for toString method
         final private int cidr;
-        final private String network;       
-        
+        final private String network;
+
         final private int networkPortion;
         final private int mask;
-        
+
         private String gateway = null;
 
         public IPMatcher(String network, int cidr, String gateway) {
@@ -143,7 +153,7 @@ public class SubnetChecker {
             String[] parts = ip.split("\\.");
             int tmp = 0;
             if (parts.length != 4) {
-                throw new IllegalArgumentException("An IPv4 address must like xxx.xxx.xxx.xxx : " + ip);
+                throw new IllegalArgumentException("An IPv4 address must be like xxx.xxx.xxx.xxx : " + ip);
             }
             for (int i = 0; i < 4; i++) {
                 int parsedInt = Integer.parseInt(parts[i]);
@@ -163,22 +173,30 @@ public class SubnetChecker {
          *  The higher the cidr is, the higher the mask will be 
          */
         public int compareTo(IPMatcher other) {
-            return other.mask - this.mask;
+            if (this.networkPortion == other.networkPortion)
+                return other.cidr - this.cidr;
+            // If network are different, then the order doesn't matter
+            return this.network.compareTo(other.network);
         }
 
-        public String getRule() {            
-            return this.network+"/"+this.cidr;
+        @Override
+        public String toString() {
+            return this.network + "/" + this.cidr;
         }
+
     }
 
+    /**
+     * Return the rule(s) which correspond to <code> gateway </code> 
+     */
     public String getRule(String gateway) {
-        StringBuilder sb = new StringBuilder("");  
-        for (IPMatcher ipm : gatewaysTable){
-              if (ipm.getGateway().equalsIgnoreCase(gateway)){
-                  sb.append(ipm.getRule());                  
-                  sb.append(";");
-              }
-          }
+        StringBuilder sb = new StringBuilder("");
+        for (IPMatcher ipm : gatewaysSet) {
+            if (ipm.getGateway().equalsIgnoreCase(gateway)) {
+                sb.append(ipm.toString());
+                sb.append(";");
+            }
+        }
         return sb.toString();
     }
 }

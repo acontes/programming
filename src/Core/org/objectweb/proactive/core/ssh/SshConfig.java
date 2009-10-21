@@ -27,7 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$ACTIVEEON_CONTRIBUTORS$$
+ * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package org.objectweb.proactive.core.ssh;
 
@@ -305,7 +305,7 @@ public class SshConfig {
 
         // Add all rules defined by regular expression on hostname for this gateway
         for (String rule : sshInfos.keySet()) {
-            String gatewayTest = sshInfos.get(rule).get(SshToken.GATEWAY);  
+            String gatewayTest = sshInfos.get(rule).get(SshToken.GATEWAY);
             if (gatewayTest != null && gatewayTest.equalsIgnoreCase(gateway)) {
                 sb.append(rule);
                 sb.append(":");
@@ -428,5 +428,5 @@ public class SshConfig {
 
     public String getKeyDir() {
         return this.keyDir;
-    }  
+    }
 }

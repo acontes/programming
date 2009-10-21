@@ -27,7 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$ACTIVEEON_CONTRIBUTORS$$
+ * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package org.objectweb.proactive.core.ssh;
 
@@ -46,7 +46,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.Sleeper;
 
 
@@ -146,7 +145,9 @@ public class SshTunnelPool {
         // Try proxy command 
         if (socket == null && config.tryProxyCommand()) {
             String gateway = config.getGateway(host);
-            String outGateway = PAProperties.PA_SSH_PROXY_USE_GATEWAY_OUT.isSet() ? PAProperties.PA_SSH_PROXY_USE_GATEWAY_OUT.getValue() : null;
+            String outGateway = PAProperties.PA_SSH_PROXY_USE_GATEWAY_OUT.isSet() ? PAProperties.PA_SSH_PROXY_USE_GATEWAY_OUT
+                    .getValue()
+                    : null;
             // if proxyCommand command mechanism is needed
             if (gateway != null || outGateway != null) {
                 synchronized (this.proxyCommandCache) {

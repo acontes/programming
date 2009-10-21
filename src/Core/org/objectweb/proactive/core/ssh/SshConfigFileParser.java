@@ -27,7 +27,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$ACTIVEEON_CONTRIBUTORS$$
+ * $$ACTIVEEON_CONTRIBUTOR$$
  */
 
 package org.objectweb.proactive.core.ssh;
@@ -149,6 +149,9 @@ public class SshConfigFileParser {
         }
     }
 
+    /**
+     * Parse the ProActiveProperties PA_SSH_PROXY_GATEWAY      
+     */
     public void parseProperties(SshConfig storer) {
         if (storer.getPAProperty() != null) {
             this.parseProperties(storer.getPAProperty(), storer);
@@ -174,17 +177,33 @@ public class SshConfigFileParser {
                         storer.addHostInformation(gateways[1], SshToken.PORT, gateways[2]);
                     }
                     break;
+
                 case 2:
                     if (gateways[1].equalsIgnoreCase("none")) {
                         storer.addHostInformation(gateways[0], SshToken.GATEWAY, "none");
                         break;
                     }
+
+                case 0:
+                    break;
+
                 default:
                     logger
-                            .error("ERROR: malformed gateway declaration. Should be host1.domain1:gateway1:port;*.domain2:host2:port2");
+                            .error("ERROR: malformed gateway declaration. Should be host1.domain1:gateway1:port;*.domain2:host2:port2 \n =>" +
+                                expandTable(gateways));
                     continue;
             }
         }
+    }
+
+    private String expandTable(String[] table) {
+        StringBuilder sb = new StringBuilder();
+        for (String s : table) {
+            sb.append(s);
+            sb.append(":");
+        }
+        sb.setCharAt(sb.length() - 1, '\n');
+        return sb.toString();
     }
 
     private String getRealHostname(String host) {
@@ -194,6 +213,9 @@ public class SshConfigFileParser {
         return host;
     }
 
+    /**
+     * Specials processing 
+     */
     private void processHostDefinition(String host, List<String> definitions, SshConfig storer) {
         String line = null;
         SshToken tok;
@@ -208,11 +230,11 @@ public class SshConfigFileParser {
                 case GATEWAY:
                     storeProxyCommand(host, cutAt(SshToken.GATEWAY.getValue(), line), storer);
                     break;
-                    
+
                 case PRIVATEKEY:
                     storePrivateKey(host, cutAt(SshToken.GATEWAY.getValue(), line), storer);
                     break;
-                    
+
                 case UNKNOW:
                     // Do nothing except debug notification                
                     if (logger.isDebugEnabled() && line.length() != 0) {
@@ -227,7 +249,7 @@ public class SshConfigFileParser {
     }
 
     ////////////////////////////////////////////////////////////////////////////////
-    // Processing the storage of information
+    // Process the storage of information
     ////////////////////////////////////////////////////////////////////////////////
 
     // Default
@@ -274,6 +296,7 @@ public class SshConfigFileParser {
     private void storePrivateKey(String host, String line, SshConfig storer) {
         defaultStore(host, line.replace("~", System.getProperty("user.home")), SshToken.PRIVATEKEY, storer);
     }
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /////////////////////////////////////////////////////////////

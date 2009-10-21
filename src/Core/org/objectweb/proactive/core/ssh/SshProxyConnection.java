@@ -27,13 +27,11 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$ACTIVEEON_CONTRIBUTORS$$
+ * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package org.objectweb.proactive.core.ssh;
 
 import java.io.IOException;
-
-import org.objectweb.proactive.core.config.PAProperties;
 
 import com.trilead.ssh2.Session;
 
@@ -70,14 +68,12 @@ public class SshProxyConnection extends SshConnection {
         String username;
         int port;
         String proxyCommand = FORWARDER_COMMAND + " " + "%h" + " " + "%p";
-        String hostname = null;        
-        
+        String hostname = null;
+
         if (outGateway != null) {
-            if (gateway == null || outGateway.equalsIgnoreCase(gateway)) {
-                hostname = outGateway;
-            } else { 
+            hostname = outGateway;
+            if (gateway != null) {
                 String user = config.getUsername(gateway);
-                hostname = outGateway;
                 proxyCommand = SSHCLIENTCOMMAND + " " + user + "@" + gateway + " " + FORWARDER_COMMAND + " " +
                     "%h" + " " + "%p";
             }
@@ -87,7 +83,7 @@ public class SshProxyConnection extends SshConnection {
             } else {
                 return null;
             }
-        } 
+        }
 
         username = config.getUsername(hostname);
         port = config.getPort(hostname);

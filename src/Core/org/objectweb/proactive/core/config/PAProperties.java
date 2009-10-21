@@ -375,7 +375,7 @@ public enum PAProperties {
 
     // The gateway to use to relay outgoing connections
     PA_SSH_PROXY_USE_GATEWAY_OUT("proactive.communication.ssh.proxy.out_gateway", PAPropertiesType.STRING),
-    
+
     /* ------------------------------------
      *  RMISSH
      */
