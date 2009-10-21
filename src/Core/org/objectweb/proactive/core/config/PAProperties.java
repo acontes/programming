@@ -270,21 +270,28 @@ public enum PAProperties {
     /**
      * Enable pamr direct connections
      */
-    PA_NET_ROUTER_DIRECT_CONNECTION("proactive.net.router.dc", PAPropertiesType.BOOLEAN),
+    PA_PAMR_DIRECT_CONNECTION("proactive.communication.pamr.dc", PAPropertiesType.BOOLEAN),
     /**
      * The IP address to which the server for the pamr direct connections binds.
      *    Optional property. Defaults to the localhost address
      */
-    PA_NET_ROUTER_DC_ADDRESS("proactive.net.router.dc.address", PAPropertiesType.STRING),
+    PA_PAMR_DC_ADDRESS("proactive.communication.pamr.dc.address", PAPropertiesType.STRING),
     /**
-     * The TCP port to which the server for the pamr direct connections binds. Mandatory
+     * The TCP port to which the server for the pamr direct connections binds.
+     * 	Optional property. If not set, a random port will be chosen
      */
-    PA_NET_ROUTER_DC_PORT("proactive.net.router.dc.port", PAPropertiesType.INTEGER),
+    PA_PAMR_DC_PORT("proactive.communication.pamr.dc.port", PAPropertiesType.INTEGER),
+    /**
+     * A range of ports which can be used to locate an open port for pamr
+     * 	direct communication. To be set if working with GCM deployment within a firewalled env
+     */
+    PA_PAMR_DC_PORT_RANGE("proactive.communication.pamr.dc.portrange", PAPropertiesType.STRING),
+
     /**
      * The number of worker threads which handle pamr direct connections.
      * 		Optional property. Defaults to 4
      */
-    PA_NET_ROUTER_DC_WORKERS_NO("proactive.net.router.workers", PAPropertiesType.INTEGER),
+    PA_PAMR_DC_WORKERS_NO("proactive.communication.pamr.dc.workers", PAPropertiesType.INTEGER),
 
     /* ------------------------------------
      *  RMI

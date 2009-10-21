@@ -71,8 +71,8 @@ public class TestAgentStartup extends UnitTests {
     @Test
     public void startNoDC() throws IOException, ProActiveException {
         // start with DC flag unset
-        if (PAProperties.PA_NET_ROUTER_DIRECT_CONNECTION.isSet()) {
-            PAProperties.PA_NET_ROUTER_DIRECT_CONNECTION.setValue(false);
+        if (PAProperties.PA_PAMR_DIRECT_CONNECTION.isSet()) {
+            PAProperties.PA_PAMR_DIRECT_CONNECTION.setValue(false);
         }
         startRouterAgent();
         Assert.assertFalse(agent.getDCManager().isEnabled());
@@ -80,54 +80,38 @@ public class TestAgentStartup extends UnitTests {
         agent.shutdown();
 
         // explicitly set DC flag to false
-        PAProperties.PA_NET_ROUTER_DIRECT_CONNECTION.setValue(false);
+        PAProperties.PA_PAMR_DIRECT_CONNECTION.setValue(false);
         startRouterAgent();
         Assert.assertFalse(agent.getDCManager().isEnabled());
         router.stop();
         agent.shutdown();
     }
 
-    // start DC but "forget" to put the mandatory DC port
-    @Test
-    public void startDCMissingPort() throws IOException, ProActiveException {
-        PAProperties.PA_NET_ROUTER_DIRECT_CONNECTION.setValue(true);
-        // make sure DC port is not set
-        if (PAProperties.PA_NET_ROUTER_DC_PORT.isSet()) {
-            // no equivalent of :
-            // System.clearProperty(PAProperties.PA_NET_ROUTER_DC_PORT.getKey());
-            // in PAProperties
-            PAProperties.PA_NET_ROUTER_DC_PORT.setValue("");
-        }
-        inspectDCState(false);
-        logger.info("If you just saw a stacktrace, it's normal.");
-    }
-
-    // start with DC enabled for server and client also
     @Test
     public void startDC() throws IOException, ProActiveException {
         // run the test only if DC_PORT is free; we don't test here port election
         if (!freePort(DC_PORT)) {
             return;
         }
-        PAProperties.PA_NET_ROUTER_DIRECT_CONNECTION.setValue(true);
-        PAProperties.PA_NET_ROUTER_DC_PORT.setValue(DC_PORT);
+        PAProperties.PA_PAMR_DIRECT_CONNECTION.setValue(true);
+        PAProperties.PA_PAMR_DC_PORT.setValue(DC_PORT);
         inspectDCState(true);
     }
 
     // start DC but try to bind to an invalid IP address
     @Test
     public void startDCInvalidAddr() throws IOException, ProActiveException {
-        PAProperties.PA_NET_ROUTER_DIRECT_CONNECTION.setValue(true);
-        String oldAddr = System.getProperty(PAProperties.PA_NET_ROUTER_DC_ADDRESS.getKey());
+        PAProperties.PA_PAMR_DIRECT_CONNECTION.setValue(true);
+        String oldAddr = System.getProperty(PAProperties.PA_PAMR_DC_ADDRESS.getKey());
         // bind to an invalid IP address
-        PAProperties.PA_NET_ROUTER_DC_ADDRESS.setValue("dumb");
+        PAProperties.PA_PAMR_DC_ADDRESS.setValue("dumb");
         inspectDCState(false);
         logger.info("If you just saw a stacktrace, it's normal.");
 
         if (oldAddr != null)
-            PAProperties.PA_NET_ROUTER_DC_ADDRESS.setValue(oldAddr);
+            PAProperties.PA_PAMR_DC_ADDRESS.setValue(oldAddr);
         else
-            System.clearProperty(PAProperties.PA_NET_ROUTER_DC_ADDRESS.getKey());
+            System.clearProperty(PAProperties.PA_PAMR_DC_ADDRESS.getKey());
     }
 
     // after starting , we check to see if the DC manager is started, and

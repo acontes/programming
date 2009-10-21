@@ -107,7 +107,11 @@ public class DirectConnectionServer implements Runnable {
         InetSocketAddress isa = new InetSocketAddress(config.getInetAddress(), config.getPort());
         serverSocket.bind(isa);
 
-        logger.info("Direct Connection Server listening on " + serverSocket.toString());
+        logger.info("Direct Connection Server for agent " + this.localAgent.getAgentID() + " listening on " +
+            serverSocket.toString());
+
+        // set the "real" port value
+        config.setPort(serverSocket.getLocalPort());
 
         // register the listener with the selector
         ssc.register(selector, SelectionKey.OP_ACCEPT);

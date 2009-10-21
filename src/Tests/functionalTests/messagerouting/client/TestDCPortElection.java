@@ -48,7 +48,6 @@ import org.junit.Test;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.extra.messagerouting.client.dc.server.DirectConnectionServerConfig;
 import org.objectweb.proactive.extra.messagerouting.client.dc.server.DirectConnectionServerConfig.DirectConnectionDisabledException;
-import org.objectweb.proactive.extra.messagerouting.client.dc.server.DirectConnectionServerConfig.MissingPortException;
 
 
 /**
@@ -60,31 +59,26 @@ public class TestDCPortElection {
     static final private Logger logger = Logger.getLogger("testsuite");
 
     private static final int DC_PORT = 18989;
-    private static final int RANGE = 5;
-    private static final int ATTEMPTS = 4;
+    private static final int RANGE = 3;
 
     @Test
-    public void occupyFree() throws UnknownHostException, DirectConnectionDisabledException,
-            MissingPortException {
-        PAProperties.PA_NET_ROUTER_DIRECT_CONNECTION.setValue(true);
-        PAProperties.PA_NET_ROUTER_DC_PORT.setValue(DC_PORT);
+    public void occupyFree() throws UnknownHostException, DirectConnectionDisabledException {
+        PAProperties.PA_PAMR_DIRECT_CONNECTION.setValue(true);
+        PAProperties.PA_PAMR_DC_PORT.setValue(DC_PORT);
         DirectConnectionServerConfig cfg = new DirectConnectionServerConfig();
         // it should not throw an exception, and it should elect the DC_PORT
         Assert.assertEquals(DC_PORT, cfg.getPort());
     }
 
     @Test
-    public void occupyAvailable() throws IOException, MissingPortException {
+    public void occupyAvailable() throws IOException {
         // occupy the port
         occupyPort(DC_PORT);
-        int range = RANGE;
-        int attempts = 2; // because the first attempt is made on the initial value
-        DirectConnectionServerConfig cfg = new DirectConnectionServerConfig(DC_PORT, range, attempts);
+        DirectConnectionServerConfig cfg = new DirectConnectionServerConfig(DC_PORT, DC_PORT + 1);
         // it should not throw an exception, and it should elect a different port
         Assert.assertFalse("The same port was elected:" + DC_PORT, DC_PORT == cfg.getPort());
-        Assert.assertTrue("The elected port " + cfg.getPort() + " is not within the range " + range, DC_PORT -
-            range <= cfg.getPort() &&
-            cfg.getPort() <= DC_PORT + range);
+        Assert.assertTrue("The elected port " + cfg.getPort() + " is not within the range ",
+                cfg.getPort() == DC_PORT + 1);
         // the elected port should also be free!
         Assert.assertTrue("The elected port " + cfg.getPort() + " is not free!", testFreePort(cfg.getPort()));
         logger.info("Elected port:" + cfg.getPort());
@@ -93,13 +87,15 @@ public class TestDCPortElection {
 
     // occupy a range of ports
     // an attempt to find a free DC port within the range should fail
-    @Test(expected = MissingPortException.class)
-    public void failRange() throws IOException, MissingPortException {
-        occupyPortRange(DC_PORT - RANGE, DC_PORT + RANGE);
+    @Test(expected = IllegalArgumentException.class)
+    public void failRange() throws IOException, IllegalArgumentException {
+        int lower = DC_PORT - RANGE;
+        int upper = DC_PORT + RANGE;
+        occupyPortRange(lower, upper);
         try {
-            new DirectConnectionServerConfig(DC_PORT, RANGE, ATTEMPTS);
+            new DirectConnectionServerConfig(lower, upper);
             releasePortRange();
-        } catch (MissingPortException e) {
+        } catch (IllegalArgumentException e) {
             logger.info(e.getMessage());
             releasePortRange();
             throw e;
@@ -107,36 +103,38 @@ public class TestDCPortElection {
     }
 
     @Test
-    public void illegalValues() throws IOException, MissingPortException {
+    public void illegalValues() throws IOException {
         // occupy the port
         occupyPort(DC_PORT);
         try {
-            new DirectConnectionServerConfig(DC_PORT, 0, ATTEMPTS);
-            Assert.fail("Zero range should fail");
-        } catch (MissingPortException e) {
-            // ok
-        }
-        try {
-            new DirectConnectionServerConfig(DC_PORT, RANGE, 0);
-            Assert.fail("Zero attempts should fail");
-            new DirectConnectionServerConfig(DC_PORT, RANGE, 1);
-            Assert.fail("First attempt is on the initial port value; should fail");
-        } catch (MissingPortException e) {
-            // ok
-        }
-        try {
-            new DirectConnectionServerConfig(DC_PORT, DC_PORT, ATTEMPTS);
-            Assert.fail("Illegal range should fail");
-        } catch (IllegalArgumentException e) {
-            // ok
-        }
-        try {
-            new DirectConnectionServerConfig(DC_PORT, 65536 - DC_PORT, ATTEMPTS);
-            Assert.fail("Illegal range should fail");
+            new DirectConnectionServerConfig(DC_PORT, DC_PORT);
+            Assert.fail("Single port range on occupied port should fail");
         } catch (IllegalArgumentException e) {
             // ok
         }
         releasePort();
+
+        try {
+            new DirectConnectionServerConfig(DC_PORT + 1, DC_PORT);
+            Assert.fail("Illegal range should fail");
+        } catch (IllegalArgumentException e) {
+            // ok
+        }
+
+        try {
+            new DirectConnectionServerConfig(0, DC_PORT);
+            Assert.fail("Illegal range should fail");
+        } catch (IllegalArgumentException e) {
+            // ok
+        }
+
+        try {
+            new DirectConnectionServerConfig(DC_PORT, 65536);
+            Assert.fail("Illegal range should fail");
+        } catch (IllegalArgumentException e) {
+            // ok
+        }
+
     }
 
     private Properties sysProps;

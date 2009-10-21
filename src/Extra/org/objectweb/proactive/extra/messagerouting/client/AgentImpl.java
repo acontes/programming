@@ -65,7 +65,6 @@ import org.objectweb.proactive.extra.messagerouting.client.dc.client.DirectConne
 import org.objectweb.proactive.extra.messagerouting.client.dc.server.DirectConnectionServer;
 import org.objectweb.proactive.extra.messagerouting.client.dc.server.DirectConnectionServerConfig;
 import org.objectweb.proactive.extra.messagerouting.client.dc.server.DirectConnectionServerConfig.DirectConnectionDisabledException;
-import org.objectweb.proactive.extra.messagerouting.client.dc.server.DirectConnectionServerConfig.MissingPortException;
 import org.objectweb.proactive.extra.messagerouting.exceptions.MalformedMessageException;
 import org.objectweb.proactive.extra.messagerouting.exceptions.MessageRoutingException;
 import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
@@ -954,7 +953,7 @@ public class AgentImpl implements Agent, AgentImplMBean {
                 disabled = false;
             } catch (DirectConnectionDisabledException e) {
                 logger.debug("Direct connection mode is disabled, reason:" + e.getMessage(), e);
-            } catch (MissingPortException e) {
+            } catch (IllegalArgumentException e) {
                 logger.error("Direct connection server is disabled, reason:" + e.getMessage(), e);
                 disabled = false;
             } catch (IOException e) {

@@ -120,14 +120,20 @@ public class FunctionalTest {
             jvmParameters.append(PAProperties.PA_NET_ROUTER_PORT.getValue());
             jvmParameters.append(" ");
 
-            if (PAProperties.PA_NET_ROUTER_DIRECT_CONNECTION.isSet()) {
-                jvmParameters.append(PAProperties.PA_NET_ROUTER_DIRECT_CONNECTION.getCmdLine());
-                jvmParameters.append(PAProperties.PA_NET_ROUTER_DIRECT_CONNECTION.getValue());
+            if (PAProperties.PA_PAMR_DIRECT_CONNECTION.isSet()) {
+                jvmParameters.append(PAProperties.PA_PAMR_DIRECT_CONNECTION.getCmdLine());
+                jvmParameters.append(PAProperties.PA_PAMR_DIRECT_CONNECTION.getValue());
                 jvmParameters.append(" ");
 
-                jvmParameters.append(PAProperties.PA_NET_ROUTER_DC_PORT.getCmdLine());
-                jvmParameters.append(PAProperties.PA_NET_ROUTER_DC_PORT.getValue());
-                jvmParameters.append(" ");
+                if (PAProperties.PA_PAMR_DC_PORT.isSet()) {
+                    jvmParameters.append(PAProperties.PA_PAMR_DC_PORT.getCmdLine());
+                    jvmParameters.append(PAProperties.PA_PAMR_DC_PORT.getValue());
+                    jvmParameters.append(" ");
+                } else if (PAProperties.PA_PAMR_DC_PORT_RANGE.isSet()) {
+                    jvmParameters.append(PAProperties.PA_PAMR_DC_PORT_RANGE.getCmdLine());
+                    jvmParameters.append(PAProperties.PA_PAMR_DC_PORT_RANGE.getValue());
+                    jvmParameters.append(" ");
+                }
             }
 
         }

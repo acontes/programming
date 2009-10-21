@@ -39,9 +39,7 @@ public class TestMessageRoutingDirectConnection extends Throughput {
         PAProperties.PA_COMMUNICATION_PROTOCOL.setValue("pamr");
         if (!PAProperties.PA_TEST_PAMR_ROUTER_STARTED.isTrue())
             PAProperties.PA_NET_ROUTER_ADDRESS.setValue("localhost");
-        PAProperties.PA_NET_ROUTER_DIRECT_CONNECTION.setValue(true);
-        if (!PAProperties.PA_NET_ROUTER_DC_PORT.isSet())
-            PAProperties.PA_NET_ROUTER_DC_PORT.setValue(18989); // to be revised
+        PAProperties.PA_PAMR_DIRECT_CONNECTION.setValue(true);
     }
 
     public TestMessageRoutingDirectConnection() {

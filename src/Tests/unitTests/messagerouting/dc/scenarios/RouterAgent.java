@@ -69,13 +69,10 @@ public class RouterAgent extends Infrastructure {
         return agent;
     }
 
-    protected static final int DC_PORT = 18989;
-
     public void startInfrastructure() throws IOException, ProActiveException {
         router = Router.createAndStart(new RouterConfig());
         try {
-            PAProperties.PA_NET_ROUTER_DIRECT_CONNECTION.setValue(agentIsDC);
-            PAProperties.PA_NET_ROUTER_DC_PORT.setValue(DC_PORT);
+            PAProperties.PA_PAMR_DIRECT_CONNECTION.setValue(agentIsDC);
             agent = new TestAgentImpl(router.getInetAddr(), router.getPort(), ProActiveMessageHandler.class);
             if (agentIsDC) {
                 // wait for the router to process the DC_AD
