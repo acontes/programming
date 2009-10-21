@@ -41,6 +41,8 @@ import org.objectweb.proactive.extra.messagerouting.client.AgentImplMBean;
 import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
 import org.objectweb.proactive.extra.messagerouting.router.RouterImplMBean;
 
+import unitTests.messagerouting.dc.TestAgentImpl;
+
 
 /**
  * Same as AgentRouterAgent, but with probes for gathering
@@ -166,6 +168,17 @@ public class AgentRouterAgentProbes extends AgentRouterAgent {
                 break;
         }
         return expected;
+    }
+
+    public boolean injectTestTunnel(TestAgentImpl agent) {
+        logger.info("Replacing the tunnel of agent " + agent.getAgentID() + " with a test tunnel");
+        try {
+            agent.injectTestTunnel(this.router.getInetAddr(), this.router.getPort());
+            return true;
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return false;
+        }
     }
 
 }

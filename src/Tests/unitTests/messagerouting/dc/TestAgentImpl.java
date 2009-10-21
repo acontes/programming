@@ -61,7 +61,8 @@ public class TestAgentImpl extends AgentImpl {
 
     private String MESSAGE_READER_FIELD_NAME = "incomingHandler";
 
-    private boolean tunnelStopped = false;
+    private boolean tunnelReplaced = false;
+    private Tunnel testTunnel;
 
     public TestAgentImpl(InetAddress routerAddr, int routerPort) throws ProActiveException,
             SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
@@ -99,17 +100,20 @@ public class TestAgentImpl extends AgentImpl {
     public void shutdown() {
         if (this.dcMgr.isEnabled())
             this.dcMgr.stop();
-        if (!this.tunnelStopped) {
-            this.mr.stop();
-            this.tunnel.shutdown();
-        }
-    }
-
-    // shutdown the Router communication channel
-    public void tunnelShutdown() {
+        if (this.tunnelReplaced)
+            this.testTunnel.shutdown();
         this.mr.stop();
         this.tunnel.shutdown();
-        this.tunnelStopped = true;
+    }
+
+    public void injectTestTunnel(InetAddress routerAddr, int routerPort) throws IOException,
+            SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+        this.testTunnel = new TestTunnel(routerAddr, routerPort);
+        Class<AgentImpl> agentClazz = AgentImpl.class;
+        Field tunnelField = agentClazz.getDeclaredField(TUNNEL_FIELD_NAME);
+        tunnelField.setAccessible(true);
+        tunnelField.set(this, this.testTunnel);
+        this.tunnelReplaced = true;
     }
 
     // send an oneway message and wait until it arrives succesfully to the remote agent
@@ -136,12 +140,10 @@ public class TestAgentImpl extends AgentImpl {
 
     public void waitForArrival(long timeout) {
         synchronized (this) {
-            while (!received) {
+            if (!received) {
                 try {
                     this.wait(timeout);
                 } catch (InterruptedException e) {
-                    // get out
-                    break;
                 }
             }
         }
@@ -166,7 +168,7 @@ public class TestAgentImpl extends AgentImpl {
 
     public void waitForReply(long timeout) {
         synchronized (this) {
-            while (!replied) {
+            if (!replied) {
                 try {
                     this.wait(timeout);
                 } catch (InterruptedException e) {
@@ -199,13 +201,19 @@ public class TestAgentImpl extends AgentImpl {
             if (data.length == 0) {
                 agent.notifyMessageArrival();
             } else {
-                logger.debug("Got data request message with non-empty payload:" +
-                    Helpers.byteArrayToString(data));
+                String request = Helpers.byteArrayToString(data);
+                logger.debug("Got data request message with non-empty payload:" + request);
                 try {
-                    // we are "working very hard" to calculate the reply
-                    new Sleeper(300).sleep();
-                    // we will reply with "reply"
-                    byte[] reply = Helpers.stringToByteArray(Helpers.REPLY_PAYLOAD);
+                    byte[] reply;
+                    try {
+                        long time = Long.parseLong(request);
+                        // we are "working very hard" to calculate the reply
+                        new Sleeper(time).sleep();
+                        // we will reply with "reply"
+                        reply = Helpers.stringToByteArray(Helpers.REPLY_PAYLOAD);
+                    } catch (NumberFormatException e) {
+                        reply = Helpers.stringToByteArray(Helpers.ERROR_PAYLOAD);
+                    }
                     this.agent.sendReply(message, reply);
                     agent.notifyMessageReply(true);
                 } catch (MessageRoutingException e) {

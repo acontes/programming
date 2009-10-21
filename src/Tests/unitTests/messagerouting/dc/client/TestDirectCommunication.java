@@ -82,7 +82,9 @@ public class TestDirectCommunication extends UnitTests {
         infrastructure.sleep();
         Assert.assertTrue(infrastructure.testRemoteAgentState(AgentState.CONNECTED));
         // now, sending a second DATA_REQ message should pass through the direct communication channel
-        infrastructure.getLocalAgent().tunnelShutdown();
+        Assert.assertTrue(
+                "Could not inject a test tunnel for the local agent. Check the error log for details.",
+                infrastructure.injectTestTunnel(infrastructure.getLocalAgent()));
         Assert.assertTrue(infrastructure.getLocalAgent().onewaySend(null, infrastructure.getRemoteAgent(),
                 Infrastructure.TIMEOUT));
         // nothing should change in the Agent state
@@ -90,8 +92,6 @@ public class TestDirectCommunication extends UnitTests {
     }
 
     // bidirectional direct communication
-    // not yet working. to be revisited.
-    @Ignore
     @Test
     public void testBidirectional() throws MessageRoutingException, IOException, ClassNotFoundException {
         // the remote agent is taken into account for DC only at message transmission
@@ -108,9 +108,12 @@ public class TestDirectCommunication extends UnitTests {
         Assert.assertTrue(infrastructure.testLocalAgentState(AgentState.CONNECTED));
 
         // now, a DATA_REQ message should pass directly through the direct communication channels
-        infrastructure.getLocalAgent().tunnelShutdown();
-        infrastructure.getRemoteAgent().tunnelShutdown();
-        logger.info("Both tunnels were shut down.");
+        Assert.assertTrue(
+                "Could not inject a test tunnel for the local agent. Check the error log for details.",
+                infrastructure.injectTestTunnel(infrastructure.getLocalAgent()));
+        Assert.assertTrue(
+                "Could not inject a test tunnel for the remote agent. Check the error log for details.",
+                infrastructure.injectTestTunnel(infrastructure.getRemoteAgent()));
         asyncSendReq();
         // nothing should change in the Agent state
         Assert.assertTrue(infrastructure.testRemoteAgentState(AgentState.CONNECTED));
@@ -124,7 +127,8 @@ public class TestDirectCommunication extends UnitTests {
         MessageSender ms = new MessageSender(infrastructure);
         Thread senderThread = new Thread(ms);
         senderThread.start();
-        if (infrastructure.getLocalAgent().waitReply(infrastructure.getRemoteAgent(), Infrastructure.TIMEOUT)) {
+        long timeout = Infrastructure.TIMEOUT + Long.parseLong(Helpers.REQUEST_PAYLOAD);
+        if (infrastructure.getLocalAgent().waitReply(infrastructure.getRemoteAgent(), timeout)) {
             // did the sender thread finish?
             if (ms.waitToFinish(Infrastructure.TIMEOUT)) {
                 Assert.assertFalse("Attempt to send the message to the remote endpoint failed ", ms
@@ -164,7 +168,7 @@ public class TestDirectCommunication extends UnitTests {
         public boolean waitToFinish(long timeout) {
             synchronized (this) {
                 try {
-                    while (!finishedWork) {
+                    if (!finishedWork) {
                         this.wait(timeout);
                     }
                 } catch (InterruptedException e) {
