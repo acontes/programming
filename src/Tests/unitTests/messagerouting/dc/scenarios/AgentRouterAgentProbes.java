@@ -37,7 +37,7 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.extra.messagerouting.client.AgentImplMBean;
+import org.objectweb.proactive.extra.messagerouting.client.dc.client.DirectConnectionManagerMBean;
 import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
 import org.objectweb.proactive.extra.messagerouting.router.RouterImplMBean;
 
@@ -48,7 +48,7 @@ import unitTests.messagerouting.dc.TestAgentImpl;
  * Same as AgentRouterAgent, but with probes for gathering
  * 	additional information:
  * 	- Router MBean
- * 	- MBean for both agents
+ * 	- MBean for the direct connection managers of both agents
  * @author fabratu
  * @version %G%, %I%
  * @since ProActive 4.10
@@ -56,8 +56,8 @@ import unitTests.messagerouting.dc.TestAgentImpl;
 public class AgentRouterAgentProbes extends AgentRouterAgent {
 
     public RouterImplMBean routerMBean;
-    public AgentImplMBean agentMBean;
-    public AgentImplMBean r_agentMBean;
+    public DirectConnectionManagerMBean dcManagerMBean;
+    public DirectConnectionManagerMBean r_dcManagerMBean;
 
     public AgentRouterAgentProbes() {
         super(true, true);
@@ -80,11 +80,11 @@ public class AgentRouterAgentProbes extends AgentRouterAgent {
         }
 
         try {
-            this.agentMBean = (AgentImplMBean) this.agent;
-            this.r_agentMBean = (AgentImplMBean) this.r_agent;
+            this.dcManagerMBean = (DirectConnectionManagerMBean) this.agent.getDCManager();
+            this.r_dcManagerMBean = (DirectConnectionManagerMBean) this.r_agent.getDCManager();
         } catch (ClassCastException e) {
             logger.error(e.getMessage(), e);
-            Assert.fail(AgentImplMBean.class.getName() +
+            Assert.fail(DirectConnectionManagerMBean.class.getName() +
                 " implementation changed. This unit test should also be re-implemented.");
         }
 
@@ -100,9 +100,9 @@ public class AgentRouterAgentProbes extends AgentRouterAgent {
 
     public boolean testRemoteAgentState(AgentState expectedState) {
         AgentID remoteAgent = this.r_agent.getAgentID();
-        List<String> seenList = Arrays.asList(this.agentMBean.getCandidateAgents());
-        List<String> connectedList = Arrays.asList(this.agentMBean.getOutboundAgents());
-        List<String> failedList = Arrays.asList(this.agentMBean.getFailedAgents());
+        List<String> seenList = Arrays.asList(this.dcManagerMBean.getCandidateAgents());
+        List<String> connectedList = Arrays.asList(this.dcManagerMBean.getOutboundAgents());
+        List<String> failedList = Arrays.asList(this.dcManagerMBean.getFailedAgents());
         boolean expected;
         switch (expectedState) {
             case NOT_SEEN:
@@ -138,9 +138,9 @@ public class AgentRouterAgentProbes extends AgentRouterAgent {
 
     public boolean testLocalAgentState(AgentState expectedState) {
         AgentID localAgent = this.agent.getAgentID();
-        List<String> seenList = Arrays.asList(this.r_agentMBean.getCandidateAgents());
-        List<String> connectedList = Arrays.asList(this.r_agentMBean.getOutboundAgents());
-        List<String> failedList = Arrays.asList(this.r_agentMBean.getFailedAgents());
+        List<String> seenList = Arrays.asList(this.r_dcManagerMBean.getCandidateAgents());
+        List<String> connectedList = Arrays.asList(this.r_dcManagerMBean.getOutboundAgents());
+        List<String> failedList = Arrays.asList(this.r_dcManagerMBean.getFailedAgents());
         boolean expected;
         switch (expectedState) {
             case NOT_SEEN:

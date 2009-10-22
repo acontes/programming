@@ -40,7 +40,7 @@ import org.objectweb.proactive.extra.messagerouting.protocol.message.Message.Mes
  * 
  * @since ProActive 4.1.0
  */
-public interface MessageHandler {
+public interface RoutedMessageHandler {
 
     public void pushMessage(DataRequestMessage message);
 }

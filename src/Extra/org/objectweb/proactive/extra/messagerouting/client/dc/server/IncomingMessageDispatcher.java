@@ -37,16 +37,16 @@ import java.nio.ByteBuffer;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extra.messagerouting.client.AgentImpl;
-import org.objectweb.proactive.extra.messagerouting.client.AgentImpl.MessageReader;
+import org.objectweb.proactive.extra.messagerouting.client.Agent;
+import org.objectweb.proactive.extra.messagerouting.client.IncomingMessageHandler;
 import org.objectweb.proactive.extra.messagerouting.exceptions.MalformedMessageException;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.Message;
 
 
 /** Incoming message handler for Direct Connection Server
  * It just passes the processing of the received {@link Message}
- * to the incoming message handler attached to the local {@link AgentImpl}
- *
+ * to the incoming message handler attached to the local {@link Agent} implementation  
+ * 
  * @author fabratu
  * @version %G%, %I%
  * @since ProActive 4.10
@@ -58,9 +58,9 @@ class IncomingMessageDispatcher implements Runnable {
     final private ByteBuffer rawMessage;
 
     /** The incoming messages handler */
-    final private MessageReader handler;
+    final private IncomingMessageHandler handler;
 
-    public IncomingMessageDispatcher(ByteBuffer message, MessageReader handler) {
+    public IncomingMessageDispatcher(ByteBuffer message, IncomingMessageHandler handler) {
         this.rawMessage = message;
         this.handler = handler;
     }

@@ -48,7 +48,7 @@ import org.objectweb.proactive.extra.messagerouting.remoteobject.message.Message
  *
  * @since ProActive 4.1.0
  */
-public class ProActiveMessageHandler implements MessageHandler {
+public class ProActiveMessageHandler implements RoutedMessageHandler {
 
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_CLIENT);
 

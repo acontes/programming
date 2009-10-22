@@ -41,7 +41,7 @@ import org.junit.Test;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.util.Sleeper;
 import org.objectweb.proactive.extra.messagerouting.client.AgentImpl;
-import org.objectweb.proactive.extra.messagerouting.client.MessageHandler;
+import org.objectweb.proactive.extra.messagerouting.client.RoutedMessageHandler;
 import org.objectweb.proactive.extra.messagerouting.exceptions.MessageRoutingException;
 import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.DataRequestMessage;
@@ -80,7 +80,7 @@ public class ClientIOException extends BlackBox {
         System.out.println("toto");
     }
 
-    static public class FakeMessageHandler implements MessageHandler {
+    static public class FakeMessageHandler implements RoutedMessageHandler {
 
         public FakeMessageHandler(AgentImpl agentV2Internal) {
         }
@@ -93,7 +93,7 @@ public class ClientIOException extends BlackBox {
     static public class Agent extends AgentImpl {
 
         public Agent(InetAddress routerAddr, int routerPort,
-                Class<? extends MessageHandler> messageHandlerClass) throws ProActiveException {
+                Class<? extends RoutedMessageHandler> messageHandlerClass) throws ProActiveException {
             super(routerAddr, routerPort, messageHandlerClass);
         }
 

@@ -50,9 +50,10 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.SweetCountDownLatch;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extra.messagerouting.client.AgentImpl;
+import org.objectweb.proactive.extra.messagerouting.client.AgentInternal;
 import org.objectweb.proactive.extra.messagerouting.exceptions.MalformedMessageException;
 import org.objectweb.proactive.extra.messagerouting.exceptions.MessageRoutingException;
+import org.objectweb.proactive.extra.messagerouting.protocol.message.DirectConnectionAdvertiseMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.Message;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.Message.MessageType;
 import org.objectweb.proactive.extra.messagerouting.router.Router;
@@ -81,14 +82,10 @@ public class DirectConnectionServer implements Runnable {
     // provide a shutdown hook for users
     private final Thread shutdownHook;
 
-    /** We need a reference to the local Agent because:
-     *  - it has methods to send messages to the router
-     *  - it has the reference to the incoming messages handler
-     *  - it has the references to the synchronization primitives
-     *  */
-    private final AgentImpl localAgent;
+    private final AgentInternal localAgent;
 
-    public DirectConnectionServer(AgentImpl agent, DirectConnectionServerConfig config) throws IOException {
+    public DirectConnectionServer(AgentInternal agent, DirectConnectionServerConfig config)
+            throws IOException {
         this.tpe = Executors.newCachedThreadPool();
         this.localAgent = agent;
         init(config);
@@ -305,7 +302,11 @@ public class DirectConnectionServer implements Runnable {
      * @throws MessageRoutingException if the advertisment could not be sent
      */
     public void advertise(DirectConnectionServerConfig config) throws MessageRoutingException {
-        this.localAgent.advertiseDirectConnection(config.getInetAddress(), config.getPort());
+        Long messageID = this.localAgent.getIDGenerator().getAndIncrement();
+        DirectConnectionAdvertiseMessage dcAdMessage = new DirectConnectionAdvertiseMessage(messageID, config
+                .getInetAddress(), config.getPort());
+        // one-way send; no need to wait for reply
+        this.localAgent.sendRoutingMessage(dcAdMessage, true);
     }
 
 }

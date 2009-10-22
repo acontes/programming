@@ -39,10 +39,13 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.util.Sleeper;
 import org.objectweb.proactive.extra.messagerouting.client.Agent;
 import org.objectweb.proactive.extra.messagerouting.client.AgentImpl;
-import org.objectweb.proactive.extra.messagerouting.client.MessageHandler;
+import org.objectweb.proactive.extra.messagerouting.client.RoutedMessageHandler;
 import org.objectweb.proactive.extra.messagerouting.client.Tunnel;
+import org.objectweb.proactive.extra.messagerouting.client.dc.client.DirectConnectionManager;
 import org.objectweb.proactive.extra.messagerouting.exceptions.MessageRoutingException;
+import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.DataRequestMessage;
+import org.objectweb.proactive.extra.messagerouting.protocol.message.DirectConnectionRequestMessage;
 
 import unitTests.messagerouting.dc.scenarios.Infrastructure;
 
@@ -72,7 +75,7 @@ public class TestAgentImpl extends AgentImpl {
     }
 
     public TestAgentImpl(InetAddress routerAddr, int routerPort,
-            Class<? extends MessageHandler> messageHandlerClass) throws ProActiveException,
+            Class<? extends RoutedMessageHandler> messageHandlerClass) throws ProActiveException,
             SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
         super(routerAddr, routerPort, messageHandlerClass);
         Class<AgentImpl> agentClazz = AgentImpl.class;
@@ -106,6 +109,18 @@ public class TestAgentImpl extends AgentImpl {
             this.testTunnel.shutdown();
         this.mr.stop();
         this.tunnel.shutdown();
+    }
+
+    // send a direct connection request to the router for connecting to remoteAgent
+    // wait for the router reply
+    public byte[] sendDCRequest(AgentID remoteAgent) throws MessageRoutingException {
+
+        long reqId = this.idGenerator.getAndIncrement();
+        DirectConnectionRequestMessage dcReq = new DirectConnectionRequestMessage(reqId, this.getAgentID(),
+            remoteAgent);
+
+        return sendRoutingMessage(dcReq, false);
+
     }
 
     // send the shutdown signal && wait a bit, so that
@@ -197,7 +212,7 @@ public class TestAgentImpl extends AgentImpl {
         }
     }
 
-    public static class TestMessageHandler implements MessageHandler {
+    public static class TestMessageHandler implements RoutedMessageHandler {
 
         private TestAgentImpl agent;
 

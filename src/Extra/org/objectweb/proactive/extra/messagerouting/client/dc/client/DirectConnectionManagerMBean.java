@@ -5,7 +5,7 @@
  *            Concurrent computing with Security and Mobility
  *
  * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,28 +22,36 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- *  Initial developer(s):               The ActiveEon Team
- *                        http://www.activeeon.com/
+ *  Initial developer(s):               The ProActive Team
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
- *
  * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.objectweb.proactive.extra.messagerouting.client;
+package org.objectweb.proactive.extra.messagerouting.client.dc.client;
 
-public interface AgentImplMBean {
+/**
+ * MBean for the Direct Connection support 
+ * 
+ * @author fabratu
+ * @version %G%, %I%
+ * @since ProActive 4.10
+ */
+public interface DirectConnectionManagerMBean {
 
-    public long getLocalAgentID();
+    // indicates if Direct Connection is enabled
+    public boolean isEnabled();
 
-    public String getLocalAddress();
+    // indicates if the Direct Connection server is started
+    public boolean isServerStarted();
 
-    public int getLocalPort();
+    // get the list of remote agents to which we are directly connected
+    public String[] getOutboundAgents() throws IllegalStateException;
 
-    public String getRemoteAddress();
+    // get the list of candidates for direct connection
+    public String[] getCandidateAgents() throws IllegalStateException;
 
-    public int getRemotePort();
-
-    public String[] getMailboxes();
+    // get the list of agents to which we tried to connect directly but failed 
+    public String[] getFailedAgents() throws IllegalStateException;
 
 }

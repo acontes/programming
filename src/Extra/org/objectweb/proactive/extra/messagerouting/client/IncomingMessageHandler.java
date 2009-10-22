@@ -5,7 +5,7 @@
  *            Concurrent computing with Security and Mobility
  *
  * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,28 +22,27 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- *  Initial developer(s):               The ActiveEon Team
- *                        http://www.activeeon.com/
+ *  Initial developer(s):               The ProActive Team
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
- *
  * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
  */
 package org.objectweb.proactive.extra.messagerouting.client;
 
-public interface AgentImplMBean {
+import org.objectweb.proactive.extra.messagerouting.protocol.message.Message;
 
-    public long getLocalAgentID();
 
-    public String getLocalAddress();
+/**
+ * Handle a generic message routing protocol {@link Message}
+ * 	on its arrival from the network layer
+ * 
+ * @author fabratu
+ * @version %G%, %I%
+ * @since ProActive 4.10
+ */
+public interface IncomingMessageHandler {
 
-    public int getLocalPort();
-
-    public String getRemoteAddress();
-
-    public int getRemotePort();
-
-    public String[] getMailboxes();
+    public void handleMessage(Message msg);
 
 }
