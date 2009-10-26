@@ -31,7 +31,6 @@
 package org.objectweb.proactive.extra.messagerouting.router.processor;
 
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 
 import org.objectweb.proactive.extra.messagerouting.exceptions.MalformedMessageException;
@@ -90,7 +89,7 @@ import org.objectweb.proactive.extra.messagerouting.router.RouterImpl;
  */
 public class ProcessorDirectConnectionRequest extends Processor {
 
-    private final SocketAddress senderEndpoint;
+    private final InetSocketAddress senderEndpoint;
 
     public ProcessorDirectConnectionRequest(ByteBuffer messageAsByteBuffer, RouterImpl router,
             Attachment attachment) {
@@ -175,8 +174,8 @@ public class ProcessorDirectConnectionRequest extends Processor {
             return true;
         }
 
-        // TODO TODO TODO!
-        return true;
+        // the information is available at the Router
+        return this.router.isAllowed(this.senderEndpoint.getAddress(), dcEndpoint);
     }
 
 }

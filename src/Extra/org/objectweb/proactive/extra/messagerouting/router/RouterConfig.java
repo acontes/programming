@@ -32,6 +32,7 @@
  */
 package org.objectweb.proactive.extra.messagerouting.router;
 
+import java.io.File;
 import java.net.InetAddress;
 
 import org.objectweb.proactive.annotation.PublicAPI;
@@ -58,6 +59,8 @@ public class RouterConfig {
     private int nbWorkerThreads;
 
     private InetAddress inetAddress;
+
+    private File networkConfigFile;
 
     public RouterConfig() {
         this.port = 0;
@@ -129,6 +132,27 @@ public class RouterConfig {
     /** The {@link InetAddress} on which the router will listen */
     public void setInetAddress(InetAddress inetAddress) {
         this.inetAddress = inetAddress;
+    }
+
+    File getNetConfigFile() {
+        return networkConfigFile;
+    }
+
+    public void setNetConfigFile(String configFilePath) {
+        checkReadOnly();
+        if (configFilePath == null) {
+            this.networkConfigFile = null;
+        } else {
+            this.networkConfigFile = new File(configFilePath);
+            if (!this.networkConfigFile.exists())
+                throw new IllegalArgumentException("The given path argument " + configFilePath +
+                    " does not point to an existing file");
+            if (!this.networkConfigFile.isFile())
+                throw new IllegalArgumentException(configFilePath + " is not a path to a file");
+            if (!this.networkConfigFile.canRead())
+                throw new IllegalArgumentException("The given path argument " + configFilePath +
+                    " points to a file which cannot be read");
+        }
     }
 
 }

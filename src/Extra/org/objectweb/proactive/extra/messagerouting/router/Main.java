@@ -89,6 +89,9 @@ class Main {
         this.options.addOption("4", "ipv4", false, "Force the router to use IPv4 addresses only");
         this.options.addOption("6", "ipv6", false, "Force the router to use IPv6 addresses only");
         this.options.addOption("w", "nbWorkers", true, "Size of the worker thread pool");
+        this.options
+                .addOption("n", "netconfig", true,
+                        "Path to an XML configuration file describing the network topology of the machines connecting to the router");
         this.options.addOption("h", "help", false, "Print help message");
         this.options.addOption("v", "verbose", false, "Verbose mode. Print clients (dis)connections");
 
@@ -158,6 +161,9 @@ class Main {
                 }
             }
 
+            arg = line.getOptionValue("n");
+            config.setNetConfigFile(arg);
+
             if (line.hasOption("v")) {
                 Logger l = Logger.getLogger(Loggers.FORWARDING_ROUTER_ADMIN);
                 l.setLevel(Level.DEBUG);
@@ -168,6 +174,8 @@ class Main {
             printHelpAndExit(e.getMessage());
         } catch (ParseException e) {
             printHelpAndExit(e);
+        } catch (IllegalArgumentException e) {
+            printHelpAndExit(e.getMessage());
         }
 
         return config;

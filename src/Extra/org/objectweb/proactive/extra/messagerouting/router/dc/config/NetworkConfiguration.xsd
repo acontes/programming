@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified" 
+	attributeFormDefault="unqualified"
+	version="1.0">
+	
+	<xs:element name="NetworkConfiguration">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="NetworkSegment" type="NetworkSegmentType" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element name="PointToPoint" type="PointToPointType" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	
+	<xs:complexType name="NetworkSegmentType">
+		<xs:attribute name="hostList" type="hostListType" use="required"/>
+	</xs:complexType>
+	
+	<xs:complexType name="PointToPointType">
+		<xs:sequence>
+			<xs:element name="endpoint" type="endpointType" minOccurs="2" maxOccurs="2"/>
+		</xs:sequence>
+		<xs:attribute name="type" type="directionType" default="oneway"/>
+	</xs:complexType>
+	
+	<xs:simpleType name="hostListType">
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1" />
+		</xs:restriction>
+	</xs:simpleType>
+	
+	<xs:complexType name="endpointType">
+		<xs:attribute name="host" type="addressType" use="required"/>
+		<xs:attribute name="port" type="portType" default="0"/>
+	</xs:complexType>
+	
+	<!-- IPV4 address or DNS hostname -->
+	<xs:simpleType name="addressType">
+		<xs:union memberTypes="ipv4AddrType hostnameType"/>
+	</xs:simpleType>
+	
+	<xs:simpleType name="ipv4AddrType">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+	<xs:simpleType name="hostnameType">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z]|[A-Za-z][A-Za-z0-9\-]*[A-Za-z0-9])"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+	<xs:simpleType name="portType">
+		<xs:restriction base="xs:integer">
+			<xs:minInclusive value="0"/>
+			<xs:maxInclusive value="65535"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+	<xs:simpleType name="directionType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="oneway"/>
+			<xs:enumeration value="bidirectional"/>
+		</xs:restriction>
+	</xs:simpleType>
+	
+</xs:schema>

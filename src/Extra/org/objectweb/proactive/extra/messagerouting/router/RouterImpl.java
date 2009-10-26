@@ -32,6 +32,7 @@
  */
 package org.objectweb.proactive.extra.messagerouting.router;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
@@ -65,6 +66,8 @@ import org.objectweb.proactive.extra.messagerouting.exceptions.MalformedMessageE
 import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.ErrorMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.ErrorMessage.ErrorType;
+import org.objectweb.proactive.extra.messagerouting.router.dc.config.NetworkConfigurationParser;
+import org.objectweb.proactive.extra.messagerouting.router.dc.config.NetworkConfigurationRegistry;
 
 
 /**
@@ -103,6 +106,9 @@ public class RouterImpl extends RouterInternal implements Runnable, RouterImplMB
     /** An unique identifier for this router */
     private final long routerId;
 
+    /** The information this router has on the network topology of the connected agents */
+    private final NetworkConfigurationRegistry networkTopology;
+
     /** Create a new router
      * 
      * When a new router is created it binds onto the given port.
@@ -130,6 +136,9 @@ public class RouterImpl extends RouterInternal implements Runnable, RouterImplMB
         }
         this.routerId = rand;
 
+        // network topology information
+        this.networkTopology = getNetworkTopology(config.getNetConfigFile());
+
         // register the MBean
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
         ObjectName name = null;
@@ -141,6 +150,21 @@ public class RouterImpl extends RouterInternal implements Runnable, RouterImplMB
         } catch (Exception e) {
             logger.warn("Failed to register a JMX MBean for router " + this.routerId);
         }
+    }
+
+    private NetworkConfigurationRegistry getNetworkTopology(File netConfigFile) throws IOException {
+        if (netConfigFile == null)
+            return new NetworkConfigurationRegistry(true);
+        NetworkConfigurationRegistry ncr = new NetworkConfigurationRegistry();
+        NetworkConfigurationParser parser = new NetworkConfigurationParser(ncr);
+        try {
+            parser.init();
+            parser.parse(netConfigFile);
+        } catch (Exception e) {
+            throw new IOException(
+                "Error while reading the network topology information from the configuration file ", e);
+        }
+        return ncr;
     }
 
     private void init(RouterConfig config) throws IOException {
@@ -331,6 +355,10 @@ public class RouterImpl extends RouterInternal implements Runnable, RouterImplMB
         synchronized (clientMap) {
             clientMap.put(client.getAgentId(), client);
         }
+    }
+
+    public boolean isAllowed(InetAddress src, InetSocketAddress dest) {
+        return this.networkTopology.isAllowed(src, dest);
     }
 
     /* @@@@@@@@@@ ROUTER PUBLIC INTERFACE: Router */
