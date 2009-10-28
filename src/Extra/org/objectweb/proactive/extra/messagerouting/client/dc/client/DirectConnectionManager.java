@@ -110,19 +110,17 @@ public class DirectConnectionManager implements DirectConnectionManagerMBean {
     private final Map<AgentID, DirectConnection> connectedAgents;
     /** the server for processing incoming direct connection communications*/
     private final DirectConnectionServer dcServer;
-    /** the negotiator which tries to establish direct connections with remote agents  */
-    private final DirectConnectionNegotiator dcNegotiator;
-    /** the synchronization manager on the Agent side */
-    private final WaitingRoom waitingRoom;
+    /** the local agent */
+    private final AgentInternal localAgent;
 
     private final boolean disabled;
     private final boolean noServer;
 
     public DirectConnectionManager(AgentInternal localAgent) {
+        this.localAgent = localAgent;
         this.connectedAgents = Collections.synchronizedMap(new HashMap<AgentID, DirectConnection>());
         this.seenAgents = Collections.synchronizedSet(new HashSet<AgentID>());
         this.knownAgents = Collections.synchronizedSet(new HashSet<AgentID>());
-        this.waitingRoom = localAgent.getWaitingRoom();
 
         // (try to) start the direct connection server
         DirectConnectionServer dcServer = null;
@@ -174,19 +172,6 @@ public class DirectConnectionManager implements DirectConnectionManagerMBean {
             this.dcServer = dcServer;
             this.disabled = disabled;
             this.noServer = noServer;
-            if (!this.disabled) {
-                // start the Direct Connection Negotiator
-                this.dcNegotiator = new DirectConnectionNegotiator(this, localAgent);
-                // start its Thread
-                Thread dcNegotiatorThread = new Thread(this.dcNegotiator);
-                dcNegotiatorThread.setDaemon(true);
-                dcNegotiatorThread.setName("Direct Connection Negotiator Thread");
-                dcNegotiatorThread.start();
-                // shutdown hook - kill on JVM exit
-                Runtime.getRuntime().addShutdownHook(this.dcNegotiator.getShutdownHook());
-            } else {
-                this.dcNegotiator = null;
-            }
 
             // MBean
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
@@ -220,25 +205,6 @@ public class DirectConnectionManager implements DirectConnectionManagerMBean {
             this.seenAgents.remove(remoteAgent);
             this.knownAgents.add(remoteAgent);
         }
-    }
-
-    /*
-     * This method will block the calling thread
-     * until a new agent is added in the seen list.
-     * Then, it will return the first agent from the seen list
-     * the returned agent will be kept in the seen list, so that if we see it
-     * again it will not be added to the set
-     */
-    public AgentID waitForNewAgent() throws InterruptedException {
-        AgentID seenAgent;
-        synchronized (this.seenAgents) {
-            while (this.seenAgents.isEmpty()) {
-                this.seenAgents.wait();
-            }
-            // take one agent
-            seenAgent = this.seenAgents.iterator().next();
-        }
-        return seenAgent;
     }
 
     public boolean isEnabled() {
@@ -289,12 +255,11 @@ public class DirectConnectionManager implements DirectConnectionManagerMBean {
 
     public void seen(AgentID remoteAgent) {
         synchronized (remoteAgent) {
-            this.seenAgents.add(remoteAgent);
-        }
-        // put the negotiator to work
-        synchronized (this.seenAgents) {
-            if (this.seenAgents.size() == 1)
-                this.seenAgents.notifyAll();
+            if (!this.seenAgents.contains(remoteAgent)) {
+                this.seenAgents.add(remoteAgent);
+                this.localAgent.getThreadPool().execute(
+                        new DirectConnectionNegotiator(this, this.localAgent, remoteAgent));
+            }
         }
     }
 
@@ -307,7 +272,7 @@ public class DirectConnectionManager implements DirectConnectionManagerMBean {
         if (oneWay) { // No response needed, just send it.
             sendRoutingProtocolMessage(msg, connection);
         } else {
-            Patient mb = this.waitingRoom.enter(remoteAgent, msg.getMessageID());
+            Patient mb = this.localAgent.getWaitingRoom().enter(remoteAgent, msg.getMessageID());
             sendRoutingProtocolMessage(msg, connection);
 
             // block until the result arrives
@@ -348,18 +313,6 @@ public class DirectConnectionManager implements DirectConnectionManagerMBean {
 
     // release all acquired resources
     public void stop() {
-
-        if (!this.disabled) {
-            // shut down the DC negotiator
-            this.dcNegotiator.stop();
-            // also remove the shutdown hook
-            try {
-                Runtime.getRuntime().removeShutdownHook(dcNegotiator.getShutdownHook());
-            } catch (IllegalStateException e) {
-                // JVM already stoppping. Leave it to die...
-            }
-        }
-
         // shut down the DC server
         if (!this.noServer) {
             try {
