@@ -30,10 +30,10 @@
  */
 package org.objectweb.proactive.extra.messagerouting.client;
 
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.objectweb.proactive.extra.messagerouting.exceptions.MessageRoutingException;
-import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.Message;
 
 
@@ -73,5 +73,13 @@ public abstract class AgentInternal implements Agent {
     public WaitingRoom getWaitingRoom() {
         return this.mailboxes;
     }
+
+    /** Implementations might decide to use thread pools
+     *   in order to implement agent-side message processing.
+     *   In this case, there should be a single, per-agent
+     *   thread pool which should be reused in the various 
+     *   processing entities available on the agent side.
+     * */
+    public abstract ExecutorService getThreadPool();
 
 }

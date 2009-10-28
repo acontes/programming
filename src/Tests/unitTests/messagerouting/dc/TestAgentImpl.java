@@ -37,8 +37,8 @@ import java.net.InetAddress;
 import org.junit.Ignore;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.util.Sleeper;
-import org.objectweb.proactive.extra.messagerouting.client.Agent;
 import org.objectweb.proactive.extra.messagerouting.client.AgentImpl;
+import org.objectweb.proactive.extra.messagerouting.client.AgentInternal;
 import org.objectweb.proactive.extra.messagerouting.client.RoutedMessageHandler;
 import org.objectweb.proactive.extra.messagerouting.client.Tunnel;
 import org.objectweb.proactive.extra.messagerouting.client.dc.client.DirectConnectionManager;
@@ -216,7 +216,7 @@ public class TestAgentImpl extends AgentImpl {
 
         private TestAgentImpl agent;
 
-        public TestMessageHandler(Agent agent) {
+        public TestMessageHandler(AgentInternal agent) {
             this.agent = (TestAgentImpl) agent;
         }
 

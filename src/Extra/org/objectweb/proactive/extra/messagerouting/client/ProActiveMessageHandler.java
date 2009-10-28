@@ -33,7 +33,6 @@
 package org.objectweb.proactive.extra.messagerouting.client;
 
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.body.request.Request;
@@ -58,20 +57,9 @@ public class ProActiveMessageHandler implements RoutedMessageHandler {
     /** Local agent */
     private Agent agent;
 
-    public ProActiveMessageHandler(Agent agent) {
+    public ProActiveMessageHandler(AgentInternal agent) {
         this.agent = agent;
-
-        /* DO NOT USE A FIXED THREAD POOL
-         * 
-         * Each time a message arrives, it is handled by a task submitted to 
-         * this executor service. Each task can a perform remote calls. If 
-         * the number of workers is fixed it can lead to deadlock.
-         * 
-         * Reentrant calls is the most obvious case of deadlock. But the same 
-         * issue can occur with remote calls. 
-         */
-        tpe = Executors.newCachedThreadPool();
-
+        this.tpe = agent.getThreadPool();
     }
 
     public void pushMessage(DataRequestMessage message) {

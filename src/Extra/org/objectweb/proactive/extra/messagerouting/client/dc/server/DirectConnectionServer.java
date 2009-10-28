@@ -86,7 +86,7 @@ public class DirectConnectionServer implements Runnable {
 
     public DirectConnectionServer(AgentInternal agent, DirectConnectionServerConfig config)
             throws IOException {
-        this.tpe = Executors.newCachedThreadPool();
+        this.tpe = agent.getThreadPool();
         this.localAgent = agent;
         init(config);
         this.shutdownHook = new Thread(new ShutdownHook(this));

@@ -40,6 +40,8 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -106,6 +108,9 @@ public class AgentImpl extends AgentInternal implements AgentImplMBean {
     /** the handler of incoming messages*/
     final private IncomingMessageHandler incomingHandler;
 
+    /** the thread pool available for this agent */
+    final private ExecutorService tpe;
+
     /**
      * Create a routing agent
      * 
@@ -151,9 +156,25 @@ public class AgentImpl extends AgentInternal implements AgentImplMBean {
         this.valves = valves;
         this.failedTunnels = new LinkedList<Tunnel>();
 
+        /* DO NOT USE A FIXED THREAD POOL
+         * The entities which will use this thread pool
+         * 	have this requirement:
+         * 
+         * 1) The ProActiveMessageHandler :
+         * Each time a message arrives, it is handled by a task submitted to 
+         * this executor service. Each task can a perform remote calls. If 
+         * the number of workers is fixed it can lead to deadlock.
+         * 
+         * Reentrant calls is the most obvious case of deadlock. But the same 
+         * issue can occur with remote calls.
+         * 2) The DirectConnectionServer:
+         * Using a fixed thread pool slows down the server. 
+         */
+        this.tpe = Executors.newCachedThreadPool();
+
         try {
             Constructor<? extends RoutedMessageHandler> mhConstructor;
-            mhConstructor = messageHandlerClass.getConstructor(Agent.class);
+            mhConstructor = messageHandlerClass.getConstructor(AgentInternal.class);
             this.messageHandler = mhConstructor.newInstance(this);
         } catch (Exception e) {
             throw new ProActiveException("Message routing agent failed to create the message handler", e);
@@ -482,6 +503,10 @@ public class AgentImpl extends AgentInternal implements AgentImplMBean {
 
     public IncomingMessageHandler getIncomingHandler() {
         return this.incomingHandler;
+    }
+
+    public ExecutorService getThreadPool() {
+        return this.tpe;
     }
 
     /** Read incoming messages from the tunnel */
