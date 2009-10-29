@@ -148,7 +148,19 @@ public class RemoteObjectExposer<T> implements Serializable {
         try {
             // select the factory matching the required protocol
             RemoteObjectFactory rof = AbstractRemoteObjectFactory.getDefaultRemoteObjectFactory();
+            InternalRemoteRemoteObject irro = rof.createRemoteObject(this.remoteObject, name, rebind);
+            this.activeRemoteRemoteObjects.put(irro.getURI(), irro);
+            return irro.getRemoteRemoteObject();
+        } catch (Exception e) {
+            throw new ProActiveException("Failed to create remote object (name=" + name + ")", e);
+        }
+    }
 
+    public synchronized RemoteRemoteObject createRemoteObject(String name, boolean rebind, String protocol)
+            throws ProActiveException, AlreadyBoundException {
+        try {
+            // 	select the factory matching the required protocol
+            RemoteObjectFactory rof = AbstractRemoteObjectFactory.getRemoteObjectFactory(protocol);
             InternalRemoteRemoteObject irro = rof.createRemoteObject(this.remoteObject, name, rebind);
             this.activeRemoteRemoteObjects.put(irro.getURI(), irro);
             return irro.getRemoteRemoteObject();

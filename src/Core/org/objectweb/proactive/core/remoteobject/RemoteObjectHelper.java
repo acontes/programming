@@ -105,12 +105,26 @@ public class RemoteObjectHelper {
      * @return the uri with all values set
      */
     public static URI expandURI(URI uri) {
-        if (uri.getScheme() == null) {
-            int port = uri.getPort();
+        int port = uri.getPort();
+        String protocol = uri.getScheme();
+        if (protocol == null) {
             if (port == -1) {
+                // Set port and protocol (using default)
                 uri = URIBuilder.buildURIFromProperties(uri.getHost(), uri.getPath());
             } else {
+                // Set only protocol (using default) 
                 uri = URIBuilder.setProtocol(uri, PAProperties.PA_COMMUNICATION_PROTOCOL.getValue());
+            }
+        } else {
+            if (port == -1) {
+                try {
+                    RemoteObjectFactory rof = AbstractRemoteObjectFactory.getRemoteObjectFactory(protocol);
+                    port = rof.getPort();
+                    // Set only port (using RemoteObjectFactory's one) 
+                    uri = URIBuilder.setPort(uri, port);
+                } catch (UnknownProtocolException e) {
+                    logger.debug(e.getMessage());
+                }
             }
         }
         return uri;

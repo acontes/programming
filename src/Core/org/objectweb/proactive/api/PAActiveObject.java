@@ -1114,11 +1114,32 @@ public class PAActiveObject {
         return registerByName(obj, name, true);
     }
 
+    public static String registerByName(Object obj, String name, String protocol) throws ProActiveException {
+        return registerByName(obj, name, true, protocol);
+    }
+
     public static String registerByName(Object obj, String name, boolean rebind) throws ProActiveException {
         try {
             UniversalBody body = getRemoteBody(obj);
 
             String url = body.registerByName(name, rebind);
+            body.setRegistered(true);
+            if (PAActiveObject.logger.isInfoEnabled()) {
+                PAActiveObject.logger.info("Success at binding url " + url);
+            }
+
+            return url;
+        } catch (IOException e) {
+            throw new ProActiveException("Failed to register" + obj + " with name " + name, e);
+        }
+    }
+
+    public static String registerByName(Object obj, String name, boolean rebind, String protocol)
+            throws ProActiveException {
+        try {
+            UniversalBody body = getRemoteBody(obj);
+
+            String url = body.registerByName(name, rebind, protocol);
             body.setRegistered(true);
             if (PAActiveObject.logger.isInfoEnabled()) {
                 PAActiveObject.logger.info("Success at binding url " + url);
@@ -1491,7 +1512,9 @@ public class PAActiveObject {
     public static Object lookupActive(String classname, String url) throws ActiveObjectCreationException,
             java.io.IOException {
         RemoteObject<?> rmo;
-        URI uri = RemoteObjectHelper.expandURI(URI.create(url));
+        //URI uri = RemoteObjectHelper.expandURI(URI.create(url));
+        // is needed ?
+        URI uri = URI.create(url);
 
         try {
             rmo = RemoteObjectHelper.lookup(uri);

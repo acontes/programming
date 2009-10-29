@@ -41,6 +41,7 @@ import org.objectweb.proactive.core.remoteobject.http.HTTPRemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.http.HttpRemoteObjectImpl;
 import org.objectweb.proactive.core.remoteobject.http.util.HTTPRegistry;
 import org.objectweb.proactive.core.remoteobject.http.util.HttpMessage;
+import org.objectweb.proactive.core.util.URIBuilder;
 
 
 /**
@@ -57,7 +58,7 @@ public class HttpRemoteObjectLookupMessage extends HttpMessage implements Serial
      * Constructs an HTTP Message
      * @param urn The urn of the Object (it can be an active object or a runtime).
      */
-    public HttpRemoteObjectLookupMessage(String urn, URI url, int port) {
+    public HttpRemoteObjectLookupMessage(String urn, URI url) {
         super(url.toString());
         this.urn = urn;
         if (!this.urn.startsWith("/")) {

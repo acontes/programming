@@ -45,10 +45,8 @@ public abstract class HttpMessage implements Serializable {
     protected Object returnedObject;
     protected String url;
 
-    //    private int port;
     public HttpMessage(String url) {
         this.url = url;
-        //        this.port = port;
     }
 
     /**

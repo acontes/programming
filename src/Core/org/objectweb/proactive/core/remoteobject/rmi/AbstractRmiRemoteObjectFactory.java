@@ -72,7 +72,6 @@ public abstract class AbstractRmiRemoteObjectFactory extends AbstractRemoteObjec
     protected static RegistryHelper registryHelper;
 
     static {
-
         createClassServer();
         createRegistry();
     }
@@ -204,13 +203,13 @@ public abstract class AbstractRmiRemoteObjectFactory extends AbstractRemoteObjec
         if (uri.getPort() == -1) {
             LOGGER_RO.debug("No port specified, using the default one");
             modifiedURI = URIBuilder.buildURI(URIBuilder.getHostNameFromUrl(uri), URIBuilder
-                    .getNameFromURI(uri));
+                    .getNameFromURI(uri), this.protocolIdentifier);
             modifiedURI = RemoteObjectHelper.expandURI(modifiedURI);
         }
 
         // Try if URL is the address of a RmiRemoteBody
         try {
-            Registry reg = getRegistry(uri);
+            Registry reg = getRegistry(modifiedURI);
             o = reg.lookup(URIBuilder.getNameFromURI(modifiedURI));
             LOGGER_RO.debug(modifiedURI.toString() + " looked up successfully");
         } catch (java.rmi.NotBoundException e) {

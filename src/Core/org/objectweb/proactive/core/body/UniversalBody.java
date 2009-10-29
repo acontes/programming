@@ -181,6 +181,9 @@ public interface UniversalBody extends Job, Serializable, SecurityEntity {
 
     public String registerByName(String name, boolean rebind) throws IOException, ProActiveException;
 
+    public String registerByName(String name, boolean rebind, String protocol) throws IOException,
+            ProActiveException;
+
     /**
      * @return The URL of this body (using the default remote object factory)
      */

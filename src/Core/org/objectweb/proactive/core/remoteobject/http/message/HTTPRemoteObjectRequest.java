@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.remoteobject.http.message;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.URI;
 
 import org.objectweb.proactive.core.body.future.MethodCallResult;
 import org.objectweb.proactive.core.body.request.Request;
@@ -41,6 +42,7 @@ import org.objectweb.proactive.core.remoteobject.SynchronousReplyImpl;
 import org.objectweb.proactive.core.remoteobject.http.util.HTTPRegistry;
 import org.objectweb.proactive.core.remoteobject.http.util.HttpMessage;
 import org.objectweb.proactive.core.util.Sleeper;
+import org.objectweb.proactive.core.util.URIBuilder;
 
 
 public class HTTPRemoteObjectRequest extends HttpMessage implements Serializable {

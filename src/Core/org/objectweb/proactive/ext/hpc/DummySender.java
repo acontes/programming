@@ -216,6 +216,11 @@ public class DummySender implements UniversalBody {
         return null;
     }
 
+    public String registerByName(String name, boolean rebind, String protocol) throws IOException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
     public String getUrl() {
         // TODO Auto-generated method stub
         return null;

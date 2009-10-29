@@ -212,6 +212,13 @@ public abstract class AbstractUniversalBody implements UniversalBody, Serializab
         return roa.getURI().toString();
     }
 
+    public String registerByName(String name, boolean rebind, String protocol) throws ProActiveException {
+        RemoteRemoteObject rro = this.roe.createRemoteObject(name, rebind, protocol);
+        RemoteObjectAdapter roa = new RemoteObjectAdapter(rro);
+
+        return roa.getURI().toString();
+    }
+
     public RemoteObjectExposer<UniversalBody> getRemoteObjectExposer() {
         return this.roe;
     }
