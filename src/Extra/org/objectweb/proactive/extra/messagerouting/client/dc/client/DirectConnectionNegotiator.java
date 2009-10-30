@@ -30,11 +30,10 @@
  */
 package org.objectweb.proactive.extra.messagerouting.client.dc.client;
 
-import java.io.IOException;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.Sleeper;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.messagerouting.client.AgentInternal;
@@ -98,18 +97,13 @@ public class DirectConnectionNegotiator implements Runnable {
             DirectConnectionReplyACKMessage replyMsg = new DirectConnectionReplyACKMessage(result, 0);
             InetAddress inetAddr = replyMsg.getInetAddress();
             int port = replyMsg.getPort();
-            DirectConnection connection = tryConnection(remoteAgent, inetAddr, port);
-            this.dcManager.directConnectionAllowed(remoteAgent, connection);
-            return;
+            InetSocketAddress remoteAgentAddr = new InetSocketAddress(inetAddr, port);
+            this.dcManager.connect(remoteAgent, remoteAgentAddr);
         } catch (MessageRoutingException e) {
             logger.info("Direct connection refused for agent " + remoteAgent + " reason:" + e.getMessage());
             this.dcManager.directConnectionRefused(remoteAgent);
         } catch (MalformedMessageException e) {
             logger.info("Direct connection refused for agent " + remoteAgent + " reason:" + e.getMessage());
-            this.dcManager.directConnectionRefused(remoteAgent);
-        } catch (IOException e) {
-            logger.info("All attempts to directly connect to remote router " + remoteAgent + " failed." +
-                "Direct connection will be disallowed for agent " + remoteAgent);
             this.dcManager.directConnectionRefused(remoteAgent);
         }
     }
@@ -121,30 +115,4 @@ public class DirectConnectionNegotiator implements Runnable {
 
         return this.localAgent.sendRoutingMessage(dcReq, false);
     }
-
-    // try to establish a direct connection
-    // it will try two times in a interval of 3s
-    // if both attempts will fail, will throw an IOException
-    private DirectConnection tryConnection(AgentID remoteAgent, InetAddress inetAddr, int port)
-            throws IOException {
-        try {
-            return new DirectConnection(inetAddr, port);
-        } catch (IOException e) {
-            logger.warn("First attempt to establish a direct connection with agent " + remoteAgent +
-                " failed, because " + e.getMessage());
-            logger.debug("Stacktrace is:", e);
-            logger.warn("Trying again in 3 seconds...");
-            new Sleeper(3000).sleep();
-            try {
-                return new DirectConnection(inetAddr, port);
-            } catch (IOException e1) {
-                logger.warn("Second attempt to establish a direct connection with agent " + remoteAgent +
-                    " failed, because " + e1.getMessage());
-                logger.debug("Stacktrace is:", e1);
-                logger.warn("Agent " + remoteAgent + " will be considered unreachable");
-                throw e1;
-            }
-        }
-    }
-
 }

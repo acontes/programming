@@ -32,7 +32,10 @@ package org.objectweb.proactive.extra.messagerouting.client.dc.client;
 
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -48,7 +51,6 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.messagerouting.client.AgentInternal;
 import org.objectweb.proactive.extra.messagerouting.client.Patient;
-import org.objectweb.proactive.extra.messagerouting.client.WaitingRoom;
 import org.objectweb.proactive.extra.messagerouting.client.dc.server.DirectConnectionServer;
 import org.objectweb.proactive.extra.messagerouting.client.dc.server.DirectConnectionServerConfig;
 import org.objectweb.proactive.extra.messagerouting.client.dc.server.DirectConnectionServerConfig.DirectConnectionDisabledException;
@@ -189,12 +191,36 @@ public class DirectConnectionManager implements DirectConnectionManagerMBean {
         }
     }
 
-    // this method will be called if the router replied with a DC_ACK message
-    // and we got the endpoint address of the seenAgent 
-    void directConnectionAllowed(AgentID remoteAgent, DirectConnection connection) {
+    void directConnectionFailed(AgentID remoteAgent) {
+        // attempted to establish a connection but failed
+        DirectConnection connection;
         synchronized (remoteAgent) {
             this.seenAgents.remove(remoteAgent);
-            this.connectedAgents.put(remoteAgent, connection);
+            this.knownAgents.add(remoteAgent);
+            connection = this.connectedAgents.remove(remoteAgent);
+        }
+        try {
+            connection.close();
+        } catch (IOException e) {
+            ProActiveLogger.logEatedException(logger, "Error while closing " + "the connection for the " +
+                remoteAgent + " agent:", e);
+        }
+    }
+
+    void directConnectionEstablished(AgentID remoteAgent) {
+        // already in connected list; remove from seen list
+        synchronized (remoteAgent) {
+            this.seenAgents.remove(remoteAgent);
+        }
+    }
+
+    void directConnectionPending(AgentID remoteAgent, DirectConnection pendingConnection, boolean established) {
+        synchronized (remoteAgent) {
+            // put it in the connected agents list.
+            this.connectedAgents.put(remoteAgent, pendingConnection);
+            // remove it from the seen list only when the connection is established
+            if (established)
+                this.seenAgents.remove(remoteAgent);
         }
     }
 
@@ -214,15 +240,15 @@ public class DirectConnectionManager implements DirectConnectionManagerMBean {
     public boolean isConnected(AgentID remoteAgent) {
         if (remoteAgent == null)
             throw new IllegalArgumentException("remoteAgent must be non-null");
-        return this.connectedAgents.containsKey(remoteAgent);
+        return this.connectedAgents.containsKey(remoteAgent) && !this.seenAgents.contains(remoteAgent);
     }
 
     public DirectConnection getConnection(AgentID remoteAgent) {
         synchronized (connectedAgents) {
             // synchronized needed because we (potentially) make two successive ops on the map
             if (!isConnected(remoteAgent))
-                throw new IllegalArgumentException("There is no direct connection with the remote agent " +
-                    remoteAgent);
+                throw new IllegalArgumentException(
+                    "There is no direct connection established with the remote agent " + remoteAgent);
 
             return this.connectedAgents.get(remoteAgent);
         }
@@ -263,6 +289,57 @@ public class DirectConnectionManager implements DirectConnectionManagerMBean {
         }
     }
 
+    public void connect(AgentID remoteAgent, InetSocketAddress remoteEndpoint) {
+        try {
+            DirectConnection connection = new DirectConnection(this, remoteAgent);
+            boolean established = connection.connect(remoteEndpoint);
+            if (!established) {
+                // wait for the connection notification
+                SelectionKey key = connection.getChannel().register(this.getSelector(),
+                        SelectionKey.OP_CONNECT);
+                key.attach(connection);
+            } else {
+                // directly register for write() ops
+                SelectionKey key = connection.getChannel()
+                        .register(this.getSelector(), SelectionKey.OP_WRITE);
+                key.attach(connection);
+            }
+            // re-enter selection
+            this.unlockSelector();
+            directConnectionPending(remoteAgent, connection, established);
+        } catch (IOException e) {
+            // cannot connect. will consider that the remote endpoint is unreachable
+            directConnectionRefused(remoteAgent);
+        }
+    }
+
+    // notification on the outcome of the connection attempt 
+    public void connectionFinished(AgentID remoteAgent, DirectConnection connection, boolean success) {
+        if (success) {
+            // register for write ops
+            try {
+                SelectionKey key = connection.getChannel()
+                        .register(this.getSelector(), SelectionKey.OP_WRITE);
+                key.attach(connection);
+                this.unlockSelector();
+                directConnectionEstablished(remoteAgent);
+            } catch (Exception e) {
+                directConnectionFailed(remoteAgent);
+            }
+        } else {
+            // cannot establish a connection
+            directConnectionFailed(remoteAgent);
+        }
+    }
+
+    private Selector getSelector() {
+        return this.dcServer.lockSelector();
+    }
+
+    private void unlockSelector() {
+        this.dcServer.unlockSelector();
+    }
+
     public byte[] sendRequest(DataRequestMessage msg, boolean oneWay) throws MessageRoutingException {
         AgentID remoteAgent = msg.getRecipient();
         // get the direct connection
@@ -298,9 +375,8 @@ public class DirectConnectionManager implements DirectConnectionManagerMBean {
     // generic one-way send of a pamr protocol message
     private void sendRoutingProtocolMessage(Message message, DirectConnection connection)
             throws MessageRoutingException {
-        byte[] msgBuf = message.toByteArray();
         try {
-            connection.push(msgBuf);
+            connection.push(message);
             if (logger.isTraceEnabled()) {
                 logger.trace("Sent message " + message + " using the direct connection " + connection);
             }

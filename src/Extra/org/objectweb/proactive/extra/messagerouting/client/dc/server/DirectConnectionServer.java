@@ -41,7 +41,6 @@ import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -51,6 +50,7 @@ import org.objectweb.proactive.core.util.SweetCountDownLatch;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.messagerouting.client.AgentInternal;
+import org.objectweb.proactive.extra.messagerouting.client.dc.client.DirectConnection;
 import org.objectweb.proactive.extra.messagerouting.exceptions.MalformedMessageException;
 import org.objectweb.proactive.extra.messagerouting.exceptions.MessageRoutingException;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.DirectConnectionAdvertiseMessage;
@@ -84,12 +84,15 @@ public class DirectConnectionServer implements Runnable {
 
     private final AgentInternal localAgent;
 
+    private volatile boolean wakeupSignal;
+
     public DirectConnectionServer(AgentInternal agent, DirectConnectionServerConfig config)
             throws IOException {
         this.tpe = agent.getThreadPool();
         this.localAgent = agent;
         init(config);
         this.shutdownHook = new Thread(new ShutdownHook(this));
+        this.wakeupSignal = false;
     }
 
     private void init(DirectConnectionServerConfig config) throws IOException {
@@ -114,6 +117,18 @@ public class DirectConnectionServer implements Runnable {
         ssc.register(selector, SelectionKey.OP_ACCEPT);
     }
 
+    public Selector lockSelector() {
+        this.wakeupSignal = true;
+        return this.selector.wakeup();
+    }
+
+    public void unlockSelector() {
+        synchronized (selector) {
+            this.wakeupSignal = false;
+            selector.notifyAll();
+        }
+    }
+
     @Override
     public void run() {
 
@@ -131,6 +146,23 @@ public class DirectConnectionServer implements Runnable {
         while (this.stopped.get() == false) {
             try {
                 selector.select();
+                // did the manager call wakeup ?
+                if (this.wakeupSignal) {
+                    // wait until the manager finishes
+                    synchronized (selector) {
+                        try {
+                            while (this.wakeupSignal) {
+                                selector.wait();
+                            }
+                        } catch (InterruptedException e) {
+                            // stop waiting. get to the outer loop to see if it is an exit signal
+                            continue;
+                        }
+                    }
+                    // try another selection
+                    continue;
+                }
+
                 selectedKeys = selector.selectedKeys();
                 it = selectedKeys.iterator();
                 while (it.hasNext()) {
@@ -140,6 +172,10 @@ public class DirectConnectionServer implements Runnable {
                         this.handleAccept(key);
                     } else if ((key.readyOps() & SelectionKey.OP_READ) == SelectionKey.OP_READ) {
                         this.handleRead(key);
+                    } else if ((key.readyOps() & SelectionKey.OP_CONNECT) == SelectionKey.OP_CONNECT) {
+                        this.handleConnect(key);
+                    } else if ((key.readyOps() & SelectionKey.OP_WRITE) == SelectionKey.OP_WRITE) {
+                        this.handleWrite(key);
                     } else {
                         logger.warn("Unhandled SelectionKey operation");
                     }
@@ -254,6 +290,35 @@ public class DirectConnectionServer implements Runnable {
             // Disconnect the client to avoid a disaster
             clientDisconnected(key);
         } catch (IOException e) {
+            clientDisconnected(key);
+        }
+    }
+
+    private void handleConnect(SelectionKey key) {
+        SocketChannel channel = (SocketChannel) key.channel();
+        DirectConnection attachment = (DirectConnection) key.attachment();
+        boolean success;
+        try {
+            success = channel.finishConnect();
+        } catch (IOException e) {
+            logger.error("Could not establish a connection to " + attachment.toString(), e);
+            success = false;
+        }
+        key.attach(null);
+        if (!success) {
+            key.cancel();
+        }
+        attachment.handleConnect(success);
+    }
+
+    private void handleWrite(final SelectionKey key) {
+
+        final DirectConnection attachment = (DirectConnection) key.attachment();
+        // write all that it's possible 
+        try {
+            attachment.handleWrite();
+        } catch (IOException e) {
+            // actually, the server disconnected...
             clientDisconnected(key);
         }
     }
