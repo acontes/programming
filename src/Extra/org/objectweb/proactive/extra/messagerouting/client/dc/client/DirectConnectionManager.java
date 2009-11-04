@@ -407,6 +407,13 @@ public class DirectConnectionManager implements DirectConnectionManagerMBean {
                 }
             }
         }
+
+        // close all the underlying direct connections
+        // do NOT rely on garbage collector
+        Set<AgentID> connectedAgents = this.connectedAgents.keySet();
+        for (AgentID connectedAgent : connectedAgents) {
+            agentDisconnected(connectedAgent);
+        }
     }
 
     /* @@@@@@@@@@@@@@@@@@@@@@@@@@@ MBean @@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */
