@@ -72,6 +72,9 @@ public class DirectConnectionServer implements Runnable {
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_SERVER_DC);
     /** Read {@link ByteBuffer} size. */
     private final static int READ_BUFFER_SIZE = 4096;
+    /** We can safely use a single read {@link ByteBuffer} for this server
+     *  as we have a single thread which reads data from a given socket channel at a given time*/
+    private final ByteBuffer readBuffer;
     private Selector selector = null;
     private ServerSocketChannel ssc = null;
 
@@ -92,6 +95,7 @@ public class DirectConnectionServer implements Runnable {
             throws IOException {
         this.tpe = agent.getThreadPool();
         this.localAgent = agent;
+        this.readBuffer = ByteBuffer.allocate(READ_BUFFER_SIZE);
         init(config);
         this.shutdownHook = new Thread(new ShutdownHook(this));
         this.wakeupSignal = false;
@@ -269,11 +273,8 @@ public class DirectConnectionServer implements Runnable {
     }
 
     private void handleRead(SelectionKey key) {
-        SocketChannel sc;
-        ByteBuffer buffer = ByteBuffer.allocate(READ_BUFFER_SIZE);
 
-        sc = (SocketChannel) key.channel();
-
+        SocketChannel sc = (SocketChannel) key.channel();
         MessageAssembler assembler = (MessageAssembler) key.attachment();
         if (assembler == null) {
             assembler = new MessageAssembler(this, sc);
@@ -284,12 +285,12 @@ public class DirectConnectionServer implements Runnable {
         try {
             int byteRead;
             do {
-                buffer.clear();
-                byteRead = sc.read(buffer);
-                buffer.flip();
+                this.readBuffer.clear();
+                byteRead = sc.read(this.readBuffer);
+                this.readBuffer.flip();
 
                 if (byteRead > 0) {
-                    assembler.pushBuffer(buffer);
+                    assembler.pushBuffer(this.readBuffer);
                 }
             } while (byteRead > 0);
 
