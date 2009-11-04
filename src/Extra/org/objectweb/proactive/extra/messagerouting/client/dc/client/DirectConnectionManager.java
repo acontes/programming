@@ -240,7 +240,10 @@ public class DirectConnectionManager implements DirectConnectionManagerMBean {
     public boolean isConnected(AgentID remoteAgent) {
         if (remoteAgent == null)
             throw new IllegalArgumentException("remoteAgent must be non-null");
-        return this.connectedAgents.containsKey(remoteAgent) && !this.seenAgents.contains(remoteAgent);
+        synchronized (remoteAgent) {
+            // return unlocks
+            return this.connectedAgents.containsKey(remoteAgent) && !this.seenAgents.contains(remoteAgent);
+        }
     }
 
     public DirectConnection getConnection(AgentID remoteAgent) {

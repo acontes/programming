@@ -120,9 +120,9 @@ public class DirectConnection {
                     if (logger.isDebugEnabled()) {
                         String remaining = currentMessage.remaining() > 0 ? currentMessage.remaining() +
                             " remaining to send" : "";
-                        logger.debug("Sent a " + writtenBytes + " bytes message to Agent " + this.remoteAgent +
-                            " socket " + this.channel.socket().getRemoteSocketAddress().toString() + ". " +
-                            remaining);
+                        logger.debug("Sent a " + writtenBytes + " bytes message to Agent " +
+                            this.remoteAgent + " socket " +
+                            this.channel.socket().getRemoteSocketAddress().toString() + ". " + remaining);
                     }
                 }
             }
