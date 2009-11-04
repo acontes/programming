@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.nio.ByteBuffer;
+import java.nio.channels.CancelledKeyException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
@@ -142,6 +143,7 @@ public class DirectConnectionServer implements Runnable {
         Set<SelectionKey> selectedKeys = null;
         Iterator<SelectionKey> it;
         SelectionKey key;
+        int readyOps;
 
         while (this.stopped.get() == false) {
             try {
@@ -168,14 +170,15 @@ public class DirectConnectionServer implements Runnable {
                 while (it.hasNext()) {
                     key = (SelectionKey) it.next();
                     it.remove();
-                    if ((key.readyOps() & SelectionKey.OP_ACCEPT) == SelectionKey.OP_ACCEPT) {
-                        this.handleAccept(key);
-                    } else if ((key.readyOps() & SelectionKey.OP_READ) == SelectionKey.OP_READ) {
+                    readyOps = key.readyOps();
+                    if ((readyOps & SelectionKey.OP_READ) == SelectionKey.OP_READ) {
                         this.handleRead(key);
-                    } else if ((key.readyOps() & SelectionKey.OP_CONNECT) == SelectionKey.OP_CONNECT) {
-                        this.handleConnect(key);
-                    } else if ((key.readyOps() & SelectionKey.OP_WRITE) == SelectionKey.OP_WRITE) {
+                    } else if ((readyOps & SelectionKey.OP_WRITE) == SelectionKey.OP_WRITE) {
                         this.handleWrite(key);
+                    } else if ((readyOps & SelectionKey.OP_CONNECT) == SelectionKey.OP_CONNECT) {
+                        this.handleConnect(key);
+                    } else if ((readyOps & SelectionKey.OP_ACCEPT) == SelectionKey.OP_ACCEPT) {
+                        this.handleAccept(key);
                     } else {
                         logger.warn("Unhandled SelectionKey operation");
                     }
@@ -183,6 +186,12 @@ public class DirectConnectionServer implements Runnable {
 
             } catch (IOException e) {
                 logger.warn("Select failed", e);
+            } catch (CancelledKeyException e) {
+                // this is an optimization; the while loop executes very often
+                // instead of always calling key.isValid() within the loop,
+                // try to get the readyOps of the key, and in the rare cases of failure,
+                // fallback here
+                logger.debug("Key cancelled in another thread " + e.getMessage());
             }
         }
 
@@ -312,7 +321,6 @@ public class DirectConnectionServer implements Runnable {
     }
 
     private void handleWrite(final SelectionKey key) {
-
         final DirectConnection attachment = (DirectConnection) key.attachment();
         // write all that it's possible 
         try {
