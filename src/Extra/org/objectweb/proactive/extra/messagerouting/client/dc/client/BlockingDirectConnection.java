@@ -32,38 +32,46 @@ package org.objectweb.proactive.extra.messagerouting.client.dc.client;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.Socket;
 
 import org.objectweb.proactive.extra.messagerouting.protocol.message.Message;
 
 
 /**
- * Manages a single direct connection with a remote agent
+ * Implementation of {@link DirectConnection}
+ * 	using blocking sockets
  *
  * @author fabratu
  * @version %G%, %I%
  * @since ProActive 4.10
  */
-public interface DirectConnection {
+public class BlockingDirectConnection implements DirectConnection {
 
-    /**
-     * Connect to a remote agent
-     * @param remote - the endpoint address of the Direct Connection server running on the remote agent
-     * @return true if the connection is established
-     * @throws IOException - if something bad happens during the connection attempt
-     */
-    public boolean connect(InetSocketAddress remote) throws IOException;
+    private final Socket socket;
 
-    /**
-     * Send a message routing {@link Message} using this direct connection
-     * @param msg the message to be sent
-     * @throws IOException - if a transmission error occurs
-     */
-    public void push(Message msg) throws IOException;
+    public BlockingDirectConnection() {
+        super();
+        this.socket = new Socket();
+    }
 
-    /**
-     * Close this Direct Connection
-     * @throws IOException - error while closing
-     */
-    public void close() throws IOException;
+    public boolean connect(InetSocketAddress remote) throws IOException {
+        this.socket.connect(remote);
+        // always succeeds
+        return true;
+    }
+
+    public synchronized void push(Message msg) throws IOException {
+        byte[] msgBuf = msg.toByteArray();
+        socket.getOutputStream().write(msgBuf, 0, msgBuf.length);
+        socket.getOutputStream().flush();
+    }
+
+    public void close() throws IOException {
+        socket.close();
+    }
+
+    public String toString() {
+        return socket.toString();
+    }
 
 }

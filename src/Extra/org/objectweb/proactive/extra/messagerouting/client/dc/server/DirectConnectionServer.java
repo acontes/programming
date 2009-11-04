@@ -52,6 +52,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.messagerouting.client.AgentInternal;
 import org.objectweb.proactive.extra.messagerouting.client.dc.client.DirectConnection;
+import org.objectweb.proactive.extra.messagerouting.client.dc.client.NonBlockingDirectConnection;
 import org.objectweb.proactive.extra.messagerouting.exceptions.MalformedMessageException;
 import org.objectweb.proactive.extra.messagerouting.exceptions.MessageRoutingException;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.DirectConnectionAdvertiseMessage;
@@ -305,7 +306,7 @@ public class DirectConnectionServer implements Runnable {
 
     private void handleConnect(SelectionKey key) {
         SocketChannel channel = (SocketChannel) key.channel();
-        DirectConnection attachment = (DirectConnection) key.attachment();
+        NonBlockingDirectConnection attachment = (NonBlockingDirectConnection) key.attachment();
         boolean success;
         try {
             success = channel.finishConnect();
@@ -321,7 +322,7 @@ public class DirectConnectionServer implements Runnable {
     }
 
     private void handleWrite(final SelectionKey key) {
-        final DirectConnection attachment = (DirectConnection) key.attachment();
+        final NonBlockingDirectConnection attachment = (NonBlockingDirectConnection) key.attachment();
         // write all that it's possible 
         try {
             attachment.handleWrite();

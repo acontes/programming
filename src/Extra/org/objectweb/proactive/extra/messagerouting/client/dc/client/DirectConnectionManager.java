@@ -47,6 +47,7 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.messagerouting.client.AgentInternal;
@@ -117,6 +118,7 @@ public class DirectConnectionManager implements DirectConnectionManagerMBean {
 
     private final boolean disabled;
     private final boolean noServer;
+    private final boolean nonBlockingConnections;
 
     public DirectConnectionManager(AgentInternal localAgent) {
         this.localAgent = localAgent;
@@ -174,6 +176,15 @@ public class DirectConnectionManager implements DirectConnectionManagerMBean {
             this.dcServer = dcServer;
             this.disabled = disabled;
             this.noServer = noServer;
+            if (!this.disabled)
+                // read the non-blocking option, if the user has set it
+                this.nonBlockingConnections = shouldUseNonBlocking();
+            else
+                this.nonBlockingConnections = false;
+
+            if (logger.isDebugEnabled())
+                logger.debug("Will use " + (this.nonBlockingConnections ? "non-" : "") +
+                    "blocking outgoing connections to remote agents");
 
             // MBean
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
@@ -189,6 +200,12 @@ public class DirectConnectionManager implements DirectConnectionManagerMBean {
                     localAgent.getAgentID());
             }
         }
+    }
+
+    private boolean shouldUseNonBlocking() {
+        if (!PAProperties.PA_PAMR_DC_NONBLOCK.isSet())
+            return false;
+        return PAProperties.PA_PAMR_DC_NONBLOCK.isTrue();
     }
 
     void directConnectionFailed(AgentID remoteAgent) {
@@ -294,21 +311,12 @@ public class DirectConnectionManager implements DirectConnectionManagerMBean {
 
     public void connect(AgentID remoteAgent, InetSocketAddress remoteEndpoint) {
         try {
-            DirectConnection connection = new DirectConnection(this, remoteAgent);
+            DirectConnection connection;
+            if (this.nonBlockingConnections)
+                connection = new NonBlockingDirectConnection(this, remoteAgent);
+            else
+                connection = new BlockingDirectConnection();
             boolean established = connection.connect(remoteEndpoint);
-            if (!established) {
-                // wait for the connection notification
-                SelectionKey key = connection.getChannel().register(this.getSelector(),
-                        SelectionKey.OP_CONNECT);
-                key.attach(connection);
-            } else {
-                // directly register for write() ops
-                SelectionKey key = connection.getChannel()
-                        .register(this.getSelector(), SelectionKey.OP_WRITE);
-                key.attach(connection);
-            }
-            // re-enter selection
-            this.unlockSelector();
             directConnectionPending(remoteAgent, connection, established);
         } catch (IOException e) {
             // cannot connect. will consider that the remote endpoint is unreachable
@@ -316,30 +324,22 @@ public class DirectConnectionManager implements DirectConnectionManagerMBean {
         }
     }
 
+    //// package access; will be called by NonBlockingDirectConnection
     // notification on the outcome of the connection attempt 
-    public void connectionFinished(AgentID remoteAgent, DirectConnection connection, boolean success) {
+    void connectionFinished(AgentID remoteAgent, boolean success) {
         if (success) {
-            // register for write ops
-            try {
-                SelectionKey key = connection.getChannel()
-                        .register(this.getSelector(), SelectionKey.OP_WRITE);
-                key.attach(connection);
-                this.unlockSelector();
-                directConnectionEstablished(remoteAgent);
-            } catch (Exception e) {
-                directConnectionFailed(remoteAgent);
-            }
+            directConnectionEstablished(remoteAgent);
         } else {
             // cannot establish a connection
             directConnectionFailed(remoteAgent);
         }
     }
 
-    private Selector getSelector() {
+    Selector getSelector() {
         return this.dcServer.lockSelector();
     }
 
-    private void unlockSelector() {
+    void unlockSelector() {
         this.dcServer.unlockSelector();
     }
 

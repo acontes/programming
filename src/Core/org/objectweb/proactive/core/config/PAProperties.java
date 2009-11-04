@@ -286,6 +286,13 @@ public enum PAProperties {
      * 	direct communication. To be set if working with GCM deployment within a firewalled env
      */
     PA_PAMR_DC_PORT_RANGE("proactive.communication.pamr.dc.portrange", PAPropertiesType.STRING),
+    /**
+     * This flag can be used for performance tuning. Usually it is recommended to be set 
+     * in the case of an IO-intensive application with many directly-connected clients.
+     * Functionally, what it does is to use non-blocking sockets for outgoing direct connections
+     * to other remote agents
+     */
+    PA_PAMR_DC_NONBLOCK("proactive.communication.pamr.dc.client.nb", PAPropertiesType.BOOLEAN),
 
     /* ------------------------------------
      *  RMI
