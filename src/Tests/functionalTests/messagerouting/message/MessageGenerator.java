@@ -42,6 +42,7 @@ import org.objectweb.proactive.extra.messagerouting.protocol.message.DirectConne
 import org.objectweb.proactive.extra.messagerouting.protocol.message.DirectConnectionReplyACKMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.DirectConnectionReplyNACKMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.DirectConnectionRequestMessage;
+import org.objectweb.proactive.extra.messagerouting.protocol.message.ErrorMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.Message;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.RegistrationReplyMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.RegistrationRequestMessage;
@@ -134,6 +135,8 @@ public abstract class MessageGenerator {
                 return new DirectConnectionReplyACKMessage(corruptedMsg, 0);
             case DIRECT_CONNECTION_NACK:
                 return new DirectConnectionReplyNACKMessage(corruptedMsg, 0);
+            case ERR_:
+                return new ErrorMessage(corruptedMsg, 0);
             default:
                 return null;
         }
