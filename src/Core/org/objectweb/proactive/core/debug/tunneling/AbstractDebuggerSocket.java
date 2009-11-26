@@ -50,7 +50,7 @@ public abstract class AbstractDebuggerSocket {
     /** Control of the reading */
     private volatile boolean keepReading;
     /** Port of the socket */
-    protected int port = 0;
+    protected volatile int port = 0;
 
     /**
      * Start to read all activated connections one by one

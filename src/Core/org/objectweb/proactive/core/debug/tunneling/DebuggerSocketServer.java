@@ -83,12 +83,15 @@ public class DebuggerSocketServer extends AbstractDebuggerSocket {
                 try {
                     DebuggerSocketClient client = (DebuggerSocketClient) target;
                     Socket socket;
-                    serverSocket = new ServerSocket(port);
+                    serverSocket = new ServerSocket(0);
+
                     port = serverSocket.getLocalPort();
+
                     if ((socket = serverSocket.accept()) != null) {
                         addConnection(socket);
                         client.connect();
                     }
+
                 } catch (SocketException e) {
                     e.printStackTrace();
                 } catch (IOException e) {

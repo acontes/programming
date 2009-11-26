@@ -155,8 +155,9 @@ public class DebuggerConnection implements Serializable, NotificationListener {
             }
         }
 
-        int port = Integer.parseInt(address.split(":")[1]);
-        return port;
+        System.out.println("DebuggerConnection.findDebuggerPort() >>>>>>" + address);
+        listeningPort = Integer.parseInt(address.split(":")[1]);
+        return listeningPort;
     }
 
     /**
@@ -166,8 +167,10 @@ public class DebuggerConnection implements Serializable, NotificationListener {
      * @return DebuggerInformation
      */
     public synchronized DebuggerInformation getDebugInfo() {
+        int port = -3;
+
         try {
-            findDebuggerPort();
+            port = findDebuggerPort();
         } catch (ProActiveException e1) {
             e1.printStackTrace();
         }
@@ -179,7 +182,7 @@ public class DebuggerConnection implements Serializable, NotificationListener {
                 e.printStackTrace();
             }
         }
-        return new DebuggerInformation(debugNode, listeningPort);
+        return new DebuggerInformation(debugNode, port);
     }
 
     private synchronized void getOrCreateNode() {
