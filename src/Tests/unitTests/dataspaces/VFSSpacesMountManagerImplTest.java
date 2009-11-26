@@ -1,3 +1,37 @@
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2009 INRIA/University of 
+ * 						   Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2. 
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://proactive.inria.fr/team_members.htm
+ *  Contributor(s):
+ *
+ * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
+ */
 package unitTests.dataspaces;
 
 import static org.junit.Assert.assertEquals;
@@ -205,7 +239,7 @@ public class VFSSpacesMountManagerImplTest {
         final DataSpacesFileObject child = fo.getChild(INPUT_FILE);
         assertNotNull(child);
         assertTrue(child.exists());
-        assertEquals(inputUri.toString(), fo.getURI());
+        assertEquals(inputUri.toString(), fo.getVirtualURI());
 
         // check if write access restrictions are computed correctly - this should be denied
         try {
@@ -239,7 +273,7 @@ public class VFSSpacesMountManagerImplTest {
 
     private void assertIsWorkingOutputSpaceDir(DataSpacesFileObject fo) throws FileSystemException {
         assertTrue(fo.exists());
-        assertEquals(outputUri.toString(), fo.getURI());
+        assertEquals(outputUri.toString(), fo.getVirtualURI());
         final DataSpacesFileObject child = fo.resolveFile("new_file");
 
         // check if write access restrictions are computed correctly - this should be allowed
@@ -257,7 +291,7 @@ public class VFSSpacesMountManagerImplTest {
         final InputStream io = fileObject.getContent().getInputStream();
         final BufferedReader reader = new BufferedReader(new InputStreamReader(io));
         assertEquals(INPUT_FILE_CONTENT, reader.readLine());
-        assertEquals(fileUri.toString(), fileObject.getURI());
+        assertEquals(fileUri.toString(), fileObject.getVirtualURI());
     }
 
     @Test
@@ -300,7 +334,7 @@ public class VFSSpacesMountManagerImplTest {
     private void assertIsWorkingScratchForAODir(final DataSpacesFileObject fo, final DataSpacesURI fileUri,
             final boolean owner) throws FileSystemException, IOException {
         assertTrue(fo.exists());
-        assertEquals(fileUri.toString(), fo.getURI());
+        assertEquals(fileUri.toString(), fo.getVirtualURI());
         final DataSpacesFileObject child = fo.resolveFile("new_file");
 
         if (owner) {

@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of 
+ * 						   Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +22,8 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2. 
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -42,19 +45,23 @@ import java.io.IOException;
  * A helper class to manager SSH Public keys
  *
  */
-public class SSHKeys {
+class SSHKeys {
     static final public String[] IDENTITY_FILES = new String[] { "identity", "id_rsa", "id_dsa" };
-
-    /** Default directory for public keys */
-    static final public String SSH_DIR = System.getProperty("user.home") + File.separator + ".ssh" +
-        File.separator;
 
     /** Default suffix for public keys */
     private final static String KEY_SUFFIX = ".pub";
     private final static int KEY_SUFFIX_LEN = KEY_SUFFIX.length();
 
     /** A Cache of public keys */
-    private static String[] keys = null;
+    private final String[] keys;
+
+    public SSHKeys(String dir) throws IOException {
+        this.keys = findKeys(dir);
+    }
+
+    public String[] getKeys() {
+        return keys;
+    }
 
     /**
      * Find all SSH keys inside SshParameters.getSshKeyDirectory()
@@ -63,12 +70,8 @@ public class SSHKeys {
      * @throws IOException If the base directory does not exist an {@link IOException}
      * is thrown
      */
-    static synchronized public String[] getKeys() throws IOException {
-        if (keys != null) {
-            return keys;
-        }
-
-        File dir = new File(SshParameters.getSshKeyDirectory());
+    private String[] findKeys(String dirStr) throws IOException {
+        File dir = new File(dirStr);
         if (!dir.exists()) {
             logger.error("Cannot open SSH connection, " + dir + "does not exist");
             throw new IOException(dir + "does not exist");
@@ -89,11 +92,10 @@ public class SSHKeys {
             tmp[i] = tmp[i].substring(0, tmp[i].length() - 4);
         }
 
-        keys = tmp;
-        return keys;
+        return tmp;
     }
 
-    static public class PrivateKeyFilter implements FilenameFilter {
+    static private class PrivateKeyFilter implements FilenameFilter {
         public boolean accept(File dir, String name) {
             if (name.endsWith(".pub")) {
                 // Look it this file without ".pub" exist

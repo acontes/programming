@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of 
+ * 						   Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,12 +23,14 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
+ * If needed, contact us to obtain a release under GPL Version 2. 
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
+ *  Contributor(s): ActiveEon Team - http://www.activeeon.com
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package org.objectweb.proactive.core.body;
 
@@ -38,6 +41,8 @@ import java.security.AccessControlException;
 import java.security.PublicKey;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanRegistrationException;
@@ -62,8 +67,11 @@ import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.body.tags.LocalMemoryTag;
+import org.objectweb.proactive.core.body.tags.MessageTagsFactory;
 import org.objectweb.proactive.core.component.representative.ItfID;
 import org.objectweb.proactive.core.component.request.Shortcut;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.debug.debugger.BreakpointType;
 import org.objectweb.proactive.core.debug.debugger.Debugger;
 import org.objectweb.proactive.core.gc.GCMessage;
@@ -166,6 +174,10 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     protected BodyWrapperMBean mbean;
     protected boolean isProActiveInternalObject = false;
 
+    // MESSAGE-TAGS Factory
+    protected MessageTagsFactory messageTagsFactory;
+    protected Map<String, LocalMemoryTag> localMemoryTags;
+
     //
     // -- PRIVATE MEMBERS -----------------------------------------------
     //
@@ -225,6 +237,10 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
 
         this.debugger = factory.newDebuggerFactory().newDebugger();
         this.debugger.setTarget(this);
+
+        // MESSAGE TAGS
+        this.messageTagsFactory = factory.newRequestTagsFactory();
+        this.localMemoryTags = new ConcurrentHashMap<String, LocalMemoryTag>();
 
         // SECURITY
         if (reifiedObject instanceof Secure) {
@@ -1136,6 +1152,46 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
 
     public GCResponse receiveGCMessage(GCMessage msg) {
         return this.gc.receiveGCMessage(msg);
+    }
+
+    // MESSAGE TAGS MEMORY
+    /**
+     * Create a local memory for the specified tag for a lease period inferior to 
+     * the max lease period defined in properties.
+     * @param id    - Tag Identifier
+     * @param lease - Lease period of the memroy
+     * @return The LocalMemoryTag 
+     */
+    public LocalMemoryTag createLocalMemoryTag(String id, int lease) {
+        int maxLease = PAProperties.PA_MAX_MEMORY_TAG_LEASE.getValueAsInt();
+        lease = (lease > maxLease) ? maxLease : lease;
+        this.localMemoryTags.put(id, new LocalMemoryTag(id, lease));
+        return this.localMemoryTags.get(id);
+    }
+
+    /**
+     * Return the local memory of the specified Tag
+     * @param id - Tag identifer
+     * @return the LocalMemoryTag of the specified Tag
+     */
+    public LocalMemoryTag getLocalMemoryTag(String id) {
+        return this.localMemoryTags.get(id);
+    }
+
+    /**
+     * Clear the local memory of the specified Tag
+     * @param id - Tag identifier
+     */
+    public void clearLocalMemoryTag(String id) {
+        this.localMemoryTags.remove(id);
+    }
+
+    /**
+     * To get the localMemoryTag Map of the body
+     * @return Map<String, {@link LocalMemoryTag}> the LocalMemoryTags
+     */
+    public Map<String, LocalMemoryTag> getLocalMemoryTags() {
+        return this.localMemoryTags;
     }
 
     /**

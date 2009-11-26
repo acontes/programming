@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of 
+ * 						   Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,10 +23,11 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
+ * If needed, contact us to obtain a release under GPL Version 2. 
+ *
  *  Initial developer(s):               The ActiveEon Team
  *                        http://www.activeeon.com/
  *  Contributor(s):
- *
  *
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
@@ -57,9 +59,8 @@ public abstract class Bandwidth extends GCMFunctionalTestDefaultNodes {
 
     @Test
     public void test() throws ActiveObjectCreationException, NodeException {
-        Server server = (Server) PAActiveObject.newActive(Server.class.getName(), new Object[] {}, super
-                .getANode());
-        Client client = (Client) PAActiveObject.newActive(Client.class.getName(), new Object[] { server });
+        Server server = PAActiveObject.newActive(Server.class, new Object[] {}, super.getANode());
+        Client client = PAActiveObject.newActive(Client.class, new Object[] { server });
         double bandwidth = client.runTest();
         HudsonReport.reportToHudson(this.cl, bandwidth);
     }

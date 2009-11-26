@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of 
+ * 						   Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +22,8 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2. 
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -46,11 +49,11 @@ public class TestGarbageCollection extends FunctionalTest {
      * \ v \ 1--->---2 \ /| ^ v | \ / | 3 v / \ | v ^ | / \| 4 5
      */
     private static void buildGraph() throws Exception {
-        GCObject a1 = (GCObject) PAActiveObject.newActive(GCObject.class.getName(), null);
-        GCObject a2 = (GCObject) PAActiveObject.newActive(GCObject.class.getName(), null);
-        GCObject a3 = (GCObject) PAActiveObject.newActive(GCObject.class.getName(), null);
-        GCObject a4 = (GCObject) PAActiveObject.newActive(GCObject.class.getName(), null);
-        GCObject a5 = (GCObject) PAActiveObject.newActive(GCObject.class.getName(), null);
+        GCObject a1 = PAActiveObject.newActive(GCObject.class, null);
+        GCObject a2 = PAActiveObject.newActive(GCObject.class, null);
+        GCObject a3 = PAActiveObject.newActive(GCObject.class, null);
+        GCObject a4 = PAActiveObject.newActive(GCObject.class, null);
+        GCObject a5 = PAActiveObject.newActive(GCObject.class, null);
 
         PAActiveObject.setForgetOnSend(a1, "addRef");
         PAActiveObject.setForgetOnSend(a2, "addRef");

@@ -1,8 +1,43 @@
 /*
- * This interface and some other interfaces in this package are highly inspired by Apache Commons VFS API,
- * as implementations of these interfaces are/were adapted to VFS interfaces. 
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2009 INRIA/University of 
+ * 						   Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2. 
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://proactive.inria.fr/team_members.htm
+ *  Contributor(s):
+ *
+ * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive.extensions.dataspaces.api;
+
+/*
+ * This interface and some other interfaces in this package are highly inspired by Apache Commons VFS API,
+ * package are highly inspired by Apache Commons VFS API,
+ */
 
 import java.util.List;
 
@@ -36,7 +71,16 @@ public interface DataSpacesFileObject {
      *
      * @return URI of a represented file without the trailing slash
      */
-    public abstract String getURI();
+    public abstract String getVirtualURI();
+
+    /**
+     * Returns the real file's URI in its current file system.
+     * This URI may not be understood by third application depending on the provider of the real path.<br />
+     * This method returns null if this URI is unknown.
+     *
+     * @return URI of a represented file without the trailing slash
+     */
+    public abstract String getRealURI();
 
     /**
      * Determines if this file exists.

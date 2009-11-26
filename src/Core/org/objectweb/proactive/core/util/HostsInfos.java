@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of 
+ * 						   Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +22,8 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2. 
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -143,13 +146,6 @@ public class HostsInfos {
     final static String REGEXP_KEYVAL = "(([0-9]{1,3}\\.){3}[0-9]{1,3}:([0-9]{1,3}\\.){3}[0-9]{1,3})";
 
     private void loadProperties() {
-        String userNames = PAProperties.PA_SSH_USERNAME.getValue();
-
-        if (userNames == null) {
-            userNames = System.getProperty("user.name");
-        }
-        parseUserNames(userNames);
-
         String secondaryNames = PAProperties.PA_NET_SECONDARYNAMES.getValue();
         if (secondaryNames != null) {
             if (secondaryNames.matches(REGEXP_KEYVAL + "(," + REGEXP_KEYVAL + ")?")) {
@@ -159,27 +155,6 @@ public class HostsInfos {
                 }
             } else {
                 logger.error("Invalid value for proactive.secondaryNames: " + secondaryNames);
-            }
-        }
-    }
-
-    /**
-     * @param userNames
-     */
-    private void parseUserNames(String userNames) {
-        String[] unames = userNames.split(";");
-        for (int i = 0; i < unames.length; i++) {
-            int index = unames[i].indexOf("@");
-            if (index < 0) {
-                if (unames.length > 1) {
-                    logger.error("ERROR: malformed usernames. Should be username1@host1;username2@host2");
-                } else {
-                    setUserName("all", unames[0]);
-                }
-            } else {
-                String username = unames[i].substring(0, index);
-                String hostname = unames[i].substring(index + 1, unames[i].length());
-                setUserName(hostname, username);
             }
         }
     }

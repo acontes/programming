@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of 
+ * 						   Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +22,8 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2. 
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -66,12 +69,10 @@ public final class TimersTestApplication extends GCMFunctionalTest {
         final GCMVirtualNode vNode = gcmad.getVirtualNode("TestVirtualNode");
         final Node n1 = vNode.getANode();
         final Node n2 = vNode.getANode();
-        this.a1 = (ActiveObjectClass) PAActiveObject.newActive(ActiveObjectClass.class.getName(),
-                new Object[] { "a1" }, n1);
-        this.a1bis = (ActiveObjectClass) PAActiveObject.newActive(ActiveObjectClass.class.getName(),
-                new Object[] { "a1bis" }, n2);
+        this.a1 = PAActiveObject.newActive(ActiveObjectClass.class, new Object[] { "a1" }, n1);
+        this.a1bis = PAActiveObject.newActive(ActiveObjectClass.class, new Object[] { "a1bis" }, n2);
         // Provide the remote reference of a1 and a1bis to a2
-        this.a2 = (ActiveObjectClass) PAActiveObject.newActive(ActiveObjectClass.class.getName(),
+        this.a2 = PAActiveObject.newActive(ActiveObjectClass.class,
                 new Object[] { this.a1, this.a1bis, "a2" }, n2);
         // In order to test the value of the WaitForRequest timer
         // the main will wait a WAITING_TIME, therefore the a2 will be in

@@ -1,3 +1,37 @@
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2009 INRIA/University of 
+ * 						   Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2. 
+ *
+ *  Initial developer(s):               The ActiveEon Team
+ *                        http://www.activeeon.com/
+ *  Contributor(s):
+ *
+ * ################################################################
+ * $$ACTIVEEON_INITIAL_DEV$$
+ */
 package org.objectweb.proactive.extensions.vfsprovider;
 
 import java.io.IOException;
@@ -20,7 +54,7 @@ import org.objectweb.proactive.extensions.vfsprovider.server.FileSystemServerImp
  * Deploys {@link FileSystemServer} with instance of {@link FileSystemServerImpl} implementation on
  * the local runtime and provides URL access methods.
  */
-public class FileSystemServerDeployer {
+public final class FileSystemServerDeployer {
 
     private static final String FILE_SERVER_DEFAULT_NAME = "defaultFileSystemServer";
 
@@ -37,7 +71,7 @@ public class FileSystemServerDeployer {
     /**
      * Deploys locally a FileSystemServer as a RemoteObject with a default name.
      *
-     * @param rootPath
+     * @param rootPath the real path on which to bind the server
      * @param autoclosing
      * @throws IOException
      */
@@ -46,19 +80,44 @@ public class FileSystemServerDeployer {
     }
 
     /**
+     * Deploys locally a FileSystemServer as a RemoteObject with a default name.
+     *
+     * @param rootPath the real path on which to bind the server
+     * @param autoclosing
+     * @param rebind true if the service must rebind an existing one, false otherwise.
+     * @throws IOException
+     */
+    public FileSystemServerDeployer(String rootPath, boolean autoclosing, boolean rebind) throws IOException {
+        this(FILE_SERVER_DEFAULT_NAME, rootPath, autoclosing, rebind);
+    }
+
+    /**
      * Deploys locally a FileSystemServer as a RemoteObject with a given name.
      *
-     * @param name
-     *            of deployed RemoteObject
-     * @param rootPath
+     * @param name of deployed RemoteObject
+     * @param rootPath the real path on which to bind the server
      * @param autoclosing
      * @throws IOException
      */
     public FileSystemServerDeployer(String name, String rootPath, boolean autoclosing) throws IOException {
+        this(name, rootPath, autoclosing, false);
+    }
+
+    /**
+     * Deploys locally a FileSystemServer as a RemoteObject with a given name.
+     *
+     * @param name of deployed RemoteObject
+     * @param rootPath the real path on which to bind the server
+     * @param autoclosing
+     * @param rebind true if the service must rebind an existing one, false otherwise.
+     * @throws IOException
+     */
+    public FileSystemServerDeployer(String name, String rootPath, boolean autoclosing, boolean rebind)
+            throws IOException {
         fileSystemServer = new FileSystemServerImpl(rootPath);
         try {
             roe = PARemoteObject.newRemoteObject(FileSystemServer.class.getName(), this.fileSystemServer);
-            roe.createRemoteObject(name, false);
+            roe.createRemoteObject(name, true);
             url = roe.getURL();
         } catch (ProActiveException e) {
             // Ugly but createRemoteObject interface changed

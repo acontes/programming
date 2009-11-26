@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of 
+ * 						   Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +22,8 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2. 
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -44,6 +47,12 @@ public abstract class AbstractExample {
     protected static String vn_name = null;
     protected static CommandLine cmd = null;
     protected static String master_vn_name = null;
+    protected static String schedulerURL = null;
+    protected static String login = null;
+    protected static String password = null;
+    protected static String fs = System.getProperty("file.separator");
+    protected static String[] classpath = new String[] { System.getProperty("proactive.home") + fs + "dist" +
+        fs + "lib" + fs + "ProActive_examples.jar" };
     public static final String DEFAULT_DESCRIPTOR = "MWApplication.xml";
 
     static {
@@ -53,6 +62,12 @@ public abstract class AbstractExample {
                 "workers virtual node name").create("w"));
         command_options.addOption(OptionBuilder.withArgName("name").hasArg().withDescription(
                 "master virtual node name").create("m"));
+        command_options.addOption(OptionBuilder.withArgName("scheduler").hasArg().withDescription(
+                "scheduler url").create("s"));
+        command_options.addOption(OptionBuilder.withArgName("login").hasArg().withDescription(
+                "scheduler login").create("l"));
+        command_options.addOption(OptionBuilder.withArgName("password").hasArg().withDescription(
+                "scheduler password").create("pw"));
     }
 
     /**
@@ -92,7 +107,7 @@ public abstract class AbstractExample {
      * @param args command line arguments
      * @throws MalformedURLException
      */
-    protected static void init(String[] args) throws MalformedURLException {
+    protected static void init(String[] args) throws Exception {
         CommandLineParser parser = new GnuParser();
 
         try {
@@ -131,6 +146,21 @@ public abstract class AbstractExample {
         vn_name = cmd.getOptionValue("w");
 
         master_vn_name = cmd.getOptionValue("m");
+
+        schedulerURL = cmd.getOptionValue("s");
+
+        // testing if scheduler jar is in classpath
+        if (schedulerURL != null) {
+            try {
+                Class.forName("org.ow2.proactive.scheduler.ext.masterworker.AOSchedulerWorker");
+            } catch (ClassNotFoundException e) {
+                throw new ClassNotFoundException(
+                    "Scheduler jars cannot be found in current classpath, they need to be added in order to run this example in the Scheduler");
+
+            }
+        }
+        login = cmd.getOptionValue("l");
+        password = cmd.getOptionValue("pw");
     }
 
     /**

@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of 
+ * 						   Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +22,8 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2. 
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -42,11 +45,13 @@ public interface Loggers {
     static final public String CONFIGURATION = CORE + ".configuration";
     static final public String CONFIGURATION_NETWORK = CONFIGURATION + ".network";
     static final public String CLASSLOADING = CORE + ".classloading";
+    static final public String VIRTUALIZATION_BOOTSTRAP = CORE + ".bootstraping";
     static final public String EVENTS = CORE + ".events";
     static final public String RUNTIME = CORE + ".runtime";
     static final public String NODE = RUNTIME + ".node";
     static final public String BODY = CORE + ".body";
     static final public String MOP = CORE + ".mop";
+    static final public String PAPROXY = MOP + ".paproxy";
     public static final String SYNC_CALL = CORE + ".sync_call";
     static final public String GROUPS = CORE + ".groups";
     public static final String GC = CORE + ".gc";
@@ -83,6 +88,8 @@ public interface Loggers {
 
     public static final String BNB = CORE + "bnb";
 
+    public static final String DSI = CORE + ".dsi";
+
     // Security loggers
     public static final String SECURITY = CORE + ".security";
     public static final String SECURITY_NODE = SECURITY + ".node";
@@ -101,12 +108,6 @@ public interface Loggers {
     public static final String FAULT_TOLERANCE = CORE + ".ft";
     public static final String FAULT_TOLERANCE_CIC = FAULT_TOLERANCE + ".cic";
     public static final String FAULT_TOLERANCE_PML = FAULT_TOLERANCE + ".pml";
-
-    // MPI loggers
-    static final public String MPI = CORE + ".mpi";
-    static final public String MPI_CONTROL = MPI + ".control";
-    static final public String MPI_CONTROL_MANAGER = MPI_CONTROL + ".control";
-    static final public String MPI_CONTROL_COUPLING = MPI_CONTROL + ".coupling";
 
     // Scilab loggers
     public static final String SCILAB = CORE + ".scilab";
@@ -140,6 +141,11 @@ public interface Loggers {
     static final public String JMX_MBEAN = JMX + ".mbean";
     static final public String JMX_NOTIFICATION = JMX + ".notification";
 
+    // Message Tagging
+    static final public String MESSAGE_TAGGING = CORE + ".messagetagging";
+    static final public String MESSAGE_TAGGING_LOCALMEMORY = MESSAGE_TAGGING + ".localmemory";
+    static final public String MESSAGE_TAGGING_LOCALMEMORY_LEASING = MESSAGE_TAGGING_LOCALMEMORY + ".leasing";
+
     // Forwarding
     static final public String FORWARDING = CORE + ".forwarding";
     static final public String FORWARDING_MESSAGE = FORWARDING + ".message";
@@ -153,7 +159,7 @@ public interface Loggers {
     public static final String EXCEPTIONS_ONE_WAY = EXCEPTIONS + ".one_way";
     public static final String EXCEPTIONS_SEND_REPLY = EXCEPTIONS + ".send_reply";
 
-    public static final String WEB_SERVICES = CORE + "webservices";
+    public static final String WEB_SERVICES = CORE + ".webservices";
 
     public static final String UTILS = CORE + ".utils";
     public static final String SLEEPER = UTILS + ".sleeper";
@@ -169,4 +175,11 @@ public interface Loggers {
     // VFS Provider
     public static final String VFS_PROVIDER = CORE + ".vfsprovider";
     public static final String VFS_PROVIDER_SERVER = VFS_PROVIDER + ".server";
+
+    //Native code-wrapping loggers
+    static final public String NATIVE = CORE + ".native";
+    static final public String NATIVE_CONTROL = NATIVE + ".control";
+    static final public String NATIVE_CONTROL_MANAGER = NATIVE_CONTROL + ".manager";
+    static final public String NATIVE_CONTROL_COUPLING = NATIVE_CONTROL + ".coupling";
+
 }

@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of 
+ * 						   Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +22,8 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2. 
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -89,6 +92,7 @@ public class Utils {
     public static final String GATHERCAST_ITF_PROXY_DEFAULT_SUFFIX = GEN_ESCAPE_CHAR + "gathercastItfProxy";
     public static final String COMPOSITE_REPRESENTATIVE_SUFFIX = GEN_ESCAPE_CHAR + "composite";
     public static final String OUTPUT_INTERCEPTOR_SUFFIX = GEN_ESCAPE_CHAR + "outputInterceptor";
+    public static final String WEBSERVICE_PROXY_SUFFIX = GEN_ESCAPE_CHAR + "webServiceProxy";
 
     // packages
     public static final String STUB_DEFAULT_PACKAGE = null;
@@ -171,6 +175,12 @@ public class Utils {
             String javaInterfaceName) {
         // just a way to have an identifier (possibly not unique ... but readable)
         return (getMetaObjectClassName(functionalInterfaceName, javaInterfaceName) + OUTPUT_INTERCEPTOR_SUFFIX);
+    }
+
+    public static String getWSProxyClassName(String functionalInterfaceName, String javaInterfaceName,
+            String wsCallerClassName) {
+        return (getMetaObjectClassName(functionalInterfaceName, javaInterfaceName) + GEN_MIDDLE_SEPARATOR +
+            escapeString(wsCallerClassName.substring(wsCallerClassName.lastIndexOf('.'))) + WEBSERVICE_PROXY_SUFFIX);
     }
 
     public static Class<?> defineClass(final String className, final byte[] bytes)

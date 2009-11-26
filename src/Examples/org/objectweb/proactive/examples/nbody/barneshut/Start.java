@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of 
+ * 						   Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +22,8 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2. 
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -95,8 +98,8 @@ public class Start {
                 // creation of its sons and computation of the values of mass and mass center of
                 // all the tree's nodes
                 // useless boolean, just for pick up a different constructor
-                listOctTree.add(PAActiveObject.newActive(OctTree.class.getName(), new Object[] { lplanets,
-                        universe, Boolean.valueOf(true) }, nodes[(10 * i + 8) % nodes.length]));
+                listOctTree.add(PAActiveObject.newActive(OctTree.class, new Object[] { lplanets, universe,
+                        Boolean.valueOf(true) }, nodes[(10 * i + 8) % nodes.length]));
             } catch (ActiveObjectCreationException e) {
                 deployer.abortOnError(e);
             } catch (NodeException e) {
@@ -143,8 +146,8 @@ public class Start {
 
         try {
             for (int i = 0; i < nbOctTree; i++) {
-                maestroArray[i] = (Maestro) PAActiveObject.newActive(Maestro.class.getName(), new Object[] {
-                        new Integer(i), domainArray, deployer }, nodes[(10 * i + 9) % nodes.length]);
+                maestroArray[i] = PAActiveObject.newActive(Maestro.class, new Object[] { new Integer(i),
+                        domainArray, deployer }, nodes[(10 * i + 9) % nodes.length]);
             }
         } catch (ActiveObjectCreationException e) {
             deployer.abortOnError(e);
@@ -160,8 +163,8 @@ public class Start {
         BigMaestro bigMaestro = null;
 
         try {
-            bigMaestro = (BigMaestro) PAActiveObject.newActive(BigMaestro.class.getName(), new Object[] {
-                    maestroArray, new Integer(maxIter), deployer }, nodes[nodes.length - 1]);
+            bigMaestro = PAActiveObject.newActive(BigMaestro.class, new Object[] { maestroArray,
+                    new Integer(maxIter), deployer }, nodes[nodes.length - 1]);
         } catch (ActiveObjectCreationException e) {
             deployer.abortOnError(e);
         } catch (NodeException e) {

@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of 
+ * 						   Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +22,8 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2. 
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -105,8 +108,7 @@ public class DinnerLayout {
 
         // Creates the Table 
         try {
-            manager = (Table) org.objectweb.proactive.api.PAActiveObject.newActive(Table.class.getName(),
-                    params, url);
+            manager = org.objectweb.proactive.api.PAActiveObject.newActive(Table.class, params, url);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -122,8 +124,7 @@ public class DinnerLayout {
         for (int n = 0; n < 5; n++) {
             params[0] = new Integer(n);
             try {
-                phils[n] = (Philosopher) org.objectweb.proactive.api.PAActiveObject.newActive(
-                        Philosopher.class.getName(), params);
+                phils[n] = org.objectweb.proactive.api.PAActiveObject.newActive(Philosopher.class, params);
             } catch (Exception e) {
                 e.printStackTrace();
             }

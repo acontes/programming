@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of 
+ * 						   Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,10 +23,11 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
+ * If needed, contact us to obtain a release under GPL Version 2. 
+ *
  *  Initial developer(s):               The ActiveEon Team
  *                        http://www.activeeon.com/
  *  Contributor(s):
- *
  *
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
@@ -36,6 +38,7 @@ import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.Constructor;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -63,6 +66,7 @@ import org.objectweb.proactive.extra.messagerouting.protocol.message.ErrorMessag
 import org.objectweb.proactive.extra.messagerouting.protocol.message.Message;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.RegistrationReplyMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.RegistrationRequestMessage;
+import org.objectweb.proactive.extra.messagerouting.remoteobject.util.socketfactory.MessageRoutingSocketFactorySPI;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.ErrorMessage.ErrorType;
 
 
@@ -104,6 +108,9 @@ public class AgentImpl implements Agent, AgentImplMBean {
     /** List of Valves that will process each message */
     final private List<Valve> valves;
 
+    /** The socket factory to use to create the Tunnel */
+    final private MessageRoutingSocketFactorySPI socketFactory;
+
     /**
      * Create a routing agent
      * 
@@ -119,8 +126,9 @@ public class AgentImpl implements Agent, AgentImplMBean {
      *             If the router cannot be contacted.
      */
     public AgentImpl(InetAddress routerAddr, int routerPort,
-            Class<? extends MessageHandler> messageHandlerClass) throws ProActiveException {
-        this(routerAddr, routerPort, messageHandlerClass, new ArrayList<Valve>());
+            Class<? extends MessageHandler> messageHandlerClass, MessageRoutingSocketFactorySPI socketFactory)
+            throws ProActiveException {
+        this(routerAddr, routerPort, messageHandlerClass, new ArrayList<Valve>(), socketFactory);
     }
 
     /**
@@ -141,14 +149,15 @@ public class AgentImpl implements Agent, AgentImplMBean {
      *             If the router cannot be contacted.
      */
     public AgentImpl(InetAddress routerAddr, int routerPort,
-            Class<? extends MessageHandler> messageHandlerClass, List<Valve> valves)
-            throws ProActiveException {
+            Class<? extends MessageHandler> messageHandlerClass, List<Valve> valves,
+            MessageRoutingSocketFactorySPI socketFactory) throws ProActiveException {
         this.routerAddr = routerAddr;
         this.routerPort = routerPort;
         this.valves = valves;
         this.mailboxes = new WaitingRoom();
         this.requestIDGenerator = new AtomicLong(0);
         this.failedTunnels = new LinkedList<Tunnel>();
+        this.socketFactory = socketFactory;
 
         try {
             Constructor<? extends MessageHandler> mhConstructor;
@@ -206,7 +215,8 @@ public class AgentImpl implements Agent, AgentImplMBean {
      */
     private void __reconnectToRouter() {
         try {
-            Tunnel tunnel = new Tunnel(this.routerAddr, this.routerPort);
+            Socket s = socketFactory.createSocket(this.routerAddr.getHostAddress(), this.routerPort);
+            Tunnel tunnel = new Tunnel(s);
 
             // if call for the first time then agentID is null
             RegistrationRequestMessage reg = new RegistrationRequestMessage(this.agentID, requestIDGenerator
