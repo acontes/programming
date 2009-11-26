@@ -326,12 +326,5 @@ public interface DataSpacesFileObject {
      */
     public abstract boolean isContentOpen();
 
-    /**
-     * Return the URL of this file. 
-     * 
-     * @return the URL of this file. 
-     */
-    public abstract String getURL();
-
     public abstract boolean equals(Object candidate);
 }

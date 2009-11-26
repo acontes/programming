@@ -365,8 +365,4 @@ public class MOCKBody implements Body {
 
     }
 
-    public String getUrl() {
-        return null;
-    }
-
 }
