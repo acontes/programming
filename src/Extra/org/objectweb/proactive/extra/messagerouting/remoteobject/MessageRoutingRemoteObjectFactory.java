@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of 
+ * 						   Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +22,8 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2. 
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -57,6 +60,7 @@ import org.objectweb.proactive.extra.messagerouting.remoteobject.message.Message
 import org.objectweb.proactive.extra.messagerouting.remoteobject.message.MessageRoutingRemoteObjectLookupMessage;
 import org.objectweb.proactive.extra.messagerouting.remoteobject.util.MessageRoutingRegistry;
 import org.objectweb.proactive.extra.messagerouting.remoteobject.util.socketfactory.MessageRoutingSocketFactorySelector;
+import org.objectweb.proactive.extra.messagerouting.router.RouterImpl;
 
 
 /**
@@ -83,10 +87,16 @@ public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFacto
                 PAProperties.PA_NET_ROUTER_ADDRESS.getKey() + " is not set.");
         }
 
-        int routerPort = PAProperties.PA_NET_ROUTER_PORT.getValueAsInt();
-        if (routerPort == 0) {
-            logAndThrowException("Message routing cannot be started because " +
-                PAProperties.PA_NET_ROUTER_PORT.getKey() + " is not set.");
+        int routerPort;
+        if (PAProperties.PA_NET_ROUTER_PORT.isSet()) {
+            routerPort = PAProperties.PA_NET_ROUTER_PORT.getValueAsInt();
+            if (routerPort <= 0 || routerPort > 65535) {
+                logAndThrowException("Invalid  router port value: " + routerPort);
+            }
+        } else {
+            routerPort = RouterImpl.DEFAULT_PORT;
+            logger.debug(PAProperties.PA_NET_ROUTER_PORT.getKey() + " not set. Using the default port: " +
+                routerPort);
         }
 
         InetAddress routerAddress = null;

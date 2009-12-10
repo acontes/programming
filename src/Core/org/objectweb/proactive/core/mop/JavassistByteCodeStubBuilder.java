@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of 
+ * 						   Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +22,8 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2. 
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -35,6 +38,7 @@ import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.GenericDeclaration;
 import java.lang.reflect.TypeVariable;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -50,6 +54,7 @@ import javassist.CtField;
 import javassist.CtMember;
 import javassist.CtMethod;
 import javassist.CtNewMethod;
+import javassist.LoaderClassPath;
 import javassist.Modifier;
 import javassist.NotFoundException;
 import javassist.bytecode.CodeAttribute;
@@ -79,6 +84,16 @@ public class JavassistByteCodeStubBuilder {
     protected static final Logger logger = ProActiveLogger.getLogger(Loggers.STUB_GENERATION);
     private static CtMethod proxyGetter;
     private static CtMethod proxySetter;
+    private static volatile boolean classPoolInitialized = false;
+
+    public synchronized static ClassPool getClassPool() {
+        ClassPool pool = ClassPool.getDefault();
+        if (!classPoolInitialized) {
+            pool.appendClassPath(new LoaderClassPath(MOPClassLoader.getMOPClassLoader()));
+            classPoolInitialized = true;
+        }
+        return pool;
+    }
 
     /**
      * <p>Creates the bytecode for a stub on the given class</p>
@@ -98,8 +113,7 @@ public class JavassistByteCodeStubBuilder {
         }
         Method[] reifiedMethodsWithoutGenerics;
         try {
-            ClassPool pool = ClassPool.getDefault();
-
+            ClassPool pool = getClassPool();
             generatedCtClass = pool.makeClass(Utils.convertClassNameToStubClassName(className,
                     genericParameters));
 
@@ -110,7 +124,7 @@ public class JavassistByteCodeStubBuilder {
                 // may happen in environments with multiple classloaders: className is not available
                 // in the initial classpath of javassist's class pool
                 // ==> try to append classpath of the class corresponding to className
-                pool.appendClassPath(new ClassClassPath(Class.forName(className)));
+                pool.appendClassPath(new LoaderClassPath(Class.forName(className).getClassLoader()));
                 superCtClass = pool.get(className);
             }
 
@@ -272,13 +286,13 @@ public class JavassistByteCodeStubBuilder {
                         // The only method we ABSOLUTELY want to be called directly
                         // on the stub (and thus not reified) is
                         // the protected void finalize () throws Throwable
-                        if ((key.toString().equals("finalize")) && (params.length == 0)) {
+                        if ((key.equals("finalize")) && (params.length == 0)) {
                             // Do nothing, simply avoid adding this method to the list
                         } else {
                             // If not, adds this method to the Vector that
                             // holds all the reifiedMethods for this class
                             //                                tempVector.addElement(currentMethod);
-                            temp.put(key.toString(), new Method(currentMethod));
+                            temp.put(key, new Method(currentMethod));
                         }
                     } else {
                         // We already know this method because it is overriden
@@ -319,8 +333,9 @@ public class JavassistByteCodeStubBuilder {
                     m = new Method(currentMethod);
                     temp.put(key.toString(), m);
                 }
-                m.setCtMethod(currentMethod);
+                //                                m.setCtMethod(currentMethod);
                 m.grabMethodandParameterAnnotation(currentMethod);
+
             }
         }
 
@@ -335,7 +350,6 @@ public class JavassistByteCodeStubBuilder {
         for (int k = 0; k < params.length; k++) {
             key.append(params[k].getName());
         }
-
         return key.toString();
     }
 
@@ -379,23 +393,13 @@ public class JavassistByteCodeStubBuilder {
                         "); \n");
                 }
 
-                //                if (hasMethodAnnotation(reifiedMethod.getCtMethod(), UnwrapFuture.class)) {
-                //                    UnwrapFuture trp = getMethodAnnotation(reifiedMethod.getCtMethod(), UnwrapFuture.class);
-                //                    int parameterIndex = parameterNameToIndex(reifiedMethod.getCtMethod(), trp
-                //                            .parameterName());
-                //                    body
-                //                            .append("$" + parameterIndex +
-                //                                " = org.objectweb.proactive.api.PAFuture.getFutureValue($" + parameterIndex +
-                //                                "); \n");
-                //                }
-
                 boolean fieldToCache = hasAnnotation(reifiedMethod.getCtMethod(), Cache.class);
                 CtField cachedField = null;
 
                 if (fieldToCache) {
                     // the generated has to cache the method
 
-                    cachedField = new CtField(ClassPool.getDefault().get(
+                    cachedField = new CtField(getClassPool().get(
                             reifiedMethod.getCtMethod().getReturnType().getName()), reifiedMethod
                             .getCtMethod().getName() +
                         i, generatedClass);
@@ -470,8 +474,6 @@ public class JavassistByteCodeStubBuilder {
 
             CtMethod methodToGenerate = null;
 
-            //                                    System.out
-            //                                          .println("JavassistByteCodeStubBuilder.createReifiedMethods() body " + reifiedMethods[i].getName() + " = " + body);
             try {
                 methodToGenerate = CtNewMethod.make(reifiedMethod.getCtMethod().getReturnType(),
                         reifiedMethod.getCtMethod().getName(), reifiedMethod.getCtMethod()
@@ -593,7 +595,7 @@ public class JavassistByteCodeStubBuilder {
      */
     public static void createStubObjectMethods(CtClass generatedClass) throws CannotCompileException,
             NotFoundException {
-        CtField proxyField = new CtField(ClassPool.getDefault().get(Proxy.class.getName()), "myProxy",
+        CtField proxyField = new CtField(getClassPool().getDefault().get(Proxy.class.getName()), "myProxy",
             generatedClass);
         generatedClass.addField(proxyField);
         proxyGetter = CtNewMethod.getter("getProxy", proxyField);
@@ -771,17 +773,15 @@ public class JavassistByteCodeStubBuilder {
         for (int i = 0; i < lmp.size(); i++) {
             MethodParameter mp = lmp.get(i);
             List<javassist.bytecode.annotation.Annotation> la = mp.getAnnotations();
+            logger.debug(method.getCtMethod().getLongName() + " " +
+                Arrays.toString(mp.getAnnotations().toArray()));
             for (javassist.bytecode.annotation.Annotation annotation : la) {
-                try {
-                    if (TurnRemote.class.isAssignableFrom(annotation.toAnnotationType(
-                            method.getClass().getClassLoader(), ClassPool.getDefault()).getClass())) {
-                        body.append("$" + (i + 1) +
-                            " = org.objectweb.proactive.api.PARemoteObject.turnRemote($" + (i + 1) + "); \n");
-                        break;
-                    }
-                } catch (Exception e) {
-                    // TODO: handle exception
-                    e.printStackTrace();
+                if (TurnRemote.class.getName().equals(annotation.getTypeName())) {
+                    body.append("$" + (i + 1) + " = org.objectweb.proactive.api.PARemoteObject.turnRemote($" +
+                        (i + 1) + "); \n");
+                    logger.debug("method " + method.getCtMethod().getLongName() + ", param " + i +
+                        " has TurnRemote Annotation");
+                    break;
                 }
             }
         }
@@ -795,16 +795,12 @@ public class JavassistByteCodeStubBuilder {
             MethodParameter mp = lmp.get(i);
             List<javassist.bytecode.annotation.Annotation> la = mp.getAnnotations();
             for (javassist.bytecode.annotation.Annotation annotation : la) {
-                try {
-                    if (TurnActive.class.isAssignableFrom(annotation.toAnnotationType(
-                            method.getClass().getClassLoader(), ClassPool.getDefault()).getClass())) {
-                        body.append("$" + (i + 1) +
-                            " = org.objectweb.proactive.api.PAActiveObject.turnActive($" + (i + 1) + "); \n");
-                        break;
-                    }
-                } catch (Exception e) {
-                    // TODO: handle exception
-                    e.printStackTrace();
+                if (TurnActive.class.getName().equals(annotation.getTypeName())) {
+                    body.append("$" + (i + 1) + " = org.objectweb.proactive.api.PAActiveObject.turnActive($" +
+                        (i + 1) + "); \n");
+                    logger.debug("method " + method.getCtMethod().getLongName() + ", param " + i +
+                        " has TurnActive Annotation");
+                    break;
                 }
             }
         }
@@ -817,16 +813,13 @@ public class JavassistByteCodeStubBuilder {
             MethodParameter mp = lmp.get(i);
             List<javassist.bytecode.annotation.Annotation> la = mp.getAnnotations();
             for (javassist.bytecode.annotation.Annotation annotation : la) {
-                try {
-                    if (UnwrapFuture.class.isAssignableFrom(annotation.toAnnotationType(
-                            method.getClass().getClassLoader(), ClassPool.getDefault()).getClass())) {
-                        body.append("$" + (i + 1) +
-                            " = org.objectweb.proactive.api.PAFuture.getFutureValue($" + (i + 1) + "); \n");
-                        break;
-                    }
-                } catch (Exception e) {
-                    // TODO: handle exception
-                    e.printStackTrace();
+
+                if (UnwrapFuture.class.getName().equals(annotation.getTypeName())) {
+                    body.append("$" + (i + 1) + " = org.objectweb.proactive.api.PAFuture.getFutureValue($" +
+                        (i + 1) + "); \n");
+                    logger.debug("method " + method.getCtMethod().getLongName() + ", param " + i +
+                        " has UnwrapFuture Annotation");
+                    break;
                 }
             }
         }

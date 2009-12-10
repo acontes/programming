@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of 
+ * 						   Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,19 +23,23 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
+ * If needed, contact us to obtain a release under GPL Version 2. 
+ *
  *  Initial developer(s):               The ActiveEon Team
  *                        http://www.activeeon.com/
  *  Contributor(s):
- *
  *
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
  */
 package org.objectweb.proactive.extra.messagerouting.protocol.message;
 
-import org.objectweb.proactive.core.remoteobject.http.util.HttpMarshaller;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
 import org.objectweb.proactive.extra.messagerouting.protocol.TypeHelper;
+import org.objectweb.proactive.extra.messagerouting.protocol.message.Message.MessageType;
 
 
 /** A {@link MessageType#ERR_} message
@@ -42,6 +47,9 @@ import org.objectweb.proactive.extra.messagerouting.protocol.TypeHelper;
  * Error message are used to notify error to the agent. Several {@link ErrorType} exist.
  * Each one indicate a special type of error.
  * 
+ * Within the current implementation, {@link MessageType#ERR_} is a {@link DataMessage} with the payload
+ * 	being an integer which identifies the error code.
+ *
  * @since ProActive 4.1.0
  */
 public class ErrorMessage extends DataMessage {
@@ -110,15 +118,43 @@ public class ErrorMessage extends DataMessage {
          */
         ERR_INVALID_ROUTER_ID;
 
-        public byte[] toByteArray() {
-            byte[] buf = new byte[4];
-            TypeHelper.intToByteArray(this.ordinal(), buf, 0);
-            return buf;
+        /** Reverse map associating an error type to an ID  */
+        final static Map<Integer, ErrorType> idToErrorType;
+        static {
+            // Can't populate idToErrorType from constructor since enums are initialized before
+            // any static initializers are run. It is safe to do it from this static block
+            idToErrorType = new HashMap<Integer, ErrorType>();
+            for (ErrorType errorType : values()) {
+                idToErrorType.put(errorType.ordinal(), errorType);
+            }
+        }
+
+        public static ErrorType getErrorType(int value) {
+            return idToErrorType.get(value);
         }
     }
 
     /** The type of this error message */
     final private ErrorType error;
+
+    /** Read the error type from the payload field of a raw message
+     * It is assumed that the payload of an error message
+     * 	is four bytes long, containing an encoded int
+     *
+     * @throws IllegalArgumentException - if the payload contains an unrecognized error code
+     * @throws IllegalArgumentException - if the payload is not a four-bytes buffer
+     * */
+    static public ErrorType readErrorType(byte[] payload) throws IllegalArgumentException {
+        if (payload.length != 4)
+            throw new IllegalArgumentException("The payload is not four-bytes long");
+
+        int errorCode = TypeHelper.byteArrayToInt(payload, 0);
+        ErrorType type = ErrorType.getErrorType(errorCode);
+        if (type != null)
+            return type;
+        else
+            throw new IllegalArgumentException("Invalid value for the error code: " + errorCode);
+    }
 
     /** Create an error message
      *
@@ -132,7 +168,9 @@ public class ErrorMessage extends DataMessage {
      * 		The error type
      */
     public ErrorMessage(ErrorType error, AgentID recipient, AgentID faulty, long msgID) {
-        super(MessageType.ERR_, faulty, recipient, msgID, HttpMarshaller.marshallObject(error));
+        super(MessageType.ERR_, faulty, recipient, msgID, new byte[Integer.SIZE / 8]);
+        // fill in the payload
+        TypeHelper.intToByteArray(error.ordinal(), this.data, 0);
         this.error = error;
     }
 
@@ -152,11 +190,7 @@ public class ErrorMessage extends DataMessage {
             throw new IllegalArgumentException("Invalid message type " + this.getType());
         }
 
-        try {
-            this.error = (ErrorType) HttpMarshaller.unmarshallObject(this.getData());
-        } catch (ClassCastException e) {
-            throw new IllegalArgumentException("Invalid error type:" + e);
-        }
+        this.error = readErrorType(this.getData());
     }
 
     /** Return the type of the error*/
@@ -191,6 +225,11 @@ public class ErrorMessage extends DataMessage {
         } else if (!error.equals(other.error))
             return false;
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + " Error code:" + this.error;
     }
 
 }

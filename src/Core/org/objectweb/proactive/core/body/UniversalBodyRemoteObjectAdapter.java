@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of 
+ * 						   Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,12 +23,14 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
+ * If needed, contact us to obtain a release under GPL Version 2. 
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
  * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive.core.body;
 
@@ -180,11 +183,6 @@ public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody> imp
 
     public String registerByName(String name, boolean rebind) throws IOException, ProActiveException {
         return target.registerByName(name, rebind);
-    }
-
-    public String registerByName(String name, boolean rebind, String protocol) throws IOException,
-            ProActiveException {
-        return target.registerByName(name, rebind, protocol);
     }
 
     public void setRegistered(boolean registered) throws IOException {

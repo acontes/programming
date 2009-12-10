@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of 
+ * 						   Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,6 +23,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
+ * If needed, contact us to obtain a release under GPL Version 2. 
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
@@ -32,7 +35,9 @@
 package org.objectweb.proactive.api;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.core.exceptions.ProActiveBadConfigurationException;
 import org.objectweb.proactive.core.gc.HalfBodies;
+import org.objectweb.proactive.core.util.ProActiveInet;
 
 
 /**
@@ -75,4 +80,26 @@ public class PALifeCycle {
         return "true".equals(System.getProperty(PA_STARTED_PROP));
     }
 
+    /**
+     * This method should be invoked before calling any call to the ProActive Programming library.
+     * It checks that ProActive is properly configured and will be able to execute successfully. If 
+     * an exception is thrown, the caller should not invoke any method from the ProActive Programming
+     * library since Runtime exceptions can be thrown.  
+     * 
+     * @throws ProActiveBadConfigurationException 
+     *  If ProActive is misconfigured or if the environment does not fulfill ProActive's requirements
+     */
+    public static void checkConfig() throws ProActiveBadConfigurationException {
+        /*
+         * BE SURE TO NOT START A ProActive RUNTIME DUE TO A SIDE EFFECT
+         */
+
+        // Check an IP address is available
+        try {
+            ProActiveInet.getInstance().getInetAddress();
+        } catch (Throwable e) {
+            throw new ProActiveBadConfigurationException(
+                "Unable to find a suitable IP Address. Please check your configuration", e);
+        }
+    }
 }

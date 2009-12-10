@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of 
+ * 						   Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,32 +23,35 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
+ * If needed, contact us to obtain a release under GPL Version 2. 
+ *
  *  Initial developer(s):               The ActiveEon Team
  *                        http://www.activeeon.com/
  *  Contributor(s):
- *
  *
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
  */
 package org.objectweb.proactive.core.mop;
 
-import java.lang.annotation.Annotation;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import javassist.CannotCompileException;
 import javassist.CtBehavior;
-import javassist.CtClass;
 import javassist.CtMethod;
-import javassist.NotFoundException;
-import javassist.bytecode.CodeAttribute;
-import javassist.bytecode.LocalVariableAttribute;
+import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.MethodInfo;
 import javassist.bytecode.ParameterAnnotationsAttribute;
+import javassist.bytecode.annotation.Annotation;
 
 
+/**
+ *
+ * This class holds all the annotations a given method has. If the method is inherited
+ * from superclass or from interfaces, this object also used to store annotations
+ * available in the class hierarchy.
+ *
+ */
 public class Method {
 
     private CtMethod method;
@@ -67,21 +71,11 @@ public class Method {
         methodAnnotation = new ArrayList<Annotation>();
         listMethodParameters = new ArrayList<MethodParameter>();
 
-        CodeAttribute codeAttribute = (CodeAttribute) method.getMethodInfo().getAttribute(CodeAttribute.tag);
-        if (codeAttribute != null) {
-            LocalVariableAttribute localVariableAttribute = (LocalVariableAttribute) codeAttribute
-                    .getAttribute(LocalVariableAttribute.tag);
-            if (localVariableAttribute != null) {
-                // localVariableAttribute returns the number of method parameters
-                // with the first being a reference on the object itself
-                // thus the nb of effective parameters is  localVariableAttribute.tableLength() - 1;
-                int nbOfParam = localVariableAttribute.tableLength() - 1;
+        MethodInfo methodInfo = method.getMethodInfo();
 
-                for (int i = 0; i < nbOfParam; i++) {
-                    // initialize the list of parameters
-                    listMethodParameters.add(new MethodParameter(null));
-                }
-            }
+        for (int i = 0; i < methodInfo.getAttributes().size(); i++) {
+            // initialize the list of parameters
+            listMethodParameters.add(new MethodParameter());
         }
         grabMethodandParameterAnnotation(method);
     }
@@ -102,25 +96,6 @@ public class Method {
         this.methodAnnotation = methodAnnotation;
     }
 
-    //    public void grabMethodandParameterAnnotation(CtMethod ctMethod) {
-    //        Object[] o  = ctMethod.getAvailableAnnotations();
-    //        for (int i =0; i< o.length; i++) {
-    //            methodAnnotation.add((Annotation) o[i]);
-    //        }
-    //
-    //        CodeAttribute codeAttribute = (CodeAttribute) ctMethod.getMethodInfo().getAttribute(
-    //                CodeAttribute.tag);
-    //        LocalVariableAttribute localVariableAttribute = (LocalVariableAttribute) codeAttribute
-    //                .getAttribute(LocalVariableAttribute.tag);
-    //        for (int j = 0; j < localVariableAttribute.tableLength(); j++) {
-    //
-    //        }
-    //
-    //
-    //
-    //
-    //    }
-
     private static ParameterAnnotationsAttribute toParameterAnnotationsAttribute(CtBehavior ctBehavior) {
         MethodInfo minfo = ctBehavior.getMethodInfo();
         ParameterAnnotationsAttribute attr = (ParameterAnnotationsAttribute) minfo
@@ -130,10 +105,18 @@ public class Method {
 
     public void grabMethodandParameterAnnotation(CtBehavior ctBehavior) {
 
-        //get method annotations 
-        Object[] methodAnn = ctBehavior.getAvailableAnnotations();
-        for (Object object : methodAnn) {
-            methodAnnotation.add((Annotation) object);
+        MethodInfo minfo = ctBehavior.getMethodInfo();
+        AnnotationsAttribute methodattr = (AnnotationsAttribute) minfo
+                .getAttribute(AnnotationsAttribute.visibleTag);
+
+        if (methodattr != null) {
+            Annotation[] methodAnn = methodattr.getAnnotations();
+
+            for (Annotation object : methodAnn) {
+                JavassistByteCodeStubBuilder.logger.debug("adding annotation " + object.getTypeName() +
+                    " to " + ctBehavior.getLongName());
+                methodAnnotation.add((Annotation) object);
+            }
         }
 
         // get parameter annotations
@@ -145,32 +128,33 @@ public class Method {
 
         javassist.bytecode.annotation.Annotation[][] parametersAnnotations = attr.getAnnotations();
 
-        if (listMethodParameters.size() > 0) {
+        //        if (listMethodParameters.size() > 0) {
 
-            for (int paramIndex = 0; paramIndex < parametersAnnotations.length; paramIndex++) {
+        for (int paramIndex = 0; paramIndex < parametersAnnotations.length; paramIndex++) {
 
-                javassist.bytecode.annotation.Annotation[] paramAnnotations = parametersAnnotations[paramIndex];
-                for (javassist.bytecode.annotation.Annotation parameterAnnotation : paramAnnotations) {
+            javassist.bytecode.annotation.Annotation[] paramAnnotations = parametersAnnotations[paramIndex];
+            for (javassist.bytecode.annotation.Annotation parameterAnnotation : paramAnnotations) {
 
-                    MethodParameter mp = listMethodParameters.get(paramIndex);
-                    if (mp == null) {
-                        mp = new MethodParameter(null);
-                        listMethodParameters.set(paramIndex, mp);
-                    }
-                    mp.getAnnotations().add(parameterAnnotation);
+                MethodParameter mp = listMethodParameters.get(paramIndex);
+                if (mp == null) {
+                    mp = new MethodParameter();
+                    listMethodParameters.set(paramIndex, mp);
                 }
+                JavassistByteCodeStubBuilder.logger.debug("adding annotation " +
+                    parameterAnnotation.getTypeName() + " to param " + paramIndex + " of " +
+                    ctBehavior.getLongName());
+                mp.getAnnotations().add(parameterAnnotation);
             }
         }
     }
 
     public boolean hasMethodAnnotation(Class<?> annotation) {
 
-        for (Object object : methodAnnotation.toArray()) {
-            if (annotation.isAssignableFrom(object.getClass())) {
+        for (Annotation object : methodAnnotation.toArray(new Annotation[] {})) {
+            if (annotation.getName().equals(object.getTypeName())) {
                 return true;
             }
         }
-
         return false;
     }
 

@@ -16,17 +16,13 @@
 	<classpathentry kind="lib" path="lib/batik-svggen.jar"/>
 	<classpathentry kind="lib" path="lib/batik-util.jar"/>
 	<classpathentry kind="lib" path="lib/batik-xml.jar"/>
-	<classpathentry kind="lib" path="lib/bcel-5.1-fixes-1.0.jar"/>
-	<classpathentry kind="lib" path="lib/bcel-5.1.jar"/>
 	<classpathentry kind="lib" path="lib/bouncycastle.jar"/>
 	<classpathentry kind="lib" path="lib/bundlerepository.jar"/>
-	<classpathentry kind="lib" path="lib/classad.jar"/>
 	<classpathentry kind="lib" path="lib/cog-jglobus-1.2.jar"/>
 	<classpathentry kind="lib" path="lib/cog-ogce.jar"/>
 	<classpathentry kind="lib" path="lib/colobus-0.1.jar"/>
 	<classpathentry kind="lib" path="lib/colt.jar"/>
 	<classpathentry kind="lib" path="lib/commons-cli-1.1.jar"/>
-	<classpathentry kind="lib" path="lib/commons-discovery.jar"/>
 	<classpathentry kind="lib" path="lib/commons-logging-1.1.1.jar"/>
 	<classpathentry kind="lib" path="lib/commons-net-1.4.1.jar"/>
 	<classpathentry kind="lib" path="lib/commons-vfs-patched-2.0-SNAPSHOTr13526-tests.jar"/>
@@ -126,11 +122,11 @@
 	<classpathentry kind="lib" path="lib/ws-common/jaxb-api-2.1.jar"/>
 	<classpathentry kind="lib" path="lib/ws-common/jaxb-impl-2.1.9.jar"/>
 	<classpathentry kind="lib" path="lib/ws-common/neethi-2.0.4.jar"/>
-	<classpathentry kind="lib" path="lib/ws-common/wsdl4j-1.6.2.jar"/>
 	<classpathentry kind="lib" path="lib/ws-common/wstx-asl-3.2.8.jar"/>
 	<classpathentry kind="lib" path="lib/ws-common/XmlSchema-1.4.5.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/axis.jar"/>
 	<classpathentry kind="lib" path="lib/virtualbox-wsdl.jar"/>
+	<classpathentry kind="lib" path="lib/ws-common/org.apache.servicemix.bundles.wsdl4j-1.6.1_1.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

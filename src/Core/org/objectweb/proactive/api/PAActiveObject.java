@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of 
+ * 						   Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,9 +23,11 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
+ * If needed, contact us to obtain a release under GPL Version 2. 
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
+ *  Contributor(s): ActiveEon Team - http://www.activeeon.com
  *
  * ################################################################
  * $$ACTIVEEON_CONTRIBUTOR$$
@@ -1114,32 +1117,11 @@ public class PAActiveObject {
         return registerByName(obj, name, true);
     }
 
-    public static String registerByName(Object obj, String name, String protocol) throws ProActiveException {
-        return registerByName(obj, name, true, protocol);
-    }
-
     public static String registerByName(Object obj, String name, boolean rebind) throws ProActiveException {
         try {
             UniversalBody body = getRemoteBody(obj);
 
             String url = body.registerByName(name, rebind);
-            body.setRegistered(true);
-            if (PAActiveObject.logger.isInfoEnabled()) {
-                PAActiveObject.logger.info("Success at binding url " + url);
-            }
-
-            return url;
-        } catch (IOException e) {
-            throw new ProActiveException("Failed to register" + obj + " with name " + name, e);
-        }
-    }
-
-    public static String registerByName(Object obj, String name, boolean rebind, String protocol)
-            throws ProActiveException {
-        try {
-            UniversalBody body = getRemoteBody(obj);
-
-            String url = body.registerByName(name, rebind, protocol);
             body.setRegistered(true);
             if (PAActiveObject.logger.isInfoEnabled()) {
                 PAActiveObject.logger.info("Success at binding url " + url);
@@ -1492,15 +1474,40 @@ public class PAActiveObject {
      * Looks-up an active object previously registered in a registry(RMI, IBIS, HTTP). In fact it is
      * the remote version of the body of an active object that can be registered into the Registry
      * under a given URL. If the lookup is successful, the method reconstructs a Stub-Proxy couple
-     * and point it to the RmiRemoteBody found. The registry where to look for is fully determined
+     * and point it to the remote nody found. The registry where to look for is fully determined
      * with the protocol included in the url
      * 
+     * @param clazz
+     *            the class the generated stub should inherit from.
+     * @param url
+     *            the url under which the remote body is registered. The url takes the following
+     *            form: protocol://machine_name:port/name.
+     * @return a remote reference on a Stub of type <code>classname</code> pointing to the remote
+     *         body found
+     * @exception java.io.IOException
+     *                if the remote body cannot be found under the given url or if the object found
+     *                is not of type UniversalBody
+     * @exception ActiveObjectCreationException
+     *                if the stub-proxy couple cannot be created
+     */
+    public static <T> T lookupActive(Class<T> clazz, String url) throws ActiveObjectCreationException,
+            java.io.IOException {
+        return (T) lookupActive(clazz.getName(), url);
+    }
+
+    /**
+     * Looks-up an active object previously registered in a registry(RMI, IBIS, HTTP). In fact it is
+     * the remote version of the body of an active object that can be registered into the Registry
+     * under a given URL. If the lookup is successful, the method reconstructs a Stub-Proxy couple
+     * and point it to the remote body found. The registry where to look for is fully determined
+     * with the protocol included in the url
+     * 
+     *
      * @param classname
      *            the fully qualified name of the class the stub should inherit from.
      * @param url
      *            the url under which the remote body is registered. The url takes the following
-     *            form: protocol://machine_name:port/name. Protocol and port can be ommited if
-     *            respectively RMI and 1099: //machine_name/name
+     *            form: protocol://machine_name:port/name.
      * @return a remote reference on a Stub of type <code>classname</code> pointing to the remote
      *         body found
      * @exception java.io.IOException
@@ -1512,9 +1519,7 @@ public class PAActiveObject {
     public static Object lookupActive(String classname, String url) throws ActiveObjectCreationException,
             java.io.IOException {
         RemoteObject<?> rmo;
-        //URI uri = RemoteObjectHelper.expandURI(URI.create(url));
-        // is needed ?
-        URI uri = URI.create(url);
+        URI uri = RemoteObjectHelper.expandURI(URI.create(url));
 
         try {
             rmo = RemoteObjectHelper.lookup(uri);
@@ -1668,7 +1673,7 @@ public class PAActiveObject {
             return MOP.createStubObject(body.getReifiedObject(), new Object[] { body }, body
                     .getReifiedObject().getClass().getName(), null);
         } catch (MOPException e) {
-            throw new ProActiveRuntimeException("Cannot create Stub for this Body e=" + e);
+            throw new ProActiveRuntimeException("Cannot create Stub for this Body e=", e);
         }
     }
 

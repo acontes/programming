@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of 
+ * 						   Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,6 +23,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
+ * If needed, contact us to obtain a release under GPL Version 2. 
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s): ActiveEon Team - http://www.activeeon.com
@@ -29,7 +32,6 @@
  * ################################################################
  * $$ACTIVEEON_CONTRIBUTOR$$
  */
-
 package org.objectweb.proactive.core.mop;
 
 import java.io.IOException;
@@ -221,11 +223,16 @@ public abstract class MOP {
             if (PAProxyBuilder.hasPAProxyAnnotation(targetClass)) {
                 String proxyName = PAProxyBuilder.generatePAProxyClassName(targetClass.getName());
                 Class<?> cl = MOPClassLoader.getMOPClassLoader().loadClass(proxyName);
+
+                ConstructorCall constructor = buildTargetObjectConstructorCall(targetClass,
+                        constructorParameters);
+                Object proxiedObject = constructor.execute();
+
                 targetClass = cl;
                 nameOfClass = targetClass.getName();
-                nameOfStubClass = PAProxyBuilder.getBaseClassNameFromPAProxyName(targetClass.getName());
+                nameOfStubClass = targetClass.getName();
 
-                System.out.println("PAPROXY  " + nameOfClass + "? ");
+                constructorParameters = new Object[] { proxiedObject };
 
             }
         } catch (NotFoundException e) {
@@ -235,11 +242,14 @@ public abstract class MOP {
             if (PAProxyBuilder.doesClassNameEndWithPAProxySuffix(targetClass.getName())) {
                 Class<?> cl = MOPClassLoader.getMOPClassLoader().loadClass(targetClass.getName());
                 targetClass = cl;
-                nameOfClass = targetClass.getName();
-                nameOfStubClass = PAProxyBuilder.getBaseClassNameFromPAProxyName(targetClass.getName());
+                nameOfStubClass = nameOfClass = targetClass.getName();
+                //                nameOfStubClass = PAProxyBuilder.getBaseClassNameFromPAProxyName(targetClass.getName());
 
-                System.out.println("PAPROXY  " + nameOfClass + "? ");
             }
+        } catch (ConstructorCallExecutionFailedException e) {
+            throw new ConstructionOfReifiedObjectFailedException(e);
+        } catch (InvocationTargetException e) {
+            throw new ConstructionOfReifiedObjectFailedException(e);
         }
 
         // Class<?> stubClass = null;
@@ -295,6 +305,27 @@ public abstract class MOP {
             }
 
             // MOP.forName(nameOfClass);//   addClassToCache(nameOfStubClass, targetClass);
+        }
+
+        try {
+            if (PAProxyBuilder.hasPAProxyAnnotation(targetClass)) {
+                String proxyName = PAProxyBuilder.generatePAProxyClassName(targetClass.getName());
+                Class<?> cl = MOPClassLoader.getMOPClassLoader().loadClass(proxyName);
+                targetClass = cl;
+                nameOfClass = targetClass.getName();
+                //                stubClass = PAProxyBuilder.getBaseClassNameFromPAProxyName(targetClass.getName());
+
+            }
+        } catch (NotFoundException e) {
+            // We could land here if we are trying to
+            // generate a _PAProxy on a runtime that does not
+            // have yet generated a paproxy for that class
+            if (PAProxyBuilder.doesClassNameEndWithPAProxySuffix(targetClass.getName())) {
+                Class<?> cl = MOPClassLoader.getMOPClassLoader().loadClass(targetClass.getName());
+                targetClass = cl;
+                nameOfClass = targetClass.getName();
+
+            }
         }
 
         // Instantiates the stub object
@@ -364,23 +395,6 @@ public abstract class MOP {
         }
     }
 
-    /**
-     * Reifies an object
-     * @param proxyParameters Array holding the proxy parameters
-     * @param nameOfStubClass The name of the object's stub class
-     * @param target the object to reify
-     */
-
-    //     public static Object turnReified(Object[] proxyParameters,
-    //			String nameOfStubClass, Object target)
-    //			throws ClassNotFoundException, ReifiedCastException,
-    //			ClassNotReifiableException, CannotGuessProxyNameException,
-    //			InvalidProxyClassException,
-    //			ConstructionOfProxyObjectFailedException {
-    //		String nameOfProxy = guessProxyName(target.getClass());
-    //		return turnReified(nameOfStubClass, nameOfProxy, proxyParameters,
-    //				target);
-    //	}
     /**
      * Reifies an object
      * @param nameOfProxyClass the name of the object's proxy
@@ -726,6 +740,44 @@ public abstract class MOP {
         // if we cannot load the stub class using its name
         // it is probably because it has been downloaded by another classloader
         // thus we ask the classloader of the target class to load it
+
+        try {
+            boolean isPAProxy = PAProxyBuilder.hasPAProxyAnnotation(targetClass);
+            if (isPAProxy) {
+                byte[] paproxyByteCode;
+                try {
+                    paproxyByteCode = PAProxyBuilder.generatePAProxy(targetClass.getName());
+                    String proxyName = PAProxyBuilder.generatePAProxyClassName(targetClass.getName());
+                    MOPClassLoader.classDataCache.put(proxyName, paproxyByteCode);
+
+                    Class<?> proxyClass = Class.forName(proxyName);
+
+                    targetClass = proxyClass;
+                    nameOfBaseClass = proxyName;
+
+                } catch (NotFoundException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (CannotCompileException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (SecurityException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } catch (IllegalArgumentException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+
+            }
+        } catch (NotFoundException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+
         Class<?> baseClass = null;
         try {
             baseClass = forName(nameOfBaseClass);

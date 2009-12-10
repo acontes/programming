@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of 
+ * 						   Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +22,8 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2. 
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -62,7 +65,7 @@ public class NQueensExample extends AbstractExample {
     private static ProActiveMaster<QueryExtern, Pair<Long, Long>> master;
 
     @SuppressWarnings("unchecked")
-    public static void main(String[] args) throws MalformedURLException, ProActiveException, LoginException {
+    public static void main(String[] args) throws Exception {
         //   Getting command line parameters and creating the master (see AbstractExample)
         init(args);
 
@@ -83,7 +86,9 @@ public class NQueensExample extends AbstractExample {
         master.setInitialTaskFlooding(20);
 
         // Adding ressources
-        if (vn_name == null) {
+        if (schedulerURL != null) {
+            master.addResources(schedulerURL, login, password, classpath);
+        } else if (vn_name == null) {
             master.addResources(descriptor_url);
         } else {
             master.addResources(descriptor_url, vn_name);
@@ -142,7 +147,7 @@ public class NQueensExample extends AbstractExample {
         PALifeCycle.exitSuccess();
     }
 
-    protected static void init(String[] args) throws MalformedURLException {
+    protected static void init(String[] args) throws Exception {
         command_options.addOption(OptionBuilder.withArgName("value").hasArg().withDescription(
                 "nqueen board size").create("size"));
         command_options.addOption(OptionBuilder.withArgName("value").hasArg().withDescription(

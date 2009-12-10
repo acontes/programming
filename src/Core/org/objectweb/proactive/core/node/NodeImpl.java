@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of 
+ * 						   Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,12 +23,14 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
+ * If needed, contact us to obtain a release under GPL Version 2. 
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
  * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive.core.node;
 
@@ -53,28 +56,24 @@ import org.objectweb.proactive.core.runtime.VMInformation;
 /**
  * <p>
  * A <code>Node</code> offers a set of services needed by ProActive to work with
- * remote JVM. Each JVM that is aimed to hold active objects should contains at
- * least one instance of the node class. That instance, when created, will be
- * registered to some registry where it is possible to perform a lookup (such as
- * the RMI registry).
+ * remote JVM. Each JVM that is aimed to hold active objects should contains at least
+ * one instance of the node class. That instance, when created, will be registered
+ * to some registry where it is possible to perform a lookup (such as the RMI registry).
+ * </p><p>
+ * When ProActive needs to interact with a remote JVM, it will lookup for one node associated
+ * with that JVM (using typically the RMI Registry) and use this node to perform the interaction.
+ * </p><p>
+ * We expect several concrete implementations of the Node to be wrtten such as a RMI node, a HTTP node ...
  * </p>
- * <p>
- * When ProActive needs to interact with a remote JVM, it will lookup for one
- * node associated with that JVM (using typically the RMI Registry) and use this
- * node to perform the interaction.
- * </p>
- * <p>
- * We expect several concrete implementations of the Node to be wrtten such as a
- * RMI node, a HTTP node ...
- * </p>
- * 
+ *
  * @author The ProActive Team
- * @version 1.1, 2002/08/28
- * @since ProActive 0.9
- * 
+ * @version 1.1,  2002/08/28
+ * @since   ProActive 0.9
+ *
  */
 
 public class NodeImpl implements Node, Serializable {
+
     protected NodeInformation nodeInformation;
     protected ProActiveRuntime proActiveRuntime;
     protected String vnName;
@@ -122,7 +121,7 @@ public class NodeImpl implements Node, Serializable {
     }
 
     //
-    // --------------------------Implements Node-----------------------------
+    //--------------------------Implements Node-----------------------------
 
     /**
      * @see org.objectweb.proactive.core.node.Node#getNodeInformation()
@@ -238,8 +237,7 @@ public class NodeImpl implements Node, Serializable {
     }
 
     //
-    // ------------------------INNER
-    // CLASS---------------------------------------
+    //------------------------INNER CLASS---------------------------------------
     //
     protected class NodeInformationImpl implements NodeInformation {
 
@@ -312,9 +310,7 @@ public class NodeImpl implements Node, Serializable {
 
         /**
          * Returns the name specified in the url
-         * 
-         * @param url
-         *            . The url of the node
+         * @param url. The url of the node
          * @return String. The name of the node
          */
         private String extractNameFromUrl(String url) {
@@ -331,11 +327,9 @@ public class NodeImpl implements Node, Serializable {
         }
 
         /**
-         * Change the Job ID of this node.
-         * 
+         * Change the Job ID of this node. 
          * @see org.objectweb.proactive.Job
-         * @param jobId
-         *            The new JobID
+         * @param jobId The new JobID
          */
         public void setJobID(String jobId) {
             this.jobID = jobId;
@@ -349,7 +343,7 @@ public class NodeImpl implements Node, Serializable {
     // SECURITY
 
     /**
-     * 
+     *
      * @throws IOException
      * @see org.objectweb.proactive.core.node.Node#killAllActiveObjects()
      */
@@ -368,8 +362,7 @@ public class NodeImpl implements Node, Serializable {
                 PAActiveObject
                         .terminateActiveObject(MOP.createStubObject(Object.class.getName(), body), true);
             } catch (MOPException e) {
-                // Bad error handling but terminateActiveObject eat remote
-                // exceptions
+                // Bad error handling but terminateActiveObject eat remote exceptions
                 throw new IOException("Cannot contact Active Objects on this node: " +
                     this.nodeInformation.getURL() + " caused by " + e.getMessage());
             }
@@ -377,8 +370,7 @@ public class NodeImpl implements Node, Serializable {
     }
 
     /**
-     * @see org.objectweb.proactive.core.node.Node#setProperty(java.lang.String,
-     *      java.lang.String)
+     * @see org.objectweb.proactive.core.node.Node#setProperty(java.lang.String, java.lang.String)
      */
     public Object setProperty(String key, String value) throws ProActiveException {
         return this.proActiveRuntime.setLocalNodeProperty(this.nodeInformation.getName(), key, value);

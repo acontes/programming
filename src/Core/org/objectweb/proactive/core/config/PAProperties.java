@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of 
+ * 						   Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +22,8 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2. 
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -402,7 +405,7 @@ public enum PAProperties {
     PA_RMISSH_CONNECT_TIMEOUT("proactive.communication.rmissh.connect_timeout", PAPropertiesType.INTEGER),
 
     // Not documented, temporary workaround until 4.3.0
-    PA_RMISSH_REMOTE_USERNAME("proactive.communication.rmissh.username", PAPropertiesType.INTEGER),
+    PA_RMISSH_REMOTE_USERNAME("proactive.communication.rmissh.username", PAPropertiesType.STRING),
 
     // Not documented, temporary workaround until 4.3.0
     PA_RMISSH_REMOTE_PORT("proactive.communication.rmissh.port", PAPropertiesType.INTEGER),
@@ -603,11 +606,6 @@ public enum PAProperties {
      * TODO vlegrand Describe this property
      */
     CATALINA_BASE("catalina.base", PAPropertiesType.STRING, true),
-
-    /**
-     * TODO
-     */
-    PA_UNICORE_FORKCLIENT("proactive.unicore.forkclient", PAPropertiesType.BOOLEAN),
 
     /**
      * if true, any reference on the reified object within an outgoing request or reply is

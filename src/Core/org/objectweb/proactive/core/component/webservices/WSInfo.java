@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of 
+ * 						   Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +22,8 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2. 
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -66,7 +69,7 @@ public class WSInfo implements Serializable {
     public static final String AXIS2WSCALLER_ID = "Axis2";
 
     /**
-     * Full name of the class using Axis2 to call a web service.
+     * Full name of the class calling web services using Axis2.
      */
     public static final String AXIS2WSCALLER_CLASSNAME = Axis2WSCaller.class.getName();
 
@@ -76,9 +79,29 @@ public class WSInfo implements Serializable {
     public static final String CXFWSCALLER_ID = "CXF";
 
     /**
-     * Full name of the class using CXF to call a web service.
+     * Full name of the class calling web services using CXF.
      */
     public static final String CXFWSCALLER_CLASSNAME = CXFWSCaller.class.getName();
+
+    /**
+     * Shortcut ID to specify that CXF configured for an Aegis data binding must be used to call the web service.
+     */
+    public static final String CXFAEGISWSCALLER_ID = "CXFAegis";
+
+    /**
+     * Full name of the class calling web services using CXF configured for an Aegis data binding.
+     */
+    public static final String CXFAEGISWSCALLER_CLASSNAME = CXFAegisWSCaller.class.getName();
+
+    /**
+     * Shortcut ID to specify that CXF with a dynamic client must be used to call the web service.
+     */
+    public static final String DYNAMICCXFWSCALLER_ID = "DynamicCXF";
+
+    /**
+     * Full name of the class calling web services using CXF with a dynamic client.
+     */
+    public static final String DYNAMICCXFWSCALLER_CLASSNAME = DynamicCXFWSCaller.class.getName();
 
     /**
      * URL of the web service.
@@ -179,6 +202,10 @@ public class WSInfo implements Serializable {
                 return AXIS2WSCALLER_CLASSNAME;
             } else if (wsInfo[1].equalsIgnoreCase(CXFWSCALLER_ID)) {
                 return CXFWSCALLER_CLASSNAME;
+            } else if (wsInfo[1].equalsIgnoreCase(CXFAEGISWSCALLER_ID)) {
+                return CXFAEGISWSCALLER_CLASSNAME;
+            } else if (wsInfo[1].equalsIgnoreCase(DYNAMICCXFWSCALLER_ID)) {
+                return DYNAMICCXFWSCALLER_CLASSNAME;
             } else {
                 return checkClassName(wsInfo[1]);
             }
