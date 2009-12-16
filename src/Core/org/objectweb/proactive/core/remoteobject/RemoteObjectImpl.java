@@ -30,7 +30,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package org.objectweb.proactive.core.remoteobject;
 
@@ -411,5 +411,4 @@ public class RemoteObjectImpl<T> implements RemoteObject<T>, Serializable {
         }
         return null;
     }
-
 }

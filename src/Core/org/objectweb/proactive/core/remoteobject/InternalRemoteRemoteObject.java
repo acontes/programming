@@ -30,12 +30,13 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package org.objectweb.proactive.core.remoteobject;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.security.SecurityEntity;
@@ -95,4 +96,21 @@ public interface InternalRemoteRemoteObject extends RemoteRemoteObject, Security
      * object that owns this internal remote remote object.
      */
     public Object getObjectProxy();
+
+    /**
+     * InternalRemoteRemoteObject keep a reference to his RemoteObjectExposer
+     * in order to be able to retrieve over RemoteRemoteObject
+     */
+    public void setRemoteObjectExposer(RemoteObjectExposer roe);
+
+    /**
+     * This method is used by the client-side RemoteObjectAdapter
+     * to get in server-side, all the RemoteRemoteObject that represent
+     * remotely the target.
+     *
+     * @return
+     *          An ArrayList of all RemoteRemoteObject
+     */
+    public ArrayList<RemoteRemoteObject> getRROs();
+
 }

@@ -30,7 +30,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package org.objectweb.proactive.extensions.mixedlocation;
 
@@ -277,6 +277,10 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
 
     public String registerByName(String name, boolean rebind) throws IOException, ProActiveException {
         return this.wrappedBody.registerByName(name, rebind);
+    }
+
+    public String registerByName(String name, boolean rebind, String protocol) throws IOException, ProActiveException {
+        return this.wrappedBody.registerByName(name, rebind, protocol);
     }
 
     public ProActiveSecurityManager getProActiveSecurityManager(Entity user)

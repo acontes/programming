@@ -30,7 +30,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package org.objectweb.proactive.core.runtime;
 
@@ -1572,5 +1572,9 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
 
     public void setVMName(String vmName) {
         vmInformation.vmName = vmName;
+    }
+
+    public String[] getProtocolOrder() {
+        return PAProperties.PA_COMMUNICATION_PROTOCOL_ORDER.getValue().split(";");
     }
 }

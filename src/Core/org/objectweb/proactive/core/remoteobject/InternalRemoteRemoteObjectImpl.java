@@ -30,7 +30,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package org.objectweb.proactive.core.remoteobject;
 
@@ -39,6 +39,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.security.AccessControlException;
 import java.security.PublicKey;
+import java.util.ArrayList;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.future.MethodCallResult;
@@ -86,6 +87,8 @@ public class InternalRemoteRemoteObjectImpl implements InternalRemoteRemoteObjec
      * the remote object that contains the reified object
      */
     private transient RemoteObject<?> remoteObject;
+
+    private RemoteObjectExposer roe;
 
     public InternalRemoteRemoteObjectImpl() {
     }
@@ -275,4 +278,15 @@ public class InternalRemoteRemoteObjectImpl implements InternalRemoteRemoteObjec
             throws SecurityNotAvailableException, AccessControlException, IOException {
         this.remoteObject.setProActiveSecurityManager(user, policyServer);
     }
+
+    public void setRemoteObjectExposer(RemoteObjectExposer roe) {
+        this.roe = roe;
+    }
+
+    public ArrayList<RemoteRemoteObject> getRROs() {
+        if (this.roe == null)
+            return null;
+        return this.roe.getAllRemoteObjects();
+    }
+
 }

@@ -115,7 +115,8 @@ public class HTTPRemoteObjectFactory extends AbstractRemoteObjectFactory impleme
             url = URI.create(HTTPTransportServlet.get().getURL() + url.toString());
         }
 
-        HTTPRegistry.getInstance().bind(url.toString(), ro, replacePrevious); // Can throw a ProActiveException
+        // Can throw a ProActiveException
+        HTTPRegistry.getInstance().bind(URIBuilder.getNameFromURI(url), ro, replacePrevious);
 
         HttpRemoteObjectImpl rro = new HttpRemoteObjectImpl(ro, url);
 
@@ -131,7 +132,7 @@ public class HTTPRemoteObjectFactory extends AbstractRemoteObjectFactory impleme
      *            the urn under which the active object has been registered
      */
     public void unregister(URI urn) throws ProActiveException {
-        HTTPRegistry.getInstance().unbind(urn.toString());
+        HTTPRegistry.getInstance().unbind(URIBuilder.getNameFromURI(urn));
     }
 
     /**
@@ -142,8 +143,8 @@ public class HTTPRemoteObjectFactory extends AbstractRemoteObjectFactory impleme
      * @return a UniversalBody
      */
     public RemoteObject lookup(URI url) throws ProActiveException {
-        String urn = url.getPath();
-        HttpRemoteObjectLookupMessage message = new HttpRemoteObjectLookupMessage(urn, url);
+
+        HttpRemoteObjectLookupMessage message = new HttpRemoteObjectLookupMessage(URIBuilder.getNameFromURI(url), url);
         try {
             message.send();
         } catch (HTTPRemoteException e) {

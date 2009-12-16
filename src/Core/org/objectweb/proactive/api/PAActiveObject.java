@@ -1133,6 +1133,26 @@ public class PAActiveObject {
         }
     }
 
+    public static String registerByName(Object obj, String name, String protocol) throws ProActiveException {
+        return registerByName(obj, name,true, protocol);
+    }
+    
+    public static String registerByName(Object obj, String name, boolean rebind,  String protocol) throws ProActiveException {
+        try {
+            UniversalBody body = getRemoteBody(obj);
+
+            String url = body.registerByName(name, rebind, protocol);
+            body.setRegistered(true);
+            if (PAActiveObject.logger.isInfoEnabled()) {
+                PAActiveObject.logger.info("Success at binding url " + url);
+            }
+
+            return url;
+        } catch (IOException e) {
+            throw new ProActiveException("Failed to register" + obj + " with name " + name, e);
+        }
+    }
+
     /**
      * Looks-up all Active Objects registered on a host, using a registry(RMI or HTTP or IBIS) The
      * registry where to look for is fully determined with the protocol included in the url.

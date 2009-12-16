@@ -30,7 +30,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package org.objectweb.proactive.core.config;
 
@@ -190,9 +190,25 @@ public enum PAProperties {
     /**
      * ProActive Communication protocol
      *
-     * Suppported values are: rmi, rmissh, ibis, http
+     * Supported values are: rmi, rmissh, rmissl, ibis, http, pamr
      */
     PA_COMMUNICATION_PROTOCOL("proactive.communication.protocol", PAPropertiesType.STRING),
+
+    /**
+     * A list of PA protocol on which active object will be bind in addition of default PA protocol
+     * protocols are expressed as String depared by ';'
+     * Each object will will be bind to each of these protocols
+     *
+     * Supported values should be pick in: rmi, rmissh, rmissl, ibis, http, pamr
+     */
+    PA_COMMUNICATION_BIND_PROTOCOL("proactive.communication.protocol_to_bind", PAPropertiesType.STRING),
+
+    /**
+     * The default order of communication protocols
+     *
+     * Supported values should be pick in: rmi, rmissh, rmissl, ibis, http, pamr
+     */
+    PA_COMMUNICATION_PROTOCOL_ORDER("proactive.communication.protocol_order", PAPropertiesType.STRING),
 
     /**
      * ProActive Runtime Hostname (or IP Address)

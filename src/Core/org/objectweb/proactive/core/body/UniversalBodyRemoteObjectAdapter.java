@@ -30,7 +30,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package org.objectweb.proactive.core.body;
 
@@ -63,10 +63,6 @@ import org.objectweb.proactive.core.security.securityentity.Entity;
 
 
 public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody> implements UniversalBody {
-
-    /**
-     *
-     */
 
     /**
      * Cache the ID of the Body locally for speed
@@ -183,6 +179,10 @@ public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody> imp
 
     public String registerByName(String name, boolean rebind) throws IOException, ProActiveException {
         return target.registerByName(name, rebind);
+    }
+
+    public String registerByName(String name, boolean rebind, String protocol) throws IOException, ProActiveException {
+        return target.registerByName(name, rebind, protocol);
     }
 
     public void setRegistered(boolean registered) throws IOException {

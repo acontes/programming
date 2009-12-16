@@ -30,13 +30,14 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package org.objectweb.proactive.core.body;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URI;
+import java.rmi.AlreadyBoundException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -128,10 +129,6 @@ public abstract class AbstractUniversalBody implements UniversalBody, Serializab
         }
     }
 
-    public String getUrl() {
-        return this.roe.getURL();
-    }
-
     //
     // -- PUBLIC METHODS -----------------------------------------------
     //
@@ -140,6 +137,10 @@ public abstract class AbstractUniversalBody implements UniversalBody, Serializab
     //
     public String getJobID() {
         return this.jobID;
+    }
+
+    public String getUrl() {
+        return this.roe.getURL();
     }
 
     public String getNodeURL() {
@@ -208,8 +209,15 @@ public abstract class AbstractUniversalBody implements UniversalBody, Serializab
         this.roe.createRemoteObject(RemoteObjectHelper.expandURI(URI.create(url)));
     }
 
-    public String registerByName(String name, boolean rebind) throws ProActiveException {
+    public String registerByName(String name, boolean rebind) throws ProActiveException{
         RemoteRemoteObject rro = this.roe.createRemoteObject(name, rebind);
+        RemoteObjectAdapter roa = new RemoteObjectAdapter(rro);
+
+        return roa.getURI().toString();
+    }
+
+    public String registerByName(String name, boolean rebind, String protocol) throws ProActiveException {
+        RemoteRemoteObject rro = this.roe.createRemoteObject(name, rebind, protocol);
         RemoteObjectAdapter roa = new RemoteObjectAdapter(rro);
 
         return roa.getURI().toString();

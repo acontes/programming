@@ -30,7 +30,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package org.objectweb.proactive.core.remoteobject;
 
@@ -38,29 +38,38 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.rmi.registry.LocateRegistry;
+import java.rmi.AlreadyBoundException;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PARemoteObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.remoteobject.adapter.Adapter;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
+import org.objectweb.proactive.core.util.ProActiveInet;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
- * @author The ProActive Team
- * The RemoteObjectExposer is in charge of exposing an object as a remote object.
- * It allows the exposition of the object it represents on one or multiple protocols, keeps
- * references on already activated protocols, allows to unregister and unexport one or more protocols.
+ * @author The ProActive Team The RemoteObjectExposer is in charge of exposing
+ *         an object as a remote object. It allows the exposition of the object
+ *         it represents on one or multiple protocols, keeps references on
+ *         already activated protocols, allows to unregister and unexport one or
+ *         more protocols.
  */
 public class RemoteObjectExposer<T> implements Serializable {
+
+    static final Logger LOGGER_RO = ProActiveLogger.getLogger(Loggers.REMOTEOBJECT);
+
     protected Hashtable<URI, InternalRemoteRemoteObject> activeRemoteRemoteObjects;
     private String className;
     private RemoteObjectImpl<T> remoteObject;
+    private transient Thread multiExposer;
 
     public RemoteObjectExposer() {
     }
@@ -71,9 +80,13 @@ public class RemoteObjectExposer<T> implements Serializable {
 
     /**
      *
-     * @param className the classname of the stub for the remote object
-     * @param target the object to turn into a remote object
-     * @param targetRemoteObjectAdapter the adapter object that allows to implement specific behaviour like cache mechanism
+     * @param className
+     *            the classname of the stub for the remote object
+     * @param target
+     *            the object to turn into a remote object
+     * @param targetRemoteObjectAdapter
+     *            the adapter object that allows to implement specific behaviour
+     *            like cache mechanism
      */
     public RemoteObjectExposer(String className, Object target,
             Class<? extends Adapter<T>> targetRemoteObjectAdapter) {
@@ -104,9 +117,12 @@ public class RemoteObjectExposer<T> implements Serializable {
 
     /**
      * activate and register the remote object on the given url
-     * @param url The URI where to register the remote object
+     *
+     * @param url
+     *            The URI where to register the remote object
      * @return a remote reference to the remote object ie a RemoteRemoteObject
-     * @throws UnknownProtocolException thrown if the protocol specified within the url is unknow
+     * @throws UnknownProtocolException
+     *             thrown if the protocol specified within the url is unknow
      */
     public synchronized RemoteRemoteObject createRemoteObject(URI url) throws ProActiveException {
         String protocol = null;
@@ -139,7 +155,6 @@ public class RemoteObjectExposer<T> implements Serializable {
 
             // put the url within the list of the activated protocols
             this.activeRemoteRemoteObjects.put(url, irro);
-
             return rmo;
         } catch (Exception e) {
             throw new ProActiveException("Failed to create remote object (url=" + url + ")", e);
@@ -147,23 +162,54 @@ public class RemoteObjectExposer<T> implements Serializable {
     }
 
     public synchronized RemoteRemoteObject createRemoteObject(String name, boolean rebind)
-            throws ProActiveException, AlreadyBoundException {
+            throws ProActiveException {
         try {
             // select the factory matching the required protocol
             RemoteObjectFactory rof = AbstractRemoteObjectFactory.getDefaultRemoteObjectFactory();
-
-            InternalRemoteRemoteObject irro = rof.createRemoteObject(this.remoteObject, name, rebind);
-            this.activeRemoteRemoteObjects.put(irro.getURI(), irro);
+            URI uri = URIBuilder.buildURI(ProActiveInet.getInstance().getHostname(), name, rof
+                    .getProtocolId(), rof.getPort());
+            InternalRemoteRemoteObject irro = activeRemoteRemoteObjects.get(uri);
+            if (irro == null) {
+                irro = rof.createRemoteObject(this.remoteObject, name, rebind);
+                irro.setRemoteObjectExposer(this);
+                this.activeRemoteRemoteObjects.put(irro.getURI(), irro);
+                this.multiExposer = new Thread(new MultiExposer(name));
+                this.multiExposer.setName("Multi exposer for remoteObject named: " + name);
+                this.multiExposer.setDaemon(true);
+                this.multiExposer.start();
+            }
             return irro.getRemoteRemoteObject();
         } catch (Exception e) {
             throw new ProActiveException("Failed to create remote object (name=" + name + ")", e);
         }
     }
 
+    public synchronized RemoteRemoteObject createRemoteObject(String name, boolean rebind, String protocol)
+            throws ProActiveException {
+        try {
+            //        select the factory matching the required protocol
+            RemoteObjectFactory rof = AbstractRemoteObjectFactory.getRemoteObjectFactory(protocol);
+            URI uri = URIBuilder.buildURI(ProActiveInet.getInstance().getHostname(), name, protocol, rof
+                    .getPort());
+            System.out.println(uri);
+            InternalRemoteRemoteObject irro = activeRemoteRemoteObjects.get(uri);
+            if (irro == null) {
+                irro = rof.createRemoteObject(this.remoteObject, name, rebind);
+                irro.setRemoteObjectExposer(this);
+                this.activeRemoteRemoteObjects.put(irro.getURI(), irro);
+            }
+            return irro.getRemoteRemoteObject();
+        } catch (Exception e) {
+            throw new ProActiveException("Failed to create remote object (name=" + name +
+                ") for protocol : " + protocol, e);
+        }
+    }
+
     /**
      *
      * @param protocol
-     * @return return the reference on the remote object targeted by the protocol
+     * @return return the reference on the remote object targeted by the
+     *         protocol
      */
     @SuppressWarnings("unchecked")
     public RemoteObject<T> getRemoteObject(String protocol) throws ProActiveException {
@@ -178,6 +224,15 @@ public class RemoteObjectExposer<T> implements Serializable {
         }
 
         return null;
+    }
+
+    public ArrayList<RemoteRemoteObject> getAllRemoteObjects() {
+        ArrayList<RemoteRemoteObject> al = new ArrayList<RemoteRemoteObject>();
+        for (URI key : activeRemoteRemoteObjects.keySet()) {
+            RemoteRemoteObject rro = activeRemoteRemoteObjects.get(key).getRemoteRemoteObject();
+            al.add(rro);
+        }
+        return al;
     }
 
     /**
@@ -221,7 +276,7 @@ public class RemoteObjectExposer<T> implements Serializable {
         URI uri = null;
         while (uris.hasMoreElements()) {
             uri = uris.nextElement();
-            //RemoteRemoteObject rro = this.activatedProtocols.get(uri);
+            // RemoteRemoteObject rro = this.activatedProtocols.get(uri);
             try {
                 PARemoteObject.unregister(uri);
             } catch (ProActiveException e) {
@@ -255,6 +310,48 @@ public class RemoteObjectExposer<T> implements Serializable {
             rof.unexport(rro);
         }
 
+    }
+
+    class MultiExposer implements Runnable {
+        private String name;
+
+        public MultiExposer(String name) {
+            this.name = name;
+        }
+
+        public void run() {
+            if (PAProperties.PA_COMMUNICATION_BIND_PROTOCOL.isSet()) {
+                for (String protocol : PAProperties.PA_COMMUNICATION_BIND_PROTOCOL.getValue().split(";")) {
+                    if (!protocol.isEmpty()) {
+                        try {
+                            // Create and store RRO in hashtable
+                            createRemoteObject(this.name, false, protocol);
+                            if (LOGGER_RO.isDebugEnabled()) {
+                                LOGGER_RO.debug("Object expose with additionnal protocol : " + protocol);
+                            }
+                        } catch (ProActiveException pae) {
+                            LOGGER_RO
+                                    .warn(
+                                            "Protocol " + protocol +
+                                                " seems invalid for this runtime, this is not a critical error, the protocol will be dismiss.",
+                                            pae);
+                            // First position
+                            PAProperties.PA_COMMUNICATION_BIND_PROTOCOL
+                                    .setValue(PAProperties.PA_COMMUNICATION_BIND_PROTOCOL.getValue().replace(
+                                            protocol + ";", ""));
+                            // Or whatever position except first
+                            PAProperties.PA_COMMUNICATION_BIND_PROTOCOL
+                                    .setValue(PAProperties.PA_COMMUNICATION_BIND_PROTOCOL.getValue().replace(
+                                            protocol, ""));
+                            // Suppress double occurence of ;
+                            PAProperties.PA_COMMUNICATION_BIND_PROTOCOL
+                                    .setValue(PAProperties.PA_COMMUNICATION_BIND_PROTOCOL.getValue().replace(
+                                            ";;", ";"));
+                        }
+                    }
+                }
+            }
+        }
     }
 
 }
