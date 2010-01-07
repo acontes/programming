@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of
+ * 						   Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +22,8 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -78,8 +81,7 @@ public class TestAContinuation extends FunctionalTest {
         @Override
         public void run() {
             try {
-                a = (AOAContinuation) PAActiveObject.newActive(AOAContinuation.class.getName(),
-                        new Object[] { "principal" });
+                a = PAActiveObject.newActive(AOAContinuation.class, new Object[] { "principal" });
                 //test future by result
                 a.initFirstDeleguate();
                 idDeleguate = a.getId("deleguate2");
@@ -94,25 +96,20 @@ public class TestAContinuation extends FunctionalTest {
                 }
 
                 //test future passed as parameter
-                b = (AOAContinuation) PAActiveObject.newActive(AOAContinuation.class.getName(),
-                        new Object[] { "dummy" });
+                b = PAActiveObject.newActive(AOAContinuation.class, new Object[] { "dummy" });
                 idPrincipal = b.getIdforFuture();
                 a.forwardID(idPrincipal);
                 //Test non-blocking when future passed as parameter
-                AOAContinuation c = (AOAContinuation) PAActiveObject.newActive(AOAContinuation.class
-                        .getName(), new Object[] { "c" });
-                AOAContinuation d = (AOAContinuation) PAActiveObject.newActive(AOAContinuation.class
-                        .getName(), new Object[] { "d" });
-                AOAContinuation e = (AOAContinuation) PAActiveObject.newActive(AOAContinuation.class
-                        .getName(), new Object[] { "e" });
+                AOAContinuation c = PAActiveObject.newActive(AOAContinuation.class, new Object[] { "c" });
+                AOAContinuation d = PAActiveObject.newActive(AOAContinuation.class, new Object[] { "d" });
+                AOAContinuation e = PAActiveObject.newActive(AOAContinuation.class, new Object[] { "e" });
 
                 AOAContinuation de = d.getA(e);
                 AOAContinuation cde = c.getA(de);
                 lastA = e.getA(cde);
 
                 //test multiple wrapped futures with multiples AC destinations
-                AOAContinuation f = (AOAContinuation) PAActiveObject.newActive(AOAContinuation.class
-                        .getName(), new Object[] { "f" });
+                AOAContinuation f = PAActiveObject.newActive(AOAContinuation.class, new Object[] { "f" });
                 c.initSecondDeleguate();
                 AOAContinuation t = c.delegatedGetA(d);
                 t1 = e.getA(t);

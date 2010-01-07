@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of
+ * 						   Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +22,8 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -108,16 +111,43 @@ public class UpdateCopyrightAndVersion {
         //        }
         int packageStart = program.indexOf("package");
 
-        // it is possible to find a snippet tag between a copyright and the package name
-        // in that case we keep the snippet.
-        int snippetStart = program.indexOf("//@" + "snippet-start");
+        // it is possible to find a snippet or a tutorial tag between a copyright and the package name
+        // in that case we keep the snippet/tutorial.
+        Pattern pattern = Pattern.compile("\\/\\/\\s*\\@snippet-start");
+        Matcher matcher = pattern.matcher(program);
+        int snippetStart = -1;
+        if (matcher.find()) {
+            snippetStart = matcher.start();
+        }
+        pattern = Pattern.compile("\\/\\/\\s*\\@tutorial-start");
+        matcher = pattern.matcher(program);
+        int tutorialStart = -1;
+        if (matcher.find()) {
+            tutorialStart = matcher.start();
+        }
+
+        // No annotation can be placed before copyright.
+        // Otherwise, Copyright cannot be updated.
+        int copyrightIndex = program.indexOf("Copyright");
+        if (copyrightIndex != -1 && snippetStart < copyrightIndex)
+            snippetStart = -1;
+
+        if (copyrightIndex != -1 && tutorialStart < copyrightIndex)
+            tutorialStart = -1;
+
+        int annotationStart;
+        if (snippetStart != -1) {
+            annotationStart = (tutorialStart != -1) ? Math.min(snippetStart, tutorialStart) : snippetStart;
+        } else {
+            annotationStart = (tutorialStart != -1) ? tutorialStart : -1;
+        }
 
         if (packageStart == -1) {
             return;
         }
 
-        if ((snippetStart != -1) && (snippetStart < packageStart)) {
-            packageStart = snippetStart;
+        if ((annotationStart != -1) && (annotationStart < packageStart)) {
+            packageStart = annotationStart;
         }
         int choice = 4;
         String copyrightInFile = program.substring(0, packageStart);

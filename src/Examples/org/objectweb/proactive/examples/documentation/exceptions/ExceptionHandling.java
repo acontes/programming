@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of
+ * 						   Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +22,8 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -46,7 +49,7 @@ public class ExceptionHandling {
         //@snippet-start basic_exception
         System.out.println("vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv");
         try {
-            A a = (A) PAActiveObject.newActive(A.class.getName(), null);
+            A a = PAActiveObject.newActive(A.class, null);
             a.throwsException(true); //Synchronous method due to the potential exception
             System.out.println("Hello");
             //...
@@ -60,7 +63,7 @@ public class ExceptionHandling {
         System.out.println("vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv");
         PAException.tryWithCatch(Exception.class);
         try {
-            A a = (A) PAActiveObject.newActive(A.class.getName(), null);
+            A a = PAActiveObject.newActive(A.class, null);
             a.throwsException(true); // Asynchronous method call that can throw an exception
             System.out.println("Hello");
             //...
@@ -77,7 +80,7 @@ public class ExceptionHandling {
         System.out.println("vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv");
         PAException.tryWithCatch(Exception.class);
         try {
-            A a = (A) PAActiveObject.newActive(A.class.getName(), null);
+            A a = PAActiveObject.newActive(A.class, null);
             a.throwsException(true); // Asynchronous method call that can throw an exception
             //...
             // Throws exceptions which has been already raised by active object
@@ -111,7 +114,7 @@ public class ExceptionHandling {
         System.out.println("vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv");
         PAException.tryWithCatch(Exception.class);
         try {
-            A a = (A) PAActiveObject.newActive(A.class.getName(), null);
+            A a = PAActiveObject.newActive(A.class, null);
             a.throwsException(true); // Asynchronous method call that can throw an exception
             //...
             // At that moment, we want to be sure that no exception has been

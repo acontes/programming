@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of
+ * 						   Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,6 +23,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
+ * If needed, contact us to obtain a release under GPL Version 2.
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
@@ -31,12 +34,17 @@
  */
 package org.objectweb.proactive.extra.messagerouting.remoteobject.message;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.net.URI;
 
+import org.objectweb.proactive.core.body.future.MethodCallResult;
 import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.exceptions.IOException6;
 import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
+import org.objectweb.proactive.core.remoteobject.SynchronousReplyImpl;
 import org.objectweb.proactive.extra.messagerouting.client.Agent;
+import org.objectweb.proactive.extra.messagerouting.client.AgentImpl;
 import org.objectweb.proactive.extra.messagerouting.remoteobject.util.MessageRoutingRegistry;
 
 
@@ -88,10 +96,17 @@ public class MessageRoutingRemoteObjectRequest extends MessageRoutingMessage imp
 
         try {
             InternalRemoteRemoteObject ro;
+
             ro = MessageRoutingRegistry.singleton.lookup(uri);
-            return ro.receiveMessage(this.request);
+            if (ro == null) {
+                return new SynchronousReplyImpl(new MethodCallResult(null, new IOException("remote object " +
+                    uri + " not found. Message " + request + " cannot be processed ")));
+            } else {
+                return ro.receiveMessage(this.request);
+            }
         } catch (Exception e) {
-            return e;
+            return new SynchronousReplyImpl(new MethodCallResult(null, new IOException6(uri +
+                " failed to process message " + this.request, e)));
         }
     }
 }

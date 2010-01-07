@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of
+ * 						   Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +22,8 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -37,11 +40,14 @@ import java.net.URL;
 import java.util.List;
 
 import org.objectweb.proactive.core.xml.VariableContractImpl;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLoggers;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationInternal;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.CommandBuilderProActive;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.bridge.Bridge;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.Group;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.vm.GCMVirtualMachineManager;
 
 
 public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
@@ -63,7 +69,7 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
 
         startGroups(commandBuilder, gcma);
         startBridges(commandBuilder, gcma);
-
+        startVMs(commandBuilder, gcma);
     }
 
     private void startLocal(CommandBuilder commandBuilder, GCMApplicationInternal gcma) {
@@ -102,6 +108,29 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
                 GCMD_LOGGER.debug("bridge id=" + bridge.getId() + " command= " + command);
                 Executor.getExecutor().submit(command);
             }
+        }
+    }
+
+    /**
+     * Starts all registered virtual machines registered within a proprietary hypervisor tag
+     * from an associated GCMD file
+     * @param commandBuilder the commandBuilder that will be used to build the remote proactive runtime command
+     * @param gcma the gcma object tied to this application
+     */
+    private void startVMs(CommandBuilder commandBuilder, GCMApplicationInternal gcma) {
+        try {
+            List<GCMVirtualMachineManager> vmms = resources.getVMM();
+            for (GCMVirtualMachineManager vmm : vmms) {
+                //since deployment with virtualization is meaningless outside of a ProActive application
+                //it is compulsory to downcast the commandBuilder to be able to bootstrap remote PART
+                GCMDeploymentLoggers.GCMD_LOGGER.debug("VMM with refid " + vmm.getId() + " is going to boot");
+                vmm
+                        .start(
+                                commandBuilder instanceof CommandBuilderProActive ? (CommandBuilderProActive) commandBuilder
+                                        : null, gcma);
+            }
+        } catch (Exception e) {
+            GCMDeploymentLoggers.GCMD_LOGGER.error("Unable to start virtual machines.", e);
         }
     }
 

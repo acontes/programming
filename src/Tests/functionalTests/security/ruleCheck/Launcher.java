@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of
+ * 						   Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +22,8 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -50,24 +53,24 @@ public class Launcher {
             descriptor1.activateMappings();
             VirtualNode virtualNode1 = descriptor1.getVirtualNode("vn1");
             Node node1 = virtualNode1.getNodes()[0];
-            SampleObject a = (SampleObject) PAActiveObject.newActive(SampleObject.class.getName(),
-                    new Object[] { "CN=Garden1" }, node1);
+            SampleObject a = PAActiveObject.newActive(SampleObject.class, new Object[] { "CN=Garden1" },
+                    node1);
 
             ProActiveDescriptor descriptor2 = PADeployment
                     .getProactiveDescriptor("descriptors/security/simple2.xml");
             descriptor2.activateMappings();
             VirtualNode virtualNode2 = descriptor2.getVirtualNode("vn2");
             Node node2 = virtualNode2.getNodes()[0];
-            SampleObject b = (SampleObject) PAActiveObject.newActive(SampleObject.class.getName(),
-                    new Object[] { "CN=Garden2" }, node2);
+            SampleObject b = PAActiveObject.newActive(SampleObject.class, new Object[] { "CN=Garden2" },
+                    node2);
 
             ProActiveDescriptor descriptor3 = PADeployment
                     .getProactiveDescriptor("descriptors/security/simple3.xml");
             descriptor3.activateMappings();
             VirtualNode virtualNode3 = descriptor3.getVirtualNode("vn3");
             Node node3 = virtualNode3.getNodes()[0];
-            SampleObject c = (SampleObject) PAActiveObject.newActive(SampleObject.class.getName(),
-                    new Object[] { "CN=Garden3" }, node3);
+            SampleObject c = PAActiveObject.newActive(SampleObject.class, new Object[] { "CN=Garden3" },
+                    node3);
 
             //			a.makeTargetDoSomething(a);
             //            System.out.println("==");

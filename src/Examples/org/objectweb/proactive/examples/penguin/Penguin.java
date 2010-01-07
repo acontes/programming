@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of
+ * 						   Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +22,8 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -241,8 +244,8 @@ public class Penguin implements org.objectweb.proactive.RunActive, java.io.Seria
             //	n.startItinerary();
             Object[] param = new Object[1];
             param[0] = n;
-            org.objectweb.proactive.api.PAActiveObject.newActive(PenguinMessageReceiver.class.getName(),
-                    param, (org.objectweb.proactive.core.node.Node) null);
+            org.objectweb.proactive.api.PAActiveObject.newActive(PenguinMessageReceiver.class, param,
+                    (org.objectweb.proactive.core.node.Node) null);
             //	n.setOther(n2);
             //	n2.setOther(null);
             //	n2.startItinerary();

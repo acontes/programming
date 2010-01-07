@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of
+ * 						   Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,6 +23,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
+ * If needed, contact us to obtain a release under GPL Version 2.
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
@@ -32,6 +35,7 @@
 package org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder;
 
 import static org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLoggers.GCMD_LOGGER;
+import static org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLoggers.GCMA_LOGGER;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,7 +46,6 @@ import java.util.Map;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.httpserver.ClassServerServlet;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.runtime.StartPARuntime;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeploymentLoggers;
@@ -58,6 +61,8 @@ import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeInter
 public class CommandBuilderProActive implements CommandBuilder {
 
     final static String PROACTIVE_JAR = "ProActive.jar";
+
+    final static String TOKEN = "___TOKEN___";
 
     /** Path to the ProActive installation */
     private PathElement proActivePath;
@@ -262,6 +267,43 @@ public class CommandBuilderProActive implements CommandBuilder {
             sb.append(fs);
             sb.append(PROACTIVE_JAR);
             sb.append(hostInfo.getOS().pathSeparator());
+
+            if (isDebugEnabled) {
+                String javaCommand = null;
+
+                if (javaPath != null) {
+                    javaCommand = javaPath.getFullPath(hostInfo, this);
+                } else {
+                    Tool javaTool = hostInfo.getTool(Tools.JAVA.id);
+                    if (javaTool != null) {
+                        javaCommand = javaTool.getPath();
+                    }
+                }
+
+                if (javaCommand == null) {
+                    // Java location must be set when the debug mode is enabled
+                    // TODO throw an exception
+                    GCMA_LOGGER
+                            .warn("GCMApplication/application/proactive/configuration/java is NOT set. Remote debbuging will fail");
+                } else {
+                    // Check if we are able to guess tool.jar location
+                    File f = new File(javaCommand.trim());
+                    if (!f.exists() || javaCommand.lastIndexOf(fs) < 0) {
+                        GCMA_LOGGER
+                                .warn("Unable to find tool.jar, please specify a full or relative path for java (" +
+                                    javaCommand + ")");
+                    } else {
+                        sb.append(javaCommand.substring(0, javaCommand.lastIndexOf(fs)));
+                        sb.append(fs);
+                        sb.append("..");
+                        sb.append(fs);
+                        sb.append("lib");
+                        sb.append(fs);
+                        sb.append("tools.jar");
+                        sb.append(hostInfo.getOS().pathSeparator());
+                    }
+                }
+            }
         }
 
         if (proactiveClasspath != null) {
@@ -314,6 +356,11 @@ public class CommandBuilderProActive implements CommandBuilder {
         // Java
         command.append(getJava(hostInfo));
         command.append(" ");
+
+        Tool jp = hostInfo.getTool(Tools.JAVA_PARAMETERS.id);
+        if (jp != null) {
+            command.append(" " + jp.getPath() + " "); // Not really a path, but it's ok
+        }
 
         for (String arg : jvmArgs) {
             command.append(arg);
@@ -396,6 +443,7 @@ public class CommandBuilderProActive implements CommandBuilder {
         if (isDebugEnabled) {
             command.append(" " + getDebugCommand(hostInfo, gcma.getDeploymentId()) + " ");
         }
+
         // Class to be started and its arguments
         command.append(StartPARuntime.class.getName());
         command.append(" ");
@@ -432,8 +480,9 @@ public class CommandBuilderProActive implements CommandBuilder {
         } else {
             switch (hostInfo.getOS()) {
                 case unix:
+                    String cmd = command.toString();
                     for (int i = 0; i < hostInfo.getHostCapacity(); i++) {
-                        ret.append(command);
+                        ret.append(cmd.replaceAll(TOKEN, "" + i));
                         ret.append(" &");
                     }
                     ret.deleteCharAt(ret.length() - 1);
@@ -521,13 +570,15 @@ public class CommandBuilderProActive implements CommandBuilder {
     }
 
     protected String getDebugCommand(HostInfo hostInfo, long deploymentId) {
+        Tool javaTool = hostInfo.getTool(Tools.JAVA.id);
+        String java = "java";
+        if (javaTool != null) {
+            java = javaTool.getPath();
+        }
         if (debugCommandLine == null) {
-            debugCommandLine = "-DdebugID=padebug_" +
-                deploymentId +
-                " -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=0,launch='java -cp " +
-                this.getPath(hostInfo) +
-                "/dist/lib/ProActive.jar org.objectweb.proactive.core.debug.dconnection.DebuggeePortSetter padebug_" +
-                deploymentId + "'";
+            String token = "padebug_" + deploymentId + "_" + TOKEN;
+            debugCommandLine = "-DdebugID=" + token +
+                " -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=0";
         }
         return debugCommandLine;
     }

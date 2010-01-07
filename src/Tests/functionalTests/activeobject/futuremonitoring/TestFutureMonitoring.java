@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of
+ * 						   Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +22,8 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -59,9 +62,9 @@ public class TestFutureMonitoring extends GCMFunctionalTestDefaultNodes {
 
         // With AC
         boolean exception = false;
-        A a1 = (A) PAActiveObject.newActive(A.class.getName(), null, node1);
+        A a1 = PAActiveObject.newActive(A.class, null, node1);
         A future = a1.sleepForever();
-        A a2 = (A) PAActiveObject.newActive(A.class.getName(), null, node2);
+        A a2 = PAActiveObject.newActive(A.class, null, node2);
         A ac = a2.wrapFuture(future);
         a2.crash();
         try {
@@ -74,9 +77,9 @@ public class TestFutureMonitoring extends GCMFunctionalTestDefaultNodes {
 
         // With AC and Terminate AO
         boolean exceptionT = false;
-        A a1T = (A) PAActiveObject.newActive(A.class.getName(), null, node1);
+        A a1T = PAActiveObject.newActive(A.class, null, node1);
         A futureT = a1T.sleepForever();
-        A a2T = (A) PAActiveObject.newActive(A.class.getName(), null, node3);
+        A a2T = PAActiveObject.newActive(A.class, null, node3);
         A acT = a2T.wrapFuture(futureT);
         a2T.crashWithTerminate();
         try {
@@ -89,7 +92,7 @@ public class TestFutureMonitoring extends GCMFunctionalTestDefaultNodes {
 
         // Without AC
         exception = false;
-        A a1bis = (A) PAActiveObject.newActive(A.class.getName(), null, node1);
+        A a1bis = PAActiveObject.newActive(A.class, null, node1);
         a1bis.crash();
         try {
             //System.out.println(future);

@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of
+ * 						   Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +22,8 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -97,14 +100,13 @@ public class TestDataSpaces extends GCMFunctionalDataSpacesBase {
         node4 = getANode();
         nodeLocal = NodeFactory.getDefaultNode();
         // create AOs on hosts on the same and different runtimes
-        ao1 = (TestActiveObject) PAActiveObject.newActive(TestActiveObject.class.getName(), null, node1);
-        ao1B = (TestActiveObject) PAActiveObject.newActive(TestActiveObject.class.getName(), null, node1);
-        ao2 = (TestActiveObject) PAActiveObject.newActive(TestActiveObject.class.getName(), null, node2);
-        ao3 = (TestActiveObject) PAActiveObject.newActive(TestActiveObject.class.getName(), null, node3);
-        ao4 = (TestActiveObject) PAActiveObject.newActive(TestActiveObject.class.getName(), null, node4);
+        ao1 = PAActiveObject.newActive(TestActiveObject.class, null, node1);
+        ao1B = PAActiveObject.newActive(TestActiveObject.class, null, node1);
+        ao2 = PAActiveObject.newActive(TestActiveObject.class, null, node2);
+        ao3 = PAActiveObject.newActive(TestActiveObject.class, null, node3);
+        ao4 = PAActiveObject.newActive(TestActiveObject.class, null, node4);
         // AO for default local node
-        aoLocal = (TestActiveObject) PAActiveObject.newActive(TestActiveObject.class.getName(), null,
-                nodeLocal);
+        aoLocal = PAActiveObject.newActive(TestActiveObject.class, null, nodeLocal);
         // non-AO to test behavior for local half-bodies node
         aoFake = new TestActiveObject();
         // no need for @After, as whole GCMApp will be killed

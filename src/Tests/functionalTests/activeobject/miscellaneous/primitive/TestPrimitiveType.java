@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of
+ * 						   Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +22,8 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -45,42 +48,42 @@ public class TestPrimitiveType extends FunctionalTest {
 
     @Test
     public void testBoolean() throws ActiveObjectCreationException, NodeException {
-        PAActiveObject.newActive(Boolean.class.getName(), new Object[] {});
+        PAActiveObject.newActive(Boolean.class, new Object[] {});
     }
 
     @Test
     public void testByte() throws ActiveObjectCreationException, NodeException {
-        PAActiveObject.newActive(Byte.class.getName(), new Object[] {});
+        PAActiveObject.newActive(Byte.class, new Object[] {});
     }
 
     @Test
     public void testChar() throws ActiveObjectCreationException, NodeException {
-        PAActiveObject.newActive(Char.class.getName(), new Object[] {});
+        PAActiveObject.newActive(Char.class, new Object[] {});
     }
 
     @Test
     public void testShort() throws ActiveObjectCreationException, NodeException {
-        PAActiveObject.newActive(Short.class.getName(), new Object[] {});
+        PAActiveObject.newActive(Short.class, new Object[] {});
     }
 
     @Test
     public void testInt() throws ActiveObjectCreationException, NodeException {
-        PAActiveObject.newActive(Int.class.getName(), new Object[] {});
+        PAActiveObject.newActive(Int.class, new Object[] {});
     }
 
     @Test
     public void testLong() throws ActiveObjectCreationException, NodeException {
-        PAActiveObject.newActive(Long.class.getName(), new Object[] {});
+        PAActiveObject.newActive(Long.class, new Object[] {});
     }
 
     @Test
     public void testFloat() throws ActiveObjectCreationException, NodeException {
-        PAActiveObject.newActive(Float.class.getName(), new Object[] {});
+        PAActiveObject.newActive(Float.class, new Object[] {});
     }
 
     @Test
     public void testDouble() throws ActiveObjectCreationException, NodeException {
-        PAActiveObject.newActive(Double.class.getName(), new Object[] {});
+        PAActiveObject.newActive(Double.class, new Object[] {});
     }
 
     static public class Boolean implements Serializable {

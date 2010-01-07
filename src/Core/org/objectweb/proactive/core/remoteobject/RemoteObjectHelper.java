@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of
+ * 						   Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,12 +23,14 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
+ * If needed, contact us to obtain a release under GPL Version 2.
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
+ *  Contributor(s): ActiveEon Team - http://www.activeeon.com
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package org.objectweb.proactive.core.remoteobject;
 
@@ -105,12 +108,26 @@ public class RemoteObjectHelper {
      * @return the uri with all values set
      */
     public static URI expandURI(URI uri) {
-        if (uri.getScheme() == null) {
-            int port = uri.getPort();
+        int port = uri.getPort();
+        String protocol = uri.getScheme();
+        if (protocol == null) {
             if (port == -1) {
+                // Set port and protocol (using default)
                 uri = URIBuilder.buildURIFromProperties(uri.getHost(), uri.getPath());
             } else {
+                // Set only protocol (using default)
                 uri = URIBuilder.setProtocol(uri, PAProperties.PA_COMMUNICATION_PROTOCOL.getValue());
+            }
+        } else {
+            if (port == -1) {
+                try {
+                    RemoteObjectFactory rof = AbstractRemoteObjectFactory.getRemoteObjectFactory(protocol);
+                    port = rof.getPort();
+                    // Set only port (using RemoteObjectFactory's one)
+                    uri = URIBuilder.setPort(uri, port);
+                } catch (UnknownProtocolException e) {
+                    logger.debug(e.getMessage());
+                }
             }
         }
         return uri;
@@ -149,9 +166,14 @@ public class RemoteObjectHelper {
     @SuppressWarnings("unchecked")
     public static <T> T generatedObjectStub(RemoteObject<T> ro) throws ProActiveException {
         try {
+            //
+            //            Object fakeObject = ro.getTargetClass().newInstance();
+            //
+            //            T reifiedObjectStub = (T) MOP.turnReified( ro.getClassName(), SynchronousProxy.class.getName(),
+            //                    new Object[] { null, new Object[] { ro } } , fakeObject, new Class[] {});
+
             T reifiedObjectStub = (T) MOP.createStubObject(ro.getClassName(), ro.getTargetClass(),
                     new Class[] {});
-
             ((StubObject) reifiedObjectStub).setProxy(new SynchronousProxy(null, new Object[] { ro }));
 
             Class<Adapter<T>> adapter = (Class<Adapter<T>>) ro.getAdapterClass();

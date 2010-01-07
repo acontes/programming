@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of
+ * 						   Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,10 +23,11 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
+ * If needed, contact us to obtain a release under GPL Version 2.
+ *
  *  Initial developer(s):               The ActiveEon Team
  *                        http://www.activeeon.com/
  *  Contributor(s):
- *
  *
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
@@ -36,6 +38,7 @@ import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.Constructor;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -66,6 +69,7 @@ import org.objectweb.proactive.extra.messagerouting.protocol.message.Registratio
 import org.objectweb.proactive.extra.messagerouting.protocol.message.RegistrationRequestMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.ErrorMessage.ErrorType;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.Message.MessageType;
+import org.objectweb.proactive.extra.messagerouting.remoteobject.util.socketfactory.MessageRoutingSocketFactorySPI;
 import org.objectweb.proactive.extra.messagerouting.router.Router;
 
 
@@ -110,6 +114,9 @@ public class AgentImpl extends AgentInternal implements AgentImplMBean {
 
     /** the thread pool available for this agent */
     final private ExecutorService tpe;
+    
+    /** The socket factory to use to create the Tunnel */
+    final private MessageRoutingSocketFactorySPI socketFactory;
 
     /**
      * Create a routing agent
@@ -126,8 +133,9 @@ public class AgentImpl extends AgentInternal implements AgentImplMBean {
      *             If the router cannot be contacted.
      */
     public AgentImpl(InetAddress routerAddr, int routerPort,
-            Class<? extends RoutedMessageHandler> messageHandlerClass) throws ProActiveException {
-        this(routerAddr, routerPort, messageHandlerClass, new ArrayList<Valve>());
+            Class<? extends RoutedMessageHandler> messageHandlerClass, MessageRoutingSocketFactorySPI socketFactory)
+            throws ProActiveException {
+        this(routerAddr, routerPort, messageHandlerClass, new ArrayList<Valve>(), socketFactory);
     }
 
     /**
@@ -148,13 +156,14 @@ public class AgentImpl extends AgentInternal implements AgentImplMBean {
      *             If the router cannot be contacted.
      */
     public AgentImpl(InetAddress routerAddr, int routerPort,
-            Class<? extends RoutedMessageHandler> messageHandlerClass, List<Valve> valves)
-            throws ProActiveException {
+            Class<? extends RoutedMessageHandler> messageHandlerClass, List<Valve> valves,
+            MessageRoutingSocketFactorySPI socketFactory) throws ProActiveException {
         super();
         this.routerAddr = routerAddr;
         this.routerPort = routerPort;
         this.valves = valves;
         this.failedTunnels = new LinkedList<Tunnel>();
+        this.socketFactory = socketFactory;
 
         /* DO NOT USE A FIXED THREAD POOL
          * The entities which will use this thread pool
@@ -233,7 +242,8 @@ public class AgentImpl extends AgentInternal implements AgentImplMBean {
      */
     private void __reconnectToRouter() {
         try {
-            Tunnel tunnel = new Tunnel(this.routerAddr, this.routerPort);
+            Socket s = socketFactory.createSocket(this.routerAddr.getHostAddress(), this.routerPort);
+            Tunnel tunnel = new Tunnel(s);
 
             // start router handshake
             try {
@@ -431,7 +441,8 @@ public class AgentImpl extends AgentInternal implements AgentImplMBean {
             try {
                 response = mb.waitForResponse(0);
             } catch (TimeoutException e) {
-                throw new MessageRoutingException("Timeout reached", e);
+                throw new MessageRoutingException("Timeout reached " +
+                    ProActiveLogger.getStackTraceAsString(e));
             }
         }
 
@@ -493,7 +504,8 @@ public class AgentImpl extends AgentInternal implements AgentImplMBean {
             } catch (IOException e) {
                 // Fail fast
                 this.reportTunnelFailure(tunnel);
-                throw new MessageRoutingException("Failed to send a message using the tunnel " + tunnel, e);
+                throw new MessageRoutingException("Failed to send a message using the tunnel " + tunnel +
+                    ProActiveLogger.getStackTraceAsString(e));
 
             }
         } else {

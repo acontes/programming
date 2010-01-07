@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of
+ * 						   Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +22,8 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -136,9 +139,9 @@ public class Main implements ActivePrimeContainerCreator, InitActive {
             }
 
             logger.info("    Creating container with size " + containerSize + " starting with number " + n);
-            result = (ActivePrimeContainer) PAActiveObject.newActive(ActivePrimeContainer.class.getName(),
-                    new Object[] { PAActiveObject.getStubOnThis(), outputListener,
-                            new Integer(containerSize), new Long(n), previous }, node);
+            result = PAActiveObject.newActive(ActivePrimeContainer.class, new Object[] {
+                    PAActiveObject.getStubOnThis(), outputListener, new Integer(containerSize), new Long(n),
+                    previous }, node);
 
             // Workaround for a little bug in ProActive (Exception in receiveRequest)
             // may be removed as the bug is fixed
@@ -164,14 +167,13 @@ public class Main implements ActivePrimeContainerCreator, InitActive {
             }
 
             // create output listener
-            outputListener = (PrimeOutputListener) PAActiveObject.newActive(ConsolePrimeOutputListener.class
-                    .getName(), new Object[] {}, listenerNode);
+            outputListener = PAActiveObject.newActive(ConsolePrimeOutputListener.class, new Object[] {},
+                    listenerNode);
 
             outputListener.newPrimeNumberFound(2);
 
             // create number source  
-            source = (NumberSource) PAActiveObject.newActive(NumberSource.class.getName(), new Object[] {},
-                    sourceNode);
+            source = PAActiveObject.newActive(NumberSource.class, new Object[] {}, sourceNode);
 
             // create first container  			
             ActivePrimeContainer first = newActivePrimeContainer(3, source);
@@ -214,8 +216,8 @@ public class Main implements ActivePrimeContainerCreator, InitActive {
             }
         }
         ProActiveConfiguration.load();
-        Main main = (Main) PAActiveObject.newActive(Main.class.getName(), new Object[] { xmlDescriptor,
-                Boolean.valueOf(gui) });
+        Main main = PAActiveObject
+                .newActive(Main.class, new Object[] { xmlDescriptor, Boolean.valueOf(gui) });
     }
 
     /** class for control window. */

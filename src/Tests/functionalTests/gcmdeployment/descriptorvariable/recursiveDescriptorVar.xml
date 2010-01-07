@@ -7,6 +7,8 @@
 	<environment>
 		<descriptorVariable name="base" value="plop"/>		
 		<descriptorVariable name="cmd" value="${base}/bin/java"/>
+		<descriptorVariable name="cmd2" value="${cmd}"/>
+
 	</environment>
 
 	<application>

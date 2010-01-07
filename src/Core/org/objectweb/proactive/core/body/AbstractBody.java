@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of
+ * 						   Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,12 +23,14 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
+ * If needed, contact us to obtain a release under GPL Version 2.
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
+ *  Contributor(s): ActiveEon Team - http://www.activeeon.com
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package org.objectweb.proactive.core.body;
 
@@ -50,6 +53,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAGroup;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.exceptions.BodyTerminatedReplyException;
 import org.objectweb.proactive.core.body.exceptions.BodyTerminatedRequestException;
@@ -69,8 +73,8 @@ import org.objectweb.proactive.core.body.tags.MessageTagsFactory;
 import org.objectweb.proactive.core.component.representative.ItfID;
 import org.objectweb.proactive.core.component.request.Shortcut;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.debug.stepbystep.BreakpointType;
-import org.objectweb.proactive.core.debug.stepbystep.Debugger;
+import org.objectweb.proactive.core.debug.debugger.BreakpointType;
+import org.objectweb.proactive.core.debug.debugger.Debugger;
 import org.objectweb.proactive.core.gc.GCMessage;
 import org.objectweb.proactive.core.gc.GCResponse;
 import org.objectweb.proactive.core.gc.GarbageCollector;
@@ -758,6 +762,18 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         }
 
         // END JMX unregistration
+
+        try {
+            super.roe.unexportAll();
+        } catch (ProActiveException e) {
+            logger.error("Failed to unexport " + this.getID(), e);
+        }
+
+        try {
+            super.roe.unregisterAll();
+        } catch (ProActiveException e) {
+            logger.error("Failed to unregister " + this.getID(), e);
+        }
     }
 
     public void blockCommunication() {
@@ -966,9 +982,9 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                 }
             }
 
-            // add StepByStep breakpoint
+            // add StepByStep and ExtrendedDebugger breakpoint
             if (!isProActiveInternalObject) {
-                debugger.breakpoint(BreakpointType.SendRequest, null);
+                debugger.breakpoint(BreakpointType.SendRequest, destinationBody);
             }
 
             this.localBodyStrategy.sendRequest(methodCall, future, destinationBody);

@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2009 INRIA/University of
+ * 						   Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,18 +23,21 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
+ * If needed, contact us to obtain a release under GPL Version 2.
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
+ *  Contributor(s): ActiveEon Team - http://www.activeeon.com
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package org.objectweb.proactive.core.body;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.management.ManagementFactory;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,6 +53,7 @@ import javax.management.ObjectName;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActiveInternalObject;
+import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.benchmarks.timit.util.CoreTimersContainer;
 import org.objectweb.proactive.core.ProActiveException;
@@ -75,7 +80,7 @@ import org.objectweb.proactive.core.body.tags.tag.DsiTag;
 import org.objectweb.proactive.core.component.body.ComponentBodyImpl;
 import org.objectweb.proactive.core.component.request.ComponentRequestImpl;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.debug.stepbystep.BreakpointType;
+import org.objectweb.proactive.core.debug.debugger.BreakpointType;
 import org.objectweb.proactive.core.gc.GarbageCollector;
 import org.objectweb.proactive.core.jmx.mbean.BodyWrapper;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
@@ -253,6 +258,8 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             }
         }
 
+        // ImmediateService
+        initializeImmediateService(reifiedObject);
     }
 
     //
@@ -343,36 +350,70 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             // the futurepool is still needed for remaining ACs
             setLocalBodyImpl(new InactiveLocalBodyStrategy(this.getFuturePool()));
         }
+
+        // terminate request receiver
+        this.requestReceiver.terminate();
     }
 
     public boolean checkMethod(String methodName) {
         return checkMethod(methodName, null);
     }
 
+    @Deprecated
     public void setImmediateService(String methodName) {
-        // FIXME see PROACTIVE-309
-        if (!((ComponentBodyImpl) this).isComponent()) {
-            if (!checkMethod(methodName)) {
-                throw new NoSuchMethodError(methodName + " is not defined in " +
-                    getReifiedObject().getClass().getName());
-            }
-        }
-        ((RequestReceiverImpl) this.requestReceiver).setImmediateService(methodName);
+        setImmediateService(methodName, false);
     }
 
-    public void setImmediateService(String methodName, Class<?>[] parametersTypes) {
-        // FIXME see ProActive-309
-        if (!((ComponentBodyImpl) this).isComponent()) {
-            if (!checkMethod(methodName, parametersTypes)) {
-                String signature = methodName + "(";
-                for (int i = 0; i < parametersTypes.length; i++) {
-                    signature += parametersTypes[i] + ((i < parametersTypes.length - 1) ? "," : "");
-                }
-                signature += " is not defined in " + getReifiedObject().getClass().getName();
-                throw new NoSuchMethodError(signature);
+    public void setImmediateService(String methodName, boolean uniqueThread) {
+        checkImmediateServiceMode(methodName, null, uniqueThread);
+        ((RequestReceiverImpl) this.requestReceiver).setImmediateService(methodName, uniqueThread);
+    }
+
+    public void setImmediateService(String methodName, Class<?>[] parametersTypes, boolean uniqueThread) {
+        checkImmediateServiceMode(methodName, parametersTypes, uniqueThread);
+        ((RequestReceiverImpl) this.requestReceiver).setImmediateService(methodName, parametersTypes,
+                uniqueThread);
+    }
+
+    protected void initializeImmediateService(Object reifiedObject) {
+        Method[] methods = reifiedObject.getClass().getMethods();
+        for (int i = 0; i < methods.length; i++) {
+            Method m = methods[i];
+            ImmediateService is = m.getAnnotation(ImmediateService.class);
+            if (is != null) {
+                setImmediateService(m.getName(), m.getParameterTypes(), is.uniqueThread());
             }
         }
-        ((RequestReceiverImpl) this.requestReceiver).setImmediateService(methodName, parametersTypes);
+    }
+
+    private void checkImmediateServiceMode(String methodName, Class<?>[] parametersTypes, boolean uniqueThread) {
+        // see PROACTIVE-309
+        if (!((ComponentBodyImpl) this).isComponent()) {
+            if (parametersTypes == null) { // all args
+                if (!((ComponentBodyImpl) this).isComponent()) {
+                    if (!checkMethod(methodName)) {
+                        throw new NoSuchMethodError(methodName + " is not defined in " +
+                            getReifiedObject().getClass().getName());
+                    }
+                }
+            } else { // args are specified
+                if (!checkMethod(methodName, parametersTypes)) {
+                    String signature = methodName + "(";
+                    for (int i = 0; i < parametersTypes.length; i++) {
+                        signature += parametersTypes[i] + ((i < parametersTypes.length - 1) ? "," : "");
+                    }
+                    signature += " is not defined in " + getReifiedObject().getClass().getName();
+                    throw new NoSuchMethodError(signature);
+                }
+            }
+        }
+
+        // cannot use IS with unique thread with fault-tolerant active object
+        if (uniqueThread && this.ftmanager != null) {
+            throw new ProActiveRuntimeException("The method " + methodName +
+                " cannot be set as immediate service with unique thread since the active object " +
+                this.getID() + " has enabled fault-tolerance.");
+        }
     }
 
     public void removeImmediateService(String methodName) {
