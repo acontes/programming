@@ -114,7 +114,7 @@ public class AgentImpl extends AgentInternal implements AgentImplMBean {
 
     /** the thread pool available for this agent */
     final private ExecutorService tpe;
-    
+
     /** The socket factory to use to create the Tunnel */
     final private MessageRoutingSocketFactorySPI socketFactory;
 
@@ -133,8 +133,8 @@ public class AgentImpl extends AgentInternal implements AgentImplMBean {
      *             If the router cannot be contacted.
      */
     public AgentImpl(InetAddress routerAddr, int routerPort,
-            Class<? extends RoutedMessageHandler> messageHandlerClass, MessageRoutingSocketFactorySPI socketFactory)
-            throws ProActiveException {
+            Class<? extends RoutedMessageHandler> messageHandlerClass,
+            MessageRoutingSocketFactorySPI socketFactory) throws ProActiveException {
         this(routerAddr, routerPort, messageHandlerClass, new ArrayList<Valve>(), socketFactory);
     }
 

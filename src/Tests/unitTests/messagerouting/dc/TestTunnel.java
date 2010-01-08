@@ -46,7 +46,7 @@ import org.objectweb.proactive.extra.messagerouting.client.Tunnel;
 public class TestTunnel extends Tunnel {
 
     public TestTunnel(InetAddress routerAddr, int routerPort) throws IOException {
-        super(routerAddr, routerPort);
+        super(new Socket(routerAddr, routerPort));
     }
 
     public TestTunnel(Socket socket) throws IOException {

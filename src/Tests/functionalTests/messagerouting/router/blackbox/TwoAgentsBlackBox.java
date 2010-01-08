@@ -32,6 +32,7 @@ package functionalTests.messagerouting.router.blackbox;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.net.UnknownHostException;
 
 import org.junit.After;
@@ -73,7 +74,7 @@ public class TwoAgentsBlackBox extends BlackBox {
 
     @Before
     public void startInfrastructure() throws UnknownHostException, IOException {
-        this.r_tunnel = new Tunnel(InetAddress.getLocalHost(), this.router.getPort());
+        this.r_tunnel = new Tunnel(new Socket(InetAddress.getLocalHost(), this.router.getPort()));
         agentID = register(tunnel);
         r_agentID = register(r_tunnel);
     }

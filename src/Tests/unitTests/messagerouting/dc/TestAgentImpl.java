@@ -46,6 +46,7 @@ import org.objectweb.proactive.extra.messagerouting.exceptions.MessageRoutingExc
 import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.DataRequestMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.DirectConnectionRequestMessage;
+import org.objectweb.proactive.extra.messagerouting.remoteobject.util.socketfactory.MessageRoutingPlainSocketFactory;
 
 import unitTests.messagerouting.dc.scenarios.Infrastructure;
 
@@ -77,7 +78,7 @@ public class TestAgentImpl extends AgentImpl {
     public TestAgentImpl(InetAddress routerAddr, int routerPort,
             Class<? extends RoutedMessageHandler> messageHandlerClass) throws ProActiveException,
             SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
-        super(routerAddr, routerPort, messageHandlerClass);
+        super(routerAddr, routerPort, messageHandlerClass, new MessageRoutingPlainSocketFactory());
         Class<AgentImpl> agentClazz = AgentImpl.class;
 
         // get the hidden fields using reflection

@@ -359,7 +359,7 @@ public class DirectConnectionManager implements DirectConnectionManagerMBean {
             try {
                 response = mb.waitForResponse(0);
             } catch (TimeoutException e) {
-                throw new MessageRoutingException("Timeout reached", e);
+                throw new MessageRoutingException("Timeout reached" + e.getMessage());
             }
         }
 
@@ -386,7 +386,7 @@ public class DirectConnectionManager implements DirectConnectionManagerMBean {
         } catch (IOException e) {
             // Fail fast
             throw new MessageRoutingException("Failed to send a message using the direct connection " +
-                connection, e);
+                connection + " reason:" + e.getMessage());
         }
     }
 

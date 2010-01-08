@@ -36,6 +36,7 @@ package functionalTests.messagerouting.router.blackbox;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.Socket;
 
 import junit.framework.Assert;
 
@@ -66,7 +67,7 @@ public class TestReconnection extends BlackBox {
 
         // Ok it's time to reconnect
         tunnel.shutdown();
-        tunnel = new Tunnel(InetAddress.getLocalHost(), this.router.getPort());
+        tunnel = new Tunnel(new Socket(InetAddress.getLocalHost(), this.router.getPort()));
         // wait a bit, for the router to finish the processing
         new Sleeper(200).sleep();
 
