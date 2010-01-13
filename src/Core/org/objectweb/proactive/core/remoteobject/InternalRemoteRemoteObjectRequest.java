@@ -34,8 +34,11 @@
  */
 package org.objectweb.proactive.core.remoteobject;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.objectweb.proactive.core.body.request.RequestImpl;
 import org.objectweb.proactive.core.mop.MethodCall;
+import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 
 
 /**
@@ -47,5 +50,9 @@ import org.objectweb.proactive.core.mop.MethodCall;
 public class InternalRemoteRemoteObjectRequest extends RequestImpl {
     public InternalRemoteRemoteObjectRequest(MethodCall methodCall) {
         super(methodCall, false);
+    }
+    
+    public Object execute(Object target) throws MethodCallExecutionFailedException, InvocationTargetException{
+        return this.methodCall.execute(target);
     }
 }
