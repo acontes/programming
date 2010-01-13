@@ -137,7 +137,7 @@ public class InternalRemoteRemoteObjectImpl implements InternalRemoteRemoteObjec
         if (message instanceof InternalRemoteRemoteObjectRequest) {
             Object o;
             try {
-                o = ((RemoteObjectRequest)message).execute(this);
+                o = ((InternalRemoteRemoteObjectRequest)message).execute(this);
                 return new SynchronousReplyImpl(new MethodCallResult(o, null));
             } catch (MethodCallExecutionFailedException e) {
                 // TODO Auto-generated catch block
