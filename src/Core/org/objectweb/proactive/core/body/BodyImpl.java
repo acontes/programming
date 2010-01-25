@@ -52,6 +52,9 @@ import javax.management.MBeanServer;
 import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
 
+import org.objectweb.fractal.api.NoSuchInterfaceException;
+import org.objectweb.fractal.api.control.BindingController;
+import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.annotation.ImmediateService;
@@ -77,8 +80,15 @@ import org.objectweb.proactive.core.body.request.RequestReceiver;
 import org.objectweb.proactive.core.body.request.RequestReceiverImpl;
 import org.objectweb.proactive.core.body.tags.MessageTags;
 import org.objectweb.proactive.core.body.tags.Tag;
+import org.objectweb.proactive.core.body.tags.tag.CMTag;
 import org.objectweb.proactive.core.body.tags.tag.DsiTag;
+import org.objectweb.proactive.core.component.ComponentMethodCallMetadata;
+import org.objectweb.proactive.core.component.ComponentParameters;
+import org.objectweb.proactive.core.component.ProActiveInterface;
+import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.body.ComponentBodyImpl;
+import org.objectweb.proactive.core.component.identity.ProActiveComponent;
+import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative;
 import org.objectweb.proactive.core.component.request.ComponentRequestImpl;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.debug.debugger.BreakpointType;
@@ -310,17 +320,20 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
      */
     @Override
     protected int internalReceiveReply(Reply reply) throws java.io.IOException {
-        // JMX Notification
-        if (!isProActiveInternalObject && (this.mbean != null) && reply.getResult().getException() == null) {
-            String tagNotification = createTagNotification(reply.getTags());
-            RequestNotificationData requestNotificationData = new RequestNotificationData(
-                BodyImpl.this.bodyID, BodyImpl.this.getNodeURL(), reply.getSourceBodyID(), this.nodeURL,
-                reply.getMethodName(), getRequestQueue().size() + 1, reply.getSequenceNumber(),
-                tagNotification);
-            this.mbean.sendNotification(NotificationType.replyReceived, requestNotificationData);
-        }
-
-        // END JMX Notification
+    	// cruz ... only want to treat replies that have the Future instead of more automatic continuations...
+    	//          Before, this if didn't exist and the notification was sent on any reply. (also the reply.getResultObject()!=null was not checked)
+    	if(!reply.isAutomaticContinuation()) {
+    		// JMX Notification
+    		if (!isProActiveInternalObject && (this.mbean != null) && reply.getResult().getResultObjet() != null &&  reply.getResult().getException() == null) {
+    			String tagNotification = createTagNotification(reply.getTags());
+    			RequestNotificationData requestNotificationData = new RequestNotificationData(
+    					BodyImpl.this.bodyID, BodyImpl.this.getNodeURL(), reply.getSourceBodyID(), this.nodeURL,
+    					reply.getMethodName(), getRequestQueue().size() + 1, reply.getSequenceNumber(),
+    					tagNotification);
+    			this.mbean.sendNotification(NotificationType.replyReceived, requestNotificationData);
+    		}
+    	}
+    	// END JMX Notification
         return replyReceiver.receiveReply(reply, this, getFuturePool());
     }
 
@@ -651,8 +664,12 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                 TimerWarehouse.startTimer(BodyImpl.this.bodyID, TimerWarehouse.SEND_REPLY);
             }
 
+            // cruz: at this time, the reply has not been sent
+            // But! ... when the reply.send() returns, the destinationBody.receiveReply(this)
+            //   has already been called, and the reception notification has been issued.
+            //   So, the JMX notification of ReplyReceived will have a greater timestamp than ReplySent.
             // JMX Notification
-            if (!isProActiveInternalObject && (mbean != null) && reply.getResult().getException() == null) {
+            if (!isProActiveInternalObject && (mbean != null) && reply.getResult().getResultObjet() != null &&  reply.getResult().getException() == null) {
                 String tagNotification = createTagNotification(request.getTags());
                 RequestNotificationData data = new RequestNotificationData(request.getSourceBodyID(), request
                         .getSenderNodeURL(), BodyImpl.this.bodyID, BodyImpl.this.nodeURL, request
@@ -666,6 +683,8 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             destinations.add(request.getSender());
             this.getFuturePool().registerDestinations(destinations);
 
+            // cruz: what is this part for?... why it has to "modify result object?",
+            //       Anyway, it seems that it doesn't have a relation to my problem 
             // Modify result object
             Object initialObject = null;
             Object stubOnActiveObject = null;
@@ -698,6 +717,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                 // Useful if the exception is due to the content of the result
                 // (e.g. InvalidClassException)
                 try {
+                	bodyLogger.debug("[BodyImpl   ] Body ["+ BodyImpl.this.getID() + "] Sending reply for method "+ request.getMethodName());
                     reply.send(request.getSender());
                 } catch (IOException e1) {
                     try {
@@ -715,6 +735,21 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                     }
                 }
             }
+            
+            // cruz: here is when the reply has been really sent
+            // But! ... when the reply.send() has returned, the destinationBody.receiveReply(this)
+            //   has already been called, and the reception notification has been issued.
+            //   So, the JMX notification of ReplyReceived will have a greater timestamp than ReplySent.
+            // JMX Notification
+//            if (!isProActiveInternalObject && (mbean != null) && reply.getResult().getResultObjet() != null &&  reply.getResult().getException() == null) {
+//                String tagNotification = createTagNotification(request.getTags());
+//                RequestNotificationData data = new RequestNotificationData(request.getSourceBodyID(), request
+//                        .getSenderNodeURL(), BodyImpl.this.bodyID, BodyImpl.this.nodeURL, request
+//                        .getMethodName(), getRequestQueue().size(), request.getSequenceNumber(),
+//                    tagNotification);
+//                mbean.sendNotification(NotificationType.replySent, data);
+//            }
+            // END JMX Notification
 
             if (Profiling.TIMERS_COMPILED) {
                 TimerWarehouse.stopTimer(BodyImpl.this.bodyID, TimerWarehouse.SEND_REPLY);
@@ -756,7 +791,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                 throws IOException, RenegotiateSessionException, CommunicationForbiddenException {
             long sequenceID = getNextSequenceID();
 
-            MessageTags tags = applyTags(sequenceID);
+            MessageTags tags = applyTags(sequenceID, destinationBody, methodCall);
 
             Request request = this.internalRequestFactory.newRequest(methodCall, BodyImpl.this,
                     future == null, sequenceID, tags);
@@ -766,8 +801,17 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                 request = new ComponentRequestImpl(request);
             }
 
+            // Registers the Future in the local FuturePool, which will be updated when the reply arrives.
             if (future != null) {
                 future.setID(sequenceID);
+                //TO DELETE: add the methodName to the future
+                future.setMethodName(methodCall.getName());
+                //TO DELETE: now I would need to add the name of the request that is currently being served
+                future.setParentMethodName(LocalBodyStore.getInstance().getContext().getCurrentRequest().getMethodName());
+                //TO CONSERVER: adds the tags of the Request to the local Future.
+                //This way it's possible to know which method is the Future waiting for, and generate
+                //the notification when the final reply arrives.
+                future.setTags(tags);
                 this.futures.receiveFuture(future);
             }
 
@@ -776,23 +820,25 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             // TODO Send a notification only if the destination doesn't
             // implement ProActiveInternalObject
             if (!isProActiveInternalObject && (mbean != null)) {
-                ServerConnector serverConnector = ProActiveRuntimeImpl.getProActiveRuntime()
-                        .getJMXServerConnector();
-
+//          	cruz: removing. This if's are removed because I still don't get the point
+//            	      of the serverConnector, and I want the "requestSent" notification to be generated
+//                ServerConnector serverConnector = ProActiveRuntimeImpl.getProActiveRuntime()
+//                        .getJMXServerConnector();
+//
                 // If the connector server is not active the connectorID can be
                 // null
-                if ((serverConnector != null) && serverConnector.getConnectorServer().isActive()) {
-                    UniqueID connectorID = serverConnector.getUniqueID();
-
-                    if (!connectorID.equals(destinationBody.getID())) {
+//                if ((serverConnector != null) && serverConnector.getConnectorServer().isActive()) {
+//                    UniqueID connectorID = serverConnector.getUniqueID();
+//
+//                    if (!connectorID.equals(destinationBody.getID())) {
                         String tagNotification = createTagNotification(tags);
 
                         mbean.sendNotification(NotificationType.requestSent, new RequestNotificationData(
                             BodyImpl.this.bodyID, BodyImpl.this.getNodeURL(), destinationBody.getID(),
                             destinationBody.getNodeURL(), methodCall.getName(), -1, request
                                     .getSequenceNumber(), tagNotification));
-                    }
-                }
+//                    }
+//                }
             }
 
             // END JMX Notification
@@ -838,9 +884,11 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
 
         /**
          * Propagate all tags attached to the current served request.
+         * @param destinationBody 
+         * @param methodCall 
          * @return The MessageTags for the propagation
          */
-        private MessageTags applyTags(long sequenceID) {
+        private MessageTags applyTags(long sequenceID, UniversalBody destinationBody, MethodCall methodCall) {
             // apply the code of all message TAGs from current context
             Request currentreq = LocalBodyStore.getInstance().getContext().getCurrentRequest();
             MessageTags currentMessagetags = null;
@@ -861,6 +909,60 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                     nextTags.addTag(new DsiTag(bodyID, sequenceID));
                 }
             }
+            
+            // if the request is a Component request, propagate the tag accordingly
+            if(currentreq != null) {
+            	if(currentreq instanceof ComponentRequestImpl) {
+            		String componentSourceName = "-";
+            		String componentDestName = "";
+            		String interfaceName = "-";
+            		String methodName = "-";
+            		// ugly!
+            		// This behaviour should be part of the Tag t.apply(), but how can the Tag have access to the BodyImpl ?
+            		// Moreover, Component specific behaviour shouldn't be in ComponentBodyImpl, instead of here? 
+            		// So, it wouldn't be necessary to do things like if(methodCall.getComponentMetadata != null) to know if it's a ComponentRequest
+            		// (but that's like a "major" thing)
+
+            		ComponentMethodCallMetadata cmcmd = methodCall.getComponentMetadata();
+            		ProActiveComponent pac = ((ComponentBodyImpl)BodyImpl.this).getProActiveComponentImpl();
+            		
+            		if(pac != null && cmcmd != null) {
+            			ComponentParameters cp = pac.getComponentParameters();
+            			componentSourceName = pac.getComponentParameters().getName();
+            			interfaceName = cmcmd.getComponentInterfaceName();
+            			// why does this return false????
+            			// System.out.println("::::::::::"+cmcmd.isComponentMethodCall());
+            			// if this component is generating a request, it should have a bound client interface,
+            			// and should have BindingController, so it shouldn't throw a NoSuchInterfaceException here
+            			BindingController bc = null;
+            			try {
+							bc = Fractal.getBindingController(pac);
+							if(!Utils.isControllerInterfaceName(interfaceName)) {
+								componentDestName = ((ProActiveComponentRepresentative)((ProActiveInterface) bc.lookupFc(interfaceName)).getFcItfOwner()).getComponentParameters().getName();
+							}
+						} catch (NoSuchInterfaceException e) {
+							e.printStackTrace();
+						}
+						
+            			
+            		}
+        			methodName = methodCall.getName();
+            		//System.out.println("Call from " + componentSourceName + " to " + interfaceName + "." + methodName);
+
+            		// Replace the current CMTag (if exists) for a new CMTag with the data of the requestSent
+        			long oldSeqID = 0;
+            		if(nextTags.check(CMTag.IDENTIFIER)) {
+            			CMTag oldTag = (CMTag) nextTags.removeTag(CMTag.IDENTIFIER);
+            			oldSeqID = oldTag.getNewSeqID();
+            		}
+            		
+            		// sequenceID is the new one, just generated (in sendRequest).
+            		// need to find the request that was being served, to be able to associate it in the callLog
+            		nextTags.addTag(new CMTag(bodyID, oldSeqID, sequenceID, componentSourceName, componentDestName, interfaceName, methodName));
+
+            	}
+            }
+
             return nextTags;
         }
     }

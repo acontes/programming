@@ -41,9 +41,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -56,7 +59,8 @@ import org.objectweb.proactive.core.body.UniversalBody;
 public class FutureMap extends Object implements java.io.Serializable {
     // main map
     private Map<UniqueID, HashMap<Long, FuturesAndACs>> indexedByBodyID;
-
+    
+    final static protected Logger logger = ProActiveLogger.getLogger(Loggers.FUTURE);
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -72,7 +76,8 @@ public class FutureMap extends Object implements java.io.Serializable {
      * @param bodyDest body which receives the future (id, bodyID)
      */
     public synchronized void addAutomaticContinuation(long id, UniqueID creatorID, UniversalBody bodyDest) {
-        java.util.HashMap<Long, FuturesAndACs> indexedByID = (indexedByBodyID.get(creatorID));
+    	
+    	java.util.HashMap<Long, FuturesAndACs> indexedByID = (indexedByBodyID.get(creatorID));
         if (indexedByID == null) {
             throw new ProActiveRuntimeException("There is no map for creatorID " + creatorID);
         }
@@ -92,6 +97,7 @@ public class FutureMap extends Object implements java.io.Serializable {
      * @param futureObject future to register
      */
     public synchronized void receiveFuture(Future futureObject) {
+    	logger.debug("[FutureMap  ] receiveFuture ID:[" + futureObject.getID()+"] creator: ["+ futureObject.getCreatorID()+"] sender:["+ futureObject.getSenderID() +"] method:["+ futureObject.getMethodName()+"]");
         long id = futureObject.getID();
         UniqueID creatorID = futureObject.getCreatorID();
         java.util.HashMap<Long, FuturesAndACs> indexedByID = indexedByBodyID.get(creatorID);
@@ -185,6 +191,8 @@ public class FutureMap extends Object implements java.io.Serializable {
         if (indexedByID != null) {
             indexedByID.remove(Long.valueOf(id));
         }
+       	logger.debug("[FutureMap  ] removeFuture ID:[" + id+"] creator: ["+ creatorID +"]");
+        	
     }
 
     /**

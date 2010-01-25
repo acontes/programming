@@ -50,12 +50,15 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.proxy.AbstractProxy;
+import org.objectweb.proactive.core.body.tags.MessageTags;
+import org.objectweb.proactive.core.body.tags.Tag;
 import org.objectweb.proactive.core.exceptions.ExceptionHandler;
 import org.objectweb.proactive.core.exceptions.ExceptionMaskLevel;
 import org.objectweb.proactive.core.group.DispatchMonitor;
 import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
 import org.objectweb.proactive.core.jmx.notification.FutureNotificationData;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
+import org.objectweb.proactive.core.jmx.notification.RequestNotificationData;
 import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedException;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.MOP;
@@ -81,7 +84,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     //
     // -- STATIC MEMBERS -----------------------------------------------
     //
-    final static protected Logger logger = ProActiveLogger.getLogger(Loggers.BODY);
+    final static protected Logger logger = ProActiveLogger.getLogger(Loggers.FUTURE);
 
     //
     // -- PROTECTED MEMBERS -----------------------------------------------
@@ -137,6 +140,12 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     // returns future update info used during dynamic dispatch for groups
     private transient DispatchMonitor dispatchMonitor;
 
+    //cruz
+    private String methodName = null;
+    private String parentMethodName = null;
+    private MessageTags tags;
+    //--cruz
+    
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -219,6 +228,47 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
             dispatchMonitor.updatedResult(originatingProxy);
         }
         target = obj;
+        
+        
+        // cruz
+        String resultTypeName = "";
+        if(obj.getResult() != null) {
+        	resultTypeName = obj.getResult().getClass().getName();
+        }
+        
+        
+        logger.debug("[FutureProxy] receiveReply. ID:" + this.getID()+ ", MethodCallResult type: ["+resultTypeName+"]. IsAwaited? "+isAwaited(obj.getResult()) + " methodName:["+ methodName +"]" );
+        if(isAwaited(target.getResult())) {       	
+        	// now I can give the name of method I'm still waiting for, to the new pair stub-proxy
+        	FutureProxy futureReceived = ((FutureProxy)((StubObject)target.getResult()).getProxy());
+        	logger.debug("[FutureProxy] receiveReply. ID:" + futureReceived.getID()+ ", was previously for method: [" + futureReceived.getMethodName() +"]");
+        	futureReceived.setMethodName(this.methodName);
+        	// propagation of the tags to the new pair stub-proxy
+        	futureReceived.setTags(this.tags);
+        }
+        else {
+        	Body body = LocalBodyStore.getInstance().getLocalBody(senderID);        	
+        	// TODO now I can generate the JMX notification RealReplyReceived :D
+        	logger.debug("[FutureProxy] receiveReply. ID:" + this.getID() + ", received REAL REPLY for method "+ methodName + " in body ["+ senderID +"]");
+        	// generates the JMX RealReplyReceived
+        	//Body body = PAActiveObject.getBodyOnThis();
+    		if(body != null) {
+    			// if it's a half body, it won't have an mbean to send notifications
+    			BodyWrapperMBean mbean = body.getMBean();
+    			if(mbean != null) {
+    				String tagNotification = createTagNotification(this.tags);
+    				// TODO correct the parameters for source and destination
+    				//      the MonitorController is not reading them for the moment
+    				RequestNotificationData requestNotificationData = new RequestNotificationData(
+    						null, null, null, null,
+    						this.methodName, -1, this.id.getID(),
+    						tagNotification);
+    				mbean.sendNotification(NotificationType.realReplyReceived, requestNotificationData);
+    			}
+    		}
+        }
+        // -- cruz
+        
         ExceptionHandler.addResult(this);
         FutureMonitoring.removeFuture(this);
 
@@ -323,10 +373,20 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
             if (mbean != null) {
                 mbean.sendNotification(NotificationType.waitByNecessity, new FutureNotificationData(bodyId,
                     getCreatorID()));
+                // send "custom" requestWbN notification, with info related to the request
+                String tagNotification = createTagNotification(this.tags);
+				// TODO correct the parameters for source and destination
+				//      the MonitorController is not reading them for the moment
+				RequestNotificationData requestNotificationData = new RequestNotificationData(
+						null, null, null, null,
+						this.methodName, -1, this.id.getID(),
+						tagNotification);
+				mbean.sendNotification(NotificationType.requestWbN, requestNotificationData);
             }
         }
 
         // END JMX Notification
+        logger.debug("[FutureProxy] ID:"+ id.getID() + " WaitByNecessity, method ["+ methodName+"]");
         TimeoutAccounter time = TimeoutAccounter.getAccounter(timeout);
         while (!isAvailable()) {
             if (time.isTimeoutElapsed()) {
@@ -339,11 +399,20 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
             }
         }
 
-        // JMX Notification
+        // JMX Notification.
+        // This receivedFutureResult notification is sent ONLY if WbN was incurred.
+        // If the result was already available (it had been received before doing any wait on it, the execution
+        // won't get to this place (returns in the first if).
+        // To detect all Future updates, we should go to the "receiveReply" method.
         if (mbean != null) {
             mbean.sendNotification(NotificationType.receivedFutureResult, new FutureNotificationData(bodyId,
                 getCreatorID()));
         }
+        if(target.getResult() != null) {
+        	logger.debug("[FutureProxy] Future updated after waiting. ID:["+this.getID() +"], target type: ["+target.getResult().getClass().getName()+"]. IsAwaited?" + isAwaited(target.getResult()) + " Method ["+ methodName + "]");
+        }
+        // This is the place to detect WaitByNecessity, but not the place if we want to detect all Future updates,
+        // because, if the value is already available, the execution will not arrive to this place.
 
         // END JMX Notification
         if (Profiling.TIMERS_COMPILED) {
@@ -373,7 +442,9 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         }
         id.setCreatorID(creatorID);
     }
-
+    /**
+     * The creatorID is the ID of the "evaluator" of the Future, not the "creator" of it.
+     */
     public UniqueID getCreatorID() {
         return id.getCreatorID();
     }
@@ -387,6 +458,10 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 
     public UniversalBody getUpdater() {
         return this.updater;
+    }
+    
+    public UniqueID getSenderID() {
+    	return senderID;
     }
 
     public void setSenderID(UniqueID i) {
@@ -501,6 +576,11 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         out.writeObject(id);
         // Pass a reference to the updater
         out.writeObject(writtenUpdater.getRemoteAdapter());
+        //cruz
+        out.writeObject(methodName);
+        out.writeObject(parentMethodName);
+        out.writeObject(tags);
+        //--cruz
     }
 
     /**
@@ -513,6 +593,11 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         target = (MethodCallResult) in.readObject();
         id = (FutureID) in.readObject();
         updater = (UniversalBody) in.readObject();
+        //cruz
+        methodName = (String) in.readObject();
+        parentMethodName = (String) in.readObject();
+        tags = (MessageTags) in.readObject();
+        //--cruz
         // register all incoming futures, even for migration or checkpointing
         if (this.isAwaited()) {
             FuturePool.registerIncomingFuture(this);
@@ -597,4 +682,39 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     public synchronized void setDispatchMonitor(DispatchMonitor dispatchMonitor) {
         this.dispatchMonitor = dispatchMonitor;
     }
+
+	public String getMethodName() {
+		return methodName;
+	}
+
+	public void setMethodName(String methodName) {
+		this.methodName = methodName;
+	}
+	
+	public String getParentMethodName() {
+		return parentMethodName;
+	}
+
+	public void setParentMethodName(String parentMethodName) {
+		this.parentMethodName = parentMethodName;
+	}
+	
+	public MessageTags getTags()  {
+		return tags;	
+	}
+	
+	public void setTags(MessageTags messageTags) {
+		this.tags = messageTags;
+	}
+	
+    private String createTagNotification(MessageTags tags) {
+        String result = "";
+        if (tags != null) {
+            for (Tag tag : tags.getTags()) {
+                result += tag.getNotificationMessage();
+            }
+        }
+        return result;
+    }
+
 }

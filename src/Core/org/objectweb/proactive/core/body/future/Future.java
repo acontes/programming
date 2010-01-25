@@ -38,6 +38,7 @@ package org.objectweb.proactive.core.body.future;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.tags.MessageTags;
 
 
 /**
@@ -138,4 +139,15 @@ public interface Future extends LocalFuture {
      * @param mode true is the copyMode is set
      */
     public void setCopyMode(boolean mode);
+    
+    //cruz
+    public void setMethodName(String n);
+    public String getMethodName();
+    public void setParentMethodName(String n);
+    public String getParentMethodName();
+    public UniqueID getSenderID();
+    public void setTags(MessageTags m);
+    public MessageTags getTags();
+    //--cruz
+    
 }

@@ -286,8 +286,18 @@ public class HalfBody extends AbstractBody {
             if (methodCall.getComponentMetadata() != null) {
                 request = new ComponentRequestImpl(request);
             }
+            
+            // Registers the Future in the local FuturePool, which will be updated when the reply arrives.
             if (future != null) {
                 future.setID(sequenceID);
+                //TO DELETE: add the methodName to the future
+                future.setMethodName(methodCall.getName());
+                //TO DELETE: now I would need to add the name of the request that is currently being served
+                //future.setParentMethodName(LocalBodyStore.getInstance().getContext().getCurrentRequest().getMethodName());
+                //TO CONSERVER: adds the tags of the Request to the local Future.
+                //This way it's possible to know which method is the Future waiting for, and generate
+                //the notification when the final reply arrives.
+                future.setTags(tags);
                 this.futures.receiveFuture(future);
             }
 
