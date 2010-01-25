@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +22,9 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -132,6 +136,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
 
     /** Group of sleeping workers */
     private Group<Worker> sleepingGroup;
+    private Set<String> sleepingWorkersName;
 
     /** Group of cleared workers */
     private Set<Worker> clearedWorkers;
@@ -249,6 +254,12 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
     }
 
     /** {@inheritDoc} */
+    public void addResources(final String schedulerURL, String login, String password,
+            final String[] classpath) throws ProActiveException {
+        (smanager).addResources(schedulerURL, login, password, classpath);
+    }
+
+    /** {@inheritDoc} */
     public void addResources(final URL descriptorURL, final VariableContract contract,
             final String virtualNodeName) throws ProActiveException {
         (smanager).addResources(descriptorURL, contract, virtualNodeName);
@@ -291,18 +302,23 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
                 worker.clear();
             }
         }
+        Worker locWorker = workersByName.get(workerName);
 
         if (emptyPending()) {
             // We say that the worker is sleeping if we don't know it yet or if it's not doing a task
             if (workersActivity.containsKey(workerName)) {
                 // If the worker requests a flooding this means that its penqing queue is empty,
                 // thus, it will sleep
-                if (flooding) {
-                    sleepingGroup.add(worker);
+                if (flooding && !sleepingWorkersName.contains(workerName)) {
+                    sleepingGroup.add(locWorker);
+                    sleepingWorkersName.add(workerName);
                 }
             } else {
-                workersActivity.put(workerName, new HashSet<Long>());
-                sleepingGroup.add(worker);
+                if (!sleepingWorkersName.contains(workerName)) {
+                    workersActivity.put(workerName, new HashSet<Long>());
+                    sleepingGroup.add(locWorker);
+                    sleepingWorkersName.add(workerName);
+                }
             }
             if (debug) {
                 logger.debug("No task given to " + workerName);
@@ -310,8 +326,9 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
             // we return an empty queue, this will cause the worker to sleep for a while
             return new LinkedList<TaskIntern<Serializable>>();
         } else {
-            if (sleepingGroup.contains(worker)) {
-                sleepingGroup.remove(worker);
+            if (sleepingWorkersName.contains(workerName)) {
+                sleepingGroup.remove(locWorker);
+                sleepingWorkersName.remove(workerName);
             }
             Queue<TaskIntern<Serializable>> tasksToDo = new LinkedList<TaskIntern<Serializable>>();
 
@@ -390,6 +407,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
             // Group of sleeping workers
             sleepingGroupStub = (Worker) PAGroup.newGroup(workerClassName);
             sleepingGroup = PAGroup.getGroup(sleepingGroupStub);
+            sleepingWorkersName = new HashSet<String>();
             workersActivity = new HashMap<String, Set<Long>>();
             workersByName = new HashMap<String, Worker>();
             workersByNameRev = new HashMap<Worker, String>();
@@ -420,18 +438,20 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
     public boolean isDead(final Worker worker) {
         if (workersByNameRev.containsKey(worker)) {
             String workerName = workersByNameRev.get(worker);
+            Worker locWorker = workersByName.get(workerName);
             if (logger.isInfoEnabled()) {
                 logger.info(workerName + " reported missing... removing it");
             }
 
             // we remove the worker from our lists
-            if (workerGroup.contains(worker)) {
-                workerGroup.remove(worker);
-                if (sleepingGroup.contains(worker)) {
-                    sleepingGroup.remove(worker);
+            if (workerGroup.contains(locWorker)) {
+                workerGroup.remove(locWorker);
+                if (sleepingWorkersName.contains(workerName)) {
+                    sleepingGroup.remove(locWorker);
+                    sleepingWorkersName.remove(workerName);
                 }
-                if (clearedWorkers.contains(worker)) {
-                    clearedWorkers.remove(worker);
+                if (clearedWorkers.contains(locWorker)) {
+                    clearedWorkers.remove(locWorker);
                 }
 
                 // Among our "dictionary of workers", we remove only entries in the reverse dictionary,
@@ -602,8 +622,10 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
             String workerName = workersByNameRev.get(worker);
             logger.debug(workerName + " is cleared");
         }
-
-        clearedWorkers.add(worker);
+        // finding the local worker stub
+        String workerName = workersByNameRev.get(worker);
+        Worker locWorker = workersByName.get(workerName);
+        clearedWorkers.add(locWorker);
     }
 
     /** {@inheritDoc} */
@@ -763,6 +785,10 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
             }
             if (clearedWorkers.size() == workerGroup.size() + spawnedWorkerNames.size()) {
                 sleepingGroup.addAll(clearedWorkers);
+                for (Worker w : clearedWorkers) {
+                    String wname = workersByNameRev.get(w);
+                    sleepingWorkersName.add(wname);
+                }
                 isClearing = false;
                 clearedWorkers.clear();
                 break;
@@ -1004,6 +1030,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
         // We clear every sleeping workers registered
         try {
             sleepingGroup.clear();
+            sleepingWorkersName.clear();
         } catch (ExceptionListException exl) {
             for (Exception ex : exl) {
                 ex.printStackTrace();
@@ -1246,6 +1273,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
         workerGroupStub = null;
         sleepingGroup.purgeExceptionAndNull();
         sleepingGroup.clear();
+        sleepingWorkersName.clear();
         sleepingGroupStub = null;
 
         clearedWorkers.clear();

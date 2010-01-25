@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +22,9 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -59,7 +63,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class FileTransferWorkShop implements Serializable {
     private static final String PROCESSDEFAULT_KEYWORD = "processDefault";
     private static final String IMPLICIT_KEYWORD = "implicit";
-    private static final String[] ALLOWED_COPY_PROTOCOLS = { PROCESSDEFAULT_KEYWORD, "scp", "unicore", "rcp",
+    private static final String[] ALLOWED_COPY_PROTOCOLS = { PROCESSDEFAULT_KEYWORD, "scp", "rcp",
             "nordugrid", "pftp" };
     private static final String[] URLPROTOCOLS = { "file://", "http://", "ftp://" };
     final protected static Logger logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT_FILETRANSFER);
@@ -223,7 +227,7 @@ public class FileTransferWorkShop implements Serializable {
         } else if (protocolname.equalsIgnoreCase("rcp")) {
             cp = new RemoteFileCopy(protocolname);
         } else {
-            cp = new DummyCopyProtocol(protocolname); //pftp, unicore, nordugrid are created here
+            cp = new DummyCopyProtocol(protocolname); //pftp, nordugrid are created here
             return cp;
         }
 

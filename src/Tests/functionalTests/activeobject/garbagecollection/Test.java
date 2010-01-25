@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +22,9 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -50,11 +54,11 @@ public class Test extends FunctionalTest {
      * \ v \ 1--->---2 \ /| ^ v | \ / | 3 v / \ | v ^ | / \| 4 5
      */
     private static void buildGraph() throws Exception {
-        A a1 = (A) PAActiveObject.newActive(A.class.getName(), null);
-        A a2 = (A) PAActiveObject.newActive(A.class.getName(), null);
-        A a3 = (A) PAActiveObject.newActive(A.class.getName(), null);
-        A a4 = (A) PAActiveObject.newActive(A.class.getName(), null);
-        A a5 = (A) PAActiveObject.newActive(A.class.getName(), null);
+        A a1 = PAActiveObject.newActive(A.class, null);
+        A a2 = PAActiveObject.newActive(A.class, null);
+        A a3 = PAActiveObject.newActive(A.class, null);
+        A a4 = PAActiveObject.newActive(A.class, null);
+        A a5 = PAActiveObject.newActive(A.class, null);
 
         a1.addRef(a2);
         a2.addRef(a3);

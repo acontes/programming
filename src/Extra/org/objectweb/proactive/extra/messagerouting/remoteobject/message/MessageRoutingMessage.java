@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,6 +23,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
@@ -31,15 +35,17 @@
  */
 package org.objectweb.proactive.extra.messagerouting.remoteobject.message;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.net.URI;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.remoteobject.http.util.HttpMarshaller;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.messagerouting.client.Agent;
 import org.objectweb.proactive.extra.messagerouting.exceptions.MessageRoutingException;
+import org.objectweb.proactive.extra.messagerouting.remoteobject.util.PamrMarshaller;
 
 
 /** Any kind of routed message.
@@ -69,19 +75,29 @@ public abstract class MessageRoutingMessage implements Serializable {
      */
     protected Object returnedObject;
 
+    /** serialization
+     *  This field is transient - it has significance only on this host
+     * */
+    private transient final PamrMarshaller marshaller;
+
     protected boolean isAsynchronous = false;
 
     public MessageRoutingMessage(URI uri, Agent agent) {
         this.uri = uri;
         this.agent = agent;
         this.returnedObject = null;
+        // get the runtime URL
+        // TODO - maybe properly synchronize, to make sure that
+        // MessageRoutingROF.createRemoteObject() for a PART was called before
+        String runtimeUrl = ProActiveRuntimeImpl.getProActiveRuntime().getURL();
+        this.marshaller = new PamrMarshaller(runtimeUrl);
     }
 
     /**
      * Processes the message.
      * @return an object as a result of the execution of the message
      */
-    public abstract Object processMessage() throws Exception;
+    public abstract Object processMessage();
 
     /** Send the message to its recipient using the local agent
      * 
@@ -89,14 +105,20 @@ public abstract class MessageRoutingMessage implements Serializable {
      */
     public final void send() throws MessageRoutingException {
         try {
-            byte[] bytes = HttpMarshaller.marshallObject(this);
+            byte[] bytes = this.marshaller.marshallObject(this);
             byte[] response = agent.sendMsg(this.uri, bytes, isAsynchronous);
             if (!isAsynchronous) {
-                this.returnedObject = HttpMarshaller.unmarshallObject(response);
+                this.returnedObject = this.marshaller.unmarshallObject(response);
             }
         } catch (MessageRoutingException e) {
             logger.error("Failed to send message to " + this.uri, e);
             throw e;
+        } catch (IOException e) {
+            logger.error("Failed to serialize this message, reason:" + e.getMessage(), e);
+            throw new MessageRoutingException(e);
+        } catch (ClassNotFoundException e) {
+            logger.error("Failed to deserialize the reply for this message, reason:" + e.getMessage(), e);
+            throw new MessageRoutingException(e);
         }
     }
 }

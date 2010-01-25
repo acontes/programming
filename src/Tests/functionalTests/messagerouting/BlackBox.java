@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,10 +23,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
+ *
  *  Initial developer(s):               The ActiveEon Team
  *                        http://www.activeeon.com/
  *  Contributor(s):
- *
  *
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
@@ -34,7 +37,9 @@ package functionalTests.messagerouting;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.Socket;
 
+import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.extra.messagerouting.client.Tunnel;
 import org.objectweb.proactive.extra.messagerouting.router.Router;
@@ -52,6 +57,13 @@ public class BlackBox extends FunctionalTest {
         RouterConfig config = new RouterConfig();
         this.router = Router.createAndStart(config);
 
-        this.tunnel = new Tunnel(InetAddress.getLocalHost(), this.router.getPort());
+        Socket s = new Socket(InetAddress.getLocalHost(), this.router.getPort());
+        this.tunnel = new Tunnel(s);
+    }
+
+    @After
+    public void afterBlackBox() {
+        this.tunnel.shutdown();
+        this.router.stop();
     }
 }

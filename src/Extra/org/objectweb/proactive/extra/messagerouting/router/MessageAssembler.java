@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,10 +23,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
+ *
  *  Initial developer(s):               The ActiveEon Team
  *                        http://www.activeeon.com/
  *  Contributor(s):
- *
  *
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
@@ -38,6 +41,7 @@ import java.nio.channels.SocketChannel;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.messagerouting.exceptions.MalformedMessageException;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.Message;
 
 
@@ -81,7 +85,7 @@ public class MessageAssembler {
         this.lengthAndProto = null;
     }
 
-    synchronized public void pushBuffer(ByteBuffer buffer) throws IllegalStateException {
+    synchronized public void pushBuffer(ByteBuffer buffer) throws MalformedMessageException {
 
         while (buffer.remaining() != 0) {
 
@@ -105,10 +109,10 @@ public class MessageAssembler {
                     if (proto != Message.PROTOV1) {
                         logger.error("Invalid protocol ID received from " + attachment + ": expected=" +
                             Message.PROTOV1 + " received=" + proto);
-                        throw new IllegalStateException("Invalid protocol ID");
+                        throw new MalformedMessageException("Invalid protocol ID");
                     } else if (l < Message.Field.getTotalOffset()) {
                         logger.error("Invalid message length received from " + attachment + ": " + l);
-                        throw new IllegalStateException("Invalid message length");
+                        throw new MalformedMessageException("Invalid message length");
                     }
 
                     // Allocate a buffer for the reassembled message

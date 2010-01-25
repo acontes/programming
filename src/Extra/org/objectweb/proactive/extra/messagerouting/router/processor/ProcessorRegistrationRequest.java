@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,10 +23,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
+ *
  *  Initial developer(s):               The ActiveEon Team
  *                        http://www.activeeon.com/
  *  Contributor(s):
- *
  *
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
@@ -36,7 +39,9 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.objectweb.proactive.extra.messagerouting.exceptions.MalformedMessageException;
 import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
+import org.objectweb.proactive.extra.messagerouting.protocol.message.DataMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.ErrorMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.Message;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.RegistrationMessage;
@@ -55,35 +60,57 @@ import org.objectweb.proactive.extra.messagerouting.router.RouterImpl;
  */
 public class ProcessorRegistrationRequest extends Processor {
 
-    final private RegistrationRequestMessage message;
     final private Attachment attachment;
-    final private RouterImpl router;
 
     public ProcessorRegistrationRequest(ByteBuffer messageAsByteBuffer, Attachment attachment,
             RouterImpl router) {
+        super(messageAsByteBuffer, router);
         this.attachment = attachment;
-        this.router = router;
-
-        Message tmpMsg = Message.constructMessage(messageAsByteBuffer.array(), 0);
-        this.message = (RegistrationRequestMessage) tmpMsg;
     }
 
-    public void process() {
-        AgentID agentId = this.message.getAgentID();
-        if (agentId == null) {
-            connection();
-        } else {
-            reconnection();
+    public void process() throws MalformedMessageException {
+        // Message.constructMessage guarantees that the cast is safe. If the message is not a RegistrationRequestMessage,
+        // a @{link MalformedMessageException} will be thrown
+        try {
+            RegistrationRequestMessage message = (RegistrationRequestMessage) Message.constructMessage(
+                    this.rawMessage.array(), 0);
+            AgentID agentId = message.getAgentID();
+            if (agentId == null) {
+                connection(message);
+            } else {
+                reconnection(message);
+            }
+        } catch (MalformedMessageException e) {
+            // try to see who sent it
+            try {
+                AgentID sender = RegistrationMessage.readAgentID(this.rawMessage.array(), 0);
+                throw new MalformedMessageException(e, sender);
+            } catch (MalformedMessageException e1) {
+                // cannot get the sender
+                throw new MalformedMessageException(e, true);
+            }
         }
     }
 
     /* Generate and unique AgentID and send the registration reply
      * in best effort. If succeeded, add the new client to the router
      */
-    private void connection() {
+    private void connection(RegistrationRequestMessage message) {
+        long routerId = message.getRouterID();
+        if (routerId != 0) {
+            logger.warn("Invalid connection request. router ID must be 0. Remote endpoint is: " +
+                attachment.getRemoteEndpointName());
+
+            // Cannot contact the client yet, disconnect it !
+            // Since we disconnect the client, we must free the resources
+            this.attachment.dtor();
+            return;
+        }
+
         AgentID agentId = AgentIdGenerator.getId();
 
-        RegistrationMessage reply = new RegistrationReplyMessage(agentId, this.message.getMessageID());
+        RegistrationMessage reply = new RegistrationReplyMessage(agentId, message.getMessageID(), this.router
+                .getId());
 
         Client client = new Client(attachment, agentId);
         boolean resp = this.sendReply(client, reply);
@@ -97,29 +124,30 @@ public class ProcessorRegistrationRequest extends Processor {
      * If succeeded, update the attachment in the client, and
      * flush the pending messages.
      */
-    private void reconnection() {
-        // Check if the client is know
+    private void reconnection(RegistrationRequestMessage message) {
         AgentID agentId = message.getAgentID();
-        Client client = router.getClient(agentId);
 
+        // Check that it is not an "old" client
+        if (message.getRouterID() != this.router.getId()) {
+            logger.warn("AgentId " + agentId +
+                " asked to reconnect but the router IDs do not match. Remote endpoint is: " +
+                attachment.getRemoteEndpointName());
+            notifyInvalidAgent(message, agentId, ErrorType.ERR_INVALID_ROUTER_ID);
+            return;
+        }
+
+        // Check if the client is know
+        Client client = router.getClient(agentId);
         if (client == null) {
-            // Send an ERR_ message (best effort)
             logger.warn("AgentId " + agentId +
                 " asked to reconnect but is not known by this router. Remote endpoint is: " +
-                attachment.getRemoteEndpoint());
-
-            ErrorMessage errMessage = new ErrorMessage(ErrorType.ERR_INVALID_AGENT_ID, agentId, agentId,
-                this.message.getMessageID());
-            try {
-                attachment.send(ByteBuffer.wrap(errMessage.toByteArray()));
-            } catch (IOException e) {
-                logger.info("Failed to notify the client that invalid agent has been advertised");
-            }
+                attachment.getRemoteEndpointName());
+            notifyInvalidAgent(message, agentId, ErrorType.ERR_INVALID_AGENT_ID);
         } else {
             // Acknowledge the registration
             client.setAttachment(attachment);
-            RegistrationReplyMessage reply = new RegistrationReplyMessage(agentId, this.message
-                    .getMessageID());
+            RegistrationReplyMessage reply = new RegistrationReplyMessage(agentId, message.getMessageID(),
+                this.router.getId());
 
             boolean resp = this.sendReply(client, reply);
             if (resp) {
@@ -129,6 +157,21 @@ public class ProcessorRegistrationRequest extends Processor {
                 // Drop the attachment
             }
         }
+    }
+
+    private void notifyInvalidAgent(RegistrationRequestMessage message, AgentID agentId, ErrorType errorCode) {
+
+        // Send an ERR_ message (best effort)
+        ErrorMessage errMessage = new ErrorMessage(errorCode, agentId, agentId, message.getMessageID());
+
+        try {
+            attachment.send(ByteBuffer.wrap(errMessage.toByteArray()));
+        } catch (IOException e) {
+            logger.info("Failed to notify the client that invalid agent has been advertised");
+        }
+
+        // Since we disconnect the client, we must free the resources
+        this.attachment.dtor();
     }
 
     /* Send the registration reply to the client (best effort)
@@ -153,5 +196,4 @@ public class ProcessorRegistrationRequest extends Processor {
             return new AgentID(generator.getAndIncrement());
         }
     }
-
 }

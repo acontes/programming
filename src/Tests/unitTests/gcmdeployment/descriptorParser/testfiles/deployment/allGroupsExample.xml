@@ -2,7 +2,7 @@
 <GCMDeployment 
 	xmlns="urn:gcm:deployment:1.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="urn:gcm:deployment:1.0 http://proactive.inria.fr/schemas/gcm/1.0/ExtensionSchemas.xsd">
+	xsi:schemaLocation="urn:gcm:deployment:1.0 ../../../../../../../src/Extensions/org/objectweb/proactive/extensions/gcmdeployment/schema/ExtensionSchemas.xsd">
 
 <!-- http://proactive.inria.fr/schemas/gcm/1.0/ExtensionSchemas.xsd -->
 	<environment>
@@ -55,19 +55,6 @@
 				<directory>"jobs/job_datas</directory>
 				<stderr>jobs/jobtrace_err.txt</stderr>
 			</gridEngineGroup>
-
-			<gLiteGroup id="gliteGroup"  jobType="parallel"  virtualOrganisation="proactive" retryCount="3" executable="/bin/echo" 
-						 javaHome="/grid_mnt/home/pro159/java" proactiveHome="/grid_mnt/home/pro159/ProActive" nodesNumber="3" >
-				<rank>-other.GlueCEStateEstimatedResponseTime</rank>
-				<stdout>stdout.log</stdout>
-				<stderr>error.log</stderr>
-				<outputSandbox>
-				   stdout.log
-				   error.log
-				</outputSandbox>
-				<requirements>other.GlueCEUniqueID=="grid10.lal.in2p3.fr:2119/jobmanager-pbs-sdj</requirements>
-				<arguments>\"Hello World\"</arguments>
-			</gLiteGroup>
 
 <!-- 		<globusGroup hostname="globus_frontend" id="globusgroup" bookedNodesAccess="rsh">
 				<count>8</count>
@@ -131,6 +118,12 @@
 				</taskRepartition>
 			</loadLevelerGroup>
 
+			<mpiGroup
+                 id="LAN_MPI"
+                 hostList="host10 host11 host12 host13"
+                 distributionPath="/usr/bin/lam"
+                 commandPath="./scripts/gcmdeployment/executable_mpi_lam.sh">
+             </mpiGroup>
 
 			<loadLevelerGroup id="loadlevelergroup4" bookedNodesAccess="rsh">
 				<scriptPath base="root" relpath="/usr/local/loadleveler/scripts/jobscript.sh" />

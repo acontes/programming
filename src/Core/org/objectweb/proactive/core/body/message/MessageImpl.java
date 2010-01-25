@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +22,9 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -91,6 +95,7 @@ public class MessageImpl implements Message, java.io.Serializable {
      * @param sequenceNumber the unique sequence number of this message
      * @param isOneWay <code>true</code> if oneWay
      * @param methodName the method name of the method call
+     * @param tags container of all tags for this message
      */
     public MessageImpl(UniqueID sourceID, long sequenceNumber, boolean isOneWay, String methodName,
             MessageTags tags) {
@@ -168,6 +173,12 @@ public class MessageImpl implements Message, java.io.Serializable {
     }
 
     public MessageTags getTags() {
+        if (this.tags == null) {
+            // Check if there is already a tag container attached on this message
+            // otherwise, create it.
+            // TODO : use the Metaobject Factory to create it instead of a direct creation
+            this.tags = new MessageTags();
+        }
         return tags;
     }
 }

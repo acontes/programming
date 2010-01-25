@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,11 +23,15 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
  * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 //@snippet-start Caller_1
 package org.objectweb.proactive.examples.documentation.activeobjectconcepts;
@@ -75,7 +80,7 @@ public class Caller {
             System.out.println("===> Asynchronous Call");
             //@snippet-resume Caller_1
             Object[] params = new Object[] { new IntWrapper(26), "Charlie" };
-            Worker charlie = (Worker) PAActiveObject.newActive(Worker.class.getName(), params);
+            Worker charlie = PAActiveObject.newActive(Worker.class, params);
             //@snippet-break Caller_1
             charlie.display();
             //@snippet-resume Caller_1
@@ -101,7 +106,7 @@ public class Caller {
         try {
             //@snippet-start Continuation_1
             Value v = new Value();
-            Worker worker = (Worker) PAActiveObject.newActive(Worker.class.getName(), null);
+            Worker worker = PAActiveObject.newActive(Worker.class, null);
             Value v1 = worker.foo(); //v1 is a future
             Value v2 = v.bar(v1, 1); //v1 is passed as parameter
             //@snippet-end Continuation_1
@@ -128,7 +133,7 @@ public class Caller {
             //@snippet-end Good_Practice_2
 
             //@snippet-start Good_Practice_3
-            Worker ao = (Worker) PAActiveObject.newActive(Worker.class.getName(), null);
+            Worker ao = PAActiveObject.newActive(Worker.class, null);
             IntWrapper future = ao.getAge();
             String str;
             try {

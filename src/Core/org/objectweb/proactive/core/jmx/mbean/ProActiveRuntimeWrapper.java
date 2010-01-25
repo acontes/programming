@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +22,9 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -48,6 +52,7 @@ import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.debug.dconnection.DebuggerConnection;
 import org.objectweb.proactive.core.debug.dconnection.DebuggerInformation;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
+import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
@@ -79,6 +84,8 @@ public class ProActiveRuntimeWrapper extends NotificationBroadcasterSupport impl
 
     /** Used by the JMX notifications */
     private long counter = 0;
+
+    private boolean eclipseDebugger = false;
 
     public ProActiveRuntimeWrapper() {
 
@@ -234,10 +241,22 @@ public class ProActiveRuntimeWrapper extends NotificationBroadcasterSupport impl
     }
 
     /**
+     * @see org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean#updateDebugInfo()
+     */
+    public void updateDebugInfo() {
+        DebuggerConnection.getDebuggerConnection().update();
+    }
+
+    /**
      * @see org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean#removeDebugger()
      */
     public void removeDebugger() {
         DebuggerConnection.getDebuggerConnection().removeDebugger();
+    }
+
+    public void removeEclipseDebugger() {
+        eclipseDebugger = false;
+        sendNotification(NotificationType.disconnectDebugger);
     }
 
     /**
@@ -252,5 +271,23 @@ public class ProActiveRuntimeWrapper extends NotificationBroadcasterSupport impl
      */
     public boolean canBeDebugged() {
         return System.getProperty("debugID") != null;
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean#getDebugID()
+     */
+    public String getDebugID() {
+        return System.getProperty("debugID");
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean#isExtendedDebugger()
+     */
+    public boolean isExtendedDebugger() {
+        return eclipseDebugger;
+    }
+
+    public void setExtendedDebugger(boolean extendedDebugger) {
+        this.eclipseDebugger = extendedDebugger;
     }
 }

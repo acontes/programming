@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +22,9 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -34,7 +38,6 @@ package org.objectweb.proactive.core.body.future;
 import org.objectweb.proactive.core.ProActiveTimeoutException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.body.tags.MessageTags;
 
 
 /**
@@ -75,6 +78,12 @@ public interface Future extends LocalFuture {
      * Returns the object wrapped by this future or throw the exception. This call is blocking on the future update.
      */
     public Object getResult();
+
+    /**
+     * Returns the object wrapped by this future or throw the exception. This call is blocking on the future update.
+     * @throws ProActiveTimeoutException if the timeout expires
+     */
+    public Object getResult(long timeout) throws ProActiveTimeoutException;
 
     /**
      * Get the encapsulation of the result and the potential exception.
@@ -129,15 +138,4 @@ public interface Future extends LocalFuture {
      * @param mode true is the copyMode is set
      */
     public void setCopyMode(boolean mode);
-    
-    //cruz
-    public void setMethodName(String n);
-    public String getMethodName();
-    public void setParentMethodName(String n);
-    public String getParentMethodName();
-    public UniqueID getSenderID();
-    public void setTags(MessageTags m);
-    public MessageTags getTags();
-    //--cruz
-    
 }

@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +22,9 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -58,11 +62,15 @@ public class NQueens implements Serializable {
         NQueens nq = new NQueens();
 
         if (args.length != 5) {
-            nq.solve(16, 14, 5, NQueens.class.getResource("../GCMEnvironmentApplication.xml").getPath(),
-                    "local");
+            System.out.println("Wrong number of arguments");
+            System.out.println("[Usage] org.objectweb.proactive.extensions.calcium.examples.nqueens.NQueens"
+                + " descriptor virtualnode boardSize solvableSize times");
+            System.exit(-1);
+            //            nq.solve(16, 14, 5, NQueens.class.getResource("GCMEnvironmentApplication.xml").getPath(),
+            //                    "local");
         } else {
-            nq.solve(Integer.parseInt(args[0]), Integer.parseInt(args[1]), Integer.parseInt(args[2]),
-                    args[3], args[4]);
+            nq.solve(Integer.parseInt(args[2]), Integer.parseInt(args[3]), Integer.parseInt(args[4]),
+                    args[0], args[1]);
         }
 
         System.exit(0);

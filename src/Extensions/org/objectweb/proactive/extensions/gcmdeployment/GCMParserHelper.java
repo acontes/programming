@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +22,9 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -46,6 +50,10 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.TechnicalServicesProperties;
+import org.objectweb.proactive.extensions.dataspaces.api.PADataSpaces;
+import org.objectweb.proactive.extensions.dataspaces.core.InputOutputSpaceConfiguration;
+import org.objectweb.proactive.extensions.dataspaces.core.SpaceType;
+import org.objectweb.proactive.extensions.dataspaces.exceptions.ConfigurationException;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -237,6 +245,35 @@ public class GCMParserHelper implements GCMParserConstants {
         return new TechnicalServicesProperties(techServicesMap);
     }
 
+    public static InputOutputSpaceConfiguration parseInputOuputSpaceConfiguration(XPath xpath,
+            Node spaceNode, SpaceType type) throws XPathExpressionException {
+        String name = getAttributeValue(spaceNode, "id");
+        if (name == null) {
+            // when there is no id - it is default input/output
+            name = PADataSpaces.DEFAULT_IN_OUT_NAME;
+        }
+
+        // Required: remote access
+        Node remoteAccessNode = (Node) xpath.evaluate("app:remoteAccess", spaceNode, XPathConstants.NODE);
+        final String url = getAttributeValue(remoteAccessNode, "url");
+
+        // Optional: location
+        Node locationNode = (Node) xpath.evaluate("app:location", spaceNode, XPathConstants.NODE);
+        String hostname = null;
+        String path = null;
+        if (locationNode != null) {
+            hostname = getAttributeValue(locationNode, "hostname");
+            path = getAttributeValue(locationNode, "path");
+        }
+
+        try {
+            return InputOutputSpaceConfiguration.createConfiguration(url, path, hostname, name, type);
+        } catch (ConfigurationException e) {
+            // it should not happen with proper schema
+            throw new RuntimeException(e);
+        }
+    }
+
     public static DocumentBuilder getNewDocumentBuilder(DocumentBuilderFactory domFactory) {
         return getNewDocumentBuilder(domFactory, null);
     }
@@ -259,5 +296,4 @@ public class GCMParserHelper implements GCMParserConstants {
     public static String elementInNS(String prefixNS, String element) {
         return prefixNS + ":" + element;
     }
-
 }

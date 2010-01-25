@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,12 +23,15 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
+ *  Contributor(s): ActiveEon Team - http://www.activeeon.com
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package org.objectweb.proactive.core.body;
 
@@ -174,7 +178,12 @@ public class HalfBody extends AbstractBody {
         return this.replyReceiver.receiveReply(reply, this, getFuturePool());
     }
 
+    @Deprecated
     public void setImmediateService(String methodName) {
+        setImmediateService(methodName, false);
+    }
+
+    public void setImmediateService(String methodName, boolean uniqueThread) {
         throw new HalfBodyException();
     }
 
@@ -182,7 +191,7 @@ public class HalfBody extends AbstractBody {
         throw new HalfBodyException();
     }
 
-    public void setImmediateService(String methodName, Class<?>[] parametersTypes) {
+    public void setImmediateService(String methodName, Class<?>[] parametersTypes, boolean uniqueThread) {
         throw new HalfBodyException();
     }
 
@@ -265,7 +274,7 @@ public class HalfBody extends AbstractBody {
 
             // Create DSI MessageTag
             MessageTags tags = null;
-            if (PAProperties.PA_TAG_DSI.isTrue()) {
+            if (PAProperties.PA_TAG_DSF.isTrue()) {
                 tags = messageTagsFactory.newMessageTags();
                 tags.addTag(new DsiTag(bodyID, sequenceID));
             }
@@ -277,18 +286,8 @@ public class HalfBody extends AbstractBody {
             if (methodCall.getComponentMetadata() != null) {
                 request = new ComponentRequestImpl(request);
             }
-            
-            // Registers the Future in the local FuturePool, which will be updated when the reply arrives.
             if (future != null) {
                 future.setID(sequenceID);
-                //TO DELETE: add the methodName to the future
-                future.setMethodName(methodCall.getName());
-                //TO DELETE: now I would need to add the name of the request that is currently being served
-                //future.setParentMethodName(LocalBodyStore.getInstance().getContext().getCurrentRequest().getMethodName());
-                //TO CONSERVER: adds the tags of the Request to the local Future.
-                //This way it's possible to know which method is the Future waiting for, and generate
-                //the notification when the final reply arrives.
-                future.setTags(tags);
                 this.futures.receiveFuture(future);
             }
 

@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +22,9 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -70,7 +74,26 @@ public class PAFuture {
      * i.e. if result of future is a future too, <CODE>getFutureValue</CODE> is called again on
      * this result, and so on.
      */
-    public static Object getFutureValue(Object future) {
+    public static <T> T getFutureValue(T future) {
+        try {
+            return getFutureValue(future, 0);
+        } catch (ProActiveTimeoutException e) {
+            //Exception above should never be thrown since timeout=0 means no timeout
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Return the object contains by the future (ie its target). If parameter is not a future, it is
+     * returned. A wait-by-necessity occurs if future is not available. This method is recursive,
+     * i.e. if result of future is a future too, <CODE>getFutureValue</CODE> is called again on
+     * this result, and so on.
+     * @param timeout to wait in ms
+     * @throws ProActiveException if the timeout expire
+     */
+    public static <T> T getFutureValue(T future, long timeout) throws ProActiveTimeoutException {
+        TimeoutAccounter ta = TimeoutAccounter.getAccounter(timeout);
         while (true) {
             // If the object is not reified, it cannot be a future
             if ((MOP.isReifiedObject(future)) == false) {
@@ -82,7 +105,7 @@ public class PAFuture {
                 if (!(theProxy instanceof Future)) {
                     return future;
                 } else {
-                    future = ((Future) theProxy).getResult();
+                    future = (T) ((Future) theProxy).getResult(ta.getRemainingTimeout());
                 }
             }
         }
@@ -164,6 +187,53 @@ public class PAFuture {
             } else {
                 ((Future) theProxy).waitFor(timeout);
             }
+        }
+    }
+
+    /**
+     * Blocks the calling thread until the object <code>future</code> is available.
+     * <code>future</code> must be the result object of an asynchronous call. Usually the the wait
+     * by necessity model take care of blocking the caller thread asking for a result not yet
+     * available. This method allows to block before the result is first used.
+     * 
+     * @param future
+     *            object to wait for
+     * @param recursive if true, wait until the updating value is not a future (i.e. if the updating 
+     * value is a future, wait for this future).
+     */
+    public static void waitFor(Object future, boolean recursive) {
+        if (recursive) {
+            // recursive version
+            getFutureValue(future);
+        } else {
+            // one step version
+            waitFor(future);
+        }
+    }
+
+    /**
+     * Blocks the calling thread until the object <code>future</code> is available or until the
+     * timeout expires. <code>future</code> must be the result object of an asynchronous call.
+     * Usually the the wait by necessity model take care of blocking the caller thread asking for a
+     * result not yet available. This method allows to block before the result is first used.
+     * 
+     * @param future
+     *            object to wait for
+     * @param timeout
+     *            to wait in ms
+     * @param recursive if true, wait until the updating value is not a future (i.e. if the updating 
+     * value is a future, wait for this future).
+     * @throws ProActiveException
+     *             if the timeout expire
+     */
+    public static void waitFor(Object future, long timeout, boolean recursive)
+            throws ProActiveTimeoutException {
+        if (recursive) {
+            // recursive version
+            getFutureValue(future, timeout);
+        } else {
+            // one step version
+            waitFor(future, timeout);
         }
     }
 
@@ -251,9 +321,9 @@ public class PAFuture {
 
     /**
      * Blocks the calling thread until one of the futures in the collection is available or until the
-     * timeout expires. 
+     * timeout expires.
      *
-     *  <b>Warning</b> : this method must be called by either any active object or by the thread that 
+     *  <b>Warning</b> : this method must be called by either any active object or by the thread that
      *  performed the method calls corresponding to the futures in the collection.
      *
      *

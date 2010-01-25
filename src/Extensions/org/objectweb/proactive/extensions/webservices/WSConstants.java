@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,6 +23,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
@@ -31,42 +35,28 @@
  */
 package org.objectweb.proactive.extensions.webservices;
 
-import java.lang.reflect.Array;
-import java.math.BigDecimal;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.GregorianCalendar;
-import java.util.Hashtable;
-import java.util.Map;
 import java.util.Vector;
-
-import org.apache.soap.util.xml.QName;
-import org.objectweb.proactive.extensions.webservices.soap.ProActiveProvider;
 
 
 /**
- * @author The ProActive Team
  * Utility constants for deploying active objects and components as Web Services
+ *
+ * @author The ProActive Team
  */
 public class WSConstants {
 
-    public static final String NAMESPACE = "/proactive/";
-    public static final String SERV_WSDL = NAMESPACE + "wsdl";
-    public static final String SERV_RPC_ROUTER = NAMESPACE + "/servlet/rpcrouter";
-    public static final String SERV_MESSAGE_ROUTER = NAMESPACE + "messagerouter";
+    public static final String SERVICES_PATH = "proactive/services/";
+    public static final String SERVLET_PATH = "/services/*";
 
-    public static final String PROACTIVE_PROVIDER = ProActiveProvider.class.getName();
-    public static final String PROACTIVE_STUB = "Stub";
-    public static final String WSDL_FILE = "Wsdl";
-    public static final String DOCUMENTATION = "ProActive Active Object";
-    public static final String COMPONENT_INTERFACE = "Compoment Interface";
-    public static final String URL_PUBLICATION = "URL";
     public static final Vector<String> disallowedMethods = new Vector<String>();
 
     static {
+        // Object methods
         disallowedMethods.addElement("equals");
         disallowedMethods.addElement("toString");
         disallowedMethods.addElement("runActivity");
+        disallowedMethods.addElement("initActivity");
+        disallowedMethods.addElement("endActivity");
         disallowedMethods.addElement("setProxy");
         disallowedMethods.addElement("getProxy");
         disallowedMethods.addElement("wait");
@@ -74,7 +64,8 @@ public class WSConstants {
         disallowedMethods.addElement("notifyAll");
         disallowedMethods.addElement("getClass");
         disallowedMethods.addElement("hashCode");
-        // component methods
+
+        // Component methods
         disallowedMethods.addElement("setFcItfName");
         disallowedMethods.addElement("isFcInternalItf");
         disallowedMethods.addElement("setFcOwner");
@@ -90,41 +81,6 @@ public class WSConstants {
         disallowedMethods.addElement("getFcItfImpl");
         disallowedMethods.addElement("setFcType");
         disallowedMethods.addElement("getFcItfImpl");
-        disallowedMethods.addElement("getFcItfImpl");
-    }
-
-    /* A vector containing all supported types by Apache Soap */
-    protected static Vector<Class<?>> supportedTypes = new Vector<Class<?>>();
-
-    static {
-        supportedTypes.addElement(String.class);
-        supportedTypes.addElement(Boolean.class);
-        supportedTypes.addElement(Boolean.TYPE);
-        supportedTypes.addElement(Double.class);
-        supportedTypes.addElement(Double.TYPE);
-        supportedTypes.addElement(Long.class);
-        supportedTypes.addElement(Long.TYPE);
-        supportedTypes.addElement(Float.class);
-        supportedTypes.addElement(Float.TYPE);
-        supportedTypes.addElement(Integer.class);
-        supportedTypes.addElement(Integer.TYPE);
-        supportedTypes.addElement(Short.class);
-        supportedTypes.addElement(Byte.class);
-        supportedTypes.addElement(Byte.TYPE);
-        supportedTypes.addElement(BigDecimal.class);
-        supportedTypes.addElement(GregorianCalendar.class);
-        supportedTypes.addElement(Date.class);
-        supportedTypes.addElement(QName.class);
-        supportedTypes.addElement(Array.newInstance(Byte.TYPE, 0).getClass());
-        supportedTypes.addElement(Array.newInstance(Boolean.TYPE, 0).getClass());
-        supportedTypes.addElement(Array.newInstance(Double.TYPE, 0).getClass());
-        supportedTypes.addElement(Array.newInstance(Long.TYPE, 0).getClass());
-        supportedTypes.addElement(Array.newInstance(Float.TYPE, 0).getClass());
-        supportedTypes.addElement(Array.newInstance(Integer.TYPE, 0).getClass());
-        supportedTypes.addElement(Array.newInstance(Object.class, 0).getClass());
-        supportedTypes.addElement(Vector.class);
-        supportedTypes.addElement(Hashtable.class);
-        supportedTypes.addElement(Map.class);
-        supportedTypes.addElement(Enumeration.class);
+        disallowedMethods.addElement("setFcItfImpl");
     }
 }

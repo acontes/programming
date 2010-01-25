@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,10 +23,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
+ *
  *  Initial developer(s):               The ActiveEon Team
  *                        http://www.activeeon.com/
  *  Contributor(s):
- *
  *
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
@@ -36,6 +39,7 @@ import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.Constructor;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -55,14 +59,20 @@ import org.objectweb.proactive.core.util.Sleeper;
 import org.objectweb.proactive.core.util.SweetCountDownLatch;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.messagerouting.exceptions.MalformedMessageException;
 import org.objectweb.proactive.extra.messagerouting.exceptions.MessageRoutingException;
 import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.DataReplyMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.DataRequestMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.ErrorMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.Message;
+import org.objectweb.proactive.extra.messagerouting.protocol.message.RegistrationMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.RegistrationReplyMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.RegistrationRequestMessage;
+import org.objectweb.proactive.extra.messagerouting.protocol.message.ErrorMessage.ErrorType;
+import org.objectweb.proactive.extra.messagerouting.protocol.message.Message.MessageType;
+import org.objectweb.proactive.extra.messagerouting.remoteobject.util.socketfactory.MessageRoutingSocketFactorySPI;
+import org.objectweb.proactive.extra.messagerouting.router.Router;
 
 
 /**
@@ -82,8 +92,10 @@ public class AgentImpl implements Agent, AgentImplMBean {
     /** Port of the router */
     final private int routerPort;
 
-    /** Local AgentID, set after initialization. **/
+    /** Local AgentID, set after initialization. */
     private AgentID agentID = null;
+    /** Remote router ID, set after initialization */
+    private long routerID = 0;
     /** Request ID Generator **/
     private final AtomicLong requestIDGenerator;
 
@@ -101,6 +113,9 @@ public class AgentImpl implements Agent, AgentImplMBean {
     /** List of Valves that will process each message */
     final private List<Valve> valves;
 
+    /** The socket factory to use to create the Tunnel */
+    final private MessageRoutingSocketFactorySPI socketFactory;
+
     /**
      * Create a routing agent
      * 
@@ -116,8 +131,9 @@ public class AgentImpl implements Agent, AgentImplMBean {
      *             If the router cannot be contacted.
      */
     public AgentImpl(InetAddress routerAddr, int routerPort,
-            Class<? extends MessageHandler> messageHandlerClass) throws ProActiveException {
-        this(routerAddr, routerPort, messageHandlerClass, new ArrayList<Valve>());
+            Class<? extends MessageHandler> messageHandlerClass, MessageRoutingSocketFactorySPI socketFactory)
+            throws ProActiveException {
+        this(routerAddr, routerPort, messageHandlerClass, new ArrayList<Valve>(), socketFactory);
     }
 
     /**
@@ -138,14 +154,15 @@ public class AgentImpl implements Agent, AgentImplMBean {
      *             If the router cannot be contacted.
      */
     public AgentImpl(InetAddress routerAddr, int routerPort,
-            Class<? extends MessageHandler> messageHandlerClass, List<Valve> valves)
-            throws ProActiveException {
+            Class<? extends MessageHandler> messageHandlerClass, List<Valve> valves,
+            MessageRoutingSocketFactorySPI socketFactory) throws ProActiveException {
         this.routerAddr = routerAddr;
         this.routerPort = routerPort;
         this.valves = valves;
         this.mailboxes = new WaitingRoom();
         this.requestIDGenerator = new AtomicLong(0);
         this.failedTunnels = new LinkedList<Tunnel>();
+        this.socketFactory = socketFactory;
 
         try {
             Constructor<? extends MessageHandler> mhConstructor;
@@ -199,15 +216,49 @@ public class AgentImpl implements Agent, AgentImplMBean {
      * on the first call. If the agent cannot reconnect to the router, this.t is
      * set to null.
      * 
-     * <b>This method must only be called by getNewTunnel</b>
+     * <b>This method must only be called by getTunnel</b>
      */
     private void __reconnectToRouter() {
         try {
-            Tunnel tunnel = new Tunnel(this.routerAddr, this.routerPort);
+            Socket s = socketFactory.createSocket(this.routerAddr.getHostAddress(), this.routerPort);
+            Tunnel tunnel = new Tunnel(s);
 
+            // start router handshake
+            try {
+                routerHandshake(tunnel);
+            } catch (RouterHandshakeException e) {
+                logger.error(
+                        "Failed to reconnect to the router: the router handshake procedure failed. Reason: " +
+                            e.getMessage(), e);
+                tunnel.shutdown();
+            }
+            this.t = tunnel;
+        } catch (IOException exception) {
+            logger.debug("Failed to reconnect to the router", exception);
+            this.t = null;
+        }
+    }
+
+    /**
+     * This is the initial handshake process between the {@link Agent} and the {@link Router}
+     * <ul>
+     * 	<li> The Agent will send a {@link MessageType#REGISTRATION_REQUEST} to the Router
+     *  <li> On first connection, the {@link RegistrationMessage.Field#AGENT_ID} is set to -1 and the
+     *  	{@link RegistrationMessage.Field#ROUTER_ID} field is set to zero. It is the responsibility of the router to fill them.</li>
+     *  <li> The Router will reply with a {@link MessageType#REGISTRATION_REPLY} message</li>
+     *  <li> On first connection, the Agent initializes its {@link RegistrationMessage.Field#AGENT_ID} and {@link RegistrationMessage.Field#ROUTER_ID}
+     *  	fields according to the Router reply </li>
+     *  <li> For subsequent reconnections, the Agent verifies that its {@link RegistrationMessage.Field#AGENT_ID} and {@link RegistrationMessage.Field#ROUTER_ID} fields
+     *  	match the ones sent by the Router in the {@link MessageType#REGISTRATION_REPLY} message.</li>
+     * </ul>
+     * @throws IOException
+     */
+    private void routerHandshake(Tunnel tunnel) throws RouterHandshakeException, IOException {
+
+        try {
             // if call for the first time then agentID is null
             RegistrationRequestMessage reg = new RegistrationRequestMessage(this.agentID, requestIDGenerator
-                    .getAndIncrement());
+                    .getAndIncrement(), routerID);
             tunnel.write(reg.toByteArray());
 
             // Waiting the router response
@@ -215,26 +266,54 @@ public class AgentImpl implements Agent, AgentImplMBean {
             Message replyMsg = Message.constructMessage(reply, 0);
 
             if (!(replyMsg instanceof RegistrationReplyMessage)) {
-                throw new IOException("Invalid router response: expected a " +
-                    RegistrationReplyMessage.class.getName() + " message but got " +
-                    replyMsg.getClass().getName());
+                if (replyMsg instanceof ErrorMessage) {
+                    ErrorMessage em = (ErrorMessage) replyMsg;
+                    if (em.getErrorType() == ErrorType.ERR_INVALID_ROUTER_ID) {
+                        throw new RouterHandshakeException("The router has been restarted. Disconnecting...");
+                    } else if (em.getErrorType() == ErrorType.ERR_MALFORMED_MESSAGE) {
+                        throw new RouterHandshakeException(
+                            "The router received a corrupted version of the original message.");
+                    }
+                } else {
+                    throw new RouterHandshakeException("Invalid router response: expected a " +
+                        MessageType.REGISTRATION_REPLY.toString() + " message but got " +
+                        replyMsg.getType().toString() + " message");
+                }
             }
 
-            AgentID replyAgentID = ((RegistrationReplyMessage) replyMsg).getAgentID();
+            RegistrationReplyMessage rrm = (RegistrationReplyMessage) replyMsg;
+            AgentID replyAgentID = rrm.getAgentID();
             if (this.agentID == null) {
                 this.agentID = replyAgentID;
                 logger.debug("Router assigned agentID=" + this.agentID + " to this client");
             } else {
                 if (!this.agentID.equals(replyAgentID)) {
-                    throw new IOException("Invalid router response: Local ID is " + this.agentID +
-                        " but server told " + replyAgentID);
+                    throw new RouterHandshakeException("Invalid router response: Local ID is " +
+                        this.agentID + " but server told " + replyAgentID);
                 }
             }
 
-            this.t = tunnel;
-        } catch (IOException exception) {
-            logger.debug("Failed to reconnect to the router", exception);
-            this.t = null;
+            if (this.routerID == 0) {
+                this.routerID = rrm.getRouterID();
+            } else if (this.routerID != rrm.getRouterID()) {
+                throw new RouterHandshakeException("Invalid router response: previous router ID  was " +
+                    this.agentID + " but server now advertises " + rrm.getRouterID());
+            }
+        } catch (MalformedMessageException e) {
+            throw new RouterHandshakeException("Invalid router response: corrupted " +
+                MessageType.REGISTRATION_REPLY.toString() + " message - " + e.getMessage());
+        }
+
+    }
+
+    private class RouterHandshakeException extends Exception {
+
+        public RouterHandshakeException() {
+            super();
+        }
+
+        public RouterHandshakeException(String msg) {
+            super(msg);
         }
     }
 
@@ -252,7 +331,7 @@ public class AgentImpl implements Agent, AgentImplMBean {
      * @param brokenTunnel
      *            the tunnel that threw an IOException
      */
-    synchronized private void reportTunnelFailure(Tunnel brokenTunnel, Throwable failure) {
+    synchronized private void reportTunnelFailure(Tunnel brokenTunnel) {
         if (brokenTunnel == null)
             return;
 
@@ -296,7 +375,7 @@ public class AgentImpl implements Agent, AgentImplMBean {
             try {
                 response = mb.waitForResponse(0);
             } catch (TimeoutException e) {
-                throw new MessageRoutingException("Timeout reached", e);
+                throw new MessageRoutingException("Timeout reached ", e);
             }
         }
 
@@ -347,7 +426,7 @@ public class AgentImpl implements Agent, AgentImplMBean {
                 }
             } catch (IOException e) {
                 // Fail fast
-                this.reportTunnelFailure(tunnel, e);
+                this.reportTunnelFailure(tunnel);
                 throw new MessageRoutingException("Failed to send a message using the tunnel " + tunnel, e);
 
             }
@@ -424,6 +503,23 @@ public class AgentImpl implements Agent, AgentImplMBean {
                     }
                 }
             }
+        }
+
+        /**
+         * Unblock the Patient waiting on a particular messageID
+         * @param agentId
+         */
+        private Patient unlockDueToCorruption(Long messageId) {
+            AgentID agent = null;
+            for (Map.Entry<AgentID, Map<Long, Patient>> entry : this.byRemoteAgent.entrySet()) {
+                if (entry.getValue().containsKey(messageId)) {
+                    agent = entry.getKey();
+                    break;
+                }
+            }
+            if (agent == null)
+                return null;
+            return remove(agent, messageId);
         }
 
         /** Remove a patient on response arrival */
@@ -571,6 +667,9 @@ public class AgentImpl implements Agent, AgentImplMBean {
                     // Blocking call
                     byte[] msgBuf = tunnel.readMessage();
                     return Message.constructMessage(msgBuf, 0);
+                } catch (MalformedMessageException e) {
+                    // TODO : Send an ERR_ ?
+                    logger.error("Dropping the message received from the router, reason:" + e.getMessage());
                 } catch (IOException e) {
                     logger
                             .info(
@@ -579,7 +678,7 @@ public class AgentImpl implements Agent, AgentImplMBean {
                     // Create a new tunnel
                     tunnel = null;
                     do {
-                        this.agent.reportTunnelFailure(this.agent.t, e);
+                        this.agent.reportTunnelFailure(this.agent.t);
                         tunnel = this.agent.getTunnel();
 
                         if (tunnel == null) {
@@ -613,6 +712,7 @@ public class AgentImpl implements Agent, AgentImplMBean {
         }
 
         private void handleError(ErrorMessage error) {
+            long messageId = error.getMessageID();
             switch (error.getErrorType()) {
                 case ERR_DISCONNECTION_BROADCAST:
                     /*
@@ -627,7 +727,6 @@ public class AgentImpl implements Agent, AgentImplMBean {
                      * router Unlock the sender
                      */
                     AgentID sender = error.getSender();
-                    long messageId = error.getMessageID();
 
                     Patient mbox = mailboxes.remove(sender, messageId);
                     if (mbox == null) {
@@ -639,6 +738,32 @@ public class AgentImpl implements Agent, AgentImplMBean {
 
                         // this is a reply containing data
                         mbox.setAndUnlock(new MessageRoutingException("Recipient not connected " + sender));
+                    }
+                    break;
+                case ERR_MALFORMED_MESSAGE:
+                    // do we have the faulty AgentID?
+                    AgentID faulty = error.getFaulty();
+                    Patient patient;
+                    if (faulty != null) {
+                        patient = mailboxes.remove(faulty, messageId);
+                    } else {
+                        // harder without the faulty agent id
+                        patient = mailboxes.unlockDueToCorruption(messageId);
+                    }
+                    if (patient == null) {
+                        if (logger.isTraceEnabled()) {
+                            logger
+                                    .trace("The router got a corrupted version of message with ID " +
+                                        messageId);
+                        }
+                    } else {
+                        if (logger.isTraceEnabled()) {
+                            logger.trace("Unlocked " + patient + " due to corruption of message with ID " +
+                                messageId + " on the router side");
+                        }
+
+                        patient
+                                .setAndUnlock(new MessageRoutingException("Message corruption on router side"));
                     }
                     break;
                 default:

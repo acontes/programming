@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +22,9 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -37,12 +41,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -55,8 +56,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class FutureMap extends Object implements java.io.Serializable {
     // main map
     private Map<UniqueID, HashMap<Long, FuturesAndACs>> indexedByBodyID;
-    
-    final static protected Logger logger = ProActiveLogger.getLogger(Loggers.FUTURE);
+
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -72,8 +72,7 @@ public class FutureMap extends Object implements java.io.Serializable {
      * @param bodyDest body which receives the future (id, bodyID)
      */
     public synchronized void addAutomaticContinuation(long id, UniqueID creatorID, UniversalBody bodyDest) {
-    	
-    	java.util.HashMap<Long, FuturesAndACs> indexedByID = (indexedByBodyID.get(creatorID));
+        java.util.HashMap<Long, FuturesAndACs> indexedByID = (indexedByBodyID.get(creatorID));
         if (indexedByID == null) {
             throw new ProActiveRuntimeException("There is no map for creatorID " + creatorID);
         }
@@ -93,7 +92,6 @@ public class FutureMap extends Object implements java.io.Serializable {
      * @param futureObject future to register
      */
     public synchronized void receiveFuture(Future futureObject) {
-    	logger.debug("[FutureMap  ] receiveFuture ID:[" + futureObject.getID()+"] creator: ["+ futureObject.getCreatorID()+"] sender:["+ futureObject.getSenderID() +"] method:["+ futureObject.getMethodName()+"]");
         long id = futureObject.getID();
         UniqueID creatorID = futureObject.getCreatorID();
         java.util.HashMap<Long, FuturesAndACs> indexedByID = indexedByBodyID.get(creatorID);
@@ -119,7 +117,6 @@ public class FutureMap extends Object implements java.io.Serializable {
         else {
             ((indexedByID.get(Long.valueOf(id)))).addFuture(futureObject);
         }
-        
     }
 
     /**
@@ -184,20 +181,10 @@ public class FutureMap extends Object implements java.io.Serializable {
      * @param creatorID UniqueID of the creator body of the future
      */
     public synchronized void removeFutures(long id, UniqueID creatorID) {
-    	FuturesAndACs t = null;
-    	
         java.util.HashMap<Long, FuturesAndACs> indexedByID = (indexedByBodyID.get(creatorID));
         if (indexedByID != null) {
-            t = indexedByID.remove(Long.valueOf(id));
+            indexedByID.remove(Long.valueOf(id));
         }
-        if(t != null) {
-        	ArrayList<Future> lf = t.getFutures();
-        	for(int i=0; i<lf.size(); i++) {
-        		Future f = lf.get(i);
-        	}
-        }
-       	logger.debug("[FutureMap  ] removeFuture ID:[" + id+"] creator: ["+ creatorID +"]");
-        	
     }
 
     /**

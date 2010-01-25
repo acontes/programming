@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +22,9 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -33,14 +37,19 @@ package org.objectweb.proactive.core.remoteobject.rmi;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.net.InetSocketAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.URI;
 import java.rmi.NoSuchObjectException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.server.RMISocketFactory;
 import java.rmi.server.UnicastRemoteObject;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
@@ -71,6 +80,29 @@ public abstract class AbstractRmiRemoteObjectFactory extends AbstractRemoteObjec
     protected static RegistryHelper registryHelper;
 
     static {
+        /* Add a custom socket factory to add a connect timeout */
+        if (PAProperties.PA_RMI_CONNECT_TIMEOUT.isSet()) {
+            try {
+                RMISocketFactory.setSocketFactory(new RMISocketFactory() {
+                    public Socket createSocket(String host, int port) throws IOException {
+                        Socket socket = new Socket();
+                        socket.connect(new InetSocketAddress(host, port), PAProperties.PA_RMI_CONNECT_TIMEOUT
+                                .getValueAsInt());
+                        return socket;
+                    }
+
+                    public ServerSocket createServerSocket(int port) throws IOException {
+                        return new ServerSocket(port);
+                    }
+                });
+            } catch (IOException e) {
+                LOGGER_RO
+                        .warn(
+                                "Failed to register a RMI socket factory supporting Connect timeout. The default one will be used",
+                                e);
+                e.printStackTrace();
+            }
+        }
 
         createClassServer();
         createRegistry();
@@ -203,13 +235,13 @@ public abstract class AbstractRmiRemoteObjectFactory extends AbstractRemoteObjec
         if (uri.getPort() == -1) {
             LOGGER_RO.debug("No port specified, using the default one");
             modifiedURI = URIBuilder.buildURI(URIBuilder.getHostNameFromUrl(uri), URIBuilder
-                    .getNameFromURI(uri));
+                    .getNameFromURI(uri), this.protocolIdentifier);
             modifiedURI = RemoteObjectHelper.expandURI(modifiedURI);
         }
 
         // Try if URL is the address of a RmiRemoteBody
         try {
-            Registry reg = getRegistry(uri);
+            Registry reg = getRegistry(modifiedURI);
             o = reg.lookup(URIBuilder.getNameFromURI(modifiedURI));
             LOGGER_RO.debug(modifiedURI.toString() + " looked up successfully");
         } catch (java.rmi.NotBoundException e) {
@@ -251,12 +283,12 @@ public abstract class AbstractRmiRemoteObjectFactory extends AbstractRemoteObjec
 
     }
 
-    public InternalRemoteRemoteObject createRemoteObject(RemoteObject<?> remoteObject, String name)
-            throws ProActiveException {
+    public InternalRemoteRemoteObject createRemoteObject(RemoteObject<?> remoteObject, String name,
+            boolean rebind) throws ProActiveException {
         URI uri = URIBuilder.buildURI(ProActiveInet.getInstance().getHostname(), name, this.getProtocolId());
         // register the object on the register
         InternalRemoteRemoteObject irro = new InternalRemoteRemoteObjectImpl(remoteObject, uri);
-        RemoteRemoteObject rmo = register(irro, uri, true);
+        RemoteRemoteObject rmo = register(irro, uri, rebind);
         irro.setRemoteRemoteObject(rmo);
 
         return irro;

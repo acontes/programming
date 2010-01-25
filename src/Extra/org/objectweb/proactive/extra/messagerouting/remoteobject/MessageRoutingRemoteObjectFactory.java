@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +22,9 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -33,6 +37,7 @@ package org.objectweb.proactive.extra.messagerouting.remoteobject;
 
 import java.net.InetAddress;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
@@ -55,6 +60,8 @@ import org.objectweb.proactive.extra.messagerouting.exceptions.MessageRoutingExc
 import org.objectweb.proactive.extra.messagerouting.remoteobject.message.MessageRoutingRegistryListRemoteObjectsMessage;
 import org.objectweb.proactive.extra.messagerouting.remoteobject.message.MessageRoutingRemoteObjectLookupMessage;
 import org.objectweb.proactive.extra.messagerouting.remoteobject.util.MessageRoutingRegistry;
+import org.objectweb.proactive.extra.messagerouting.remoteobject.util.socketfactory.MessageRoutingSocketFactorySelector;
+import org.objectweb.proactive.extra.messagerouting.router.RouterImpl;
 
 
 /**
@@ -81,10 +88,16 @@ public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFacto
                 PAProperties.PA_NET_ROUTER_ADDRESS.getKey() + " is not set.");
         }
 
-        int routerPort = PAProperties.PA_NET_ROUTER_PORT.getValueAsInt();
-        if (routerPort == 0) {
-            logAndThrowException("Message routing cannot be started because " +
-                PAProperties.PA_NET_ROUTER_PORT.getKey() + " is not set.");
+        int routerPort;
+        if (PAProperties.PA_NET_ROUTER_PORT.isSet()) {
+            routerPort = PAProperties.PA_NET_ROUTER_PORT.getValueAsInt();
+            if (routerPort <= 0 || routerPort > 65535) {
+                logAndThrowException("Invalid  router port value: " + routerPort);
+            }
+        } else {
+            routerPort = RouterImpl.DEFAULT_PORT;
+            logger.debug(PAProperties.PA_NET_ROUTER_PORT.getKey() + " not set. Using the default port: " +
+                routerPort);
         }
 
         InetAddress routerAddress = null;
@@ -96,7 +109,8 @@ public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFacto
 
         Agent agent = null;
         try {
-            agent = new AgentImpl(routerAddress, routerPort, ProActiveMessageHandler.class);
+            agent = new AgentImpl(routerAddress, routerPort, ProActiveMessageHandler.class,
+                MessageRoutingSocketFactorySelector.get());
         } catch (ProActiveException e) {
             logAndThrowException("Failed to create the local agent", e);
         }
@@ -151,7 +165,7 @@ public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFacto
      */
     public RemoteRemoteObject register(InternalRemoteRemoteObject ro, URI uri, boolean replacePrevious)
             throws ProActiveException {
-        this.registry.bind(uri, ro);
+        this.registry.bind(uri, ro, replacePrevious); // throw a ProActiveException if needed
         MessageRoutingRemoteObject rro = new MessageRoutingRemoteObject(ro, uri, agent);
         if (logger.isDebugEnabled()) {
             logger.debug("Registered remote object at endpoint " + uri);
@@ -233,20 +247,30 @@ public class MessageRoutingRemoteObjectFactory extends AbstractRemoteObjectFacto
     public int getPort() {
         // Reverse connections are used with message routing so this method is
         // irrelevant
-        throw new UnsupportedOperationException();
+        return -1;
     }
 
-    public InternalRemoteRemoteObject createRemoteObject(RemoteObject<?> remoteObject, String name)
-            throws ProActiveException {
+    public InternalRemoteRemoteObject createRemoteObject(RemoteObject<?> remoteObject, String name,
+            boolean rebind) throws ProActiveException {
 
-        URI uri = URI.create(this.getProtocolId() + "://" + this.agent.getAgentID() + "/" + name);
+        try {
+            // Must be a fixed path
+            if (!name.startsWith("/")) {
+                name = "/" + name;
+            }
 
-        // register the object on the register
-        InternalRemoteRemoteObject irro = new InternalRemoteRemoteObjectImpl(remoteObject, uri);
-        RemoteRemoteObject rmo = register(irro, uri, true);
-        irro.setRemoteRemoteObject(rmo);
+            URI uri = new URI(this.getProtocolId(), null, this.agent.getAgentID().toString(), this.getPort(),
+                name, null, null);
 
-        return irro;
+            // register the object on the register
+            InternalRemoteRemoteObject irro = new InternalRemoteRemoteObjectImpl(remoteObject, uri);
+            RemoteRemoteObject rmo = register(irro, uri, rebind);
+            irro.setRemoteRemoteObject(rmo);
+
+            return irro;
+        } catch (URISyntaxException e) {
+            throw new ProActiveException("Failed to create remote object " + name, e);
+        }
     }
 
     public Agent getAgent() {

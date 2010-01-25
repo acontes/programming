@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +22,9 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -60,6 +64,7 @@ import org.apache.log4j.MDC;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.api.PARemoteObject;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
@@ -94,6 +99,7 @@ import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.mop.JavassistByteCodeStubBuilder;
+import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -158,6 +164,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
         try {
             proActiveRuntime = new ProActiveRuntimeImpl();
             proActiveRuntime.createMBean();
+            System.setProperty(PALifeCycle.PA_STARTED_PROP, "true");
         } catch (UnknownProtocolException e) {
             e.printStackTrace();
         } catch (ProActiveException e) {
@@ -231,8 +238,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
                     String domainURL = PAProperties.PA_RUNTIME_DOMAIN_URL.getValue();
 
                     if (domainURL != null) {
-                        SecurityEntity domain = (SecurityDomain) PAActiveObject.lookupActive(
-                                "org.objectweb.proactive.ext.security.domain.SecurityDomain", domainURL);
+                        SecurityEntity domain = PAActiveObject.lookupActive(SecurityDomain.class, domainURL);
                         ProActiveRuntimeImpl.runtimeSecurityManager.setParent(domain);
                     }
                 } else {
@@ -261,9 +267,20 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
 
         // Remote Object exporter
         this.roe = new RemoteObjectExposer<ProActiveRuntime>(
-            "org.objectweb.proactive.core.runtime.ProActiveRuntime", this,
+            org.objectweb.proactive.core.runtime.ProActiveRuntime.class.getName(), this,
             ProActiveRuntimeRemoteObjectAdapter.class);
-        this.roe.createRemoteObject(vmInformation.getName());
+        this.roe.createRemoteObject(vmInformation.getName(), false);
+
+        if (PAProperties.PA_CLASSLOADING_USEHTTP.isTrue()) {
+            // Set the codebase in case of useHTTP is true and the ProActiveRMIClassLoader is in use
+            String codebase = ClassServerServlet.get().getCodeBase();
+            PAProperties.PA_CODEBASE.setValue(codebase);
+        } else {
+            // Publish the URL of this runtime in the ProActive codebase
+            // URL must be prefixed by pa tu use our custom protocol handlers
+            // URL must be terminated by a / according to the RMI specification
+            PAProperties.PA_CODEBASE.setValue("pa" + this.getURL() + "/");
+        }
 
         if (PAProperties.PA_CLASSLOADING_USEHTTP.isTrue()) {
             // Set the codebase in case of useHTTP is true and the ProActiveRMIClassLoader is in use
@@ -749,7 +766,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
 
     public void registerVirtualNode(String virtualNodeName, boolean replacePreviousBinding)
             throws ProActiveException {
-        this.roe.createRemoteObject(virtualNodeName);
+        this.roe.createRemoteObject(virtualNodeName, false);
     }
 
     public void unregisterVirtualNode(String virtualNodeName) {

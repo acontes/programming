@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,6 +23,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
@@ -32,7 +36,9 @@
 package org.objectweb.proactive.core.remoteobject.http.util;
 
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
+import org.objectweb.proactive.core.remoteobject.AlreadyBoundException;
 import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -46,7 +52,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class HTTPRegistry {
     private static final String REGISTRY_NAME = "HTTP_REGISTRY";
     private static HTTPRegistry instance;
-    private static HashMap<String, InternalRemoteRemoteObject> rRemteObjectMap = new HashMap<String, InternalRemoteRemoteObject>();
+    private static ConcurrentHashMap<String, InternalRemoteRemoteObject> rRemteObjectMap = new ConcurrentHashMap<String, InternalRemoteRemoteObject>();
 
     private HTTPRegistry() {
     }
@@ -63,13 +69,24 @@ public class HTTPRegistry {
     }
 
     /**
-     * Binds a body  with a name
-     * @param name  the name of the body
-     * @param body the body to be binded
+     * Binds an internal remote remote object to an identifier
+     * @param name the identifier
+     * @param irro the internal remote remote object to store
+     * @throws AlreadyBoundException if the name already exists
      */
-    public void bind(String name, InternalRemoteRemoteObject body) {
-        ProActiveLogger.getLogger(Loggers.REMOTEOBJECT).debug("registering remote object at " + name);
-        rRemteObjectMap.put(name, body);
+    public void bind(String name, InternalRemoteRemoteObject irro, boolean rebind)
+            throws AlreadyBoundException {
+        if (rebind) {
+            rRemteObjectMap.put(name, irro);
+        } else {
+            InternalRemoteRemoteObject r = rRemteObjectMap.putIfAbsent(name, irro);
+            if (r != null) {
+                throw new AlreadyBoundException(name + " is already bound");
+            }
+        }
+
+        ProActiveLogger.getLogger(Loggers.REMOTEOBJECT).debug("registed remote object at " + name);
+
     }
 
     /**
@@ -92,8 +109,8 @@ public class HTTPRegistry {
 
     /**
      * Retrieves a body from a name
-     * @param name The name of the body to be retrieved
-     * @return the binded body
+     * @param name The name of the remote object to be retrieved
+     * @return the internal remote remote object matching the name
      */
     public InternalRemoteRemoteObject lookup(String name) {
         return rRemteObjectMap.get(name);

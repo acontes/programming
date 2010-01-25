@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +22,9 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -39,6 +43,8 @@ import java.net.UnknownHostException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -75,8 +81,15 @@ public class URIBuilder {
         }
     }
 
+    /**
+     * returns a new URI where the name part has been set to name
+     * @param baseURI the base URI
+     * @param name the new name
+     * @return the new URI which the new name part
+     */
     public static URI buildURI(URI baseURI, String name) {
-        return URI.create(baseURI.toString() + name);
+        return buildURI(getHostNameFromUrl(baseURI), name, getProtocol(baseURI), getPortNumber(baseURI),
+                false);
     }
 
     /**
@@ -90,7 +103,8 @@ public class URIBuilder {
      */
     public static URI buildURI(String host, String name, String protocol) {
         try {
-            return buildURI(host, name, protocol, RemoteObjectHelper.getDefaultPortForProtocol(protocol));
+            RemoteObjectFactory rof = AbstractRemoteObjectFactory.getRemoteObjectFactory(protocol);
+            return buildURI(host, name, protocol, rof.getPort());
         } catch (UnknownProtocolException e) {
             e.printStackTrace();
         }
@@ -185,14 +199,15 @@ public class URIBuilder {
             // ok, awful hack but ensures that the factory for the given
             // protocol has effectively been loaded by the classloader
             // and that the initialization process has been performed
-            port = RemoteObjectHelper.getDefaultPortForProtocol(protocol);
+            RemoteObjectFactory rof = AbstractRemoteObjectFactory.getRemoteObjectFactory(protocol);
+            port = rof.getPort();
         } catch (UnknownProtocolException e) {
             logger.debug(e.getMessage());
         }
         if (port == -1) {
             return buildURI(host, name, protocol);
         } else {
-            return buildURI(host, name, protocol, Integer.valueOf(port).intValue());
+            return buildURI(host, name, protocol, port);
         }
     }
 

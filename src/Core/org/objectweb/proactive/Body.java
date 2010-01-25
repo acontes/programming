@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +22,9 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -185,8 +189,24 @@ public interface Body extends LocalBodyStrategy, UniversalBody {
 
     /**
      * For setting an immediate service for this body. An immediate service is a method that will be
-     * executed by the calling thread.
+     * executed by the calling thread, or by a dedicated per-caller thread if uniqueThread is true.
+     * 
+     * @param methodName
+     *            the name of the method
+     * @param uniqueThread true if this immediate service should be always executed by the same thread for 
+     * 			  a given caller, false if any thread can be used.
      */
+    public void setImmediateService(String methodName, boolean uniqueThread);
+
+    /**
+     * For setting an immediate service for this body. An immediate service is a method that will be
+     * executed by the calling thread.
+     *
+     * @param methodName the name of the method
+     *
+     * @deprecated Replaced by {@link #setImmediateService(String, boolean)}
+     */
+    @Deprecated
     public void setImmediateService(String methodName);
 
     /**
@@ -200,14 +220,17 @@ public interface Body extends LocalBodyStrategy, UniversalBody {
 
     /**
      * Adds an immediate service for this body An immediate service is a method that will be
-     * executed by the calling thread.
+     * executed by the calling thread, or by a dedicated per-caller thread if uniqueThread is true.
      * 
      * @param methodName
      *            the name of the method
      * @param parametersTypes
      *            the types of the parameters of the method
+     * @param uniqueThread true if this immediate service should be always executed by the same thread for 
+     * 			  a given caller, false if any thread can be used.
+     *            
      */
-    public void setImmediateService(String methodName, Class<?>[] parametersTypes);
+    public void setImmediateService(String methodName, Class<?>[] parametersTypes, boolean uniqueThread);
 
     /**
      * Removes an immediate service for this body An immediate service is a method that will be

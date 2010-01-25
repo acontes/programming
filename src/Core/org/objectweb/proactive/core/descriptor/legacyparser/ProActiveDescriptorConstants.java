@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +22,9 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -88,7 +92,6 @@ public interface ProActiveDescriptorConstants {
     public static final String PBS_PROCESS_TAG = "pbsProcess";
     public static final String OAR_PROCESS_TAG = "oarProcess";
     public static final String CLUSTERFORK_PROCESS_TAG = "clusterForkProcess";
-    public static final String GLITE_PROCESS_TAG = "gLiteProcess";
     public static final String DEPENDENT_PROCESS_SEQUENCE_TAG = "dependentProcessSequence";
     public static final String SEQUENTIAL_PROCESS_TAG = "independentProcessSequence";
     public static final String MPI_PROCESS_TAG = "mpiProcess";
@@ -101,7 +104,6 @@ public interface ProActiveDescriptorConstants {
     public static final String OARGRID_PROCESS_TAG = "oarGridProcess";
     public static final String HIERARCHICAL_PROCESS_TAG = "hierarchicalProcess";
     public static final String GRID_ENGINE_PROCESS_TAG = "gridEngineProcess";
-    public static final String GLITE_PROCESS_OPTIONS_TAG = "gLiteOptions";
     public static final String GRID_ENGINE_OPTIONS_TAG = "gridEngineOption";
     public static final String PROCESSES_TAG = "processes";
     public static final String SERVICES_TAG = "services";
@@ -170,16 +172,6 @@ public interface ProActiveDescriptorConstants {
     public static final String PARAMETERS_TAG = "parameters";
     public static final String ABS_PATH_TAG = "absolutePath";
     public static final String REL_PATH_TAG = "relativePath";
-    public static final String GLITE_PATH_TAG = "JDLFilePath";
-    public static final String GLITE_REMOTE_PATH_TAG = "JDLRemoteFilePath";
-    public static final String GLITE_ARGUMENTS_TAG = "arguments";
-    public static final String GLITE_INPUTSANDBOX_TAG = "inputSandbox";
-    public static final String GLITE_OUTPUTSANDBOX_TAG = "outputSandbox";
-    public static final String GLITE_ENVIRONMENT_TAG = "environment";
-    public static final String GLITE_REQUIREMENTS_TAG = "requirements";
-    public static final String GLITE_RANK_TAG = "rank";
-    public static final String GLITE_CONFIG_TAG = "configFile";
-    public static final String GLITE_INPUTDATA_TAG = "inputData";
     public static final String JVMPARAMETERS_TAG = "jvmParameters";
     public static final String JVMPARAMETER_TAG = "parameter";
     public static final String SECURITY_TAG = "security";
@@ -193,9 +185,6 @@ public interface ProActiveDescriptorConstants {
     public static final String FT_GLOBALSERVER_TAG = "globalServer";
     public static final String FT_TTCVALUE_TAG = "ttc";
     public static final String FT_PROTO_TAG = "protocol";
-    public static final String UNICORE_PROCESS_TAG = "unicoreProcess";
-    public static final String UNICORE_OPTIONS_TAG = "unicoreOption";
-    public static final String UNICORE_DIR_PATH_TAG = "unicoreDirPath";
     public static final String UNICORE_KEYFILE_PATH_TAG = "keyFilePath";
     public static final String UNICORE_USITE_TAG = "usite";
     public static final String UNICORE_VSITE_TAG = "vsite";

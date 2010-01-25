@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +22,9 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -126,8 +130,8 @@ public class GroupA {
                  * Definition of one standard Java object and two active objects
                  */
                 A a1 = new A();
-                A a2 = (A) PAActiveObject.newActive(A.class.getName(), new Object[] { "A Object" });
-                B b = (B) PAActiveObject.newActive(B.class.getName(), new Object[] { "B Object" });
+                A a2 = PAActiveObject.newActive(A.class, new Object[] { "A Object" });
+                B b = PAActiveObject.newActive(B.class, new Object[] { "B Object" });
 
                 /**
                  * For management purposes, get the management representation
@@ -230,7 +234,7 @@ public class GroupA {
                 //@snippet-end group_A_6
 
                 //@snippet-start group_A_7
-                A a3 = (A) PAActiveObject.newActive(A.class.getName(), new Object[] { "Another A object" });
+                A a3 = PAActiveObject.newActive(A.class, new Object[] { "Another A object" });
 
                 /**
                  * Using the previous management representation, we insert

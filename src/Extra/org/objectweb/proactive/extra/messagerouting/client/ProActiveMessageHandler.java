@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,10 +23,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
+ *
  *  Initial developer(s):               The ActiveEon Team
  *                        http://www.activeeon.com/
  *  Contributor(s):
- *
  *
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
@@ -37,11 +40,12 @@ import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.core.remoteobject.http.util.HttpMarshaller;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.DataRequestMessage;
 import org.objectweb.proactive.extra.messagerouting.remoteobject.message.MessageRoutingMessage;
+import org.objectweb.proactive.extra.messagerouting.remoteobject.util.PamrMarshaller;
 
 
 /** Executes a ProActive {@link Request} received and send the response.
@@ -89,10 +93,17 @@ public class ProActiveMessageHandler implements MessageHandler {
         private final DataRequestMessage _toProcess;
         /** the local agent*/
         private final Agent agent;
+        /** serialization*/
+        private final PamrMarshaller marshaller;
 
         public ProActiveMessageProcessor(DataRequestMessage msg, Agent agent) {
             this._toProcess = msg;
             this.agent = agent;
+            // get the runtime URL
+            // if the local Agent has received a DataRequestMessage,
+            // means that a ProActiveRuntime exists on this machine
+            String runtimeUrl = ProActiveRuntimeImpl.getProActiveRuntime().getURL();
+            this.marshaller = new PamrMarshaller(runtimeUrl);
         }
 
         public void run() {
@@ -101,21 +112,15 @@ public class ProActiveMessageHandler implements MessageHandler {
                 Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
 
                 // Handle the message
-                MessageRoutingMessage message = (MessageRoutingMessage) HttpMarshaller
+                MessageRoutingMessage message = (MessageRoutingMessage) this.marshaller
                         .unmarshallObject(_toProcess.getData());
-                Object result = null;
-                try {
-                    if (logger.isTraceEnabled()) {
-                        logger.trace("Processing message: " + message);
-                    }
-                    result = message.processMessage();
-                } catch (Exception e) {
-                    logger.warn("Exception during execution of message: " + _toProcess, e);
-                    // TODO: Send an ERR_ ?
-                    return;
-                }
 
-                byte[] resultBytes = HttpMarshaller.marshallObject(result);
+                if (logger.isTraceEnabled()) {
+                    logger.trace("Processing message: " + message);
+                }
+                Object result = message.processMessage();
+
+                byte[] resultBytes = this.marshaller.marshallObject(result);
                 agent.sendReply(_toProcess, resultBytes);
             } catch (Exception e) {
                 logger.warn("ProActive Message failed to serve a message", e);

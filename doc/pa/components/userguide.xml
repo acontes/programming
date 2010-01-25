@@ -1942,58 +1942,54 @@ Node node = vns.get("VN1").getANode();</programlisting>
 			</para>
 
 			<section xml:id="UsingProActiveWebServicesAPI"><info><title>Using ProActive Web Services API</title></info>
-
 				<para>
 					The main difference with active objects is that, when exposing a component as web service, all the methods of each server interfaces are
-					automatically exposed as a web service (with active objects you can expose just one method at once).
-					Thus, the way to expose a component as web services is quite simple and can be done in a single call method by using the
-					<emphasis role="bold">org.objectweb.proactive.extensions.webservices.WebServices</emphasis> API.
-					After having defined the component and having started it as usual, the following method must be called:
-					<programlisting language="java">WebService.exposeComponentAsWebService(Component component, String url, String componentName);</programlisting>
+					automatically exposed as a web service (with active objects you can expose just one method at once). However, you can choose the
+					interfaces you want to deploy.
+					After having defined the component and having started it as usual, the following lines enable you to expose a component:
+					<programlisting language="java"><textobject><textdata fileref="automatic_snippets/webservices_Component_2.snip"/></textobject></programlisting>
 					where:
 					<itemizedlist>
-	    	  			<listitem>
-    	    				<para>
-        						<emphasis role="bold">component</emphasis> is the instance of the component whose interfaces will be exposed as web services.
-       					</para>
-   				   </listitem>
-	    	  			<listitem>
+	   		  			<listitem>
+        					<para>
+								<emphasis role="bold">a</emphasis> is the instance of the component whose interfaces will be exposed as web services.
+    						</para>
+        	           </listitem>
+						<listitem>
 							<para>
-   		     					<emphasis role="bold">url</emphasis> is the url of the web server; typically http://localhost:8080
-       						</para>
-   						</listitem>
-	    	  			<listitem>
-    		    			<para>
-        						<emphasis role="bold">componentName</emphasis> is the name of the component. Each service available in this way will get a name
-        						composed by the component name followed by the interface name: <emphasis>componentName_interfaceName</emphasis>.
-       						</para>
-   						</listitem>
-       				</itemizedlist>
+								<emphasis role="bold">myComponent</emphasis> is the name you want to give to the first part of the service name. Each service available in this way will get a name
+								composed by the component name followed by the interface name: <emphasis>componentName_interfaceName</emphasis>.
+							</para>
+						</listitem>
+					</itemizedlist>
 				</para>
 
 				<para>
 					Likewise, to undeploy a component, just call the method:
-					<programlisting language="java"> WebServices.unExposeAsWebService ( String componentName , String url,  Component component);</programlisting>
+					<programlisting language="java"><textobject><textdata fileref="automatic_snippets/webservices_Component_3.snip"/></textobject></programlisting>
 					where:
 					<itemizedlist>
-	      				<listitem>
-    	    				<para>
-        						<emphasis role="bold">componentName</emphasis> is the name of the component.
-       						</para>
-    		    			<para>
-        						<emphasis role="bold">url</emphasis> is the url of the web server; typically http://localhost:8080
-       						</para>
-    	    				<para>
-        						<emphasis role="bold">component</emphasis> is the instance of the component.
-       						</para>
-   						</listitem>
-       				</itemizedlist>
+						<listitem>
+							<para>
+								<emphasis role="bold">a</emphasis> is the instance of the component.
+							</para>
+						</listitem>
+						<listitem>
+							<para>
+								<emphasis role="bold">myComponent</emphasis> is the name of the component as given before.
+							</para>
+						</listitem>
+					</itemizedlist>
+				</para>
+
+				<para>
+					The methods expose and unexpose a component with all its non controller server interfaces. If you want to choose the interfaces to
+					expose or unexpose, please refer to <xref linkend="WSDoc"/>.
 				</para>
 
 				<para>
 					Once the component interfaces are deployed, you can access it via any web service enabled client.
 				</para>
-
 			</section>
 
 			<section xml:id="AsimpleexampleHelloWorldwithcomponent"><info><title>A simple example: Hello World with component</title></info>
@@ -2003,15 +1999,15 @@ Node node = vns.get("VN1").getANode();</programlisting>
 				</para>
 
 				<para>
-					First, below is the only one server interface of the component:
+					First, below are the two server interfaces of the component:
 					<programlisting language="java"><textobject><textdata fileref="automatic_snippets/helloworlditfcomponent.snip"/></textobject></programlisting>
+					<programlisting language="java"><textobject><textdata fileref="automatic_snippets/goodbyeworlditfcomponent.snip"/></textobject></programlisting>
 				</para>
 
 				<para>
-					The implementation class of the component which also contains the main method to create the component, start it and deploy it:
+					The implementation class of the component which also contains the main method to create the component, start it and deploy it, is the following one:
 					<programlisting language="java"><textobject><textdata fileref="automatic_snippets/helloworldcomponent.snip"/></textobject></programlisting>
-					The component <literal>comp</literal> has been deployed as a web service on the web server located at <literal>"http://localhost:8080"</literal>.
-					The accessible service method is <literal>server_hello-world_helloWorld</literal>.
+					The component <literal>comp</literal> has been deployed as a web service on the web server located at <literal>url</literal>.
 				</para>
 
 				<para>
@@ -2019,6 +2015,96 @@ Node node = vns.get("VN1").getANode();</programlisting>
 					<programlisting language="java"><textobject><textdata fileref="automatic_snippets/wsclientcomponent.snip"/></textobject></programlisting>
 				</para>
 			</section>
+		</section>
+
+		<section xml:id="Webservicebindings_53"><info><title>Web service bindings</title>
+			</info>
+
+			<para>
+				ProActive also gives the possibility to bind a functional
+				client interface of a component to a web service.
+			</para>
+			<para>
+				For	instance, this feature is useful to enable
+				communication between SCA (Service Component Architecture)
+				components and GCM/ProActive components by using the web
+				service communication protocol. Effectively, communication
+				from SCA component to GCM/ProActive component can be done
+				thanks to the ability of exposing GCM server interface as
+				web service (See
+				<xref linkend="Exporting_components_as_Web_Services"/>)
+				and communication from GCM/ProActive component to SCA
+				component can be done by using this feature. This has
+				already been successfully tested with two different SCA
+				implementations: Apache Tuscany (http://tuscany.apache.org/)
+				and FraSCAti (https://wiki.ow2.org/frascati/). 
+			</para>
+			<para>
+				The only requirement for binding a client interface to a
+				web service is that the web service must be known in
+				advance in order to ensure the compatibility between
+				the client interface and the web service to bind to.
+				In other words, the Java interface representing the
+				client interface must have the same method signatures
+				than those exposed by the web service.
+			</para>
+			<para>
+				It is the same principle to bind a client interface to a
+				web service with both the ADL and the API: the web
+				service binding can be done just by replacing the server
+				interface name by the URL of the web service (not the WSDL
+				address) in the call to the method
+				<literal>
+					bindFc
+				</literal>
+				with the API or in the tag
+				<literal>
+					binding
+				</literal>
+				with the ADL.
+			</para>
+			<para>
+				By default, the Axis2 (http://ws.apache.org/axis2/) API is
+				used to call the web service, but it is also possible to
+				specify another library. If so, the URL has to be followed,
+				in parenthesis, by the ID or the full name of the class to
+				use to call the web service. Thus, ProActive offers several
+				ways to call web services: using Axis2 API or using various
+				configurations of CXF API (http://cxf.apache.org/). Their
+				ID are defined in the class
+				<literal>
+					org.objectweb.proactive.core.component.webservices.WSInfo
+				</literal>.
+				Otherwise, the full	class name has to be the one of a class
+				implementing the
+				<literal>
+					org.objectweb.proactive.core.component.webservices.ProActiveWSCaller
+				</literal>
+				interface:
+				<programlisting language="java"><textobject><textdata fileref="automatic_snippets/proactivewscaller.snip"/></textobject></programlisting>
+			</para>
+			<para>
+				For instance, the replacing string of the server interface
+				name may be:
+				<itemizedlist>
+					<listitem>
+						<para>
+							"http://localhost:8080/proactive/services/Server_HelloWorld(org.objectweb.proactive.core.component.webservices.Axis2WSCaller)"
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							which is equivalent to: "http://localhost:8080/proactive/services/Server_HelloWorld(org.objectweb.proactive.core.component.webservices.WSInfo.AXIS2WSCALLER_ID)"
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							which is also equivalent to: "http://localhost:8080/proactive/services/Server_HelloWorld"
+							since Axis2 is used by default.
+						</para>
+					</listitem>
+				</itemizedlist>
+			</para>
 		</section>
 
 		<section xml:id="Lifecycle_encapsulation_of_functional_activity_in_component_lifecycle"><info><title>Lifecycle: encapsulation of functional activity in component lifecycle</title>

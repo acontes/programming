@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +22,9 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -52,10 +56,6 @@ public class NotificationType {
     public final static String requestSent = "requestSent";
     public final static String servingStarted = "servingStarted";
     public final static String voidRequestServed = "voidRequestServed";
-    // cruz
-    public final static String realReplyReceived = "realReplyReceived";
-    public final static String requestWbN = "requestWaitByNecessity";
-    // -- cruz
 
     // --- Corresponds to the MigrationEvent -----------------------
     public final static String migratedBodyRestarted = "migratedBodyRestarted";
@@ -71,7 +71,7 @@ public class NotificationType {
      */
     public final static String migrationFinished = "migrationFinished";
 
-    // --- Corresponds to the FutureEvent ---------------------------
+    // --- Corresponds to the FuturEvent ---------------------------
     public final static String receivedFutureResult = "receivedFutureResult";
     public final static String waitByNecessity = "waitByNecessity";
 
@@ -102,6 +102,11 @@ public class NotificationType {
     public final static String stepByStepSlowMotionDisabled = "stepByStepSlowMotionDisabled";
     public final static String stepByStepISEnabled = "stepByStepISEnabled";
     public final static String stepByStepISDisabled = "stepByStepISDisabled";
+
+    // ExtendedDebugger
+    public final static String connectDebugger = "connectDebugger";
+    public final static String disconnectDebugger = "disconnectDebugger";
+    public final static String requestQueueModified = "requestQueueModified";
 
     /* TODO Send this notification */
     // public final static String forwarderRuntimeRegistered = "forwarderRuntimeRegistered";

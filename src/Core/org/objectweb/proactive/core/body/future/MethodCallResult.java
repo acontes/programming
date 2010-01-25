@@ -4,13 +4,14 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +22,9 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -54,15 +58,33 @@ public class MethodCallResult implements Serializable {
     /** The exception to throw */
     private Throwable exception;
 
+    /**
+     * 
+     * @param result the method call's result
+     * @param exception the exception thrown during the method call execution
+     */
     public MethodCallResult(Object result, Throwable exception) {
         this.result = result;
         this.exception = exception;
     }
 
+    /**
+     * returns the exception thrown during the method call's execution
+     * or null if no exception has been raised.
+     * @return returns the exception thrown during the method call's execution
+     * or null if no exception has been raised.
+     */
     public Throwable getException() {
         return exception;
     }
 
+    /**
+     * Return the result of the method call.
+     * If an exception has been raised during the method call's execution then
+     * the exception is thrown.
+     * @return Return the result of the method call. If an exception has been 
+     * raised during the method call's execution then the exception is thrown. 
+     */
     public Object getResult() {
         if (exception != null) {
             ExceptionHandler.throwException(exception);
@@ -101,7 +123,7 @@ public class MethodCallResult implements Serializable {
      * Provide access to the result object.
      * Override the behavior of getResult() by not throwing the exception if the method
      * call has thrown an exception.
-     * @return
+     * @return the result -- can be null if an exception has been thrown.
      */
     public Object getResultObjet() {
         return this.result;

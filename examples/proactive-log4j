@@ -15,8 +15,7 @@ log4j.logger.org.mortbay = WARN
 #log4j.logger.proactive.classloader = DEBUG
 #log4j.logger.proactive.events = DEBUG
 #log4j.logger.proactive.runtime = DEBUG
-log4j.logger.proactive.body = DEBUG
-log4j.logger.proactive.future = DEBUG
+#log4j.logger.proactive.body = DEBUG
 #log4j.logger.proactive.mop = DEBUG
 #log4j.logger.proactive.groups = DEBUG
 #log4j.logger.proactive.sync_call = DEBUG
@@ -39,12 +38,11 @@ log4j.logger.proactive.future = DEBUG
 #log4j.logger.proactive.examples = DEBUG
 
 #log4j.logger.proactive.components = DEBUG
-log4j.logger.proactive.components.requests = DEBUG
+#log4j.logger.proactive.components.requests = DEBUG
 #log4j.logger.proactive.components.activity = DEBUG
 #log4j.logger.proactive.components.bytecodegeneration = DEBUG
 #log4j.logger.proactive.components.adl = DEBUG
 #log4j.logger.proactive.components.gui = DEBUG
-#log4j.logger.proactive.components.controllers = DEBUG
 
 #log4j.logger.proactive.security = DEBUG
 #log4j.logger.proactive.security.node = DEBUG
@@ -80,6 +78,8 @@ log4j.logger.proactive.components.requests = DEBUG
 #log4j.logger.proactive.jmx.mbean = DEBUG
 #log4j.logger.proactive.jmx.notification = DEBUG
 
+#log4j.logger.proactive.webservices = DEBUG
+
 ################ Appenders ####################
 #
 # Appender output can be configured by using a pattern layout
@@ -100,8 +100,7 @@ log4j.logger.proactive.components.requests = DEBUG
 # CONSOLE appender is used by default
 log4j.appender.CONSOLE=org.apache.log4j.ConsoleAppender
 log4j.appender.CONSOLE.layout=org.apache.log4j.PatternLayout
-#log4j.appender.CONSOLE.layout.ConversionPattern=%X{shortid@hostname} - [%p %20.20c{2}] %m%n
-log4j.appender.CONSOLE.layout.ConversionPattern= - [%p %t %20.15c{2}] %m%n
+log4j.appender.CONSOLE.layout.ConversionPattern=%X{shortid@hostname} - [%p %20.20c{2}] %m%n
 
 # Appender FILE writes to the file "tests.log".
 # This file is recreated a file for each run
