@@ -36,16 +36,20 @@
 package org.objectweb.proactive.core.component.adl.bindings;
 
 import java.lang.reflect.Method;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import org.objectweb.fractal.adl.ADLException;
 import org.objectweb.fractal.adl.Node;
 import org.objectweb.fractal.adl.bindings.Binding;
 import org.objectweb.fractal.adl.bindings.BindingContainer;
+import org.objectweb.fractal.adl.bindings.BindingErrors;
 import org.objectweb.fractal.adl.bindings.TypeBindingLoader;
+import org.objectweb.fractal.adl.components.Component;
+import org.objectweb.fractal.adl.components.ComponentContainer;
+import org.objectweb.fractal.adl.interfaces.IDLException;
 import org.objectweb.fractal.adl.interfaces.Interface;
+import org.objectweb.fractal.adl.interfaces.InterfaceContainer;
 import org.objectweb.fractal.adl.types.TypeInterface;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 
@@ -54,35 +58,86 @@ import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
  * @author The ProActive Team
  */
 public class ProActiveTypeBindingLoader extends TypeBindingLoader {
+    private TypeInterface getFromTypeInterface(final Binding binding,
+            final Map<String, Map<String, Interface>> itfMap) throws ADLException {
+        final String from = binding.getFrom();
+
+        if (from == null) {
+            throw new ADLException(BindingErrors.MISSING_FROM, binding);
+        }
+
+        int i = from.indexOf('.');
+        if (i < 1 || i == from.length() - 1) {
+            throw new ADLException(BindingErrors.INVALID_FROM_SYNTAX, binding, from);
+        }
+        final String fromCompName = from.substring(0, i);
+        final String fromItfName = from.substring(i + 1);
+
+        final Interface fromItf = getInterface(fromCompName, fromItfName, binding, itfMap);
+        return (TypeInterface) fromItf;
+    }
+
     @Override
-    protected void checkNode(final Object node, final Map context) throws ADLException {
-        try {
-            super.checkNode(node, context);
-        } catch (ADLException e) {
-            Binding[] bindings = ((BindingContainer) node).getBindings();
-            Set<String> fromItfs = new HashSet<String>();
-            for (int i = 0; i < bindings.length; i++) {
-                if (fromItfs.contains(bindings[i].getFrom())) {
-                    // ignore (allows multicast bindings
+    protected void checkNode(final Object node, final Map<Object, Object> context) throws ADLException {
+        if (node instanceof BindingContainer) {
+            final Map<String, Map<String, Interface>> itfMap = new HashMap<String, Map<String, Interface>>();
+            if (node instanceof InterfaceContainer) {
+                final Map<String, Interface> containerItfs = new HashMap<String, Interface>();
+                for (final Interface itf : ((InterfaceContainer) node).getInterfaces()) {
+                    containerItfs.put(itf.getName(), itf);
                 }
+                itfMap.put("this", containerItfs);
+            }
+            if (node instanceof ComponentContainer) {
+                for (final Component comp : ((ComponentContainer) node).getComponents()) {
+                    if (comp instanceof InterfaceContainer) {
+                        final Map<String, Interface> compItfs = new HashMap<String, Interface>();
+                        for (final Interface itf : ((InterfaceContainer) comp).getInterfaces()) {
+                            compItfs.put(itf.getName(), itf);
+                        }
+                        itfMap.put(comp.getName(), compItfs);
+                    }
+                }
+            }
+            for (final Binding binding : ((BindingContainer) node).getBindings()) {
+                checkBinding(binding, itfMap, context);
+            }
+            final Map<String, Binding> fromItfs = new HashMap<String, Binding>();
+            for (final Binding binding : ((BindingContainer) node).getBindings()) {
+                final Binding previousDefinition = fromItfs.put(binding.getFrom(), binding);
+                if ((previousDefinition != null) &&
+                    !(ProActiveTypeFactory.MULTICAST_CARDINALITY.equals(getFromTypeInterface(binding, itfMap)
+                            .getCardinality()))) {
+                    throw new ADLException(BindingErrors.DUPLICATED_BINDING, binding, binding.getFrom(),
+                        previousDefinition);
+                }
+            }
+        }
+        if (node instanceof ComponentContainer) {
+            for (final Component comp : ((ComponentContainer) node).getComponents()) {
+                checkNode(comp, context);
             }
         }
     }
 
     @Override
-    protected void checkBinding(final Binding binding, final Interface fromItf, final Interface toItf,
-            final Map context) throws ADLException {
+    protected void checkBinding(final Binding binding, final Interface fromItf, final String fromCompName,
+            final String fromItfName, final Interface toItf, final String toCompName, final String toItfName,
+            final Map<Object, Object> context) throws ADLException {
         try {
-            super.checkBinding(binding, fromItf, toItf, context);
+            super.checkBinding(binding, fromItf, fromCompName, fromItfName, toItf, toCompName, toItfName,
+                    context);
         } catch (ADLException e) {
             // check if signatures are incompatible
             TypeInterface cItf = (TypeInterface) fromItf;
             TypeInterface sItf = (TypeInterface) toItf;
 
             try {
-                ClassLoader cl = getClassLoader(context);
-                Class<?> clientSideItfClass = cl.loadClass(cItf.getSignature());
-                Class<?> serverSideItfClass = cl.loadClass(sItf.getSignature());
+                //ClassLoader cl = getClassLoader(context);
+                Class<?> clientSideItfClass = (Class<?>) interfaceCodeLoaderItf.loadInterface(cItf
+                        .getSignature(), context);
+                Class<?> serverSideItfClass = (Class<?>) interfaceCodeLoaderItf.loadInterface(sItf
+                        .getSignature(), context);
 
                 //            	Class<?> clientSideItfClass = Class<?>.forName(cItf.getSignature());
                 //            	Class<?> serverSideItfClass = Class<?>.forName(sItf.getSignature());
@@ -130,7 +185,7 @@ public class ProActiveTypeBindingLoader extends TypeBindingLoader {
                         //                        }
                     }
                 }
-            } catch (ClassNotFoundException e1) {
+            } catch (IDLException e1) {
                 throw new ADLException("incompatible binding between multicast client interface " +
                     cItf.getName() + " (" + cItf.getSignature() + ")  and server interface " +
                     sItf.getName() + " (" + sItf.getSignature() + ") : cannot find interface " +

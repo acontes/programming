@@ -40,10 +40,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import org.objectweb.deployment.scheduling.component.api.InstanceProviderTask;
-import org.objectweb.deployment.scheduling.core.api.Task;
+import org.objectweb.fractal.task.deployment.api.InstanceProviderTask;
+import org.objectweb.fractal.task.deployment.lib.AbstractRequireInstanceProviderTask;
+import org.objectweb.fractal.task.core.Task;
+import org.objectweb.fractal.task.core.TaskMap;
+import org.objectweb.fractal.task.core.TaskMap.TaskHole;
 import org.objectweb.fractal.adl.ADLException;
-import org.objectweb.fractal.adl.TaskMap;
 import org.objectweb.fractal.adl.bindings.Binding;
 import org.objectweb.fractal.adl.bindings.BindingBuilder;
 import org.objectweb.fractal.adl.bindings.BindingCompiler;
@@ -65,8 +67,8 @@ public class ProActiveBindingCompiler extends BindingCompiler {
     // --------------------------------------------------------------------------
     @Override
     @SuppressWarnings("unchecked")
-    public void compile(final List path, final ComponentContainer container, final TaskMap tasks,
-            final Map context) throws ADLException {
+    public void compile(final List path, final ComponentContainer container,
+            final org.objectweb.fractal.task.core.TaskMap tasks, final Map context) throws ADLException {
         Map subComponents = new HashMap();
         subComponents.put("this", container);
         Component[] comps = container.getComponents();
@@ -94,18 +96,17 @@ public class ProActiveBindingCompiler extends BindingCompiler {
                 int index = value.indexOf('.');
                 Object clientComp = subComponents.get(value.substring(0, index));
                 String clientItf = value.substring(index + 1);
-                InstanceProviderTask createClientTask = (InstanceProviderTask) tasks.getTask("create",
-                        clientComp);
+                TaskHole createClientTask = tasks.getTaskHole("create", clientComp);
 
                 value = binding.getTo();
                 Object serverComp = null;
                 String serverItf = null;
-                InstanceProviderTask createServerTask = null;
+                TaskHole createServerTask = null;
                 if (type != ProActiveBindingBuilder.WEBSERVICE_BINDING) {
                     index = value.indexOf('.');
                     serverComp = subComponents.get(value.substring(0, index));
                     serverItf = value.substring(index + 1);
-                    createServerTask = (InstanceProviderTask) tasks.getTask("create", serverComp);
+                    createServerTask = tasks.getTaskHole("create", serverComp);
                 } else {
                     serverItf = value;
                 }
@@ -156,21 +157,24 @@ public class ProActiveBindingCompiler extends BindingCompiler {
                         clientItf = setMulticastIndex(clientComp, clientItf, itfContainer);
                     }
 
-                    tasks.addTask("bind" + clientItf, clientComp, bindTask);
+                    TaskHole bindTaskHole = tasks.addTask("bind" + clientItf, clientComp, bindTask);
 
                     if (clientComp != container) {
-                        Task addTask = tasks.getTask("add", new ComponentPair(container,
+                        TaskHole addTask = tasks.getTaskHole("add", new ComponentPair(container,
                             (Component) clientComp));
-                        bindTask.addPreviousTask(addTask);
+                        bindTask.addDependency(addTask, Task.PREVIOUS_TASK_ROLE, context);
+                        //bindTask.addPreviousTask(addTask);
                     }
                     if ((type != ProActiveBindingBuilder.WEBSERVICE_BINDING) && (serverComp != container)) {
-                        Task addTask = tasks.getTask("add", new ComponentPair(container,
+                        TaskHole addTask = tasks.getTaskHole("add", new ComponentPair(container,
                             (Component) serverComp));
-                        bindTask.addPreviousTask(addTask);
+                        bindTask.addDependency(addTask, Task.PREVIOUS_TASK_ROLE, context);
+                        //bindTask.addPreviousTask(addTask);
                     }
 
-                    Task startTask = tasks.getTask("start", clientComp);
-                    startTask.addPreviousTask(bindTask);
+                    TaskHole startTask = tasks.getTaskHole("start", clientComp);
+                    startTask.addDependency(bindTaskHole, Task.PREVIOUS_TASK_ROLE, context);
+                    //startTask.addPreviousTask(bindTask);
                 }
             }
         }
@@ -206,7 +210,11 @@ public class ProActiveBindingCompiler extends BindingCompiler {
         return clientItf;
     }
 
-    static class ProActiveBindTask extends BindTask {
+    static class ProActiveBindTask extends AbstractRequireInstanceProviderTask {
+        private TaskMap.TaskHole serverInstanceProviderTask;
+
+        private BindingBuilder builder;
+
         private BindingBuilder proActiveBuilder;
 
         private int type;
@@ -217,20 +225,48 @@ public class ProActiveBindingCompiler extends BindingCompiler {
 
         public ProActiveBindTask(final BindingBuilder builder, final int type, final String clientItf,
                 final String serverItf) {
-            super(builder, type, clientItf, serverItf);
+            this.builder = builder;
             this.proActiveBuilder = new ProActiveBindingBuilder();
             this.type = type;
             this.clientItf = clientItf;
             this.serverItf = serverItf;
         }
 
-        public void execute(final Object context) throws Exception {
+        public InstanceProviderTask getServerInstanceProviderTask() {
+            return (serverInstanceProviderTask) == null ? null
+                    : (InstanceProviderTask) serverInstanceProviderTask.getTask();
+        }
+
+        public void setServerInstanceProviderTask(final TaskMap.TaskHole task) {
+            if (serverInstanceProviderTask != null) {
+                removePreviousTask(serverInstanceProviderTask);
+            }
+            serverInstanceProviderTask = task;
+            if (serverInstanceProviderTask != null) {
+                addPreviousTask(serverInstanceProviderTask);
+            }
+        }
+
+        public void execute(final Map context) throws Exception {
             if (type != ProActiveBindingBuilder.WEBSERVICE_BINDING) {
-                super.execute(context);
+                Object client = getInstanceProviderTask().getInstance();
+                Object server = getServerInstanceProviderTask().getInstance();
+                builder.bindComponent(type, client, clientItf, server, serverItf, context);
             } else {
                 Object client = getInstanceProviderTask().getInstance();
                 proActiveBuilder.bindComponent(type, client, clientItf, null, serverItf, context);
             }
+        }
+
+        public Object getResult() {
+            return null;
+        }
+
+        public void setResult(final Object result) {
+        }
+
+        public String toString() {
+            return "T" + System.identityHashCode(this) + "[BindTask(" + clientItf + "," + serverItf + ")]";
         }
     }
 }

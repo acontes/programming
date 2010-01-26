@@ -122,14 +122,14 @@ public class ExportedVirtualNodesList {
                 throw new ADLException("cannot compose " + composingNode.getDefiningComponentName() + '.' +
                     composingNode.getVirtualNodeName() + " which is SINGLE, whith composer virtual node " +
                     composerNode.getDefiningComponentName() + '.' + composerNode.getVirtualNodeName() +
-                    " because it is already composed from a virtual node of cardinality MULTIPLE", null);
+                    " because it is already composed from a virtual node of cardinality MULTIPLE");
             }
         } else {
             if (!composerNode.getComposingVirtualNodes().isEmpty() && composingNode.isMultiple()) {
                 throw new ADLException("cannot mix a MULTIPLE virtual node (" +
                     composingNode.getDefiningComponentName() + '.' + composingNode.getVirtualNodeName() +
                     " with SINGLE virtual nodes in composer node " + composerNode.getDefiningComponentName() +
-                    '.' + composerNode.getVirtualNodeName(), null);
+                    '.' + composerNode.getVirtualNodeName());
             }
         }
     }

@@ -53,29 +53,25 @@ import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
  */
 public class ProActiveTypeLoader extends TypeLoader {
     @Override
-    protected void checkInterfaceContainer(final InterfaceContainer container, final boolean extend,
-            final Map context) throws ADLException {
+    protected void checkInterfaceContainer(final InterfaceContainer container,
+            final Map<Object, Object> context) throws ADLException {
         Interface[] itfs = container.getInterfaces();
         for (int i = 0; i < itfs.length; i++) {
             Interface itf = itfs[i];
             if (itf instanceof TypeInterface) {
                 String signature = ((TypeInterface) itf).getSignature();
                 if (signature == null) {
-                    if (!extend) {
-                        throw new ADLException("Signature missing", (Node) itf);
-                    }
+                    throw new ADLException("Signature missing", (Node) itf);
                 } else {
                     try {
-                        getClassLoader(context).loadClass(signature);
-                    } catch (ClassNotFoundException e) {
-                        throw new ADLException("Invalid signature '" + signature + "'", (Node) itf, e);
+                        interfaceCodeLoaderItf.loadInterface(signature, context);
+                    } catch (final ADLException e) {
+                        throw e;
                     }
                 }
                 String role = ((TypeInterface) itf).getRole();
                 if (role == null) {
-                    if (!extend) {
-                        throw new ADLException("Role missing", (Node) itf);
-                    }
+                    throw new ADLException("Role missing", (Node) itf);
                 } else {
                     if (!role.equals("client") && !role.equals("server")) {
                         throw new ADLException("Invalid role '" + role + "'", (Node) itf);

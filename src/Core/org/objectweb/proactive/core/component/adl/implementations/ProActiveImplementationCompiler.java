@@ -40,12 +40,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.objectweb.deployment.scheduling.component.api.FactoryProviderTask;
-import org.objectweb.deployment.scheduling.component.lib.AbstractInstanceProviderTask;
+import org.objectweb.fractal.task.deployment.api.FactoryProviderTask;
+import org.objectweb.fractal.task.deployment.lib.AbstractInstanceProviderTask;
 import org.objectweb.fractal.adl.ADLException;
 import org.objectweb.fractal.adl.Definition;
 import org.objectweb.fractal.adl.Node;
-import org.objectweb.fractal.adl.TaskMap;
+import org.objectweb.fractal.task.core.TaskMap;
+import org.objectweb.fractal.task.core.TaskMap.TaskHole;
 import org.objectweb.fractal.adl.components.Component;
 import org.objectweb.fractal.adl.components.ComponentContainer;
 import org.objectweb.fractal.adl.implementations.ControllerContainer;
@@ -71,8 +72,9 @@ public class ProActiveImplementationCompiler extends ImplementationCompiler {
     protected static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_ADL);
 
     @Override
-    public void compile(final List path, final ComponentContainer container, final TaskMap tasks,
-            final Map context) throws ADLException {
+    public void compile(List path, ComponentContainer container, TaskMap tasks, Map context)
+            throws ADLException {
+
         ObjectsContainer obj = init(path, container, tasks, context);
         controllers(obj.getImplementation(), obj.getController(), obj.getName(), obj);
         end(tasks, container, context, obj.getName(), obj.getDefinition(), obj.getControllerDesc(), obj
@@ -174,9 +176,8 @@ public class ProActiveImplementationCompiler extends ImplementationCompiler {
         createTask = new CreateTask((ProActiveImplementationBuilder) builder, container, name, definition,
             controllerDesc, contentDesc, n, context);
 
-        FactoryProviderTask typeTask = (FactoryProviderTask) tasks.getTask("type", container);
+        TaskHole typeTask = tasks.getTaskHole("type", container);
         createTask.setFactoryProviderTask(typeTask);
-
         tasks.addTask("create", container, createTask);
     }
 
@@ -233,7 +234,7 @@ public class ProActiveImplementationCompiler extends ImplementationCompiler {
             this.context = context;
         }
 
-        public void execute(final Object context) throws Exception {
+        public void execute(Map<Object, Object> context) throws Exception {
             if (getInstance() != null) {
                 return;
             }

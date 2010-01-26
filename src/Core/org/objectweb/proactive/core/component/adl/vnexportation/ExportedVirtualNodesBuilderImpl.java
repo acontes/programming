@@ -62,13 +62,13 @@ public class ExportedVirtualNodesBuilderImpl implements ExportedVirtualNodesBuil
                     if (currentComponentVN == null) {
                         throw new ADLException("Trying to compose a virtual node from " +
                             composing_vns[j].getName() + ", which is declared to be in the component " +
-                            componentName + " , but there is no virtual node defined in this component", null);
+                            componentName + " , but there is no virtual node defined in this component");
                     }
                     if (!currentComponentVN.getName().equals(composing_vns[j].getName())) {
                         throw new ADLException("Trying to compose a virtual node from " +
                             composing_vns[i].getName() + ", which is declared to be in the component " +
                             componentName + ", but " + currentComponentVN.getName() + " is not defined " +
-                            "in this component", null);
+                            "in this component");
                     }
 
                     // change "this" into the name of the component

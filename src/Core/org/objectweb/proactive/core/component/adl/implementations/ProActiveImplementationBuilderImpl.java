@@ -178,7 +178,7 @@ public class ProActiveImplementationBuilderImpl implements ProActiveImplementati
                                         " will be instantiated in the current virtual machine (\"null\" was specified as the virtual node name)");
                         } else {
                             throw new ADLException("Could not find virtual node  " + adlVN.getName() +
-                                " in the deployment descriptor", null);
+                                " in the deployment descriptor");
                         }
                     } else {
                         if (deploymentVN.isMultiple() && (adlVN.getCardinality().equals(VirtualNode.SINGLE))) {
@@ -188,7 +188,7 @@ public class ProActiveImplementationBuilderImpl implements ProActiveImplementati
                             (adlVN.getCardinality().equals(VirtualNode.MULTIPLE))) {
                             throw new ADLException(
                                 "Cannot deploy on a single virtual node when the cardinality of this virtual node named " +
-                                    adlVN.getName() + " in the ADL is set to multiple", null);
+                                    adlVN.getName() + " in the ADL is set to multiple");
                         }
                     }
 

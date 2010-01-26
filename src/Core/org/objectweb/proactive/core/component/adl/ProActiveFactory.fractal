@@ -2,28 +2,32 @@
 <!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN" "classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd">
 
 <!-- this definition does not extend org.objectweb.fractal.adl.BasicFactory because it does not
-require any argument (the backend is always the same) -->
-<definition extends="org.objectweb.fractal.adl.FactoryType" name="org.objectweb.proactive.core.component.adl.ProActiveFactory">
+require any argument (the compiler is always the same) -->
+<definition name="org.objectweb.proactive.core.component.adl.ProActiveFactory" extends="org.objectweb.fractal.adl.FactoryType">
+  <!-- Factory component -->
   <component name="factory" definition="org.objectweb.fractal.adl.FactoryType">
     <interface name="loader" role="client" signature="org.objectweb.fractal.adl.Loader"/>
     <interface name="compiler" role="client" signature="org.objectweb.fractal.adl.Compiler"/>
-    <interface name="scheduler" role="client" signature="org.objectweb.deployment.scheduling.core.api.Scheduler"/>
+    <interface name="scheduler" role="client" signature="org.objectweb.fractal.task.core.Scheduler"/>
     <content class="org.objectweb.fractal.adl.BasicFactory"/>
   </component>
+
+  <!-- Loader component -->
   <component name="loader" definition="org.objectweb.proactive.core.component.adl.ProActiveLoader"/>
+
+  <!-- Compiler component -->
   <component name="compiler" definition="org.objectweb.proactive.core.component.adl.ProActiveCompiler"/>
-  <component name="backend" definition="org.objectweb.proactive.core.component.adl.ProActiveBackend"/>
-  <component name="scheduler" definition="org.objectweb.fractal.adl.BasicScheduler"/>  <binding client="this.factory" server="factory.factory"/>
+
+  <!-- Scheduler component -->
+  <component name="scheduler" definition="org.objectweb.fractal.task.core.BasicScheduler"/>
+
+  <binding client="this.factory" server="factory.factory"/>
   <binding client="factory.loader" server="loader.loader"/>
   <binding client="factory.compiler" server="compiler.compiler"/>
   <binding client="factory.scheduler" server="scheduler.scheduler"/>
-  <binding client="compiler.type-builder" server="backend.type-builder"/>
-  <binding client="compiler.implementation-builder" server="backend.implementation-builder"/>
-  <binding client="compiler.component-builder" server="backend.component-builder"/>
-  <binding client="compiler.binding-builder" server="backend.binding-builder"/>
-  <binding client="compiler.attribute-builder" server="backend.attribute-builder"/>
-  <binding client="compiler.exportedVirtualNode-builder" server="backend.exportedVirtualNode-builder"/>
+
   <controller desc="composite"/>
+
   <coordinates color="-73" y0="0.08464000000000065" x1="0.24249257317827413" y1="0.1704000000000006" name="factory" x0="0.02902420760048841"/>
   <coordinates color="-73" y0="0.0283199999999999" x1="0.471848569020942" y1="0.15887999999999997" name="loader" x0="0.28235136231703134">
     <coordinates color="-73" y0="0.44792332268370594" x1="0.8729724644044409" y1="0.5233226837060702" name="basic-loader" x0="0.6935332120679922"/>

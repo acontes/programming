@@ -23,7 +23,7 @@ differences between the standard Fractal ADL parser and this one are :
 	</li>
   <li>a registry that can store references to instantiated components</li>
 
-	<li>virtual nodes in the ADL can find a mapping in the ProActive deployment descriptor.
+	<li>virtual nodes in the ADL can find a mapping in the GCM Application descriptor.
 	</li>
   <li>virtual nodes can be exported and composed ; this allows colocation of processes
 	</li>
@@ -49,14 +49,13 @@ differences between the standard Fractal ADL parser and this one are :
 </ul>
 <ul>
   <li>The backend has a new exportedVirtualNode builder and a custom
-implementation builder that handles virtual nodes and stores compoent
+implementation builder that handles virtual nodes and stores component
 instances into a registry.</li>
 
   <img src="proactive-backend.png" alt="proactive backend" border="0" height="650" width="934">
 </ul>
 <br>
 <br>
-
 
   @author The ProActive Team
   

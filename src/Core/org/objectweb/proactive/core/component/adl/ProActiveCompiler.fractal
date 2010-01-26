@@ -2,24 +2,74 @@
 <!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN" "classpath://org/objectweb/fractal/adl/xml/basic.dtd">
 
 <definition name="org.objectweb.proactive.core.component.adl.ProActiveCompiler" extends="org.objectweb.fractal.adl.BasicCompiler">
-  <interface name="implementation-builder" role="client" signature="org.objectweb.proactive.core.component.adl.implementations.ProActiveImplementationBuilder"/>
-  <interface signature="org.objectweb.proactive.core.component.adl.vnexportation.ExportedVirtualNodesBuilder" role="client" name="exportedVirtualNode-builder"/>
-
+  <!-- compilers definitions -->
   <component name="implementation-compiler" definition="org.objectweb.fractal.adl.components.PrimitiveCompilerType">
     <interface name="builder" role="client" signature="org.objectweb.fractal.adl.implementations.ImplementationBuilder"/>
     <content class="org.objectweb.proactive.core.component.adl.implementations.ProActiveImplementationCompiler"/>
+  </component>
+  <component name="binding-compiler" definition="org.objectweb.fractal.adl.components.PrimitiveCompilerType">
+    <interface name="builder" role="client" signature="org.objectweb.fractal.adl.bindings.BindingBuilder"/>
+    <content class="org.objectweb.proactive.core.component.adl.bindings.ProActiveBindingCompiler"/>
   </component>
   <component name="exportedVirtualNodes-compiler" definition="org.objectweb.fractal.adl.components.PrimitiveCompilerType">
     <interface name="builder" role="client" signature="org.objectweb.proactive.core.component.adl.vnexportation.ExportedVirtualNodesBuilder"/>
     <content class="org.objectweb.proactive.core.component.adl.vnexportation.ExportedVirtualNodesCompiler"/>
   </component>
-  
-   <component name="binding-compiler" definition="org.objectweb.fractal.adl.components.PrimitiveCompilerType">
-    <interface name="builder" role="client" signature="org.objectweb.fractal.adl.bindings.BindingBuilder"/>
-    <content class="org.objectweb.proactive.core.component.adl.bindings.ProActiveBindingCompiler"/>
+
+  <!-- builders types definititions -->
+  <component name="type-builder">
+    <interface name="builder" signature="org.objectweb.fractal.adl.types.TypeBuilder"
+        role="server"/>
+    <content class="org.objectweb.proactive.core.component.adl.types.ProActiveTypeBuilder"/>
+    <controller desc="primitive"/>
   </component>
- 
+  <component name="implementation-builder">
+    <interface name="builder" signature="org.objectweb.proactive.core.component.adl.implementations.ProActiveImplementationBuilder"
+        role="server"/>
+    <component name="builder">
+      <interface name="builder" signature="org.objectweb.proactive.core.component.adl.implementations.ProActiveImplementationBuilder"
+          role="server"/>
+      <interface name="registry" signature="org.objectweb.proactive.core.component.adl.RegistryManager"
+          role="client"/>
+      <content class="org.objectweb.proactive.core.component.adl.implementations.ProActiveImplementationBuilderImpl"/>
+      <controller desc="primitive"/>
+    </component>
+    <component name="registry">
+      <interface signature="org.objectweb.proactive.core.component.adl.RegistryManager" role="server" name="registry"/>
+      <content class="org.objectweb.proactive.core.component.adl.RegistryManagerImpl"/>
+      <controller desc="primitive"/>
+    </component>
+    <binding client="this.builder" server="builder.builder"/>
+    <binding client="builder.registry" server="registry.registry"/>
+    <controller desc="composite"/>
+  </component>
+  <component name="component-builder">
+    <interface name="builder" signature="org.objectweb.fractal.adl.components.ComponentBuilder"
+        role="server"/>
+    <content class="org.objectweb.proactive.core.component.adl.components.ProActiveComponentBuilder"/>
+    <controller desc="primitive"/>
+  </component>
+  <component name="binding-builder">
+    <interface name="builder" signature="org.objectweb.fractal.adl.bindings.BindingBuilder"
+        role="server"/>
+    <content class="org.objectweb.fractal.adl.bindings.FractalBindingBuilder"/>
+    <controller desc="primitive"/>
+  </component>
+  <component name="attribute-builder">
+    <interface name="builder" signature="org.objectweb.fractal.adl.attributes.AttributeBuilder"
+        role="server"/>
+    <content class="org.objectweb.fractal.adl.attributes.FractalAttributeBuilder"/>
+    <controller desc="primitive"/>
+  </component>
+  <component name="exportedVirtualNodes-builder">
+    <interface name="builder" signature="org.objectweb.proactive.core.component.adl.vnexportation.ExportedVirtualNodesBuilder"
+        role="server"/>
+    <content class="org.objectweb.proactive.core.component.adl.vnexportation.ExportedVirtualNodesBuilderImpl"/>
+    <controller desc="primitive"/>
+  </component>
+
+  <!-- bindings between composite compiler and primitives -->
   <binding client="main-compiler.primitive-compilers5" server="exportedVirtualNodes-compiler.compiler"/>
-  <binding client="exportedVirtualNodes-compiler.builder" server="this.exportedVirtualNode-builder"/>
-  
+
+  <binding client="exportedVirtualNodes-compiler.builder" server="exportedVirtualNodes-builder.builder"/>
 </definition>
