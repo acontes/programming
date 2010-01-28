@@ -127,9 +127,10 @@ public class ProActiveImplementationBuilderImpl implements ProActiveImplementati
             bootstrap = Fractal.getBootstrapComponent();
         }
 
+        Object deploymentDescriptor = context.get("deployment-descriptor");
         ObjectsContainer result = null;
 
-        if (adlVN != null) {
+        if ((deploymentDescriptor != null) && (adlVN != null)) {
             // consider exported virtual nodes
             LinkedVirtualNode exported = ExportedVirtualNodesList.instance().getNode(name, adlVN.getName(),
                     false);
@@ -142,8 +143,6 @@ public class ProActiveImplementationBuilderImpl implements ProActiveImplementati
                 ExportedVirtualNodesList.instance().addLeafVirtualNode(name, adlVN.getName(),
                         adlVN.getCardinality()); // TODO_M check this
             }
-
-            Object deploymentDescriptor = context.get("deployment-descriptor");
 
             if (deploymentDescriptor != null) {
 
@@ -199,7 +198,6 @@ public class ProActiveImplementationBuilderImpl implements ProActiveImplementati
 
         } else {
             // adlVN == null
-            Object deploymentDescriptor = context.get("deployment-descriptor");
             if (deploymentDescriptor != null && deploymentDescriptor instanceof GCMApplication) {
                 result = new NewDeploymentObjectsContainer(null, bootstrap);
             } else {
