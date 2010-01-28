@@ -40,13 +40,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.objectweb.fractal.task.deployment.api.FactoryProviderTask;
-import org.objectweb.fractal.task.deployment.lib.AbstractInstanceProviderTask;
 import org.objectweb.fractal.adl.ADLException;
 import org.objectweb.fractal.adl.Definition;
 import org.objectweb.fractal.adl.Node;
-import org.objectweb.fractal.task.core.TaskMap;
-import org.objectweb.fractal.task.core.TaskMap.TaskHole;
 import org.objectweb.fractal.adl.components.Component;
 import org.objectweb.fractal.adl.components.ComponentContainer;
 import org.objectweb.fractal.adl.implementations.ControllerContainer;
@@ -54,6 +50,9 @@ import org.objectweb.fractal.adl.implementations.Implementation;
 import org.objectweb.fractal.adl.implementations.ImplementationCompiler;
 import org.objectweb.fractal.adl.implementations.ImplementationContainer;
 import org.objectweb.fractal.adl.nodes.VirtualNodeContainer;
+import org.objectweb.fractal.task.core.TaskMap;
+import org.objectweb.fractal.task.core.TaskMap.TaskHole;
+import org.objectweb.fractal.task.deployment.lib.AbstractInstanceProviderTask;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
@@ -72,9 +71,8 @@ public class ProActiveImplementationCompiler extends ImplementationCompiler {
     protected static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_ADL);
 
     @Override
-    public void compile(List path, ComponentContainer container, TaskMap tasks, Map context)
-            throws ADLException {
-
+    public void compile(List<ComponentContainer> path, ComponentContainer container, TaskMap tasks,
+            Map<Object, Object> context) throws ADLException {
         ObjectsContainer obj = init(path, container, tasks, context);
         controllers(obj.getImplementation(), obj.getController(), obj.getName(), obj);
         end(tasks, container, context, obj.getName(), obj.getDefinition(), obj.getControllerDesc(), obj
@@ -91,10 +89,9 @@ public class ProActiveImplementationCompiler extends ImplementationCompiler {
         }
     }
 
-    protected ObjectsContainer init(final List path, final ComponentContainer container, final TaskMap tasks,
-            final Map context) {
+    protected ObjectsContainer init(final List<ComponentContainer> path, final ComponentContainer container,
+            final TaskMap tasks, final Map<Object, Object> context) {
         counter++;
-
         String implementation = null;
 
         if (container instanceof ImplementationContainer) {
@@ -168,9 +165,10 @@ public class ProActiveImplementationCompiler extends ImplementationCompiler {
         return new ObjectsContainer(implementation, controller, name, definition, n);
     }
 
-    protected void end(final TaskMap tasks, final ComponentContainer container, final Map context,
-            String name, String definition, ControllerDescription controllerDesc,
-            ContentDescription contentDesc, VirtualNode n, boolean isFunctional) {
+    protected void end(final TaskMap tasks, final ComponentContainer container,
+            final Map<Object, Object> context, String name, String definition,
+            ControllerDescription controllerDesc, ContentDescription contentDesc, VirtualNode n,
+            boolean isFunctional) {
         AbstractInstanceProviderTask createTask = null;
 
         createTask = new CreateTask((ProActiveImplementationBuilder) builder, container, name, definition,
@@ -218,12 +216,12 @@ public class ProActiveImplementationCompiler extends ImplementationCompiler {
         ControllerDescription controllerDesc;
         ContentDescription contentDesc;
         VirtualNode vn;
-        Map context;
+        Map<Object, Object> context;
         ComponentContainer container;
 
         public CreateTask(final ProActiveImplementationBuilder builder, final ComponentContainer container,
                 final String name, final String definition, final ControllerDescription controllerDesc,
-                final ContentDescription contentDesc, final VirtualNode vn, final Map context) {
+                final ContentDescription contentDesc, final VirtualNode vn, final Map<Object, Object> context) {
             this.builder = builder;
             this.container = container;
             this.name = name;
@@ -241,7 +239,7 @@ public class ProActiveImplementationCompiler extends ImplementationCompiler {
 
             Object type = getFactoryProviderTask().getFactory();
             Object result = builder.createComponent(type, name, definition, controllerDesc, contentDesc, vn,
-                    (Map) context);
+                    context);
             setInstance(result);
         }
 

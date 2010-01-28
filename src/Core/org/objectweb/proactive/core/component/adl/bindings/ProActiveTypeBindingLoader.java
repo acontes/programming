@@ -40,7 +40,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.objectweb.fractal.adl.ADLException;
-import org.objectweb.fractal.adl.Node;
 import org.objectweb.fractal.adl.bindings.Binding;
 import org.objectweb.fractal.adl.bindings.BindingContainer;
 import org.objectweb.fractal.adl.bindings.BindingErrors;
@@ -58,23 +57,20 @@ import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
  * @author The ProActive Team
  */
 public class ProActiveTypeBindingLoader extends TypeBindingLoader {
-    private TypeInterface getFromTypeInterface(final Binding binding,
-            final Map<String, Map<String, Interface>> itfMap) throws ADLException {
+    private boolean isMulticastBinding(final Binding binding, final Map<String, Map<String, Interface>> itfMap)
+            throws ADLException {
         final String from = binding.getFrom();
-
         if (from == null) {
             throw new ADLException(BindingErrors.MISSING_FROM, binding);
         }
-
         int i = from.indexOf('.');
         if (i < 1 || i == from.length() - 1) {
             throw new ADLException(BindingErrors.INVALID_FROM_SYNTAX, binding, from);
         }
         final String fromCompName = from.substring(0, i);
         final String fromItfName = from.substring(i + 1);
-
         final Interface fromItf = getInterface(fromCompName, fromItfName, binding, itfMap);
-        return (TypeInterface) fromItf;
+        return ProActiveTypeFactory.MULTICAST_CARDINALITY.equals(((TypeInterface) fromItf).getCardinality());
     }
 
     @Override
@@ -105,9 +101,7 @@ public class ProActiveTypeBindingLoader extends TypeBindingLoader {
             final Map<String, Binding> fromItfs = new HashMap<String, Binding>();
             for (final Binding binding : ((BindingContainer) node).getBindings()) {
                 final Binding previousDefinition = fromItfs.put(binding.getFrom(), binding);
-                if ((previousDefinition != null) &&
-                    !(ProActiveTypeFactory.MULTICAST_CARDINALITY.equals(getFromTypeInterface(binding, itfMap)
-                            .getCardinality()))) {
+                if ((previousDefinition != null) && !isMulticastBinding(binding, itfMap)) {
                     throw new ADLException(BindingErrors.DUPLICATED_BINDING, binding, binding.getFrom(),
                         previousDefinition);
                 }
@@ -158,7 +152,7 @@ public class ProActiveTypeBindingLoader extends TypeBindingLoader {
                                     " (" +
                                     sItf.getSignature() +
                                     ") : there is not the same number of methods (including those inherited) " +
-                                    "in both interfaces !", (Node) binding);
+                                    "in both interfaces !", binding);
                         }
 
                         //                        Map<Method, Method> matchingMethodsForThisItf = new HashMap<Method, Method>(clientSideItfMethods.length);
@@ -189,7 +183,7 @@ public class ProActiveTypeBindingLoader extends TypeBindingLoader {
                 throw new ADLException("incompatible binding between multicast client interface " +
                     cItf.getName() + " (" + cItf.getSignature() + ")  and server interface " +
                     sItf.getName() + " (" + sItf.getSignature() + ") : cannot find interface " +
-                    e1.getMessage(), (Node) binding);
+                    e1.getMessage(), binding);
             }
         }
     }

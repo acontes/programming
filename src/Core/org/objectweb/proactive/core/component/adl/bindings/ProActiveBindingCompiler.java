@@ -40,11 +40,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import org.objectweb.fractal.task.deployment.api.InstanceProviderTask;
-import org.objectweb.fractal.task.deployment.lib.AbstractRequireInstanceProviderTask;
-import org.objectweb.fractal.task.core.Task;
-import org.objectweb.fractal.task.core.TaskMap;
-import org.objectweb.fractal.task.core.TaskMap.TaskHole;
 import org.objectweb.fractal.adl.ADLException;
 import org.objectweb.fractal.adl.bindings.Binding;
 import org.objectweb.fractal.adl.bindings.BindingBuilder;
@@ -56,6 +51,11 @@ import org.objectweb.fractal.adl.components.ComponentPair;
 import org.objectweb.fractal.adl.interfaces.Interface;
 import org.objectweb.fractal.adl.interfaces.InterfaceContainer;
 import org.objectweb.fractal.adl.types.TypeInterface;
+import org.objectweb.fractal.task.core.Task;
+import org.objectweb.fractal.task.core.TaskMap;
+import org.objectweb.fractal.task.core.TaskMap.TaskHole;
+import org.objectweb.fractal.task.deployment.api.InstanceProviderTask;
+import org.objectweb.fractal.task.deployment.lib.AbstractRequireInstanceProviderTask;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 
 
@@ -215,8 +215,6 @@ public class ProActiveBindingCompiler extends BindingCompiler {
 
         private BindingBuilder builder;
 
-        private BindingBuilder proActiveBuilder;
-
         private int type;
 
         private String clientItf;
@@ -226,7 +224,6 @@ public class ProActiveBindingCompiler extends BindingCompiler {
         public ProActiveBindTask(final BindingBuilder builder, final int type, final String clientItf,
                 final String serverItf) {
             this.builder = builder;
-            this.proActiveBuilder = new ProActiveBindingBuilder();
             this.type = type;
             this.clientItf = clientItf;
             this.serverItf = serverItf;
@@ -247,15 +244,16 @@ public class ProActiveBindingCompiler extends BindingCompiler {
             }
         }
 
-        public void execute(final Map context) throws Exception {
+        public void execute(final Map<Object, Object> context) throws Exception {
+            Object client = null;
+            Object server = null;
             if (type != ProActiveBindingBuilder.WEBSERVICE_BINDING) {
-                Object client = getInstanceProviderTask().getInstance();
-                Object server = getServerInstanceProviderTask().getInstance();
-                builder.bindComponent(type, client, clientItf, server, serverItf, context);
+                client = getInstanceProviderTask().getInstance();
+                server = getServerInstanceProviderTask().getInstance();
             } else {
-                Object client = getInstanceProviderTask().getInstance();
-                proActiveBuilder.bindComponent(type, client, clientItf, null, serverItf, context);
+                client = getInstanceProviderTask().getInstance();
             }
+            builder.bindComponent(type, client, clientItf, server, serverItf, context);
         }
 
         public Object getResult() {

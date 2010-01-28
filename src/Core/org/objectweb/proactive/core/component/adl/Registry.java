@@ -107,7 +107,7 @@ public class Registry {
      * see @link org.objectweb.fractal.adl.RegistryManager#getComponent(java.lang.String)
      */
     public Component getComponent(String name) {
-        return (Component) table.get(name);
+        return table.get(name);
     }
 
     /**

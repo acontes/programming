@@ -112,13 +112,13 @@ public class ProActiveImplementationBuilderImpl implements ProActiveImplementati
 
     public Object createComponent(Object type, String name, String definition,
             ControllerDescription controllerDesc, ContentDescription contentDesc, VirtualNode adlVN,
-            Map context) throws Exception {
+            Map<Object, Object> context) throws Exception {
         ObjectsContainer obj = commonCreation(type, name, definition, contentDesc, adlVN, context);
         return createFComponent(type, obj, controllerDesc, contentDesc, adlVN, obj.getBootstrapComponent());
     }
 
     protected ObjectsContainer commonCreation(Object type, String name, String definition,
-            ContentDescription contentDesc, VirtualNode adlVN, Map context) throws Exception {
+            ContentDescription contentDesc, VirtualNode adlVN, Map<Object, Object> context) throws Exception {
         Component bootstrap = null;
         if (context != null) {
             bootstrap = (Component) context.get("bootstrap");

@@ -347,7 +347,7 @@ public class ExportedVirtualNodesList {
             //List to_remove = new ArrayList();
             LinkedVirtualNode to_remove = null;
             while (it.hasNext()) {
-                LinkedVirtualNode lvn = (LinkedVirtualNode) it.next();
+                LinkedVirtualNode lvn = it.next();
                 if (lvn.getVirtualNodeName().equals(virtualNodeName) ||
                     lvn.getExportedVirtualNodeNameAfterComposition().equals(virtualNodeName)) {
                     // as the current list should not be modified while iterated, keep a list

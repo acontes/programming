@@ -35,23 +35,27 @@
  */
 package org.objectweb.proactive.core.component.adl.bindings;
 
-import org.objectweb.fractal.adl.bindings.BindingBuilder;
+import org.objectweb.fractal.adl.bindings.FractalBindingBuilder;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.util.Fractal;
 
 
 /**
- * A specific implementation of the {@link BindingBuilder} interface for web service bindings.
+ * An extension of the {@link FractalBindingBuilder} class for web service bindings.
  *
  * @author The ProActive Team
  */
-public class ProActiveBindingBuilder implements BindingBuilder {
+public class ProActiveBindingBuilder extends FractalBindingBuilder {
     public static final int WEBSERVICE_BINDING = 3;
 
     public void bindComponent(int type, Object client, String clientItf, Object server, String serverItf,
             Object context) throws Exception {
-        BindingController bc = Fractal.getBindingController((Component) client);
-        bc.bindFc(clientItf, serverItf);
+        if (type != WEBSERVICE_BINDING) {
+            super.bindComponent(type, client, clientItf, server, serverItf, context);
+        } else {
+            BindingController bc = Fractal.getBindingController((Component) client);
+            bc.bindFc(clientItf, serverItf);
+        }
     }
 }
