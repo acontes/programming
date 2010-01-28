@@ -89,16 +89,14 @@ public class Registry {
             try {
                 String name = Fractal.getNameController(component).getFcName();
                 if (table.containsKey(name)) {
-                    throw new ADLException("A component with the name " + name +
-                        " is already stored in the registry");
+                    throw new ADLException(RegistryErrors.DUPLICATED_COMPONENT_NAME, name);
                 }
                 table.put(name, component);
                 if (logger.isDebugEnabled()) {
                     logger.debug("added component " + name + " to the local registry");
                 }
             } catch (NoSuchInterfaceException e) {
-                throw new ADLException(
-                    "It is not possible to register a component without a NameController controller");
+                throw new ADLException(RegistryErrors.NAME_CONTROLLER_MISSING);
             }
         }
     }

@@ -46,7 +46,6 @@ import org.objectweb.fractal.adl.bindings.BindingErrors;
 import org.objectweb.fractal.adl.bindings.TypeBindingLoader;
 import org.objectweb.fractal.adl.components.Component;
 import org.objectweb.fractal.adl.components.ComponentContainer;
-import org.objectweb.fractal.adl.interfaces.IDLException;
 import org.objectweb.fractal.adl.interfaces.Interface;
 import org.objectweb.fractal.adl.interfaces.InterfaceContainer;
 import org.objectweb.fractal.adl.types.TypeInterface;
@@ -126,64 +125,21 @@ public class ProActiveTypeBindingLoader extends TypeBindingLoader {
             TypeInterface cItf = (TypeInterface) fromItf;
             TypeInterface sItf = (TypeInterface) toItf;
 
-            try {
-                //ClassLoader cl = getClassLoader(context);
-                Class<?> clientSideItfClass = (Class<?>) interfaceCodeLoaderItf.loadInterface(cItf
-                        .getSignature(), context);
-                Class<?> serverSideItfClass = (Class<?>) interfaceCodeLoaderItf.loadInterface(sItf
-                        .getSignature(), context);
+            Class<?> clientSideItfClass = (Class<?>) interfaceCodeLoaderItf.loadInterface(
+                    cItf.getSignature(), context);
+            Class<?> serverSideItfClass = (Class<?>) interfaceCodeLoaderItf.loadInterface(
+                    sItf.getSignature(), context);
+            if (!clientSideItfClass.isAssignableFrom(serverSideItfClass)) {
+                // check if multicast interface
+                if (ProActiveTypeFactory.MULTICAST_CARDINALITY.equals(cItf.getCardinality())) {
+                    Method[] clientSideItfMethods = clientSideItfClass.getMethods();
+                    Method[] serverSideItfMethods = serverSideItfClass.getMethods();
 
-                //            	Class<?> clientSideItfClass = Class<?>.forName(cItf.getSignature());
-                //            	Class<?> serverSideItfClass = Class<?>.forName(sItf.getSignature());
-                if (!clientSideItfClass.isAssignableFrom(serverSideItfClass)) {
-                    // check if multicast interface
-                    if (ProActiveTypeFactory.MULTICAST_CARDINALITY.equals(cItf.getCardinality())) {
-                        Method[] clientSideItfMethods = clientSideItfClass.getMethods();
-                        Method[] serverSideItfMethods = serverSideItfClass.getMethods();
-
-                        if (clientSideItfMethods.length != serverSideItfMethods.length) {
-                            throw new ADLException(
-                                "incompatible binding between multicast client interface " +
-                                    cItf.getName() +
-                                    " (" +
-                                    cItf.getSignature() +
-                                    ")  and server interface " +
-                                    sItf.getName() +
-                                    " (" +
-                                    sItf.getSignature() +
-                                    ") : there is not the same number of methods (including those inherited) " +
-                                    "in both interfaces !", binding);
-                        }
-
-                        //                        Map<Method, Method> matchingMethodsForThisItf = new HashMap<Method, Method>(clientSideItfMethods.length);
-                        //
-                        //                        for (Method method : clientSideItfMethods) {
-                        //                            try {
-                        ////                                matchingMethodsForThisItf
-                        ////                                        .put(method, MulticastBindingChecker.searchMatchingMethod(method, serverSideItfMethods, ProActiveTypeInterface.GATHER_CARDINALITY.equals(sItf.getCardinality()), (ProActiveInterface)toItf));
-                        //                                matchingMethodsForThisItf
-                        //                                .put(method, MulticastBindingChecker.searchMatchingMethod(method, serverSideItfMethods, ProActiveTypeInterface.GATHER_CARDINALITY.equals(sItf.getCardinality())));
-                        //                            } catch (ParameterDispatchException e1) {
-                        //                                throw new ADLException("incompatible binding between multicast client interface " + cItf
-                        //                                        .getName() + " (" + cItf.getSignature()
-                        //                                        + ")  and server interface " + sItf.getName() + " (" + sItf
-                        //                                        .getSignature() + ") : incompatible dispatch " +
-                        //                                        e1.getMessage(), (Node) binding);
-                        //                            } catch (NoSuchMethodException e1) {
-                        //                                throw new ADLException("incompatible binding between multicast client interface " + cItf
-                        //                                        .getName() + " (" + cItf.getSignature()
-                        //                                        + ")  and server interface " + sItf.getName() + " (" + sItf
-                        //                                        .getSignature() + ") : cannot find corresponding method " +
-                        //                                        e1.getMessage(), (Node) binding);
-                        //                            }
-                        //                        }
+                    if (clientSideItfMethods.length != serverSideItfMethods.length) {
+                        throw new ADLException(ProActiveBindingErrors.INVALID_MULTICAST_SIGNATURE, fromItf,
+                            toItf);
                     }
                 }
-            } catch (IDLException e1) {
-                throw new ADLException("incompatible binding between multicast client interface " +
-                    cItf.getName() + " (" + cItf.getSignature() + ")  and server interface " +
-                    sItf.getName() + " (" + sItf.getSignature() + ") : cannot find interface " +
-                    e1.getMessage(), binding);
             }
         }
     }

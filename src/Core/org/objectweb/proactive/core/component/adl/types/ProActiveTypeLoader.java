@@ -38,9 +38,9 @@ package org.objectweb.proactive.core.component.adl.types;
 import java.util.Map;
 
 import org.objectweb.fractal.adl.ADLException;
-import org.objectweb.fractal.adl.Node;
 import org.objectweb.fractal.adl.interfaces.Interface;
 import org.objectweb.fractal.adl.interfaces.InterfaceContainer;
+import org.objectweb.fractal.adl.types.TypeErrors;
 import org.objectweb.fractal.adl.types.TypeInterface;
 import org.objectweb.fractal.adl.types.TypeLoader;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
@@ -61,7 +61,7 @@ public class ProActiveTypeLoader extends TypeLoader {
             if (itf instanceof TypeInterface) {
                 String signature = ((TypeInterface) itf).getSignature();
                 if (signature == null) {
-                    throw new ADLException("Signature missing", (Node) itf);
+                    throw new ADLException(TypeErrors.SIGNATURE_MISSING, itf);
                 } else {
                     try {
                         interfaceCodeLoaderItf.loadInterface(signature, context);
@@ -71,16 +71,16 @@ public class ProActiveTypeLoader extends TypeLoader {
                 }
                 String role = ((TypeInterface) itf).getRole();
                 if (role == null) {
-                    throw new ADLException("Role missing", (Node) itf);
+                    throw new ADLException(TypeErrors.ROLE_MISSING, itf);
                 } else {
                     if (!role.equals("client") && !role.equals("server")) {
-                        throw new ADLException("Invalid role '" + role + "'", (Node) itf);
+                        throw new ADLException(TypeErrors.INVALID_ROLE, itf, role);
                     }
                 }
                 String contingency = ((TypeInterface) itf).getContingency();
                 if (contingency != null) {
                     if (!contingency.equals("mandatory") && !contingency.equals("optional")) {
-                        throw new ADLException("Invalid contingency '" + contingency + "'", (Node) itf);
+                        throw new ADLException(TypeErrors.INVALID_CONTINGENCY, itf, contingency);
                     }
                 }
 
@@ -89,7 +89,7 @@ public class ProActiveTypeLoader extends TypeLoader {
                     if (!cardinality.equals("singleton") && !cardinality.equals("collection") &&
                         !cardinality.equals(ProActiveTypeFactory.MULTICAST_CARDINALITY) &&
                         !cardinality.equals(ProActiveTypeFactory.GATHER_CARDINALITY)) {
-                        throw new ADLException("Invalid cardinality '" + cardinality + "'", (Node) itf);
+                        throw new ADLException(TypeErrors.INVALID_CARDINALITY, itf, cardinality);
                     }
                 }
             }
