@@ -87,10 +87,10 @@
 			following libraries which are included in the
 			<literal>/lib</literal>
 			directory of the ProActive distribution :
-			<literal>fractal-adl.jar</literal>,
-			<literal>dtdparser.jar</literal>,
-			<literal>ow_deployment_scheduling.jar
-			</literal>.
+			<literal>fractal-adl-2.4-SNAPSHOT.jar</literal>,
+			<literal>dtdparser-1.21.jar</literal>,
+			<literal>task-deployment-2.4-SNAPSHOT.jar</literal>,
+			<literal>task-framework-2.4-SNAPSHOT.jar</literal>.
 		</para>
 		<section xml:id="Overview_500">
 			<info>
