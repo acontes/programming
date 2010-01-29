@@ -101,7 +101,7 @@ public class Launcher {
         if (pargs[0].equals("-java")) {
             Factory f = FactoryFactory.getFactory(FactoryFactory.JAVA_BACKEND);
 
-            return ((Map) f.newComponent(pargs[1], new HashMap())).get(pargs[2]);
+            return ((Map) f.newComponent(pargs[1], new HashMap<Object, Object>())).get(pargs[2]);
         } else {
             Factory f;
             if ("org.objectweb.proactive.core.component.Fractive".equals(PAProperties.FRACTAL_PROVIDER
@@ -116,12 +116,12 @@ public class Launcher {
             // PROACTIVE
             if (pargs[3] != null) {
                 deploymentDescriptor = PADeployment.getProactiveDescriptor(pargs[3]);
-                HashMap context = new HashMap(1);
+                Map<Object, Object> context = new HashMap<Object, Object>(1);
                 context.put("deployment-descriptor", deploymentDescriptor);
                 return f.newComponent(pargs[1], context);
             } else {
                 try {
-                    return f.newComponent(pargs[1], new HashMap());
+                    return f.newComponent(pargs[1], new HashMap<Object, Object>());
                 } catch (ClassCastException e) {
                     if (e.getMessage().indexOf("attribute_controller_representative") != (-1)) {
                         System.out
