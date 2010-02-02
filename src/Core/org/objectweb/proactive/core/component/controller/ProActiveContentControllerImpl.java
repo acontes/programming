@@ -44,11 +44,13 @@ import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.ContentController;
 import org.objectweb.fractal.api.control.IllegalContentException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.fractal.api.factory.InstantiationException;
+import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.api.PAGroup;
@@ -94,13 +96,22 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController 
 
     /*
      * @see org.objectweb.fractal.api.control.ContentController#getFcInternalInterfaces()
-     * 
+     *
      * in this implementation, the external interfaces are also internal interfaces
      */
     public Object[] getFcInternalInterfaces() {
-        logger
-                .error("Internal interfaces are only accessible from the stub, i.e. from outside of this component");
-        return null;
+        Object[] itfs = ((ProActiveComponent) getFcItfOwner()).getRepresentativeOnThis().getFcInterfaces();
+        List<Object> internalItfs = new ArrayList<Object>();
+
+        for (int i = 0; i < itfs.length; i++) {
+            InterfaceType itfType = (InterfaceType) ((Interface) itfs[i]).getFcItfType();
+            if (!itfType.isFcClientItf() && !itfType.getFcItfName().equals(Constants.COMPONENT) &&
+                !itfType.getFcItfName().endsWith("-controller")) {
+                internalItfs.add(itfs[i]);
+            }
+        }
+
+        return internalItfs.toArray(new Interface[internalItfs.size()]);
     }
 
     /*
