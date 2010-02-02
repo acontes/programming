@@ -65,9 +65,6 @@ import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
 
-//import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplication;
-//import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNode;
-
 /**
  * @author The ProActive Team
  */
@@ -119,17 +116,17 @@ public class ProActiveImplementationBuilderImpl implements ProActiveImplementati
 
     protected ObjectsContainer commonCreation(Object type, String name, String definition,
             ContentDescription contentDesc, VirtualNode adlVN, Map<Object, Object> context) throws Exception {
+        Object deploymentDescriptor = null;
         Component bootstrap = null;
+        ObjectsContainer result = null;
+
         if (context != null) {
+            deploymentDescriptor = context.get("deployment-descriptor");
             bootstrap = (Component) context.get("bootstrap");
         }
         if (bootstrap == null) {
             bootstrap = Fractal.getBootstrapComponent();
         }
-
-        Object deploymentDescriptor = context.get("deployment-descriptor");
-        ObjectsContainer result = null;
-
         if ((deploymentDescriptor != null) && (adlVN != null)) {
             // consider exported virtual nodes
             LinkedVirtualNode exported = ExportedVirtualNodesList.instance().getNode(name, adlVN.getName(),
@@ -143,30 +140,22 @@ public class ProActiveImplementationBuilderImpl implements ProActiveImplementati
                 ExportedVirtualNodesList.instance().addLeafVirtualNode(name, adlVN.getName(),
                         adlVN.getCardinality()); // TODO_M check this
             }
-
             if (deploymentDescriptor != null) {
-
                 if (deploymentDescriptor instanceof GCMApplication) {
                     //
                     // New deployment
                     //
                     GCMApplication gcmApplication = (GCMApplication) deploymentDescriptor;
-
                     GCMVirtualNode virtualNode = gcmApplication.getVirtualNode(adlVN.getName());
-
                     result = new NewDeploymentObjectsContainer(virtualNode, bootstrap);
-
                 } else if (deploymentDescriptor instanceof ProActiveDescriptor) {
                     //
                     // Old deployment
                     //
                     org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal deploymentVN = null;
-
                     ProActiveDescriptor proactiveDecriptor = (ProActiveDescriptor) deploymentDescriptor;
-
                     org.objectweb.proactive.core.descriptor.data.VirtualNode vn = proactiveDecriptor
                             .getVirtualNode(adlVN.getName());
-
                     if (vn != null) {
                         deploymentVN = vn.getVirtualNodeInternal();
                     }
@@ -190,17 +179,18 @@ public class ProActiveImplementationBuilderImpl implements ProActiveImplementati
                                         .getName());
                         }
                     }
-
                     result = new ObjectsContainer(deploymentVN, bootstrap);
                 }
-
             }
-
-        } else {
-            // adlVN == null
+        } else { // (deploymentDescriptor == null || adlVN == null)
             if (deploymentDescriptor != null && deploymentDescriptor instanceof GCMApplication) {
                 result = new NewDeploymentObjectsContainer(null, bootstrap);
             } else {
+                if ((deploymentDescriptor == null) && (adlVN != null)) {
+                    logger
+                            .info(name +
+                                " will be instantiated in the current virtual machine (a virtual node name is specified but no deployment descriptor has been set in the context)");
+                }
                 result = new ObjectsContainer(null, bootstrap);
             }
         }
@@ -214,8 +204,8 @@ public class ProActiveImplementationBuilderImpl implements ProActiveImplementati
         Component result;
 
         result = objectContainer.createFComponent((ComponentType) type, controllerDesc, contentDesc, adlVN);
-
         //        registry.addComponent(result); // the registry can handle groups
+
         return result;
     }
 
@@ -250,19 +240,13 @@ public class ProActiveImplementationBuilderImpl implements ProActiveImplementati
             if ((deploymentVN != null) && VirtualNode.MULTIPLE.equals(adlVN.getCardinality()) &&
                 controllerDesc.getHierarchicalType().equals(Constants.PRIMITIVE) &&
                 !contentDesc.uniqueInstance()) {
-
                 Group<Component> fcInstance = (Group<Component>) newFcInstanceAsList(bootstrap, type,
                         controllerDesc, contentDesc, deploymentVN);
                 result = (Component) fcInstance.getGroupByType();
-
             } else {
-
                 if (deploymentVN == null) {
-
                     result = genericFactory.newFcInstance(type, controllerDesc, contentDesc, (Node) null);
-
                 } else {
-
                     try {
                         deploymentVN.activate();
                         if (deploymentVN.getNodes().length == 0) {
@@ -283,7 +267,6 @@ public class ProActiveImplementationBuilderImpl implements ProActiveImplementati
 
             return result;
         }
-
     }
 
     protected class NewDeploymentObjectsContainer extends ObjectsContainer {
@@ -302,11 +285,10 @@ public class ProActiveImplementationBuilderImpl implements ProActiveImplementati
         @Override
         public Component createFComponent(ComponentType type, ControllerDescription controllerDesc,
                 ContentDescription contentDesc, VirtualNode adlVN) throws Exception {
-
             Component result = null;
+
             ProActiveGenericFactory genericFactory = (ProActiveGenericFactory) Fractal
                     .getGenericFactory(bootstrap);
-
             result = genericFactory.newFcInstance(type, controllerDesc, contentDesc, ADLNodeProvider
                     .getNode(gcmDeploymentVN));
 
@@ -317,10 +299,8 @@ public class ProActiveImplementationBuilderImpl implements ProActiveImplementati
     private List<Component> newFcInstanceAsList(Component bootstrap, Type type,
             ControllerDescription controllerDesc, ContentDescription contentDesc,
             org.objectweb.proactive.core.descriptor.data.VirtualNode virtualNode) throws Exception {
-
         ProActiveGenericFactory genericFactory = (ProActiveGenericFactory) Fractal
                 .getGenericFactory(bootstrap);
-
         if (virtualNode == null) {
             return genericFactory.newFcInstanceAsList(type, controllerDesc, contentDesc, (Node[]) null);
         }
