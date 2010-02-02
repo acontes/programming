@@ -108,7 +108,7 @@ public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType, Seria
         this.isOptional = isOptional;
         this.isStream = checkIsStream(signature);
         this.cardinality = cardinality;
-        checkMethodsSignatures(signature, cardinality);
+        checkMethodSignatures(signature, cardinality);
     }
 
     public ProActiveInterfaceTypeImpl(String name, String signature, boolean isClient, boolean isOptional,
@@ -129,12 +129,12 @@ public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType, Seria
         }
     }
 
-    private void checkMethodsSignatures(String signature, String cardinality) throws InstantiationException {
-        checkMethodsStream(signature);
-        checkMethodsCardinality(signature, cardinality);
+    private void checkMethodSignatures(String signature, String cardinality) throws InstantiationException {
+        checkStreamMethods(signature);
+        checkMethodCardinalities(signature, cardinality);
     }
 
-    private void checkMethodsStream(String signature) throws InstantiationException {
+    private void checkStreamMethods(String signature) throws InstantiationException {
         try {
             if (isStream) {
                 Class<?> c = Class.forName(signature);
@@ -154,7 +154,7 @@ public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType, Seria
         }
     }
 
-    private void checkMethodsCardinality(String signature, String cardinality) throws InstantiationException {
+    private void checkMethodCardinalities(String signature, String cardinality) throws InstantiationException {
         try {
             if (ProActiveTypeFactory.GATHER_CARDINALITY.equals(cardinality)) {
                 Class<?> c = Class.forName(signature);
