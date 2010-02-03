@@ -86,7 +86,8 @@ public class HttpRemoteObjectLookupMessage extends HttpMessage implements Serial
     @Override
     public Object processMessage() {
         if (this.urn != null) {
-            InternalRemoteRemoteObject irro = HTTPRegistry.getInstance().lookup(URIBuilder.getNameFromURI(url));
+            InternalRemoteRemoteObject irro = HTTPRegistry.getInstance().lookup(
+                    URIBuilder.getNameFromURI(url));
 
             //            System.out.println("HttpRemoteObjectLookupMessage.processMessage() ++ ro at " + url +" : " +ro) ;
             if (irro != null) {

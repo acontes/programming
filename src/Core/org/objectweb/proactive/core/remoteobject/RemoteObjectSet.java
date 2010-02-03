@@ -1,6 +1,41 @@
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2009 INRIA/University of
+ *                         Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2.
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://proactive.inria.fr/team_members.htm
+ *  Contributor(s):
+ *
+ * ################################################################
+ * $$ACTIVEEON_INITIAL_DEV$$
+ */
 package org.objectweb.proactive.core.remoteobject;
 
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.lang.reflect.TypeVariable;
@@ -14,7 +49,9 @@ import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.mop.MethodCall;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
+import org.objectweb.proactive.core.util.URIBuilder;
 
 
 public class RemoteObjectSet implements Serializable {
@@ -23,8 +60,9 @@ public class RemoteObjectSet implements Serializable {
     private HashSet<RemoteRemoteObject> unreliables;
     private RemoteRemoteObject _default;
     private static Method getURI;
-    private Pair first;
-    private String[] order = PAProperties.PA_COMMUNICATION_PROTOCOL_ORDER.getValue().split(";");
+    private String[] order = null;
+    private String[] urls;
+    private String forcedProtocol = null;
 
     static {
         try {
@@ -36,45 +74,42 @@ public class RemoteObjectSet implements Serializable {
 
     private RemoteObjectSet() {
         this.rros = new HashMap<URI, RemoteRemoteObject>();
+        this.unreliables = new HashSet<RemoteRemoteObject>();
     }
 
     public RemoteObjectSet(RemoteRemoteObject rro) {
         this();
         try {
-            this.first = new Pair(getURI(rro), rro);
+            this._default = rro;
+            this.urls = getPARuntimeUrls(rro);
+            this.updateOrder();
         } catch (NotReliableRemoteRemoteObjectException e) {
             this.unreliables.add(rro);
         }
-        this._default = rro;
+    }
+
+    public void forceProtocol(String protocol) {
+        this.forcedProtocol = protocol;
     }
 
     public void add(RemoteRemoteObject rro) {
         // If an older same rro is present, it will be updated
         try {
             this.rros.put(getURI(rro), rro);
-            this.chooseFirst();
+            // Update ?
         } catch (NotReliableRemoteRemoteObjectException e) {
             this.unreliables.add(rro);
         }
     }
 
-    public RemoteRemoteObject getFirst() {
-        if (first == null)
-            chooseFirst();
-        return first.getRRO();
-    }
-
-    private Pair internalGet(int i) throws NoPriorityRemoteRemoteObjectException {
-        // Search by order
-        for (int j = i; j < order.length; j++) {
-            String protocol = order[j];
-            // Search the faster protocol in available one            
-            for (URI uri : rros.keySet()) {
-                if (protocol.equalsIgnoreCase(uri.getScheme()))
-                    return new Pair(uri, rros.get(uri));
-            }
+    private Pair internalGet(int i) throws UnaccessibleRemoteRemoteObjectException,
+            ArrayIndexOutOfBoundsException {
+        String protocol = order[i];
+        for (URI uri : rros.keySet()) {
+            if (protocol.equalsIgnoreCase(uri.getScheme()))
+                return new Pair(uri, rros.get(uri));
         }
-        throw new NoPriorityRemoteRemoteObjectException();
+        throw new UnaccessibleRemoteRemoteObjectException();
     }
 
     /**
@@ -86,52 +121,33 @@ public class RemoteObjectSet implements Serializable {
      *          
      * @return Never return null, if there is no order, or no available RemoteRemoteObject 
      * in the specified protocol order list, return the default protocol associated, RemoteRemoteObject 
+     * @throws UnaccessibleRemoteRemoteObjectException
      */
-    public RemoteRemoteObject get(int i) {
-        if (i > this.order.length)
-            return _default;
+    public RemoteRemoteObject get(int i) throws UnaccessibleRemoteRemoteObjectException {
+        if (forcedProtocol != null) {
+            for (URI uri : rros.keySet()) {
+                if (forcedProtocol.equalsIgnoreCase(uri.getScheme()))
+                    return rros.get(uri);
+            }
+        }
+
         try {
             return internalGet(i).getRRO();
-        } catch (NoPriorityRemoteRemoteObjectException e) {
+        } catch (ArrayIndexOutOfBoundsException e) {
             return _default;
         }
-    }
-
-    private void chooseFirst() {
-        try {
-            first = internalGet(0);
-        } catch (NoPriorityRemoteRemoteObjectException e) {
-            // No more change needed
-        }
-    }
-
-    // Use only for debugging
-    // Will be remove shortly
-    public void printAll() {
-        System.out.println("#####################################");
-        System.out.println("Faster is : " + this.first.getURI());
-        for (URI uri : rros.keySet()) {
-            System.out.println(uri);
-        }
-        System.out.println("#####################################");
-    }
-
-    public void setOrder(String[] protocolOrder) {
-        this.order = order;
-        this.chooseFirst();
     }
 
     private URI getURI(RemoteRemoteObject rro) throws NotReliableRemoteRemoteObjectException {
         // Retrying the uri from here will ensure that accessing this rro
-        //  doesn't throw any exception, so it could be use quite safely 
+        // doesn't throw any exception, so it could be use quite safely
         // in the future.
-        MethodCall mc = MethodCall.getMethodCall(getURI, new Object[0],
-                new HashMap<TypeVariable<?>, Class<?>>());
-        Request r = new InternalRemoteRemoteObjectRequest(mc);
-        Reply rep = null;
         try {
-            rep = rro.receiveMessage(r);
-            // TODO Treat exception in a smarter way 
+            MethodCall mc = MethodCall.getMethodCall(getURI, new Object[0],
+                    new HashMap<TypeVariable<?>, Class<?>>());
+            Request r = new InternalRemoteRemoteObjectRequest(mc);
+            Reply rep = rro.receiveMessage(r);
+            return (URI) rep.getResult().getResult();
         } catch (ProActiveException e) {
             throw new NotReliableRemoteRemoteObjectException();
         } catch (IOException e) {
@@ -140,8 +156,23 @@ public class RemoteObjectSet implements Serializable {
             throw new NotReliableRemoteRemoteObjectException();
         } catch (RenegotiateSessionException e) {
             e.printStackTrace();
+            throw new NotReliableRemoteRemoteObjectException();
         }
-        return (URI) rep.getResult().getResult();
+    }
+
+    private String[] getPARuntimeUrls(RemoteRemoteObject rro) throws NotReliableRemoteRemoteObjectException {
+        try {
+            Request r = new PARuntimeUrlsRequest();
+            Reply rep = rro.receiveMessage(r);
+            return (String[]) rep.getResult().getResult();
+        } catch (ProActiveException e) {
+            throw new NotReliableRemoteRemoteObjectException();
+        } catch (IOException e) {
+            throw new NotReliableRemoteRemoteObjectException();
+        } catch (RenegotiateSessionException e) {
+            e.printStackTrace();
+            throw new NotReliableRemoteRemoteObjectException();
+        }
     }
 
     private class Pair implements Serializable {
@@ -163,28 +194,39 @@ public class RemoteObjectSet implements Serializable {
     }
 
     private class NotReliableRemoteRemoteObjectException extends Exception {
-        public NotReliableRemoteRemoteObjectException() {
-            super();
-        }
     }
 
-    private class NoPriorityRemoteRemoteObjectException extends Exception {
-        public NoPriorityRemoteRemoteObjectException() {
-            super();
-        }
+    public class UnaccessibleRemoteRemoteObjectException extends Exception {
     }
 
     public int size() {
         return this.rros.size();
     }
 
-    //TODO remove debug only
-    public URI getURI(int i) {
+    public String getProtocol(int i) {
         try {
-            return internalGet(i).getURI();
-        } catch (NoPriorityRemoteRemoteObjectException e) {
-            // ? 
+            return order[i];
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
         }
-        return null;
+    }
+
+    /**
+     * Update the protocol order from the new ProActive Runtime
+     * when the remote remote object is reified
+     *
+     */
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        this.updateOrder();
+    }
+
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.defaultWriteObject();
+    }
+
+    private void updateOrder() {
+        order = ProActiveRuntimeImpl.getProActiveRuntime().getProtocolOrder(
+                URIBuilder.getNameFromURI(urls[0]), urls);
     }
 }

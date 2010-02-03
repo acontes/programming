@@ -181,7 +181,8 @@ public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody> imp
         return target.registerByName(name, rebind);
     }
 
-    public String registerByName(String name, boolean rebind, String protocol) throws IOException, ProActiveException {
+    public String registerByName(String name, boolean rebind, String protocol) throws IOException,
+            ProActiveException {
         return target.registerByName(name, rebind, protocol);
     }
 

@@ -39,16 +39,21 @@ import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.TypeVariable;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
+import java.rmi.dgc.VMID;
 import java.security.AccessControlException;
 import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.TreeSet;
 
 import javax.management.InstanceAlreadyExistsException;
 import javax.management.InstanceNotFoundException;
@@ -58,6 +63,7 @@ import javax.management.MalformedObjectNameException;
 import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
 
+import org.apache.cxf.jaxrs.impl.UriBuilderImpl;
 import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -67,6 +73,7 @@ import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.api.PARemoteObject;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.ActiveBody;
@@ -76,6 +83,8 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
+import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.body.request.RequestImpl;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
@@ -98,6 +107,9 @@ import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.mop.JavassistByteCodeStubBuilder;
+import org.objectweb.proactive.core.mop.MOP;
+import org.objectweb.proactive.core.mop.MOPException;
+import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.core.node.Node;
@@ -105,7 +117,11 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.node.NodeImpl;
 import org.objectweb.proactive.core.process.UniversalProcess;
+import org.objectweb.proactive.core.remoteobject.BenchmarkRequest;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectAdapter;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
+import org.objectweb.proactive.core.remoteobject.SynchronousReplyImpl;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.rmi.FileProcess;
 import org.objectweb.proactive.core.security.PolicyServer;
@@ -129,6 +145,7 @@ import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.springframework.remoting.support.RemoteAccessor;
 
 
 /**
@@ -205,6 +222,9 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
 
     private long gcmNodes;
 
+    private java.util.Hashtable<String, String[]> order;
+    private final String[] performingBenchmark = { "__performingBenchmark__" };
+
     //
     // -- CONSTRUCTORS
     // -----------------------------------------------------------
@@ -218,6 +238,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
             this.virtualNodesMap = new java.util.Hashtable<String, VirtualNodeInternal>();
             this.descriptorMap = new java.util.Hashtable<String, ProActiveDescriptorInternal>();
             this.nodeMap = new java.util.Hashtable<String, LocalNode>();
+            this.order = new java.util.Hashtable<String, String[]>();
 
             try {
                 String file = PAProperties.PA_RUNTIME_SECURITY.getValue();
@@ -376,7 +397,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
 
         // hierarchical search or not, look if we know the pad
         if (pad != null) {
-            // if pad found and hierarchy search return pad with no main
+            // if pad found and hierarchy search return pad with no mainrmi://tagada.activeeon.com:2016/PA_JVM344364580
+
             if (isHierarchicalSearch) {
                 return RefactorPAD.buildNoMainPAD(pad);
             } else {
@@ -1574,7 +1596,128 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
         vmInformation.vmName = vmName;
     }
 
-    public String[] getProtocolOrder() {
-        return PAProperties.PA_COMMUNICATION_PROTOCOL_ORDER.getValue().split(";");
+    public String[] getProtocolOrder(String runtimeName, String[] urls) {
+        String[] ret = order.get(runtimeName);
+        if (ret == null) {
+            // do it in a thread
+            new BenchmarkThread(urls).start();
+            order.put(runtimeName, performingBenchmark);
+        } else {
+            if (ret != performingBenchmark) {
+                return ret;
+            }
+        }
+        return new String[0];
+    }
+
+    private class BenchmarkThread extends Thread {
+
+        private String[] urls;
+        private Pair orderedProtocols[];
+
+        public BenchmarkThread(String[] urls) {
+            this.urls = urls;
+            this.orderedProtocols = new Pair[urls.length];
+            for (int i = 0; i < orderedProtocols.length; i++) {
+                orderedProtocols[i] = null;
+            }
+        }
+
+        private void addAndSort(Pair pair) {
+            for (int i = 0; i < orderedProtocols.length; i++) {
+                if (orderedProtocols[i] == null) {
+                    orderedProtocols[i] = pair;
+                    return;
+                } else if (orderedProtocols[i].throughput < pair.throughput) {
+                    for (int j = i; j < orderedProtocols.length - 1; j++) {
+                        orderedProtocols[j + 1] = orderedProtocols[j];
+                    }
+                    orderedProtocols[i] = pair;
+                    return;
+                }
+            }
+        }
+
+        private String[] getArray() {
+            String[] ret = new String[orderedProtocols.length];
+            for (int i = 0; i < orderedProtocols.length; i++) {
+                ret[i] = orderedProtocols[i].protocol;
+            }
+            return ret;
+        }
+
+        public void run() {
+            String PARTName = URIBuilder.getNameFromURI(urls[0]);
+            Method method = null;
+            try {
+                method = ProActiveRuntimeImpl.class.getDeclaredMethod("getBenchmarkObjectUrl", null);
+            } catch (SecurityException e1) {
+                e1.printStackTrace();
+            } catch (NoSuchMethodException e1) {
+                e1.printStackTrace();
+            }
+            for (String partUrl : urls) {
+                try {
+                    RemoteObjectAdapter adapter = (RemoteObjectAdapter) RemoteObjectHelper.lookup(new URI(
+                        partUrl));
+                    MethodCall mc = MethodCall.getMethodCall(method, new Object[0],
+                            new HashMap<TypeVariable<?>, Class<?>>());
+                    Request message = new RequestImpl(mc, true);
+                    String bmoUrl = (String) ((SynchronousReplyImpl) adapter.receiveMessage(message))
+                            .getResult().getResult();
+
+                    Request bmoMessage = new BenchmarkRequest();
+                    RemoteObjectAdapter bmoAdapter = (RemoteObjectAdapter) RemoteObjectHelper.lookup(new URI(
+                        bmoUrl));
+                    bmoAdapter.forceProtocol(URIBuilder.getProtocol(partUrl));
+
+                    int count = 0;
+                    long time = System.currentTimeMillis();
+                    long limit = PAProperties.PA_BENCHMARK_PROTOCOL_DURATION.getValueAsInt();
+                    while (System.currentTimeMillis() - time < limit) {
+                        count += (Integer) bmoAdapter.receiveMessage(bmoMessage).getResult().getResult();
+                    }
+                    Pair pair = new Pair(URIBuilder.getProtocol(partUrl), count);
+                    addAndSort(pair);
+                } catch (NullPointerException npe) {
+                    // it seems that the PA runtime is down, so benchmarking is useless
+                    return;
+                } catch (ActiveObjectCreationException e) {
+                    e.printStackTrace();
+                } catch (ProActiveException e) {
+                    e.printStackTrace();
+                } catch (URISyntaxException e) {
+                    e.printStackTrace();
+                } catch (RenegotiateSessionException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            order.put(PARTName, getArray());
+        }
+    }
+
+    public String getBenchmarkObjectUrl() {
+        Object bo = null;
+        try {
+            bo = PAActiveObject.newActive(Object.class, null);
+            return PAActiveObject.getUrl(bo);
+        } catch (ActiveObjectCreationException aoce) {
+            aoce.printStackTrace();
+        } catch (NodeException ne) {
+            ne.printStackTrace();
+        }
+        return null;
+    }
+
+    private class Pair {
+        public int throughput;
+        public String protocol;
+
+        public Pair(String protocol, int throughput) {
+            this.throughput = throughput;
+            this.protocol = protocol;
+        }
     }
 }

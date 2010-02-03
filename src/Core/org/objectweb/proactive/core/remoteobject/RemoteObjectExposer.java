@@ -38,7 +38,6 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.rmi.AlreadyBoundException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -69,7 +68,6 @@ public class RemoteObjectExposer<T> implements Serializable {
     protected Hashtable<URI, InternalRemoteRemoteObject> activeRemoteRemoteObjects;
     private String className;
     private RemoteObjectImpl<T> remoteObject;
-    private transient Thread multiExposer;
 
     public RemoteObjectExposer() {
     }
@@ -173,10 +171,41 @@ public class RemoteObjectExposer<T> implements Serializable {
                 irro = rof.createRemoteObject(this.remoteObject, name, rebind);
                 irro.setRemoteObjectExposer(this);
                 this.activeRemoteRemoteObjects.put(irro.getURI(), irro);
-                this.multiExposer = new Thread(new MultiExposer(name));
-                this.multiExposer.setName("Multi exposer for remoteObject named: " + name);
-                this.multiExposer.setDaemon(true);
-                this.multiExposer.start();
+                // Expose the remote object using all specified communication protocol
+                if (PAProperties.PA_COMMUNICATION_ADDITIONAL_PROTOCOLS.isSet()) {
+                    for (String protocol : PAProperties.PA_COMMUNICATION_ADDITIONAL_PROTOCOLS.getValue()
+                            .split(";")) {
+                        if (!protocol.isEmpty()) {
+                            try {
+                                // Create and store RRO in hashtable
+                                createRemoteObject(name, false, protocol);
+                                if (LOGGER_RO.isDebugEnabled()) {
+                                    LOGGER_RO.debug("Object expose with additionnal protocol : " + protocol);
+                                }
+                            } catch (AlreadyBoundException abe) {
+                                // Do nothing, here, we try to expose the object with extra protocol,
+                                // error here won't cause trouble
+                            } catch (ProActiveException pae) {
+                                // this protocol throw exception, so we remove it from the candidate list for multi exposure
+                                LOGGER_RO
+                                        .warn("Protocol " + protocol +
+                                            " seems invalid for this runtime, this is not a critical error, the protocol will be dismiss.");
+                                // First position
+                                PAProperties.PA_COMMUNICATION_ADDITIONAL_PROTOCOLS
+                                        .setValue(PAProperties.PA_COMMUNICATION_ADDITIONAL_PROTOCOLS
+                                                .getValue().replace(protocol + ";", ""));
+                                // Or whatever position except first
+                                PAProperties.PA_COMMUNICATION_ADDITIONAL_PROTOCOLS
+                                        .setValue(PAProperties.PA_COMMUNICATION_ADDITIONAL_PROTOCOLS
+                                                .getValue().replace(protocol, ""));
+                                // Suppress double occurence of ';'
+                                PAProperties.PA_COMMUNICATION_ADDITIONAL_PROTOCOLS
+                                        .setValue(PAProperties.PA_COMMUNICATION_ADDITIONAL_PROTOCOLS
+                                                .getValue().replace(";;", ";"));
+                            }
+                        }
+                    }
+                }
             }
             return irro.getRemoteRemoteObject();
         } catch (Exception e) {
@@ -191,7 +220,6 @@ public class RemoteObjectExposer<T> implements Serializable {
             RemoteObjectFactory rof = AbstractRemoteObjectFactory.getRemoteObjectFactory(protocol);
             URI uri = URIBuilder.buildURI(ProActiveInet.getInstance().getHostname(), name, protocol, rof
                     .getPort());
-            System.out.println(uri);
             InternalRemoteRemoteObject irro = activeRemoteRemoteObjects.get(uri);
             if (irro == null) {
                 irro = rof.createRemoteObject(this.remoteObject, name, rebind);
@@ -312,46 +340,7 @@ public class RemoteObjectExposer<T> implements Serializable {
 
     }
 
-    class MultiExposer implements Runnable {
-        private String name;
+    public void forceProtocol(String protocol) {
 
-        public MultiExposer(String name) {
-            this.name = name;
-        }
-
-        public void run() {
-            if (PAProperties.PA_COMMUNICATION_BIND_PROTOCOL.isSet()) {
-                for (String protocol : PAProperties.PA_COMMUNICATION_BIND_PROTOCOL.getValue().split(";")) {
-                    if (!protocol.isEmpty()) {
-                        try {
-                            // Create and store RRO in hashtable
-                            createRemoteObject(this.name, false, protocol);
-                            if (LOGGER_RO.isDebugEnabled()) {
-                                LOGGER_RO.debug("Object expose with additionnal protocol : " + protocol);
-                            }
-                        } catch (ProActiveException pae) {
-                            LOGGER_RO
-                                    .warn(
-                                            "Protocol " + protocol +
-                                                " seems invalid for this runtime, this is not a critical error, the protocol will be dismiss.",
-                                            pae);
-                            // First position
-                            PAProperties.PA_COMMUNICATION_BIND_PROTOCOL
-                                    .setValue(PAProperties.PA_COMMUNICATION_BIND_PROTOCOL.getValue().replace(
-                                            protocol + ";", ""));
-                            // Or whatever position except first
-                            PAProperties.PA_COMMUNICATION_BIND_PROTOCOL
-                                    .setValue(PAProperties.PA_COMMUNICATION_BIND_PROTOCOL.getValue().replace(
-                                            protocol, ""));
-                            // Suppress double occurence of ;
-                            PAProperties.PA_COMMUNICATION_BIND_PROTOCOL
-                                    .setValue(PAProperties.PA_COMMUNICATION_BIND_PROTOCOL.getValue().replace(
-                                            ";;", ";"));
-                        }
-                    }
-                }
-            }
-        }
     }
-
 }

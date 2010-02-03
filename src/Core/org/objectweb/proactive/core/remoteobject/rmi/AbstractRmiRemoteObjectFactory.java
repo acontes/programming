@@ -48,6 +48,7 @@ import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
+import org.objectweb.proactive.core.remoteobject.AlreadyBoundException;
 import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObjectImpl;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
@@ -173,7 +174,7 @@ public abstract class AbstractRmiRemoteObjectFactory extends AbstractRemoteObjec
             LOGGER_RO.debug(" successfully bound in registry at " + url);
         } catch (java.rmi.AlreadyBoundException e) {
             LOGGER_RO.warn(url + " already bound in registry", e);
-            throw new ProActiveException(e);
+            throw new AlreadyBoundException(e);
         } catch (RemoteException e) {
             LOGGER_RO.debug(" cannot bind object at " + url);
             throw new ProActiveException(e);

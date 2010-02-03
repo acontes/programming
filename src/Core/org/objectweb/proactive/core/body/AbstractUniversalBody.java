@@ -184,7 +184,9 @@ public abstract class AbstractUniversalBody implements UniversalBody, Serializab
         try {
             // rebind must be true: if an object migrates between two JVM on the same machine (same rmi registry)
             RemoteRemoteObject rro = this.roe.createRemoteObject(this.bodyID.toString(), true);
+            //TODO Create only one ROA for each roe
             this.remoteBody = (UniversalBody) new RemoteObjectAdapter(rro).getObjectProxy();
+
         } catch (ProActiveException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -209,7 +211,7 @@ public abstract class AbstractUniversalBody implements UniversalBody, Serializab
         this.roe.createRemoteObject(RemoteObjectHelper.expandURI(URI.create(url)));
     }
 
-    public String registerByName(String name, boolean rebind) throws ProActiveException{
+    public String registerByName(String name, boolean rebind) throws ProActiveException {
         RemoteRemoteObject rro = this.roe.createRemoteObject(name, rebind);
         RemoteObjectAdapter roa = new RemoteObjectAdapter(rro);
 

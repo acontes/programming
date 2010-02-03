@@ -190,6 +190,7 @@ public interface UniversalBody extends Job, Serializable, SecurityEntity {
      */
     public String getUrl();
 
-    public String registerByName(String name, boolean rebind, String protocol) throws IOException, ProActiveException;
+    public String registerByName(String name, boolean rebind, String protocol) throws IOException,
+            ProActiveException;
 }
 //@snippet-end universalbody

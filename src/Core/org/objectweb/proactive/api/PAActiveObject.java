@@ -1134,10 +1134,11 @@ public class PAActiveObject {
     }
 
     public static String registerByName(Object obj, String name, String protocol) throws ProActiveException {
-        return registerByName(obj, name,true, protocol);
+        return registerByName(obj, name, true, protocol);
     }
-    
-    public static String registerByName(Object obj, String name, boolean rebind,  String protocol) throws ProActiveException {
+
+    public static String registerByName(Object obj, String name, boolean rebind, String protocol)
+            throws ProActiveException {
         try {
             UniversalBody body = getRemoteBody(obj);
 

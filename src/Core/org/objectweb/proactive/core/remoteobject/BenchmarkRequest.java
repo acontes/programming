@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2009 INRIA/University of 
+ * Copyright (C) 1997-2009 INRIA/University of
  * 						   Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org
  *
@@ -23,7 +23,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2. 
+ * If needed, contact us to obtain a release under GPL Version 2.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -34,29 +34,17 @@
  */
 package org.objectweb.proactive.core.remoteobject;
 
-import java.lang.reflect.InvocationTargetException;
-
 import org.objectweb.proactive.core.body.request.RequestImpl;
 import org.objectweb.proactive.core.mop.MethodCall;
-import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
+import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 
 
-/**
- * @author The ProActive Team
- * This is a request that is served by an internal remote remote object
- * If an internal remote remote object receives a request of this type, it will
- * process it instead of sending it to the remote object it represents.
- */
-public class InternalRemoteRemoteObjectRequest extends RequestImpl {
-
-    public InternalRemoteRemoteObjectRequest() {
+public class BenchmarkRequest extends RemoteObjectRequest {
+    public BenchmarkRequest() {
     };
 
-    public InternalRemoteRemoteObjectRequest(MethodCall methodCall) {
-        super(methodCall, false);
-    }
-
-    public Object execute(Object target) throws MethodCallExecutionFailedException, InvocationTargetException {
-        return methodCall.execute(target);
+    public Object execute(Object unused) {
+        return new Integer(1);
     }
 }

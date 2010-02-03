@@ -144,7 +144,8 @@ public class HTTPRemoteObjectFactory extends AbstractRemoteObjectFactory impleme
      */
     public RemoteObject lookup(URI url) throws ProActiveException {
 
-        HttpRemoteObjectLookupMessage message = new HttpRemoteObjectLookupMessage(URIBuilder.getNameFromURI(url), url);
+        HttpRemoteObjectLookupMessage message = new HttpRemoteObjectLookupMessage(URIBuilder
+                .getNameFromURI(url), url);
         try {
             message.send();
         } catch (HTTPRemoteException e) {

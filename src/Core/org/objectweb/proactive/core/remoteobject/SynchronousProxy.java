@@ -156,4 +156,12 @@ public class SynchronousProxy implements Proxy, Serializable {
         }
         return true;
     }
+
+    public void forceProtocol(String protocol) {
+        if (this.remoteObject instanceof RemoteObjectAdapter) {
+            ((RemoteObjectAdapter) this.remoteObject).forceProtocol(protocol);
+        } else {
+            throw new IllegalArgumentException("Method forceProtocol can only be called on stub object");
+        }
+    }
 }

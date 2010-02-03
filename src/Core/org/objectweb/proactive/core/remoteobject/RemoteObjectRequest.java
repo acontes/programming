@@ -42,11 +42,15 @@ import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 
 
 public class RemoteObjectRequest extends RequestImpl {
+
+    public RemoteObjectRequest() {
+    };
+
     public RemoteObjectRequest(MethodCall methodCall) {
         super(methodCall, false);
     }
-    
-    public Object execute(Object target) throws MethodCallExecutionFailedException, InvocationTargetException{
-        return this.methodCall.execute(target);
+
+    public Object execute(Object target) throws MethodCallExecutionFailedException, InvocationTargetException {
+        return methodCall.execute(target);
     }
 }

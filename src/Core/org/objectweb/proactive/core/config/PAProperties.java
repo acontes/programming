@@ -196,19 +196,13 @@ public enum PAProperties {
 
     /**
      * A list of PA protocol on which active object will be bind in addition of default PA protocol
-     * protocols are expressed as String depared by ';'
+     * protocols are expressed as String separed by ';'
      * Each object will will be bind to each of these protocols
      *
      * Supported values should be pick in: rmi, rmissh, rmissl, ibis, http, pamr
      */
-    PA_COMMUNICATION_BIND_PROTOCOL("proactive.communication.protocol_to_bind", PAPropertiesType.STRING),
-
-    /**
-     * The default order of communication protocols
-     *
-     * Supported values should be pick in: rmi, rmissh, rmissl, ibis, http, pamr
-     */
-    PA_COMMUNICATION_PROTOCOL_ORDER("proactive.communication.protocol_order", PAPropertiesType.STRING),
+    PA_COMMUNICATION_ADDITIONAL_PROTOCOLS("proactive.communication.additional_protocols",
+            PAPropertiesType.STRING),
 
     /**
      * ProActive Runtime Hostname (or IP Address)
@@ -353,6 +347,15 @@ public enum PAProperties {
      * for the Jetty syntax reference.
      */
     PA_HTTP_JETTY_XML("proactive.http.jetty.xml", PAPropertiesType.STRING),
+
+    /*
+     * MULTI PROTOCOl
+     */
+
+    /**
+     * Express in ms
+     */
+    PA_BENCHMARK_PROTOCOL_DURATION("proactive.communication.benchmark.duration", PAPropertiesType.INTEGER),
 
     /* ------------------------------------
      *  COMPONENTS

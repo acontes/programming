@@ -49,9 +49,10 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.future.MethodCallResult;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.mop.MethodCall;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectSet.UnaccessibleRemoteRemoteObjectException;
 import org.objectweb.proactive.core.remoteobject.adapter.Adapter;
-import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityContext;
@@ -172,22 +173,27 @@ public class RemoteObjectAdapter implements RemoteObject {
         this.remoteObjectSet.add(rro);
     }
 
+    public void forceProtocol(String protocol) {
+        this.remoteObjectSet.forceProtocol(protocol);
+    }
+
     public Reply receiveMessage(Request message) throws ProActiveException, RenegotiateSessionException,
             IOException {
         for (int i = 0; i < remoteObjectSet.size(); i++) {
             try {
                 return remoteObjectSet.get(i).receiveMessage(message);
+            } catch (UnaccessibleRemoteRemoteObjectException e) {
+                continue;
             } catch (EOFException e) {
                 LOGGER_RO.debug("EOFException while calling method " + message.getMethodName());
                 return new SynchronousReplyImpl();
             } catch (ProActiveException e) {
-                LOGGER_RO.debug("Catch an PA exception, throw an io exception");
                 continue;
                 //throw new IOException(e.getMessage());
             } catch (IOException e) {
                 // Log for keeping a trace
                 LOGGER_RO.warn("unable to contact remote object when calling " + message.getMethodName() +
-                    "with protocol " + remoteObjectSet.getURI(i).getScheme() +
+                    "with protocol " + remoteObjectSet.getProtocol(i) +
                     ". Trying an other protocol if available. ", e);
                 continue;
             }
@@ -529,7 +535,6 @@ public class RemoteObjectAdapter implements RemoteObject {
             for (RemoteRemoteObject ro : rros) {
                 this.remoteObjectSet.add(ro);
             }
-            this.remoteObjectSet.setOrder(ProActiveRuntimeImpl.getProActiveRuntime().getProtocolOrder());
         } catch (ProActiveException pae) {
             // TODO Auto-generated catch block
             pae.printStackTrace();
@@ -742,5 +747,4 @@ public class RemoteObjectAdapter implements RemoteObject {
         }
         return null;
     }
-
 }
