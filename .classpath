@@ -38,6 +38,7 @@
 	<classpathentry kind="lib" path="lib/dtdparser-1.21.jar"/>
 	<classpathentry kind="lib" path="lib/fractal-adl-2.4-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="lib/fractal-api-2.0.3-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="lib/fractal-gcm-api-1.1.1.jar"/>
 	<classpathentry kind="lib" path="lib/glite-wms-jdlj.jar"/>
 	<classpathentry kind="lib" path="lib/http.jar"/>
 	<classpathentry kind="lib" path="lib/ibis-1.4.jar"/>
