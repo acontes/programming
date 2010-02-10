@@ -40,6 +40,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
+import junit.framework.Assert;
+
+import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.fractal.api.Component;
@@ -49,7 +52,6 @@ import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.fractal.util.Fractal;
-import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
 import functionalTests.component.conform.components.BadSlaveMulticast;
@@ -59,13 +61,10 @@ import functionalTests.component.conform.components.Slave;
 import functionalTests.component.conform.components.SlaveImpl;
 import functionalTests.component.conform.components.SlaveMulticast;
 
-import junit.framework.Assert;
-
 
 public class TestMulticast extends Conformtest {
     protected Component boot;
-    protected TypeFactory tf;
-    protected ProActiveTypeFactory ptf;
+    protected GCMTypeFactory tf;
     protected GenericFactory gf;
     protected ComponentType tMaster;
     protected ComponentType tBadMaster;
@@ -81,16 +80,13 @@ public class TestMulticast extends Conformtest {
     @Before
     public void setUp() throws Exception {
         boot = Fractal.getBootstrapComponent();
-        tf = Fractal.getTypeFactory(boot);
-        ptf = (ProActiveTypeFactory) tf;
+        tf = (GCMTypeFactory) Fractal.getTypeFactory(boot);
         gf = Fractal.getGenericFactory(boot);
         tMaster = tf.createFcType(new InterfaceType[] {
                 tf.createFcItfType("server", Master.class.getName(), TypeFactory.SERVER,
                         TypeFactory.MANDATORY, TypeFactory.SINGLE),
-                ptf
-                        .createFcItfType(MasterImpl.ITF_CLIENTE_MULTICAST, SlaveMulticast.class.getName(),
-                                TypeFactory.CLIENT, TypeFactory.MANDATORY,
-                                ProActiveTypeFactory.MULTICAST_CARDINALITY) });
+                tf.createGCMItfType(MasterImpl.ITF_CLIENTE_MULTICAST, SlaveMulticast.class.getName(),
+                        TypeFactory.CLIENT, TypeFactory.MANDATORY, GCMTypeFactory.MULTICAST_CARDINALITY) });
         tSlave = tf.createFcType(new InterfaceType[] { tf.createFcItfType("server-multicast", Slave.class
                 .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE), });
     }
@@ -123,10 +119,8 @@ public class TestMulticast extends Conformtest {
         tBadMaster = tf.createFcType(new InterfaceType[] {
                 tf.createFcItfType("server", Master.class.getName(), TypeFactory.SERVER,
                         TypeFactory.MANDATORY, TypeFactory.SINGLE),
-                ptf
-                        .createFcItfType("client-multicast", BadSlaveMulticast.class.getName(),
-                                TypeFactory.CLIENT, TypeFactory.MANDATORY,
-                                ProActiveTypeFactory.MULTICAST_CARDINALITY) });
+                tf.createGCMItfType("client-multicast", BadSlaveMulticast.class.getName(),
+                        TypeFactory.CLIENT, TypeFactory.MANDATORY, GCMTypeFactory.MULTICAST_CARDINALITY) });
     }
 
     // -------------------------------------------------------------------------

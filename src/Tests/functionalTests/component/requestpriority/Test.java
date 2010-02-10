@@ -36,6 +36,9 @@
 package functionalTests.component.requestpriority;
 
 import static org.junit.Assert.assertEquals;
+
+import org.etsi.uri.gcm.api.control.PriorityController;
+import org.etsi.uri.gcm.api.control.PriorityController.RequestPriority;
 import org.junit.Before;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.GenericFactory;
@@ -46,8 +49,6 @@ import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
-import org.objectweb.proactive.core.component.controller.PriorityController;
-import org.objectweb.proactive.core.component.controller.PriorityController.RequestPriority;
 
 import functionalTests.ComponentTest;
 
@@ -95,30 +96,30 @@ public class Test extends ComponentTest {
         nonFunctionnal3_Itf = ((NF3Itf) p1.getFcInterface(NF3Itf.CONTROLLER_NAME));
 
         // set priorities functional 
-        PriorityController pc = (PriorityController) p1.getFcInterface(Constants.REQUEST_PRIORITY_CONTROLLER);
-        assertEquals(RequestPriority.NF1, pc.getPriority(Constants.REQUEST_PRIORITY_CONTROLLER,
-                "setPriority", null));
-        assertEquals(RequestPriority.NF2, pc.getPriority(Constants.REQUEST_PRIORITY_CONTROLLER,
-                "setPriorityNF2", null));
-        assertEquals(RequestPriority.NF3, pc.getPriority(Constants.REQUEST_PRIORITY_CONTROLLER,
-                "setPriorityNF3", null));
-        assertEquals(RequestPriority.NF1, pc.getPriority(Constants.REQUEST_PRIORITY_CONTROLLER,
-                "getPriority", null));
+        PriorityController pc = (PriorityController) p1.getFcInterface(Constants.PRIORITY_CONTROLLER);
+        assertEquals(RequestPriority.NF1, pc.getGCMPriority(Constants.PRIORITY_CONTROLLER, "setPriority",
+                null));
+        assertEquals(RequestPriority.NF2, pc.getGCMPriority(Constants.PRIORITY_CONTROLLER, "setPriorityNF2",
+                null));
+        assertEquals(RequestPriority.NF3, pc.getGCMPriority(Constants.PRIORITY_CONTROLLER, "setPriorityNF3",
+                null));
+        assertEquals(RequestPriority.NF1, pc.getGCMPriority(Constants.PRIORITY_CONTROLLER, "getPriority",
+                null));
 
-        assertEquals(RequestPriority.F, pc.getPriority(FItf.ITF_NAME, "addCall", null));
-        assertEquals(RequestPriority.F, pc.getPriority(FItf.ITF_NAME, "getCallOrder", null));
-        assertEquals(RequestPriority.F, pc.getPriority(FItf.ITF_NAME, "longFunctionalCall", null));
-        assertEquals(RequestPriority.F, pc.getPriority(FItf.ITF_NAME, "functionalCall", null));
+        assertEquals(RequestPriority.F, pc.getGCMPriority(FItf.ITF_NAME, "addCall", null));
+        assertEquals(RequestPriority.F, pc.getGCMPriority(FItf.ITF_NAME, "getCallOrder", null));
+        assertEquals(RequestPriority.F, pc.getGCMPriority(FItf.ITF_NAME, "longFunctionalCall", null));
+        assertEquals(RequestPriority.F, pc.getGCMPriority(FItf.ITF_NAME, "functionalCall", null));
 
-        assertEquals(RequestPriority.NF1, pc.getPriority(NF1Itf.CONTROLLER_NAME, "NF1Call", null));
-        assertEquals(RequestPriority.NF1, pc.getPriority(NF2Itf.CONTROLLER_NAME, "NF2Call", null));
-        assertEquals(RequestPriority.NF1, pc.getPriority(NF3Itf.CONTROLLER_NAME, "NF3Call", null));
+        assertEquals(RequestPriority.NF1, pc.getGCMPriority(NF1Itf.CONTROLLER_NAME, "NF1Call", null));
+        assertEquals(RequestPriority.NF1, pc.getGCMPriority(NF2Itf.CONTROLLER_NAME, "NF2Call", null));
+        assertEquals(RequestPriority.NF1, pc.getGCMPriority(NF3Itf.CONTROLLER_NAME, "NF3Call", null));
 
-        pc.setPriority(NF2Itf.CONTROLLER_NAME, "NF2Call", RequestPriority.NF2);
-        assertEquals(RequestPriority.NF2, pc.getPriority(NF2Itf.CONTROLLER_NAME, "NF2Call", null));
+        pc.setGCMPriority(NF2Itf.CONTROLLER_NAME, "NF2Call", new Class<?>[] {}, RequestPriority.NF2);
+        assertEquals(RequestPriority.NF2, pc.getGCMPriority(NF2Itf.CONTROLLER_NAME, "NF2Call", null));
 
-        pc.setPriority(NF3Itf.CONTROLLER_NAME, "NF3Call", RequestPriority.NF3);
-        assertEquals(RequestPriority.NF3, pc.getPriority(NF3Itf.CONTROLLER_NAME, "NF3Call", null));
+        pc.setGCMPriority(NF3Itf.CONTROLLER_NAME, "NF3Call", new Class<?>[] {}, RequestPriority.NF3);
+        assertEquals(RequestPriority.NF3, pc.getGCMPriority(NF3Itf.CONTROLLER_NAME, "NF3Call", null));
     }
 
     /**

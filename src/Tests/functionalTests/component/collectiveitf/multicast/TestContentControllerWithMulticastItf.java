@@ -35,6 +35,7 @@
  */
 package functionalTests.component.collectiveitf.multicast;
 
+import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -47,15 +48,13 @@ import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.Fractive;
-import org.objectweb.proactive.core.component.ProActiveInterface;
-import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 
 import functionalTests.ComponentTest;
 
 
 public class TestContentControllerWithMulticastItf extends ComponentTest {
     protected Component boot;
-    protected ProActiveTypeFactory tf;
+    protected GCMTypeFactory tf;
     protected GenericFactory gf;
     protected ComponentType tRoot;
     protected ComponentType tTester;
@@ -74,18 +73,18 @@ public class TestContentControllerWithMulticastItf extends ComponentTest {
     @Before
     public void setUp() throws Exception {
         boot = Fractal.getBootstrapComponent();
-        tf = (ProActiveTypeFactory) Fractal.getTypeFactory(boot);
+        tf = (GCMTypeFactory) Fractal.getTypeFactory(boot);
         gf = Fractal.getGenericFactory(boot);
         tRoot = tf.createFcType(new InterfaceType[] {
                 tf.createFcItfType("tester", Tester.class.getName(), TypeFactory.SERVER,
                         TypeFactory.MANDATORY, TypeFactory.MANDATORY),
-                tf.createFcItfType("serverMult", MulticastTestItf.class.getName(), TypeFactory.SERVER,
-                        TypeFactory.MANDATORY, ProActiveTypeFactory.MULTICAST_CARDINALITY) });
+                tf.createGCMItfType("serverMult", MulticastTestItf.class.getName(), TypeFactory.SERVER,
+                        TypeFactory.MANDATORY, GCMTypeFactory.MULTICAST_CARDINALITY) });
         tTester = tf.createFcType(new InterfaceType[] {
                 tf.createFcItfType("tester", Tester.class.getName(), TypeFactory.SERVER,
                         TypeFactory.MANDATORY, TypeFactory.MANDATORY),
-                tf.createFcItfType("clientItf", MulticastTestItf.class.getName(), TypeFactory.CLIENT,
-                        TypeFactory.MANDATORY, ProActiveTypeFactory.MULTICAST_CARDINALITY) });
+                tf.createGCMItfType("clientItf", MulticastTestItf.class.getName(), TypeFactory.CLIENT,
+                        TypeFactory.MANDATORY, GCMTypeFactory.MULTICAST_CARDINALITY) });
         tServer = tf.createFcType(new InterfaceType[] { tf.createFcItfType("server", ServerTestItf.class
                 .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.MANDATORY) });
         setUpComponents();
@@ -149,8 +148,8 @@ public class TestContentControllerWithMulticastItf extends ComponentTest {
     @Ignore
     public void testRemoveServer3() throws Exception {
         ContentController cc = Fractal.getContentController(root);
-        Fractive.getMulticastController(tester).unbindFcMulticast("clientItf",
-                (ProActiveInterface) server3.getFcInterface("server"));
+        Fractive.getMulticastController(tester).unbindGCMMulticast("clientItf",
+                server3.getFcInterface("server"));
         cc.removeFcSubComponent(server3);
     }
 }

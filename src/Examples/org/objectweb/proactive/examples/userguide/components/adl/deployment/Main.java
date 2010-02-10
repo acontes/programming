@@ -64,7 +64,6 @@ public class Main {
         // TODO: Load the Application Descriptor
         //@tutorial-break
         //@snippet-break adl_deployment_Main_skeleton
-        String sep = System.getProperty("path.separator");
         String descriptorPath = "file://" +
             System.getProperty("proactive.home") +
             "/src/Examples/org/objectweb/proactive/examples/userguide/components/adl/deployment/descriptors/application_descriptor.xml";

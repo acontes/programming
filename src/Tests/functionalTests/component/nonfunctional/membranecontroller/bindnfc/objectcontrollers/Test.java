@@ -40,21 +40,17 @@ import org.objectweb.fractal.api.Type;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.fractal.util.Fractal;
-
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.Fractive;
-
-import org.objectweb.proactive.core.component.controller.MembraneController;
+import org.objectweb.proactive.core.component.controller.ProActiveMembraneController;
 import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative;
-
 import org.objectweb.proactive.core.node.Node;
 
 import functionalTests.ComponentTest;
-
 import functionalTests.component.creation.ComponentA;
 import functionalTests.component.creation.ComponentInfo;
 
@@ -102,7 +98,7 @@ public class Test extends ComponentTest {
                         type_factory
                                 .createFcItfType(
                                         Constants.LIFECYCLE_CONTROLLER,
-                                        /*LIFECYCLE CONTROLLER*/org.objectweb.proactive.core.component.controller.ProActiveLifeCycleController.class
+                                        /*LIFECYCLE CONTROLLER*/org.objectweb.proactive.core.component.controller.ProActiveGCMLifeCycleController.class
                                                 .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                                         TypeFactory.SINGLE),
                         type_factory
@@ -115,8 +111,8 @@ public class Test extends ComponentTest {
                         /*NAME CONTROLLER*/org.objectweb.fractal.api.control.NameController.class.getName(),
                                 TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE),
                         type_factory.createFcItfType(Constants.MEMBRANE_CONTROLLER,
-                        /*MEMBRANE CONTROLLER*/MembraneController.class.getName(), TypeFactory.SERVER,
-                                TypeFactory.MANDATORY, TypeFactory.SINGLE),
+                        /*MEMBRANE CONTROLLER*/ProActiveMembraneController.class.getName(),
+                                TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE),
 
                 });
 
@@ -124,7 +120,7 @@ public class Test extends ComponentTest {
                 new ControllerDescription("myComposite", Constants.COMPOSITE, !Constants.SYNCHRONOUS,
                     Constants.WITHOUT_CONFIG_FILE), (Node) null);
 
-        MembraneController memController = Fractive.getMembraneController(componentA);
+        ProActiveMembraneController memController = Fractive.getMembraneController(componentA);
         //Setting the controllers by hand
 
         memController.setControllerObject(Constants.BINDING_CONTROLLER,
@@ -148,7 +144,7 @@ public class Test extends ComponentTest {
                 .getName(), new Object[] { "tata" }), new ControllerDescription("componentB",
             Constants.PRIMITIVE, !Constants.SYNCHRONOUS, Constants.WITHOUT_CONFIG_FILE), (Node) null);
 
-        MembraneController componentBMembraneController = Fractive.getMembraneController(componentB);
+        ProActiveMembraneController componentBMembraneController = Fractive.getMembraneController(componentB);
 
         componentBMembraneController.setControllerObject(Constants.SUPER_CONTROLLER,
                 org.objectweb.proactive.core.component.controller.ProActiveSuperControllerImpl.class

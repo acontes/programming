@@ -84,16 +84,19 @@ public class DummyAO implements Serializable {
         Component x = (Component) f.newComponent("functionalTests.component.migration.x", context);
         deploymentDescriptor.activateMappings();
         Fractal.getLifeCycleController(x).startFc();
-        Fractive.getMigrationController(x).migrateTo(deploymentDescriptor.getVirtualNode("VN3").getNode());
+        Fractive.getMigrationController(x).migrateGCMComponentTo(
+                deploymentDescriptor.getVirtualNode("VN3").getNode());
         Assert.assertEquals("hello", ((E) x.getFcInterface("e")).gee(new StringWrapper("hello"))
                 .stringValue());
 
         Component y = (Component) f.newComponent("functionalTests.component.migration.y", context);
-        Fractive.getMigrationController(y).migrateTo(deploymentDescriptor.getVirtualNode("VN1").getNode());
+        Fractive.getMigrationController(y).migrateGCMComponentTo(
+                deploymentDescriptor.getVirtualNode("VN1").getNode());
         Fractal.getLifeCycleController(y).startFc();
 
         Component toto = (Component) f.newComponent("functionalTests.component.migration.toto", context);
-        Fractive.getMigrationController(toto).migrateTo(deploymentDescriptor.getVirtualNode("VN2").getNode());
+        Fractive.getMigrationController(toto).migrateGCMComponentTo(
+                deploymentDescriptor.getVirtualNode("VN2").getNode());
         Fractal.getLifeCycleController(toto).startFc();
         Assert.assertEquals("toto", ((E) toto.getFcInterface("e01")).gee(new StringWrapper("toto"))
                 .stringValue());
@@ -110,7 +113,7 @@ public class DummyAO implements Serializable {
         for (int i = 0; i < subComponents.length; i++) {
             NameController nc = Fractal.getNameController(subComponents[i]);
             if (nc.getFcName().equals("y")) {
-                Fractive.getMigrationController(subComponents[i]).migrateTo(
+                Fractive.getMigrationController(subComponents[i]).migrateGCMComponentTo(
                         deploymentDescriptor.getVirtualNode("VN3").getNode());
                 break;
             }
@@ -157,18 +160,18 @@ public class DummyAO implements Serializable {
         Component x = (Component) f.newComponent("functionalTests.component.migration.x", context);
         Fractal.getLifeCycleController(x).startFc();
 
-        Fractive.getMigrationController(x)
-                .migrateTo(newDeploymentDescriptor.getVirtualNode("VN3").getANode());
+        Fractive.getMigrationController(x).migrateGCMComponentTo(
+                newDeploymentDescriptor.getVirtualNode("VN3").getANode());
         Assert.assertEquals("hello", ((E) x.getFcInterface("e")).gee(new StringWrapper("hello"))
                 .stringValue());
 
         Component y = (Component) f.newComponent("functionalTests.component.migration.y", context);
-        Fractive.getMigrationController(y)
-                .migrateTo(newDeploymentDescriptor.getVirtualNode("VN1").getANode());
+        Fractive.getMigrationController(y).migrateGCMComponentTo(
+                newDeploymentDescriptor.getVirtualNode("VN1").getANode());
         Fractal.getLifeCycleController(y).startFc();
 
         Component toto = (Component) f.newComponent("functionalTests.component.migration.toto", context);
-        Fractive.getMigrationController(toto).migrateTo(
+        Fractive.getMigrationController(toto).migrateGCMComponentTo(
                 newDeploymentDescriptor.getVirtualNode("VN2").getANode());
         Fractal.getLifeCycleController(toto).startFc();
         Assert.assertEquals("toto", ((E) toto.getFcInterface("e01")).gee(new StringWrapper("toto"))
@@ -186,7 +189,7 @@ public class DummyAO implements Serializable {
         for (int i = 0; i < subComponents.length; i++) {
             NameController nc = Fractal.getNameController(subComponents[i]);
             if (nc.getFcName().equals("y")) {
-                Fractive.getMigrationController(subComponents[i]).migrateTo(
+                Fractive.getMigrationController(subComponents[i]).migrateGCMComponentTo(
                         newDeploymentDescriptor.getVirtualNode("VN3").getANode());
                 break;
             }

@@ -11,8 +11,8 @@
             <implementation>org.objectweb.proactive.core.component.controller.ProActiveContentControllerImpl</implementation>
         </controller>
         <controller>
-            <interface>org.objectweb.proactive.core.component.controller.ProActiveLifeCycleController</interface>
-            <implementation>org.objectweb.proactive.core.component.controller.ProActiveLifeCycleControllerImpl</implementation>
+            <interface>org.objectweb.proactive.core.component.controller.ProActiveGCMLifeCycleController</interface>
+            <implementation>org.objectweb.proactive.core.component.controller.ProActiveGCMLifeCycleControllerImpl</implementation>
         </controller>
         <controller>
             <interface>org.objectweb.proactive.core.component.controller.ProActiveSuperController</interface>
@@ -24,7 +24,7 @@
         </controller>
         <!-- specific controllers & interceptors -->
          <controller>
-            <interface>org.objectweb.proactive.core.component.controller.MulticastController</interface>
+            <interface>org.objectweb.proactive.core.component.controller.ProActiveMulticastController</interface>
             <implementation>functionalTests.component.collectiveitf.unicast.CustomUnicastController</implementation>
         </controller>
     </controllers>

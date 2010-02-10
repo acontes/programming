@@ -38,6 +38,7 @@ package functionalTests.component;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.factory.InstantiationException;
@@ -50,7 +51,6 @@ import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
 import org.objectweb.proactive.core.component.type.Composite;
-import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.node.Node;
 
@@ -64,7 +64,7 @@ public class Setup {
     private static ComponentType A_TYPE = null;
     private static ComponentType B_TYPE = null;
     private static ProActiveGenericFactory gf = null;
-    private static ProActiveTypeFactory tf = null;
+    private static GCMTypeFactory tf = null;
 
     private static void createTypes() throws Exception {
         createTypeD();
@@ -77,7 +77,7 @@ public class Setup {
             PAProperties.FRACTAL_PROVIDER.setValue("org.objectweb.proactive.core.component.Fractive");
             Component boot = Fractal.getBootstrapComponent();
             if (tf == null) {
-                tf = (ProActiveTypeFactory) Fractal.getTypeFactory(boot);
+                tf = (GCMTypeFactory) Fractal.getTypeFactory(boot);
             }
 
             if (gf == null) {
@@ -100,8 +100,8 @@ public class Setup {
             d_type = tf.createFcType(new InterfaceType[] {
                     tf.createFcItfType("i1", I1Multicast.class.getName(), TypeFactory.SERVER,
                             TypeFactory.MANDATORY, TypeFactory.SINGLE),
-                    tf.createFcItfType("i2", I2Multicast.class.getName(), TypeFactory.CLIENT,
-                            TypeFactory.MANDATORY, ProActiveTypeFactory.MULTICAST_CARDINALITY) });
+                    tf.createGCMItfType("i2", I2Multicast.class.getName(), TypeFactory.CLIENT,
+                            TypeFactory.MANDATORY, GCMTypeFactory.MULTICAST_CARDINALITY) });
         }
     }
 

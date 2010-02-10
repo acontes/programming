@@ -42,11 +42,11 @@ import org.junit.Test;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
+import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
-import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 import org.objectweb.proactive.core.component.webservices.WSInfo;
 import org.objectweb.proactive.extensions.webservices.AbstractWebServicesFactory;
 import org.objectweb.proactive.extensions.webservices.WSConstants;
@@ -87,11 +87,10 @@ public class TestCXFWSBindings extends CommonSetup {
     @Test
     public void testCXFWebServicesBindingWithMethodError() throws Exception {
         ComponentType cType = tf.createFcType(new InterfaceType[] {
-                tf.createFcItfType("Runner", Runner.class.getName(), ProActiveTypeFactory.SERVER,
-                        ProActiveTypeFactory.MANDATORY, ProActiveTypeFactory.SINGLE),
+                tf.createFcItfType("Runner", Runner.class.getName(), TypeFactory.SERVER,
+                        TypeFactory.MANDATORY, TypeFactory.SINGLE),
                 tf.createFcItfType(Client.SERVICEERROR_NAME, ServiceError.class.getName(),
-                        ProActiveTypeFactory.CLIENT, ProActiveTypeFactory.MANDATORY,
-                        ProActiveTypeFactory.SINGLE) });
+                        TypeFactory.CLIENT, TypeFactory.MANDATORY, TypeFactory.SINGLE) });
         Component client = gf.newFcInstance(cType, new ControllerDescription("Client", Constants.PRIMITIVE),
                 new ContentDescription(Client.class.getName()));
         Fractal.getBindingController(client).bindFc(

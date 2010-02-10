@@ -40,6 +40,7 @@ import static org.junit.Assert.fail;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.junit.Assert;
 import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.api.Component;
@@ -50,7 +51,6 @@ import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.fractal.util.Fractal;
-import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
 import functionalTests.ComponentTest;
@@ -102,13 +102,13 @@ public class Test extends ComponentTest {
     @org.junit.Test
     public void testStartCompositeWithGathercastInternalClientItf() throws Exception {
         Component boot = Fractal.getBootstrapComponent();
-        ProActiveTypeFactory ptf = (ProActiveTypeFactory) Fractal.getTypeFactory(boot);
+        GCMTypeFactory ptf = (GCMTypeFactory) Fractal.getTypeFactory(boot);
         GenericFactory gf = Fractal.getGenericFactory(boot);
         ComponentType rType = ptf.createFcType(new InterfaceType[] {
                 ptf.createFcItfType("server", GatherDummyItf.class.getName(), TypeFactory.SERVER,
                         TypeFactory.MANDATORY, TypeFactory.SINGLE),
-                ptf.createFcItfType("client", GatherDummyItf.class.getName(), TypeFactory.CLIENT,
-                        TypeFactory.MANDATORY, ProActiveTypeFactory.GATHER_CARDINALITY) });
+                ptf.createGCMItfType("client", GatherDummyItf.class.getName(), TypeFactory.CLIENT,
+                        TypeFactory.MANDATORY, GCMTypeFactory.GATHERCAST_CARDINALITY) });
         ComponentType cType = ptf.createFcType(new InterfaceType[] {
                 ptf.createFcItfType("server", GatherDummyItf.class.getName(), TypeFactory.SERVER,
                         TypeFactory.MANDATORY, TypeFactory.SINGLE),

@@ -42,7 +42,7 @@ import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.controller.AbstractProActiveController;
 import org.objectweb.proactive.core.component.interception.InputInterceptor;
-import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
+import org.objectweb.proactive.core.component.type.ProActiveGCMTypeFactoryImpl;
 import org.objectweb.proactive.core.mop.MethodCall;
 
 
@@ -55,7 +55,7 @@ public class MyInputInterceptor extends AbstractProActiveController implements I
 
     protected void setControllerItfType() {
         try {
-            setItfType(ProActiveTypeFactoryImpl.instance().createFcItfType("mycontroller",
+            setItfType(ProActiveGCMTypeFactoryImpl.instance().createFcItfType("mycontroller",
                     ControllerItf.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                     TypeFactory.SINGLE));
         } catch (InstantiationException e) {

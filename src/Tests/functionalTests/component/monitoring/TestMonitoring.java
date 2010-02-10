@@ -41,13 +41,13 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.etsi.uri.gcm.api.control.MonitorController;
 import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.control.NameController;
 import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.controller.MethodStatistics;
-import org.objectweb.proactive.core.component.controller.MonitorController;
 
 import functionalTests.ComponentTest;
 
@@ -94,7 +94,7 @@ public class TestMonitoring extends ComponentTest {
     }
 
     private void printStats() {
-        Iterator<MethodStatistics> stats = monitor.getAllStatistics().values().iterator();
+        Iterator<Object> stats = monitor.getAllGCMStatistics().values().iterator();
         while (stats.hasNext()) {
             System.out.println(stats.next().toString());
         }
@@ -110,7 +110,7 @@ public class TestMonitoring extends ComponentTest {
 
     private void checkMethodStatistics(String itfName, String methodName, int nbCalls, int nbMethods,
             long sleepTimeCallMethod) throws Exception {
-        MethodStatistics methodStats = monitor.getStatistics(itfName, methodName);
+        MethodStatistics methodStats = (MethodStatistics) monitor.getGCMStatistics(itfName, methodName, null);
         checkTime(ServerImpl.EXECUTION_TIME, methodStats.getAverageServiceTime());
         checkTime(nbMethods * sleepTimeCallMethod, methodStats.getAverageInterArrivalTime());
     }
@@ -128,7 +128,7 @@ public class TestMonitoring extends ComponentTest {
 
         Runner runner1 = ((Runner) root.getFcInterface("runner1"));
         Runner runner2 = ((Runner) root.getFcInterface("runner2"));
-        monitor.startMonitoring();
+        monitor.startGCMMonitoring();
 
         System.out.println();
         System.out.println("-----------------------------------------------------------");

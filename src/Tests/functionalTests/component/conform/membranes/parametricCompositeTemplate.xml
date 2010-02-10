@@ -31,10 +31,10 @@
 		</controller>
 		<controller>
 			<interface>
-				org.objectweb.proactive.core.component.controller.ProActiveLifeCycleController
+				org.objectweb.proactive.core.component.controller.ProActiveGCMLifeCycleController
 			</interface>
 			<implementation>
-				org.objectweb.proactive.core.component.controller.ProActiveLifeCycleControllerImpl
+				org.objectweb.proactive.core.component.controller.ProActiveGCMLifeCycleControllerImpl
 			</implementation>
 		</controller>
 		<controller>
@@ -48,28 +48,28 @@
 
 		<controller>
 			<interface>
-				org.objectweb.proactive.core.component.controller.MulticastController
+				org.objectweb.proactive.core.component.controller.ProActiveMulticastController
 			</interface>
 			<implementation>
-				org.objectweb.proactive.core.component.controller.MulticastControllerImpl
+				org.objectweb.proactive.core.component.controller.ProActiveMulticastControllerImpl
 			</implementation>
 		</controller>
 		<controller>
 			<interface>
-				org.objectweb.proactive.core.component.controller.GathercastController
+				org.etsi.uri.gcm.api.control.GathercastController
 			</interface>
 			<implementation>
-				org.objectweb.proactive.core.component.controller.GathercastControllerImpl
+				org.objectweb.proactive.core.component.controller.ProActiveGathercastControllerImpl
 			</implementation>
 		</controller>
-		<controller>
-			<interface>
-				org.objectweb.proactive.core.component.controller.MigrationController
-			</interface>
-			<implementation>
-				org.objectweb.proactive.core.component.controller.MigrationControllerImpl
-			</implementation>
-		</controller>
+        <controller>
+            <interface>
+            	org.objectweb.proactive.core.component.controller.ProActiveMigrationController
+            </interface>
+            <implementation>
+            	org.objectweb.proactive.core.component.controller.ProActiveMigrationControllerImpl
+            </implementation>
+        </controller>
 	</controllers>
 
 </componentConfiguration>

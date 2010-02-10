@@ -35,6 +35,7 @@
  */
 package functionalTests.component.wsbindings;
 
+import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.junit.After;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.GenericFactory;
@@ -45,7 +46,6 @@ import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
-import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 import org.objectweb.proactive.extensions.webservices.AbstractWebServicesFactory;
 import org.objectweb.proactive.extensions.webservices.WebServices;
 import org.objectweb.proactive.extensions.webservices.WebServicesFactory;
@@ -75,12 +75,10 @@ public abstract class CommonSetup extends ComponentTest {
 
         url = AbstractWebServicesFactory.getLocalUrl();
         ComponentType sType = tf.createFcType(new InterfaceType[] {
-                tf.createFcItfType(SERVER_SERVICES_NAME, Services.class.getName(),
-                        ProActiveTypeFactory.SERVER, ProActiveTypeFactory.MANDATORY,
-                        ProActiveTypeFactory.SINGLE),
-                tf.createFcItfType(SERVER_SERVICEMULTICAST_NAME, Service.class.getName(),
-                        ProActiveTypeFactory.SERVER, ProActiveTypeFactory.MANDATORY,
-                        ProActiveTypeFactory.SINGLE) });
+                tf.createFcItfType(SERVER_SERVICES_NAME, Services.class.getName(), TypeFactory.SERVER,
+                        TypeFactory.MANDATORY, TypeFactory.SINGLE),
+                tf.createFcItfType(SERVER_SERVICEMULTICAST_NAME, Service.class.getName(), TypeFactory.SERVER,
+                        TypeFactory.MANDATORY, TypeFactory.SINGLE) });
         servers = new Component[NUMBER_SERVERS];
         for (int i = 0; i < NUMBER_SERVERS; i++) {
             servers[i] = gf.newFcInstance(sType, new ControllerDescription(SERVER_DEFAULT_NAME + i,
@@ -91,17 +89,15 @@ public abstract class CommonSetup extends ComponentTest {
         }
 
         componentType = tf.createFcType(new InterfaceType[] {
-                tf.createFcItfType("Runner", Runner.class.getName(), ProActiveTypeFactory.SERVER,
-                        ProActiveTypeFactory.MANDATORY, ProActiveTypeFactory.SINGLE),
-                tf.createFcItfType(Client.SERVICES_NAME, Services.class.getName(),
-                        ProActiveTypeFactory.CLIENT, ProActiveTypeFactory.MANDATORY,
-                        ProActiveTypeFactory.SINGLE),
-                ((ProActiveTypeFactory) tf).createFcItfType(Client.SERVICEMULTICASTREAL_NAME,
-                        ServiceMulticast.class.getName(), ProActiveTypeFactory.CLIENT,
-                        ProActiveTypeFactory.OPTIONAL, ProActiveTypeFactory.MULTICAST_CARDINALITY),
+                tf.createFcItfType("Runner", Runner.class.getName(), TypeFactory.SERVER,
+                        TypeFactory.MANDATORY, TypeFactory.SINGLE),
+                tf.createFcItfType(Client.SERVICES_NAME, Services.class.getName(), TypeFactory.CLIENT,
+                        TypeFactory.MANDATORY, TypeFactory.SINGLE),
+                ((GCMTypeFactory) tf).createGCMItfType(Client.SERVICEMULTICASTREAL_NAME,
+                        ServiceMulticast.class.getName(), TypeFactory.CLIENT, TypeFactory.OPTIONAL,
+                        GCMTypeFactory.MULTICAST_CARDINALITY),
                 tf.createFcItfType(Client.SERVICEMULTICASTFALSE_NAME, ServiceMulticast.class.getName(),
-                        ProActiveTypeFactory.CLIENT, ProActiveTypeFactory.OPTIONAL,
-                        ProActiveTypeFactory.SINGLE) });
+                        TypeFactory.CLIENT, TypeFactory.OPTIONAL, TypeFactory.SINGLE) });
     }
 
     @After

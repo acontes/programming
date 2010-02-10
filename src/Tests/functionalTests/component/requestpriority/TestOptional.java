@@ -36,6 +36,7 @@
 package functionalTests.component.requestpriority;
 
 import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
@@ -80,7 +81,7 @@ public class TestOptional extends ComponentTest {
 
         assertEquals(Fractal.getNameController(p1).getFcName(), P1_NAME);
 
-        p1.getFcInterface(Constants.REQUEST_PRIORITY_CONTROLLER);
+        p1.getFcInterface(Constants.PRIORITY_CONTROLLER);
     }
 
     @Test(expected = NoSuchInterfaceException.class)
@@ -97,6 +98,6 @@ public class TestOptional extends ComponentTest {
 
         assertEquals(Fractal.getNameController(p1).getFcName(), P2_NAME);
 
-        p1.getFcInterface(Constants.REQUEST_PRIORITY_CONTROLLER);
+        p1.getFcInterface(Constants.PRIORITY_CONTROLLER);
     }
 }

@@ -41,7 +41,7 @@ import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.controller.AbstractProActiveController;
-import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
+import org.objectweb.proactive.core.component.type.ProActiveGCMTypeFactoryImpl;
 
 
 /**
@@ -73,7 +73,7 @@ public class NF1ItfImpl extends AbstractProActiveController implements NF1Itf {
     @Override
     protected void setControllerItfType() {
         try {
-            setItfType(ProActiveTypeFactoryImpl.instance().createFcItfType(NF1Itf.CONTROLLER_NAME,
+            setItfType(ProActiveGCMTypeFactoryImpl.instance().createFcItfType(NF1Itf.CONTROLLER_NAME,
                     NF1Itf.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE));
         } catch (InstantiationException e) {
             e.printStackTrace();
